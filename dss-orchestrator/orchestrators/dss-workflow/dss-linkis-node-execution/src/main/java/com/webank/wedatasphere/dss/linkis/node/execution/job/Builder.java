@@ -17,12 +17,27 @@
 package com.webank.wedatasphere.dss.linkis.node.execution.job;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
+import com.webank.wedatasphere.dss.linkis.node.execution.entity.WorkspaceInfoGetAction;
 import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExecutionErrorException;
+import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLService;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
+import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisUjesClientUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.utils.JsonUtils;
+import org.apache.linkis.httpclient.dws.DWSHttpClient;
+import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
+import org.apache.linkis.httpclient.response.impl.DefaultHttpResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public abstract class Builder {
+
+    protected Logger logger = LoggerFactory.getLogger(getClass());
 
     protected abstract String getJobType();
 
@@ -83,7 +98,43 @@ public abstract class Builder {
         fillJobInfo(job);
         fillLinkisJobInfo(job);
 
+        String workspace = "";
+        try {
+            workspace = getWorkspace(job);
+            logger.info("Get workspace str: " + workspace);
+        } catch (Exception e) {
+            logger.error("Failed to get workspace.", e);
+        }
+        if(job.getRuntimeParams() == null) {
+            job.setRuntimeParams(new HashMap<>());
+        }
+        job.getRuntimeParams().put("workspace", workspace);
         return job;
+    }
+
+    private String getWorkspace(Job job) throws Exception {
+        String user=job.getUser();
+        String linkisUrl = LinkisURLService.Factory.getLinkisURLService().getDefaultLinkisURL(job);
+        String token = LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(job.getJobProps());
+        DWSHttpClient client = null;
+        DWSClientConfig clientConfig = LinkisUjesClientUtils.getClientConfig1_X(linkisUrl, user, token, job.getJobProps());
+        WorkspaceInfoGetAction workspaceInfoGetAction = new WorkspaceInfoGetAction();
+        workspaceInfoGetAction.setURL("/api/rest_j/v1/dss/framework/project/getWorkSpaceStr");
+        workspaceInfoGetAction.setUser(user);
+        try {
+            client = new DWSHttpClient(clientConfig, "Workspace-Fetch-Client-");
+            DefaultHttpResult result = (DefaultHttpResult) client.execute(workspaceInfoGetAction);
+            if (result.getStatusCode() == 200 || result.getStatusCode() == 0) {
+                Map<String, Object> responseBody = JsonUtils.jackson().readValue(result.getResponseBody(), Map.class);
+                Map<String, Object> data = (Map<String, Object>) responseBody.get("data");
+                return (String) data.get("workspaceStr");
+            } else {
+                throw new LinkisJobExecutionErrorException(50063, "Failed to get workspace str, responseBody is: " +
+                        result.getResponseBody());
+            }
+        } finally {
+            IOUtils.closeQuietly(client);
+        }
     }
 
 }

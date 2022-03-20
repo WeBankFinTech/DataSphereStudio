@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
-import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
-import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
-import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationService;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -54,10 +51,8 @@ import com.webank.wedatasphere.dss.standard.app.development.standard.Development
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
-import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -96,23 +91,29 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
         //作为Orchestrator的唯一标识，包括跨环境导入导出也不发生变化。
         dssOrchestratorInfo.setUUID(uuid);
-        //1.往数据库插入一条DSS编排模式
-        orchestratorMapper.addOrchestrator(dssOrchestratorInfo);
 
         String version = OrchestratorUtils.generateNewVersion();
         String contextId = contextService.createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), version, userName);
         LOGGER.info("Create a new ContextId: {} for new orchestrator {}.", contextId, dssOrchestratorInfo.getName());
-        //3. 访问DSS工作流微模块创建工作流
+        //1. 访问DSS工作流微模块创建工作流
         RefJobContentResponseRef appRef = tryRefOperation(dssOrchestratorInfo, userName, workspace, dssLabels, null,
                 developmentService -> ((RefCRUDService) developmentService).getRefCreationOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
                 projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setProjectRefId(projectId),
                 (developmentOperation, developmentRequestRef) -> {
+                    DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
+                            workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssLabels);
+                    Map<String, Object> dssJobContent = MapUtils.newCommonMapBuilder()
+                            .put(OrchestratorRefConstant.DSS_ORCHESTRATOR_INFO_KEY, dssOrchestratorInfo)
+                            .put(OrchestratorRefConstant.ORCHESTRATOR_VERSION_KEY, version)
+                            .put(OrchestratorRefConstant.ORCHESTRATION_SCHEDULER_APP_CONN, dssOrchestrator.getSchedulerAppConn().getAppDesc().getAppName()).build();
                     DSSJobContentRequestRef requestRef = (DSSJobContentRequestRef) developmentRequestRef;
-                    requestRef.setDSSJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.DSS_ORCHESTRATOR_INFO_KEY, dssOrchestratorInfo,
-                            OrchestratorRefConstant.ORCHESTRATOR_VERSION_KEY, version));
+                    requestRef.setDSSJobContent(dssJobContent);
                     return ((RefCreationOperation) developmentOperation).createRef(requestRef);
                 }, "create");
+
+        //2.往数据库插入一条DSS编排模式
+        orchestratorMapper.addOrchestrator(dssOrchestratorInfo);
 
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
         dssOrchestratorVersion.setOrchestratorId(dssOrchestratorInfo.getId());
@@ -146,7 +147,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                                                                                        BiFunction<DevelopmentOperation, K, V> responseRefConsumer,
                                                                                        String operationName) throws DSSErrorException {
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
-                workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssOrchestratorInfo.getAppConnName(), dssLabels);
+                workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssLabels);
+        dssOrchestratorInfo.setAppConnName(dssOrchestrator.getAppConn().getAppDesc().getAppName());
         if (getDevelopmentService == null) {
             getDevelopmentService = DevelopmentIntegrationStandard::getRefCRUDService;
         }

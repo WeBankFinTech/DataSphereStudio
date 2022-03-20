@@ -29,12 +29,10 @@ public interface OrchestratorLoader {
      * @param userName
      * @param workspaceName
      * @param typeName
-     * @param appConnName    唯一标识一种类型的AppConn,比如workflowOrchestratorAppConn
      * @return
      */
     DSSOrchestrator loadOrchestrator(String userName,
                                      String workspaceName,
                                      String typeName,
-                                     String appConnName,
                                      List<DSSLabel> dssLabels);
 }

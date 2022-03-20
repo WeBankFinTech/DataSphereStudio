@@ -9,11 +9,11 @@ import com.webank.wedatasphere.dss.linkis.node.execution.job.{Builder, CommonLin
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf.LinkisJobTypeConf
 import org.apache.commons.lang.StringUtils
-import org.apache.linkis.common.utils.{JsonUtils, Logging}
+import org.apache.linkis.common.utils.JsonUtils
 
 import scala.collection.JavaConverters._
 
-class DolphinSchedulerJobBuilder(jobProps: JMap[String, String]) extends Builder with Logging {
+class DolphinSchedulerJobBuilder(jobProps: JMap[String, String]) extends Builder {
 
   override protected def getJobType: String = jobProps.get(LinkisJobTypeConf.LINKIS_TYPE)
 

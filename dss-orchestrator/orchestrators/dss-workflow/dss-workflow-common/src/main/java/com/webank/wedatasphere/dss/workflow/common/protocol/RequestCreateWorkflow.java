@@ -32,6 +32,7 @@ public class RequestCreateWorkflow {
     private List<String > linkedAppConnNames;
     private List<DSSLabel> dssLabels;
     private String orcVersion;
+    private String schedulerAppConnName;
 
     public RequestCreateWorkflow(String userName,
                                  String workflowName,
@@ -41,7 +42,8 @@ public class RequestCreateWorkflow {
                                  String uses,
                                  List<String> linkedAppConnNames,
                                  List<DSSLabel> dssLabels,
-                                 String orcVersion) {
+                                 String orcVersion,
+                                 String schedulerAppConnName) {
         this.userName = userName;
         this.workflowName = workflowName;
         this.contextIDStr = contextIDStr;
@@ -51,6 +53,7 @@ public class RequestCreateWorkflow {
         this.linkedAppConnNames = linkedAppConnNames;
         this.dssLabels =dssLabels;
         this.orcVersion = orcVersion;
+        this.schedulerAppConnName = schedulerAppConnName;
     }
 
     public String getUserName() {
@@ -122,5 +125,13 @@ public class RequestCreateWorkflow {
 
     public void setOrcVersion(String orcVersion) {
         this.orcVersion = orcVersion;
+    }
+
+    public String getSchedulerAppConnName() {
+        return schedulerAppConnName;
+    }
+
+    public void setSchedulerAppConnName(String schedulerAppConnName) {
+        this.schedulerAppConnName = schedulerAppConnName;
     }
 }

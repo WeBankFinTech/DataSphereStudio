@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
@@ -39,12 +40,15 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
+import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
+import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.apache.linkis.server.BDPJettyServerHelper;
@@ -57,6 +61,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.DEFAULT_SCHEDULER_APP_CONN;
 
 @Component
 public class DefaultWorkFlowManager implements WorkFlowManager {
@@ -76,6 +82,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
     @Autowired
     private MetaInputService metaInputService;
+    @Autowired
+    private WorkFlowParser workFlowParser;
 
     @Override
     public DSSFlow createWorkflow(String userName,
@@ -86,7 +94,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                   String uses,
                                   List<String> linkedAppConnNames,
                                   List<DSSLabel> dssLabels,
-                                  String orcVersion) throws DSSErrorException, JsonProcessingException {
+                                  String orcVersion,
+                                  String schedulerAppConn) throws DSSErrorException, JsonProcessingException {
         DSSFlow dssFlow = new DSSFlow();
         dssFlow.setName(flowName);
         dssFlow.setDescription(description);
@@ -96,8 +105,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         dssFlow.setSource("create by user");
         dssFlow.setUses(uses);
 
-        String appConnJson = BDPJettyServerHelper.jacksonJson().writeValueAsString(linkedAppConnNames);
-        dssFlow.setLinkedAppConnNames(appConnJson);
+        dssFlow.setLinkedAppConnNames(String.join(",", linkedAppConnNames));
         Map<String, String> dssLabelList = new HashMap<>(1);
         if (null != dssLabels) {
             dssLabels.stream().map(DSSLabel::getValue).forEach(a->{
@@ -112,14 +120,14 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             dssFlow.setRootFlow(true);
             dssFlow.setRank(0);
             dssFlow.setHasSaved(true);
-            dssFlow = flowService.addFlow(dssFlow, contextIdStr, orcVersion);
+            dssFlow = flowService.addFlow(dssFlow, contextIdStr, orcVersion, schedulerAppConn);
         } else {
             dssFlow.setRootFlow(false);
             Integer rank = flowService.getParentRank(parentFlowId);
             // TODO: 2019/6/3 并发问题考虑for update
             dssFlow.setRank(rank + 1);
             dssFlow.setHasSaved(true);
-            dssFlow = flowService.addSubFlow(dssFlow, parentFlowId, contextIdStr, orcVersion);
+            dssFlow = flowService.addSubFlow(dssFlow, parentFlowId, contextIdStr, orcVersion, schedulerAppConn);
         }
         return dssFlow;
     }
@@ -199,37 +207,67 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException {
+    public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) {
         //TODO try to optimize it by select db in batch.
         List<ImmutablePair<DSSFlow, Long>> flowInfos = requestConversionWorkflow.getOrchestrationIdMap().entrySet()
                 .stream().map(entry -> new ImmutablePair<>(flowService.getFlowWithJsonAndSubFlowsByID(entry.getKey()), entry.getValue()))
                 .collect(Collectors.toList());
         List<DSSFlow> flows = flowInfos.stream().map(ImmutablePair::getKey).collect(Collectors.toList());
-        SchedulerAppConn appConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
+        // 区分各个工作流所归属的调度系统
+        List<ResponseOperateOrchestrator> responseList = new ArrayList<>();
+        flows.stream().map(DSSExceptionUtils.map(flow -> {
+            String schedulerAppConnName = workFlowParser.getValueWithKey(flow.getFlowJson(), DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME);
+            if(StringUtils.isBlank(schedulerAppConnName)) {
+                // 向下兼容老版本
+                schedulerAppConnName = DEFAULT_SCHEDULER_APP_CONN.getValue();
+            }
+            return new ImmutablePair<>(schedulerAppConnName, flow);
+        })).collect(Collectors.groupingBy(ImmutablePair::getKey)).forEach((appConnName, pairList) -> {
+            List<DSSFlow> selectedFlows = pairList.stream().map(ImmutablePair::getValue).collect(Collectors.toList());
+            ResponseOperateOrchestrator response = convert(requestConversionWorkflow, appConnName, selectedFlows, flowInfos);
+            responseList.add(response);
+        });
+        List<ResponseOperateOrchestrator> failedResponseList = responseList.stream().filter(ResponseOperateOrchestrator::isFailed).collect(Collectors.toList());
+        if(!failedResponseList.isEmpty()) {
+            return ResponseOperateOrchestrator.failed("由于该 Project 包含指向多个调度系统的工作流，发布过程中有一部分失败了。失败部分如下："
+                    + failedResponseList.stream().map(ResponseOperateOrchestrator::getMessage).collect(Collectors.joining("; ")));
+        } else {
+            return responseList.get(0);
+        }
+    }
+
+    private ResponseOperateOrchestrator convert(RequestConvertOrchestrations requestConversionWorkflow,
+                                                String schedulerAppConnName,
+                                                List<DSSFlow> flows,
+                                                List<ImmutablePair<DSSFlow, Long>> flowInfos) {
+        SchedulerAppConn appConn = (SchedulerAppConn) AppConnManager.getAppConnManager().getAppConn(schedulerAppConnName);
         AppInstance schedulerInstance = appConn.getAppDesc().getAppInstances().get(0);
         DSSToRelConversionOperation operation = appConn.getOrCreateConversionStandard()
-            .getDSSToRelConversionService(schedulerInstance).getDSSToRelConversionOperation();
+                .getDSSToRelConversionService(schedulerInstance).getDSSToRelConversionOperation();
         DSSToRelConversionRequestRef requestRef = RequestRefUtils.getRequestRef(operation);
         requestRef.setDSSProject((DSSProject) requestConversionWorkflow.getProject())
                 .setUserName(requestConversionWorkflow.getUserName())
                 .setWorkspace((Workspace) requestConversionWorkflow.getWorkspace());
         if(requestRef instanceof ProjectToRelConversionRequestRef) {
-            Map<String, Long> orchestrationMap = flowInfos.stream().map(pair -> new ImmutablePair<>(pair.getKey().getName(), pair.getValue()))
+            Map<String, Long> orchestrationMap = flowInfos.stream().filter(pair -> flows.contains(pair.getKey()))
+                    .map(pair -> new ImmutablePair<>(pair.getKey().getName(), pair.getValue()))
                     .collect(HashMap::new, (map, pair) -> map.put(pair.getKey(), pair.getValue()), HashMap::putAll);
             ((ProjectToRelConversionRequestRef) requestRef).setDSSOrcList(flows).setRefOrchestrationId(orchestrationMap);
         } else if(requestRef instanceof OrchestrationToRelConversionRequestRef) {
-            ((OrchestrationToRelConversionRequestRef) requestRef).setDSSOrchestration(flows.get(0))
-                    .setRefOrchestrationId(flowInfos.get(0).getValue());
+            flowInfos.stream().filter(pair -> pair.getKey() == flows.get(0)).forEach( pair ->
+                    ((OrchestrationToRelConversionRequestRef) requestRef).setDSSOrchestration(pair.getKey())
+                            .setRefOrchestrationId(pair.getValue())
+            );
         }
         try{
             ResponseRef responseRef = operation.convert(requestRef);
             if(responseRef.isFailed()) {
-                return ResponseOperateOrchestrator.failed(responseRef.getErrorMsg());
+                return ResponseOperateOrchestrator.failed("publish to " + schedulerAppConnName + "failed! Reason: " + responseRef.getErrorMsg());
             }
             return ResponseOperateOrchestrator.success();
         } catch (Exception e) {
-            logger.error("user {} convert workflow(s) {} failed.", requestConversionWorkflow.getUserName(),
-                    flows.stream().map(DSSFlow::getName).collect(Collectors.joining(", ")), e);
+            logger.error("user {} convert workflow(s) {} to {} failed.", requestConversionWorkflow.getUserName(),
+                    flows.stream().map(DSSFlow::getName).collect(Collectors.joining(", ")), schedulerAppConnName, e);
             return ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(e));
         }
     }

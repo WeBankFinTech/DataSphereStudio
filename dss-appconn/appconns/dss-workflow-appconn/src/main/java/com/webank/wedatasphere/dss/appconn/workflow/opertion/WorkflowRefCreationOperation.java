@@ -50,13 +50,14 @@ public class WorkflowRefCreationOperation
         String description = dssOrchestratorInfo.getDesc();
         List<DSSLabel> dssLabels = requestRef.getDSSLabels();
         String orcVersion = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATOR_VERSION_KEY);
+        String schedulerAppConnName = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATION_SCHEDULER_APP_CONN);
         long parentFlowId = -1L;
         List<String> linkedAppConnNames = dssOrchestratorInfo.getLinkedAppConnNames() != null ?
                 dssOrchestratorInfo.getLinkedAppConnNames() : new ArrayList<>();
         String uses = dssOrchestratorInfo.getUses() != null ?
                 dssOrchestratorInfo.getUses() : "uses";
         RequestCreateWorkflow requestCreateWorkflow = new RequestCreateWorkflow(userName, workflowName,
-                contextId, description, parentFlowId, uses, linkedAppConnNames, dssLabels, orcVersion);
+                contextId, description, parentFlowId, uses, linkedAppConnNames, dssLabels, orcVersion, schedulerAppConnName);
 
         ResponseCreateWorkflow responseCreateWorkflow = (ResponseCreateWorkflow) sender.ask(requestCreateWorkflow);
         Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCreateWorkflow.getDssFlow().getId(),

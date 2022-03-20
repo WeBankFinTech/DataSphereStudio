@@ -40,7 +40,8 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       val dssFlow = workflowManager.createWorkflow(reqCreateFlow.getUserName, reqCreateFlow.getWorkflowName,
         reqCreateFlow.getContextIDStr, reqCreateFlow.getDescription,
         reqCreateFlow.getParentFlowID, reqCreateFlow.getUses,
-        reqCreateFlow.getLinkedAppConnNames, reqCreateFlow.getDssLabels, reqCreateFlow.getOrcVersion)
+        reqCreateFlow.getLinkedAppConnNames, reqCreateFlow.getDssLabels, reqCreateFlow.getOrcVersion,
+        reqCreateFlow.getSchedulerAppConnName)
       val responseCreateWorkflow = new ResponseCreateWorkflow()
       responseCreateWorkflow.setDssFlow(dssFlow)
       responseCreateWorkflow

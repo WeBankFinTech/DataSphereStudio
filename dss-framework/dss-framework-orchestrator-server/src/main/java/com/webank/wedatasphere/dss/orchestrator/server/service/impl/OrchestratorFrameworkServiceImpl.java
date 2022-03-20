@@ -54,6 +54,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +105,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setProjectId(orchestratorCreateRequest.getProjectId());
         dssOrchestratorInfo.setComment(orchestratorCreateRequest.getDescription());
         dssOrchestratorInfo.setSecondaryType(orchestratorCreateRequest.getOrchestratorWays().toString());
+        dssOrchestratorInfo.setUses(orchestratorCreateRequest.getUses());
         //new field
         dssOrchestratorInfo.setWorkspaceId(workspace.getWorkspaceId());
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorCreateRequest.getOrchestratorWays()));
@@ -218,7 +220,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorDeleteRequest.getLabels().getRoute()));
-        tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, null,
+        tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, orchestratorInfo,
                 OrchestrationService::getOrchestrationDeletionOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
                         .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
@@ -267,8 +269,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private boolean hasProjectEditPriv(Long projectId, String username) {
         ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
                 .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username));
-        return projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank())
-                || projectUserAuthResponse.getProjectOwner().equals(username);
+        boolean hasEditPriv = false;
+        if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+            hasEditPriv = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
+        }
+        return hasEditPriv || projectUserAuthResponse.getProjectOwner().equals(username);
     }
 
 }

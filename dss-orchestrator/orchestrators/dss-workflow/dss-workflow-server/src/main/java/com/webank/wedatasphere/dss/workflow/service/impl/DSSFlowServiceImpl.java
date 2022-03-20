@@ -68,7 +68,7 @@ import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.
 
 @Service
 public class DSSFlowServiceImpl implements DSSFlowService {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private FlowMapper flowMapper;
     @Autowired
@@ -105,13 +105,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         cyFlow.setFlowJson(query.get("string").toString());
 
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(parentFlowId);
+        logger.info("find subFlow_ids:{} for parentFlow_id:{}", subFlowIDs, parentFlowId);
         for (Long subFlowID : subFlowIDs) {
             if (cyFlow.getChildren() == null) {
                 cyFlow.setChildren(new ArrayList<DSSFlow>());
             }
-            DSSFlow SubFlow = genDSSFlowTree(subFlowID);
+            DSSFlow subFlow = genDSSFlowTree(subFlowID);
 
-            cyFlow.addChildren(SubFlow);
+            cyFlow.addChildren(subFlow);
         }
         return cyFlow;
     }
@@ -133,7 +134,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (StringUtils.isNotBlank(contextID)) {
             flowJsonMap.put(CSCommonUtils.CONTEXT_ID_STR, contextID);
         }
-        if(StringUtils.isNotBlank(orcVersion)) {
+        if (StringUtils.isNotBlank(orcVersion)) {
             flowJsonMap.put(DSSJobContentConstant.ORC_VERSION_KEY, orcVersion);
         }
         if(StringUtils.isNotBlank(schedulerAppConn)) {
@@ -324,7 +325,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         //封装flow信息
         cyFlow.setCreator(userName);
         cyFlow.setCreateTime(new Date());
-        if(StringUtils.isNotBlank(description)) {
+        if (StringUtils.isNotBlank(description)) {
             cyFlow.setDescription(description);
         }
         cyFlow.setId(null);
@@ -453,7 +454,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
                     throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                 }
-            } else if(nodeJsonMap.get("jobContent") != null) {
+            } else if (nodeJsonMap.get("jobContent") != null) {
                 CommonAppConnNode newNode = new CommonAppConnNode();
                 CommonAppConnNode oldNode = new CommonAppConnNode();
                 oldNode.setJobContent((Map<String, Object>) nodeJsonMap.get("jobContent"));

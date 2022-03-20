@@ -23,7 +23,7 @@ public class DolphinSchedulerWorkflowToRelConverter implements WorkflowToRelConv
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey)
                 .collect(Collectors.joining(", "));
-        if (!StringUtils.isNotEmpty(repeatNodes)) {
+        if (StringUtils.isNotEmpty(repeatNodes)) {
             throw new DSSRuntimeException(80001, "重复的节点名称：" + repeatNodes);
         }
         DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel = new DolphinSchedulerConvertedRel(rel);

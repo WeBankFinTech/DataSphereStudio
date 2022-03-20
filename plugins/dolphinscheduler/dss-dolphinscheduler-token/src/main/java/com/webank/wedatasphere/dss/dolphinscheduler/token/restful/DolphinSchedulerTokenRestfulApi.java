@@ -24,13 +24,12 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class DolphinSchedulerTokenRestfulApi {
 
+    public static final String DOLPHIN_SCHEDULER_APP_CONN_NAME = "dolphinscheduler";
+
     @RequestMapping(path ="/ds/token", method = RequestMethod.GET)
     public Message dsApiServiceTokenCreate(HttpServletRequest req) {
         String userName = SecurityFilter.getLoginUsername(req);
-        SchedulerAppConn schedulerAppConn = AppConnManager.getAppConnManager().getAppConn(SchedulerAppConn.class);
-        if("dolphinscheduler".equals(schedulerAppConn.getAppDesc().getAppName().toLowerCase())) {
-            return Message.error("Ask for a token failed, the integrated Scheduler is not DolphinScheduler.");
-        }
+        SchedulerAppConn schedulerAppConn = (SchedulerAppConn) AppConnManager.getAppConnManager().getAppConn(DOLPHIN_SCHEDULER_APP_CONN_NAME);
         AppInstance appInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
         OptionalOperation optionalOperation = ((OptionalAppConn) schedulerAppConn).getOrCreateOptionalStandard()
                 .getOptionalService(appInstance).getOptionalOperation("getToken");

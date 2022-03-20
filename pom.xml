@@ -39,8 +39,7 @@
         <module>dss-data-governance</module>
         <module>dss-apps/dss-user-guide</module>
         <module>assembly</module>
-<!--        <module>plugins/dolphinscheduler/dolphinscheduler-prod-metrics</module>-->
-        <module>plugins/dolphinscheduler/dss-dolphinscheduler-token</module>
+        <module>plugins/dolphinscheduler</module>
     </modules>
 
     <properties>

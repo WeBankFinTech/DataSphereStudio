@@ -208,8 +208,8 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
         return orchestratorMode;
     }
 
-    public void setOrchestratorMode(String orchestratoMode) {
-        this.orchestratorMode = orchestratoMode;
+    public void setOrchestratorMode(String orchestratorMode) {
+        this.orchestratorMode = orchestratorMode;
     }
 
     public String getOrchestratorWay() {

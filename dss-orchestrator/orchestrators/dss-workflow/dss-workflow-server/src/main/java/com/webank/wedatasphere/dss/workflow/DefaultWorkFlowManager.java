@@ -208,6 +208,13 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
     @Override
     public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) {
+        if(requestConversionWorkflow.getOrchestrationIdMap() == null || requestConversionWorkflow.getOrchestrationIdMap().isEmpty()) {
+            logger.info("the project {} has no workflow, the conversion by user {} is ignored.", requestConversionWorkflow.getProject().getName(),
+                    requestConversionWorkflow.getUserName());
+            return ResponseOperateOrchestrator.failed("No workflow found, publish is ignored.");
+        }
+        logger.info("user {} try to convert workflow(s) {} in project {} to SchedulerAppConn(s).", requestConversionWorkflow.getUserName(),
+                requestConversionWorkflow.getOrchestrationIdMap().keySet(), requestConversionWorkflow.getProject().getName());
         //TODO try to optimize it by select db in batch.
         List<ImmutablePair<DSSFlow, Long>> flowInfos = requestConversionWorkflow.getOrchestrationIdMap().entrySet()
                 .stream().map(entry -> new ImmutablePair<>(flowService.getFlowWithJsonAndSubFlowsByID(entry.getKey()), entry.getValue()))
@@ -240,6 +247,9 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                                 String schedulerAppConnName,
                                                 List<DSSFlow> flows,
                                                 List<ImmutablePair<DSSFlow, Long>> flowInfos) {
+        String convertFlowStr = flows.stream().map(DSSFlow::getName).collect(Collectors.joining(", "));
+        logger.info("user {} try to convert workflow(s) {} to SchedulerAppConn {}.", requestConversionWorkflow.getUserName(),
+                convertFlowStr, schedulerAppConnName);
         SchedulerAppConn appConn = (SchedulerAppConn) AppConnManager.getAppConnManager().getAppConn(schedulerAppConnName);
         AppInstance schedulerInstance = appConn.getAppDesc().getAppInstances().get(0);
         DSSToRelConversionOperation operation = appConn.getOrCreateConversionStandard()
@@ -262,13 +272,17 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         try{
             ResponseRef responseRef = operation.convert(requestRef);
             if(responseRef.isFailed()) {
-                return ResponseOperateOrchestrator.failed("publish to " + schedulerAppConnName + "failed! Reason: " + responseRef.getErrorMsg());
+                logger.error("user {} convert workflow(s) {} to {} failed, Reason: {}.", requestConversionWorkflow.getUserName(),
+                        convertFlowStr, schedulerAppConnName, responseRef.getErrorMsg());
+                return ResponseOperateOrchestrator.failed("workflow(s) " + convertFlowStr + " publish to " + schedulerAppConnName + "failed! Reason: "
+                        + responseRef.getErrorMsg());
             }
             return ResponseOperateOrchestrator.success();
         } catch (Exception e) {
             logger.error("user {} convert workflow(s) {} to {} failed.", requestConversionWorkflow.getUserName(),
-                    flows.stream().map(DSSFlow::getName).collect(Collectors.joining(", ")), schedulerAppConnName, e);
-            return ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(e));
+                    convertFlowStr, schedulerAppConnName, e);
+            return ResponseOperateOrchestrator.failed("Workflow(s) " + convertFlowStr + " publish to " + schedulerAppConnName +
+                    "failed! Reason: " + ExceptionUtils.getRootCauseMessage(e));
         }
     }
 }

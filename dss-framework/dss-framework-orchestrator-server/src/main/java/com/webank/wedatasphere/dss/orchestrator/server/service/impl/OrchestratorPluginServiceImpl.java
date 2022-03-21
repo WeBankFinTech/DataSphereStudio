@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
@@ -66,6 +67,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Override
     public ResponseConvertOrchestrator convertOrchestration(RequestFrameworkConvertOrchestration requestConversionOrchestration) {
+        LOGGER.info("conversion request is called, request is {}.", DSSCommonUtils.COMMON_GSON.toJson(requestConversionOrchestration));
         Long toPublishOrcId;
         if(requestConversionOrchestration.getOrcAppId() != null) {
             OrchestratorInfo orchestratorInfo = orchestratorMapper.getOrcInfoByAppId(requestConversionOrchestration.getOrcAppId());
@@ -117,12 +119,12 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 }
             }
             if(requestConversionOrchestration.getOrcIds() != null && !requestConversionOrchestration.getOrcIds().isEmpty()) {
-                publishedOrcIds.addAll(requestConversionOrchestration.getOrcIds());
                 for (Long orcId : requestConversionOrchestration.getOrcIds()) {
                     DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,1);
                     if (dssOrchestratorVersion == null) {
                         continue;
                     }
+                    publishedOrcIds.add(orcId);
                     DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration = orchestratorMapper.getRefOrchestrationId(orcId);
                     if(dssOrchestratorRefOrchestration != null) {
                         orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), dssOrchestratorRefOrchestration.getRefOrchestrationId());
@@ -132,8 +134,15 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 }
             }
         }
+        if(orchestrationIdMap.isEmpty()) {
+            LOGGER.info("the project {} has no suitable workflow, the publish by user {} is ignored.", projectId,
+                    requestConversionOrchestration.getUserName());
+            return new ResponseConvertOrchestrator("no-necessary-id", ResponseOperateOrchestrator.failed("No suitable workflow(s) found, publish is ignored."));
+        }
         OrchestratorConversionJob job = new OrchestratorConversionJob();
         job.setId(generateId());
+        LOGGER.info("user {} try to submit a conversion job {}, the orchestrationIdMap is {}, the orcIdList is {}.", requestConversionOrchestration.getUserName(),
+                job.getId(), orchestrationIdMap, publishedOrcIds);
         ConversionJobEntity entity = new ConversionJobEntity();
         entity.setResponse(ResponseOperateOrchestrator.inited());
         entity.setCreateTime(new Date());

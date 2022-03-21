@@ -4,7 +4,7 @@ delete from `dss_appconn_instance` where `appconn_id`=@dss_appconn_dolphinschedu
 delete from `dss_appconn` where `appconn_name`='dolphinscheduler';
 
 INSERT INTO `dss_appconn` (`appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`)
-VALUES ('dolphinscheduler', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinschedulerAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/dolphinscheduler/lib', '');
+VALUES ('dolphinscheduler', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/dolphinscheduler/lib', '');
 
 select @dss_appconn_dolphinschedulerId:=id from `dss_appconn` where `appconn_name` = 'dolphinscheduler';
 insert into `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) values(@dss_appconn_dolphinschedulerId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/');

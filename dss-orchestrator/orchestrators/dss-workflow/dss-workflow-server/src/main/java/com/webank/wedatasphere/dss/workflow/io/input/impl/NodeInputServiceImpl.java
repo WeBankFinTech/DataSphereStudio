@@ -20,8 +20,10 @@ package com.webank.wedatasphere.dss.workflow.io.input.impl;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
@@ -43,6 +45,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @Service
 public class NodeInputServiceImpl implements NodeInputService {
@@ -115,15 +118,16 @@ public class NodeInputServiceImpl implements NodeInputService {
         File file = new File(nodeResourcePath);
         if (file.exists()) {
             InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);
-            Map<String, Object> bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
+            Supplier<Map<String, Object>> bmlResourceMap = () -> bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
                     projectName);
+            Supplier<Map<String, Object>> streamResourceMap = () -> MapUtils.newCommonMap(ImportRequestRef.INPUT_STREAM_KEY, resourceInputStream);
             try {
-                nodeExportContent = nodeService.importNode(userName, appConnNode, bmlReturnMap, orcVersion);
+                nodeExportContent = nodeService.importNode(userName, appConnNode, bmlResourceMap, streamResourceMap, orcVersion);
             } catch (ExternalOperationFailedException e) {
-                logger.error("failed to import node ", e);
+                logger.error("failed to import node.", e);
                 throw new DSSErrorException(e.getErrCode(), e.getMessage());
             } catch (Exception e) {
-                logger.error("failed to import node ", e);
+                logger.error("failed to import node.", e);
                 throw new DSSErrorException(90011, e.getMessage());
             }
             if (nodeExportContent != null) {

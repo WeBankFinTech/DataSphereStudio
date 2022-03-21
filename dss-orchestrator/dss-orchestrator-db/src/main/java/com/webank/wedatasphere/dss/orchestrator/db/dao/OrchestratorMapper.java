@@ -45,6 +45,19 @@ public interface OrchestratorMapper {
     DSSOrchestratorVersion getOrchestratorVersion(Long versionId);
 
     /**
+     * 获取orc指定版本信息
+     *
+     * @param orchestratorId id
+     * @param orcVersionId   orc版本id
+     * @param validFlag      有效标志
+     * @return DSSOrchestratorVersion
+     */
+    DSSOrchestratorVersion getOrcVersionByIdAndOrcVersionId(@Param("orchestratorId") Long orchestratorId,
+                                                            @Param("orcVersionId") Long orcVersionId,
+                                                            @Param("validFlag") Integer validFlag);
+
+
+    /**
      * 根据id查找最新的版本信息
      *
      * @param orchestratorId

@@ -78,6 +78,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     @Autowired
     private ContextService contextService;
 
+    private static final int VALID_FLAG = 1;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrchestratorVo createOrchestrator(String userName,
@@ -127,7 +129,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         dssOrchestratorVersion.setUpdater(userName);
         dssOrchestratorVersion.setVersion(version);
         dssOrchestratorVersion.setUpdateTime(new Date());
-        dssOrchestratorVersion.setValidFlag(1);
+        dssOrchestratorVersion.setValidFlag(VALID_FLAG);
         dssOrchestratorVersion.setFormatContextId(contextId);
         // 4. 持久化编排的版本信息
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
@@ -165,7 +167,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                                    DSSOrchestratorInfo dssOrchestratorInfo,
                                    List<DSSLabel> dssLabels) throws Exception {
         orchestratorMapper.updateOrchestrator(dssOrchestratorInfo);
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(dssOrchestratorInfo.getId(), 1);
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(dssOrchestratorInfo.getId(), VALID_FLAG);
 
         tryRefOperation(dssOrchestratorInfo, userName, workspace, dssLabels, null,
                 developmentService -> ((RefCRUDService) developmentService).getRefUpdateOperation(),
@@ -232,7 +234,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     @Override
     public String openOrchestrator(String userName, Workspace workspace, Long orchestratorId, List<DSSLabel> dssLabels) throws Exception {
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, VALID_FLAG);
         if (null == dssOrchestratorInfo || null == dssOrchestratorVersion) {
             throw new DSSOrchestratorErrorException(1000856, "can not find orc from db for orcId: " + orchestratorId);
         }
@@ -255,7 +257,18 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     public OrchestratorVo getOrchestratorVoById(Long orchestratorId) {
 
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, VALID_FLAG);
+
+        OrchestratorVo orchestratorVo = new OrchestratorVo();
+        orchestratorVo.setDssOrchestratorInfo(dssOrchestratorInfo);
+        orchestratorVo.setDssOrchestratorVersion(dssOrchestratorVersion);
+        return orchestratorVo;
+    }
+
+    @Override
+    public OrchestratorVo getOrchestratorVoByIdAndOrcVersionId(Long orchestratorId, Long orcVersionId) {
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getOrcVersionByIdAndOrcVersionId(orchestratorId, orcVersionId, VALID_FLAG);
 
         OrchestratorVo orchestratorVo = new OrchestratorVo();
         orchestratorVo.setDssOrchestratorInfo(dssOrchestratorInfo);

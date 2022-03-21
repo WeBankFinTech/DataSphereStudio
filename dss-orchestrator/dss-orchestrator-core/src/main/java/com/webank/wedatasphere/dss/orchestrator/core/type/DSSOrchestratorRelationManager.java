@@ -23,7 +23,7 @@ public class DSSOrchestratorRelationManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSOrchestratorRelationManager.class);
 
-    private static final List<DSSOrchestratorRelation> dssOrchestratorRelations = ClassUtils.getInstances(DSSOrchestratorRelation.class);
+    private static final List<DSSOrchestratorRelation> dssOrchestratorRelations = ClassUtils.getInstances(DSSOrchestratorRelation.class, c -> c != OrchestratorJsonRelation.class);
 
     static {
         int index = 1;

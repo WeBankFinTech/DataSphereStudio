@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.service;
 
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.entity.AbstractAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public interface WorkflowNodeService {
 
@@ -55,11 +57,12 @@ public interface WorkflowNodeService {
     }
 
     Map<String, Object> importNode(String userName,
-                                           CommonAppConnNode node,
-                                           Map<String, Object> resourceMap,
-                                           String orcVersion) throws Exception;
+                                   CommonAppConnNode node,
+                                   Supplier<Map<String, Object>> getBmlResourceMap,
+                                   Supplier<Map<String, Object>> getStreamResourceMap,
+                                   String orcVersion) throws Exception;
 
-    Map<String, Object> exportNode(String userName, CommonAppConnNode node);
+    ExportResponseRef exportNode(String userName, CommonAppConnNode node);
 
     String getNodeJumpUrl(Map<String, Object> params, CommonAppConnNode node, String userName) throws ExternalOperationFailedException;
 

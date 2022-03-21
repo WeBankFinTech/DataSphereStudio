@@ -33,7 +33,8 @@ public class DolphinSchedulerProjectCreationOperation
     @Override
     public void init() {
         super.init();
-        this.projectUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "projects/create" : getBaseUrl() + "/projects/create";
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.projectUrl = mergeUrl(baseUrl, "projects/create");
     }
 
     @Override

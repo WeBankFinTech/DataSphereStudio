@@ -31,11 +31,9 @@ public class DolphinSchedulerProjectGrantOperation
     @Override
     public void init() {
         super.init();
-        String baseUrl = getBaseUrl();
-        this.grantProjectUrl =
-                baseUrl.endsWith("/") ? baseUrl + "users/grant-project" : baseUrl + "/users/grant-project";
-        this.authedProjectUrl =
-                baseUrl.endsWith("/") ? baseUrl + "projects/authed-project" : baseUrl + "/projects/authed-project";
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.grantProjectUrl = mergeUrl(baseUrl, "users/grant-project");
+        this.authedProjectUrl = mergeUrl(baseUrl, "projects/authed-project");
     }
 
 

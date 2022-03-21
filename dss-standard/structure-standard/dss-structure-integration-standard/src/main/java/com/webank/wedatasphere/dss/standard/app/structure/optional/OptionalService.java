@@ -1,10 +1,10 @@
 package com.webank.wedatasphere.dss.standard.app.structure.optional;
 
-import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.app.structure.OptionalIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.app.AppIntegrationServiceImpl;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
@@ -21,13 +21,13 @@ public class OptionalService extends AppIntegrationServiceImpl<SSORequestService
     private OptionalIntegrationStandard appStandard;
 
     public void init() {
-        operations = ClassUtils.getInstances(OptionalOperation.class);
+        operations = AppStandardClassUtils.getInstance(appStandard.getAppConnName()).getInstances(OptionalOperation.class);
         operations.forEach(optionalOperation -> {
             optionalOperation.setOptionalService(this);
             optionalOperation.init();
         });
-        LoggerFactory.getLogger(OptionalService.class).info("The appInstance " + getAppInstance().getBaseUrl() +
-                " inited a list of OptionalOperations: " + operations.stream().map(OptionalOperation::getOperationName).collect(Collectors.joining(", ")));
+        LoggerFactory.getLogger(OptionalService.class).info("The AppConn {} initialized a list of OptionalOperations {}.",
+                getAppInstance().getBaseUrl(), operations.stream().map(OptionalOperation::getOperationName).collect(Collectors.joining(", ")));
     }
 
     public OptionalOperation getOptionalOperation(String operationName) {
@@ -42,4 +42,5 @@ public class OptionalService extends AppIntegrationServiceImpl<SSORequestService
     public OptionalIntegrationStandard getAppStandard() {
         return appStandard;
     }
+
 }

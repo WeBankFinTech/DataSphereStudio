@@ -29,15 +29,13 @@ public class DolphinSchedulerProjectSearchOperation
 
     @Override
     public ProjectResponseRef searchProject(RefProjectContentRequestRef.RefProjectContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
-        int i = 1;
         String url = this.listPagingUrl + "?pageNo=1&pageSize=40&searchVal=" + requestRef.getProjectName();
         DolphinSchedulerPageInfoResponseRef responseRef = DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, url, requestRef.getUserName());
         return responseRef.getTotalList().stream().filter(project -> requestRef.getProjectName().equals(project.get("name")))
                 .map(project -> {
                     Long id = Long.parseLong(project.get("id").toString());
                     return ProjectResponseRef.newExternalBuilder().setRefProjectId(id).success();
-                }).findAny().orElseThrow(() ->
-                new ExternalOperationFailedException(90023, "DolphinScheduler 查询不到项目 " + requestRef.getProjectName()));
+                }).findAny().orElse(ProjectResponseRef.newExternalBuilder().success());
     }
 
 }

@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.linkis.node.execution.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.conf.Configuration;
+
 import java.util.Map;
 
 public class LinkisJobExecutionConfiguration {
@@ -84,6 +85,8 @@ public class LinkisJobExecutionConfiguration {
 
     //兼容老版本
     public static final CommonVars<String> LINKIS_DEFAULT_VERSION = CommonVars.apply("wds.dss.workflow.execution.linkis.version",  "1.0.0");
+
+    public static final CommonVars<Boolean> LINKIS_DISCOVERY_ENABLE = CommonVars.apply("wds.dss.workflow.execution.linkis.discovery.enable",  false);
 
     public static boolean isLinkis1_X(Map<String, String> props) {
         return props.getOrDefault(LinkisJobExecutionConfiguration.LINKIS_VERSION_KEY,"")

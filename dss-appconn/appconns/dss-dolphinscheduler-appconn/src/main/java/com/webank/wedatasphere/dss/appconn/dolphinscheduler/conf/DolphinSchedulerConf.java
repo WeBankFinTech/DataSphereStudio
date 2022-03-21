@@ -17,4 +17,5 @@ public interface DolphinSchedulerConf {
 
     CommonVars<String> DSS_DOLPHINSCHEDULER_CLIENT_HOME = CommonVars.apply("wds.dss.appconn.ds.client.home", "${DSS_DOLPHINSCHEDULER_CLIENT_HOME}");
 
+    CommonVars<String> DOLPHIN_SCHEDULER_URI_PREFIX = CommonVars.apply("wds.dss.appconn.ds.url.prefix", "");
 }

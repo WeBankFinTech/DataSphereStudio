@@ -23,8 +23,8 @@ public class DolphinSchedulerProjectSearchOperation
     @Override
     public void init() {
         super.init();
-        this.listPagingUrl = getBaseUrl().endsWith("/") ?
-                getBaseUrl() + "projects/list-paging" : getBaseUrl() + "/projects/list-paging";
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.listPagingUrl = mergeUrl(baseUrl, "projects/list-paging");
     }
 
     @Override

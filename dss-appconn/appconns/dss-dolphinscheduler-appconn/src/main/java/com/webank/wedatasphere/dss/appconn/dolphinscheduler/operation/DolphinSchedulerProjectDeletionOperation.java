@@ -28,8 +28,8 @@ public class DolphinSchedulerProjectDeletionOperation
     @Override
     public void init() {
         super.init();
-        String baseUrl = getBaseUrl();
-        this.deleteProjectByIdUrl = baseUrl.endsWith("/") ? baseUrl + "projects/delete" : baseUrl + "/projects/delete";
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.deleteProjectByIdUrl = mergeUrl(baseUrl, "projects/delete");
     }
 
     @Override

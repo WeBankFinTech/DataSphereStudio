@@ -25,7 +25,8 @@ public class DolphinSchedulerWorkflowSearchOperation
     @Override
     public void init() {
         super.init();
-        this.getProcessDefinitionByIdUrl = mergeBaseUrl("projects/${projectName}/process/list");
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.getProcessDefinitionByIdUrl = mergeUrl(baseUrl, "projects/${projectName}/process/list");
     }
 
     @Override

@@ -32,8 +32,9 @@ implements OrchestrationUpdateOperation<OrchestrationUpdateRequestRef.Orchestrat
     @Override
     public void init() {
         super.init();
-        this.updateProcessDefinitionByIdUrl = mergeBaseUrl("projects/${projectName}/process/update");
-        this.selectProcessDefinitionByIdUrl = mergeBaseUrl("projects/${projectName}/process/select-by-id");
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.updateProcessDefinitionByIdUrl = mergeUrl(baseUrl, "projects/${projectName}/process/update");
+        this.selectProcessDefinitionByIdUrl = mergeUrl(baseUrl, "projects/${projectName}/process/select-by-id");
     }
 
     @Override

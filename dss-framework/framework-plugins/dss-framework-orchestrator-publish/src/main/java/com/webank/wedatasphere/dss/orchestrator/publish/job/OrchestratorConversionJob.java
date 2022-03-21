@@ -24,12 +24,13 @@ import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugi
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import org.apache.linkis.common.utils.ByteTimeUtils;
-import java.util.List;
-import java.util.function.Consumer;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.linkis.common.utils.ByteTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 
 public final class OrchestratorConversionJob implements Runnable {
@@ -70,8 +71,8 @@ public final class OrchestratorConversionJob implements Runnable {
     public void run() {
         //1.从编排中心导出一次工作流,进行一次版本升级
         //2.进行发布到schedulis等调度系统
-        LOGGER.info("Begin to convert project {} for user {} to scheduler, the orcIdList is {}.",
-            conversionJobEntity.getProject().getName(), conversionJobEntity.getUserName(), conversionJobEntity.getOrchestrationIdMap().keySet());
+        LOGGER.info("Job {} begin to convert project {} for user {} to scheduler, the orcIdList is {}.", id,
+            conversionJobEntity.getProject().getId(), conversionJobEntity.getUserName(), conversionJobEntity.getOrchestrationIdMap().keySet());
         conversionJobEntity.setResponse(ResponseOperateOrchestrator.running());
         ConversionDSSOrchestratorPlugin conversionDSSOrchestratorPlugin = null;
         for (DSSOrchestratorPlugin plugin: conversionDSSOrchestratorPlugins) {
@@ -96,12 +97,12 @@ public final class OrchestratorConversionJob implements Runnable {
             consumer.accept(response);
             conversionJobEntity.setResponse(response);
         } catch (final Exception t){
-            LOGGER.error("Convert for project {} failed.", conversionJobEntity.getProject(), t);
+            LOGGER.error("Job {} convert for project {} failed.", id, conversionJobEntity.getProject().getId(), t);
             ResponseOperateOrchestrator response = ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(t));
             conversionJobEntity.setResponse(response);
             consumer.accept(response);
         }
-        LOGGER.info("convert project {} for user {} to scheduler {}, costs {}.", conversionJobEntity.getResponse().getJobStatus(), conversionJobEntity.getProject().getId(),
-            conversionJobEntity.getUserName(), ByteTimeUtils.msDurationToString(conversionJobEntity.getUpdateTime().getTime() - conversionJobEntity.getCreateTime().getTime()));
+        LOGGER.info("Job {} convert project {} for user {} to Orchestrator {}, costs {}.", id, conversionJobEntity.getProject().getId(),
+            conversionJobEntity.getUserName(), conversionJobEntity.getResponse().getJobStatus(), ByteTimeUtils.msDurationToString(conversionJobEntity.getUpdateTime().getTime() - conversionJobEntity.getCreateTime().getTime()));
     }
 }

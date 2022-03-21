@@ -207,7 +207,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                             Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId(),
                                     OrchestratorRefConstant.ORCHESTRATOR_ID_KEY, orchestratorInfoId);
                             requestRef.setRefJobContent(refJobContent);
-                            return ((RefDeletionOperation) developmentRequestRef).deleteRef(requestRef);
+                            return ((RefDeletionOperation) developmentOperation).deleteRef(requestRef);
                         }, "delete");
             } catch (DSSErrorException e) {
                 throw new ExternalOperationWarnException(e.getErrCode(), e.getMessage(), e);

@@ -149,6 +149,9 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
     @Autowired
     private  ApiServiceAccessDao apiServiceAccessDao;
 
+    @Autowired
+    private ApiServiceApprovalDao apiServiceApprovalDao;
+
     /**
      * Bml client
      */
@@ -244,6 +247,8 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
 
 //            AssertUtil.isTrue(MapUtils.isNotEmpty((Map) collect.getKey()), "数据源不能为空");
 
+            //获取代理执行用户
+            ApprovalVo approvalVo =  apiServiceApprovalDao.queryByVersionId(maxApiVersionVo.getId());
 
             ApiServiceExecuteJob job = new DefaultApiServiceJob();
             //sql代码封装成scala执行
@@ -253,7 +258,12 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
             //不允许创建用户自己随意代理执行，创建用户只能用自己用户执行
             //如果需要代理执行可以在这里更改用户
             job.setUser(loginUser);
-
+            if( !apiServiceVo.getCreator().equals(loginUser) && StringUtils.isNotEmpty(approvalVo.getExecuteUser())){
+                if("hadoop".equals(approvalVo.getExecuteUser().toLowerCase())){
+                    throw new ApiServiceRuntimeException("非法使用Hadoop用户作为执行用户");
+                }
+                job.setUser(approvalVo.getExecuteUser());
+            }
             job.setParams(null);
             job.setRuntimeParams(reqParams);
             job.setScriptePath(apiServiceVo.getScriptPath());

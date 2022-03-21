@@ -118,6 +118,21 @@ object VariableUtils extends Logging {
     nameAndType("run_mon_end") = MonType(new CustomMonType(run_mon.toString, false, true))
     nameAndType("run_mon_end_std") = MonType(new CustomMonType(run_mon.toString, true, true))
 
+    nameAndType("run_quarter_begin") = QuarterType(new CustomQuarterType(run_date.toString, false))
+    nameAndType("run_quarter_begin_std") = QuarterType(new CustomQuarterType(run_date.toString))
+    nameAndType("run_quarter_end") = QuarterType(new CustomQuarterType(run_date.toString, false, true))
+    nameAndType("run_quarter_end_std") = QuarterType(new CustomQuarterType(run_date.toString, true, true))
+
+    nameAndType("run_half_year_begin") = HalfYearType(new CustomHalfYearType(run_date.toString, false))
+    nameAndType("run_half_year_begin_std") = HalfYearType(new CustomHalfYearType(run_date.toString))
+    nameAndType("run_half_year_end") = HalfYearType(new CustomHalfYearType(run_date.toString, false, true))
+    nameAndType("run_half_year_end_std") = HalfYearType(new CustomHalfYearType(run_date.toString, true, true))
+
+    nameAndType("run_year_begin") = YearType(new CustomYearType(run_date.toString, false))
+    nameAndType("run_year_begin_std") = YearType(new CustomYearType(run_date.toString))
+    nameAndType("run_year_end") = YearType(new CustomYearType(run_date.toString, false, true))
+    nameAndType("run_year_end_std") = YearType(new CustomYearType(run_date.toString, true, true))
+
   }
 
   /**

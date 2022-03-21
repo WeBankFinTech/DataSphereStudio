@@ -49,7 +49,7 @@ public class SchedulisProjectSearchOperation
     @Override
     public void init() {
         super.init();
-        queryUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "manager" : getBaseUrl() + "/manager";
+        queryUrl = mergeBaseUrl("manager");
     }
 
 }

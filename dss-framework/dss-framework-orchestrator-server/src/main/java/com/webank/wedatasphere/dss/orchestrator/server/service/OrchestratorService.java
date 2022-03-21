@@ -79,6 +79,15 @@ public interface OrchestratorService {
     OrchestratorVo getOrchestratorVoById(Long orchestratorId);
 
     /**
+     * 获取一个指定版本编排
+     *
+     * @param orchestratorId 編排id
+     * @param orcVersionId   编排版本id
+     * @return 编排
+     */
+    OrchestratorVo getOrchestratorVoByIdAndOrcVersionId(Long orchestratorId, Long orcVersionId);
+
+    /**
      * 根据一个集合查找
      *
      * @param orchestratorIds

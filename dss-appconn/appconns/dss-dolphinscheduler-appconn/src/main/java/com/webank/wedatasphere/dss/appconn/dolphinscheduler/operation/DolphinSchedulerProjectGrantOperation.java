@@ -57,6 +57,8 @@ public class DolphinSchedulerProjectGrantOperation
                 grantTo(userId, authedProjectIds);
             }
         });
+        // 被去掉的已授权用户，需清除
+
         return ResponseRef.newExternalBuilder().success();
     }
 

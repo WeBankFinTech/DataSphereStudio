@@ -33,6 +33,7 @@ public class DolphinSchedulerTokenManager_1_X extends AbstractDolphinSchedulerTo
     @Override
     public void init(String baseUrl) {
         super.init(baseUrl);
+        baseUrl = getBaseUrl();
         this.verifyUserNameUrl =
                 baseUrl.endsWith("/") ? baseUrl + "users/verify-user-name" : baseUrl + "/users/verify-user-name";
         this.createUserUrl = baseUrl.endsWith("/") ? baseUrl + "users/create" : baseUrl + "/users/create";
@@ -91,6 +92,7 @@ public class DolphinSchedulerTokenManager_1_X extends AbstractDolphinSchedulerTo
     @Override
     protected Integer fetchUserId(String userName) throws ExternalOperationFailedException {
         String url = this.queryUserPageUrl + "?pageNo=1&pageSize=20&searchVal=" + userName;
+        logger.info("begin to fetch userId for user:{}, url is: {}", userName, url);
         DolphinSchedulerPageInfoResponseRef responseRef = getHttpGetResult(url);
         Optional<Integer> userId = responseRef.getTotalList().stream()
                 .filter(user -> userName.equals(user.get("userName"))).findAny().map(user -> (int) user.get("id"));

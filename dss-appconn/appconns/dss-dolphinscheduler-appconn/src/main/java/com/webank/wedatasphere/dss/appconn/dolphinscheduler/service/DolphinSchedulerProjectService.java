@@ -4,11 +4,14 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppC
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation.*;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerTokenManager;
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
 public class DolphinSchedulerProjectService extends ProjectService {
 
-    public DolphinSchedulerProjectService() {
-        DolphinSchedulerTokenManager.getDolphinSchedulerTokenManager(getAppInstance().getBaseUrl())
+    @Override
+    public void setAppInstance(AppInstance appInstance) {
+        super.setAppInstance(appInstance);
+        DolphinSchedulerTokenManager.getDolphinSchedulerTokenManager(appInstance.getBaseUrl())
                 .setSSORequestOperation(getSSORequestService()
                         .createSSORequestOperation(DolphinSchedulerAppConn.DOLPHINSCHEDULER_APPCONN_NAME));
     }

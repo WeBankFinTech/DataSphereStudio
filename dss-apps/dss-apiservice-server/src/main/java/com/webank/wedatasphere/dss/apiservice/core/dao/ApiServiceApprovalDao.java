@@ -24,10 +24,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * @author: jinyangrao
- * @date: 2020-08-26 18:03:34
- */
+
 public interface ApiServiceApprovalDao {
 
     /**

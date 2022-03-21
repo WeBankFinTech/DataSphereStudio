@@ -174,7 +174,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                 (structureOperation, structureRequestRef) -> ((ProjectSearchOperation) structureOperation).searchProject((RefProjectContentRequestRef) structureRequestRef),
                 (pair, responseRef) -> {
                     ProjectService projectService = ((OnlyStructureAppConn) pair.getLeft()).getOrCreateStructureStandard().getProjectService(pair.getRight());
-                    if(responseRef.getRefProjectId() > 0 && projectService.isProjectNameUnique()) {
+                    if(responseRef.getRefProjectId() != null && responseRef.getRefProjectId() > 0 && projectService.isProjectNameUnique()) {
                         appConnNameList.add(pair.getLeft().getAppDesc().getAppName());
                     }
                 }, "check project name " + dssProjectCreateRequest.getName() + " whether third-party refProject is exists");

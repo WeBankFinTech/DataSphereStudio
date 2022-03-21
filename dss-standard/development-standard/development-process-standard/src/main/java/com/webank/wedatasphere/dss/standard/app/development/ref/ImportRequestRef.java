@@ -30,19 +30,31 @@ public interface ImportRequestRef<R extends RefJobContentRequestRef<R>>
     /**
      * ResourceMap is the content of ExportRequestRef exported.
      * <br>
-     * Now, DSS only supports to import BML resources, so the resourceMap is consisted of `resourceId`
-     * and `version`.
+     * Now, DSS only supports to import BML resources and one inputStream,
+     * so when you want to use BML resources to import/export, the resourceMap must be
+     * consisted of `resourceId` and `version`; and if you want to use BML resources to
+     * import/export, the resourceMap must be consisted of `inputStream` and `closeable`.
+     * <br>
+     * The `closeable` is remained field that if your inputStream comes from HttpClient,
+     * you can set the `closeable` to CloseableHttpResponse to void exception.
      * @return the content of ExportRequestRef exported.
      */
     default Map<String, Object> getResourceMap() {
         return (Map<String, Object>) getParameter("resourceMap");
     }
 
-    static boolean isLinkisBMLResources(Map<String, Object> resourceMap) {
-        return resourceMap.containsKey("resourceId") && resourceMap.containsKey("version");
+    default boolean isLinkisBMLResources() {
+        return true;
+    }
+
+    default boolean isStreamResources() {
+        return !isLinkisBMLResources();
     }
 
     String RESOURCE_ID_KEY = "resourceId";
     String RESOURCE_VERSION_KEY = "version";
+
+    String INPUT_STREAM_KEY = "inputStream";
+    String CLOSEABLE_KEY = "closeable";
 
 }

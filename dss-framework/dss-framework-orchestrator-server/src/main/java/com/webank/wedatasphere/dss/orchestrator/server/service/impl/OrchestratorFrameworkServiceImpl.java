@@ -54,6 +54,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
@@ -65,6 +66,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkService {
@@ -236,9 +238,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                                                                                        Workspace workspace,
                                                                                        List<DSSLabel> dssLabels) {
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(user, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssLabels);
+        if(CollectionUtils.isEmpty(dssOrchestratorInfo.getLinkedAppConnNames())) {
+            dssOrchestratorInfo.setLinkedAppConnNames(dssOrchestrator.getLinkedAppConn().stream().map(appConn -> appConn.getAppDesc().getAppName()).collect(Collectors.toList()));
+        }
         SchedulerAppConn appConn = dssOrchestrator.getSchedulerAppConn();
         if (appConn == null) {
-            return null;
+            throw new ExternalOperationWarnException(50322, "DSSOrchestrator " + dssOrchestrator.getName() + " has no SchedulerAppConn.");
         }
         AppInstance appInstance = appConn.getAppDesc().getAppInstances().get(0);
         return new ImmutablePair<>(appConn.getOrCreateStructureStandard().getOrchestrationService(appInstance), appInstance);

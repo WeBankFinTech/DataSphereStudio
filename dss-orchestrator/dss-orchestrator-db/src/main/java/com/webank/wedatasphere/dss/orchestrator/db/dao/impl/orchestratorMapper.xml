@@ -135,6 +135,16 @@
         id = #{versionId} and valid_flag = 1
     </select>
 
+    <select id="getOrcVersionByIdAndOrcVersionId"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        SELECT
+        <include refid="orchestrator_version"/>
+        FROM
+        `dss_orchestrator_version_info`
+        WHERE
+        orchestrator_id = #{orchestratorId} and id = #{orcVersionId} and valid_flag = #{validFlag}
+    </select>
+
     <delete id="deleteOrchestratorVersion">
         DELETE
         FROM

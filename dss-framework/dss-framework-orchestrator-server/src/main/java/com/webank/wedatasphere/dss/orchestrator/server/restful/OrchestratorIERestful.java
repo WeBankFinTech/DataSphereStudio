@@ -112,7 +112,12 @@ public class OrchestratorIERestful {
         String userName = SecurityFilter.getLoginUsername(req);
         List<DSSLabel> dssLabelList = getDSSLabelList(labels);
         Map<String, Object> res = null;
-        OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
+        OrchestratorVo orchestratorVo;
+        if (orcVersionId != null) {
+            orchestratorVo = orchestratorService.getOrchestratorVoByIdAndOrcVersionId(orchestratorId, orcVersionId);
+        } else {
+            orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
+        }
         orcVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
         logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {

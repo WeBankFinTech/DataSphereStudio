@@ -88,12 +88,15 @@ public class PublishServiceImpl implements PublishService {
             requestFrameworkConvertOrchestration.setConvertAllOrcs(schedulerAppConn.getOrCreateConversionStandard().getDSSToRelConversionService(appInstance).isConvertAllOrcs());
             requestFrameworkConvertOrchestration.setLabels(dssLabel);
             ResponseConvertOrchestrator response = (ResponseConvertOrchestrator) getOrchestratorSender().ask(requestFrameworkConvertOrchestration);
+            if(response.getResponse().isFailed()) {
+                throw new DSSErrorException(50311, response.getResponse().getMessage());
+            }
             return response.getId();
         } catch (DSSErrorException e) {
             throw e;
         } catch (final Exception t) {
             Object str = dssFlow == null ? workflowId : dssFlow.getName();
-            LOGGER.error("Failed to submit publish {}.", str, t);
+            LOGGER.error("User {} failed to submit publish {}.", convertUser, str, t);
             DSSExceptionUtils.dealErrorException(63325, "Failed to submit publish " + str, t, DSSErrorException.class);
         }
         return null;

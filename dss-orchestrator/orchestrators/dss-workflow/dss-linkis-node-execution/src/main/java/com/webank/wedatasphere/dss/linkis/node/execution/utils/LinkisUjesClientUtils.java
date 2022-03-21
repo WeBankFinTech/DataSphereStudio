@@ -39,7 +39,7 @@ public class LinkisUjesClientUtils {
                 .addServerUrl(url)
                 .connectionTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
                 .discoveryEnabled(false).discoveryFrequency(1, TimeUnit.MINUTES)
-                .loadbalancerEnabled(true)
+                .loadbalancerEnabled(false)
                 .maxConnectionSize(LinkisJobExecutionConfiguration.MAX_HTTP_CONNECTION_COUNT.getValue())
                 .retryEnabled(false).readTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
                 .setAuthenticationStrategy(new TokenAuthenticationStrategy())
@@ -52,19 +52,21 @@ public class LinkisUjesClientUtils {
         retryHandler.addRetryException(LinkisRetryException.class);
         retryHandler.addRetryException(ConnectTimeoutException.class);
         retryHandler.addRetryException(ConnectException.class);
-
-        return ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
+        DWSClientConfigBuilder builder = (DWSClientConfigBuilder) DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(url)
                 .connectionTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
-                .discoveryEnabled(true).discoveryFrequency(10, TimeUnit.MINUTES)
-                .loadbalancerEnabled(true)
                 .maxConnectionSize(LinkisJobExecutionConfiguration.MAX_HTTP_CONNECTION_COUNT.getValue())
-                .retryEnabled(true)
-                .setRetryHandler(retryHandler)
                 .readTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
                 .setAuthenticationStrategy(new TokenAuthenticationStrategy())
-                .setAuthTokenKey(user).setAuthTokenValue(token)))
-                .setDWSVersion(LinkisJobExecutionConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
+                .setAuthTokenKey(user).setAuthTokenValue(token)
+                .retryEnabled(true)
+                .setRetryHandler(retryHandler);
+        builder.setDWSVersion(LinkisJobExecutionConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
+        if(LinkisJobExecutionConfiguration.LINKIS_DISCOVERY_ENABLE.getValue()) {
+            builder.discoveryEnabled(true).discoveryFrequency(10, TimeUnit.MINUTES)
+                    .loadbalancerEnabled(true);
+        }
+        return builder.build();
     }
 
     public static UJESClient getUJESClient(String url, String user, String token, Map<String, String> jobProps) {

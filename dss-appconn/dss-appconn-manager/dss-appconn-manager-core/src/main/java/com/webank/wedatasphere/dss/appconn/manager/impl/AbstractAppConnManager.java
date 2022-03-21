@@ -119,7 +119,6 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         LOGGER.info("Try to load AppConn {} with home path {}.", appConnInfo.getAppConnName(), appConnHome);
         AppConn appConn = appConnLoader.getAppConn(appConnInfo.getAppConnName(),
             appConnInfo.getClassName(), appConnHome);
-        appConn.init();
         List<? extends AppInstanceInfo> instanceInfos = appConnInfoService.getAppInstancesByAppConnInfo(appConnInfo);
         LOGGER.info("The instanceInfos of AppConn {} are {}.", appConnInfo.getAppConnName(), instanceInfos);
         AppDescImpl appDesc = new AppDescImpl();
@@ -134,6 +133,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         }
         appDesc.setAppName(appConnInfo.getAppConnName());
         appConn.setAppDesc(appDesc);
+        appConn.init();
         LOGGER.info("AppConn {} is loaded successfully.", appConnInfo.getAppConnName());
         return appConn;
     }

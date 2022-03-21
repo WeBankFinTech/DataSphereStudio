@@ -29,7 +29,8 @@ public class DolphinSchedulerWorkflowCreationOperation
     @Override
     public void init() {
         super.init();
-        this.createProcessDefinitionByIdUrl = mergeBaseUrl("projects/${projectName}/process/save");
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.createProcessDefinitionByIdUrl = mergeUrl(baseUrl, "projects/${projectName}/process/save");
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils;
 
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerResponseRefBuilder;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerTokenManager;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSGetAction;
@@ -9,6 +10,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPut
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.apache.linkis.httpclient.response.HttpResult;
 
@@ -59,6 +61,15 @@ public class DolphinSchedulerHttpUtils {
         DSSPutAction postAction = new DSSPutAction();
         formData.forEach(postAction::setFormParam);
         return getHttpResult(ssoRequestOperation, postAction, url, user);
+    }
+
+    public static String getDolphinSchedulerBaseUrl(String baseUrl) {
+        if(StringUtils.isNotBlank(DolphinSchedulerConf.DOLPHIN_SCHEDULER_URI_PREFIX.getValue())) {
+            return baseUrl.endsWith("/") ? baseUrl + DolphinSchedulerConf.DOLPHIN_SCHEDULER_URI_PREFIX.getValue() :
+                    baseUrl + "/" + DolphinSchedulerConf.DOLPHIN_SCHEDULER_URI_PREFIX.getValue();
+        } else {
+            return baseUrl;
+        }
     }
 
 }

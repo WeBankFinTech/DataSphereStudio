@@ -28,7 +28,8 @@ public class DolphinSchedulerProjectUpdateOperation
 
     @Override
     public void init() {
-        this.projectUpdateUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "projects/update" : getBaseUrl() + "/projects/update";
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.projectUpdateUrl = mergeUrl(baseUrl, "projects/update");
     }
 
     @Override

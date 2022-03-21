@@ -45,7 +45,7 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
 
     @Override
     public void init(String baseUrl) {
-        this.baseUrl = baseUrl;
+        this.baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(baseUrl);
         userCreationFactory = AppStandardClassUtils.getInstance(DolphinSchedulerAppConn.DOLPHINSCHEDULER_APPCONN_NAME)
                 .getInstanceOrDefault(UserCreationFactory.class, new UserCreationFactory());
         logger.info("use {} to create new DolphinScheduler users.", userCreationFactory.getClass().getSimpleName());

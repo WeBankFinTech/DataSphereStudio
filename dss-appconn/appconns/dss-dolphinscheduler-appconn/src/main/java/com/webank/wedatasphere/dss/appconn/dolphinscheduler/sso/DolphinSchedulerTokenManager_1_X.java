@@ -79,12 +79,12 @@ public class DolphinSchedulerTokenManager_1_X extends AbstractDolphinSchedulerTo
     @Override
     protected void createUser(String userName) throws ExternalOperationFailedException {
         logger.info("Try to ask DolphinScheduler to create user {}.", userName);
-
+        UserCreationFactory.User user = userCreationFactory.createUser(userName);
         Map<String, Object> formData = MapUtils.newCommonMapBuilder().put("userName", userName)
-            .put("userPassword", "afykde@37589")
-            .put("tenantId", "1")
-            .put("email", "xx@qq.com")
-            .put("queue", "ide").build();
+            .put("userPassword", user.getUserPassword())
+            .put("tenantId", user.getTenantId())
+            .put("email", user.getEmail())
+            .put("queue", user.getQueue()).build();
         getHttpPostResult(createUserUrl, formData);
     }
 

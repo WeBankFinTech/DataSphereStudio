@@ -28,10 +28,11 @@ import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.HtmlEma
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.PictureEmailContentParser$;
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.TableEmailContentParser$;
 import com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailRefExecutionHook;
-import com.webank.wedatasphere.dss.common.utils.ClassUtils;
-import java.util.List;
+import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class SendEmailAppConnInstanceConfiguration {
 
@@ -48,7 +49,7 @@ public class SendEmailAppConnInstanceConfiguration {
     private static final SendEmailRefExecutionHook[] sendEmailRefExecutionHooks = createSendEmailRefExecutionHooks();
 
     private static EmailSender createEmailSender() {
-        EmailSender emailSender = ClassUtils.getInstanceOrDefault(EmailSender.class, new SpringJavaEmailSender());
+        EmailSender emailSender = AppStandardClassUtils.getInstance("sendemail").getInstanceOrDefault(EmailSender.class, new SpringJavaEmailSender());
         logger.info("Try to use {} to instance a EmailSender.", emailSender.getClass().getSimpleName());
         return emailSender;
     }
@@ -63,7 +64,7 @@ public class SendEmailAppConnInstanceConfiguration {
     }
 
     private static SendEmailRefExecutionHook[] createSendEmailRefExecutionHooks() {
-        List<SendEmailRefExecutionHook> hooks = ClassUtils.getInstances(SendEmailRefExecutionHook.class);
+        List<SendEmailRefExecutionHook> hooks = AppStandardClassUtils.getInstance("sendemail").getInstances(SendEmailRefExecutionHook.class);
         logger.info("SendEmailRefExecutionHook list is {}.", hooks);
         return hooks.toArray(new SendEmailRefExecutionHook[0]);
     }

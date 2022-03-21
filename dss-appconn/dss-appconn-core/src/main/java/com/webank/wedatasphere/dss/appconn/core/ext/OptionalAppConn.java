@@ -19,7 +19,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.OptionalIntegrationSta
 public interface OptionalAppConn extends AppConn {
 
     default OptionalIntegrationStandard getOrCreateOptionalStandard() {
-        return OptionalIntegrationStandard.getInstance();
+        return OptionalIntegrationStandard.getInstance(getAppDesc().getAppName());
     }
 
 }

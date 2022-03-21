@@ -1,12 +1,13 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso;
 
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerAccessToken;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinSchedulerHttpUtils;
-import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.linkis.common.utils.ByteTimeUtils;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
     // 一个DSS系统，只支持对接一个调度系统，所以这里只需要给出一个实例即可
     static DolphinSchedulerTokenManager dolphinSchedulerTokenManager;
     static final List<DolphinSchedulerTokenManager> dolphinSchedulerTokenManagers =
-            ClassUtils.getInstances(DolphinSchedulerTokenManager.class);
+            AppStandardClassUtils.getInstance(DolphinSchedulerAppConn.DOLPHINSCHEDULER_APPCONN_NAME).getInstances(DolphinSchedulerTokenManager.class);
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
     protected UserCreationFactory userCreationFactory;
@@ -45,7 +46,8 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
     @Override
     public void init(String baseUrl) {
         this.baseUrl = baseUrl;
-        userCreationFactory = ClassUtils.getInstanceOrDefault(UserCreationFactory.class, new UserCreationFactory());
+        userCreationFactory = AppStandardClassUtils.getInstance(DolphinSchedulerAppConn.DOLPHINSCHEDULER_APPCONN_NAME)
+                .getInstanceOrDefault(UserCreationFactory.class, new UserCreationFactory());
         logger.info("use {} to create new DolphinScheduler users.", userCreationFactory.getClass().getSimpleName());
     }
 

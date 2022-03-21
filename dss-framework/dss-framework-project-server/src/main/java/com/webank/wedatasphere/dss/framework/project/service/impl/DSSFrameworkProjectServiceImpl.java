@@ -94,7 +94,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         try {
             isExistSameProjectName(projectCreateRequest, workspace, appConnNameList, username);
         } catch (Exception e) {
-            throw new DSSProjectErrorException(71000, "向第三方应用发起检查工程名是否重复失败，原因：" + ExceptionUtils.getRootCauseMessage(e));
+            throw new DSSProjectErrorException(71000, "向第三方应用发起检查工程名是否重复失败，原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
         if (!appConnNameList.isEmpty()) {
             throw new DSSProjectErrorException(71000, String.join(", ", appConnNameList) + " 已存在相同项目名称，请重新命名!");

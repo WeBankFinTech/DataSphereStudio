@@ -1,12 +1,13 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
 
+import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.operation.impl.AbstractOperationStrategy;
-import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
+import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -19,7 +20,7 @@ public class OperationStrategyFactory {
     private static final Map<String, Class<? extends OperationStrategy>> operationStrategyClasses = new HashMap<>();
 
     private OperationStrategyFactory() {
-        ClassUtils.getClasses(OperationStrategy.class).forEach(clazz -> {
+        AppStandardClassUtils.getInstance(VisualisAppConn.VISUALIS_APPCONN_NAME).getClasses(OperationStrategy.class).forEach(clazz -> {
             try {
                 operationStrategyClasses.put(clazz.newInstance().getStrategyName(), clazz);
             } catch (InstantiationException | IllegalAccessException e) {

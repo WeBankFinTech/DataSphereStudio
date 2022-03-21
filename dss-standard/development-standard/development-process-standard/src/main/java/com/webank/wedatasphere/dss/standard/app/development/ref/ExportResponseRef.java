@@ -23,6 +23,11 @@ public interface ExportResponseRef extends ResponseRef {
      */
     Map<String, Object> getResourceMap();
 
+    default boolean isLinkisBMLResources() {
+        return getResourceMap().containsKey(ImportRequestRef.RESOURCE_ID_KEY)
+                && getResourceMap().containsKey(ImportRequestRef.RESOURCE_VERSION_KEY);
+    }
+
     static ExportResponseRefBuilder newBuilder() {
         return new ExportResponseRefBuilder();
     }

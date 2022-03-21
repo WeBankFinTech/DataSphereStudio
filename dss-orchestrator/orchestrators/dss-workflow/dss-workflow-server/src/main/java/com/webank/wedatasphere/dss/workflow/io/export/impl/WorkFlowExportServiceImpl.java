@@ -35,15 +35,16 @@ import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -98,8 +99,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 if (!dssFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", dssFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResources(userName, dssProjectId, flowExportSaveBasePath, flowJson, dssFlow.getName(), workspace,dssLabels);
-                    exportAllSubFlows(userName, dssFlow, dssProjectId, flowExportSaveBasePath, workspace,dssLabels);
+                    exportFlowResources(userName, dssProjectId, projectName, flowExportSaveBasePath, flowJson, dssFlow.getName(), workspace,dssLabels);
+                    exportAllSubFlows(userName, dssFlow, dssProjectId, projectName, flowExportSaveBasePath, workspace,dssLabels);
                     dssFlows.add(dssFlow);
                 } else {
                     String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, dssFlow.getName(), dssFlow.getBmlVersion());
@@ -116,7 +117,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     }
 
 
-    private void exportAllSubFlows(String userName, DSSFlow dssFlowParent, Long projectId, String projectExportBasePath, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
+    private void exportAllSubFlows(String userName, DSSFlow dssFlowParent, Long projectId, String projectName,
+                                   String projectExportBasePath, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
         List<? extends DSSFlow> subFlows = dssFlowParent.getChildren();
         if (subFlows != null) {
             for (DSSFlow subFlow : subFlows) {
@@ -126,8 +128,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 if (!subFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", subFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResources(userName, projectId, projectExportBasePath, flowJson, subFlow.getName(), workspace,dssLabels);
-                    exportAllSubFlows(userName, subFlow, projectId, projectExportBasePath, workspace,dssLabels);
+                    exportFlowResources(userName, projectId, projectName, projectExportBasePath, flowJson, subFlow.getName(), workspace,dssLabels);
+                    exportAllSubFlows(userName, subFlow, projectId, projectName, projectExportBasePath, workspace,dssLabels);
                 } else {
                     String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, subFlow.getName(), subFlow.getBmlVersion());
                     logger.info(warnMsg);
@@ -143,7 +145,9 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     }
 
     @Override
-    public void exportFlowResources(String userName, Long projectId, String projectSavePath, String flowJson, String flowName, Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
+    public void exportFlowResources(String userName, Long projectId, String projectName,
+                                    String projectSavePath, String flowJson, String flowName,
+                                    Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
         String workFlowExportPath = genWorkFlowExportDir(projectSavePath, flowName);
         String workFlowResourceSavePath = workFlowExportPath + File.separator + "resource";
         String appConnResourceSavePath = workFlowExportPath + File.separator + "appconn-resource";
@@ -161,7 +165,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             if (nodes != null) {
                 for (DSSNode node : nodes) {
                     nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
-                    nodeExportService.downloadAppConnResourceToLocal(userName, projectId, node, appConnResourceSavePath, workspace,dssLabels);
+                    nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace,dssLabels);
                 }
             }
 

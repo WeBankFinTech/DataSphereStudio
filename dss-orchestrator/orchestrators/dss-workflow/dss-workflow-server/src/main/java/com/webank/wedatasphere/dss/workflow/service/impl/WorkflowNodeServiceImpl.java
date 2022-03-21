@@ -49,11 +49,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @Service
 public class WorkflowNodeServiceImpl implements WorkflowNodeService {
@@ -206,26 +208,30 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
     }
 
     @Override
-    public Map<String, Object> exportNode(String userName, CommonAppConnNode node) {
-        ExportResponseRef responseRef = tryNodeOperation(userName, node,
+    public ExportResponseRef exportNode(String userName, CommonAppConnNode node) {
+        return tryNodeOperation(userName, node,
                 (appConn, dssLabels) -> getDevelopmentService(appConn, dssLabels, DevelopmentIntegrationStandard::getRefExportService),
                 developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
                 (developmentOperation, developmentRequestRef) ->
                     ((RefExportOperation) developmentOperation).exportRef((RefJobContentRequestRef) developmentRequestRef)
-                , null, "import");
-        return responseRef.getResourceMap();
+                , null, "export");
     }
 
     @Override
     public Map<String, Object> importNode(String userName, CommonAppConnNode node,
-                                          Map<String, Object> resourceMap,
+                                          Supplier<Map<String, Object>> getBmlResourceMap,
+                                          Supplier<Map<String, Object>> getStreamResourceMap,
                                           String orcVersion) {
         RefJobContentResponseRef responseRef = tryNodeOperation(userName, node,
                 (appConn, dssLabels) -> getDevelopmentService(appConn, dssLabels, DevelopmentIntegrationStandard::getRefImportService),
                 developmentService -> ((RefImportService) developmentService).getRefImportOperation(),
                 (developmentOperation, developmentRequestRef) -> {
                     ImportRequestRef importRequestRef = (ImportRequestRef) developmentRequestRef;
-                    importRequestRef.setResourceMap(resourceMap);
+                    if(importRequestRef.isLinkisBMLResources()) {
+                        importRequestRef.setResourceMap(getBmlResourceMap.get());
+                    } else {
+                        importRequestRef.setResourceMap(getStreamResourceMap.get());
+                    }
                     importRequestRef.setNewVersion(orcVersion).setName(node.getName());
                     return ((RefImportOperation) developmentOperation).importRef(importRequestRef);
                 }, null, "import");

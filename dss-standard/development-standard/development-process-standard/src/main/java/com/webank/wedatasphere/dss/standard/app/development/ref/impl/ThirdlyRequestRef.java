@@ -41,9 +41,26 @@ public interface ThirdlyRequestRef {
     class ImportRequestRefImpl extends DevelopmentRequestRefImpl<ImportRequestRefImpl>
             implements ImportRequestRef<ImportRequestRefImpl>, ProjectRefRequestRef<ImportRequestRefImpl> {}
 
+    class ImportWithStreamRequestRefImpl extends DevelopmentRequestRefImpl<ImportWithStreamRequestRefImpl>
+            implements ImportRequestRef<ImportWithStreamRequestRefImpl>, ProjectRefRequestRef<ImportWithStreamRequestRefImpl> {
+        @Override
+        public boolean isLinkisBMLResources() {
+            return false;
+        }
+    }
+
     class ImportWitContextRequestRefImpl extends DevelopmentRequestRefImpl<ImportWitContextRequestRefImpl>
             implements ImportRequestRef<ImportWitContextRequestRefImpl>, ProjectRefRequestRef<ImportWitContextRequestRefImpl>,
             DSSContextRequestRef<ImportWitContextRequestRefImpl>{}
+
+    class ImportWitContextAndStreamRequestRefImpl extends DevelopmentRequestRefImpl<ImportWitContextAndStreamRequestRefImpl>
+            implements ImportRequestRef<ImportWitContextAndStreamRequestRefImpl>, ProjectRefRequestRef<ImportWitContextAndStreamRequestRefImpl>,
+            DSSContextRequestRef<ImportWitContextAndStreamRequestRefImpl>{
+        @Override
+        public boolean isLinkisBMLResources() {
+            return false;
+        }
+    }
 
     class UpdateRequestRefImpl extends DevelopmentRequestRefImpl<UpdateRequestRefImpl>
             implements UpdateRequestRef<UpdateRequestRefImpl>, ProjectRefRequestRef<UpdateRequestRefImpl> {}

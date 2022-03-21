@@ -25,6 +25,8 @@ public class DSSProjectErrorException extends ErrorException {
         super(errorCode, errorDesc);
     }
 
-
-
+    public DSSProjectErrorException(int errorCode, String errorDesc, Exception e) {
+        super(errorCode, errorDesc);
+        initCause(e);
+    }
 }

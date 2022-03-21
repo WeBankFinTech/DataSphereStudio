@@ -6,7 +6,8 @@ import com.webank.wedatasphere.dss.standard.common.core.AbstractAppIntegrationSt
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 这是一个可选的 Standard，用于协助第三方AppConn想要实现一些特殊的 Operation，这些Operation本身并不属于
@@ -17,21 +18,32 @@ import java.io.IOException;
  */
 public class OptionalIntegrationStandard extends AbstractAppIntegrationStandard<OptionalService, SSORequestService> {
 
-    private static OptionalIntegrationStandard optionalIntegrationStandard;
+    private static Map<String, OptionalIntegrationStandard> optionalIntegrationStandards = new HashMap<>();
+    private String appConnName;
 
-    public static OptionalIntegrationStandard getInstance() {
-        if(optionalIntegrationStandard == null) {
+    public static OptionalIntegrationStandard getInstance(String appConnName) {
+        if(!optionalIntegrationStandards.containsKey(appConnName)) {
             synchronized (OptionalIntegrationStandard.class) {
-                if(optionalIntegrationStandard == null) {
-                    optionalIntegrationStandard = new OptionalIntegrationStandard();
+                if(!optionalIntegrationStandards.containsKey(appConnName)) {
+                    OptionalIntegrationStandard standard = new OptionalIntegrationStandard();
+                    standard.setAppConnName(appConnName);
+                    optionalIntegrationStandards.put(appConnName, standard);
                 }
             }
         }
-        return optionalIntegrationStandard;
+        return optionalIntegrationStandards.get(appConnName);
     }
 
     public OptionalService getOptionalService(AppInstance appInstance) {
         return getOrCreate(appInstance, OptionalService::new, OptionalService.class);
+    }
+
+    public String getAppConnName() {
+        return appConnName;
+    }
+
+    public void setAppConnName(String appConnName) {
+        this.appConnName = appConnName;
     }
 
     @Override
@@ -56,7 +68,7 @@ public class OptionalIntegrationStandard extends AbstractAppIntegrationStandard<
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
 
     }
 }

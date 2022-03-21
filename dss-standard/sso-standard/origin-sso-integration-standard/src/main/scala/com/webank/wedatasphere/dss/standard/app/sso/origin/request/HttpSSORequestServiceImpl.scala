@@ -16,7 +16,7 @@ class HttpSSORequestServiceImpl extends AppServiceImpl with SSORequestService {
   private val ssoRequestServices = new util.HashMap[String, HttpSSORequestOperation]
 
   protected def createHttpSSORequestOperation(appName: String): HttpSSORequestOperation =
-    new OriginSSORequestOperation(appName)
+    new HttpSSORequestOperation(appName)
 
   override def createSSORequestOperation(appName: String): HttpSSORequestOperation = {
     if(!ssoRequestServices.containsKey(appName)) synchronized {

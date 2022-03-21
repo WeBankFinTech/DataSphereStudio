@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.workflow.io.export.impl;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
@@ -27,13 +27,16 @@ import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
-import org.apache.linkis.rpc.Sender;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.Closeable;
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -49,8 +52,6 @@ public class NodeExportServiceImpl implements NodeExportService {
     private NodeInfoMapper nodeInfoMapper;
     @Autowired
     private WorkflowNodeService workflowNodeService;
-
-    private Sender projectSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
 
     @Override
     public void downloadNodeResourceToLocal(String userName, DSSNode dwsNode, String savePath) {
@@ -70,7 +71,8 @@ public class NodeExportServiceImpl implements NodeExportService {
     }
 
     @Override
-    public void downloadAppConnResourceToLocal(String userName, Long projectId, DSSNode dwsNode, String savePath, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
+    public void downloadAppConnResourceToLocal(String userName, Long projectId, String projectName, DSSNode dwsNode,
+                                               String savePath, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
         CommonAppConnNode node = new CommonAppConnNode();
         node.setJobContent(dwsNode.getJobContent());
         node.setProjectId(projectId);
@@ -79,11 +81,23 @@ public class NodeExportServiceImpl implements NodeExportService {
         node.setNodeType(dwsNode.getNodeType());
         node.setName(dwsNode.getName());
         node.setId(dwsNode.getId());
-        Map<String, Object> resourceMap = workflowNodeService.exportNode(userName, node);
-        String resourceId = resourceMap.get(ImportRequestRef.RESOURCE_ID_KEY).toString();
-        String version = resourceMap.get(ImportRequestRef.RESOURCE_VERSION_KEY).toString();
+        ExportResponseRef responseRef = workflowNodeService.exportNode(userName, node);
+        Map<String, Object> resourceMap = responseRef.getResourceMap();
         String nodeResourcePath = savePath + File.separator + dwsNode.getId() + ".appconnre";
-        bmlService.downloadToLocalPath(userName, resourceId, version, nodeResourcePath);
+        if(responseRef.isLinkisBMLResources()) {
+            String resourceId = resourceMap.get(ImportRequestRef.RESOURCE_ID_KEY).toString();
+            String version = resourceMap.get(ImportRequestRef.RESOURCE_VERSION_KEY).toString();
+            bmlService.downloadToLocalPath(userName, resourceId, version, nodeResourcePath);
+        } else {
+            InputStream inputStream = (InputStream) resourceMap.get(ImportRequestRef.INPUT_STREAM_KEY);
+            Closeable closeable = (Closeable) resourceMap.get(ImportRequestRef.CLOSEABLE_KEY);
+            try {
+                FileUtils.copyInputStreamToFile(inputStream, new File(nodeResourcePath));
+            } finally {
+                IOUtils.closeQuietly(inputStream);
+                IOUtils.closeQuietly(closeable);
+            }
+        }
     }
 
 }

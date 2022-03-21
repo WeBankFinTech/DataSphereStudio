@@ -38,6 +38,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProject
 import com.webank.wedatasphere.dss.standard.app.structure.utils.StructureOperationUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.conf.CommonVars;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,9 +91,13 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
         List<String> appConnNameList = new ArrayList<>(1);
         //判断已有组件是否已经存在相同的工程名称
-        isExistSameProjectName(projectCreateRequest, workspace, appConnNameList, username);
+        try {
+            isExistSameProjectName(projectCreateRequest, workspace, appConnNameList, username);
+        } catch (Exception e) {
+            throw new DSSProjectErrorException(71000, "向第三方应用发起检查工程名是否重复失败，原因：" + ExceptionUtils.getRootCauseMessage(e));
+        }
         if (!appConnNameList.isEmpty()) {
-            throw new DSSProjectErrorException(71000, String.join(", ", appConnNameList) + "已存在相同项目名称，请重新命名!");
+            throw new DSSProjectErrorException(71000, String.join(", ", appConnNameList) + " 已存在相同项目名称，请重新命名!");
         }
 
         Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace);

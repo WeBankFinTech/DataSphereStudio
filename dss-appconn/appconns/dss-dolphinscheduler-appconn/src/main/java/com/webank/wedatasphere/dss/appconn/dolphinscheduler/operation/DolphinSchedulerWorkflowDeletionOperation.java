@@ -24,7 +24,8 @@ public class DolphinSchedulerWorkflowDeletionOperation
     @Override
     public void init() {
         super.init();
-        this.deleteProcessDefinitionByIdUrl = mergeBaseUrl("projects/${projectName}/process/delete");
+        String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
+        this.deleteProcessDefinitionByIdUrl = mergeUrl(baseUrl, "projects/${projectName}/process/delete");
     }
 
     @Override

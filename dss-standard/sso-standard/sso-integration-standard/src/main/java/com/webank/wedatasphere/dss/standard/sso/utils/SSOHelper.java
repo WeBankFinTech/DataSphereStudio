@@ -49,12 +49,6 @@ public class SSOHelper {
         SSOHelper.ssoBuilderService = ssoBuilderService;
     }
 
-    public static Workspace getWorkspace(String workspaceName) {
-        Workspace workspace = new Workspace();
-        workspace.setWorkspaceName(workspaceName);
-        return workspace;
-    }
-
     public static Workspace getWorkspace(Map<String, String> cookies) {
         Workspace workspace = new Workspace();
         workspace.setCookies(cookies);
@@ -71,7 +65,10 @@ public class SSOHelper {
     }
 
     private static void addWorkspaceInfo(HttpServletRequest request, Workspace workspace) {
-        workspace.setDssUrl("http://" + request.getRemoteHost() + ":" + request.getRemotePort());
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+        if(StringUtils.isNotBlank(forwardedHost)) {
+            workspace.setDssUrl("http://" + forwardedHost);
+        }
         if(StringUtils.isBlank(workspace.getWorkspaceName())) {
             throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies, please ensure front-web has injected cookie['workspaceName'](不能找到工作空间名，请确认前端是否已经注入cookie['workspaceName']).");
         }

@@ -54,8 +54,9 @@ public class OrchestratorJsonRelation implements DSSOrchestratorRelation {
         if(StringUtils.isNotBlank(linkedAppConn)) {
             String[] appConns = linkedAppConn.split(",");
             predicate = appConn -> ArrayUtils.contains(appConns, appConn.getAppDesc().getAppName());
+        } else {
+            predicate = appConn -> appConn instanceof OnlyDevelopmentAppConn;
         }
-        predicate = appConn -> appConn instanceof OnlyDevelopmentAppConn;
     }
 
     @Override

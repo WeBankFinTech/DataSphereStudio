@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.constant.Constant;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinSchedulerHttpUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefBuilder;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
@@ -25,7 +26,7 @@ public class DolphinSchedulerResponseRefBuilder
     @Override
     public DolphinSchedulerResponseRefBuilder setResponseBody(String responseBody) {
         Map<String, Object> responseMap = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
-        status = ((Double) responseMap.get("code")).intValue();
+        status = (int) DolphinSchedulerHttpUtils.parseToLong(responseMap.get("code"));
         if(status != Constant.DS_RESULT_CODE_SUCCESS) {
             errorMsg = (String) responseMap.get("msg");
             throw new ExternalOperationFailedException(90051, "request to DolphinScheduler failed. Caused by: " + errorMsg);

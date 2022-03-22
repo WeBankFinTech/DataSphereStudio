@@ -8,6 +8,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.linkis.common.utils.ByteTimeUtils;
 import org.slf4j.Logger;
@@ -45,6 +46,10 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
 
     @Override
     public void init(String baseUrl) {
+        if(StringUtils.isBlank(DolphinSchedulerConf.DS_ADMIN_TOKEN.getValue())) {
+            logger.error("please set {} for DolphinScheduler AppConn.", DolphinSchedulerConf.DS_ADMIN_TOKEN.key());
+            throw new ExternalOperationFailedException(90388, "please set " + DolphinSchedulerConf.DS_ADMIN_TOKEN.key() + " for DolphinScheduler AppConn.");
+        }
         this.baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(baseUrl);
         userCreationFactory = AppStandardClassUtils.getInstance(DolphinSchedulerAppConn.DOLPHINSCHEDULER_APPCONN_NAME)
                 .getInstanceOrDefault(UserCreationFactory.class, new UserCreationFactory());

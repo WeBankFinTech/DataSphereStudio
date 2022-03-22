@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerAccessToken;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerDataResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerPageInfoResponseRef;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinSchedulerHttpUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
@@ -96,7 +97,7 @@ public class DolphinSchedulerTokenManager_1_X extends AbstractDolphinSchedulerTo
         DolphinSchedulerPageInfoResponseRef responseRef = getHttpGetResult(url);
         Optional<Integer> userId = responseRef.getTotalList().stream()
                 .filter(user -> userName.equals(user.get("userName")))
-                .findAny().map(user -> ((Double) user.get("id")).intValue());
+                .findAny().map(user -> (int) DolphinSchedulerHttpUtils.parseToLong(user.get("id")));
         return userId.orElse(null);
     }
 

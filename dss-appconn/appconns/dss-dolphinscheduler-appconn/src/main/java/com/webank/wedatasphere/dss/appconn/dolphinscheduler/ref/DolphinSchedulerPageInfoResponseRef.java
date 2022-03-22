@@ -1,9 +1,7 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref;
 
-import com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
-import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
 import org.apache.commons.beanutils.BeanUtils;
 
 import java.util.ArrayList;
@@ -43,8 +41,7 @@ public class DolphinSchedulerPageInfoResponseRef extends ResponseRefImpl {
     public <T> List<T> getTotalList(Class<T> clazz) {
         List<Map<String, Object>> totalList = getTotalList();
         return totalList.stream().map(DSSExceptionUtils.map(map -> {
-            T t = AppStandardClassUtils.getInstance(DolphinSchedulerAppConn.DOLPHINSCHEDULER_APPCONN_NAME)
-                    .getInstanceOrWarn(clazz);
+            T t = clazz.newInstance();
             BeanUtils.populate(t, map);
             return t;
         })).collect(Collectors.toList());

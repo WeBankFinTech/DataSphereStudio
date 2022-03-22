@@ -137,7 +137,7 @@ public class DolphinSchedulerTokenManager_1_X extends AbstractDolphinSchedulerTo
                 .put("userId", userToken.getUserId())
                 .put("expireTime", expireTime)
                 .put("token", userToken.getToken()).build();
-        getHttpPutResult(updateTokenUrl, formData);
+        getHttpPostResult(updateTokenUrl, formData);
     }
 
     @Override

@@ -11,8 +11,11 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpStatus;
 import org.apache.linkis.httpclient.response.HttpResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -23,8 +26,16 @@ import java.util.Map;
  */
 public class DolphinSchedulerHttpUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DolphinSchedulerHttpUtils.class);
+
     public static <T extends ResponseRefImpl> T getHttpResult(SSORequestOperation ssoRequestOperation, DSSHttpAction action) {
-        HttpResult httpResult = (HttpResult) ssoRequestOperation.requestWithSSO(null, action);
+        HttpResult httpResult;
+        try {
+            httpResult = (HttpResult) ssoRequestOperation.requestWithSSO(null, action);
+        } catch (Exception e) {
+            LOGGER.error("user {} send request to dolphinscheduler in url {} failed, the requestBody is {}.", action.getUser(), action.getURL(), action.getRequestBody());
+            throw new ExternalOperationFailedException(90322, "send request to dolphinscheduler failed. Caused by: " + ExceptionUtils.getRootCauseMessage(e), e);
+        }
         String responseBody = httpResult.getResponseBody();
         int httpStatusCode = httpResult.getStatusCode();
         if (HttpStatus.SC_OK != httpStatusCode && HttpStatus.SC_CREATED != httpStatusCode) {

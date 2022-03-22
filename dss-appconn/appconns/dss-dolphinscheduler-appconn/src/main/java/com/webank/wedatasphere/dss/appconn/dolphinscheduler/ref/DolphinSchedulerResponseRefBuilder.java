@@ -25,7 +25,7 @@ public class DolphinSchedulerResponseRefBuilder
     @Override
     public DolphinSchedulerResponseRefBuilder setResponseBody(String responseBody) {
         Map<String, Object> responseMap = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
-        status = (int) responseMap.get("code");
+        status = ((Double) responseMap.get("code")).intValue();
         if(status != Constant.DS_RESULT_CODE_SUCCESS) {
             errorMsg = (String) responseMap.get("msg");
             throw new ExternalOperationFailedException(90051, "request to DolphinScheduler failed. Caused by: " + errorMsg);

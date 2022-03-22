@@ -83,4 +83,14 @@ public class DolphinSchedulerHttpUtils {
         }
     }
 
+    public static long parseToLong(Object val) {
+        if (val instanceof Double) {
+            return ((Double) val).longValue();
+        }
+        if (val instanceof Integer) {
+            return new Double((Integer) val).longValue();
+        }
+        return (Long) val;
+    }
+
 }

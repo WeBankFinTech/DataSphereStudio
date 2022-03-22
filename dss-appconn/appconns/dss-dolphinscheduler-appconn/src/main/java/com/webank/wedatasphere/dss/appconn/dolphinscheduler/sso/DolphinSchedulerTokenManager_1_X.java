@@ -95,7 +95,8 @@ public class DolphinSchedulerTokenManager_1_X extends AbstractDolphinSchedulerTo
         logger.info("begin to fetch userId for user:{}, url is: {}", userName, url);
         DolphinSchedulerPageInfoResponseRef responseRef = getHttpGetResult(url);
         Optional<Integer> userId = responseRef.getTotalList().stream()
-                .filter(user -> userName.equals(user.get("userName"))).findAny().map(user -> (int) user.get("id"));
+                .filter(user -> userName.equals(user.get("userName")))
+                .findAny().map(user -> ((Double) user.get("id")).intValue());
         return userId.orElse(null);
     }
 

@@ -16,9 +16,13 @@
 
 package com.webank.wedatasphere.dss.common.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.utils.JsonUtils;
 
 public class DSSCommonUtils {
 
@@ -37,15 +41,21 @@ public class DSSCommonUtils {
 
     public static final String NODE_PROP_NAME = "params";
 
-    public static final String NODE_PROP_VARIABLE_NAME = "variable";
 
     public static final String NODE_ID_NAME = "id";
 
     public static final String NODE_NAME_NAME = "title";
 
-    public static final String FLOW_CONTEXT_ID_PREFIX = "dss.context.id.";
+    public static final Gson COMMON_GSON = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").serializeNulls()
+            .registerTypeAdapter(Double.class, (JsonSerializer<Double>) (t, type, jsonSerializationContext) -> {
+                if(t == t.longValue()) {
+                    return new JsonPrimitive(t.longValue());
+                } else {
+                    return new JsonPrimitive(t);
+                }
+            }).create();
 
-    public static final Gson COMMON_GSON = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+    public static final ObjectMapper JACKSON = JsonUtils.jackson();
 
     public static final String ENV_LABEL_VALUE_DEV = "dev";
 

@@ -64,13 +64,13 @@ public class DolphinSchedulerHttpUtils {
 
     public static <T extends ResponseRefImpl> T getHttpPostResult(SSORequestOperation ssoRequestOperation, String url, String user, Map<String, Object> formData) {
         DSSPostAction postAction = new DSSPostAction();
-        formData.forEach(postAction::setFormParam);
+        formData.forEach(postAction::addRequestPayload);
         return getHttpResult(ssoRequestOperation, postAction, url, user);
     }
 
     public static <T extends ResponseRefImpl> T getHttpPutResult(SSORequestOperation ssoRequestOperation, String url, String user, Map<String, Object> formData) {
         DSSPutAction postAction = new DSSPutAction();
-        formData.forEach(postAction::setFormParam);
+        formData.forEach(postAction::addRequestPayload);
         return getHttpResult(ssoRequestOperation, postAction, url, user);
     }
 

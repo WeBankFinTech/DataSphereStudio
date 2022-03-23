@@ -23,6 +23,17 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 public interface RefCreationOperation<K extends DSSJobContentRequestRef<K>>
         extends DevelopmentOperation<K, RefJobContentResponseRef> {
 
+    /**
+     * 该方法会尝试请求第三方应用工具，在 refProject 下创建一个与 DSS Job 一对一关联的第三方 refJob。
+     * 如果创建成功，请返回一个包含了第三方应用工具的 job ID（命名为 refJobId）的 RefJobContentResponseRef，
+     * 以便 DSS 接下来可以使用 refJobId 来管理第三方应用工具对应 refProject 工程下的 refJob。
+     * <br>
+     * 返回的 refJobId 是其他 DevelopmentOperation 能够操作这个第三方应用工具的 Job 的基础。DSS 在调用其他
+     * DevelopmentOperation 时，会将该 refJobId 作为方法参数传入，以便用户能正常找到对应的 refJob 进行相应操作。
+     * @param requestRef
+     * @return
+     * @throws ExternalOperationFailedException
+     */
     RefJobContentResponseRef createRef(K requestRef) throws ExternalOperationFailedException;
 
 }

@@ -133,15 +133,4 @@ public class SSOUrlBuilderOperationImpl implements SSOUrlBuilderOperation {
         return operation;
     }
 
-    public static SSOUrlBuilderOperation restore(String operationStr){
-        Map operationMap = SSOIntegrationConf.gson().fromJson(operationStr, Map.class);
-        SSOUrlBuilderOperationImpl operation = new SSOUrlBuilderOperationImpl();
-        if(operationMap.get("appName") != null) operation.appName = operationMap.get("appName").toString();
-        if(operationMap.get("cookies") != null) operation.cookies = (Map<String, String>) operationMap.get("cookies");
-        if(operationMap.get("dssUrl") != null) operation.dssUrl = operationMap.get("dssUrl").toString();
-        if(operationMap.get("redirectUrl") != null) operation.redirectUrl = operationMap.get("redirectUrl").toString();
-        if(operationMap.get("reqUrl") != null) operation.reqUrl = operationMap.get("reqUrl").toString();
-        if(operationMap.get("workspaceName") != null) operation.workspaceName = operationMap.get("workspaceName").toString();
-        return operation;
-    }
 }

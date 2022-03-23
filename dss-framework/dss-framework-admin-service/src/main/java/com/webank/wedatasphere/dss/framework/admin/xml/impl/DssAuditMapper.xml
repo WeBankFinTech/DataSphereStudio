@@ -13,7 +13,7 @@
 	`sql`,
 	create_time
   FROM
-	dss_download_audit
+		dss_workspace_download_audit
 
 		<where>
 			<if test="creator != null and creator != ''">

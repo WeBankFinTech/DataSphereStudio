@@ -34,7 +34,7 @@
     </sql>
 
     <sql id="favorite_main">
-        id,`username`,`workspace_id`,`menu_application_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`,`type`
+        id,`username`,`workspace_id`,`menu_appconn_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`,`type`
     </sql>
 
     <resultMap id="dss_workspace_user01_map"
@@ -91,7 +91,7 @@
     <select id="getManagementMenuCn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
         SELECT `id`,`name`,`title_cn` AS `title`,`order`
-        FROM dss_onestop_menu
+        FROM dss_workspace_menu
         <where>
             `is_active` = 0
         </where>
@@ -100,7 +100,7 @@
     <select id="getManagementMenuEn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`order`
-        FROM dss_onestop_menu
+        FROM dss_workspace_menu
         <where>
             `is_active` = 0
         </where>
@@ -109,7 +109,7 @@
     <select id="getApplicationMenuCn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
         SELECT `id`,`name`,`title_cn` AS `title`,`order`
-        FROM dss_onestop_menu
+        FROM dss_workspace_menu
         <where>
             `is_active` = 1
         </where>
@@ -118,7 +118,7 @@
     <select id="getApplicationMenuEn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`order`
-        FROM dss_onestop_menu
+        FROM dss_workspace_menu
         <where>
             `is_active` = 1
         </where>
@@ -128,11 +128,11 @@
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuAppInstanceVo">
         SELECT
         <include refid="menu_appInstances_cn"/>
-        FROM dss_onestop_menu_application m
+        FROM dss_workspace_menu_appconn m
         LEFT JOIN dss_application app
-        ON m.`application_id` = app.`id`
+        ON m.`appconn_id` = app.`id`
         <where>
-            m.`onestop_menu_id` = #{id}
+            m.`menu_id` = #{id}
         </where>
     </select>
 
@@ -140,24 +140,24 @@
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuAppInstanceVo">
         SELECT
         <include refid="menu_appInstances_en"/>
-        FROM dss_onestop_menu_application m
+        FROM dss_workspace_menu_appconn m
         LEFT JOIN dss_application app
-        ON m.`application_id` = app.`id`
+        ON m.`appconn_id` = app.`id`
         <where>
-            m.`onestop_menu_id` = #{id}
+            m.`menu_id` = #{id}
         </where>
     </select>
 
     <select id="getWorkspaceFavoritesCn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo">
-        SELECT dss_onestop_user_favorites.id, dss_onestop_menu_application.id AS menuApplicationId , name, url, icon,
+        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId , name, url, icon,
         title_cn AS title
-        FROM dss_onestop_user_favorites join dss_onestop_menu_application
-        on dss_onestop_user_favorites.menu_application_id = dss_onestop_menu_application.id
-        join dss_application on dss_application.id = dss_onestop_menu_application.application_id
+        FROM dss_workspace_user_favorites_appconn join dss_workspace_menu_appconn
+        on dss_workspace_user_favorites_appconn.menu_appconn_id = dss_workspace_menu_appconn.id
+        join dss_application on dss_application.id = dss_workspace_menu_appconn.appconn_id
         <where>
-            (dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
-            or `dss_onestop_user_favorites`.`workspace_id` = -1)
+            (dss_workspace_user_favorites_appconn.`username` = #{username} and `workspace_id` = #{workspaceId}
+            or `dss_workspace_user_favorites_appconn`.`workspace_id` = -1)
             AND type = #{type}
 
         </where>
@@ -165,20 +165,20 @@
 
     <select id="getWorkspaceFavoritesEn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo">
-        SELECT dss_onestop_user_favorites.id, dss_onestop_menu_application.id AS menuApplicationId, name, url, icon,
+        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId, name, url, icon,
         title_en AS `title`
-        FROM dss_onestop_user_favorites join dss_onestop_menu_application
-        on dss_onestop_user_favorites.menu_application_id = dss_onestop_menu_application.id
-        join dss_application on dss_application.id = dss_onestop_menu_application.application_id
+        FROM dss_workspace_user_favorites_appconn join dss_workspace_menu_appconn
+        on dss_workspace_user_favorites_appconn.menu_appconn_id = dss_workspace_menu_appconn.id
+        join dss_application on dss_application.id = dss_workspace_menu_appconn.appconn_id
         <where>
-            dss_onestop_user_favorites.`username` = #{username} and `workspace_id` = #{workspaceId}
+            dss_workspace_user_favorites_appconn.`username` = #{username} and `workspace_id` = #{workspaceId}
             AND type = #{type}
         </where>
     </select>
 
     <insert id="addFavorite" useGeneratedKeys="true" keyProperty="id"
             parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite">
-        INSERT INTO dss_onestop_user_favorites (<include refid="favorite_main"/>)
+        INSERT INTO dss_workspace_user_favorites_appconn (<include refid="favorite_main"/>)
         VALUES
         (#{id},#{username},#{workspaceId},#{menuApplicationId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime},#{type})
     </insert>
@@ -186,9 +186,9 @@
     <delete id="deleteFavorite">
         DELETE
         FROM
-        dss_onestop_user_favorites
+        dss_workspace_user_favorites_appconn
         WHERE
-        menu_application_id = #{applicationId}
+        menu_appconn_id = #{applicationId}
         AND username = #{username}
         AND workspace_id = #{workspaceId}
         AND type = #{type}
@@ -204,9 +204,9 @@
         t2.dept_name,
         t3.dept_name )
         FROM
-        ( SELECT dept_name, parent_id FROM dss_admin_dept WHERE id = #{id} ) t3
-        LEFT JOIN dss_admin_dept t2 ON t3.parent_id = t2.id
-        LEFT JOIN dss_admin_dept t1 ON t2.parent_id = t1.id
+        ( SELECT dept_name, parent_id FROM dss_workspace_admin_dept WHERE id = #{id} ) t3
+        LEFT JOIN dss_workspace_admin_dept t2 ON t3.parent_id = t2.id
+        LEFT JOIN dss_workspace_admin_dept t1 ON t2.parent_id = t1.id
     </select>
 
 
@@ -222,8 +222,8 @@
         FROM
         ( SELECT * FROM dss_workspace_user WHERE workspace_id = #{id} ) t1
         JOIN dss_user t2 ON t2.username = t1.username
-        JOIN dss_admin_dept t3 ON t3.id = t2.dept_id
-        left JOIN dss_admin_dept t4 ON t4.id = t3.parent_id
+        JOIN dss_workspace_admin_dept t3 ON t3.id = t2.dept_id
+        left JOIN dss_workspace_admin_dept t4 ON t4.id = t3.parent_id
         join dss_workspace_user_role t5
         on t5.username = t1.username and t5.workspace_id=t1.workspace_id
     </select>

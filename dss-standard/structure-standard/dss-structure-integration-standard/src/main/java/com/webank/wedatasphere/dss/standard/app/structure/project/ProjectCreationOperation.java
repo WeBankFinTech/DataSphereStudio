@@ -30,9 +30,16 @@ public interface ProjectCreationOperation<R extends DSSProjectContentRequestRef<
      * If created successfully, please return a ProjectResponseRef contained refProjectId,
      * so DSS can use the refProjectId to operate the related refProject in third-party AppConn.
      * The returned refProjectId is the other ProjectOperations which used.
-     * @param projectRef contains the DSS project info.
-     * @return a ProjectResponseRef contained refProjectId
-     * @throws ExternalOperationFailedException
+     * <br><br>
+     * 该方法会尝试请求第三方应用工具创建一个与 DSS 工程一对一关联的第三方 refProject。
+     * 如果创建成功，请返回一个包含了第三方应用工具的工程 ID（命名为 refProjectId）的 ProjectResponseRef，
+     * 以便 DSS 接下来可以使用 refProjectId 来管理第三方应用工具的这个工程（命名为 refProject）。
+     * <br>
+     * 返回的 refProjectId 是其他 ProjectOperation 能够操作这个第三方应用工具的工程的基础。DSS 在调用其他
+     * ProjectOperation 时，会将该 refProjectId 作为方法参数传入，以便用户能正常找到对应的 refProject进行相应操作。
+     * @param projectRef contains the DSS project info(包含了 DSS 的工程信息).
+     * @return a ProjectResponseRef contained refProjectId(返回一个包含了 refProjectId 的 ProjectResponseRef)
+     * @throws ExternalOperationFailedException 如果创建过程中发生异常，请抛出该异常。
      */
     ProjectResponseRef createProject(R projectRef) throws ExternalOperationFailedException;
 

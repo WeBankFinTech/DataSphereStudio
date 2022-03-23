@@ -1,113 +1,3 @@
-
-DROP TABLE IF EXISTS `dss_apiservice_api`;
-CREATE TABLE `dss_apiservice_api` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `name` varchar(180) NOT NULL COMMENT '服务名称',
-  `alias_name` varchar(200) NOT NULL COMMENT '服务中文名称',
-  `path` varchar(180) NOT NULL COMMENT '服务路径',
-  `protocol` int(11) NOT NULL COMMENT '协议: http, https',
-  `method` varchar(10) NOT NULL COMMENT '方法： post, put, delete',
-  `tag` varchar(200) DEFAULT NULL COMMENT '标签',
-  `scope` varchar(50) DEFAULT NULL COMMENT '范围',
-  `description` varchar(200) DEFAULT NULL COMMENT '服务描述',
-  `status` int(11) DEFAULT '0' COMMENT '服务状态，默认0是停止，1是运行中，2是删除',
-  `type` varchar(50) DEFAULT NULL COMMENT '服务引擎类型',
-  `run_type` varchar(50) DEFAULT NULL COMMENT '脚本类型',
-  `create_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `modify_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
-  `creator` varchar(50) DEFAULT NULL COMMENT '创建者',
-  `modifier` varchar(50) DEFAULT NULL COMMENT '修改者',
-  `script_path` varchar(180) NOT NULL COMMENT '脚本路径',
-  `workspaceID` int(11) NOT NULL COMMENT '工作空间ID',
-  `api_comment` varchar(1024) DEFAULT NULL COMMENT '服务备注',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_uniq_config_name` (`name`),
-  UNIQUE KEY `idx_uniq_dconfig_path` (`path`),
-  KEY `idx_dss_script_path` (`script_path`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='服务api配置表';
-
-DROP TABLE IF EXISTS `dss_apiservice_param`;
-CREATE TABLE `dss_apiservice_param` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `api_version_id` bigint(20) NOT NULL COMMENT '服务api版本id',
-  `name` varchar(200) NOT NULL COMMENT '名称',
-  `display_name` varchar(50) DEFAULT NULL COMMENT '展示名',
-  `type` varchar(50) DEFAULT NULL COMMENT '类型',
-  `required` tinyint(1) DEFAULT '1' COMMENT '是否必须: 0否, 1是',
-  `default_value` varchar(1024) DEFAULT NULL COMMENT '参数的默认值',
-  `description` varchar(200) DEFAULT NULL COMMENT '描述',
-  `details` varchar(1024) DEFAULT NULL COMMENT '变量的详细说明',
-  PRIMARY KEY (`id`),
-  KEY `idx_api_version_id` (`api_version_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='apiservice 参数表';
-
-DROP TABLE IF EXISTS `dss_apiservice_api_version`;
-CREATE TABLE `dss_apiservice_api_version` (
-   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-   `api_id` bigint(20) NOT NULL COMMENT '服务的ID',
-   `version` varchar(50) NOT NULL COMMENT '服务对应的版本信息',
-   `bml_resource_id` varchar(50) NOT NULL COMMENT 'bml资源id',
-   `bml_version` varchar(20) NOT NULL COMMENT 'bml版本',
-   `source` varchar(200) DEFAULT NULL COMMENT '来源',
-   `creator` varchar(50) DEFAULT NULL COMMENT '创建者',
-   `create_time`timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-   `status` tinyint(1) default '1' COMMENT '0表示被禁用，1表示正在运行',
-   `metadata_info` varchar(5000) NOT NULL COMMENT '发布者库表信息',
-   `auth_id` varchar(200) NOT NULL COMMENT '用于与datamap交互的UUID',
-   `datamap_order_no` varchar(200) DEFAULT NULL COMMENT 'datamap审批单号码',
-   PRIMARY KEY(`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='服务api版本表';
-
-DROP TABLE IF EXISTS `dss_apiservice_token_manager`;
-CREATE TABLE `dss_apiservice_token_manager` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `api_version_id` bigint(20) NOT NULL COMMENT '服务api版本id',
-  `api_id` bigint(20) NOT NULL COMMENT '服务api配置id',
-  `publisher` varchar(20) NOT NULL COMMENT '发布用户',
-  `user` varchar(20) NOT NULL COMMENT '申请用户',
-  `apply_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
-  `duration` int(10) NOT NULL COMMENT '时长',
-  `reason` varchar(200) DEFAULT NULL COMMENT '申请原因',
-  `ip_whitelist` varchar(200) DEFAULT NULL COMMENT 'IP白名单',
-  `status` tinyint(1) DEFAULT '1' COMMENT '状态0过期，1有效期内',
-  `caller` varchar(50) DEFAULT NULL COMMENT '调用方',
-  `access_limit` varchar(50) DEFAULT NULL COMMENT '限流情况',
-  `apply_source` varchar(200) DEFAULT NULL COMMENT '申请来源',
-  `token` varchar(500) DEFAULT NULL COMMENT 'token内容',
-   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='apiservice token管理表';
-
-DROP TABLE IF EXISTS `dss_apiservice_approval`;
-CREATE TABLE `dss_apiservice_approval` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `api_id` bigint(20) NOT NULL COMMENT '服务api id',
-  `api_version_id` bigint(20) NOT NULL COMMENT '版本id',
-  `approval_name` varchar(50) NOT NULL COMMENT '审批单名称',
-  `apply_user` varchar(1024) NOT NULL COMMENT '申请用户',
-  `execute_user` varchar(50) DEFAULT NULL COMMENT '代理执行用户，用,分割',
-  `creator` varchar(50) NOT NULL COMMENT '创建者',
-  `status` int(10) DEFAULT '0' COMMENT '申请状态，提单成功1，审批中2，成功3，失败4',
-  `create_time` timestamp NOT null DEFAULT CURRENT_TIMESTAMP COMMENT '审批单创建时间',
-  `update_time` timestamp NOT null DEFAULT CURRENT_TIMESTAMP COMMENT '审批单状态更新时间',
-  `approval_no` varchar(500) NOT NULL COMMENT '审批单号',
-  PRIMARY KEY(`id`),
-  UNIQUE KEY `idx_uniq_api_version_id` (`api_version_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='apiservice 审批单表';
-
-DROP TABLE IF EXISTS `dss_apiservice_access_info`;
-CREATE TABLE `dss_apiservice_access_info` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `api_id` bigint(20) NOT NULL COMMENT '服务id',
-  `api_version_id` bigint(20) NOT NULL COMMENT '版本id',
-  `api_name` varchar(50) NOT NULL COMMENT '服务名称',
-  `login_user` varchar(50) NOT NULL COMMENT '提交用户',
-  `execute_user` varchar(50) DEFAULT NULL COMMENT '代理执行用户',
-  `api_publisher` varchar(50) NOT NULL COMMENT 'api创建者',
-  `access_time` timestamp NOT null DEFAULT CURRENT_TIMESTAMP COMMENT '访问时间',
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='apiservice 访问信息表';
-
-
 DROP TABLE IF EXISTS `dss_appconn`;
 CREATE TABLE `dss_appconn` (
   `id` int(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -136,15 +26,8 @@ CREATE TABLE `dss_appconn_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='dss instance的实例表';
 
-DROP TABLE IF EXISTS `dss_appconn_project_relation`;
-CREATE TABLE `dss_appconn_project_relation` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `project_id` bigint(20) NOT NULL,
-  `appconn_instance_id` bigint(20) NOT NULL,
-  `appconn_instance_project_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
+-- wait for delete
 DROP TABLE IF EXISTS `dss_application`;
 CREATE TABLE `dss_application` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -162,305 +45,10 @@ CREATE TABLE `dss_application` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 
--- no use
-DROP TABLE IF EXISTS `dss_application_user_init_result`;
-CREATE TABLE `dss_application_user_init_result` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `application_id` int(11) DEFAULT NULL,
-  `result` varchar(255) DEFAULT NULL,
-  `username` varchar(32) DEFAULT NULL,
-  `is_init_success` tinyint(1) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- no use
-DROP TABLE IF EXISTS `dss_component_info`;
-CREATE TABLE `dss_component_info` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `title` varchar(128) NOT NULL,
-  `icon` varchar(64) NOT NULL,
-  `desc` varchar(1024) NOT NULL,
-  `button_text` varchar(64) NOT NULL,
-  `menu_id` int(10) NOT NULL,
-  `application_id` int(10) DEFAULT '0',
-  `user_manual_url` varchar(512) DEFAULT NULL,
-  `indicator_url` varchar(512) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_component_role`;
-CREATE TABLE `dss_component_role` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` bigint(20) DEFAULT NULL,
-  `component_id` int(20) DEFAULT NULL,
-  `role_id` int(20) DEFAULT NULL,
-  `priv` int(20) DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `updateby` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5103 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_dev_flow`;
-CREATE TABLE `dss_dev_flow` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID，默认为0，所有空间都有',
-  `workspace_id` int(11) DEFAULT '0' COMMENT '空间ID，默认为0，所有空间都有',
-  `type` int(1) DEFAULT '0' COMMENT '类型: 0-空间开发流程，1-工程开发流程，2-工程编排模式',
-  `dev_name` varchar(200) DEFAULT NULL COMMENT '名称',
-  `dev_code` varchar(200) NOT NULL COMMENT '编码，可以当做checkbox或radio中的value来使用,赋值可以当做英文名称来使用',
-  `title` varchar(200) DEFAULT NULL COMMENT '标题',
-  `url` varchar(200) DEFAULT NULL COMMENT 'url',
-  `url_type` int(1) DEFAULT '0' COMMENT 'url类型: 0-内部系统，1-外部系统；默认是内部',
-  `icon` varchar(200) DEFAULT NULL COMMENT '图标',
-  `dev_desc` varchar(500) DEFAULT NULL COMMENT '描述',
-  `order_num` int(2) DEFAULT '1' COMMENT '序号',
-  `remark` varchar(200) DEFAULT NULL COMMENT '备注',
-  `create_user` varchar(100) DEFAULT NULL COMMENT '创建人',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_user` varchar(100) DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_unique_workspace_id` (`workspace_id`,`type`,`dev_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='开发流程/编排模式等配置表';
-
-
-DROP TABLE IF EXISTS `dss_dictionary`;
-CREATE TABLE `dss_dictionary` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `workspace_id` int(11) DEFAULT '0' COMMENT '空间ID，默认为0，所有空间都有',
-  `parent_key` varchar(200) DEFAULT '0' COMMENT '父key',
-  `dic_name` varchar(200) NOT NULL COMMENT '名称',
-  `dic_name_en` varchar(300) DEFAULT NULL COMMENT '名称（英文）',
-  `dic_key` varchar(200) NOT NULL COMMENT 'key 相当于编码，空间是w_开头，工程是p_',
-  `dic_value` varchar(500) DEFAULT NULL COMMENT 'key对应的值',
-  `dic_value_en` varchar(1000) DEFAULT NULL COMMENT 'key对应的值（英文）',
-  `title` varchar(200) DEFAULT NULL COMMENT '标题',
-  `title_en` varchar(400) DEFAULT NULL COMMENT '标题（英文）',
-  `url` varchar(200) DEFAULT NULL COMMENT 'url',
-  `url_type` int(1) DEFAULT '0' COMMENT 'url类型: 0-内部系统，1-外部系统；默认是内部',
-  `icon` varchar(200) DEFAULT NULL COMMENT '图标',
-  `order_num` int(2) DEFAULT '1' COMMENT '序号',
-  `remark` varchar(1000) DEFAULT NULL COMMENT '备注',
-  `create_user` varchar(100) DEFAULT NULL COMMENT '创建人',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_user` varchar(100) DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `idx_unique_workspace_id` (`workspace_id`,`dic_key`),
-  KEY `idx_parent_key` (`parent_key`),
-  KEY `idx_dic_key` (`dic_key`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='数据字典表';
-
-DROP TABLE IF EXISTS `dss_event_relation`;
-CREATE TABLE `dss_event_relation` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `project_version_id` bigint(20) NOT NULL,
-  `flow_id` bigint(20) NOT NULL,
-  `msg_type` varchar(45) NOT NULL,
-  `msg_topic` varchar(45) NOT NULL,
-  `msg_name` varchar(45) NOT NULL,
-  `msg_sender` varchar(45) DEFAULT NULL,
-  `msg_receiver` varchar(45) DEFAULT NULL,
-  `node_json` varchar(4096) DEFAULT NULL,
-  `project_id` bigint(20) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='save eventchecker info for application map';
-
-DROP TABLE IF EXISTS `dss_flow_edit_lock`;
-CREATE TABLE `dss_flow_edit_lock` (
-   `id` int(11) NOT NULL AUTO_INCREMENT,
-   `flow_id` bigint(11) NOT NULL,
-   `flow_version` varchar(16) NOT NULL,
-   `username` varchar(64) NOT NULL,
-   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-   `owner` varchar(128) NOT NULL,
-   `lock_stamp` int(8) NOT NULL DEFAULT '0',
-   `is_expire` tinyint(1) NOT NULL DEFAULT '0',
-   `lock_content` varchar(512) NOT NULL,
-   PRIMARY KEY (`id`),
-   UNIQUE KEY `dss_flow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
- ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_flow_relation`;
-CREATE TABLE `dss_flow_relation` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `flow_id` bigint(20) DEFAULT NULL,
-  `parent_flow_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_homepage_demo_instance`;
-CREATE TABLE `dss_homepage_demo_instance` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `menu_id` int(20) DEFAULT NULL,
-  `name` varchar(64) DEFAULT NULL,
-  `url` varchar(128) DEFAULT NULL,
-  `title_en` varchar(64) DEFAULT NULL,
-  `title_cn` varchar(64) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
-  `icon` varchar(255) DEFAULT NULL,
-  `order` int(2) DEFAULT NULL,
-  `click_num` int(11) DEFAULT '0',
-  `create_by` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `last_update_user` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_homepage_demo_menu`;
-CREATE TABLE `dss_homepage_demo_menu` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) DEFAULT NULL,
-  `title_en` varchar(64) DEFAULT NULL,
-  `title_cn` varchar(64) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
-  `icon` varchar(255) DEFAULT NULL,
-  `order` int(2) DEFAULT NULL,
-  `create_by` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `last_update_user` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_homepage_video`;
-CREATE TABLE `dss_homepage_video` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) DEFAULT NULL,
-  `url` varchar(128) DEFAULT NULL,
-  `title_en` varchar(64) DEFAULT NULL,
-  `title_cn` varchar(64) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
-  `icon` varchar(255) DEFAULT NULL,
-  `order` int(2) DEFAULT NULL,
-  `play_num` int(11) DEFAULT '0',
-  `create_by` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `last_update_user` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_input_relation`;
-CREATE TABLE `dss_input_relation` (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(16) DEFAULT NULL,
-  `source_env` varchar(16) DEFAULT NULL,
-  `source_id` bigint(20) DEFAULT NULL,
-  `target_env` varchar(16) DEFAULT NULL,
-  `target_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_menu`;
-CREATE TABLE `dss_menu` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `level` varchar(255) DEFAULT NULL,
-  `upper_menu_id` int(20) DEFAULT NULL,
-  `front_name` varchar(255) DEFAULT NULL,
-  `comment` varchar(255) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `is_active` tinyint(4) DEFAULT '1',
-  `is_component` tinyint(1) NOT NULL DEFAULT '0',
-  `icon` varchar(128) DEFAULT NULL,
-  `application_id` int(11) DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_menu_component_url`;
-CREATE TABLE `dss_menu_component_url` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `menu_id` int(10) NOT NULL,
-  `dss_application_id` int(11) DEFAULT NULL,
-  `url` varchar(512) COLLATE utf8_bin NOT NULL,
-  `manul_url` varchar(512) COLLATE utf8_bin DEFAULT NULL,
-  `operation_url` varchar(512) COLLATE utf8_bin DEFAULT NULL,
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_menu_page_relation`;
-CREATE TABLE `dss_menu_page_relation` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_menu_role`;
-CREATE TABLE `dss_menu_role` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` int(20) DEFAULT NULL,
-  `menu_id` int(20) DEFAULT NULL,
-  `role_id` int(20) DEFAULT NULL,
-  `priv` int(20) DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `updateby` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5263 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_onestop_menu`;
-CREATE TABLE `dss_onestop_menu` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) DEFAULT NULL,
-  `title_en` varchar(64) DEFAULT NULL,
-  `title_cn` varchar(64) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT '1',
-  `icon` varchar(255) DEFAULT NULL,
-  `order` int(2) DEFAULT NULL,
-  `create_by` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `last_update_user` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_onestop_menu_application`;
-CREATE TABLE `dss_onestop_menu_application` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `application_id` int(20) DEFAULT NULL,
-  `onestop_menu_id` int(20) NOT NULL,
-  `title_en` varchar(64) DEFAULT NULL,
-  `title_cn` varchar(64) DEFAULT NULL,
-  `desc_en` varchar(255) DEFAULT NULL,
-  `desc_cn` varchar(255) DEFAULT NULL,
-  `labels_en` varchar(255) DEFAULT NULL,
-  `labels_cn` varchar(255) DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT NULL,
-  `access_button_en` varchar(64) DEFAULT NULL,
-  `access_button_cn` varchar(64) DEFAULT NULL,
-  `manual_button_en` varchar(64) DEFAULT NULL,
-  `manual_button_cn` varchar(64) DEFAULT NULL,
-  `manual_button_url` varchar(255) DEFAULT NULL,
-  `icon` varchar(255) DEFAULT NULL,
-  `order` int(2) DEFAULT NULL,
-  `create_by` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `last_update_user` varchar(30) DEFAULT NULL,
-  `image` varchar(200) DEFAULT NULL COMMENT '图片',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
-
-
-DROP TABLE IF EXISTS `dss_onestop_user_favorites`;
-CREATE TABLE `dss_onestop_user_favorites` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `username` varchar(64) DEFAULT NULL,
-  `workspace_id` bigint(20) DEFAULT '1',
-  `menu_application_id` int(20) DEFAULT NULL,
-  `order` int(2) DEFAULT NULL,
-  `create_by` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `last_update_user` varchar(30) DEFAULT NULL,
-  `type` varchar(20) NOT NULL DEFAULT "" COMMENT "dingyiding or 收藏",
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
+---------------------------------------------------------------------
+-------------------  DSS Orchestrator Framework ---------------------
+---------------------------------------------------------------------
 
 DROP TABLE IF EXISTS `dss_orchestrator_info`;
 CREATE TABLE `dss_orchestrator_info` (
@@ -487,31 +75,6 @@ CREATE TABLE `dss_orchestrator_info` (
    UNIQUE KEY `unique_idx_uuid` (`uuid`)
  ) ENGINE=InnoDB AUTO_INCREMENT=326 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `dss_orchestrator_schedule_info`;
-CREATE TABLE `dss_orchestrator_schedule_info` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `orchestrator_id` bigint(20) NOT NULL,
-  `project_name` varchar(1024) COLLATE utf8_bin NOT NULL,
-  `schedule_user` varchar(128) COLLATE utf8_bin DEFAULT NULL,
-  `schedule_time` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
-  `alarm_level` varchar(32) COLLATE utf8_bin DEFAULT NULL,
-  `alarm_user_emails` varchar(4096) COLLATE utf8_bin DEFAULT NULL,
-  `last_update_time` datetime DEFAULT CURRENT_TIMESTAMP,
-  `active_flag` VARCHAR(10)  DEFAULT 'true'  COMMENT '调度标示：true-已启动；false-已禁用',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_orchestrator_user`;
-CREATE TABLE `dss_orchestrator_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `orchestrator_id` bigint(20) NOT NULL,
-  `project_id` bigint(20) NOT NULL,
-  `workspace_id` int(10) NOT NULL DEFAULT '0',
-  `username` varchar(100) COLLATE utf8_bin NOT NULL,
-  `priv` tinyint(5) NOT NULL DEFAULT '0',
-  `last_update_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
 
 DROP TABLE IF EXISTS `dss_orchestrator_version_info`;
 CREATE TABLE `dss_orchestrator_version_info` (
@@ -529,6 +92,10 @@ CREATE TABLE `dss_orchestrator_version_info` (
    `valid_flag` INT(1) DEFAULT '1' COMMENT '版本有效标示，0:无效；1：有效',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=422 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+
+---------------------------------------------------------------------
+-------------------  DSS Project Framework ---------------------
+---------------------------------------------------------------------
 
 DROP TABLE IF EXISTS `dss_project`;
 CREATE TABLE `dss_project` (
@@ -562,67 +129,6 @@ CREATE TABLE `dss_project` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=313 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `dss_project_applications_project`;
-CREATE TABLE `dss_project_applications_project` (
-  `project_id` bigint(20) NOT NULL,
-  `application_id` int(11) NOT NULL,
-  `application_project_id` bigint(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_project_orchestrator`;
-CREATE TABLE `dss_project_orchestrator` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `workspace_id` int(11) DEFAULT NULL COMMENT '空间id',
-  `project_id` int(11) DEFAULT NULL COMMENT '工程id',
-  `orchestrator_id` int(11) DEFAULT NULL COMMENT '编排模式id（工作流,调用orchestrator服务返回的orchestratorId）',
-  `orchestrator_version_id` int(11) DEFAULT NULL COMMENT '编排模式版本id（工作流,调用orchestrator服务返回的orchestratorVersionId）',
-  `orchestrator_name` varchar(100) DEFAULT NULL COMMENT '编排名称',
-  `orchestrator_mode` varchar(100) DEFAULT NULL COMMENT '编排模式，取得的值是dss_dictionary中的dic_key(parent_key=p_arrangement_mode)',
-  `orchestrator_way` varchar(256) DEFAULT NULL COMMENT '编排方式',
-  `uses` varchar(256) DEFAULT NULL COMMENT '用途',
-  `description` varchar(256) DEFAULT NULL COMMENT '描述',
-  `create_user` varchar(100) DEFAULT NULL COMMENT '创建人',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_user` varchar(100) DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  KEY `idx_workspace_id` (`workspace_id`,`project_id`),
-  KEY `idx_orchestrator_id` (`orchestrator_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=197 DEFAULT CHARSET=utf8 COMMENT='DSS编排模式信息表';
-
-DROP TABLE IF EXISTS `dss_project_publish_history`;
-CREATE TABLE `dss_project_publish_history` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `project_version_id` bigint(20) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `creator` varchar(32) COLLATE utf8_bin DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `comment` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `state` tinyint(255) DEFAULT NULL,
-  `version_path` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `expire_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `project_version_id` (`project_version_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_project_taxonomy`;
-CREATE TABLE `dss_project_taxonomy` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(20) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `creator` varchar(32) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `name` (`name`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_project_taxonomy_relation`;
-CREATE TABLE `dss_project_taxonomy_relation` (
-  `taxonomy_id` bigint(20) NOT NULL,
-  `project_id` bigint(20) NOT NULL,
-  `creator` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 DROP TABLE IF EXISTS `dss_project_user`;
 CREATE TABLE `dss_project_user` (
@@ -635,30 +141,73 @@ CREATE TABLE `dss_project_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1859 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `dss_project_version`;
-CREATE TABLE `dss_project_version` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `project_id` bigint(20) DEFAULT NULL,
-  `version` varchar(10) COLLATE utf8_bin DEFAULT NULL,
-  `comment` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `updator` varchar(32) COLLATE utf8_bin DEFAULT NULL,
-  `lock` int(255) DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=773 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_release_task`;
-CREATE TABLE `dss_release_task` (
+DROP TABLE IF EXISTS `dss_appconn_project_relation`;
+CREATE TABLE `dss_appconn_project_relation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `project_id` bigint(20) NOT NULL,
-  `orchestrator_version_id` bigint(20) NOT NULL,
-  `orchestrator_id` bigint(20) NOT NULL,
-  `release_user` varchar(128) NOT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `status` varchar(64) DEFAULT 'init',
+  `appconn_instance_id` bigint(20) NOT NULL,
+  `appconn_instance_project_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=605 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+
+---------------------------------------------------------------------
+---------------------  DSS Workspace Framework ----------------------
+---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `dss_workspace`;
+CREATE TABLE `dss_workspace` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `label` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `create_by` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `department` varchar(255) DEFAULT NULL,
+  `product` varchar(255) DEFAULT NULL,
+  `source` varchar(255) DEFAULT NULL,
+  `last_update_time` datetime DEFAULT NULL,
+  `last_update_user` varchar(30) DEFAULT NULL COMMENT '最新修改用户',
+  `workspace_type`  varchar(20) DEFAULT NULL comment '工作空间类型',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `dss_workspace_homepage`;
+CREATE TABLE `dss_workspace_homepage` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` int(10) NOT NULL,
+  `role_id` int(20) DEFAULT NULL,
+  `homepage_url` varchar(256) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1213 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `dss_dictionary`;
+CREATE TABLE `dss_dictionary` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `workspace_id` int(11) DEFAULT '0' COMMENT '空间ID，默认为0，所有空间都有',
+  `parent_key` varchar(200) DEFAULT '0' COMMENT '父key',
+  `dic_name` varchar(200) NOT NULL COMMENT '名称',
+  `dic_name_en` varchar(300) DEFAULT NULL COMMENT '名称（英文）',
+  `dic_key` varchar(200) NOT NULL COMMENT 'key 相当于编码，空间是w_开头，工程是p_',
+  `dic_value` varchar(500) DEFAULT NULL COMMENT 'key对应的值',
+  `dic_value_en` varchar(1000) DEFAULT NULL COMMENT 'key对应的值（英文）',
+  `title` varchar(200) DEFAULT NULL COMMENT '标题',
+  `title_en` varchar(400) DEFAULT NULL COMMENT '标题（英文）',
+  `url` varchar(200) DEFAULT NULL COMMENT 'url',
+  `url_type` int(1) DEFAULT '0' COMMENT 'url类型: 0-内部系统，1-外部系统；默认是内部',
+  `icon` varchar(200) DEFAULT NULL COMMENT '图标',
+  `order_num` int(2) DEFAULT '1' COMMENT '序号',
+  `remark` varchar(1000) DEFAULT NULL COMMENT '备注',
+  `create_user` varchar(100) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_user` varchar(100) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_unique_workspace_id` (`workspace_id`,`dic_key`),
+  KEY `idx_parent_key` (`parent_key`),
+  KEY `idx_dic_key` (`dic_key`)
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='数据字典表';
 
 DROP TABLE IF EXISTS `dss_role`;
 CREATE TABLE `dss_role` (
@@ -671,6 +220,47 @@ CREATE TABLE `dss_role` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `workspace_id` (`workspace_id`,`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
+
+
+
+DROP TABLE IF EXISTS `dss_user`;
+CREATE TABLE `dss_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(64) DEFAULT NULL,
+  `name` varchar(64) DEFAULT NULL,
+  `is_first_login` tinyint(1) DEFAULT NULL,
+  `dept_id` int(11) DEFAULT NULL,
+  `is_admin` tinyint(1) DEFAULT '0' COMMENT '是否管理员(1:是;0:否)',
+  `email` varchar(50) DEFAULT '' COMMENT '用户邮箱',
+  `phonenumber` varchar(11) DEFAULT '' COMMENT '手机号码',
+  `password` varchar(100) DEFAULT '' COMMENT '密码',
+  `del_flag` char(1) DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS `dss_admin_dept`;
+CREATE TABLE `dss_admin_dept` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '部门id',
+  `parent_id` bigint(20) DEFAULT '0' COMMENT '父部门id',
+  `ancestors` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '祖级列表',
+  `dept_name` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '部门名称',
+  `order_num` int(4) DEFAULT '0' COMMENT '显示顺序',
+  `leader` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '负责人',
+  `phone` varchar(11) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '联系电话',
+  `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '邮箱',
+  `status` char(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '0' COMMENT '部门状态（0正常 1停用）',
+  `del_flag` char(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
+  `create_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '更新者',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='部门表';
 
 DROP TABLE IF EXISTS `dss_sidebar`;
 CREATE TABLE `dss_sidebar` (
@@ -713,7 +303,21 @@ CREATE TABLE `dss_sidebar_content` (
   KEY `idx_sidebarws_id` (`workspace_id`,`sidebar_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='侧边栏-内容表';
 
+DROP TABLE IF EXISTS `dss_download_audit`;
+CREATE TABLE `dss_download_audit`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `creator` varchar(255)  COMMENT '创建者',
+  `tenant` varchar(255)  COMMENT '租户',
+	`path` varchar(255)  COMMENT '文件路径',
+	`sql` varchar(3000)  COMMENT '执行sql脚本',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+	 PRIMARY KEY (`id`)
+) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = '文件下载审计';
 
+---------------------------------------------------------------------
+---------------------------  DSS Workflow ---------------------------
+---------------------------------------------------------------------
 
 DROP TABLE IF EXISTS `dss_workflow`;
 CREATE TABLE `dss_workflow` (
@@ -735,6 +339,77 @@ CREATE TABLE `dss_workflow` (
   `dss_labels` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=455 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+
+DROP TABLE IF EXISTS `dss_flow_relation`;
+CREATE TABLE `dss_flow_relation` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `flow_id` bigint(20) DEFAULT NULL,
+  `parent_flow_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+
+
+DROP TABLE IF EXISTS `dss_flow_edit_lock`;
+CREATE TABLE `dss_flow_edit_lock` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '',
+   `flow_id` bigint(11) NOT NULL COMMENT '',
+   `flow_version` varchar(16) NOT NULL COMMENT '',
+   `username` varchar(64) NOT NULL COMMENT '',
+   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   `owner` varchar(128) NOT NULL COMMENT '',
+   `lock_stamp` int(8) NOT NULL DEFAULT '0' COMMENT '',
+   `is_expire` tinyint(1) NOT NULL DEFAULT '0' COMMENT '',
+   `lock_content` varchar(512) NOT NULL COMMENT '',
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `dss_flow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
+ ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
+
+ DROP TABLE IF EXISTS `dss_workflow_task`;
+CREATE TABLE `dss_workflow_task` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key, auto increment',
+  `instance` varchar(50) DEFAULT NULL COMMENT 'An instance of Entrance, consists of IP address of the entrance server and port',
+  `exec_id` varchar(50) DEFAULT NULL COMMENT 'execution ID, consists of jobID(generated by scheduler), executeApplicationName , creator and instance',
+  `um_user` varchar(50) DEFAULT NULL COMMENT 'User name',
+  `submit_user` varchar(50) DEFAULT NULL COMMENT 'submitUser name',
+  `execution_code` text COMMENT 'Run script. When exceeding 6000 lines, script would be stored in HDFS and its file path would be stored in database',
+  `progress` float DEFAULT NULL COMMENT 'Script execution progress, between zero and one',
+  `log_path` varchar(200) DEFAULT NULL COMMENT 'File path of the log files',
+  `result_location` varchar(200) DEFAULT NULL COMMENT 'File path of the result',
+  `status` varchar(50) DEFAULT NULL COMMENT 'Script execution status, must be one of the following: Inited, WaitForRetry, Scheduled, Running, Succeed, Failed, Cancelled, Timeout',
+  `created_time` datetime DEFAULT NULL COMMENT 'Creation time',
+  `updated_time` datetime DEFAULT NULL COMMENT 'Update time',
+  `run_type` varchar(50) DEFAULT NULL COMMENT 'Further refinement of execution_application_time, e.g, specifying whether to run pySpark or SparkR',
+  `err_code` int(11) DEFAULT NULL COMMENT 'Error code. Generated when the execution of the script fails',
+  `err_desc` text COMMENT 'Execution description. Generated when the execution of script fails',
+  `execute_application_name` varchar(200) DEFAULT NULL COMMENT 'The service a user selects, e.g, Spark, Python, R, etc',
+  `request_application_name` varchar(200) DEFAULT NULL COMMENT 'Parameter name for creator',
+  `script_path` varchar(200) DEFAULT NULL COMMENT 'Path of the script in workspace',
+  `params` text COMMENT 'Configuration item of the parameters',
+  `engine_instance` varchar(50) DEFAULT NULL COMMENT 'An instance of engine, consists of IP address of the engine server and port',
+  `task_resource` varchar(1024) DEFAULT NULL,
+  `engine_start_time` time DEFAULT NULL,
+  `label_json` varchar(200) DEFAULT NULL COMMENT 'label json',
+  PRIMARY KEY (`id`),
+  KEY `created_time` (`created_time`),
+  KEY `um_user` (`um_user`)
+) ENGINE=InnoDB AUTO_INCREMENT=715 DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `dss_workflow_execute_info` (
+   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+   `task_id` bigint(20) NOT NULL COMMENT '任务id',
+   `status` int(1) DEFAULT NULL COMMENT '状态，0：失败 1：成功，',
+   `flow_id` bigint(20) NOT NULL COMMENT 'flowId',
+   `version` varchar(200) DEFAULT NULL COMMENT '工作流bml版本号',
+   `failed_jobs` text COMMENT '执行失败节点',
+   `Pending_jobs` text COMMENT '未执行节点',
+   `skipped_jobs` text COMMENT '执行跳过节点',
+   `succeed_jobs` text COMMENT '执行成功节点',
+   `createtime` datetime NOT NULL COMMENT '创建时间',
+   `running_jobs` text COMMENT '正在执行节点',
+   `updatetime` datetime DEFAULT NULL COMMENT '更新时间',
+   PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB AUTO_INCREMENT=471 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `dss_workflow_node`;
 CREATE TABLE `dss_workflow_node` (
@@ -772,7 +447,6 @@ CREATE TABLE `dss_workflow_node_to_ui` (
   `workflow_node_id` int(11) NOT NULL,
   `ui_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 
 DROP TABLE IF EXISTS `dss_workflow_node_ui`;
 CREATE TABLE `dss_workflow_node_ui` (
@@ -813,445 +487,28 @@ CREATE TABLE `dss_workflow_node_ui_validate` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4;
 
-DROP TABLE IF EXISTS `dss_workflow_project`;
-CREATE TABLE `dss_workflow_project` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-  `source` varchar(50) COLLATE utf8_bin DEFAULT NULL COMMENT 'Source of the dss_project',
-  `description` text COLLATE utf8_bin,
-  `user_id` bigint(20) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `create_by` bigint(20) DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  `update_by` datetime DEFAULT NULL,
-  `org_id` bigint(20) DEFAULT NULL COMMENT 'Organization ID',
-  `visibility` bit(1) DEFAULT NULL,
-  `is_transfer` bit(1) DEFAULT NULL COMMENT 'Reserved word',
-  `initial_org_id` bigint(20) DEFAULT NULL,
-  `isArchive` bit(1) DEFAULT b'0' COMMENT 'If it is archived',
-  `pic` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `star_num` int(11) DEFAULT '0',
-  `product` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-  `application_area` tinyint(1) DEFAULT NULL,
-  `business` varchar(200) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
-
-DROP TABLE IF EXISTS `dss_workflow_project_priv`;
-CREATE TABLE `dss_workflow_project_priv` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workapce_id` bigint(20) DEFAULT NULL,
-  `project_id` bigint(20) DEFAULT NULL,
-  `user_id` bigint(20) DEFAULT NULL,
-  `priv` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_workflow_task`;
-CREATE TABLE `dss_workflow_task` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key, auto increment',
-  `instance` varchar(50) DEFAULT NULL COMMENT 'An instance of Entrance, consists of IP address of the entrance server and port',
-  `exec_id` varchar(50) DEFAULT NULL COMMENT 'execution ID, consists of jobID(generated by scheduler), executeApplicationName , creator and instance',
-  `um_user` varchar(50) DEFAULT NULL COMMENT 'User name',
-  `submit_user` varchar(50) DEFAULT NULL COMMENT 'submitUser name',
-  `execution_code` text COMMENT 'Run script. When exceeding 6000 lines, script would be stored in HDFS and its file path would be stored in database',
-  `progress` float DEFAULT NULL COMMENT 'Script execution progress, between zero and one',
-  `log_path` varchar(200) DEFAULT NULL COMMENT 'File path of the log files',
-  `result_location` varchar(200) DEFAULT NULL COMMENT 'File path of the result',
-  `status` varchar(50) DEFAULT NULL COMMENT 'Script execution status, must be one of the following: Inited, WaitForRetry, Scheduled, Running, Succeed, Failed, Cancelled, Timeout',
-  `created_time` datetime DEFAULT NULL COMMENT 'Creation time',
-  `updated_time` datetime DEFAULT NULL COMMENT 'Update time',
-  `run_type` varchar(50) DEFAULT NULL COMMENT 'Further refinement of execution_application_time, e.g, specifying whether to run pySpark or SparkR',
-  `err_code` int(11) DEFAULT NULL COMMENT 'Error code. Generated when the execution of the script fails',
-  `err_desc` text COMMENT 'Execution description. Generated when the execution of script fails',
-  `execute_application_name` varchar(200) DEFAULT NULL COMMENT 'The service a user selects, e.g, Spark, Python, R, etc',
-  `request_application_name` varchar(200) DEFAULT NULL COMMENT 'Parameter name for creator',
-  `script_path` varchar(200) DEFAULT NULL COMMENT 'Path of the script in workspace',
-  `params` text COMMENT 'Configuration item of the parameters',
-  `engine_instance` varchar(50) DEFAULT NULL COMMENT 'An instance of engine, consists of IP address of the engine server and port',
-  `task_resource` varchar(1024) DEFAULT NULL,
-  `engine_start_time` time DEFAULT NULL,
-  `label_json` varchar(200) DEFAULT NULL COMMENT 'label json',
-  PRIMARY KEY (`id`),
-  KEY `created_time` (`created_time`),
-  KEY `um_user` (`um_user`)
-) ENGINE=InnoDB AUTO_INCREMENT=715 DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `dss_workspace`;
-CREATE TABLE `dss_workspace` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) DEFAULT NULL,
-  `label` varchar(255) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `create_by` varchar(255) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `department` varchar(255) DEFAULT NULL,
-  `product` varchar(255) DEFAULT NULL,
-  `source` varchar(255) DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  `last_update_user` varchar(30) DEFAULT NULL COMMENT '最新修改用户',
-  `workspace_type`  varchar(20) DEFAULT NULL comment '工作空间类型',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_workspace_datasource`;
-CREATE TABLE `dss_workspace_datasource` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` int(20) DEFAULT NULL,
-  `datasource_name` varchar(255) DEFAULT NULL,
-  `type` varchar(255) DEFAULT NULL,
-  `created_time` datetime DEFAULT NULL,
-  `env` varchar(255) DEFAULT NULL,
-  `creater` varchar(255) DEFAULT NULL,
-  `responser` varchar(255) DEFAULT NULL,
-  `last_update_user` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_workspace_homepage`;
-CREATE TABLE `dss_workspace_homepage` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` int(10) NOT NULL,
-  `role_id` int(20) DEFAULT NULL,
-  `homepage_url` varchar(256) DEFAULT NULL,
-  `update_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1213 DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_workspace_public_table`;
-CREATE TABLE `dss_workspace_public_table` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `worksapce_id` int(20) DEFAULT NULL,
-  `table_name` varchar(255) DEFAULT NULL,
-  `type` varchar(255) DEFAULT NULL,
-  `created_time` datetime DEFAULT NULL,
-  `env` varchar(255) DEFAULT NULL,
-  `creater` varchar(255) DEFAULT NULL,
-  `responser` varchar(255) DEFAULT NULL,
-  `last_update_user` datetime DEFAULT NULL,
-  `last_update_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_workspace_role`;
-CREATE TABLE `dss_workspace_role` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` int(20) DEFAULT NULL,
-  `role_id` int(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `dss_workspace_user`;
-CREATE TABLE `dss_workspace_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` bigint(20) DEFAULT NULL,
-  `username` varchar(32) DEFAULT NULL,
-  `join_time` datetime DEFAULT NULL,
-  `created_by` varchar(255) DEFAULT NULL,
-  `user_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
-
-DROP TABLE IF EXISTS `dss_workspace_user_role`;
-CREATE TABLE `dss_workspace_user_role` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` bigint(20) DEFAULT NULL,
-  `username` varchar(32) DEFAULT NULL,
-  `role_id` int(20) DEFAULT NULL,
-  `create_time` datetime DEFAULT NULL,
-  `created_by` varchar(255) DEFAULT NULL,
-  `user_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
-
-DROP TABLE IF EXISTS `event_auth`;
-CREATE TABLE `event_auth` (
-  `sender` varchar(45) NOT NULL COMMENT '消息发送者',
-  `topic` varchar(45) NOT NULL COMMENT '消息主题',
-  `msg_name` varchar(45) NOT NULL COMMENT '消息名称',
-  `record_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '插入记录时间',
-  `allow_send` int(11) NOT NULL COMMENT '允许发送标志',
-  PRIMARY KEY (`sender`,`topic`,`msg_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息发送授权表';
-
-DROP TABLE IF EXISTS `event_queue`;
-CREATE TABLE `event_queue` (
-  `msg_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '消息ID号',
-  `sender` varchar(45) NOT NULL COMMENT '消息发送者',
-  `send_time` datetime NOT NULL COMMENT '消息发送时间',
-  `topic` varchar(45) NOT NULL COMMENT '消息主题',
-  `msg_name` varchar(45) NOT NULL COMMENT '消息名称',
-  `msg` varchar(250) DEFAULT NULL COMMENT '消息内容',
-  `send_ip` varchar(45) NOT NULL,
-  PRIMARY KEY (`msg_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21068 DEFAULT CHARSET=utf8 COMMENT='azkaban调取系统消息队列表';
-
-DROP TABLE IF EXISTS `event_status`;
-CREATE TABLE `event_status` (
-  `receiver` varchar(45) NOT NULL COMMENT '消息接收者',
-  `receive_time` datetime NOT NULL COMMENT '消息接收时间',
-  `topic` varchar(45) NOT NULL COMMENT '消息主题',
-  `msg_name` varchar(45) NOT NULL COMMENT '消息名称',
-  `msg_id` int(11) NOT NULL COMMENT '消息的最大消费id',
-  PRIMARY KEY (`receiver`,`topic`,`msg_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息消费状态表';
-
-DROP TABLE IF EXISTS `linkis_user`;
-CREATE TABLE `linkis_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) DEFAULT NULL,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) DEFAULT NULL,
-  `admin` tinyint(1) DEFAULT NULL COMMENT 'If it is an administrator',
-  `active` tinyint(1) DEFAULT NULL COMMENT 'If it is active',
-  `name` varchar(255) DEFAULT NULL COMMENT 'User name',
-  `description` varchar(255) DEFAULT NULL,
-  `department` varchar(255) DEFAULT NULL,
-  `avatar` varchar(255) DEFAULT NULL COMMENT 'Path of the avator',
-  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `create_by` bigint(20) DEFAULT '0',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_by` bigint(20) DEFAULT '0',
-  `is_first_login` bit(1) DEFAULT NULL COMMENT 'If it is the first time to log in',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-alter table `dss_release_task`
-   add column `error_msg` varchar(500) NULL COMMENT '发布错误信息' after `status`,
-   add column `comment` varchar(500) NULL COMMENT '发布描述' after `error_msg`,
-   add column `log_msg` varchar(255) DEFAULT NULL COMMENT '日志信息或日志路径',
-   add column `bak` varchar(255) NULL COMMENT '备用字段' after `log_msg`;
-
-CREATE TABLE `dss_workflow_execute_info` (
-   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-   `task_id` bigint(20) NOT NULL COMMENT '任务id',
-   `status` int(1) DEFAULT NULL COMMENT '状态，0：失败 1：成功，',
-   `flow_id` bigint(20) NOT NULL COMMENT 'flowId',
-   `version` varchar(200) DEFAULT NULL COMMENT '工作流bml版本号',
-   `failed_jobs` text COMMENT '执行失败节点',
-   `Pending_jobs` text COMMENT '未执行节点',
-   `skipped_jobs` text COMMENT '执行跳过节点',
-   `succeed_jobs` text COMMENT '执行成功节点',
-   `createtime` datetime NOT NULL COMMENT '创建时间',
-   `running_jobs` text COMMENT '正在执行节点',
-   `updatetime` datetime DEFAULT NULL COMMENT '更新时间',
-   PRIMARY KEY (`id`)
- ) ENGINE=InnoDB AUTO_INCREMENT=471 DEFAULT CHARSET=utf8;
-
-ALTER TABLE dss_menu ADD COLUMN `menu_application_id` bigint(20);
 
 
-DROP TABLE IF EXISTS `dss_admin_dept`;
-CREATE TABLE `dss_admin_dept` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '部门id',
-  `parent_id` bigint(20) DEFAULT '0' COMMENT '父部门id',
-  `ancestors` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '祖级列表',
-  `dept_name` varchar(30) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '部门名称',
-  `order_num` int(4) DEFAULT '0' COMMENT '显示顺序',
-  `leader` varchar(20) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '负责人',
-  `phone` varchar(11) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '联系电话',
-  `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT NULL COMMENT '邮箱',
-  `status` char(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '0' COMMENT '部门状态（0正常 1停用）',
-  `del_flag` char(1) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
-  `create_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(64) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='部门表';
-
-DROP TABLE IF EXISTS `dss_dataapi_config`;
-CREATE TABLE `dss_dataapi_config` (
-	`id` BIGINT ( 20 ) NOT NULL AUTO_INCREMENT COMMENT '主键',
-	`workspace_id` BIGINT ( 20 ) NOT NULL COMMENT '工作空间id',
-	`api_name` VARCHAR ( 255 ) NOT NULL COMMENT 'API名称',
-	`api_path` VARCHAR ( 255 ) NOT NULL unique COMMENT 'API Path',
-	`group_id` BIGINT ( 20 ) NOT NULL COMMENT 'API组id',
-	`api_type` VARCHAR ( 20 ) NOT NULL COMMENT 'API类型：GUIDE-向导模式，SQL-脚本模式',
-	`protocol` VARCHAR ( 20 ) NOT NULL COMMENT 'Http协议',
-	`datasource_id` BIGINT ( 20 ) NOT NULL COMMENT '数据源id',
-	`datasource_name` VARCHAR ( 50 ) DEFAULT NULL COMMENT '数据源名称',
-	`datasource_type` VARCHAR ( 20 ) DEFAULT NULL COMMENT '数据源类型',
-
-	`sql` text COMMENT 'sql模板',
-	`tbl_name` VARCHAR ( 100 ) DEFAULT NULL COMMENT '数据表名称',
-	`req_fields` VARCHAR ( 1000 ) DEFAULT NULL COMMENT '请求字段名称',
-	`res_fields` VARCHAR ( 1000 ) DEFAULT NULL COMMENT '返回字段名称',
-	`order_fields` VARCHAR ( 500 ) DEFAULT NULL COMMENT '排序字段名称及方式',
-	`is_test` TINYINT ( 1 ) DEFAULT '0' COMMENT '是否测试成功：0未测试(默认)，1测试成功',
-	`status` TINYINT ( 1 ) DEFAULT '0' COMMENT 'API状态：0未发布(默认)，1已发布',
-	`previlege` VARCHAR ( 20 ) DEFAULT 'WORKSPACE' COMMENT 'WORKSPACE,PRIVATE',
-	`method` VARCHAR ( 20 ) DEFAULT NULL COMMENT 'HTTPS,HTTP',
-	`describe` VARCHAR ( 255 ) DEFAULT NULL COMMENT '描述',
-	`memory` INT DEFAULT NULL COMMENT '内存大小',
-	`req_timeout` INT DEFAULT NULL COMMENT '请求超时时间',
-	`label` VARCHAR ( 255 ) DEFAULT NULL COMMENT '标签',
-	`create_by` VARCHAR ( 255 ) DEFAULT NULL COMMENT '创建者',
-	`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-	`update_by` VARCHAR ( 255 ) DEFAULT NULL COMMENT '更新者',
-	`update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-	`is_delete` TINYINT ( 1 ) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
-	`page_size` int  DEFAULT 0 COMMENT '每页数据大小',
-
-	PRIMARY KEY ( `id` )
-) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = 'API';
-
-DROP TABLE IF EXISTS `dss_dataapi_group`;
-CREATE TABLE `dss_dataapi_group` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` bigint(20) DEFAULT NULL COMMENT '工作空间id',
-  `name` varchar(255) NOT NULL COMMENT '名称',
-  `note` varchar(255) DEFAULT NULL COMMENT '描述',
-  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
-  `create_time`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
-  PRIMARY KEY (`id`)
-) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT='服务组';
-
-DROP TABLE IF EXISTS `dss_dataapi_auth`;
-CREATE TABLE `dss_dataapi_auth` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` bigint(20) NOT NULL COMMENT '工作空间ID',
-  `caller` varchar(255)  DEFAULT NULL COMMENT '调用者名称',
-  `token` varchar(255)  DEFAULT NULL COMMENT 'token字符串',
-  `expire` datetime DEFAULT NULL COMMENT 'token过期时间',
-  `group_id` bigint(20) DEFAULT NULL COMMENT 'api组',
-  `create_by` varchar(255)  DEFAULT NULL COMMENT '创建者',
-  `create_time`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(255)  DEFAULT NULL COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB  DEFAULT CHARSET=utf8 COMMENT='API认证';
-
-DROP TABLE IF EXISTS `dss_dataapi_call`;
-CREATE TABLE `dss_dataapi_call` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `api_id` bigint(11) NOT NULL COMMENT 'API ID',
-  `params_value` text COMMENT '调用参数名称和值',
-  `status` tinyint(255) DEFAULT NULL COMMENT '执行状态：1成功，2失败，3超时',
-  `time_start` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '开始时间',
-  `time_end` datetime DEFAULT NULL COMMENT '结束时间',
-  `time_length` bigint(20) DEFAULT NULL COMMENT '调用时长',
-  `caller` varchar(255) DEFAULT NULL COMMENT '调用者名称',
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB  DEFAULT CHARSET=utf8 COMMENT='API调用记录'
-;
-DROP TABLE IF EXISTS `dss_dataapi_datasource`;
-CREATE TABLE `dss_dataapi_datasource` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` bigint(20) DEFAULT NULL COMMENT '工作空间id',
-  `name` varchar(255) NOT NULL COMMENT '名称',
-  `note` varchar(255) DEFAULT NULL COMMENT '描述',
-  `type` varchar(255) NOT NULL COMMENT '数据库类型',
-  `url` varchar(255) NOT NULL COMMENT '连接url',
-  `username` varchar(255) NOT NULL COMMENT '用户名',
-  `pwd` varchar(255) NOT NULL COMMENT '密码',
-  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
-  `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='数据源';
-DROP TABLE IF EXISTS `dss_user`;
-CREATE TABLE `dss_user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `username` varchar(64) DEFAULT NULL,
-  `name` varchar(64) DEFAULT NULL,
-  `is_first_login` tinyint(1) DEFAULT NULL,
-  `dept_id` int(11) DEFAULT NULL,
-  `is_admin` tinyint(1) DEFAULT '0' COMMENT '是否管理员(1:是;0:否)',
-  `email` varchar(50) DEFAULT '' COMMENT '用户邮箱',
-  `phonenumber` varchar(11) DEFAULT '' COMMENT '手机号码',
-  `password` varchar(100) DEFAULT '' COMMENT '密码',
-  `del_flag` char(1) DEFAULT '0' COMMENT '删除标志（0代表存在 2代表删除）',
-  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
-
-
-DROP TABLE IF EXISTS `dss_guide_group`;
-CREATE TABLE IF NOT EXISTS `dss_guide_group` (
-  `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
-  `path` VARCHAR(100) NOT NULL COMMENT '页面URL路径',
-  `title` VARCHAR(255) DEFAULT NULL COMMENT '标题',
-  `description` VARCHAR(200) DEFAULT NULL COMMENT '描述',
-  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导页面';
-
-DROP TABLE IF EXISTS `dss_guide_content`;
-CREATE TABLE IF NOT EXISTS `dss_guide_content` (
-  `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
-  `group_id` BIGINT(50) NOT NULL COMMENT '所属页面ID',
-  `path` VARCHAR(100) NOT NULL COMMENT '所属页面URL路径',
-  `title` VARCHAR(255) DEFAULT NULL COMMENT '标题',
-  `title_alias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
-  `seq` VARCHAR(20) DEFAULT NULL COMMENT '序号',
-  `type` INT(1) DEFAULT '1' COMMENT '类型: 1-步骤step，2-问题question',
-  `content` TEXT DEFAULT NULL COMMENT 'Markdown格式的内容',
-  `content_html` MEDIUMTEXT DEFAULT NULL COMMENT 'Markdown内容转化为HTML格式',
-  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导页面内容详情';
-
-DROP TABLE IF EXISTS `dss_download_audit`;
-CREATE TABLE `dss_download_audit`  (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `creator` varchar(255)  COMMENT '创建者',
-  `tenant` varchar(255)  COMMENT '租户',
-	`path` varchar(255)  COMMENT '文件路径',
-	`sql` varchar(3000)  COMMENT '执行sql脚本',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-	 PRIMARY KEY (`id`)
-) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = '文件下载审计';
-
-DROP TABLE IF EXISTS `dss_guide_catalog`;
-CREATE TABLE IF NOT EXISTS `dss_guide_catalog` (
-  `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
-  `parent_id` BIGINT(13) NOT NULL COMMENT '父级目录ID，-1代表最顶级目录',
-  `title` VARCHAR(255) DEFAULT NULL COMMENT '标题',
-  `description` VARCHAR(200) DEFAULT NULL COMMENT '描述',
-  `create_by` VARCHAR(255) DEFAULT NULL COMMENT '创建者',
-  `create_time` DATETIME DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` VARCHAR(255) DEFAULT NULL COMMENT '更新者',
-  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_delete` TINYINT(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导知识库目录';
-
-DROP TABLE IF EXISTS `dss_guide_chapter`;
-CREATE TABLE IF NOT EXISTS `dss_guide_chapter` (
-  `id` BIGINT(13) NOT NULL AUTO_INCREMENT,
-  `catalog_id` BIGINT(13) NOT NULL COMMENT '目录ID',
-  `title` VARCHAR(255) DEFAULT NULL COMMENT '标题',
-  `title_alias` VARCHAR(50) DEFAULT NULL COMMENT '标题简称',
-  `content` TEXT DEFAULT NULL COMMENT 'Markdown格式的内容',
-  `content_html` MEDIUMTEXT DEFAULT NULL COMMENT 'Markdown转换为html内容',
-  `create_by` varchar(255) DEFAULT NULL COMMENT '创建者',
-  `create_time` datetime DEFAULT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_by` varchar(255) DEFAULT NULL COMMENT '更新者',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_delete` tinyint(1) DEFAULT '0' COMMENT '0:未删除(默认), 1已删除',
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8 COMMENT='用户向导知识库文章';
-
+--DROP TABLE IF EXISTS `event_queue`;
+--CREATE TABLE `event_queue` (
+--  `msg_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '消息ID号',
+--  `sender` varchar(45) NOT NULL COMMENT '消息发送者',
+--  `send_time` datetime NOT NULL COMMENT '消息发送时间',
+--  `topic` varchar(45) NOT NULL COMMENT '消息主题',
+--  `msg_name` varchar(45) NOT NULL COMMENT '消息名称',
+--  `msg` varchar(250) DEFAULT NULL COMMENT '消息内容',
+--  `send_ip` varchar(45) NOT NULL,
+--  PRIMARY KEY (`msg_id`)
+--) ENGINE=InnoDB AUTO_INCREMENT=21068 DEFAULT CHARSET=utf8 COMMENT='azkaban调取系统消息队列表';
+--
+--DROP TABLE IF EXISTS `event_status`;
+--CREATE TABLE `event_status` (
+--  `receiver` varchar(45) NOT NULL COMMENT '消息接收者',
+--  `receive_time` datetime NOT NULL COMMENT '消息接收时间',
+--  `topic` varchar(45) NOT NULL COMMENT '消息主题',
+--  `msg_name` varchar(45) NOT NULL COMMENT '消息名称',
+--  `msg_id` int(11) NOT NULL COMMENT '消息的最大消费id',
+--  PRIMARY KEY (`receiver`,`topic`,`msg_name`)
+--) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息消费状态表';

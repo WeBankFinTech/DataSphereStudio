@@ -64,6 +64,13 @@ CREATE TABLE `dss_orchestrator_info` (
    `uuid` varchar(180) NOT NULL,
    `secondary_type` varchar(500) DEFAULT NULL,
    `is_published` tinyint(1) NOT NULL DEFAULT '0',
+   `workspace_id` int(11) DEFAULT NULL COMMENT '空间id',
+   `orchestrator_mode` varchar(100) DEFAULT NULL COMMENT '编排模式，取得的值是dss_dictionary中的dic_key(parent_key=p_arrangement_mode)',
+   `orchestrator_way` varchar(256) DEFAULT NULL COMMENT '编排方式',
+   `update_user` varchar(100) DEFAULT NULL COMMENT '更新人',
+   `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+   PRIMARY KEY (`id`) USING BTREE,
+   UNIQUE KEY `unique_idx_uuid` (`uuid`)
    PRIMARY KEY (`id`) USING BTREE,
    UNIQUE KEY `unique_idx_uuid` (`uuid`)
  ) ENGINE=InnoDB AUTO_INCREMENT=326 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;

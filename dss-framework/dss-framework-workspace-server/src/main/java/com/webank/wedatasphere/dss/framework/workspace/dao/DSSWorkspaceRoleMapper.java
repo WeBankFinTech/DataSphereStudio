@@ -25,7 +25,7 @@ import java.util.List;
 @Mapper
 public interface DSSWorkspaceRoleMapper {
 
-    @Select("select * from dss_role")
+    @Select("select * from dss_workspace_role")
     @Results({
             @Result(property = "workspaceId", column = "workspace_id"),
             @Result(property = "frontName", column = "front_name"),
@@ -34,12 +34,12 @@ public interface DSSWorkspaceRoleMapper {
     List<DSSRole> getRoles();
 
 
-    @Select("select a.`name` from dss_role a join dss_workspace_user_role b on a.id = b.role_id" +
+    @Select("select a.`name` from dss_workspace_role a join dss_workspace_user_role b on a.id = b.role_id" +
             " and b.`username` = #{username} and b.workspace_id = #{workspaceId}")
     List<String> getAllRoles(@Param("username") String username, @Param("workspaceId") int workspaceId);
 
 
-    @Select("select * from dss_onestop_menu")
+    @Select("select * from dss_workspace_menu")
     @Results({
             @Result(property = "titleCn", column = "title_cn"),
             @Result(property = "titleEn", column = "title_En")
@@ -68,7 +68,7 @@ public interface DSSWorkspaceRoleMapper {
     })
     List<DSSApplicationBean> getDSSApplications();
 
-    @Insert("insert into dss_role(workspace_id, name, front_name, update_time) " +
+    @Insert("insert into dss_workspace_role(workspace_id, name, front_name, update_time) " +
             "values(#{dssRole.workspaceId}, #{dssRole.name}, #{dssRole.frontName}, #{dssRole.createTime})")
     @Options(useGeneratedKeys = true, keyProperty = "dssRole.id", keyColumn = "id")
     int addNewRole(@Param("dssRole") DSSRole dssRole);
@@ -76,7 +76,7 @@ public interface DSSWorkspaceRoleMapper {
 
     @Insert({
             "<script>",
-            "insert into dss_menu_role (workspace_id, menu_id, role_id, priv, updateby, update_time)",
+            "insert into dss_workspace_menu_role (workspace_id, menu_id, role_id, priv, updateby, update_time)",
             "values",
             "<foreach collection='menuIds' item='menuId' open='(' separator='),(' close=')'>",
             "#{workspaceId}, #{menuId}, #{roleId}, #{priv}, #{username},now()",
@@ -91,7 +91,7 @@ public interface DSSWorkspaceRoleMapper {
 
     @Insert({
             "<script>",
-            "insert into dss_component_role (workspace_id, component_id, role_id, priv, updateby, update_time)",
+            "insert into dss_workspace_appconn_role (workspace_id, component_id, role_id, priv, updateby, update_time)",
             "values",
             "<foreach collection='componentIds' item='componentId' open='(' separator='),(' close=')'>",
             "#{workspaceId}, #{componentId}, #{roleId}, #{priv}, #{username}, now()",
@@ -109,13 +109,13 @@ public interface DSSWorkspaceRoleMapper {
     @Select("select workspace_id from dss_workspace where `name` = #{defaultWorkspaceName}")
     Integer getDefaultWorkspaceId(@Param("defaultWorkspaceName") String defaultWorkspaceName);
 
-    @Select("select id from dss_role where workspace_id = #{workspaceId} and name = #{apiUser}")
+    @Select("select id from dss_workspace_role where workspace_id = #{workspaceId} and name = #{apiUser}")
     int getRoleId(@Param("apiUser") String apiUser, @Param("workspaceId") int workspaceId);
 
-    @Select("Select count(*) from dss_component_role where workspace_id = #{workspaceId} and role_id = #{roleId} and component_id = #{componentId}")
+    @Select("Select count(*) from dss_workspace_appconn_role where workspace_id = #{workspaceId} and role_id = #{roleId} and component_id = #{componentId}")
     int getCount(@Param("workspaceId") Integer workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId);
 
-    @Select("select priv from dss_component_role where workspace_id = #{workspaceId} and role_id = #{roleId} and " +
+    @Select("select priv from dss_workspace_appconn_role where workspace_id = #{workspaceId} and role_id = #{roleId} and " +
             "component_id = #{componentId}")
     Integer getPriv(@Param("workspaceId") Integer workspaceId, @Param("roleId") int roleId, @Param("componentId") int componentId);
 

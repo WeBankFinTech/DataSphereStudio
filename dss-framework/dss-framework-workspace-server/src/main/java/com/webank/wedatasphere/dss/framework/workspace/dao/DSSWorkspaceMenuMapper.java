@@ -29,10 +29,6 @@ public interface DSSWorkspaceMenuMapper {
 
 
 
-    @Select("select url from dss_menu_component_url where menu_id = #{menuId}")
-    String getSubMenuUrl(@Param("menuId") int menuId);
-
-
     @Select("select * from dss_component_role where workspace_id = #{workspaceId}")
     @Results({
             @Result(property = "workspaceId", column = "workspace_id"),

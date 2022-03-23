@@ -77,9 +77,6 @@ public interface DSSWorkspaceService {
 
     List<WorkspaceDepartmentVo> getWorkSpaceDepartments();
 
-    List<HomepageDemoMenuVo> getHomepageDemos(boolean isChinese);
-
-    List<HomepageVideoVo> getHomepageVideos(boolean isChinese);
 
     List<OnestopMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese);
 
@@ -93,7 +90,6 @@ public interface DSSWorkspaceService {
 
     Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type);
 
-    List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId);
 
     boolean checkAdminByWorkspace(String username, int workspaceId);
 

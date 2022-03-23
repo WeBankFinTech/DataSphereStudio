@@ -29,7 +29,7 @@ public interface DSSWorkspaceMenuMapper {
 
 
 
-    @Select("select * from dss_component_role where workspace_id = #{workspaceId}")
+    @Select("select * from dss_workspace_appconn_role where workspace_id = #{workspaceId}")
     @Results({
             @Result(property = "workspaceId", column = "workspace_id"),
             @Result(property = "componentId", column = "component_id"),
@@ -48,18 +48,18 @@ public interface DSSWorkspaceMenuMapper {
     })
     List<DSSWorkspaceHomepageSetting> getWorkspaceHompageSettings(@Param("workspaceId") int workspaceId);
 
-    @Select("select priv from dss_component_role where workspace_id = #{workspaceId} " +
+    @Select("select priv from dss_workspace_appconn_role where workspace_id = #{workspaceId} " +
             "and role_id = #{roleId} and " +
             "component_id = #{applicationId}")
     Integer getOneCompoentRolePriv(@Param("workspaceId") int workspaceId,
                                    @Param("roleId") int roleId, @Param("applicationId") int applicationId);
 
     /**
-     * 如果在dss_component_role中是有workspace_id=-1的情况,
+     * 如果在dss_workspace_appconn_role中是有workspace_id=-1的情况,
      * 默认是-1的时候，就要全部拿出来
      * @return
      */
-    @Select("select * from dss_component_role where workspace_id = -1")
+    @Select("select * from dss_workspace_appconn_role where workspace_id = -1")
     @Results({
             @Result(property = "workspaceId", column = "workspace_id"),
             @Result(property = "componentId", column = "component_id"),
@@ -70,7 +70,7 @@ public interface DSSWorkspaceMenuMapper {
     List<DSSWorkspaceComponentRolePriv> getDefaultComponentRolePriv();
 
 
-    @Select("select  -1 as workspace_id,application_id  as component_id, 1 as role_id, last_update_time,last_update_user as update_by from dss_onestop_menu_application")
+    @Select("select  -1 as workspace_id,appconn_id  as component_id, 1 as role_id, last_update_time,last_update_user as update_by from dss_workspace_menu_appconn")
     @Results({
             @Result(property = "workspaceId", column = "workspace_id"),
             @Result(property = "componentId", column = "component_id"),

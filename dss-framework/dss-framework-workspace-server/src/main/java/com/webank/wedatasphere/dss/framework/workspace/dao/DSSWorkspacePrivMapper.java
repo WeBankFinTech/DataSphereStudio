@@ -25,23 +25,23 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface DSSWorkspacePrivMapper {
 
-    @Update("update dss_menu_role set priv = #{priv}, update_time = now() " +
+    @Update("update dss_workspace_menu_role set priv = #{priv}, update_time = now() " +
             "where workspace_id = #{workspaceId} and menu_id = #{menuId} and role_id = #{roleId}")
     void updateRoleMenuPriv(@Param("workspaceId") int workspaceId, @Param("menuId") int menuId,
                             @Param("roleId") int roleId, @Param("priv") int priv);
 
-    @Update("update dss_component_role set priv = #{priv} , update_time = now()" +
+    @Update("update dss_workspace_appconn_role set priv = #{priv} , update_time = now()" +
             "where workspace_id = #{workspaceId} and component_id = #{componentId} and role_id = #{roleId}")
     void updateRoleComponentPriv(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId,
                                  @Param("roleId") int roleId, @Param("priv") int priv);
 
-    @Select("select id from dss_role where workspace_id = #{workspaceId} and name = #{key}")
+    @Select("select id from dss_workspace_role where workspace_id = #{workspaceId} and name = #{key}")
     Integer getRoleId(@Param("workspaceId") int workspaceId, @Param("key") String key);
 
-    @Select("select count(*) from dss_component_role where workspace_id = #{workspaceId} and component_id = #{componentId} and role_id = #{roleId}")
+    @Select("select count(*) from dss_workspace_appconn_role where workspace_id = #{workspaceId} and component_id = #{componentId} and role_id = #{roleId}")
     int queryCntOfRCP(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId);
 
-    @Select("insert into dss_component_role (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) " +
+    @Select("insert into dss_workspace_appconn_role (`workspace_id`, `component_id`, `role_id`, `priv`, `update_time`, `updateby`) " +
             "values(#{workspaceId}, #{componentId}, #{roleId}, #{priv}, now(), #{username})")
     void insertRolComponentPriv(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId,
                                 @Param("priv") int priv,

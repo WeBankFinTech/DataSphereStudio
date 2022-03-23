@@ -71,8 +71,6 @@ CREATE TABLE `dss_orchestrator_info` (
    `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
    PRIMARY KEY (`id`) USING BTREE,
    UNIQUE KEY `unique_idx_uuid` (`uuid`)
-   PRIMARY KEY (`id`) USING BTREE,
-   UNIQUE KEY `unique_idx_uuid` (`uuid`)
  ) ENGINE=InnoDB AUTO_INCREMENT=326 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 

@@ -80,9 +80,6 @@
         AND doma.application_id IS NOT NULL
     </select>
 
-    <select id="getSpaceMenu" resultMap="dss_menu_map">
-        SELECT * from dss_menu WHERE id = #{menuId}
-    </select>
 
     <select id="getDSSWorkspaceMenuPriv" resultMap="dss_workspace_menu_priv_map">
         SELECT * from dss_menu_role where workspace_id = #{workspaceId}

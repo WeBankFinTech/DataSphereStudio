@@ -102,36 +102,6 @@ public interface OrchestratorMapper {
     @Select("select `name` from dss_orchestrator_info where `id` = #{orchestratorId}")
     String getOrchestratorNameById(@Param("orchestratorId") int orchestratorId);
 
-    @Delete("delete from `dss_orchestrator_schedule_info` where `orchestrator_id` = #{orchestratorId}")
-    int deleteScheduleInfo(@Param("orchestratorId") Integer orchestratorId);
-
-    @Update("update dss_orchestrator_schedule_info set active_flag = #{activeFlag}  where `orchestrator_id` = #{orchestratorId}")
-    int updateScheduleInfoActiveFlag(@Param("orchestratorId") Long orchestratorId, @Param("activeFlag") String activeFlag);
-
-
-    @Insert({
-            "<script>",
-            "insert into `dss_orchestrator_user`",
-            "(`workspace_id`, `project_id`, `orchestrator_id`, `username`, `priv`, `last_update_time`)",
-            "values",
-            "<foreach collection='accessUsers' item='accessUser' open='(' separator='),(' close=')'>",
-            " #{workspaceId}, #{projectId}, #{orchestratorId}, #{accessUser}, #{priv}, #{updateTime}",
-            "</foreach>",
-            "</script>"
-    })
-    void setOrchestratorPriv(@Param("workspaceId") int workspaceId,
-                             @Param("projectId") Long projectId, @Param("orchestratorId") int orchestratorId,
-                             @Param("accessUsers") List<String> accessUsers, @Param("priv") int priv, @Param("updateTime") Date date);
-
-    @Delete("delete from `dss_orchestrator_user` " +
-            "where `workspace_id` = #{workspaceId} " +
-            "and `project_id` = #{projectId} " +
-            "and `orchestrator_id` = #{orchestratorId}")
-    void deleteAllOrchestratorPriv(@Param("workspaceId") int workspaceId, @Param("projectId") Long projectId, @Param("orchestratorId") int orchestratorId);
-
-
-    List<OrchestratorUser> getOrchestratorUserByOrcId(@Param("orchestratorId") Long orchestratorId);
-
     int getByNameAndProjectId(@Param("projectId") Long projectId, @Param("name") String name);
 
     void addOrchestratorRefOrchestration(DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration);

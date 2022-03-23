@@ -39,15 +39,6 @@ public interface WorkspaceMapper {
 
     void addWorkSpace(DSSWorkspace dssWorkspace);
 
-    List<HomepageDemoMenuVo> getHomepageDemoMenusEn();
-    List<HomepageDemoMenuVo> getHomepageDemoMenusCn();
-
-    List<HomepageDemoInstanceVo> getHomepageInstancesByMenuIdCn(Long id);
-    List<HomepageDemoInstanceVo> getHomepageInstancesByMenuIdEn(Long id);
-
-    List<HomepageVideoVo> getHomepageVideosEn();
-    List<HomepageVideoVo> getHomepageVideosCn();
-
     DSSWorkspace getWorkspaceById(@Param("workspaceId") Long workspaceId);
 
     List<OnestopMenuVo> getManagementMenuCn();

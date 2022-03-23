@@ -9,7 +9,7 @@ import com.webank.wedatasphere.dss.standard.common.service.Operation;
  * 三大规范强制要求要实现的 Operation，但是会提供给三大规范或是DSS内嵌的应用工具使用。
  * @author enjoyyin
  * @date 2022-03-18
- * @since 0.5.0
+ * @since 1.1.0
  */
 public interface OptionalOperation<K extends RequestRef, V extends ResponseRef> extends Operation<K, V> {
 

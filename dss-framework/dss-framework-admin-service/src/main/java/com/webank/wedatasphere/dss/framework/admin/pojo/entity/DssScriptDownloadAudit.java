@@ -20,7 +20,7 @@ import java.util.Date;
 
 
 
-@TableName(value = "dss_download_audit")
+@TableName(value = "dss_workspace_download_audit")
 public class DssScriptDownloadAudit {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer  id;

@@ -135,6 +135,7 @@ CREATE TABLE `dss_flow_edit_lock` (
    UNIQUE KEY `dss_flow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
  ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
 
+
 DROP TABLE IF EXISTS `dss_admin_dept`;
 CREATE TABLE `dss_admin_dept` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '部门id',

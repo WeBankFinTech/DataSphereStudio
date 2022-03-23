@@ -68,7 +68,7 @@ public class DolphinSchedulerProjectGrantOperation
     private List<Long> getAuthedProjectIds(int userId) throws ExternalOperationFailedException {
         String url = this.authedProjectUrl + "?userId=" + userId;
         DolphinSchedulerPageInfoResponseRef responseRef = DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, url, DolphinSchedulerConf.DS_ADMIN_USER.getValue());
-        return responseRef.getTotalList().stream().map(project -> (Long) project.get("id")).collect(Collectors.toList());
+        return responseRef.getTotalList().stream().map(project -> DolphinSchedulerHttpUtils.parseToLong(project.get("id"))).collect(Collectors.toList());
     }
 
 }

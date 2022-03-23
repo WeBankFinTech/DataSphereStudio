@@ -45,29 +45,9 @@ public interface DSSWorkspaceRoleMapper {
             @Result(property = "titleEn", column = "title_En")
     })
     List<DSSOnestopMenu> getOnestopMenus();
-    @Select("select * from dss_menu")
-    @Results({
-            @Result(property = "upperMenuId", column = "upper_menu_id"),
-            @Result(property = "frontName", column = "front_name"),
-            @Result(property = "isActive", column = "is_active")
-    })
-    List<DSSMenu> getMenus();
-
-
-    @Select("select * from dss_menu_component_url")
-    @Results({
-            @Result(property = "menuId", column = "menu_id"),
-            @Result(property = "dssApplicationId", column = "dss_application_id"),
-            @Result(property = "manulUrl", column = "manul_url"),
-            @Result(property = "operationUrl", column = "operation_url"),
-            @Result(property = "updateTime", column = "update_time"),
-    })
-    List<DSSWorkspaceMenuComponentUrl> getMenuComponentUrl();
-
 
     @Select("select homepage_url from dss_application where id = #{applicationId}")
     String getEntryUrl(@Param("applicationId") int applicationId);
-
 
 
     @Select("select * from dss_application")

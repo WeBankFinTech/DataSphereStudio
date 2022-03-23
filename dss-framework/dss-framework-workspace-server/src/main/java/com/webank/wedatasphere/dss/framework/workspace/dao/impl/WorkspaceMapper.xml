@@ -88,59 +88,6 @@
         (#{id},#{name},#{label},#{description},#{department},#{product},#{source},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime})
     </insert>
 
-    <select id="getHomepageDemoMenusCn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo">
-        SELECT `id`,`name`,`title_cn` AS title,`description`,`icon`,`order`
-        FROM dss_homepage_demo_menu
-        <where>
-            `is_active` = 1
-        </where>
-    </select>
-    <select id="getHomepageDemoMenusEn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo">
-        SELECT `id`,`name`,`title_en` AS `title`,`description`,`icon`,`order`
-        FROM dss_homepage_demo_menu
-        <where>
-            `is_active` = 1
-        </where>
-    </select>
-
-    <select id="getHomepageInstancesByMenuIdCn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoInstanceVo">
-        SELECT `id`,`menu_id`,`name`,`url`,`title_cn` AS `title`,`description`,`icon`,`order`
-        FROM dss_homepage_demo_instance
-        <where>
-            `is_active` = 1 AND `menu_id` = #{id}
-        </where>
-    </select>
-
-    <select id="getHomepageInstancesByMenuIdEn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoInstanceVo">
-        SELECT `id`,`menu_id`,`name`,`url`,`title_en` AS `title`,`description`,`icon`,`order`
-        FROM dss_homepage_demo_instance
-        <where>
-            `is_active` = 1 AND `menu_id` = #{id}
-        </where>
-    </select>
-
-    <select id="getHomepageVideosCn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo">
-        SELECT `id`,`name`,`title_cn` AS `title`,`url`,`description`,`order`
-        FROM dss_homepage_video
-        <where>
-            `is_active` = 1
-        </where>
-    </select>
-
-    <select id="getHomepageVideosEn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo">
-        SELECT `id`,`name`,`title_en` AS `title`,`url`,`description`,`order`
-        FROM dss_homepage_video
-        <where>
-            `is_active` = 1
-        </where>
-    </select>
-
     <select id="getManagementMenuCn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
         SELECT `id`,`name`,`title_cn` AS `title`,`order`

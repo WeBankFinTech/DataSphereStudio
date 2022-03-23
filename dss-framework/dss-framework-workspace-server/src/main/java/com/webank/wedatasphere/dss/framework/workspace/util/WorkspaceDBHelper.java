@@ -54,8 +54,6 @@ public class WorkspaceDBHelper {
 
     private List<DSSOnestopMenu> dssOnestopMenus;
 
-    private List<DSSWorkspaceMenuComponentUrl> dssWorkspaceMenuComponentUrls;
-
     private List<DSSWorkspaceComponent> dssWorkspaceComponents;
 
     private List<DSSApplicationBean> dssApplicationBeans;
@@ -79,15 +77,6 @@ public class WorkspaceDBHelper {
             public void run() {
                 synchronized (lock) {
                     dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
-                }
-            }
-        }, 0, 1, TimeUnit.MINUTES);
-
-        Utils.defaultScheduler().scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    dssWorkspaceMenuComponentUrls = dssWorkspaceRoleMapper.getMenuComponentUrl();
                 }
             }
         }, 0, 1, TimeUnit.MINUTES);
@@ -137,7 +126,6 @@ public class WorkspaceDBHelper {
         synchronized (lock) {
             dssApplicationBeans = dssWorkspaceRoleMapper.getDSSApplications();
             dssWorkspaceComponents = dssWorkspaceRoleMapper.getComponents();
-            dssWorkspaceMenuComponentUrls = dssWorkspaceRoleMapper.getMenuComponentUrl();
             dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
             dssRoles = dssWorkspaceRoleMapper.getRoles();
         }
@@ -256,19 +244,6 @@ public class WorkspaceDBHelper {
                 collect(Collectors.toList());
     }
 
-
-    public List<String> getComponentUrlsById(int componentId) {
-        Optional<DSSWorkspaceMenuComponentUrl> optional = dssWorkspaceMenuComponentUrls.
-                stream().filter(obj -> obj.getMenuId() == componentId).
-                findFirst();
-        if (optional.isPresent()) {
-            int applicationId = optional.get().getDssApplicationId();
-            String homepageUrl = dssWorkspaceRoleMapper.getEntryUrl(applicationId);
-            return Collections.singletonList(homepageUrl);
-        } else {
-            return null;
-        }
-    }
 
 
     public String getRoleFrontName(int roleId) {

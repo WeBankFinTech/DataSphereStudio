@@ -104,21 +104,6 @@ public class WorkspaceRestfulApi {
         return Message.ok().data("workspaceId", workspaceId);
     }
 
-    @RequestMapping(path = "/workspaces/demos", method = RequestMethod.GET)
-    public Message getAllHomepageDemos(HttpServletRequest req) {
-        String header = req.getHeader("Content-language").trim();
-        boolean isChinese = "zh-CN".equals(header);
-        List<HomepageDemoMenuVo> homepageDemos = dssWorkspaceService.getHomepageDemos(isChinese);
-        return Message.ok().data("demos", homepageDemos);
-    }
-
-    @RequestMapping(path = "/workspaces/videos", method = RequestMethod.GET)
-    public Message getAllVideos(HttpServletRequest req) {
-        String header = req.getHeader("Content-language").trim();
-        boolean isChinese = "zh-CN".equals(header);
-        List<HomepageVideoVo> homepageVideos = dssWorkspaceService.getHomepageVideos(isChinese);
-        return Message.ok().data("videos", homepageVideos);
-    }
 
     @RequestMapping(path = "/workspaces/{workspaceId}/managements", method = RequestMethod.GET)
     public Message getWorkspaceManagements(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {

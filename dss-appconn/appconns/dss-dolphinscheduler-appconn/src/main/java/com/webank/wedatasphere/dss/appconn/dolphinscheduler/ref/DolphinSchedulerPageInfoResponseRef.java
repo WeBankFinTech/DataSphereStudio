@@ -3,8 +3,11 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.converters.DateConverter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,6 +43,9 @@ public class DolphinSchedulerPageInfoResponseRef extends ResponseRefImpl {
 
     public <T> List<T> getTotalList(Class<T> clazz) {
         List<Map<String, Object>> totalList = getTotalList();
+        DateConverter dateConverter = new DateConverter();
+        dateConverter.setPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        ConvertUtils.register(dateConverter, Date.class);
         return totalList.stream().map(DSSExceptionUtils.map(map -> {
             T t = clazz.newInstance();
             BeanUtils.populate(t, map);

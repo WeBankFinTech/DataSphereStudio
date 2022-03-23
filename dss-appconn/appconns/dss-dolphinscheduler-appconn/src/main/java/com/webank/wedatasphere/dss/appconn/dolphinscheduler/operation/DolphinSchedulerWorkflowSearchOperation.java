@@ -36,7 +36,7 @@ public class DolphinSchedulerWorkflowSearchOperation
         String getUrl = StringUtils.replace(this.getProcessDefinitionByIdUrl, "${projectName}", dolphinProjectName);
         DolphinSchedulerPageInfoResponseRef responseRef = DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, getUrl, ref.getUserName());
         return responseRef.getTotalList().stream().filter(workflow -> ref.getOrchestrationName().equals(workflow.get("name")))
-                .map(workflow -> (Long) workflow.get("id")).map(id -> OrchestrationResponseRef.newExternalBuilder().setRefOrchestrationId(id).success())
+                .map(workflow -> DolphinSchedulerHttpUtils.parseToLong(workflow.get("id"))).map(id -> OrchestrationResponseRef.newExternalBuilder().setRefOrchestrationId(id).success())
                 .findAny().orElse(OrchestrationResponseRef.newExternalBuilder().success());
     }
 

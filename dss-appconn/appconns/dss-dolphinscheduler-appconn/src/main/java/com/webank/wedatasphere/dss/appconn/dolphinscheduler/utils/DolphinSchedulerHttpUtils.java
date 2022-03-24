@@ -86,11 +86,14 @@ public class DolphinSchedulerHttpUtils {
     public static long parseToLong(Object val) {
         if (val instanceof Double) {
             return ((Double) val).longValue();
-        }
-        if (val instanceof Integer) {
+        } else if (val instanceof Integer) {
             return new Double((Integer) val).longValue();
+        } else if( val instanceof Long) {
+            return (Long) val;
+        } else if(val != null) {
+            return Long.parseLong(val.toString());
         }
-        return (Long) val;
+        throw new ExternalOperationFailedException(90322, "parse the return of DolphinScheduler failed, the value is null.");
     }
 
 }

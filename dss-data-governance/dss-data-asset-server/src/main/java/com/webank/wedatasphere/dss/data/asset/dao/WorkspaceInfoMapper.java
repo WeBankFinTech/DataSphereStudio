@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface WorkspaceInfoMapper {
 
-    @Select("select username from dss_workspace_user where workspace_id= #{workspaceId} and username like  #{search} ")
+    @Select("select distinct username from dss_workspace_user_role where workspace_id= #{workspaceId} and username like  #{search} ")
     List<String>  getWorkspaceUsersName (@Param("workspaceId") int workspaceId,@Param("search") String search);
 
 }

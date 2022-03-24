@@ -238,8 +238,6 @@ public class FlowRestfulApi {
             // 锁更新操作，保证保存后的锁是最新的
             newFlowEditLock = DSSFlowEditLockManager.updateLock(flowEditLock);
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
-            //更新编辑锁表中flowVersion字段
-            DSSFlowEditLockManager.updateLockFlowVersion(new DSSFlowEditLock(version, flowEditLock.split(DSSWorkFlowConstant.SPLIT)[0]));
         }
         return Message.ok().data("flowVersion", version).data("flowEditLock", newFlowEditLock);
     }

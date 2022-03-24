@@ -28,13 +28,10 @@ public interface LockMapper {
      * 获取数据库中isExpire字段为false的lock，只有一个，owner必须
      *
      * @param flowID      工作流id
-     * @param flowVersion 工作流版本号
      * @param owner       锁的持有者
      * @return DSSFlowEditLock
      */
-    DSSFlowEditLock getPersonalFlowEditLock(@Param("flowID") Long flowID,
-                                            @Param("flowVersion") String flowVersion,
-                                            @Param("owner") String owner);
+    DSSFlowEditLock getPersonalFlowEditLock(@Param("flowID") Long flowID, @Param("owner") String owner);
 
     Boolean flowNotExistEditLock(@Param("flowID") Long flowID,
                                  @Param("flowVersion") String flowVersion,
@@ -49,8 +46,6 @@ public interface LockMapper {
     void insertLock(DSSFlowEditLock newLock) throws DuplicateKeyException;
 
     void clearExpire(@Param("flowId") Long flowId);
-
-    Integer update(DSSFlowEditLock lock);
 
     void deleteALL();
 }

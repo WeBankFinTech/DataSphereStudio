@@ -128,6 +128,9 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
             createToken(userId, expireTime);
         }
         userToken = getTokenByUserName(userName, userId);
+        if(userToken == null) {
+            throw new ExternalOperationFailedException(90321, "cannot find the token from DolphinScheduler of user " + userName);
+        }
         userToken.setUserName(userName);
         userTokens.put(userName, userToken);
         return userToken.getToken();

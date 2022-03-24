@@ -6,7 +6,9 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinScheduler
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinSchedulerHttpUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import org.apache.commons.lang3.time.DateUtils;
 
+import java.text.ParseException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -114,8 +116,24 @@ public class DolphinSchedulerTokenManager_1_X extends AbstractDolphinSchedulerTo
             throws ExternalOperationFailedException {
         String url = this.queryAccessTokenListUrl + "?pageNo=1&pageSize=20&searchVal=" + userName;
         DolphinSchedulerPageInfoResponseRef responseRef = getHttpGetResult(url);
-        return responseRef.getTotalList(DolphinSchedulerAccessToken.class).stream()
-                .filter(token -> userId == token.getUserId()).findAny().orElse(null);
+        Map<String, Object> tokenMap = responseRef.getTotalList().stream()
+                .filter(token -> userId == DolphinSchedulerHttpUtils.parseToLong(token.get("userId"))).findAny()
+                .orElse(null);
+        if(tokenMap == null) {
+            return null;
+        }
+        DolphinSchedulerAccessToken token = new DolphinSchedulerAccessToken();
+        token.setUserName(userName);
+        token.setId((int) DolphinSchedulerHttpUtils.parseToLong(tokenMap.get("id")));
+        token.setToken((String) tokenMap.get("token"));
+        token.setUserId((int) DolphinSchedulerHttpUtils.parseToLong(tokenMap.get("userId")));
+        try {
+            token.setExpireTime(DateUtils.parseDate((String) tokenMap.get("expireTime"), "yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+        } catch (ParseException e) {
+            throw new ExternalOperationFailedException(90321, "parse the date format of DolphinScheduler failed, date string is " +
+                    tokenMap.get("expireTime"), e);
+        }
+        return token;
     }
 
     @Override

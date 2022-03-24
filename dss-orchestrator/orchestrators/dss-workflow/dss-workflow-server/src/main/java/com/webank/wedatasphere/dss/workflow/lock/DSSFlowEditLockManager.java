@@ -103,13 +103,9 @@ public class DSSFlowEditLockManager {
         if (flowID == null) {
             throw new DSSErrorException(60063, "tryAcquireLock failed , because flowId is null");
         }
-        String flowVersion = dssFlow.getBmlVersion();
-        if (StringUtils.isBlank(flowVersion)) {
-            throw new DSSErrorException(60064, "tryAcquireLock failed , because flowVersion is null");
-        }
         String lock;
         init();
-        DSSFlowEditLock flowEditLock = lockMapper.getPersonalFlowEditLock(flowID, flowVersion, owner);
+        DSSFlowEditLock flowEditLock = lockMapper.getPersonalFlowEditLock(flowID, owner);
 
         if (flowEditLock != null && isLockExpire(flowEditLock)) {
             // 1.另外的dss-server服务挂掉了（main）;2.记录已经过期，但是UnLockEvent 尚未(即将)去更新数据库;3.记录已经过期，但是updateTime 尚未（即将）更新数据库
@@ -120,7 +116,7 @@ public class DSSFlowEditLockManager {
                 //更新成功，尝试获取新锁
                 LOGGER.info("unlock success,lock:{}", flowEditLock);
                 lockMapper.clearExpire(flowEditLock.getFlowID());
-                lock = generateLock(flowID, flowVersion, username, owner);
+                lock = generateLock(flowID, username, owner);
             } else {
                 // 失败的缘由: 1.另外的dss-server也走到了这步，优先更新了;2.UnLockEvent;3.用户刚好点了saveFlow延续
                 throw new DSSErrorException(60055, "acquire lock failed");
@@ -129,13 +125,13 @@ public class DSSFlowEditLockManager {
             lock = flowEditLock.getLockContent() + DSSWorkFlowConstant.SPLIT + flowEditLock.getLockStamp();
         } else {
             // 插入锁,获取到数据库自增id
-            lock = generateLock(flowID, flowVersion, username, owner);
+            lock = generateLock(flowID, username, owner);
         }
         // 插入成功，返回lock，push一条记录到queue中，插入失败，返回null
         return lock;
     }
 
-    private static String generateLock(Long flowID, String flowVersion, String username, String owner) throws DSSErrorException {
+    private static String generateLock(Long flowID,  String username, String owner) throws DSSErrorException {
         try {
             String lockContent = UUID.randomUUID().toString();
             Date date = new Date();
@@ -144,7 +140,6 @@ public class DSSFlowEditLockManager {
             newLock.setCreateTime(date);
             newLock.setUpdateTime(date);
             newLock.setFlowID(flowID);
-            newLock.setFlowVersion(flowVersion);
             newLock.setLockContent(lockContent);
             newLock.setLockStamp(0);
             newLock.setOwner(owner);
@@ -159,7 +154,7 @@ public class DSSFlowEditLockManager {
             return lockContent + DSSWorkFlowConstant.SPLIT + 0;
         } catch (DuplicateKeyException e) {
             LOGGER.warn("acquire lock failed", e);
-            DSSFlowEditLock personalFlowEditLock = lockMapper.getPersonalFlowEditLock(flowID, flowVersion, null);
+            DSSFlowEditLock personalFlowEditLock = lockMapper.getPersonalFlowEditLock(flowID,  null);
             String userName = Optional.ofNullable(personalFlowEditLock).map(DSSFlowEditLock::getUsername).orElse(null);
             throw new DSSErrorException(DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE, "用户" + userName + "已锁定编辑");
         }
@@ -197,10 +192,6 @@ public class DSSFlowEditLockManager {
             LOGGER.info("unexpected update error,{}", dssFlowEditLock);
             throw new DSSErrorException(60059, String.format("unexpected update error,%s", dssFlowEditLock));
         }
-    }
-
-    public static int updateLockFlowVersion(DSSFlowEditLock lock) {
-        return lockMapper.update(lock);
     }
 
     public static boolean isLockExpire(DSSFlowEditLock flowEditLock) {

@@ -63,7 +63,7 @@
     </sql>
 
     <select id="getWorkspaces" resultMap="dss_workspace">
-        SELECT * from dss_workspace where id in (select workspace_id from dss_workspace_user WHERE username = #{username}) order by create_time desc
+        SELECT * from dss_workspace where id in (select distinct workspace_id from dss_workspace_user_role WHERE username = #{username}) order by create_time desc
     </select>
 
     <select id="getMenuId" resultType="java.lang.Integer">

@@ -590,6 +590,18 @@ CREATE TABLE `dss_workspace_user_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
 
+CREATE TABLE `dss_workspace_user_role` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL,
+  `username` varchar(32) DEFAULT NULL,
+  `role_id` int(20) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
+
+
 
 --DROP TABLE IF EXISTS `event_queue`;
 --CREATE TABLE `event_queue` (

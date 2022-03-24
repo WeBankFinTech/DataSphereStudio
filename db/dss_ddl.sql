@@ -353,12 +353,10 @@ DROP TABLE IF EXISTS `dss_workflow_edit_lock`;
 CREATE TABLE `dss_workflow_edit_lock` (
    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '',
    `flow_id` bigint(11) NOT NULL COMMENT '',
-   `flow_version` varchar(16) NOT NULL COMMENT '',
    `username` varchar(64) NOT NULL COMMENT '',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
    `owner` varchar(128) NOT NULL COMMENT '',
-   `lock_stamp` int(8) NOT NULL DEFAULT '0' COMMENT '',
    `is_expire` tinyint(1) NOT NULL DEFAULT '0' COMMENT '',
    `lock_content` varchar(512) NOT NULL COMMENT '',
    PRIMARY KEY (`id`),
@@ -569,6 +567,30 @@ CREATE TABLE `dss_workspace_menu_appconn` (
   `image` varchar(200) DEFAULT NULL COMMENT '图片',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `dss_workspace_user`;  -- delete this table
+CREATE TABLE `dss_workspace_user` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL,
+  `username` varchar(32) DEFAULT NULL,
+  `join_time` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
+
+DROP TABLE IF EXISTS `dss_workspace_user_role`;  -- use this table
+CREATE TABLE `dss_workspace_user_role` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL,
+  `username` varchar(32) DEFAULT NULL,
+  `role_id` int(20) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
 
 
 --DROP TABLE IF EXISTS `event_queue`;

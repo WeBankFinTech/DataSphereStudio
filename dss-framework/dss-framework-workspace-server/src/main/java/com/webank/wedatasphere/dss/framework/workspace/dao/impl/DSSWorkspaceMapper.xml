@@ -31,7 +31,7 @@
         <id property="component" column="is_component"/>
         <id property="frontName" column="front_name"/>
         <id property="icon" column="icon"/>
-        <id property="applicationId" column="application_id"/>
+        <id property="applicationId" column="appconn_id"/>
     </resultMap>
 
     <resultMap id="dss_workspace_user_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser">
@@ -74,10 +74,10 @@
         SELECT DISTINCT(doma.id)
         FROM dss_workspace_user_role dwur
         LEFT JOIN dss_workspace_appconn_role dcr ON dwur.role_id = dcr.role_id
-        LEFT JOIN dss_workspace_menu_appconn doma ON dcr.component_id = doma.application_id
+        LEFT JOIN dss_workspace_menu_appconn doma ON dcr.appconn_id = doma.appconn_id
         WHERE dwur.workspace_id=#{workspaceId} AND dwur.username=#{username}
         AND dcr.workspace_id=#{workspaceId} AND dcr.priv>0
-        AND doma.application_id IS NOT NULL
+        AND doma.appconn_id IS NOT NULL
     </select>
 
     <select id="getDSSWorkspaceMenuPriv" resultMap="dss_workspace_menu_priv_map">

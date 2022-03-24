@@ -91,7 +91,7 @@ public interface DSSWorkspaceRoleMapper {
 
     @Insert({
             "<script>",
-            "insert into dss_workspace_appconn_role (workspace_id, component_id, role_id, priv, updateby, update_time)",
+            "insert into dss_workspace_appconn_role (workspace_id, appconn_id, role_id, priv, updateby, update_time)",
             "values",
             "<foreach collection='componentIds' item='componentId' open='(' separator='),(' close=')'>",
             "#{workspaceId}, #{componentId}, #{roleId}, #{priv}, #{username}, now()",
@@ -112,13 +112,13 @@ public interface DSSWorkspaceRoleMapper {
     @Select("select id from dss_workspace_role where workspace_id = #{workspaceId} and name = #{apiUser}")
     int getRoleId(@Param("apiUser") String apiUser, @Param("workspaceId") int workspaceId);
 
-    @Select("Select count(*) from dss_workspace_appconn_role where workspace_id = #{workspaceId} and role_id = #{roleId} and component_id = #{componentId}")
+    @Select("Select count(*) from dss_workspace_appconn_role where workspace_id = #{workspaceId} and role_id = #{roleId} and appconn_id = #{componentId}")
     int getCount(@Param("workspaceId") Integer workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId);
 
     @Select("select priv from dss_workspace_appconn_role where workspace_id = #{workspaceId} and role_id = #{roleId} and " +
-            "component_id = #{componentId}")
+            "appconn_id = #{componentId}")
     Integer getPriv(@Param("workspaceId") Integer workspaceId, @Param("roleId") int roleId, @Param("componentId") int componentId);
 
     @Select("select id from dss_application where `name` = #{appName}")
-    int getComponentId(@Param("appName") String appName);
+    int getComponentId(@Param("appNaAme") String appName);
 }

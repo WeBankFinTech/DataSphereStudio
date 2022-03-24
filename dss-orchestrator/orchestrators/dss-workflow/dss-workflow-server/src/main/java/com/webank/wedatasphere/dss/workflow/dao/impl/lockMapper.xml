@@ -62,7 +62,7 @@
     <insert id="insertLock" useGeneratedKeys="true" keyProperty="id"
             parameterType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
         insert into dss_workflow_edit_lock(<include refid="flow_lock"/>)
-        values(#{id},#{flowID},#{flowVersion},#{createTime},#{updateTime},#{owner},#{lockStamp},#{isExpire},#{lockContent},#{username})
+        values(#{id},#{flowID},#{createTime},#{updateTime},#{owner},#{isExpire},#{lockContent},#{username})
     </insert>
 
     <delete id="clearExpire">

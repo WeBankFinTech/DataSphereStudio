@@ -34,13 +34,11 @@ public interface DSSWorkspaceMapper {
     List<Long> getUserMenuApplicationId(@Param("username")String username, @Param("workspaceId")Long workspaceId);
     List<Integer> getMenuId(int roleId, String workspaceId);
 
-    DSSMenu getSpaceMenu(int menuId);
-
     List<DSSWorkspaceMenuRolePriv> getDSSWorkspaceMenuPriv(String workspaceId);
 
     @Insert({
             "<script>",
-            "insert into dss_component_role (workspace_id, component_id, role_id, priv, update_time, updateby)",
+            "insert into dss_workspace_appconn_role (workspace_id, appconn_id, role_id, priv, update_time, updateby)",
             "values",
             "<foreach collection='privs' item='priv' open='(' separator='),(' close=')'>",
             "#{priv.workspaceId}, #{priv.componentId}, #{priv.roleId}, #{priv.priv}, #{priv.updateTime}, #{priv.updateBy}",

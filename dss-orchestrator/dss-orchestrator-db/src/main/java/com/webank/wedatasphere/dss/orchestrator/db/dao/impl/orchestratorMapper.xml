@@ -187,9 +187,6 @@
         <result column="last_update_time" property="lastUpdateTime"/>
     </resultMap>
 
-    <select id="getOrchestratorUserByOrcId" resultMap="orchestrator_user_map" parameterType="java.lang.Long">
-        select * from dss_orchestrator_user where `orchestrator_id` = #{orchestratorId}
-    </select>
 
     <select id="getVersionByOrchestratorIdAndVersion" resultMap="orchestrator_version_info_result_map">
         SELECT * FROM dss_orchestrator_version_info

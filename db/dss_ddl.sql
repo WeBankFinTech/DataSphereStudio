@@ -121,8 +121,8 @@ CREATE TABLE `dss_project` (
   `is_personal` tinyint(4) NOT NULL DEFAULT '0',
   `create_by_str` varchar(256) COLLATE utf8_bin DEFAULT NULL,
   `update_by_str` varchar(256) COLLATE utf8_bin DEFAULT NULL,
-  `dev_process` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '开发流程，多个以英文逗号分隔，取得的值是dss_dictionary中的dic_key(parent_key=p_develop_process)',
-  `orchestrator_mode` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '编排模式，多个以英文逗号分隔，取得的值是dss_dictionary中的dic_key(parent_key=p_arrangement_mode或下面一级)',
+  `dev_process` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '开发流程，多个以英文逗号分隔，取得的值是dss_workspace_dictionary中的dic_key(parent_key=p_develop_process)',
+  `orchestrator_mode` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '编排模式，多个以英文逗号分隔，取得的值是dss_workspace_dictionary中的dic_key(parent_key=p_arrangement_mode或下面一级)',
   `visible` tinyint(4) DEFAULT '1' COMMENT '0:已删除；1：未删除(默认)',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=313 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
@@ -180,8 +180,8 @@ CREATE TABLE `dss_workspace_homepage` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1213 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `dss_dictionary`;
-CREATE TABLE `dss_dictionary` (
+DROP TABLE IF EXISTS `dss_workspace_dictionary`;
+CREATE TABLE `dss_workspace_dictionary` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `workspace_id` int(11) DEFAULT '0' COMMENT '空间ID，默认为0，所有空间都有',
   `parent_key` varchar(200) DEFAULT '0' COMMENT '父key',
@@ -207,8 +207,8 @@ CREATE TABLE `dss_dictionary` (
   KEY `idx_dic_key` (`dic_key`)
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COMMENT='数据字典表';
 
-DROP TABLE IF EXISTS `dss_role`;
-CREATE TABLE `dss_role` (
+DROP TABLE IF EXISTS `dss_workspace_role`;
+CREATE TABLE `dss_workspace_role` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
   `workspace_id` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
@@ -241,8 +241,8 @@ CREATE TABLE `dss_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
 
 
-DROP TABLE IF EXISTS `dss_admin_dept`;
-CREATE TABLE `dss_admin_dept` (
+DROP TABLE IF EXISTS `dss_workspace_admin_dept`;
+CREATE TABLE `dss_workspace_admin_dept` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '部门id',
   `parent_id` bigint(20) DEFAULT '0' COMMENT '父部门id',
   `ancestors` varchar(50) CHARACTER SET utf8 COLLATE utf8_bin DEFAULT '' COMMENT '祖级列表',
@@ -301,8 +301,8 @@ CREATE TABLE `dss_sidebar_content` (
   KEY `idx_sidebarws_id` (`workspace_id`,`sidebar_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 COMMENT='侧边栏-内容表';
 
-DROP TABLE IF EXISTS `dss_download_audit`;
-CREATE TABLE `dss_download_audit`  (
+DROP TABLE IF EXISTS `dss_workspace_download_audit`;
+CREATE TABLE `dss_workspace_download_audit`  (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
   `creator` varchar(255)  COMMENT '创建者',
   `tenant` varchar(255)  COMMENT '租户',
@@ -338,8 +338,8 @@ CREATE TABLE `dss_workflow` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=455 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
-DROP TABLE IF EXISTS `dss_flow_relation`;
-CREATE TABLE `dss_flow_relation` (
+DROP TABLE IF EXISTS `dss_workflow_relation`;
+CREATE TABLE `dss_workflow_relation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `flow_id` bigint(20) DEFAULT NULL,
   `parent_flow_id` bigint(20) DEFAULT NULL,
@@ -347,20 +347,18 @@ CREATE TABLE `dss_flow_relation` (
 ) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 
-DROP TABLE IF EXISTS `dss_flow_edit_lock`;
-CREATE TABLE `dss_flow_edit_lock` (
+DROP TABLE IF EXISTS `dss_workflow_edit_lock`;
+CREATE TABLE `dss_workflow_edit_lock` (
    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '',
    `flow_id` bigint(11) NOT NULL COMMENT '',
-   `flow_version` varchar(16) NOT NULL COMMENT '',
    `username` varchar(64) NOT NULL COMMENT '',
    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
    `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
    `owner` varchar(128) NOT NULL COMMENT '',
-   `lock_stamp` int(8) NOT NULL DEFAULT '0' COMMENT '',
    `is_expire` tinyint(1) NOT NULL DEFAULT '0' COMMENT '',
    `lock_content` varchar(512) NOT NULL COMMENT '',
    PRIMARY KEY (`id`),
-   UNIQUE KEY `dss_flow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
+   UNIQUE KEY `dss_workflow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
  ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
 
  DROP TABLE IF EXISTS `dss_workflow_task`;
@@ -485,7 +483,123 @@ CREATE TABLE `dss_workflow_node_ui_validate` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `dss_workspace_user_favorites_appconn`;
+CREATE TABLE `dss_workspace_user_favorites_appconn` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `username` varchar(64) DEFAULT NULL,
+  `workspace_id` bigint(20) DEFAULT '1',
+  `menu_appconn_id` int(20) DEFAULT NULL,
+  `order` int(2) DEFAULT NULL,
+  `create_by` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `last_update_time` datetime DEFAULT NULL,
+  `last_update_user` varchar(30) DEFAULT NULL,
+  `type` varchar(20) NOT NULL DEFAULT "" COMMENT "dingyiding or 收藏",
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `dss_workspace_menu_role`;
+CREATE TABLE `dss_workspace_menu_role` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` int(20) DEFAULT NULL,
+  `menu_id` int(20) DEFAULT NULL,
+  `role_id` int(20) DEFAULT NULL,
+  `priv` int(20) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  `updateby` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5263 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `dss_workspace_menu`;
+CREATE TABLE `dss_workspace_menu` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) DEFAULT NULL,
+  `title_en` varchar(64) DEFAULT NULL,
+  `title_cn` varchar(64) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT '1',
+  `icon` varchar(255) DEFAULT NULL,
+  `order` int(2) DEFAULT NULL,
+  `create_by` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `last_update_time` datetime DEFAULT NULL,
+  `last_update_user` varchar(30) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `dss_workspace_appconn_role`;
+CREATE TABLE `dss_workspace_appconn_role` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL,
+  `appconn_id` int(20) DEFAULT NULL,
+  `role_id` int(20) DEFAULT NULL,
+  `priv` int(20) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  `updateby` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5103 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `dss_workspace_menu_appconn`;
+CREATE TABLE `dss_workspace_menu_appconn` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `appconn_id` int(20) DEFAULT NULL,
+  `menu_id` int(20) NOT NULL,
+  `title_en` varchar(64) DEFAULT NULL,
+  `title_cn` varchar(64) DEFAULT NULL,
+  `desc_en` varchar(255) DEFAULT NULL,
+  `desc_cn` varchar(255) DEFAULT NULL,
+  `labels_en` varchar(255) DEFAULT NULL,
+  `labels_cn` varchar(255) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
+  `access_button_en` varchar(64) DEFAULT NULL,
+  `access_button_cn` varchar(64) DEFAULT NULL,
+  `manual_button_en` varchar(64) DEFAULT NULL,
+  `manual_button_cn` varchar(64) DEFAULT NULL,
+  `manual_button_url` varchar(255) DEFAULT NULL,
+  `icon` varchar(255) DEFAULT NULL,
+  `order` int(2) DEFAULT NULL,
+  `create_by` varchar(255) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `last_update_time` datetime DEFAULT NULL,
+  `last_update_user` varchar(30) DEFAULT NULL,
+  `image` varchar(200) DEFAULT NULL COMMENT '图片',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `dss_workspace_user`;  -- delete this table
+CREATE TABLE `dss_workspace_user` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL,
+  `username` varchar(32) DEFAULT NULL,
+  `join_time` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
+
+DROP TABLE IF EXISTS `dss_workspace_user_role`;  -- use this table
+CREATE TABLE `dss_workspace_user_role` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL,
+  `username` varchar(32) DEFAULT NULL,
+  `role_id` int(20) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
+
+CREATE TABLE `dss_workspace_user_role` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `workspace_id` bigint(20) DEFAULT NULL,
+  `username` varchar(32) DEFAULT NULL,
+  `role_id` int(20) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
 
 
 
@@ -510,3 +624,4 @@ CREATE TABLE `dss_workflow_node_ui_validate` (
 --  `msg_id` int(11) NOT NULL COMMENT '消息的最大消费id',
 --  PRIMARY KEY (`receiver`,`topic`,`msg_name`)
 --) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息消费状态表';
+

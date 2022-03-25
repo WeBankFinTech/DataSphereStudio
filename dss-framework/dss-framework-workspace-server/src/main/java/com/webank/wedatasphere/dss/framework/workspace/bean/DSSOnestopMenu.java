@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
-@TableName(value = "dss_onestop_menu")
+@TableName(value = "dss_workspace_menu")
 public class DSSOnestopMenu {
     private Integer id;
     private String name;

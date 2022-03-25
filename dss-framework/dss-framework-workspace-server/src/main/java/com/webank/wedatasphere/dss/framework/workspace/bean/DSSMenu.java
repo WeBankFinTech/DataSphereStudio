@@ -16,19 +16,13 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.base.Objects;
 
 import java.io.Serializable;
 
 
-@TableName(value = "dss_menu")
 public class DSSMenu implements Serializable {
     private static final long serialVersionUID=1L;
-    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
     private String name;
     private int level;
@@ -38,7 +32,6 @@ public class DSSMenu implements Serializable {
     private String description;
     private boolean isActive;
     private boolean isComponent;
-    @TableField(exist = false)
     private String url;
     private String icon;
     private int applicationId;

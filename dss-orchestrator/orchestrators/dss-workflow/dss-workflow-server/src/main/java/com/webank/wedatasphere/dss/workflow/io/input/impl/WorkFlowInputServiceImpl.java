@@ -29,7 +29,6 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
-import com.webank.wedatasphere.dss.workflow.io.input.InputRelationService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
@@ -62,9 +61,6 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
 
     @Autowired
     private NodeParser nodeParser;
-
-    @Autowired
-    private InputRelationService inputRelationService;
 
     @Autowired
     private FlowMapper flowMapper;

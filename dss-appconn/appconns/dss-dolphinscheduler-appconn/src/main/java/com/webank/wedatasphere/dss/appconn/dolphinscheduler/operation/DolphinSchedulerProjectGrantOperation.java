@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerDataResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerPageInfoResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerTokenManager;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinSchedulerHttpUtils;
@@ -67,8 +68,9 @@ public class DolphinSchedulerProjectGrantOperation
 
     private List<Long> getAuthedProjectIds(int userId) throws ExternalOperationFailedException {
         String url = this.authedProjectUrl + "?userId=" + userId;
-        DolphinSchedulerPageInfoResponseRef responseRef = DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, url, DolphinSchedulerConf.DS_ADMIN_USER.getValue());
-        return responseRef.getTotalList().stream().map(project -> DolphinSchedulerHttpUtils.parseToLong(project.get("id"))).collect(Collectors.toList());
+        DolphinSchedulerDataResponseRef responseRef = DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, url, DolphinSchedulerConf.DS_ADMIN_USER.getValue());
+        List<Map<String, Object>> projectList = responseRef.getData();
+        logger.info("the authed project is: {}", projectList);
+        return projectList.stream().map(project -> DolphinSchedulerHttpUtils.parseToLong(project.get("id"))).collect(Collectors.toList());
     }
-
 }

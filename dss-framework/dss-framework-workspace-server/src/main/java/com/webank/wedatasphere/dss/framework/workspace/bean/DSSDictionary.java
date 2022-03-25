@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-@TableName(value = "dss_dictionary")
+@TableName(value = "dss_workspace_dictionary")
 public class DSSDictionary implements Serializable {
 
     private static final long serialVersionUID=1L;

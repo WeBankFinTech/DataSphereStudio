@@ -64,7 +64,7 @@ public class DolphinSchedulerHttpUtils {
 
     public static <T extends ResponseRefImpl> T getHttpPostResult(SSORequestOperation ssoRequestOperation, String url, String user, Map<String, Object> formData) {
         DSSPostAction postAction = new DSSPostAction();
-        formData.forEach(postAction::addRequestPayload);
+        formData.forEach(postAction::setParameter);
         return getHttpResult(ssoRequestOperation, postAction, url, user);
     }
 

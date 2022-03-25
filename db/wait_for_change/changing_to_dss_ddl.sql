@@ -1,3 +1,4 @@
+--√√
 DROP TABLE IF EXISTS `dss_workspace_appconn_role`;  -- changed
 CREATE TABLE `dss_workspace_appconn_role` ( -- changed
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -10,6 +11,7 @@ CREATE TABLE `dss_workspace_appconn_role` ( -- changed
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5103 DEFAULT CHARSET=utf8;
 
+--
 DROP TABLE IF EXISTS `dss_workflow_edit_lock`;  -- changed
 CREATE TABLE `dss_workflow_edit_lock` (  -- changed
    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '',
@@ -26,6 +28,7 @@ CREATE TABLE `dss_workflow_edit_lock` (  -- changed
    UNIQUE KEY `dss_flow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
  ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_workspace_menu`;  -- changed
 CREATE TABLE `dss_workspace_menu` (  -- changed
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -43,6 +46,7 @@ CREATE TABLE `dss_workspace_menu` (  -- changed
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_workspace_menu_role`;  -- changed
 CREATE TABLE `dss_workspace_menu_role` (  -- changed
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -55,6 +59,7 @@ CREATE TABLE `dss_workspace_menu_role` (  -- changed
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5263 DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_workspace_menu_appconn`; -- changed
 CREATE TABLE `dss_workspace_menu_appconn` (  -- changed
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -82,6 +87,7 @@ CREATE TABLE `dss_workspace_menu_appconn` (  -- changed
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_workspace_user_favorites_appconn`;  -- changed
 CREATE TABLE `dss_workspace_user_favorites_appconn` (  -- changed
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -97,6 +103,7 @@ CREATE TABLE `dss_workspace_user_favorites_appconn` (  -- changed
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_workspace_role`;  -- changed
 CREATE TABLE `dss_workspace_role` (  -- changed
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -109,7 +116,7 @@ CREATE TABLE `dss_workspace_role` (  -- changed
   UNIQUE KEY `workspace_id` (`workspace_id`,`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8 CHECKSUM=1 DELAY_KEY_WRITE=1 ROW_FORMAT=DYNAMIC;
 
-
+--√√
 DROP TABLE IF EXISTS `dss_workflow_relation`;  -- changed
 CREATE TABLE `dss_workflow_relation` (  -- changed
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -119,22 +126,8 @@ CREATE TABLE `dss_workflow_relation` (  -- changed
 ) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 
-DROP TABLE IF EXISTS `dss_workflow_edit_lock`;  -- changed
-CREATE TABLE `dss_workflow_edit_lock` (  -- changed
-   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '',
-   `flow_id` bigint(11) NOT NULL COMMENT '',
-   `flow_version` varchar(16) NOT NULL COMMENT '',
-   `username` varchar(64) NOT NULL COMMENT '',
-   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-   `owner` varchar(128) NOT NULL COMMENT '',
-   `lock_stamp` int(8) NOT NULL DEFAULT '0' COMMENT '',
-   `is_expire` tinyint(1) NOT NULL DEFAULT '0' COMMENT '',
-   `lock_content` varchar(512) NOT NULL COMMENT '',
-   PRIMARY KEY (`id`),
-   UNIQUE KEY `dss_flow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
- ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_workspace_admin_dept`;  -- changed
 CREATE TABLE `dss_workspace_admin_dept` (  -- changed
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '部门id',
@@ -166,6 +159,7 @@ CREATE TABLE `dss_workspace_user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
+
 DROP TABLE IF EXISTS `dss_workspace_user_role`;  -- use this table
 CREATE TABLE `dss_workspace_user_role` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -178,7 +172,7 @@ CREATE TABLE `dss_workspace_user_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
 
-
+--√√
 DROP TABLE IF EXISTS `dss_workspace_download_audit`; -- changed
 CREATE TABLE `dss_workspace_download_audit`  (  -- changed
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
@@ -191,7 +185,7 @@ CREATE TABLE `dss_workspace_download_audit`  (  -- changed
 	 PRIMARY KEY (`id`)
 ) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = '文件下载审计';
 
-
+--use√√
 DROP TABLE IF EXISTS `dss_workspace_dictionary`;  -- changed
 CREATE TABLE `dss_workspace_dictionary` (  -- changed
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '主键ID',

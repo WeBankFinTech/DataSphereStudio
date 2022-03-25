@@ -36,7 +36,7 @@ Caused by: java.lang.Exception: /data/DSSInstall/visualis-server/bin/phantomjsis
 #### (4) DSS多次重复安装后报错:TooManyResultsException:Expected on result
 
 
-删除数据库中表linkis_user、dss_user、linkis_application中的重复记录
+删除数据库中表dss_user、linkis_application中的重复记录
 
 #### (5) 访问前端出错
 

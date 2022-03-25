@@ -22,9 +22,6 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoInstanceVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuAppInstanceVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
@@ -120,7 +117,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             throw exception1;
         }
         String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
-        dssWorkspaceUserMapper.insertUser(userName, dssWorkspace.getId(), userName,userId);
         dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(), CommonRoleEnum.ADMIN.getId(), userName, userName,userId);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
@@ -145,11 +141,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         //根据用户名 从用户表拿到用户id
 //        Long userId = dssUserService.getUserID(userName);
         if(userId == null){
-            //保存 - dss_user、linkis_user
+            //保存 - dss_user
             dssUserService.saveWorkspaceUser(userName);
         }
-        //保存 - dss_workspace_user
-        dssWorkspaceUserMapper.insertUser(userName, workspaceId, creator,userId);
         //保存 - 保存用户角色关系 dss_workspace_user_role
         for (Integer roleId : roleIds) {
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, roleId, userName, creator,userId);
@@ -195,7 +189,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         if (workspaceIds.size() == 0){
             String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
-            dssWorkspaceUserMapper.insertUser(userName, workspaceId, "system",userId);
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, CommonRoleEnum.ANALYSER.getId(), userName, "system",userId);
             String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, CommonRoleEnum.ANALYSER.getId());
             if(ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)){
@@ -236,26 +229,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setHomePageUrl(homepageUrl);
         }
         return dssWorkspaceHomePageVO;
-    }
-
-    @Override
-    public List<DSSWorkspaceUser01> getWorkspaceUsers01(String workspaceId, String department, String username,
-                                                      String roleName, int pageNow, int pageSize, List<Long> total) {
-        int roleId = -1;
-        if (StringUtils.isNotEmpty(roleName)){
-            roleId = workspaceDBHelper.getRoleIdByName(roleName);
-        }
-        PageHelper.startPage(pageNow, pageSize);
-        List<DSSWorkspaceUser01> workspaceUsers = new ArrayList<>();
-        try{
-            workspaceUsers = workspaceMapper.getWorkspaceUsers01(Long.valueOf(workspaceId));
-        }finally {
-            PageHelper.clearPage();
-        }
-        PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
-        total.add(pageInfo.getTotal());
-        List<DSSWorkspaceUserVO> dssWorkspaceUserVOs = new ArrayList<>();
-        return workspaceUsers;
     }
 
     @Override
@@ -546,22 +519,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public List<HomepageDemoMenuVo> getHomepageDemos(boolean isChinese) {
-        List<HomepageDemoMenuVo> demoMenuVos = isChinese ? workspaceMapper.getHomepageDemoMenusCn() : workspaceMapper.getHomepageDemoMenusEn();
-        for (HomepageDemoMenuVo demoMenuVo : demoMenuVos) {
-            Long menuId = demoMenuVo.getId();
-            List<HomepageDemoInstanceVo> demoInstanceVos = isChinese ? workspaceMapper.getHomepageInstancesByMenuIdCn(menuId) : workspaceMapper.getHomepageInstancesByMenuIdEn(menuId);
-            demoMenuVo.setDemoInstances(demoInstanceVos);
-        }
-        return demoMenuVos;
-    }
-
-    @Override
-    public List<HomepageVideoVo> getHomepageVideos(boolean isChinese) {
-        return isChinese ? workspaceMapper.getHomepageVideosCn() : workspaceMapper.getHomepageVideosEn();
-    }
-
-    @Override
     public List<OnestopMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese) {
         List<OnestopMenuVo> applicationMenuVos = isChinese ? workspaceMapper.getApplicationMenuCn() : workspaceMapper.getApplicationMenuEn();
         List<Long> userMenuApplicationId = dssWorkspaceMapper.getUserMenuApplicationId(username, workspaceId);
@@ -630,23 +587,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return applicationId;
     }
 
-
-    @Override
-    public List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId) {
-        //根据用户及工作空间id获取到用户角色id，根据角色和工作空间id 获取菜单id，根据菜单id 封装1级2级菜单并返回
-        List<Integer> roleIds = dssWorkspaceUserMapper.getRoleInWorkspace(Integer.parseInt(workspaceId), userName);
-        Set<Integer> menuIds = new HashSet<>();
-        for (Integer roleId : roleIds) {
-            List<Integer> menuList = dssWorkspaceMapper.getMenuId(roleId, workspaceId);
-            menuIds.addAll(menuList);
-        }
-        List<DSSMenu> dssMenuList = new ArrayList<>();
-        for (int menuId : menuIds){
-            DSSMenu dssMenu = dssWorkspaceMapper.getSpaceMenu(menuId);
-            dssMenuList.add(dssMenu);
-        }
-        return dssMenuList;
-    }
 
     /**
      * 是否超级管理员

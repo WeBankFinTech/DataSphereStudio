@@ -22,64 +22,55 @@
 <mapper namespace="com.webank.wedatasphere.dss.workflow.dao.LockMapper">
 
     <sql id="flow_lock">
-        `id`,`flow_id`,`flow_version`,`create_time`,`update_time`,`owner`,`lock_stamp`,`is_expire`,`lock_content`,username
+        `id`,`flow_id`,`create_time`,`update_time`,`owner`,`is_expire`,`lock_content`,username
     </sql>
 
     <update id="compareAndSwap" parameterType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
-        update dss_flow_edit_lock
+        update dss_workflow_edit_lock
         <set>
-            <if test="lockStamp != null">lock_stamp = lock_stamp,</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="isExpire != null">is_expire = #{isExpire},</if>
         </set>
-        <where>lock_content = #{lockContent} and lock_stamp = #{lockStamp}</where>
+        <where>lock_content = #{lockContent}</where>
     </update>
 
     <select id="getPersonalFlowEditLock" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
         select
         <include refid="flow_lock"/>
-        from dss_flow_edit_lock where flow_id = #{flowID} and
+        from dss_workflow_edit_lock where flow_id = #{flowID} and
         <if test="owner != null and owner != ''">owner = #{owner} and </if>
         is_expire = false
     </select>
 
     <select id="flowNotExistEditLock" resultType="java.lang.Boolean">
-        select COUNT(*) = 0 from dss_flow_edit_lock where flow_id = #{flowID} and flow_version = #{flowVersion}
+        select COUNT(*) = 0 from dss_workflow_edit_lock where flow_id = #{flowID}
         and is_expire = false and owner !=#{owner} and #{timeout} >= now() - update_time
     </select>
 
     <select id="getFlowEditLockByID" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
         select
         <include refid="flow_lock"/>
-        from dss_flow_edit_lock where flow_id = #{flowId}
+        from dss_workflow_edit_lock where flow_id = #{flowId}
     </select>
 
     <select id="getFlowEditLockByLockContent" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
         select
         <include refid="flow_lock"/>
-        from dss_flow_edit_lock where lock_content = #{lock_content}
+        from dss_workflow_edit_lock where lock_content = #{lock_content}
     </select>
 
     <insert id="insertLock" useGeneratedKeys="true" keyProperty="id"
             parameterType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
-        insert into dss_flow_edit_lock(<include refid="flow_lock"/>)
-        values(#{id},#{flowID},#{flowVersion},#{createTime},#{updateTime},#{owner},#{lockStamp},#{isExpire},#{lockContent},#{username})
+        insert into dss_workflow_edit_lock(<include refid="flow_lock"/>)
+        values(#{id},#{flowID},#{createTime},#{updateTime},#{owner},#{isExpire},#{lockContent},#{username})
     </insert>
 
     <delete id="clearExpire">
-        delete from dss_flow_edit_lock where  flow_id = #{flowId}
+        delete from dss_workflow_edit_lock where  flow_id = #{flowId}
     </delete>
 
     <delete id="deleteALL">
-        delete from dss_flow_edit_lock
+        delete from dss_workflow_edit_lock
     </delete>
-
-    <update id="update" parameterType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
-        update dss_flow_edit_lock
-        <trim prefix="set" suffixOverrides=",">
-            <if test="flowVersion != null">flow_version = #{flowVersion},</if>
-        </trim>
-        <where>lock_content = #{lockContent}</where>
-    </update>
 
 </mapper>

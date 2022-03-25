@@ -25,10 +25,10 @@
 
     <sql id="selectDeptVo">
         select d.id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.phone, d.email, d.status, d.del_flag, d.create_by, d.create_time
-        from dss_admin_dept d
+        from dss_workspace_admin_dept d
     </sql>
 
-    <select id="selectDeptList" parameterType="DssAdminDept" resultMap="DssAdminDeptResult">
+    <select id="selectDeptList" parameterType="com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept" resultMap="DssAdminDeptResult">
         <include refid="selectDeptVo"/>
         where d.del_flag = '0'
         <if test="parentId != null and parentId != 0">
@@ -55,16 +55,16 @@
 	</select>
 
     <select id="hasChildById" parameterType="Long" resultType="int">
-		select count(1) from dss_admin_dept
+		select count(1) from dss_workspace_admin_dept
 		where del_flag = '0' and parent_id = #{id}
 	</select>
 
     <select id="selectChildrenDeptById" parameterType="Long" resultMap="DssAdminDeptResult">
-		select * from dss_admin_dept where find_in_set(#{id}, ancestors)
+		select * from dss_workspace_admin_dept where find_in_set(#{id}, ancestors)
 	</select>
 
     <select id="selectNormalChildrenDeptById" parameterType="Long" resultType="java.lang.Integer">
-		select count(*) from dss_admin_dept where status = 0 and del_flag = '0' and find_in_set(#{id}, ancestors)
+		select count(*) from dss_workspace_admin_dept where status = 0 and del_flag = '0' and find_in_set(#{id}, ancestors)
 	</select>
 
     <select id="checkDeptNameUnique" resultMap="DssAdminDeptResult">
@@ -72,8 +72,8 @@
         where dept_name=#{deptName} and del_flag = '0' and parent_id = #{parentId} limit 1
     </select>
 
-    <insert id="insertDept" parameterType="DssAdminDept">
-        insert into dss_admin_dept(
+    <insert id="insertDept" parameterType="com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept">
+        insert into dss_workspace_admin_dept(
         <if test="id != null and id != 0">id,</if>
         <if test="parentId != null and parentId != 0">parent_id,</if>
         <if test="deptName != null and deptName != ''">dept_name,</if>
@@ -100,8 +100,8 @@
         )
     </insert>
 
-    <update id="updateDept" parameterType="DssAdminDept">
-        update dss_admin_dept
+    <update id="updateDept" parameterType="com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept">
+        update dss_workspace_admin_dept
         <set>
             <if test="parentId != null and parentId != 0">parent_id = #{parentId},</if>
             <if test="deptName != null and deptName != ''">dept_name = #{deptName},</if>
@@ -118,7 +118,7 @@
     </update>
 
     <update id="updateDeptChildren" parameterType="java.util.List">
-        update dss_admin_dept set ancestors =
+        update dss_workspace_admin_dept set ancestors =
         <foreach collection="depts" item="item" index="index"
                  separator=" " open="case id" close="end">
             when #{item.id} then #{item.ancestors}
@@ -130,8 +130,8 @@
         </foreach>
     </update>
 
-    <update id="updateDeptStatus" parameterType="DssAdminDept">
-        update dss_admin_dept
+    <update id="updateDeptStatus" parameterType="com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept">
+        update dss_workspace_admin_dept
         <set>
             <if test="status != null and status != ''">status = #{status},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
@@ -141,10 +141,10 @@
     </update>
 
     <delete id="deleteDeptById" parameterType="Long">
-		update dss_admin_dept set del_flag = '2' where id = #{id}
+		update dss_workspace_admin_dept set del_flag = '2' where id = #{id}
 	</delete>
     <select id="checkDeptFinalStage" parameterType="Long" resultType="int">
-        SELECT LENGTH(ancestors)-LENGTH(REPLACE(ancestors,',',''))  FROM   dss_admin_dept WHERE id = #{parentId} and del_flag = '0'
+        SELECT LENGTH(ancestors)-LENGTH(REPLACE(ancestors,',',''))  FROM   dss_workspace_admin_dept WHERE id = #{parentId} and del_flag = '0'
     </select>
 
 

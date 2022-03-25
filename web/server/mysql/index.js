@@ -16,7 +16,7 @@ class Mysql {
   constructor() {}
   queryMenu() {
     return new Promise((resolve, reject) => {
-      pool.query("SELECT * from dss_onestop_menu a ORDER BY a.id;", function(
+      pool.query("SELECT * from dss_workspace_menu a ORDER BY a.id;", function(
         error,
         results,
         fields
@@ -31,7 +31,7 @@ class Mysql {
   queryAll() {
     return new Promise((resolve, reject) => {
       pool.query(
-        "SELECT * from dss_onestop_menu_application b RIGHT JOIN dss_application a ON a.id = b.application_id ORDER BY a.id;",
+        "SELECT * from dss_workspace_menu_appconn b RIGHT JOIN dss_application a ON a.id = b.appconn_id ORDER BY a.id;",
         function(error, results, fields) {
           if (error) {
             throw error;
@@ -44,7 +44,7 @@ class Mysql {
   query(id) {
     return new Promise((resolve, reject) => {
       pool.query(
-        `SELECT * from dss_onestop_menu_application b RIGHT JOIN dss_application a ON a.id = b.application_id WHERE a.id=${id};`,
+        `SELECT * from dss_workspace_menu_appconn b RIGHT JOIN dss_application a ON a.id = b.appconn_id WHERE a.id=${id};`,
         function(error, results, fields) {
           if (error) {
             throw error;
@@ -60,7 +60,7 @@ class Mysql {
         !data.title_en ||
         !data.title_cn ||
         !data.url ||
-        !data.onestop_menu_id ||
+        !data.menu_id ||
         !data.project_url ||
         !data.homepage_url
       ) {
@@ -81,10 +81,10 @@ class Mysql {
             throw error;
           }
           if (result && result.insertId) {
-            let sql2 = `INSERT INTO dss_onestop_menu_application(id,application_id,onestop_menu_id,title_en,title_cn,desc_en,desc_cn,labels_en,labels_cn,is_active,access_button_en,access_button_cn) VALUES(0,?,?,?,?,?,?,?,?,?,?,?)`;
+            let sql2 = `INSERT INTO dss_workspace_menu_appconn(id,appconn_id,menu_id,title_en,title_cn,desc_en,desc_cn,labels_en,labels_cn,is_active,access_button_en,access_button_cn) VALUES(0,?,?,?,?,?,?,?,?,?,?,?)`;
             let params2 = [
               result.insertId,
-              data.onestop_menu_id,
+              data.menu_id,
               data.title_en,
               data.title_cn,
               data.desc_en,
@@ -118,9 +118,9 @@ class Mysql {
           if (error) {
             throw error;
           }
-          let sql2 = `UPDATE dss_onestop_menu_application SET onestop_menu_id=?,title_en=?,title_cn=?,desc_en=?,desc_cn=?,labels_en=?,labels_cn=?,is_active=?,access_button_en=?,access_button_cn=? WHERE application_id=?`;
+          let sql2 = `UPDATE dss_workspace_menu_appconn SET menu_id=?,title_en=?,title_cn=?,desc_en=?,desc_cn=?,labels_en=?,labels_cn=?,is_active=?,access_button_en=?,access_button_cn=? WHERE appconn_id=?`;
           let params2 = [
-            data.onestop_menu_id,
+            data.menu_id,
             data.title_en,
             data.title_cn,
             data.desc_en,

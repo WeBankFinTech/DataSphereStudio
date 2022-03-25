@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
-import com.webank.wedatasphere.dss.framework.workspace.bean.LinkisUser;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSUserMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.LinkisUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSUserService;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -42,7 +40,7 @@ public class DSSUserServiceImpl implements DSSUserService {
     /**
      * 在用户及角色添加到工作空间 之前，
      * 判断是否存在 username是否存在dss_user
-     * 不存在保存 ： 将username以及默认信息分别保存到dss_user、linkis_user两张表中
+     * 不存在保存 ： 将username以及默认信息分别保存到dss_user表中
      * @param userName
      */
     @Override

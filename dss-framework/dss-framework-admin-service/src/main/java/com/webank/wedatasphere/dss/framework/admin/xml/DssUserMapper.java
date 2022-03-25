@@ -18,13 +18,6 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      */
     public List<DssAdminUser> selectUserList(DssAdminUser DssAdminUser);
 
-    /**
-     * 通过用户名查询用户
-     *
-     * @param userName 用户名
-     * @return 用户对象信息
-     */
-    public DssAdminUser selectUserByUserName(String userName);
 
     /**
      * 通过用户ID查询用户
@@ -50,23 +43,6 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      */
     public int updateUser(DssAdminUser user);
 
-
-    /**
-     * 重置用户密码
-     *
-     * @param userName 用户名
-     * @param password 密码
-     * @return 结果
-     */
-    public int resetUserPwd(@Param("userName") String userName, @Param("password") String password);
-
-    /**
-     * 通过用户ID删除用户
-     *
-     * @param id 用户ID
-     * @return 结果
-     */
-    public int deleteUserById(Long id);
 
 
     /**

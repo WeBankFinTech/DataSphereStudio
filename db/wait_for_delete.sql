@@ -1,4 +1,4 @@
--- no use √
+-- no use √√
 DROP TABLE IF EXISTS `dss_application_user_init_result`;
 CREATE TABLE `dss_application_user_init_result` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -9,7 +9,7 @@ CREATE TABLE `dss_application_user_init_result` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- no use √
+-- no use √√
 DROP TABLE IF EXISTS `dss_component_info`;
 CREATE TABLE `dss_component_info` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -24,6 +24,7 @@ CREATE TABLE `dss_component_info` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_event_relation`;
 CREATE TABLE `dss_event_relation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -39,6 +40,7 @@ CREATE TABLE `dss_event_relation` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='save eventchecker info for application map';
 
+--√√
 DROP TABLE IF EXISTS `dss_homepage_demo_instance`;
 CREATE TABLE `dss_homepage_demo_instance` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -59,6 +61,7 @@ CREATE TABLE `dss_homepage_demo_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_homepage_demo_menu`;
 CREATE TABLE `dss_homepage_demo_menu` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -76,6 +79,7 @@ CREATE TABLE `dss_homepage_demo_menu` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
+--√√
 DROP TABLE IF EXISTS `dss_homepage_video`;
 CREATE TABLE `dss_homepage_video` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -95,7 +99,7 @@ CREATE TABLE `dss_homepage_video` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 
--- no use
+-- no use√√
 DROP TABLE IF EXISTS `dss_input_relation`;
 CREATE TABLE `dss_input_relation` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT,
@@ -108,7 +112,7 @@ CREATE TABLE `dss_input_relation` (
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 
-
+-- no use√√
 DROP TABLE IF EXISTS `dss_menu`;
 CREATE TABLE `dss_menu` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
@@ -125,6 +129,7 @@ CREATE TABLE `dss_menu` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
 
+--no use√√
 DROP TABLE IF EXISTS `dss_menu_component_url`;
 CREATE TABLE `dss_menu_component_url` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
@@ -137,12 +142,14 @@ CREATE TABLE `dss_menu_component_url` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
 
+--no use√√
 DROP TABLE IF EXISTS `dss_menu_page_relation`;
 CREATE TABLE `dss_menu_page_relation` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--no use√√
 DROP TABLE IF EXISTS `dss_orchestrator_schedule_info`;
 CREATE TABLE `dss_orchestrator_schedule_info` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -157,6 +164,7 @@ CREATE TABLE `dss_orchestrator_schedule_info` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
 
+--no use√√
 DROP TABLE IF EXISTS `dss_orchestrator_user`;
 CREATE TABLE `dss_orchestrator_user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -169,7 +177,7 @@ CREATE TABLE `dss_orchestrator_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
 
--- no use
+-- no use√√
 DROP TABLE IF EXISTS `dss_project_taxonomy`;
 CREATE TABLE `dss_project_taxonomy` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -183,7 +191,7 @@ CREATE TABLE `dss_project_taxonomy` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 
--- no use
+-- no use√√
 DROP TABLE IF EXISTS `dss_release_task`;
 CREATE TABLE `dss_release_task` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
@@ -198,7 +206,7 @@ CREATE TABLE `dss_release_task` (
 ) ENGINE=InnoDB AUTO_INCREMENT=605 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 
--- no use
+-- no use√√
 DROP TABLE IF EXISTS `linkis_user`;
 CREATE TABLE `linkis_user` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,

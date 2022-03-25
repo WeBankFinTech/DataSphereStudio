@@ -33,7 +33,7 @@ public class DolphinSchedulerProjectSearchOperation
         DolphinSchedulerPageInfoResponseRef responseRef = DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, url, requestRef.getUserName());
         return responseRef.getTotalList().stream().filter(project -> requestRef.getProjectName().equals(project.get("name")))
                 .map(project -> {
-                    Long id = Long.parseLong(project.get("id").toString());
+                    Long id = DolphinSchedulerHttpUtils.parseToLong(project.get("id"));
                     return ProjectResponseRef.newExternalBuilder().setRefProjectId(id).success();
                 }).findAny().orElse(ProjectResponseRef.newExternalBuilder().success());
     }

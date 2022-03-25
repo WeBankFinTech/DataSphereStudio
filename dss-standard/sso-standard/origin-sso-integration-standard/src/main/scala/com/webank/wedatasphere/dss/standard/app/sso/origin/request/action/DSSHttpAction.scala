@@ -34,13 +34,13 @@ trait DSSHttpAction extends HttpAction with UserAction {
 class DSSGetAction extends GetAction with DSSHttpAction
 
 class DSSPostAction extends POSTAction with DSSHttpAction {
-  override def getRequestPayload: String = DSSCommonUtils.COMMON_GSON.toJson(getRequestPayloads)
+  override def getRequestPayload: String = if (getRequestPayloads.isEmpty) "" else DSSCommonUtils.COMMON_GSON.toJson(getRequestPayloads)
 }
 
 class DSSDeleteAction extends DeleteAction with DSSHttpAction
 
 class DSSPutAction extends PutAction with DSSHttpAction {
-  override def getRequestPayload: String = DSSCommonUtils.COMMON_GSON.toJson(getRequestPayloads)
+  override def getRequestPayload: String = if (getRequestPayloads.isEmpty) "" else DSSCommonUtils.COMMON_GSON.toJson(getRequestPayloads)
 }
 
 class DSSDownloadAction extends DSSGetAction with DownloadAction with DSSHttpAction {

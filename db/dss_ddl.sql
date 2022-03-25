@@ -91,6 +91,15 @@ CREATE TABLE `dss_orchestrator_version_info` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=422 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
+CREATE TABLE `dss_orchestrator_ref_orchestration_relation` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `orchestrator_id` bigint(20) NOT NULL COMMENT 'dss的编排模式id',
+  `ref_project_id` bigint(20) DEFAULT NULL '调度系统关联的工程Id',
+  `ref_orchestration_id` int(11) DEFAULT NULL COMMENT '调度系统工作流的id（调用SchedulerAppConn的OrchestrationOperation服务返回的orchestrationId）',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=326 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
+
+
 ---------------------------------------------------------------------
 -------------------  DSS Project Framework ---------------------
 ---------------------------------------------------------------------

@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -38,15 +37,6 @@ public interface WorkspaceMapper {
     List<DSSWorkspace> findByWorkspaceName(@Param("name") String name);
 
     void addWorkSpace(DSSWorkspace dssWorkspace);
-
-    List<HomepageDemoMenuVo> getHomepageDemoMenusEn();
-    List<HomepageDemoMenuVo> getHomepageDemoMenusCn();
-
-    List<HomepageDemoInstanceVo> getHomepageInstancesByMenuIdCn(Long id);
-    List<HomepageDemoInstanceVo> getHomepageInstancesByMenuIdEn(Long id);
-
-    List<HomepageVideoVo> getHomepageVideosEn();
-    List<HomepageVideoVo> getHomepageVideosCn();
 
     DSSWorkspace getWorkspaceById(@Param("workspaceId") Long workspaceId);
 
@@ -69,5 +59,4 @@ public interface WorkspaceMapper {
 
     String getDepartName(@Param("id") Long id);
 
-    List<DSSWorkspaceUser01> getWorkspaceUsers01(@Param("id") Long id);
 }

@@ -17,11 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
@@ -51,8 +47,6 @@ public interface DSSWorkspaceService {
     List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
                                                String roleName, int pageNow, int pageSize, List<Long> total);
 
-    List<DSSWorkspaceUser01> getWorkspaceUsers01(String workspaceId, String department, String username,
-                                               String roleName, int pageNow, int pageSize, List<Long> total);
 
     List<DSSWorkspaceRoleVO> getWorkspaceRoles(int workspaceId);
 
@@ -77,9 +71,6 @@ public interface DSSWorkspaceService {
 
     List<WorkspaceDepartmentVo> getWorkSpaceDepartments();
 
-    List<HomepageDemoMenuVo> getHomepageDemos(boolean isChinese);
-
-    List<HomepageVideoVo> getHomepageVideos(boolean isChinese);
 
     List<OnestopMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese);
 
@@ -93,7 +84,6 @@ public interface DSSWorkspaceService {
 
     Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type);
 
-    List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId);
 
     boolean checkAdminByWorkspace(String username, int workspaceId);
 

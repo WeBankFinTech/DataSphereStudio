@@ -76,14 +76,13 @@ public class DssProxyUserController {
                 }
                 cookie.setPath("/");
                 resp.addCookie(cookie);
+
             } else {
                 DSSExceptionUtils.dealErrorException(100103,"The requested user name is not a login user",DSSAdminErrorException.class);
             }
             return Message.ok("Success to add proxy user into cookie");
 
         } catch (Exception exception) {
-            LOGGER.error("Failed to set cookie for proxy user", exception);
-            return Message.error(exception.getMessage());
             LOGGER.error("Failed to set cookie for proxy user", exception);
             return Message.error(ExceptionUtils.getRootCauseMessage(exception));
         }
@@ -110,7 +109,6 @@ public class DssProxyUserController {
         } catch (Exception exception) {
             LOGGER.error("Failed to add proxy user", exception);
             return Message.error(ExceptionUtils.getRootCauseMessage(exception));
-
         }
 
     }

@@ -23,6 +23,6 @@ class OriginSSORequestServiceImpl extends HttpSSORequestServiceImpl {
     new OriginSSORequestOperation(appName)
 
   override def createSSORequestOperation(appName: String): OriginSSORequestOperation = {
-    super.createHttpSSORequestOperation(appName).asInstanceOf[OriginSSORequestOperation]
+    super.createSSORequestOperation(appName).asInstanceOf[OriginSSORequestOperation]
   }
 }

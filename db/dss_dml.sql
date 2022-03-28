@@ -2,8 +2,8 @@ DELETE FROM dss_workspace;
 insert into `dss_workspace` (`name`, `label`, `description`, `create_by`, `create_time`, `department`, `product`, `source`, `last_update_time`, `last_update_user`) values('bdapWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','1','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop');
 insert  into `dss_workspace`(`id`,`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`) values(323,'hadoop001','','1','hadoop','2021-09-06 14:39:14','0','DSS',NULL,'2021-09-06 14:39:14','hadoop','project');
 
-DELETE FROM dss_workspace_user;
-insert  into `dss_workspace_user`(`id`,`workspace_id`,`username`,`join_time`,`created_by`,`user_id`) values (20,323,'hadoop','2021-09-06 14:39:17','hadoop',214);
+DELETE FROM dss_workspace_user_role;
+insert  into `dss_workspace_user_role`(`id`,`workspace_id`,`username`,`create_time`,`created_by`,`user_id`) values (20,323,'hadoop','2021-09-06 14:39:17','hadoop',214);
 
 DELETE FROM dss_user;
 INSERT INTO `dss_user` VALUES (214,'luban_test','luban_test',1,101,1,'','','','0',NULL,'2021-11-17 09:33:45','2021-11-17 09:51:55',NULL),(215,'hadoop','hadoop',1,101,1,'','','','0',NULL,'2021-11-17 09:43:41','2021-11-17 09:51:49',NULL);

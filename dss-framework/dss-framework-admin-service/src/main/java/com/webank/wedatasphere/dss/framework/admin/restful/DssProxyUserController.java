@@ -56,6 +56,26 @@ public class DssProxyUserController {
         try {
             if (userRep.getUserName().equals(username)) {
                 if (StringUtils.isEmpty(userRep.getUserName())) {
+                    return Message.error("User name is empty");
+                } else if (StringUtils.isEmpty(userRep.getProxyUserName())) {
+                    return Message.error("Proxy user name is empty");
+                } else if (dssProxyUserService.isExists(userRep.getUserName(), userRep.getProxyUserName())) {
+                    for (Cookie cookie : req.getCookies()) {
+                        if (null != cookie && cookie.getName().equalsIgnoreCase(PROXY_USER_TICKET_ID_STRING)) {
+                            cookie.setValue(null);
+                            cookie.setMaxAge(0);
+                            resp.addCookie(cookie);
+                        }
+                    }
+                }
+                Tuple2<String, String> userTicketIdKv = ProxyUserSSOUtils.getProxyUserTicketKV(userRep.getProxyUserName(), trustCode);
+                Cookie cookie = new Cookie(userTicketIdKv._1, userTicketIdKv._2);
+                cookie.setMaxAge(-1);
+                if (sslEnable) cookie.setSecure(true);
+                cookie.setPath("/");
+                resp.addCookie(cookie);
+            if (userRep.getUserName().equals(username)) {
+                if (StringUtils.isEmpty(userRep.getUserName())) {
                     DSSExceptionUtils.dealErrorException(100101, "User name is empty", DSSAdminErrorException.class);
                 } else if (StringUtils.isEmpty(userRep.getProxyUserName())) {
                     DSSExceptionUtils.dealErrorException(100102, "Proxy user name is empty", DSSAdminErrorException.class);
@@ -78,11 +98,18 @@ public class DssProxyUserController {
                 resp.addCookie(cookie);
 
             } else {
+                return Message.error("The requested user name is not a login user");
+            }
+            return Message.ok("Success to add proxy user into cookie");
+
+            } else {
                 DSSExceptionUtils.dealErrorException(100103,"The requested user name is not a login user",DSSAdminErrorException.class);
             }
             return Message.ok("Success to add proxy user into cookie");
 
         } catch (Exception exception) {
+            LOGGER.error("Failed to set cookie for proxy user", exception);
+            return Message.error(exception.getMessage());
             LOGGER.error("Failed to set cookie for proxy user", exception);
             return Message.error(ExceptionUtils.getRootCauseMessage(exception));
         }
@@ -109,6 +136,7 @@ public class DssProxyUserController {
         } catch (Exception exception) {
             LOGGER.error("Failed to add proxy user", exception);
             return Message.error(ExceptionUtils.getRootCauseMessage(exception));
+
         }
 
     }

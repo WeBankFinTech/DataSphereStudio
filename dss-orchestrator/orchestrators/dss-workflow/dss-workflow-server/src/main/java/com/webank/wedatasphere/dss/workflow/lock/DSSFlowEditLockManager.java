@@ -122,7 +122,7 @@ public class DSSFlowEditLockManager {
                 throw new DSSErrorException(60055, "acquire lock failed");
             }
         } else if (flowEditLock != null) {
-            lock = flowEditLock.getLockContent() + DSSWorkFlowConstant.SPLIT + flowEditLock.getLockStamp();
+            lock = flowEditLock.getLockContent();
         } else {
             // 插入锁,获取到数据库自增id
             lock = generateLock(flowID, username, owner);
@@ -141,7 +141,6 @@ public class DSSFlowEditLockManager {
             newLock.setUpdateTime(date);
             newLock.setFlowID(flowID);
             newLock.setLockContent(lockContent);
-            newLock.setLockStamp(0);
             newLock.setOwner(owner);
             newLock.setUsername(username);
             lockMapper.insertLock(newLock);
@@ -167,11 +166,9 @@ public class DSSFlowEditLockManager {
         //保存并刷新数据库更新时间
         String[] array = lock.split(DSSWorkFlowConstant.SPLIT);
         String lockContent = array[0];
-        int lockStamp = Integer.parseInt(array[1]);
         DSSFlowEditLock dssFlowEditLock = new DSSFlowEditLock();
         dssFlowEditLock.setUpdateTime(new Date());
         dssFlowEditLock.setLockContent(lockContent);
-        dssFlowEditLock.setLockStamp(lockStamp);
         int i = lockMapper.compareAndSwap(dssFlowEditLock);
         if (i == 0) {
             //update failed

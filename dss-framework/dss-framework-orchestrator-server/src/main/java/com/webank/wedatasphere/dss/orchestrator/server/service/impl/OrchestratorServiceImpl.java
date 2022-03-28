@@ -343,8 +343,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     //新建前是否存在相同的编排名称
     @Override
     public void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String arrangeName) throws DSSFrameworkErrorException {
-        int count = orchestratorMapper.getByNameAndProjectId(projectId, arrangeName);
-        if (count > 0) {
+        List<DSSOrchestratorInfo> retList = orchestratorMapper.getByNameAndProjectId(projectId, arrangeName);
+        if (CollectionUtils.isNotEmpty(retList)) {
             DSSFrameworkErrorException.dealErrorException(60000, "编排名称已经存在");
         }
     }
@@ -400,6 +400,11 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             }
         }
         return retList;
+    }
+
+    @Override
+    public List<DSSOrchestratorInfo> getByNameAndProjectId(Long projectId, String name) {
+        return orchestratorMapper.getByNameAndProjectId(projectId, name);
     }
 
 

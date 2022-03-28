@@ -36,6 +36,7 @@
         <module>dss-framework-orchestrator-server</module>
         <module>dss-framework-project-server</module>
         <module>dss-framework-admin-service</module>
+        <module>framework-plugins/dss-framework-migrate-server</module>
     </modules>
 
 </project>

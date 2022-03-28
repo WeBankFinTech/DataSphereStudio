@@ -56,7 +56,6 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteWorkspaceUser(String userName, int workspaceId) {
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
-        dssWorkspaceUserMapper.removeUserInWorkspace(userName, workspaceId);
     }
 
     @Override

@@ -28,6 +28,7 @@ public class DolphinSchedulerProjectUpdateOperation
 
     @Override
     public void init() {
+        super.init();
         String baseUrl = DolphinSchedulerHttpUtils.getDolphinSchedulerBaseUrl(getBaseUrl());
         this.projectUpdateUrl = mergeUrl(baseUrl, "projects/update");
     }
@@ -36,7 +37,7 @@ public class DolphinSchedulerProjectUpdateOperation
     public ProjectResponseRef updateProject(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl requestRef) throws ExternalOperationFailedException {
         // Dolphin Scheduler项目名
         String dsProjectName =
-            ProjectUtils.generateDolphinProjectName(requestRef.getDSSProject().getWorkspaceName(),
+            ProjectUtils.generateDolphinProjectName(requestRef.getWorkspace().getWorkspaceName(),
                     requestRef.getProjectName());
         logger.info("user {} begin to update project in DolphinScheduler, project name is {}.", requestRef.getUserName(), dsProjectName);
         Map<String, Object> formData = MapUtils.newCommonMapBuilder().put("projectId", requestRef.getRefProjectId())

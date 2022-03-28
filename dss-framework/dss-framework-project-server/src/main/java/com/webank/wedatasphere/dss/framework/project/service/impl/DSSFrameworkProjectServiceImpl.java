@@ -135,6 +135,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         //2.修改dss_project_user 工程与用户关系
         projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
         //调用第三方的工程修改接口
+        dbProject.setUsername(username);
         modifyThirdProject(projectModifyRequest, dbProject, workspace);
         //3.修改dss_project DSS基本工程信息
         dssProjectService.modifyProject(username, projectModifyRequest);
@@ -160,7 +161,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             }, workspace, projectService -> projectService.getProjectUpdateOperation(),
             dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject)
                     .setAccessUsers(projectModifyRequest.getAccessUsers()).setEditUsers(projectModifyRequest.getEditUsers())
-                    .setReleaseUsers(projectModifyRequest.getReleaseUsers()),
+                    .setReleaseUsers(projectModifyRequest.getReleaseUsers()).setUserName(dbProject.getUsername()).setWorkspace(workspace),
             (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setRefProjectId(appInstanceToRefProjectId.get(appInstance)),
             (structureOperation, structureRequestRef) -> ((ProjectUpdateOperation) structureOperation).updateProject((ProjectUpdateRequestRef) structureRequestRef)
             , null, "update refProject " + projectModifyRequest.getName());

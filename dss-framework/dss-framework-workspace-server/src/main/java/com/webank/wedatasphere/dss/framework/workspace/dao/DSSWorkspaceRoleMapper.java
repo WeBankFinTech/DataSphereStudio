@@ -103,7 +103,7 @@ public interface DSSWorkspaceRoleMapper {
                              @Param("priv") Integer priv);
 
 
-    @Select("select workspace_id from dss_workspace_user where username = #{username}")
+    @Select("select distinct workspace_id from dss_workspace_user_role where username = #{username}")
     List<Integer> getWorkspaceIds(@Param("username") String username);
 
     @Select("select workspace_id from dss_workspace where `name` = #{defaultWorkspaceName}")
@@ -120,5 +120,5 @@ public interface DSSWorkspaceRoleMapper {
     Integer getPriv(@Param("workspaceId") Integer workspaceId, @Param("roleId") int roleId, @Param("componentId") int componentId);
 
     @Select("select id from dss_application where `name` = #{appName}")
-    int getComponentId(@Param("appNaAme") String appName);
+    int getComponentId(@Param("appName") String appName);
 }

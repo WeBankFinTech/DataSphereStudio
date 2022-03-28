@@ -22,9 +22,6 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoInstanceVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuAppInstanceVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
@@ -120,7 +117,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             throw exception1;
         }
         String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
-        dssWorkspaceUserMapper.insertUser(userName, dssWorkspace.getId(), userName,userId);
         dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(), CommonRoleEnum.ADMIN.getId(), userName, userName,userId);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
@@ -148,8 +144,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             //保存 - dss_user
             dssUserService.saveWorkspaceUser(userName);
         }
-        //保存 - dss_workspace_user
-        dssWorkspaceUserMapper.insertUser(userName, workspaceId, creator,userId);
         //保存 - 保存用户角色关系 dss_workspace_user_role
         for (Integer roleId : roleIds) {
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, roleId, userName, creator,userId);
@@ -195,7 +189,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         if (workspaceIds.size() == 0){
             String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
-            dssWorkspaceUserMapper.insertUser(userName, workspaceId, "system",userId);
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, CommonRoleEnum.ANALYSER.getId(), userName, "system",userId);
             String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, CommonRoleEnum.ANALYSER.getId());
             if(ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)){
@@ -236,26 +229,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setHomePageUrl(homepageUrl);
         }
         return dssWorkspaceHomePageVO;
-    }
-
-    @Override
-    public List<DSSWorkspaceUser01> getWorkspaceUsers01(String workspaceId, String department, String username,
-                                                      String roleName, int pageNow, int pageSize, List<Long> total) {
-        int roleId = -1;
-        if (StringUtils.isNotEmpty(roleName)){
-            roleId = workspaceDBHelper.getRoleIdByName(roleName);
-        }
-        PageHelper.startPage(pageNow, pageSize);
-        List<DSSWorkspaceUser01> workspaceUsers = new ArrayList<>();
-        try{
-            workspaceUsers = workspaceMapper.getWorkspaceUsers01(Long.valueOf(workspaceId));
-        }finally {
-            PageHelper.clearPage();
-        }
-        PageInfo<DSSWorkspaceUser01> pageInfo = new PageInfo<>(workspaceUsers);
-        total.add(pageInfo.getTotal());
-        List<DSSWorkspaceUserVO> dssWorkspaceUserVOs = new ArrayList<>();
-        return workspaceUsers;
     }
 
     @Override

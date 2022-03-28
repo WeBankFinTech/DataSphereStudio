@@ -45,9 +45,10 @@ public class DolphinSchedulerProjectCreationOperation
         Map<String, Object> formData = MapUtils.newCommonMap("projectName", dsProjectName, "description", requestRef.getDSSProject().getDescription());
         DolphinSchedulerHttpUtils.getHttpPostResult(ssoRequestOperation, projectUrl, DolphinSchedulerConf.DS_ADMIN_USER.getValue(), formData);
         RefProjectContentRequestRef searchRequestRef = new RefProjectContentRequestRef.RefProjectContentRequestRefImpl();
-        searchRequestRef.setProjectName(requestRef.getDSSProject().getName()).setWorkspace(requestRef.getWorkspace())
+        searchRequestRef.setProjectName(dsProjectName).setWorkspace(requestRef.getWorkspace())
                 .setUserName(DolphinSchedulerConf.DS_ADMIN_USER.getValue());
         Long refProjectId = ((ProjectService) service).getProjectSearchOperation().searchProject(searchRequestRef).getRefProjectId();
+        logger.info("the refProjectId in dolphinScheduler of projectName:{} is:{}", requestRef.getDSSProject().getName(), refProjectId);
         // 对releaseUsers授权工程可访问权限
         if(CollectionUtils.isNotEmpty(requestRef.getReleaseUsers())) {
             ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl updateRequestRef = new ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl();

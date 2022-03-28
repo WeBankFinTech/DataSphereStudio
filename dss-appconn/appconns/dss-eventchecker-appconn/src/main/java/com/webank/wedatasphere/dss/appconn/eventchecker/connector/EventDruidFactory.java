@@ -23,32 +23,38 @@ import org.apache.log4j.Logger;
 
 import java.util.Base64;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventDruidFactory {
-	private static DruidDataSource msgInstance;
+	private static ConcurrentHashMap<String, DruidDataSource> instanceMap = new ConcurrentHashMap<>();
+	private static final String EVENT_DRUID_USERNAME = "msg.eventchecker.jdo.option.username";
+	private static final String EVENT_DRUID_URL = "msg.eventchecker.jdo.option.url";
 
 	public static DruidDataSource getMsgInstance(Properties props, Logger log) {
-		if (msgInstance == null ) {
+		log.info("EVENT_DRUID_USERNAME：" + EVENT_DRUID_USERNAME + "");
+		log.info("EVENT_DRUID_URL：" + EVENT_DRUID_URL + "");
+		String key = props.getProperty(EVENT_DRUID_USERNAME) + props.getProperty(EVENT_DRUID_URL);
+		if (instanceMap.contains(key)) {
+			return instanceMap.get(key);
+		} else {
 			synchronized (EventDruidFactory.class) {
-				if(msgInstance == null) {
-					try {
-						msgInstance = createDataSource(props, log, "Msg");
-				    } catch (Exception e) {
-				    	throw new RuntimeException("Error creating Druid DataSource", e);
-				    }
+				if (instanceMap.contains(key)) {
+					return instanceMap.get(key);
 				}
+				DruidDataSource msgInstance = createDataSource(props, log, "Msg");
+				instanceMap.put(key, msgInstance);
+				return instanceMap.get(key);
 			}
 		}
-		return msgInstance;
 	}
-	
+
 	private static DruidDataSource createDataSource(Properties props, Logger log, String type) {
 		String name = null;
 		String url = null;
 		String username = null;
 		String password = null;
 		String loginType = null;
-		
+
 		if(type.equals("Msg")){
 			name = props.getProperty("msg.eventchecker.jdo.option.name");
 			url = props.getProperty("msg.eventchecker.jdo.option.url");
@@ -64,7 +70,7 @@ public class EventDruidFactory {
 				log.error("password decore failed" + e);
 			}
 		}
-		
+
 		int initialSize = Integer.valueOf(props.getProperty("option.initial.size", "1"));
 		int maxActive = Integer.valueOf(props.getProperty("option.max.active", "100"));
 		int minIdle = Integer.valueOf(props.getProperty("option.min.idle", "1"));
@@ -78,13 +84,13 @@ public class EventDruidFactory {
 		if (timeBetweenEvictionRunsMillis > minEvictableIdleTimeMillis) {
 			timeBetweenEvictionRunsMillis = minEvictableIdleTimeMillis;
 		}
-		
+
 		DruidDataSource ds = new DruidDataSource();
-		
+
 		if (StringUtils.isNotBlank(name)) {
 			ds.setName(name);
 		}
-		
+
 		ds.setUrl(url);
 		ds.setDriverClassName("com.mysql.jdbc.Driver");
 	    ds.setUsername(username);

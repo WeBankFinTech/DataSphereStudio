@@ -257,6 +257,7 @@ public class MigrateServiceImpl implements MigrateService {
     @Override
     public String queryOrcUUIDByName(Long workspaceId, Long projectId, String orcName) throws DSSErrorException {
         String uuid = null;
+        //todo rpc调用
         List<DSSOrchestratorInfo> orchestratorInfos = orchestratorService.getByNameAndProjectId(projectId, orcName);
         if (CollectionUtils.isNotEmpty(orchestratorInfos)) {
 //            List<OrchestratorVo> orchestratorVos = queryExitsOrc(Arrays.asList(orchestratorInfos.getOrchestratorId()));

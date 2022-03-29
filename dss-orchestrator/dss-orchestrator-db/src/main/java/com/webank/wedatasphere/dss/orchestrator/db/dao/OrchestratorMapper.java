@@ -102,7 +102,8 @@ public interface OrchestratorMapper {
     @Select("select `name` from dss_orchestrator_info where `id` = #{orchestratorId}")
     String getOrchestratorNameById(@Param("orchestratorId") int orchestratorId);
 
-    int getByNameAndProjectId(@Param("projectId") Long projectId, @Param("name") String name);
+    @Select("select * from dss_orchestrator_info where `project_id` = #{projectId} and `name` = #{name}")
+    List<DSSOrchestratorInfo> getByNameAndProjectId(@Param("projectId") Long projectId, @Param("name") String name);
 
     void addOrchestratorRefOrchestration(DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration);
 

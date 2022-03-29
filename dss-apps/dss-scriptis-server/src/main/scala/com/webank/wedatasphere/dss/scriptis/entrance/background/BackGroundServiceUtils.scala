@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatasphere.dss.datapipe.entrance.background
+package com.webank.wedatasphere.dss.scriptis.entrance.background
 
 import java.io.{InputStream, OutputStream}
 import java.lang

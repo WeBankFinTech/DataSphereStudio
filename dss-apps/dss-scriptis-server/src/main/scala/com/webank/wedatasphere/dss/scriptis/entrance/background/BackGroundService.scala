@@ -14,18 +14,12 @@
  *
  */
 
-package com.webank.wedatasphere.dss.datapipe.exception;
+package com.webank.wedatasphere.dss.scriptis.entrance.background
 
-import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.server.socket.controller.ServerEvent
 
 
-public class DataPipeExecuteException extends ErrorException {
-
-        public DataPipeExecuteException(int errCode, String desc) {
-            super(errCode, desc);
-        }
-
-        public DataPipeExecuteException(int errCode, String desc, String ip, int port, String serviceKind) {
-            super(errCode, desc, ip, port, serviceKind);
-        }
-    }
+trait BackGroundService {
+  val serviceType:String
+  def operation(serverEvent: ServerEvent):ServerEvent
+}

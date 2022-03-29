@@ -14,14 +14,14 @@
  *
  */
 
-package com.webank.wedatasphere.dss.datapipe
+package com.webank.wedatasphere.dss.scriptis
 
 import com.webank.wedatasphere.dss.common.utils.DSSMainHelper
 import org.apache.linkis.DataWorkCloudApplication
 import org.apache.linkis.common.utils.{Logging, Utils}
 
 
-object DSSDatapipeServerApplication extends Logging {
+object DSSScriptisServerApplication extends Logging {
 
   val userName: String = System.getProperty("user.name")
   val hostName: String = Utils.getComputerName

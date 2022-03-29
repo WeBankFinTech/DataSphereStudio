@@ -50,7 +50,7 @@ public class WorkspaceDBHelper {
 
     private final Object lock = new Object();
 
-    private List<DSSOnestopMenu> dssOnestopMenus;
+    private List<DSSWorkspaceMenu> dssWorkspaceMenus;
 
     private List<DSSApplicationBean> dssApplicationBeans;
 
@@ -72,7 +72,7 @@ public class WorkspaceDBHelper {
             @Override
             public void run() {
                 synchronized (lock) {
-                    dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
+                    dssWorkspaceMenus = dssWorkspaceRoleMapper.getOnestopMenus();
                 }
             }
         }, 0, 1, TimeUnit.MINUTES);
@@ -112,7 +112,7 @@ public class WorkspaceDBHelper {
     public void retrieveFromDB() {
         synchronized (lock) {
             dssApplicationBeans = dssWorkspaceRoleMapper.getDSSAppConns();
-            dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
+            dssWorkspaceMenus = dssWorkspaceRoleMapper.getOnestopMenus();
             dssRoles = dssWorkspaceRoleMapper.getRoles();
         }
     }
@@ -121,37 +121,37 @@ public class WorkspaceDBHelper {
     public List<DSSWorkspaceMenuRole> generateDefaultWorkspaceMenuRole(int workspaceId, String username) {
         List<DSSWorkspaceMenuRole> list = new ArrayList<>();
         Date date = new Date(System.currentTimeMillis());
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,1,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,1,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,1,1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 1, 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 1, 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 1, 1, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,2,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,2,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,2,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 2, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 2, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 2, 0, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,3,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,3,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,3,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 3, 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 3, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 3, 0, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,4,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,4,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,4,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 4, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 4, 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 4, 0, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,5,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,5,0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,5,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 5, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 5, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 5, 0, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2,6,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3,6,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28,6,0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 6, 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 6, 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 6, 0, date, username));
 
-        if(StringUtils.isNotBlank(ApplicationConf.ESB_APPID)){
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1,1,1, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1,2,1, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1,3,0, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1,4,0, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1,5,0, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1,6,1, date, username));
+        if (StringUtils.isNotBlank(ApplicationConf.ESB_APPID)) {
+            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 1, 1, date, username));
+            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 2, 1, date, username));
+            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 3, 0, date, username));
+            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 4, 0, date, username));
+            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 5, 0, date, username));
+            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 6, 1, date, username));
         }
         return list;
     }
@@ -231,7 +231,6 @@ public class WorkspaceDBHelper {
     }
 
 
-
     public String getRoleFrontName(int roleId) {
         DSSRole role = dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(null);
         if (role != null) {
@@ -265,9 +264,9 @@ public class WorkspaceDBHelper {
         return vo;
     }
 
-    public DSSOnestopMenu getMenuNameById(int menuId) {
-        if (dssOnestopMenus.stream().anyMatch(dssMenu -> dssMenu.getId() == menuId)) {
-            return dssOnestopMenus.stream().filter(dssMenu -> dssMenu.getId() == menuId).findFirst().get();
+    public DSSWorkspaceMenu getMenuNameById(int menuId) {
+        if (dssWorkspaceMenus.stream().anyMatch(dssMenu -> dssMenu.getId() == menuId)) {
+            return dssWorkspaceMenus.stream().filter(dssMenu -> dssMenu.getId() == menuId).findFirst().get();
         } else {
             return null;
         }
@@ -287,7 +286,7 @@ public class WorkspaceDBHelper {
 
     public DSSApplicationBean getAppConn(String appConnName) {
         return dssApplicationBeans.stream().
-                filter(dssApplicationBean -> dssApplicationBean.getName() == appConnName).
+                filter(dssApplicationBean -> dssApplicationBean.getName().equals(appConnName)).
                 findFirst().
                 orElse(null);
     }
@@ -301,7 +300,7 @@ public class WorkspaceDBHelper {
     }
 
     public List<Integer> getAllMenuIds() {
-        return dssOnestopMenus.stream().map(DSSOnestopMenu::getId).collect(Collectors.toList());
+        return dssWorkspaceMenus.stream().map(DSSWorkspaceMenu::getId).collect(Collectors.toList());
     }
 
 }

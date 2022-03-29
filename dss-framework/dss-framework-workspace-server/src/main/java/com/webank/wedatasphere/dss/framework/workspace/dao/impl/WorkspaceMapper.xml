@@ -89,7 +89,7 @@
     </insert>
 
     <select id="getManagementMenuCn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
+            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo">
         SELECT `id`,`name`,`title_cn` AS `title`,`order`
         FROM dss_workspace_menu
         <where>
@@ -98,7 +98,7 @@
     </select>
 
     <select id="getManagementMenuEn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
+            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`order`
         FROM dss_workspace_menu
         <where>
@@ -107,7 +107,7 @@
     </select>
 
     <select id="getApplicationMenuCn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
+            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo">
         SELECT `id`,`name`,`title_cn` AS `title`,`order`
         FROM dss_workspace_menu
         <where>
@@ -116,7 +116,7 @@
     </select>
 
     <select id="getApplicationMenuEn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo">
+            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`order`
         FROM dss_workspace_menu
         <where>
@@ -125,11 +125,13 @@
     </select>
 
     <select id="getMenuAppInstancesCn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuAppInstanceVo">
+            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuAppconnVo">
         SELECT
-        <include refid="menu_appInstances_cn"/>
+        <!--        <include refid="menu_appInstances_cn"/>-->
+        m.`id`,m.`title_cn` AS `title`, m.`desc_cn` AS `description`, m.`labels_cn` AS `labels`, m.image, m.`is_active`,
+        m.`icon`,m.`order`, app.`appconn_name` as `name`
         FROM dss_workspace_menu_appconn m
-        LEFT JOIN dss_application app
+        LEFT JOIN dss_appconn app
         ON m.`appconn_id` = app.`id`
         <where>
             m.`menu_id` = #{id}
@@ -137,11 +139,13 @@
     </select>
 
     <select id="getMenuAppInstancesEn"
-            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuAppInstanceVo">
+            resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuAppconnVo">
         SELECT
-        <include refid="menu_appInstances_en"/>
+        <!--        <include refid="menu_appInstances_en"/>-->
+        m.`id`,m.`title_en` AS `title`, m.`desc_en` AS `description`, m.`labels_en` AS `labels`, m.image, m.`is_active`,
+        m.`icon`,m.`order`, app.`appconn_name` as `name`
         FROM dss_workspace_menu_appconn m
-        LEFT JOIN dss_application app
+        LEFT JOIN dss_appconn app
         ON m.`appconn_id` = app.`id`
         <where>
             m.`menu_id` = #{id}
@@ -150,7 +154,8 @@
 
     <select id="getWorkspaceFavoritesCn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo">
-        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId , name, url, icon,
+        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId , name, url,
+        icon,
         title_cn AS title
         FROM dss_workspace_user_favorites_appconn join dss_workspace_menu_appconn
         on dss_workspace_user_favorites_appconn.menu_appconn_id = dss_workspace_menu_appconn.id
@@ -165,7 +170,8 @@
 
     <select id="getWorkspaceFavoritesEn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo">
-        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId, name, url, icon,
+        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId, name, url,
+        icon,
         title_en AS `title`
         FROM dss_workspace_user_favorites_appconn join dss_workspace_menu_appconn
         on dss_workspace_user_favorites_appconn.menu_appconn_id = dss_workspace_menu_appconn.id
@@ -192,8 +198,6 @@
         AND username = #{username}
         AND workspace_id = #{workspaceId}
         AND type = #{type}
-
-
     </delete>
 
 

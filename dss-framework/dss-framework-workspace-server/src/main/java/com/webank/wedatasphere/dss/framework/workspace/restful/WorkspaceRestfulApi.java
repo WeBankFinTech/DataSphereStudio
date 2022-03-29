@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageDemoMenuVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.HomepageVideoVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
@@ -110,18 +108,28 @@ public class WorkspaceRestfulApi {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
-        List<OnestopMenuVo> managements = dssWorkspaceService.getWorkspaceManagements(workspaceId, username, isChinese);
+        List<WorkspaceMenuVo> managements = dssWorkspaceService.getWorkspaceManagements(workspaceId, username, isChinese);
         return Message.ok().data("managements", managements);
     }
 
-    @RequestMapping(path = "workspaces/{workspaceId}/applications", method = RequestMethod.GET)
-    public Message getWorkspaceApplications(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
+//    @RequestMapping(path = "workspaces/{workspaceId}/applications", method = RequestMethod.GET)
+//    public Message getWorkspaceApplications(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
+//        String header = req.getHeader("Content-language").trim();
+//        boolean isChinese = "zh-CN".equals(header);
+//        String username = SecurityFilter.getLoginUsername(req);
+//        List<OnestopMenuVo> applications = dssWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
+//        return Message.ok().data("applications", applications);
+//    }
+
+    @RequestMapping(path = "workspaces/{workspaceId}/appconns", method = RequestMethod.GET)
+    public Message getWorkspaceAppconns(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
-        List<OnestopMenuVo> applications = dssWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
-        return Message.ok().data("applications", applications);
+        List<WorkspaceMenuVo> appconns = dssWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
+        return Message.ok().data("menus", appconns);
     }
+
 
     @RequestMapping(path = "/workspaces/{workspaceId}/favorites", method = RequestMethod.GET)
     public Message getWorkspaceFavorites(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @RequestParam(value = "type", required = false) String type) {

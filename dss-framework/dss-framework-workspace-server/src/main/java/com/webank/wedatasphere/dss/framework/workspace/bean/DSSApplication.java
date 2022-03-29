@@ -24,6 +24,7 @@ import java.io.Serializable;
 
 
 @TableName(value = "dss_application")
+@Deprecated
 public class DSSApplication implements Serializable {
 
     private static final long serialVersionUID=1L;

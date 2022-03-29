@@ -40,14 +40,14 @@ public interface WorkspaceMapper {
 
     DSSWorkspace getWorkspaceById(@Param("workspaceId") Long workspaceId);
 
-    List<OnestopMenuVo> getManagementMenuCn();
-    List<OnestopMenuVo> getManagementMenuEn();
+    List<WorkspaceMenuVo> getManagementMenuCn();
+    List<WorkspaceMenuVo> getManagementMenuEn();
 
-    List<OnestopMenuVo> getApplicationMenuCn();
-    List<OnestopMenuVo> getApplicationMenuEn();
+    List<WorkspaceMenuVo> getApplicationMenuCn();
+    List<WorkspaceMenuVo> getApplicationMenuEn();
 
-    List<OnestopMenuAppInstanceVo> getMenuAppInstancesCn(Long id);
-    List<OnestopMenuAppInstanceVo> getMenuAppInstancesEn(Long id);
+    List<WorkspaceMenuAppconnVo> getMenuAppInstancesCn(Long id);
+    List<WorkspaceMenuAppconnVo> getMenuAppInstancesEn(Long id);
 
     List<WorkspaceFavoriteVo> getWorkspaceFavoritesCn(@Param("username") String username, @Param("workspaceId") Long workspaceId,@Param("type") String  type);
 

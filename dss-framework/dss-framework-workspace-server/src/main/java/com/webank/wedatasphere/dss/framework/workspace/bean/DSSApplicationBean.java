@@ -21,7 +21,7 @@ public class DSSApplicationBean {
     private Integer id;
     private String name;
     private String homepageUrl;
-    private String projectUrl;
+    private String label;
 
     public Integer getId() {
         return id;
@@ -47,11 +47,11 @@ public class DSSApplicationBean {
         this.homepageUrl = homepageUrl;
     }
 
-    public String getProjectUrl() {
-        return projectUrl;
+    public String getLabel() {
+        return label;
     }
 
-    public void setProjectUrl(String projectUrl) {
-        this.projectUrl = projectUrl;
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

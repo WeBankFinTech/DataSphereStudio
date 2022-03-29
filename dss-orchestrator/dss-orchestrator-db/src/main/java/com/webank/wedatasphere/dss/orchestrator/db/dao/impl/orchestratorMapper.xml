@@ -200,7 +200,7 @@
         values (#{id},#{orchestratorId},#{refProjectId},#{refOrchestrationId})
     </insert>
 
-    <select id="getListByPage" parameterType="java.util.Map"
+    <select id="queryOrchestratorInfos" parameterType="java.util.Map"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
         select * from dss_orchestrator_info
         <where>
@@ -215,6 +215,9 @@
             </if>
             <if test="params.orchestrator_mode != null and params.orchestrator_mode != ''">
                 and orchestrator_mode=#{params.orchestrator_mode}
+            </if>
+            <if test="params.name != null and params.name != ''">
+                and name=#{params.name}
             </if>
         </where>
     </select>

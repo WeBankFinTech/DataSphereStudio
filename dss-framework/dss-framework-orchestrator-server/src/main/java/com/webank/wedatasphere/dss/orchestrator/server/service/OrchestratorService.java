@@ -26,6 +26,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.request.Orchestrat
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -106,4 +107,6 @@ public interface OrchestratorService {
     Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest) throws DSSFrameworkErrorException;
 
     List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username);
+
+    List<DSSOrchestratorInfo> getByNameAndProjectId(@Param("projectId") Long projectId, @Param("name") String name);
 }

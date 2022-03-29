@@ -14,13 +14,14 @@
  *
  */
 
-package com.webank.wedatasphere.dss.datapipe.execute;
+package com.webank.wedatasphere.dss.scriptis.execute;
 
-import com.webank.wedatasphere.dss.datapipe.config.DataPipeServiceConfiguration;
+import com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration;
 import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
+import org.apache.linkis.server.conf.ServerConfiguration;
 import org.apache.linkis.server.socket.controller.ServerEvent;
 import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.UJESClientImpl;
@@ -34,65 +35,67 @@ import java.util.concurrent.TimeUnit;
 
 public class LinkisJobSubmit {
 
-    public static UJESClient getClient(Map<String, String> props) {
-        UJESClient client = getUJESClient(
-                Configuration.GATEWAY_URL().getValue(props),
-                DataPipeServiceConfiguration.LINKIS_ADMIN_USER.getValue(props),
-                DataPipeServiceConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(props),
-                props);
+    private static UJESClient ujesClient;
 
-        return client;
+    public static UJESClient getClient() {
+        if(ujesClient == null) {
+            synchronized (LinkisJobSubmit.class) {
+                if(ujesClient == null) {
+                    ujesClient = getUJESClient(
+                            Configuration.GATEWAY_URL().getValue(),
+                            DSSScriptisConfiguration.LINKIS_ADMIN_USER.getValue(),
+                            DSSScriptisConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue());
+                }
+            }
+        }
+        return ujesClient;
     }
 
-    public static UJESClient getUJESClient(String url, String user, String token, Map<String, String> jobProps){
-        return new UJESClientImpl(getClientConfig(url,user,token, jobProps));
+    public static UJESClient getUJESClient(String url, String user, String token){
+        return new UJESClientImpl(getClientConfig(url, user, token));
     }
 
-    public static DWSClientConfig getClientConfig(String url, String user, String token, Map<String, String> jobProps){
-        DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
+    public static DWSClientConfig getClientConfig(String url, String user, String token){
+        return ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(url)
-                .connectionTimeout(DataPipeServiceConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
+                .connectionTimeout(DSSScriptisConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue())
                 .discoveryEnabled(false).discoveryFrequency(1, TimeUnit.MINUTES)
                 .loadbalancerEnabled(true)
                 .maxConnectionSize(5)
-                .retryEnabled(false).readTimeout(DataPipeServiceConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
+                .retryEnabled(false).readTimeout(DSSScriptisConfiguration.LINKIS_READ_TIMEOUT.getValue())
                 .setAuthenticationStrategy(new TokenAuthenticationStrategy())
                 .setAuthTokenKey(user).setAuthTokenValue(token)))
-                .setDWSVersion(DataPipeServiceConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
-        return clientConfig;
+                .setDWSVersion(ServerConfiguration.BDP_SERVER_VERSION()).build();
     }
 
     /**
      * @param operation
-     * @param client
      * @return
      */
-    public static JobExecuteResult execute(ServerEvent operation, UJESClient client) {
+    public static JobExecuteResult execute(ServerEvent operation) {
         Map<String,Object> dataMap = operation.getData();
-        String runType = (String)dataMap.get("runType");
-        String background = (String)dataMap.get("background");
-        String executionCode = (String)dataMap.get("executionCode");
+        String runType = (String) dataMap.get("runType");
+        String background = (String) dataMap.get("background");
+        String executionCode = (String) dataMap.get("executionCode");
         String scriptPath = "default.scala";
-        Map<String,String> sourceMap = (Map<String,String>)dataMap.get("source");
-        scriptPath = sourceMap!=null && sourceMap.containsKey("scriptPath") ? sourceMap.get("scriptPath") : scriptPath;
+        Map<String, String> sourceMap = (Map<String,String>) dataMap.get("source");
+        scriptPath = sourceMap != null && sourceMap.containsKey("scriptPath") ? sourceMap.get("scriptPath") : scriptPath;
 
         String executeApplicationName = (String)dataMap.get("executeApplicationName");
         String umUser = (String)dataMap.get("umUser");
-        Map<String,Object> paramsMap = (Map<String,Object>)dataMap.get("params");
+        Map<String, Object> paramsMap = (Map<String,Object>) dataMap.get("params");
 
-        Map<String, Object> source = new HashMap<>();
-        source.put("DSS-DataPipe",scriptPath);
+        Map<String, Object> source = new HashMap<>(1);
+        source.put("DSS-Scriptis", scriptPath);
         JobExecuteAction.Builder builder = JobExecuteAction.builder().setCreator("IDE")
                 .addExecuteCode(executionCode)
                 .setEngineTypeStr(executeApplicationName)
                 .setRunTypeStr(runType)
                 .setUser(umUser)
                 .setParams(paramsMap)
-                .setVariableMap(new HashMap<>())
                 .setSource(source);
         JobExecuteAction jobAction = builder.build();
-        JobExecuteResult res = client.execute(jobAction);
-        return res;
+        return getClient().execute(jobAction);
     }
 
 }

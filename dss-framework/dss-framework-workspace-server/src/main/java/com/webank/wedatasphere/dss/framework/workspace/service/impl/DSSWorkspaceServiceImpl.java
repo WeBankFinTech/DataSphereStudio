@@ -357,8 +357,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             vo.setId(k);
             Map<String, Boolean> componentPrivs = new HashMap<>();
 
-            if (workspaceDBHelper.getComponent(k) != null){
-                vo.setName(workspaceDBHelper.getComponent(k).getName());
+            if (workspaceDBHelper.getAppConn(k) != null){
+                vo.setName(workspaceDBHelper.getAppConn(k).getName());
                 workspaceRoleVOList.forEach(role->{
                     int roleId = role.getRoleId();
                     boolean isContain = false;

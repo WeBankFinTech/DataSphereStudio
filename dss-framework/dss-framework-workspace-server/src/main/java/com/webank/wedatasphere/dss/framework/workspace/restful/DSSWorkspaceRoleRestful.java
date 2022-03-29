@@ -17,20 +17,15 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplication;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddWorkspaceRoleRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSApplicationMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
-import com.webank.wedatasphere.dss.framework.workspace.util.ApplicationUtils;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -42,7 +37,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
@@ -59,38 +53,38 @@ public class DSSWorkspaceRoleRestful {
     private DSSWorkspaceRoleService dssWorkspaceRoleService;
     @Autowired
     private DSSUserService userService;
-    @Autowired
-    private DSSApplicationMapper applicationMapper;
+//    @Autowired
+//    private DSSApplicationMapper applicationMapper;
 
-    @RequestMapping(path ="getBaseInfo", method = RequestMethod.GET)
-    public Message getBaseInfo(HttpServletRequest req) {
-        String username = SecurityFilter.getLoginUsername(req);
-        userService.saveWorkspaceUser(username);
-        List<DSSApplication> applicationList = applicationMapper.selectList(null);
-        for (DSSApplication application : applicationList) {
-            String redirectUrl = application.getRedirectUrl();
-            String enhanceJson = application.getEnhanceJson();
-            if (redirectUrl != null && redirectUrl.startsWith("http")) {
-                application.setHomepageUrl(ApplicationUtils.redirectUrlFormat(redirectUrl, application.getHomepageUrl()));
-                application.setProjectUrl(ApplicationUtils.redirectUrlFormat(redirectUrl, application.getProjectUrl()));
-                if (StringUtils.isNotEmpty(enhanceJson) && enhanceJson.contains("scheduleHistory")) {
-                    Gson gson = new Gson();
-                    HashMap<String, Object> scheduleHistoryMap = gson.fromJson(enhanceJson, HashMap.class);
-                    String oldUrl = scheduleHistoryMap.get("scheduleHistory").toString();
-                    String formatUrl = ApplicationUtils.redirectUrlFormat(redirectUrl, oldUrl);
-                    scheduleHistoryMap.replace("scheduleHistory", formatUrl);
-                    application.setEnhanceJson(gson.toJson(scheduleHistoryMap));
-                }
-            }
-        }
+//    @RequestMapping(path ="getBaseInfo", method = RequestMethod.GET)
+//    public Message getBaseInfo(HttpServletRequest req) {
+//        String username = SecurityFilter.getLoginUsername(req);
+//        userService.saveWorkspaceUser(username);
+//        List<DSSApplication> applicationList = applicationMapper.selectList(null);
+//        for (DSSApplication application : applicationList) {
+//            String redirectUrl = application.getRedirectUrl();
+//            String enhanceJson = application.getEnhanceJson();
+//            if (redirectUrl != null && redirectUrl.startsWith("http")) {
+//                application.setHomepageUrl(ApplicationUtils.redirectUrlFormat(redirectUrl, application.getHomepageUrl()));
+//                application.setProjectUrl(ApplicationUtils.redirectUrlFormat(redirectUrl, application.getProjectUrl()));
+//                if (StringUtils.isNotEmpty(enhanceJson) && enhanceJson.contains("scheduleHistory")) {
+//                    Gson gson = new Gson();
+//                    HashMap<String, Object> scheduleHistoryMap = gson.fromJson(enhanceJson, HashMap.class);
+//                    String oldUrl = scheduleHistoryMap.get("scheduleHistory").toString();
+//                    String formatUrl = ApplicationUtils.redirectUrlFormat(redirectUrl, oldUrl);
+//                    scheduleHistoryMap.replace("scheduleHistory", formatUrl);
+//                    application.setEnhanceJson(gson.toJson(scheduleHistoryMap));
+//                }
+//            }
+//        }
         //返回FAQ地址
-        String faqUrl = ApplicationConf.FAQ.getValue();
-        boolean isAdmin = userService.isAdminUser(username);
-        //前台需要返回username
-        return Message.ok().data("applications", applicationList).
-                data("username", username).data("isAdmin", isAdmin)
-                .data("DWSParams", Collections.singletonMap("faq", faqUrl));
-    }
+//        String faqUrl = ApplicationConf.FAQ.getValue();
+//        boolean isAdmin = userService.isAdminUser(username);
+//        //前台需要返回username
+//        return Message.ok().
+//                data("username", username).data("isAdmin", isAdmin)
+//                .data("DWSParams", Collections.singletonMap("faq", faqUrl));
+//    }
 
     @RequestMapping(path ="getWorkspaceRoles", method = RequestMethod.GET)
     public Message getWorkspaceRoles(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId){

@@ -546,7 +546,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                         appConn.getAppDesc().getAppInstances().forEach(appInstance -> {
 //                                nameAndUrl.put("进入开发中心", appInstance.getBaseUrl());
                             String label = String.join(",", appInstance.getLabels().stream()
-                                    .map(SerializableLabel::getStringValue).toArray(String[]::new));
+                                    .map(l -> ((EnvDSSLabel) l).getEnv()).toArray(String[]::new));
                             String env = ((EnvDSSLabel) appInstance.getLabels().get(0)).getEnv();
                             String selectedName = menuAppconn.getName();
                             if (!isCommunity) {

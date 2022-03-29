@@ -44,7 +44,7 @@ public interface DSSWorkspaceRoleMapper {
             @Result(property = "titleCn", column = "title_cn"),
             @Result(property = "titleEn", column = "title_En")
     })
-    List<DSSOnestopMenu> getOnestopMenus();
+    List<DSSWorkspaceMenu> getOnestopMenus();
 
 
     @Select("select a.id id, a.appconn_name name, b.homepage_url homepage_url, b.label label from dss_appconn a join dss_appconn_instance b on a.id=b.appconn_id")

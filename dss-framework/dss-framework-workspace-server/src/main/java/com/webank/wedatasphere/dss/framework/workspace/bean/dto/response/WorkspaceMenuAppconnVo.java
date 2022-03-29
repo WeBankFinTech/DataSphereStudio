@@ -15,27 +15,32 @@
  */
 package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplicationBean;
+
+import java.util.List;
 import java.util.Map;
 
 
-public class OnestopMenuAppInstanceVo {
+public class WorkspaceMenuAppconnVo {
     private Long id;
     private String title;
     private String description;
     private String labels;
-    private String accessButton;
-    private String accessButtonUrl;
-    private String manualButton;
-    private String manualButtonUrl;
-    private String projectUrl;
+//    private String accessButton;
+//    private String accessButtonUrl;
+//    private String manualButton;
+//    private String manualButtonUrl;
+//    private String projectUrl;
     private String name;
     private Boolean isActive;
     private Boolean accessable;
     private String icon;
     private Integer order;
-    private Map<String, String> nameAndUrls;
+//    private Map<String, String> nameAndUrls;
     //图片
     private String image;
+
+    private List<DSSApplicationBean> appInstances;
 
     public String getImage() {
         return image;
@@ -76,38 +81,38 @@ public class OnestopMenuAppInstanceVo {
     public void setLabels(String labels) {
         this.labels = labels;
     }
-
-    public String getAccessButton() {
-        return accessButton;
-    }
-
-    public void setAccessButton(String accessButton) {
-        this.accessButton = accessButton;
-    }
-
-    public String getAccessButtonUrl() {
-        return accessButtonUrl;
-    }
-
-    public void setAccessButtonUrl(String accessButtonUrl) {
-        this.accessButtonUrl = accessButtonUrl;
-    }
-
-    public String getManualButton() {
-        return manualButton;
-    }
-
-    public void setManualButton(String manualButton) {
-        this.manualButton = manualButton;
-    }
-
-    public String getManualButtonUrl() {
-        return manualButtonUrl;
-    }
-
-    public void setManualButtonUrl(String manualButtonUrl) {
-        this.manualButtonUrl = manualButtonUrl;
-    }
+//
+//    public String getAccessButton() {
+//        return accessButton;
+//    }
+//
+//    public void setAccessButton(String accessButton) {
+//        this.accessButton = accessButton;
+//    }
+//
+//    public String getAccessButtonUrl() {
+//        return accessButtonUrl;
+//    }
+//
+//    public void setAccessButtonUrl(String accessButtonUrl) {
+//        this.accessButtonUrl = accessButtonUrl;
+//    }
+//
+//    public String getManualButton() {
+//        return manualButton;
+//    }
+//
+//    public void setManualButton(String manualButton) {
+//        this.manualButton = manualButton;
+//    }
+//
+//    public String getManualButtonUrl() {
+//        return manualButtonUrl;
+//    }
+//
+//    public void setManualButtonUrl(String manualButtonUrl) {
+//        this.manualButtonUrl = manualButtonUrl;
+//    }
 
     public String getIcon() {
         return icon;
@@ -124,14 +129,14 @@ public class OnestopMenuAppInstanceVo {
     public void setOrder(Integer order) {
         this.order = order;
     }
-
-    public String getProjectUrl() {
-        return projectUrl;
-    }
-
-    public void setProjectUrl(String projectUrl) {
-        this.projectUrl = projectUrl;
-    }
+//
+//    public String getProjectUrl() {
+//        return projectUrl;
+//    }
+//
+//    public void setProjectUrl(String projectUrl) {
+//        this.projectUrl = projectUrl;
+//    }
 
     public Boolean getActive() {
         return isActive;
@@ -149,13 +154,13 @@ public class OnestopMenuAppInstanceVo {
         this.name = name;
     }
 
-    public Map<String, String> getNameAndUrls() {
-        return nameAndUrls;
-    }
-
-    public void setNameAndUrls(Map<String, String> nameAndUrls) {
-        this.nameAndUrls = nameAndUrls;
-    }
+//    public Map<String, String> getNameAndUrls() {
+//        return nameAndUrls;
+//    }
+//
+//    public void setNameAndUrls(Map<String, String> nameAndUrls) {
+//        this.nameAndUrls = nameAndUrls;
+//    }
 
     public Boolean getAccessable() {
         return accessable;
@@ -163,5 +168,17 @@ public class OnestopMenuAppInstanceVo {
 
     public void setAccessable(Boolean accessable) {
         this.accessable = accessable;
+    }
+
+    public List<DSSApplicationBean> getAppInstances() {
+        return appInstances;
+    }
+
+    public void setAppInstances(List<DSSApplicationBean> appInstances) {
+        this.appInstances = appInstances;
+    }
+
+    public void addAppInstances(DSSApplicationBean dssApplicationBean){
+        this.appInstances.add(dssApplicationBean);
     }
 }

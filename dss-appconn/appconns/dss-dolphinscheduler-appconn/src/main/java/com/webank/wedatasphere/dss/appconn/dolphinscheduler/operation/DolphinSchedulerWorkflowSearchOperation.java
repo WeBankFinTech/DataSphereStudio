@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn;
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerDataResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.ref.DolphinSchedulerPageInfoResponseRef;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.DolphinSchedulerHttpUtils;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.utils.ProjectUtils;
@@ -10,6 +11,9 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+import java.util.Map;
 
 public class DolphinSchedulerWorkflowSearchOperation
         extends AbstractStructureOperation<RefOrchestrationContentRequestRef.RefOrchestrationContentRequestRefImpl, OrchestrationResponseRef>
@@ -34,8 +38,9 @@ public class DolphinSchedulerWorkflowSearchOperation
         String dolphinProjectName =
                 ProjectUtils.generateDolphinProjectName(ref.getWorkspace().getWorkspaceName(), ref.getProjectName());
         String getUrl = StringUtils.replace(this.getProcessDefinitionByIdUrl, "${projectName}", dolphinProjectName);
-        DolphinSchedulerPageInfoResponseRef responseRef = DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, getUrl, ref.getUserName());
-        return responseRef.getTotalList().stream().filter(workflow -> ref.getOrchestrationName().equals(workflow.get("name")))
+        DolphinSchedulerDataResponseRef responseRef = DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, getUrl, ref.getUserName());
+        List<Map<String, Object>> dataList = responseRef.getData();
+        return dataList.stream().filter(workflow -> ref.getOrchestrationName().equals(workflow.get("name")))
                 .map(workflow -> DolphinSchedulerHttpUtils.parseToLong(workflow.get("id"))).map(id -> OrchestrationResponseRef.newExternalBuilder().setRefOrchestrationId(id).success())
                 .findAny().orElse(OrchestrationResponseRef.newExternalBuilder().success());
     }

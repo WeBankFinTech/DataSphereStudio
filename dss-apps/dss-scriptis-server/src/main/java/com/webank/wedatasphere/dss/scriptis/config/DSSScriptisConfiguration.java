@@ -14,17 +14,19 @@
  *
  */
 
-package com.webank.wedatasphere.dss.datapipe.config;
+package com.webank.wedatasphere.dss.scriptis.config;
 
 import org.apache.linkis.common.conf.CommonVars;
 
 
-public class DataPipeServiceConfiguration {
+public class DSSScriptisConfiguration {
     public final static CommonVars<String> LINKIS_AUTHOR_USER_TOKEN = CommonVars.apply("wds.linkis.client.api.service.author.user.token","WS-AUTH");
     public final static CommonVars<String> LINKIS_ADMIN_USER = CommonVars.apply("wds.linkis.client.api.service.adminuser","ws");
 
-    public final static  CommonVars<Integer>  LINKIS_CONNECTION_TIMEOUT = CommonVars.apply("wds.linkis.flow.connection.timeout",30000);
-    public final static CommonVars<String> LINKIS_API_VERSION = CommonVars.apply("wds.linkis.server.version","v1");
+    public final static  CommonVars<Long>  LINKIS_CONNECTION_TIMEOUT = CommonVars.apply("wds.linkis.client.connection.timeout",45000L);
+    public final static CommonVars<Long> LINKIS_READ_TIMEOUT = CommonVars.apply("wds.linkis.client.read.timeout",45000L);
 
+    public final static String GLOBAL_LIMITS_PREFIX = "wds.dss.scriptis.global.limits.";
+    public final static String GLOBAL_LIMIT_PREFIX = "wds.dss.scriptis.global.limit.";
 
 }

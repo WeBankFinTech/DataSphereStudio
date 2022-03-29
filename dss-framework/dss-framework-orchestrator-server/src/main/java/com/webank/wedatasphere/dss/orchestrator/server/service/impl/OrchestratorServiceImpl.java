@@ -29,7 +29,9 @@ import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorE
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
@@ -372,7 +374,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
      */
     @Override
     public List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username) {
-        List<DSSOrchestratorInfo> list = orchestratorMapper.getListByPage(new HashMap<String, Object>() {{
+        List<DSSOrchestratorInfo> list = orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{
             put("workspace_id", orchestratorRequest.getWorkspaceId());
             put("project_id", orchestratorRequest.getProjectId());
             put("orchestrator_mode", orchestratorRequest.getOrchestratorMode());
@@ -403,9 +405,14 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    public List<DSSOrchestratorInfo> getByNameAndProjectId(Long projectId, String name) {
-        return orchestratorMapper.getByNameAndProjectId(projectId, name);
+    public ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos) {
+        List<DSSOrchestratorInfo> orchestratorInfos = orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{
+            put("workspace_id", requestOrchestratorInfos.getWorkspaceId());
+            put("project_id", requestOrchestratorInfos.getProjectId());
+            put("name", requestOrchestratorInfos.getName());
+            put("orchestrator_mode", requestOrchestratorInfos.getOrchestratorMode());
+        }});
+        return new ResponseOrchestratorInfos(orchestratorInfos);
     }
-
 
 }

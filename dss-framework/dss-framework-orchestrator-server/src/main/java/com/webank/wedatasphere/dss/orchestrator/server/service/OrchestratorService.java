@@ -22,11 +22,12 @@ import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorE
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -108,5 +109,5 @@ public interface OrchestratorService {
 
     List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username);
 
-    List<DSSOrchestratorInfo> getByNameAndProjectId(@Param("projectId") Long projectId, @Param("name") String name);
+    ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos);
 }

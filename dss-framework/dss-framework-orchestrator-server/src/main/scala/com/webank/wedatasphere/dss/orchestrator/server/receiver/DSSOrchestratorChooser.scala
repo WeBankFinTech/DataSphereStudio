@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 
-
 @Component
 class DSSOrchestratorChooser extends ReceiverChooser {
 
@@ -41,7 +40,7 @@ class DSSOrchestratorChooser extends ReceiverChooser {
   var receiver: Option[DSSOrchestratorReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService,orchestratorPluginService,orchestratorContext))
+  def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService, orchestratorPluginService, orchestratorContext))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: RequestCreateOrchestrator => receiver
@@ -54,6 +53,7 @@ class DSSOrchestratorChooser extends ReceiverChooser {
     case _: RequestFrameworkConvertOrchestrationStatus => receiver
     case _: RequestAddVersionAfterPublish => receiver
     case _: RequestOrchestratorVersion => receiver
+    case _: RequestOrchestratorInfos => receiver
     case _ => None
   }
 }

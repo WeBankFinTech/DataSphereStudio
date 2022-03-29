@@ -23,7 +23,7 @@
         <format>dir</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>dss-datapipe-server</baseDirectory>
+    <baseDirectory>dss-scriptis-server</baseDirectory>
 
     <dependencySets>
         <dependencySet>

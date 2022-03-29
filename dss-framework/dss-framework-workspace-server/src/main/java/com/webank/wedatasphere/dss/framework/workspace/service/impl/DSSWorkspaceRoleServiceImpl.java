@@ -61,7 +61,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
             allMenuIds.removeAll(menuIds);
             dssWorkspaceRoleMapper.updateRoleMenu(dssRole.getId(), workspaceId, allMenuIds, username, 0);
         }
-        List<Integer> allComponentIds = workspaceDBHelper.getAllComponentIds();
+        List<Integer> allComponentIds = workspaceDBHelper.getAppConnIds();
         if (componentIds.size() > 0){
             dssWorkspaceRoleMapper.updateRoleComponent(dssRole.getId(), workspaceId, componentIds, username, 1);
         }
@@ -95,7 +95,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
     @Override
     public int getApiPriv(String username, Integer workspaceId, String roleName, String appName) {
         int roleId = dssWorkspaceRoleMapper.getRoleId(roleName, -1);
-        int componentId = dssWorkspaceRoleMapper.getComponentId(appName);
+        int componentId = workspaceDBHelper.getAppConn(appName).getId();
         int count = dssWorkspaceRoleMapper.getCount(workspaceId, componentId, roleId);
         if (count >= 1){
             Integer tmpPriv = dssWorkspaceRoleMapper.getPriv(workspaceId, roleId, componentId);

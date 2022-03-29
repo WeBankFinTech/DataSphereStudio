@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.OnestopMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
@@ -72,9 +72,9 @@ public interface DSSWorkspaceService {
     List<WorkspaceDepartmentVo> getWorkSpaceDepartments();
 
 
-    List<OnestopMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese);
+    List<WorkspaceMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese);
 
-    List<OnestopMenuVo> getWorkspaceApplications(Long workspaceId, String username, boolean isChinese);
+    List<WorkspaceMenuVo> getWorkspaceApplications(Long workspaceId, String username, boolean isChinese);
 
     DSSWorkspace getWorkspacesById(Long id, String username) throws DSSErrorException;
 

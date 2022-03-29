@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 
 public class DSSMenu implements Serializable {
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
     private Integer id;
     private String name;
     private int level;
@@ -151,7 +151,7 @@ public class DSSMenu implements Serializable {
             return false;
         }
         DSSMenu dssMenu = (DSSMenu) o;
-        return id == dssMenu.id &&
+        return id.equals(dssMenu.id) &&
                 level == dssMenu.level &&
                 upperMenuId == dssMenu.upperMenuId &&
                 isActive == dssMenu.isActive &&

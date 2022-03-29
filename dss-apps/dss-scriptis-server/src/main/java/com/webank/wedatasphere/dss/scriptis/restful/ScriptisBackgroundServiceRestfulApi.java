@@ -14,19 +14,18 @@
  *
  */
 
-package com.webank.wedatasphere.dss.datapipe.restful;
+package com.webank.wedatasphere.dss.scriptis.restful;
 
-import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
-import com.webank.wedatasphere.dss.datapipe.entrance.background.BackGroundService;
-import com.webank.wedatasphere.dss.datapipe.entrance.background.ExportBackGroundService;
-import com.webank.wedatasphere.dss.datapipe.entrance.background.LoadBackGroundService;
-import com.webank.wedatasphere.dss.datapipe.execute.LinkisJobSubmit;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.scriptis.entrance.background.BackGroundService;
+import com.webank.wedatasphere.dss.scriptis.entrance.background.ExportBackGroundService;
+import com.webank.wedatasphere.dss.scriptis.entrance.background.LoadBackGroundService;
+import com.webank.wedatasphere.dss.scriptis.execute.LinkisJobSubmit;
 import org.apache.linkis.protocol.constants.TaskConstant;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.linkis.server.socket.controller.ServerEvent;
-import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,59 +35,49 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.Map;
 
 
-@RequestMapping(path = "/dss/datapipe", produces = {"application/json"})
+@RequestMapping(path = "/dss/scriptis", produces = {"application/json"})
 @RestController
-public class DSSEntranceRestfulApi {
-    private static final Logger logger = LoggerFactory.getLogger(DSSEntranceRestfulApi.class);
+public class ScriptisBackgroundServiceRestfulApi {
 
-    @RequestMapping(value = "/backgroundservice",method = RequestMethod.POST)
-    public Message backgroundservice(HttpServletRequest req,@RequestBody Map<String, Object> json) {
-        Message message = null;
-        logger.info("Begin to get an execID");
+    private final Logger logger = LoggerFactory.getLogger(ScriptisBackgroundServiceRestfulApi.class);
+
+    @RequestMapping(value = "/backgroundservice", method = RequestMethod.POST)
+    public Message backgroundService(HttpServletRequest req, @RequestBody Map<String, Object> json) {
+        String user = SecurityFilter.getLoginUsername(req);
         String backgroundType = (String) json.get("background");
-        BackGroundService bgService = null;
+        logger.info("Begin to submit a '{}' background job for user {}.", backgroundType, user);
+        BackGroundService bgService;
         if("export".equals(backgroundType)){
             bgService = new ExportBackGroundService();
         }else if("load".equals(backgroundType)){
             bgService = new LoadBackGroundService();
         }else{
-            message = Message.error("export type is not exist："+backgroundType);
-            return message;
+            return Message.error("export type is not exist："+backgroundType);
         }
-        Gson gson = new Gson();
         Map<String, Object> executionCode = (Map<String, Object>) json.get("executionCode");
-        executionCode = gson.fromJson(gson.toJson(executionCode),LinkedTreeMap.class);
-        json.put("executionCode",executionCode);
-        json.put(TaskConstant.UMUSER, SecurityFilter.getLoginUsername(req));
+        executionCode = DSSCommonUtils.COMMON_GSON.fromJson(DSSCommonUtils.COMMON_GSON.toJson(executionCode), LinkedTreeMap.class);
+        json.put("executionCode", executionCode);
+        json.put(TaskConstant.UMUSER, user);
         ServerEvent serverEvent = new ServerEvent();
         serverEvent.setData(json);
         serverEvent.setUser(SecurityFilter.getLoginUsername(req));
         ServerEvent operation = bgService.operation(serverEvent);
-
-
         JobExecuteResult jobExecuteResult = toLinkisEntrance(operation);
-        message = Message.ok();
-        message.setMethod("/api/dss/datapipe/backgroundservice");
-        message.data("operation",operation);
-        message.data("execID", jobExecuteResult.getExecID());
-        message.data("taskID", jobExecuteResult.getTaskID());
-        logger.info("End to get an an execID: {}, taskID: {}", jobExecuteResult.getExecID(), jobExecuteResult.getTaskID());
-        return message;
-
+        logger.info("submitted background job with execID: {}, taskID: {}.", jobExecuteResult.getExecID(), jobExecuteResult.getTaskID());
+        return Message.ok().data("operation", operation)
+            .data("execID", jobExecuteResult.getExecID())
+            .data("taskID", jobExecuteResult.getTaskID());
     }
 
     public JobExecuteResult toLinkisEntrance(ServerEvent operation){
-        JobExecuteResult jobExecuteResult = null;
+        JobExecuteResult jobExecuteResult;
         try{
-            Map<String, String> props = new HashMap<>();
-            UJESClient client = LinkisJobSubmit.getClient(props);
-            jobExecuteResult = LinkisJobSubmit.execute(operation,client);
+            jobExecuteResult = LinkisJobSubmit.execute(operation);
         }catch (Exception e){
-            logger.error("toLinkisEntranceError-",e);
+            logger.error("submit background job failed.", e);
             throw e;
         }
         return jobExecuteResult;

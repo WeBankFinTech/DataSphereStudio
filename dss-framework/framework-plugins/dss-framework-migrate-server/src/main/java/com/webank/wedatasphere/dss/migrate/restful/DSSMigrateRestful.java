@@ -26,16 +26,11 @@ import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestExportOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchetratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
-import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflow;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.common.exception.LinkisException;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
@@ -101,8 +96,7 @@ public class DSSMigrateRestful {
     BMLService bmlService;
     @Autowired
     private MetaService metaService;
-    @Autowired
-    private OrchestratorService dssOrchestratorService;
+
     // todo only dev开发中心
     private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
     private Sender workflowSender = Sender.getSender(MigrateConf.WORKFLOW_SERVER_NAME);
@@ -442,52 +436,54 @@ public class DSSMigrateRestful {
             throw new MigrateErrorException(0, "cannot find projectName : " + projectName + "  in workspace : " + workspaceName);
         }
         // 获取工作流列表
-        OrchestratorRequest orchestratorRequest = new OrchestratorRequest();
-        orchestratorRequest.setWorkspaceId(workspaceId);
-        orchestratorRequest.setProjectId(projectDo.getId());
+        RequestOrchestratorInfos requestOrchestratorInfos = new RequestOrchestratorInfos();
+        requestOrchestratorInfos.setWorkspaceId(workspaceId);
+        requestOrchestratorInfos.setProjectId(projectDo.getId());
         // mod只能为一个
         Arrays.stream(projectDo.getOrchestratorMode().split(",")).forEach((mode) -> {
             if (StringUtils.isNotBlank(mode)) {
-                orchestratorRequest.setOrchestratorMode(mode);
+                requestOrchestratorInfos.setOrchestratorMode(mode);
             }
         });
-        if (StringUtils.isBlank(orchestratorRequest.getOrchestratorMode())) {
-            orchestratorRequest.setOrchestratorMode(DEFAULT_PROJECT_ORCHESTRATOR_MODE);
+        if (StringUtils.isBlank(requestOrchestratorInfos.getOrchestratorMode())) {
+            requestOrchestratorInfos.setOrchestratorMode(DEFAULT_PROJECT_ORCHESTRATOR_MODE);
         }
-        List<OrchestratorBaseInfo> orchestratorBaseInfos = dssOrchestratorService.getListByPage(orchestratorRequest, username);
+        ResponseOrchestratorInfos responseOrchestratorInfos = (ResponseOrchestratorInfos) orchestratorSender.ask(requestOrchestratorInfos);
         int count = 0;
-        for (OrchestratorBaseInfo orchestratorBaseInfo : orchestratorBaseInfos) {
-            List<DSSLabel> devLabels = Lists.newArrayList(new EnvDSSLabel("dev"));
-            // 查询最新Orchestrator版本
-            RequestOrchestratorVersion requestOrchestratorVersion = new RequestOrchestratorVersion();
-            requestOrchestratorVersion.setUsername(username);
-            requestOrchestratorVersion.setOrchestratorId(orchestratorBaseInfo.getOrchestratorId());
-            requestOrchestratorVersion.setProjectId(orchestratorBaseInfo.getProjectId());
-            ResponseOrchetratorVersion responseOrchetratorVersion = null;
-            try {
-                responseOrchetratorVersion = (ResponseOrchetratorVersion) orchestratorSender.ask(requestOrchestratorVersion);
-            } catch (Exception e) {
-                DSSExceptionUtils.dealErrorException(60015, "Ask orchestrotor version failed " + BDPJettyServerHelper.gson().toJson(requestOrchestratorVersion), e,
-                        DSSErrorException.class);
-            }
-            long latestVersionId = responseOrchetratorVersion.getOrchestratorVersions().stream().map((version) -> version.getId()).max(
-                    new Comparator<Long>() {
-                        @Override
-                        public int compare(Long o1, Long o2) {
-                            // 注意，正序
-                            if (o1 < o2) {
-                                return -1;
-                            } else if (o1 == o2) {
-                                return 0;
-                            } else {
-                                return 1;
+        if (CollectionUtils.isNotEmpty(responseOrchestratorInfos.getOrchestratorInfos())) {
+            for (DSSOrchestratorInfo orchestratorInfo : responseOrchestratorInfos.getOrchestratorInfos()) {
+                List<DSSLabel> devLabels = Lists.newArrayList(new EnvDSSLabel("dev"));
+                // 查询最新Orchestrator版本
+                RequestOrchestratorVersion requestOrchestratorVersion = new RequestOrchestratorVersion();
+                requestOrchestratorVersion.setUsername(username);
+                requestOrchestratorVersion.setOrchestratorId(orchestratorInfo.getId());
+                requestOrchestratorVersion.setProjectId(orchestratorInfo.getProjectId());
+                ResponseOrchetratorVersion responseOrchetratorVersion = null;
+                try {
+                    responseOrchetratorVersion = (ResponseOrchetratorVersion) orchestratorSender.ask(requestOrchestratorVersion);
+                } catch (Exception e) {
+                    DSSExceptionUtils.dealErrorException(60015, "Ask orchestrotor version failed " + BDPJettyServerHelper.gson().toJson(requestOrchestratorVersion), e,
+                            DSSErrorException.class);
+                }
+                long latestVersionId = responseOrchetratorVersion.getOrchestratorVersions().stream().map((version) -> version.getId()).max(
+                        new Comparator<Long>() {
+                            @Override
+                            public int compare(Long o1, Long o2) {
+                                // 注意，正序
+                                if (o1 < o2) {
+                                    return -1;
+                                } else if (o1 == o2) {
+                                    return 0;
+                                } else {
+                                    return 1;
+                                }
                             }
                         }
-                    }
-            ).get();
-            exportFlow(username, workspace, projectName, orchestratorBaseInfo.getOrchestratorId(), latestVersionId,
-                    false, devLabels, orchestratorBaseInfo.getOrchestratorName(), pathRoot);
-            count += 1;
+                ).get();
+                exportFlow(username, workspace, projectName, orchestratorInfo.getId(), latestVersionId,
+                        false, devLabels, orchestratorInfo.getName(), pathRoot);
+                count += 1;
+            }
         }
         Message respMsg = Message.ok();
         respMsg.data("count", count);

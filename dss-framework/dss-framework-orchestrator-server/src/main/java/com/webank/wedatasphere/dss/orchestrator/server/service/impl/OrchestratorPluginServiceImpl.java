@@ -88,6 +88,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         if(requestConversionOrchestration.isConvertAllOrcs()) {
             //这个地方应该是要获取所有的已经发布过的orchestrator
             publishedOrcIds = orchestratorMapper.getAllOrcIdsByProjectId(projectId);
+            publishedOrcIds.add(toPublishOrcId);
             for (Long orcId : publishedOrcIds) {
                 int validFlag = 1;
                 if (orcId.longValue() == toPublishOrcId.longValue() && !DSSLabelUtil.isDevEnv(labels)) {

@@ -254,9 +254,9 @@
     <!--dss-datapipe-server-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-apps/dss-datapipe-server/target/out/dss-datapipe-server/lib/
+        ${basedir}/../../dss-apps/dss-scriptis-server/target/out/dss-scriptis-server/lib/
       </directory>
-      <outputDirectory>lib/dss-apps/dss-datapipe-server</outputDirectory>
+      <outputDirectory>lib/dss-apps/dss-scriptis-server</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>

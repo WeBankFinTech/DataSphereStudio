@@ -19,11 +19,11 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 import java.util.List;
 
 
-public class OnestopMenuVo {
+public class WorkspaceMenuVo {
     private Long id;
     private String title;
     private Integer order;
-    private List<OnestopMenuAppInstanceVo> appInstances;
+    private List<WorkspaceMenuAppconnVo> appconns;
 
     public Long getId() {
         return id;
@@ -49,11 +49,11 @@ public class OnestopMenuVo {
         this.order = order;
     }
 
-    public List<OnestopMenuAppInstanceVo> getAppInstances() {
-        return appInstances;
+    public List<WorkspaceMenuAppconnVo> getAppconns() {
+        return appconns;
     }
 
-    public void setAppInstances(List<OnestopMenuAppInstanceVo> appInstances) {
-        this.appInstances = appInstances;
+    public void setAppconns(List<WorkspaceMenuAppconnVo> appInstances) {
+        this.appconns = appInstances;
     }
 }

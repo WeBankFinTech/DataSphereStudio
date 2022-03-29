@@ -30,12 +30,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -53,8 +51,6 @@ public class WorkspaceDBHelper {
     private final Object lock = new Object();
 
     private List<DSSOnestopMenu> dssOnestopMenus;
-
-    private List<DSSWorkspaceComponent> dssWorkspaceComponents;
 
     private List<DSSApplicationBean> dssApplicationBeans;
 
@@ -85,16 +81,7 @@ public class WorkspaceDBHelper {
             @Override
             public void run() {
                 synchronized (lock) {
-                    dssWorkspaceComponents = dssWorkspaceRoleMapper.getComponents();
-                }
-            }
-        }, 0, 1, TimeUnit.MINUTES);
-
-        Utils.defaultScheduler().scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    dssApplicationBeans = dssWorkspaceRoleMapper.getDSSApplications();
+                    dssApplicationBeans = dssWorkspaceRoleMapper.getDSSAppConns();
                 }
             }
         }, 0, 1, TimeUnit.MINUTES);
@@ -124,8 +111,7 @@ public class WorkspaceDBHelper {
 
     public void retrieveFromDB() {
         synchronized (lock) {
-            dssApplicationBeans = dssWorkspaceRoleMapper.getDSSApplications();
-            dssWorkspaceComponents = dssWorkspaceRoleMapper.getComponents();
+            dssApplicationBeans = dssWorkspaceRoleMapper.getDSSAppConns();
             dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
             dssRoles = dssWorkspaceRoleMapper.getRoles();
         }
@@ -292,11 +278,22 @@ public class WorkspaceDBHelper {
         return dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(new DSSRole()).getName();
     }
 
-    public DSSApplicationBean getComponent(int componentId) {
+    public DSSApplicationBean getAppConn(int appConnId) {
         return dssApplicationBeans.stream().
-                filter(dssApplicationBean -> dssApplicationBean.getId() == componentId).
+                filter(dssApplicationBean -> dssApplicationBean.getId() == appConnId).
                 findFirst().
                 orElse(null);
+    }
+
+    public DSSApplicationBean getAppConn(String appConnName) {
+        return dssApplicationBeans.stream().
+                filter(dssApplicationBean -> dssApplicationBean.getName() == appConnName).
+                findFirst().
+                orElse(null);
+    }
+
+    public List<Integer> getAppConnIds() {
+        return dssApplicationBeans.stream().map(DSSApplicationBean::getId).collect(Collectors.toList());
     }
 
     public String getHomepageName(String homepage) {
@@ -305,10 +302,6 @@ public class WorkspaceDBHelper {
 
     public List<Integer> getAllMenuIds() {
         return dssOnestopMenus.stream().map(DSSOnestopMenu::getId).collect(Collectors.toList());
-    }
-
-    public List<Integer> getAllComponentIds() {
-        return dssWorkspaceComponents.stream().map(DSSWorkspaceComponent::getId).collect(Collectors.toList());
     }
 
 }

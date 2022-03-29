@@ -46,27 +46,15 @@ public interface DSSWorkspaceRoleMapper {
     })
     List<DSSOnestopMenu> getOnestopMenus();
 
-    @Select("select homepage_url from dss_application where id = #{applicationId}")
-    String getEntryUrl(@Param("applicationId") int applicationId);
 
-
-    @Select("select * from dss_application")
-    @Results(id = "dss_application_map", value = {
-            @Result(property = "id", column = "id"),
-            @Result(property = "homepageUrl", column = "hoempage_url"),
-            @Result(property = "componentName", column = "name")
-    })
-    List<DSSWorkspaceComponent> getComponents();
-
-
-    @Select("select * from dss_application")
+    @Select("select a.id id, a.appconn_name name, b.homepage_url homepage_url, b.label label from dss_appconn a join dss_appconn_instance b on a.id=b.appconn_id")
     @Results(value = {
             @Result(property = "id", column = "id"),
             @Result(property = "name", column = "name"),
             @Result(property = "homepageUrl", column = "homepage_url"),
-            @Result(property = "projectUrl", column = "project_url")
+            @Result(property = "label", column = "label")
     })
-    List<DSSApplicationBean> getDSSApplications();
+    List<DSSApplicationBean> getDSSAppConns();
 
     @Insert("insert into dss_workspace_role(workspace_id, name, front_name, update_time) " +
             "values(#{dssRole.workspaceId}, #{dssRole.name}, #{dssRole.frontName}, #{dssRole.createTime})")
@@ -119,6 +107,4 @@ public interface DSSWorkspaceRoleMapper {
             "appconn_id = #{componentId}")
     Integer getPriv(@Param("workspaceId") Integer workspaceId, @Param("roleId") int roleId, @Param("componentId") int componentId);
 
-    @Select("select id from dss_application where `name` = #{appName}")
-    int getComponentId(@Param("appName") String appName);
 }

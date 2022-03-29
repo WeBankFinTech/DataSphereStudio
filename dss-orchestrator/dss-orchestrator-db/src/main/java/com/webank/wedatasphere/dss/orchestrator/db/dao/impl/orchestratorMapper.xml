@@ -194,10 +194,6 @@
         ORDER BY app_id DESC limit 1
     </select>
 
-    <select id="getByNameAndProjectId" resultType="java.lang.Integer">
-        select count(1) from dss_orchestrator_info where name = #{name} and project_id=#{projectId}
-    </select>
-
     <insert id="addOrchestratorRefOrchestration" useGeneratedKeys="true" keyProperty="id"
             parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration">
         insert into dss_orchestrator_ref_orchestration_relation (<include refid="orchestrator_ref_orchestration"/>)

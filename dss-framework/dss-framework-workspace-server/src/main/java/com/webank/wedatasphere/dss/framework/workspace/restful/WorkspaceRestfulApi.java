@@ -21,11 +21,14 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +39,13 @@ import java.util.*;
 @RestController
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 public class WorkspaceRestfulApi {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkspaceRestfulApi.class);
+
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
+
+    @Autowired
+    private DSSWorkspaceRoleService dssWorkspaceRoleService;
 
     @RequestMapping(path = "workspaces", method = RequestMethod.GET)
     public Message getAllWorkspaces(HttpServletRequest req) {
@@ -49,16 +57,41 @@ public class WorkspaceRestfulApi {
     @RequestMapping(path = "/workspaces/{id}", method = RequestMethod.GET)
     public Message getWorkspacesById(HttpServletRequest req,
                                      HttpServletResponse resp,
-                                     @PathVariable("id") Long id) {
+                                     @PathVariable("id") Long workspaceId) {
         String username = SecurityFilter.getLoginUsername(req);
         DSSWorkspace workspace = null;
         try {
-            workspace = dssWorkspaceService.getWorkspacesById(id, username);
+            workspace = dssWorkspaceService.getWorkspacesById(workspaceId, username);
         } catch (DSSErrorException e) {
             return Message.error(e);
         }
         SSOHelper.setAndGetWorkspace(req, resp, workspace.getId(), workspace.getName());
-        return Message.ok().data("workspace", workspace);
+        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, workspaceId.intValue());
+        if (roles == null || roles.isEmpty()) {
+            LOGGER.error("username {}, in workspace {} roles are null or empty", username, workspaceId);
+            return Message.error("can not get roles information");
+        }
+        //判断如果是没有权限的，那么就直接干掉
+        if (roles.contains("apiUser")) {
+            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId.intValue(), "apiUser", "apiService");
+            if (priv <= 0) {
+                roles.remove("apiUser");
+            }
+        }
+        Message retMessage = Message.ok();
+        //如果其他的角色也是有这个api权限的，那么就加上这个apiUser
+        boolean flag = false;
+        for (String role : roles) {
+            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId.intValue(), role, "apiService");
+            if (priv >= 1) {
+                flag = true;
+                break;
+            }
+        }
+        if (flag && !roles.contains("apiUser")) {
+            roles.add("apiUser");
+        }
+        return retMessage.data("roles", roles).data("workspace", workspace);
     }
 
     @RequestMapping(path = "/workspaces/departments", method = RequestMethod.GET)

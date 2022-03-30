@@ -18,8 +18,8 @@
 
 package com.webank.wedatasphere.dss.data.governance.conf;
 
-import org.apache.linkis.common.conf.CommonVars;
 
+import org.apache.linkis.common.conf.CommonVars;
 
 public interface GovernanceConf {
     CommonVars<String> ATLAS_REST_ADDRESS = CommonVars.apply("atlas.rest.address");

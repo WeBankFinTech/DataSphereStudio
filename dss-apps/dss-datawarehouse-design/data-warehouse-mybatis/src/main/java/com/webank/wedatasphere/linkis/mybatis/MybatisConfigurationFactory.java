@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.mybatis;
+package com.webank.wedatasphere.linkis.mybatis;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;

@@ -116,7 +116,6 @@ public class AtlasService {
         //atlasClient.createAtlasTypeDefs()
         return atlasSearchResult.getEntities();
     }
-
     /**
      * 创建子类型
      *

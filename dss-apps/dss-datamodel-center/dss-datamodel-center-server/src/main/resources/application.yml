@@ -1,5 +1,7 @@
 server:
   port: 9321
+  servlet:
+    context-path: /api/rest_j/v1
 spring:
   application:
     name: datamodel-server

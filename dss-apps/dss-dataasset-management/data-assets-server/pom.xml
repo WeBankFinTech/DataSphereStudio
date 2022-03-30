@@ -15,6 +15,7 @@
         <atlas.version>2.2.0</atlas.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
+        <hadoop.version>2.7.2</hadoop.version>
     </properties>
 
     <dependencies>
@@ -30,6 +31,10 @@
                 <exclusion>
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -48,6 +53,7 @@
             <version>${linkis.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>org.apache.atlas</groupId>
             <artifactId>atlas-client-v2</artifactId>
@@ -57,8 +63,13 @@
                     <groupId>com.google.guava</groupId>
                     <artifactId>guava</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -77,6 +88,13 @@
             <artifactId>dss-framework-workspace-client</artifactId>
             <version>1.0.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.49</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -115,7 +133,7 @@
                 </executions>
                 <configuration>
                     <skipAssembly>false</skipAssembly>
-                    <finalName>data-assets-server</finalName>
+                    <finalName>data-assets</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <attach>false</attach>
                     <descriptors>

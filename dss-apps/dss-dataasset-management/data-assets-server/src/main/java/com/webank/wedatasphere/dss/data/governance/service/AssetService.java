@@ -46,6 +46,17 @@ public interface AssetService {
 
     public List<TableInfo> getTop10Table () throws DataGovernanceException, SQLException, DAOException;
 
+    /**
+     * 根据标签和日期获取存储量前10的表
+     * @param label
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws DataGovernanceException
+     * @throws SQLException
+     * @throws DAOException
+     */
+    public List<TableInfo> getTop10TableByLabelDay (final String label,final String startDate,final String endDate) throws DataGovernanceException, SQLException, DAOException;
 
     /**
      * 创建模型

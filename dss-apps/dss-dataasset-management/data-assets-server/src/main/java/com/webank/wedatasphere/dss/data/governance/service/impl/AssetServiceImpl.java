@@ -5,13 +5,11 @@ import com.google.common.collect.Sets;
 import com.google.gson.internal.LinkedTreeMap;
 import com.webank.wedatasphere.dss.data.governance.atlas.AtlasService;
 import com.webank.wedatasphere.dss.data.governance.dao.*;
-import com.webank.wedatasphere.dss.data.governance.dao.impl.MetaInfoMapperImpl;
 import com.webank.wedatasphere.dss.data.governance.dto.HiveTblStatsDTO;
 import com.webank.wedatasphere.dss.data.governance.dto.SearchLabelDTO;
 import com.webank.wedatasphere.dss.data.governance.entity.*;
 import com.webank.wedatasphere.dss.data.governance.exception.DAOException;
 import com.webank.wedatasphere.dss.data.governance.exception.DataGovernanceException;
-import com.webank.wedatasphere.dss.data.governance.restful.DSSDataGovernanceAssetRestful;
 import com.webank.wedatasphere.dss.data.governance.service.AssetService;
 import com.webank.wedatasphere.dss.data.governance.utils.DateUtil;
 import com.webank.wedatasphere.dss.data.governance.vo.*;
@@ -31,6 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,9 +40,11 @@ import java.util.stream.Collectors;
 @Service
 public class AssetServiceImpl implements AssetService {
     private static final Logger logger = LoggerFactory.getLogger(AssetServiceImpl.class);
+    @Resource
     private AtlasService atlasService;
-    private MetaInfoMapper metaInfoMapper;
     private WorkspaceInfoMapper workspaceInfoMapper;
+
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy MM-dd HH:mm:ss");
 
     @Resource
     private TableColumnCountQueryMapper tableColumnCountQueryMapper;
@@ -51,11 +53,19 @@ public class AssetServiceImpl implements AssetService {
     private TableSizeInfoMapper tableSizeInfoMapper;
 
     @Resource
+    private TableStorageMapper tableStorageMapper;
+
+    @Resource
+    private PartInfoMapper partInfoMapper;
+
+    @Resource
+    private TableStorageInfoMapper tableStorageInfoMapper;
+
+    @Resource
     private TableSizePartitionInfoMapper tableSizePartitionInfoMapper;
 
     public AssetServiceImpl(AtlasService atlasService) {
         this.atlasService = atlasService;
-        this.metaInfoMapper = new MetaInfoMapperImpl();
     }
 
     @Override
@@ -65,10 +75,10 @@ public class AssetServiceImpl implements AssetService {
 
             result.put("hiveDb", atlasService.getHiveDbCnt());
             result.put("hiveTable", atlasService.getHiveTableCnt());
-            result.put("hiveStore", metaInfoMapper.getTableStorage());
+            result.put("hiveStore", tableStorageMapper.getTableStorage().get(0));
 
             return result;
-        } catch (AtlasServiceException | DAOException exception) {
+        } catch (AtlasServiceException exception) {
             throw new DataGovernanceException(23000, exception.getMessage());
         }
     }
@@ -287,14 +297,16 @@ public class AssetServiceImpl implements AssetService {
             AtlasEntity atlasEntity = atlasService.getHiveTbl(guid);
             Map<String, Object> hiveTblNameAndIsPartById = atlasService.getHiveTblNameAndIsPartById(guid);
             Boolean isPartTable = (Boolean) hiveTblNameAndIsPartById.get("isPartition");
-            int storage = 0;
+            long storage = 0;
             String db_name = String.valueOf(atlasEntity.getAttributes().get("qualifiedName")).split("@")[0];
             String tableName = db_name.split("\\.")[1];
             String dbName = db_name.split("\\.")[0];
-            try {
-                storage = metaInfoMapper.getTableInfo(dbName, tableName, isPartTable);
-            } catch (DAOException e) {
-                e.printStackTrace();
+            if (isPartTable){
+                List<Long> partTableInfo = tableStorageMapper.getPartTableInfo(dbName, tableName);
+                storage = partTableInfo.isEmpty()?0:partTableInfo.get(0);
+            }else{
+                List<Long> tableInfo = tableStorageMapper.getTableInfo(dbName, tableName);
+                storage = tableInfo.isEmpty()?0:tableInfo.get(0);
             }
             List<String> guids = new ArrayList<>();
             List<LinkedTreeMap<String, String>> columns = (List<LinkedTreeMap<String, String>>) atlasEntity.getAttributes().get("columns");
@@ -334,7 +346,7 @@ public class AssetServiceImpl implements AssetService {
             basic.setName(tableName);
             basic.setQualifiedName(atlasEntity.getAttribute("qualifiedName").toString());
             basic.setOwner(String.valueOf(atlasEntity.getAttributes().get("owner")));
-            basic.setCreateTime(new java.text.SimpleDateFormat("yyyy MM-dd HH:mm:ss").format(atlasEntity.getCreateTime()));
+            basic.setCreateTime(new SimpleDateFormat("yyyy MM-dd HH:mm:ss").format(atlasEntity.getCreateTime()));
             basic.setStore(String.valueOf(storage));
             //设置标签
             Set<String> labels = Sets.newHashSet();
@@ -349,8 +361,17 @@ public class AssetServiceImpl implements AssetService {
             basic.setIsParTbl(isPartTable);
             basic.setGuid(guid);
 
+//            if (!CollectionUtils.isEmpty(atlasEntity.getClassifications())) {
+//                basic.setClassifications(atlasEntity.getClassifications().stream().map(AtlasStruct::getTypeName).collect(Collectors.toList()));
+//            }
             if (!CollectionUtils.isEmpty(atlasEntity.getClassifications())) {
-                basic.setClassifications(atlasEntity.getClassifications().stream().map(AtlasStruct::getTypeName).collect(Collectors.toList()));
+                basic.setClassifications(atlasEntity.getClassifications().stream()
+                    .map(AtlasStruct::getTypeName)
+                    .filter(typeName ->{
+                        String[] split = typeName.split("_");
+                        int modeType = ClassificationConstant.valueOf(split[0].toUpperCase(Locale.ROOT)).getType();
+                        return (modeType == 3 || modeType == 4);
+                    }).collect(Collectors.toList()));
             }
             Object comment = atlasEntity.getAttribute("comment");
             if (comment != null) {
@@ -409,12 +430,7 @@ public class AssetServiceImpl implements AssetService {
     private List<PartInfo> getPartInfos(String db_name) {
         String tableName = db_name.split("\\.")[1];
         String dbName = db_name.split("\\.")[0];
-        List<PartInfo> partInfo = new ArrayList<>();
-        try {
-            partInfo = metaInfoMapper.getPartInfo(dbName, tableName);
-        } catch (DAOException e) {
-            e.printStackTrace();
-        }
+        List<PartInfo> partInfo = partInfoMapper.query(dbName, tableName);
         return partInfo;
     }
 
@@ -586,7 +602,56 @@ public class AssetServiceImpl implements AssetService {
 
     @Override
     public List<TableInfo> getTop10Table() throws DAOException {
-        return metaInfoMapper.getTop10Table();
+        List<TableInfo> tableInfoList = tableStorageInfoMapper.query();
+        // 根据存储量进行排序，并获取Top10
+        tableInfoList.sort((tb1,tb2)-> Long.compare(Long.parseLong(tb2.getStorage()), Long.parseLong(tb1.getStorage())));
+        return tableInfoList.stream().limit(10).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TableInfo> getTop10TableByLabelDay(String label,String startDate,String endDate) throws DAOException, DataGovernanceException {
+
+        if (!StringUtils.isBlank(label)){
+            label = GlossaryConstant.LABEL.formatQuery(label);
+        }
+
+        //根据标签和日期去Atlas获取tableName列表
+        List<String> tableNameList = null;
+        try {
+            List<AtlasEntityHeader> atlasEntityHeaders = atlasService.searchHiveTable0(null,null,label,true,0,0);
+            //对Atlas查询结果根据day进行过滤，并对tableName进行格式化处理
+
+            if (atlasEntityHeaders != null) {
+                tableNameList = atlasEntityHeaders.stream()
+                        .filter(atlasEntityHeader -> {
+                            long createTime = 0;
+                            Object ct = atlasEntityHeader.getAttribute("createTime");
+                            if (ct != null) {
+                                try {
+                                    createTime = simpleDateFormat.parse(DateUtil.unixToTimeStr((Double) ct)).getTime()/1000;
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            return Long.parseLong(startDate) < createTime && createTime < Long.parseLong(endDate);
+                        }).map(atlasEntityHeader -> {
+                            String qualifiedName = atlasEntityHeader.getAttribute("qualifiedName").toString();
+                            return StringUtils.substringBefore(qualifiedName,"@");
+                        }).collect(Collectors.toList());
+            }
+        } catch (AtlasServiceException ex) {
+            throw new DataGovernanceException(23000, ex.getMessage());
+        }
+
+        if (!CollectionUtils.isEmpty(tableNameList)){
+            //根据表名（DB.TABLE）列表去数据库获取存储量
+            List<TableInfo> tableInfoList = tableStorageInfoMapper.queryByTableName(Wrappers.<TableInfo>lambdaQuery().in(TableInfo::getTableName, tableNameList));
+
+            tableInfoList.sort((tb1,tb2)-> Long.compare(Long.parseLong(tb2.getStorage()), Long.parseLong(tb1.getStorage())));
+
+            return tableInfoList.stream().limit(10).collect(Collectors.toList());
+        }
+        return null;
     }
 
 
@@ -818,7 +883,7 @@ public class AssetServiceImpl implements AssetService {
     }
 
     public List<PartInfo> getHiveTblPartitionByName(String dbName,String tableName) throws Exception {
-        return metaInfoMapper.getPartInfo(dbName,tableName);
+        return partInfoMapper.query(dbName,tableName);
 
     }
 

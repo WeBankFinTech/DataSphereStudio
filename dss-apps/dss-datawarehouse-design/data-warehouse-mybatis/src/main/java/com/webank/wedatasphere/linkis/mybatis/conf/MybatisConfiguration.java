@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.apache.linkis.mybatis.conf;
+package com.webank.wedatasphere.linkis.mybatis.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 

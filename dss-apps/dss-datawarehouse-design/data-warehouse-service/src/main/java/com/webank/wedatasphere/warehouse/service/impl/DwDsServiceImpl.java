@@ -36,7 +36,7 @@ public class DwDsServiceImpl implements DwDsService {
 
             GetMetadataSourceAllDatabasesAction action = GetMetadataSourceAllDatabasesAction.builder().setUser(userName).build();
             GetMetadataSourceAllDatabasesResult result = client.getAllDBMetaDataSource(action);
-            List<String> dbs = result.getDbs();
+            List<String> dbs = result.allDbs();
             return Message.ok().data("list", dbs);
         } catch (Exception e) {
             if (e instanceof ErrorException) {

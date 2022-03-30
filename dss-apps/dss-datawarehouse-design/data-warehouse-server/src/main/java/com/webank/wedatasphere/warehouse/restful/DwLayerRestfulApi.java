@@ -7,18 +7,14 @@ import com.webank.wedatasphere.warehouse.cqe.DwLayerUpdateCommand;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.service.DwLayerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-@Path("/data-warehouse")
+
+
+@RestController
+@RequestMapping(value = "/data-warehouse", produces = {"application/json;charset=utf-8"})
 public class DwLayerRestfulApi {
 
     private final DwLayerService dwLayerService;
@@ -29,29 +25,29 @@ public class DwLayerRestfulApi {
     }
 
     // list all preset layers
-    @GET
-    @Path("/layers/preset")
-    public Response getAllPresetLayers(@Context HttpServletRequest request) throws DwException {
+
+    @RequestMapping( value = "/layers/preset", method = RequestMethod.GET)
+    public Message getAllPresetLayers(HttpServletRequest request) throws DwException {
         Message message = this.dwLayerService.getAllPresetLayers(request);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("/layers/all")
-    public Response getAllLayers(@Context HttpServletRequest request, @QueryParam(value = "isAvailable") Boolean isAvailable, @QueryParam(value = "db") String db) throws DwException {
+
+    @RequestMapping( value = "/layers/all", method = RequestMethod.GET)
+    public Message getAllLayers(HttpServletRequest request, @RequestParam(value = "isAvailable",required = false) Boolean isAvailable, @RequestParam(value = "db",required = false) String db) throws DwException {
         Message message = this.dwLayerService.getAllLayers(request, isAvailable, db);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // query paged custom layers
-    @GET
-    @Path("/layers/custom")
-    public Response queryPagedCustomLayers(
-            @Context HttpServletRequest request,
-            @QueryParam("page") Integer page,
-            @QueryParam("size") Integer size,
-            @QueryParam("name") String name,
-            @QueryParam("enabled") Boolean enabled
+
+    @RequestMapping( value = "/layers/custom", method = RequestMethod.GET)
+    public Message queryPagedCustomLayers(
+            HttpServletRequest request,
+            @RequestParam(value = "page",required = false) Integer page,
+            @RequestParam(value = "size",required = false) Integer size,
+            @RequestParam(value = "name",required = false) String name,
+            @RequestParam(value = "enabled",required = false) Boolean enabled
     )throws DwException {
         final DwLayerQueryCommand command = new DwLayerQueryCommand();
         command.setName(name);
@@ -59,71 +55,67 @@ public class DwLayerRestfulApi {
         command.setPage(page);
         command.setSize(size);
         Message message = this.dwLayerService.queryPagedCustomLayers(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // create custom layer
-    @POST
-    @Path("/layers/custom")
-    public Response createDwCustomLayer(@Context HttpServletRequest request, DwLayerCreateCommand command) throws DwException {
+    @RequestMapping( value = "/layers/custom", method = RequestMethod.POST)
+    public Message createDwCustomLayer( HttpServletRequest request,@RequestBody DwLayerCreateCommand command) throws DwException {
         Message message = this.dwLayerService.createDwCustomLayer(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // get layer by id
-    @GET
-    @Path("/layers/{id}")
-    public Response getLayerById(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+    @RequestMapping( value = "/layers/{id}", method = RequestMethod.GET)
+    public Message getLayerById(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwLayerService.getLayerById(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // delete layer
-    @DELETE
-    @Path("/layers/{id}")
-    public Response deleteById(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+
+    @RequestMapping( value = "/layers/{id}", method = RequestMethod.DELETE)
+    public Message deleteById(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwLayerService.deleteById(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // update layer
-    @PUT
-    @Path("/layers/{id}")
-    public Response update(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id,
-            DwLayerUpdateCommand command
+    @RequestMapping( value = "/layers/{id}", method = RequestMethod.PUT)
+    public Message update(
+            HttpServletRequest request,
+            @PathVariable("id") Long id,
+            @RequestBody DwLayerUpdateCommand command
     ) throws DwException {
         command.setId(id);
         Message message = this.dwLayerService.update(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // enable layer
-    @PUT
-    @Path("/layers/{id}/enable")
-    public Response enable(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+    @RequestMapping( value = "/layers/{id}/enable", method = RequestMethod.PUT)
+    public Message enable(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwLayerService.enable(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // disable layer
-    @PUT
-    @Path("/layers/{id}/disable")
-    public Response disable(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+
+    @RequestMapping( value = "/layers/{id}/disable", method = RequestMethod.PUT)
+    public Message disable(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwLayerService.disable(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 }

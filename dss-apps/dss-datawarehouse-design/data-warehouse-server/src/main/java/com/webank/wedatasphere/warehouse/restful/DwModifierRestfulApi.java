@@ -6,19 +6,13 @@ import com.webank.wedatasphere.warehouse.cqe.*;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.service.DwModifierService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Optional;
 
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-@Path("/data-warehouse")
+
+@RestController
+@RequestMapping(value = "/data-warehouse", produces = {"application/json;charset=utf-8"})
 public class DwModifierRestfulApi {
 
     private final DwModifierService dwModifierService;
@@ -28,14 +22,14 @@ public class DwModifierRestfulApi {
         this.dwModifierService = dwModifierService;
     }
 
-    @GET
-    @Path("/modifiers/all")
-    public Response queryAllModifiers(
-            @Context HttpServletRequest request,
-            @QueryParam("typeName") String typeName,
-            @QueryParam(value = "isAvailable") Boolean isAvailable,
-            @QueryParam(value = "theme") String theme,
-            @QueryParam(value = "layer") String layer
+
+    @RequestMapping( value = "/modifiers/all", method = RequestMethod.GET)
+    public Message queryAllModifiers(
+            HttpServletRequest request,
+            @RequestParam(value = "typeName",required = false) String typeName,
+            @RequestParam(value = "isAvailable",required = false) Boolean isAvailable,
+            @RequestParam(value = "theme",required = false) String theme,
+            @RequestParam(value = "layer",required = false) String layer
     )throws DwException {
         final DwModifierQueryCommand command = new DwModifierQueryCommand();
         command.setName(typeName);
@@ -43,18 +37,17 @@ public class DwModifierRestfulApi {
         command.setTheme(theme);
         command.setLayer(layer);
         Message message = this.dwModifierService.queryAllModifiers(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // query paged modifiers
-    @GET
-    @Path("/modifiers")
-    public Response queryPagedDecorations(
-            @Context HttpServletRequest request,
-            @QueryParam("page") Integer page,
-            @QueryParam("size") Integer size,
-            @QueryParam("name") String typeName,
-            @QueryParam("enabled") String enabled
+    @RequestMapping( value = "/modifiers", method = RequestMethod.GET)
+    public Message queryPagedDecorations(
+            HttpServletRequest request,
+            @RequestParam(value = "page",required = false) Integer page,
+            @RequestParam(value = "size",required = false) Integer size,
+            @RequestParam(value = "name",required = false) String typeName,
+            @RequestParam(value = "enabled",required = false) String enabled
     )throws DwException {
         final DwModifierQueryCommand command = new DwModifierQueryCommand();
         command.setName(typeName);
@@ -64,71 +57,66 @@ public class DwModifierRestfulApi {
             command.setEnabled(Boolean.parseBoolean(enabled));
         }
         Message message = this.dwModifierService.queryPage(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // create dw decoration word
-    @POST
-    @Path("/modifiers")
-    public Response create(@Context HttpServletRequest request, DwModifierCreateCommand command) throws DwException {
+    @RequestMapping( value = "/modifiers", method = RequestMethod.POST)
+    public Message create(HttpServletRequest request,@RequestBody DwModifierCreateCommand command) throws DwException {
         Message message = this.dwModifierService.create(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // fetch one decoration details by id
-    @GET
-    @Path("/modifiers/{id}")
-    public Response getById(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+    @RequestMapping( value = "/modifiers/{id}", method = RequestMethod.GET)
+    public Message getById(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwModifierService.getById(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // remove decoration logic
-    @DELETE
-    @Path("/modifiers/{id}")
-    public Response deleteById(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+    @RequestMapping( value = "/modifiers/{id}", method = RequestMethod.DELETE)
+    public Message deleteById(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwModifierService.deleteById(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // update
-    @PUT
-    @Path("/modifiers/{id}")
-    public Response update(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id,
-            DwModifierUpdateCommand command
+    @RequestMapping( value = "/modifiers/{id}", method = RequestMethod.PUT)
+    public Message update(
+            HttpServletRequest request,
+            @PathVariable("id") Long id,
+            @RequestBody DwModifierUpdateCommand command
     ) throws DwException {
         command.setId(id);
         Message message = this.dwModifierService.update(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // enable modifier
-    @PUT
-    @Path("/modifiers/{id}/enable")
-    public Response enable(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+
+    @RequestMapping( value = "/modifiers/{id}/enable", method = RequestMethod.PUT)
+    public Message enable(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwModifierService.enable(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // disable modifier
-    @PUT
-    @Path("/modifiers/{id}/disable")
-    public Response disable(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+    @RequestMapping( value = "/modifiers/{id}/disable", method = RequestMethod.PUT)
+    public Message disable(
+             HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwModifierService.disable(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 }

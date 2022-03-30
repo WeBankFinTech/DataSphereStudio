@@ -6,19 +6,13 @@ import com.webank.wedatasphere.warehouse.cqe.*;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.service.DwStatisticalPeriodService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Optional;
 
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-@Path("/data-warehouse")
+
+@RestController
+@RequestMapping(value = "/data-warehouse", produces = {"application/json;charset=utf-8"})
 public class DwStatisticalPeriodRestfulApi {
 
     private final DwStatisticalPeriodService dwStatisticalPeriodService;
@@ -28,14 +22,14 @@ public class DwStatisticalPeriodRestfulApi {
         this.dwStatisticalPeriodService = dwStatisticalPeriodService;
     }
 
-    @GET
-    @Path("/statistical_periods/all")
-    public Response queryAll(
-            @Context HttpServletRequest request,
-            @QueryParam("name") String name,
-            @QueryParam(value = "isAvailable") Boolean isAvailable,
-            @QueryParam(value = "theme") String theme,
-            @QueryParam(value = "layer") String layer
+
+    @RequestMapping( value = "/statistical_periods/all", method = RequestMethod.GET)
+    public Message queryAll(
+            HttpServletRequest request,
+            @RequestParam(value = "name",required = false) String name,
+            @RequestParam(value = "isAvailable",required = false) Boolean isAvailable,
+            @RequestParam(value = "theme",required = false) String theme,
+            @RequestParam(value = "layer",required = false) String layer
     )throws DwException {
         final DwStatisticalPeriodQueryCommand command = new DwStatisticalPeriodQueryCommand();
         command.setName(name);
@@ -43,18 +37,18 @@ public class DwStatisticalPeriodRestfulApi {
         command.setTheme(theme);
         command.setLayer(layer);
         Message message = this.dwStatisticalPeriodService.queryAll(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // query paged statistical periods
-    @GET
-    @Path("/statistical_periods")
-    public Response queryPagedDecorations(
-            @Context HttpServletRequest request,
-            @QueryParam("page") Integer page,
-            @QueryParam("size") Integer size,
-            @QueryParam("name") String name,
-            @QueryParam(value = "enabled") String enabled
+
+    @RequestMapping( value = "/statistical_periods", method = RequestMethod.GET)
+    public Message queryPagedDecorations(
+            HttpServletRequest request,
+            @RequestParam(value = "page",required = false) Integer page,
+            @RequestParam(value = "size",required = false) Integer size,
+            @RequestParam(value = "name",required = false) String name,
+            @RequestParam(value = "enabled",required = false) String enabled
     )throws DwException {
         final DwStatisticalPeriodQueryCommand command = new DwStatisticalPeriodQueryCommand();
         command.setName(name);
@@ -64,72 +58,71 @@ public class DwStatisticalPeriodRestfulApi {
             command.setEnabled(Boolean.parseBoolean(enabled));
         }
         Message message = this.dwStatisticalPeriodService.queryPage(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // create dw statistical_periods
-    @POST
-    @Path("/statistical_periods")
-    public Response create(@Context HttpServletRequest request, DwStatisticalPeriodCreateCommand command) throws DwException {
+
+    @RequestMapping( value = "/statistical_periods", method = RequestMethod.POST)
+    public Message create(HttpServletRequest request, @RequestBody DwStatisticalPeriodCreateCommand command) throws DwException {
         Message message = this.dwStatisticalPeriodService.create(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // fetch one statistical_periods details by id
-    @GET
-    @Path("/statistical_periods/{id}")
-    public Response getById(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+
+    @RequestMapping( value = "/statistical_periods/{id}", method = RequestMethod.GET)
+    public Message getById(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwStatisticalPeriodService.getById(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // remove statistical_periods logic
-    @DELETE
-    @Path("/statistical_periods/{id}")
-    public Response deleteById(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+
+    @RequestMapping( value = "/statistical_periods/{id}", method = RequestMethod.DELETE)
+    public Message deleteById(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwStatisticalPeriodService.deleteById(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // update statistical_periods
-    @PUT
-    @Path("/statistical_periods/{id}")
-    public Response update(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id,
-            DwStatisticalPeriodUpdateCommand command
+
+    @RequestMapping( value = "/statistical_periods/{id}", method = RequestMethod.PUT)
+    public Message update(
+            HttpServletRequest request,
+            @PathVariable("id") Long id,
+            @RequestBody DwStatisticalPeriodUpdateCommand command
     ) throws DwException {
         command.setId(id);
         Message message = this.dwStatisticalPeriodService.update(request, command);
-        return Message.messageToResponse(message);
+        return message;
     }
 
 
     // enable statistical_periods
-    @PUT
-    @Path("/statistical_periods/{id}/enable")
-    public Response enable(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+
+    @RequestMapping( value = "/statistical_periods/{id}/enable", method = RequestMethod.PUT)
+    public Message enable(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwStatisticalPeriodService.enable(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
     // disable statistical_periods
-    @PUT
-    @Path("/statistical_periods/{id}/disable")
-    public Response disable(
-            @Context HttpServletRequest request,
-            @PathParam("id") Long id
+    @RequestMapping( value = "/statistical_periods/{id}/disable", method = RequestMethod.PUT)
+    public Message disable(
+            HttpServletRequest request,
+            @PathVariable("id") Long id
     ) throws DwException {
         Message message = this.dwStatisticalPeriodService.disable(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 }

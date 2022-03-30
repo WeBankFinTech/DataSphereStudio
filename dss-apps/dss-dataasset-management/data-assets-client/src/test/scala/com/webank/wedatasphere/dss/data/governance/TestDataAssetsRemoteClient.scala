@@ -1,7 +1,8 @@
 package com.webank.wedatasphere.dss.data.governance
 
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient
-import com.webank.wedatasphere.dss.data.governance.request.{GetHiveTblPartitionAction, GetTblPartInfoByNameAction}
+import com.webank.wedatasphere.dss.data.governance.request.{GetHiveTblPartitionAction, GetTblPartInfoByNameAction, SearchHiveDbAction}
+import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy
 import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder
 
 import java.util.concurrent.TimeUnit
@@ -11,7 +12,7 @@ import scala.Console.println
 object TestDataAssetsRemoteClient {
   def main(args: Array[String]): Unit = {
     val clientConfig = DWSClientConfigBuilder.newBuilder()
-      .addServerUrl("http://localhost:20082")
+      .addServerUrl("http://192.168.0.25:8088")
       .connectionTimeout(30000)
       .discoveryEnabled(false)
       .discoveryFrequency(1,TimeUnit.MINUTES)
@@ -19,9 +20,9 @@ object TestDataAssetsRemoteClient {
       .maxConnectionSize(5)
       .retryEnabled(false)
       .readTimeout(30000)
-      .setAuthenticationStrategy(null)
+      .setAuthenticationStrategy(new TokenAuthenticationStrategy())
       .setAuthTokenKey("hdfs")
-      .setAuthTokenValue("hdfs")
+      .setAuthTokenValue("BML-AUTH")
       .setDWSVersion("v1")
       .build()
 
@@ -30,16 +31,18 @@ object TestDataAssetsRemoteClient {
 //    val searchHiveTblResult = dataAssetsClient.searchHiveTbl(SearchHiveTblAction.builder().setUser("hdfs").setQuery("").setLimit(10).setOffset(0).setOwner("undefined").build()).getHiveList
 //    println(searchHiveTblResult)
 //
-//    val searchHiveDbResult = dataAssetsClient.searchHiveDb(SearchHiveDbAction.builder().setUser("hdfs").setQuery("").setLimit(10).setOffset(0).setOwner("undefined").build()).getHiveList
-//    println(searchHiveDbResult)
+    val searchHiveDbResult = dataAssetsClient.searchHiveDb(SearchHiveDbAction.builder().setUser("hdfs").setQuery("").setLimit(10).setOffset(0).setOwner("undefined").build()).getHiveList
+    println(searchHiveDbResult)
 //
 //    val hiveTblBasicResult = dataAssetsClient
 //  .getHiveTblBasic(GetHiveTblBasicAction.builder().setUser("hdfs").setGuid("27920dc8-1eef-4d7d-9423-b5967d9e2d33").build())
 //  .result
 //    println(hiveTblBasicResult)
 //
-    val hiveTblPartitionResult = dataAssetsClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
-    println(hiveTblPartitionResult)
+//    val hiveTblPartitionResult = dataAssetsClient.getHiveTblPartition(GetHiveTblPartitionAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
+//    println(hiveTblPartitionResult)
+
+
 //
 //    val hiveTblCreateResult = dataAssetsClient.getHiveTblCreate(GetHiveTblCreateAction.builder().setUser("hdfs").setGuid("a3be4a97-6465-4c3d-adee-76dfa662e531").build()).result
 //    println(hiveTblCreateResult)
@@ -102,7 +105,7 @@ object TestDataAssetsRemoteClient {
 //
 //    println(hiveTableStatsResult.getResult)
 
-    val partInfo = dataAssetsClient.getHiveTblPartInfoByNameResult(GetTblPartInfoByNameAction.builder().setUser("hdfs").setDbName("linkis_db").setTableName("linkis_partitions").build())
-    println(partInfo.getInfo)
+//    val partInfo = dataAssetsClient.getHiveTblPartInfoByNameResult(GetTblPartInfoByNameAction.builder().setUser("hdfs").setDbName("linkis_db").setTableName("linkis_partitions").build())
+//    println(partInfo.getInfo)
   }
 }

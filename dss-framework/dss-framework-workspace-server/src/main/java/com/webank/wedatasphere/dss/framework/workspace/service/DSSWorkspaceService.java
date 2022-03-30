@@ -71,9 +71,6 @@ public interface DSSWorkspaceService {
 
     List<WorkspaceDepartmentVo> getWorkSpaceDepartments();
 
-
-    List<WorkspaceMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese);
-
     List<WorkspaceMenuVo> getWorkspaceApplications(Long workspaceId, String username, boolean isChinese);
 
     DSSWorkspace getWorkspacesById(Long id, String username) throws DSSErrorException;

@@ -163,7 +163,7 @@ function setServerName(){
     SERVER_NAME=dss-guide-server
   else
 		echo "please input： sh daemon.sh [start,restart,stop] [server name]; for example : sh dss-daemon.sh workspece "
-		echo "server name :  project、orchestrator、apiservice、datapipe、workflow、execution、data-api、data-governance、guide"
+		echo "server name :  project、orchestrator、apiservice、scriptis、workflow、execution、data-api、data-governance、guide"
 		exit 1
 	fi
 }

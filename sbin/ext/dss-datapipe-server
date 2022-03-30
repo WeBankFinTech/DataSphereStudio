@@ -15,7 +15,7 @@ if [ "$DSS_CONF_DIR" = "" ]; then
   export DSS_CONF_DIR=$DSS_HOME/conf
 fi
 
-SERVER_SUFFIX="dss-datapipe-server"
+SERVER_SUFFIX="dss-scriptis-server"
 ## set log
 if [ "$DSS_LOG_DIR" = "" ]; then
   export DSS_LOG_DIR="$DSS_HOME/logs"

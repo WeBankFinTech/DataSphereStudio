@@ -1,12 +1,11 @@
 ### deploy user
-deployUser=root
+deployUser=hadoop
 
 ## max memory for services
 SERVER_HEAP_SIZE="512M"
 
-
 ### The install home path of DSS，Must provided
-DSS_INSTALL_HOME=/usr/local/anlexander/all_bak/dss_linkis/dss-linkis-1.0.2
+DSS_INSTALL_HOME=/appcom/Install/dss
 
 ###  Linkis EUREKA  information.  # Microservices Service Registration Discovery Center
 EUREKA_INSTALL_IP=127.0.0.1

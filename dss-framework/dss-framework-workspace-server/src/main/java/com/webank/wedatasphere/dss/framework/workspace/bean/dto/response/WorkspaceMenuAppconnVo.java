@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.framework.workspace.bean.dto.response;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplicationBean;
 
 import java.util.List;
-import java.util.Map;
 
 
 public class WorkspaceMenuAppconnVo {
@@ -26,7 +25,7 @@ public class WorkspaceMenuAppconnVo {
     private String title;
     private String description;
     private String labels;
-//    private String accessButton;
+    //    private String accessButton;
 //    private String accessButtonUrl;
 //    private String manualButton;
 //    private String manualButtonUrl;
@@ -36,9 +35,12 @@ public class WorkspaceMenuAppconnVo {
     private Boolean accessable;
     private String icon;
     private Integer order;
-//    private Map<String, String> nameAndUrls;
+    //    private Map<String, String> nameAndUrls;
     //图片
     private String image;
+
+    private Boolean ifIframe;
+    private Boolean isExternal;
 
     private List<DSSApplicationBean> appInstances;
 
@@ -178,7 +180,23 @@ public class WorkspaceMenuAppconnVo {
         this.appInstances = appInstances;
     }
 
-    public void addAppInstances(DSSApplicationBean dssApplicationBean){
+    public void addAppInstances(DSSApplicationBean dssApplicationBean) {
         this.appInstances.add(dssApplicationBean);
+    }
+
+    public Boolean getIfIframe() {
+        return ifIframe;
+    }
+
+    public void setIfIframe(Boolean ifIframe) {
+        this.ifIframe = ifIframe;
+    }
+
+    public Boolean getExternal() {
+        return isExternal;
+    }
+
+    public void setExternal(Boolean external) {
+        isExternal = external;
     }
 }

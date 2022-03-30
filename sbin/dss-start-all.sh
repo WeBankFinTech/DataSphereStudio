@@ -38,7 +38,7 @@ fi
 
 local_host="`hostname --fqdn`"
 source $DSS_HOME/sbin/common.sh
-source $DSS_HOME/conf/config.sh
+source $DSS_CONF_DIR/config.sh
 
 function startApp(){
 echo "<-------------------------------->"

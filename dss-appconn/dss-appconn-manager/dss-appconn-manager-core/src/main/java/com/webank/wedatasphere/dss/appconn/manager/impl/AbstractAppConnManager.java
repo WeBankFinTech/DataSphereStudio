@@ -38,6 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class AbstractAppConnManager implements AppConnManager {
@@ -99,10 +102,27 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             return;
         }
         Map<String, AppConn> appConns = new HashMap<>();
-        appConnInfos.forEach(DSSExceptionUtils.handling(appConnInfo -> {
+        Consumer<AppConnInfo> loadAndAdd = DSSExceptionUtils.handling(appConnInfo -> {
             AppConn appConn = loadAppConn(appConnInfo);
             if(appConn != null) {
                 appConns.put(appConnInfo.getAppConnName().toLowerCase(), appConn);
+            }
+        });
+        appConnInfos.forEach(DSSExceptionUtils.handling(appConnInfo -> {
+            if(appConns.containsKey(appConnInfo.getAppConnName())) {
+                return;
+            }
+            if(StringUtils.isNotBlank(appConnInfo.getReference())) {
+                if(!appConns.containsKey(appConnInfo.getReference())) {
+                    AppConnInfo referenceAppConnInfo = appConnInfos.stream().filter(info -> info.getAppConnName().equals(appConnInfo.getReference()))
+                            .findAny().orElseThrow(() -> new DSSRuntimeException("cannot find the reference appConn " + appConnInfo.getReference() +
+                                    " for appConn " + appConnInfo.getAppConnName()));
+                    loadAndAdd.accept(referenceAppConnInfo);
+                }
+                AppConn appConn = loadAppConn(appConnInfo, appConns.get(appConnInfo.getReference()));
+                appConns.put(appConnInfo.getAppConnName().toLowerCase(), appConn);
+            } else {
+                loadAndAdd.accept(appConnInfo);
             }
         }));
         synchronized (this.appConns) {
@@ -119,6 +139,24 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         LOGGER.info("Try to load AppConn {} with home path {}.", appConnInfo.getAppConnName(), appConnHome);
         AppConn appConn = appConnLoader.getAppConn(appConnInfo.getAppConnName(),
             appConnInfo.getClassName(), appConnHome);
+        AppDescImpl appDesc = loadAppDesc(appConnInfo);
+        appConn.setAppDesc(appDesc);
+        appConn.init();
+        LOGGER.info("AppConn {} is loaded successfully.", appConnInfo.getAppConnName());
+        return appConn;
+    }
+
+    protected AppConn loadAppConn(AppConnInfo appConnInfo, AppConn referenceAppConn) throws Exception {
+        LOGGER.info("Ready to load a reference AppConn {}, the appConnInfo are {}.", appConnInfo.getAppConnName(), appConnInfo);
+        AppDescImpl appDesc = loadAppDesc(appConnInfo);
+        AppConn appConn = referenceAppConn.getClass().newInstance();
+        appConn.setAppDesc(appDesc);
+        appConn.init();
+        LOGGER.info("AppConn {} is loaded successfully.", appConnInfo.getAppConnName());
+        return appConn;
+    }
+
+    protected AppDescImpl loadAppDesc(AppConnInfo appConnInfo) {
         List<? extends AppInstanceInfo> instanceInfos = appConnInfoService.getAppInstancesByAppConnInfo(appConnInfo);
         LOGGER.info("The instanceInfos of AppConn {} are {}.", appConnInfo.getAppConnName(), instanceInfos);
         AppDescImpl appDesc = new AppDescImpl();
@@ -128,14 +166,10 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             appDesc.addAppInstance(appInstance);
         }
         if(appDesc.getAppInstances().isEmpty()) {
-            LOGGER.error("The AppConn {} has no appInstance, we cannot load this AppConn successfully, please check the database info.", appConnInfo.getAppConnName());
-            return null;
+            LOGGER.warn("The AppConn {} has no appInstance, maybe this AppConn is a reference AppConn? If not, please check the database info.", appConnInfo.getAppConnName());
         }
         appDesc.setAppName(appConnInfo.getAppConnName());
-        appConn.setAppDesc(appDesc);
-        appConn.init();
-        LOGGER.info("AppConn {} is loaded successfully.", appConnInfo.getAppConnName());
-        return appConn;
+        return appDesc;
     }
 
     private void copyProperties(String appConnName, AppInstanceInfo appInstanceInfo, AppInstanceImpl appInstance){

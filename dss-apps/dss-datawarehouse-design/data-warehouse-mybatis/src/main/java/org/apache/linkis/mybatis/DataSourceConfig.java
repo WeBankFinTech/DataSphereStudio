@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.webank.wedatasphere.linkis.mybatis;
+package org.apache.linkis.mybatis;
 
 import org.apache.linkis.common.utils.JavaLog;
 import org.apache.linkis.mybatis.conf.MybatisConfiguration;

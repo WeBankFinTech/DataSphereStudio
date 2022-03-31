@@ -314,6 +314,7 @@ public class DSSMigrateRestful {
             request.setApplicationArea(DEFAULT_PROJECT_AREA);
             request.setWorkspaceId(workspaceId);
             request.setWorkspaceName(workspace.getWorkspaceName());
+            request.setDescription("dss auto test.");
 
             Map<String, Object> userMap = BDPJettyServerHelper.gson().fromJson(projectUserJson, HashMap.class);
             Set<String> accessUsers = new HashSet<>(1);

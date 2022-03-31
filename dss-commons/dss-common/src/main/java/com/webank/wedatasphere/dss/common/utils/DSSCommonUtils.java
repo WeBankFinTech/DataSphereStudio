@@ -33,7 +33,6 @@ public class DSSCommonUtils {
 
     public static final String FLOW_PARENT_NAME = "parent";
 
-
     public static final String NODE_RESOURCE_NAME = "resources";
 
     public static final String FLOW_NODE_NAME = "nodes";

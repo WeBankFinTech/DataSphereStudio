@@ -107,7 +107,7 @@ public interface OrchestratorMapper {
 
     void addOrchestratorRefOrchestration(DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration);
 
-    List<DSSOrchestratorInfo> getListByPage(@Param("params") Map<String, Object> params);
+    List<DSSOrchestratorInfo> queryOrchestratorInfos(@Param("params") Map<String, Object> params);
 
     DSSOrchestratorRefOrchestration getRefOrchestrationId(@Param("orchestratorId") Long orchestratorId);
 }

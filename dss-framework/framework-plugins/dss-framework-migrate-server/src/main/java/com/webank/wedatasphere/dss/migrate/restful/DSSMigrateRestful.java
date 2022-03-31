@@ -26,16 +26,11 @@ import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestExportOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchetratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
-import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflow;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.common.exception.LinkisException;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
@@ -45,35 +40,23 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 
-
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes({MediaType.APPLICATION_JSON, MediaType.MULTIPART_FORM_DATA})
 @RequestMapping(path = "/dss/framework/release", produces = {"application/json"})
 @RestController
 public class DSSMigrateRestful {
@@ -88,7 +71,6 @@ public class DSSMigrateRestful {
     public static final String FLOW_BML_VERSION_KEY = "bmlVersion";
     public static final String DEFAULT_PROJECT_ORCHESTRATOR_MODE = "pom_work_flow";
 
-
     @Autowired
     private MigrateService migrateService;
     @Autowired
@@ -101,17 +83,16 @@ public class DSSMigrateRestful {
     BMLService bmlService;
     @Autowired
     private MetaService metaService;
-    @Autowired
-    private OrchestratorService dssOrchestratorService;
+
     // todo only dev开发中心
     private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
     private Sender workflowSender = Sender.getSender(MigrateConf.WORKFLOW_SERVER_NAME);
 
 
     @PostMapping("/importOldDSSProject")
-    public Message importOldDSSProject(@Context HttpServletRequest req,
-                                       @FormDataParam("dssLabels") String dssLabels,
-                                       FormDataMultiPart form) throws Exception {
+    public Message importOldDSSProject(HttpServletRequest req,
+                                       @RequestParam(value = "dssLabels", required = false) String dssLabels,
+                                       @RequestParam(name = "file") List<MultipartFile> files) throws Exception {
         //通过从0.x导出的zip包上传到此处，然后进行一下导入到开发环境
         //1.下载到本地解压
         //2.保证工程信息要同步，如果没有建工程，那么就要把工程给建立
@@ -120,15 +101,14 @@ public class DSSMigrateRestful {
         //4.上传到bml
         //5.通过resourceId 和 version 导入到 dev的 orchestrator-server
         String userName = SecurityFilter.getLoginUsername(req);
-        List<FormDataBodyPart> files = form.getFields("file");
+//        List<FormDataBodyPart> files = form.getFields("file");
         if (files == null || files.size() <= 0) {
             LOG.error("files are null, can not continue");
             return Message.error("no files to import");
         }
         //只取第一个文件
-        FormDataBodyPart p = files.get(0);
-        FormDataContentDisposition fileDetail = p.getFormDataContentDisposition();
-        String fileName = new String(fileDetail.getFileName().getBytes("ISO8859-1"), "UTF-8");
+        MultipartFile p = files.get(0);
+        String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
         InputStream is = null;
         OutputStream os = null;
         try {
@@ -137,7 +117,7 @@ public class DSSMigrateRestful {
             if (file.getParentFile().exists()) {
                 FileUtils.deleteDirectory(file.getParentFile());
             }
-            is = p.getValueAs(InputStream.class);
+            is = p.getInputStream();
             os = IoUtils.generateExportOutputStream(inputPath);
             IOUtils.copy(is, os);
             Workspace workspace = SSOHelper.getWorkspace(req);
@@ -176,30 +156,30 @@ public class DSSMigrateRestful {
      * @param projectName   项目名没有就创建
      * @param projectUser   项目用户，接口会保证本用户加入到权限列表。格式跟createProject接口的用户一致 {"editUsers":["alexyang"],"accessUsers":["alexyang"],"releaseUsers":["alexyang"]}
      * @param dssLabels
-     * @param form
      * @return
      * @throws Exception
      */
-    @POST
-    @Path("/importworkflow")
-    public Message importWorkFlow(@Context HttpServletRequest req,
-                                  @Context HttpServletResponse response,
-                                  @FormDataParam("workspaceName") String workspaceName,
-                                  @FormDataParam("projectName") String projectName,
-                                  @FormDataParam("projectUser") String projectUser,
-                                  @FormDataParam("flowName") String flowName,
-                                  @FormDataParam("dssLabels") String dssLabels,
-                                  FormDataMultiPart form) throws Exception {
+    @PostMapping("/importworkflow")
+    public Message importWorkFlow(HttpServletRequest req,
+                                  HttpServletResponse response,
+                                  @RequestParam(value = "workspaceName", required = false) String workspaceName,
+                                  @RequestParam(value = "projectName", required = false) String projectName,
+                                  @RequestParam(value = "projectUser", required = false) String projectUser,
+                                  @RequestParam(value = "flowName", required = false) String flowName,
+                                  @RequestParam(value = "dssLabels", required = false) String dssLabels,
+                                  @RequestParam(name = "file") List<MultipartFile> files) throws Exception {
         String userName = SecurityFilter.getLoginUsername(req);
-        List<FormDataBodyPart> files = form.getFields("file");
+//        List<FormDataBodyPart> files = form.getFields("file");
         if (files == null || files.size() <= 0) {
             LOG.error("files are null, can not continue");
             return Message.error("no files to import");
         }
         //只取第一个文件
-        FormDataBodyPart p = files.get(0);
-        FormDataContentDisposition fileDetail = p.getFormDataContentDisposition();
-        String fileName = new String(fileDetail.getFileName().getBytes("ISO8859-1"), "UTF-8");
+//        FormDataBodyPart p = files.get(0);
+        MultipartFile p = files.get(0);
+//        FormDataContentDisposition fileDetail = p.getFormDataContentDisposition();
+//        String fileName = new String(fileDetail.getFileName().getBytes("ISO8859-1"), "UTF-8");
+        String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
         InputStream is = null;
         OutputStream os = null;
         Message responseMsg = Message.ok();
@@ -212,7 +192,7 @@ public class DSSMigrateRestful {
             if (file.getParentFile().exists()) {
                 FileUtils.deleteDirectory(file.getParentFile());
             }
-            is = p.getValueAs(InputStream.class);
+            is = p.getInputStream();
             os = IoUtils.generateExportOutputStream(inputZipPath);
             IOUtils.copy(is, os);
             // 获取工作空间id，没有就报错
@@ -414,8 +394,8 @@ public class DSSMigrateRestful {
      * @throws Exception
      */
     @PostMapping("/exportallflow")
-    public Message exportAllFlowInProject(@Context HttpServletRequest req,
-                                          @Context HttpServletResponse response,
+    public Message exportAllFlowInProject(HttpServletRequest req,
+                                          HttpServletResponse response,
                                           JsonNode json) throws Exception {
         String username = SecurityFilter.getLoginUsername(req);
         String workspaceName = json.get("workspaceName").getTextValue();
@@ -442,52 +422,54 @@ public class DSSMigrateRestful {
             throw new MigrateErrorException(0, "cannot find projectName : " + projectName + "  in workspace : " + workspaceName);
         }
         // 获取工作流列表
-        OrchestratorRequest orchestratorRequest = new OrchestratorRequest();
-        orchestratorRequest.setWorkspaceId(workspaceId);
-        orchestratorRequest.setProjectId(projectDo.getId());
+        RequestOrchestratorInfos requestOrchestratorInfos = new RequestOrchestratorInfos();
+        requestOrchestratorInfos.setWorkspaceId(workspaceId);
+        requestOrchestratorInfos.setProjectId(projectDo.getId());
         // mod只能为一个
         Arrays.stream(projectDo.getOrchestratorMode().split(",")).forEach((mode) -> {
             if (StringUtils.isNotBlank(mode)) {
-                orchestratorRequest.setOrchestratorMode(mode);
+                requestOrchestratorInfos.setOrchestratorMode(mode);
             }
         });
-        if (StringUtils.isBlank(orchestratorRequest.getOrchestratorMode())) {
-            orchestratorRequest.setOrchestratorMode(DEFAULT_PROJECT_ORCHESTRATOR_MODE);
+        if (StringUtils.isBlank(requestOrchestratorInfos.getOrchestratorMode())) {
+            requestOrchestratorInfos.setOrchestratorMode(DEFAULT_PROJECT_ORCHESTRATOR_MODE);
         }
-        List<OrchestratorBaseInfo> orchestratorBaseInfos = dssOrchestratorService.getListByPage(orchestratorRequest, username);
+        ResponseOrchestratorInfos responseOrchestratorInfos = (ResponseOrchestratorInfos) orchestratorSender.ask(requestOrchestratorInfos);
         int count = 0;
-        for (OrchestratorBaseInfo orchestratorBaseInfo : orchestratorBaseInfos) {
-            List<DSSLabel> devLabels = Lists.newArrayList(new EnvDSSLabel("dev"));
-            // 查询最新Orchestrator版本
-            RequestOrchestratorVersion requestOrchestratorVersion = new RequestOrchestratorVersion();
-            requestOrchestratorVersion.setUsername(username);
-            requestOrchestratorVersion.setOrchestratorId(orchestratorBaseInfo.getOrchestratorId());
-            requestOrchestratorVersion.setProjectId(orchestratorBaseInfo.getProjectId());
-            ResponseOrchetratorVersion responseOrchetratorVersion = null;
-            try {
-                responseOrchetratorVersion = (ResponseOrchetratorVersion) orchestratorSender.ask(requestOrchestratorVersion);
-            } catch (Exception e) {
-                DSSExceptionUtils.dealErrorException(60015, "Ask orchestrotor version failed " + BDPJettyServerHelper.gson().toJson(requestOrchestratorVersion), e,
-                        DSSErrorException.class);
-            }
-            long latestVersionId = responseOrchetratorVersion.getOrchestratorVersions().stream().map((version) -> version.getId()).max(
-                    new Comparator<Long>() {
-                        @Override
-                        public int compare(Long o1, Long o2) {
-                            // 注意，正序
-                            if (o1 < o2) {
-                                return -1;
-                            } else if (o1 == o2) {
-                                return 0;
-                            } else {
-                                return 1;
+        if (CollectionUtils.isNotEmpty(responseOrchestratorInfos.getOrchestratorInfos())) {
+            for (DSSOrchestratorInfo orchestratorInfo : responseOrchestratorInfos.getOrchestratorInfos()) {
+                List<DSSLabel> devLabels = Lists.newArrayList(new EnvDSSLabel("dev"));
+                // 查询最新Orchestrator版本
+                RequestOrchestratorVersion requestOrchestratorVersion = new RequestOrchestratorVersion();
+                requestOrchestratorVersion.setUsername(username);
+                requestOrchestratorVersion.setOrchestratorId(orchestratorInfo.getId());
+                requestOrchestratorVersion.setProjectId(orchestratorInfo.getProjectId());
+                ResponseOrchetratorVersion responseOrchetratorVersion = null;
+                try {
+                    responseOrchetratorVersion = (ResponseOrchetratorVersion) orchestratorSender.ask(requestOrchestratorVersion);
+                } catch (Exception e) {
+                    DSSExceptionUtils.dealErrorException(60015, "Ask orchestrotor version failed " + BDPJettyServerHelper.gson().toJson(requestOrchestratorVersion), e,
+                            DSSErrorException.class);
+                }
+                long latestVersionId = responseOrchetratorVersion.getOrchestratorVersions().stream().map((version) -> version.getId()).max(
+                        new Comparator<Long>() {
+                            @Override
+                            public int compare(Long o1, Long o2) {
+                                // 注意，正序
+                                if (o1 < o2) {
+                                    return -1;
+                                } else if (o1 == o2) {
+                                    return 0;
+                                } else {
+                                    return 1;
+                                }
                             }
                         }
-                    }
-            ).get();
-            exportFlow(username, workspace, projectName, orchestratorBaseInfo.getOrchestratorId(), latestVersionId,
-                    false, devLabels, orchestratorBaseInfo.getOrchestratorName(), pathRoot);
-            count += 1;
+                ).get();
+                exportFlow(username, workspace, projectName, orchestratorInfo.getId(), latestVersionId,
+                        false, devLabels, orchestratorInfo.getName(), pathRoot);
+                count += 1;
+            }
         }
         Message respMsg = Message.ok();
         respMsg.data("count", count);

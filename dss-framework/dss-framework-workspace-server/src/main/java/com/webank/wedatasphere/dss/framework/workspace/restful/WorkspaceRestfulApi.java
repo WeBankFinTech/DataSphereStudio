@@ -135,25 +135,6 @@ public class WorkspaceRestfulApi {
         return Message.ok().data("workspaceId", workspaceId);
     }
 
-
-    @RequestMapping(path = "/workspaces/{workspaceId}/managements", method = RequestMethod.GET)
-    public Message getWorkspaceManagements(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
-        String header = req.getHeader("Content-language").trim();
-        boolean isChinese = "zh-CN".equals(header);
-        String username = SecurityFilter.getLoginUsername(req);
-        List<WorkspaceMenuVo> managements = dssWorkspaceService.getWorkspaceManagements(workspaceId, username, isChinese);
-        return Message.ok().data("managements", managements);
-    }
-
-//    @RequestMapping(path = "workspaces/{workspaceId}/applications", method = RequestMethod.GET)
-//    public Message getWorkspaceApplications(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
-//        String header = req.getHeader("Content-language").trim();
-//        boolean isChinese = "zh-CN".equals(header);
-//        String username = SecurityFilter.getLoginUsername(req);
-//        List<OnestopMenuVo> applications = dssWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
-//        return Message.ok().data("applications", applications);
-//    }
-
     @RequestMapping(path = "workspaces/{workspaceId}/appconns", method = RequestMethod.GET)
     public Message getWorkspaceAppconns(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
         String header = req.getHeader("Content-language").trim();

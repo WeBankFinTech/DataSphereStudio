@@ -63,7 +63,7 @@ function stopDssProject(){
 	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
 	stopApp
 
-	SERVER_NAME=dss-datapipe-server
+	SERVER_NAME=dss-scriptis-server
   SERVER_IP=$DSS_DATAPIPE_SERVER_INSTALL_IP
   stopApp
 

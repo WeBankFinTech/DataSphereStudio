@@ -1,12 +1,11 @@
 ### deploy user
-deployUser=root
+deployUser=hadoop
 
 ## max memory for services
 SERVER_HEAP_SIZE="512M"
 
-
 ### The install home path of DSS，Must provided
-DSS_INSTALL_HOME=/usr/local/anlexander/all_bak/dss_linkis/dss-linkis-1.0.2
+DSS_INSTALL_HOME=/appcom/Install/dss
 
 ###  Linkis EUREKA  information.  # Microservices Service Registration Discovery Center
 EUREKA_INSTALL_IP=127.0.0.1
@@ -51,7 +50,7 @@ DSS_WORKFLOW_SERVER_PORT=9005
 ### dss-flow-execution-server
 DSS_FLOW_EXECUTION_SERVER_INSTALL_IP=127.0.0.1
 DSS_FLOW_EXECUTION_SERVER_PORT=9006
-###dss-datapipe-server
+###dss-scriptis-server
 DSS_DATAPIPE_SERVER_INSTALL_IP=127.0.0.1
 DSS_DATAPIPE_SERVER_PORT=9008
 

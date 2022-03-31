@@ -22,15 +22,11 @@ import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseQueryOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.rpc.Sender;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -63,9 +59,6 @@ public class MigrateServiceImpl implements MigrateService {
 
     @Autowired
     BMLService bmlService;
-
-    @Autowired
-    private OrchestratorService orchestratorService;
 
     private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
 
@@ -257,16 +250,15 @@ public class MigrateServiceImpl implements MigrateService {
     @Override
     public String queryOrcUUIDByName(Long workspaceId, Long projectId, String orcName) throws DSSErrorException {
         String uuid = null;
-        //todo rpc调用
-        List<DSSOrchestratorInfo> orchestratorInfos = orchestratorService.getByNameAndProjectId(projectId, orcName);
-        if (CollectionUtils.isNotEmpty(orchestratorInfos)) {
-//            List<OrchestratorVo> orchestratorVos = queryExitsOrc(Arrays.asList(orchestratorInfos.getOrchestratorId()));
-            DSSOrchestratorInfo orchestratorInfo = orchestratorInfos.get(0);
-            uuid = orchestratorInfo.getUUID();
+        ResponseOrchestratorInfos responseOrchestratorInfos = (ResponseOrchestratorInfos) orchestratorSender
+                .ask(new RequestOrchestratorInfos(null, projectId, orcName, null));
+        if (CollectionUtils.isNotEmpty(responseOrchestratorInfos.getOrchestratorInfos())) {
+            uuid = responseOrchestratorInfos.getOrchestratorInfos().get(0).getUUID();
         }
         return uuid;
     }
 
+    @Deprecated
     private List<OrchestratorVo> queryExitsOrc(List<Long> orcIds) throws DSSErrorException {
         RequestQueryOrchestrator queryRequest = new RequestQueryOrchestrator(orcIds);
         ResponseQueryOrchestrator queryResponse = null;

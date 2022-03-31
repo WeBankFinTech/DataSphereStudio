@@ -30,7 +30,11 @@ dss-appconn/dss-scheduler-appconn/target
 
 # dss-apps
 dss-apps/dss-apiservice-server/target
-dss-apps/dss-datapipe-server/target
+dss-apps/dss-scriptis-server/target
+
+#dss-guide
+dss-apps/dss-user-guide/dss-user-guide-server/src/main/resources/
+dss-apps/dss-user-guide/dss-user-guide-server/target
 
 # dss-commons
 dss-commons/dss-common/target
@@ -89,10 +93,6 @@ dss-data-governance/dss-data-classification-server/target
 dss-data-governance/dss-data-warehouse-dao/target
 dss-data-governance/dss-data-warehouse-service/target
 dss-data-governance/dss-data-warehouse-server/target
-
-#dss-guide
-dss-apps/dss-user-guide/dss-user-guide-server/src/main/resources/
-dss-apps/dss-user-guide/dss-user-guide-server/target
 
 
 # plugins

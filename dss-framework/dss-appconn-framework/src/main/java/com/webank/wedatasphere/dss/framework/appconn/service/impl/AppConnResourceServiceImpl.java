@@ -26,29 +26,26 @@ import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.framework.appconn.dao.AppConnMapper;
-import com.webank.wedatasphere.dss.framework.appconn.exception.AppConnNotExistsErrorException;
 import com.webank.wedatasphere.dss.framework.appconn.entity.AppConnBean;
 import com.webank.wedatasphere.dss.framework.appconn.entity.AppConnResource;
+import com.webank.wedatasphere.dss.framework.appconn.exception.AppConnNotExistsErrorException;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
 import com.webank.wedatasphere.dss.framework.appconn.utils.AppConnServiceUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.bml.client.BmlClient;
 import org.apache.linkis.bml.client.BmlClientFactory;
 import org.apache.linkis.bml.protocol.BmlUpdateResponse;
 import org.apache.linkis.bml.protocol.BmlUploadResponse;
 import org.apache.linkis.common.utils.Utils;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.io.*;
 
 
 @Component
@@ -68,12 +65,7 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
 
     @Override
     public String getAppConnHome(AppConnInfo appConnInfo) {
-        AppConnBean appConnBean = (AppConnBean) appConnInfo;
-        String appConnHome=appConnBean.getAppConnClassPath();
-        if(appConnHome.endsWith(LIB_NAME)){
-            appConnHome =appConnHome.substring(0,appConnHome.lastIndexOf(LIB_NAME));
-        }
-        return appConnHome;
+        return AppConnUtils.getAppConnHomePath();
     }
 
     @Override
@@ -148,7 +140,6 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
         appConnBeanReLoad.setId(appConnBean.getId());
         appConnBeanReLoad.setResource(resourceStr);
         appConnBeanReLoad.setAppConnName(appConnName);
-        appConnBeanReLoad.setAppConnClassPath(appConnPath.getPath());
         appConnBeanReLoad.setClassName(appConnBean.getClassName());
         appConnMapper.updateResourceByName(appConnBeanReLoad);
         // update index file.
@@ -167,7 +158,7 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
     }
 
     @PreDestroy
-    public void destory() {
+    public void destroy() {
         IOUtils.closeQuietly(bmlClient);
     }
 }

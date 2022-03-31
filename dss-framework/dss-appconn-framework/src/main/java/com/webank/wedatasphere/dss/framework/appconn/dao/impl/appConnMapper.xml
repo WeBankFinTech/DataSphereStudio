@@ -22,7 +22,7 @@
 
     <cache flushInterval="120000"/>
 
-    <resultMap id="AppConnBeanMap"  type="com.webank.wedatasphere.dss.framework.appconn.entity.AppConnBean">
+    <resultMap id="AppConnBeanMap" type="com.webank.wedatasphere.dss.framework.appconn.entity.AppConnBean">
         <result property="id" column="id"/>
         <result property="appConnName" column="appconn_name"/>
         <result property="isUserNeedInit" column="is_user_need_init"/>
@@ -31,18 +31,17 @@
         <result property="isExternal" column="is_external"/>
         <result property="reference" column="reference"/>
         <result property="className" column="class_name"/>
-        <result property="appConnClassPath" column="appconn_class_path"/>
         <result property="resource" column="resource"/>
     </resultMap>
 
     <sql id="fields">
         `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`,
-        `reference`, `class_name`, `appconn_class_path`,`resource`
+        `reference`, `class_name`, `resource`
     </sql>
 
     <sql id="fields_query">
         `id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`,
-        `reference`, `class_name`, `appconn_class_path`, `resource`
+        `reference`, `class_name`, `resource`
     </sql>
 
     <select id="getAllAppConnBeans" resultMap="AppConnBeanMap">
@@ -55,7 +54,7 @@
         SELECT `appconn_name`
         FROM `dss_appconn`
     </select>
-    
+
     <select id="getAppConnBeanByName" resultMap="AppConnBeanMap">
         <![CDATA[SELECT]]>
         <include refid="fields_query"/>
@@ -74,7 +73,6 @@
         update `dss_appconn`
         <trim prefix="set" suffixOverrides=",">
             <if test="resource != null">resource=#{resource},</if>
-            <if test="appConnClassPath != null">appconn_class_path=#{appConnClassPath},</if>
         </trim>
         where appconn_name=#{appConnName}
     </update>

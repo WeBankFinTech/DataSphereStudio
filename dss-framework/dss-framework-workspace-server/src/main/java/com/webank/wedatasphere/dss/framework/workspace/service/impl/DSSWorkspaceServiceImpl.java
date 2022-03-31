@@ -521,13 +521,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return departments;
     }
 
-    @Override
-    public List<WorkspaceMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese) {
-        List<WorkspaceMenuVo> applicationMenuVos = isChinese ? workspaceMapper.getApplicationMenuCn() : workspaceMapper.getApplicationMenuEn();
-        List<Long> userMenuApplicationId = dssWorkspaceMapper.getUserMenuApplicationId(username, workspaceId);
-        return getMenuAppInstances(applicationMenuVos, userMenuApplicationId, isChinese);
-    }
-
     private List<WorkspaceMenuVo> getMenuAppInstances(List<WorkspaceMenuVo> menuVos, List<Long> userMenuApplicationId,
                                                       boolean isChinese) {
         List<AppConn> appConns = AppConnManager.getAppConnManager().listAppConns();

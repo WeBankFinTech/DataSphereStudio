@@ -36,7 +36,7 @@ if [ ! -w "$DSS_PID_DIR" ] ; then
   mkdir -p "$DSS_PID_DIR"
 fi
 source $DSS_HOME/sbin/common.sh
-source $DSS_HOME/conf/config.sh
+source $DSS_CONF_DIR/config.sh
 typeset -l PROJECT_NAME
 PROJECT_NAME=$2
 

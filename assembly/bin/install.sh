@@ -288,7 +288,7 @@ function installDssProject() {
   installPackage
   #echo ""
 
-  SERVER_NAME=dss-datapipe-server
+  SERVER_NAME=dss-scriptis-server
   SERVER_IP=$DSS_DATAPIPE_SERVER_INSTALL_IP
   SERVER_PORT=$DSS_DATAPIPE_SERVER_PORT
   UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-apps/$SERVER_NAME
@@ -297,7 +297,7 @@ function installDssProject() {
   CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
   CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
-  ###install dss-datapipe-server
+  ###install dss-scriptis-server
   installPackage
   #echo ""
 

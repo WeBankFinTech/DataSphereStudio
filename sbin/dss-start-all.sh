@@ -38,7 +38,7 @@ fi
 
 local_host="`hostname --fqdn`"
 source $DSS_HOME/sbin/common.sh
-source $DSS_HOME/conf/config.sh
+source $DSS_CONF_DIR/config.sh
 
 function startApp(){
 echo "<-------------------------------->"
@@ -94,7 +94,7 @@ function startDssProject(){
 	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
 	startApp
 
-	SERVER_NAME=dss-datapipe-server
+	SERVER_NAME=dss-scriptis-server
   SERVER_IP=$DSS_DATAPIPE_SERVER_INSTALL_IP
   startApp
 
@@ -133,7 +133,7 @@ function checkDssService(){
 	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
 	checkServer
 
-	SERVER_NAME=dss-datapipe-server
+	SERVER_NAME=dss-scriptis-server
   SERVER_IP=$DSS_DATAPIPE_SERVER_INSTALL_IP
   checkServer
 

@@ -133,7 +133,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public DSSFlow copyRootFlowWithSubFlows(String userName, long rootFlowId, Workspace workspace,
+    public DSSFlow copyRootFlowWithSubFlows(String userName, Long rootFlowId, Workspace workspace,
                                             String projectName, String contextIdStr, String orcVersion,
                                             String description, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
         return flowService.copyRootFlow(rootFlowId, userName, workspace, projectName,

@@ -137,7 +137,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (StringUtils.isNotBlank(orcVersion)) {
             flowJsonMap.put(DSSJobContentConstant.ORC_VERSION_KEY, orcVersion);
         }
-        if(StringUtils.isNotBlank(schedulerAppConn)) {
+        if (StringUtils.isNotBlank(schedulerAppConn)) {
             flowJsonMap.put(SCHEDULER_APP_CONN_NAME, schedulerAppConn);
         }
         String jsonFlow = DSSCommonUtils.COMMON_GSON.toJson(flowJsonMap);
@@ -440,21 +440,23 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             String nodeType = nodeJsonMap.get("jobType").toString();
             if ("workflow.subflow".equals(nodeType)) {
                 String subFlowName = nodeJsonMap.get("title").toString();
-                List<DSSFlow> DSSFlowList = subflows.stream().filter(subflow ->
+                List<DSSFlow> dssFlowList = subflows.stream().filter(subflow ->
                         subflow.getName().equals(subFlowName)
                 ).collect(Collectors.toList());
-                if (DSSFlowList.size() == 1) {
-                    updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, DSSFlowList.get(0).getId());
+                if (dssFlowList.size() == 1) {
+                    updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, dssFlowList.get(0).getId());
                     nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
                     nodeJsonListRes.add(nodeJsonMap);
-                } else if (DSSFlowList.size() > 1) {
+                } else if (dssFlowList.size() > 1) {
                     logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
                     throw new DSSErrorException(90077, "工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
                 } else {
                     logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
                     throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                 }
-            } else if (nodeJsonMap.get("jobContent") != null) {
+                //todo 确认jobContent在各个三方节点的内容
+            } else if (nodeJsonMap.get("jobContent") != null && !((Map) nodeJsonMap.get("jobContent")).containsKey("script")) {
+                logger.info("nodeJsonMap.jobContent is:{}", nodeJsonMap.get("jobContent"));
                 CommonAppConnNode newNode = new CommonAppConnNode();
                 CommonAppConnNode oldNode = new CommonAppConnNode();
                 oldNode.setJobContent((Map<String, Object>) nodeJsonMap.get("jobContent"));

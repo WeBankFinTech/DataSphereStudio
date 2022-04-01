@@ -193,7 +193,6 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 (developmentOperation, developmentRequestRef) -> {
                     CopyRequestRef copyRequestRef = (CopyRequestRef) developmentRequestRef;
                     copyRequestRef.setNewVersion(finalOrcVersion).setName(newNode.getName());
-                    copyRequestRef.getRefJobContent().put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, oldNode.getFlowId());
                     return ((RefCopyOperation) developmentOperation).copyRef(copyRequestRef);
                 }, null, "copy");
         return responseRef.getRefJobContent();

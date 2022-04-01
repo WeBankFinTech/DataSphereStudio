@@ -35,6 +35,8 @@ import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,7 +167,10 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             if (nodes != null) {
                 for (DSSNode node : nodes) {
                     nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
-                    nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace,dssLabels);
+                    if (MapUtils.isNotEmpty(node.getJobContent()) && !node.getJobContent().containsKey("script")) {
+                        logger.info("node.getJobContent() is :{}", node.getJobContent());
+                        nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);
+                    }
                 }
             }
 

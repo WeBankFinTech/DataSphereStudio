@@ -69,7 +69,7 @@ public class NodeConverter {
                 addLine.accept("FLOW_PROPERTIES", DSSCommonUtils.COMMON_GSON.toJson(workflow.getFlowProperties()));
             }
             String executionScript = String.join(" ", "sh",
-                    DSS_DOLPHINSCHEDULER_CLIENT_HOME.getValue() + "/dss-dolphinscheduler-client.sh",
+                    DSS_DOLPHINSCHEDULER_CLIENT_HOME.getValue() + "/bin/dss-dolphinscheduler-client.sh",
                     nodeStr);
             scriptList.add(executionScript);
             taskParams.setRawScript(String.join("\n", scriptList));

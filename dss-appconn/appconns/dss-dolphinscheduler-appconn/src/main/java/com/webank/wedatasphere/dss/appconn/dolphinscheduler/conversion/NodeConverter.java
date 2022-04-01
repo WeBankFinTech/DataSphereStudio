@@ -10,6 +10,7 @@ import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.Orchestra
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.linkis.common.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,7 @@ public class NodeConverter {
             addLine.accept("JOB_RESOURCES", DSSCommonUtils.COMMON_GSON.toJson(dssNode.getResources()));
             addLine.accept("JOB_SOURCE", DSSCommonUtils.COMMON_GSON.toJson(sourceMap));
             addLine.accept("CONTEXT_ID", workflow.getContextID());
-            addLine.accept("LINKIS_GATEWAY_URL", ref.getWorkspace().getDssUrl());
+            addLine.accept("LINKIS_GATEWAY_URL", Configuration.getGateWayURL());
             addLine.accept("RUN_DATE", "${system.biz.date}");
             if(CollectionUtils.isNotEmpty(workflow.getFlowResources())) {
                 addLine.accept("FLOW_RESOURCES", DSSCommonUtils.COMMON_GSON.toJson(workflow.getFlowResources()));

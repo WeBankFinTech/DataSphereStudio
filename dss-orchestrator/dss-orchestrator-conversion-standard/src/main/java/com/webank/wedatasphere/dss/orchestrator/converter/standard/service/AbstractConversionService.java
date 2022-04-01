@@ -44,7 +44,6 @@ public abstract class AbstractConversionService extends AppSingletonIntegrationS
     @Override
     protected void initOperation(ConversionOperation operation) {
         operation.setConversionService(this);
-        operation.init();
     }
 
     @Override

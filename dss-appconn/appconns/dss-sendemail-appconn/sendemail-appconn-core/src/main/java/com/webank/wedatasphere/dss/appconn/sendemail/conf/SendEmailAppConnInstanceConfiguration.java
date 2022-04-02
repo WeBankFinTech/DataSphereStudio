@@ -49,9 +49,15 @@ public class SendEmailAppConnInstanceConfiguration {
     private static final SendEmailRefExecutionHook[] sendEmailRefExecutionHooks = createSendEmailRefExecutionHooks();
 
     private static EmailSender createEmailSender() {
-        EmailSender emailSender = AppStandardClassUtils.getInstance("sendemail").getInstanceOrDefault(EmailSender.class, new SpringJavaEmailSender());
-        logger.info("Try to use {} to instance a EmailSender.", emailSender.getClass().getSimpleName());
-        return emailSender;
+        String emailSenderClassName = "com.webank.wedatasphere.dss.appconn.sendemail.email.sender.EsbEmailSender";
+        try {
+            logger.info("Use user config EmailSender by conf:{}", emailSenderClassName);
+            return (EmailSender)SendEmailAppConnInstanceConfiguration.class.getClassLoader().loadClass(emailSenderClassName).newInstance();
+            // return  (EmailSender) ClassUtils.getClassInstance(emailSenderClass);
+        } catch (Exception e) {
+            logger.warn("{} can not be instanced, use SpringJavaEmailSender by default.", emailSenderClassName, e);
+            return new SpringJavaEmailSender();
+        }
     }
 
     private static EmailContentGenerator[] createEmailContentGenerators() {

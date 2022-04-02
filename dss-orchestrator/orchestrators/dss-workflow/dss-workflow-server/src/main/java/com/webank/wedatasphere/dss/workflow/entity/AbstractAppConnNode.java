@@ -24,7 +24,7 @@ public abstract class AbstractAppConnNode {
 
     private String projectName;
 
-    private long projectId;
+    private Long projectId;
 
     private String flowName;
 
@@ -67,7 +67,7 @@ public abstract class AbstractAppConnNode {
         this.projectName = projectName;
     }
 
-    public void setProjectId(long projectId) {
+    public void setProjectId(Long projectId) {
         this.projectId = projectId;
     }
 
@@ -111,7 +111,7 @@ public abstract class AbstractAppConnNode {
     }
 
 
-    public long getProjectId() {
+    public Long getProjectId() {
         return this.projectId;
     }
 

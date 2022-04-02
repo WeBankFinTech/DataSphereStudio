@@ -44,7 +44,7 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
         DolphinSchedulerWorkflow dolphinSchedulerWorkflow = new DolphinSchedulerWorkflow();
         Workflow workflow = dolphinSchedulerConvertedRel.getWorkflow();
         try {
-            BeanUtils.copyProperties(dolphinSchedulerWorkflow, workflow);
+            BeanUtils.copyProperties(workflow, dolphinSchedulerWorkflow);
         } catch (Exception e) {
             throw new DSSRuntimeException(91500, "Copy workflow fields failed!", e);
         }

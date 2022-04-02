@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.*;
+import java.nio.file.Paths;
 
 
 @Component
@@ -65,7 +66,7 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
 
     @Override
     public String getAppConnHome(AppConnInfo appConnInfo) {
-        return AppConnUtils.getAppConnHomePath();
+        return Paths.get(AppConnUtils.getAppConnHomePath(), appConnInfo.getAppConnName()).toFile().getPath();
     }
 
     @Override

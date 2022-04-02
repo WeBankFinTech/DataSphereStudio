@@ -99,7 +99,8 @@ class DSSGatewayParser extends AbstractGatewayParser {
     var requestUrlLabels = gatewayContext.getRequest.getQueryParams.getOrDefault(DSSGatewayConfiguration.DSS_URL_LABEL_PREFIX.getValue, null)
     if(requestUrlLabels == null) requestUrlLabels = gatewayContext.getRequest.getQueryParams.getOrDefault(DSSGatewayConfiguration.DSS_URL_ROUTE_LABEL_PREFIX.getValue,null)
     logger.info("Get ServiceName From  Label and method is "+ gatewayContext.getRequest.getMethod.toString+",and urlLabels is "+requestUrlLabels)
-    if (requestUrlLabels == null && gatewayContext.getRequest.getMethod.equalsIgnoreCase("post")) {
+    val requestMethod = gatewayContext.getRequest.getMethod.toLowerCase
+    if (requestUrlLabels == null && (requestMethod.equals("post") || requestMethod.equals("put") || requestMethod.equals("delete"))) {
       val requestBody = Option(gatewayContext.getRequest.getRequestBody)
       val routeLabelList = new util.ArrayList[RouteLabel]()
 

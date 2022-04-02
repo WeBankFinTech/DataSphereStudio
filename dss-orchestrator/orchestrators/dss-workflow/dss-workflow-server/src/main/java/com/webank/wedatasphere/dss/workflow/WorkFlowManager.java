@@ -64,7 +64,7 @@ public interface WorkFlowManager {
      * @throws DSSErrorException
      */
     DSSFlow copyRootFlowWithSubFlows(String userName,
-                                     long rootFlowId,
+                                     Long rootFlowId,
                                      Workspace workspace,
                                      String projectName,
                                      String contextIdStr,

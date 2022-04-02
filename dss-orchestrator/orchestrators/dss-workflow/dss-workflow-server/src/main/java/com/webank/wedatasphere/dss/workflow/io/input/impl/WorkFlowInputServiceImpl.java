@@ -32,6 +32,7 @@ import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
@@ -139,8 +140,9 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 if(nodeType.contains("appjoint")){
                     nodeJsonMap.replace("jobType",nodeType.replace("appjoint","appconn"));
                 }
-                if ("workflow.subflow".equals(nodeType)) {
+                if ("workflow.subflow".equals(nodeType) && CollectionUtils.isNotEmpty(subflows)) {
                     String subFlowName = nodeJsonMap.get("title").toString();
+                    logger.info("subflows:{}", subflows);
                     List<DSSFlow> DSSFlowList = subflows.stream().filter(subflow ->
                             subflow.getName().equals(subFlowName)
                     ).collect(Collectors.toList());

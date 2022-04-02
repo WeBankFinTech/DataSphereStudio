@@ -95,10 +95,12 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
         val developmentIntegrationStandard = appConn.asInstanceOf[OnlyDevelopmentAppConn].getOrCreateDevelopmentStandard
         val refExecutionService = developmentIntegrationStandard.getRefExecutionService(appInstance)
         Utils.tryCatch {
+          val refJobContent = if (StringUtils.isNotBlank(code)) BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]])
+          else engineExecutorContext.getProperties
           val responseRef = AppConnExecutionUtils.tryToOperation(refExecutionService, getValue(engineExecutorContext.getProperties, CONTEXT_ID_KEY),
             getValue(source, PROJECT_NAME_STR), new ExecutionRequestRefContextImpl(engineExecutorContext, userWithCreator),
             getLabels(labels), getValue(source, NODE_NAME_STR), getValue(engineExecutorContext.getProperties, NODE_TYPE),
-            userWithCreator.user, workspace, BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]]))
+            userWithCreator.user, workspace, refJobContent)
           responseRef match {
             case asyncResponseRef: AsyncExecutionResponseRef =>
               engineExecutorContext.getJobId match {

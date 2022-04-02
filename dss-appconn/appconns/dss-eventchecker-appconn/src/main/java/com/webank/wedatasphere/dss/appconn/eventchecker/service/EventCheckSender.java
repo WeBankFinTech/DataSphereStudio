@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
+import com.webank.wedatasphere.dss.appconn.eventchecker.execution.EventCheckerExecutionAction;
+import com.webank.wedatasphere.dss.appconn.eventchecker.utils.Utils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 
@@ -27,7 +29,10 @@ import java.util.Properties;
 
 public class EventCheckSender extends AbstractEventCheck {
 
-    public EventCheckSender(Properties props) {
+    EventCheckerExecutionAction backAction;
+
+    public EventCheckSender(Properties props,EventCheckerExecutionAction backAction) {
+        this.backAction = backAction;
         initECParams(props);
     }
 
@@ -57,6 +62,7 @@ public class EventCheckSender extends AbstractEventCheck {
                     log.error("Send msg failed for update database!");
                 }
             } catch (SQLException e) {
+                Utils.log(backAction,e);
                 throw new RuntimeException("Send EventChecker msg failed!" + e);
             } finally {
                 closeQueryStmt(pstmt, log);

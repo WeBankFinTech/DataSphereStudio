@@ -18,6 +18,8 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
 
 
+import com.webank.wedatasphere.dss.appconn.eventchecker.execution.EventCheckerExecutionAction;
+import com.webank.wedatasphere.dss.appconn.eventchecker.utils.Utils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 
@@ -28,13 +30,16 @@ import java.util.Date;
 import java.util.Properties;
 
 public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
+
+    EventCheckerExecutionAction backAction;
     String todayStartTime;
     String todayEndTime;
     String allStartTime;
     String allEndTime;
     String nowStartTime;
 
-    public DefaultEventcheckReceiver(Properties props) {
+    public DefaultEventcheckReceiver(Properties props, EventCheckerExecutionAction backAction) {
+        this.backAction = backAction;
         initECParams(props);
         initReceiverTimes();
     }
@@ -51,18 +56,19 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
     public boolean reciveMsg(int jobId, Properties props, Logger log) {
         boolean result = false;
         try{
-            String lastMsgId = getOffset(jobId,props,log);
+            String lastMsgId = getOffset(jobId,props,log,backAction);
             String[] executeType = createExecuteType(jobId,props,log,lastMsgId);
             if(executeType!=null && executeType.length ==3){
-                String[] consumedMsgInfo = getMsg(props, log,executeType);
+                String[] consumedMsgInfo = getMsg(props, log,backAction,executeType);
                 if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){
-                    result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId);
+                    result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId,backAction);
                 }
             }else{
                 log.error("executeType error {} " + executeType.toString());
                 return result;
             }
         }catch (Exception e){
+            Utils.log(backAction,e);
             log.error("EventChecker failed to receive the message {}" + e);
             return result;
         }
@@ -104,6 +110,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
                 }
             }
         }catch(Exception e){
+            Utils.log(backAction,e);
             log.error("create executeType failed {}" + e);
         }
         return executeType;
@@ -117,6 +124,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
         try {
             targetWaitTime = fmt.parse(formatWaitForTime);
         } catch (ParseException e) {
+            Utils.log(backAction,e);
             log.error("parse date failed {}" + e);
         }
 
@@ -129,6 +137,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
                 try {
                     Thread.sleep(wt);
                 } catch (InterruptedException e) {
+                    Utils.log(backAction,e);
                     throw new RuntimeException("EventChecker throws an exception during the waiting time {}"+e);
                 }
             }else{

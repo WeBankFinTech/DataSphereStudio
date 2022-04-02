@@ -184,9 +184,10 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                                          OrchestratorConversionJob job,
                                          RequestFrameworkConvertOrchestration requestConversionOrchestration) {
         LOGGER.info("{} completed with status {}.", job.getId(), response.getJobStatus());
-        if(response.isSucceed()) {
+        if (response.isSucceed()) {
             //1. 进行导出,用于升级版本,目的是为了复用原来的代码
             List<Long> orcIdList = job.getConversionJobEntity().getOrcIdList();
+            LOGGER.info("the orcIdList is:{}", orcIdList);
             // 开发环境才新增版本号
             if(DSSLabelUtil.isDevEnv(job.getConversionJobEntity().getLabels())){
                 orcIdList.forEach(DSSExceptionUtils.handling(orcId -> {

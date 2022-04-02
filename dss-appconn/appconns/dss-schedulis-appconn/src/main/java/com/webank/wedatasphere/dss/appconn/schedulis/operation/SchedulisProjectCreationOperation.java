@@ -57,7 +57,7 @@ public class SchedulisProjectCreationOperation
     @Override
     public ProjectResponseRef createProject(DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
         logger.info("begin to create project in schedulis, project name is {}.", requestRef.getDSSProject().getName());
-        if(CollectionUtils.isNotEmpty(requestRef.getReleaseUsers())) {
+        if (CollectionUtils.isNotEmpty(requestRef.getReleaseUsers())) {
             // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
             requestRef.getReleaseUsers().forEach(releaseUser -> {
                 if (!AzkabanUserService.containsReleaseUser(releaseUser, getBaseUrl(), ssoRequestOperation, requestRef.getWorkspace())) {
@@ -82,7 +82,7 @@ public class SchedulisProjectCreationOperation
         }
         Long projectId = null;
         try {
-            projectId = getSchedulisProjectId(requestRef.getName(), requestRef);
+            projectId = getSchedulisProjectId(requestRef.getDSSProject().getName(), requestRef);
         } catch (Exception e) {
             DSSExceptionUtils.dealWarnException(60051, "failed to get project id.", e,
                     ExternalOperationFailedException.class);
@@ -105,7 +105,7 @@ public class SchedulisProjectCreationOperation
             String content = SchedulisHttpUtils.getHttpGetResult(this.managerUrl, params, ssoRequestOperation, requestRef.getWorkspace());
             logger.info("Get Schedulis project id return str is {}.", content);
             Map map = DSSCommonUtils.COMMON_GSON.fromJson(content, Map.class);
-            projectId = (long) map.get("projectId");
+            projectId = DSSCommonUtils.parseToLong(map.get("projectId"));
         } catch (final Throwable t) {
             DSSExceptionUtils.dealWarnException(60051, "failed to fetch project id in schedulis.", t,
                     ExternalOperationFailedException.class);

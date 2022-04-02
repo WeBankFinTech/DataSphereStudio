@@ -115,6 +115,7 @@ public class NodeInputServiceImpl implements NodeInputService {
         appConnNode.setContextId(flowContextId);
 
         Map<String, Object> nodeExportContent = null;
+        logger.info("nodeResourcePath:{}", nodeResourcePath);
         File file = new File(nodeResourcePath);
         if (file.exists()) {
             InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);

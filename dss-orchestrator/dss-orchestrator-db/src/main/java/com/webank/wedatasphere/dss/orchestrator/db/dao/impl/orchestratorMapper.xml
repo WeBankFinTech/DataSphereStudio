@@ -60,9 +60,9 @@
             <if test="desc != null">`desc`=#{desc},</if>
             <if test="appConnName != null">`appconn_name`=#{appConnName},</if>
             <if test="uses != null">`uses`=#{uses},</if>
-            <if test="secondaryType != null">`secondary_type`=#{secondaryType}</if>
-            <if test="updateUser !=null">`update_user`=#{updateUser}</if>
-            <if test="updateTime !=null">`update_time`=#{updateTime}</if>
+            <if test="secondaryType != null">`secondary_type`=#{secondaryType},</if>
+            <if test="updateUser != null">`update_user`=#{updateUser},</if>
+            <if test="updateTime != null">`update_time`=#{updateTime},</if>
         </trim>
         WHERE id = #{id}
     </update>
@@ -222,7 +222,8 @@
         </where>
     </select>
 
-    <select id="getRefOrchestrationId" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration">
+    <select id="getRefOrchestrationId"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration">
         select *
         from dss_orchestrator_ref_orchestration_relation
         where orchestrator_id = #{orchestratorId}

@@ -30,12 +30,12 @@ public class SchedulisProjectSearchOperation
             logger.info("responseBody from Schedulis is: {}.", responseBody);
             Map map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
             String errorInfo = (String) map.get("error");
-            if (errorInfo != null && errorInfo.contains("Project " + requestRef.getName() + " doesn't exist")) {
+            if (errorInfo != null && errorInfo.contains("Project " + requestRef.getProjectName() + " doesn't exist")) {
                 return ProjectResponseRef.newExternalBuilder().success();
-            } else if(errorInfo != null) {
+            } else if (errorInfo != null) {
                 return ProjectResponseRef.newExternalBuilder().error(errorInfo);
             }
-            return ProjectResponseRef.newExternalBuilder().setRefProjectId((Long) map.get("projectId")).success();
+            return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(map.get("projectId"))).success();
         } catch (Exception e) {
             throw new ExternalOperationFailedException(90117, "Failed to search Schedulis project name!", e);
         }

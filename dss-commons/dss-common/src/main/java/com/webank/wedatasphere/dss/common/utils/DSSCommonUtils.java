@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.utils.JsonUtils;
 
@@ -31,7 +32,6 @@ public class DSSCommonUtils {
     public static final String FLOW_EDGES_NAME = "edges";
 
     public static final String FLOW_PARENT_NAME = "parent";
-
 
     public static final String NODE_RESOURCE_NAME = "resources";
 
@@ -48,7 +48,7 @@ public class DSSCommonUtils {
 
     public static final Gson COMMON_GSON = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").serializeNulls()
             .registerTypeAdapter(Double.class, (JsonSerializer<Double>) (t, type, jsonSerializationContext) -> {
-                if(t == t.longValue()) {
+                if (t == t.longValue()) {
                     return new JsonPrimitive(t.longValue());
                 } else {
                     return new JsonPrimitive(t);
@@ -62,5 +62,18 @@ public class DSSCommonUtils {
     public static final String DSS_LABELS_KEY = "labels";
 
     public static final CommonVars<String> DSS_HOME = CommonVars.apply("DSS_HOME", "");
-    
+
+    public static long parseToLong(Object val) {
+        if (val instanceof Double) {
+            return ((Double) val).longValue();
+        } else if (val instanceof Integer) {
+            return new Double((Integer) val).longValue();
+        } else if (val instanceof Long) {
+            return (Long) val;
+        } else if (val != null) {
+            return Long.parseLong(val.toString());
+        }
+        throw new DSSRuntimeException(90322, "parse the return of externalSystem failed, the value is null.");
+    }
+
 }

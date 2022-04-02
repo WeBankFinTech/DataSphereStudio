@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.migrate.restful;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -39,14 +40,10 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -314,6 +311,7 @@ public class DSSMigrateRestful {
             request.setApplicationArea(DEFAULT_PROJECT_AREA);
             request.setWorkspaceId(workspaceId);
             request.setWorkspaceName(workspace.getWorkspaceName());
+            request.setDescription("dss auto test.");
 
             Map<String, Object> userMap = BDPJettyServerHelper.gson().fromJson(projectUserJson, HashMap.class);
             Set<String> accessUsers = new HashSet<>(1);
@@ -396,11 +394,11 @@ public class DSSMigrateRestful {
     @PostMapping("/exportallflow")
     public Message exportAllFlowInProject(HttpServletRequest req,
                                           HttpServletResponse response,
-                                          JsonNode json) throws Exception {
+                                          @RequestBody JsonNode json) throws Exception {
         String username = SecurityFilter.getLoginUsername(req);
-        String workspaceName = json.get("workspaceName").getTextValue();
-        String projectName = json.get("projectName").getTextValue();
-        String pathRoot = json.get("pathRoot").getTextValue();
+        String workspaceName = json.get("workspaceName").textValue();
+        String projectName = json.get("projectName").textValue();
+        String pathRoot = json.get("pathRoot").textValue();
 
         // 1，获取项目下所有的工作流
         // 获取工作空间id，没有就报错

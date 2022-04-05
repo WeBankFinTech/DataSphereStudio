@@ -25,12 +25,11 @@
         <result property="label" column="label"/>
         <result property="url" column="url"/>
         <result property="enhanceJson" column="enhance_json"/>
-        <result property="homepageUrl" column="homepage_url"/>
-        <result property="redirectUrl" column="redirect_url"/>
+        <result property="homepageUri" column="homepage_uri"/>
     </resultMap>
 
     <sql id="fields_query">
-        `id`, `appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`
+        `id`, `appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`
     </sql>
 
     <select id="getAppInstancesByAppConnId" resultMap="AppInstanceMap">

@@ -24,8 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -52,7 +51,6 @@ public class AppDescImpl implements AppDesc {
 
     @Override
     public List<AppInstance> getAppInstancesByLabels(List<DSSLabel> labels) throws NoSuchAppInstanceException{
-        // todo~！
         // 1. 通过用户自定义的比较器完成的排序，返回最前一个appInstance
         // 2. 返回与labels完全匹配的appInstance
         AppInstance targetAppInstance = null;
@@ -77,38 +75,25 @@ public class AppDescImpl implements AppDesc {
         }
         // if all the labels is different form the target, then return null.
         if(maxSimilarity <= 0) {
-            LOG.error("{} has no such AppInstance machs the labels: {}", appName, labels);
+            LOG.error("{} has no such AppInstance machs the labels: {}.", appName, labels);
             throw new NoSuchAppInstanceException(60002, "No such AppInstance machs the labels.");
         }
-        return Arrays.asList(targetAppInstance);
+        return Collections.singletonList(targetAppInstance);
     }
 
-    //判断两个label是否相等
-    public boolean isEqualLabel(DSSLabel userLabel,DSSLabel label){
-        boolean flag = false;
-
-        DSSLabel tempUserLabel = (DSSLabel) userLabel;
-        String userEnv = tempUserLabel.getValue().get(tempUserLabel.getLabelKey());
-
-        DSSLabel tempLabel = (DSSLabel) label;
-        String instanceEnv = tempLabel.getValue().get(tempLabel.getLabelKey());
-
-        if (StringUtils.isNotBlank(userEnv) && userEnv.equalsIgnoreCase(instanceEnv)) {
-            flag = true;
-        }
-        return flag;
+    /**
+     * 判断两个label是否相等
+     */
+    public boolean isEqualLabel(DSSLabel userLabel, DSSLabel label){
+        String userEnv = userLabel.getValue().get(userLabel.getLabelKey());
+        String instanceEnv = label.getValue().get(label.getLabelKey());
+        return StringUtils.isNotBlank(userEnv) && userEnv.equalsIgnoreCase(instanceEnv);
     }
 
-    public List<AppInstance> getAppInstancesByLabels(List<DSSLabel> labels, Comparator comparator) {
-        return null;
-    }
-
-    @Override
     public void addAppInstance(AppInstance appInstance) {
         appInstances.add(appInstance);
     }
 
-    @Override
     public void removeAppInstance(AppInstance appInstance) {
         appInstances.remove(appInstance);
     }

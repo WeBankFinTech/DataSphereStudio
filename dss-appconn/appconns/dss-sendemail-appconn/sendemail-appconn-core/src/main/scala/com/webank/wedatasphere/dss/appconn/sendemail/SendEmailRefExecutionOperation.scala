@@ -16,10 +16,9 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail
 
-import java.util.Properties
+import java.util
 
 import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnInstanceConfiguration
-import com.webank.wedatasphere.dss.appconn.sendemail.email.sender.SpringJavaEmailSender
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{ExecutionResponseRef, RefExecutionRequestRef}
 import com.webank.wedatasphere.dss.standard.app.development.operation.{AbstractDevelopmentOperation, RefExecutionOperation}
@@ -32,36 +31,25 @@ class SendEmailRefExecutionOperation
   extends AbstractDevelopmentOperation[RefExecutionRequestRef.RefExecutionRequestRefImpl, ResponseRef]
     with RefExecutionOperation[RefExecutionRequestRef.RefExecutionRequestRefImpl] {
 
-  val EMAIL_FROM_DEFAULT = "email.from.default"
-  val EMAIL_HOST = "email.host"
-  val EMAIL_USERNAME = "email.username"
-  val EMAIL_PASSWORD = "email.password"
-  val EMAIL_PORT = "email.port"
-  val EMAIL_PROTOCOL = "email.protocol"
-
   private val sendEmailAppConnHooks = SendEmailAppConnInstanceConfiguration.getSendEmailRefExecutionHooks
   private val emailContentParsers = SendEmailAppConnInstanceConfiguration.getEmailContentParsers
   private val emailContentGenerators = SendEmailAppConnInstanceConfiguration.getEmailContentGenerators
   private val emailGenerator = SendEmailAppConnInstanceConfiguration.getEmailGenerator
   private val emailSender = SendEmailAppConnInstanceConfiguration.getEmailSender
 
-  override def execute(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): ExecutionResponseRef = {
-    val instanceConfig = this.service.getAppInstance.getConfig
-    val properties = new Properties()
-    instanceConfig.foreach {
-      case (key: String, value: Object) =>
+
+  override def init(): Unit = {
+    super.init()
+    val properties = new util.HashMap[String, String]
+    service.getAppInstance.getConfig.foreach {
+      case (key: String, value: Object) if value != null =>
         properties.put(key, value.toString)
-    }
-    emailSender match {
-      case springJavaEmailSender: SpringJavaEmailSender =>
-        val javaMailSender = springJavaEmailSender.getJavaMailSender
-        javaMailSender.setHost(properties.getProperty(EMAIL_HOST))
-        javaMailSender.setPort(Integer.parseInt(properties.getProperty(EMAIL_PORT)))
-        javaMailSender.setUsername(properties.getProperty(EMAIL_USERNAME))
-        javaMailSender.setPassword(properties.getProperty(EMAIL_PASSWORD))
-        javaMailSender.setProtocol(properties.getProperty(EMAIL_PROTOCOL))
       case _ =>
     }
+    emailSender.init(properties)
+  }
+
+  override def execute(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): ExecutionResponseRef = {
     val email = Utils.tryCatch {
       sendEmailAppConnHooks.foreach(_.preGenerate(requestRef))
       val email = emailGenerator.generateEmail(requestRef)

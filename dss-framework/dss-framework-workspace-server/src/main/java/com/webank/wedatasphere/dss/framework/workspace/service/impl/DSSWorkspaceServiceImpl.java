@@ -20,33 +20,27 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuAppconnVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuAppconnVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSComponentRoleMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSMenuRoleMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceHomepageMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceInfoMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceMenuMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.WorkspaceMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.*;
 import com.webank.wedatasphere.dss.framework.workspace.exception.DSSWorkspaceDuplicateNameException;
 import com.webank.wedatasphere.dss.framework.workspace.service.*;
 import com.webank.wedatasphere.dss.framework.workspace.util.CommonRoleEnum;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.linkis.common.exception.ErrorException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.linkis.manager.label.entity.SerializableLabel;
+import org.apache.linkis.common.exception.ErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants.HOMEPAGE_URL;
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.DEFAULT_DEMO_WORKSPACE_NAME;
 
 @Service
@@ -522,51 +515,46 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     private List<WorkspaceMenuVo> getMenuAppInstances(List<WorkspaceMenuVo> menuVos, List<Long> userMenuApplicationId,
+                                                      DSSWorkspace workspace,
                                                       boolean isChinese) {
-        List<AppConn> appConns = AppConnManager.getAppConnManager().listAppConns();
         for (WorkspaceMenuVo menuVo : menuVos) {
             Long menuId = menuVo.getId();
             List<WorkspaceMenuAppconnVo> menuAppconns = isChinese ? workspaceMapper.getMenuAppInstancesCn(menuId) : workspaceMapper.getMenuAppInstancesEn(menuId);
             for (WorkspaceMenuAppconnVo menuAppconn : menuAppconns) {
                 // 如果该工作空间中用户拥有该组件权限，则该组件的accessable属性为true；否则为false
                 menuAppconn.setAccessable(userMenuApplicationId.contains(menuAppconn.getId()));
-//                Map<String, String> nameAndUrl = new HashMap<>();
-                appConns.forEach(appConn -> {
-                    if (appConn.getAppDesc().getAppName().equalsIgnoreCase(menuAppconn.getName())) {
-                        List<DSSApplicationBean> instanceList = new ArrayList<>();
-                        //社区版appconn的instance数为1
-                        boolean isCommunity = appConn.getAppDesc().getAppInstances().size() <= 1;
-                        appConn.getAppDesc().getAppInstances().forEach(appInstance -> {
-//                                nameAndUrl.put("进入开发中心", appInstance.getBaseUrl());
-                            String label = String.join(",", appInstance.getLabels().stream()
-                                    .map(l -> ((EnvDSSLabel) l).getEnv()).toArray(String[]::new));
-                            String env = ((EnvDSSLabel) appInstance.getLabels().get(0)).getEnv();
-                            String selectedName = menuAppconn.getName();
-                            if (!isCommunity) {
-                                selectedName = env.equalsIgnoreCase("dev") ? "进入开发中心" : "进入生产中心";
-                            }
-                            Object homepageUrl = appInstance.getConfig().get(HOMEPAGE_URL);
-                            instanceList.add(new DSSApplicationBean(selectedName, appInstance.getBaseUrl(),
-                                    homepageUrl == null ? "" : homepageUrl.toString(), label));
-                        });
-                        menuAppconn.setAppInstances(instanceList);
-                    }
+                AppConn appConn = AppConnManager.getAppConnManager().getAppConn(menuAppconn.getName());
+                List<DSSApplicationBean> instanceList = new ArrayList<>();
+                appConn.getAppDesc().getAppInstances().forEach(appInstance -> {
+                    String label = String.join(",", appInstance.getLabels().stream()
+                            .map(l -> ((EnvDSSLabel) l).getEnv()).toArray(String[]::new));
+                    String selectedName = getAppInstanceTitle(appConn, appInstance, isChinese);
+                    String homepageUri = AppInstanceConstants.getHomepageUrl(appInstance, (long) workspace.getId(), workspace.getName());
+                    instanceList.add(new DSSApplicationBean(selectedName, appInstance.getBaseUrl(),
+                            homepageUri, label));
                 });
-//                if (nameAndUrl.size() == 0) {
-//                    nameAndUrl.put(menuAppconn.getAccessButton(), menuAppconn.getAccessButtonUrl());
-//                }
-//                menuAppconn.setNameAndUrls(nameAndUrl);
+                menuAppconn.setAppInstances(instanceList);
             }
             menuVo.setAppconns(menuAppconns);
         }
         return menuVos;
     }
 
+    protected String getAppInstanceTitle(AppConn appConn, AppInstance appInstance, boolean isChinese) {
+        if(isChinese) {
+            return "进入 " + appConn.getAppDesc().getAppName();
+        } else {
+            return "Enter " + appConn.getAppDesc().getAppName();
+        }
+    }
+
     @Override
-    public List<WorkspaceMenuVo> getWorkspaceApplications(Long workspaceId, String username, boolean isChinese) {
+    public List<WorkspaceMenuVo> getWorkspaceApplications(Long workspaceId, String username,
+                                                          boolean isChinese) throws DSSErrorException {
+        DSSWorkspace dssWorkspace = getWorkspacesById(workspaceId, username);
         List<WorkspaceMenuVo> applicationMenuVos = isChinese ? workspaceMapper.getApplicationMenuCn() : workspaceMapper.getApplicationMenuEn();
         List<Long> userMenuApplicationId = dssWorkspaceMapper.getUserMenuApplicationId(username, workspaceId);
-        return getMenuAppInstances(applicationMenuVos, userMenuApplicationId, isChinese);
+        return getMenuAppInstances(applicationMenuVos, userMenuApplicationId, dssWorkspace, isChinese);
     }
 
     @Override

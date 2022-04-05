@@ -16,12 +16,36 @@
 
 package com.webank.wedatasphere.dss.appconn.manager.utils;
 
-public class AppInstanceConstants {
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import org.apache.commons.lang.StringUtils;
 
-    public static final String REDIRECT_URL = "redirectUrl";
-    public static final String HOMEPAGE_URL = "homepageUrl";
+public class AppInstanceConstants {
 
     static final String INDEX_FILE_PREFIX = "index_";
     static final String INDEX_FILE_SUFFIX = ".index";
+
+    public static String getHomepageUrl(AppInstance appInstance,
+                                        Long workspaceId, String workspaceName) {
+        return getHomepageUrl(appInstance.getBaseUrl(), appInstance.getHomepageUri(),
+                workspaceId, workspaceName);
+    }
+
+    public static String getHomepageUrl(String baseUrl, String homepageUri,
+                                        Long workspaceId, String workspaceName) {
+        if(StringUtils.isBlank(homepageUri)) {
+            return baseUrl;
+        }
+        if(workspaceId != null && homepageUri.contains("${workspaceId}")) {
+            homepageUri = homepageUri.replace("${workspaceId}", workspaceId.toString());
+        }
+        if(StringUtils.isNotBlank(workspaceName) && homepageUri.contains("${workspaceName}")) {
+            homepageUri = homepageUri.replace("${workspaceName}", workspaceName);
+        }
+        if(baseUrl.endsWith("/")) {
+            return baseUrl + homepageUri;
+        } else {
+            return baseUrl + "/" + homepageUri;
+        }
+    }
 
 }

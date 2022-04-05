@@ -21,29 +21,9 @@ CREATE TABLE `dss_appconn_instance` (
   `label` varchar(128) NOT NULL COMMENT '实例的标签',
   `url` varchar(128) DEFAULT NULL COMMENT '访问第三方的url',
   `enhance_json` varchar(1024) DEFAULT NULL COMMENT 'json格式的配置',
-  `homepage_url` varchar(255) DEFAULT NULL COMMENT '主页url',
-  `redirect_url` varchar(255) DEFAULT NULL COMMENT '重定向url',
+  `homepage_uri` varchar(255) DEFAULT NULL COMMENT '主页uri，非URL',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='dss instance的实例表';
-
-
--- wait for delete
-DROP TABLE IF EXISTS `dss_application`;
-CREATE TABLE `dss_application` (
-  `id` int(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) DEFAULT NULL,
-  `url` varchar(128) DEFAULT NULL,
-  `is_user_need_init` tinyint(1) DEFAULT NULL,
-  `level` int(8) DEFAULT NULL,
-  `user_init_url` varchar(255) DEFAULT NULL,
-  `exists_project_service` tinyint(1) DEFAULT NULL,
-  `project_url` varchar(255) DEFAULT NULL,
-  `enhance_json` varchar(255) DEFAULT NULL,
-  `if_iframe` tinyint(1) DEFAULT NULL,
-  `homepage_url` varchar(255) DEFAULT NULL,
-  `redirect_url` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 
 
 ---------------------------------------------------------------------

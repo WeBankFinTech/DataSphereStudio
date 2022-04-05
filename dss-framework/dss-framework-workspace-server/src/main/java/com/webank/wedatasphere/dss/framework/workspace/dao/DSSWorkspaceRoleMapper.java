@@ -47,11 +47,12 @@ public interface DSSWorkspaceRoleMapper {
     List<DSSWorkspaceMenu> getOnestopMenus();
 
 
-    @Select("select a.id id, a.appconn_name name, b.homepage_url homepage_url, b.label label from dss_appconn a join dss_appconn_instance b on a.id=b.appconn_id")
+    @Select("select a.id id, a.appconn_name name,b.url url, b.homepage_uri homepage_uri, b.label label from dss_appconn a join dss_appconn_instance b on a.id=b.appconn_id")
     @Results(value = {
             @Result(property = "id", column = "id"),
             @Result(property = "name", column = "name"),
-            @Result(property = "homepageUrl", column = "homepage_url"),
+            @Result(property = "url", column = "url"),
+            @Result(property = "homepageUri", column = "homepage_uri"),
             @Result(property = "label", column = "label")
     })
     List<DSSApplicationBean> getDSSAppConns();

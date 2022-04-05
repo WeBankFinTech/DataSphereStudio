@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.appconn.entity;
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
+
 import java.io.Serializable;
 
 
@@ -29,8 +30,7 @@ public class AppInstanceBean implements AppInstanceInfo, Serializable {
     private String label;
     private String url;
     private String enhanceJson;
-    private String homepageUrl;
-    private String redirectUrl;
+    private String homepageUri;
 
     @Override
     public Long getId() {
@@ -41,7 +41,7 @@ public class AppInstanceBean implements AppInstanceInfo, Serializable {
         this.id = id;
     }
 
-    public Long getAppconnId() {
+    public Long getAppConnId() {
         return appConnId;
     }
 
@@ -76,26 +76,17 @@ public class AppInstanceBean implements AppInstanceInfo, Serializable {
     }
 
     @Override
-    public String getHomepageUrl() {
-        return homepageUrl;
+    public String getHomepageUri() {
+        return homepageUri;
     }
 
-    public void setHomepageUrl(String homepageUrl) {
-        this.homepageUrl = homepageUrl;
-    }
-
-    @Override
-    public String getRedirectUrl() {
-        return redirectUrl;
+    public void setHomepageUri(String homepageUri) {
+        this.homepageUri = homepageUri;
     }
 
     @Override
     public String getLabels() {
         return label;
-    }
-
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
     }
 
     @Override
@@ -105,6 +96,8 @@ public class AppInstanceBean implements AppInstanceInfo, Serializable {
                 ", appConnId=" + appConnId +
                 ", label='" + label + '\'' +
                 ", url='" + url + '\'' +
+                ", enhanceJson='" + enhanceJson + '\'' +
+                ", homepageUri='" + homepageUri + '\'' +
                 '}';
     }
 }

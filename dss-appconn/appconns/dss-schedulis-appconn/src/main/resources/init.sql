@@ -7,11 +7,7 @@ INSERT INTO `dss_appconn` (`appconn_name`, `is_user_need_init`, `level`, `if_ifr
 VALUES ('schedulis', 0, 1, NULL, 0, NULL, 'com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/schedulis/lib', '');
 
 select @dss_appconn_schedulisId:=id from `dss_appconn` where `appconn_name` = 'schedulis';
-insert into `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) values(@dss_appconn_schedulisId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/');
-
-delete from  `dss_application`  WHERE `name` ='schedulis';
-INSERT  INTO `dss_application`(`name`,`url`,`is_user_need_init`,`level`,`user_init_url`,`exists_project_service`,`project_url`,`enhance_json`,`if_iframe`,`homepage_url`,`redirect_url`)
-VALUES ('schedulis','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT',0,1,NULL,0,'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/manager?project=${projectName}','{\"scheduleHistory\":\"http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/manager?project=${projectName}&flow=${flowName}&hideHead=true#executions\"}',1,'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/homepage','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/api/v1/redirect');
+insert into `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`) values(@dss_appconn_schedulisId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','','');
 
 select @dss_schedulis_applicationId:=id from `dss_application` WHERE `name` ='schedulis';
 delete from  `dss_workspace_menu_appconn`  WHERE  title_en='Schedulis';

@@ -21,13 +21,16 @@ public class DSSApplicationBean {
     private Integer id;
     private String name;
     private String url;
-    private String homepageUrl;
+    private String homepageUri;
     private String label;
 
-    public DSSApplicationBean(String name, String url, String homepageUrl, String label) {
+    public DSSApplicationBean() {
+    }
+
+    public DSSApplicationBean(String name, String url, String homepageUri, String label) {
         this.name = name;
         this.url = url;
-        this.homepageUrl = homepageUrl;
+        this.homepageUri = homepageUri;
         this.label = label;
     }
 
@@ -47,12 +50,12 @@ public class DSSApplicationBean {
         this.name = name;
     }
 
-    public String getHomepageUrl() {
-        return homepageUrl;
+    public String getHomepageUri() {
+        return homepageUri;
     }
 
-    public void setHomepageUrl(String homepageUrl) {
-        this.homepageUrl = homepageUrl;
+    public void setHomepageUri(String homepageUri) {
+        this.homepageUri = homepageUri;
     }
 
     public String getLabel() {

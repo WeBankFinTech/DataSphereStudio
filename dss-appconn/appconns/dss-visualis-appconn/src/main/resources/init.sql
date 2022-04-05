@@ -1,10 +1,4 @@
 
-delete from  `dss_application`  WHERE `name` ='visualis';
-INSERT  INTO  `dss_application`(`name`,`url`,`is_user_need_init`,`level`,`user_init_url`,`exists_project_service`,`project_url`,`enhance_json`,`if_iframe`,`homepage_url`,`redirect_url`) VALUES ('visualis','',0,1,NULL,0,'','{\"watermark\":false,\"rsDownload\":true}',1,'',NULL);
-
-UPDATE `dss_application` SET url = 'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT' WHERE `name` ='visualis';
-UPDATE `dss_application` SET project_url = 'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/dss/visualis/#/project/${projectId}',homepage_url = 'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/dss/visualis/#/projects' WHERE `name` in('visualis');
-
 select @dss_visualis_applicationId:=id from `dss_application` WHERE `name` ='visualis';
 
 delete from  `dss_menu` WHERE `name` ='visualis';
@@ -19,8 +13,8 @@ INSERT INTO `dss_appconn` (`appconn_name`, `is_user_need_init`, `level`, `if_ifr
 
 select @dss_appconn_visualisId:=id from `dss_appconn` where `appconn_name` = 'visualis';
 
-delete from `dss_appconn_instance` where `homepage_url` like '%visualis%';
-INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_url`, `redirect_url`) VALUES (@dss_appconn_visualisId, 'DEV', 'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/', '', 'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/dss/visualis/#/projects', 'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/');
+delete from `dss_appconn_instance` where `homepage_uri` like '%visualis%';
+INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`) VALUES (@dss_appconn_visualisId, 'DEV', 'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/', '', 'dss/visualis/#/projects');
 
 
 delete from `dss_workflow_node`  where `node_type` like '%visualis%';

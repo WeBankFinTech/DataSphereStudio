@@ -28,14 +28,10 @@ public interface AppDesc {
     List<AppInstance> getAppInstances();
 
     /**
-     * 对于每个AppConn而言，会拥有多个AppInstance，如需要获取相应的AppInstance，
-     * 通过传入的labels来进行匹配。
-     * 返回的List实例，其中第0个是匹配程度最大的实例。
+     * 对于每个 AppConn 而言，允许拥有多个 AppInstance，如需要获取相应的 AppInstance，
+     * 通过传入的 labels 来与 AppInstance 的 getLabels() 所对应的 labels 来进行匹配。<br/>
+     * 返回的 List 实例，其中第0个是匹配程度最大的实例。
      * */
     List<AppInstance> getAppInstancesByLabels(List<DSSLabel> labels) throws NoSuchAppInstanceException;
-
-    void addAppInstance(AppInstance appInstance);
-
-    void removeAppInstance(AppInstance appInstance);
 
 }

@@ -24,7 +24,6 @@ import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnResourceService;
-import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -182,11 +181,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             }
         }
         appInstance.setConfig(config);
-        if(StringUtils.isNotBlank(appInstanceInfo.getRedirectUrl())) {
-            config.put(AppInstanceConstants.REDIRECT_URL, appInstanceInfo.getRedirectUrl());
-        }
-        if(StringUtils.isNotBlank(appInstanceInfo.getHomepageUrl())) {
-            config.put(AppInstanceConstants.HOMEPAGE_URL, appInstanceInfo.getHomepageUrl());
+        if(StringUtils.isNotBlank(appInstanceInfo.getHomepageUri())) {
+            appInstance.setHomepageUri(appInstanceInfo.getHomepageUri());
         }
         //TODO should use Linkis labelFactory to new labels.
         List<DSSLabel> labels = Arrays.stream(appInstanceInfo.getLabels().split(",")).map(EnvDSSLabel::new)

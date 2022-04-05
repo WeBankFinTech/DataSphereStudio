@@ -18,8 +18,8 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
@@ -34,7 +34,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
@@ -136,11 +139,17 @@ public class WorkspaceRestfulApi {
     }
 
     @RequestMapping(path = "workspaces/{workspaceId}/appconns", method = RequestMethod.GET)
-    public Message getWorkspaceAppconns(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
+    public Message getWorkspaceAppConns(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId) {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
-        List<WorkspaceMenuVo> appconns = dssWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
+        List<WorkspaceMenuVo> appconns;
+        try {
+            appconns = dssWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
+        } catch (DSSErrorException e) {
+            LOGGER.warn("{} get appconns from workspace {} failed.", username, workspaceId, e);
+            return Message.error(e);
+        }
         return Message.ok().data("menus", appconns);
     }
 

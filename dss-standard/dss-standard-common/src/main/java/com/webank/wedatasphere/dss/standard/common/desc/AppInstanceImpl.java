@@ -27,6 +27,7 @@ public class AppInstanceImpl implements AppInstance {
 
     private Long id;
     private String baseUrl;
+    private String homepageUri;
     private Map<String, Object> config;
     private List<DSSLabel> labels;
 
@@ -42,6 +43,15 @@ public class AppInstanceImpl implements AppInstance {
     @Override
     public String getBaseUrl() {
         return baseUrl;
+    }
+
+    @Override
+    public String getHomepageUri() {
+        return homepageUri;
+    }
+
+    public void setHomepageUri(String homepageUri) {
+        this.homepageUri = homepageUri;
     }
 
     public void setBaseUrl(String baseUrl) {

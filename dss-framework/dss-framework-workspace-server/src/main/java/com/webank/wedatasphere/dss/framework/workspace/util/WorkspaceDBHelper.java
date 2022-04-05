@@ -17,23 +17,20 @@
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
 
+import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
-import org.apache.linkis.common.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -96,10 +93,10 @@ public class WorkspaceDBHelper {
                     String developerUrl =
                             dssApplicationBeans.stream().
                                     filter(dssApplicationBean -> "workflow".equals(dssApplicationBean.getName().toLowerCase())).
-                                    findFirst().map(DSSApplicationBean::getHomepageUrl).orElse(defaultUrl);
+                                    findFirst().map(WorkspaceDBHelper.this::getHomepageUrl).orElse(defaultUrl);
                     String analyserUrl = dssApplicationBeans.stream().
                             filter(dssApplicationBean -> "linkis".equals(dssApplicationBean.getName().toLowerCase())).
-                            findFirst().map(DSSApplicationBean::getHomepageUrl).orElse(defaultUrl);
+                            findFirst().map(WorkspaceDBHelper.this::getHomepageUrl).orElse(defaultUrl);
                     dssHomepageNameMap.put("/workspace", "工作空间首页");
                     dssHomepageNameMap.put(developerUrl, "工作流开发");
                     dssHomepageNameMap.put(analyserUrl, "意书(Scriptis)");
@@ -107,6 +104,10 @@ public class WorkspaceDBHelper {
                 }
             }
         }, 1, 1, TimeUnit.MINUTES);
+    }
+
+    private String getHomepageUrl(DSSApplicationBean bean) {
+        return AppInstanceConstants.getHomepageUrl(bean.getUrl(), bean.getHomepageUri(), null, null);
     }
 
     public void retrieveFromDB() {
@@ -163,10 +164,10 @@ public class WorkspaceDBHelper {
         String developerUrl =
                 dssApplicationBeans.stream().
                         filter(dssApplicationBean -> "workflow".equals(dssApplicationBean.getName().toLowerCase())).
-                        findFirst().map(DSSApplicationBean::getHomepageUrl).orElse(defaultUrl);
+                        findFirst().map(this::getHomepageUrl).orElse(defaultUrl);
         String analyserUrl = dssApplicationBeans.stream().
                 filter(dssApplicationBean -> "linkis".equals(dssApplicationBean.getName().toLowerCase())).
-                findFirst().map(DSSApplicationBean::getHomepageUrl).orElse(defaultUrl);
+                findFirst().map(this::getHomepageUrl).orElse(defaultUrl);
         List<DSSWorkspaceHomepage> dssWorkspaceHomepages = new ArrayList<>();
         Date date = new Date(System.currentTimeMillis());
         dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 1, defaultUrl, date));

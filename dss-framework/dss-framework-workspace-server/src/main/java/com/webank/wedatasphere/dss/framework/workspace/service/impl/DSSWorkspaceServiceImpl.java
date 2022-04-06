@@ -514,7 +514,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return departments;
     }
 
-    private List<WorkspaceMenuVo> getMenuAppInstances(List<WorkspaceMenuVo> menuVos, List<Long> userMenuApplicationId,
+    private List<WorkspaceMenuVo> getMenuAppInstances(List<WorkspaceMenuVo> menuVos, List<Long> userMenuAppConnIds,
                                                       DSSWorkspace workspace,
                                                       boolean isChinese) {
         for (WorkspaceMenuVo menuVo : menuVos) {
@@ -522,7 +522,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             List<WorkspaceMenuAppconnVo> menuAppconns = isChinese ? workspaceMapper.getMenuAppInstancesCn(menuId) : workspaceMapper.getMenuAppInstancesEn(menuId);
             for (WorkspaceMenuAppconnVo menuAppconn : menuAppconns) {
                 // 如果该工作空间中用户拥有该组件权限，则该组件的accessable属性为true；否则为false
-                menuAppconn.setAccessable(userMenuApplicationId.contains(menuAppconn.getId()));
+                menuAppconn.setAccessable(userMenuAppConnIds.contains(menuAppconn.getId()));
                 AppConn appConn = AppConnManager.getAppConnManager().getAppConn(menuAppconn.getName());
                 List<DSSApplicationBean> instanceList = new ArrayList<>();
                 appConn.getAppDesc().getAppInstances().forEach(appInstance -> {
@@ -541,7 +541,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     protected String getAppInstanceTitle(AppConn appConn, AppInstance appInstance, boolean isChinese) {
-        if(isChinese) {
+        if (isChinese) {
             return "进入 " + appConn.getAppDesc().getAppName();
         } else {
             return "Enter " + appConn.getAppDesc().getAppName();
@@ -549,12 +549,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceMenuVo> getWorkspaceApplications(Long workspaceId, String username,
-                                                          boolean isChinese) throws DSSErrorException {
+    public List<WorkspaceMenuVo> getWorkspaceAppConns(Long workspaceId, String username,
+                                                      boolean isChinese) throws DSSErrorException {
         DSSWorkspace dssWorkspace = getWorkspacesById(workspaceId, username);
-        List<WorkspaceMenuVo> applicationMenuVos = isChinese ? workspaceMapper.getApplicationMenuCn() : workspaceMapper.getApplicationMenuEn();
-        List<Long> userMenuApplicationId = dssWorkspaceMapper.getUserMenuApplicationId(username, workspaceId);
-        return getMenuAppInstances(applicationMenuVos, userMenuApplicationId, dssWorkspace, isChinese);
+        List<WorkspaceMenuVo> appconnMenuVos = isChinese ? workspaceMapper.getAppConnMenuCn() : workspaceMapper.getAppConnMenuEn();
+        List<Long> userMenuAppConnId = dssWorkspaceMapper.getUserMenuAppConnId(username, workspaceId);
+        return getMenuAppInstances(appconnMenuVos, userMenuAppConnId, dssWorkspace, isChinese);
     }
 
     @Override
@@ -567,7 +567,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         DSSFavorite dssFavorite = new DSSFavorite();
         dssFavorite.setUsername(username);
         dssFavorite.setWorkspaceId(workspaceId);
-        dssFavorite.setMenuApplicationId(menuApplicationId);
+        dssFavorite.setMenuAppConnId(menuApplicationId);
         // todo: order will from the front end
         dssFavorite.setOrder(1);
         dssFavorite.setCreateBy(username);

@@ -145,7 +145,7 @@ public class WorkspaceRestfulApi {
         String username = SecurityFilter.getLoginUsername(req);
         List<WorkspaceMenuVo> appconns;
         try {
-            appconns = dssWorkspaceService.getWorkspaceApplications(workspaceId, username, isChinese);
+            appconns = dssWorkspaceService.getWorkspaceAppConns(workspaceId, username, isChinese);
         } catch (DSSErrorException e) {
             LOGGER.warn("{} get appconns from workspace {} failed.", username, workspaceId, e);
             return Message.error(e);
@@ -156,16 +156,6 @@ public class WorkspaceRestfulApi {
 
     @RequestMapping(path = "/workspaces/{workspaceId}/favorites", method = RequestMethod.GET)
     public Message getWorkspaceFavorites(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @RequestParam(value = "type", required = false) String type) {
-        String header = req.getHeader("Content-language").trim();
-        boolean isChinese = "zh-CN".equals(header);
-        String username = SecurityFilter.getLoginUsername(req);
-        List<WorkspaceFavoriteVo> favorites = dssWorkspaceService.getWorkspaceFavorites(workspaceId, username, isChinese, type == null ? "" : type);
-        Set<WorkspaceFavoriteVo> favoriteVos = new HashSet<>(favorites);
-        return Message.ok().data("favorites", favoriteVos);
-    }
-
-    @RequestMapping(path = "/workspaces/{workspaceId}/components", method = RequestMethod.GET)
-    public Message getWorkspaceComponent(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @RequestParam(value = "type", required = false) String type) {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);

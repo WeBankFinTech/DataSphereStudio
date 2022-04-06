@@ -86,7 +86,7 @@
 | [**Linkis**](https://github.com/apache/incubator-linkis) | 计算中间件 Apache Linkis，通过提供 REST/WebSocket/JDBC/SDK 等标准接口，上层应用可以方便地连接访问 MySQL/Spark/Hive/Presto/Flink 等底层引擎. | 推荐 Linkis0.11.0（**已发布**） | >= Linkis1.0.3（**已发布**） |
 | [**DataApiService**](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3/DataApiService%E4%BD%BF%E7%94%A8%E6%96%87%E6%A1%A3.md)  | （DSS已内置的第三方应用工具）数据API服务。可快速将SQL脚本发布为一个 Restful 接口，对外提供 Rest 访问能力。    | 不支持 | 推荐 DSS1.0.1（**已发布**）|
 | [**Scriptis**](https://github.com/WeBankFinTech/DataSphereStudio)   | （DSS 已内置的第三方应用工具）支持在线写 SQL、Pyspark、HiveQL 等脚本，提交给[Linkis](https://github.com/WeBankFinTech/Linkis)执行的数据分析 Web 工具。 | 推荐 DSS0.9.1（**已发布**） | 推荐 DSS1.0.1（**已发布**） |
-| [**Schedulis**](https://github.com/WeBankFinTech/Schedulis) | 基于 Azkaban 二次开发的工作流任务调度系统,具备高性能，高可用和多租户资源隔离等金融级特性。 | 推荐 Schedulis0.6.1（**已发布**） | >= Schedulis0.6.2（**开发中**） |
+| [**Schedulis**](https://github.com/WeBankFinTech/Schedulis) | 基于 Azkaban 二次开发的工作流任务调度系统,具备高性能，高可用和多租户资源隔离等金融级特性。 | 推荐 Schedulis0.6.1（**已发布**） | >= Schedulis0.6.2（**已发布**） |
 | **EventCheck**  | （DSS 已内置的第三方应用工具）提供跨业务、跨工程和跨工作流的信号通信能力。 | 推荐 DSS0.9.1（**已发布**） | 推荐 DSS1.0.1（**已发布**） |
 | **SendEmail**   | （DSS 已内置的第三方应用工具）提供数据发送能力，所有其他工作流节点的结果集，都可以通过邮件进行发送 | 推荐 DSS0.9.1（**已发布**） | 推荐 DSS1.0.1（**已发布**） |
 | [**Qualitis**](https://github.com/WeBankFinTech/Qualitis)   | 数据质量校验工具，提供数据完整性、正确性等数据校验能力 | 推荐 Qualitis0.8.0（**已发布**） | >= Qualitis0.9.0（**已发布**） |

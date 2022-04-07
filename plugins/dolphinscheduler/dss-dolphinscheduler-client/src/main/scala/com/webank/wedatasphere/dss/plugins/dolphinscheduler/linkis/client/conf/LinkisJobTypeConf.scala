@@ -28,6 +28,7 @@ object LinkisJobTypeConf {
   val JOB_PARAMS = "jobParams"
   val JOB_SOURCE = "jobSource"
   val JOB_RESOURCES = "jobResources"
+  val JOB_LABELS = "jobLabels"
 
   val FLOW_RESOURCES = "flowResources"
   val FLOW_PROPERTIES = "flowProperties"

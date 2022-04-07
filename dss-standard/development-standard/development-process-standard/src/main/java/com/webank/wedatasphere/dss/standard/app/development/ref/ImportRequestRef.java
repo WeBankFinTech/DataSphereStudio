@@ -30,9 +30,9 @@ public interface ImportRequestRef<R extends RefJobContentRequestRef<R>>
     /**
      * ResourceMap is the content of ExportRequestRef exported.
      * <br>
-     * Now, DSS only supports to import BML resources and one inputStream,
+     * Now, DSS only supports to import BML resources or one inputStream,
      * so when you want to use BML resources to import/export, the resourceMap must be
-     * consisted of `resourceId` and `version`; and if you want to use BML resources to
+     * consisted of `resourceId` and `version`; and if you want to use stream to
      * import/export, the resourceMap must be consisted of `inputStream` and `closeable`.
      * <br>
      * The `closeable` is remained field that if your inputStream comes from HttpClient,

@@ -43,8 +43,8 @@ public interface WorkspaceMapper {
     List<WorkspaceMenuVo> getManagementMenuCn();
     List<WorkspaceMenuVo> getManagementMenuEn();
 
-    List<WorkspaceMenuVo> getApplicationMenuCn();
-    List<WorkspaceMenuVo> getApplicationMenuEn();
+    List<WorkspaceMenuVo> getAppConnMenuCn();
+    List<WorkspaceMenuVo> getAppConnMenuEn();
 
     List<WorkspaceMenuAppconnVo> getMenuAppInstancesCn(Long id);
     List<WorkspaceMenuAppconnVo> getMenuAppInstancesEn(Long id);

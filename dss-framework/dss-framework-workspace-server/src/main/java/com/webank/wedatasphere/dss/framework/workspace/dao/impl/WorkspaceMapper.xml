@@ -154,28 +154,25 @@
 
     <select id="getWorkspaceFavoritesCn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo">
-        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId , name, url,
-        icon,
-        title_cn AS title
+        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId,
+        dss_appconn.appconn_name as name, icon, title_cn AS title
         FROM dss_workspace_user_favorites_appconn join dss_workspace_menu_appconn
         on dss_workspace_user_favorites_appconn.menu_appconn_id = dss_workspace_menu_appconn.id
-        join dss_application on dss_application.id = dss_workspace_menu_appconn.appconn_id
+        join dss_appconn on dss_appconn.id = dss_workspace_menu_appconn.appconn_id
         <where>
             (dss_workspace_user_favorites_appconn.`username` = #{username} and `workspace_id` = #{workspaceId}
             or `dss_workspace_user_favorites_appconn`.`workspace_id` = -1)
             AND type = #{type}
-
         </where>
     </select>
 
     <select id="getWorkspaceFavoritesEn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo">
-        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId, name, url,
-        icon,
-        title_en AS `title`
+        SELECT dss_workspace_user_favorites_appconn.id, dss_workspace_menu_appconn.id AS menuApplicationId,
+        dss_appconn.appconn_name as name, icon, title_en AS `title`
         FROM dss_workspace_user_favorites_appconn join dss_workspace_menu_appconn
         on dss_workspace_user_favorites_appconn.menu_appconn_id = dss_workspace_menu_appconn.id
-        join dss_application on dss_application.id = dss_workspace_menu_appconn.appconn_id
+        join dss_appconn on dss_appconn.id = dss_workspace_menu_appconn.appconn_id
         <where>
             dss_workspace_user_favorites_appconn.`username` = #{username} and `workspace_id` = #{workspaceId}
             AND type = #{type}

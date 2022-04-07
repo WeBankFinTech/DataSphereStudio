@@ -31,7 +31,7 @@ public interface DSSWorkspaceMapper {
 
     List<DSSWorkspace> getWorkspaces(String username);
 
-    List<Long> getUserMenuApplicationId(@Param("username")String username, @Param("workspaceId")Long workspaceId);
+    List<Long> getUserMenuAppConnId(@Param("username")String username, @Param("workspaceId")Long workspaceId);
     List<Integer> getMenuId(int roleId, String workspaceId);
 
     List<DSSWorkspaceMenuRolePriv> getDSSWorkspaceMenuPriv(String workspaceId);

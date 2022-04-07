@@ -3,7 +3,9 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conversion;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerConvertedRel;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
+import com.webank.wedatasphere.dss.appconn.scheduler.utils.SchedulerConf;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.OrchestrationToRelConversionRequestRef;
@@ -53,20 +55,29 @@ public class NodeConverter {
         try {
             List<String> scriptList = new ArrayList<>();
             BiConsumer<String, String> addLine = (key, value) -> scriptList.add(String.format("export %s=\"%s\"", key, value));
+            BiConsumer<String, Object> addObjectLine = (key, value) -> {
+                if(value == null) {
+                    return;
+                }
+                String valueStr = DSSCommonUtils.COMMON_GSON.toJson(value);
+                valueStr = valueStr.replaceAll("\"", "\\\"");
+                addLine.accept(key, valueStr);
+            };
             addLine.accept("LINKIS_TYPE", dssNode.getNodeType());
             addLine.accept("PROXY_USER", dssNode.getUserProxy());
-            addLine.accept("JOB_COMMAND", DSSCommonUtils.COMMON_GSON.toJson(dssNode.getJobContent())+"\"");
-            addLine.accept("JOB_PARAMS", DSSCommonUtils.COMMON_GSON.toJson(dssNode.getParams()));
-            addLine.accept("JOB_RESOURCES", DSSCommonUtils.COMMON_GSON.toJson(dssNode.getResources()));
-            addLine.accept("JOB_SOURCE", DSSCommonUtils.COMMON_GSON.toJson(sourceMap));
+            addObjectLine.accept("JOB_COMMAND", dssNode.getJobContent());
+            addObjectLine.accept("JOB_PARAMS", dssNode.getParams());
+            addObjectLine.accept("JOB_RESOURCES", dssNode.getResources());
+            addObjectLine.accept("JOB_SOURCE", sourceMap);
             addLine.accept("CONTEXT_ID", workflow.getContextID());
             addLine.accept("LINKIS_GATEWAY_URL", Configuration.getGateWayURL());
             addLine.accept("RUN_DATE", "${system.biz.date}");
+            addObjectLine.accept("JOB_LABELS", new EnvDSSLabel(SchedulerConf.JOB_LABEL.getValue()).getValue());
             if(CollectionUtils.isNotEmpty(workflow.getFlowResources())) {
-                addLine.accept("FLOW_RESOURCES", DSSCommonUtils.COMMON_GSON.toJson(workflow.getFlowResources()));
+                addObjectLine.accept("FLOW_RESOURCES", workflow.getFlowResources());
             }
             if(CollectionUtils.isNotEmpty(workflow.getFlowProperties())) {
-                addLine.accept("FLOW_PROPERTIES", DSSCommonUtils.COMMON_GSON.toJson(workflow.getFlowProperties()));
+                addObjectLine.accept("FLOW_PROPERTIES", workflow.getFlowProperties());
             }
             String executionScript = String.join(" ", "sh",
                     DSS_DOLPHINSCHEDULER_CLIENT_HOME.getValue() + "/bin/dss-dolphinscheduler-client.sh",

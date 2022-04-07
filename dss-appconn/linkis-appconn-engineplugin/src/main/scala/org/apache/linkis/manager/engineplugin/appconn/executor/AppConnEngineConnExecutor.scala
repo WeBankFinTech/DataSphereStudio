@@ -158,10 +158,9 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
   }
 
   private def getLabels(labels: String): util.List[DSSLabel] = {
-    val envLabelValue = if (labels.contains(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
-      val labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, classOf[util.Map[_, _]])
-      labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY).asInstanceOf[String]
-    } else labels
+    val labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, classOf[util.Map[String, String]])
+    val envLabelValue = labelMap.getOrDefault(LabelKeyConvertor.ROUTE_LABEL_KEY,
+      labelMap.getOrDefault(EnvDSSLabel.DSS_ENV_LABEL_KEY, labels))
     util.Arrays.asList(new EnvDSSLabel(envLabelValue))
   }
 

@@ -78,14 +78,16 @@ public class AzkanbanBuilder extends Builder{
         if (null != job.getRuntimeParams()){
             runtimeMap = job.getRuntimeParams();
         }
-        //update by peaceWong add contextID to runtimeMap
-        if (jobProps.containsKey(LinkisJobExecutionConfiguration.FLOW_CONTEXTID)){
-            runtimeMap.put("contextID", jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID).replace("/", "\\"));
-        }
+
         runtimeMap.put("nodeName", jobProps.get(LinkisJobTypeConf.JOB_ID));
 
         runtimeMap.put(LinkisJobTypeConf.DSS_LABELS_KEY, jobProps.get(LinkisJobTypeConf.DSS_LABELS_KEY));
         job.setRuntimeParams(runtimeMap);
+    }
+
+    @Override
+    protected String getContextID(Job job) {
+        return jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID);
     }
 
     @Override

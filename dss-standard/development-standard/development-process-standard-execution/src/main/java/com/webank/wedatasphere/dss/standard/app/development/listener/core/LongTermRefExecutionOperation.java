@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Description: LongTermRefExecutionOperation is used to execute long-term tasks in external application systems.
+ * Description: LongTermRefExecutionOperation is used to execute long-term tasks in external AppConn systems.
  * Long-term task usually supports to execute asyncly and can fetch status and logs when it is submitted.
  *
  */
@@ -52,10 +52,35 @@ public abstract class LongTermRefExecutionOperation<K extends RefExecutionReques
         this.refExecutionListener.add(refExecutionListener);
     }
 
+    /**
+     * 异步提交给第三方 AppConn，请求执行该 refJob。
+     * 通常情况下，第三方 AppConn 会返回一个 executionId，请将该 executionId 放入 {@code RefExecutionAction}之中，
+     * 以便后面的 {@code state()} 和 {@code result()} 方法可通过该 {@code RefExecutionAction} 中的 executionId获取
+     * 到这个 refJob 的状态和结果。
+     * @param requestRef 包含了第三方 refJob 信息的 requestRef
+     * @return 包含了 executionId 的 RefExecutionAction
+     * @throws ExternalOperationFailedException 提交失败时抛出该异常
+     */
     protected abstract RefExecutionAction submit(K requestRef) throws ExternalOperationFailedException;
 
+    /**
+     * 获取已提交给第三方 AppConn 的 refJob 的状态。
+     * 您也可以在该方法内，既获取 refJob 的状态，同时也获取 refJob 的执行进度，然后通过调用
+     * {@code RefExecutionAction.getExecutionRequestRefContext().updateProgress()} 方法更新该 refJob 的执行进度，
+     * 以便 DSS 能够直接在前端展示出该 refJob 的实时进度信息。
+     * @param action 包含了 executionId 的 RefExecutionAction
+     * @return 返回 refJob 的状态
+     * @throws ExternalOperationFailedException 获取状态失败时抛出该异常
+     */
     public abstract RefExecutionState state(RefExecutionAction action) throws ExternalOperationFailedException;
 
+    /**
+     * 获取已提交给第三方 AppConn 的 refJob 的结果。
+     * 请注意：该方法只在 {@code state()} 方法返回的状态为成功时才会被调用。
+     * @param action 包含了 executionId 的 RefExecutionAction
+     * @return 返回 refJob 的结果
+     * @throws ExternalOperationFailedException 获取结果失败时抛出该异常
+     */
     public abstract ExecutionResponseRef result(RefExecutionAction action) throws ExternalOperationFailedException;
 
     protected ExecutionRequestRefContext createExecutionRequestRefContext(K requestRef) {

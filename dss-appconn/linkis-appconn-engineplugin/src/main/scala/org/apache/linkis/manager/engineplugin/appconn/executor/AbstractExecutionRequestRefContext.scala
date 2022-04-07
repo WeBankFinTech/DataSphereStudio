@@ -25,16 +25,15 @@ import org.apache.linkis.common.io.{FsPath, MetaData, Record}
 import org.apache.linkis.common.utils.{Logging, Utils}
 import org.apache.linkis.engineconn.computation.executor.execute.EngineExecutionContext
 import org.apache.linkis.manager.engineplugin.appconn.conf.AppConnEngineConnConfiguration
-import org.apache.linkis.protocol.UserWithCreator
 import org.apache.linkis.rpc.Sender
 import org.apache.linkis.storage.FSFactory
 import org.apache.linkis.storage.fs.FileSystem
 import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReader}
 
-abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineExecutionContext, userWithCreator: UserWithCreator)
+abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineExecutionContext,
+                                                  user: String,
+                                                  submitUser: String)
   extends ExecutionRequestRefContext with Logging {
-
-  private var storePath: String = _
 
   override def getRuntimeMap: util.Map[String, AnyRef] = engineExecutorContext.getProperties
 
@@ -42,15 +41,9 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
 
   override def updateProgress(progress: Float): Unit = engineExecutorContext.pushProgress(progress, Array.empty)
 
+  override def getSubmitUser: String = submitUser
 
-  override def getUser: String = userWithCreator.user
-
-  override def setStorePath(storePath: String): Unit = {
-    this.storePath = storePath
-    engineExecutorContext.setStorePath(storePath)
-  }
-
-  override def getStorePath: String = storePath
+  override def getUser: String = user
 
   override def createTableResultSetWriter[M <: MetaData, R <: Record](): ResultSetWriter[M, R] =
     createTableResultSetWriter(null)

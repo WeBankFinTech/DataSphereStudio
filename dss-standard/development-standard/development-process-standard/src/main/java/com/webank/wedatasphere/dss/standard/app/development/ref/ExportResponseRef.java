@@ -14,11 +14,13 @@ import java.util.Map;
 public interface ExportResponseRef extends ResponseRef {
 
     /**
-     * Now, DSS only supports to import/export BML resources, so the resourceMap is consisted of `resourceId`
-     * and `version`.
+     * Now, DSS only supports to import/export Linkis BML resources or one inputStream,
+     * so the resourceMap is consisted of `resourceId` and `version` if you choose Linkis BML resources,
+     * or `InputStream` and `Closeable` if you choose Stream resources.
      * <br>
-     * So, if third-part AppConn want to achieve the RefExportOperation, it is neccessary that the third-part AppConn
-     * must upload the third-part AppConn jobs to Linkis BML at first, and then return the resourceMap to DSS.
+     * If third-part AppConn want to achieve the {@code RefExportOperation}, it is necessary that the third-part AppConn
+     * must upload the meta and resources of third-part AppConn job to Linkis BML at first, or packages the the meta and
+     * resources of third-part AppConn job as a InputStream, then return the resourceMap to DSS.
      * @return a refJobContent related a only third appConn refJob
      */
     Map<String, Object> getResourceMap();

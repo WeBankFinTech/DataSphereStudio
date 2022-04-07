@@ -153,13 +153,14 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
     @Override
     public ResponseRef executeRef(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref) throws ExternalOperationFailedException {
         String previewUrl = URLUtils.getUrl(baseUrl, URLUtils.DISPLAY_PREVIEW_URL_FORMAT, getDisplayId(ref.getRefJobContent()).toString());
-        logger.info("The {} of Visualis try to execute ref RefJobContent: {} in previewUrl {}.", ref.getType(), ref.getRefJobContent(), previewUrl);
+        logger.info("User {} try to execute Visualis display with refJobContent: {} in previewUrl {}.", ref.getExecutionRequestRefContext().getSubmitUser(),
+                ref.getRefJobContent(), previewUrl);
         ref.getExecutionRequestRefContext().appendLog(String.format("The %s of Visualis try to execute ref RefJobContent: %s in previewUrl %s.", ref.getType(), ref.getRefJobContent(), previewUrl));
         DSSDownloadAction previewDownloadAction = new DSSDownloadAction();
-        previewDownloadAction.setUser(VisualisCommonUtil.getUser(ref));
+        previewDownloadAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
 
         DSSDownloadAction metadataDownloadAction = new DSSDownloadAction();
-        metadataDownloadAction.setUser(VisualisCommonUtil.getUser(ref));
+        metadataDownloadAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
 
         try {
             VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, previewUrl, previewDownloadAction);

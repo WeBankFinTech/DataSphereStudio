@@ -39,10 +39,10 @@ class DolphinSchedulerJobBuilder(jobProps: JMap[String, String]) extends Builder
     val source = getSource
     linkisJob.setSource(source)
     linkisJob.getRuntimeParams.put("nodeName", source.get("nodeName"))
-    if(!linkisJob.getRuntimeParams.containsKey("contextID")) {
-      linkisJob.getRuntimeParams.put("contextID", LinkisJobExecutionConfiguration.FLOW_CONTEXTID)
-    }
+    linkisJob.getRuntimeParams.put("labels", jobProps.get(LinkisJobTypeConf.JOB_LABELS))
   }
+
+  override protected def getContextID(job: Job): String = jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID)
 
   override protected def fillCommonLinkisJobInfo(commonLinkisJob: CommonLinkisJob): Unit = {
     commonLinkisJob.setJobResourceList(LinkisJobExecutionUtils.getResourceListByJson(jobProps.get(LinkisJobTypeConf.JOB_RESOURCES)))

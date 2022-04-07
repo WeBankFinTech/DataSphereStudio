@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
@@ -57,19 +56,6 @@ public class DSSFrameworkProjectRestfulApi {
     private DSSProjectService projectService;
     @Autowired
     private DSSProjectService dssProjectService;
-
-    /**
-     * 获取所有工程或者单个工程
-     *
-     * @param request
-     * @return
-     */
-    @RequestMapping(path = "getWorkSpaceStr", method = RequestMethod.GET)
-    public Message getWorkSpaceStr(HttpServletRequest request) {
-        Workspace workspace = SSOHelper.getWorkspace(request);
-        Message message = Message.ok("").data("workspaceStr", DSSCommonUtils.COMMON_GSON.toJson(workspace));
-        return message;
-    }
 
     /**
      * 获取所有工程或者单个工程

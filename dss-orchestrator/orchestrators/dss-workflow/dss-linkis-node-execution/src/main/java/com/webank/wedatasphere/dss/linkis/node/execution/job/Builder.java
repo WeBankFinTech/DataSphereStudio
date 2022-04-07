@@ -56,7 +56,7 @@ public abstract class Builder {
         String jobType = getJobType();
         String[] jobTypeSplit = jobType.split("\\.");
         if (jobTypeSplit.length < 3) {
-            throw new LinkisJobExecutionErrorException(90100, "This is not Linkis job type,this jobtype is " + jobType);
+            throw new LinkisJobExecutionErrorException(90100, "This is not Linkis job type, this jobtype is " + jobType);
         }
         String engineType = jobTypeSplit[1];
         //delete linkis.engineType
@@ -83,7 +83,6 @@ public abstract class Builder {
             job.setJobType(JobTypeEnum.EmptyJob);
             return job;
         }
-        //update by peaceWong
         if (LinkisJobExecutionUtils.isCommonAppConnJob(engineType)) {
             job = creatLinkisJob(false);
             job.setJobType(JobTypeEnum.CommonJob);
@@ -98,28 +97,35 @@ public abstract class Builder {
         fillJobInfo(job);
         fillLinkisJobInfo(job);
 
-        String workspace = "";
-        try {
-            workspace = getWorkspace(job);
-            logger.info("Get workspace str: " + workspace);
-        } catch (Exception e) {
-            logger.error("Failed to get workspace.", e);
-        }
         if(job.getRuntimeParams() == null) {
             job.setRuntimeParams(new HashMap<>());
         }
+        String contextId = getContextID(job);
+        if(StringUtils.isBlank(contextId)) {
+            throw new LinkisJobExecutionErrorException(90100, "contextID is not exists.");
+        }
+        contextId = contextId.replace("/", "\\");
+        Map contextMap = JsonUtils.jackson().readValue(contextId, Map.class);
+        String workspaceName = (String) ((Map) contextMap.get("value")).get("workspace");
+        logger.info("try to get workspace str by workspaceName {}.", workspaceName);
+        String workspace = getWorkspaceStr(job, workspaceName);
+        logger.info("Got workspace str {}.", workspace);
+        job.getRuntimeParams().put("contextID", contextId);
         job.getRuntimeParams().put("workspace", workspace);
         return job;
     }
 
-    private String getWorkspace(Job job) throws Exception {
-        String user=job.getUser();
+    protected abstract String getContextID(Job job);
+
+    private String getWorkspaceStr(Job job, String workspaceName) throws Exception {
+        String user = job.getUser();
         String linkisUrl = LinkisURLService.Factory.getLinkisURLService().getDefaultLinkisURL(job);
         String token = LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(job.getJobProps());
         DWSHttpClient client = null;
         DWSClientConfig clientConfig = LinkisUjesClientUtils.getClientConfig1_X(linkisUrl, user, token, job.getJobProps());
         WorkspaceInfoGetAction workspaceInfoGetAction = new WorkspaceInfoGetAction();
-        workspaceInfoGetAction.setURL("/api/rest_j/v1/dss/framework/project/getWorkSpaceStr");
+        workspaceInfoGetAction.setURL("/api/rest_j/v1/dss/framework/workspace/getWorkSpaceStr");
+        workspaceInfoGetAction.setParameter("workspaceName", workspaceName);
         workspaceInfoGetAction.setUser(user);
         try {
             client = new DWSHttpClient(clientConfig, "Workspace-Fetch-Client-");

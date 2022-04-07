@@ -20,14 +20,17 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRe
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-/**
- * Now, DSS only supports to export a third-part AppConn job to Linkis BML resources.
- * <br>
- * So, if third-part AppConn want to achieve the RefExportOperation, it is necessary that the third-part AppConn
- * must upload the third-part AppConn jobs to Linkis BML at first, and then return the resourceMap to DSS.
- */
+
 public interface RefExportOperation<K extends RefJobContentRequestRef<K>> extends DevelopmentOperation<K, ExportResponseRef> {
 
+    /**
+     * Now, DSS only supports to export a third-part AppConn job to Linkis BML resources or {@code InputStream}.
+     * <br>
+     * So, if third-part AppConn want to achieve the {@code RefExportOperation}, it is necessary that the third-part AppConn
+     * must upload the meta and resources of third-part AppConn job to Linkis BML at first, or packages the the meta and
+     * resources of third-part AppConn job as a InputStream, then return the resourceMap to DSS.
+     * For more detail, please see {@code ExportResponseRef} or {@code ImportRequestRef}.
+     */
     ExportResponseRef exportRef(K requestRef) throws ExternalOperationFailedException;
 
 }

@@ -17,12 +17,14 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
@@ -57,6 +59,28 @@ public class WorkspaceRestfulApi {
         return Message.ok().data("workspaces", workspaces);
     }
 
+    /**
+     * 获取所有工程或者单个工程
+     *
+     * @param request
+     * @return
+     */
+    @RequestMapping(path = "getWorkSpaceStr", method = RequestMethod.GET)
+    public Message getWorkSpaceStr(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   @RequestParam(name = "workspaceName") String workspaceName) {
+        String username = SecurityFilter.getLoginUsername(request);
+        DSSWorkspace workspaceEntity;
+        try {
+            workspaceEntity = dssWorkspaceService.getWorkspacesByName(workspaceName, username);
+        } catch (DSSErrorException e) {
+            LOGGER.error("User {} get workspace {} failed.", username, workspaceName, e);
+            return Message.error(e);
+        }
+        Workspace workspace = SSOHelper.setAndGetWorkspace(request, response, workspaceEntity.getId(), workspaceName);
+        return Message.ok("succeed.").data("workspaceStr", DSSCommonUtils.COMMON_GSON.toJson(workspace));
+    }
+
     @RequestMapping(path = "/workspaces/{id}", method = RequestMethod.GET)
     public Message getWorkspacesById(HttpServletRequest req,
                                      HttpServletResponse resp,
@@ -66,6 +90,7 @@ public class WorkspaceRestfulApi {
         try {
             workspace = dssWorkspaceService.getWorkspacesById(workspaceId, username);
         } catch (DSSErrorException e) {
+            LOGGER.error("User {} get workspace {} failed.", username, workspaceId, e);
             return Message.error(e);
         }
         SSOHelper.setAndGetWorkspace(req, resp, workspace.getId(), workspace.getName());

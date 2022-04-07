@@ -62,7 +62,6 @@ public class DSSFlowEditLockManager {
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             UnLockEvent pop = unLockEvents.poll();
             if (pop != null) {
-                LOGGER.info(pop.toString());
                 DSSFlowEditLock flowEditLock = pop.getFlowEditLock();
                 DSSFlowEditLock updateFlowEditLock = lockMapper.getFlowEditLockByID(flowEditLock.getFlowID());
                 //队列对象如果过期，先去数据库查询锁，并判断锁是否过期
@@ -70,12 +69,10 @@ public class DSSFlowEditLockManager {
                     //锁过期，移除记录
                     flowEditLock.setExpire(true);
                     lockMapper.clearExpire(flowEditLock.getFlowID());
-                    LOGGER.info(String.format("clear lock success,lock:%s", pop));
                 } else if (updateFlowEditLock == null) {
                     LOGGER.info("lock already clear");
                 } else {
                     //锁没有过期，延长队列时间
-                    LOGGER.info(String.format("delay pop:%s", pop));
                     pop.setExpireTime(updateFlowEditLock.getUpdateTime().getTime() + DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue());
                     unLockEvents.offer(pop);
                 }

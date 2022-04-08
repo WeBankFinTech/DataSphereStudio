@@ -115,7 +115,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             throw exception1;
         }
         String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
-        dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(), CommonRoleEnum.ADMIN.getId(), userName, userName, userId);
+        dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(), workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()), userName, userName, userId);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
         dssComponentRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceComponentPrivs(dssWorkspace.getId(), userName));
@@ -187,8 +187,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         if (workspaceIds.size() == 0) {
             String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, CommonRoleEnum.ANALYSER.getId(), userName, "system", userId);
-            String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, CommonRoleEnum.ANALYSER.getId());
+            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+                    userName, "system", userId);
+            String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()));
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
                 homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
             }
@@ -395,7 +396,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     public DSSWorkspaceHomepageSettingVO getWorkspaceHomepageSettings(int workspaceId) {
         DSSWorkspaceHomepageSettingVO dssWorkspaceHomepageSettingVO = new DSSWorkspaceHomepageSettingVO();
 
-        List<DSSWorkspaceHomepageSetting> dssWorkspaceHomepageSettings = dssWorkspaceMenuMapper.getWorkspaceHompageSettings(workspaceId);
+        List<DSSWorkspaceHomepageSetting> dssWorkspaceHomepageSettings = dssWorkspaceMenuMapper.getWorkspaceHomepageSettings(workspaceId);
         List<DSSWorkspaceHomepageSettingVO.RoleHomepage> roleHomepageList = new ArrayList<>();
         dssWorkspaceHomepageSettings.forEach(homepage -> {
             DSSWorkspaceHomepageSettingVO.RoleHomepage roleHomepage = new DSSWorkspaceHomepageSettingVO.RoleHomepage();
@@ -488,9 +489,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     public DSSWorkspace getWorkspacesByName(String workspaceName, String username) throws DSSErrorException {
         return getWorkspace(() -> {
             List<DSSWorkspace> dssWorkspaces = workspaceMapper.findByWorkspaceName(workspaceName);
-            if(dssWorkspaces == null || dssWorkspaces.isEmpty()) {
+            if (dssWorkspaces == null || dssWorkspaces.isEmpty()) {
                 return null;
-            } else if(dssWorkspaces.size() > 1) {
+            } else if (dssWorkspaces.size() > 1) {
                 throw new DSSFrameworkWarnException(30021, "Too many workspaces named " + workspaceName);
             } else {
                 return dssWorkspaces.get(0);

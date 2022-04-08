@@ -53,7 +53,9 @@ class AppConnEngineConnFactory extends ComputationSingleExecutorEngineConnFactor
      * 2. when a task is killed by user, and the AppConns is loading, the loading will be failed, cause a bug when new task submitted in later
      */
     AppConnManager.getAppConnManager.init()
-    new AppConnEngineConnExecutor(AppConnEngineConnConfiguration.ENGINE_DEFAULT_LIMIT.getValue, id)
+    val executor = new AppConnEngineConnExecutor(AppConnEngineConnConfiguration.ENGINE_DEFAULT_LIMIT.getValue, id)
+    executor.setUser(engineCreationContext.getUser)
+    executor
   }
 
   override protected def getEngineConnType: EngineType = EngineType.APPCONN

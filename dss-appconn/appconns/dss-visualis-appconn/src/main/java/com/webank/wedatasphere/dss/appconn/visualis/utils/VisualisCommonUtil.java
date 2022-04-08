@@ -2,7 +2,6 @@ package com.webank.wedatasphere.dss.appconn.visualis.utils;
 
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.ref.VisualisResponseRefBuilder;
-import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
@@ -29,10 +28,6 @@ public class VisualisCommonUtil {
         ssoUrlBuilderOperation.setAppName(VisualisAppConn.VISUALIS_APPCONN_NAME);
         ssoUrlBuilderOperation.setReqUrl(url);
         return ssoUrlBuilderOperation;
-    }
-
-    public static String getUser(RefExecutionRequestRef requestRef) {
-        return requestRef.getExecutionRequestRefContext().getRuntimeMap().get("wds.dss.workflow.submit.user").toString();
     }
 
     public static HttpResult getHttpResult(WorkspaceRequestRef requestRef,

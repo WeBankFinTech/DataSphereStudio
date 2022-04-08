@@ -24,10 +24,13 @@ public interface RefImportOperation<K extends ImportRequestRef<K>>
         extends DevelopmentOperation<K, RefJobContentResponseRef> {
 
     /**
-     * The resourceMap in ImportRequestRef is the content of ExportRequestRef exported.
+     * The resourceMap in {@code ImportRequestRef} is the content of {@code ExportRequestRef} exported.
      * <br>
-     * Now, DSS only supports to import Linkis BML resources, so the resourceMap is consisted of `resourceId`
-     * and `version`.
+     * Now, DSS only supports to import Linkis BML resources or {@code InputStream},
+     * so if you want to choose Linkis BML resources to ex/import, the resourceMap is consisted of `resourceId`
+     * and `version`, otherwise the resourceMap is consisted of inputStream.
+     * <br/>
+     * For more information about {@code requestRef}, please see {@code ImportRequestRef}.
      * @return a refJobContent related to a only third appConn refJob which created by the resourceMap.
      */
     RefJobContentResponseRef importRef(K requestRef) throws ExternalOperationFailedException;

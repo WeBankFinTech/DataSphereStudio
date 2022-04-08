@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkWarnException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
@@ -48,6 +49,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.DEFAULT_DEMO_WORKSPACE_NAME;
@@ -460,16 +462,14 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return dssWorkspaceUserVOs;
     }
 
-
-    @Override
-    public DSSWorkspace getWorkspacesById(Long id, String username) throws DSSErrorException {
-        List<String> users = dssWorkspaceUserMapper.getAllWorkspaceUsers(id.intValue());
-        if (!users.contains(username)) {
-            throw new DSSErrorException(30021, "You have no permission to access this workspace " + id);
-        }
-        DSSWorkspace dssWorkSpace = workspaceMapper.getWorkspaceById(id);
+    private DSSWorkspace getWorkspace(Supplier<DSSWorkspace> workspaceSupplier, String username) throws DSSErrorException {
+        DSSWorkspace dssWorkSpace = workspaceSupplier.get();
         if (dssWorkSpace == null) {
-            throw new DSSErrorException(30022, "workspace " + id + " is not exists.");
+            throw new DSSErrorException(30022, "workspace is not exists.");
+        }
+        List<String> users = dssWorkspaceUserMapper.getAllWorkspaceUsers(dssWorkSpace.getId());
+        if (!users.contains(username)) {
+            throw new DSSErrorException(30021, "You have no permission to access this workspace " + dssWorkSpace.getName());
         }
         String originDepart = dssWorkSpace.getDepartment();
         if (StringUtils.isNotBlank(originDepart)) {
@@ -479,6 +479,24 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return dssWorkSpace;
     }
 
+    @Override
+    public DSSWorkspace getWorkspacesById(Long id, String username) throws DSSErrorException {
+        return getWorkspace(() -> workspaceMapper.getWorkspaceById(id), username);
+    }
+
+    @Override
+    public DSSWorkspace getWorkspacesByName(String workspaceName, String username) throws DSSErrorException {
+        return getWorkspace(() -> {
+            List<DSSWorkspace> dssWorkspaces = workspaceMapper.findByWorkspaceName(workspaceName);
+            if(dssWorkspaces == null || dssWorkspaces.isEmpty()) {
+                return null;
+            } else if(dssWorkspaces.size() > 1) {
+                throw new DSSFrameworkWarnException(30021, "Too many workspaces named " + workspaceName);
+            } else {
+                return dssWorkspaces.get(0);
+            }
+        }, username);
+    }
 
     @Override
     public Long addWorkspace(String userName, String name, String department, String label, String description) {

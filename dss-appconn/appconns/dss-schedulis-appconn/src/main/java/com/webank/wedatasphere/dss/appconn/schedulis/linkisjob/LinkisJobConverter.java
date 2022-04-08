@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.linkisjob;
 
+import com.webank.wedatasphere.dss.appconn.scheduler.utils.SchedulerConf;
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.AzkabanConf;
 import com.webank.wedatasphere.dss.appconn.schedulis.constant.AzkabanConstant;
 import com.webank.wedatasphere.dss.appconn.schedulis.conversion.NodeConverter;
@@ -68,7 +69,7 @@ public class LinkisJobConverter implements NodeConverter {
         map.put(WorkflowConstant.PROXY_USER,job.getProxyUser());
         map.put(AzkabanConstant.JOB_COMMAND,job.getCommand());
         Map<String, Object> labels = new HashMap<>(1);
-        labels.put("route", AzkabanConf.JOB_LABEL.getValue());
+        labels.put("route", SchedulerConf.JOB_LABEL.getValue());
         map.put(AzkabanConstant.JOB_LABELS, DSSCommonUtils.COMMON_GSON.toJson(labels));
         map.putAll(job.getConf());
         StringBuilder stringBuilder = new StringBuilder();

@@ -48,6 +48,7 @@ object DSSDolphinSchedulerClient extends Logging {
     getAndSet("JOB_RESOURCES", LinkisJobTypeConf.JOB_RESOURCES)
     getAndSet("FLOW_RESOURCES", LinkisJobTypeConf.FLOW_RESOURCES)
     getAndSet("FLOW_PROPERTIES", LinkisJobTypeConf.FLOW_RESOURCES)
+    getAndSet("JOB_LABELS", LinkisJobTypeConf.JOB_LABELS)
     val job: Job = new DolphinSchedulerJobBuilder(jobProps).build()
     job.setLogObj(logObj)
 

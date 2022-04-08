@@ -164,7 +164,8 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
     @Override
     public String submit(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref) throws ExternalOperationFailedException {
         String url = URLUtils.getUrl(baseUrl, URLUtils.VIEW_DATA_URL_SUBMIT, getId(ref.getRefJobContent()));
-        logger.info("The {} of Visualis try to submit ref RefJobContent: {} in url {}.", ref.getType(), ref.getRefJobContent(), url);
+        logger.info("User {} try to submit Visualis view with refJobContent: {} in url {}.", ref.getExecutionRequestRefContext().getSubmitUser(),
+                ref.getRefJobContent(), url);
         ref.getExecutionRequestRefContext().appendLog("dss execute view node, ready to submit to " + url);
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getUserName());
@@ -183,7 +184,7 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         ref.getExecutionRequestRefContext().appendLog("dss execute view node, ready to get state from " + url);
 
         DSSPostAction visualisPostAction = new DSSPostAction();
-        visualisPostAction.setUser(VisualisCommonUtil.getUser(ref));
+        visualisPostAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
 
         ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisPostAction);
         ref.getExecutionRequestRefContext().appendLog(responseRef.getResponseBody());
@@ -202,7 +203,7 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         ref.getExecutionRequestRefContext().appendLog("dss execute view node,ready to get result set from " + url);
         DSSPostAction visualisPostAction = new DSSPostAction();
 
-        visualisPostAction.setUser(VisualisCommonUtil.getUser(ref));
+        visualisPostAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
         try {
             ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisPostAction);
             ViewAsyncResultData responseData = BDPJettyServerHelper.gson().fromJson(BDPJettyServerHelper.gson().toJson(responseRef.toMap()), ViewAsyncResultData.class);

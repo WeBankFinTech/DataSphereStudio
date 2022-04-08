@@ -75,6 +75,8 @@ public interface DSSWorkspaceService {
 
     DSSWorkspace getWorkspacesById(Long id, String username) throws DSSErrorException;
 
+    DSSWorkspace getWorkspacesByName(String workspaceName, String username) throws DSSErrorException;
+
     List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese,String type);
 
     Long addFavorite(String username, Long workspaceId, Long menuApplicationId,String type);

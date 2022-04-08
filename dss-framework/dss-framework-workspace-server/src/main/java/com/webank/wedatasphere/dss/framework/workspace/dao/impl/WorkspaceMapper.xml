@@ -106,7 +106,7 @@
         </where>
     </select>
 
-    <select id="getApplicationMenuCn"
+    <select id="getAppConnMenuCn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo">
         SELECT `id`,`name`,`title_cn` AS `title`,`order`
         FROM dss_workspace_menu
@@ -115,7 +115,7 @@
         </where>
     </select>
 
-    <select id="getApplicationMenuEn"
+    <select id="getAppConnMenuEn"
             resultType="com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo">
         SELECT `id`,`name`,`title_en` AS `title`,`order`
         FROM dss_workspace_menu
@@ -131,7 +131,7 @@
         m.`id`,m.`title_cn` AS `title`, m.`desc_cn` AS `description`, m.`labels_cn` AS `labels`, m.image, m.`is_active`,
         m.`icon`,m.`order`, app.`appconn_name` as `name`, app.`if_iframe`, app.`is_external`
         FROM dss_workspace_menu_appconn m
-        LEFT JOIN dss_appconn app
+        JOIN dss_appconn app
         ON m.`appconn_id` = app.`id`
         <where>
             m.`menu_id` = #{id}
@@ -145,7 +145,7 @@
         m.`id`,m.`title_en` AS `title`, m.`desc_en` AS `description`, m.`labels_en` AS `labels`, m.image, m.`is_active`,
         m.`icon`,m.`order`, app.`appconn_name` as `name`, app.`if_iframe`, app.`is_external`
         FROM dss_workspace_menu_appconn m
-        LEFT JOIN dss_appconn app
+        JOIN dss_appconn app
         ON m.`appconn_id` = app.`id`
         <where>
             m.`menu_id` = #{id}

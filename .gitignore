@@ -49,6 +49,7 @@ dss-framework/dss-framework-project-server/target
 dss-framework/dss-framework-workspace-server/target
 dss-framework/framework-plugins/dss-framework-orchestrator-publish/target
 dss-framework/framework-plugins/dss-framework-release-server/target
+dss-framework/framework-plugins/dss-framework-migrate-server/target
 dss-framework/dss-framework-admin/target
 dss-framework/dss-framework-sql-template/target
 dss-framework/dss-framework-dbapi-server/target

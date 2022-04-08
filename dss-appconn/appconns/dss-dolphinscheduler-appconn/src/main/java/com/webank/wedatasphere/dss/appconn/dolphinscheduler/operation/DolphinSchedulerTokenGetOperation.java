@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.operation;
 
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.sso.DolphinSchedulerTokenManager;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
@@ -12,6 +13,11 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
  * @since 1.1.0
  */
 public class DolphinSchedulerTokenGetOperation extends AbstractOptionalOperation<StructureRequestRef, ResponseRef> {
+
+    @Override
+    protected String getAppConnName() {
+        return DolphinSchedulerAppConn.DOLPHINSCHEDULER_APPCONN_NAME;
+    }
 
     @Override
     public String getOperationName() {

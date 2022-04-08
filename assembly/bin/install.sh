@@ -44,7 +44,7 @@ function isSuccess(){
       echo "Failed to " + $1
       exit 1
   else
-      echo "Succeed to" + $1
+      echo "Succeed to " + $1
   fi
 }
 

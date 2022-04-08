@@ -22,7 +22,6 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleV
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUsersVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -49,8 +48,6 @@ public class DSSWorkspaceUserRestful {
 
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
-    @Autowired
-    private DSSWorkspaceMenuService dssWorkspaceMenuService;
     @Autowired
     private WorkspaceDBHelper workspaceDBHelper;
     @Autowired

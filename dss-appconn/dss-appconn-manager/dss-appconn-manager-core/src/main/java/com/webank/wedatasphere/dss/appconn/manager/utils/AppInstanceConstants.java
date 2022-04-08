@@ -18,11 +18,15 @@ package com.webank.wedatasphere.dss.appconn.manager.utils;
 
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.conf.TimeType;
 
 public class AppInstanceConstants {
 
     static final String INDEX_FILE_PREFIX = "index_";
     static final String INDEX_FILE_SUFFIX = ".index";
+
+    public static final CommonVars<TimeType> APP_CONN_REFRESH_INTERVAL = CommonVars.apply("wds.dss.appconn.refresh.interval", new TimeType("5m"));
 
     public static String getHomepageUrl(AppInstance appInstance,
                                         Long workspaceId, String workspaceName) {

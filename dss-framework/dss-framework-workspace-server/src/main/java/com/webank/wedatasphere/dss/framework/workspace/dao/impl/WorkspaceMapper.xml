@@ -37,18 +37,6 @@
         id,`username`,`workspace_id`,`menu_appconn_id`,`order`,`create_by`,`create_time`,`last_update_user`,`last_update_time`,`type`
     </sql>
 
-    <resultMap id="dss_workspace_user01_map"
-               type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01">
-        <result property="id" column="id"/>
-        <result property="name" column="username"/>
-        <result property="joinTime" column="join_time"/>
-        <result property="creator" column="created_by"/>
-        <result property="department" column="department"/>
-        <result property="office" column="office"/>
-        <collection property="roles" resultMap="roles"/>
-
-    </resultMap>
-
     <resultMap id="roles" type="Integer">
         <result column="role_id" property="roleId"/>
     </resultMap>

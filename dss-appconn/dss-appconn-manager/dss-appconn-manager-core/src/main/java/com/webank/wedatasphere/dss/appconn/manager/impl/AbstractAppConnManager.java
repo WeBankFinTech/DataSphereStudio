@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnResourceService;
+import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -33,10 +34,12 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDescImpl;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstanceImpl;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -48,8 +51,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private final Map<String, AppConn> appConns = new HashMap<>();
     private boolean isLoaded = false;
     private List<AppConn> appConnList = null;
-    private AppConnInfoService appConnInfoService;
-    private AppConnResourceService appConnResourceService;
+    AppConnInfoService appConnInfoService;
+    AppConnResourceService appConnResourceService;
 
     private static AppConnManager appConnManager;
     private static boolean lazyLoad = false;
@@ -98,6 +101,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             LOGGER.warn("No AppConnInfos returned, ignore it.");
             return;
         }
+        long refreshInterval = AppInstanceConstants.APP_CONN_REFRESH_INTERVAL.getValue().toLong();
+        Utils.defaultScheduler().scheduleAtFixedRate(new AppConnRefreshThread(this, appConnInfos),
+                refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
         Map<String, AppConn> appConns = new HashMap<>();
         Consumer<AppConnInfo> loadAndAdd = DSSExceptionUtils.handling(appConnInfo -> {
             AppConn appConn = loadAppConn(appConnInfo);

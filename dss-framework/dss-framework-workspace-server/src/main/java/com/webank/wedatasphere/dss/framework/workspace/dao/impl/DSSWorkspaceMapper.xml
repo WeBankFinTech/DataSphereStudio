@@ -25,15 +25,6 @@
         <id property="lastUpdateUser" column="last_update_user"/>
     </resultMap>
 
-    <resultMap id="dss_menu_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu">
-        <id property="upperMenuId" column="upper_menu_id"/>
-        <id property="active" column="is_active"/>
-        <id property="component" column="is_component"/>
-        <id property="frontName" column="front_name"/>
-        <id property="icon" column="icon"/>
-        <id property="applicationId" column="appconn_id"/>
-    </resultMap>
-
     <resultMap id="dss_workspace_user_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser">
         <id property="joinTime" column="join_time"/>
         <id property="creator" column="created_by"/>
@@ -70,7 +61,7 @@
         SELECT menu_id from dss_workspace_menu_role WHERE role_id = #{roleId} and workspace_id = #{workspaceId} and priv >= 1
     </select>
 
-    <select id="getUserMenuApplicationId" resultType="java.lang.Long">
+    <select id="getUserMenuAppConnId" resultType="java.lang.Long">
         SELECT DISTINCT(doma.id)
         FROM dss_workspace_user_role dwur
         LEFT JOIN dss_workspace_appconn_role dcr ON dwur.role_id = dcr.role_id

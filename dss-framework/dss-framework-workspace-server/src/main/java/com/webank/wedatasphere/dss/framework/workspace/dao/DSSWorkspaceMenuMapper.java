@@ -27,8 +27,6 @@ import java.util.List;
 @Mapper
 public interface DSSWorkspaceMenuMapper {
 
-
-
     @Select("select * from dss_workspace_appconn_role where workspace_id = #{workspaceId}")
     @Results({
             @Result(property = "workspaceId", column = "workspace_id"),
@@ -46,7 +44,7 @@ public interface DSSWorkspaceMenuMapper {
             @Result(property = "roleId", column = "role_id"),
             @Result(property = "updateTime", column = "update_time")
     })
-    List<DSSWorkspaceHomepageSetting> getWorkspaceHompageSettings(@Param("workspaceId") int workspaceId);
+    List<DSSWorkspaceHomepageSetting> getWorkspaceHomepageSettings(@Param("workspaceId") int workspaceId);
 
     @Select("select priv from dss_workspace_appconn_role where workspace_id = #{workspaceId} " +
             "and role_id = #{roleId} and " +

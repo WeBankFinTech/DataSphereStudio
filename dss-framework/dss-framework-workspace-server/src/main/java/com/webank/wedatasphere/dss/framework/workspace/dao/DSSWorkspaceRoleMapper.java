@@ -31,7 +31,7 @@ public interface DSSWorkspaceRoleMapper {
             @Result(property = "frontName", column = "front_name"),
             @Result(property = "createTime", column = "update_time")
     })
-    List<DSSRole> getRoles();
+    List<DSSWorkspaceRole> getRoles();
 
 
     @Select("select a.`name` from dss_workspace_role a join dss_workspace_user_role b on a.id = b.role_id" +
@@ -44,7 +44,7 @@ public interface DSSWorkspaceRoleMapper {
             @Result(property = "titleCn", column = "title_cn"),
             @Result(property = "titleEn", column = "title_En")
     })
-    List<DSSWorkspaceMenu> getOnestopMenus();
+    List<DSSWorkspaceMenu> getWorkspaceMenus();
 
 
     @Select("select a.id id, a.appconn_name name,b.url url, b.homepage_uri homepage_uri, b.label label from dss_appconn a join dss_appconn_instance b on a.id=b.appconn_id")
@@ -60,7 +60,7 @@ public interface DSSWorkspaceRoleMapper {
     @Insert("insert into dss_workspace_role(workspace_id, name, front_name, update_time) " +
             "values(#{dssRole.workspaceId}, #{dssRole.name}, #{dssRole.frontName}, #{dssRole.createTime})")
     @Options(useGeneratedKeys = true, keyProperty = "dssRole.id", keyColumn = "id")
-    int addNewRole(@Param("dssRole") DSSRole dssRole);
+    int addNewRole(@Param("dssRole") DSSWorkspaceRole dssRole);
 
 
     @Insert({

@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 import java.util.Date;
 
 
-public class DSSRole {
+public class DSSWorkspaceRole {
     private int id;
     private int workspaceId;
     private String name;

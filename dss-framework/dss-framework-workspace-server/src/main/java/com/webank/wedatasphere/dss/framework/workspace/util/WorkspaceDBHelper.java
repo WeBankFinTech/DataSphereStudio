@@ -20,7 +20,6 @@ package com.webank.wedatasphere.dss.framework.workspace.util;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
-import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.utils.Utils;
@@ -42,8 +41,7 @@ public class WorkspaceDBHelper {
     @Autowired
     private DSSWorkspaceRoleMapper dssWorkspaceRoleMapper;
 
-
-    private List<DSSRole> dssRoles;
+    private List<DSSWorkspaceRole> dssRoles;
 
     private final Object lock = new Object();
 
@@ -69,7 +67,7 @@ public class WorkspaceDBHelper {
             @Override
             public void run() {
                 synchronized (lock) {
-                    dssWorkspaceMenus = dssWorkspaceRoleMapper.getOnestopMenus();
+                    dssWorkspaceMenus = dssWorkspaceRoleMapper.getWorkspaceMenus();
                 }
             }
         }, 0, 1, TimeUnit.MINUTES);
@@ -113,47 +111,53 @@ public class WorkspaceDBHelper {
     public void retrieveFromDB() {
         synchronized (lock) {
             dssApplicationBeans = dssWorkspaceRoleMapper.getDSSAppConns();
-            dssWorkspaceMenus = dssWorkspaceRoleMapper.getOnestopMenus();
+            dssWorkspaceMenus = dssWorkspaceRoleMapper.getWorkspaceMenus();
             dssRoles = dssWorkspaceRoleMapper.getRoles();
         }
     }
 
-
     public List<DSSWorkspaceMenuRole> generateDefaultWorkspaceMenuRole(int workspaceId, String username) {
         List<DSSWorkspaceMenuRole> list = new ArrayList<>();
         Date date = new Date(System.currentTimeMillis());
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 1, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 1, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 1, 1, date, username));
+        //todo 需要确定各角色默认的菜单权限
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.ADMIN.getName()), 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.ADMIN.getName()), 1, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 2, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 2, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 2, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), 0, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 3, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 3, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 3, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), 0, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 4, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 4, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 4, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), 1, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 5, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 5, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 5, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), 0, date, username));
 
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 6, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 6, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 28, 6, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.BOSS.getName()), 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.BOSS.getName()), 1, date, username));
 
-        if (StringUtils.isNotBlank(ApplicationConf.ESB_APPID)) {
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 1, 1, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 2, 1, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 3, 0, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 4, 0, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 5, 0, date, username));
-            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 6, 1, date, username));
-        }
+//        if (StringUtils.isNotBlank(ApplicationConf.ESB_APPID)) {
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 1, 1, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 2, 1, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 3, 0, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 4, 0, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 5, 0, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 6, 1, date, username));
+//        }
         return list;
     }
 
@@ -170,12 +174,12 @@ public class WorkspaceDBHelper {
                 findFirst().map(this::getHomepageUrl).orElse(defaultUrl);
         List<DSSWorkspaceHomepage> dssWorkspaceHomepages = new ArrayList<>();
         Date date = new Date(System.currentTimeMillis());
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 1, defaultUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 2, maintenanceUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 3, developerUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 4, analyserUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 5, defaultUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 6, defaultUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()), defaultUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), maintenanceUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), developerUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), analyserUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), defaultUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()), defaultUrl, date));
         return dssWorkspaceHomepages;
     }
 
@@ -184,31 +188,32 @@ public class WorkspaceDBHelper {
                                                                                   String username) {
         List<DSSWorkspaceComponentPriv> dssWorkspaceComponentPrivs = new ArrayList<>();
         Date updateTime = new Date(System.currentTimeMillis());
-        //admin
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 4, 1, updateTime, username));
+        //admin //todo 具体是哪几个component
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()), 1, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()), 2, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()), 4, 1, updateTime, username));
         //运维
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 4, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), 1, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), 2, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), 4, 1, updateTime, username));
         //开发人员
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 4, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), 1, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), 2, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), 4, 1, updateTime, username));
         //分析人员
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 4, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), 1, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), 2, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), 4, 1, updateTime, username));
         //运营人员
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 4, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), 1, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), 2, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), 4, 1, updateTime, username));
         //领导
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 4, 1, updateTime, username));
-       /* if(StringUtils.isNotBlank(ApplicationConf.ESB_APPID)){
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()), 1, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()), 2, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()), 4, 1, updateTime, username));
+
+        /* if(StringUtils.isNotBlank(ApplicationConf.ESB_APPID)){
             dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 3, 1, updateTime, username));
             dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 3, 1, updateTime, username));
             dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 3, 1, updateTime, username));
@@ -220,12 +225,12 @@ public class WorkspaceDBHelper {
     }
 
 
-    public List<DSSRole> getRoles() {
+    public List<DSSWorkspaceRole> getRoles() {
         return this.dssRoles;
     }
 
 
-    public List<DSSRole> getRoles(int workspaceId) {
+    public List<DSSWorkspaceRole> getRoles(int workspaceId) {
         return this.dssRoles.stream().
                 filter(dssRole -> dssRole.getWorkspaceId() == workspaceId || dssRole.getWorkspaceId() == -1).
                 collect(Collectors.toList());
@@ -233,7 +238,7 @@ public class WorkspaceDBHelper {
 
 
     public String getRoleFrontName(int roleId) {
-        DSSRole role = dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(null);
+        DSSWorkspaceRole role = dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(null);
         if (role != null) {
             return role.getFrontName();
         } else {
@@ -248,7 +253,7 @@ public class WorkspaceDBHelper {
         return dssRoles.stream().
                 filter(dssRole -> roleName.equals(dssRole.getName())).
                 findFirst().
-                map(DSSRole::getId).
+                map(DSSWorkspaceRole::getId).
                 orElse(-1);
     }
 
@@ -257,7 +262,7 @@ public class WorkspaceDBHelper {
         return getRoles(workspaceId).stream().map(this::changeToRoleVO).collect(Collectors.toList());
     }
 
-    private DSSWorkspaceRoleVO changeToRoleVO(DSSRole dssRole) {
+    private DSSWorkspaceRoleVO changeToRoleVO(DSSWorkspaceRole dssRole) {
         DSSWorkspaceRoleVO vo = new DSSWorkspaceRoleVO();
         vo.setRoleFrontName(dssRole.getFrontName());
         vo.setRoleId(dssRole.getId());
@@ -273,9 +278,17 @@ public class WorkspaceDBHelper {
         }
     }
 
+    public int getMenuIdByName(String name) {
+        if (dssWorkspaceMenus.stream().anyMatch(dssMenu -> dssMenu.getName().equals(name))) {
+            return dssWorkspaceMenus.stream().filter(dssMenu -> dssMenu.getName().equals(name)).findFirst().get().getId();
+        } else {
+            return -1;
+        }
+    }
+
 
     public String getRoleNameById(int roleId) {
-        return dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(new DSSRole()).getName();
+        return dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(new DSSWorkspaceRole()).getName();
     }
 
     public DSSApplicationBean getAppConn(int appConnId) {

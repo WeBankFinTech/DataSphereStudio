@@ -11,19 +11,9 @@ public class DolphinSchedulerAppConn extends AbstractSchedulerAppConn implements
 
     public static final String DOLPHINSCHEDULER_APPCONN_NAME = "dolphinscheduler";
 
-    private WorkflowConversionIntegrationStandard dolphinSchedulerWorkflowStandard;
-
     @Override
-    protected void initialize() {
-        dolphinSchedulerWorkflowStandard = new WorkflowConversionIntegrationStandard();
-    }
-
-    @Override
-    public ConversionIntegrationStandard getOrCreateConversionStandard() {
-        dolphinSchedulerWorkflowStandard.setSSORequestService(this.getOrCreateSSOStandard().getSSORequestService());
-        dolphinSchedulerWorkflowStandard.setAppConn(this);
-        dolphinSchedulerWorkflowStandard.init();
-        return dolphinSchedulerWorkflowStandard;
+    protected ConversionIntegrationStandard createConversionIntegrationStandard() {
+        return new WorkflowConversionIntegrationStandard();
     }
 
     @Override

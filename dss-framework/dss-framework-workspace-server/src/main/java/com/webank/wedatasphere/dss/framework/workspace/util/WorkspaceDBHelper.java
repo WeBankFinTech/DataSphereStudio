@@ -20,7 +20,6 @@ package com.webank.wedatasphere.dss.framework.workspace.util;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
-import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.utils.Utils;
@@ -42,8 +41,7 @@ public class WorkspaceDBHelper {
     @Autowired
     private DSSWorkspaceRoleMapper dssWorkspaceRoleMapper;
 
-
-    private List<DSSRole> dssRoles;
+    private List<DSSWorkspaceRole> dssRoles;
 
     private final Object lock = new Object();
 
@@ -69,7 +67,7 @@ public class WorkspaceDBHelper {
             @Override
             public void run() {
                 synchronized (lock) {
-                    dssWorkspaceMenus = dssWorkspaceRoleMapper.getOnestopMenus();
+                    dssWorkspaceMenus = dssWorkspaceRoleMapper.getWorkspaceMenus();
                 }
             }
         }, 0, 1, TimeUnit.MINUTES);
@@ -113,7 +111,7 @@ public class WorkspaceDBHelper {
     public void retrieveFromDB() {
         synchronized (lock) {
             dssApplicationBeans = dssWorkspaceRoleMapper.getDSSAppConns();
-            dssWorkspaceMenus = dssWorkspaceRoleMapper.getOnestopMenus();
+            dssWorkspaceMenus = dssWorkspaceRoleMapper.getWorkspaceMenus();
             dssRoles = dssWorkspaceRoleMapper.getRoles();
         }
     }
@@ -227,12 +225,12 @@ public class WorkspaceDBHelper {
     }
 
 
-    public List<DSSRole> getRoles() {
+    public List<DSSWorkspaceRole> getRoles() {
         return this.dssRoles;
     }
 
 
-    public List<DSSRole> getRoles(int workspaceId) {
+    public List<DSSWorkspaceRole> getRoles(int workspaceId) {
         return this.dssRoles.stream().
                 filter(dssRole -> dssRole.getWorkspaceId() == workspaceId || dssRole.getWorkspaceId() == -1).
                 collect(Collectors.toList());
@@ -240,7 +238,7 @@ public class WorkspaceDBHelper {
 
 
     public String getRoleFrontName(int roleId) {
-        DSSRole role = dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(null);
+        DSSWorkspaceRole role = dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(null);
         if (role != null) {
             return role.getFrontName();
         } else {
@@ -255,7 +253,7 @@ public class WorkspaceDBHelper {
         return dssRoles.stream().
                 filter(dssRole -> roleName.equals(dssRole.getName())).
                 findFirst().
-                map(DSSRole::getId).
+                map(DSSWorkspaceRole::getId).
                 orElse(-1);
     }
 
@@ -264,7 +262,7 @@ public class WorkspaceDBHelper {
         return getRoles(workspaceId).stream().map(this::changeToRoleVO).collect(Collectors.toList());
     }
 
-    private DSSWorkspaceRoleVO changeToRoleVO(DSSRole dssRole) {
+    private DSSWorkspaceRoleVO changeToRoleVO(DSSWorkspaceRole dssRole) {
         DSSWorkspaceRoleVO vo = new DSSWorkspaceRoleVO();
         vo.setRoleFrontName(dssRole.getFrontName());
         vo.setRoleId(dssRole.getId());
@@ -290,7 +288,7 @@ public class WorkspaceDBHelper {
 
 
     public String getRoleNameById(int roleId) {
-        return dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(new DSSRole()).getName();
+        return dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(new DSSWorkspaceRole()).getName();
     }
 
     public DSSApplicationBean getAppConn(int appConnId) {

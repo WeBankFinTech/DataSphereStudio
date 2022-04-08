@@ -25,15 +25,6 @@
         <id property="lastUpdateUser" column="last_update_user"/>
     </resultMap>
 
-    <resultMap id="dss_menu_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu">
-        <id property="upperMenuId" column="upper_menu_id"/>
-        <id property="active" column="is_active"/>
-        <id property="component" column="is_component"/>
-        <id property="frontName" column="front_name"/>
-        <id property="icon" column="icon"/>
-        <id property="applicationId" column="appconn_id"/>
-    </resultMap>
-
     <resultMap id="dss_workspace_user_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser">
         <id property="joinTime" column="join_time"/>
         <id property="creator" column="created_by"/>

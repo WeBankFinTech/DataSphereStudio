@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplicationBean;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSRole;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceRole;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -48,7 +47,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addWorkspaceRole(String roleName, int workspaceId, List<Integer> menuIds, List<Integer> componentIds, String username) {
-        DSSRole dssRole = new DSSRole();
+        DSSWorkspaceRole dssRole = new DSSWorkspaceRole();
         dssRole.setWorkspaceId(workspaceId);
         dssRole.setFrontName(roleName);
         dssRole.setName(roleName);

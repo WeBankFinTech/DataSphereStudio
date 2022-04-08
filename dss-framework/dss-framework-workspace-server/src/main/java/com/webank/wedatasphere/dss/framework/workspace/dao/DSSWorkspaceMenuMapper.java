@@ -27,8 +27,6 @@ import java.util.List;
 @Mapper
 public interface DSSWorkspaceMenuMapper {
 
-
-
     @Select("select * from dss_workspace_appconn_role where workspace_id = #{workspaceId}")
     @Results({
             @Result(property = "workspaceId", column = "workspace_id"),

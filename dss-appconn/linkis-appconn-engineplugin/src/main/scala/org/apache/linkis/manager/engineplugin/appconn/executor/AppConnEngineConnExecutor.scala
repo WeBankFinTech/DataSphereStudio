@@ -42,19 +42,16 @@ import org.apache.linkis.manager.engineplugin.appconn.exception.AppConnExecuteFa
 import org.apache.linkis.manager.engineplugin.appconn.executor.AppConnEngineConnExecutor._
 import org.apache.linkis.manager.engineplugin.common.conf.EngineConnPluginConf
 import org.apache.linkis.manager.label.entity.Label
-import org.apache.linkis.protocol.UserWithCreator
 import org.apache.linkis.protocol.engine.JobProgressInfo
 import org.apache.linkis.scheduler.executer.{AsynReturnExecuteResponse, ErrorExecuteResponse, ExecuteResponse, SuccessExecuteResponse}
 import org.apache.linkis.server.BDPJettyServerHelper
 
-import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 
 class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
   extends AsyncConcurrentComputationExecutor {
 
-  @BeanProperty
-  var userWithCreator: UserWithCreator = _
+  private var user: String = _
 
   private val executorLabels: util.List[Label[_]] = new util.ArrayList[Label[_]](2)
 
@@ -68,6 +65,8 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
       info(s"Cleaned ${iterator.size} history jobs, now only ${taskHashMap.size()} remained.")
     }
   }, 0, 5, TimeUnit.MINUTES)
+
+  def setUser(user: String): Unit = this.user = user
 
   override def executeLine(engineExecutorContext: EngineExecutionContext, code: String): ExecuteResponse = {
     info(s"The execution code is: $code, runtime properties is: ${BDPJettyServerHelper.gson.toJson(engineExecutorContext.getProperties)}.")
@@ -97,10 +96,12 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
         Utils.tryCatch {
           val refJobContent = if (StringUtils.isNotBlank(code)) BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]])
           else engineExecutorContext.getProperties
+          var submitUser = getValue(engineExecutorContext.getProperties, SUBMIT_USER_KEY)
+          if (submitUser == null) submitUser = user
           val responseRef = AppConnExecutionUtils.tryToOperation(refExecutionService, getValue(engineExecutorContext.getProperties, CONTEXT_ID_KEY),
-            getValue(source, PROJECT_NAME_STR), new ExecutionRequestRefContextImpl(engineExecutorContext, userWithCreator),
+            getValue(source, PROJECT_NAME_STR), new ExecutionRequestRefContextImpl(engineExecutorContext, user, submitUser),
             getLabels(labels), getValue(source, NODE_NAME_STR), getValue(engineExecutorContext.getProperties, NODE_TYPE),
-            userWithCreator.user, workspace, refJobContent)
+            user, workspace, refJobContent)
           responseRef match {
             case asyncResponseRef: AsyncExecutionResponseRef =>
               engineExecutorContext.getJobId match {
@@ -157,10 +158,9 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
   }
 
   private def getLabels(labels: String): util.List[DSSLabel] = {
-    val envLabelValue = if (labels.contains(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
-      val labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, classOf[util.Map[_, _]])
-      labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY).asInstanceOf[String]
-    } else labels
+    val labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, classOf[util.Map[String, String]])
+    val envLabelValue = labelMap.getOrDefault(LabelKeyConvertor.ROUTE_LABEL_KEY,
+      labelMap.getOrDefault(EnvDSSLabel.DSS_ENV_LABEL_KEY, labels))
     util.Arrays.asList(new EnvDSSLabel(envLabelValue))
   }
 
@@ -249,5 +249,7 @@ object AppConnEngineConnExecutor {
   private val NODE_TYPE = "nodeType"
 
   private val CONTEXT_ID_KEY = "contextID"
+
+  private val SUBMIT_USER_KEY = "wds.dss.workflow.submit.user"
 
 }

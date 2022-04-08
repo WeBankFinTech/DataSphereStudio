@@ -19,25 +19,13 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 import java.util.Date;
 
 
-public class DSSRole {
+public class DSSWorkspaceRole {
     private int id;
     private int workspaceId;
     private String name;
     private String frontName;
     private Date createTime;
     private String description;
-
-    public static DSSRole adminRole = null;
-    public static DSSRole maintenanceRole = null;
-    public static DSSRole developerRole = null;
-
-
-    public static DSSRole getAdminRole() {
-        if (adminRole == null) {
-
-        }
-        return adminRole;
-    }
 
     public int getId() {
         return id;

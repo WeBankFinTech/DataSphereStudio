@@ -27,6 +27,18 @@ public class DSSRole {
     private Date createTime;
     private String description;
 
+    public static DSSRole adminRole = null;
+    public static DSSRole maintenanceRole = null;
+    public static DSSRole developerRole = null;
+
+
+    public static DSSRole getAdminRole() {
+        if (adminRole == null) {
+
+        }
+        return adminRole;
+    }
+
     public int getId() {
         return id;
     }

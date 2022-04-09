@@ -20,7 +20,8 @@ package com.webank.wedatapshere.dss.appconn.datachecker;
 import com.webank.wedatapshere.dss.appconn.datachecker.connector.DataCheckerDao;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
@@ -35,7 +36,7 @@ public class DataChecker {
     public final static String MASK_APP_TOKEN = "bdp.mask.app.token";
 
     private Properties p;
-    private static final Logger logger = Logger.getRootLogger();
+    private static final Logger logger = LoggerFactory.getLogger(DataChecker.class);;
     DataCheckerDao wbDao = DataCheckerDao.getInstance();
     DataCheckerExecutionAction dataCheckerAction = null;
     public long maxWaitTime;

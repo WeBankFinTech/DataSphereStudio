@@ -81,8 +81,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Autowired
     private DSSComponentRoleMapper dssComponentRoleMapper;
     @Autowired
-    private DSSWorkspaceMenuService dssWorkspaceMenuService;
-    @Autowired
     private WorkspaceMapper workspaceMapper;
 
     @Autowired

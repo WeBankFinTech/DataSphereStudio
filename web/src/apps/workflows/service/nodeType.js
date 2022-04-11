@@ -55,7 +55,8 @@ const NODETYPE = {
   EXCHANGE: 'linkis.data.exchange',
   QUALITIS: 'linkis.appconn.qualitis',
   PROJECTNODE: 'projectNode',
-  MLSS: 'linkis.appconn.mlss'
+  MLSS: 'linkis.appconn.mlss',
+  JDBC: 'linkis.jdbc.jdbc',
 }
 const ext = {
   [NODETYPE.SHELL]: 'shell',
@@ -63,7 +64,8 @@ const ext = {
   [NODETYPE.SPARKSQL]: 'sql',
   [NODETYPE.SPARKPY]: 'pyspark',
   [NODETYPE.SCALA]: 'scala',
-  [NODETYPE.PYTHON]: 'python'
+  [NODETYPE.PYTHON]: 'python',
+  [NODETYPE.JDBC]: 'jdbc'
 }
 const NODEICON = {
   [NODETYPE.SHELL]: {

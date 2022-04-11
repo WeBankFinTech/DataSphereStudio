@@ -456,8 +456,8 @@ export default {
               const methodName = 'Workbench:add';
               const supportModes = this.getSupportModes();
               const model = this.node.modelType;
-              const match = supportModes.find((s) => s.flowType && s.flowType.toLowerCase() == model);
-              const name = `${this.node.name || this.node.key}${match.ext}`;
+              const match = supportModes.find((s) => (s.flowType || s.scriptType || '').toLowerCase() == model) || {};
+              const name = `${this.node.name || this.node.key}${match.ext||''}`;
               this[methodName]({
                 id: this.node.key,
                 filename: this.node.jobContent && this.node.jobContent.script ? this.node.jobContent.script : name,

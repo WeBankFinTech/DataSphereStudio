@@ -28,7 +28,7 @@
     <artifactId>dss-appconn-core</artifactId>
 
     <properties>
-        <fasterxml.jackson.version>2.11.0</fasterxml.jackson.version>
+        <fasterxml.jackson.version>2.12.6.1</fasterxml.jackson.version>
         <commons-collections.version>3.2.2</commons-collections.version>
     </properties>
 

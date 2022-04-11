@@ -22,7 +22,6 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomeP
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import org.apache.linkis.common.exception.ErrorException;
@@ -42,8 +41,6 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
 public class DSSWorkspaceRestful {
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
-    @Autowired
-    private DSSWorkspaceMenuService dssWorkspaceMenuService;
     @Autowired
     private WorkspaceDBHelper workspaceDBHelper;
 

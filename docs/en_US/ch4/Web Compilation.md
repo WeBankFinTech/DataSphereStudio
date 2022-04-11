@@ -90,7 +90,7 @@ open -n /Applications/Google\ Chrome.app/ --args --disable-web-security --user-d
 Try to use Taobao npm mirror:
 
 ```
-npm install -g cnpm --registry=https://registry.npm.taobao.org
+npm install -g cnpm --registry=https://registry.npmmirror.com
 ```
 
 Next,  run the following command instead of npm install:

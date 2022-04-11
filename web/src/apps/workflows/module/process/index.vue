@@ -24,8 +24,8 @@
           <div>
             <img
               class="tab-icon"
-              :class="nodeImg[item.node.type].class"
-              :src="nodeImg[item.node.type].icon"
+              :class="nodeImg[item.node.type]&&nodeImg[item.node.type].class"
+              :src="nodeImg[item.node.type]?nodeImg[item.node.type].icon:item.node.image"
               alt
             />
             <div :title="item.title" class="process-tab-name">{{ item.title }}</div>

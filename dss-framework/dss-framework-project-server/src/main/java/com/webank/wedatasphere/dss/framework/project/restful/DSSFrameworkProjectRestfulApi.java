@@ -156,8 +156,6 @@ public class DSSFrameworkProjectRestfulApi {
     public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-        // 删除第三方系统中的项目
-        projectDeleteRequest.setIfDelOtherSys(true);
         try {
             // 检查是否具有删除项目权限
             projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);

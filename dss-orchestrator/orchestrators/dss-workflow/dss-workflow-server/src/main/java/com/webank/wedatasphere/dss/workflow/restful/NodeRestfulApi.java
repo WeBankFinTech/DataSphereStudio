@@ -16,16 +16,11 @@
 
 package com.webank.wedatasphere.dss.workflow.restful;
 
-import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
-import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
-import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
@@ -44,7 +39,6 @@ import com.webank.wedatasphere.dss.workflow.entity.vo.NodeUiValidateVO;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -141,21 +135,6 @@ public class NodeRestfulApi {
         }
         nodeUiVOS.sort(NodeUiVO::compareTo);
         nodeInfoVO.setNodeUiVOS(nodeUiVOS);
-        //cache
-        AppConn applicationAppConn =  AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
-        if (applicationAppConn instanceof OnlySSOAppConn) {
-            SSOIntegrationStandard standard =((OnlySSOAppConn) applicationAppConn).getOrCreateSSOStandard();
-            if(null !=standard) {
-                SSOUrlBuilderOperation ssoUrlBuilderOperation=standard.getSSOBuilderService().createSSOUrlBuilderOperation();
-                ssoUrlBuilderOperation.setDSSUrl(Configuration.GATEWAY_URL().getValue());
-                //todo add redirect url by labels
-                ssoUrlBuilderOperation.setReqUrl(applicationAppConn.getAppDesc().getAppInstances().get(0).getBaseUrl());
-                String redirectUrl =ssoUrlBuilderOperation.getBuiltUrl();
-                if (redirectUrl != null) {
-                    nodeInfoVO.setJumpUrl(redirectUrl);
-                }
-            }
-        }
         return nodeInfoVO;
     }
 

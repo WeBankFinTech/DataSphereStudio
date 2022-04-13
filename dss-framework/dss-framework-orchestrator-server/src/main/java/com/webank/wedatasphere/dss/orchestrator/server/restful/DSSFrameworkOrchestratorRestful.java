@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
+import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
@@ -37,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.List;
 
 @RequestMapping(path = "/dss/framework/orchestrator", produces = {"application/json"})
 @RestController
@@ -132,5 +135,13 @@ public class DSSFrameworkOrchestratorRestful {
             LOGGER.error("Failed to delete orchestrator {} for user {}.", deleteRequest.getId(), username, e);
             return Message.error("删除工作流编排模式失败:" + ExceptionUtils.getRootCauseMessage(e));
         }
+    }
+
+    @RequestMapping(path = "orchestratorLevels", method = RequestMethod.GET)
+    public Message getOrchestratorLevels(HttpServletRequest httpServletRequest) {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        List<OrchestratorLevelEnum> levels = Arrays.asList(OrchestratorLevelEnum.values());
+        return Message.ok("获取编排重要级别列表成功").data("orchestratorLevels", levels);
     }
 }

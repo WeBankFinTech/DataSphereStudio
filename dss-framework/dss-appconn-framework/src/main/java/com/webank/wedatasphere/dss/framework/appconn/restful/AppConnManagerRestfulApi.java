@@ -16,11 +16,14 @@
 
 package com.webank.wedatasphere.dss.framework.appconn.restful;
 
+import com.webank.wedatasphere.dss.appconn.core.AppConn;
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf;
+import com.webank.wedatasphere.dss.framework.appconn.service.AppConnQualityChecker;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.Message;
@@ -44,18 +47,26 @@ public class AppConnManagerRestfulApi {
     private AppConnInfoService appConnInfoService;
     @Autowired
     private AppConnResourceUploadService appConnResourceUploadService;
+    @Autowired
+    private List<AppConnQualityChecker> appConnQualityCheckers;
 
     @PostConstruct
     public void init() {
         if (AppConnConf.IS_APPCONN_MANAGER.getValue()) {
-            LOGGER.info("Try to scan AppConn plugins...");
+            LOGGER.info("First, try to load all AppConn...");
+            AppConnManager.getAppConnManager().listAppConns().forEach(appConn -> {
+                LOGGER.info("Try to check the quality of AppConn {}.", appConn.getAppDesc().getAppName());
+                appConnQualityCheckers.forEach(DSSExceptionUtils.handling(checker -> checker.checkQuality(appConn)));
+            });
+            LOGGER.info("All AppConn have loaded successfully.");
+            LOGGER.info("Last, try to scan AppConn plugins and upload AppConn resources...");
             appConnInfoService.getAppConnInfos().forEach(DSSExceptionUtils.handling(appConnInfo -> {
-                LOGGER.info("Try to load or update AppConn {}.", appConnInfo.getAppConnName());
+                LOGGER.info("Try to scan AppConn {}.", appConnInfo.getAppConnName());
                 appConnResourceUploadService.upload(appConnInfo.getAppConnName());
             }));
             LOGGER.info("All AppConn plugins has scanned.");
         } else {
-            LOGGER.info("Not appconn manager, will not scan plugins.");
+            LOGGER.info("Not appConn manager, will not scan plugins.");
         }
     }
 
@@ -85,16 +96,20 @@ public class AppConnManagerRestfulApi {
 
     @RequestMapping(path ="{appConnName}/load", method = RequestMethod.GET)
     public Message load(@PathVariable("appConnName") String appConnName) {
-        LOGGER.info("Try to load a new AppConn {}.", appConnName);
+        LOGGER.info("Try to reload AppConn {}.", appConnName);
         try {
+            LOGGER.info("First, reload AppConn {}.", appConnName);
+            AppConnManager.getAppConnManager().reloadAppConn(appConnName);
+            AppConn appConn = AppConnManager.getAppConnManager().getAppConn(appConnName);
+            LOGGER.info("Second, check the quality of AppConn {}.", appConnName);
+            appConnQualityCheckers.forEach(DSSExceptionUtils.handling(checker -> checker.checkQuality(appConn)));
+            LOGGER.info("Last, upload AppConn {} resources.", appConnName);
             appConnResourceUploadService.upload(appConnName);
         } catch (Exception e) {
             LOGGER.error("Load AppConn " + appConnName + " failed.", e);
-            Message message = Message.error("Load AppConn " + appConnName + " failed. Reason: " + ExceptionUtils.getRootCauseMessage(e));
-            return message;
+            return Message.error("Load AppConn " + appConnName + " failed. Reason: " + ExceptionUtils.getRootCauseMessage(e));
         }
-        Message message = Message.ok("Load AppConn " + appConnName + " succeed.");
-        return message;
+        return Message.ok("Load AppConn " + appConnName + " succeed.");
     }
 
 }

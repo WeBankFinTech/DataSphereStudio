@@ -52,7 +52,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private boolean isLoaded = false;
     private List<AppConn> appConnList = null;
     AppConnInfoService appConnInfoService;
-    AppConnResourceService appConnResourceService;
+    private AppConnResourceService appConnResourceService;
+    private AppConnRefreshThread appConnRefreshThread;
 
     private static AppConnManager appConnManager;
     private static boolean lazyLoad = false;
@@ -102,8 +103,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             return;
         }
         long refreshInterval = AppInstanceConstants.APP_CONN_REFRESH_INTERVAL.getValue().toLong();
-        Utils.defaultScheduler().scheduleAtFixedRate(new AppConnRefreshThread(this, appConnInfos),
-                refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
+        appConnRefreshThread = new AppConnRefreshThread(this, appConnInfos);
+        Utils.defaultScheduler().scheduleAtFixedRate(appConnRefreshThread, refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
         Map<String, AppConn> appConns = new HashMap<>();
         Consumer<AppConnInfo> loadAndAdd = DSSExceptionUtils.handling(appConnInfo -> {
             AppConn appConn = loadAppConn(appConnInfo);
@@ -227,6 +228,13 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             throw new DSSRuntimeException("Cannot get any info about AppConn " + appConnName);
         }
         reloadAppConn(appConnInfo);
+    }
+
+    @Override
+    public String getAppConnHomePath(String appConnName) {
+        AppConnInfo appConnInfo = appConnRefreshThread.getAppConnInfos().stream().filter(info -> info.getAppConnName().equals(appConnName))
+                .findAny().orElseThrow(() -> new DSSRuntimeException("Not exists AppConn " + appConnName));
+        return appConnResourceService.getAppConnHome(appConnInfo);
     }
 
     public void reloadAppConn(AppConnInfo appConnInfo) {

@@ -67,7 +67,7 @@ CREATE TABLE `dss_orchestrator_version_info` (
   `project_id` bigint(20) DEFAULT NULL,
   `content` varchar(255) DEFAULT NULL,
   `context_id` varchar(200) DEFAULT NULL COMMENT '上下文ID',
-   `valid_flag` INT(1) DEFAULT '1' COMMENT '版本有效标示，0:无效；1：有效',
+  `valid_flag` INT(1) DEFAULT '1' COMMENT '版本有效标示，0:无效；1：有效',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=422 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 

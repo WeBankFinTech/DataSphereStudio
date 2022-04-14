@@ -57,6 +57,8 @@ public interface AppConnManager {
 
     void reloadAppConn(String appConnName);
 
+    String getAppConnHomePath(String appConnName);
+
     static void setLazyLoad() {
         AbstractAppConnManager.setLazyLoad();
     }

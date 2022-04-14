@@ -17,10 +17,8 @@
 package com.webank.wedatasphere.dss.appconn.manager.service;
 
 import com.webank.wedatasphere.dss.appconn.loader.utils.AppConnUtils;
-import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.exception.AppConnHomeNotExistsWarnException;
-import com.webank.wedatasphere.dss.appconn.manager.impl.AbstractAppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnIndexFileUtils;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -28,6 +26,9 @@ import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import org.apache.linkis.bml.client.BmlClient;
 import org.apache.linkis.bml.client.BmlClientFactory;
 import org.apache.linkis.common.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,8 +38,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AppConnResourceServiceImpl implements AppConnResourceService {
 
@@ -94,7 +93,7 @@ public class AppConnResourceServiceImpl implements AppConnResourceService {
             // ignore delete failed.
             IntStream.range(0, files.size() - 2).forEach(index -> files.get(index).delete());
         }
-        // Finally, reload appconn and write index file.
+        // Finally, write index file.
         Path indexFile = Paths.get(appConnPath.getPath(), AppConnIndexFileUtils.getIndexFileName(resource));
         try {
             Files.createFile(indexFile);
@@ -102,7 +101,6 @@ public class AppConnResourceServiceImpl implements AppConnResourceService {
             throw new AppConnHomeNotExistsWarnException(20350, "Cannot create index file " + indexFile.toFile().getPath() + " for AppConn "
                 + appConnName, e);
         }
-        ((AbstractAppConnManager) AppConnManager.getAppConnManager()).reloadAppConn(appConnInfo);
         return appConnPath.getPath();
     }
 

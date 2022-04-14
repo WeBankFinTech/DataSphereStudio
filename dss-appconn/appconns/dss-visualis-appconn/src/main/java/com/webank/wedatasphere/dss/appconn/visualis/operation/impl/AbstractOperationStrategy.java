@@ -51,7 +51,7 @@ public abstract class AbstractOperationStrategy implements OperationStrategy {
         this.baseUrl = baseUrl;
     }
 
-    protected QueryJumpUrlResponseRef getQueryResponseRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef, Long projectId,
+    protected QueryJumpUrlResponseRef getQueryResponseRef(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef, Long projectId,
                                               String jumpUrlFormat, String id) {
         String jumpUrl = URLUtils.getUrl(baseUrl, jumpUrlFormat, projectId.toString(), id, requestRef.getName());
         String env = requestRef.getDSSLabels().stream().filter(dssLabel -> dssLabel instanceof EnvDSSLabel)

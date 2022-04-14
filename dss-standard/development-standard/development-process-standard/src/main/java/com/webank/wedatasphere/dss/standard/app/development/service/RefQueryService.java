@@ -16,10 +16,13 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.service;
 
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryJumpUrlOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
 
 public interface RefQueryService extends DevelopmentService {
 
-    RefQueryOperation getRefQueryOperation();
+    RefQueryJumpUrlOperation getRefQueryOperation();
+
+    RefQueryOperation getExtraRefQueryOperation(Class<RefQueryOperation> clazz);
 
 }

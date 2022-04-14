@@ -14,9 +14,6 @@ public interface OrchestratorRefConstant {
     /** so it is represented the orchestrator framework abstract defination. **/
     /*************************************************************/
     String ORCHESTRATOR_ID_KEY = "orchestratorId";
-    String ORCHESTRATOR_ID_LIST_KEY = "orchestratorIdList";
-    String ORCHESTRATOR_VERSION_ID_KEY = "orchestratorVersionId";
-    String ORCHESTRATOR_ADD_VERSION_FLAG_KEY = "addOrcVersionFlag";
     String ORCHESTRATOR_VERSION_KEY = "orchestratorVersion";
 
 

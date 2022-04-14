@@ -27,31 +27,31 @@ public interface OnlyDevelopmentRequestRef {
     class RefJobContentWithContextRequestRef extends DevelopmentRequestRefImpl<RefJobContentWithContextRequestRef>
             implements RefJobContentRequestRef<RefJobContentWithContextRequestRef>, DSSContextRequestRef<RefJobContentWithContextRequestRef> {}
 
-    class CopyRequestRefImpl extends DevelopmentRequestRefImpl<ThirdlyRequestRef.CopyRequestRefImpl>
-            implements CopyRequestRef<ThirdlyRequestRef.CopyRequestRefImpl> {}
+    class CopyRequestRefImpl extends DevelopmentRequestRefImpl<CopyRequestRefImpl>
+            implements CopyRequestRef<CopyRequestRefImpl> {}
 
-    class CopyWitContextRequestRefImpl extends DevelopmentRequestRefImpl<ThirdlyRequestRef.CopyWitContextRequestRefImpl>
-            implements CopyRequestRef<ThirdlyRequestRef.CopyWitContextRequestRefImpl>,
-            DSSContextRequestRef<ThirdlyRequestRef.CopyWitContextRequestRefImpl> {}
+    class CopyWitContextRequestRefImpl extends DevelopmentRequestRefImpl<CopyWitContextRequestRefImpl>
+            implements CopyRequestRef<CopyWitContextRequestRefImpl>,
+            DSSContextRequestRef<CopyWitContextRequestRefImpl> {}
 
-    class ImportRequestRefImpl extends DevelopmentRequestRefImpl<ThirdlyRequestRef.ImportRequestRefImpl>
-            implements ImportRequestRef<ThirdlyRequestRef.ImportRequestRefImpl> {}
+    class ImportRequestRefImpl extends DevelopmentRequestRefImpl<ImportRequestRefImpl>
+            implements ImportRequestRef<ImportRequestRefImpl> {}
 
-    class ImportWithStreamRequestRefImpl extends DevelopmentRequestRefImpl<ThirdlyRequestRef.ImportRequestRefImpl>
-            implements ImportRequestRef<ThirdlyRequestRef.ImportRequestRefImpl> {
+    class ImportWithStreamRequestRefImpl extends DevelopmentRequestRefImpl<ImportRequestRefImpl>
+            implements ImportRequestRef<ImportRequestRefImpl> {
         @Override
         public boolean isLinkisBMLResources() {
             return false;
         }
     }
 
-    class ImportWitContextRequestRefImpl extends DevelopmentRequestRefImpl<ThirdlyRequestRef.ImportWitContextRequestRefImpl>
-            implements ImportRequestRef<ThirdlyRequestRef.ImportWitContextRequestRefImpl>,
-            DSSContextRequestRef<ThirdlyRequestRef.ImportWitContextRequestRefImpl>{}
+    class ImportWitContextRequestRefImpl extends DevelopmentRequestRefImpl<ImportWitContextRequestRefImpl>
+            implements ImportRequestRef<ImportWitContextRequestRefImpl>,
+            DSSContextRequestRef<ImportWitContextRequestRefImpl>{}
 
-    class ImportWitContextAndStreamRequestRefImpl extends DevelopmentRequestRefImpl<ThirdlyRequestRef.ImportWitContextRequestRefImpl>
-            implements ImportRequestRef<ThirdlyRequestRef.ImportWitContextRequestRefImpl>,
-            DSSContextRequestRef<ThirdlyRequestRef.ImportWitContextRequestRefImpl> {
+    class ImportWitContextAndStreamRequestRefImpl extends DevelopmentRequestRefImpl<ImportWitContextRequestRefImpl>
+            implements ImportRequestRef<ImportWitContextRequestRefImpl>,
+            DSSContextRequestRef<ImportWitContextRequestRefImpl> {
         @Override
         public boolean isLinkisBMLResources() {
             return false;
@@ -63,4 +63,11 @@ public interface OnlyDevelopmentRequestRef {
 
     class UpdateWitContextRequestRefImpl extends DevelopmentRequestRefImpl<UpdateWitContextRequestRefImpl>
             implements UpdateRequestRef<UpdateWitContextRequestRefImpl>, DSSContextRequestRef<UpdateWitContextRequestRefImpl>{}
+
+    class QueryJumpUrlRequestRefImpl extends DevelopmentRequestRefImpl<QueryJumpUrlRequestRefImpl>
+            implements QueryJumpUrlRequestRef<QueryJumpUrlRequestRefImpl> {}
+
+    class QueryJumpUrlWithContextRequestRefImpl extends DevelopmentRequestRefImpl<QueryJumpUrlWithContextRequestRefImpl>
+            implements QueryJumpUrlRequestRef<QueryJumpUrlWithContextRequestRefImpl>,
+            DSSContextRequestRef<QueryJumpUrlWithContextRequestRefImpl> {}
 }

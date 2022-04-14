@@ -18,46 +18,30 @@
         xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.3"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/2.3 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-    <id>dss-orchestrator-framework-appconn</id>
+    <id>dss-scriptis-appconn</id>
     <formats>
         <format>dir</format>
     </formats>
     <includeBaseDirectory>true</includeBaseDirectory>
-    <baseDirectory>orchestrator-framework</baseDirectory>
-
-    <dependencySets>
-        <dependencySet>
-            <!-- Enable access to all projects in the current multimodule build! <useAllReactorProjects>true</useAllReactorProjects> -->
-            <!-- Now, select which projects to include in this module-set. -->
-            <outputDirectory>lib</outputDirectory>
-            <useProjectArtifact>true</useProjectArtifact>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <unpack>false</unpack>
-            <useStrictFiltering>true</useStrictFiltering>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-        </dependencySet>
-    </dependencySets>
+    <baseDirectory>scriptis</baseDirectory>
 
     <fileSets>
         <fileSet>
             <directory>${basedir}/src/main/resources</directory>
             <includes>
-                <include>appconn.properties</include>
+                <include>init.sql</include>
             </includes>
             <fileMode>0777</fileMode>
-            <outputDirectory>/</outputDirectory>
-            <lineEnding>unix</lineEnding>
+            <outputDirectory>db</outputDirectory>
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/src/main/resources</directory>
+            <directory>${basedir}/src/main/icons</directory>
             <includes>
-                <include>log4j.properties</include>
-                <include>log4j2.xml</include>
+                <include>*</include>
             </includes>
             <fileMode>0777</fileMode>
-            <outputDirectory>conf</outputDirectory>
-            <lineEnding>unix</lineEnding>
+            <outputDirectory>icons</outputDirectory>
         </fileSet>
 
     </fileSets>

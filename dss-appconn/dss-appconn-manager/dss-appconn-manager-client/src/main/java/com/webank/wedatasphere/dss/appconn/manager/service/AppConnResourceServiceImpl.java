@@ -69,7 +69,7 @@ public class AppConnResourceServiceImpl implements AppConnResourceService {
         bmlClient.downloadResource(Utils.getJvmUser(), resource.getResourceId(), resource.getVersion(),
             "file://" + zipFilePath, true);
         // Then, try to unzip it.
-        if(!DeleteAppConnDir(appConnPath)) {
+        if(!deleteAppConnDir(appConnPath)) {
             throw new AppConnHomeNotExistsWarnException(20350, "Cannot delete dir " + appConnPath.getPath() + " for AppConn " + appConnName);
         }
         try {
@@ -104,14 +104,14 @@ public class AppConnResourceServiceImpl implements AppConnResourceService {
         return appConnPath.getPath();
     }
 
-    public boolean DeleteAppConnDir(File f){
+    public boolean deleteAppConnDir(File f){
         if(f.isDirectory()){
             File[] files = f.listFiles();
             for (File key : files) {
                 if(key.isFile()){
                     key.delete();
                 }else{
-                    DeleteAppConnDir(key);
+                    deleteAppConnDir(key);
                 }
             }
         }

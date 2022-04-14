@@ -22,10 +22,16 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.ProjectRefReques
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.DevelopmentRequestRefImpl;
 
+import java.util.Map;
+
 
 public interface RefExecutionRequestRef<R extends RefExecutionRequestRef<R>>
         extends RefJobContentRequestRef<R> {
 
+    /**
+     * 节点执行的上下文信息类，详见 {@code ExecutionRequestRefContext}。
+     * @return 节点执行的上下文信息类
+     */
     default ExecutionRequestRefContext getExecutionRequestRefContext() {
         return (ExecutionRequestRefContext) getParameter("executionRequestRefContext");
     }
@@ -33,6 +39,32 @@ public interface RefExecutionRequestRef<R extends RefExecutionRequestRef<R>>
     default R setExecutionRequestRefContext(ExecutionRequestRefContext executionRequestRefContext) {
         setParameter("executionRequestRefContext", executionRequestRefContext);
         return (R) this;
+    }
+
+    /**
+     * DSS 工作流设置的所有全局变量
+     * @return 返回 DSS 工作流所设置的所有全局变量
+     */
+    default Map<String, Object> getVariables() {
+        return (Map<String, Object>) getParameter("variables");
+    }
+
+    default R setVariables(Map<String, Object> variables) {
+        setParameter("variables", variables);
+        return (R) this;
+    }
+
+    /**
+     * 这是一个非常重要的属性，当第三方 AppConn 支持按照选定的日期进行跑批时，那么在执行对应的 refJob 时，请一定要带上该
+     * 参数到第三方 refJob，以便一些调度系统想要做历史跑批时，可以正确地执行其对应日期的作业。
+     * @return null if not exists, otherwise return the date string, the date format is yyyyMMdd.
+     */
+    default String getRunDate() {
+        if(getVariables().containsKey("run_date")) {
+            return (String) getVariables().get("run_date");
+        } else {
+            return null;
+        }
     }
 
     /**

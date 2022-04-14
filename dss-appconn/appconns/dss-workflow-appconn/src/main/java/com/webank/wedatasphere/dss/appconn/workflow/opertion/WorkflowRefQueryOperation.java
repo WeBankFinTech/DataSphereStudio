@@ -18,17 +18,17 @@ package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryJumpUrlOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.OnlyDevelopmentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 
 public class WorkflowRefQueryOperation
-        extends AbstractDevelopmentOperation<OnlyDevelopmentRequestRef.RefJobContentRequestRefImpl, QueryJumpUrlResponseRef>
-        implements RefQueryOperation<OnlyDevelopmentRequestRef.RefJobContentRequestRefImpl, QueryJumpUrlResponseRef> {
+        extends AbstractDevelopmentOperation<OnlyDevelopmentRequestRef.QueryJumpUrlRequestRefImpl, QueryJumpUrlResponseRef>
+        implements RefQueryJumpUrlOperation<OnlyDevelopmentRequestRef.QueryJumpUrlRequestRefImpl, QueryJumpUrlResponseRef> {
 
     @Override
-    public QueryJumpUrlResponseRef query(OnlyDevelopmentRequestRef.RefJobContentRequestRefImpl ref) {
+    public QueryJumpUrlResponseRef query(OnlyDevelopmentRequestRef.QueryJumpUrlRequestRefImpl ref) {
         // Now only support to fetch workflow open url, not support other orchestrations.
         return ref.getDSSLabels().stream().filter(EnvDSSLabel.class::isInstance).findFirst().map(label -> {
             String urlStr = "router/workflow/editable?labels=" + ((EnvDSSLabel) label).getEnv();

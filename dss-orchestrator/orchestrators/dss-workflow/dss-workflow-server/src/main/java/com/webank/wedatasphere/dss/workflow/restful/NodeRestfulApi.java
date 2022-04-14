@@ -16,12 +16,13 @@
 
 package com.webank.wedatasphere.dss.workflow.restful;
 
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
@@ -38,6 +39,7 @@ import com.webank.wedatasphere.dss.workflow.entity.vo.NodeUiVO;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeUiValidateVO;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -51,6 +53,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +76,7 @@ public class NodeRestfulApi {
     @RequestMapping(value = "/listNodeType",method = RequestMethod.GET)
     public Message listNodeType(HttpServletRequest req) {
         Function<NodeGroup, String> supplier = internationalization(req, NodeGroup::getNameEn, NodeGroup::getName);
-        List<NodeGroupVO> groupVOS = new ArrayList<>();
+        List<NodeGroupVO> groupVos = new ArrayList<>();
         //cache
         List<NodeGroup> groups = workflowNodeService.listNodeGroups();
         for (NodeGroup group : groups) {
@@ -82,15 +86,15 @@ public class NodeRestfulApi {
             nodeGroupVO.setChildren(group.getNodes().stream().map(n -> {
                 try {
                     return transfer(n, req);
-                } catch (AppStandardErrorException e) {
-                    e.printStackTrace();
-                    return null;
+                } catch (IOException e) {
+                    logger.error("listNodeType get icons failed.", e);
+                    throw new DSSRuntimeException(81200, e.getMessage(), e);
                 }
             }).collect(Collectors.toList()));
-            groupVOS.add(nodeGroupVO);
+            groupVos.add(nodeGroupVO);
         }
-        groupVOS = groupVOS.stream().sorted(NodeGroupVO::compareTo).collect(Collectors.toList());
-        return Message.ok().data("nodeTypes", groupVOS);
+        groupVos = groupVos.stream().sorted(NodeGroupVO::compareTo).collect(Collectors.toList());
+        return Message.ok().data("nodeTypes", groupVos);
     }
 
     private <P, T> Function<P, T> internationalization(HttpServletRequest req,
@@ -116,12 +120,12 @@ public class NodeRestfulApi {
         return nodeUiValidateVO;
     }
 
-    private NodeInfoVO transfer(NodeInfo nodeInfo, HttpServletRequest req) throws AppStandardErrorException {
+    private NodeInfoVO transfer(NodeInfo nodeInfo, HttpServletRequest req) throws IOException {
         NodeInfoVO nodeInfoVO = new NodeInfoVO();
         BeanUtils.copyProperties(nodeInfo, nodeInfoVO);
         nodeInfoVO.setTitle(nodeInfo.getName());
         nodeInfoVO.setType(nodeInfo.getNodeType());
-        nodeInfoVO.setImage(nodeInfo.getIcon());
+        nodeInfoVO.setImage(getIcon(nodeInfo));
         Function<NodeUi, String> descriptionSupplier = internationalization(req, NodeUi::getDescriptionEn, NodeUi::getDescription);
         Function<NodeUi, String> labelNameSupplier = internationalization(req, NodeUi::getLableNameEn, NodeUi::getLableName);
         ArrayList<NodeUiVO> nodeUiVOS = new ArrayList<>();
@@ -136,6 +140,17 @@ public class NodeRestfulApi {
         nodeUiVOS.sort(NodeUiVO::compareTo);
         nodeInfoVO.setNodeUiVOS(nodeUiVOS);
         return nodeInfoVO;
+    }
+
+    private String getIcon(NodeInfo nodeInfo) throws IOException {
+        String appConnHomePath = AppConnManager.getAppConnManager().getAppConnHomePath(nodeInfo.getAppConnName());
+        File iconPath = new File(appConnHomePath, nodeInfo.getIconPath());
+        if(!iconPath.exists()) {
+            throw new IOException("Get icon failed. Caused by: " + iconPath + " not exists.");
+        } else if(!iconPath.isFile()) {
+            throw new IOException("Get icon failed. Caused by: " + iconPath + " is not a file.");
+        }
+        return FileUtils.readFileToString(iconPath);
     }
 
     @RequestMapping(value = "/createAppConnNode",method = RequestMethod.POST)

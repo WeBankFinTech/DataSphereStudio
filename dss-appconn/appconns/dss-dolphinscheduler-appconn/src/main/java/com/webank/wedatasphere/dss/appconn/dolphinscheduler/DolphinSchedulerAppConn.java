@@ -12,7 +12,7 @@ public class DolphinSchedulerAppConn extends AbstractSchedulerAppConn implements
     public static final String DOLPHINSCHEDULER_APPCONN_NAME = "dolphinscheduler";
 
     @Override
-    protected ConversionIntegrationStandard createConversionIntegrationStandard() {
+    public ConversionIntegrationStandard createConversionIntegrationStandard() {
         return new WorkflowConversionIntegrationStandard();
     }
 

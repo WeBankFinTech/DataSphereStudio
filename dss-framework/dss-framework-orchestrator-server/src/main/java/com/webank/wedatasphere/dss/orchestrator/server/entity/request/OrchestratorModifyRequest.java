@@ -41,6 +41,8 @@ public class OrchestratorModifyRequest extends OrchestratorRequest {
     @NotNull(message = "编排方式不能为空")
     private List<String> orchestratorWays;
 
+    private String orchestratorLevel;
+
     /**
      * 编排用途
      */
@@ -120,5 +122,13 @@ public class OrchestratorModifyRequest extends OrchestratorRequest {
                 ", description='" + description + '\'' +
                 ", labels=" + getLabels() +
                 '}';
+    }
+
+    public String getOrchestratorLevel() {
+        return orchestratorLevel;
+    }
+
+    public void setOrchestratorLevel(String orchestratorLevel) {
+        this.orchestratorLevel = orchestratorLevel;
     }
 }

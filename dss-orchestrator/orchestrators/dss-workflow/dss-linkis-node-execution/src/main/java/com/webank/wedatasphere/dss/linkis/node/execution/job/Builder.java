@@ -97,16 +97,17 @@ public abstract class Builder {
         fillJobInfo(job);
         fillLinkisJobInfo(job);
 
-        if(job.getRuntimeParams() == null) {
+        if (job.getRuntimeParams() == null) {
             job.setRuntimeParams(new HashMap<>());
         }
         String contextId = getContextID(job);
-        if(StringUtils.isBlank(contextId)) {
+        if (StringUtils.isBlank(contextId)) {
             throw new LinkisJobExecutionErrorException(90100, "contextID is not exists.");
         }
         contextId = contextId.replace("/", "\\");
         Map contextMap = JsonUtils.jackson().readValue(contextId, Map.class);
-        String workspaceName = (String) ((Map) contextMap.get("value")).get("workspace");
+        logger.info("the contextMap is:{}", contextMap);
+        String workspaceName = (String) JsonUtils.jackson().readValue((String) contextMap.get("value"), Map.class).get("workspace");
         logger.info("try to get workspace str by workspaceName {}.", workspaceName);
         String workspace = getWorkspaceStr(job, workspaceName);
         logger.info("Got workspace str {}.", workspace);

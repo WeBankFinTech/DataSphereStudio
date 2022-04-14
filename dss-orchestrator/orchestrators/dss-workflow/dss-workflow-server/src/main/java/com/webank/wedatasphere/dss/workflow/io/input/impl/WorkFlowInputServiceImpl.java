@@ -31,6 +31,7 @@ import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
+import com.webank.wedatasphere.dss.workflow.io.scheduler.NodeImportJob;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
@@ -45,7 +46,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+
+import static com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool.nodeExportThreadPool;
 
 @Service
 public class WorkFlowInputServiceImpl implements WorkFlowInputService {
@@ -122,44 +126,28 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         List<DSSFlow> subflows = (List<DSSFlow>) dssFlow.getChildren();
         String workFlowResourceSavePath = flowPath + File.separator + "resource" + File.separator;
         String appConnResourceSavePath = flowPath + File.separator + "appconn-resource";
-        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
+//        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
+        List<Map<String, Object>> nodeJsonListRes = Collections.synchronizedList(new ArrayList<>());
         if (nodeJsonList.size() > 0) {
             for (String nodeJson : nodeJsonList) {
-                // TODO: 2020/3/20 暂时注视掉appconn相关
-                String updateNodeJson = nodeInputService.uploadResourceToBml(userName, nodeJson, workFlowResourceSavePath, projectName);
-                updateNodeJson = nodeInputService.uploadAppConnResource(userName, projectName,
-                        dssFlow, updateNodeJson, updateContextId, appConnResourceSavePath,
-                        workspace, orcVersion, dssLabels);
-                //兼容0.x的key修改
-                if(updateNodeJson.contains("wds.linkis.yarnqueue")) {
-                    updateNodeJson = updateNodeJson.replace("wds.linkis.yarnqueue", "wds.linkis.rm.yarnqueue");
-                }
-                Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
-                //更新subflowID
-                String nodeType = nodeJsonMap.get("jobType").toString();
-                if(nodeType.contains("appjoint")){
-                    nodeJsonMap.replace("jobType",nodeType.replace("appjoint","appconn"));
-                }
-                if ("workflow.subflow".equals(nodeType) && CollectionUtils.isNotEmpty(subflows)) {
-                    String subFlowName = nodeJsonMap.get("title").toString();
-                    logger.info("subflows:{}", subflows);
-                    List<DSSFlow> DSSFlowList = subflows.stream().filter(subflow ->
-                            subflow.getName().equals(subFlowName)
-                    ).collect(Collectors.toList());
-                    if (DSSFlowList.size() == 1) {
-                        updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, DSSFlowList.get(0).getId());
-                        nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
-                        nodeJsonListRes.add(nodeJsonMap);
-                    } else if (DSSFlowList.size() > 1) {
-                        logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
-                        throw new DSSErrorException(90077, "工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
-                    } else {
-                        logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
-                        throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
-                    }
-                } else {
-                    nodeJsonListRes.add(nodeJsonMap);
-                }
+                NodeImportJob.ImportJobEntity jobEntity = new NodeImportJob.ImportJobEntity();
+                jobEntity.setDssFlow(dssFlow);
+                jobEntity.setNodeJson(nodeJson);
+                jobEntity.setUserName(userName);
+                jobEntity.setProjectName(projectName);
+                jobEntity.setWorkFlowResourceSavePath(workFlowResourceSavePath);
+                jobEntity.setAppConnResourceSavePath(appConnResourceSavePath);
+                jobEntity.setDssLabels(dssLabels);
+                jobEntity.setWorkspace(workspace);
+                jobEntity.setUpdateContextId(updateContextId);
+                jobEntity.setSubflows(subflows);
+                jobEntity.setOrcVersion(orcVersion);
+
+                NodeImportJob nodeImportJob = new NodeImportJob();
+                nodeImportJob.setNodeInputService(nodeInputService);
+                nodeImportJob.setJobEntity(jobEntity);
+                nodeImportJob.setNodeJsonListRes(nodeJsonListRes);
+                nodeExportThreadPool.submit(nodeImportJob);
             }
         }
 

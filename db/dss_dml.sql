@@ -6,7 +6,7 @@ DELETE FROM dss_workspace_user_role;
 insert  into `dss_workspace_user_role`(`id`,`workspace_id`,`username`,`create_time`,`created_by`,`user_id`) values (20,323,'hadoop','2021-09-06 14:39:17','hadoop',214);
 
 DELETE FROM dss_user;
-INSERT INTO `dss_user` VALUES (214,'luban_test','luban_test',1,101,1,'','','','0',NULL,'2021-11-17 09:33:45','2021-11-17 09:51:55',NULL),(215,'hadoop','hadoop',1,101,1,'','','','0',NULL,'2021-11-17 09:43:41','2021-11-17 09:51:49',NULL);
+INSERT INTO `dss_user` VALUES (214,'hadoop_test','hadoop_test',1,101,1,'','','','0',NULL,'2021-11-17 09:33:45','2021-11-17 09:51:55',NULL),(215,'hadoop','hadoop',1,101,1,'','','','0',NULL,'2021-11-17 09:43:41','2021-11-17 09:51:49',NULL);
 
 
 DELETE FROM dss_workspace_dictionary;

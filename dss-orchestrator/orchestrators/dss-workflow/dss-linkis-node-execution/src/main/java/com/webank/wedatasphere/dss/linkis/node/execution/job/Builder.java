@@ -128,6 +128,7 @@ public abstract class Builder {
         workspaceInfoGetAction.setURL("/api/rest_j/v1/dss/framework/workspace/getWorkSpaceStr");
         workspaceInfoGetAction.setParameter("workspaceName", workspaceName);
         workspaceInfoGetAction.setUser(user);
+        workspaceInfoGetAction.addHeader("Referer", "");
         try {
             client = new DWSHttpClient(clientConfig, "Workspace-Fetch-Client-");
             DefaultHttpResult result = (DefaultHttpResult) client.execute(workspaceInfoGetAction);

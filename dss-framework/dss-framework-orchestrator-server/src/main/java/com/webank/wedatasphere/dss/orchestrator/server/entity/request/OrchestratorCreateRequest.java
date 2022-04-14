@@ -38,6 +38,12 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
      */
     @NotNull(message = "编排方式不能为空")
     private List<String> orchestratorWays;
+
+    /**
+     * 编排重要性级别
+     */
+    private String orchestratorLevel;
+
     private List<String> dssLabels;
 
     /**
@@ -116,6 +122,14 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
 
     public void setWorkspaceName(String workspaceName) {
         this.workspaceName = workspaceName;
+    }
+
+    public String getOrchestratorLevel() {
+        return orchestratorLevel;
+    }
+
+    public void setOrchestratorLevel(String orchestratorLevel) {
+        this.orchestratorLevel = orchestratorLevel;
     }
 
     @Override

@@ -151,7 +151,13 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     }
 
     protected AppConn loadAppConn(AppConnInfo appConnInfo, AppConn referenceAppConn) throws Exception {
-        LOGGER.info("Ready to load a reference AppConn {}, the appConnInfo are {}.", appConnInfo.getAppConnName(), appConnInfo);
+        LOGGER.info("Ready to load AppConn {} with referenceAppConn {}, the appConnInfo are {}.", appConnInfo.getAppConnName(),
+                referenceAppConn.getClass().getSimpleName(), appConnInfo);
+        if(appConnInfo.getAppConnResource() != null) {
+            String appConnHome = appConnResourceService.getAppConnHome(appConnInfo);
+            LOGGER.warn("Because AppConn {} is a referenced AppConn, we only download its resources(since not null) to home path {}, but never load AppConn by it.",
+                    appConnInfo.getAppConnName(), appConnHome);
+        }
         AppDescImpl appDesc = loadAppDesc(appConnInfo);
         AppConn appConn = referenceAppConn.getClass().newInstance();
         appConn.setAppDesc(appDesc);
@@ -241,10 +247,23 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         lazyLoadAppConns();
         AppConn appConn;
         try {
-            appConn = loadAppConn(appConnInfo);
+            if(StringUtils.isNotBlank(appConnInfo.getReference())) {
+                AppConn referenceAppConn = getAppConn(appConnInfo.getReference());
+                if(referenceAppConn == null) {
+                    throw new DSSRuntimeException("Load AppConn " + appConnInfo.getAppConnName() +
+                            " failed! Caused by: The reference AppConn " + appConnInfo.getReference() + " is not exists.");
+                }
+                appConn = loadAppConn(appConnInfo, referenceAppConn);
+            } else {
+                appConn = loadAppConn(appConnInfo);
+            }
+        } catch (DSSRuntimeException e) {
+            throw e;
         } catch (Exception e) {
             LOGGER.error("Reload AppConn failed.", e);
-            throw new DSSRuntimeException("Load AppConn " + appConnInfo.getAppConnName() + " failed!");
+            DSSRuntimeException exception = new DSSRuntimeException("Load AppConn " + appConnInfo.getAppConnName() + " failed!");
+            exception.initCause(e);
+            throw exception;
         }
         if(appConn == null) {
             return;

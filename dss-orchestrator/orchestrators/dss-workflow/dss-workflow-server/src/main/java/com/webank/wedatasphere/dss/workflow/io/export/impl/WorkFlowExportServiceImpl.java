@@ -30,13 +30,13 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
+import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
+import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +47,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool.nodeExportThreadPool;
 
 
 @Service
@@ -68,6 +70,9 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
     @Autowired
     private FlowMapper flowMapper;
+
+    @Autowired
+    private NodeInfoMapper nodeInfoMapper;
 
     @Autowired
     private DSSFlowService flowService;
@@ -101,8 +106,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 if (!dssFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", dssFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResources(userName, dssProjectId, projectName, flowExportSaveBasePath, flowJson, dssFlow.getName(), workspace,dssLabels);
-                    exportAllSubFlows(userName, dssFlow, dssProjectId, projectName, flowExportSaveBasePath, workspace,dssLabels);
+                    exportFlowResources(userName, dssProjectId, projectName, flowExportSaveBasePath, flowJson, dssFlow.getName(), workspace, dssLabels);
+                    exportAllSubFlows(userName, dssFlow, dssProjectId, projectName, flowExportSaveBasePath, workspace, dssLabels);
                     dssFlows.add(dssFlow);
                 } else {
                     String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, dssFlow.getName(), dssFlow.getBmlVersion());
@@ -130,8 +135,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 if (!subFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", subFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResources(userName, projectId, projectName, projectExportBasePath, flowJson, subFlow.getName(), workspace,dssLabels);
-                    exportAllSubFlows(userName, subFlow, projectId, projectName, projectExportBasePath, workspace,dssLabels);
+                    exportFlowResources(userName, projectId, projectName, projectExportBasePath, flowJson, subFlow.getName(), workspace, dssLabels);
+                    exportAllSubFlows(userName, subFlow, projectId, projectName, projectExportBasePath, workspace, dssLabels);
                 } else {
                     String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, subFlow.getName(), subFlow.getBmlVersion());
                     logger.info(warnMsg);
@@ -149,7 +154,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     @Override
     public void exportFlowResources(String userName, Long projectId, String projectName,
                                     String projectSavePath, String flowJson, String flowName,
-                                    Workspace workspace,List<DSSLabel> dssLabels) throws Exception {
+                                    Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
         String workFlowExportPath = genWorkFlowExportDir(projectSavePath, flowName);
         String workFlowResourceSavePath = workFlowExportPath + File.separator + "resource";
         String appConnResourceSavePath = workFlowExportPath + File.separator + "appconn-resource";
@@ -166,11 +171,21 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(flowJson);
             if (nodes != null) {
                 for (DSSNode node : nodes) {
-                    nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
-                    if (MapUtils.isNotEmpty(node.getJobContent()) && !node.getJobContent().containsKey("script")) {
-                        logger.info("node.getJobContent() is :{}", node.getJobContent());
-                        nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);
-                    }
+                    nodeExportThreadPool.submit(() -> {
+                        try {
+                            nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
+                            NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+                            //规定节点nodeType为-1时是非三方节点
+                            if (!nodeInfo.getAppConnName().equals("-1")) {
+//                    if (MapUtils.isNotEmpty(node.getJobContent()) && !node.getJobContent().containsKey("script")) {
+                                logger.info("node.getJobContent() is :{}", node.getJobContent());
+                                nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);
+                            }
+                        } catch (Exception e) {
+                            //todo 失败重试
+                            logger.error("failed to export node:{}", node.getName(), e);
+                        }
+                    });
                 }
             }
 

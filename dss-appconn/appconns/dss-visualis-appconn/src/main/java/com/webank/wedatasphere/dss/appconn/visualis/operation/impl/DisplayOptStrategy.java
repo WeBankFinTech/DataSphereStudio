@@ -92,7 +92,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
 
 
     @Override
-    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) {
+    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef) {
         String displayId = getDisplayId(requestRef.getRefJobContent()).toString();
         return getQueryResponseRef(requestRef, requestRef.getProjectRefId(), URLUtils.DISPLAY_JUMP_URL_FORMAT, displayId);
     }

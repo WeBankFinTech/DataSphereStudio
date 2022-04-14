@@ -68,4 +68,11 @@ public interface ThirdlyRequestRef {
     class UpdateWitContextRequestRefImpl extends DevelopmentRequestRefImpl<UpdateWitContextRequestRefImpl>
             implements UpdateRequestRef<UpdateWitContextRequestRefImpl>, ProjectRefRequestRef<UpdateWitContextRequestRefImpl>,
             DSSContextRequestRef<UpdateWitContextRequestRefImpl>{}
+
+    class QueryJumpUrlRequestRefImpl extends DevelopmentRequestRefImpl<QueryJumpUrlRequestRefImpl>
+            implements QueryJumpUrlRequestRef<QueryJumpUrlRequestRefImpl>, ProjectRefRequestRef<QueryJumpUrlRequestRefImpl> {}
+
+    class QueryJumpUrlWithContextRequestRefImpl extends DevelopmentRequestRefImpl<QueryJumpUrlWithContextRequestRefImpl>
+            implements QueryJumpUrlRequestRef<QueryJumpUrlWithContextRequestRefImpl>, ProjectRefRequestRef<QueryJumpUrlWithContextRequestRefImpl>,
+            DSSContextRequestRef<QueryJumpUrlWithContextRequestRefImpl> {}
 }

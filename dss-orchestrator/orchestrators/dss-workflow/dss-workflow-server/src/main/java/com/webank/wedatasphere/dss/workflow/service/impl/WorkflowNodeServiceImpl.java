@@ -18,11 +18,11 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
+import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationResponse;
-import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.*;
 import com.webank.wedatasphere.dss.standard.app.development.ref.*;
@@ -30,10 +30,13 @@ import com.webank.wedatasphere.dss.standard.app.development.service.*;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DevelopmentOperationUtils;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
@@ -50,7 +53,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -135,7 +137,12 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         return DevelopmentOperationUtils.tryDevelopmentOperation(() -> developmentServiceFunction.apply(appConn, node.getDssLabels()),
                 developmentOperationFunction,
                 dssJobContentRequestRef -> dssJobContentRequestRef.setDSSJobContent(node.getParams()),
-                refJobContentRequestRef -> refJobContentRequestRef.setRefJobContent(node.getJobContent()),
+                refJobContentRequestRef -> {
+                    refJobContentRequestRef.setRefJobContent(node.getJobContent());
+                    if(refJobContentRequestRef instanceof QueryJumpUrlRequestRef) {
+                        ((QueryJumpUrlRequestRef) refJobContentRequestRef).setSSOUrlBuilderOperation(getSSOUrlBuilderOperation(appConn, node.getWorkspace()));
+                    }
+                },
                 dssContextRequestRef -> dssContextRequestRef.setContextId(node.getContextId()),
                 projectRefRequestRef -> {
                     Long refProjectId;
@@ -160,17 +167,12 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     @Override
     public void deleteNode(String userName, CommonAppConnNode node) throws ExternalOperationFailedException {
-
-//            ref.setOrcId(node.getFlowId());
-//            ref.setOrcName(node.getFlowName());
         tryNodeOperation(userName, node, this::getRefCRUDService, developmentService -> ((RefCRUDService) developmentService).getRefDeletionOperation(),
             (developmentOperation, developmentRequestRef) -> ((RefDeletionOperation) developmentOperation).deleteRef((RefJobContentRequestRef) developmentRequestRef), null, "delete");
     }
 
     @Override
     public Map<String, Object> updateNode(String userName, CommonAppConnNode node) throws ExternalOperationFailedException {
-//        ref.setOrcId(node.getFlowId());
-//        ref.setOrcName(node.getFlowName());
         tryNodeOperation(userName, node, this::getRefCRUDService, developmentService -> ((RefCRUDService) developmentService).getRefUpdateOperation(),
                 (developmentOperation, developmentRequestRef) -> ((RefUpdateOperation) developmentOperation).updateRef((UpdateRequestRef) developmentRequestRef), null, "update");
         return node.getJobContent();
@@ -260,5 +262,15 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         }
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
         return workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSJobContentConstant.ORC_VERSION_KEY);
+    }
+
+    private SSOUrlBuilderOperation getSSOUrlBuilderOperation(AppConn appConn, Workspace workspace) {
+        if(!(appConn instanceof OnlySSOAppConn)) {
+            return null;
+        }
+        SSOUrlBuilderOperation ssoUrlBuilderOperation = ((OnlySSOAppConn) appConn).getOrCreateSSOStandard().getSSOBuilderService().createSSOUrlBuilderOperation();
+        ssoUrlBuilderOperation.setAppName(appConn.getAppDesc().getAppName());
+        SSOHelper.setSSOUrlBuilderOperation(ssoUrlBuilderOperation, workspace);
+        return ssoUrlBuilderOperation;
     }
 }

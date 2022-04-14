@@ -94,7 +94,7 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
 
 
     @Override
-    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) {
+    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef) {
         String id = getId(requestRef.getRefJobContent());
         return getQueryResponseRef(requestRef, requestRef.getProjectRefId(), URLUtils.VIEW_JUMP_URL_FORMAT, id);
     }

@@ -22,7 +22,7 @@ public interface OperationStrategy {
                                 String url,
                                 DSSPostAction visualisPostAction) throws ExternalOperationFailedException;
 
-    QueryJumpUrlResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef);
+    QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef);
 
     ResponseRef updateRef(ThirdlyRequestRef.UpdateWitContextRequestRefImpl requestRef) throws ExternalOperationFailedException;
 

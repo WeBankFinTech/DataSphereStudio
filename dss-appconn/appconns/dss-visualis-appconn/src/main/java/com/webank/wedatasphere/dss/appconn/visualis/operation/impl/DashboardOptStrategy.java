@@ -99,7 +99,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
 
 
     @Override
-    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl visualisOpenRequestRef) {
+    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl visualisOpenRequestRef) {
         String dashboardId = getDashboardPortalId(visualisOpenRequestRef.getRefJobContent());
         Long projectId = visualisOpenRequestRef.getProjectRefId();
         return getQueryResponseRef(visualisOpenRequestRef, projectId, URLUtils.DASHBOARD_JUMP_URL_FORMAT, dashboardId);

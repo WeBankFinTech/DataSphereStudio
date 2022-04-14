@@ -7,12 +7,14 @@ import com.webank.wedatasphere.dss.framework.appconn.exception.AppConnQualityErr
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnQualityChecker;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import org.springframework.stereotype.Component;
 
 /**
  * @author enjoyyin
  * @date 2022-04-14
- * @since 0.5.0
+ * @since 1.1.0
  */
+@Component
 public class DevelopmentAppConnQualityChecker extends AbstractAppConnQualityChecker {
 
     @Override

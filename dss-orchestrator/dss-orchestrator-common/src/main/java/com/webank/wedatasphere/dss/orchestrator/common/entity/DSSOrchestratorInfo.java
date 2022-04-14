@@ -49,6 +49,8 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     private String orchestratorWay;
 
+    private String orchestratorLevel;
+
     private String updateUser;
 
     private Date updateTime;
@@ -218,6 +220,14 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     public void setOrchestratorWay(String orchestratorWay) {
         this.orchestratorWay = orchestratorWay;
+    }
+
+    public String getOrchestratorLevel() {
+        return orchestratorLevel;
+    }
+
+    public void setOrchestratorLevel(String orchestratorLevel) {
+        this.orchestratorLevel = orchestratorLevel;
     }
 
     public String getUpdateUser() {

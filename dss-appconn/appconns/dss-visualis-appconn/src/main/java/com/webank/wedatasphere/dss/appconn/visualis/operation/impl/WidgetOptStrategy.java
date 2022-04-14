@@ -70,7 +70,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
 
 
     @Override
-    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.RefJobContentRequestRefImpl visualisOpenRequestRef) {
+    public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl visualisOpenRequestRef) {
         String widgetId = getWidgetId(visualisOpenRequestRef.getRefJobContent());
         return getQueryResponseRef(visualisOpenRequestRef, visualisOpenRequestRef.getProjectRefId(), URLUtils.WIDGET_JUMP_URL_FORMAT, widgetId);
     }

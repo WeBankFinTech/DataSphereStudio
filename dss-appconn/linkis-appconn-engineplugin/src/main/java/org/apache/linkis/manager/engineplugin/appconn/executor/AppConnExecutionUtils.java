@@ -21,7 +21,7 @@ public class AppConnExecutionUtils {
     public static ResponseRef tryToOperation(RefExecutionService refExecutionService, String contextId, String projectName,
                                       ExecutionRequestRefContextImpl executionRequestRefContext, List<DSSLabel> dssLabels,
                                       String name, String type, String userName, Workspace workspace,
-                                      Map<String, Object> refJobContent) {
+                                      Map<String, Object> refJobContent, Map<String, Object> variables) {
         return DevelopmentOperationUtils.tryRefJobContentRequestRefOperation(() -> refExecutionService,
                 developmentService -> refExecutionService.getRefExecutionOperation(),
                 refJobContentRequestRef -> refJobContentRequestRef.setRefJobContent(refJobContent),
@@ -30,6 +30,7 @@ public class AppConnExecutionUtils {
                 (developmentOperation, developmentRequestRef) -> {
                     RefExecutionRequestRef requestRef = (RefExecutionRequestRef) developmentRequestRef;
                     requestRef.setExecutionRequestRefContext(executionRequestRefContext)
+                        .setVariables(variables)
                         .setDSSLabels(dssLabels)
                         .setName(name)
                         .setType(type)

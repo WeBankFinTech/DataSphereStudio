@@ -93,47 +93,51 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
       case Some(appInstance) =>
         val developmentIntegrationStandard = appConn.asInstanceOf[OnlyDevelopmentAppConn].getOrCreateDevelopmentStandard
         val refExecutionService = developmentIntegrationStandard.getRefExecutionService(appInstance)
-        Utils.tryCatch {
-          val refJobContent = if (StringUtils.isNotBlank(code)) BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]])
-          else engineExecutorContext.getProperties
-          var submitUser = getValue(engineExecutorContext.getProperties, SUBMIT_USER_KEY)
-          if (submitUser == null) submitUser = user
-          val responseRef = AppConnExecutionUtils.tryToOperation(refExecutionService, getValue(engineExecutorContext.getProperties, CONTEXT_ID_KEY),
+        val refJobContent = if (StringUtils.isNotBlank(code)) BDPJettyServerHelper.gson.fromJson(code, classOf[util.HashMap[String, AnyRef]])
+        else engineExecutorContext.getProperties
+        var submitUser = getValue(engineExecutorContext.getProperties, SUBMIT_USER_KEY)
+        if (submitUser == null) submitUser = user
+        val variables = engineExecutorContext.getProperties.get(VARIABLES_KEY) match {
+          case map: util.Map[String, Object] => map
+          case _ => new util.HashMap[String, Object]()
+        }
+        val responseRef = Utils.tryCatch {
+          AppConnExecutionUtils.tryToOperation(refExecutionService, getValue(engineExecutorContext.getProperties, CONTEXT_ID_KEY),
             getValue(source, PROJECT_NAME_STR), new ExecutionRequestRefContextImpl(engineExecutorContext, user, submitUser),
             getLabels(labels), getValue(source, NODE_NAME_STR), getValue(engineExecutorContext.getProperties, NODE_TYPE),
-            user, workspace, refJobContent)
-          responseRef match {
-            case asyncResponseRef: AsyncExecutionResponseRef =>
-              engineExecutorContext.getJobId match {
-                case Some(id) =>
-                  info(s"add async responseRef to task map, the taskId is $id.")
-                  taskHashMap.put(id, asyncResponseRef)
-                case _ =>
-              }
-              new AsynReturnExecuteResponse {
-                private var er: ExecuteResponse => Unit = _
+            user, workspace, refJobContent, variables)
+        } (t => ExecutionResponseRef.newBuilder.setException(t).error())
+        responseRef match {
+          case asyncResponseRef: AsyncExecutionResponseRef =>
+            engineExecutorContext.getJobId match {
+              case Some(id) =>
+                info(s"add async responseRef to task map, the taskId is $id.")
+                taskHashMap.put(id, asyncResponseRef)
+              case _ =>
+            }
+            new AsynReturnExecuteResponse {
+              private var er: ExecuteResponse => Unit = _
 
-                def tryToNotifyAll(responseRef: ResponseRef): Unit = {
-                  val executeResponse = createExecuteResponse(responseRef, appConnName)
-                  if (er == null) this synchronized {
-                    while (er == null) this.wait(1000)
-                  }
-                  er(executeResponse)
+              def tryToNotifyAll(responseRef: ResponseRef): Unit = {
+                val executeResponse = createExecuteResponse(responseRef, appConnName)
+                if (er == null) this synchronized {
+                  while (er == null) this.wait(1000)
                 }
-
-                override def notify(rs: ExecuteResponse => Unit): Unit = {
-                  er = rs
-                  this synchronized notifyAll()
-                }
-
-                asyncResponseRef.notifyMe(new java.util.function.Consumer[ResponseRef] {
-                  override def accept(t: ResponseRef): Unit = tryToNotifyAll(t)
-                })
+                er(executeResponse)
               }
-            case responseRef: ResponseRef =>
-              createExecuteResponse(responseRef, appConnName)
-          }
-        } (ErrorExecuteResponse("Failed to execute appConn.", _))
+
+              override def notify(rs: ExecuteResponse => Unit): Unit = {
+                er = rs
+                this synchronized notifyAll()
+              }
+
+              asyncResponseRef.notifyMe(new java.util.function.Consumer[ResponseRef] {
+                override def accept(t: ResponseRef): Unit = tryToNotifyAll(t)
+              })
+            }
+          case responseRef: ResponseRef =>
+            createExecuteResponse(responseRef, appConnName)
+        }
       case None =>
         throw AppConnExecuteFailedException(510000, "Cannot Find AppInstance by labels." + labels)
     }
@@ -147,9 +151,7 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
         case response: ExecutionResponseRef => response.getException
         case _ => null
       }
-      error(s"$appConnName execute failed, failed reason is ${
-        responseRef.getErrorMsg
-      }.", exception)
+      error(s"$appConnName execute failed, failed reason is ${responseRef.getErrorMsg}.", exception)
       ErrorExecuteResponse(responseRef.getErrorMsg, exception)
     }
 
@@ -251,5 +253,7 @@ object AppConnEngineConnExecutor {
   private val CONTEXT_ID_KEY = "contextID"
 
   private val SUBMIT_USER_KEY = "wds.dss.workflow.submit.user"
+
+  private val VARIABLES_KEY = "variables"
 
 }

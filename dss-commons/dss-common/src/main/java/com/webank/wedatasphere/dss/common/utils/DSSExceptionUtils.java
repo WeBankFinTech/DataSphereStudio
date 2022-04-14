@@ -39,8 +39,8 @@ public class DSSExceptionUtils {
             try {
                 throwingConsumer.accept(i);
             } catch (Exception e) {
-                LOGGER.error("execute failed,reason:",e);
-                throw new DSSRuntimeException(e.getMessage());
+                LOGGER.error("execute failed, reason: ", e);
+                throw new DSSRuntimeException(ExceptionUtils.getRootCauseMessage(e));
             }
         };
     }
@@ -51,8 +51,8 @@ public class DSSExceptionUtils {
             try {
                 return throwingFunction.accept(i);
             } catch (Exception e) {
-                LOGGER.error("execute failed,reason:",e);
-                throw new DSSRuntimeException(e.getMessage());
+                LOGGER.error("execute failed,reason:", e);
+                throw new DSSRuntimeException(ExceptionUtils.getRootCauseMessage(e));
             }
         };
     }
@@ -63,7 +63,7 @@ public class DSSExceptionUtils {
             try {
                 return throwingFunction.accept(i);
             } catch (Exception e) {
-                LOGGER.error("execute failed,reason:",e);
+                LOGGER.error("execute failed,reason:", e);
                 throw new DSSRuntimeException(53320, ExceptionUtils.getRootCauseMessage(e));
             }
         };

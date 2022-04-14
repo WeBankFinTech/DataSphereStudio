@@ -112,6 +112,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setWorkspaceId(workspace.getWorkspaceId());
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorCreateRequest.getOrchestratorWays()));
         dssOrchestratorInfo.setOrchestratorMode(orchestratorCreateRequest.getOrchestratorMode());
+        dssOrchestratorInfo.setOrchestratorLevel(orchestratorCreateRequest.getOrchestratorLevel());
         //1.去orchestratorFramework创建编排模式
         LOGGER.info("{} begins to create a orchestrator {}.", username, orchestratorCreateRequest);
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorCreateRequest.getLabels().getRoute()));
@@ -202,6 +203,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setUpdateUser(username);
         dssOrchestratorInfo.setOrchestratorMode(orchestratorModifyRequest.getOrchestratorMode());
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorModifyRequest.getOrchestratorWays()));
+        dssOrchestratorInfo.setOrchestratorLevel(orchestratorModifyRequest.getOrchestratorLevel());
         dssOrchestratorInfo.setUses(orchestratorModifyRequest.getUses());
         //1.如果调度系统要求同步创建工作流，向调度系统发送更新工作流的请求
         tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, dssOrchestratorInfo,
@@ -238,7 +240,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                                                                                        Workspace workspace,
                                                                                        List<DSSLabel> dssLabels) {
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(user, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssLabels);
-        if(CollectionUtils.isEmpty(dssOrchestratorInfo.getLinkedAppConnNames())) {
+        if (CollectionUtils.isEmpty(dssOrchestratorInfo.getLinkedAppConnNames())) {
             dssOrchestratorInfo.setLinkedAppConnNames(dssOrchestrator.getLinkedAppConn().stream().map(appConn -> appConn.getAppDesc().getAppName()).collect(Collectors.toList()));
         }
         SchedulerAppConn appConn = dssOrchestrator.getSchedulerAppConn();

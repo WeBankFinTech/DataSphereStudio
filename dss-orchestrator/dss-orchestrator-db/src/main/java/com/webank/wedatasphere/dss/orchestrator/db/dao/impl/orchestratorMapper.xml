@@ -22,7 +22,7 @@
 
     <sql id="orchestrator_main">
         id,`name`,`type`,`desc`,`creator`,`create_time`,`project_id`,`uses`,`appconn_name`,`uuid`,`secondary_type` ,
-        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`update_user`,`update_time`
+        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`orchestrator_level`,`update_user`,`update_time`
     </sql>
 
     <sql id="orchestrator_version">
@@ -49,7 +49,7 @@
         VALUES
         (#{id},#{name},#{type},#{desc},#{creator},#{createTime},#{projectId},#{uses},#{appConnName},
         #{uuid},#{secondaryType},
-        #{workspaceId},#{orchestratorMode},#{orchestratorWay},#{updateUser},#{updateTime})
+        #{workspaceId},#{orchestratorMode},#{orchestratorWay},#{orchestratorLevel},#{updateUser},#{updateTime})
     </insert>
 
     <update id="updateOrchestrator"
@@ -61,6 +61,7 @@
             <if test="appConnName != null">`appconn_name`=#{appConnName},</if>
             <if test="uses != null">`uses`=#{uses},</if>
             <if test="secondaryType != null">`secondary_type`=#{secondaryType},</if>
+            <if test="orchestratorLevel != null">`orchestrator_level`=#{orchestratorLevel},</if>
             <if test="updateUser != null">`update_user`=#{updateUser},</if>
             <if test="updateTime != null">`update_time`=#{updateTime},</if>
         </trim>

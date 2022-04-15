@@ -58,6 +58,15 @@
             <outputDirectory>conf</outputDirectory>
             <lineEnding>unix</lineEnding>
         </fileSet>
+        <fileSet>
+            <directory>${basedir}/src/main/icons</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0777</fileMode>
+            <outputDirectory>icons</outputDirectory>
+        </fileSet>
+
     </fileSets>
 
 </assembly>

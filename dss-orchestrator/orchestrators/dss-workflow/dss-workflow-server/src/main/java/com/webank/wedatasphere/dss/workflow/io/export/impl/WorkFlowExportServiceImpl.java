@@ -175,8 +175,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                         try {
                             nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
                             NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-                            //规定节点nodeType为-1时是非三方节点
-                            if (!nodeInfo.getAppConnName().equals("-1")) {
+                            if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
 //                    if (MapUtils.isNotEmpty(node.getJobContent()) && !node.getJobContent().containsKey("script")) {
                                 logger.info("node.getJobContent() is :{}", node.getJobContent());
                                 nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);

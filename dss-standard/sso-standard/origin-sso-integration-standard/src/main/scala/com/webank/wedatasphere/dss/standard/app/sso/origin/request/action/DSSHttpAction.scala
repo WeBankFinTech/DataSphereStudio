@@ -2,8 +2,8 @@ package com.webank.wedatasphere.dss.standard.app.sso.origin.request.action
 
 import java.io.InputStream
 import java.util
-
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
+import org.apache.http.HttpResponse
 import org.apache.linkis.httpclient.request._
 
 /**
@@ -46,6 +46,7 @@ class DSSPutAction extends PutAction with DSSHttpAction {
 class DSSDownloadAction extends DSSGetAction with DownloadAction with DSSHttpAction {
 
   private var inputStream: InputStream = _
+  private var response: HttpResponse = _
 
   def getInputStream: InputStream = inputStream
 
@@ -53,6 +54,9 @@ class DSSDownloadAction extends DSSGetAction with DownloadAction with DSSHttpAct
     this.inputStream = inputStream
   }
 
+  override def getResponse: HttpResponse = response
+
+  override def setResponse(response: HttpResponse): Unit = this.response = response
 }
 
 class DSSUploadAction(override val files: util.Map[String, String])

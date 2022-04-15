@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.framework.appconn.service.impl;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyStructureAppConn;
+import com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf;
 import com.webank.wedatasphere.dss.framework.appconn.exception.AppConnQualityErrorException;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
@@ -16,8 +17,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectAppConnQualityChecker extends AbstractAppConnQualityChecker {
 
+    public ProjectAppConnQualityChecker() {
+        super(AppConnConf.PROJECT_QUALITY_CHECKER_IGNORE_LIST.getValue());
+    }
+
     @Override
-    public void checkQuality(AppConn appConn) throws AppConnQualityErrorException {
+    protected void checkAppConnQuality(AppConn appConn) throws AppConnQualityErrorException {
         if(!(appConn instanceof OnlyStructureAppConn)) {
             return;
         }
@@ -29,7 +34,7 @@ public class ProjectAppConnQualityChecker extends AbstractAppConnQualityChecker 
         checkNull(structureIntegrationStandard, appConnName, "structureStandard");
         ProjectService projectService = structureIntegrationStandard.getProjectService(appInstance);
         checkNull(projectService, appConnName, "projectService");
-        conditionCheck(a -> projectService.isProjectNameUnique() && projectService.getProjectSearchOperation() == null,
+        checkBoolean(projectService.isProjectNameUnique() && projectService.getProjectSearchOperation() == null,
                 appConnName, "isProjectNameUnique is true but projectSearchOperation is not exists.");
         checkNull(projectService.getProjectCreationOperation(), appConnName, "projectCreationOperation");
         checkNull(projectService.getProjectUpdateOperation(), appConnName, "projectUpdateOperation");

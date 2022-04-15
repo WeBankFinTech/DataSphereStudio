@@ -11,6 +11,10 @@ public class AppConnConf {
 
     public static final CommonVars<Boolean> IS_APPCONN_MANAGER = CommonVars.apply("wds.dss.appconn.framework.ismanager", true);
 
+    public static final CommonVars<String> PROJECT_QUALITY_CHECKER_IGNORE_LIST = CommonVars.apply("wds.dss.appconn.checker.project.ignore.list", "");
+
+    public static final CommonVars<String> DEVELOPMENT_QUALITY_CHECKER_IGNORE_LIST = CommonVars.apply("wds.dss.appconn.checker.development.ignore.list", "");
+
     public static final List<String> DISABLED_APP_CONNS = getDisabledAppConns();
 
     private static List<String> getDisabledAppConns() {

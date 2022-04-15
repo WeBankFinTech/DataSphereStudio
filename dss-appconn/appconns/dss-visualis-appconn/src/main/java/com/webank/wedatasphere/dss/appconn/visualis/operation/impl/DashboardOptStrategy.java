@@ -200,8 +200,8 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
             ref.getExecutionRequestRefContext().appendLog("Failed to execute Dashboard url " + previewUrl);
             throw new ExternalOperationFailedException(90176, "Failed to debug Dashboard", e);
         } finally {
-            IOUtils.closeQuietly(previewDownloadAction.getInputStream());
-            IOUtils.closeQuietly(metadataDownloadAction.getInputStream());
+            IOUtils.closeQuietly(previewDownloadAction);
+            IOUtils.closeQuietly(metadataDownloadAction);
         }
         return ResponseRef.newExternalBuilder().success();
     }

@@ -1,9 +1,12 @@
 package com.webank.wedatasphere.dss.standard.app.sso.origin.request.action
 
-import java.io.InputStream
+import java.io.{Closeable, InputStream}
 import java.util
+
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
+import org.apache.commons.io.IOUtils
 import org.apache.http.HttpResponse
+import org.apache.http.client.methods.CloseableHttpResponse
 import org.apache.linkis.httpclient.request._
 
 /**
@@ -43,7 +46,7 @@ class DSSPutAction extends PutAction with DSSHttpAction {
   override def getRequestPayload: String = if (getRequestPayloads.isEmpty) "" else DSSCommonUtils.COMMON_GSON.toJson(getRequestPayloads)
 }
 
-class DSSDownloadAction extends DSSGetAction with DownloadAction with DSSHttpAction {
+class DSSDownloadAction extends DSSGetAction with DownloadAction with DSSHttpAction with Closeable {
 
   private var inputStream: InputStream = _
   private var response: HttpResponse = _
@@ -57,6 +60,17 @@ class DSSDownloadAction extends DSSGetAction with DownloadAction with DSSHttpAct
   override def getResponse: HttpResponse = response
 
   override def setResponse(response: HttpResponse): Unit = this.response = response
+
+  override def close(): Unit = {
+    if(inputStream != null) {
+      IOUtils.closeQuietly(inputStream)
+    }
+    response match {
+      case r: CloseableHttpResponse =>
+        IOUtils.closeQuietly(r)
+      case _ =>
+    }
+  }
 }
 
 class DSSUploadAction(override val files: util.Map[String, String])

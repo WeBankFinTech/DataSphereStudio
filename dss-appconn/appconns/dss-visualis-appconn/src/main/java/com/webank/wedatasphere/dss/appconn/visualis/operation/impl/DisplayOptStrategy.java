@@ -181,8 +181,8 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
             ref.getExecutionRequestRefContext().appendLog("Failed to debug Display url " + previewUrl);
             throw new ExternalOperationFailedException(90176, "Failed to debug Display", e);
         } finally {
-            IOUtils.closeQuietly(previewDownloadAction.getInputStream());
-            IOUtils.closeQuietly(metadataDownloadAction.getInputStream());
+            IOUtils.closeQuietly(previewDownloadAction);
+            IOUtils.closeQuietly(metadataDownloadAction);
         }
         return ResponseRef.newExternalBuilder().success();
     }

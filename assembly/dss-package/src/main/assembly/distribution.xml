@@ -200,6 +200,28 @@
       </includes>
     </fileSet>
 
+    <!--dss-sso-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-sso-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-sso-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-scriptis-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
     <!--dss-qualitis-appconn-->
 <!--    <fileSet>
       <directory>

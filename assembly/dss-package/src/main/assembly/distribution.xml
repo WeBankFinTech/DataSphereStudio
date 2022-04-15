@@ -211,7 +211,7 @@
       </includes>
     </fileSet>
 
-    <!--dss-sso-appconn-->
+    <!--dss-scriptis-appconn-->
     <fileSet>
       <directory>
         ${basedir}/../../dss-appconn/appconns/dss-scriptis-appconn/target/out/

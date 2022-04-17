@@ -100,8 +100,8 @@ public class OrchestratorIERestful {
                               @RequestParam(defaultValue = "exportOrc",required = false, name = "outputFileName") String outputFileName,
                               @RequestParam(defaultValue = "utf-8",required = false, name = "charset") String charset,
                               @RequestParam(defaultValue = "zip",required = false, name = "outputFileType") String outputFileType,
-                              @RequestParam(required = false, name = "projectName") String projectName,
-                              @RequestParam(required = false, name = "orchestratorId") Long orchestratorId,
+                              @RequestParam(name = "projectName") String projectName,
+                              @RequestParam(name = "orchestratorId") Long orchestratorId,
                               @RequestParam(required = false, name = "orcVersionId") Long orcVersionId,
                               @RequestParam(defaultValue = "false",required = false, name = "addOrcVersion") Boolean addOrcVersion,
                               @RequestParam(required = false, name = "labels") String labels) throws DSSErrorException, IOException {

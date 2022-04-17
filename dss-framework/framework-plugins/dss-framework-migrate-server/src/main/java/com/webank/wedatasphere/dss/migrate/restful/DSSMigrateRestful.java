@@ -387,18 +387,16 @@ public class DSSMigrateRestful {
      *
      * @param req
      * @param response
-     * @param json
      * @return
      * @throws Exception
      */
-    @PostMapping("/exportallflow")
+    @RequestMapping(path = "/exportallflow", method = RequestMethod.POST)
     public Message exportAllFlowInProject(HttpServletRequest req,
                                           HttpServletResponse response,
-                                          @RequestBody JsonNode json) throws Exception {
+                                          @RequestParam(name = "workspaceName") String workspaceName,
+                                          @RequestParam(name = "projectName") String projectName,
+                                          @RequestParam(name = "pathRoot") String pathRoot) throws Exception {
         String username = SecurityFilter.getLoginUsername(req);
-        String workspaceName = json.get("workspaceName").textValue();
-        String projectName = json.get("projectName").textValue();
-        String pathRoot = json.get("pathRoot").textValue();
 
         // 1，获取项目下所有的工作流
         // 获取工作空间id，没有就报错

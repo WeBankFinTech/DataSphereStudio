@@ -402,12 +402,12 @@ CREATE TABLE `dss_workflow_node` (
    `name` varchar(16) DEFAULT NULL,
    `appconn_name` varchar(64) DEFAULT '-1' COMMENT 'appconn的名称，与dss_appconn这表的appconn_name名称对应',
    `node_type` varchar(255) DEFAULT NULL,
-   `jump_url` varchar(255) DEFAULT NULL,
+   `jump_type` int(11) DEFAULT NULL,
    `support_jump` tinyint(1) DEFAULT NULL,
    `submit_to_scheduler` tinyint(1) DEFAULT NULL,
    `enable_copy` tinyint(1) DEFAULT NULL,
    `should_creation_before_node` tinyint(1) DEFAULT NULL,
-   `icon` longtext,
+   `icon_path` varchar(255) DEFAULT NULL,
    PRIMARY KEY (`id`)
  ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8;
 

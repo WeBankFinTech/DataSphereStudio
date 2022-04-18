@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.appconn.scheduler.AbstractSchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerStructureIntegrationStandard;
 import com.webank.wedatasphere.dss.appconn.schedulis.standard.SchedulisStructureStandard;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ConversionIntegrationStandard;
-import com.webank.wedatasphere.dss.workflow.conversion.ProjectConversionIntegrationStandard;
 
 public class SchedulisAppConn extends AbstractSchedulerAppConn {
 

@@ -4,8 +4,6 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRefImpl;
 
-import java.util.List;
-
 /**
  * @author enjoyyin
  * @date 2022-03-13
@@ -23,30 +21,16 @@ public interface DSSProjectContentRequestRef<R extends DSSProjectContentRequestR
         return (R) this;
     }
 
-    default List<String> getAccessUsers() {
-        return (List<String>) this.getParameter("accessUsers");
+    /**
+     * DSS 工程的全量最新权限信息，包含了 DSS 工程所有的最新权限信息
+     * @return DSSProjectPrivilege
+     */
+    default DSSProjectPrivilege getDSSProjectPrivilege() {
+        return (DSSProjectPrivilege) this.getParameter("dssProjectPrivilege");
     }
 
-    default R setAccessUsers(List<String> accessUsers) {
-        setParameter("accessUsers", accessUsers);
-        return (R) this;
-    }
-
-    default List<String> getEditUsers() {
-        return (List<String>) this.getParameter("editUsers");
-    }
-
-    default R setEditUsers(List<String> editUsers) {
-        setParameter("editUsers", editUsers);
-        return (R) this;
-    }
-
-    default List<String> getReleaseUsers() {
-        return (List<String>) this.getParameter("releaseUsers");
-    }
-
-    default R setReleaseUsers(List<String> releaseUsers) {
-        setParameter("releaseUsers", releaseUsers);
+    default R setDSSProjectPrivilege(DSSProjectPrivilege dssProjectPrivilege) {
+        setParameter("dssProjectPrivilege", dssProjectPrivilege);
         return (R) this;
     }
 

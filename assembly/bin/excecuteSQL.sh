@@ -63,6 +63,12 @@ function executeSQL() {
 
   mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source $DB_CONF_PATH/dss_ddl.sql"
   isSuccess "source dss_ddl.sql"
+  mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source $DB_CONF_PATH/apps/dss_apiservice_ddl.sql"
+  isSuccess "source dss_apiservice_ddl.sql"
+  mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source $DB_CONF_PATH/apps/dss_dataapi_ddl.sql"
+  isSuccess "source dss_dataapi_ddl.sql"
+  mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source $DB_CONF_PATH/apps/dss_guide_ddl.sql"
+  isSuccess "source dss_guide_ddl.sql"
   mysql -h$MYSQL_HOST -P$MYSQL_PORT -u$MYSQL_USER -p$MYSQL_PASSWORD -D$MYSQL_DB --default-character-set=utf8 -e "source $DB_DML_PATH"
   isSuccess "source dss_dml_real.sql"
   echo "Rebuild the table"

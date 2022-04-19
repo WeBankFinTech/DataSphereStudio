@@ -433,19 +433,28 @@ insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_ra
 INSERT INTO `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('59','OFT','["true","false"]','请填写是否复用引擎，false：不复用，true：复用','Please fill in whether or not to reuse engine, true: reuse, false: not reuse','blur');
 
 DELETE FROM dss_appconn;
-INSERT INTO `dss_appconn` VALUES (3,'workflow',0,1,NULL,0,NULL,'com.webank.wedatasphere.dss.appconn.workflow.WorkflowAppConn','/appcom/Install/dss/dss-appconns/workflow',''),
-(5,'eventchecker',0,1,NULL,0,NULL,'com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerAppConn','/appcom/Install/dss/dss-appconns/eventchecker',''),
-(6,'datachecker',0,1,NULL,0,NULL,'com.webank.wedatapshere.dss.appconn.datachecker.DataCheckerAppConn','/appcom/Install/dss/dss-appconns/datachecker',''),
-(7,'dolphinscheduler',0,1,NULL,0,NULL,'com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn','/appcom/Install/dss/dss-appconns/dolphinscheduler',NULL);
-update dss_appconn set resource=NULL ;
+INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`)
+VALUES (1,'sso',0,1,0,0,NULL,"com.webank.wedatasphere.dss.appconn.sso.SSOAppConn",NULL,NULL),
+(2,'scriptis',0,1,0,0,"sso",NULL,NULL,NULL),
+(3,'workflow',0,1,1,0,NULL,'com.webank.wedatasphere.dss.appconn.workflow.WorkflowAppConn','/appcom/Install/dss/dss-appconns/workflow',NULL),
+(4,'visualis', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn', '/appcom/Install/dss/dss-appconns/visualis', NULL),
+(5,'eventchecker',0,1,1,0,NULL,'com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerAppConn','/appcom/Install/dss/dss-appconns/eventchecker',NULL),
+(6,'datachecker',0,1,1,0,NULL,'com.webank.wedatapshere.dss.appconn.datachecker.DataCheckerAppConn','/appcom/Install/dss/dss-appconns/datachecker',NULL),
+(7, 'sendemail', 0, 1, 1, 0, NULL, 'com.webank.wedatasphere.dss.appconn.sendemail.SendEmailAppConn', '/appcom/Install/dss/dss-appconns/sendemail',NUll),
+(8, 'schedulis', 0, 1, 0, 1, '', 'com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn', '/appcom/Install/dss/dss-appconns/schedulis', NUll);
+-- (9,'dolphinscheduler',0,1,NULL,0,NULL,'com.webank.wedatasphere.dss.appconn.dolphinscheduler.DolphinSchedulerAppConn','/appcom/Install/dss/dss-appconns/dolphinscheduler',NULL);
+update dss_appconn set resource = NULL;
 
 DELETE FROM dss_appconn_instance;
-INSERT INTO `dss_appconn_instance` VALUES (1,1,'PROD','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/','',''),
-(3,3,'DEV','http://WORKFLOW_IP:WORKFLOW_PORT/#/workspaceHome?workspaceId=104','',''),
+INSERT INTO `dss_appconn_instance` (`id`, `appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
+VALUES (1,8,'PROD','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/','',''),
+(2, 2, 'DEV', '/home', '', ''),
+(3,3,'DEV','http://WORKFLOW_IP:WORKFLOW_PORT/#/workspaceHome','',''),
 (4,4,'DEV','http://VISUALIS_IP:VISUALIS_PORT/','','http://VISUALIS_NGINX_IP_2:VISUALIS_NGINX_PORT/dss/visualis/#/projects'),
 (5,5,'DEV','eventchecker','{\"msg.eventchecker.jdo.option.name\": \"msg\",\"msg.eventchecker.jdo.option.url\": \"EVENTCHECKER_JDBC_URL\",\"msg.eventchecker.jdo.option.username\": \"EVENTCHECKER_JDBC_USERNAME\",\"msg.eventchecker.jdo.option.password\": \"EVENTCHECKER_JDBC_PASSWORD\"}',NULL),
 (6,6,'DEV','datachecker','{\"job.datachecker.jdo.option.name\":\"job\",\"job.datachecker.jdo.option.url\":\"DATACHECKER_JOB_JDBC_URL\",\"job.datachecker.jdo.option.username\":\"DATACHECKER_JOB_JDBC_USERNAME\",\"job.datachecker.jdo.option.password\":\"DATACHECKER_JOB_JDBC_PASSWORD\",\"bdp.datachecker.jdo.option.name\":\"bdp\",\"bdp.datachecker.jdo.option.url\":\"DATACHECKER_BDP_JDBC_URL\",\"bdp.datachecker.jdo.option.username\":\"DATACHECKER_BDP_JDBC_USERNAME\",\"bdp.datachecker.jdo.option.password\":\"DATACHECKER_BDP_JDBC_PASSWORD\",\"bdp.datachecker.jdo.option.login.type\":\"base64\",\"bdp.mask.url\":\"http://BDP_MASK_IP:BDP_MASK_PORT/api/v1/mask-status?\",\"bdp.mask.app.id\":\"wtss\",\"bdp.mask.app.token\":\"20a0ccdfc0\"}',NULL),
-(7,7,'DEV','http://localhost:12345/dolphinscheduler',NULL,'http://localhost:12345/dolphinscheduler');
+(7, 7, 'DEV', 'sendemail', '{"email.host":"EMAIL_HOST","email.port":"EMAIL_PORT","email.username":"EMAIL_USERNAME","email.password":"EMAIL_PASSWORD","email.protocol":"EMAIL_PROTOCOL"}', NULL, NULL);
+-- (9,9,'DEV','http://localhost:12345/dolphinscheduler',NULL,'http://localhost:12345/dolphinscheduler');
 
 
 DELETE FROM dss_workspace_appconn_role;

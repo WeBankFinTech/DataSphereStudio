@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.service;
 
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.entity.AbstractAppConnNode;
@@ -47,7 +48,7 @@ public interface WorkflowNodeService {
         return null;
     }
 
-    Map<String, Object> copyNode(String userName, CommonAppConnNode newNode, CommonAppConnNode oldNode, String orcVersion) throws IOException;
+    Map<String, Object> copyNode(String userName, CommonAppConnNode newNode, CommonAppConnNode oldNode, String orcVersion) throws IOException, DSSErrorException;
 
     default void setNodeReadOnly(String userName, CommonAppConnNode node) {
     }

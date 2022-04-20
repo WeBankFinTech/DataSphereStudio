@@ -16,12 +16,14 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.service;
 
+import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.AzkabanConf;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanUserEntity;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
+import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,30 +43,30 @@ public class AzkabanUserService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AzkabanUserService.class);
 
     private static void requestUserId(String baseUrl, SSORequestOperation ssoRequestOperation, Workspace workspace) {
-        if(userMapLastModified.containsKey(baseUrl) &&
+        if (userMapLastModified.containsKey(baseUrl) &&
                 System.currentTimeMillis() - userMapLastModified.get(baseUrl) < AzkabanConf.REALESE_USER_FRESH_TIME.getValue().toLong()) {
             return;
         }
         LOGGER.info("try to update all releaseUsers from Schedulis url {}.", baseUrl);
-        Map<String,Object> params = new HashMap<>(3);
+        Map<String, Object> params = new HashMap<>(3);
         params.put("page", "1");
         params.put("pageSize", "10000");
         params.put("ajax", "loadSystemUserSelectData");
-        String finalUrl = ! baseUrl.endsWith("/") ? (baseUrl + "/" + "system") : baseUrl + "system";
+        String finalUrl = !baseUrl.endsWith("/") ? (baseUrl + "/" + "system") : baseUrl + "system";
         try {
             String response = SchedulisHttpUtils.getHttpGetResult(finalUrl, params, ssoRequestOperation, workspace);
             Map<String, Object> map = DSSCommonUtils.COMMON_GSON.fromJson(response, Map.class);
-            if (map.get("systemUserList") instanceof List){
-                if(!schedulisUserMap.containsKey(baseUrl)) {
+            if (map.get("systemUserList") instanceof List) {
+                if (!schedulisUserMap.containsKey(baseUrl)) {
                     synchronized (schedulisUserMap) {
-                        if(!schedulisUserMap.containsKey(baseUrl)) {
+                        if (!schedulisUserMap.containsKey(baseUrl)) {
                             schedulisUserMap.put(baseUrl, new ArrayList<>());
                         }
                     }
                 }
                 List<AzkabanUserEntity> entityList = schedulisUserMap.get(baseUrl);
                 List<AzkabanUserEntity> newEntityList = ((List<Object>) map.get("systemUserList")).stream().map(e ->
-                    DSSCommonUtils.COMMON_GSON.fromJson(e.toString(), AzkabanUserEntity.class)
+                        DSSCommonUtils.COMMON_GSON.fromJson(e.toString(), AzkabanUserEntity.class)
                 ).collect(Collectors.toList());
                 synchronized (entityList) {
                     entityList.clear();
@@ -78,12 +80,21 @@ public class AzkabanUserService {
     }
 
     public static boolean containsReleaseUser(String releaseUser, String baseUrl,
-                                         SSORequestOperation ssoRequestOperation, Workspace workspace) {
+                                              SSORequestOperation ssoRequestOperation, Workspace workspace) {
         Supplier<Boolean> supplier = () -> schedulisUserMap.containsKey(baseUrl) &&
                 schedulisUserMap.get(baseUrl).stream().anyMatch(entity -> entity.getUsername().equals(releaseUser));
         if (!supplier.get()) {
             requestUserId(baseUrl, ssoRequestOperation, workspace);
         }
         return supplier.get();
+    }
+
+    public static String getUserIdByName(String username, String baseUrl, SSORequestService ssoRequestService, Workspace workspace) {
+        if (containsReleaseUser(username, baseUrl, ssoRequestService.createSSORequestOperation(SchedulisAppConn.SCHEDULIS_APPCONN_NAME), workspace)) {
+            return schedulisUserMap.get(baseUrl).stream()
+                    .filter(l -> l.getUsername().equals(username)).findFirst().get().getUsername();
+        } else {
+            return null;
+        }
     }
 }

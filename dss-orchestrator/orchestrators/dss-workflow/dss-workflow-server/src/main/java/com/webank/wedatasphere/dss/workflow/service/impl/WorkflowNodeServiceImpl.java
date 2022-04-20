@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationResponse;
@@ -46,6 +47,7 @@ import com.webank.wedatasphere.dss.workflow.entity.AbstractAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.rpc.Sender;
@@ -69,6 +71,8 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
     private FlowMapper flowMapper;
     @Autowired
     private WorkFlowParser workFlowParser;
+    @Autowired
+    private DSSFlowService dssFlowService;
 
     private Sender projectSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
 
@@ -102,7 +106,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         String orcVersion;
         try {
             orcVersion = getOrcVersion(node.getFlowId());
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new ExternalOperationFailedException(50205, "get workflow version failed.", e);
         }
         RefJobContentResponseRef responseRef = tryNodeOperation(userName, node, this::getRefCRUDService,
@@ -185,8 +189,8 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     @Override
     public Map<String, Object> copyNode(String userName, CommonAppConnNode newNode,
-                                        CommonAppConnNode oldNode, String orcVersion) throws IOException {
-        if(StringUtils.isBlank(orcVersion)) {
+                                        CommonAppConnNode oldNode, String orcVersion) throws IOException, DSSErrorException {
+        if (StringUtils.isBlank(orcVersion)) {
             orcVersion = getOrcVersion(oldNode.getFlowId());
         }
         String finalOrcVersion = orcVersion;
@@ -256,11 +260,11 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         }
     }
 
-    private String getOrcVersion(Long flowId) throws IOException {
+    private String getOrcVersion(Long flowId) throws IOException, DSSErrorException {
         if(flowId == null) {
             return null;
         }
-        DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
+        DSSFlow dssFlow = dssFlowService.getFlow(flowId);
         return workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSJobContentConstant.ORC_VERSION_KEY);
     }
 

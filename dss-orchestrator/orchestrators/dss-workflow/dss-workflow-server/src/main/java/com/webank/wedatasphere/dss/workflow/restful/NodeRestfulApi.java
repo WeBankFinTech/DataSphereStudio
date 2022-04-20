@@ -161,6 +161,7 @@ public class NodeRestfulApi {
         String nodeType = createExternalNodeRequest.getNodeType();
         Long flowId = createExternalNodeRequest.getFlowID();
         Map<String, Object> params = createExternalNodeRequest.getParams();
+        String nodeId = createExternalNodeRequest.getNodeID();
 
         logger.info("try to create a {} node for workflow {}, params is {}.", nodeType, flowId, params);
         CommonAppConnNode node = new CommonAppConnNode();
@@ -168,7 +169,6 @@ public class NodeRestfulApi {
         node.setFlowId(flowId);
         node.setProjectId(projectId);
         //update by peaceWong add nodeId to appConnNode
-        String nodeId = createExternalNodeRequest.getNodeID();
         node.setId(nodeId);
         //update by shanhuang json中解析获取contextID,然后放到请求参数中
         DSSFlow dssFlow = dssFlowService.getFlow(flowId);
@@ -181,6 +181,7 @@ public class NodeRestfulApi {
         node.setDssLabels(Collections.singletonList(new EnvDSSLabel(label)));
         node.setWorkspace(workspace);
         node.setParams(params);
+        node.setJobContent(params);
         //补充json信息,方便appConn去解析获取响应的值
         if(params.containsKey(DSSJobContentConstant.UP_STREAM_KEY)) {
             String[] upStreams = ((String) params.get(DSSJobContentConstant.UP_STREAM_KEY)).split(",");

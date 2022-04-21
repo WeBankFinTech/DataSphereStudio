@@ -65,10 +65,10 @@ public class SSOHelper {
     }
 
     private static void addWorkspaceInfo(HttpServletRequest request, Workspace workspace) {
-        String forwardedHost = request.getHeader("X-Forwarded-Host");
-        if(StringUtils.isNotBlank(forwardedHost)) {
-            workspace.setDssUrl("http://" + forwardedHost);
-        }
+//        String forwardedHost = request.getHeader("X-Forwarded-Host");
+//        if(StringUtils.isNotBlank(forwardedHost)) {
+//            workspace.setDssUrl("http://" + forwardedHost);
+//        }
         if(StringUtils.isBlank(workspace.getWorkspaceName())) {
             throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies, please ensure front-web has injected cookie['workspaceName'](不能找到工作空间名，请确认前端是否已经注入cookie['workspaceName']).");
         }

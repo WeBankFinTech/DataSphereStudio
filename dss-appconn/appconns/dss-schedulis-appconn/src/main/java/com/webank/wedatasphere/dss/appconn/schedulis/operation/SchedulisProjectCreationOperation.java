@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
 import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
 import com.webank.wedatasphere.dss.appconn.schedulis.service.AzkabanUserService;
+import com.webank.wedatasphere.dss.appconn.schedulis.service.SchedulisProjectService;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.AzkabanUtils;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -26,6 +27,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOpera
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -57,10 +59,10 @@ public class SchedulisProjectCreationOperation
     @Override
     public ProjectResponseRef createProject(DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
         logger.info("begin to create project in schedulis, project name is {}.", requestRef.getDSSProject().getName());
-        if (CollectionUtils.isNotEmpty(requestRef.getReleaseUsers())) {
+        if (CollectionUtils.isNotEmpty(requestRef.getDSSProjectPrivilege().getReleaseUsers())) {
             // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
-            requestRef.getReleaseUsers().forEach(releaseUser -> {
-                if (!AzkabanUserService.containsReleaseUser(releaseUser, getBaseUrl(), ssoRequestOperation, requestRef.getWorkspace())) {
+            requestRef.getDSSProjectPrivilege().getReleaseUsers().forEach(releaseUser -> {
+                if (!AzkabanUserService.containsUser(releaseUser, getBaseUrl(), ssoRequestOperation, requestRef.getWorkspace())) {
                     throw new ExternalOperationFailedException(100323, "当前设置的发布用户: " + releaseUser + ", 在 Schedulis 系统中不存在，请联系 Schedulis 管理员创建该用户！");
                 }
             });
@@ -79,6 +81,13 @@ public class SchedulisProjectCreationOperation
         } catch (final Exception t) {
             logger.error("Failed to create project!", t);
             return ProjectResponseRef.newExternalBuilder().error(t);
+        }
+        // 绑定权限
+        if(CollectionUtils.isNotEmpty(requestRef.getDSSProjectPrivilege().getReleaseUsers())) {
+            ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl updateRequestRef = new ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl()
+                    .setWorkspace(requestRef.getWorkspace()).setUserName(requestRef.getUserName()).setDSSProject(requestRef.getDSSProject())
+                    .setDSSProjectPrivilege(requestRef.getDSSProjectPrivilege()).setAddedDSSProjectPrivilege(requestRef.getDSSProjectPrivilege());
+            ((SchedulisProjectService) service).getProjectUpdateOperation().updateProject(updateRequestRef);
         }
         Long projectId = null;
         try {

@@ -17,6 +17,7 @@ public class VisualisResponseRefBuilder
 
     @Override
     public VisualisResponseRefBuilder setResponseBody(String responseBody) {
+        super.setResponseBody(responseBody).build();
         Map<String, Object> headerMap = (Map<String, Object>) responseMap.get("header");
         if (headerMap.containsKey("code")) {
             status = getInt(headerMap.get("code"));
@@ -28,7 +29,8 @@ public class VisualisResponseRefBuilder
         if(payload instanceof Map) {
             setResponseMap((Map<String, Object>) payload);
         }
-        return super.setResponseBody(responseBody);
+        return this;
+//        return super.setResponseBody(responseBody);
     }
 
 }

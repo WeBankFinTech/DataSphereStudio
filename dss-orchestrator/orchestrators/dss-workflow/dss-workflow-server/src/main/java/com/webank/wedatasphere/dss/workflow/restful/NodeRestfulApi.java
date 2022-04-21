@@ -212,6 +212,7 @@ public class NodeRestfulApi {
         node.setDssLabels(Collections.singletonList(new EnvDSSLabel(label)));
         node.setWorkspace(workspace);
         node.setParams(params);
+        node.setJobContent(params);
         workflowNodeService.updateNode(userName, node);
         return Message.ok().data("result", node.getJobContent());
     }
@@ -231,6 +232,7 @@ public class NodeRestfulApi {
         node.setNodeType(nodeType);
         node.setJobContent(params);
         node.setFlowId(updateExternalNodeRequest.getFlowID());
+        node.setName(updateExternalNodeRequest.getName());
         workflowNodeService.deleteNode(userName, node);
         return Message.ok().data("result", node.getJobContent());
     }

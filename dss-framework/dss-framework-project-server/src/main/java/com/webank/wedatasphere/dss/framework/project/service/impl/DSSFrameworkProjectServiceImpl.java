@@ -241,6 +241,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                         }
                     }, "create refProject " + dssProjectCreateRequest.getName());
         } catch (RuntimeException e) {
+            LOGGER.error("create appconn project failed:", e);
             if(!STRICT_PROJECT_CREATE_MODE) {
                 throw e;
             }
@@ -249,7 +250,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             appConnListMap.forEach((key, value) -> value.forEach(appInstance -> {
                 StructureOperationUtils.tryProjectOperation(() -> ((OnlyStructureAppConn) key).getOrCreateStructureStandard().getProjectService(appInstance),
                         ProjectService::getProjectDeletionOperation, null,
-                        refProjectContentRequestRef -> refProjectContentRequestRef.setRefProjectId(projectMap.get(appInstance)).setProjectName(dssProjectCreateRequest.getName()),
+                        refProjectContentRequestRef -> refProjectContentRequestRef.setRefProjectId(projectMap.get(appInstance))
+                                .setProjectName(dssProjectCreateRequest.getName()).setWorkspace(workspace),
                         (structureOperation, structureRequestRef) -> ((ProjectDeletionOperation) structureOperation).deleteProject((RefProjectContentRequestRef) structureRequestRef),
                         "delete refProject " + dssProjectCreateRequest.getName());
             }));

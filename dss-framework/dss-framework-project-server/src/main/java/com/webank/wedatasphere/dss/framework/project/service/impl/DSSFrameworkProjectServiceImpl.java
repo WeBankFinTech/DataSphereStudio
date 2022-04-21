@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
@@ -33,13 +34,16 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserServi
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectPrivilege;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.utils.StructureOperationUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -47,6 +51,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.project.utils.ProjectOperationUtils.tryProjectOperation;
 
@@ -147,6 +154,30 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     private void modifyThirdProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, Workspace workspace){
         DSSProject dssProject = new DSSProject();
         BeanUtils.copyProperties(projectModifyRequest, dssProject);
+        DSSProjectPrivilege privilege = DSSProjectPrivilege.newBuilder().setAccessUsers(projectModifyRequest.getAccessUsers())
+                .setEditUsers(projectModifyRequest.getEditUsers())
+                .setReleaseUsers(projectModifyRequest.getReleaseUsers()).build();
+        List<DSSProjectUser> projectUsers = projectUserService.getProjectPriv(projectModifyRequest.getId());
+        DSSProjectPrivilege addedPrivilege;
+        DSSProjectPrivilege removedPrivilege;
+        if(CollectionUtils.isEmpty(projectUsers)) {
+            addedPrivilege = privilege;
+            removedPrivilege = DSSProjectPrivilege.EMPTY;
+        } else {
+            BiFunction<ImmutablePair<Integer, Boolean>, List<String>, List<String>> getDifference = (privAndIsAdded, users) -> {
+                List<String> privUsers = projectUsers.stream().filter(user -> user.getPriv().equals(privAndIsAdded.getKey())).map(DSSProjectUser::getUsername).collect(Collectors.toList());
+                if(privAndIsAdded.getValue()) {
+                    return (List<String>) CollectionUtils.subtract(users, privUsers);
+                } else {
+                    return (List<String>) CollectionUtils.subtract(privUsers, users);
+                }
+            };
+            Function<Boolean, DSSProjectPrivilege> getPrivilege = isAdded -> DSSProjectPrivilege.newBuilder().setAccessUsers(getDifference.apply(new ImmutablePair<>(1, isAdded), projectModifyRequest.getAccessUsers()))
+                    .setEditUsers(getDifference.apply(new ImmutablePair<>(2, isAdded), projectModifyRequest.getEditUsers()))
+                    .setReleaseUsers(getDifference.apply(new ImmutablePair<>(3, isAdded), projectModifyRequest.getReleaseUsers())).build();
+            addedPrivilege = getPrivilege.apply(true);
+            removedPrivilege = getPrivilege.apply(false);
+        }
         Map<AppInstance, Long> appInstanceToRefProjectId = new HashMap<>(10);
         tryProjectOperation((appConn, appInstance) -> {
                 Long refProjectId = dssProjectService.getAppConnProjectId(appInstance.getId(), dbProject.getId());
@@ -159,12 +190,13 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     return true;
                 }
             }, workspace, projectService -> projectService.getProjectUpdateOperation(),
-            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject)
-                    .setAccessUsers(projectModifyRequest.getAccessUsers()).setEditUsers(projectModifyRequest.getEditUsers())
-                    .setReleaseUsers(projectModifyRequest.getReleaseUsers()).setUserName(dbProject.getUsername()).setWorkspace(workspace),
+            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setUserName(dbProject.getUsername()).setWorkspace(workspace),
             (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setRefProjectId(appInstanceToRefProjectId.get(appInstance)),
-            (structureOperation, structureRequestRef) -> ((ProjectUpdateOperation) structureOperation).updateProject((ProjectUpdateRequestRef) structureRequestRef)
-            , null, "update refProject " + projectModifyRequest.getName());
+            (structureOperation, structureRequestRef) -> {
+                ProjectUpdateRequestRef projectUpdateRequestRef = (ProjectUpdateRequestRef) structureRequestRef;
+                projectUpdateRequestRef.setAddedDSSProjectPrivilege(addedPrivilege).setRemovedDSSProjectPrivilege(removedPrivilege);
+                return ((ProjectUpdateOperation) structureOperation).updateProject(projectUpdateRequestRef);
+            }, null, "update refProject " + projectModifyRequest.getName());
     }
 
 
@@ -192,11 +224,13 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         final Map<AppConn, List<AppInstance>> appConnListMap = new HashMap<>(10);
         DSSProject dssProject = new DSSProject();
         BeanUtils.copyProperties(dssProjectCreateRequest, dssProject);
+        DSSProjectPrivilege privilege = DSSProjectPrivilege.newBuilder().setAccessUsers(dssProjectCreateRequest.getAccessUsers())
+                .setEditUsers(dssProjectCreateRequest.getEditUsers())
+                .setReleaseUsers(dssProjectCreateRequest.getReleaseUsers()).build();
         try {
             tryProjectOperation(null, workspace, ProjectService::getProjectCreationOperation,
                     dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject)
-                            .setAccessUsers(dssProjectCreateRequest.getAccessUsers()).setEditUsers(dssProjectCreateRequest.getEditUsers())
-                            .setReleaseUsers(dssProjectCreateRequest.getReleaseUsers()), null,
+                            .setDSSProjectPrivilege(privilege), null,
                     (structureOperation, structureRequestRef) -> ((ProjectCreationOperation) structureOperation).createProject((DSSProjectContentRequestRef) structureRequestRef),
                     (pair, projectResponseRef) -> {
                         projectMap.put(pair.right, projectResponseRef.getRefProjectId());

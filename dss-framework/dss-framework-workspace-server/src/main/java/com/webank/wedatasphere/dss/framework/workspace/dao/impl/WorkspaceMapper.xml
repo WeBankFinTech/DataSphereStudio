@@ -171,7 +171,7 @@
             parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite">
         INSERT INTO dss_workspace_user_favorites_appconn (<include refid="favorite_main"/>)
         VALUES
-        (#{id},#{username},#{workspaceId},#{menuApplicationId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime},#{type})
+        (#{id},#{username},#{workspaceId},#{menuAppConnId},#{order},#{createBy},#{createTime},#{lastUpdateUser},#{lastUpdateTime},#{type})
     </insert>
 
     <delete id="deleteFavorite">

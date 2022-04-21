@@ -17,9 +17,9 @@
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
-import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
@@ -30,17 +30,16 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectUserUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DSSProjectUserServiceImpl implements DSSProjectUserService {
 
@@ -171,6 +170,11 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         queryWrapper.eq("project_id", projectId);
         queryWrapper.eq("username", username);
         return projectUserMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public List<DSSProjectUser> getProjectPriv(Long projectId) {
+        return projectUserMapper.getPrivsByProjectId(projectId);
     }
 
     private boolean isProjectOwner(Long projectId, String username) {

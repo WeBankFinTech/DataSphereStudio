@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.service;
 
-import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.AzkabanConf;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanUserEntity;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
@@ -24,7 +23,6 @@ import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

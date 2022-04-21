@@ -16,6 +16,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProject
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -50,9 +51,9 @@ public class DolphinSchedulerProjectCreationOperation
         Long refProjectId = ((ProjectService) service).getProjectSearchOperation().searchProject(searchRequestRef).getRefProjectId();
         logger.info("the refProjectId in dolphinScheduler of projectName:{} is:{}", requestRef.getDSSProject().getName(), refProjectId);
         // 对releaseUsers授权工程可访问权限
-        if(CollectionUtils.isNotEmpty(requestRef.getReleaseUsers())) {
+        if(CollectionUtils.isNotEmpty(requestRef.getDSSProjectPrivilege().getReleaseUsers())) {
             ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl updateRequestRef = new ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl();
-            updateRequestRef.setReleaseUsers(requestRef.getReleaseUsers()).setUserName(requestRef.getUserName())
+            updateRequestRef.setAddedDSSProjectPrivilege(requestRef.getDSSProjectPrivilege()).setUserName(requestRef.getUserName())
                     .setRefProjectId(refProjectId).setDSSProject(requestRef.getDSSProject()).setWorkspace(requestRef.getWorkspace());
             ((DolphinSchedulerProjectService) service).getProjectGrantOperation().grantProject(updateRequestRef);
         }

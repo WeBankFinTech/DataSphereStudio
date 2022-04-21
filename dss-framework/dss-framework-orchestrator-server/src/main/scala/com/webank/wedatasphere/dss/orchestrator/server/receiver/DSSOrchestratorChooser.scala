@@ -43,9 +43,6 @@ class DSSOrchestratorChooser extends ReceiverChooser {
   def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService, orchestratorPluginService, orchestratorContext))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
-    case _: RequestCreateOrchestrator => receiver
-    case _: RequestUpdateOrchestrator => receiver
-    case _: RequestDeleteOrchestrator => receiver
     case _: RequestExportOrchestrator => receiver
     case _: RequestImportOrchestrator => receiver
     case _: RequestQueryOrchestrator => receiver

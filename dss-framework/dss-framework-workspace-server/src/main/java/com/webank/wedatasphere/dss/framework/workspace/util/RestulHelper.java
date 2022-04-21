@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 
-
+@Deprecated
 @Component
 public class RestulHelper {
 

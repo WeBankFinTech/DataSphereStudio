@@ -63,11 +63,11 @@ public class SchedulisProjectUpdateOperation
     private void addProjectPrivilege(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl projectRef) {
         String projectName = projectRef.getProjectName();
         if (projectRef.getAddedDSSProjectPrivilege() == null ||
-                CollectionUtils.isEmpty(projectRef.getAddedDSSProjectPrivilege().getAccessUsers())) {
+                CollectionUtils.isEmpty(projectRef.getAddedDSSProjectPrivilege().getReleaseUsers())) {
             return;
         }
-        projectRef.getAddedDSSProjectPrivilege().getAccessUsers().forEach(accessUser -> {
-            String userId = AzkabanUserService.getUserId(accessUser, getBaseUrl(), ssoRequestOperation, projectRef.getWorkspace());
+        projectRef.getAddedDSSProjectPrivilege().getReleaseUsers().forEach(releaseUser -> {
+            String userId = AzkabanUserService.getUserId(releaseUser, getBaseUrl(), ssoRequestOperation, projectRef.getWorkspace());
             Map<String, Object> params = new HashMap<>(8);
             params.put("project", projectName);
             params.put("userId", userId);
@@ -79,17 +79,17 @@ public class SchedulisProjectUpdateOperation
             params.put("permissions[schedule]", "true");
             String response = SchedulisHttpUtils.getHttpGetResult(managerUrl, params, ssoRequestOperation, projectRef.getWorkspace());
             logger.info("for project {} add a accessUser {} response is {}.",
-                    projectName, accessUser, response);
+                    projectName, releaseUser, response);
         });
     }
 
     private void removeRelProjectPrivilege(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl projectRef) {
         String projectName = projectRef.getProjectName();
         if (projectRef.getRemovedDSSProjectPrivilege() == null ||
-                CollectionUtils.isEmpty(projectRef.getRemovedDSSProjectPrivilege().getAccessUsers())) {
+                CollectionUtils.isEmpty(projectRef.getRemovedDSSProjectPrivilege().getReleaseUsers())) {
             return;
         }
-        projectRef.getRemovedDSSProjectPrivilege().getAccessUsers().forEach(accessUser -> {
+        projectRef.getRemovedDSSProjectPrivilege().getReleaseUsers().forEach(accessUser -> {
             Map<String, Object> params = new HashMap<>(3);
             params.put("project", projectName);
             params.put("userId", accessUser);

@@ -17,6 +17,7 @@ import org.apache.linkis.httpclient.response.HttpResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class VisualisCommonUtil {
@@ -75,6 +76,7 @@ public class VisualisCommonUtil {
                                                          String url,
                                                          DSSHttpAction visualisHttpAction) throws ExternalOperationFailedException {
         HttpResult httpResult = getHttpResult(requestRef, ssoRequestOperation, url, visualisHttpAction);
+        logger.info("responsebody from visualis:{}", httpResult.getResponseBody());
         ResponseRef responseRef = new VisualisResponseRefBuilder().setResponseBody(httpResult.getResponseBody()).build();
         checkResponseRef(responseRef);
         return responseRef;

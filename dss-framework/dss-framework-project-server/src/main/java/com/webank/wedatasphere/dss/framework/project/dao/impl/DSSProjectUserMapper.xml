@@ -26,4 +26,8 @@
         WHERE username = #{username} and workspace_id = #{workspaceId} and role_id = 1
     </select>
 
+    <select id="getPrivsByProjectId" resultType="com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser">
+        select * from dss_project_user where project_id = #{projectID}
+    </select>
+
 </mapper>

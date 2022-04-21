@@ -16,14 +16,13 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.service;
 
-import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
 import com.webank.wedatasphere.dss.appconn.schedulis.conf.AzkabanConf;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanUserEntity;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +78,7 @@ public class AzkabanUserService {
         userMapLastModified.put(baseUrl, System.currentTimeMillis());
     }
 
-    public static boolean containsReleaseUser(String releaseUser, String baseUrl,
+    public static boolean containsUser(String releaseUser, String baseUrl,
                                               SSORequestOperation ssoRequestOperation, Workspace workspace) {
         Supplier<Boolean> supplier = () -> schedulisUserMap.containsKey(baseUrl) &&
                 schedulisUserMap.get(baseUrl).stream().anyMatch(entity -> entity.getUsername().equals(releaseUser));
@@ -89,12 +88,12 @@ public class AzkabanUserService {
         return supplier.get();
     }
 
-    public static String getUserIdByName(String username, String baseUrl, SSORequestService ssoRequestService, Workspace workspace) {
-        if (containsReleaseUser(username, baseUrl, ssoRequestService.createSSORequestOperation(SchedulisAppConn.SCHEDULIS_APPCONN_NAME), workspace)) {
-            return schedulisUserMap.get(baseUrl).stream()
-                    .filter(l -> l.getUsername().equals(username)).findFirst().get().getUsername();
+    public static String getUserId(String user, String baseUrl,
+                                    SSORequestOperation ssoRequestOperation, Workspace workspace) {
+        if(containsUser(user, baseUrl, ssoRequestOperation, workspace)) {
+            return schedulisUserMap.get(baseUrl).stream().filter(entity -> entity.getUsername().equals(user)).findAny().get().getId();
         } else {
-            return null;
+            throw new ExternalOperationFailedException(10823, "Not exists user in Schedulis " + user);
         }
     }
 }

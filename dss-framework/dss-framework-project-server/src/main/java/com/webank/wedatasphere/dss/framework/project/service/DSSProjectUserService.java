@@ -77,6 +77,8 @@ public interface DSSProjectUserService {
 
     List<DSSProjectUser> getProjectUserPriv(Long projectId, String username);
 
+    List<DSSProjectUser> getProjectPriv(Long projectId);
+
     boolean isWorkspaceUser(Long workspaceId,String username);
 
     /**

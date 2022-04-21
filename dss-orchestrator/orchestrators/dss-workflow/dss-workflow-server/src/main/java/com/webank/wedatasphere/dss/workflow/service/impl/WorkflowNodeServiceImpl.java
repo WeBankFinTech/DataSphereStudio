@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationResponse;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.*;
 import com.webank.wedatasphere.dss.standard.app.development.ref.*;
@@ -151,7 +152,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 projectRefRequestRef -> {
                     Long refProjectId;
                     if(node.getJobContent().containsKey(DSSWorkFlowConstant.REF_PROJECT_ID_KEY)) {
-                        refProjectId = (Long) node.getJobContent().get(DSSWorkFlowConstant.REF_PROJECT_ID_KEY);
+                        refProjectId = DSSCommonUtils.parseToLong(node.getJobContent().get(DSSWorkFlowConstant.REF_PROJECT_ID_KEY));
                     } else {
                         refProjectId = parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), node.getDssLabels());
                     }

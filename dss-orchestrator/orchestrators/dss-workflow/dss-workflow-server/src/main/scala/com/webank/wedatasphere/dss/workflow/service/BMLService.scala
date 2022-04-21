@@ -32,11 +32,22 @@ import scala.collection.JavaConversions._
 
 
 @Component
-class BMLService extends JavaLog{
+class BMLService extends JavaLog {
 
-  def upload(userName: String, content: String, fileName: String, projectName:String): util.Map[String, Object] = {
+  var bmlClient: BmlClient = _
+
+  def getBmlClient(userName: String): BmlClient = {
+    if (bmlClient == null) synchronized {
+      if (bmlClient == null) {
+        bmlClient = BmlClientFactory.createBmlClient(userName)
+      }
+    }
+    bmlClient
+  }
+
+  def upload(userName: String, content: String, fileName: String, projectName: String): util.Map[String, Object] = {
     val inputStream = new ByteArrayInputStream(content.getBytes("utf-8"))
-    val client: BmlClient = createBMLClient(userName)
+    val client: BmlClient = getBmlClient(userName)
     val resource: BmlUploadResponse = client.uploadShareResource(userName, projectName, fileName, inputStream)
     if (!resource.isSuccess) throw new DSSErrorException(911113, "上传失败")
     val map = new util.HashMap[String, Object]
@@ -44,8 +55,8 @@ class BMLService extends JavaLog{
     map += "version" -> resource.version
   }
 
-  def upload(userName: String, inputStream: InputStream, fileName: String, projectName:String): util.Map[String, Object] = {
-    val client: BmlClient = createBMLClient(userName)
+  def upload(userName: String, inputStream: InputStream, fileName: String, projectName: String): util.Map[String, Object] = {
+    val client: BmlClient = getBmlClient(userName)
     val resource: BmlUploadResponse = client.uploadShareResource(userName, projectName, fileName, inputStream)
     if (!resource.isSuccess) throw new DSSErrorException(911113, "上传失败")
     val map = new util.HashMap[String, Object]
@@ -54,7 +65,7 @@ class BMLService extends JavaLog{
   }
 
   def update(userName: String, resourceId: String, inputStream: InputStream): util.Map[String, Object] = {
-    val client: BmlClient = createBMLClient(userName)
+    val client: BmlClient = getBmlClient(userName)
     val resource: BmlUpdateResponse = client.updateShareResource(userName, resourceId, "", inputStream)
     if (!resource.isSuccess) throw new DSSErrorException(911114, "更新失败")
     val map = new util.HashMap[String, Object]
@@ -64,8 +75,8 @@ class BMLService extends JavaLog{
 
   def update(userName: String, resourceId: String, content: String): util.Map[String, Object] = {
     val inputStream = new ByteArrayInputStream(content.getBytes("utf-8"))
-    val client: BmlClient = createBMLClient(userName)
-    val resource: BmlUpdateResponse = client.updateShareResource(userName, resourceId, UUID.randomUUID().toString+".json", inputStream)
+    val client: BmlClient = getBmlClient(userName)
+    val resource: BmlUpdateResponse = client.updateShareResource(userName, resourceId, UUID.randomUUID().toString + ".json", inputStream)
     if (!resource.isSuccess) throw new DSSErrorException(911114, "更新失败")
     val map = new util.HashMap[String, Object]
     map += "resourceId" -> resource.resourceId
@@ -73,7 +84,7 @@ class BMLService extends JavaLog{
   }
 
   def query(userName: String, resourceId: String, version: String): util.Map[String, Object] = {
-    val client: BmlClient = createBMLClient(userName)
+    val client: BmlClient = getBmlClient(userName)
     var resource: BmlDownloadResponse = null
     if (version == null) {
       resource = client.downloadShareResource(userName, resourceId)
@@ -87,7 +98,7 @@ class BMLService extends JavaLog{
   }
 
   def download(userName: String, resourceId: String, version: String): util.Map[String, Object] = {
-    val client: BmlClient = createBMLClient(userName)
+    val client: BmlClient = getBmlClient(userName)
     var resource: BmlDownloadResponse = null
     if (version == null) {
       resource = client.downloadShareResource(userName, resourceId)
@@ -101,10 +112,10 @@ class BMLService extends JavaLog{
   }
 
   def downloadToLocalPath(userName: String, resourceId: String, version: String, path: String): String = {
-    val result = download(userName,resourceId,version)
+    val result = download(userName, resourceId, version)
     val is = result.get("is").asInstanceOf[InputStream]
     val os = IoUtils.generateExportOutputStream(path)
-    Utils.tryFinally(IOUtils.copy(is,os)){
+    Utils.tryFinally(IOUtils.copy(is, os)) {
       IOUtils.closeQuietly(os)
       IOUtils.closeQuietly(is)
     }
@@ -112,40 +123,40 @@ class BMLService extends JavaLog{
   }
 
   def downloadAndGetFlowJson(userName: String, resourceId: String, version: String, path: String): String = {
-    downloadToLocalPath(userName,resourceId,version,path)
+    downloadToLocalPath(userName, resourceId, version, path)
     //因为下载到指定目录后返回的resource的Stream为null,只能从文件重新读取。
     val is = IoUtils.generateInputInputStream(path)
     Utils.tryFinally(inputstremToString(is))(IOUtils.closeQuietly(is))
   }
 
-  def readLocalResourceFile(userName: String,readPath: String): InputStream ={
+  def readLocalResourceFile(userName: String, readPath: String): InputStream = {
     IoUtils.generateInputInputStream(readPath)
   }
 
-  def readLocalFlowJsonFile(userName: String,readPath: String): String ={
-    var inputStream:InputStream = null
-    var flowJson:String = null
-    Utils.tryFinally{
+  def readLocalFlowJsonFile(userName: String, readPath: String): String = {
+    var inputStream: InputStream = null
+    var flowJson: String = null
+    Utils.tryFinally {
       inputStream = IoUtils.generateInputInputStream(readPath)
       flowJson = inputstremToString(inputStream)
-    }{
+    } {
       IOUtils.closeQuietly(inputStream)
     }
     flowJson
   }
 
 
-  def readFlowJsonFromBML(userName: String, resourceId:String ,version: String ): String ={
+  def readFlowJsonFromBML(userName: String, resourceId: String, version: String): String = {
 
-    val result = download(userName,resourceId,version)
+    val result = download(userName, resourceId, version)
     val is = result.get("is").asInstanceOf[InputStream]
 
-    var inputStream:InputStream = null
-    var flowJson:String = null
-    Utils.tryFinally{
-      inputStream =is
+    var inputStream: InputStream = null
+    var flowJson: String = null
+    Utils.tryFinally {
+      inputStream = is
       flowJson = inputstremToString(inputStream)
-    }{
+    } {
       IOUtils.closeQuietly(inputStream)
     }
     flowJson
@@ -156,46 +167,37 @@ class BMLService extends JavaLog{
     scala.io.Source.fromInputStream(inputStream).mkString
   }
 
-  private def createBMLClient(userName: String): BmlClient = {
-    if (userName == null)
-      BmlClientFactory.createBmlClient()
-    else
-      BmlClientFactory.createBmlClient(userName)
-  }
-
-  def createBmlProject(username:String, projectName:String, editUsers:util.List[String],
-                       accessUsers:util.List[String] ): Unit ={
-    val client = createBMLClient(username)
-    val response =  client.createBmlProject(username, projectName, accessUsers, editUsers)
-    if (response.isSuccess){
+  def createBmlProject(username: String, projectName: String, editUsers: util.List[String],
+                       accessUsers: util.List[String]): Unit = {
+    val client = getBmlClient(username)
+    val response = client.createBmlProject(username, projectName, accessUsers, editUsers)
+    if (response.isSuccess) {
       logger.info(s"for user $username create bml project $projectName success")
-    }else{
+    } else {
       logger.error(s"for user $username create bml project $projectName failed")
     }
   }
 
-  def attachResourceAndProject(username:String, projectName:String, resourceId:String):Unit = {
-    val client = createBMLClient(username)
+  def attachResourceAndProject(username: String, projectName: String, resourceId: String): Unit = {
+    val client = getBmlClient(username)
     val response = client.attachResourceAndProject(projectName, resourceId)
-    if (response.isSuccess){
+    if (response.isSuccess) {
       logger.info(s"attach $username and $projectName success")
-    }else{
+    } else {
       logger.error(s"attach $username and $projectName failed")
     }
   }
 
 
-  def updateProjectPriv(projectName:String, username:String, editUsers:util.List[String],
-                        accessUsers:util.List[String]): Unit ={
-    val client = createBMLClient(username)
+  def updateProjectPriv(projectName: String, username: String, editUsers: util.List[String],
+                        accessUsers: util.List[String]): Unit = {
+    val client = getBmlClient(username)
     val response = client.updateProjectPriv(username, projectName, editUsers, accessUsers)
-    if (response.isSuccess){
+    if (response.isSuccess) {
       logger.info(s"attach $username and $projectName success")
-    }else{
+    } else {
       logger.error(s"attach $username and $projectName failed")
     }
   }
-
-
 
 }

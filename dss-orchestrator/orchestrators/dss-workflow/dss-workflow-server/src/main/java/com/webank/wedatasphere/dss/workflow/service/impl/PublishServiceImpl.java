@@ -35,6 +35,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -42,7 +43,9 @@ import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.
 
 public class PublishServiceImpl implements PublishService {
 
+    @Autowired
     private DSSFlowService dssFlowService;
+    @Autowired
     private WorkFlowParser workFlowParser;
 
     public void setDssFlowService(DSSFlowService dssFlowService) {

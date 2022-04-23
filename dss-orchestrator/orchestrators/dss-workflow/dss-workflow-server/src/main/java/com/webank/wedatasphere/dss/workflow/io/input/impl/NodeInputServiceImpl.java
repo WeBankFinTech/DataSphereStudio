@@ -142,7 +142,7 @@ public class NodeInputServiceImpl implements NodeInputService {
                 return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
             }
         } else {
-            logger.error("appConn node resource file does not exists." + nodeId);
+            logger.error("appConn node resource file does not exists. nodeId: {}" + nodeId);
         }
 
 

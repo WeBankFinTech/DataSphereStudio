@@ -51,7 +51,7 @@ public class SchedulisProjectDeletionOperation
     public ResponseRef deleteProject(RefProjectContentRequestRef.RefProjectContentRequestRefImpl projectRef) throws ExternalOperationFailedException {
         try {
             Map<String, Object> params = new HashMap<>(2);
-            params.put("project", projectRef.getName());
+            params.put("project", projectRef.getProjectName());
             params.put("delete", "true");
             String responseContent = SchedulisHttpUtils.getHttpGetResult(this.managerUrl, params, ssoRequestOperation, projectRef.getWorkspace());
             logger.info("delete Schedulis Project with response: {}.", responseContent);

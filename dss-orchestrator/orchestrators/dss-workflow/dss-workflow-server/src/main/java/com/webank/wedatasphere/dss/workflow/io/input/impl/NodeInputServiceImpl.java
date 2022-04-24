@@ -145,7 +145,6 @@ public class NodeInputServiceImpl implements NodeInputService {
             logger.error("appConn node resource file does not exists. nodeId: {}" + nodeId);
         }
 
-
         return nodeJson;
     }
 

@@ -83,7 +83,9 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 //        try{
         logger.info("Begin to get an execID");
         DSSWorkspace workspace = SSOHelper.getWorkspace(req);
-        json.put(TaskConstant.UMUSER, SecurityFilter.getLoginUsername(req));
+        String umUser = SecurityFilter.getLoginUsername(req);
+        json.put(TaskConstant.UMUSER, umUser);
+        json.put(TaskConstant.EXECUTE_USER, umUser);
         Map<String, Object> params = (Map<String, Object>) json.get("params");
         //失败节点重新执行功能，通过isReExecute字段来判断
         if (json.containsKey(ExecuteStrategyEnum.IS_RE_EXECUTE.getName())) {

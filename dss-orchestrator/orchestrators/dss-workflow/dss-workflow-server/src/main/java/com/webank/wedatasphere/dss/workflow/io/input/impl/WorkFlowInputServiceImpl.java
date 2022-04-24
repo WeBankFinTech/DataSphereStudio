@@ -46,7 +46,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool.nodeExportThreadPool;
@@ -128,6 +130,8 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         String appConnResourceSavePath = flowPath + File.separator + "appconn-resource";
 //        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
         List<Map<String, Object>> nodeJsonListRes = Collections.synchronizedList(new ArrayList<>());
+        CountDownLatch cdl = new CountDownLatch(nodeJsonList.size());
+        AtomicInteger failedCount = new AtomicInteger(0);
         if (nodeJsonList.size() > 0) {
             for (String nodeJson : nodeJsonList) {
                 NodeImportJob.ImportJobEntity jobEntity = new NodeImportJob.ImportJobEntity();
@@ -142,17 +146,27 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 jobEntity.setUpdateContextId(updateContextId);
                 jobEntity.setSubflows(subflows);
                 jobEntity.setOrcVersion(orcVersion);
-
                 NodeImportJob nodeImportJob = new NodeImportJob();
                 nodeImportJob.setNodeInputService(nodeInputService);
                 nodeImportJob.setJobEntity(jobEntity);
+                nodeImportJob.setFailedCount(failedCount);
+                nodeImportJob.setCountDownLatch(cdl);
                 nodeImportJob.setNodeJsonListRes(nodeJsonListRes);
                 nodeExportThreadPool.submit(nodeImportJob);
             }
         }
-
+        // 用户需要等待所有节点导入完成
+        boolean success = false;
+        try {
+            success = cdl.await(30, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            logger.error("failed to import node for workflow:{}", dssFlow.getName(), e);
+            throw new DSSErrorException(90071, "导入节点超时！");
+        }
+        if (failedCount.get() > 0) {
+            throw new DSSErrorException(90074, "有节点导入失败，请重试！");
+        }
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
-
     }
 
     private String uploadFlowResourceToBml(String userName, String flowJson, String flowResourcePath, String projectName) throws IOException {

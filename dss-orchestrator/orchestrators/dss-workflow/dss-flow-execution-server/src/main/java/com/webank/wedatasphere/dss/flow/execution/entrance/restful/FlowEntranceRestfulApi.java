@@ -172,7 +172,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         return message;
     }
 
-    @RequestMapping(path = {"/{id}/killWorkflow"},method = {RequestMethod.GET})
+    @RequestMapping(path = {"/{id}/kill"},method = {RequestMethod.GET})
     public Message kill(@PathVariable("id") String id, @RequestParam(value = "taskID",required = false) Long taskID) {
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option job;

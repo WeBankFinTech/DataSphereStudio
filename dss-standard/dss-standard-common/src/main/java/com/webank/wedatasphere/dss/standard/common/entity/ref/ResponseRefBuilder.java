@@ -36,7 +36,7 @@ public interface ResponseRefBuilder<R extends ResponseRefBuilder<R, T>, T extend
         @Override
         public final T build() {
             Map<String, Object> responseMap = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
-            int status = (int) responseMap.get("status");
+            int status = (int) DSSCommonUtils.parseToLong(responseMap.get("status"));
             String errorMsg = (String) responseMap.get("message");
             return createResponseRef(responseBody, status, errorMsg, responseMap);
         }

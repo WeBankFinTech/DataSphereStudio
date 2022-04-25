@@ -402,6 +402,9 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
                 isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
             }
+            isReleasable = isReleasable || projectUserAuthResponse.getProjectOwner().equals(username);
+            isEditable = isEditable || projectUserAuthResponse.getProjectOwner().equals(username);
+
             for (DSSOrchestratorInfo dssOrchestratorInfo : list) {
                 OrchestratorBaseInfo orchestratorBaseInfo = new OrchestratorBaseInfo();
                 BeanUtils.copyProperties(dssOrchestratorInfo, orchestratorBaseInfo);

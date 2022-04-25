@@ -16,16 +16,17 @@
 
 package com.webank.wedatapshere.dss.appconn.datachecker
 
+
 import java.util
 import java.util.{Properties, UUID}
 
-import com.webank.wedatasphere.dss.common.utils.VariableUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
 import org.apache.linkis.common.log.LogUtils
 import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.common.utils.VariableUtils
 
 import scala.collection.mutable
 
@@ -77,11 +78,11 @@ class DataCheckerRefExecutionOperation
         properties.put(record._1, "")
       }
       else {
-        if(inputParams.exists(x=>x._1.equalsIgnoreCase(VariableUtils.RUN_DATE))) {
-          val tmp:util.HashMap[String, Any]  = new util.HashMap[String,Any]()
-          tmp.put(VariableUtils.RUN_DATE,inputParams.getOrElse(VariableUtils.RUN_DATE, null))
-          properties.put(record._1, VariableUtils.replace(record._2.toString,tmp))
-        }else {
+        if (inputParams.exists(x => x._1.equalsIgnoreCase(VariableUtils.RUN_DATE))) {
+          val tmp: util.HashMap[String, Any] = new util.HashMap[String, Any]()
+          tmp.put(VariableUtils.RUN_DATE, inputParams.getOrElse(VariableUtils.RUN_DATE, null))
+          properties.put(record._1, VariableUtils.replace(record._2.toString, tmp))
+        } else {
           properties.put(record._1, VariableUtils.replace(record._2.toString))
         }
       }

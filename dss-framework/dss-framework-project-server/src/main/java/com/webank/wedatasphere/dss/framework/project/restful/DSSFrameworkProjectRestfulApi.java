@@ -162,7 +162,7 @@ public class DSSFrameworkProjectRestfulApi {
             projectService.deleteProject(username, projectDeleteRequest, workspace);
             return Message.ok("删除工程成功");
         } catch (final Throwable t) {
-            LOGGER.error("Failed to delete {} for user {}", projectDeleteRequest, username);
+            LOGGER.error("Failed to delete {} for user {}", projectDeleteRequest, username, t);
             return Message.error("删除工程失败");
         }
     }

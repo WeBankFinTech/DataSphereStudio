@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
@@ -44,6 +46,9 @@ public class VisualisRefImportOperation
         visualisPostAction.addRequestPayload("resourceId", requestRef.getResourceMap().get(ThirdlyRequestRef.ImportWitContextRequestRefImpl.RESOURCE_ID_KEY));
         visualisPostAction.addRequestPayload("version", requestRef.getResourceMap().get(ThirdlyRequestRef.ImportWitContextRequestRefImpl.RESOURCE_VERSION_KEY));
 
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        visualisPostAction.addRequestPayload("labels", routeVO);
         return OperationStrategyFactory.getInstance().getOperationStrategy(getAppInstance(), nodeType)
                 .importRef(requestRef, url, visualisPostAction);
 

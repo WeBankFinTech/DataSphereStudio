@@ -27,7 +27,7 @@
     </select>
 
     <select id="getPrivsByProjectId" resultType="com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser">
-        select * from dss_project_user where project_id = #{projectID}
+        select * from dss_project_user where project_id = #{projectId}
     </select>
 
 </mapper>

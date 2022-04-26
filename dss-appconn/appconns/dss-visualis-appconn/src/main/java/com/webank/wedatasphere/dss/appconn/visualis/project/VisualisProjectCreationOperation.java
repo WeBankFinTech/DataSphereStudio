@@ -18,6 +18,9 @@ package com.webank.wedatasphere.dss.appconn.visualis.project;
 
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectCreationOperation;
@@ -41,11 +44,14 @@ public class VisualisProjectCreationOperation extends AbstractStructureOperation
         visualisPostAction.addRequestPayload("description", projectRef.getDSSProject().getDescription());
         visualisPostAction.addRequestPayload("pic", "6");
         visualisPostAction.addRequestPayload("visibility", true);
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (projectRef.getDSSLabels().get(0))).getEnv());
+        visualisPostAction.addRequestPayload("labels", routeVO);
         ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(projectRef, ssoRequestOperation, url, visualisPostAction);
         @SuppressWarnings("unchecked")
-        Integer projectId = (Integer) responseRef.getValue("id");
+        Long projectId = DSSCommonUtils.parseToLong(responseRef.getValue("id"));
         return ProjectResponseRef.newExternalBuilder()
-                .setRefProjectId(projectId.longValue()).success();
+                .setRefProjectId(projectId).success();
     }
 
     @Override

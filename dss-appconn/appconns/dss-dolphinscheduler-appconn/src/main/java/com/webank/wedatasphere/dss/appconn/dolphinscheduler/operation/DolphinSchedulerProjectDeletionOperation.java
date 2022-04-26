@@ -36,7 +36,7 @@ public class DolphinSchedulerProjectDeletionOperation
     public ResponseRef deleteProject(RefProjectContentRequestRef.RefProjectContentRequestRefImpl projectRef) throws ExternalOperationFailedException {
         // Dolphin Scheduler项目名
         String dsProjectName =
-                ProjectUtils.generateDolphinProjectName(projectRef.getWorkspace().getWorkspaceName(), projectRef.getName());
+                ProjectUtils.generateDolphinProjectName(projectRef.getWorkspace().getWorkspaceName(), projectRef.getProjectName());
         logger.info("User {} begin to delete project in DolphinScheduler, project name is {}.", projectRef.getUserName(), dsProjectName);
         DolphinSchedulerHttpUtils.getHttpGetResult(ssoRequestOperation, this.deleteProjectByIdUrl, DolphinSchedulerConf.DS_ADMIN_USER.getValue(),
                 MapUtils.newCommonMap("projectId", projectRef.getRefProjectId()));

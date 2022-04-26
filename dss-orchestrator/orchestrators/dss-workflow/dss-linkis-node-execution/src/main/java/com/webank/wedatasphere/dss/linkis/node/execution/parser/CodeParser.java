@@ -35,38 +35,36 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang.StringUtils;
 
 
 public class CodeParser implements JobParser {
 
     private static final Pattern pb = Pattern.compile("((project)|(flow)|(node))://[^\\s\"]+[$\\s]{0,1}", Pattern.CASE_INSENSITIVE);
-    private WorkspaceClient client = null;
+    private  WorkspaceClient client1X = null;
+    private  WorkspaceClient client0X = null;
     private final Object clientLocker = new Object();
-
     @Override
-    public void parseJob(Job job) throws Exception {
-        if (!(job instanceof CommonLinkisJob)) {
-            return;
+    public void parseJob(Job job) throws Exception{
+        if (! ( job instanceof CommonLinkisJob) ) {
+            return ;
         }
-        CommonLinkisJob linkisAppConnJob = (CommonLinkisJob) job;
-        Map<String, Object> script = LinkisJobExecutionUtils.gson.fromJson(linkisAppConnJob.getCode(), new TypeToken<Map<String, Object>>() {
-        }.getType());
+        CommonLinkisJob linkisAppConnJob  = (CommonLinkisJob) job;
+        Map<String, Object> script = LinkisJobExecutionUtils.gson.fromJson(linkisAppConnJob.getCode(), new TypeToken<Map<String, Object>>() {}.getType());
         List<BMLResource> jobResourceList = linkisAppConnJob.getJobResourceList();
         BMLResource scriptResource = null;
         if (script == null) {
-            throw new LinkisJobExecutionErrorException(90102, "Script is empty");
+            throw  new LinkisJobExecutionErrorException(90102,"Script is empty");
         }
         String fileName = (String) script.get("script");
-        for (BMLResource bmlResource : jobResourceList) {
-            if (bmlResource.getFileName().equals(fileName)) {
+        for(BMLResource bmlResource : jobResourceList){
+            if(bmlResource.getFileName().equals(fileName)){
                 scriptResource = bmlResource;
                 break;
             }
         }
-        if (null == scriptResource) {
-            throw new LinkisJobExecutionErrorException(90102, "Failed to get script resource");
+        if(null == scriptResource) {
+            throw  new LinkisJobExecutionErrorException(90102,"Failed to get script resource");
         }
 
         Map<String, Object> executionParams = getExecutionParams(scriptResource, linkisAppConnJob);
@@ -80,34 +78,48 @@ public class CodeParser implements JobParser {
         }
         if (executionParams.get("params") != null && executionParams.get("params") instanceof Map) {
             if (linkisAppConnJob.getParams() != null) {
-                linkisAppConnJob.getParams().putAll((Map<String, Object>) executionParams.get("params"));
+                linkisAppConnJob.getParams().putAll( (Map<String, Object>)executionParams.get("params"));
             }
         }
     }
 
-    private Map<String, Object> getExecutionParams(BMLResource bmlResource, CommonLinkisJob linkisAppConnJob) {
+    private Map<String, Object> getExecutionParams(BMLResource bmlResource,  CommonLinkisJob linkisAppConnJob) {
         Map<String, Object> map = new HashMap<>();
-        //to-do 少了 linkisAppConnJob.getSubmitUser()这个参数
-        ScriptFromBMLResponse response = getOrCreateWorkSpaceClient(linkisAppConnJob).requestOpenScriptFromBML(bmlResource.getResourceId(), bmlResource.getVersion(), bmlResource.getFileName());
-        linkisAppConnJob.getLogObj().info("Get execution code from workspace client,bml resource id " + bmlResource.getResourceId() + ", version is " + bmlResource.getVersion());
+        ScriptFromBMLResponse response = getOrCreateWorkSpaceClient(linkisAppConnJob).requestOpenScriptFromBML(bmlResource.getResourceId(), bmlResource.getVersion(), bmlResource.getFileName(),linkisAppConnJob.getSubmitUser());
+        linkisAppConnJob.getLogObj().info("Get execution code from workspace client,bml resource id "+bmlResource.getResourceId()+", version is "+bmlResource.getVersion());
         map.put("executionCode", response.scriptContent());
         map.put("params", response.metadata());
         return map;
     }
 
     private WorkspaceClient getOrCreateWorkSpaceClient(CommonLinkisJob linkisAppConnJob) {
-        if (null == client) {
-            synchronized (clientLocker) {
-                if (null == client) {
-                    this.client = WorkspaceClientFactory.getClient(linkisAppConnJob.getSubmitUser(), LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(linkisAppConnJob.getJobProps()),
-                            LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+        Map<String, String> props = linkisAppConnJob.getJobProps();
+        if(LinkisJobExecutionConfiguration.isLinkis1_X(props)) {
+            if (null == client1X) {
+                synchronized (clientLocker) {
+                    if (null == client1X) {
+                        this.client1X = WorkspaceClientFactory.getClient(linkisAppConnJob.getSubmitUser(), LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(linkisAppConnJob.getJobProps()),
+                                LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+                    }
                 }
             }
+            linkisAppConnJob.getLogObj().info("Use workspace client1X:"+LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+            return client1X;
+        }else{
+            if (null == client0X) {
+                synchronized (clientLocker) {
+                    if (null == client0X) {
+                        this.client0X = WorkspaceClientFactory.getClient(linkisAppConnJob.getSubmitUser(), LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(linkisAppConnJob.getJobProps()),
+                                LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+                    }
+                }
+            }
+            linkisAppConnJob.getLogObj().info("Use workspace client0X:"+LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+            return client0X;
         }
-        return client;
     }
 
-    private ArrayList<String> getResourceNames(String code) {
+    private   ArrayList<String> getResourceNames(String code){
         ArrayList<String> bmlResourceNames = new ArrayList<String>();
         Matcher mb = pb.matcher(code);
         while (mb.find()) {
@@ -122,12 +134,11 @@ public class CodeParser implements JobParser {
      * 2.Find the node file used in the script
      * 3.Recursively find the flow file used in the script
      * 4.Replace file name with prefixed name
-     *
      * @param resourceNames
      * @param linkisAppConnJob
      * @return
      */
-    private ArrayList<BMLResource> getResourcesByNames(ArrayList<String> resourceNames, CommonLinkisJob linkisAppConnJob) {
+    private  ArrayList<BMLResource> getResourcesByNames(ArrayList<String> resourceNames, CommonLinkisJob linkisAppConnJob) {
 
         ArrayList<BMLResource> bmlResourceArrayList = new ArrayList<>();
 
@@ -176,17 +187,18 @@ public class CodeParser implements JobParser {
     /**
      * Recursively find the flow file used in the script
      * Recursive exit condition is top-level flow
+     *
      */
-    private BMLResource findFlowResource(CommonLinkisJob linkisAppConnJob, String fileName, String flowName) {
+    private  BMLResource findFlowResource(CommonLinkisJob linkisAppConnJob, String fileName, String flowName) {
 
         String fullFlowName = "";
         Map<String, List<BMLResource>> fLowNameAndResources = linkisAppConnJob.getFlowNameAndResources();
-        if (fLowNameAndResources == null) {
+        if (fLowNameAndResources == null){
             return null;
         }
         Optional<Map.Entry<String, List<BMLResource>>> first = fLowNameAndResources.entrySet().stream().filter(fLowNameAndResource -> fLowNameAndResource.getKey().endsWith(flowName + LinkisJobExecutionConfiguration.RESOURCES_NAME)).findFirst();
 
-        if (first.isPresent()) {
+        if(first.isPresent()){
             fullFlowName = first.get().getKey();
             BMLResource resource = findResource(first.get().getValue(), fileName);
             if (resource != null) {
@@ -210,24 +222,24 @@ public class CodeParser implements JobParser {
     }
 
 
-    private String replaceCodeResourceNames(String code, ArrayList<String> resourceNameList, ArrayList<BMLResource> resourceList) {
-        if (resourceList.size() != resourceNameList.size()) {
+    private  String replaceCodeResourceNames(String code, ArrayList<String> resourceNameList, ArrayList<BMLResource> resourceList){
+        if(resourceList.size() != resourceNameList.size()){
             throw new RuntimeException("Failed to parsed resource file");
         }
 
         String[] names = resourceNameList.toArray(new String[]{});
 
         String[] afterNames = new String[resourceList.size()];
-        for (int i = 0; i < afterNames.length; i++) {
+        for (int i=0 ; i < afterNames.length ; i++){
             afterNames[i] = resourceList.get(i).getFileName();
         }
         return StringUtils.replaceEach(code, names, afterNames);
     }
 
-    private BMLResource findResource(List<BMLResource> resourceArrayList, String fileName) {
-        if (resourceArrayList != null && !resourceArrayList.isEmpty()) {
-            for (BMLResource resource : resourceArrayList) {
-                if (resource.getFileName().equals(fileName)) {
+    private   BMLResource findResource(List<BMLResource> resourceArrayList, String fileName){
+        if(resourceArrayList != null && !resourceArrayList.isEmpty()) {
+            for(BMLResource resource : resourceArrayList){
+                if(resource.getFileName().equals(fileName)){
                     return resource;
                 }
             }

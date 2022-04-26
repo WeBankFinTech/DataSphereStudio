@@ -1,0 +1,108 @@
+@font-face {
+  font-family: 'iconfont';
+  src:  url('fonts/iconfont.eot?av82gf');
+  src:  url('fonts/iconfont.eot?av82gf#iefix') format('embedded-opentype'),
+    url('fonts/iconfont.ttf?av82gf') format('truetype'),
+    url('fonts/iconfont.woff?av82gf') format('woff'),
+    url('fonts/iconfont.svg?av82gf#iconfont') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="fi-"], [class*=" fi-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'iconfont' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.fi-scriptis:before {
+  content: "\e900";
+}
+.fi-guanlishitu:before {
+  content: "\e608";
+}
+.fi-JDBC:before {
+  content: "\e75e";
+}
+.fi-scala:before {
+  content: "\e727";
+}
+.fi-hive:before {
+  content: "\e601";
+}
+.fi-spark-python:before {
+  content: "\e603";
+}
+.fi-mail:before {
+  content: "\e60d";
+}
+.fi-python-o:before {
+  content: "\e624";
+}
+.fi-data:before {
+  content: "\e6ab";
+}
+.fi-log:before {
+  content: "\e650";
+}
+.fi-table:before {
+  content: "\e955";
+}
+.fi-field:before {
+  content: "\e612";
+}
+.fi-storage:before {
+  content: "\e68f";
+}
+.fi-txt:before {
+  content: "\e638";
+}
+.fi-quality:before {
+  content: "\e627";
+}
+.fi-hivedb-open:before {
+  content: "\e6b3";
+}
+.fi-folder-o:before {
+  content: "\e631";
+}
+.fi-python:before {
+  content: "\f216";
+}
+.fi-jar:before {
+  content: "\e618";
+}
+.fi-folder:before {
+  content: "\e622";
+}
+.fi-csv:before {
+  content: "\e8aa";
+}
+.fi-xls:before {
+  content: "\e8c4";
+}
+.fi-xlsx:before {
+  content: "\e8c5";
+}
+.fi-hivedb:before {
+  content: "\e6a9";
+}
+.fi-file:before {
+  content: "\e600";
+}
+.fi-file-o:before {
+  content: "\e81b";
+}
+.fi-spark:before {
+  content: "\ed2e";
+}

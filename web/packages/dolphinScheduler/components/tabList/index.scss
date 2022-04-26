@@ -1,0 +1,173 @@
+@import "@dataspherestudio/shared/common/style/variables.scss";
+.workflowTabContainer {
+  margin-left: 250px;
+  transition: margin-left 0.3s;
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  &.tree-fold {
+    margin-left: 0px;
+  }
+  .tap-menu {
+    min-width: 98px;
+    height: 40px;
+    box-sizing: border-box;
+    line-height: 40px;
+    text-align: center;
+    padding: 0 12px;
+  }
+
+  .tap-bar {
+    &.tree-fold {
+      margin-left: 40px;
+    }
+    @include bg-color(#f8f9fc, $dark-workspace-body-bg-color);
+    .topTabList {
+      padding: 25px $padding-25 0px;
+      flex: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      .topLeft {
+        flex: 1;
+        min-width: 320px;
+        .ivu-breadcrumb {
+          font-size: 21px;
+          /deep/.ivu-breadcrumb-item-separator {
+            // color: rgba(0,0,0,0.65);
+            @include font-color($light-text-color, $dark-text-color);
+          }
+        }
+      }
+      .buttonChange {
+        flex: none;
+        .ivu-btn {
+          font-size: 14px;
+        }
+        .bottomTapList {
+            padding: 0px $padding-25;
+            border-bottom: $border-width-base $border-style-base $border-color-base;
+            @include border-color($background-color-base, $dark-workspace-body-bg-color);
+            @include font-color($workspace-title-color, $dark-workspace-title-color);
+            margin-top: 12px;
+            flex: none;
+            display: flex;
+            align-items: center;
+            font-size: $font-size-large;
+            .bottomLeftText {
+                cursor: pointer;
+                flex: none;
+                font-size: $font-size-large;
+                padding: 0 15px;
+                margin-bottom: -1px;
+                line-height: 40px;
+                position: relative;
+                &::after {
+                    content: "";
+                    border-left: 1px solid #DEE4EC;
+                    @include border-color($border-color-base, $dark-border-color-base);
+                    width: 0;
+                    position: absolute;
+                    right: -15px;
+                    top: 12px;
+                    height: 16px;
+                    margin: 0 15px;
+                }
+            }
+            .active {
+                border-bottom: 2px solid $primary-color;
+                @include border-color($primary-color, $dark-primary-color);
+            }
+            .bottomRightContainer {
+                flex: 1;
+                height: 40px;
+            }
+        }
+      }
+    }
+    .bottomTapList {
+      border-bottom: $border-width-base $border-style-base $border-color-base;
+      @include border-color(
+        $background-color-base,
+        $dark-workspace-body-bg-color
+      );
+      @include font-color($workspace-title-color, $dark-workspace-title-color);
+      // margin-top: 12px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      .bottomLeftText {
+        cursor: pointer;
+        flex: none;
+        font-size: $font-size-large;
+        padding: 0 15px;
+        margin-bottom: -1px;
+        line-height: 40px;
+        position: relative;
+        &::after {
+          content: "";
+          border-left: 1px solid #dee4ec;
+          @include border-color($border-color-base, $dark-border-color-base);
+          width: 0;
+          position: absolute;
+          right: -15px;
+          top: 12px;
+          height: 16px;
+          margin: 0 15px;
+        }
+      }
+      .active {
+        // border-bottom: 2px solid $primary-color;
+        // @include border-color($primary-color, $dark-primary-color);
+      }
+      .bottomRightContainer {
+        flex: 1;
+        height: 40px;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+  .defaultSlot {
+    flex: 1;
+  }
+}
+
+.tab-item {
+  display: inline-block;
+  height: 24px;
+  line-height: 24px;
+  // color: $title-color;
+  @include font-color($workspace-title-color, $dark-workspace-title-color);
+  cursor: pointer;
+  min-width: 90px;
+  max-width: 200px;
+  padding: 0 10px;
+  overflow: hidden;
+  margin-right: 8px;
+  @include bg-color( #E1E5EA, $dark-workspace-body-bg-color);
+  border-radius: 12px;
+  &.active {
+    height: 24px;
+    @include font-color($primary-color, $dark-primary-color);
+    line-height: 24px;
+    @include bg-color(#E8EEF4, $dark-workspace-body-bg-color);
+    border-radius: 12px;
+  }
+  &:hover {
+    height: 24px;
+    @include font-color($primary-color, $dark-primary-color);
+    line-height: 24px;
+    border-radius: 12px;
+    @include bg-color(#D1D7DD, $dark-workspace-body-bg-color);
+  }
+}
+
+.top-tap-lists {
+  display: flex;
+  align-items: center;
+}

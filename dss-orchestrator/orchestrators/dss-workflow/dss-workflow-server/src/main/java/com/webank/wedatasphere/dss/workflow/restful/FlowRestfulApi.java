@@ -16,8 +16,12 @@
 
 package com.webank.wedatasphere.dss.workflow.restful;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.contextservice.service.ContextService;
+import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
@@ -43,16 +47,14 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "/dss/workflow", produces = {"application/json"})
 public class FlowRestfulApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowRestfulApi.class);
 
+    private ContextService contextService = ContextServiceImpl.getInstance();
     @Autowired
     private DSSFlowService flowService;
     @Autowired
@@ -61,6 +63,37 @@ public class FlowRestfulApi {
     private DSSFlowService dssFlowService;
     @Autowired
     private WorkFlowManager workFlowManager;
+
+    /**
+     * 添加subflow节点
+     *
+     * @param req
+     * @param addFlowRequest
+     * @return
+     * @throws DSSErrorException
+     * @throws JsonProcessingException
+     */
+    @RequestMapping(value = "addFlow", method = RequestMethod.POST)
+    public Message addFlow(HttpServletRequest req, @RequestBody AddFlowRequest addFlowRequest) throws DSSErrorException, JsonProcessingException {
+        //如果是子工作流，那么分类应该是和父类一起的？
+        String userName = SecurityFilter.getLoginUsername(req);
+        // TODO: 2019/5/23 flowName工程名下唯一校验
+        String name = addFlowRequest.getName();
+        String workspaceName = addFlowRequest.getWorkspaceName();
+        String projectName = addFlowRequest.getProjectName();
+        String version = addFlowRequest.getVersion();
+        String description = addFlowRequest.getDescription();
+        Long parentFlowID = addFlowRequest.getParentFlowID();
+        String uses = addFlowRequest.getUses();
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(addFlowRequest.getLabels().getRoute()));
+        String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
+        DSSFlow dssFlow = workFlowManager.createWorkflow(userName, workspaceName, contextId, description, parentFlowID,
+                uses, new ArrayList<>(), dssLabelList, null, null);
+
+        // TODO: 2019/5/16 空值校验，重复名校验
+        return Message.ok().data("flow", dssFlow);
+    }
 
     @RequestMapping(value = "publishWorkflow", method = RequestMethod.POST)
     public Message publishWorkflow(HttpServletRequest request, @RequestBody PublishWorkflowRequest publishWorkflowRequest) throws Exception {

@@ -46,6 +46,9 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool.nodeExportThreadPool;
@@ -169,7 +172,10 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
             //导出工作流节点资源文件,工作流节点appconn文件
             List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(flowJson);
+            CountDownLatch countDownLatch;
+            AtomicInteger failedImportCount = new AtomicInteger(0);
             if (nodes != null) {
+                countDownLatch = new CountDownLatch(nodes.size());
                 for (DSSNode node : nodes) {
                     nodeExportThreadPool.submit(() -> {
                         try {
@@ -182,9 +188,22 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                             }
                         } catch (Exception e) {
                             //todo 失败重试
+                            failedImportCount.getAndAdd(1);
                             logger.error("failed to export node:{}", node.getName(), e);
+                        } finally {
+                            countDownLatch.countDown();
                         }
                     });
+                }
+                boolean success = false;
+                try {
+                    success = countDownLatch.await(30, TimeUnit.MINUTES);
+                } catch (InterruptedException e) {
+                    logger.error("failed to export node for workflow:{}", flowName, e);
+                    throw new DSSErrorException(90071, "导出节点超时！");
+                }
+                if (failedImportCount.get() > 0) {
+                    throw new DSSErrorException(90070, "有" + failedImportCount.get() + "个节点导出失败，请重试！");
                 }
             }
 

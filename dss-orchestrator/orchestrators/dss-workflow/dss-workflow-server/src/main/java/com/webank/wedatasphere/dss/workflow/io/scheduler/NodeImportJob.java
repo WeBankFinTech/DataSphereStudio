@@ -11,6 +11,8 @@ import org.apache.linkis.server.BDPJettyServerHelper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class NodeImportJob extends DssJob {
@@ -19,32 +21,11 @@ public class NodeImportJob extends DssJob {
 
     private ImportJobEntity jobEntity;
 
-    List<Map<String, Object>> nodeJsonListRes;
+    private List<Map<String, Object>> nodeJsonListRes;
 
-    public NodeInputService getNodeInputService() {
-        return nodeInputService;
-    }
+    private AtomicInteger failedCount;
 
-    public void setNodeInputService(NodeInputService nodeInputService) {
-        this.nodeInputService = nodeInputService;
-    }
-
-    public ImportJobEntity getJobEntity() {
-        return jobEntity;
-    }
-
-    public void setJobEntity(ImportJobEntity jobEntity) {
-        this.jobEntity = jobEntity;
-    }
-
-    public List<Map<String, Object>> getNodeJsonListRes() {
-        return nodeJsonListRes;
-    }
-
-    public void setNodeJsonListRes(List<Map<String, Object>> nodeJsonListRes) {
-        this.nodeJsonListRes = nodeJsonListRes;
-    }
-
+    private CountDownLatch countDownLatch;
 
     @Override
     public void run() {
@@ -83,11 +64,55 @@ public class NodeImportJob extends DssJob {
             } else {
                 nodeJsonListRes.add(nodeJsonMap);
             }
+//            countDownLatch.countDown();
         } catch (Exception e) {
             //todo 失败重试
+            failedCount.getAndAdd(1);
             logger.error("failed to import node:", e);
+        }finally {
+            countDownLatch.countDown();
         }
 
+    }
+
+    public NodeInputService getNodeInputService() {
+        return nodeInputService;
+    }
+
+    public void setNodeInputService(NodeInputService nodeInputService) {
+        this.nodeInputService = nodeInputService;
+    }
+
+    public ImportJobEntity getJobEntity() {
+        return jobEntity;
+    }
+
+    public void setJobEntity(ImportJobEntity jobEntity) {
+        this.jobEntity = jobEntity;
+    }
+
+    public List<Map<String, Object>> getNodeJsonListRes() {
+        return nodeJsonListRes;
+    }
+
+    public void setNodeJsonListRes(List<Map<String, Object>> nodeJsonListRes) {
+        this.nodeJsonListRes = nodeJsonListRes;
+    }
+
+    public CountDownLatch getCountDownLatch() {
+        return countDownLatch;
+    }
+
+    public void setCountDownLatch(CountDownLatch countDownLatch) {
+        this.countDownLatch = countDownLatch;
+    }
+
+    public AtomicInteger getFailedCount() {
+        return failedCount;
+    }
+
+    public void setFailedCount(AtomicInteger failedCount) {
+        this.failedCount = failedCount;
     }
 
 

@@ -12,6 +12,13 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 public abstract class SSOUserGetOperation<R extends DSSUserContentRequestRef<R>>
         extends SSOUserOperation<R, RefUserContentResponseRef> {
 
+    /**
+     * 请求第三方 AppConn，获取唯一英文用户名为 username 的 第三方 AppConn 用户信息。
+     * 如果第三方 AppConn 不存在该用户，请将 refUserId 置为 null。
+     * @param requestRef
+     * @return 第三方 AppConn 用户信息，第三方 AppConn 不存在该用户，请将 refUserId 置为 null。
+     * @throws ExternalOperationFailedException
+     */
     public abstract RefUserContentResponseRef getUser(R requestRef) throws ExternalOperationFailedException;
 
 }

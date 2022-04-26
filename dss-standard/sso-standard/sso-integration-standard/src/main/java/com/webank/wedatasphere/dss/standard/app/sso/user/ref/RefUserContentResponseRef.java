@@ -13,8 +13,16 @@ import java.util.Map;
  */
 public interface RefUserContentResponseRef extends ResponseRef {
 
+    /**
+     * 第三方 AppConn 的 userId
+     * @return
+     */
     String getRefUserId();
 
+    /**
+     * 第三方 AppConn 的额外用户信息，可以为空
+     * @return
+     */
     Map<String, Object> getRefUserContent();
 
     static Builder newBuilder() {

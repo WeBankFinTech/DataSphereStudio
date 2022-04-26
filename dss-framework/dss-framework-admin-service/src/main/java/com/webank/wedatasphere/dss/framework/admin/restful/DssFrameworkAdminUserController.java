@@ -7,20 +7,21 @@ import com.webank.wedatasphere.dss.framework.admin.common.domain.PasswordResult;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.TableDataInfo;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.PasswordUtils;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
-import com.webank.wedatasphere.dss.framework.admin.conf.ProjectConf;
+import com.webank.wedatasphere.dss.framework.admin.conf.AdminConf;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.admin.service.LdapService;
 import com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper;
-import org.apache.linkis.server.security.SecurityFilter;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,22 +73,27 @@ public class DssFrameworkAdminUserController extends BaseController {
             } else if (!PasswordResult.PASSWORD_RULE_PASS.equals(passwordResult)) {
                 return Message.error().data("弱密码请关注:", passwordResult.getMessage());
             }
-            boolean ldapExist = ldapService.exist(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), user.getUserName());
+            boolean ldapExist = ldapService.exist(AdminConf.LDAP_ADMIN_NAME.getValue(), AdminConf.LDAP_ADMIN_PASS.getValue(), AdminConf.LDAP_URL.getValue(), AdminConf.LDAP_BASE_DN.getValue(), user.getUserName());
             if (ldapExist) {
                 return Message.error().message("新增用户'" + user.getUserName() + "'失败，登录账号在ldap已存在");
             }
-
             String pwd = user.getPassword();
             user.setPassword(DigestUtils.md5Hex(pwd));
             user.setCreateBy(SecurityFilter.getLoginUsername(req));
-            int rows = dssAdminUserService.insertUser(user);
+            int rows = dssAdminUserService.insertUser(user, getWorkspace(req));
             String userName = user.getUserName();
-            ldapService.addUser(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), userName, pwd);
+            ldapService.addUser(AdminConf.LDAP_ADMIN_NAME.getValue(), AdminConf.LDAP_ADMIN_PASS.getValue(), AdminConf.LDAP_URL.getValue(), AdminConf.LDAP_BASE_DN.getValue(), userName, pwd);
             return Message.ok().data("rows", rows).message("新增成功");
         } catch (Exception exception) {
             return Message.error().data("rows", 0).message(exception.getMessage());
         }
 
+    }
+
+    private Workspace getWorkspace(HttpServletRequest req) {
+        Workspace workspace = new Workspace();
+        workspace.setCookies(Arrays.stream(req.getCookies()).collect(HashMap::new, (map, cookie) -> map.put(cookie.getName(), cookie.getValue()), HashMap::putAll));
+        return workspace;
     }
 
 
@@ -98,7 +104,7 @@ public class DssFrameworkAdminUserController extends BaseController {
 
 
     @RequestMapping(path = "edit", method = RequestMethod.POST)
-    public Message edit(@Validated @RequestBody DssAdminUser user) {
+    public Message edit(@Validated @RequestBody DssAdminUser user, HttpServletRequest req) {
         if (StringUtils.isNotEmpty(user.getPhonenumber())
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkPhoneUnique(user))) {
             return Message.error().message("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
@@ -106,27 +112,8 @@ public class DssFrameworkAdminUserController extends BaseController {
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
             return Message.error().message("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
-//        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return Message.ok().data("修改用户成功", dssAdminUserService.updateUser(user));
+        return Message.ok().data("修改用户成功。", dssAdminUserService.updateUser(user, getWorkspace(req)));
     }
 
-//    @POST
-//    @Path("/resetPsw")
-/*    @RequestMapping(path ="resetPsw", method = RequestMethod.POST)
-    public Message resetPwd(@RequestBody DssAdminUser user) {
-        try {
-            PasswordResult passwordResult = PasswordUtils.checkPwd(user.getPassword(), user);
-            if (!PasswordResult.PASSWORD_RULE_PASS.equals(passwordResult)) {
-                return Message.error().data("弱密码请关注:",passwordResult.getMessage());
-            }
-            DssAdminUser dssAdminUser = dssUserMapper.selectUserById(user.getId());
-            ldapService.update(ProjectConf.LDAP_ADMIN_NAME.getValue(), ProjectConf.LDAP_ADMIN_PASS.getValue(), ProjectConf.LDAP_URL.getValue(), ProjectConf.LDAP_BASE_DN.getValue(), dssAdminUser.getUserName(), user.getPassword());
-            user.setPassword(DigestUtils.md5Hex(user.getPassword()));
-            return Message.ok().data("重置密码成功", dssAdminUserService.resetPwd(user));
-
-        } catch (Exception exception) {
-            return  Message.error().message(exception.getMessage());
-        }
-    }*/
 }
 

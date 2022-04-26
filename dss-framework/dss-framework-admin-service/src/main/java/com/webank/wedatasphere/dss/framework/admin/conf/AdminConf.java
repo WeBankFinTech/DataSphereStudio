@@ -20,13 +20,7 @@ package com.webank.wedatasphere.dss.framework.admin.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-public interface ProjectConf {
-
-    CommonVars<String> SUPPORT_ABILITY = CommonVars.apply("wds.dss.framework.project.support.ability", "import,export,publish");
-    CommonVars<String> SERVICE_NAME = CommonVars.apply("wds.dss.framework.project.service.name", "dss-framework-project-server");
-
-    CommonVars<String> DS_ADMIN_TOKEN = CommonVars.apply("wds.dss.ds.token", "");
-    CommonVars<String> DS_URL = CommonVars.apply("wds.dss.ds.url", "");
+public interface AdminConf {
 
     CommonVars<String> LDAP_ADMIN_NAME = CommonVars.apply("wds.dss.ldap.admin.name", "");
     CommonVars<String> LDAP_ADMIN_PASS = CommonVars.apply("wds.dss.ldap.admin.password", "");
@@ -35,5 +29,6 @@ public interface ProjectConf {
     CommonVars<String> EXCHANGE_URL = CommonVars.apply("wds.dss.exchange.url", "");
     CommonVars<String> EXCHANGE_ADMIN_COOKIE = CommonVars.apply("wds.dss.exchange.cookie", "");
 
+    String[] SUPER_ADMIN_LIST = CommonVars.apply("wds.dss.super.admin", "").getValue().split(",");
 
 }

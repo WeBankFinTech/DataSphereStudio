@@ -86,6 +86,12 @@
             <version>${dss.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-framework-admin-service</artifactId>
+            <version>${dss.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
 
@@ -99,12 +105,6 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-  <!--              <configuration>
-                    <args>
-                        <arg>-nobootcp</arg>
-                        .......
-                    </args>
-                </configuration>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

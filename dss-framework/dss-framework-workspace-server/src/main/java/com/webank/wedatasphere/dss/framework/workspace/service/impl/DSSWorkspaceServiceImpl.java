@@ -23,6 +23,8 @@ import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.framework.admin.conf.AdminConf;
+import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkWarnException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
@@ -33,11 +35,15 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.*;
 import com.webank.wedatasphere.dss.framework.workspace.exception.DSSWorkspaceDuplicateNameException;
-import com.webank.wedatasphere.dss.framework.workspace.service.*;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
+import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
 import com.webank.wedatasphere.dss.framework.workspace.util.CommonRoleEnum;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +51,6 @@ import org.apache.linkis.common.exception.ErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -73,7 +78,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Autowired
     private DSSWorkspaceUserService dssWorkspaceUserService;
     @Autowired
-    private DSSUserService dssUserService;
+    private DssAdminUserService dssUserService;
     @Autowired
     private DSSMenuRoleMapper dssMenuRoleMapper;
     @Autowired
@@ -133,16 +138,16 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     //把用户及角色添加到工作空间
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addWorkspaceUser(List<Integer> roleIds, int workspaceId, String userName, String creator, String userId) {
+    public void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creator, String userId) {
         //根据用户名 从用户表拿到用户id
 //        Long userId = dssUserService.getUserID(userName);
         if (userId == null) {
             //保存 - dss_user
-            dssUserService.saveWorkspaceUser(userName);
+            dssUserService.insertOrUpdateUser(userName, workspace);
         }
         //保存 - 保存用户角色关系 dss_workspace_user_role
         for (Integer roleId : roleIds) {
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, roleId, userName, creator, userId);
+            dssWorkspaceUserMapper.setUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, userName, creator, userId);
         }
     }
 
@@ -620,18 +625,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             }
         }
         //默认空间配置的超级管理员，返回true
-        if (workspace.getName().equals(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue())) {
-            String superAdmin = DSSWorkspaceConstant.SUPER_ADMIN;
-            if (StringUtils.isNotBlank(superAdmin)) {
-                superAdmin = superAdmin.replace("，", ",");
-                String[] accounts = superAdmin.split(",");
-                for (int i = 0; i < accounts.length; i++) {
-                    if (accounts[i].equals(username)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return username != null && workspace != null && username.equals(workspace.getCreateBy());
+        return (workspace.getName().equals(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue()) &&
+                org.apache.commons.lang3.ArrayUtils.contains(AdminConf.SUPER_ADMIN_LIST, username)) ||
+                username.equals(workspace.getCreateBy());
     }
 }

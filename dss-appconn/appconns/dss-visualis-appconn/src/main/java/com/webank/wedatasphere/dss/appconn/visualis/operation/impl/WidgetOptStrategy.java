@@ -5,6 +5,8 @@ import com.webank.wedatasphere.dss.appconn.visualis.utils.NumberUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResponseRef;
@@ -39,6 +41,9 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         postAction.addRequestPayload("projectId", requestRef.getProjectRefId());
         postAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
         postAction.addRequestPayload(CSCommonUtils.CONTEXT_ID_STR, requestRef.getContextId());
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        postAction.addRequestPayload("labels", routeVO);
         if (requestRef.getDSSJobContent().containsKey(DSSJobContentConstant.UP_STREAM_KEY)) {
             List<DSSNode> dssNodes = (List<DSSNode>) requestRef.getDSSJobContent().get(DSSJobContentConstant.UP_STREAM_KEY);
             postAction.addRequestPayload(CSCommonUtils.NODE_NAME_STR, dssNodes.get(0).getName());
@@ -55,7 +60,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         String url = baseUrl + URLUtils.widgetDeleteUrl + "/" + getWidgetId(visualisDeleteRequestRef.getRefJobContent());
         DSSDeleteAction deleteAction = new DSSDeleteAction();
         deleteAction.setUser(visualisDeleteRequestRef.getUserName());
-
+        deleteAction.setParameter("labels", ((EnvDSSLabel) (visualisDeleteRequestRef.getDSSLabels().get(0))).getEnv());
         VisualisCommonUtil.getExternalResponseRef(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction);
     }
 
@@ -87,7 +92,9 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         postAction.addRequestPayload("name", requestRef.getName());
         postAction.addRequestPayload("description", requestRef.getRefJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
         postAction.setUser(requestRef.getUserName());
-
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        postAction.addRequestPayload("labels", routeVO);
         return VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
     }
 
@@ -143,6 +150,10 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         postAction.addRequestPayload("id", Integer.parseInt(getWidgetId(requestRef.getRefJobContent())));
         postAction.addRequestPayload(CSCommonUtils.CONTEXT_ID_STR, contextId);
         postAction.setUser(requestRef.getUserName());
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        postAction.addRequestPayload("labels", routeVO);
+
         return VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
     }
 

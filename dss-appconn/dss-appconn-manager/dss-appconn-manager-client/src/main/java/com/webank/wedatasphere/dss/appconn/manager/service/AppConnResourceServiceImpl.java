@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnIndexFileUtils;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.bml.client.BmlClient;
 import org.apache.linkis.bml.client.BmlClientFactory;
 import org.apache.linkis.common.utils.Utils;
@@ -60,6 +61,9 @@ public class AppConnResourceServiceImpl implements AppConnResourceService {
             throw new AppConnHomeNotExistsWarnException(20350, "Cannot create dir " + appConnPath.getPath() + " for AppConn " + appConnName);
         }
         if(AppConnIndexFileUtils.isLatestIndex(appConnPath, resource)) {
+            return appConnPath.getPath();
+        }
+        if (StringUtils.isNotBlank(appConnInfo.getReference())) {
             return appConnPath.getPath();
         }
         LOGGER.info("Try to download latest resource {} in version {} from BML for AppConn {}.", resource.getResourceId(),

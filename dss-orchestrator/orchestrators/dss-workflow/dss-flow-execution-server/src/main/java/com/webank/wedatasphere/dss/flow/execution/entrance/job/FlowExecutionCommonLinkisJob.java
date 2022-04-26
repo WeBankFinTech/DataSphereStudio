@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.job.AbstractCommonLinki
 import com.webank.wedatasphere.dss.linkis.node.execution.job.CommonLinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.JobTypeEnum;
 import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
 
 import java.util.ArrayList;
@@ -39,7 +40,12 @@ public class FlowExecutionCommonLinkisJob extends AbstractCommonLinkisJob {
 
     @Override
     public String getUser() {
-        return getSubmitUser();
+        String proxyUser = getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
+        if(StringUtils.isNotEmpty(proxyUser)){
+            return proxyUser;
+        }else {
+            return getSubmitUser();
+        }
         //return getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
     }
 

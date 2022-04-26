@@ -1,0 +1,11 @@
+{
+  "name": "@dataspherestudio/dolphinScheduler",
+  "version": "1.1.3",
+  "dependencies": {
+    "@dataspherestudio/shared": "^1.1.3",
+    "bootstrap": "^3.4.1",
+    "d3": "3.5.17",
+    "dayjs": "1.10.7",
+    "moment-timezone": "^0.5.34"
+  }
+}

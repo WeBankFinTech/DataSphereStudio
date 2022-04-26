@@ -237,7 +237,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                         if (appConnListMap.containsKey(pair.left)) {
                             appConnListMap.get(pair.left).add(pair.right);
                         } else {
-                            appConnListMap.put(pair.left, Collections.singletonList(pair.right));
+                            appConnListMap.put(pair.left, new ArrayList<AppInstance>(){{
+                                add(pair.right);
+                            }});
                         }
                     }, "create refProject " + dssProjectCreateRequest.getName());
         } catch (RuntimeException e) {

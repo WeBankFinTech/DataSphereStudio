@@ -49,7 +49,9 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         visualisPostAction.addRequestPayload("avatar", "18");
         visualisPostAction.addRequestPayload("publish", true);
         visualisPostAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
-
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        visualisPostAction.addRequestPayload("labels", routeVO);
         // 执行http请求，获取响应结果
         ResponseRef dashboardPortalResponseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         return createDashboard(dashboardPortalResponseRef, requestRef);
@@ -65,6 +67,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         String url = baseUrl + URLUtils.dashboardPortalUrl + "/" + portalId;
         DSSDeleteAction deleteAction = new DSSDeleteAction();
         deleteAction.setUser(visualisDeleteRequestRef.getUserName());
+        deleteAction.setParameter("labels", ((EnvDSSLabel) (visualisDeleteRequestRef.getDSSLabels().get(0))).getEnv());
         VisualisCommonUtil.getExternalResponseRef(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction);
     }
 
@@ -128,6 +131,10 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         putAction.addRequestPayload("roleIds", Lists.newArrayList());
         putAction.setUser(requestRef.getUserName());
 
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        putAction.addRequestPayload("labels", routeVO);
+
         return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, putAction);
     }
 
@@ -180,10 +187,11 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         ref.getExecutionRequestRefContext().appendLog(String.format("The %s of Visualis try to execute ref RefJobContent: %s in previewUrl %s.", ref.getType(), ref.getRefJobContent(), previewUrl));
         DSSDownloadAction previewDownloadAction = new DSSDownloadAction();
         previewDownloadAction.setUser(ref.getUserName());
+        previewDownloadAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
 
         DSSDownloadAction metadataDownloadAction = new DSSDownloadAction();
         metadataDownloadAction.setUser(ref.getUserName());
-
+        metadataDownloadAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
         try {
             VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, previewUrl, previewDownloadAction);
             ByteArrayOutputStream os = new ByteArrayOutputStream();

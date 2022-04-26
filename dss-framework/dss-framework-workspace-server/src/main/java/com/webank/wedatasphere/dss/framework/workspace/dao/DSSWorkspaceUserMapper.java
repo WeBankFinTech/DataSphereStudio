@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import org.apache.ibatis.annotations.*;
 
@@ -49,9 +48,6 @@ public interface DSSWorkspaceUserMapper {
 
     @Select("select homepage_url from dss_workspace_homepage where workspace_id = #{workspaceId} and role_id = #{roleId}")
     String getHomepageUrl(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId);
-
-    @Select("select * from dss_user")
-    List<DSSUser> listAllDSSUsers();
 
     @Select("select distinct username from dss_workspace_user_role where workspace_id = #{workspaceId}")
     List<String> getAllWorkspaceUsers(@Param("workspaceId") int workspaceId);

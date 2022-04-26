@@ -7,7 +7,8 @@ node_modules/
 dist/
 
 package-lock.json
+yarn-eror.log
 wedatasphere-*.zip
 luban-*.zip
-./cn.json
+dist.zip
 .env.*

@@ -71,7 +71,7 @@ public final class OrchestratorConversionJob implements Runnable {
     public void run() {
         //1.从编排中心导出一次工作流,进行一次版本升级
         //2.进行发布到schedulis等调度系统
-        LOGGER.info("Job {} begin to convert project {} for user {} to scheduler, the orcIdList is {}.", id,
+        LOGGER.info("Job {} begin to convert project {} for user {} to scheduler, the orchestrationIds is {}.", id,
             conversionJobEntity.getProject().getId(), conversionJobEntity.getUserName(), conversionJobEntity.getOrchestrationIdMap().keySet());
         conversionJobEntity.setResponse(ResponseOperateOrchestrator.running());
         ConversionDSSOrchestratorPlugin conversionDSSOrchestratorPlugin = null;

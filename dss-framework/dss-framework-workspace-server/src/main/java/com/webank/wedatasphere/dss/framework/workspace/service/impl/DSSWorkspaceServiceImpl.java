@@ -112,8 +112,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             exception1.initCause(e);
             throw exception1;
         }
-        String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
-        dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(), workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()), userName, userName, userId);
+        Long userId = dssWorkspaceUserMapper.getUserID(userName);
+        dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(),
+                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()), userName, userName, userId);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
         dssComponentRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceComponentPrivs(dssWorkspace.getId(), userName));
@@ -142,7 +143,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         //保存 - 保存用户角色关系 dss_workspace_user_role
         for (Integer roleId : roleIds) {
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, roleId, userName, creator, userId);
+            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, roleId, userName, creator, userId == null ? null : Long.parseLong(userId));
         }
     }
 
@@ -183,7 +184,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 forEach(workspaceIds::add);
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = new DSSWorkspaceHomePageVO();
         if (workspaceIds.size() == 0) {
-            String userId = String.valueOf(dssWorkspaceUserMapper.getUserID(userName));
+            Long userId = dssWorkspaceUserMapper.getUserID(userName);
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                     userName, "system", userId);

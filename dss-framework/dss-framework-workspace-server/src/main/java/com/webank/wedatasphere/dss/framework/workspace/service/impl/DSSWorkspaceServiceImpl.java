@@ -148,7 +148,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         //保存 - 保存用户角色关系 dss_workspace_user_role
         for (Integer roleId : roleIds) {
-            dssWorkspaceUserMapper.setUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, userName, creator, userId);
+            dssWorkspaceUserMapper.setUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, userName, creator, userId == null ? null : Long.parseLong(userId));
         }
     }
 

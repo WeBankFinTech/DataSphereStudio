@@ -16,7 +16,7 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @param DssAdminUser 用户信息
      * @return 用户信息集合信息
      */
-    public List<DssAdminUser> selectUserList(DssAdminUser DssAdminUser);
+    List<DssAdminUser> selectUserList(DssAdminUser DssAdminUser);
 
 
     /**
@@ -25,7 +25,9 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @param id 用户ID
      * @return 用户对象信息
      */
-    public DssAdminUser selectUserById(Long  id);
+    DssAdminUser selectUserById(Long  id);
+
+    DssAdminUser selectUserByName(String  username);
 
     /**
      * 新增用户信息
@@ -33,7 +35,7 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @param user 用户信息
      * @return 结果
      */
-    public int insertUser(DssAdminUser user);
+    int insertUser(DssAdminUser user);
 
     /**
      * 修改用户信息
@@ -41,7 +43,7 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @param user 用户信息
      * @return 结果
      */
-    public int updateUser(DssAdminUser user);
+    int updateUser(DssAdminUser user);
 
 
 
@@ -51,7 +53,7 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @param userName 用户名称
      * @return 结果
      */
-    public int checkUserNameUnique(String userName);
+    int checkUserNameUnique(String userName);
 
     /**
      * 校验手机号码是否唯一
@@ -59,7 +61,7 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @param phonenumber 手机号码
      * @return 结果
      */
-    public DssAdminUser checkPhoneUnique(String phonenumber);
+    DssAdminUser checkPhoneUnique(String phonenumber);
 
     /**
      * 校验email是否唯一
@@ -67,7 +69,7 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
      * @param email 用户邮箱
      * @return 结果
      */
-    public DssAdminUser checkEmailUnique(String email);
+    DssAdminUser checkEmailUnique(String email);
 
 
 

@@ -37,7 +37,9 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
+import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
+import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -71,6 +73,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private FlowMapper flowMapper;
+    @Autowired
+    private NodeInfoMapper nodeInfoMapper;
     @Autowired
     private NodeInputService nodeInputService;
 
@@ -431,6 +435,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         List<DSSFlow> subflows = (List<DSSFlow>) dssFlow.getChildren();
         List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
+
         for (String nodeJson : nodeJsonList) {
             //重新上传一份jar文件到bml
             String updateNodeJson = inputNodeFiles(userName, projectName, nodeJson);
@@ -438,6 +443,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
             //更新subflowID
             String nodeType = nodeJsonMap.get("jobType").toString();
+            NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(nodeType);
             if ("workflow.subflow".equals(nodeType)) {
                 String subFlowName = nodeJsonMap.get("title").toString();
                 List<DSSFlow> dssFlowList = subflows.stream().filter(subflow ->
@@ -454,8 +460,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
                     throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                 }
-                //todo 确认jobContent在各个三方节点的内容
-            } else if (nodeJsonMap.get("jobContent") != null && !((Map) nodeJsonMap.get("jobContent")).containsKey("script")) {
+//            } else if (nodeJsonMap.get("jobContent") != null && !((Map) nodeJsonMap.get("jobContent")).containsKey("script")) {
+            } else if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
                 logger.info("nodeJsonMap.jobContent is:{}", nodeJsonMap.get("jobContent"));
                 CommonAppConnNode newNode = new CommonAppConnNode();
                 CommonAppConnNode oldNode = new CommonAppConnNode();

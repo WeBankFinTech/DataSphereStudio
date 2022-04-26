@@ -213,7 +213,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                     requestConversionWorkflow.getUserName());
             return ResponseOperateOrchestrator.failed("No workflow found, publish is ignored.");
         }
-        logger.info("user {} try to convert workflow(s) {} in project {} to SchedulerAppConn(s).", requestConversionWorkflow.getUserName(),
+        logger.info("user {} try to convert workflowId(s) {} in project {} to SchedulerAppConn(s).", requestConversionWorkflow.getUserName(),
                 requestConversionWorkflow.getOrchestrationIdMap().keySet(), requestConversionWorkflow.getProject().getName());
         //TODO try to optimize it by select db in batch.
         List<ImmutablePair<DSSFlow, Long>> flowInfos = requestConversionWorkflow.getOrchestrationIdMap().entrySet()

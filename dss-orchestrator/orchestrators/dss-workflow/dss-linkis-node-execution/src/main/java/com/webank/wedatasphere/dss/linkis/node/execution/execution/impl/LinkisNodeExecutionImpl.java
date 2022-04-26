@@ -260,7 +260,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
             printJobLog(job);
         }
         if (!jobInfo.isSucceed()) {
-            //printJobLog(job);
+            printJobLog(job);
             throw new LinkisJobExecutionErrorException(90101, "Failed to execute Job: " + jobInfo.getMessage());
         }
     }

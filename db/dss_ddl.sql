@@ -47,6 +47,7 @@ CREATE TABLE `dss_orchestrator_info` (
    `workspace_id` int(11) DEFAULT NULL COMMENT '空间id',
    `orchestrator_mode` varchar(100) DEFAULT NULL COMMENT '编排模式，取得的值是dss_dictionary中的dic_key(parent_key=p_arrangement_mode)',
    `orchestrator_way` varchar(256) DEFAULT NULL COMMENT '编排方式',
+   `orchestrator_level` varchar(32) DEFAULT NULL COMMENT '工作流级别',
    `update_user` varchar(100) DEFAULT NULL COMMENT '更新人',
    `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
    PRIMARY KEY (`id`) USING BTREE,
@@ -71,6 +72,7 @@ CREATE TABLE `dss_orchestrator_version_info` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=422 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
+DROP TABLE IF EXISTS `dss_orchestrator_ref_orchestration_relation`;
 CREATE TABLE `dss_orchestrator_ref_orchestration_relation` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `orchestrator_id` bigint(20) NOT NULL COMMENT 'dss的编排模式id',
@@ -350,7 +352,7 @@ CREATE TABLE `dss_workflow_edit_lock` (
    UNIQUE KEY `dss_workflow_edit_lock_flow_id_IDX` (`flow_id`) USING BTREE
  ) ENGINE=InnoDB AUTO_INCREMENT=571 DEFAULT CHARSET=utf8;
 
- DROP TABLE IF EXISTS `dss_workflow_task`;
+DROP TABLE IF EXISTS `dss_workflow_task`;
 CREATE TABLE `dss_workflow_task` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'Primary Key, auto increment',
   `instance` varchar(50) DEFAULT NULL COMMENT 'An instance of Entrance, consists of IP address of the entrance server and port',
@@ -380,6 +382,7 @@ CREATE TABLE `dss_workflow_task` (
   KEY `um_user` (`um_user`)
 ) ENGINE=InnoDB AUTO_INCREMENT=715 DEFAULT CHARSET=utf8mb4;
 
+DROP TABLE IF EXISTS `dss_workflow_execute_info`;
 CREATE TABLE `dss_workflow_execute_info` (
    `id` bigint(20) NOT NULL AUTO_INCREMENT,
    `task_id` bigint(20) NOT NULL COMMENT '任务id',
@@ -602,4 +605,16 @@ CREATE TABLE `dss_workspace_user_role` (
 --  `msg_id` int(11) NOT NULL COMMENT '消息的最大消费id',
 --  PRIMARY KEY (`receiver`,`topic`,`msg_name`)
 --) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息消费状态表';
+
+DROP TABLE IF EXISTS `dss_proxy_user`;
+CREATE TABLE `dss_proxy_user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(64) DEFAULT NULL,
+  `proxy_user_name` varchar(64) DEFAULT NULL,
+  `create_by` varchar(64) DEFAULT NULL COMMENT '创建者',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `remark` varchar(500) DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
 

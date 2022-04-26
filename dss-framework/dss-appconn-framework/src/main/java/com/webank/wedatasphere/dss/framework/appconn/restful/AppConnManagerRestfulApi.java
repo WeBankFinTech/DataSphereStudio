@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnQualityChecker;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
@@ -60,7 +61,9 @@ public class AppConnManagerRestfulApi {
             });
             LOGGER.info("All AppConn have loaded successfully.");
             LOGGER.info("Last, try to scan AppConn plugins and upload AppConn resources...");
-            appConnInfoService.getAppConnInfos().forEach(DSSExceptionUtils.handling(appConnInfo -> {
+            // reference不为空，说明是引用的其他appconn，不用上传appconn目录
+            appConnInfoService.getAppConnInfos().stream().filter(l -> StringUtils.isBlank(l.getReference()))
+                    .forEach(DSSExceptionUtils.handling(appConnInfo -> {
                 LOGGER.info("Try to scan AppConn {}.", appConnInfo.getAppConnName());
                 appConnResourceUploadService.upload(appConnInfo.getAppConnName());
             }));

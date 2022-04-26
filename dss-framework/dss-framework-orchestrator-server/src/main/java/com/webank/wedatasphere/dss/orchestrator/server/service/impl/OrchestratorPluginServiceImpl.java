@@ -37,6 +37,7 @@ import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversi
 import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.manager.label.builder.factory.LabelBuilderFactoryContext;
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         if(requestConversionOrchestration.getOrcAppId() != null) {
             OrchestratorInfo orchestratorInfo = orchestratorMapper.getOrcInfoByAppId(requestConversionOrchestration.getOrcAppId());
             toPublishOrcId = orchestratorInfo.getOrchestratorId();
-        } else if(requestConversionOrchestration.getOrcIds() != null && !requestConversionOrchestration.getOrcIds().isEmpty()) {
+        } else if (CollectionUtils.isNotEmpty(requestConversionOrchestration.getOrcIds())) {
             toPublishOrcId = requestConversionOrchestration.getOrcIds().get(0);
         } else {
             return new ResponseConvertOrchestrator("-1", ResponseOperateOrchestrator.failed("Both orcAppId and orcIds are not exists."));
@@ -88,7 +89,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         if(requestConversionOrchestration.isConvertAllOrcs()) {
             //这个地方应该是要获取所有的已经发布过的orchestrator
             publishedOrcIds = orchestratorMapper.getAllOrcIdsByProjectId(projectId);
-            publishedOrcIds.add(toPublishOrcId);
+            if (!publishedOrcIds.contains(toPublishOrcId)) {
+                publishedOrcIds.add(toPublishOrcId);
+            }
             for (Long orcId : publishedOrcIds) {
                 int validFlag = 1;
                 if (orcId.longValue() == toPublishOrcId.longValue() && !DSSLabelUtil.isDevEnv(labels)) {

@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
@@ -35,6 +37,9 @@ public class VisualisRefExportOperation extends VisualisDevelopmentOperation<Thi
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
         visualisPostAction.addRequestPayload("partial", true);
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        visualisPostAction.addRequestPayload("labels", routeVO);
         return OperationStrategyFactory.getInstance().getOperationStrategy(getAppInstance(), nodeType)
                 .exportRef(requestRef, url, visualisPostAction);
     }

@@ -28,6 +28,9 @@ public interface AdminConf {
     CommonVars<String> LDAP_BASE_DN = CommonVars.apply("wds.dss.ldap.base.dn", "");
     CommonVars<String> EXCHANGE_URL = CommonVars.apply("wds.dss.exchange.url", "");
     CommonVars<String> EXCHANGE_ADMIN_COOKIE = CommonVars.apply("wds.dss.exchange.cookie", "");
+    CommonVars<String> DS_TRUST_TOKEN = CommonVars.apply("wds.dss.trust.token", "");
+    CommonVars<Boolean> DS_PROXY_SELF_ENABLE = CommonVars.apply("wds.dss.proxy.self.enable", true);
+    CommonVars<String> DSS_PROXY_ADMIN_NAME = CommonVars.apply("wds.dss.proxy.admin.name", "adminUser");
 
     String[] SUPER_ADMIN_LIST = CommonVars.apply("wds.dss.super.admin", "").getValue().split(",");
 

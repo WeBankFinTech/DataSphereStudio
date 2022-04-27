@@ -65,8 +65,7 @@ public interface DSSWorkspaceUserMapper {
     List<DSSWorkspaceUser> getWorkspaceUsers(@Param("workspaceId") String workspaceId,@Param("username") String username);
 
     @Select("select distinct created_by as creator, username as username, create_time as joinTime,workspace_id as workspaceId " +
-            " from dss_workspace_user_role where role_id = #{roleId} and workspace_id = #{workspaceId}) " +
-            "and workspace_id = #{workspaceId}")
+            " from dss_workspace_user_role where role_id = #{roleId} and workspace_id = #{workspaceId}")
     List<DSSWorkspaceUser> getWorkspaceUsersByRole(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId);
 
     List<String> getWorkspaceEditUsers(int workspaceId);

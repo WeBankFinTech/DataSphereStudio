@@ -43,7 +43,7 @@ public class SchedulisProjectUpdateOperation
 
     @Override
     public ResponseRef updateProject(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl projectRef) {
-        if(CollectionUtils.isNotEmpty(projectRef.getDSSProjectPrivilege().getReleaseUsers())) {
+        if (CollectionUtils.isNotEmpty(projectRef.getDSSProjectPrivilege().getReleaseUsers())) {
             // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
             projectRef.getDSSProjectPrivilege().getReleaseUsers().forEach(releaseUser -> {
                 if (!AzkabanUserService.containsUser(releaseUser, getBaseUrl(), ssoRequestOperation, projectRef.getWorkspace())) {
@@ -51,8 +51,8 @@ public class SchedulisProjectUpdateOperation
                 }
             });
         }
-        // TODO 支持更新description
-
+        // 更新description
+        syncProjectDesc(projectRef);
         // 往 Schedulis 增加新增的用户
         addProjectPrivilege(projectRef);
         // 往 Schedulis 删除已去掉的用户
@@ -97,6 +97,16 @@ public class SchedulisProjectUpdateOperation
             String response = SchedulisHttpUtils.getHttpGetResult(managerUrl, params, ssoRequestOperation, projectRef.getWorkspace());
             logger.info("for project {} remove a accessUser {} response is {}.", projectName, accessUser, response);
         });
+    }
+
+    private void syncProjectDesc(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl projectRef) {
+        String projectName = projectRef.getProjectName();
+        Map<String, Object> params = new HashMap<>();
+        params.put("project", projectName);
+        params.put("ajax", "changeDescription");
+        params.put("description", projectRef.getDSSProject().getDescription());
+        String response = SchedulisHttpUtils.getHttpGetResult(managerUrl, params, ssoRequestOperation, projectRef.getWorkspace());
+        logger.info("for project {} update description, response is {}.", projectName, response);
     }
 
     @Override

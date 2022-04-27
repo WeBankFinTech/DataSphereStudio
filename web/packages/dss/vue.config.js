@@ -214,16 +214,5 @@ module.exports = {
       entry: 'mock.js',
       power: false
     }
-  },
-  devServer: {
-    proxy: {
-      '/api': {
-        target: 'http://x.x.x.x',
-        changeOrigin: true,
-        pathRewrite: {
-          '^/api': '/api'
-        }
-      }
-    }
   }
 }

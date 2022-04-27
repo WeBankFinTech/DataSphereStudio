@@ -67,6 +67,11 @@
         where u.id = #{userId}
     </select>
 
+    <select id="selectUserByName" parameterType="java.lang.String" resultMap="DssUserResult">
+        <include refid="selectUserVo"/>
+        where u.username = #{username}
+    </select>
+
 
     <update id="updateUser" parameterType="com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser">
         update dss_user

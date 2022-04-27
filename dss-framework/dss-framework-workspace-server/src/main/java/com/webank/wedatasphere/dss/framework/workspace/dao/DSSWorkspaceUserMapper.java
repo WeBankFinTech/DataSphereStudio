@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import org.apache.ibatis.annotations.*;
 
@@ -32,9 +31,9 @@ public interface DSSWorkspaceUserMapper {
     String getUserName(Long userID);
 
     @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by,user_id)" +
-            "values(#{workspaceId}, #{username}, #{roleId}, now(), #{createdBy},#{userId})")
+            "values(#{workspaceId}, #{username}, #{roleId}, now(), #{createdBy}, #{userId})")
     void setUserRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId,
-                                @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") String userId);
+                                @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId);
 
     @Select("select role_id from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
     List<Integer> getRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("username") String username);
@@ -49,9 +48,6 @@ public interface DSSWorkspaceUserMapper {
 
     @Select("select homepage_url from dss_workspace_homepage where workspace_id = #{workspaceId} and role_id = #{roleId}")
     String getHomepageUrl(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId);
-
-    @Select("select * from dss_user")
-    List<DSSUser> listAllDSSUsers();
 
     @Select("select distinct username from dss_workspace_user_role where workspace_id = #{workspaceId}")
     List<String> getAllWorkspaceUsers(@Param("workspaceId") int workspaceId);

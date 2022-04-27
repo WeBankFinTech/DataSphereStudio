@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.appconn.visualis.project;
 import com.webank.wedatasphere.dss.appconn.visualis.VisualisAppConn;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSGetAction;
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
@@ -21,6 +22,7 @@ public class VisualisProjectSearchOperation extends AbstractStructureOperation<R
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(projectRef.getUserName());
         visualisGetAction.setParameter("keywords", projectRef.getProjectName());
+        visualisGetAction.setParameter("labels", ((EnvDSSLabel) (projectRef.getDSSLabels().get(0))).getEnv());
         ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(projectRef, ssoRequestOperation, url, visualisGetAction);
         return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(responseRef.toMap().get("id"))).success();
     }

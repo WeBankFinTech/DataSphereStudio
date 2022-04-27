@@ -7,6 +7,8 @@ import com.webank.wedatasphere.dss.appconn.visualis.operation.AsyncExecutionOper
 import com.webank.wedatasphere.dss.appconn.visualis.utils.NumberUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
@@ -68,6 +70,9 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         postAction.addRequestPayload("sql", "");
         postAction.addRequestPayload("model", "");
         postAction.addRequestPayload("roles", Lists.newArrayList());
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        postAction.addRequestPayload("labels", routeVO);
 
         // 执行http请求，获取响应结果
         return VisualisCommonUtil.getRefJobContentResponseRef(requestRef, ssoRequestOperation, url, postAction);
@@ -80,7 +85,7 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
 
         DSSDeleteAction deleteAction = new DSSDeleteAction();
         deleteAction.setUser(requestRef.getUserName());
-
+        deleteAction.setParameter("labels", ((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
         VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, deleteAction);
     }
 
@@ -92,13 +97,11 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         return VisualisCommonUtil.getExportResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
     }
 
-
     @Override
     public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef) {
         String id = getId(requestRef.getRefJobContent());
         return getQueryResponseRef(requestRef, requestRef.getProjectRefId(), URLUtils.VIEW_JUMP_URL_FORMAT, id);
     }
-
 
     @Override
     public ResponseRef updateRef(ThirdlyRequestRef.UpdateWitContextRequestRefImpl requestRef) throws ExternalOperationFailedException {
@@ -111,6 +114,10 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         putAction.addRequestPayload("id", Long.parseLong(id));
         putAction.addRequestPayload("description", requestRef.getRefJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
         putAction.setUser(requestRef.getUserName());
+
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        putAction.addRequestPayload("labels", routeVO);
 
         return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, putAction);
     }
@@ -169,6 +176,7 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         ref.getExecutionRequestRefContext().appendLog("dss execute view node, ready to submit to " + url);
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getUserName());
+        visualisGetAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
         InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
         Map<String, Object> paginateWithExecStatusMap = (Map<String, Object>) responseRef.getData().get("paginateWithExecStatus");
         return paginateWithExecStatusMap.get("execId").toString();
@@ -185,6 +193,9 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
 
         DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
+        visualisPostAction.addRequestPayload("labels", routeVO);
 
         ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisPostAction);
         ref.getExecutionRequestRefContext().appendLog(responseRef.getResponseBody());
@@ -202,6 +213,9 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         String url = URLUtils.getUrl(baseUrl, URLUtils.VIEW_DATA_URL_ASYNC_RESULT, execId);
         ref.getExecutionRequestRefContext().appendLog("dss execute view node,ready to get result set from " + url);
         DSSPostAction visualisPostAction = new DSSPostAction();
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
+        visualisPostAction.addRequestPayload("labels", routeVO);
 
         visualisPostAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
         try {

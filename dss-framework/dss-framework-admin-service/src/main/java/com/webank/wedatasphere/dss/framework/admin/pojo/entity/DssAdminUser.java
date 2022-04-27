@@ -2,21 +2,12 @@ package com.webank.wedatasphere.dss.framework.admin.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-
-import java.time.LocalDateTime;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.BaseEntity;
-//import io.swagger.annotations.ApiModel;
-//import io.swagger.annotations.ApiModelProperty;
-//import lombok.Data;
-//import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+
+import java.util.Date;
 
 /**
  * <p>
@@ -30,7 +21,6 @@ public class DssAdminUser extends BaseEntity {
      * user_id
      */
     @TableId(type = IdType.AUTO)
-
     private Long id;
 
     /**
@@ -75,6 +65,10 @@ public class DssAdminUser extends BaseEntity {
      * 删除标志（0代表存在 2代表删除）
      */
     private String delFlag;
+
+    private Date lastLoginTime;
+
+    private Integer loginNum;
 
     public void setId(Long id) {
         this.id = id;
@@ -156,6 +150,22 @@ public class DssAdminUser extends BaseEntity {
         return delFlag;
     }
 
+    public Date getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(Date lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+
+    public Integer getLoginNum() {
+        return loginNum;
+    }
+
+    public void setLoginNum(Integer loginNum) {
+        this.loginNum = loginNum;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -172,6 +182,8 @@ public class DssAdminUser extends BaseEntity {
                 .append("createTime" , getCreateTime())
                 .append("updateTime" , getUpdateTime())
                 .append("remark" , getRemark())
+                .append("lastLoginTime", lastLoginTime)
+                .append("loginNum" , loginNum)
                 .toString();
     }
 

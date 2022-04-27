@@ -27,7 +27,7 @@ export default {
         applicationItem = item.appconns.find(app => app.name == 'realTimeJobCenter') || {}
       }
     })
-    this.url = applicationItem.url;
+    this.url = applicationItem.appInstance && applicationItem.appInstance[0] && applicationItem.appInstance[0].homepageUri;
   },
   data() {
     return {

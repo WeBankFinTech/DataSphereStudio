@@ -20,7 +20,9 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOBuilderService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOBuilderServiceImplImpl;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.SSOPluginService;
+import com.webank.wedatasphere.dss.standard.app.sso.user.SSOUserService;
 import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
 
 public interface SSOIntegrationStandard extends AppStandard {
@@ -32,6 +34,8 @@ public interface SSOIntegrationStandard extends AppStandard {
     SSORequestService getSSORequestService();
 
     SSOPluginService getSSOPluginService();
+
+    SSOUserService getSSOUserService(AppInstance appInstance);
 
     @Override
     default String getStandardName() {

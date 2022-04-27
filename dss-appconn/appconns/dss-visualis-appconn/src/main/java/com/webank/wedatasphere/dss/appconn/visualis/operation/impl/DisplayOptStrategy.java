@@ -6,6 +6,8 @@ import com.webank.wedatasphere.dss.appconn.visualis.constant.VisualisConstant;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.NumberUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResponseRef;
@@ -51,6 +53,10 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         visualisPostAction.addRequestPayload("publish", true);
         visualisPostAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
 
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        visualisPostAction.addRequestPayload("labels", routeVO);
+
         // 执行http请求，获取响应结果
         ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         String displayId = responseRef.toMap().get("id").toString();
@@ -65,6 +71,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         String url = baseUrl + URLUtils.displayUrl + "/" + getDisplayId(visualisDeleteRequestRef.getRefJobContent());
         DSSDeleteAction deleteAction = new DSSDeleteAction();
         deleteAction.setUser(visualisDeleteRequestRef.getUserName());
+        deleteAction.setParameter("labels", ((EnvDSSLabel) (visualisDeleteRequestRef.getDSSLabels().get(0))).getEnv());
         VisualisCommonUtil.getExternalResponseRef(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction);
     }
 
@@ -78,6 +85,9 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         visualisPostAction.addRequestPayload("displayId", Long.parseLong(id));
         visualisPostAction.addRequestPayload("index", 0);
 
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        visualisPostAction.addRequestPayload("labels", routeVO);
         VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
     }
 
@@ -89,7 +99,6 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         postAction.addRequestPayload("displayIds", getDisplayId(requestRef.getRefJobContent()));
         return VisualisCommonUtil.getExportResponseRef(requestRef, ssoRequestOperation, url, postAction);
     }
-
 
     @Override
     public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef) {
@@ -115,6 +124,10 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         putAction.addRequestPayload("publish", true);
         putAction.addRequestPayload("roleIds", Lists.newArrayList());
         putAction.setUser(requestRef.getUserName());
+
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        putAction.addRequestPayload("labels", routeVO);
 
         return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, putAction);
     }
@@ -158,9 +171,11 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         ref.getExecutionRequestRefContext().appendLog(String.format("The %s of Visualis try to execute ref RefJobContent: %s in previewUrl %s.", ref.getType(), ref.getRefJobContent(), previewUrl));
         DSSDownloadAction previewDownloadAction = new DSSDownloadAction();
         previewDownloadAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
+        previewDownloadAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
 
         DSSDownloadAction metadataDownloadAction = new DSSDownloadAction();
         metadataDownloadAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
+        metadataDownloadAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
 
         try {
             VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, previewUrl, previewDownloadAction);

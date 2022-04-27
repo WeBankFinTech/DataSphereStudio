@@ -25,6 +25,8 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -109,17 +111,21 @@ public class DSSWorkspaceUserRestful {
         //todo 工作空间添加用户
         String creator = SecurityFilter.getLoginUsername(request);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
+        Workspace workspace = SSOHelper.getWorkspace(request);
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
+        if (workspace.getWorkspaceId() != workspaceId) {
+            return Message.error("cookie 中的 workspaceId 与请求添加用户的 workspace 不同！");
+        }
         String userName = updateWorkspaceUserRequest.getUserName();
         String userId = updateWorkspaceUserRequest.getUserId();
         Long count = dssWorkspaceUserService.getCountByUsername(userName, workspaceId);
-        if (count != null && count.longValue() > 0) {
+        if (count != null && count > 0) {
             return Message.error("用户已经存在该工作空间，不需要重复添加！");
         }
-        if (!dssWorkspaceService.isAdminUser(Long.valueOf(workspaceId), creator)) {
+        if (!dssWorkspaceService.isAdminUser((long) workspaceId, creator)) {
             return Message.error("无权限进行该操作");
         }
-        dssWorkspaceService.addWorkspaceUser(roles, workspaceId, userName, creator, userId);
+        dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);
         return Message.ok();
     }
 

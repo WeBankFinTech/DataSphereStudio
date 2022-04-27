@@ -95,7 +95,7 @@ function startDssProject(){
 	startApp
 
 	SERVER_NAME=dss-scriptis-server
-  SERVER_IP=$DSS_DATAPIPE_SERVER_INSTALL_IP
+  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
   startApp
 
 	SERVER_NAME=dss-workflow-server
@@ -134,7 +134,7 @@ function checkDssService(){
 	checkServer
 
 	SERVER_NAME=dss-scriptis-server
-  SERVER_IP=$DSS_DATAPIPE_SERVER_INSTALL_IP
+  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
   checkServer
 
 	SERVER_NAME=dss-workflow-server

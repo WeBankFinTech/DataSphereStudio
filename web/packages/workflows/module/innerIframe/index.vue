@@ -24,10 +24,11 @@ export default {
     let applicationItem = {}
     applications.forEach(item => {
       if (item.appconns) {
-        applicationItem = item.appconns.find(app => app.name == 'realTimeJobCenter') || {}
+        const appItem = item.appconns.find(app => app.name == 'realTimeJobCenter')
+        if (appItem) applicationItem = appItem
       }
     })
-    this.url = applicationItem.appInstance && applicationItem.appInstance[0] && applicationItem.appInstance[0].homepageUri;
+    this.url = applicationItem.appInstances && applicationItem.appInstances[0] && applicationItem.appInstances[0].homepageUri;
   },
   data() {
     return {

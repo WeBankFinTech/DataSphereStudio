@@ -42,7 +42,6 @@ public class SchedulisProjectCreationOperation
 
     private String managerUrl;
 
-
     @Override
     protected String getAppConnName() {
         return SchedulisAppConn.SCHEDULIS_APPCONN_NAME;
@@ -54,7 +53,6 @@ public class SchedulisProjectCreationOperation
         this.projectUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "manager" : getBaseUrl() + "/manager";
         managerUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "manager" : getBaseUrl() + "/manager";
     }
-
 
     @Override
     public ProjectResponseRef createProject(DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl requestRef) throws ExternalOperationFailedException {

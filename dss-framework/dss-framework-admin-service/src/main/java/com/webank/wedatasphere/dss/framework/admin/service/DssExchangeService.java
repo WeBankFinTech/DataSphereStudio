@@ -4,11 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
-import com.webank.wedatasphere.dss.framework.admin.conf.ProjectConf;
+import com.webank.wedatasphere.dss.framework.admin.conf.AdminConf;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssExchangeTask;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssExchangeTaskRes;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssExchangisProject;
@@ -18,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,11 +31,11 @@ public class DssExchangeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OkHttpHelper.class);
 
     public List<DssExchangisProject> queryExchangeProject(String userName) throws Exception {
-        String url = ProjectConf.EXCHANGE_URL.getValue() + PROJECT_TREE_PATH + "/"+userName;
+        String url = AdminConf.EXCHANGE_URL.getValue() + PROJECT_TREE_PATH + "/"+userName;
         Request getRequest = new Request.Builder()
                 .url(url)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Cookie", ProjectConf.EXCHANGE_ADMIN_COOKIE.getValue())
+                .addHeader("Cookie", AdminConf.EXCHANGE_ADMIN_COOKIE.getValue())
                 .build();
         Response response = OkHttpHelper.syncGet(getRequest);
         JsonObject returnData = new JsonParser().parse(response.body().string()).getAsJsonObject();
@@ -50,12 +47,12 @@ public class DssExchangeService {
     }
 
     public DssExchangeTaskRes queryExchangeTask(int projectId, String userName, int pageNum, String fullName) throws Exception {
-        String url = ProjectConf.EXCHANGE_URL.getValue() + TASK_TREE_PATH + "/" + userName +
+        String url = AdminConf.EXCHANGE_URL.getValue() + TASK_TREE_PATH + "/" + userName +
                 "?projectId=" + projectId + "&page=" + pageNum + "&pageSize=10&fuzzyName=&jobId=";
         Request getRequest = new Request.Builder()
                 .url(url)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Cookie", ProjectConf.EXCHANGE_ADMIN_COOKIE.getValue())
+                .addHeader("Cookie", AdminConf.EXCHANGE_ADMIN_COOKIE.getValue())
                 .get()
                 .build();
         Response response = OkHttpHelper.syncGet(getRequest);
@@ -95,7 +92,7 @@ public class DssExchangeService {
     public String getSellScript(int taskId, int projectId) {
         String shellScript = "str=`curl -X GET --data '{\"project_id\":" + projectId + ",\"task_id\":" + taskId + "}' " +
                 "--header 'Content-Type: application/json' --header 'Accept: application/json' " +
-                "--header 'Cookie:" + ProjectConf.EXCHANGE_ADMIN_COOKIE.getValue() + "' " + ProjectConf.EXCHANGE_URL.getValue() +
+                "--header 'Cookie:" + AdminConf.EXCHANGE_ADMIN_COOKIE.getValue() + "' " + AdminConf.EXCHANGE_URL.getValue() +
                 "/api/v1/jobinfo/runTask/" + taskId + "?userName=admin`;if [[ ${str} =~ 'job execution successed' ]];then exit 0;else exit 1;fi";
         return shellScript;
     }

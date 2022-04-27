@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.appconn.visualis.operation.impl.ViewOptStrate
 import com.webank.wedatasphere.dss.appconn.visualis.operation.impl.VisualisRefExecutionAction;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.LongTermRefExecutionOperation;
@@ -127,6 +128,7 @@ public class VisualisRefExecutionOperation
         ref.getExecutionRequestRefContext().appendLog("dss execute view node, judge dataSource type from  " + url);
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getUserName());
+        visualisGetAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
         InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
         return (boolean) responseRef.getData().get("isLinkisDataSource");
     }

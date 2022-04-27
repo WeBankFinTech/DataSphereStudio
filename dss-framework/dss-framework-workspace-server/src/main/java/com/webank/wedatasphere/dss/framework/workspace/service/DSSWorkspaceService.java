@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivV
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.common.exception.ErrorException;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public interface DSSWorkspaceService {
 
     int createWorkspace(String workspaceName, String tags, String userName, String description, String department, String productName,String workspaceType) throws ErrorException;
 
-    void addWorkspaceUser(List<Integer> roleIds, int workspaceId, String userName, String creater,String userId);
+    void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creater, String userId);
 
     List<DSSWorkspace> getWorkspaces(String userName);
 

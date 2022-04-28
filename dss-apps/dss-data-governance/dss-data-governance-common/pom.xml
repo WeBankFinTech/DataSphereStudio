@@ -6,18 +6,16 @@
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
         <version>1.1.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>dss-data-api-server</artifactId>
 
+    <artifactId>dss-data-governance-common</artifactId>
+
+    <properties>
+        <atlas.version>2.1.0</atlas.version>
+    </properties>
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.webank.wedatasphere.dss</groupId>-->
-<!--            <artifactId>dss-framework-common</artifactId>-->
-<!--            <version>${dss.version}</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-module</artifactId>
@@ -35,108 +33,35 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <artifactId>xstream</artifactId>
-            <groupId>com.thoughtworks.xstream</groupId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-            <version>${spring.cloud.version}</version>
-            <scope>provided</scope>
+            <groupId>org.apache.atlas</groupId>
+            <artifactId>atlas-client-v2</artifactId>
+            <version>${atlas.version}</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>logback-classic</artifactId>
-                    <groupId>ch.qos.logback</groupId>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>log4j-to-slf4j</artifactId>
-                    <groupId>org.apache.logging.log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>gson</artifactId>
-                    <groupId>com.google.code.gson</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jsr311-api</artifactId>
-                    <groupId>javax.ws.rs</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>xstream</artifactId>
-                    <groupId>com.thoughtworks.xstream</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>commons-math</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jackson-core</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>spring-boot-autoconfigure</artifactId>
-                    <groupId>org.springframework.boot</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-boot-starter-aop</artifactId>
-                    <groupId>org.springframework.boot</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-boot-starter</artifactId>
-                    <groupId>org.springframework.boot</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>spring-boot-starter-cache</artifactId>
-                    <groupId>org.springframework.boot</groupId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.linkis</groupId>
-            <artifactId>linkis-mybatis</artifactId>
-            <version>${linkis.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.16</version>
-            <optional>true</optional>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.1.9</version>
         </dependency>
-        <dependency>
-            <groupId>com.webank.wedatasphere.dss</groupId>
-            <artifactId>dss-common</artifactId>
-            <version>${dss.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>${commons.lang3.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.webank.wedatasphere.dss</groupId>
-            <artifactId>dss-api-sql-template</artifactId>
-            <version>${dss.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.webank.wedatasphere.dss</groupId>
-            <artifactId>dss-sso-integration-standard</artifactId>
-            <version>1.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -199,14 +124,14 @@
                     <include>**/*.xml</include>
                 </includes>
             </resource>
-            <!-- <resource>
-                 <directory>src/main/resources</directory>
-                 <includes>
-                     <include>**/*.xml</include>
-                     <include>**/*.properties</include>
-                     <include>**/*.yml</include>
-                 </includes>
-             </resource>-->
+<!--            <resource>-->
+<!--                 <directory>src/main/resources</directory>-->
+<!--                 <includes>-->
+<!--                     <include>**/*.xml</include>-->
+<!--                     <include>**/*.properties</include>-->
+<!--                     <include>**/*.yml</include>-->
+<!--                 </includes>-->
+<!--             </resource>-->
         </resources>
     </build>
 

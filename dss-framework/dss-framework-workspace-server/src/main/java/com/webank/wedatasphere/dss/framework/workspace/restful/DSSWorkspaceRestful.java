@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
@@ -97,7 +98,7 @@ public class DSSWorkspaceRestful {
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(request);
         // todo 调用这个接口时，前端还没有调用workspaces/{id}，此时还没有workspaceName和workspaceId的cookie，暂时先注释
-//        dssUserService.insertOrUpdateUser(username, SSOHelper.getWorkspace(request));
+        dssUserService.insertOrUpdateUser(username, new Workspace());
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username,moduleName);
         return Message.ok().data("workspaceHomePage", dssWorkspaceHomePageVO);
     }

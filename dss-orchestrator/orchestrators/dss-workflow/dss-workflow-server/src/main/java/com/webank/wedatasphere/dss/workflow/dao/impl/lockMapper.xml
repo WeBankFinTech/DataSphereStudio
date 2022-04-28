@@ -66,7 +66,7 @@
     </insert>
 
     <delete id="clearExpire">
-        delete from dss_workflow_edit_lock where  flow_id = #{flowId}
+        delete from dss_workflow_edit_lock where  update_time &lt;= #{expireTime} or flow_id = #{flowId}
     </delete>
 
     <delete id="deleteALL">

@@ -476,9 +476,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         if (!users.contains(username)) {
             throw new DSSErrorException(30021, "You have no permission to access this workspace " + dssWorkSpace.getName());
         }
-        String originDepart = dssWorkSpace.getDepartment();
-        if (StringUtils.isNotBlank(originDepart)) {
-            String departName = workspaceMapper.getDepartName(Long.valueOf(originDepart));
+        String originDepartId = dssWorkSpace.getDepartment();
+        if (StringUtils.isNotBlank(originDepartId)) {
+            String departName = workspaceMapper.getDepartName(Long.valueOf(originDepartId));
             dssWorkSpace.setDepartment(departName);
         }
         return dssWorkSpace;

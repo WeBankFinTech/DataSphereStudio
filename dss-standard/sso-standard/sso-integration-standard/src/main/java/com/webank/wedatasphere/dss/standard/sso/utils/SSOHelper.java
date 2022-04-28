@@ -152,6 +152,9 @@ public class SSOHelper {
         } else if(host.startsWith("http://")) {
             host = host.substring(7);
         }
+        if (host.endsWith("/")) {
+            host = host.substring(0, host.length() - 1);
+        }
         if(DOMAIN_REGEX.matcher(host).find()) {
             String[] domains = host.split("\\.");
             int index = level;

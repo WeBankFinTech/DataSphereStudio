@@ -150,7 +150,7 @@ replaceCommonIp
 EUREKA_URL=http://$EUREKA_INSTALL_IP:$EUREKA_PORT/eureka/
 
 ## excecute sql
-source ${workDir}/bin/excecuteSQL.sh
+source ${workDir}/bin/executeSQL.sh
 
 function changeCommonConf(){
   sed -i "s#defaultZone:.*#defaultZone: $EUREKA_URL#g" $CONF_APPLICATION_YML
@@ -208,7 +208,7 @@ function installPackage(){
     echo "ERROR:SERVER_NAME is null "
     exit 1
   fi
-  uploadProjectFile
+  uploadServiceFile
   # change configuration
   changeConf
 }
@@ -376,4 +376,16 @@ installDssProject
 
 echo "Congratulations! You have installed DSS $DSS_VERSION successfully, please use sbin/dss-start-all.sh to start it!"
 ## todo 启动dss所有服务，然后选择
-echo "Now begin to start all dss servers."
+echo "Now begin to start all dss servers, please wait some time."
+cd $SERVER_HOME
+sh sbin/dss-start-all.sh
+
+sleep 15
+echo "end to start all dss servers."
+echo "now begin to install default appconn: datachecker."
+sh ./appconn-install.sh datachecker
+echo "now begin to install default appconn: eventchecker."
+sh ./appconn-install.sh eventchecker
+echo "now begin to install default appconn: sendemail."
+sh ./appconn-install.sh sendemail
+

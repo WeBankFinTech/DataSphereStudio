@@ -45,7 +45,7 @@ public interface LockMapper {
 
     void insertLock(DSSFlowEditLock newLock) throws DuplicateKeyException;
 
-    void clearExpire(@Param("flowId") Long flowId);
+    void clearExpire(@Param("expireTime") String expireTime, @Param("flowId") long flowId);
 
     void deleteALL();
 }

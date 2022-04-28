@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
+import com.google.common.base.Objects;
+
 import java.util.Date;
 
 
@@ -82,5 +84,23 @@ public class DSSWorkspaceMenuRolePriv {
 
     public void setUpdateBy(String updateBy) {
         this.updateBy = updateBy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        DSSWorkspaceMenuRolePriv that = (DSSWorkspaceMenuRolePriv) o;
+        return Objects.equal(menuId, that.menuId) &&
+                Objects.equal(roleId, that.roleId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(menuId, roleId);
     }
 }

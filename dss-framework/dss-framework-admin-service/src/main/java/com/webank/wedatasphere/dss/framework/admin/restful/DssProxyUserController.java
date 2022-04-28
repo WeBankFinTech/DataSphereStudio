@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.webank.wedatasphere.dss.framework.admin.conf.AdminConf.*;
+
 @RequestMapping(path = "/dss/framework/admin/user", produces = {"application/json"})
 @RestController
 public class DssProxyUserController {

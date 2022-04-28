@@ -41,35 +41,41 @@ delete from `dss_workflow_node_to_ui` where `workflow_node_id`=@dss_visualis_das
 delete from `dss_workflow_node_to_ui` where `workflow_node_id`=@dss_visualis_widgetId;
 delete from `dss_workflow_node_to_ui` where `workflow_node_id`=@dss_visualis_viewId;
 
-select @dss_visualis_displayId:=id from `dss_workflow_node` where `node_type` = 'linkis.appconn.visualis.display';
-select @dss_visualis_dashboardId:=id from `dss_workflow_node` where `node_type` = 'linkis.appconn.visualis.dashboard';
-select @dss_visualis_widgetId:=id from `dss_workflow_node` where `node_type` = 'linkis.appconn.visualis.widget';
+-- 查找节点所属组的id
+select @visualis_node_groupId:=id from `dss_workflow_node_group` where `name` = '数据可视化';
 
-INSERT INTO `dss_workflow_node_to_group`(`node_id`,`group_id`) values (@dss_visualis_displayId,4);
-INSERT INTO `dss_workflow_node_to_group`(`node_id`,`group_id`) values (@dss_visualis_dashboardId,4);
-INSERT INTO `dss_workflow_node_to_group`(`node_id`,`group_id`) values (@dss_visualis_widgetId,4);
+INSERT INTO `dss_workflow_node_to_group`(`node_id`,`group_id`) values (@dss_visualis_displayId, @visualis_node_groupId);
+INSERT INTO `dss_workflow_node_to_group`(`node_id`,`group_id`) values (@dss_visualis_dashboardId, @visualis_node_groupId);
+INSERT INTO `dss_workflow_node_to_group`(`node_id`,`group_id`) values (@dss_visualis_widgetId, @visualis_node_groupId);
+INSERT INTO `dss_workflow_node_to_group`(`node_id`,`group_id`) values (@dss_visualis_viewId, @visualis_node_groupId);
+-- 表中有的是重复记录，最好加上limit 1
+select @visualis_node_ui_label_name_1:=id from `dss_workflow_node_ui` where `label_name` = '节点名' limit 1;
+select @visualis_node_ui_label_name_2:=id from `dss_workflow_node_ui` where `label_name` = '节点描述' limit 1;
+select @visualis_node_ui_label_name_3:=id from `dss_workflow_node_ui` where `label_name` = '业务标签' limit 1;
+select @visualis_node_ui_label_name_4:=id from `dss_workflow_node_ui` where `label_name` = '应用标签' limit 1;
+select @visualis_node_ui_label_name_5:=id from `dss_workflow_node_ui` where `label_name` = '是否复用引擎' limit 1;
+select @visualis_node_ui_label_name_6:=id from `dss_workflow_node_ui` where `label_name` = '绑定上游节点' limit 1;
 
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId, @visualis_node_ui_label_name_1);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId, @visualis_node_ui_label_name_2);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId, @visualis_node_ui_label_name_3);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId, @visualis_node_ui_label_name_4);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId, @visualis_node_ui_label_name_5);
 
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId,1);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId,2);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId,3);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId,4);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId,5);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId,6);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_displayId,45);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId, @visualis_node_ui_label_name_1);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId, @visualis_node_ui_label_name_2);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId, @visualis_node_ui_label_name_3);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId, @visualis_node_ui_label_name_5);
 
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId,1);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId,2);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId,3);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId,4);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId,5);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_dashboardId,45);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId, @visualis_node_ui_label_name_1);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId, @visualis_node_ui_label_name_2);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId, @visualis_node_ui_label_name_3);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId, @visualis_node_ui_label_name_4);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId, @visualis_node_ui_label_name_5);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId, @visualis_node_ui_label_name_6);
 
-
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId,1);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId,3);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId,5);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId,6);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId,37);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId,2);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_widgetId,45);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_viewId, @visualis_node_ui_label_name_1);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_viewId, @visualis_node_ui_label_name_2);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_viewId, @visualis_node_ui_label_name_3);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_viewId, @visualis_node_ui_label_name_4);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@dss_visualis_viewId, @visualis_node_ui_label_name_5);

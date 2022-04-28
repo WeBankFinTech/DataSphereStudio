@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import javax.ws.rs.QueryParam;
 import java.util.List;
 
 @Mapper
@@ -15,4 +16,9 @@ public interface GuideChapterMapper extends BaseMapper<GuideChapter> {
 
     @Select("SELECT * FROM dss_guide_chapter WHERE is_delete =0 AND (content LIKE CONCAT('%', #{keyword}, '%') OR title LIKE CONCAT('%', #{keyword}, '%')) ORDER BY id ASC")
     List<GuideChapter> searchGuideChapterListByKeyword(@Param("keyword") String keyword);
+
+    int batchInsert(@Param("list") List<GuideChapter> list);
+
+    @Select("truncate table dss_guide_chapter;")
+    void initChapterId();
 }

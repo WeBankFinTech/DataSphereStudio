@@ -96,7 +96,8 @@ public class DSSWorkspaceRestful {
     public Message getWorkspaceHomePage(HttpServletRequest request, @RequestParam(required = false, name = "micro_module") String moduleName) throws Exception{
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(request);
-        dssUserService.insertOrUpdateUser(username, SSOHelper.getWorkspace(request));
+        // todo 调用这个接口时，前端还没有调用workspaces/{id}，此时还没有workspaceName和workspaceId的cookie，暂时先注释
+//        dssUserService.insertOrUpdateUser(username, SSOHelper.getWorkspace(request));
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username,moduleName);
         return Message.ok().data("workspaceHomePage", dssWorkspaceHomePageVO);
     }

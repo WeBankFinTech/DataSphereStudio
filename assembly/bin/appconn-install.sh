@@ -64,8 +64,7 @@ function initInstallAppConn() {
   echo ""
   replaceCommonIp
   echo "The base url of $APPCONN_NAME is http://${APPCONN_INSTALL_IP}:${APPCONN_INSTALL_PORT}/."
-
-}}
+}
 
 function replaceCommonIp() {
  if [[ $APPCONN_INSTALL_IP == "127.0.0.1" ]] || [[ $APPCONN_INSTALL_IP == "0.0.0.0" ]];then

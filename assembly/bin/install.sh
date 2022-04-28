@@ -377,8 +377,7 @@ installDssProject
 echo "Congratulations! You have installed DSS $DSS_VERSION successfully, please use sbin/dss-start-all.sh to start it!"
 ## todo 启动dss所有服务，然后选择
 echo "Now begin to start all dss servers, please wait some time."
-cd $SERVER_HOME
-sh sbin/dss-start-all.sh
+sh $SERVER_HOME/sbin/dss-start-all.sh
 
 sleep 15
 echo "end to start all dss servers."

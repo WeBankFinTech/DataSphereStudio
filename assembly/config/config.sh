@@ -5,7 +5,11 @@ deployUser=hadoop
 SERVER_HEAP_SIZE="512M"
 
 ### The install home path of DSS，Must provided
-DSS_INSTALL_HOME=/appcom/Install/dss
+DSS_INSTALL_HOME=/appcom/Install/DSSInstall
+
+DSS_VERSION=1.1.0
+
+DSS_FILE_NAME="dss-$DSS_VERSION"
 
 ###  Linkis EUREKA  information.  # Microservices Service Registration Discovery Center
 EUREKA_INSTALL_IP=127.0.0.1
@@ -51,8 +55,8 @@ DSS_WORKFLOW_SERVER_PORT=9005
 DSS_FLOW_EXECUTION_SERVER_INSTALL_IP=127.0.0.1
 DSS_FLOW_EXECUTION_SERVER_PORT=9006
 ###dss-scriptis-server
-DSS_DATAPIPE_SERVER_INSTALL_IP=127.0.0.1
-DSS_DATAPIPE_SERVER_PORT=9008
+DSS_SCRIPTIS_SERVER_INSTALL_IP=127.0.0.1
+DSS_SCRIPTIS_SERVER_PORT=9008
 
 ###dss-data-api-server
 DSS_DATA_API_SERVER_INSTALL_IP=127.0.0.1
@@ -84,6 +88,3 @@ EMAIL_PASSWORD=xxxxx
 EMAIL_PROTOCOL=smtp
 ############## ############## dss_appconn_instance configuration   end   ############## ##############
 
-DSS_VERSION=1.0.0
-
-DSS_FILE_NAME="dss-$DSS_VERSION"

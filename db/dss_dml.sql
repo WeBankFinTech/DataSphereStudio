@@ -117,6 +117,7 @@ insert  into `dss_workflow_node_to_group`(`node_id`,`group_id`) values (10, @fun
 insert  into `dss_workflow_node_to_group`(`node_id`,`group_id`) values (12, @function_node_groupId);
 
 DELETE FROM dss_workflow_node_ui;
+-- todo msg.topic在receiver和sender使用了重复key
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (1,'title','请填写节点名称','Please enter node name','节点名','Node name','Input',1,NULL,NULL,0,NULL,0,1,1,1,'node');
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (3,'desc','请填写节点描述','Please enter the node description','节点描述','Node description','Text',0,NULL,NULL,0,NULL,0,4,1,1,'node');
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (5,'businessTag',NULL,NULL,'业务标签','businessTag','Tag',0,NULL,NULL,0,NULL,0,2,1,1,'node');
@@ -168,13 +169,14 @@ select @workflow_node_jdbc:=id from dss_workflow_node where name='jdbc';
 select @workflow_node_connector:=id from dss_workflow_node where name='connector';
 select @workflow_node_subFlow:=id from dss_workflow_node where name='subFlow';
 
-select @node_ui_title:=id from dss_workflow_node_ui where `key`='title';
-select @node_ui_desc:=id from dss_workflow_node_ui where `key`='desc';
+select @node_ui_title:=id from dss_workflow_node_ui where `key`='title' limit 1;
+select @node_ui_desc:=id from dss_workflow_node_ui where `key`='desc' limit 1;
 select @node_ui_businessTag:=id from dss_workflow_node_ui where `key`='businessTag';
 select @node_ui_appTag:=id from dss_workflow_node_ui where `key`='appTag';
 select @node_ui_spark_driver_memory:=id from dss_workflow_node_ui where `key`='spark.driver.memory';
 select @node_ui_spark_executor_memory:=id from dss_workflow_node_ui where `key`='spark.executor.memory';
 select @node_ui_spark_executor_cores:=id from dss_workflow_node_ui where `key`='spark.executor.cores';
+select @node_ui_spark_executor_instances:=id from dss_workflow_node_ui where `key`='spark.executor.instances';
 select @node_ui_wds_linkis_rm_yarnqueue:=id from dss_workflow_node_ui where `key`='wds.linkis.rm.yarnqueue';
 select @node_ui_resources:=id from dss_workflow_node_ui where `key`='resources';
 select @node_ui_category:=id from dss_workflow_node_ui where `key`='category';
@@ -206,12 +208,17 @@ insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@work
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_spark_driver_memory);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_spark_executor_memory);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_spark_executor_cores);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_spark_executor_instances);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_wds_linkis_rm_yarnqueue);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_resources);
+INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_sql,@node_ui_ReuseEngine);
+
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_python,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_python,@node_ui_desc);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_python,@node_ui_businessTag);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_python,@node_ui_appTag);
+INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_python,@node_ui_ReuseEngine);
+
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_desc);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_businessTag);
@@ -219,8 +226,11 @@ insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@work
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_spark_driver_memory);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_spark_executor_memory);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_spark_executor_cores);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_spark_executor_instances);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_wds_linkis_rm_yarnqueue);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_pyspark,@node_ui_resources);
+INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_pyspark,@node_ui_ReuseEngine);
+
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_scala,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_scala,@node_ui_desc);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_scala,@node_ui_businessTag);
@@ -228,40 +238,70 @@ insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@work
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_scala,@node_ui_spark_driver_memory);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_scala,@node_ui_spark_executor_memory);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_scala,@node_ui_spark_executor_cores);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_scala,@node_ui_spark_executor_instances);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_scala,@node_ui_wds_linkis_rm_yarnqueue);
+INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_scala,@node_ui_ReuseEngine);
+
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_hql,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_hql,@node_ui_desc);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_hql,@node_ui_businessTag);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_hql,@node_ui_appTag);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_hql,@node_ui_wds_linkis_rm_yarnqueue);
+INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_hql,@node_ui_ReuseEngine);
+
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_shell,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_shell,@node_ui_desc);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_shell,@node_ui_businessTag);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_shell,@node_ui_appTag);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,39);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,40);
+INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_shell,@node_ui_ReuseEngine);
+
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_jdbc,@node_ui_title);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_jdbc,@node_ui_desc);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_jdbc,@node_ui_businessTag);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_jdbc,@node_ui_appTag);
+INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_jdbc,@node_ui_ReuseEngine);
+
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_desc);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_businessTag);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_appTag);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,25);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_msg_receiver);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_query_frequency);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_max_receive_hours);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_msg_savekey);
-insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_connector,@node_ui_only_receive_today);
+INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_connector,@node_ui_ReuseEngine);
+
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_subFlow,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_subFlow,@node_ui_desc);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_subFlow,@node_ui_businessTag);
-INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_python,@node_ui_ReuseEngine);
-INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_pyspark,@node_ui_ReuseEngine);
-INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_sql,@node_ui_ReuseEngine);
-INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_scala,@node_ui_ReuseEngine);
-INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_hql,@node_ui_ReuseEngine);
-INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_jdbc,@node_ui_ReuseEngine);
-INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_shell,@node_ui_ReuseEngine);
-INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_connector,@node_ui_ReuseEngine);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_subFlow,@node_ui_appTag);
 INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_subFlow,@node_ui_ReuseEngine);
+
+DELETE FROM dss_workflow_node_ui_validate;
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('7','NumInterval','[1,15]','驱动器内存大小，默认值：2','Drive memory size, default value: 2','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('8','NumInterval','[3,15]','执行器内存大小，默认值：3','Actuator memory size, default value: 3','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('9','NumInterval','[1,10]','执行器核心个数，默认值：1','Number of cores per executor, default value : 1','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('10','NumInterval','[1,40]','执行器个数，默认值：2','Number of per executor, default value : 2','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('13','OFT','[\"node\"]','请选择类型','Please select type','change');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('25','OFT','[\"RECEIVE\"]','','Please select ','change');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('27','NumInterval','[1,1000]','请填写查询频率，默认10次，范围：1-1000','Please fill in the inquiry frequency, default : 10, range is 1 to 1000','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('28','NumInterval','[1,1000]','请填写等待时间，默认1小时，范围：1-1000','Please enter waiting time, 1 hour by default, range is 1 to 1000','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('31','OFT','[\"hivedb\",\"maskdb\"]','','Invalid format,example:ProjectName@WFName@jobName','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('32','Regex','^[^\\u4e00-\\u9fa5]+$','此值不能输入中文','Chinese characters are not allowed','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('40','Regex','^[a-zA-Z]([^.]*\\.[^.]*){1,}$','需要检查的数据源dbname.tablename{partition}','Checked data source dbname.tablename{partition}','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('41','Regex','^.{1,500}$','长度在1到500个字符','The length is between 1 and 500 characters','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('44','Regex','^[a-zA-Z][a-zA-Z0-9_@-]*$','必须以字母开头，且只支持字母、数字、下划线、@、中横线','Started with alphabetic characters, only alphanumeric characters, underscore(_), @ and hyphen(-) are allowed','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('45','Regex','^[a-zA-Z0_9-]([^@]*@[^@]*){2}[a-zA-Z\\d]$','此值格式错误，例如：ProjectName@WFName@jobName','Invalid format,example:ProjectName@WFName@jobName','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('46','Regex','^[a-zA-Z0_9-]([^_]*_[^_]*){2}[a-zA-Z\\d]$','此值格式错误，例如：bdp_tac_name','Invalid format,example:bdp_tac_name','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('47','Regex','^.{1,128}$','长度在1到128个字符','The length is between 1 and 128 characters','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('48','Regex','^[a-zA-Z][a-zA-Z0-9_-]*$','必须以字母开头，且只支持字母、数字、下划线！','Started with alphabetic characters, only alphanumeric and underscore are allowed!','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('49','Regex','^[a-zA-Z0-9_\\u4e00-\\u9fa5]*$','只支持中文、字母、数字和下划线！','Only Chinese characters, alphanumeric characters and underscore are allowed in subject!','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('50','Regex','^[a-z][a-zA-Z0-9_.@;]*$','必须以字母开头，且只支持字母、数字、下划线、@、点','Must start with a letter and only letters, numbers, underscores, @, points are supported','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('51','Regex','^[0-9_.]*$','只支持数字、下划线、点','Only numbers, underscores and dots are supported','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('52','None',NULL,NULL,NULL,'blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('53','OFT','[\"SEND\"]',NULL,NULL,'change');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('54','NumInterval','[1,1000]','请填写等待时间，默认1小时，范围：1-1000','Please fill in the waiting time, default 1 hour, range: 1-1000','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('55','Required',NULL,'该值不能为空','The value cannot be empty\n\n','change');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('56','Function','validatorTitle','节点名不能和工作流名一样','The node name cannot be the same as the workflow name',NULL);
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('57','Regex','^[a-zA-Z][a-zA-Z0-9_.-]*$','必须以字母开头，且只支持字母、数字、下划线、点！','It must start with a letter and only supports letters, numbers, underscores and dots!','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('58','Regex','(.+)@(.+)@(.+)','此格式错误，例如：ProjectName@WFName@jobName','Invalid format,example:ProjectName@WFName@jobName','blur');
+INSERT INTO `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('59','OFT','["true","false"]','请填写是否复用引擎，false：不复用，true：复用','Please fill in whether or not to reuse engine, true: reuse, false: not reuse','blur');
 
 DELETE FROM dss_workflow_node_ui_to_validate;
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_source_type,31);
@@ -338,37 +378,6 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_executeUser,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (42,52);
 INSERT  INTO `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) VALUES (@node_ui_ReuseEngine,59);
-
-DELETE FROM dss_workflow_node_ui_validate;
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('7','NumInterval','[1,15]','驱动器内存大小，默认值：2','Drive memory size, default value: 2','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('8','NumInterval','[3,15]','执行器内存大小，默认值：3','Actuator memory size, default value: 3','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('9','NumInterval','[1,10]','执行器核心个数，默认值：1','Number of cores per executor, default value : 1','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('10','NumInterval','[1,40]','执行器个数，默认值：2','Number of per executor, default value : 2','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('13','OFT','[\"node\"]','请选择类型','Please select type','change');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('25','OFT','[\"RECEIVE\"]','','Please select ','change');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('27','NumInterval','[1,1000]','请填写查询频率，默认10次，范围：1-1000','Please fill in the inquiry frequency, default : 10, range is 1 to 1000','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('28','NumInterval','[1,1000]','请填写等待时间，默认1小时，范围：1-1000','Please enter waiting time, 1 hour by default, range is 1 to 1000','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('31','OFT','[\"hivedb\",\"maskdb\"]','','Invalid format,example:ProjectName@WFName@jobName','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('32','Regex','^[^\\u4e00-\\u9fa5]+$','此值不能输入中文','Chinese characters are not allowed','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('40','Regex','^[a-zA-Z]([^.]*\\.[^.]*){1,}$','需要检查的数据源dbname.tablename{partition}','Checked data source dbname.tablename{partition}','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('41','Regex','^.{1,500}$','长度在1到500个字符','The length is between 1 and 500 characters','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('44','Regex','^[a-zA-Z][a-zA-Z0-9_@-]*$','必须以字母开头，且只支持字母、数字、下划线、@、中横线','Started with alphabetic characters, only alphanumeric characters, underscore(_), @ and hyphen(-) are allowed','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('45','Regex','^[a-zA-Z0_9-]([^@]*@[^@]*){2}[a-zA-Z\\d]$','此值格式错误，例如：ProjectName@WFName@jobName','Invalid format,example:ProjectName@WFName@jobName','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('46','Regex','^[a-zA-Z0_9-]([^_]*_[^_]*){2}[a-zA-Z\\d]$','此值格式错误，例如：bdp_tac_name','Invalid format,example:bdp_tac_name','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('47','Regex','^.{1,128}$','长度在1到128个字符','The length is between 1 and 128 characters','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('48','Regex','^[a-zA-Z][a-zA-Z0-9_-]*$','必须以字母开头，且只支持字母、数字、下划线！','Started with alphabetic characters, only alphanumeric and underscore are allowed!','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('49','Regex','^[a-zA-Z0-9_\\u4e00-\\u9fa5]*$','只支持中文、字母、数字和下划线！','Only Chinese characters, alphanumeric characters and underscore are allowed in subject!','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('50','Regex','^[a-z][a-zA-Z0-9_.@;]*$','必须以字母开头，且只支持字母、数字、下划线、@、点','Must start with a letter and only letters, numbers, underscores, @, points are supported','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('51','Regex','^[0-9_.]*$','只支持数字、下划线、点','Only numbers, underscores and dots are supported','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('52','None',NULL,NULL,NULL,'blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('53','OFT','[\"SEND\"]',NULL,NULL,'change');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('54','NumInterval','[1,1000]','请填写等待时间，默认1小时，范围：1-1000','Please fill in the waiting time, default 1 hour, range: 1-1000','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('55','Required',NULL,'该值不能为空','The value cannot be empty\n\n','change');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('56','Function','validatorTitle','节点名不能和工作流名一样','The node name cannot be the same as the workflow name',NULL);
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('57','Regex','^[a-zA-Z][a-zA-Z0-9_.-]*$','必须以字母开头，且只支持字母、数字、下划线、点！','It must start with a letter and only supports letters, numbers, underscores and dots!','blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('58','Regex','(.+)@(.+)@(.+)','此格式错误，例如：ProjectName@WFName@jobName','Invalid format,example:ProjectName@WFName@jobName','blur');
-INSERT INTO `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('59','OFT','["true","false"]','请填写是否复用引擎，false：不复用，true：复用','Please fill in whether or not to reuse engine, true: reuse, false: not reuse','blur');
-
 
 
 DELETE FROM dss_workspace_appconn_role;

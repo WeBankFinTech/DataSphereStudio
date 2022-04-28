@@ -294,6 +294,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspacePrivVO.setRoleVOS(workspaceRoleVOList);
         List<DSSWorkspaceMenuPrivVO> dssWorkspaceMenuPrivVOList = new ArrayList<>();
         List<DSSWorkspaceMenuRolePriv> dssWorkspaceMenuRolePrivList = dssWorkspaceMapper.getDSSWorkspaceMenuPriv(workspaceId);
+        List<DSSWorkspaceMenuRolePriv> defaultWorkspaceMenuRolePrivList = dssWorkspaceMapper.getDefaultWorkspaceMenuPriv();
+        for (DSSWorkspaceMenuRolePriv v : defaultWorkspaceMenuRolePrivList) {
+            if (!dssWorkspaceMenuRolePrivList.contains(v)) {
+                dssWorkspaceMenuRolePrivList.add(v);
+            }
+        }
         Map<Integer, List<DSSWorkspaceMenuRolePriv>> map = new HashMap<>();
         for (DSSWorkspaceMenuRolePriv dssWorkspaceMenuPriv : dssWorkspaceMenuRolePrivList) {
             int menuId = dssWorkspaceMenuPriv.getMenuId();
@@ -367,7 +373,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                     boolean isContain = false;
                     for (DSSWorkspaceComponentRolePriv dssWorkspaceComponentRolePriv : v) {
                         if (roleId == dssWorkspaceComponentRolePriv.getRoleId()) {
-                            componentPrivs.put(role.getRoleName(), dssWorkspaceComponentRolePriv.getPriv() == null ? false : dssWorkspaceComponentRolePriv.getPriv() == 1);
+                            componentPrivs.put(role.getRoleName(), dssWorkspaceComponentRolePriv.getPriv() != null && dssWorkspaceComponentRolePriv.getPriv() == 1);
                             isContain = true;
                             break;
                         }
@@ -576,8 +582,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                                                       boolean isChinese) throws DSSErrorException {
         DSSWorkspace dssWorkspace = getWorkspacesById(workspaceId, username);
         List<WorkspaceMenuVo> appconnMenuVos = isChinese ? workspaceMapper.getAppConnMenuCn() : workspaceMapper.getAppConnMenuEn();
-        List<Long> userMenuAppConnId = dssWorkspaceMapper.getUserMenuAppConnId(username, workspaceId);
-        return getMenuAppInstances(appconnMenuVos, userMenuAppConnId, dssWorkspace, isChinese);
+        List<Long> userMenuAppConnIds = dssWorkspaceMapper.getUserMenuAppConnId(username, workspaceId);
+        return getMenuAppInstances(appconnMenuVos, userMenuAppConnIds, dssWorkspace, isChinese);
     }
 
     @Override

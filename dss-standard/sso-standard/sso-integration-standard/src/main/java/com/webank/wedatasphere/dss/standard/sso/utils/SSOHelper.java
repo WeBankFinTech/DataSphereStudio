@@ -64,19 +64,23 @@ public class SSOHelper {
         return workspace;
     }
 
-    private static void addWorkspaceInfo(HttpServletRequest request, Workspace workspace) {
-//        String forwardedHost = request.getHeader("X-Forwarded-Host");
-//        if(StringUtils.isNotBlank(forwardedHost)) {
-//            workspace.setDssUrl("http://" + forwardedHost);
-//        }
+    public static void addWorkspaceInfo(HttpServletRequest request, Workspace workspace) {
+        String gatewayUrl = request.getHeader("GATEWAY_URL");
+        if(StringUtils.isNotBlank(gatewayUrl)) {
+            if(gatewayUrl.startsWith("http")) {
+                workspace.setDssUrl(gatewayUrl);
+            } else {
+                workspace.setDssUrl("http://" + gatewayUrl);
+            }
+        }
+        Cookie[] cookies = request.getCookies();
+        Arrays.stream(cookies).forEach(cookie -> workspace.addCookie(cookie.getName(), cookie.getValue()));
         if(StringUtils.isBlank(workspace.getWorkspaceName())) {
             throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies, please ensure front-web has injected cookie['workspaceName'](不能找到工作空间名，请确认前端是否已经注入cookie['workspaceName']).");
         }
         if(workspace.getWorkspaceId() <= 0) {
             throw new AppStandardWarnException(50010, "Cannot find workspace info from cookies, please ensure front-web has injected cookie['workspaceId'](不能找到工作空间名，请确认前端是否已经注入cookie['workspaceId']).");
         }
-        Cookie[] cookies = request.getCookies();
-        Arrays.stream(cookies).forEach(cookie -> workspace.addCookie(cookie.getName(), cookie.getValue()));
     }
 
     public static Workspace getWorkspace(HttpServletRequest request){

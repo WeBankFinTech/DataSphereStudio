@@ -10,7 +10,7 @@
       v-if="work.type=='backgroundScript'"
       :work="work"
       @remove-work="removeWork"/>
-    <detailView
+    <tbDetail
       :work="work"
       v-if="work.type=='tableDetails'"
     />
@@ -21,23 +21,28 @@
       v-if="work.type == 'dbDetails'"
       :work="work">
     </dbDetails>
-
+    <iframeView
+      v-if="work.type == 'iframe'"
+      :url="work.url">
+    </iframeView>
   </div>
 </template>
 <script>
 import scriptView from './script/script.vue';
 import backgroundScriptView from './script/backgroundScript.vue';
-import detailView from './tableDetails/index.vue';
+import tbDetail from './tableDetails/index.vue';
 import createTableView from './createTable/index.vue';
 import dbDetails from './dbDetails/index.vue';
+import iframeView from './iframeView/index.vue';
 export default {
   name: 'workbench',
   components: {
     scriptView,
     backgroundScriptView,
-    detailView,
+    tbDetail,
     createTableView,
-    dbDetails
+    dbDetails,
+    iframeView
   },
   props: {
     work: Object,

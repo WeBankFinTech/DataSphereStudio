@@ -166,7 +166,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
         postAction.addRequestPayload("labels", routeVO);
 
-        return VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
+        return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
     }
 
 }

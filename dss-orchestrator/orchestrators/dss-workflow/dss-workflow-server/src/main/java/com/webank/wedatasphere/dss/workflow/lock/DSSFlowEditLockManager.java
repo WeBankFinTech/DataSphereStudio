@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,6 +50,7 @@ public class DSSFlowEditLockManager {
 
 
     private static final DelayQueue<UnLockEvent> unLockEvents = new DelayQueue<>();
+    private static final ThreadLocal<SimpleDateFormat> sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     protected DSSFlowEditLockManager() {
     }
@@ -60,22 +62,30 @@ public class DSSFlowEditLockManager {
         //程序重启时，删除所有编辑锁
         lockMapper.deleteALL();
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
-            UnLockEvent pop = unLockEvents.poll();
-            if (pop != null) {
-                DSSFlowEditLock flowEditLock = pop.getFlowEditLock();
-                DSSFlowEditLock updateFlowEditLock = lockMapper.getFlowEditLockByID(flowEditLock.getFlowID());
-                //队列对象如果过期，先去数据库查询锁，并判断锁是否过期
-                if (updateFlowEditLock != null && isLockExpire(updateFlowEditLock)) {
-                    //锁过期，移除记录
-                    flowEditLock.setExpire(true);
-                    lockMapper.clearExpire(flowEditLock.getFlowID());
-                } else if (updateFlowEditLock == null) {
-                    LOGGER.info("lock already clear");
-                } else {
-                    //锁没有过期，延长队列时间
-                    pop.setExpireTime(updateFlowEditLock.getUpdateTime().getTime() + DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue());
-                    unLockEvents.offer(pop);
+            try {
+                UnLockEvent pop = unLockEvents.poll();
+                if (pop != null) {
+                    DSSFlowEditLock flowEditLock = pop.getFlowEditLock();
+                    long flowId = flowEditLock.getFlowID();
+                    DSSFlowEditLock updateFlowEditLock = lockMapper.getFlowEditLockByID(flowId);
+                    //队列对象如果过期，先去数据库查询锁，并判断锁是否过期
+                    if (updateFlowEditLock != null && isLockExpire(updateFlowEditLock)) {
+                        //锁过期，移除记录
+                        String expireTime = sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue()));
+                        LOGGER.info("删除用户{}的编辑锁,flowId:{},lockContent:{},owner:{},update_time:{},expireTime:{}",
+                                updateFlowEditLock.getUsername(), flowId, updateFlowEditLock.getLockContent(),
+                                updateFlowEditLock.getOwner(), updateFlowEditLock.getUpdateTime(), expireTime);
+                        lockMapper.clearExpire(expireTime, flowId);
+                    } else if (updateFlowEditLock == null) {
+                        LOGGER.info("lock already clear");
+                    } else {
+                        //锁没有过期，延长队列时间
+                        pop.setExpireTime(updateFlowEditLock.getUpdateTime().getTime() + DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue());
+                        unLockEvents.offer(pop);
+                    }
                 }
+            } catch (Exception e) {
+                LOGGER.error("定时清除工作流编辑锁错误", e);
             }
         }, 0, 1, TimeUnit.SECONDS);
     }
@@ -112,7 +122,7 @@ public class DSSFlowEditLockManager {
             if (i == 1) {
                 //更新成功，尝试获取新锁
                 LOGGER.info("unlock success,lock:{}", flowEditLock);
-                lockMapper.clearExpire(flowEditLock.getFlowID());
+                lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowID);
                 lock = generateLock(flowID, username, owner);
             } else {
                 // 失败的缘由: 1.另外的dss-server也走到了这步，优先更新了;2.UnLockEvent;3.用户刚好点了saveFlow延续
@@ -128,12 +138,12 @@ public class DSSFlowEditLockManager {
         return lock;
     }
 
-    private static String generateLock(Long flowID,  String username, String owner) throws DSSErrorException {
+    private static String generateLock(Long flowID, String username, String owner) throws DSSErrorException {
         try {
             String lockContent = UUID.randomUUID().toString();
-            Date date = new Date();
             DSSFlowEditLock newLock = new DSSFlowEditLock();
             newLock.setExpire(false);
+            Date date = new Date();
             newLock.setCreateTime(date);
             newLock.setUpdateTime(date);
             newLock.setFlowID(flowID);
@@ -147,10 +157,10 @@ public class DSSFlowEditLockManager {
             unLockEvent.setExpireTime(date.getTime() + DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue());
             unLockEvent.setFlowEditLock(newLock);
             unLockEvents.offer(unLockEvent);
-            return lockContent + DSSWorkFlowConstant.SPLIT + 0;
+            return lockContent;
         } catch (DuplicateKeyException e) {
             LOGGER.warn("acquire lock failed", e);
-            DSSFlowEditLock personalFlowEditLock = lockMapper.getPersonalFlowEditLock(flowID,  null);
+            DSSFlowEditLock personalFlowEditLock = lockMapper.getPersonalFlowEditLock(flowID, null);
             String userName = Optional.ofNullable(personalFlowEditLock).map(DSSFlowEditLock::getUsername).orElse(null);
             throw new DSSErrorException(DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE, "用户" + userName + "已锁定编辑");
         }
@@ -161,37 +171,26 @@ public class DSSFlowEditLockManager {
             throw new DSSErrorException(60066, "update workflow failed because you do not have flowEditLock!");
         }
         //保存并刷新数据库更新时间
-        String[] array = lock.split(DSSWorkFlowConstant.SPLIT);
-        String lockContent = array[0];
         DSSFlowEditLock dssFlowEditLock = new DSSFlowEditLock();
         dssFlowEditLock.setUpdateTime(new Date());
-        dssFlowEditLock.setLockContent(lockContent);
-        int i = lockMapper.compareAndSwap(dssFlowEditLock);
-        if (i == 0) {
-            //update failed
-            //情况1.点太快了，分发到另外一台dss-server先更新了
-            //情况2.已经让unlockEvent设置为过期了
-            //情况3，已经让tryAccquire 方法设置为过期了
-            DSSFlowEditLock updateFlowEditLock = lockMapper.getFlowEditLockByLockContent(array[0]);
-            if (updateFlowEditLock == null || updateFlowEditLock.getExpire()) {
-                throw new DSSErrorException(60057, "编辑锁已过期，请刷新页面");
-            } else {
-                return lock;
-            }
-        } else if (i == 1) {
-            //update success 防止开2窗口的情况
-            LOGGER.info("update lock expire time success,{}", dssFlowEditLock);
+        dssFlowEditLock.setLockContent(lock);
+        DSSFlowEditLock updateFlowEditLock = lockMapper.getFlowEditLockByLockContent(lock);
+        if (updateFlowEditLock == null || updateFlowEditLock.getExpire()) {
+            lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), 0L);
+            throw new DSSErrorException(60057, "工作流编辑锁已过期，请刷新页面");
+        }
+        try {
+            lockMapper.compareAndSwap(dssFlowEditLock);
             return lock;
-        } else {
-            LOGGER.info("unexpected update error,{}", dssFlowEditLock);
-            throw new DSSErrorException(60059, String.format("unexpected update error,%s", dssFlowEditLock));
+        } catch (Exception e) {
+            LOGGER.error("unexpected error occurred when update dss flow edit lock,{}", dssFlowEditLock, e);
+            throw new DSSErrorException(60059, "工作流编辑锁更新失败，请刷新页面");
         }
     }
 
     public static boolean isLockExpire(DSSFlowEditLock flowEditLock) {
         return System.currentTimeMillis() - flowEditLock.getUpdateTime().getTime() >= DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue();
     }
-
 
     public static void init() {
         if (!isInit) {

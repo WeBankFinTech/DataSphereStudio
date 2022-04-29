@@ -2,20 +2,24 @@ DELETE FROM dss_appconn;
 INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`)
 VALUES (1,'sso',0,1,0,0,NULL,"com.webank.wedatasphere.dss.appconn.sso.SSOAppConn",NULL,NULL),
 (2,'scriptis',0,1,0,0,"sso",NULL,NULL,NULL),
-(3,'workflow',0,1,1,0,NULL,'com.webank.wedatasphere.dss.appconn.workflow.WorkflowAppConn','/appcom/Install/dss/dss-appconns/workflow',NULL);
+(3,'workflow',0,1,1,0,NULL,'com.webank.wedatasphere.dss.appconn.workflow.WorkflowAppConn','/appcom/Install/dss/dss-appconns/workflow',NULL),
+(4,'apiservice',0,1,0,0,"sso",NULL,NULL,NULL);
 
 DELETE FROM dss_appconn_instance;
+select @scriptis_appconn_id:= id from dss_appconn where appconn_name="scriptis";
+select @workflow_appconn_id:= id from dss_appconn where appconn_name="workflow";
+select @apiservice_appconn_id:= id from dss_appconn where appconn_name="apiservice";
 INSERT INTO `dss_appconn_instance` (`id`, `appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
-VALUES (1,8,'PROD','http://AZKABAN_ADRESS_IP_2:AZKABAN_ADRESS_PORT/','',''),
-(2, 2, 'DEV', '/home', '', ''),
-(3,3,'DEV','http://WORKFLOW_IP:WORKFLOW_PORT/#/workspaceHome','','');
+VALUES (2, @scriptis_appconn_id, 'DEV', '/home', '', ''),
+(3, @workflow_appconn_id,'DEV','/workspaceHome','',''),
+(4, @apiservice_appconn_id, 'DEV', '/apiservices', '', '');
 
 DELETE FROM dss_workspace;
 insert into `dss_workspace`(`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`)
 values('defaultWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','1','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop','project');
 
 DELETE FROM dss_workspace_user_role;
-select @defaultWorkspaceId:=id from dss_workspace where name='defaultWorkspace';
+select @defaultWorkspaceId:=id from dss_workspace where name='bdapWorkspace';
 insert  into `dss_workspace_user_role`(`workspace_id`,`username`,`create_time`,`created_by`,`user_id`) values (@defaultWorkspaceId,'hadoop','2021-09-06 14:39:17','hadoop',NULL);
 
 DELETE FROM dss_user;
@@ -23,22 +27,22 @@ INSERT INTO `dss_user` VALUES (100,'hadoop_test','hadoop_test',1,101,1,'','','',
 (215,'hadoop','hadoop',1,101,1,'','','','0',NULL,'2021-11-17 09:43:41','2021-11-17 09:51:49',NULL);
 
 DELETE FROM dss_workspace_dictionary;
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (1,0,'0','空间开发流程','Space development process','w_develop_process',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'空间开发流程','SYSTEM','2020-12-28 17:32:34',NULL,'2021-02-22 17:46:40');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (2,0,'w_develop_process','需求','Demand','wdp_demand','创建新的业务需求，并将需求指派给对应负责人。','Create new business requirements and assign them to the corresponding responsible person.','Demo案例','Demo case',NULL,0,'xuqiu',1,'空间开发流程-需求','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:07');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (3,0,'w_develop_process','设计','Design','wdp_design','针对新的业务需求，进行数仓规划和库表设计。','According to the new business requirements, data warehouse planning and database table design are carried out.','Demo案例','Demo case',NULL,0,'sheji',1,'空间开发流程-设计','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:09');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (4,0,'w_develop_process','开发','Development','wdp_development','针对新的业务需求，进行数仓规划和库表设计。','According to the new business requirements, data warehouse planning and database table design are carried out.','Demo案例','Demo case',NULL,0,'kaifa',1,'空间开发流程-开发','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:10');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (5,0,'w_develop_process','调试','Debugging','wdp_debug','创建新的业务需求，并将需求指派给对应负责人。','Create new business requirements and assign them to the corresponding responsible person.','Demo案例','Demo case',NULL,0,'tiaoshi',1,'空间开发流程-调试','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:11');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (6,0,'w_develop_process','生产','Production','wdp_product','创建新的业务需求，并将需求指派给对应负责人。','Create new business requirements and assign them to the corresponding responsible person.','Demo案例','Demo case',NULL,0,'shengchan',1,'空间开发流程-生产','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:12');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (7,0,'0','工程开发流程','Engineering development process','p_develop_process',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程开发流程','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:48:48');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (8,0,'p_develop_process','开发中心','Development Center','pdp_development_center','dev',NULL,NULL,NULL,NULL,0,'kaifa-icon',1,'工程开发流程-开发中心','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:49:02');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (10,0,'0','工程编排模式','Project layout mode','p_orchestrator_mode',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:49:36');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (11,0,'p_orchestrator_mode','工作流','Workflow','pom_work_flow','radio',NULL,NULL,NULL,NULL,0,'gongzuoliu-icon',1,'工程编排模式-工作流','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:49:49');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (14,0,'pom_work_flow','DAG','DAG','pom_work_flow_DAG',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-工作流-DAG','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:50:31');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (16,0,'pom_single_task','Scriptis','Scriptis','pom_single_task_scriptis',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-单任务-Scriptis','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:51:08');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (18,0,'pom_single_task','Qualitis','Qualitis','pom_single_task_qualitis',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-单任务-Qualitis','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:50:53');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (20,0,'pom_consist_orchestrator','Qualitis','Qualitis','pom_consist_orchestrator_qualitis',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-组合编排-Qualitis','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:50:57');
-insert  into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (21,0,'pom_consist_orchestrator','Email','Email','pom_consist_orchestrator_email',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-组合编排-Email','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:51:22');
-insert into `dss_workspace_dictionary` (`workspace_id`, `parent_key`, `dic_name`, `dic_name_en`, `dic_key`, `dic_value`, `dic_value_en`, `title`, `title_en`, `url`, `url_type`, `icon`, `order_num`, `remark`, `create_user`, `create_time`, `update_user`, `update_time`) values('0','0','工作空间默认部门','Space development name','w_workspace_department','10001-部门一;10002-部门二;10003-部门三',NULL,NULL,NULL,NULL,'0',NULL,'1','工作空间默认部门，前面是id后面是部门名称中间使用‘-’,横杆分隔，多个以英文分号分隔','SYSTEM','2020-12-28 17:32:34',NULL,'2021-02-22 17:46:40');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (1,0,'0','空间开发流程','Space development process','w_develop_process',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'空间开发流程','SYSTEM','2020-12-28 17:32:34',NULL,'2021-02-22 17:46:40');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (2,0,'w_develop_process','需求','Demand','wdp_demand','创建新的业务需求，并将需求指派给对应负责人。','Create new business requirements and assign them to the corresponding responsible person.','Demo案例','Demo case',NULL,0,'xuqiu',1,'空间开发流程-需求','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:07');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (3,0,'w_develop_process','设计','Design','wdp_design','针对新的业务需求，进行数仓规划和库表设计。','According to the new business requirements, data warehouse planning and database table design are carried out.','Demo案例','Demo case',NULL,0,'sheji',1,'空间开发流程-设计','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:09');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (4,0,'w_develop_process','开发','Development','wdp_development','针对新的业务需求，进行数仓规划和库表设计。','According to the new business requirements, data warehouse planning and database table design are carried out.','Demo案例','Demo case',NULL,0,'kaifa',1,'空间开发流程-开发','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:10');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (5,0,'w_develop_process','调试','Debugging','wdp_debug','创建新的业务需求，并将需求指派给对应负责人。','Create new business requirements and assign them to the corresponding responsible person.','Demo案例','Demo case',NULL,0,'tiaoshi',1,'空间开发流程-调试','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:11');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (6,0,'w_develop_process','生产','Production','wdp_product','创建新的业务需求，并将需求指派给对应负责人。','Create new business requirements and assign them to the corresponding responsible person.','Demo案例','Demo case',NULL,0,'shengchan',1,'空间开发流程-生产','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:12');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (7,0,'0','工程开发流程','Engineering development process','p_develop_process',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程开发流程','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:48:48');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (8,0,'p_develop_process','开发中心','Development Center','pdp_development_center','dev',NULL,NULL,NULL,NULL,0,'kaifa-icon',1,'工程开发流程-开发中心','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:49:02');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (10,0,'0','工程编排模式','Project layout mode','p_orchestrator_mode',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:49:36');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (11,0,'p_orchestrator_mode','工作流','Workflow','pom_work_flow','radio',NULL,NULL,NULL,NULL,0,'gongzuoliu-icon',1,'工程编排模式-工作流','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:49:49');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (14,0,'pom_work_flow','DAG','DAG','pom_work_flow_DAG',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-工作流-DAG','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:50:31');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (16,0,'pom_single_task','Scriptis','Scriptis','pom_single_task_scriptis',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-单任务-Scriptis','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:51:08');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (18,0,'pom_single_task','Qualitis','Qualitis','pom_single_task_qualitis',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-单任务-Qualitis','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:50:53');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (20,0,'pom_consist_orchestrator','Qualitis','Qualitis','pom_consist_orchestrator_qualitis',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-组合编排-Qualitis','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:50:57');
+insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (21,0,'pom_consist_orchestrator','Email','Email','pom_consist_orchestrator_email',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-组合编排-Email','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:51:22');
+insert into `dss_workspace_dictionary`(`workspace_id`, `parent_key`, `dic_name`, `dic_name_en`, `dic_key`, `dic_value`, `dic_value_en`, `title`, `title_en`, `url`, `url_type`, `icon`, `order_num`, `remark`, `create_user`, `create_time`, `update_user`, `update_time`) values('0','0','工作空间默认部门','Space development name','w_workspace_department','10001-部门一;10002-部门二;10003-部门三',NULL,NULL,NULL,NULL,'0',NULL,'1','工作空间默认部门，前面是id后面是部门名称中间使用‘-’,横杆分隔，多个以英文分号分隔','SYSTEM','2020-12-28 17:32:34',NULL,'2021-02-22 17:46:40');
 
 DELETE FROM dss_sidebar;
 insert  into `dss_sidebar`(`id`,`workspace_id`,`name`,`name_en`,`title`,`title_en`,`type`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (2,0,'菜单','Menu','菜单','Menu',1,1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:45:50');
@@ -62,13 +66,12 @@ INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `descrip
 insert into `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) values('6','数据应用','data application','数据应用','数据应用描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 
 DELETE FROM dss_workspace_menu_appconn;
-
 INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
-VALUES (5, 5, 'Scriptis', '即席查询', 'Scriptis is a one-stop interactive data exploration analysis tool built by WeDataSphere, uses Linkis as the kernel.', 'Scriptis是微众银行微数域(WeDataSphere)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。', 'scripts development,IDE', '脚本开发,IDE', 1, 'enter Scriptis', '进入Scriptis', 'user manual', '用户手册', 'http://127.0.0.1:8088/wiki/scriptis/manual/workspace_cn.html', 'shujukaifa-logo', null, null, null, null, null, 'shujukaifa-icon');
+VALUES (@scriptis_appconn_id, 5, 'Scriptis', '即席查询', 'Scriptis is a one-stop interactive data exploration analysis tool built by WeDataSphere, uses Linkis as the kernel.', 'Scriptis是微众银行微数域(WeDataSphere)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。', 'scripts development,IDE', '脚本开发,IDE', 1, 'enter Scriptis', '进入Scriptis', 'user manual', '用户手册', 'http://127.0.0.1:8088/wiki/scriptis/manual/workspace_cn.html', 'shujukaifa-logo', null, null, null, null, null, 'shujukaifa-icon');
 INSERT INTO dss_workspace_menu_appconn (id, appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
-VALUES (16, 2, 'workflow', '工作流开发', '工作流开发', '工作流开发', null, null, 1, 'Enter workflow', '进入 工作流开发', null, null, null, null, null, null, null, null, null, null);
+VALUES (@workflow_appconn_id, 2, 'workflow', '工作流开发', '工作流开发', '工作流开发', null, null, 1, 'Enter workflow', '进入 工作流开发', null, null, null, null, null, null, null, null, null, null);
 INSERT INTO dss_workspace_menu_appconn (id, appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
-VALUES (12, 2, 'dataService', '数据服务', '/dataService', '/dataService', null, null, 1, 'Enter dataService', '进入 数据服务', null, null, null, null, null, null, null, null, null, null);
+VALUES (@apiservice_appconn_id, 2, 'dataService', '数据服务', '/dataService', '/dataService', null, null, 1, 'Enter dataService', '进入 数据服务', null, null, null, null, null, null, null, null, null, null);
 
 DELETE FROM dss_workspace_role;
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('1','-1','admin','管理员','2020-07-13 02:43:35','通用角色管理员');
@@ -305,9 +308,11 @@ INSERT INTO `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_ra
 
 DELETE FROM dss_workflow_node_ui_to_validate;
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_source_type,31);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_source_type,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_check_object,32);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_check_object,40);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_check_object,41);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_check_object,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_max_receive_hours,28);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_query_frequency,27);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_desc,32);
@@ -316,15 +321,20 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_sender,45);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_sender,41);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (25,25);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (25,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_receiver,32);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_receiver,41);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_receiver,55);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_receiver,58);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (21,32);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (21,41);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (21,46);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (21,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_savekey,32);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_savekey,41);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (23,47);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (23,48);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (23,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_body,32);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_body,41);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_spark_driver_memory,7);
@@ -334,6 +344,8 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_wds_linkis_rm_yarnqueue,57);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_title,48);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_title,47);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_title,55);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_title,56);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_category,13);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_subject,47);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_to,50);
@@ -345,96 +357,48 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_appTag,52);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_resources,52);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (20,53);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (20,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_only_receive_today,52);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_max_check_hours,54);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_job_desc,32);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (35,52);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_source_type,55);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_check_object,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_job_desc,41);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_sender,55);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (20,55);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_receiver,55);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (21,55);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (25,55);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_title,56);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_category,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_to,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_itsm,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_subject,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_bindViewKey,55);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_title,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (39,32);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (39,41);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (39,46);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (39,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (40,47);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (40,48);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (23,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (40,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_content,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_sender,58);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_msg_receiver,58);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_executeUser,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (42,52);
 INSERT  INTO `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) VALUES (@node_ui_ReuseEngine,59);
 
 
 DELETE FROM dss_workspace_appconn_role;
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'7','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'1','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'2','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'3','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'4','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'5','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',5,'6','0',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'1','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'2','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'3','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'4','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'5','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'6','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'7','1',now(),'system');
 
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'7','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'1','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'2','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'3','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'4','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'5','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',7,'6','0',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'1','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'2','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'3','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'4','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'5','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'6','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'7','1',now(),'system');
 
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'7','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'1','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'2','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'3','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'4','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'5','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',10,'6','0',now(),'system');
-
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','7','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','1','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','2','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','3','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','4','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','5','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1','11','6','0',now(),'system');
-
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'7','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'1','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'2','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'3','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'4','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'5','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',14,'6','0',now(),'system');
-
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'7','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'1','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'2','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'3','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'4','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'5','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',16,'6','0',now(),'system');
-
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'7','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'1','1',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'2','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'3','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'4','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'5','0',now(),'system');
-INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',17,'6','0',now(),'system');
 
 INSERT INTO `dss_workspace_admin_dept` (`id`, `parent_id`, `ancestors`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES('100','0','0','基础科技','0','leader01','1888888888','123@qq.com','0','0','admin',now(),'admin',now());

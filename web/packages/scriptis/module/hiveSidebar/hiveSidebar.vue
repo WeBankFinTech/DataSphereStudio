@@ -98,6 +98,7 @@ import util from '@dataspherestudio/shared/common/util';
 import deleteDialog from '@dataspherestudio/shared/components/deleteDialog';
 import weHiveList from './hiveList';
 import WeHiveTableExport from './hiveTableExport';
+import plugin from '@dataspherestudio/shared/common/util/plugin'
 export default {
   name: 'WorkSidebar',
   components: {
@@ -479,6 +480,19 @@ export default {
       });
     },
     describeTable() {
+      const filename = `${this.$t('message.scripts.hiveTableDesc.tableDetail')}(${this.currentAcitved.name})`;
+      const md5 = util.md5(filename);
+      const ext = plugin.emitHook('script_dbtb_details', {
+        context: this,
+        params: {
+          type: 'tableDetails',
+          filename,
+          md5
+        }
+      })
+      if (ext) {
+        return
+      }
       const waitFor = [];
       const params = {
         database: this.currentAcitved.dbName,
@@ -487,8 +501,6 @@ export default {
       waitFor.push(this.getTableBaseInfo(params));
       if (waitFor.length) {
         Promise.all(waitFor).then(() => {
-          const filename = `${this.$t('message.scripts.hiveTableDesc.tableDetail')}(${this.currentAcitved.name})`;
-          const md5 = util.md5(filename);
           this.dispatch('Workbench:add', {
             id: md5,
             filename,
@@ -864,6 +876,17 @@ export default {
     describeDb() {
       const filename = `库详情(${this.currentAcitved.name})`;
       const md5 = util.md5(filename);
+      const ext = plugin.emitHook('script_dbtb_details', {
+        context: this,
+        params: {
+          type: 'dbDetails',
+          filename,
+          md5
+        }
+      })
+      if (ext) {
+        return
+      }
       this.dispatch('Workbench:add', {
         id: md5,
         filename,

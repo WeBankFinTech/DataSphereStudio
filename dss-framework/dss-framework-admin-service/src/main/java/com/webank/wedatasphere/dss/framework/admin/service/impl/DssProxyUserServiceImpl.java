@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 
-import static com.webank.wedatasphere.dss.framework.admin.conf.ProjectConf.DS_PROXY_SELF_ENABLE;
+import static com.webank.wedatasphere.dss.framework.admin.conf.AdminConf.DS_PROXY_SELF_ENABLE;
 
 @Service
 public class DssProxyUserServiceImpl implements DssProxyUserService {

@@ -85,8 +85,10 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path = "getAllWorkspaceUsers", method = RequestMethod.GET)
-    public Message getAllWorkspaceUsers(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId) {
+    public Message getAllWorkspaceUsers(HttpServletRequest request) {
         DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
+        // workspaceId改为从cookie取
+        int workspaceId = (int) SSOHelper.getWorkspace(request).getWorkspaceId();
         dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
 //        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
 //        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
@@ -96,12 +98,12 @@ public class DSSWorkspaceUserRestful {
     }
 
 
-    @RequestMapping(path ="existUserInWorkspace",method = RequestMethod.GET)
-    public Message existUserInWorkspace(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId, @RequestParam("queryUserName") String queryUserName){
+    @RequestMapping(path = "existUserInWorkspace", method = RequestMethod.GET)
+    public Message existUserInWorkspace(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId, @RequestParam("queryUserName") String queryUserName) {
         String username = SecurityFilter.getLoginUsername(request);
         List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
-        boolean existFlag = users.stream().anyMatch(user->user.equalsIgnoreCase(queryUserName));
-        LOGGER.info("Check exist user result:"+existFlag+", query user  is " +queryUserName+",workSpace id is "+workspaceId);
+        boolean existFlag = users.stream().anyMatch(user -> user.equalsIgnoreCase(queryUserName));
+        LOGGER.info("Check exist user result:" + existFlag + ", query user  is " + queryUserName + ",workSpace id is " + workspaceId);
         return Message.ok().data("existFlag", existFlag);
     }
 

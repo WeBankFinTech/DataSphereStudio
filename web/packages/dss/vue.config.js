@@ -214,5 +214,8 @@ module.exports = {
       entry: 'mock.js',
       power: false
     }
+  },
+  devServer: {
+    disableHostCheck: true
   }
 }

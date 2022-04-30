@@ -15,7 +15,7 @@ APPCONN_INSTALL_IP=127.0.0.1
 APPCONN_INSTALL_PORT=8088
 
 #echo "Current path of init sql is ${DB_DML_PATH}"
-LOCAL_IP="`ifconfig | grep 'inet' | grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $2}'`"
+LOCAL_IP=127.0.0.1
 
 function isSuccess(){
   if [ $? -ne 0 ]; then

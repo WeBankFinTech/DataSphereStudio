@@ -24,7 +24,7 @@ scriptis_port="8088"
 linkis_url="http://localhost:20401"
 
 # Scriptis ip address
-scriptis_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
+scriptis_ipaddr=127.0.0.1
 ```
 
 After the modification, run the following command in the directory: ```sudo sh install.sh > install.log 2>&1```

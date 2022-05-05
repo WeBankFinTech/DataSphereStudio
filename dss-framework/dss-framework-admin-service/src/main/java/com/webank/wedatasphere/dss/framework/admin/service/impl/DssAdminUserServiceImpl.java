@@ -143,6 +143,11 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
         return dssUserMapper.selectUserById(userId);
     }
 
+    @Override
+    public DssAdminUser selectUserByName(String username) {
+        return dssUserMapper.selectUserByName(username);
+    }
+
 
     @Override
     public int updateUser(DssAdminUser user, Workspace workspace) {

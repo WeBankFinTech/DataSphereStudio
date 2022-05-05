@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.framework.project.server.rpc
 import java.util
 
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject
-import com.webank.wedatasphere.dss.common.protocol.{ProxyUserCheckRequest, ProxyUserCheckResponse, ResponseProxyUserCheck}
+import com.webank.wedatasphere.dss.common.protocol.{ProxyUserCheckRequest, ResponseProxyUserCheck}
 import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRefIdRequest, ProjectRefIdResponse, ProjectRelationRequest, ProjectRelationResponse, ProjectUserAuthRequest, ProjectUserAuthResponse}
 import com.webank.wedatasphere.dss.framework.admin.service.DssProxyUserService
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO

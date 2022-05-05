@@ -6,6 +6,7 @@ import com.webank.wedatasphere.dss.framework.admin.xml.DSSProxyUserMapper;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.admin.conf.AdminConf.DS_PROXY_SELF_ENABLE;
 
@@ -17,6 +18,13 @@ public class DssProxyUserServiceImpl implements DssProxyUserService {
     @Override
     public List<DssProxyUser> selectProxyUserList(String userName) {
         return dssProxyUserMapper.selectProxyUserList(userName);
+    }
+
+    @Override
+    public List<String> getProxyUserNameList(String userName) {
+        List<DssProxyUser> userList = dssProxyUserMapper.selectProxyUserList(userName);;
+        List<String> proxyUserNameList=userList.stream().map(dssProxyUser -> dssProxyUser.getProxyUserName()).collect(Collectors.toList());
+        return  proxyUserNameList;
     }
 
     @Override

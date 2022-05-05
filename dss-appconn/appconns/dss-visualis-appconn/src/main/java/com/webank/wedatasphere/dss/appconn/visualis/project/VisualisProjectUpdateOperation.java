@@ -9,19 +9,20 @@ import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPut
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public class VisualisProjectUpdateOperation extends AbstractStructureOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl, ProjectResponseRef>
-        implements ProjectUpdateOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl> {
+public class VisualisProjectUpdateOperation extends AbstractStructureOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl, ProjectResponseRef>
+        implements ProjectUpdateOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl> {
     @Override
     protected String getAppConnName() {
         return VisualisAppConn.VISUALIS_APPCONN_NAME;
     }
 
     @Override
-    public ResponseRef updateProject(RefProjectContentRequestRef.RefProjectContentRequestRefImpl projectRef) throws ExternalOperationFailedException {
+    public ResponseRef updateProject(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl projectRef) throws ExternalOperationFailedException {
         String url = getBaseUrl() + URLUtils.PROJECT_DELETE_UPDATE_URL;
         DSSPutAction updateAction = new DSSPutAction();
         LabelRouteVO routeVO = new LabelRouteVO();
@@ -31,4 +32,5 @@ public class VisualisProjectUpdateOperation extends AbstractStructureOperation<R
         updateAction.setParameter("id", projectRef.getRefProjectId());
         return VisualisCommonUtil.getExternalResponseRef(projectRef, ssoRequestOperation, url, updateAction);
     }
+
 }

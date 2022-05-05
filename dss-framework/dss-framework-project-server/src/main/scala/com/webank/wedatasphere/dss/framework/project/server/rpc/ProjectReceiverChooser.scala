@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.project.server.rpc
 
+import com.webank.wedatasphere.dss.common.protocol.ProxyUserCheckRequest
 import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest}
+import com.webank.wedatasphere.dss.framework.admin.service.DssProxyUserService
 import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestProjectImportOrchestrator, RequestProjectUpdateOrcVersion}
@@ -39,10 +41,13 @@ class ProjectReceiverChooser extends ReceiverChooser {
   @Autowired
   private var dssProjectUserService: DSSProjectUserService = _
 
+  @Autowired
+  private var dssProxyUserService : DssProxyUserService= _
+
   private var receiver: Option[ProjectReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new ProjectReceiver(projectService, dssWorkspaceUserService, dssProjectUserService))
+  def init(): Unit = receiver = Some(new ProjectReceiver(projectService, dssWorkspaceUserService, dssProjectUserService,dssProxyUserService))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: ProjectRelationRequest => receiver
@@ -51,6 +56,7 @@ class ProjectReceiverChooser extends ReceiverChooser {
     case _: ProjectInfoRequest => receiver
     case _: RequestProjectImportOrchestrator => receiver
     case _: RequestProjectUpdateOrcVersion => receiver
+    case _: ProxyUserCheckRequest => receiver
     case _ => None
   }
 }

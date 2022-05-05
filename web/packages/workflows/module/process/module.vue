@@ -1446,6 +1446,7 @@ export default {
         this.isParamModalShow = !this.isParamModalShow;
       } else {
         this.isParamModalShow = true;
+        this.nodebaseinfoShow = false;
         this.isResourceShow = false;
         this.isDispatch = false;
       }

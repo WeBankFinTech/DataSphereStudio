@@ -23,13 +23,12 @@ public class VisualisProjectUpdateOperation extends AbstractStructureOperation<R
     @Override
     public ResponseRef updateProject(RefProjectContentRequestRef.RefProjectContentRequestRefImpl projectRef) throws ExternalOperationFailedException {
         String url = getBaseUrl() + URLUtils.PROJECT_DELETE_UPDATE_URL;
-        DSSPutAction deleteAction = new DSSPutAction();
-        deleteAction.
+        DSSPutAction updateAction = new DSSPutAction();
         LabelRouteVO routeVO = new LabelRouteVO();
         routeVO.setRoute(((EnvDSSLabel) (projectRef.getDSSLabels().get(0))).getEnv());
-        deleteAction.addRequestPayload("labels", routeVO);
-        deleteAction.setUser(projectRef.getUserName());
-        deleteAction.setParameter("id", projectRef.getRefProjectId());
-        return VisualisCommonUtil.getExternalResponseRef(projectRef, ssoRequestOperation, url, deleteAction);
+        updateAction.addRequestPayload("labels", routeVO);
+        updateAction.setUser(projectRef.getUserName());
+        updateAction.setParameter("id", projectRef.getRefProjectId());
+        return VisualisCommonUtil.getExternalResponseRef(projectRef, ssoRequestOperation, url, updateAction);
     }
 }

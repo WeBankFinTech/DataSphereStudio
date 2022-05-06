@@ -193,23 +193,18 @@ public class KnowledgeGuideAdminRestful {
 
     @PostConstruct
     public void syncKnowledge() {
+        String summaryPath = GuideConf.GUIDE_GITBOOK_SUMMARY_PATH.getValue();
         logger.info("开始执行定时任务...");
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             try {
-                guideCatalogService.syncKnowledge();
-                guideGroupService.asyncGuide();
+                guideCatalogService.syncKnowledge(summaryPath);
+                guideGroupService.asyncGuide(summaryPath);
             } catch (Exception e) {
                 logger.error("定时任务执行异常：" + e);
                 throw new RuntimeException(e);
             }
+            logger.info("定时任务执行结束！！！");
         }, 0, 2, TimeUnit.HOURS);
-        logger.info("定时任务执行结束！！！");
-    }
-
-    @RequestMapping(path = "/syncKnowledge", method = RequestMethod.POST)
-    public void fileUpload() throws Exception {
-        guideCatalogService.syncKnowledge();
-        guideGroupService.asyncGuide();
     }
 
 }

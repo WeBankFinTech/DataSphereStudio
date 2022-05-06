@@ -68,4 +68,15 @@
         WHERE a.is_delete =0 AND a.path = #{path}
     </select>
 
+    <insert id="batchInsert" parameterType="map" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into dss_guide_group
+        (`id`,`path`, title, description, create_by, create_time, update_by, update_time, is_delete)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.path}, #{item.title}, #{item.description},
+            #{item.createBy}, #{item.createTime}, #{item.updateBy},
+            #{item.updateTime}, #{item.isDelete})
+        </foreach>
+    </insert>
 </mapper>

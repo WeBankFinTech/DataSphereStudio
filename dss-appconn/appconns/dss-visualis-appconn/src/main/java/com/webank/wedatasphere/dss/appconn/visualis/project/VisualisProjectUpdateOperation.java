@@ -10,7 +10,6 @@ import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOpera
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 

@@ -60,11 +60,9 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
     }
 
     @Override
-    public void asyncGuide() throws GuideException {
+    public void asyncGuide(String summaryPath) throws GuideException {
         logger.info("====================初始化guide-group guide-content==================");
         guideInit();
-        String summaryPath = GuideConf.GUIDE_GITBOOK_SUMMARY_PATH.getValue();
-        logger.info("summary文件路径：" + summaryPath);
         //父级目录
         String parentPath = new File(summaryPath).getParent();
         logger.info("父级路径：" + parentPath);

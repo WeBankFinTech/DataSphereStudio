@@ -40,7 +40,7 @@ public class VisualisProjectCreationOperation extends AbstractStructureOperation
         String url = getBaseUrl() + projectUrl;
         DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(projectRef.getDSSProject().getCreateBy());
-        visualisPostAction.addRequestPayload("name", projectRef.getName());
+        visualisPostAction.addRequestPayload("name", projectRef.getDSSProject().getName());
         visualisPostAction.addRequestPayload("description", projectRef.getDSSProject().getDescription());
         visualisPostAction.addRequestPayload("pic", "6");
         visualisPostAction.addRequestPayload("visibility", true);

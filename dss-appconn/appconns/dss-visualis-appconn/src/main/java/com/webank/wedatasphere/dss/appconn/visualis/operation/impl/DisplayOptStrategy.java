@@ -142,9 +142,9 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
                                             DSSPostAction postAction) throws ExternalOperationFailedException {
         Long id = getDisplayId(requestRef.getRefJobContent());
         postAction.addRequestPayload(VisualisConstant.DISPLAY_IDS, id);
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
         @SuppressWarnings("unchecked")
-        Map<String, Object> displayData = (Map<String, Object>) responseRef.getData().get("display");
+        Map<String, Object> displayData = (Map<String, Object>) responseRef.toMap().get("display");
         Map<String, Object> refJobContent = new HashMap<>(1);
         refJobContent.put("displayId", Double.parseDouble(displayData.get(id.toString()).toString()));
         return RefJobContentResponseRef.newBuilder().setRefJobContent(refJobContent).success();
@@ -156,11 +156,11 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
     public RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef,
                                               String url,
                                               DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         Map<String, Object> jobContent = new HashMap<>(1);
         String id = getDisplayId(requestRef.getRefJobContent()).toString();
 
-        Map<String, Object> displayData =(Map<String, Object>) responseRef.getData().get("display");
+        Map<String, Object> displayData =(Map<String, Object>) responseRef.toMap().get("display");
         jobContent.put("displayId", Double.parseDouble(displayData.get(id).toString()));
         return RefJobContentResponseRef.newBuilder().setRefJobContent(jobContent).success();
     }

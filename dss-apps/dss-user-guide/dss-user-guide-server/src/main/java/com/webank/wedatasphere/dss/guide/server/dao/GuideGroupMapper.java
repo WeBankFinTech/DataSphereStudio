@@ -13,6 +13,8 @@ public interface GuideGroupMapper extends BaseMapper<GuideGroup> {
 
     List<GuideGroup> getAllGuideGroupDetails();
 
+    int batchInsert(@Param("list") List<GuideGroup> list);
+
 //    @Update("UPDATE dss_guide_group SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
 //    void deleteGuideGroup(@Param("id") Long id);
 }

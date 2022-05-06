@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.guide.server.entity.GuideCatalog;
 import com.webank.wedatasphere.dss.guide.server.entity.GuideChapter;
 import com.webank.wedatasphere.dss.guide.server.service.GuideCatalogService;
 import com.webank.wedatasphere.dss.guide.server.service.GuideChapterService;
+import com.webank.wedatasphere.dss.guide.server.service.GuideGroupService;
 import com.webank.wedatasphere.dss.guide.server.util.FileUtils;
 import lombok.AllArgsConstructor;
 import org.apache.linkis.common.utils.Utils;
@@ -38,6 +39,8 @@ public class KnowledgeGuideAdminRestful {
 
     private GuideCatalogService guideCatalogService;
     private GuideChapterService guideChapterService;
+
+    private GuideGroupService guideGroupService;
 
 
     /**
@@ -190,16 +193,18 @@ public class KnowledgeGuideAdminRestful {
 
     @PostConstruct
     public void syncKnowledge() {
+        String summaryPath = GuideConf.GUIDE_GITBOOK_SUMMARY_PATH.getValue();
         logger.info("开始执行定时任务...");
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             try {
-                guideCatalogService.syncKnowledge();
+                guideCatalogService.syncKnowledge(summaryPath);
+                guideGroupService.asyncGuide(summaryPath);
             } catch (Exception e) {
                 logger.error("定时任务执行异常：" + e);
                 throw new RuntimeException(e);
             }
+            logger.info("定时任务执行结束！！！");
         }, 0, 2, TimeUnit.HOURS);
-        logger.info("定时任务执行结束！！！");
     }
 
 }

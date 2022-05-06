@@ -148,10 +148,11 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
                                DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
         String oldDashboardPortalId = getDashboardPortalId(requestRef.getRefJobContent());
         visualisPostAction.addRequestPayload(VisualisConstant.DASHBOARD_PORTAL_IDS, oldDashboardPortalId);
-        InternalResponseRef responseRef1 = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+
         String dashboardId = NumberUtils.parseDoubleString(requestRef.getRefJobContent().get("id").toString());
         @SuppressWarnings("unchecked")
-        Map<String, Object> dashboardData = (Map<String, Object>) responseRef1.getData().get("dashboard");
+        Map<String, Object> dashboardData = (Map<String, Object>) responseRef.toMap().get("dashboard");
         Map<String, Object> refJobContent = new HashMap<>(2);
         refJobContent.put("id", Double.parseDouble(dashboardData.get(dashboardId).toString()));
         refJobContent.put("projectId", requestRef.getProjectRefId());
@@ -159,7 +160,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         //dashboardPortal
         String dashboardPortalId = NumberUtils.parseDoubleString(requestRef.getRefJobContent().get("dashboardPortalId").toString());
         @SuppressWarnings("unchecked")
-        Map<String, Object> dashboardPortalData = (Map<String, Object>) responseRef1.getData().get("dashboardPortal");
+        Map<String, Object> dashboardPortalData = (Map<String, Object>) responseRef.toMap().get("dashboardPortal");
         refJobContent.put("dashboardPortalId", Double.parseDouble(dashboardPortalData.get(dashboardPortalId).toString()));
         return RefJobContentResponseRef.newBuilder().setRefJobContent(refJobContent).success();
     }
@@ -169,16 +170,16 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
     public RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef,
                                               String url,
                                               DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         Map<String, Object> jobContent = new HashMap<>(3);
         jobContent.put("projectId", requestRef.getProjectRefId());
         String dashboardPortalId = getDashboardPortalId(requestRef.getRefJobContent());
         @SuppressWarnings("unchecked")
-        Map<String, Object> dashboardPortal =(Map<String, Object>) responseRef.getData().get("dashboardPortal");
+        Map<String, Object> dashboardPortal = (Map<String, Object>) responseRef.toMap().get("dashboardPortal");
         jobContent.put("dashboardPortalId", Double.parseDouble(dashboardPortal.get(dashboardPortalId).toString()));
 
         String dashboardId = NumberUtils.parseDoubleString(requestRef.getRefJobContent().get("id").toString());
-        Map<String, Object> dashboard = (Map<String, Object>) responseRef.getData().get("dashboard");
+        Map<String, Object> dashboard = (Map<String, Object>) responseRef.toMap().get("dashboard");
         jobContent.put("id", Double.parseDouble(dashboard.get(dashboardId).toString()));
         return RefJobContentResponseRef.newBuilder().setRefJobContent(jobContent).success();
     }

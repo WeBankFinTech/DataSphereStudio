@@ -72,6 +72,7 @@ export class Work {
     this.owner = option.owner;
     this.specialSetting = option.specialSetting;
     this.nodeName = option.nodeName || null; // 在工作流操作时记录名称
+    if (option.url) this.url = option.url; // option.type=iframe， src
   }
 
   /**

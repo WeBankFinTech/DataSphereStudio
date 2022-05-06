@@ -38,7 +38,7 @@ public class MdAnalysis {
      * @return
      */
     public static String readMd(String filePath){
-        logger.info("开始读取md文件===========》》》》》》");
+        logger.info("开始读取md文件："+ filePath);
         File file = new File(filePath);
         if(!file.exists()){
             logger.info("文件不存在！" + filePath);
@@ -55,7 +55,7 @@ public class MdAnalysis {
                 line = br.readLine();
             }
         } catch (IOException e) {
-            logger.error("文件读取一场===》"+ e);
+            logger.error("文件读取异常===》"+ e);
             throw new RuntimeException(e);
         } finally {
             try {
@@ -116,20 +116,17 @@ public class MdAnalysis {
             matcherContent(line, dataMap);
             map.put(String.valueOf(ROOT_COUNT), dataMap);
             mapList.add(map);
-            logger.info(ROOT_COUNT + line);
         } else if (line.startsWith("    -")) {
             Y++;
             Z = 0;
             matcherContent(line, dataMap);
             map.put(ROOT_COUNT + "-" + Y, dataMap);
             mapList.add(map);
-            logger.info(ROOT_COUNT + "-" + Y + line);
         } else if (line.startsWith("      -")) {
             Z++;
             matcherContent(line, dataMap);
             map.put(ROOT_COUNT + "-" + Y + "-" + Z, dataMap);
             mapList.add(map);
-            logger.info(ROOT_COUNT + "-" + Y + "-" + Z + line);
         }
     }
 

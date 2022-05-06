@@ -13,6 +13,8 @@ import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.admin.service.LdapService;
 import com.webank.wedatasphere.dss.framework.admin.xml.DssUserMapper;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,9 @@ public class DssFrameworkAdminUserController extends BaseController {
 
     private Workspace getWorkspace(HttpServletRequest req) {
         Workspace workspace = new Workspace();
-        workspace.setCookies(Arrays.stream(req.getCookies()).collect(HashMap::new, (map, cookie) -> map.put(cookie.getName(), cookie.getValue()), HashMap::putAll));
+        try {
+            SSOHelper.addWorkspaceInfo(req, workspace);
+        } catch (AppStandardWarnException ignored) {} // ignore it.
         return workspace;
     }
 
@@ -100,6 +103,12 @@ public class DssFrameworkAdminUserController extends BaseController {
     @RequestMapping(path = "{id}", method = RequestMethod.GET)
     public Message getInfo(@PathVariable("id") Long userId) {
         return Message.ok().data("users", dssAdminUserService.selectUserById(userId));
+    }
+
+    @RequestMapping(path = "userInfo", method = RequestMethod.GET)
+    public Message getLoginUserInfo(HttpServletRequest request) {
+        String userName = SecurityFilter.getLoginUsername(request);
+        return Message.ok().data("userInfo", dssAdminUserService.selectUserByName(userName));
     }
 
 

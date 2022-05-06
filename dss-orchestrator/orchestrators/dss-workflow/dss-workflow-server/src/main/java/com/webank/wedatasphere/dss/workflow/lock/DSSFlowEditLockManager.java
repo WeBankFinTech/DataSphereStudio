@@ -177,14 +177,15 @@ public class DSSFlowEditLockManager {
         DSSFlowEditLock updateFlowEditLock = lockMapper.getFlowEditLockByLockContent(lock);
         if (updateFlowEditLock == null || updateFlowEditLock.getExpire()) {
             lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), 0L);
-            throw new DSSErrorException(60057, "工作流编辑锁已过期，请刷新页面");
+            throw new DSSErrorException(60057, "编辑锁已过期，请刷新页面");
         }
         try {
             lockMapper.compareAndSwap(dssFlowEditLock);
             return lock;
         } catch (Exception e) {
             LOGGER.error("unexpected error occurred when update dss flow edit lock,{}", dssFlowEditLock, e);
-            throw new DSSErrorException(60059, "工作流编辑锁更新失败，请刷新页面");
+            lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), updateFlowEditLock.getFlowID());
+            throw new DSSErrorException(60059, "工作流编辑锁更新出错，请刷新页面");
         }
     }
 

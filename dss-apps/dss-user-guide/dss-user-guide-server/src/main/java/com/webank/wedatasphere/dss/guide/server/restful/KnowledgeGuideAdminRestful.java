@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.guide.server.entity.GuideCatalog;
 import com.webank.wedatasphere.dss.guide.server.entity.GuideChapter;
 import com.webank.wedatasphere.dss.guide.server.service.GuideCatalogService;
 import com.webank.wedatasphere.dss.guide.server.service.GuideChapterService;
+import com.webank.wedatasphere.dss.guide.server.service.GuideGroupService;
 import com.webank.wedatasphere.dss.guide.server.util.FileUtils;
 import lombok.AllArgsConstructor;
 import org.apache.linkis.common.utils.Utils;
@@ -38,6 +39,8 @@ public class KnowledgeGuideAdminRestful {
 
     private GuideCatalogService guideCatalogService;
     private GuideChapterService guideChapterService;
+
+    private GuideGroupService guideGroupService;
 
 
     /**
@@ -194,12 +197,19 @@ public class KnowledgeGuideAdminRestful {
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             try {
                 guideCatalogService.syncKnowledge();
+                guideGroupService.asyncGuide();
             } catch (Exception e) {
                 logger.error("定时任务执行异常：" + e);
                 throw new RuntimeException(e);
             }
         }, 0, 2, TimeUnit.HOURS);
         logger.info("定时任务执行结束！！！");
+    }
+
+    @RequestMapping(path = "/syncKnowledge", method = RequestMethod.POST)
+    public void fileUpload() throws Exception {
+        guideCatalogService.syncKnowledge();
+        guideGroupService.asyncGuide();
     }
 
 }

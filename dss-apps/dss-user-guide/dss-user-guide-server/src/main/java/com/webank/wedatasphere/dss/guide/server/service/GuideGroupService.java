@@ -14,5 +14,5 @@ public interface GuideGroupService {
 
     public void deleteGuideGroup(Long id);
 
-    public void asyncGuide() throws GuideException;
+    public void asyncGuide(String summaryPath) throws GuideException;
 }

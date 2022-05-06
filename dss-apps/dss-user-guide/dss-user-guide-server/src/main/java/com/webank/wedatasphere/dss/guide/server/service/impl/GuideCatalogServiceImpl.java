@@ -68,10 +68,9 @@ public class GuideCatalogServiceImpl extends ServiceImpl<GuideCatalogMapper, Gui
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void syncKnowledge() throws Exception {
+    public void syncKnowledge(String summaryPath) throws Exception {
         logger.info("====================初始化==================");
         chapterInit();
-        String summaryPath = GuideConf.GUIDE_GITBOOK_SUMMARY_PATH.getValue();
         logger.info("summary文件路径：" + summaryPath);
         //父级目录
         String parentPath = new File(summaryPath).getParent();

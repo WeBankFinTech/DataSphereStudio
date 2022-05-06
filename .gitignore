@@ -83,19 +83,19 @@ dss-standard/structure-standard/dss-structure-integration-standard/target
 dss-standard/structure-standard/spring-origin-dss-project-plugin/target
 
 #dss-data-api
-dss-data-api/dss-data-api-server/src/main/resources
-dss-data-api/dss-api-sql-template/target
-dss-data-api/dss-data-api-server/target
+dss-apps/dss-data-api/dss-data-api-server/src/main/resources
+dss-apps/dss-data-api/dss-api-sql-template/target
+dss-apps/dss-data-api/dss-data-api-server/target
 
 #dss-data-governance
-dss-data-governance/dss-data-governance-server/src/main/resources
-dss-data-governance/dss-data-governance-server/target
-dss-data-governance/dss-data-governance-common/target
-dss-data-governance/dss-data-asset-server/target
-dss-data-governance/dss-data-classification-server/target
-dss-data-governance/dss-data-warehouse-dao/target
-dss-data-governance/dss-data-warehouse-service/target
-dss-data-governance/dss-data-warehouse-server/target
+dss-apps/dss-data-governance/dss-data-governance-server/src/main/resources
+dss-apps/dss-data-governance/dss-data-governance-server/target
+dss-apps/dss-data-governance/dss-data-governance-common/target
+dss-apps/dss-data-governance/dss-data-asset-server/target
+dss-apps/dss-data-governance/dss-data-classification-server/target
+dss-apps/dss-data-governance/dss-data-warehouse-dao/target
+dss-apps/dss-data-governance/dss-data-warehouse-service/target
+dss-apps/dss-data-governance/dss-data-warehouse-server/target
 
 
 # plugins

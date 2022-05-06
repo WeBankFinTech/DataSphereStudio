@@ -92,6 +92,8 @@ public class OrchestratorBaseInfo {
 
     private List<String> orchestratorWays;
 
+    private String orchestratorLevel;
+
     private boolean flowEditLockExist = false;
 
     public Boolean getEditable() {
@@ -240,5 +242,13 @@ public class OrchestratorBaseInfo {
 
     public void setFlowEditLockExist(boolean flowEditLockExist) {
         this.flowEditLockExist = flowEditLockExist;
+    }
+
+    public String getOrchestratorLevel() {
+        return orchestratorLevel;
+    }
+
+    public void setOrchestratorLevel(String orchestratorLevel) {
+        this.orchestratorLevel = orchestratorLevel;
     }
 }

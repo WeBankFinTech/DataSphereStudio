@@ -17,9 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.*;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -35,6 +33,15 @@ public interface DSSWorkspaceMapper {
     List<Integer> getMenuId(int roleId, String workspaceId);
 
     List<DSSWorkspaceMenuRolePriv> getDSSWorkspaceMenuPriv(String workspaceId);
+
+    @Select("select -1 as workspaceId, id as menu_id, 1 as role_id, 1 as priv from dss_workspace_menu")
+    @Results({
+            @Result(property = "workspaceId",column = "workspace_id"),
+            @Result(property = "menuId",column = "menu_id"),
+            @Result(property = "roleId",column = "role_id"),
+            @Result(property = "priv",column = "priv")
+    })
+    List<DSSWorkspaceMenuRolePriv> getDefaultWorkspaceMenuPriv();
 
     @Insert({
             "<script>",

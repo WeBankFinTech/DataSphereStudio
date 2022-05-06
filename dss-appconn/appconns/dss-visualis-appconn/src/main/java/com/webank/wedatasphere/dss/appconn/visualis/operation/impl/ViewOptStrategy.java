@@ -82,10 +82,12 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
     @Override
     public void deleteRef(ThirdlyRequestRef.RefJobContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
         String url = baseUrl + URLUtils.VIEW_URL + "/" + getId(requestRef.getRefJobContent());
-
-        DSSDeleteAction deleteAction = new DSSDeleteAction();
+        // Delete协议在加入url label时会存在被nginx拦截转发情况，在这里换成Post协议对label进行兼容
+        DSSPostAction deleteAction = new DSSPostAction();
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        deleteAction.addRequestPayload("labels", routeVO);
         deleteAction.setUser(requestRef.getUserName());
-        deleteAction.setParameter("labels", ((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
         VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, deleteAction);
     }
 

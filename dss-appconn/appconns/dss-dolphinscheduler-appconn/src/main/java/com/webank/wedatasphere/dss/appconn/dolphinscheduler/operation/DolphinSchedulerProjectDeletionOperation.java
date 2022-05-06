@@ -13,7 +13,7 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 public class DolphinSchedulerProjectDeletionOperation
-        extends AbstractStructureOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl, ResponseRef>
+        extends AbstractStructureOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl, ProjectResponseRef>
         implements ProjectDeletionOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl> {
 
     private String deleteProjectByIdUrl;

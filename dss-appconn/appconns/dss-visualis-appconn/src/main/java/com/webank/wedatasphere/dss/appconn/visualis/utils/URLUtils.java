@@ -48,6 +48,8 @@ public class URLUtils {
     public final static String VIEW_JUMP_URL_FORMAT = "dss/visualis/#/project/%s/view/%s";
     //工程搜索地址
     public final static String PROJECT_SEARCH_URL = "/api/rest_s/" + ServerConfiguration.BDP_SERVER_VERSION() + "/visualis/check/projectName";
+    // 工程删除和更新URL
+    public final static String PROJECT_DELETE_UPDATE_URL = "/api/rest_s" + ServerConfiguration.BDP_SERVER_VERSION() + "/visualis/project/%s";
 
 
     public static String getUrl(String baseUrl, String format, String entityId) {

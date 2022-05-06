@@ -56,9 +56,12 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
     @Override
     public void deleteRef(ThirdlyRequestRef.RefJobContentRequestRefImpl visualisDeleteRequestRef) throws ExternalOperationFailedException {
         String url = baseUrl + URLUtils.widgetDeleteUrl + "/" + getWidgetId(visualisDeleteRequestRef.getRefJobContent());
-        DSSDeleteAction deleteAction = new DSSDeleteAction();
+        // Delete协议在加入url label时会存在被nginx拦截转发情况，在这里换成Post协议对label进行兼容
+        DSSPostAction deleteAction = new DSSPostAction();
+        LabelRouteVO routeVO = new LabelRouteVO();
+        routeVO.setRoute(((EnvDSSLabel) (visualisDeleteRequestRef.getDSSLabels().get(0))).getEnv());
+        deleteAction.addRequestPayload("labels", routeVO);
         deleteAction.setUser(visualisDeleteRequestRef.getUserName());
-        deleteAction.setParameter("labels", ((EnvDSSLabel) (visualisDeleteRequestRef.getDSSLabels().get(0))).getEnv());
         VisualisCommonUtil.getExternalResponseRef(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction);
     }
 
@@ -166,7 +169,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
         postAction.addRequestPayload("labels", routeVO);
 
-        return VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
+        return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
     }
 
 }

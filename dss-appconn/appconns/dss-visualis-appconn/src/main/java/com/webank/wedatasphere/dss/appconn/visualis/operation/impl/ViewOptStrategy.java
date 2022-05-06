@@ -131,10 +131,10 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
                                             DSSPostAction postAction) throws ExternalOperationFailedException {
 
         postAction.addRequestPayload(VisualisConstant.VIEW_IDS, getId(requestRef.getRefJobContent()));
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
         String id = getId(requestRef.getRefJobContent());
         @SuppressWarnings("unchecked")
-        Map<String, Object> viewData = (Map<String, Object>) responseRef.getData().get("view");
+        Map<String, Object> viewData = (Map<String, Object>) responseRef.toMap().get("view");
         Map<String, Object> jobContent = new HashMap<>(2);
         jobContent.put("id", Double.parseDouble(viewData.get(id).toString()));
         return RefJobContentResponseRef.newBuilder().setRefJobContent(jobContent).success();
@@ -146,12 +146,12 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
                                               String url,
                                               DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
 
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         Map<String, Object> jobContent = new HashMap<>(2);
         String id = getId(requestRef.getRefJobContent());
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> viewData = (Map<String, Object>) responseRef.getData().get("view");
+        Map<String, Object> viewData = (Map<String, Object>) responseRef.toMap().get("view");
         jobContent.put("projectId", requestRef.getParameter("projectId"));
         jobContent.put("id", Double.parseDouble(viewData.get(id).toString()));
         return RefJobContentResponseRef.newBuilder().setRefJobContent(jobContent).success();
@@ -179,8 +179,8 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getUserName());
         visualisGetAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
-        Map<String, Object> paginateWithExecStatusMap = (Map<String, Object>) responseRef.getData().get("paginateWithExecStatus");
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
+        Map<String, Object> paginateWithExecStatusMap = (Map<String, Object>) responseRef.toMap().get("paginateWithExecStatus");
         return paginateWithExecStatusMap.get("execId").toString();
     }
 

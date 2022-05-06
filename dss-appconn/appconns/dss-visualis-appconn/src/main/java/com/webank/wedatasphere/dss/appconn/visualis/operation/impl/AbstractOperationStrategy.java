@@ -52,7 +52,7 @@ public abstract class AbstractOperationStrategy implements OperationStrategy {
     }
 
     protected QueryJumpUrlResponseRef getQueryResponseRef(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef, Long projectId,
-                                              String jumpUrlFormat, String id) {
+                                                          String jumpUrlFormat, String id) {
         String jumpUrl = URLUtils.getUrl(baseUrl, jumpUrlFormat, projectId.toString(), id, requestRef.getName());
         String env = requestRef.getDSSLabels().stream().filter(dssLabel -> dssLabel instanceof EnvDSSLabel)
                 .map(dssLabel -> (EnvDSSLabel) dssLabel).findAny().get().getEnv();
@@ -61,21 +61,21 @@ public abstract class AbstractOperationStrategy implements OperationStrategy {
     }
 
     protected ResponseRef executeRef(RefExecutionRequestRef.RefExecutionProjectWithContextRequestRef ref,
-                              String url) throws ExternalOperationFailedException {
+                                     String url) throws ExternalOperationFailedException {
         logger.info("User {} try to execute Visualis {} with refJobContent: {} in url {}.", ref.getExecutionRequestRefContext().getSubmitUser(),
                 ref.getType(), ref.getRefJobContent(), url);
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
         visualisGetAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
         try {
-            InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
-            Map<String, Object> data = responseRef.getData();
-            List<Map<String, String>> columns = (List<Map<String, String>>) data.get("columns");
-            if(data.get("columns") == null || columns.isEmpty()) {
+            ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
+            Map<String, Object> resultMap = responseRef.toMap();
+            List<Map<String, String>> columns = (List<Map<String, String>>) resultMap.get("columns");
+            if (resultMap.get("columns") == null || columns.isEmpty()) {
                 ref.getExecutionRequestRefContext().appendLog("Cannot execute an empty Widget!");
                 throw new ExternalOperationFailedException(90176, "Cannot execute an empty Widget!", null);
             }
-            List<Map<String, Object>> resultList = (List<Map<String, Object>>) data.get("resultList");
+            List<Map<String, Object>> resultList = (List<Map<String, Object>>) resultMap.get("resultList");
             Column[] linkisColumns = columns.stream().map(columnData -> new Column(columnData.get("name"),
                     DataType.toDataType(columnData.get("type").toLowerCase()), ""))
                     .toArray(Column[]::new);

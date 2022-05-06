@@ -17,8 +17,11 @@
 package com.webank.wedatasphere.dss.framework.project.server.rpc
 
 import java.util
+
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject
+import com.webank.wedatasphere.dss.common.protocol.{ProxyUserCheckRequest, ResponseProxyUserCheck}
 import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRefIdRequest, ProjectRefIdResponse, ProjectRelationRequest, ProjectRelationResponse, ProjectUserAuthRequest, ProjectUserAuthResponse}
+import com.webank.wedatasphere.dss.framework.admin.service.DssProxyUserService
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo
 import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
@@ -33,7 +36,10 @@ import scala.concurrent.duration.Duration
 
 
 @Component
-class ProjectReceiver(projectService: DSSProjectService, dssWorkspaceUserService: DSSWorkspaceUserService, projectUserService: DSSProjectUserService) extends Receiver {
+class ProjectReceiver(projectService: DSSProjectService,
+                      dssWorkspaceUserService: DSSWorkspaceUserService,
+                      projectUserService: DSSProjectUserService,
+                      dssProxyUserService: DssProxyUserService) extends Receiver {
 
   override def receive(message: Any, sender: Sender): Unit = {
 
@@ -72,6 +78,10 @@ class ProjectReceiver(projectService: DSSProjectService, dssWorkspaceUserService
         val projectDo: DSSProjectDO = projectService.getProjectById(projectId)
         val privList = projectUserService.getProjectUserPriv(projectId, userName).map(_.getPriv)
         new ProjectUserAuthResponse(projectId, userName, privList, projectDo.getCreateBy)
+      }
+      case proxyUserCheckRequest: ProxyUserCheckRequest => {
+        val isExists = dssProxyUserService.isExists(proxyUserCheckRequest.userName, proxyUserCheckRequest.proxyUser)
+        ResponseProxyUserCheck(isExists,dssProxyUserService.getProxyUserNameList(proxyUserCheckRequest.userName))
       }
     }
   }

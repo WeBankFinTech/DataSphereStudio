@@ -68,11 +68,12 @@ public interface DSSWorkspaceMenuMapper {
     List<DSSWorkspaceComponentRolePriv> getDefaultComponentRolePriv();
 
 
-    @Select("select  -1 as workspace_id,appconn_id  as appconn_id, 1 as role_id, last_update_time,last_update_user as update_by from dss_workspace_menu_appconn")
+    @Select("select  -1 as workspace_id,appconn_id  as appconn_id, 1 as role_id, 1 as priv, last_update_time,last_update_user as update_by from dss_workspace_menu_appconn")
     @Results({
             @Result(property = "workspaceId", column = "workspace_id"),
             @Result(property = "componentId", column = "appconn_id"),
             @Result(property = "roleId", column = "role_id"),
+            @Result(property = "priv", column = "priv"),
             @Result(property = "lastUpdateTime", column = "last_update_time"),
             @Result(property = "updateBy", column = "update_by")
     })

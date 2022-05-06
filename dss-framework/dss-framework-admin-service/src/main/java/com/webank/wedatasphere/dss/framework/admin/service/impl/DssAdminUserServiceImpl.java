@@ -40,6 +40,7 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
 
     @Resource
     DssUserMapper dssUserMapper;
+
     /**
      * 校验用户名称是否唯一
      *
@@ -47,11 +48,9 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
      * @return 结果
      */
     @Override
-    public String checkUserNameUnique(String userName)
-    {
+    public String checkUserNameUnique(String userName) {
         int count = dssUserMapper.checkUserNameUnique(userName);
-        if (count > 0)
-        {
+        if (count > 0) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -64,12 +63,10 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
      * @return
      */
     @Override
-    public String checkPhoneUnique(DssAdminUser user)
-    {
+    public String checkPhoneUnique(DssAdminUser user) {
         Long userId = StringUtils.isNull(user.getId()) ? -1L : user.getId();
         DssAdminUser info = dssUserMapper.checkPhoneUnique(user.getPhonenumber());
-        if (StringUtils.isNotNull(info) && info.getId().longValue() != userId.longValue())
-        {
+        if (StringUtils.isNotNull(info) && info.getId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -82,12 +79,10 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
      * @return
      */
     @Override
-    public String checkEmailUnique(DssAdminUser user)
-    {
+    public String checkEmailUnique(DssAdminUser user) {
         Long userId = StringUtils.isNull(user.getId()) ? -1L : user.getId();
         DssAdminUser info = dssUserMapper.checkEmailUnique(user.getEmail());
-        if (StringUtils.isNotNull(info) && info.getId().longValue() != userId.longValue())
-        {
+        if (StringUtils.isNotNull(info) && info.getId().longValue() != userId.longValue()) {
             return UserConstants.NOT_UNIQUE;
         }
         return UserConstants.UNIQUE;
@@ -96,7 +91,7 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
     @Override
     public void insertOrUpdateUser(String username, Workspace workspace) {
         DssAdminUser dssUser = dssUserMapper.selectUserByName(username);
-        if(dssUser == null) {
+        if (dssUser == null) {
             logger.info("new user {} access to DSS, now try to add it.", username);
             dssUser = new DssAdminUser();
             dssUser.setUserName(username);
@@ -108,7 +103,7 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
         } else {
             dssUser.setIsFirstLogin(0);
             dssUser.setLastLoginTime(new Date());
-            dssUser.setLoginNum(dssUser.getLoginNum() + 1);
+            dssUser.setLoginNum(dssUser.getLoginNum() == null ? 0 : dssUser.getLoginNum() + 1);
             dssUserMapper.updateUser(dssUser);
         }
     }
@@ -122,7 +117,7 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
     @Override
     @Transactional(rollbackFor = Exception.class)
     public int insertUser(DssAdminUser user, Workspace workspace) {
-        tryUserOperation( (ssoUserService, requestRefUser) -> {
+        tryUserOperation((ssoUserService, requestRefUser) -> {
                     SSOUserGetOperation ssoUserOperation = ssoUserService.getSSOUserGetOperation();
                     DSSUserContentRequestRef requestRef = RequestRefUtils.getRequestRef(ssoUserOperation);
                     requestRef.setWorkspace(workspace).setUser(requestRefUser);
@@ -148,6 +143,11 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
         return dssUserMapper.selectUserById(userId);
     }
 
+    @Override
+    public DssAdminUser selectUserByName(String username) {
+        return dssUserMapper.selectUserByName(username);
+    }
+
 
     @Override
     public int updateUser(DssAdminUser user, Workspace workspace) {
@@ -165,36 +165,39 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
             public String getUsername() {
                 return user.getUserName();
             }
+
             @Override
             public String getName() {
                 return user.getName();
             }
+
             @Override
             public Boolean isFirstLogin() {
                 return user.getIsFirstLogin() == 1;
             }
+
             @Override
             public Boolean isAdmin() {
                 return user.getIsAdmin() == 1;
             }
         };
         AppConnManager.getAppConnManager().listAppConns().forEach(appConn -> {
-            if(appConn instanceof OnlySSOAppConn && CollectionUtils.isNotEmpty(appConn.getAppDesc().getAppInstances())) {
+            if (appConn instanceof OnlySSOAppConn && CollectionUtils.isNotEmpty(appConn.getAppDesc().getAppInstances())) {
                 OnlySSOAppConn onlySSOAppConn = (OnlySSOAppConn) appConn;
                 appConn.getAppDesc().getAppInstances().forEach(appInstance -> {
                     SSOUserService ssoUserService = onlySSOAppConn.getOrCreateSSOStandard().getSSOUserService(appInstance);
-                    if(filter != null && !filter.test(ssoUserService, requestRefUser)) {
+                    if (filter != null && !filter.test(ssoUserService, requestRefUser)) {
                         return;
                     }
                     T ssoUserOperation = operationFunction.apply(ssoUserService);
-                    if(ssoUserOperation == null) {
+                    if (ssoUserOperation == null) {
                         return;
                     }
                     DSSUserContentRequestRef requestRef = RequestRefUtils.getRequestRef(ssoUserOperation);
                     requestRef.setWorkspace(workspace).setUser(requestRefUser);
                     logger.info("try to ask AppConn {} to operate {} with user {}.", appConn.getAppDesc().getAppName(), ssoUserOperation.getClass().getSimpleName(), user);
                     ResponseRef responseRef = operationConsumer.apply(ssoUserOperation, requestRef);
-                    if(responseRef.isFailed()) {
+                    if (responseRef.isFailed()) {
                         DSSExceptionUtils.dealWarnException(50030, responseRef.getErrorMsg(), DSSFrameworkWarnException.class);
                     }
                 });

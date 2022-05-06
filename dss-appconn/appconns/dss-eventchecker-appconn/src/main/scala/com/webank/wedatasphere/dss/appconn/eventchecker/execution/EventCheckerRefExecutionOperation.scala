@@ -32,7 +32,6 @@ import org.apache.linkis.storage.LineRecord
 class EventCheckerRefExecutionOperation
   extends LongTermRefExecutionOperation[RefExecutionRequestRef.RefExecutionContextRequestRef] with Killable with Procedure {
 
-  private var killTag = false
 
   override def progress(action: RefExecutionAction): Float = {
     //temp  set
@@ -52,13 +51,17 @@ class EventCheckerRefExecutionOperation
   }
 
   override def kill(action: RefExecutionAction): Boolean = {
-    killTag = true
     action match {
       case longTermAction: EventCheckerExecutionAction =>
         longTermAction.setKilledFlag(true)
         longTermAction.setState(RefExecutionState.Killed)
         true
+      case _ => {
+        logger.error("EventChecker kill failed for error action")
+        false
+      }
     }
+
   }
 
   protected def putErrorMsg(errorMsg: String, t: Throwable, action: EventCheckerExecutionAction): EventCheckerExecutionAction = {
@@ -96,7 +99,7 @@ class EventCheckerRefExecutionOperation
 
   override def state(action: RefExecutionAction): RefExecutionState = {
     action match {
-      case action: EventCheckerExecutionAction =>
+      case action: EventCheckerExecutionAction =>{
         action.getExecutionRequestRefContext.appendLog("EventCheck is running!")
         if (action.getState.isCompleted) return action.getState
         if (action.eventType.equals("RECEIVE")) {
@@ -106,13 +109,13 @@ class EventCheckerRefExecutionOperation
             putErrorMsg("EventChecker run failed!" + t.getMessage, t, action)
             false
           })
-          if(killTag) {
-            killTag = false
-            return RefExecutionState.Killed
-          }
         }
         action.getState
-      case _ => RefExecutionState.Failed
+      }
+      case _ => {
+        logger.error("EventChecker run failed for error action")
+        RefExecutionState.Failed
+      }
     }
   }
 

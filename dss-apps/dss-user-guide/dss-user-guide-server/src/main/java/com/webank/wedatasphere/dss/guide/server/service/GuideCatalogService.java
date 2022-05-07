@@ -2,7 +2,6 @@ package com.webank.wedatasphere.dss.guide.server.service;
 
 import com.webank.wedatasphere.dss.guide.server.entity.GuideCatalog;
 import com.webank.wedatasphere.dss.guide.server.entity.response.GuideCatalogDetail;
-import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 
@@ -15,5 +14,5 @@ public interface GuideCatalogService {
 
     public GuideCatalogDetail queryGuideCatalogDetailById(Long id);
 
-    public void syncKnowledge() throws Exception;
+    public void syncKnowledge(String summaryPath) throws Exception;
 }

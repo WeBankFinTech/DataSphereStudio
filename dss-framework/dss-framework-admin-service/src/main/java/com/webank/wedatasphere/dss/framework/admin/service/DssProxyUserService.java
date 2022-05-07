@@ -15,6 +15,8 @@ public interface DssProxyUserService {
      */
     List<DssProxyUser> selectProxyUserList(String  userName);
 
+    List<String> getProxyUserNameList(String userName);
+
     int insertProxyUser(DssProxyUser dssProxyUser);
 
     boolean isExists(String userName,String proxyUserName);

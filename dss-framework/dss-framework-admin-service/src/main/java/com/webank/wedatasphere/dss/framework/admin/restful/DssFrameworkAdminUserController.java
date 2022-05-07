@@ -105,6 +105,12 @@ public class DssFrameworkAdminUserController extends BaseController {
         return Message.ok().data("users", dssAdminUserService.selectUserById(userId));
     }
 
+    @RequestMapping(path = "userInfo", method = RequestMethod.GET)
+    public Message getLoginUserInfo(HttpServletRequest request) {
+        String userName = SecurityFilter.getLoginUsername(request);
+        return Message.ok().data("userInfo", dssAdminUserService.selectUserByName(userName));
+    }
+
 
     @RequestMapping(path = "edit", method = RequestMethod.POST)
     public Message edit(@Validated @RequestBody DssAdminUser user, HttpServletRequest req) {

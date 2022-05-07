@@ -17,13 +17,14 @@
 package com.webank.wedatasphere.dss.standard.app.structure.project;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 
 public interface ProjectDeletionOperation<R extends RefProjectContentRequestRef<R>>
-        extends StructureOperation<R, ResponseRef> {
+        extends StructureOperation<R, ProjectResponseRef> {
 
     /**
      * delete the related refProject in third-party AppConn by refProjectId

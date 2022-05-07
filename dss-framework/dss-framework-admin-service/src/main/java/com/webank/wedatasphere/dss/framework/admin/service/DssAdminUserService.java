@@ -22,6 +22,8 @@ public interface DssAdminUserService extends IService<DssAdminUser> {
 
     DssAdminUser selectUserById(Long userId);
 
+    DssAdminUser selectUserByName(String username);
+
     int updateUser(DssAdminUser user, Workspace workspace);
 
 }

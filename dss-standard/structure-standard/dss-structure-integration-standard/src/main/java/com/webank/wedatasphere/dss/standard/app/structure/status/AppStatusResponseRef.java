@@ -17,9 +17,41 @@
 package com.webank.wedatasphere.dss.standard.app.structure.status;
 
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefBuilder;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 
 public interface AppStatusResponseRef extends ResponseRef {
 
     AppStatus getAppStatus();
+
+    static Builder newBuilder() {
+        return new Builder();
+    }
+
+    class Builder extends ResponseRefBuilder.ExternalResponseRefBuilder<Builder, AppStatusResponseRef> {
+        protected AppStatus appStatus;
+
+        public Builder setAppStatus(AppStatus appStatus) {
+            this.appStatus = appStatus;
+            return this;
+        }
+
+        @Override
+        protected AppStatusResponseRef createResponseRef() {
+            return new AppStatusResponseRefImpl();
+        }
+
+        class AppStatusResponseRefImpl extends ResponseRefImpl implements AppStatusResponseRef {
+            public AppStatusResponseRefImpl() {
+                super(Builder.this.responseBody, Builder.this.status,
+                        Builder.this.errorMsg, Builder.this.responseMap);
+            }
+
+            @Override
+            public AppStatus getAppStatus() {
+                return appStatus;
+            }
+        }
+    }
 
 }

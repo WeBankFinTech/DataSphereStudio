@@ -42,7 +42,7 @@ export default {
     // 获取需要在创建的时候填写的参数
     getCreatePrams(node) {
       const createParams = {}
-      node.nodeUiVOS.filter((item) => !item.nodeMenuType)
+      node.nodeUiVOS.filter((item) => item.baseInfo)
         .map(item => item.key).map(item => {
           createParams[item] = node[item];
         })

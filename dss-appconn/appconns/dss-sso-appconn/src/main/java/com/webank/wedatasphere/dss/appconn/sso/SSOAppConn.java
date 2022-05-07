@@ -5,7 +5,7 @@ import com.webank.wedatasphere.dss.appconn.core.impl.AbstractOnlySSOAppConn;
 /**
  * @author enjoyyin
  * @date 2022-03-31
- * @since 0.5.0
+ * @since 1.1.0
  */
 public class SSOAppConn extends AbstractOnlySSOAppConn {
     @Override

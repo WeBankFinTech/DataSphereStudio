@@ -129,7 +129,7 @@ public class VisualisRefExecutionOperation
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getUserName());
         visualisGetAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
-        return (boolean) responseRef.getData().get("isLinkisDataSource");
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
+        return (boolean) responseRef.getValue("isLinkisDataSource");
     }
 }

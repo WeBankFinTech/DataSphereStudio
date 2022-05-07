@@ -21,7 +21,7 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 
 /**
- * Only the third level standard
+ * 如果您的第三方系统想作为 DSS 工作流的一个节点集成进来，则需实现该 AppConn。
  * */
 public interface OnlyDevelopmentAppConn extends AppConn {
 

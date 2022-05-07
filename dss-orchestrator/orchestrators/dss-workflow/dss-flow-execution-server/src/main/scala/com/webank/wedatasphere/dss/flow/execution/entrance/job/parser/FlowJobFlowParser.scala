@@ -39,10 +39,6 @@ class FlowJobFlowParser extends FlowEntranceJobParser with Logging {
 
   override def parse(flowEntranceJob: FlowEntranceJob): Unit = {
     info(s"Start to parse flow of Job(${flowEntranceJob.getId}).")
-    val proxyUser:String = flowEntranceJob.getParams.get(FlowExecutionEntranceConfiguration.PROXY_USER).asInstanceOf[String]
-    if(StringUtils.isNotEmpty(proxyUser) && !checkFlowProxyByUserName(flowEntranceJob.getUser,proxyUser)){
-       throw  new FlowExecutionErrorException(90103,s"Current User ${flowEntranceJob.getUser} can not use proxy user ${proxyUser}")
-    }
     val code = flowEntranceJob.jobToExecuteRequest().code
     val label = flowEntranceJob.getParams.getOrDefault(DSSCommonUtils.DSS_LABELS_KEY, DSSCommonUtils.ENV_LABEL_VALUE_DEV).asInstanceOf[String]
     val codeLanguageLabel = FlowExecutionUtils.getRunTypeLabel(flowEntranceJob.getJobRequest().getLabels)
@@ -64,16 +60,5 @@ class FlowJobFlowParser extends FlowEntranceJobParser with Logging {
                                                .ask(req).asInstanceOf[ResponseQueryWorkflow]
     WorkflowFactory.INSTANCE.getJsonToFlowParser.parse(response.getDssFlow)
   }
-
-  private def checkFlowProxyByUserName(userName: String,proxyUser: String): Boolean = {
-    val req = ProxyUserCheckRequest(userName, proxyUser)
-    logger.info("Send query proxy user  is " + req.userName+",and proxy user is" + req.proxyUser)
-    val response: ResponseProxyUserCheck= DSSSenderServiceFactory.getOrCreateServiceInstance.getProjectServerSender
-      .ask(req).asInstanceOf[ResponseProxyUserCheck]
-    logger.info("Send query proxy user  response is " + response.canProxy +",and proxy user is" + response.proxyUserList)
-   response.canProxy
-  }
-
-
 
 }

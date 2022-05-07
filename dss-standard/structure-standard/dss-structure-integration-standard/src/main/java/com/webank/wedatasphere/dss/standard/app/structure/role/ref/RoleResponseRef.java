@@ -14,42 +14,37 @@
  *
  */
 
-package com.webank.wedatasphere.dss.standard.app.structure.status;
+package com.webank.wedatasphere.dss.standard.app.structure.role.ref;
 
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefBuilder;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRefImpl;
 
-public interface AppStatusResponseRef extends ResponseRef {
+public interface RoleResponseRef extends ResponseRef {
 
-    AppStatus getAppStatus();
+    Long getRefRoleId();
 
-    static Builder newBuilder() {
-        return new Builder();
-    }
+    class Builder extends ResponseRefBuilder.ExternalResponseRefBuilder<Builder, RoleResponseRef> {
+        protected Long refRoleId;
 
-    class Builder extends ResponseRefBuilder.ExternalResponseRefBuilder<Builder, AppStatusResponseRef> {
-        protected AppStatus appStatus;
-
-        public Builder setAppStatus(AppStatus appStatus) {
-            this.appStatus = appStatus;
+        public Builder setRefRoleId(Long refRoleId) {
+            this.refRoleId = refRoleId;
             return this;
         }
 
         @Override
-        protected AppStatusResponseRef createResponseRef() {
-            return new AppStatusResponseRefImpl();
+        protected RoleResponseRef createResponseRef() {
+            return new RoleResponseRefImpl();
         }
 
-        class AppStatusResponseRefImpl extends ResponseRefImpl implements AppStatusResponseRef {
-            public AppStatusResponseRefImpl() {
+        class RoleResponseRefImpl extends ResponseRefImpl implements RoleResponseRef {
+            public RoleResponseRefImpl() {
                 super(Builder.this.responseBody, Builder.this.status,
                         Builder.this.errorMsg, Builder.this.responseMap);
             }
-
             @Override
-            public AppStatus getAppStatus() {
-                return appStatus;
+            public Long getRefRoleId() {
+                return refRoleId;
             }
         }
     }

@@ -22,6 +22,12 @@ hooks = {
     mulit: true,
     listener: []
   },
+  // scriptis 数据库表详情
+  script_dbtb_details: {
+    type: 'listener',
+    mulit: false,
+    listener: []
+  },
   // workflows: 工作流开发底部TAB面板
   workflow_bottom_panel: {
     type: 'component',

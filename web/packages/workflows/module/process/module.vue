@@ -595,7 +595,7 @@ export default {
     },
     // 获取新建节点时需要的参数列表
     createNodeParamsList() {
-      return this.clickCurrentNode.nodeUiVOS ? this.clickCurrentNode.nodeUiVOS.filter((item) => !item.nodeMenuType) : [];
+      return this.clickCurrentNode.nodeUiVOS ? this.clickCurrentNode.nodeUiVOS.filter((item) => item.baseInfo) : [];
     },
     formRules() {
       let rules = {};
@@ -1446,6 +1446,7 @@ export default {
         this.isParamModalShow = !this.isParamModalShow;
       } else {
         this.isParamModalShow = true;
+        this.nodebaseinfoShow = false;
         this.isResourceShow = false;
         this.isDispatch = false;
       }
@@ -2029,7 +2030,7 @@ export default {
     // 获取需要在创建的时候填写的参数
     getCreatePrams(node) {
       const createParams = {}
-      node.nodeUiVOS.filter((item) => !item.nodeMenuType)
+      node.nodeUiVOS.filter((item) => item.baseInfo)
         .map(item => item.key).map(item => {
           createParams[item] = node[item];
         })

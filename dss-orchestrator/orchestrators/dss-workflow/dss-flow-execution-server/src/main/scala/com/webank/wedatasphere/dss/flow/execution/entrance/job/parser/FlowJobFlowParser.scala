@@ -15,12 +15,14 @@
  */
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.job.parser
-import com.webank.wedatasphere.dss.common.protocol.RequestQueryWorkFlow
+import com.webank.wedatasphere.dss.common.protocol.{ProxyUserCheckRequest, RequestQueryWorkFlow, ResponseProxyUserCheck}
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
+import com.webank.wedatasphere.dss.flow.execution.entrance.exception.FlowExecutionErrorException
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflow
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow

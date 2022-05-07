@@ -1,7 +1,6 @@
 package com.webank.wedatasphere.dss.guide.server.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.webank.wedatasphere.dss.guide.server.conf.GuideConf;
 import com.webank.wedatasphere.dss.guide.server.dao.GuideContentMapper;
 import com.webank.wedatasphere.dss.guide.server.dao.GuideGroupMapper;
 import com.webank.wedatasphere.dss.guide.server.entity.GuideContent;
@@ -134,6 +133,7 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
         guideContent.setUpdateTime(new Date());
         guideContent.setUpdateBy("system");
         guideContent.setCreateBy("system");
+        guideContent.setIsDelete(0);
         return guideContent;
     }
 
@@ -147,6 +147,7 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
         guideGroup.setCreateBy("system");
         guideGroup.setUpdateBy("system");
         guideGroup.setPath(index);
+        guideGroup.setIsDelete(0);
         return guideGroup;
     }
 

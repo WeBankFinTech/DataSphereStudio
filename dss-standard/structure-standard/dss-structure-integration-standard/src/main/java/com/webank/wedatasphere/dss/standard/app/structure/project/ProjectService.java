@@ -18,7 +18,10 @@ package com.webank.wedatasphere.dss.standard.app.structure.project;
 
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureService;
 
-
+/**
+ * 实现了工程的统一创建、更新、删除和查重操作。
+ * 用于打通 DSS 工程与接入的第三方应用工具的工程体系，实现工程的协同管理。
+ */
 public abstract class ProjectService extends AbstractStructureService {
 
     /**

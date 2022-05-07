@@ -7,7 +7,9 @@ import com.webank.wedatasphere.dss.guide.server.service.GuideCatalogService;
 import com.webank.wedatasphere.dss.guide.server.service.GuideChapterService;
 import com.webank.wedatasphere.dss.guide.server.service.GuideGroupService;
 import com.webank.wedatasphere.dss.guide.server.util.FileUtils;
+import com.webank.wedatasphere.dss.guide.server.util.ShellUtils;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -23,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -41,6 +44,10 @@ public class KnowledgeGuideAdminRestful {
     private GuideChapterService guideChapterService;
 
     private GuideGroupService guideGroupService;
+
+    private final static String SUMMARY = "SUMMARY.md";
+
+    private final static String SHELL_COMMAND_HOST_IP = "hostname -i";
 
 
     /**
@@ -193,10 +200,28 @@ public class KnowledgeGuideAdminRestful {
 
     @PostConstruct
     public void syncKnowledge() {
-        String summaryPath = GuideConf.GUIDE_GITBOOK_SUMMARY_PATH.getValue();
+        final String summaryPath = GuideConf.HOST_GITBOOK_PATH.getValue() + File.separator + SUMMARY;
+        final String savePath = GuideConf.TARGET_GITBOOK_PATH.getValue() + File.separator + "gitbook_books";
+        final String scpCommand = "scp -r "
+                + " hadoop@" + GuideConf.HOST_IP_ADDRESS.getValue() + ":"
+                + GuideConf.HOST_GITBOOK_PATH.getValue() + " "
+                + GuideConf.TARGET_GITBOOK_PATH.getValue();
+        String delMkdir = "rm -rf " + savePath;
         logger.info("开始执行定时任务...");
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             try {
+                String hostIp = ShellUtils.callShellQuery(SHELL_COMMAND_HOST_IP);
+                //如果不是当前节点，则需要拷贝文件
+                if (!StringUtils.equals(hostIp, GuideConf.HOST_IP_ADDRESS.getValue())) {
+                    //判断文件是否存在
+                    boolean flag = FileUtils.fileExist(savePath);
+                    if (flag) {
+                        //删除文件
+                        ShellUtils.callShellByExec(delMkdir);
+                    }
+                    //拷贝文件到相应节点
+                    ShellUtils.callShellByExec(scpCommand);
+                }
                 guideCatalogService.syncKnowledge(summaryPath);
                 guideGroupService.asyncGuide(summaryPath);
             } catch (Exception e) {

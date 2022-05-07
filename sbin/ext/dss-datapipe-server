@@ -11,6 +11,12 @@ cd `dirname $0`
 cd ..
 INSTALL_HOME=`pwd`
 
+#export DEBUG_PORT=
+if [ "$DEBUG_PORT" ];
+then
+  export DEBUG_CMD="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$DEBUG_PORT"
+fi
+
 # set DSS_HOME
 if [ "$DSS_HOME" = "" ]; then
   export DSS_HOME=$INSTALL_HOME
@@ -38,7 +44,7 @@ fi
 
 if test -z "$SERVER_JAVA_OPTS"
 then
-  export SERVER_JAVA_OPTS="-DserviceName=$SERVER_SUFFIX -Xmx$SERVER_HEAP_SIZE -XX:+UseG1GC -Xloggc:$SERVER_LOG_PATH/$SERVER_SUFFIX.log"
+  export SERVER_JAVA_OPTS="-DserviceName=$SERVER_SUFFIX -Xmx$SERVER_HEAP_SIZE -XX:+UseG1GC -Xloggc:$SERVER_LOG_PATH/$SERVER_SUFFIX.log $DEBUG_CMD "
 fi
 
 export SERVER_CLASS=com.webank.wedatasphere.dss.datapipe.DSSDatapipeServerApplication

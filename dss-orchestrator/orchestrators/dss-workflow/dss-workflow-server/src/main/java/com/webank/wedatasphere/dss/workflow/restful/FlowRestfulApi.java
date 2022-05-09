@@ -88,7 +88,7 @@ public class FlowRestfulApi {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(addFlowRequest.getLabels().getRoute()));
         String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
-        DSSFlow dssFlow = workFlowManager.createWorkflow(userName, workspaceName, contextId, description, parentFlowID,
+        DSSFlow dssFlow = workFlowManager.createWorkflow(userName, name, contextId, description, parentFlowID,
                 uses, new ArrayList<>(), dssLabelList, null, null);
 
         // TODO: 2019/5/16 空值校验，重复名校验

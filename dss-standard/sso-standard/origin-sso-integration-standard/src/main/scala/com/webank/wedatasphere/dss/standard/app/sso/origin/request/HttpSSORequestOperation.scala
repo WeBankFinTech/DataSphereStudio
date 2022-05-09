@@ -15,13 +15,19 @@ import org.apache.linkis.httpclient.response.impl.DefaultHttpResult
 import org.apache.linkis.httpclient.response.{HttpResult, Result}
 
 /**
- *
- * @date 2022-03-17
+ * 用于通过使用类似 token 的方式，访问没有打通一级规范的第三方系统，不推荐使用。
  * @author enjoyyin
  * @since 1.1.0
  */
 class HttpSSORequestOperation(private val appName: String) extends SSORequestOperation[DSSHttpAction, HttpResult] with Logging {
 
+  /**
+   * 用于通过使用类似 token 的方式，访问没有打通一级规范的第三方系统，不推荐使用。
+   * 为了能正常访问 第三方系统，请保证 req 已在 header 或 cookies 中注入了 token。
+   * @param urlBuilder 由于第三方系统没有打通一级规范，所以 urlBuilder 一般为空
+   * @param req Http 请求实体
+   * @return Http 请求结果
+   */
   override def requestWithSSO(urlBuilder: SSOUrlBuilderOperation, req: DSSHttpAction): HttpResult = {
     val key = getKey(urlBuilder, req)
     val url = getUrl(urlBuilder, req)

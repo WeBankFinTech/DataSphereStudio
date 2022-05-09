@@ -13,7 +13,11 @@ public class DolphinSchedulerAppConn extends AbstractSchedulerAppConn implements
 
     @Override
     public ConversionIntegrationStandard createConversionIntegrationStandard() {
-        return new WorkflowConversionIntegrationStandard();
+        if (super.getOrCreateConversionStandard() == null) {
+            return new WorkflowConversionIntegrationStandard();
+        } else {
+            return super.getOrCreateConversionStandard();
+        }
     }
 
     @Override

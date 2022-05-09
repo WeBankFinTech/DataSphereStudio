@@ -13,8 +13,13 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance
 import scala.collection.mutable
 
 /**
+ * HttpSSOIntegrationStandard 与 OriginSSOIntegrationStandard 的唯一区别，在于 SSORequestService 的不同。
  *
- * @date 2022-03-17
+ * 请注意，DSS 框架不推荐使用该一级规范实现类。
+ *
+ * 1. OriginSSORequestServiceImpl：通常用于请求与 DSS 打通了一级规范的第三方系统，推荐使用；
+ * 2. HttpSSORequestServiceImpl：用于通过使用类似 token 的方式，访问没有打通一级规范的第三方系统，不推荐使用。
+ *
  * @author enjoyyin
  * @since 1.1.0
  */

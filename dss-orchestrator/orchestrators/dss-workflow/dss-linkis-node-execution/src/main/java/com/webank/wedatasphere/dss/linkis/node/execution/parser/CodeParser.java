@@ -85,7 +85,7 @@ public class CodeParser implements JobParser {
 
     private Map<String, Object> getExecutionParams(BMLResource bmlResource,  CommonLinkisJob linkisAppConnJob) {
         Map<String, Object> map = new HashMap<>();
-        ScriptFromBMLResponse response = getOrCreateWorkSpaceClient(linkisAppConnJob).requestOpenScriptFromBML(bmlResource.getResourceId(), bmlResource.getVersion(), bmlResource.getFileName(),linkisAppConnJob.getSubmitUser());
+        ScriptFromBMLResponse response = getOrCreateWorkSpaceClient(linkisAppConnJob).requestOpenScriptFromBML(bmlResource.getResourceId(), bmlResource.getVersion(), bmlResource.getFileName());
         linkisAppConnJob.getLogObj().info("Get execution code from workspace client,bml resource id "+bmlResource.getResourceId()+", version is "+bmlResource.getVersion());
         map.put("executionCode", response.scriptContent());
         map.put("params", response.metadata());

@@ -43,6 +43,9 @@ public interface RefExecutionRequestRef<R extends RefExecutionRequestRef<R>>
 
     /**
      * DSS 工作流设置的所有全局变量
+     * 由于第三方 AppConn 的 Job 也可能支持添加自定义变量，我们建议自定义变量的作用域如下：
+     *  1. 如果 用户同时在 DSS 工作流和 第三方 AppConn 的 Job 都设置了同一个自定义变量，则以第三方 AppConn 的 Job 的为准
+     *  2. 否则使用 DSS 工作流的自定义变量
      * @return 返回 DSS 工作流所设置的所有全局变量
      */
     default Map<String, Object> getVariables() {

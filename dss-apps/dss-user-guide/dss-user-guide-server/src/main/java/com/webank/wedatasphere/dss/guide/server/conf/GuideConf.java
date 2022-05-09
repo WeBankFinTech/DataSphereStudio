@@ -7,10 +7,11 @@ public interface GuideConf {
 
     CommonVars<String> GUIDE_CHAPTER_IMAGES_PATH = CommonVars.apply("guide.chapter.images.path", "/usr/local/anlexander/all_bak/dss_linkis/dss-linkis-1.0.2/images");
 
-    /**gitbook的SUMMARY.md存放路径*/
-    CommonVars<String> GUIDE_GITBOOK_SUMMARY_PATH = CommonVars.apply("guide.gitbook.summary.path", "/appcom/Install/ApacheInstall/gitbook_books/SUMMARY.md");
+    /**gitbook路径*/
+    CommonVars<String> HOST_GITBOOK_PATH = CommonVars.apply("host.gitbook.path", "/appcom/Install/ApacheInstall/gitbook_books");
 
-    /**nginx指向图片的路径*/
-    CommonVars<String> GUIDE_KNOWLEDGE_IMAGES_PATH = CommonVars.apply("guide.gitbook.summary.path", "/appcom/Install/ApacheInstall/gitbook_books/SUMMARY.md");
+    CommonVars<String> HOST_IP_ADDRESS = CommonVars.apply("target.ip.address", "127.0.0.1");
+
+    CommonVars<String> TARGET_GITBOOK_PATH = CommonVars.apply("target.gitbook.path", "/appcom/Install/ApacheInstall");
 
 }

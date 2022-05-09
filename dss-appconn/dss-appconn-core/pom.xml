@@ -28,7 +28,9 @@
     <artifactId>dss-appconn-core</artifactId>
 
     <properties>
+        <!-- /pom.xml 里已定义
         <fasterxml.jackson.version>2.12.6.1</fasterxml.jackson.version>
+        -->
         <commons-collections.version>3.2.2</commons-collections.version>
     </properties>
 
@@ -66,13 +68,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${fasterxml.jackson.version}</version>
+            <version>${fasterxml.jackson-databind.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${fasterxml.jackson.version}</version>
+            <version>${fasterxml.jackson-annotations.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

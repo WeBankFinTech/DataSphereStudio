@@ -96,7 +96,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         LabelRouteVO routeVO = new LabelRouteVO();
         routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
         postAction.addRequestPayload("labels", routeVO);
-        return VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
+        return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
     }
 
 
@@ -106,10 +106,10 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
                                             DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
         visualisPostAction.addRequestPayload(VisualisConstant.WIDGET_IDS, getWidgetId(requestRef.getRefJobContent()));
 
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         String id = getWidgetId(requestRef.getRefJobContent());
         @SuppressWarnings("unchecked")
-        Map<String, Object> widgetData = (Map<String, Object>) responseRef.getData().get("widget");
+        Map<String, Object> widgetData = (Map<String, Object>) responseRef.toMap().get("widget");
         Map<String, Object> jobContent = new HashMap<>(1);
         jobContent.put("widgetId", Double.parseDouble(widgetData.get(id).toString()));
         return RefJobContentResponseRef.newBuilder().setRefJobContent(jobContent).success();
@@ -120,12 +120,12 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
                                               String url,
                                               DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
 
-        InternalResponseRef responseRef = VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
+        ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         Map<String, Object> jobContent = new HashMap<>();
         String id = getWidgetId(requestRef.getRefJobContent());
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> widgetData = (Map<String, Object>) responseRef.getData().get("widget");
+        Map<String, Object> widgetData = (Map<String, Object>) responseRef.toMap().get("widget");
         jobContent.put("widgetId", Double.parseDouble(widgetData.get(id).toString()));
 
         // cs更新
@@ -155,7 +155,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
         postAction.addRequestPayload("labels", routeVO);
 
-        return VisualisCommonUtil.getInternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
+        return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
     }
 
     private ResponseRef updateCsRef(DSSJobContentRequestRef requestRef, Long widgetId,

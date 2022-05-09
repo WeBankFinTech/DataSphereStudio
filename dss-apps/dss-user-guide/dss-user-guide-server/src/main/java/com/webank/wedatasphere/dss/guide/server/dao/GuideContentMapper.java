@@ -20,6 +20,10 @@ public interface GuideContentMapper extends BaseMapper<GuideContent> {
     @Update("UPDATE dss_guide_content SET content =#{content},content_html =#{contentHtml} WHERE id =#{id}")
     void updateGuideContentById(@Param("id") long id, @Param("content") String content, @Param("contentHtml") String contentHtml);
 
+    int batchInsert(@Param("list") List<GuideContent> list);
+
+    void initContentId();
+
 //    @Update("UPDATE dss_guide_content SET `is_delete` = 1,`update_time` = NOW() WHERE `id` = #{id}")
 //    void deleteGuideContent(@Param("id") Long id);
 }

@@ -47,7 +47,7 @@ public class VisualisRefImportOperation
         visualisPostAction.addRequestPayload("version", requestRef.getResourceMap().get(ThirdlyRequestRef.ImportWitContextRequestRefImpl.RESOURCE_VERSION_KEY));
 
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(requestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         visualisPostAction.addRequestPayload("labels", routeVO);
         return OperationStrategyFactory.getInstance().getOperationStrategy(getAppInstance(), nodeType)
                 .importRef(requestRef, url, visualisPostAction);

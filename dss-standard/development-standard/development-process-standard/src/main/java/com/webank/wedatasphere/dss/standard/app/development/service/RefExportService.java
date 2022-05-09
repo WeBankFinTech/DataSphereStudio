@@ -19,7 +19,16 @@ package com.webank.wedatasphere.dss.standard.app.development.service;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
 
-
+/**
+ * Job 导出规范，主要用于导出第三方应用工具的 Job。
+ * 建议直接继承 AbstractRefExportService。
+ */
 public interface RefExportService extends DevelopmentService {
+
+    /**
+     * 支持将第三方 AppConn 的 Job 导出成 Linkis BML 物料或 InputStream 字节流。
+     * @param <K> RefJobContentRequestRef 实现类
+     * @return RefExportOperation 实现类
+     */
     <K extends RefJobContentRequestRef<K>> RefExportOperation<K> getRefExportOperation();
 }

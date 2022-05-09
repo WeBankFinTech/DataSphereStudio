@@ -20,6 +20,10 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
+/**
+ * 通过传入 Linkis BML 物料或 InputStream 字节流，第三方 AppConn 需支持将其转换成一个 refJob。
+ * @param <K>
+ */
 public interface RefImportOperation<K extends ImportRequestRef<K>>
         extends DevelopmentOperation<K, RefJobContentResponseRef> {
 

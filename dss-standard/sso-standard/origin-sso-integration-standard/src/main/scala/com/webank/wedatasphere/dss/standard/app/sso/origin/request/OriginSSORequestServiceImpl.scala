@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.origin.request
 
-
+/**
+ * 通常用于请求与 DSS 打通了一级规范的第三方系统，是默认的使用方案
+ */
 class OriginSSORequestServiceImpl extends HttpSSORequestServiceImpl {
 
   override protected def createHttpSSORequestOperation(appName: String): HttpSSORequestOperation =

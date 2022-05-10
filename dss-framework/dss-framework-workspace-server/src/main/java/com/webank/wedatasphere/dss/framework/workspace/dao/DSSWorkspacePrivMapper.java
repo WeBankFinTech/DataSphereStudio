@@ -30,6 +30,15 @@ public interface DSSWorkspacePrivMapper {
     void updateRoleMenuPriv(@Param("workspaceId") int workspaceId, @Param("menuId") int menuId,
                             @Param("roleId") int roleId, @Param("priv") int priv);
 
+    @Select("select count(*) from dss_workspace_menu_role where workspace_id = #{workspaceId} and menu_id = #{menuId} and role_id = #{roleId}")
+    int queryCntOfMenuRolePriv(@Param("workspaceId") int workspaceId, @Param("menuId") int menuId, @Param("roleId") int roleId);
+
+    @Select("insert into dss_workspace_menu_role (`workspace_id`, `menu_id`, `role_id`, `priv`, `update_time`, `updateby`) " +
+            "values(#{workspaceId}, #{menuId}, #{roleId}, #{priv}, now(), #{username})")
+    void insertMenuRolePriv(@Param("workspaceId") int workspaceId, @Param("menuId") int menuId, @Param("roleId") int roleId,
+                                @Param("priv") int priv,
+                                @Param("username") String username);
+
     @Update("update dss_workspace_appconn_role set priv = #{priv} , update_time = now()" +
             "where workspace_id = #{workspaceId} and appconn_id = #{componentId} and role_id = #{roleId}")
     void updateRoleComponentPriv(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId,

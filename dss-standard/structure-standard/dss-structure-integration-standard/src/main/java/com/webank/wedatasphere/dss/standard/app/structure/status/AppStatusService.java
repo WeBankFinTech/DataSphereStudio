@@ -18,9 +18,15 @@ package com.webank.wedatasphere.dss.standard.app.structure.status;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
 
-
+/**
+ * 第三方应用状态检查规范。
+ */
 public interface AppStatusService extends StructureService {
 
-    AppStatusOperation createAppStatusOperation();
+    /**
+     * 返回第三方应用状态检查操作。
+     * @return AppStatusOperation 实现类
+     */
+    AppStatusOperation getAppStatusOperation();
 
 }

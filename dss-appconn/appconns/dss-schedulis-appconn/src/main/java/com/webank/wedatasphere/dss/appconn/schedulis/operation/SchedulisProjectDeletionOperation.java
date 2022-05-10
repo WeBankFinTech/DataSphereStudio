@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SchedulisProjectDeletionOperation
-        extends AbstractStructureOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl, ProjectResponseRef>
+        extends AbstractStructureOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl, ResponseRef>
         implements ProjectDeletionOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl> {
 
     private String managerUrl;

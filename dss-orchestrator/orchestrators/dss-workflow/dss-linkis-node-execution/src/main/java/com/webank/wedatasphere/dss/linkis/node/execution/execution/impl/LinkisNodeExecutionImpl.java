@@ -174,7 +174,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         while (retryCnt++ < MAX_RETRY_TIMES) {
             try {
                 openLogResult = getClient(job).openLog(OpenLogAction.newBuilder().setLogPath(logPath).setProxyUser(user).build());
-                job.getLogObj().info("persisted-log-result:" + LinkisJobExecutionUtils.gson.toJson(openLogResult));
+                //job.getLogObj().info("persisted-log-result:" + LinkisJobExecutionUtils.gson.toJson(openLogResult));
                 if (openLogResult == null ||
                         0 != openLogResult.getStatus() ||
                         StringUtils.isBlank(openLogResult.getLog()[LinkisJobExecutionUtils.IDX_FOR_LOG_TYPE_ALL])) {
@@ -256,6 +256,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
             printJobLog(job);
         }
         if (!jobInfo.isSucceed()) {
+            Utils.sleepQuietly(LinkisJobExecutionConfiguration.LINKIS_JOB_REQUEST_STATUS_TIME.getValue(job.getJobProps()));
             printJobLog(job);
             throw new LinkisJobExecutionErrorException(90101, "Failed to execute Job: " + jobInfo.getMessage());
         }

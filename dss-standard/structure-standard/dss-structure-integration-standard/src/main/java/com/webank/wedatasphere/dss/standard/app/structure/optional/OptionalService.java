@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 为第三方 AppConn 提供的通用 Service 服务，用于构建一些具备特殊能力的 Operation，以供DSS内嵌的应用工具使用。
  * @author enjoyyin
  * @date 2022-03-18
- * @since 0.5.0
+ * @since 1.1.0
  */
 public class OptionalService extends AppIntegrationServiceImpl<SSORequestService> {
 

@@ -31,9 +31,18 @@ import org.apache.linkis.httpclient.response.HttpResult
 
 import scala.collection.convert.wrapAsScala._
 
-
+/**
+ * 用于请求与 DSS 打通了一级规范的第三方系统
+ * @param appName AppConn 名称
+ */
 class OriginSSORequestOperation private[request](appName: String) extends HttpSSORequestOperation(appName) {
 
+  /**
+   * 用于请求与 DSS 打通了一级规范的第三方系统，也可以是请求 DSS 内嵌的数据应用工具。
+   * @param urlBuilder 不能为空，且必须为 SSOUrlBuilderOperationImpl 的实现类
+   * @param req DSSHttpAction 实现类
+   * @return HTTP 请求的结果
+   */
   override def requestWithSSO(urlBuilder: SSOUrlBuilderOperation, req: DSSHttpAction): HttpResult = {
     urlBuilder match {
       case urlBuilderOperationImpl: SSOUrlBuilderOperationImpl =>

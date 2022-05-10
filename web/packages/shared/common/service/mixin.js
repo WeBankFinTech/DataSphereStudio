@@ -66,7 +66,7 @@ export default {
      * @param {*} info
      * @param {*} query
      */
-    gotoCommonFunc(app = {}, query = {}) {
+    gotoCommonFunc({app , index}, query = {}) {
       let url = app.homepageUri
       const openFn = (info) => {
         if (info.external) {
@@ -98,8 +98,8 @@ export default {
         openFn(app)
       } else {
         const item = this.getAppConnItem(app.name, app.id)
-        if (item.appInstances && item.appInstances[0]) {
-          url = item.appInstances[0].homepageUri
+        if (item.appInstances && item.appInstances[index]) {
+          url = item.appInstances[index].homepageUri
           openFn(item)
         }
       }

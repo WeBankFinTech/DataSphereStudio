@@ -119,6 +119,10 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
     public int insertUser(DssAdminUser user, Workspace workspace) {
         tryUserOperation((ssoUserService, requestRefUser) -> {
                     SSOUserGetOperation ssoUserOperation = ssoUserService.getSSOUserGetOperation();
+                    //一些没有实现该operation的如SSOAppconn
+                    if (ssoUserOperation == null) {
+                        return false;
+                    }
                     DSSUserContentRequestRef requestRef = RequestRefUtils.getRequestRef(ssoUserOperation);
                     requestRef.setWorkspace(workspace).setUser(requestRefUser);
                     return StringUtils.isEmpty(ssoUserOperation.getUser(requestRef).getRefUserId());

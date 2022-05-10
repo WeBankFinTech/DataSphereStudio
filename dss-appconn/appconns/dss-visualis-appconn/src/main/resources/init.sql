@@ -10,7 +10,7 @@ INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`
 VALUES (@visualis_appconnId, 'DEV', 'http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/', '', 'dss/visualis/#/projects');
 
 -- 看appconn组件是要归属于哪个菜单
-select @visualis_menuId:id from dss_workspace_menu where name = "数据分析";
+select @visualis_menuId:=id from dss_workspace_menu where name = "数据分析";
 --delete from  `dss_workspace_menu_appconn`  WHERE  title_en='Visualis';
 INSERT INTO `dss_workspace_menu_appconn` (`appconn_id`, `menu_id`, `title_en`, `title_cn`, `desc_en`, `desc_cn`, `labels_en`, `labels_cn`, `is_active`, `access_button_en`, `access_button_cn`, `manual_button_en`, `manual_button_cn`, `manual_button_url`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`, `image`)
  VALUES(@visualis_appconnId,@visualis_menuId,'Visualis','Visualis','Visualis is a data visualization BI tool based on Davinci, with Linkis as the kernel, it supports the analysis mode of data development exploration.','Visualis是基于宜信开源项目Davinci开发的数据可视化BI工具，以任意桥(Linkis)做为内核，支持拖拽式报表定义、图表联动、钻取、全局筛选、多维分析、实时查询等数据开发探索的分析模式，并做了水印、数据质量校验等金融级增强。'

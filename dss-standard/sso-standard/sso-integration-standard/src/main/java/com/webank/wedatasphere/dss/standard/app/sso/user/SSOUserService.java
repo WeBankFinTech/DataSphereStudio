@@ -18,7 +18,7 @@ public interface SSOUserService extends AppIntegrationService<SSORequestService>
     SSOUserCreationOperation getSSOUserCreationOperation();
 
     /**
-     * 预留接口，用于修改第三方 AppConn 用户的基础信息
+     * 用于修改第三方 AppConn 用户的基础信息
      * @return SSOUserUpdateOperation
      */
     SSOUserUpdateOperation getSSOUserUpdateOperation();

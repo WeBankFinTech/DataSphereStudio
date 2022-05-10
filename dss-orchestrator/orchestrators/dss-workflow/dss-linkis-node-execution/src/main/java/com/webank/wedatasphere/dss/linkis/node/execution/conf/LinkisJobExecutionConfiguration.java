@@ -56,7 +56,7 @@ public class LinkisJobExecutionConfiguration {
 
     public final static  CommonVars<Integer>  LINKIS_CONNECTION_TIMEOUT = CommonVars.apply("wds.linkis.flow.connection.timeout",300000);
 
-    public final static  CommonVars<Integer>  LINKIS_JOB_REQUEST_STATUS_TIME = CommonVars.apply("wds.linkis.job.status.timeout",3000);
+    public final static  CommonVars<Integer>  LINKIS_JOB_REQUEST_STATUS_TIME = CommonVars.apply("wds.linkis.job.status.timeout",10000);
 
     public final static CommonVars<String> LINKIS_ADMIN_USER = CommonVars.apply("wds.linkis.client.flow.adminuser","ws");
 

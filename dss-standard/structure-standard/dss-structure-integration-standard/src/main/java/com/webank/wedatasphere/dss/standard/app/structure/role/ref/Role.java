@@ -14,15 +14,24 @@
  *
  */
 
-package com.webank.wedatasphere.dss.standard.app.structure.role;
+package com.webank.wedatasphere.dss.standard.app.structure.role.ref;
 
 import java.util.Date;
+import java.util.List;
 
 
 public interface Role {
 
+    /**
+     * 角色英文名，每个工作空间唯一
+     * @return 角色英文名
+     */
     String getName();
 
+    /**
+     * 角色中文名，如果不存在则与 {@code getName()} 完全相同。
+     * @return 角色中文名
+     */
     String getShowName();
 
     Date getCreateTime();
@@ -34,5 +43,11 @@ public interface Role {
     String getUpdator();
 
     String getLastUpdateTime();
+
+    /**
+     * 该角色目前已绑定的所有用户列表
+     * @return
+     */
+    List<String> getUserNames();
 
 }

@@ -432,11 +432,8 @@ export default {
         })
       }
     },
-    handleMenuClick(item, index) {
-      if (index !== undefined && item.appInstances && item.appInstances[index]) {
-        item.url = item.appInstances[index].url
-      }
-      this.gotoCommonFunc(item, {
+    handleMenuClick(item, index = 0) {
+      this.gotoCommonFunc({app: item, index}, {
         workspaceId: this.$route.query.workspaceId,
       });
     },
@@ -606,7 +603,7 @@ export default {
       this.isHomePage = false;
       this.isConsolePage = false;
       this.currentId = app.menuApplicationId || -1;
-      this.gotoCommonFunc(app, {
+      this.gotoCommonFunc({app, index: 0}, {
         workspaceId: this.$route.query.workspaceId,
       });
     }

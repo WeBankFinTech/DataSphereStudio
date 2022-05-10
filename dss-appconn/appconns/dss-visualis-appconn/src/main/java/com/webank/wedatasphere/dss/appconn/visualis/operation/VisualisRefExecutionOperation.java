@@ -128,7 +128,7 @@ public class VisualisRefExecutionOperation
         ref.getExecutionRequestRefContext().appendLog("dss execute view node, judge dataSource type from  " + url);
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getUserName());
-        visualisGetAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
+        visualisGetAction.setParameter("labels", ref.getDSSLabels().get(0).getValue().get("DSSEnv"));
         ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
         return (boolean) responseRef.getValue("isLinkisDataSource");
     }

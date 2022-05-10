@@ -50,7 +50,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         visualisPostAction.addRequestPayload("publish", true);
         visualisPostAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(requestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         visualisPostAction.addRequestPayload("labels", routeVO);
         // 执行http请求，获取响应结果
         ResponseRef dashboardPortalResponseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
@@ -68,7 +68,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         // Delete协议在加入url label时会存在被nginx拦截转发情况，在这里换成Post协议对label进行兼容
         DSSPostAction deleteAction = new DSSPostAction();
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (visualisDeleteRequestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(visualisDeleteRequestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         deleteAction.addRequestPayload("labels", routeVO);
         deleteAction.setUser(visualisDeleteRequestRef.getUserName());
         VisualisCommonUtil.getExternalResponseRef(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction);
@@ -90,7 +90,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         visualisPostAction.addRequestPayload("parentId", 0);
         visualisPostAction.addRequestPayload("type", 1);
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(requestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         visualisPostAction.addRequestPayload("labels", routeVO);
         return VisualisCommonUtil.getRefJobContentResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
     }
@@ -135,7 +135,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         putAction.setUser(requestRef.getUserName());
 
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(requestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         putAction.addRequestPayload("labels", routeVO);
 
         return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, putAction);
@@ -195,7 +195,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
 
         DSSDownloadAction metadataDownloadAction = new DSSDownloadAction();
         metadataDownloadAction.setUser(ref.getUserName());
-        metadataDownloadAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
+        metadataDownloadAction.setParameter("labels", ref.getDSSLabels().get(0).getValue().get("DSSEnv"));
         try {
             VisualisCommonUtil.getHttpResult(ref, ssoRequestOperation, previewUrl, previewDownloadAction);
             ByteArrayOutputStream os = new ByteArrayOutputStream();

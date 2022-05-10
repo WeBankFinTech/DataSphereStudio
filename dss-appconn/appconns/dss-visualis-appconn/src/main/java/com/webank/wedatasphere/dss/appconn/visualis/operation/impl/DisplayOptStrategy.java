@@ -54,7 +54,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         visualisPostAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
 
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(requestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         visualisPostAction.addRequestPayload("labels", routeVO);
 
         // 执行http请求，获取响应结果
@@ -72,7 +72,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         // Delete协议在加入url label时会存在被nginx拦截转发情况，在这里换成Post协议对label进行兼容
         DSSPostAction deleteAction = new DSSPostAction();
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (visualisDeleteRequestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(visualisDeleteRequestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         deleteAction.addRequestPayload("labels", routeVO);
         deleteAction.setUser(visualisDeleteRequestRef.getUserName());
         VisualisCommonUtil.getExternalResponseRef(visualisDeleteRequestRef, ssoRequestOperation, url, deleteAction);
@@ -89,7 +89,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         visualisPostAction.addRequestPayload("index", 0);
 
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(requestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         visualisPostAction.addRequestPayload("labels", routeVO);
         VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
     }

@@ -25,7 +25,7 @@ public class VisualisProjectUpdateOperation extends AbstractStructureOperation<P
         String url = getBaseUrl() + URLUtils.PROJECT_DELETE_UPDATE_URL;
         DSSPutAction updateAction = new DSSPutAction();
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (projectRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(projectRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         updateAction.addRequestPayload("labels", routeVO);
         updateAction.setUser(projectRef.getUserName());
         updateAction.setParameter("id", projectRef.getRefProjectId());

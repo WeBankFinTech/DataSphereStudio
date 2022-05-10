@@ -34,13 +34,14 @@ public class MdAnalysis {
 
     /**
      * 读取MD文件
+     *
      * @param filePath
      * @return
      */
-    public static String readMd(String filePath){
-        logger.info("开始读取md文件："+ filePath);
+    public static String readMd(String filePath) {
+        logger.info("开始读取md文件：" + filePath);
         File file = new File(filePath);
-        if(!file.exists()){
+        if (!file.exists()) {
             logger.info("文件不存在！" + filePath);
             return null;
         }
@@ -55,7 +56,7 @@ public class MdAnalysis {
                 line = br.readLine();
             }
         } catch (IOException e) {
-            logger.error("文件读取异常===》"+ e);
+            logger.error("文件读取异常===》" + e);
             throw new RuntimeException(e);
         } finally {
             try {
@@ -69,11 +70,12 @@ public class MdAnalysis {
 
     /**
      * 解析SUMMARY.md文件
+     *
      * @param filePath
      * @return
      * @throws IOException
      */
-    public static List<Map<String, Map<String, String>>>  analysisMd(String filePath,String type) throws IOException{
+    public static List<Map<String, Map<String, String>>> analysisMd(String filePath, String type) throws IOException {
         logger.info("开始解析summary.md文件=============》");
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
         List<Map<String, Map<String, String>>> mapList = new ArrayList<>();
@@ -83,20 +85,20 @@ public class MdAnalysis {
             Map<String, Map<String, String>> map = new HashMap<>();
             Map<String, String> dataMap = new HashMap<>();
             if (StringUtils.equals(type, "guide")) {
-                if (StringUtils.equals(matcherDir(line), type)) {
+                if (StringUtils.equals(line.trim(), type)) {
                     logger.info("开始解析学习引导模块");
                     flag = true;
                 }
-                if (StringUtils.equals(matcherDir(line), "knowledge")) {
+                if (StringUtils.equals(line.trim(), "knowledge")) {
                     flag = false;
                 }
             }
             if (StringUtils.equals(type, "knowledge")) {
-                if (StringUtils.equals(matcherDir(line), type)) {
+                if (StringUtils.equals(line.trim(), type)) {
                     logger.info("开始解析知识库模块");
                     flag = true;
                 }
-                if (StringUtils.equals(matcherDir(line), "guide")) {
+                if (StringUtils.equals(line.trim(), "guide")) {
                     flag = false;
                 }
             }
@@ -127,18 +129,27 @@ public class MdAnalysis {
             matcherContent(line, dataMap);
             map.put(ROOT_COUNT + "-" + Y + "-" + Z, dataMap);
             mapList.add(map);
+        } else if (line.trim().startsWith("/")) {
+            dataMap.put("path",line);
+            map.put("url",dataMap);
+            mapList.add(map);
         }
     }
 
     /**
      * 获取跟目录数量
+     *
      * @return
      */
-    public static Long getRootCount(){
+    public static Long getRootCount() {
         return Long.valueOf(ROOT_COUNT);
     }
 
-    public static void rootCountInit(){ ROOT_COUNT = 0;};
+    public static void rootCountInit() {
+        ROOT_COUNT = 0;
+    }
+
+    ;
 
     /**
      * 解析SUMMARY中的标题和文件
@@ -159,12 +170,13 @@ public class MdAnalysis {
 
     /**
      * md转html
+     *
      * @param filePath
      * @return
      */
     public static String markdown2Html(String filePath) throws IOException {
         File file = new File(filePath);
-        if(!file.exists()){
+        if (!file.exists()) {
             return null;
         }
         MutableDataSet OPTIONS = new MutableDataSet();

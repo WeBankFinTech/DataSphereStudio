@@ -115,6 +115,8 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 (developmentOperation, developmentRequestRef) -> {
                     DSSJobContentRequestRef requestRef = (DSSJobContentRequestRef) developmentRequestRef;
                     requestRef.getDSSJobContent().put(DSSJobContentConstant.ORC_VERSION_KEY, orcVersion);
+                    requestRef.getDSSJobContent().put(DSSJobContentConstant.ORCHESTRATION_ID, node.getFlowId());
+                    requestRef.getDSSJobContent().put(DSSJobContentConstant.ORCHESTRATION_NAME, node.getFlowName());
                     return ((RefCreationOperation) developmentOperation).createRef(requestRef);
                 }, (developmentRequestRef, refJobContentResponseRef) -> {
                     if(developmentRequestRef instanceof ProjectRefRequestRef) {

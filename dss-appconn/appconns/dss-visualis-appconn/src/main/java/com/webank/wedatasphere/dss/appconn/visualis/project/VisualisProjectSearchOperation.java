@@ -22,7 +22,7 @@ public class VisualisProjectSearchOperation extends AbstractStructureOperation<R
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(projectRef.getUserName());
         visualisGetAction.setParameter("keywords", projectRef.getProjectName());
-        visualisGetAction.setParameter("labels", ((EnvDSSLabel) (projectRef.getDSSLabels().get(0))).getEnv());
+        visualisGetAction.setParameter("labels", projectRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(projectRef, ssoRequestOperation, url, visualisGetAction);
         return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(responseRef.toMap().get("id"))).success();
     }

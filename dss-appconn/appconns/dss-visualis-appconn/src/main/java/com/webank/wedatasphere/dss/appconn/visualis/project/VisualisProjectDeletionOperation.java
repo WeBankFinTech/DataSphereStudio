@@ -27,7 +27,7 @@ public class VisualisProjectDeletionOperation extends AbstractStructureOperation
         String url = getBaseUrl() + URLUtils.PROJECT_DELETE_UPDATE_URL;
         DSSPostAction deleteAction = new DSSPostAction();
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (projectRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(projectRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         deleteAction.addRequestPayload("labels", routeVO);
         deleteAction.setUser(projectRef.getUserName());
         deleteAction.setParameter("id", projectRef.getRefProjectId());

@@ -336,7 +336,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         dssOrchestratorVersion.setFormatContextId(contextId);
         //update appConn node contextId
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
-        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
+//        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
         return dssOrchestratorVersion.getVersion();
     }
 

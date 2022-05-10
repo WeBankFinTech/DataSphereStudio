@@ -34,6 +34,20 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-appconn-core</artifactId>
             <version>${dss.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.webank.wedatasphere.dss</groupId>
+                    <artifactId>dss-development-process-standard</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.json4s</groupId>
+                    <artifactId>json4s-jackson_2.11</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -48,6 +62,12 @@
             <artifactId>dss-common</artifactId>
             <version>${dss.version}</version>
             <scope>provided</scope>
+        </dependency>
+      
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-core_2.11</artifactId>
+            <version>3.5.3</version>
         </dependency>
 
     </dependencies>

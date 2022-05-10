@@ -39,7 +39,12 @@ public class DSSWorkspacePrivServiceImpl implements DSSWorkspacePrivService {
         pairs.forEach(pair -> {
             int roleId = pair.getKey();
             int priv = pair.getValue() ? 1 : 0;
-            dssWorkspacePrivMapper.updateRoleMenuPriv(workspaceId, menuId, roleId, priv);
+            int count = dssWorkspacePrivMapper.queryCntOfMenuRolePriv(workspaceId, menuId, roleId);
+            if (count >= 1) {
+                dssWorkspacePrivMapper.updateRoleMenuPriv(workspaceId, menuId, roleId, priv);
+            } else {
+                dssWorkspacePrivMapper.insertMenuRolePriv(workspaceId, menuId, roleId, priv, updater);
+            }
         });
     }
 
@@ -52,8 +57,8 @@ public class DSSWorkspacePrivServiceImpl implements DSSWorkspacePrivService {
             int count = dssWorkspacePrivMapper.queryCntOfRCP(workspaceId, componentId, roleId);
             if (count >= 1) {
                 dssWorkspacePrivMapper.updateRoleComponentPriv(workspaceId, componentId, roleId, priv);
-            }else {
-                dssWorkspacePrivMapper.insertRolComponentPriv(workspaceId, componentId, roleId, priv,username);
+            } else {
+                dssWorkspacePrivMapper.insertRolComponentPriv(workspaceId, componentId, roleId, priv, username);
             }
         });
     }

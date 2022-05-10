@@ -7,7 +7,6 @@ import com.webank.wedatasphere.dss.appconn.visualis.operation.AsyncExecutionOper
 import com.webank.wedatasphere.dss.appconn.visualis.utils.NumberUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
 import com.webank.wedatasphere.dss.appconn.visualis.utils.VisualisCommonUtil;
-import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
@@ -17,11 +16,9 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResp
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
-import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDeleteAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSGetAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPutAction;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.io.IOUtils;
@@ -63,7 +60,7 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         DSSPostAction postAction = new DSSPostAction();
         postAction.setUser(requestRef.getUserName());
         postAction.addRequestPayload("name", requestRef.getName());
-        postAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        postAction.addRequestPayload("projectId", requestRef.getRefProjectId());
         postAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
         postAction.addRequestPayload("sourceId", 0);
         postAction.addRequestPayload("config", "");
@@ -102,7 +99,7 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
     @Override
     public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef) {
         String id = getId(requestRef.getRefJobContent());
-        return getQueryResponseRef(requestRef, requestRef.getProjectRefId(), URLUtils.VIEW_JUMP_URL_FORMAT, id);
+        return getQueryResponseRef(requestRef, requestRef.getRefProjectId(), URLUtils.VIEW_JUMP_URL_FORMAT, id);
     }
 
     @Override
@@ -111,7 +108,7 @@ public class ViewOptStrategy extends AbstractOperationStrategy implements AsyncE
         String url = baseUrl + URLUtils.VIEW_URL + "/" + id;
         logger.info("requestUrl: {}.", url);
         DSSPutAction putAction = new DSSPutAction();
-        putAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        putAction.addRequestPayload("projectId", requestRef.getRefProjectId());
         putAction.addRequestPayload("name", requestRef.getName());
         putAction.addRequestPayload("id", Long.parseLong(id));
         putAction.addRequestPayload("description", requestRef.getRefJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));

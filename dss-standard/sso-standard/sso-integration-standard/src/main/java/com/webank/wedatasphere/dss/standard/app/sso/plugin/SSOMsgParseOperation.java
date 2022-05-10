@@ -20,7 +20,9 @@ import com.webank.wedatasphere.dss.standard.common.service.Operation;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg;
 import javax.servlet.http.HttpServletRequest;
 
-
+/**
+ *
+ */
 public interface SSOMsgParseOperation extends Operation {
 
     boolean isDssRequest(HttpServletRequest request);

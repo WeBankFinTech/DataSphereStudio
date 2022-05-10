@@ -31,14 +31,16 @@ public class EventDruidFactory {
 	private static final String EVENT_DRUID_URL = "msg.eventchecker.jdo.option.url";
 
 	public static DruidDataSource getMsgInstance(Properties props, Logger log) {
-		log.info("EVENT_DRUID_USERNAME：" + EVENT_DRUID_USERNAME + "");
-		log.info("EVENT_DRUID_URL：" + EVENT_DRUID_URL + "");
-		String key = props.getProperty(EVENT_DRUID_USERNAME) + props.getProperty(EVENT_DRUID_URL);
-		if (instanceMap.contains(key)) {
+		String eventDruidUsername =props.getProperty(EVENT_DRUID_USERNAME);
+		String eventDruidUrl = props.getProperty(EVENT_DRUID_URL);
+		log.info("EVENT_DRUID_USERNAME：" + eventDruidUsername+ "");
+		log.info("EVENT_DRUID_URL：" + eventDruidUrl + "");
+		String key = eventDruidUsername + eventDruidUrl;
+		if (instanceMap.containsKey(key)) {
 			return instanceMap.get(key);
 		} else {
 			synchronized (EventDruidFactory.class) {
-				if (instanceMap.contains(key)) {
+				if (instanceMap.containsKey(key)) {
 					return instanceMap.get(key);
 				}
 				DruidDataSource msgInstance = createDataSource(props, log, "Msg");

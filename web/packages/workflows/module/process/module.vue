@@ -384,6 +384,7 @@
       :appId="flowId"
       :product="product"
       :readonly="readonly"
+      @event-from-ext="eventFromExt"
     />
   </div>
 </template>
@@ -737,6 +738,11 @@ export default {
     document.removeEventListener('keyup', this.onKeyUp)
   },
   methods: {
+    eventFromExt(evt) {
+      if (evt && evt.callFn && typeof this[evt.callFn] === 'function') {
+        this[evt.callFn](...evt.params)
+      }
+    },
     getToolbarsConfig() {
       api.fetch(`/dss/workflow/getExtraToolBars`, {
         projectId: +this.$route.query.projectID,

@@ -152,7 +152,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         postAction.addRequestPayload(CSCommonUtils.CONTEXT_ID_STR, contextId);
         postAction.setUser(requestRef.getUserName());
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(requestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         postAction.addRequestPayload("labels", routeVO);
 
         return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, postAction);
@@ -166,7 +166,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         postAction.addRequestPayload(CSCommonUtils.CONTEXT_ID_STR, contextId);
         postAction.setUser(requestRef.getUserName());
         LabelRouteVO routeVO = new LabelRouteVO();
-        routeVO.setRoute(((EnvDSSLabel) (requestRef.getDSSLabels().get(0))).getEnv());
+        routeVO.setRoute(requestRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         postAction.addRequestPayload("labels", routeVO);
 
         return VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, postAction);

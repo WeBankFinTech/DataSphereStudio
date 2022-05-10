@@ -21,7 +21,6 @@ import com.webank.wedatasphere.dss.appconn.schedulis.service.AzkabanUserService;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
 import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -31,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SchedulisProjectUpdateOperation
-        extends AbstractStructureOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl, ProjectResponseRef>
+        extends AbstractStructureOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl, ResponseRef>
         implements ProjectUpdateOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl> {
 
     private String managerUrl;

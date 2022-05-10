@@ -16,7 +16,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 import java.util.Map;
 
 public class DolphinSchedulerProjectUpdateOperation
-        extends AbstractStructureOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl, ProjectResponseRef>
+        extends AbstractStructureOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl, ResponseRef>
         implements ProjectUpdateOperation<ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl> {
 
     private String projectUpdateUrl;

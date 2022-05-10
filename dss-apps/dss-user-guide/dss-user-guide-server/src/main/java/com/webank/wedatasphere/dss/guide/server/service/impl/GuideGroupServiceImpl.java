@@ -73,8 +73,10 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
             List<Map<String, Map<String, String>>> maps = MdAnalysis.analysisMd(summaryPath,"guide");
             for(Map<String, Map<String, String>> map : maps){
                 for (Map.Entry tag : map.entrySet()) {
+                    if(!StringUtils.isEmpty(map.get("url"))){
+                        index = map.get("url").get("path");
+                    }
                     if(MdAnalysis.isStr2Num(String.valueOf(tag.getKey()))){
-                        index = map.get(tag.getKey()).get("file");
                         guideGroups.add(buildGroupParams(map,tag,Long.valueOf(tag.getKey().toString()),index));
                     }
                     //解析三级标题

@@ -66,7 +66,7 @@ public abstract class AbstractOperationStrategy implements OperationStrategy {
                 ref.getType(), ref.getRefJobContent(), url);
         DSSGetAction visualisGetAction = new DSSGetAction();
         visualisGetAction.setUser(ref.getExecutionRequestRefContext().getSubmitUser());
-        visualisGetAction.setParameter("labels", ((EnvDSSLabel) (ref.getDSSLabels().get(0))).getEnv());
+        visualisGetAction.setParameter("labels", ref.getDSSLabels().get(0).getValue().get("DSSEnv"));
         try {
             ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(ref, ssoRequestOperation, url, visualisGetAction);
             Map<String, Object> resultMap = responseRef.toMap();

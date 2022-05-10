@@ -19,8 +19,17 @@ package com.webank.wedatasphere.dss.standard.app.development.service;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 
+/**
+ * Job 导入规范，主要用于导入第三方应用工具的 Job。
+ * 建议直接继承使用 {@code AbstractRefImportService}。
+ */
 public interface RefImportService extends DevelopmentService {
 
+    /**
+     * 通过传入 Linkis BML 物料或 InputStream 字节流，第三方 AppConn 需支持将其转换成一个 refJob。
+     * @param <K> ImportRequestRef 实现类
+     * @return RefImportOperation 实现类
+     */
     <K extends ImportRequestRef<K>> RefImportOperation<K> getRefImportOperation();
 
 }

@@ -120,7 +120,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                     return ((RefCreationOperation) developmentOperation).createRef(requestRef);
                 }, (developmentRequestRef, refJobContentResponseRef) -> {
                     if(developmentRequestRef instanceof ProjectRefRequestRef) {
-                        Long projectRefId = ((ProjectRefRequestRef) developmentRequestRef).getProjectRefId();
+                        Long projectRefId = ((ProjectRefRequestRef) developmentRequestRef).getRefProjectId();
                         refJobContentResponseRef.getRefJobContent().put(DSSWorkFlowConstant.REF_PROJECT_ID_KEY, projectRefId);
                     }
                 }, "create");
@@ -158,7 +158,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                     } else {
                         refProjectId = parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), node.getDssLabels());
                     }
-                    projectRefRequestRef.setProjectRefId(refProjectId).setProjectName(node.getProjectName());
+                    projectRefRequestRef.setDSSProjectId(node.getProjectId()).setRefProjectId(refProjectId).setProjectName(node.getProjectName());
                 },
                 (developmentOperation, developmentRequestRef) -> {
                     developmentRequestRef.setDSSLabels(node.getDssLabels()).setUserName(userName).setWorkspace(node.getWorkspace()).setName(name).setType(node.getNodeType());

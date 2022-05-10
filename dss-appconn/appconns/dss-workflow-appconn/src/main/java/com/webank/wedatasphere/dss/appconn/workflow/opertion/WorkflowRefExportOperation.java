@@ -40,7 +40,7 @@ public class WorkflowRefExportOperation
 
         String userName = requestRef.getUserName();
         long flowId = (long) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);
-        Long projectId = requestRef.getProjectRefId();
+        Long projectId = requestRef.getRefProjectId();
         String projectName = requestRef.getProjectName();
         RequestExportWorkflow requestExportWorkflow = new RequestExportWorkflow(userName,
                 flowId,

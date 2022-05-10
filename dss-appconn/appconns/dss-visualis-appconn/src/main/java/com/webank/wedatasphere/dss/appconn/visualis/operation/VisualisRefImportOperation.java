@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.appconn.visualis.operation;
 
 import com.webank.wedatasphere.dss.appconn.visualis.utils.URLUtils;
-import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
@@ -37,10 +36,10 @@ public class VisualisRefImportOperation
         logger.info("The {} of Visualis try to import ref RefJobContent: {} in url {}.", nodeType, requestRef.getRefJobContent(), url);
         DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
-        if(null == requestRef.getProjectRefId()){
+        if(null == requestRef.getRefProjectId()){
             throw new ExternalOperationFailedException(100067,"导入节点Visualis工程ID为空");
         }
-        visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        visualisPostAction.addRequestPayload("projectId", requestRef.getRefProjectId());
         visualisPostAction.addRequestPayload("projectVersion", "v1");
         visualisPostAction.addRequestPayload("flowVersion", requestRef.getNewVersion());
         visualisPostAction.addRequestPayload("resourceId", requestRef.getResourceMap().get(ThirdlyRequestRef.ImportWitContextRequestRefImpl.RESOURCE_ID_KEY));

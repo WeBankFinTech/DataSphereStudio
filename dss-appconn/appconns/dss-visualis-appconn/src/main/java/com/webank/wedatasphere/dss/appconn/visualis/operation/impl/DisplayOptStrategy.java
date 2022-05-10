@@ -14,11 +14,9 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResp
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
-import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDeleteAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDownloadAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPutAction;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.io.IOUtils;
@@ -48,7 +46,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("name", requestRef.getName());
-        visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        visualisPostAction.addRequestPayload("projectId", requestRef.getRefProjectId());
         visualisPostAction.addRequestPayload("avatar", "18");
         visualisPostAction.addRequestPayload("publish", true);
         visualisPostAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
@@ -106,7 +104,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
     @Override
     public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl requestRef) {
         String displayId = getDisplayId(requestRef.getRefJobContent()).toString();
-        return getQueryResponseRef(requestRef, requestRef.getProjectRefId(), URLUtils.DISPLAY_JUMP_URL_FORMAT, displayId);
+        return getQueryResponseRef(requestRef, requestRef.getRefProjectId(), URLUtils.DISPLAY_JUMP_URL_FORMAT, displayId);
     }
 
     private Long getDisplayId(Map<String, Object> refJobContent) {
@@ -119,7 +117,7 @@ public class DisplayOptStrategy extends AbstractOperationStrategy {
         long id = getDisplayId(requestRef.getRefJobContent());
         String url = baseUrl + URLUtils.displayUrl + "/" + id;
         DSSPutAction putAction = new DSSPutAction();
-        putAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        putAction.addRequestPayload("projectId", requestRef.getRefProjectId());
         putAction.addRequestPayload("name", requestRef.getName());
         putAction.addRequestPayload("id", id);
         putAction.addRequestPayload("avatar", "9");

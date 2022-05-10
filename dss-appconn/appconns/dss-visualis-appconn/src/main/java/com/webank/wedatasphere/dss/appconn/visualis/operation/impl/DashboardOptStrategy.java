@@ -13,11 +13,9 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResp
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
-import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDeleteAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDownloadAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPutAction;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.io.IOUtils;
@@ -45,7 +43,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         DSSPostAction visualisPostAction = new DSSPostAction();
         visualisPostAction.setUser(requestRef.getUserName());
         visualisPostAction.addRequestPayload("name", requestRef.getName());
-        visualisPostAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        visualisPostAction.addRequestPayload("projectId", requestRef.getRefProjectId());
         visualisPostAction.addRequestPayload("avatar", "18");
         visualisPostAction.addRequestPayload("publish", true);
         visualisPostAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
@@ -112,7 +110,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
     @Override
     public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl visualisOpenRequestRef) {
         String dashboardId = getDashboardPortalId(visualisOpenRequestRef.getRefJobContent());
-        Long projectId = visualisOpenRequestRef.getProjectRefId();
+        Long projectId = visualisOpenRequestRef.getRefProjectId();
         return getQueryResponseRef(visualisOpenRequestRef, projectId, URLUtils.DASHBOARD_JUMP_URL_FORMAT, dashboardId);
     }
 
@@ -125,7 +123,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         }
         String url = baseUrl + URLUtils.dashboardPortalUrl + "/" + id;
         DSSPutAction putAction = new DSSPutAction();
-        putAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        putAction.addRequestPayload("projectId", requestRef.getRefProjectId());
         putAction.addRequestPayload("name", requestRef.getName());
         putAction.addRequestPayload("id", Long.parseLong(id));
         putAction.addRequestPayload("avatar", "9");
@@ -155,7 +153,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
         Map<String, Object> dashboardData = (Map<String, Object>) responseRef.toMap().get("dashboard");
         Map<String, Object> refJobContent = new HashMap<>(2);
         refJobContent.put("id", Double.parseDouble(dashboardData.get(dashboardId).toString()));
-        refJobContent.put("projectId", requestRef.getProjectRefId());
+        refJobContent.put("projectId", requestRef.getRefProjectId());
 
         //dashboardPortal
         String dashboardPortalId = NumberUtils.parseDoubleString(requestRef.getRefJobContent().get("dashboardPortalId").toString());
@@ -172,7 +170,7 @@ public class DashboardOptStrategy extends AbstractOperationStrategy {
                                               DSSPostAction visualisPostAction) throws ExternalOperationFailedException {
         ResponseRef responseRef = VisualisCommonUtil.getExternalResponseRef(requestRef, ssoRequestOperation, url, visualisPostAction);
         Map<String, Object> jobContent = new HashMap<>(3);
-        jobContent.put("projectId", requestRef.getProjectRefId());
+        jobContent.put("projectId", requestRef.getRefProjectId());
         String dashboardPortalId = getDashboardPortalId(requestRef.getRefJobContent());
         @SuppressWarnings("unchecked")
         Map<String, Object> dashboardPortal = (Map<String, Object>) responseRef.toMap().get("dashboardPortal");

@@ -1,17 +1,14 @@
 package com.webank.wedatasphere.dss.migrate.restful;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
 import com.webank.wedatasphere.dss.common.protocol.RequestQueryWorkFlow;
 import com.webank.wedatasphere.dss.common.protocol.ResponseExportOrchestrator;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.IoUtils;
-import com.webank.wedatasphere.dss.common.utils.ZipHelper;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
@@ -27,11 +24,19 @@ import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflow;
+import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
+import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
+import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.common.exception.LinkisException;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
@@ -46,12 +51,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.*;
 
 @RequestMapping(path = "/dss/framework/release", produces = {"application/json"})
@@ -117,7 +120,7 @@ public class DSSMigrateRestful {
             is = p.getInputStream();
             os = IoUtils.generateExportOutputStream(inputPath);
             IOUtils.copy(is, os);
-            Workspace workspace = SSOHelper.getWorkspace(req);
+            Workspace workspace = new Workspace();
             migrateService.migrate(userName, inputPath, workspace);
         } catch (Exception e) {
             String errorMsg = "project import failed for:" + e.getMessage();
@@ -142,6 +145,28 @@ public class DSSMigrateRestful {
             IOUtils.closeQuietly(is);
         }
         return Message.ok();
+    }
+
+
+    public static Workspace getWorkspaceForOldVersion(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        Cookie workspaceCookie = Arrays.stream(cookies).
+                filter(cookie -> "workspaceId".equals(cookie.getName())).findAny().orElse(null);
+        Workspace workspace = new Workspace();
+        if (workspaceCookie != null) {
+            workspace.setWorkspaceName(workspaceCookie.getValue());
+        }
+        SSOUrlBuilderOperation ssoUrlBuilderOperation = new SSOUrlBuilderOperationImpl();
+        Arrays.stream(cookies).forEach(cookie -> ssoUrlBuilderOperation.addCookie(cookie.getName(), cookie.getValue()));
+        String gateWayUrl = Configuration.GATEWAY_URL().getValue();
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+        if (StringUtils.isNotEmpty(forwardedHost) && forwardedHost.contains(":")) {
+            gateWayUrl = "http://" + forwardedHost + "/";
+        }
+        ssoUrlBuilderOperation.setDSSUrl(gateWayUrl);
+        ssoUrlBuilderOperation.setWorkspace(workspace.getWorkspaceName());
+//        workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
+        return workspace;
     }
 
 
@@ -292,6 +317,111 @@ public class DSSMigrateRestful {
         return responseMsg;
     }
 
+    @RequestMapping(path = "exportOrcSqlFile", method = RequestMethod.GET)
+    public void exportOrcSqlFile(HttpServletRequest req,
+                                 HttpServletResponse resp,
+                                 @RequestParam(defaultValue = "exportOrc", required = false, name = "outputFileName") String outputFileName,
+                                 @RequestParam(defaultValue = "utf-8", required = false, name = "charset") String charset,
+                                 @RequestParam(defaultValue = "zip", required = false, name = "outputFileType") String outputFileType,
+                                 @RequestParam(name = "projectName") String projectName,
+                                 @RequestParam(name = "orchestratorId") Long orchestratorId,
+                                 @RequestParam(required = false, name = "orcVersionId") Long orcVersionId,
+                                 @RequestParam(defaultValue = "false", required = false, name = "addOrcVersion") Boolean addOrcVersion,
+                                 @RequestParam(required = false, name = "labels") String labels) throws DSSErrorException, IOException {
+
+        /**
+         * 1、下载编排文件(调用downloadToLocalPath方法) 到本地临时目录下（调用IoUtils.generateIOPath() 方法）
+         * 2、解压文件，获取到脚本代码文件
+         * 3、根据sql文件resource_id查出sql文件节点名称，并重新命名脚本代码文件
+         * 4、文件打包成zip文件，文件名为工程名_工作流名_版本号.zip，并输出
+         * 5、关闭流，删除临时文件
+         */
+        resp.addHeader("Content-Disposition", "attachment;filename="
+                + new String(outputFileName.getBytes("UTF-8"), "ISO8859-1") + "." + outputFileType);
+        resp.setCharacterEncoding(charset);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+        String userName = SecurityFilter.getLoginUsername(req);
+        List<DSSLabel> dssLabelList = getDSSLabelList(labels);
+        ResponseExportOrchestrator exportResponse = null;
+        OrchestratorVo orchestratorVo;
+        if (orcVersionId != null) {
+            orchestratorVo = (OrchestratorVo) orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, orcVersionId));
+        } else {
+            orchestratorVo = (OrchestratorVo) orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, null));
+        }
+        orcVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
+        LOG.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
+        try {
+            RequestExportOrchestrator requestExportOrchestrator = new RequestExportOrchestrator(
+                    userName, orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace);
+            exportResponse = (ResponseExportOrchestrator) orchestratorSender.ask(requestExportOrchestrator);
+        } catch (Exception e) {
+            LOG.error("export orchestrator failed for ", e);
+            throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());
+        }
+        if (null != exportResponse) {
+            // 获取本地路径
+            String pathRoot = IoUtils.generateIOPath(userName, "project", "");
+            // 下载编排文件到本地
+            String zipFilePath = bmlService.downloadToLocalPath(userName, exportResponse.resourceId(), exportResponse.version(), pathRoot + "project.zip");
+            // 解压下载文件
+            ZipHelper.unzip(zipFilePath);
+            // 解压后工程文件夹路径
+            String projectBasePath = pathRoot + "default_orc";
+            // 解压工作流zip文件
+            String orcFlowZipFile = projectBasePath + File.separator + "orc_flow.zip";
+            ZipHelper.unzip(orcFlowZipFile);
+            // 解压后工作流文件夹路径
+            String flowBasePath = projectBasePath + File.separator + projectName;
+            // 读取工作流信息
+            List<DSSFlow> dssFlows = metaService.readFlow(flowBasePath);
+            // 获取工作流节点解析对象
+            JsonToFlowParser jsonToFlowParser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
+
+            for (DSSFlow dssFlow : dssFlows) {
+                // 获取资源文件信息
+                Workflow workflow = jsonToFlowParser.parse(dssFlow);
+                String workflowPath = flowBasePath + File.separator + workflow.getName() + File.separator;
+                // 替换资源文件名称为节点名称
+                workflow.getFlowResources().stream().forEach(resource -> {
+                    String oldSqlFilePath = workflowPath + resource.getResourceId() + "_" + resource.getVersion() + ".re";
+                    String newSqlFilePath = workflowPath + workflow.getName() + "_" + resource.getVersion() + ".re";
+                    FileUtils.getFile(oldSqlFilePath).renameTo(new File(newSqlFilePath));
+                });
+            }
+            //删除掉无用文件，包括zip包,.json,.txt,.properties
+            List<String> fileNameList = new ArrayList<>();
+            FileHelper.getAllFileNames(pathRoot, fileNameList);
+            fileNameList.forEach(fileName -> {
+                if (fileName.endsWith(".zip") || fileName.endsWith(".json") || fileName.endsWith(".txt") || fileName.endsWith(".properties")) {
+                    new File(fileName).delete();
+                }
+            });
+            //将文件打成zip包并输出
+            String orcZipPath = ZipHelper.zip(flowBasePath, true);
+            try (InputStream inputStream = new FileInputStream(orcZipPath)) {
+                IOUtils.copy(inputStream, resp.getOutputStream());
+                resp.getOutputStream().flush();
+            }
+        }
+    }
+
+
+    //生成label list
+    private List<DSSLabel> getDSSLabelList(String labels) {
+        String labelStr = DSSCommonUtils.ENV_LABEL_VALUE_DEV;
+        try {
+            Map<String, Object> labelMap = DSSCommonUtils.COMMON_GSON.fromJson(labels, Map.class);
+            if (labelMap.containsKey(LabelKeyConvertor.ROUTE_LABEL_KEY)) {
+                labelStr = (String) labelMap.get(LabelKeyConvertor.ROUTE_LABEL_KEY);
+            }
+        } catch (Exception e) {
+            LOG.error("get labels failed for {}", e.getMessage());
+        }
+        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labelStr));
+        return dssLabelList;
+    }
+
     /**
      * 查找或创建工程
      *
@@ -339,7 +469,6 @@ public class DSSMigrateRestful {
                 releaseUsers.addAll(releList);
                 releList.clear();
                 releList.addAll(releaseUsers);
-                request.setReleaseUsers(releList);
             }
             request.setDevProcessList(Lists.newArrayList("dev", "prod"));
             request.setOrchestratorModeList(Lists.newArrayList("pom_work_flow"));

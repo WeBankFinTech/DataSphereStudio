@@ -8,6 +8,16 @@ package com.webank.wedatasphere.dss.standard.app.development.utils;
 public class DSSJobContentConstant {
 
     /**
+     * DSSJob 所归属的 DSS编排（如：DSS工作流）的编排名，其对应的 value 值为 {@code String}。
+     */
+    public static final String ORCHESTRATION_NAME = "orchestrationName";
+
+    /**
+     * DSSJob 所归属的 DSS编排（如：DSS工作流）的编排名，其对应的 value 值为 {@code Long}。
+     */
+    public static final String ORCHESTRATION_ID = "orchestrationId";
+
+    /**
      * DSS编排的版本号，例如： DSS 工作流所在的版本。
      * <strong>请注意：该 key 只有在创建 refJob 时才存在，更新等操作不存在该 key。</strong>
      * 强烈建议根据 orcVersion 提供的 value 值，为 refJob 命名。

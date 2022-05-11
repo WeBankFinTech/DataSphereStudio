@@ -186,7 +186,8 @@ public class NodeRestfulApi {
         if(params.containsKey(DSSJobContentConstant.UP_STREAM_KEY)) {
             List<DSSNode> dssNodes = null;
             if(params.get(DSSJobContentConstant.UP_STREAM_KEY).equals("empty")) {
-                dssNodes = workFlowParser.getWorkFlowNodes(flowContent);
+//                dssNodes = workFlowParser.getWorkFlowNodes(flowContent);
+                params.remove(DSSJobContentConstant.UP_STREAM_KEY);
                 logger.info("Create a node that is not bound to an upstream node.");
             } else {
                 String[] upStreams = ((String) params.get(DSSJobContentConstant.UP_STREAM_KEY)).split(",");
@@ -195,8 +196,9 @@ public class NodeRestfulApi {
                 if(dssNodes.isEmpty() && upStreams.length > 0) {
                     return Message.error("create node failed! Caused by: the banding up-stream nodes are not exists(绑定的上游节点不存在).");
                 }
+                params.put(DSSJobContentConstant.UP_STREAM_KEY, dssNodes);
             }
-            params.put(DSSJobContentConstant.UP_STREAM_KEY, dssNodes);
+
         }
         Map<String, Object> jobContent = workflowNodeService.createNode(userName, node);
         return Message.ok().data("result", jobContent);

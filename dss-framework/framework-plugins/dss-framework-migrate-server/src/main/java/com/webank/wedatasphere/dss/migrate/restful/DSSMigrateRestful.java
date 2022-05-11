@@ -29,9 +29,12 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInf
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflow;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.common.exception.LinkisException;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
@@ -46,6 +49,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -117,7 +121,8 @@ public class DSSMigrateRestful {
             is = p.getInputStream();
             os = IoUtils.generateExportOutputStream(inputPath);
             IOUtils.copy(is, os);
-            Workspace workspace = SSOHelper.getWorkspace(req);
+//            Workspace workspace = SSOHelper.getWorkspace(req);
+            Workspace workspace = new Workspace();
             migrateService.migrate(userName, inputPath, workspace);
         } catch (Exception e) {
             String errorMsg = "project import failed for:" + e.getMessage();
@@ -142,6 +147,28 @@ public class DSSMigrateRestful {
             IOUtils.closeQuietly(is);
         }
         return Message.ok();
+    }
+
+
+    public static Workspace getWorkspaceForOldVersion(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        Cookie workspaceCookie = Arrays.stream(cookies).
+                filter(cookie -> "workspaceId".equals(cookie.getName())).findAny().orElse(null);
+        Workspace workspace = new Workspace();
+        if (workspaceCookie != null) {
+            workspace.setWorkspaceName(workspaceCookie.getValue());
+        }
+        SSOUrlBuilderOperation ssoUrlBuilderOperation = new SSOUrlBuilderOperationImpl();
+        Arrays.stream(cookies).forEach(cookie -> ssoUrlBuilderOperation.addCookie(cookie.getName(), cookie.getValue()));
+        String gateWayUrl = Configuration.GATEWAY_URL().getValue();
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+        if (StringUtils.isNotEmpty(forwardedHost) && forwardedHost.contains(":")) {
+            gateWayUrl = "http://" + forwardedHost + "/";
+        }
+        ssoUrlBuilderOperation.setDSSUrl(gateWayUrl);
+        ssoUrlBuilderOperation.setWorkspace(workspace.getWorkspaceName());
+//        workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
+        return workspace;
     }
 
 

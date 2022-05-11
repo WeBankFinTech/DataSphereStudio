@@ -173,7 +173,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 DevelopmentIntegrationStandard::getRefImportService,
                 developmentService -> ((RefImportService) developmentService).getRefImportOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
-                projectRefRequestRef -> projectRefRequestRef.setProjectRefId(finalProjectId).setProjectName(projectName),
+                projectRefRequestRef -> projectRefRequestRef.setRefProjectId(finalProjectId).setProjectName(projectName),
                 (developmentOperation, developmentRequestRef) -> {
                     ImportRequestRef requestRef = (ImportRequestRef) developmentRequestRef;
                     requestRef.setResourceMap(MapUtils.newCommonMap(ImportRequestRef.RESOURCE_ID_KEY, orcResourceId, ImportRequestRef.RESOURCE_VERSION_KEY, orcBmlVersion));

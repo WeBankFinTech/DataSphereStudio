@@ -1448,11 +1448,11 @@ export default {
      */
     showParamView() {
       if (this.workflowIsExecutor) return;
+      this.nodebaseinfoShow = false;
       if (!this.isResourceShow && !this.isDispatch) {
         this.isParamModalShow = !this.isParamModalShow;
       } else {
         this.isParamModalShow = true;
-        this.nodebaseinfoShow = false;
         this.isResourceShow = false;
         this.isDispatch = false;
       }
@@ -1495,6 +1495,7 @@ export default {
     showResourceView() {
       if (this.workflowIsExecutor) return;
       this.isDispatch = false;
+      this.nodebaseinfoShow = false;
       if (this.isResourceShow) {
         this.isParamModalShow = !this.isParamModalShow;
       } else {
@@ -2352,7 +2353,7 @@ export default {
         orchestratorId: this.orchestratorId,
         orchestratorVersionId: this.newOrchestratorVersionId,
         dssLabel: this.getCurrentDsslabels(),
-        workflowId: Number(this.flowId),
+        workflowId: Number(this.newFlowId),
         labels: {route: this.getCurrentDsslabels()},
         comment: this.pubulishFlowComment
       }

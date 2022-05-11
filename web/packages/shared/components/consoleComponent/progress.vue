@@ -253,6 +253,7 @@ export default {
   .progress {
     @include bg-color($light-base-color, $dark-base-color);
     position: relative;
+    margin-bottom: 0;
     .ivu-table-wrapper {
       border: none;
       .ivu-table th {

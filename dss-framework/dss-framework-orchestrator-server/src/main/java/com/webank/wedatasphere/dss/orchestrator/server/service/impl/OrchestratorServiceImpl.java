@@ -103,7 +103,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         RefJobContentResponseRef appRef = tryRefOperation(dssOrchestratorInfo, userName, workspace, dssLabels, null,
                 developmentService -> ((RefCRUDService) developmentService).getRefCreationOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
-                projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setProjectRefId(projectId),
+                projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setRefProjectId(projectId),
                 (developmentOperation, developmentRequestRef) -> {
                     DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
                             workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssLabels);
@@ -172,7 +172,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         tryRefOperation(dssOrchestratorInfo, userName, workspace, dssLabels, null,
                 developmentService -> ((RefCRUDService) developmentService).getRefUpdateOperation(),
                 null,
-                projectRefRequestRef -> projectRefRequestRef.setProjectRefId(dssOrchestratorInfo.getProjectId()),
+                projectRefRequestRef -> projectRefRequestRef.setRefProjectId(dssOrchestratorInfo.getProjectId()),
                 (developmentOperation, developmentRequestRef) -> {
                     UpdateRequestRef requestRef = (UpdateRequestRef) developmentRequestRef;
                     Map<String, Object> dssJobContent = MapUtils.newCommonMapBuilder()
@@ -205,7 +205,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             try {
                 tryRefOperation(dssOrchestratorInfo, userName, workspace, dssLabels, null,
                         developmentService -> ((RefCRUDService) developmentService).getRefDeletionOperation(),
-                        null, projectRefRequestRef -> projectRefRequestRef.setProjectRefId(dssOrchestratorInfo.getProjectId()),
+                        null, projectRefRequestRef -> projectRefRequestRef.setRefProjectId(dssOrchestratorInfo.getProjectId()),
                         (developmentOperation, developmentRequestRef) -> {
                             RefJobContentRequestRef requestRef = (RefJobContentRequestRef) developmentRequestRef;
                             Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId(),
@@ -242,7 +242,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 workspace, dssLabels, DevelopmentIntegrationStandard::getRefQueryService,
                 developmentService -> ((RefQueryService) developmentService).getRefQueryOperation(),
                 null,
-                projectRefRequestRef -> projectRefRequestRef.setProjectRefId(dssOrchestratorInfo.getProjectId()),
+                projectRefRequestRef -> projectRefRequestRef.setRefProjectId(dssOrchestratorInfo.getProjectId()),
                 (developmentOperation, developmentRequestRef) -> {
                     RefJobContentRequestRef requestRef = (RefJobContentRequestRef) developmentRequestRef;
                     requestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId(),
@@ -322,7 +322,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         RefJobContentResponseRef responseRef = tryRefOperation(dssOrchestratorInfo, userName, workspace, Collections.singletonList(dssLabel), null,
                 developmentService -> ((RefCRUDService) developmentService).getRefCopyOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
-                projectRefRequestRef -> projectRefRequestRef.setProjectRefId(dssOrchestratorInfo.getProjectId()).setProjectName(projectName),
+                projectRefRequestRef -> projectRefRequestRef.setRefProjectId(dssOrchestratorInfo.getProjectId()).setProjectName(projectName),
                 (developmentOperation, developmentRequestRef) -> {
                     CopyRequestRef copyRequestRef = (CopyRequestRef) developmentRequestRef;
                     Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dbOrcVersion.getAppId(),
@@ -336,7 +336,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         dssOrchestratorVersion.setFormatContextId(contextId);
         //update appConn node contextId
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
-        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
+//        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
         return dssOrchestratorVersion.getVersion();
     }
 

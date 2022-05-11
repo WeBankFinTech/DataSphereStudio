@@ -222,8 +222,8 @@ public class KnowledgeGuideAdminRestful {
                     //拷贝文件到相应节点
                     ShellUtils.callShellByExec(scpCommand);
                 }
-                guideCatalogService.syncKnowledge(summaryPath);
-                guideGroupService.asyncGuide(summaryPath);
+                guideCatalogService.syncKnowledge(summaryPath,GuideConf.SUMMARY_IGNORE_MODEL.getValue());
+                guideGroupService.asyncGuide(summaryPath,GuideConf.SUMMARY_IGNORE_MODEL.getValue());
             } catch (Exception e) {
                 logger.error("定时任务执行异常：" + e);
                 throw new RuntimeException(e);

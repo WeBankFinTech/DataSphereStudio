@@ -42,7 +42,7 @@ public class WorkflowRefImportOperation
         RequestImportWorkflow requestImportWorkflow = new RequestImportWorkflow(requestRef.getUserName(),
                 (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_ID_KEY),
                 (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY),
-                requestRef.getProjectRefId(), requestRef.getProjectName(),
+                requestRef.getRefProjectId(), requestRef.getProjectName(),
                 requestRef.getNewVersion(),
                 requestRef.getWorkspace(),
                 requestRef.getContextId(), requestRef.getDSSLabels());

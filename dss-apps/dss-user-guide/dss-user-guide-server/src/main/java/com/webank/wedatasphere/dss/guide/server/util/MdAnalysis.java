@@ -75,7 +75,7 @@ public class MdAnalysis {
      * @return
      * @throws IOException
      */
-    public static List<Map<String, Map<String, String>>> analysisMd(String filePath, String type) throws IOException {
+    public static List<Map<String, Map<String, String>>> analysisMd(String filePath, String type, String ignoreModel) throws IOException {
         logger.info("开始解析summary.md文件=============》");
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
         List<Map<String, Map<String, String>>> mapList = new ArrayList<>();
@@ -89,7 +89,7 @@ public class MdAnalysis {
                     logger.info("开始解析学习引导模块");
                     flag = true;
                 }
-                if (StringUtils.equals(line.trim(), "knowledge")) {
+                if (StringUtils.equals(line.trim(), "knowledge") || ignoreModel.contains(line.trim())) {
                     flag = false;
                 }
             }
@@ -98,7 +98,7 @@ public class MdAnalysis {
                     logger.info("开始解析知识库模块");
                     flag = true;
                 }
-                if (StringUtils.equals(line.trim(), "guide")) {
+                if (StringUtils.equals(line.trim(), "guide") || ignoreModel.contains(line.trim())) {
                     flag = false;
                 }
             }

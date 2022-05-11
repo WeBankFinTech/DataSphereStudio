@@ -2353,7 +2353,7 @@ export default {
         orchestratorId: this.orchestratorId,
         orchestratorVersionId: this.newOrchestratorVersionId,
         dssLabel: this.getCurrentDsslabels(),
-        workflowId: Number(this.flowId),
+        workflowId: Number(this.newFlowId),
         labels: {route: this.getCurrentDsslabels()},
         comment: this.pubulishFlowComment
       }

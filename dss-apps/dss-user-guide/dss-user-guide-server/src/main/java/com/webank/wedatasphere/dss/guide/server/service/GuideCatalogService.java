@@ -14,5 +14,5 @@ public interface GuideCatalogService {
 
     public GuideCatalogDetail queryGuideCatalogDetailById(Long id);
 
-    public void syncKnowledge(String summaryPath) throws Exception;
+    public void syncKnowledge(String summaryPath, String ignoreModel) throws Exception;
 }

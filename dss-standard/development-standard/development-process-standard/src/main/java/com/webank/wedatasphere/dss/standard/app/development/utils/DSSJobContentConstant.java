@@ -39,4 +39,6 @@ public class DSSJobContentConstant {
      */
     public static final String UP_STREAM_KEY = "upStreams";
 
+    public static final String UP_STREAM_EMPTY_VALUE = "empty";
+
 }

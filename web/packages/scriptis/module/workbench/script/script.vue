@@ -1397,7 +1397,6 @@ export default {
   }
   }
   .log-panel {
-    margin-top: 6px;
     border-top: $border-width-base $border-style-base $border-color-base;
     @include border-color($border-color-base, $dark-border-color-base);
     @include bg-color($light-base-color, $dark-base-color);

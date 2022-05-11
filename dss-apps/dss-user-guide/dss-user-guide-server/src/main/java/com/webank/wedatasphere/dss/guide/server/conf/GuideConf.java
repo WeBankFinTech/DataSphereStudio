@@ -14,4 +14,6 @@ public interface GuideConf {
 
     CommonVars<String> TARGET_GITBOOK_PATH = CommonVars.apply("target.gitbook.path", "/appcom/Install/ApacheInstall");
 
+    CommonVars<String> SUMMARY_IGNORE_MODEL = CommonVars.apply("summary.ignore.model","km");
+
 }

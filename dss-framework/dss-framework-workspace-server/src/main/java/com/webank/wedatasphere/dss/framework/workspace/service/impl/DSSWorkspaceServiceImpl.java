@@ -297,6 +297,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         List<DSSWorkspaceMenuRolePriv> defaultWorkspaceMenuRolePrivList = dssWorkspaceMapper.getDefaultWorkspaceMenuPriv();
         for (DSSWorkspaceMenuRolePriv v : defaultWorkspaceMenuRolePrivList) {
             if (!dssWorkspaceMenuRolePrivList.contains(v)) {
+                v.setPriv(0);
                 dssWorkspaceMenuRolePrivList.add(v);
             }
         }
@@ -344,6 +345,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         List<DSSWorkspaceComponentRolePriv> defaultDssWorkspaceComponentRolePrivList = dssWorkspaceMenuMapper.getDefaultComponentRolePriv01();
         for (DSSWorkspaceComponentRolePriv p : defaultDssWorkspaceComponentRolePrivList) {
             if (!dssWorkspaceComponentRolePrivList.contains(p)) {
+                p.setPriv(0);
                 dssWorkspaceComponentRolePrivList.add(p);
             }
         }

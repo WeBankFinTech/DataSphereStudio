@@ -68,7 +68,7 @@ public class GuideCatalogServiceImpl extends ServiceImpl<GuideCatalogMapper, Gui
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void syncKnowledge(String summaryPath) throws Exception {
+    public void syncKnowledge(String summaryPath, String ignoreModel) throws Exception {
         logger.info("====================初始化==================");
         chapterInit();
         logger.info("summary文件路径：" + summaryPath);
@@ -79,7 +79,7 @@ public class GuideCatalogServiceImpl extends ServiceImpl<GuideCatalogMapper, Gui
         List<GuideChapter> chapters = null;
         try {
             //1.解析SUMMARY.md文件
-            List<Map<String, Map<String, String>>> maps = MdAnalysis.analysisMd(summaryPath,"knowledge");
+            List<Map<String, Map<String, String>>> maps = MdAnalysis.analysisMd(summaryPath,"knowledge", ignoreModel);
             //2.解析maps并插入dss_guide_catalog表
             catalogs = new ArrayList<>();
             chapters = new ArrayList<>();

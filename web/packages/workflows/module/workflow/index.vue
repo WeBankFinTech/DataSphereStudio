@@ -8,15 +8,6 @@
           :goto="gotoLastWorkflow"
         />
       </template>
-
-      <div class="no-data" v-show="dataList.length <= 0">
-        <img
-          class="no-data-img"
-          src="../../../dss/assets/images/no-data.svg"
-          :alt="$t('message.workflow.searchWorkflow')"
-        />
-        <div>{{ $t("message.workflow.searchWorkflow") }}</div>
-      </div>
     </div>
     <Modal
       v-model="deleteProjectShow"
@@ -141,33 +132,18 @@ export default {
       ProjectShow: false, // 添加工作流展示
       versionDetailShow: false,
       deleteProjectShow: false, // 删除工作流弹窗展示
-      deleteClassifyItem: "",
       deleteProjectItem: "", // 删除的工作流项
       isRootFlow: false,
       actionType: "", // add || modify
       loading: false,
-      projectClassify: {
-        name: "",
-        descipte: ""
-      },
-      dataList: [
-        {
-          id: 1,
-          name: "My workflow",
-          dwsFlowList: []
-        }
-      ], // 右侧数据过滤后的
       cacheData: [], // 工作流初始树结构，用于搜索过滤
       params: "",
       versionData: [], // 工作流版本信息
-      flowTaxonomyID: 0, // 工作流分类的id
       currentOrchetratorData: null,
       applicationAreaMap: [],
       importModal: false,
       uploadUrl: ``,
       uploadData: null,
-      typeFilter: "all",
-      searchText: "",
     };
   },
   computed: {
@@ -444,16 +420,6 @@ export default {
       this.currentOrchetratorData = project;
       this.currentOrchetratorData.taxonomyID = classifyId;
     },
-    workflowModify(params) {
-      const classifyId = this.$refs.projectConentItem[0].currentData.id;
-      const _params = this.dataList[0]["dwsFlowList"].filter(item => {
-        return (
-          item.orchestratorName == params.orchestratorName &&
-          item.orchestratorId == params.orchestratorId
-        );
-      })[0];
-      this.projectModify(classifyId, _params);
-    },
     ProjectShowAction(val) {
       this.ProjectShow = val;
     },
@@ -524,21 +490,6 @@ export default {
     },
     versionDetailAction(val) {
       this.versionDetailShow = val;
-    },
-    searchWorkflow(event, id) {
-      let tepArray = JSON.parse(JSON.stringify(this.cacheData));
-      if (event.target.value) {
-        this.dataList = tepArray.map(item => {
-          if (id === item.id) {
-            item.dwsFlowList = item.dwsFlowList.filter(subItem => {
-              return subItem.orchestratorName.indexOf(event.target.value) != -1;
-            });
-          }
-          return item;
-        });
-      } else {
-        this.dataList = tepArray;
-      }
     },
     // 点击版本的打开跳转工作流编辑
     versionGotoWorkflow(row) {

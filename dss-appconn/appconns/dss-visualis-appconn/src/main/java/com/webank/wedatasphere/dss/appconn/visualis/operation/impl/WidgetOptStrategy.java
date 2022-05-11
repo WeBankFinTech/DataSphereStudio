@@ -12,9 +12,7 @@ import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExec
 import com.webank.wedatasphere.dss.standard.app.development.ref.*;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
-import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSDeleteAction;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPostAction;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.InternalResponseRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
@@ -36,7 +34,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
         DSSPostAction postAction = new DSSPostAction();
         postAction.setUser(requestRef.getUserName());
         postAction.addRequestPayload("widgetName", requestRef.getName());
-        postAction.addRequestPayload("projectId", requestRef.getProjectRefId());
+        postAction.addRequestPayload("projectId", requestRef.getRefProjectId());
         postAction.addRequestPayload("description", requestRef.getDSSJobContent().get(DSSJobContentConstant.NODE_DESC_KEY));
         postAction.addRequestPayload(CSCommonUtils.CONTEXT_ID_STR, requestRef.getContextId());
         LabelRouteVO routeVO = new LabelRouteVO();
@@ -78,7 +76,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
     @Override
     public QueryJumpUrlResponseRef query(ThirdlyRequestRef.QueryJumpUrlRequestRefImpl visualisOpenRequestRef) {
         String widgetId = getWidgetId(visualisOpenRequestRef.getRefJobContent());
-        return getQueryResponseRef(visualisOpenRequestRef, visualisOpenRequestRef.getProjectRefId(), URLUtils.WIDGET_JUMP_URL_FORMAT, widgetId);
+        return getQueryResponseRef(visualisOpenRequestRef, visualisOpenRequestRef.getRefProjectId(), URLUtils.WIDGET_JUMP_URL_FORMAT, widgetId);
     }
 
     @Override

@@ -109,7 +109,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                     workspace, dssLabels, DevelopmentIntegrationStandard::getRefExportService,
                     developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
                     null,
-                    projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setProjectRefId(dssOrchestratorVersion.getProjectId()),
+                    projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setRefProjectId(dssOrchestratorVersion.getProjectId()),
                     (developmentOperation, developmentRequestRef) -> {
                         RefJobContentRequestRef requestRef = (RefJobContentRequestRef) developmentRequestRef;
                         requestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId()));
@@ -186,7 +186,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 workspace, dssLabels, DevelopmentIntegrationStandard::getRefCRUDService,
                 developmentService -> ((RefCRUDService) developmentService).getRefCopyOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
-                projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setProjectRefId(dssOrchestratorVersion.getProjectId()),
+                projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setRefProjectId(dssOrchestratorVersion.getProjectId()),
                 (developmentOperation, developmentRequestRef) -> {
                     CopyRequestRef requestRef = (CopyRequestRef) developmentRequestRef;
                     Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId(),

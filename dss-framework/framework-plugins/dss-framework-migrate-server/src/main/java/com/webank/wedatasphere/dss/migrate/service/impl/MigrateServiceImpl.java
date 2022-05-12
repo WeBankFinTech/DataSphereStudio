@@ -94,6 +94,9 @@ public class MigrateServiceImpl implements MigrateService {
             projectCreateRequest.setApplicationArea(dssProject.getApplicationArea());
             projectCreateRequest.setDevProcessList(Lists.newArrayList("dev", "prod"));
             projectCreateRequest.setOrchestratorModeList(Lists.newArrayList("pom_work_flow"));
+            workspace.setWorkspaceId(dssProject.getWorkspaceId());
+            //todo
+            workspace.setWorkspaceName("");
             finalProject = dssFrameworkProjectService.createProject(projectCreateRequest, userName, workspace);
         } else if (!dbProject.getUsername().equals(dssProject.getUsername())) {
             LOG.error("fatal error, project {} 已经创建，但是创建人不是 {}", dssProject.getName(), dssProject.getCreateBy());

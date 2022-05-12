@@ -2451,8 +2451,26 @@ export default {
       }, 'post').then((openOrchestrator) => {
         this.loading = false;
         if (openOrchestrator) {
-          this.appId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.appId;
-          this.newOrchestratorVersionId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
+          const previd = `${this.orchestratorId}${this.newOrchestratorVersionId}`
+          const resVersion =  openOrchestrator.OrchestratorVo.dssOrchestratorVersion
+          // 发布成功后id变化，更新缓存，防止刷新页面重复打开工作流
+          let workspaceId = this.$route.query.workspaceId;
+          let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+          workFlowLists.forEach(it => {
+            if (it.tabId == previd) {
+              it.version = resVersion.id
+              it.tabId = `${this.orchestratorId}${resVersion.id}`
+              it.query = {
+                ...it.query,
+                orchestratorVersionId: resVersion.id,
+                appId: resVersion.appId,
+                version: resVersion.id
+              }
+            }
+          });
+          sessionStorage.setItem(`work_flow_lists_${workspaceId}`, JSON.stringify(workFlowLists))
+          this.appId = resVersion.appId;
+          this.newOrchestratorVersionId = resVersion.id;
           if(cb) {
             cb();
           }

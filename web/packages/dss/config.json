@@ -60,6 +60,11 @@
   "conf": {
     "app_name": "DataSphere Studio",
     "app_logo": "dss/assets/images/dssLogo.png",
-    "user_guide": ""
+    "user_guide": "",
+    "watermark": {
+      "show": false,
+      "template": "${username} ${time}",
+      "timeupdate": 60000
+    }
   }
 }

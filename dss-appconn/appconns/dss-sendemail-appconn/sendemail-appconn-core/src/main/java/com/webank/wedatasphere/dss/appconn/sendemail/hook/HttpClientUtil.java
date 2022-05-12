@@ -154,10 +154,10 @@ public final class HttpClientUtil {
 			}
 		} catch (UnsupportedEncodingException e) {
 			logger.error("UnsupportedEncodingException", e);
-			throw new RuntimeException("failed post json return blank!");
+			throw new RuntimeException("postJsonBody error: "+e.getMessage());
 		} catch (Exception e) {
 			logger.error("Exception", e);
-			throw new RuntimeException("failed post json return blank!");
+			throw new RuntimeException("postJsonBody Exception: "+e.getMessage());
 		} finally {
 			post.releaseConnection();
 		}
@@ -165,6 +165,7 @@ public final class HttpClientUtil {
 		return "";
 	}
 
+	@SuppressWarnings("deprecation")
 	public static String invokeGet(String url, Map<String, String> params, String encode, int connectTimeout,
 			int soTimeout) {
 		String responseString = null;

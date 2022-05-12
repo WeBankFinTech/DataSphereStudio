@@ -157,7 +157,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     public List<DSSWorkspace> getWorkspaces(String userName) {
         List<DSSWorkspace> workspaces = dssWorkspaceMapper.getWorkspaces(userName);
         //用于展示demo的工作空间是不应该返回的,除非用户是管理员
-        if (dssWorkspaceUserMapper.isAdmin(userName)) {
+        if (dssWorkspaceUserMapper.isAdmin(userName) == 1) {
             return workspaces;
         } else {
             //踢掉那个演示demo工作空间
@@ -430,7 +430,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public boolean checkAdmin(String userName) {
-        return dssWorkspaceUserMapper.isAdmin(userName);
+        return dssWorkspaceUserMapper.isAdmin(userName) == 1;
     }
 
     @Override

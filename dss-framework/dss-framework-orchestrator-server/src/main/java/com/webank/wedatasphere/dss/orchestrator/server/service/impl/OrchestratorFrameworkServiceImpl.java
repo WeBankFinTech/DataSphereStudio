@@ -278,7 +278,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username));
         boolean hasEditPriv = false;
         if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
-            hasEditPriv = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
+            hasEditPriv = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||
+                    projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
         }
         return hasEditPriv || projectUserAuthResponse.getProjectOwner().equals(username);
     }

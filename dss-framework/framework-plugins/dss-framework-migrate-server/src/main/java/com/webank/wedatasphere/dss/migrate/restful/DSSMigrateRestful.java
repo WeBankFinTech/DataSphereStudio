@@ -393,16 +393,28 @@ public class DSSMigrateRestful {
             List<DSSFlow> dssFlows = metaService.readFlow(flowBasePath);
             // 获取工作流节点解析对象
             JsonToFlowParser jsonToFlowParser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
+            List<String> uploadResourceNewFileNameList = new ArrayList<>();
             for (DSSFlow dssFlow : dssFlows) {
                 String workflowPath = flowBasePath + File.separator + dssFlow.getName() + File.separator;
                 String flowJsonFile = workflowPath + dssFlow.getName() + ".json";
                 String jsonContent = FileHelper.readFile(flowJsonFile);
+
                 if (StringUtils.isNotBlank(jsonContent)) {
                     //将json读取为string，存入workflow
                     dssFlow.setFlowJson(jsonContent);
                     // 获取工作流节点信息
                     Workflow workflow = jsonToFlowParser.parse(dssFlow);
-                    // 替换资源文件名称为节点名称
+                    // 替换用户上传的资源文件名称
+                    List<Resource> uploadResources = workflow.getFlowResources();
+                    if (uploadResources != null && uploadResources.size() > 0) {
+                        for (Resource uploadResource : uploadResources) {
+                            String oldUploadResourceName = workflowPath + "resource" + File.separator + uploadResource.getResourceId() + ".re";
+                            String newUploadResourceName = workflowPath + "resource" + File.separator + uploadResource.getFileName();
+                            FileUtils.getFile(oldUploadResourceName).renameTo(new File(newUploadResourceName));
+                            uploadResourceNewFileNameList.add(newUploadResourceName);
+                        }
+                    }
+                    // 替换脚本sql文件名称为节点名称
                     workflow.getWorkflowNodes().forEach(workflowNode -> {
                         List<Resource> resources = workflowNode.getDSSNode().getResources();
                         if (resources != null && resources.size() > 0) {
@@ -420,7 +432,10 @@ public class DSSMigrateRestful {
             FileHelper.getAllFileNames(pathRoot, fileNameList);
             fileNameList.forEach(fileName -> {
                 if (fileName.endsWith(".zip") || fileName.endsWith(".json") || fileName.endsWith(".txt") || fileName.endsWith(".properties")) {
-                    new File(fileName).delete();
+                    // 上传的资源文件不能删除
+                    if (uploadResourceNewFileNameList.stream().noneMatch(fileName::equals)) {
+                        new File(fileName).delete();
+                    }
                 }
             });
             //将文件打成zip包并输出

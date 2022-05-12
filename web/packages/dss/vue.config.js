@@ -91,8 +91,10 @@ Object.keys(exts).forEach((item, index) => {
 Object.keys(conf).forEach(item=> {
   if(['app_logo'].includes(item)) {
     confs.push(`${item}: require('@/${conf[item]}')`)
-  } else {
+  } else if(typeof conf[item] == 'string') {
     confs.push(`${item}: '${conf[item]}'`)
+  } else if(typeof conf[item] == 'object') {
+    confs.push(`${item}: ${JSON.stringify(conf[item])}`)
   }
 })
 

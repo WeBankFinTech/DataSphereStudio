@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.migrate.restful;
 
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.entity.IOType;
+import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -317,6 +318,28 @@ public class DSSMigrateRestful {
         return responseMsg;
     }
 
+    /**
+     * 下载资源文件
+     * 1、下载编排文到本地临时目录下
+     * 2、解压文件，解析json文件，获取工作流节点对象
+     * 3、替换资源文件的名称为节点名称+版本号
+     * 4、删除无用文件
+     * 5、将文件打成zip包并输出
+     * 6、清理掉文件夹
+     *
+     * @param req            reqeust
+     * @param resp           response
+     * @param outputFileName 下载文件名称
+     * @param charset        文件字符集
+     * @param outputFileType 输出文件类型
+     * @param projectName    工程名称
+     * @param orchestratorId 编排ID
+     * @param orcVersionId   编排版本号ID
+     * @param addOrcVersion  是否增加版本号
+     * @param labels         标签
+     * @throws DSSErrorException
+     * @throws IOException
+     */
     @RequestMapping(path = "exportOrcSqlFile", method = RequestMethod.GET)
     public void exportOrcSqlFile(HttpServletRequest req,
                                  HttpServletResponse resp,
@@ -329,13 +352,6 @@ public class DSSMigrateRestful {
                                  @RequestParam(defaultValue = "false", required = false, name = "addOrcVersion") Boolean addOrcVersion,
                                  @RequestParam(required = false, name = "labels") String labels) throws DSSErrorException, IOException {
 
-        /**
-         * 1、下载编排文件(调用downloadToLocalPath方法) 到本地临时目录下（调用IoUtils.generateIOPath() 方法）
-         * 2、解压文件，获取到脚本代码文件
-         * 3、根据sql文件resource_id查出sql文件节点名称，并重新命名脚本代码文件
-         * 4、文件打包成zip文件，文件名为工程名_工作流名_版本号.zip，并输出
-         * 5、关闭流，删除临时文件
-         */
         resp.addHeader("Content-Disposition", "attachment;filename="
                 + new String(outputFileName.getBytes("UTF-8"), "ISO8859-1") + "." + outputFileType);
         resp.setCharacterEncoding(charset);
@@ -377,17 +393,27 @@ public class DSSMigrateRestful {
             List<DSSFlow> dssFlows = metaService.readFlow(flowBasePath);
             // 获取工作流节点解析对象
             JsonToFlowParser jsonToFlowParser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
-
             for (DSSFlow dssFlow : dssFlows) {
-                // 获取资源文件信息
-                Workflow workflow = jsonToFlowParser.parse(dssFlow);
-                String workflowPath = flowBasePath + File.separator + workflow.getName() + File.separator;
-                // 替换资源文件名称为节点名称
-                workflow.getFlowResources().stream().forEach(resource -> {
-                    String oldSqlFilePath = workflowPath + resource.getResourceId() + "_" + resource.getVersion() + ".re";
-                    String newSqlFilePath = workflowPath + workflow.getName() + "_" + resource.getVersion() + ".re";
-                    FileUtils.getFile(oldSqlFilePath).renameTo(new File(newSqlFilePath));
-                });
+                String workflowPath = flowBasePath + File.separator + dssFlow.getName() + File.separator;
+                String flowJsonFile = workflowPath + dssFlow.getName() + ".json";
+                String jsonContent = FileHelper.readFile(flowJsonFile);
+                if (StringUtils.isNotBlank(jsonContent)) {
+                    //将json读取为string，存入workflow
+                    dssFlow.setFlowJson(jsonContent);
+                    // 获取工作流节点信息
+                    Workflow workflow = jsonToFlowParser.parse(dssFlow);
+                    // 替换资源文件名称为节点名称
+                    workflow.getWorkflowNodes().forEach(workflowNode -> {
+                        List<Resource> resources = workflowNode.getDSSNode().getResources();
+                        if (resources != null && resources.size() > 0) {
+                            for (Resource resource : resources) {
+                                String oldSqlFilePath = workflowPath + "resource" + File.separator + resource.getResourceId() + "_" + resource.getVersion() + ".re";
+                                String newSqlFilePath = workflowPath + "resource" + File.separator + workflowNode.getDSSNode().getName() + "_" + resource.getVersion() + ".re";
+                                FileUtils.getFile(oldSqlFilePath).renameTo(new File(newSqlFilePath));
+                            }
+                        }
+                    });
+                }
             }
             //删除掉无用文件，包括zip包,.json,.txt,.properties
             List<String> fileNameList = new ArrayList<>();
@@ -402,6 +428,9 @@ public class DSSMigrateRestful {
             try (InputStream inputStream = new FileInputStream(orcZipPath)) {
                 IOUtils.copy(inputStream, resp.getOutputStream());
                 resp.getOutputStream().flush();
+            } catch (IOException e) {
+                LOG.error("资源文件打包下载失败，下载路径：{}", orcZipPath, e);
+                throw new DSSErrorException(100800, "资源文件打包下载失败:原因： " + e.getMessage());
             }
         }
     }

@@ -60,10 +60,6 @@
           @on-sort-change="sortChange"
           class="result-normal-table">
         </wb-table>
-        <we-water-mask
-          v-if="isWaterMask"
-          :text="watermaskText"
-          ref="watermask"></we-water-mask>
       </template>
       <template v-else-if="!result.hugeData">
         <we-table
@@ -75,10 +71,6 @@
           @dbl-click="copyLabel"
           @on-click="onWeTableRowClick"
           @on-sort-change="sortChange"/>
-        <we-water-mask
-          v-if="isWaterMask"
-          :text="watermaskText"
-          ref="watermask"></we-water-mask>
       </template>
       <div v-if="result.hugeData" :style="{height: resultHeight+'px', padding: '15px'}">
         因为您的结果集较大，为了更好的体验，<a :href="`/#/results?workspaceId=${$route.query.workspaceId}&resultPath=${resultPath}&fileName=${script.fileName||script.ti}&from=${$route.name}&taskID=${taskID}`" target="_blank">点击查看结果集</a>
@@ -142,7 +134,6 @@ import Table from '@dataspherestudio/shared/components/virtualTable';
 import WbTable from '@dataspherestudio/shared/components/table';
 import WeWaterMask from '@dataspherestudio/shared/components/watermark';
 import WeToolbar from './toolbar.vue';
-import elementResizeEvent from '@dataspherestudio/shared/common/helper/elementResizeEvent';
 import resultSetList from './resultSetList.vue';
 import filter from './filter.vue';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
@@ -181,11 +172,7 @@ export default {
   },
   mixins: [mixin],
   data() {
-    const isWaterMask = true // todo isWaterMask
-    const username = this.getUserName();
     return {
-      isWaterMask,
-      watermaskText: `${this.$t('message.common.watermaskText')}-${username}`,
       data: {
         headRows: [],
         bodyRows: [],
@@ -263,13 +250,11 @@ export default {
     }
   },
   mounted() {
-    elementResizeEvent.bind(this.$el, this.resize);
     this.baseinfo = storage.get("baseInfo", "local") || {}
     this.updateData();
     this.initPage();
   },
   beforeDestroy: function() {
-    elementResizeEvent.unbind(this.$el);
   },
   methods: {
     initPage() {
@@ -538,15 +523,6 @@ export default {
         ...this.script.resultList,
       });
       this.pageingData();
-    },
-    resizeWaterMask() {
-      if (this.$refs.watermask) {
-        this.$refs.watermask.updateCanvas(this.watermaskText);
-      }
-    },
-    resize() {
-      this.resizeWaterMask();
-      return false;
     },
     changeSet(set) {
       this.isLoading = true;

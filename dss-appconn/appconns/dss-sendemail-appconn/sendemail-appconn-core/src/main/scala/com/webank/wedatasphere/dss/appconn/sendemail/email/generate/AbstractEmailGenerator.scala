@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.appconn.sendemail.email.generate
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.AbstractEmail
 import com.webank.wedatasphere.dss.appconn.sendemail.email.{Email, EmailGenerator}
+import com.webank.wedatasphere.dss.common.utils.VariableUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
 import org.apache.linkis.common.utils.Logging
@@ -45,7 +46,11 @@ trait AbstractEmailGenerator extends EmailGenerator with Logging{
     runtimeMap foreach {
       case (k, v) => logger.info(s"K is $k, V is $v")
     }
-    val subject = if (runtimeMap.get("subject") != null) runtimeMap.get("subject").toString else "This is an email"
+    val subject = if (runtimeMap.get("subject") != null) {
+      VariableUtils.replace(runtimeMap.get("subject").toString)
+    } else{
+      "This is an email"
+    }
     email.setSubject(subject)
     val bcc = if (runtimeMap.get("bcc") != null) runtimeMap.get("bcc").toString else ""
     email.setBcc(bcc)

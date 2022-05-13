@@ -127,6 +127,16 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             importDssOrchestratorInfo.setId(null);
             importDssOrchestratorInfo.setCreator(userName);
             importDssOrchestratorInfo.setCreateTime(new Date());
+            //0.x工作流导入兼容
+            if (importDssOrchestratorInfo.getWorkspaceId() == null) {
+                importDssOrchestratorInfo.setWorkspaceId(workspace.getWorkspaceId());
+            }
+            if (StringUtils.isEmpty(importDssOrchestratorInfo.getOrchestratorMode())) {
+                importDssOrchestratorInfo.setOrchestratorMode("pom_work_flow");
+            }
+            if (StringUtils.isEmpty(importDssOrchestratorInfo.getOrchestratorWay())) {
+                importDssOrchestratorInfo.setOrchestratorWay(",pom_work_flow_DAG,");
+            }
             orchestratorMapper.addOrchestrator(importDssOrchestratorInfo);
         }
         String flowZipPath = inputPath + File.separator + "orc_flow.zip";
@@ -135,7 +145,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         Map<String, Object> resultMap = bmlService.upload(userName, inputStream, importDssOrchestratorInfo.getName() + "_orc_flow.zip", projectName);
         String orcResourceId = resultMap.get("resourceId").toString();
         String orcBmlVersion = resultMap.get("version").toString();
-
 
         //4、导入版本Version信息
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
@@ -191,11 +200,11 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         return dssOrchestratorVersion.getOrchestratorId();
     }
 
-    public void synProjectOrchestrator(DSSOrchestratorInfo importDssOrchestratorInfo,DSSOrchestratorVersion dssOrchestratorVersion,List<DSSLabel> dssLabels){
+    public void synProjectOrchestrator(DSSOrchestratorInfo importDssOrchestratorInfo, DSSOrchestratorVersion dssOrchestratorVersion, List<DSSLabel> dssLabels) {
         //Is dev environment
-        if(DSSLabelUtil.isDevEnv(dssLabels)){
+        if (DSSLabelUtil.isDevEnv(dssLabels)) {
             RequestProjectImportOrchestrator projectImportOrchestrator = new RequestProjectImportOrchestrator();
-            BeanUtils.copyProperties(importDssOrchestratorInfo,projectImportOrchestrator);
+            BeanUtils.copyProperties(importDssOrchestratorInfo, projectImportOrchestrator);
             projectImportOrchestrator.setVersionId(dssOrchestratorVersion.getId());
             //保存工程级别的编排模式
             DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()

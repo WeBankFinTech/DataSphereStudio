@@ -121,7 +121,9 @@ public class DSSMigrateRestful {
             is = p.getInputStream();
             os = IoUtils.generateExportOutputStream(inputPath);
             IOUtils.copy(is, os);
-            Workspace workspace = new Workspace();
+//            Workspace workspace = new Workspace();
+            Cookie[] cookies = req.getCookies();
+            Workspace workspace = getWorkspace(req);
             migrateService.migrate(userName, inputPath, workspace);
         } catch (Exception e) {
             String errorMsg = "project import failed for:" + e.getMessage();
@@ -148,6 +150,21 @@ public class DSSMigrateRestful {
         return Message.ok();
     }
 
+    public static Workspace getWorkspace(HttpServletRequest request) {
+        Workspace workspace = new Workspace();
+        Cookie[] cookies = request.getCookies();
+        Arrays.stream(cookies).forEach(cookie -> {
+            if ("workspaceId".equals(cookie.getName())) {
+                workspace.setWorkspaceName(cookie.getValue());
+            } else if ("workspaceName".equals(cookie.getName())) {
+                workspace.setWorkspaceId(Long.parseLong(cookie.getValue()));
+            }
+        });
+        workspace.setWorkspaceId(100);
+        workspace.setWorkspaceName("test_workspace");
+        SSOHelper.addWorkspaceInfo(request, workspace);
+        return workspace;
+    }
 
     public static Workspace getWorkspaceForOldVersion(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();

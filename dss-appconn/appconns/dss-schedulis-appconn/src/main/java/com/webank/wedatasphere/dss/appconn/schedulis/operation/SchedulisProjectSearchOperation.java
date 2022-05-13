@@ -30,7 +30,9 @@ public class SchedulisProjectSearchOperation
             logger.info("responseBody from Schedulis is: {}.", responseBody);
             Map map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
             String errorInfo = (String) map.get("error");
-            if (errorInfo != null && errorInfo.contains("Project " + requestRef.getProjectName() + " doesn't exist")) {
+            if (errorInfo != null && (errorInfo.contains("Project " + requestRef.getProjectName() + " doesn't exist")
+                    //schedulis已删除但未永久删除的项目返回这个
+                    || errorInfo.contains("Permission denied. Need READ access"))) {
                 return ProjectResponseRef.newExternalBuilder().success();
             } else if (errorInfo != null) {
                 return ProjectResponseRef.newExternalBuilder().error(errorInfo);

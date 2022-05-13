@@ -608,6 +608,5 @@ export default {
   }
 };
 </script>
-<style  scoped>
-  @import "./table.css";
+<style lang="scss" src="./table.scss" scoped>
 </style>

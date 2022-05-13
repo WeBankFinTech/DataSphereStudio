@@ -156,7 +156,9 @@
     color: $dark-text-color;
     border-color: $dark-border-color-base;
   }
-
+  .we-editor a {
+    color: $dark-text-color !important;
+  }
   .we-editor .monaco-editor .margin {
     background-color: $dark-submenu-color;
   }
@@ -523,28 +525,6 @@
     background-color: $dark-primary-color !important;
   }
 
-  .table-div {
-    background: $dark-base-color;
-    border-color: $dark-border-color-base;
-  }
-  .top-td {
-    background: $dark-menu-base-color;
-    color: $dark-workspace-title-color;
-    border-color: $dark-border-color-base;
-  }
-  .bottom-td {
-    color: $dark-workspace-title-color;
-    border-color: $dark-border-color-base;
-  }
-  .sort-icon i {
-    color: $dark-text-color;
-  }
-  .trselect td {
-    background-color: $dark-active-menu-item;
-    &:hover {
-      background-color: $dark-active-menu-item;
-    }
-  }
   .no-data-tip {
     color: $dark-text-color;
   }

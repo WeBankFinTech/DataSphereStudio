@@ -80,6 +80,10 @@ public class MigrateServiceImpl implements MigrateService {
         DSSProjectDO dssProject = metaService.readProject(inputPath);
         DSSProjectVo finalProject;
         DSSProjectDO dbProject = dssProjectService.getProjectByName(dssProject.getName());
+        if(!dssProject.getUsername().equalsIgnoreCase(userName)){
+            LOG.error("fatal error, project owner is {} ，but export user is {}", dssProject.getUsername(), userName);
+            throw new MigrateErrorException(40013, "project has been exported by others,not owner "+dssProject.getUsername());
+        }
         if (dbProject == null) {
             //判断如果没有该工程，则开始调用接口来进行工程创建
             LOG.info("dssProject {} is not exist will create it first", dssProject.getName());

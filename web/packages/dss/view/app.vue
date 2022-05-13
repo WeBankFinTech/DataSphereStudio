@@ -19,7 +19,6 @@ export default {
   },
   mounted() {
     this.watermark = this.$APP_CONF.watermark || { template: '', show: false }
-    console.log(this.$APP_CONF, this.watermark)
     if (this.watermark.show) {
       this.resizeWaterMark();
       elementResizeEvent.bind(this.$el, this.resizeWaterMark);

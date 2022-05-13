@@ -1344,20 +1344,11 @@ export default {
         overflow: hidden;
         margin-right: 8px;
         border-radius: 12px;
-        /deep/.svg-icon {
-          @include font-color(
-            $workspace-title-color,
-            $dark-workspace-title-color
-          );
-        }
         &.active {
           margin-top: 1px;
           @include bg-color(#e8eef4, $dark-workspace-body-bg-color);
           color: $primary-color;
           @include font-color($primary-color, $dark-primary-color);
-          /deep/.svg-icon {
-            @include font-color($primary-color, $dark-primary-color);
-          }
         }
 
         &:hover {

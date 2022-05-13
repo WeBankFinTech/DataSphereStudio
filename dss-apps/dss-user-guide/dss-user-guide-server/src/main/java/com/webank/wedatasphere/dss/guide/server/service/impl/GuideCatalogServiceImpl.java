@@ -165,7 +165,7 @@ public class GuideCatalogServiceImpl extends ServiceImpl<GuideCatalogMapper, Gui
             logger.info("GuideChapter文件路径："+ mdFilePath);
             String content = MdAnalysis.readMd(mdFilePath);
             guideChapter.setContent(content);
-            guideChapter.setContentHtml(MdAnalysis.markdown2Html(mdFilePath));
+            guideChapter.setContentHtml(MdAnalysis.changeHtmlTagA(MdAnalysis.markdown2Html(mdFilePath)));
         }
         guideChapter.setUpdateTime(new Date());
         guideChapter.setCreateTime(new Date());

@@ -124,7 +124,7 @@ public class WidgetOptStrategy extends AbstractOperationStrategy {
 
         @SuppressWarnings("unchecked")
         Map<String, Object> widgetData = (Map<String, Object>) responseRef.toMap().get("widget");
-        long newId = ((Double)Double.parseDouble(widgetData.get(id).toString())).longValue();
+        long newId = DSSCommonUtils.parseToLong(widgetData.get(id));
         jobContent.put("id", newId);
         requestRef.getRefJobContent().put("id", newId);
         // cs更新

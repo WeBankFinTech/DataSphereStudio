@@ -89,7 +89,14 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
-        String updateFlowJson = updateFlowContextIdAndVersion(flowJson, contextId, orcVersion);
+        String updateFlowJson = updateFlowContextIdAndVersion(userName,
+                workspace.getWorkspaceName(),
+                projectName,
+                flowJson,
+                dssFlow,
+                parentFlowId,
+                contextId,
+                orcVersion);
         updateFlowJson = inputWorkFlowNodes(userName, projectName, updateFlowJson, dssFlow,
                 flowInputPath, workspace, orcVersion, dssLabels);
         List<? extends DSSFlow> subFlows = dssFlow.getChildren();
@@ -110,7 +117,24 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
 
     }
 
-    private String updateFlowContextIdAndVersion(String flowJson, String contextId, String orcVersion) throws IOException {
+
+    private String updateFlowContextIdAndVersion(String userName,
+                                                 String workspaceName,
+                                                 String projectName,
+                                                 String flowJson,
+                                                 DSSFlow dssFlow,
+                                                 Long parentFlowId,
+                                                 String contextId,
+                                                 String orcVersion) throws IOException, DSSErrorException {
+
+        String parentFlowIdStr = null;
+        if (parentFlowId != null) {
+            parentFlowIdStr = parentFlowId.toString();
+        }
+        if (!dssFlow.getRootFlow()) {
+            contextId = contextService.checkAndInitContext(flowJson, parentFlowIdStr, workspaceName, projectName, dssFlow.getName(), orcVersion, userName);
+            logger.info("create subflow contextID is " + contextId);
+        }
         return workFlowParser.updateFlowJsonWithMap(flowJson, MapUtils.newCommonMap(CSCommonUtils.CONTEXT_ID_STR, contextId, DSSJobContentConstant.ORC_VERSION_KEY, orcVersion));
     }
 

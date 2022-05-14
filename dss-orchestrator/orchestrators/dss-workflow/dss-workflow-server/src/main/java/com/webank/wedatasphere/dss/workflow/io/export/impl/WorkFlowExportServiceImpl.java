@@ -19,7 +19,10 @@ package com.webank.wedatasphere.dss.workflow.io.export.impl;
 
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.entity.Resource;
+import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
+import com.webank.wedatasphere.dss.common.entity.node.DSSEdgeDefault;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+import com.webank.wedatasphere.dss.common.entity.node.Node;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
@@ -37,6 +40,7 @@ import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,13 +48,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.NODE_EXPORT_IMPORT_TIMEOUT_MINUTES;
 import static com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool.nodeExportThreadPool;
 
 
@@ -172,38 +178,73 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
             //导出工作流节点资源文件,工作流节点appconn文件
             List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(flowJson);
-            CountDownLatch countDownLatch;
-            AtomicInteger failedImportCount = new AtomicInteger(0);
-            if (nodes != null) {
-                countDownLatch = new CountDownLatch(nodes.size());
-                for (DSSNode node : nodes) {
-                    nodeExportThreadPool.submit(() -> {
-                        try {
-                            nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
-                            NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-                            if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
-//                    if (MapUtils.isNotEmpty(node.getJobContent()) && !node.getJobContent().containsKey("script")) {
-                                logger.info("node.getJobContent() is :{}", node.getJobContent());
-                                nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);
-                            }
-                        } catch (Exception e) {
-                            //todo 失败重试
-                            failedImportCount.getAndAdd(1);
-                            logger.error("failed to export node:{}", node.getName(), e);
-                        } finally {
-                            countDownLatch.countDown();
+            if (CollectionUtils.isNotEmpty(nodes)) {
+                List<DSSEdge> edges = workFlowParser.getWorkFlowEdges(flowJson);
+                Map<String, DSSNode> waitingNodes = nodes.stream().collect(Collectors.toConcurrentMap(Node::getId, t -> t));
+                Set<String> completedNodes = Collections.synchronizedSet(new HashSet<>());
+                List<String> failedNodes = Collections.synchronizedList(new ArrayList<>());
+                CountDownLatch countDownLatch = new CountDownLatch(nodes.size());
+                List<FutureTask> futureTaskList = Collections.synchronizedList(new ArrayList<>());
+//                Map.Entry<String, DSSNode> entry;
+                while (!waitingNodes.isEmpty()) {
+                    //若有失败节点，直接失败，中断其他节点线程
+                    if (!failedNodes.isEmpty()) {
+                        for (FutureTask futureTask : futureTaskList) {
+                            futureTask.cancel(true);
                         }
-                    });
+                        throw new DSSErrorException(90070, "有节点导出失败，请重试: " + failedNodes);
+                    }
+                    for (Map.Entry<String, DSSNode> entry : waitingNodes.entrySet()) {
+//                        entry = stringDSSNodeEntry;
+                        String nodeId = entry.getKey();
+                        DSSNode node = entry.getValue();
+                        //todo 缓存
+                        Set<String> dependNodes = edges.stream().filter(l -> l.getTarget().equals(nodeId)).map(DSSEdge::getSource).collect(Collectors.toSet());
+                        boolean canSubmit = true;
+                        if (!dependNodes.isEmpty()) {
+                            for (String n : dependNodes) {
+                                if (!completedNodes.contains(n)) {
+                                    canSubmit = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (canSubmit) {
+                            FutureTask<Boolean> futureTask = new FutureTask<>(() -> {
+                                boolean result = false;
+                                try {
+                                    nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
+                                    NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+                                    if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
+                                        logger.info("node.getJobContent() is :{}", node.getJobContent());
+                                        nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);
+                                    }
+                                    completedNodes.add(nodeId);
+                                    result = true;
+                                } catch (Exception e) {
+                                    failedNodes.add(node.getName());
+                                    logger.error("failed to export node:{}", node.getName(), e);
+                                } finally {
+                                    countDownLatch.countDown();
+                                }
+                                return result;
+                            });
+                            waitingNodes.remove(nodeId);
+                            nodeExportThreadPool.submit(futureTask);
+                            futureTaskList.add(futureTask);
+                        }
+                    }
+                    Thread.sleep(10L);
                 }
                 boolean success = false;
                 try {
-                    success = countDownLatch.await(30, TimeUnit.MINUTES);
+                    success = countDownLatch.await(NODE_EXPORT_IMPORT_TIMEOUT_MINUTES.getValue(), TimeUnit.MINUTES);
                 } catch (InterruptedException e) {
                     logger.error("failed to export node for workflow:{}", flowName, e);
                     throw new DSSErrorException(90071, "导出节点超时！");
                 }
-                if (failedImportCount.get() > 0) {
-                    throw new DSSErrorException(90070, "有" + failedImportCount.get() + "个节点导出失败，请重试！");
+                if (!failedNodes.isEmpty()) {
+                    throw new DSSErrorException(90070, "有节点导出失败，请重试: " + failedNodes);
                 }
             }
 

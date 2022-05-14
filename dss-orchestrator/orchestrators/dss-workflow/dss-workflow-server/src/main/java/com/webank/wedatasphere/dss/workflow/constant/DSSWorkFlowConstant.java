@@ -30,6 +30,7 @@ public class DSSWorkFlowConstant {
     public static final CommonVars CACHE_TIMEOUT = CommonVars$.MODULE$.apply("wds.dss.server.cache.timeout", 1000 * 60 * 60);
     public static final CommonVars PUBLISH_TIMEOUT = CommonVars$.MODULE$.apply("wds.dss.server.publish.timeout", 60 * 10);
     public static final CommonVars<Integer> NODE_EXPORT_IMPORT_THREAD_NUM = CommonVars.apply("wds.dss.server.workflow.exportImport.thread.num", 50);
+    public static final CommonVars<Integer> NODE_EXPORT_IMPORT_TIMEOUT_MINUTES= CommonVars.apply("wds.dss.server.workflow.exportImport.timeout.minutes", 30);
     /**
      * 工作流编辑锁超时时间
      */

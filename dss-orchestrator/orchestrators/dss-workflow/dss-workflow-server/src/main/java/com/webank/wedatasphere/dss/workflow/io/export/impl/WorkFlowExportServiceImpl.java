@@ -41,6 +41,7 @@ import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,6 +165,39 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     public void exportFlowResources(String userName, Long projectId, String projectName,
                                     String projectSavePath, String flowJson, String flowName,
                                     Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
+        String workFlowExportPath = genWorkFlowExportDir(projectSavePath, flowName);
+        String workFlowResourceSavePath = workFlowExportPath + File.separator + "resource";
+        String appConnResourceSavePath = workFlowExportPath + File.separator + "appconn-resource";
+        if (StringUtils.isNotEmpty(workFlowExportPath)) {
+            //导出工作流资源文件
+            List<Resource> resources = workFlowParser.getWorkFlowResources(flowJson);
+            if (resources != null) {
+                resources.forEach(resource -> {
+                    downloadFlowResourceFromBml(userName, resource, workFlowResourceSavePath);
+                });
+            }
+
+            //导出工作流节点资源文件,工作流节点appconn文件
+            List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(flowJson);
+            if (nodes != null) {
+                for (DSSNode node : nodes) {
+                    nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
+                    NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+                    if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
+                        logger.info("node.getJobContent() is :{}", node.getJobContent());
+                        nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);
+                    }
+                }
+            }
+
+        } else {
+            throw new DSSErrorException(90067, "工作流导出生成路径为空");
+        }
+    }
+
+    public void exportFlowResources_for_multi_thread(String userName, Long projectId, String projectName,
+                                                     String projectSavePath, String flowJson, String flowName,
+                                                     Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
         String workFlowExportPath = genWorkFlowExportDir(projectSavePath, flowName);
         String workFlowResourceSavePath = workFlowExportPath + File.separator + "resource";
         String appConnResourceSavePath = workFlowExportPath + File.separator + "appconn-resource";

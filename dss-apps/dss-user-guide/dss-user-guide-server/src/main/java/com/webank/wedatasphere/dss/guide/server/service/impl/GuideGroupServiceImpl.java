@@ -59,7 +59,7 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
     }
 
     @Override
-    public void asyncGuide(String summaryPath) throws GuideException {
+    public void asyncGuide(String summaryPath,String ignoreModel) throws GuideException {
         logger.info("====================初始化guide-group guide-content==================");
         guideInit();
         //父级目录
@@ -70,11 +70,11 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
         String index = null;
         try {
             //1.解析SUMMARY.md文件
-            List<Map<String, Map<String, String>>> maps = MdAnalysis.analysisMd(summaryPath,"guide");
+            List<Map<String, Map<String, String>>> maps = MdAnalysis.analysisMd(summaryPath,"guide",ignoreModel);
             for(Map<String, Map<String, String>> map : maps){
                 for (Map.Entry tag : map.entrySet()) {
                     if(!StringUtils.isEmpty(map.get("url"))){
-                        index = map.get("url").get("path");
+                        index = map.get("url").get("path").trim();
                     }
                     if(MdAnalysis.isStr2Num(String.valueOf(tag.getKey()))){
                         guideGroups.add(buildGroupParams(map,tag,Long.valueOf(tag.getKey().toString()),index));
@@ -125,7 +125,7 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
         if (!StringUtils.isEmpty(mdFilePath)) {
             String content = MdAnalysis.readMd(mdFilePath);
             guideContent.setContent(content);
-            guideContent.setContentHtml(MdAnalysis.markdown2Html(mdFilePath));
+            guideContent.setContentHtml(MdAnalysis.changeHtmlTagA(MdAnalysis.markdown2Html(mdFilePath)));
         }
         guideContent.setType(type);
         guideContent.setTitle(map.get(tag.getKey()).get("title"));

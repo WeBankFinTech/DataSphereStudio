@@ -74,6 +74,29 @@ export default {
       max-width: 100%;
       cursor: pointer;
     }
+    /deep/h1 {
+      font-size: 18px;
+      margin: 6px 0;
+    }
+    /deep/h2 {
+      font-size: 16px;
+      margin: 6px 0;
+    }
+    /deep/h3 {
+      font-size: 14px;
+      margin: 6px 0;
+    }
+    /deep/h4 {
+      font-size: 12px;
+      margin: 6px 0;
+    }
+    /deep/h5 {
+      font-size: 12px;
+      margin: 6px 0;
+    }
+    p /deep/p {
+      margin: 5px;
+    }
   }
 }
 </style>

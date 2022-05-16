@@ -1377,10 +1377,6 @@ export default {
     // 保存请求
     saveRequest(json, comment, f, cb) {
       const updateTime = Date.now();
-      // 如果保存的时候代理用户为空加上默认用户
-      if (!this.props[0]['user.to.proxy']) {
-        this.props[0]['user.to.proxy'] = this.getUserName();
-      }
       const paramsJson = JSON.parse(JSON.stringify(Object.assign(json, {
         comment: comment,
         type: this.type,
@@ -2353,7 +2349,7 @@ export default {
         orchestratorId: this.orchestratorId,
         orchestratorVersionId: this.newOrchestratorVersionId,
         dssLabel: this.getCurrentDsslabels(),
-        workflowId: Number(this.flowId),
+        workflowId: Number(this.newFlowId),
         labels: {route: this.getCurrentDsslabels()},
         comment: this.pubulishFlowComment
       }
@@ -2451,8 +2447,26 @@ export default {
       }, 'post').then((openOrchestrator) => {
         this.loading = false;
         if (openOrchestrator) {
-          this.appId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.appId;
-          this.newOrchestratorVersionId = openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
+          const previd = `${this.orchestratorId}${this.newOrchestratorVersionId}`
+          const resVersion =  openOrchestrator.OrchestratorVo.dssOrchestratorVersion
+          // 发布成功后id变化，更新缓存，防止刷新页面重复打开工作流
+          let workspaceId = this.$route.query.workspaceId;
+          let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+          workFlowLists.forEach(it => {
+            if (it.tabId == previd) {
+              it.version = resVersion.id
+              it.tabId = `${this.orchestratorId}${resVersion.id}`
+              it.query = {
+                ...it.query,
+                orchestratorVersionId: resVersion.id,
+                appId: resVersion.appId,
+                version: resVersion.id
+              }
+            }
+          });
+          sessionStorage.setItem(`work_flow_lists_${workspaceId}`, JSON.stringify(workFlowLists))
+          this.appId = resVersion.appId;
+          this.newOrchestratorVersionId = resVersion.id;
           if(cb) {
             cb();
           }

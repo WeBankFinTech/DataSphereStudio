@@ -169,8 +169,9 @@ export default {
                   location.href = rst.redirectLinkisUrl;
                   return
                 }
-                this.baseInfo = { username: this.loginForm.user, isAdmin: rst.isAdmin }
+                this.baseInfo = { username: this.loginForm.user };
                 storage.set('baseInfo', this.baseInfo, 'local');
+                this.getIsAdmin()
                 // 登录之后需要获取当前用户的调转首页的路径
                 this.getPageHomeUrl().then((res) => {
                   this.$router.replace({path: res});
@@ -201,6 +202,12 @@ export default {
     },
     getGlobalLimit() {
       return api.fetch(`/dss/scriptis/globalLimits`, {}, 'get')
+    },
+    getIsAdmin() {
+      api.fetch(`/jobhistory/governanceStationAdmin`, {}, 'get').then((rst)=> {
+        this.baseInfo = { username: this.loginForm.user, isAdmin: rst.admin }
+        storage.set('baseInfo', this.baseInfo, 'local');
+      })
     }
   },
 };

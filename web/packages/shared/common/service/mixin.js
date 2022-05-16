@@ -105,10 +105,10 @@ export default {
       }
     },
     getUserName() {
-      return  storage.get("baseInfo", 'local') ? storage.get("baseInfo", 'local') .username : null;
+      return  storage.get("baseInfo", 'local') ? storage.get("baseInfo", 'local').username : null;
     },
     getIsAdmin() {
-      return  storage.get("baseInfo", 'local')  ? storage.get("baseInfo", 'local') .isAdmin : false;
+      return  storage.get("baseInfo", 'local')  ? storage.get("baseInfo", 'local').isAdmin : false;
     },
     // 获取当前工作流的环境
     getCurrentDsslabels() {

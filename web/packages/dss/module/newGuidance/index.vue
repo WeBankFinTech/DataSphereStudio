@@ -325,13 +325,13 @@ export default {
           let dropdownWidth = document.querySelector(".ivu-dropdown-rel")
           let block3 = document.querySelector(".headerSuspension .item1 .block3")
           let block5 = document.querySelector(".headerSuspension .item1 .block5")
-          let img3 = document.querySelector(".headerSuspension .item2 .img3")
+          // let img3 = document.querySelector(".headerSuspension .item2 .img3")
           let img5 = document.querySelector(".headerSuspension .item2 .img5")
-          let computedStyle3 = getComputedStyle(img3, null)
-          let offset = dropdownWidth.clientWidth + 38 - 110
+          // let computedStyle3 = getComputedStyle(img3, null)
+          // let offset = dropdownWidth.clientWidth + 38 - 110
           block5.setAttribute("style", "width: " + user.clientWidth + "px")
           block3.setAttribute("style", "width: " + (dropdownWidth.clientWidth + 38) + "px")
-          img3.setAttribute("style", "margin-left: " + (parseInt(computedStyle3.marginLeft.slice(0, -2)) + offset) + "px")
+          // img3.setAttribute("style", "margin-left: " + (parseInt(computedStyle3.marginLeft.slice(0, -2)) + offset) + "px")
           img5.setAttribute("style", "right: " + ((user.clientWidth / 2) + 5) + "px")
         })
       } else if (this.currentStep === 4) {
@@ -381,13 +381,13 @@ export default {
           let dropdownWidth = document.querySelector(".ivu-dropdown-rel")
           let block3 = document.querySelector(".headerSuspension .item1 .block3")
           let block5 = document.querySelector(".headerSuspension .item1 .block5")
-          let img3 = document.querySelector(".headerSuspension .item2 .img3")
+          // let img3 = document.querySelector(".headerSuspension .item2 .img3")
           let img5 = document.querySelector(".headerSuspension .item2 .img5")
-          let computedStyle3 = getComputedStyle(img3, null)
-          let offset = dropdownWidth.clientWidth + 38 - 110
+          // let computedStyle3 = getComputedStyle(img3, null)
+          // let offset = dropdownWidth.clientWidth + 38 - 110
           block5.setAttribute("style", "width: " + user.clientWidth + "px")
           block3.setAttribute("style", "width: " + (dropdownWidth.clientWidth + 38) + "px")
-          img3.setAttribute("style", "margin-left: " + (parseInt(computedStyle3.marginLeft.slice(0, -2)) + offset) + "px")
+          // img3.setAttribute("style", "margin-left: " + (parseInt(computedStyle3.marginLeft.slice(0, -2)) + offset) + "px")
           img5.setAttribute("style", "right: " + ((user.clientWidth / 2) + 5) + "px")
         })
       } else if (this.currentStep === 2) {

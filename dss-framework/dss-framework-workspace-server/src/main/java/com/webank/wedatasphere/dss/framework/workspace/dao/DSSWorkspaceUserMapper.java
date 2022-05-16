@@ -53,7 +53,7 @@ public interface DSSWorkspaceUserMapper {
     List<String> getAllWorkspaceUsers(@Param("workspaceId") int workspaceId);
 
     @Select("select is_admin from dss_user where username = #{userName}")
-    boolean isAdmin(@Param("userName") String userName);
+    Integer isAdmin(@Param("userName") String userName);
 
     @Select({
             "<script>",

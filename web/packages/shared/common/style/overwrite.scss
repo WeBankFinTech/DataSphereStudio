@@ -156,7 +156,9 @@
     color: $dark-text-color;
     border-color: $dark-border-color-base;
   }
-
+  .we-editor a {
+    color: $dark-text-color !important;
+  }
   .we-editor .monaco-editor .margin {
     background-color: $dark-submenu-color;
   }
@@ -467,10 +469,8 @@
     color: $dark-text-color !important;
   }
   .designer .node-selected {
-    // box-shadow: 0 0 8px #0e1118;
     background: #DEE8F4;
-    // border: 1px solid #234C7F;
-    box-shadow: 1px 4px 6px 1px rgba(106,133,167,0.30);
+    box-shadow: 1px 4px 6px 1px rgba(106, 141, 185, 0.65);
     border-radius: 4px;
   }
   .bg-img {
@@ -523,27 +523,6 @@
     background-color: $dark-primary-color !important;
   }
 
-  .table-div {
-    background: $dark-base-color;
-    border-color: $dark-border-color-base;
-  }
-  .top-td {
-    background: $dark-menu-base-color;
-    color: $dark-workspace-title-color;
-    border-color: $dark-border-color-base;
-  }
-  .bottom-td {
-    border-color: $dark-border-color-base;
-  }
-  .sort-icon i {
-    color: $dark-text-color;
-  }
-  .trselect td {
-    background-color: $dark-active-menu-item;
-    &:hover {
-      background-color: $dark-active-menu-item;
-    }
-  }
   .no-data-tip {
     color: $dark-text-color;
   }

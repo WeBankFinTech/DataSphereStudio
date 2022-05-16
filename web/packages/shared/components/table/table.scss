@@ -1,3 +1,4 @@
+@import '@dataspherestudio/shared/common/style/variables.scss';
 
 .tableBody {
   width: 100%;
@@ -7,17 +8,17 @@
   height: 40px;
   white-space: nowrap;
   overflow: hidden;
-  background-color: rgb(94, 157, 224);
   box-sizing: border-box;
   text-align: center;
   text-overflow: ellipsis;
   vertical-align: middle;
   font-weight: 600;
   border-bottom: 1px solid #e8eaec;
-  color: #fff;
   font-size: 12px;
   overflow: hidden;
   position: relative;
+  @include bg-color(rgb(94, 157, 224), $dark-menu-base-color);
+  @include border-color(#e8eaec, $dark-border-color-base);
 }
 .top-td .text {
   display: inline-block;
@@ -42,7 +43,6 @@
   line-height: 6px;
   overflow: hidden;
   position: absolute;
-  color: #c5c8ce;
   transition: color 0.2s ease-in-out;
   font-size: 16px;
   font-family: Ionicons;
@@ -51,6 +51,7 @@
   font-variant: normal;
   text-transform: none;
   text-rendering: auto;
+  color: $dark-text-color;
 }
 .sort-icon i:first-child {
   top: 0;
@@ -59,10 +60,10 @@
   bottom: 0;
 }
 .sort-icon i:hover {
-  color: #FFF;
+  @include font-color(#fff, $dark-text-color);
 }
 .sort-icon i.on {
-  color: #FFF;
+  @include font-color(#fff, $dark-text-color);
 }
 .sort-icon-arrow-down:before {
   content: "\F33D";
@@ -107,8 +108,8 @@
 }
 .table-bottom-load .msg {
   margin-top: 10px;
-  color: #000;
   line-height: 30px;
+  @include font-color(#000, $dark-text-color);
 }
 @keyframes ani-demo-spin {
   from {
@@ -124,14 +125,14 @@
 .table-div {
   width: inherit;
   max-width: 100%;
-  color: #495060;
   font-size: 12px;
-  background-color: #fff;
   box-sizing: border-box;
   position: relative;
   margin: auto;
   border: 1px solid #e8eaec;
   overflow: auto;
+  @include font-color(#495060, $dark-text-color);
+  @include border-color(#e8eaec, $dark-border-color-base);
 }
 .bottom-td {
   overflow: hidden;
@@ -143,12 +144,16 @@
   border-bottom: 1px solid #e8eaec;
   border-right: 1px solid #e8eaec;
   transition: background-color 0.2s ease-in-out;
+  @include border-color(#e8eaec, $dark-border-color-base);
 }
 .trselect td {
-  background-color: #ebf7ff;
+  @include bg-color(#ebf7ff, $dark-active-menu-item);
+  &:hover {
+    @include bg-color(#ebf7ff, $dark-active-menu-item)
+  }
 }
 .trhover:hover td {
-  background-color: #ebf7ff;
+  @include bg-color(#ebf7ff, $dark-active-menu-item);
 }
 .no-data-tip {
   height: 100%;

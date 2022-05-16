@@ -40,12 +40,12 @@ public class VisualisProjectService extends ProjectService {
 
     @Override
     protected ProjectUpdateOperation createProjectUpdateOperation() {
-        return null;
+        return new VisualisProjectUpdateOperation();
     }
 
     @Override
     protected ProjectDeletionOperation createProjectDeletionOperation() {
-        return null;
+        return new VisualisProjectDeletionOperation();
     }
 
     @Override

@@ -22,7 +22,7 @@ public class VisualisProjectUpdateOperation extends AbstractStructureOperation<P
     public ResponseRef updateProject(ProjectUpdateRequestRef.ProjectUpdateRequestRefImpl projectRef) throws ExternalOperationFailedException {
         String url = URLUtils.getUrl(getBaseUrl(), URLUtils.PROJECT_DELETE_UPDATE_URL, projectRef.getRefProjectId().toString());
         DSSPutAction updateAction = new DSSPutAction();
-        updateAction.addRequestPayload("descriotion", projectRef.getDSSProject().getDescription());
+        updateAction.addRequestPayload("description", projectRef.getDSSProject().getDescription());
         LabelRouteVO routeVO = new LabelRouteVO();
         routeVO.setRoute(projectRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         updateAction.addRequestPayload("labels", routeVO);

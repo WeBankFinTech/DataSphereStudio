@@ -80,6 +80,10 @@ public class MigrateServiceImpl implements MigrateService {
         DSSProjectDO dssProject = metaService.readProject(inputPath);
         DSSProjectVo finalProject;
         DSSProjectDO dbProject = dssProjectService.getProjectByName(dssProject.getName());
+        if(!dssProject.getUsername().equalsIgnoreCase(userName)){
+            LOG.error("fatal error, project owner is {} ，but export user is {}", dssProject.getUsername(), userName);
+            throw new MigrateErrorException(40013, "project has been exported by others,not owner "+dssProject.getUsername());
+        }
         if (dbProject == null) {
             //判断如果没有该工程，则开始调用接口来进行工程创建
             LOG.info("dssProject {} is not exist will create it first", dssProject.getName());
@@ -94,6 +98,11 @@ public class MigrateServiceImpl implements MigrateService {
             projectCreateRequest.setApplicationArea(dssProject.getApplicationArea());
             projectCreateRequest.setDevProcessList(Lists.newArrayList("dev", "prod"));
             projectCreateRequest.setOrchestratorModeList(Lists.newArrayList("pom_work_flow"));
+            //todo
+            workspace.setWorkspaceId(dssProject.getWorkspaceId());
+            workspace.setWorkspaceName("");
+            workspace.addCookie("workspaceId", String.valueOf(workspace.getWorkspaceId()));
+            workspace.addCookie("workspaceName", String.valueOf(workspace.getWorkspaceName()));
             finalProject = dssFrameworkProjectService.createProject(projectCreateRequest, userName, workspace);
         } else if (!dbProject.getUsername().equals(dssProject.getUsername())) {
             LOG.error("fatal error, project {} 已经创建，但是创建人不是 {}", dssProject.getName(), dssProject.getCreateBy());

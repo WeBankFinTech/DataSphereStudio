@@ -352,7 +352,7 @@ export default {
 .guide-container {
   position: fixed;
   right: 0;
-  width: 400px;
+  width: 650px;
   top: 54px;
   bottom: 0;
   @include bg-color(#fff, $dark-menu-base-color);

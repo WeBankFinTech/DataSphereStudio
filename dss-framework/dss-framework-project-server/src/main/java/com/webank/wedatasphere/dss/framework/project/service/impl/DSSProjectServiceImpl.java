@@ -95,7 +95,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     @Override
     public void modifyProject(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException {
         //校验当前登录用户是否含有修改权限
-        projectUserService.isEditProjectAuth(projectModifyRequest.getId(), username);
+//        projectUserService.isEditProjectAuth(projectModifyRequest.getId(), username);
         DSSProjectDO project = new DSSProjectDO();
         //修改的字段
         project.setDescription(projectModifyRequest.getDescription());

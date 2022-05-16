@@ -157,7 +157,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     public List<DSSWorkspace> getWorkspaces(String userName) {
         List<DSSWorkspace> workspaces = dssWorkspaceMapper.getWorkspaces(userName);
         //用于展示demo的工作空间是不应该返回的,除非用户是管理员
-        if (dssWorkspaceUserMapper.isAdmin(userName)) {
+        if (dssWorkspaceUserMapper.isAdmin(userName) == 1) {
             return workspaces;
         } else {
             //踢掉那个演示demo工作空间
@@ -297,6 +297,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         List<DSSWorkspaceMenuRolePriv> defaultWorkspaceMenuRolePrivList = dssWorkspaceMapper.getDefaultWorkspaceMenuPriv();
         for (DSSWorkspaceMenuRolePriv v : defaultWorkspaceMenuRolePrivList) {
             if (!dssWorkspaceMenuRolePrivList.contains(v)) {
+                v.setPriv(0);
                 dssWorkspaceMenuRolePrivList.add(v);
             }
         }
@@ -344,6 +345,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         List<DSSWorkspaceComponentRolePriv> defaultDssWorkspaceComponentRolePrivList = dssWorkspaceMenuMapper.getDefaultComponentRolePriv01();
         for (DSSWorkspaceComponentRolePriv p : defaultDssWorkspaceComponentRolePrivList) {
             if (!dssWorkspaceComponentRolePrivList.contains(p)) {
+                p.setPriv(0);
                 dssWorkspaceComponentRolePrivList.add(p);
             }
         }
@@ -428,7 +430,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public boolean checkAdmin(String userName) {
-        return dssWorkspaceUserMapper.isAdmin(userName);
+        return dssWorkspaceUserMapper.isAdmin(userName) == 1;
     }
 
     @Override

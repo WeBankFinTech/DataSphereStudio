@@ -36,8 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration.LINKIS_JOB_CREATOR;
-import static com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration.LINKIS_JOB_CREATOR_1_X;
+import static com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration.*;
 
 
 public class BuildJobActionImpl implements BuildJobAction {
@@ -70,7 +69,21 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     private String parseExecutionCode(Job job) {
         String code = job.getCode();
+        logger.info("The parseExecutionCode0X code for the job is {}", code);
         if (StringUtils.isEmpty(code) || code.equalsIgnoreCase("null")) {
+            Gson gson = new Gson();
+            code = gson.toJson(job.getParams());
+            logger.info("The executable code for the job is {}", code);
+        }
+        return code;
+    }
+
+
+    private String parseExecutionCodeFor1X(Job job) {
+        String code = job.getCode();
+        logger.info("The parseExecutionCodeFor1X code for the job is {}", code);
+        //for appconn node  in subflow  contains embeddedFlowId
+        if (StringUtils.isEmpty(code) || code.equalsIgnoreCase("null") || code.contains(EMBEDDED_FLOW_ID.getValue())) {
             Gson gson = new Gson();
             code = gson.toJson(job.getParams());
             logger.info("The executable code for the job is {}", code);
@@ -113,7 +126,7 @@ public class BuildJobActionImpl implements BuildJobAction {
 
         TaskUtils.addLabelsMap(job.getParams(), labels);
 
-        String code = parseExecutionCode(job);
+        String code = parseExecutionCodeFor1X(job);
 
         EngineTypeLabel engineTypeLabel = EngineTypeLabelCreator.createEngineTypeLabel(parseAppConnEngineType(job.getEngineType(), job));
 

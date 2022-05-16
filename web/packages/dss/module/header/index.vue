@@ -211,6 +211,7 @@ export default {
       });
   },
   mounted() {
+    this.init();
     this.getCurrentProject();
   },
   computed: {

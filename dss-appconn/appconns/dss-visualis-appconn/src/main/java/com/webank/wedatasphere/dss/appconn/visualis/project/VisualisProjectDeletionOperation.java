@@ -22,13 +22,12 @@ public class VisualisProjectDeletionOperation extends AbstractStructureOperation
     @Override
     public ResponseRef deleteProject(RefProjectContentRequestRef.RefProjectContentRequestRefImpl projectRef)
             throws ExternalOperationFailedException {
-        String url = getBaseUrl() + URLUtils.PROJECT_DELETE_UPDATE_URL;
+        String url = URLUtils.getUrl(getBaseUrl(), URLUtils.PROJECT_DELETE_UPDATE_URL, projectRef.getRefProjectId().toString());
         DSSPostAction deleteAction = new DSSPostAction();
         LabelRouteVO routeVO = new LabelRouteVO();
         routeVO.setRoute(projectRef.getDSSLabels().get(0).getValue().get("DSSEnv"));
         deleteAction.addRequestPayload("labels", routeVO);
         deleteAction.setUser(projectRef.getUserName());
-        deleteAction.setParameter("id", projectRef.getRefProjectId());
         return VisualisCommonUtil.getExternalResponseRef(projectRef, ssoRequestOperation, url, deleteAction);
     }
 }

@@ -48,6 +48,7 @@ import com.webank.wedatasphere.dss.workflow.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.protocol.util.ImmutablePair;
@@ -190,6 +191,10 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         List<DSSFlow> dssFlows = metaInputService.inputFlow(inputPath);
         //导入工作流关系信息
         List<DSSFlowRelation> dwsFlowRelations = metaInputService.inputFlowRelation(inputPath);
+        //兼容0.x导入
+        if (CollectionUtils.isEmpty(dwsFlowRelations)) {
+            dwsFlowRelations = metaInputService.inputFlowRelation_for_0_x(inputPath);
+        }
 
         List<DSSFlow> dwsFlowRelationList = workFlowInputService.persistenceFlow(dssFlowImportParam.getProjectID(),
                 dssFlowImportParam.getUserName(),

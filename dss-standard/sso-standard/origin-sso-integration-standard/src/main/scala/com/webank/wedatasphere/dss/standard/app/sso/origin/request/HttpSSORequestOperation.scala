@@ -8,6 +8,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSHttpAction
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException
+import com.webank.wedatasphere.dss.standard.app.sso.origin.conf.OriginSSOIntegrationConfiguration._
 import org.apache.commons.io.IOUtils
 import org.apache.linkis.common.utils.{ByteTimeUtils, Logging, Utils}
 import org.apache.linkis.httpclient.Client
@@ -89,6 +90,8 @@ object HttpSSORequestOperation extends Logging {
           IOUtils.closeQuietly(httpClientMap.get(key))
         }
         info(s"The appName $appName try to create http client with key $key.")
+        HttpClient.setConnectTimeout(SSO_MAX_HTTP_CONNECT_TIMEOUT.getValue)
+        HttpClient.setReadTimeout(SSO_MAX_HTTP_READ_TIMEOUT.getValue)
         val httpClient = HttpClient.getHttpClient(url, appName)
         httpClientMap.put(key, httpClient)
         httpClientLastAccessMap.put(key, System.currentTimeMillis)

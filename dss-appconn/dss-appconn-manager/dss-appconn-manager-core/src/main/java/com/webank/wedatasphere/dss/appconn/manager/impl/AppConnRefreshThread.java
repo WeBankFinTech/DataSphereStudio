@@ -14,7 +14,7 @@ import java.util.Optional;
  */
 public class AppConnRefreshThread implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAppConnManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppConnRefreshThread.class);
 
     private AbstractAppConnManager appConnManager;
     private List<? extends AppConnInfo> appConnInfos;
@@ -43,6 +43,7 @@ public class AppConnRefreshThread implements Runnable {
             LOGGER.warn("no appConnInfos fetched, ignore to refresh it.");
             return;
         }
+        LOGGER.info("Fetched appConn infos list => {}.", appConnInfos);
         appConnInfos.forEach(appConnInfo -> {
             Optional<? extends AppConnInfo> oldOne = this.appConnInfos.stream().filter(old -> old.getAppConnName().equals(appConnInfo.getAppConnName())).findAny();
             if(!oldOne.isPresent() || !oldOne.get().getAppConnResource().equals(appConnInfo.getAppConnResource())) {

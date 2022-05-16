@@ -38,6 +38,8 @@ import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
+import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
+import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -50,6 +52,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -419,7 +422,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return workFlowParser.updateFlowJsonWithKey(flowJson, CSCommonUtils.CONTEXT_ID_STR, contextIdStr);
     }
 
-
     private String updateWorkFlowNodeJson(String userName, String projectName,
                                           String flowJson, DSSFlow dssFlow,
                                           String version, Workspace workspace, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
@@ -436,46 +438,73 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return flowJson;
         }
         List<DSSFlow> subflows = (List<DSSFlow>) dssFlow.getChildren();
-//        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
-        List<Map<String, Object>> nodeJsonListRes = Collections.synchronizedList(new ArrayList<>());
-        CountDownLatch cdl = new CountDownLatch(nodeJsonList.size());
-        AtomicInteger failedCount = new AtomicInteger(0);
-        for (String nodeJson : nodeJsonList) {
-            NodeCopyJob.JobEntity jobEntity = new NodeCopyJob.JobEntity();
-            jobEntity.setDssFlow(dssFlow);
-            jobEntity.setNodeJson(nodeJson);
-            jobEntity.setUserName(userName);
-            jobEntity.setProjectName(projectName);
-            jobEntity.setDssLabels(dssLabels);
-            jobEntity.setWorkspace(workspace);
-            jobEntity.setUpdateContextId(updateContextId);
-            jobEntity.setSubflows(subflows);
-            jobEntity.setOrcVersion(version);
-            NodeCopyJob nodeCopyJob = new NodeCopyJob();
-            nodeCopyJob.setNodeInputService(nodeInputService);
-            nodeCopyJob.setNodeExportService(nodeExportService);
-            nodeCopyJob.setWorkflowNodeService(workflowNodeService);
-            nodeCopyJob.setNodeInfoMapper(nodeInfoMapper);
-            nodeCopyJob.setJobEntity(jobEntity);
-            nodeCopyJob.setFailedCount(failedCount);
-            nodeCopyJob.setCountDownLatch(cdl);
-            nodeCopyJob.setNodeJsonListRes(nodeJsonListRes);
-            nodeExportThreadPool.submit(nodeCopyJob);
-        }
+        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
 
-        // 用户需要等待所有节点导入完成
-        boolean success = false;
-        try {
-            success = cdl.await(30, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            logger.error("failed to import node for workflow:{}", dssFlow.getName(), e);
-            throw new DSSErrorException(90071, "导入节点超时！");
-        }
-        if (failedCount.get() > 0) {
-            throw new DSSErrorException(90074, "有节点导入失败，请重试！");
+        for (String nodeJson : nodeJsonList) {
+            //重新上传一份jar文件到bml
+            String updateNodeJson = inputNodeFiles(userName, projectName, nodeJson);
+
+            Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
+            //更新subflowID
+            String nodeType = nodeJsonMap.get("jobType").toString();
+            NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(nodeType);
+            if ("workflow.subflow".equals(nodeType)) {
+                String subFlowName = nodeJsonMap.get("title").toString();
+                List<DSSFlow> dssFlowList = subflows.stream().filter(subflow ->
+                        subflow.getName().equals(subFlowName)
+                ).collect(Collectors.toList());
+                if (dssFlowList.size() == 1) {
+                    updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, dssFlowList.get(0).getId());
+                    nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
+                    nodeJsonListRes.add(nodeJsonMap);
+                } else if (dssFlowList.size() > 1) {
+                    logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                    throw new DSSErrorException(90077, "工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                } else {
+                    logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                    throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
+                }
+//            } else if (nodeJsonMap.get("jobContent") != null && !((Map) nodeJsonMap.get("jobContent")).containsKey("script")) {
+            } else if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
+                logger.info("nodeJsonMap.jobContent is:{}", nodeJsonMap.get("jobContent"));
+                CommonAppConnNode newNode = new CommonAppConnNode();
+                CommonAppConnNode oldNode = new CommonAppConnNode();
+                oldNode.setJobContent((Map<String, Object>) nodeJsonMap.get("jobContent"));
+                oldNode.setContextId(updateContextId);
+                oldNode.setNodeType(nodeType);
+                oldNode.setName((String) nodeJsonMap.get("title"));
+                oldNode.setFlowId(dssFlow.getId());
+                oldNode.setWorkspace(workspace);
+                oldNode.setDssLabels(dssLabels);
+                oldNode.setFlowName(dssFlow.getName());
+                oldNode.setProjectId(dssFlow.getProjectID());
+                newNode.setName(oldNode.getName());
+                Map<String, Object> jobContent = workflowNodeService.copyNode(userName, newNode, oldNode, version);
+                nodeJsonMap.put("jobContent", jobContent);
+                nodeJsonListRes.add(nodeJsonMap);
+            } else {
+                nodeJsonListRes.add(nodeJsonMap);
+            }
         }
 
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
+    }
+
+    //由于每一个节点可能含有jar文件，这个功能不能直接复制使用，因为删掉新版本节点会直接删掉旧版本的node中的jar文件
+    //所以重新上传一份jar文件到bml
+    private String inputNodeFiles(String userName, String projectName, String nodeJson) throws IOException {
+        String flowPath = IoUtils.generateIOPath(userName, projectName, "");
+        String workFlowResourceSavePath = flowPath + File.separator + "resource" + File.separator;
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(nodeJson).getAsJsonObject();
+        DSSNode node = gson.fromJson(jsonObject, new TypeToken<DSSNodeDefault>() {
+        }.getType());
+        //先导出来
+        nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
+        //后导入到bml
+        String updateNodeJson = nodeInputService.uploadResourceToBml(userName, nodeJson, workFlowResourceSavePath, projectName);
+        return updateNodeJson;
     }
 
     private void persistenceFlowRelation(Long flowID, Long parentFlowID) {

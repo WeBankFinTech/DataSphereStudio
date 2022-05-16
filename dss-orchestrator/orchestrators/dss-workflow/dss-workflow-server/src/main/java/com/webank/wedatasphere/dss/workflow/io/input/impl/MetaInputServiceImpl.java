@@ -52,6 +52,13 @@ public class MetaInputServiceImpl implements MetaInputService {
         }
     }
 
+    @Override
+    public List<DSSFlowRelation> inputFlowRelation_for_0_x(String basePath) throws IOException {
+        try (InputStream inputStream = generateInputstream(basePath)) {
+            return MetaReader.of("dss_flow_relation", DSSFlowRelation.class).read(inputStream);
+        }
+    }
+
     /**
      * 获取inputStream
      *

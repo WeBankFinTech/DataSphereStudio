@@ -107,7 +107,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             throw new DSSProjectErrorException(71000, String.join(", ", appConnNameList) + " 已存在相同项目名称，请重新命名!");
         }
 
-        Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace);
+        Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace, username);
         //3.保存dss_project
         DSSProjectDO project = dssProjectService.createProject(username, projectCreateRequest);
         //4.保存dss_project_user 工程与用户关系
@@ -151,9 +151,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     /**
      * 统一修改各个接入的第三方的系统的工程状态信息，修改 dss_project 调用。
      */
-    private void modifyThirdProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, Workspace workspace){
+    private void modifyThirdProject(ProjectModifyRequest projectModifyRequest,
+                                    DSSProjectDO dbProject, Workspace workspace){
         DSSProject dssProject = new DSSProject();
-        BeanUtils.copyProperties(projectModifyRequest, dssProject);
+        BeanUtils.copyProperties(dbProject, dssProject);
         DSSProjectPrivilege privilege = DSSProjectPrivilege.newBuilder().setAccessUsers(projectModifyRequest.getAccessUsers())
                 .setEditUsers(projectModifyRequest.getEditUsers())
                 .setReleaseUsers(projectModifyRequest.getReleaseUsers()).build();
@@ -190,7 +191,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     return true;
                 }
             }, workspace, projectService -> projectService.getProjectUpdateOperation(),
-            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setUserName(dbProject.getUsername()).setWorkspace(workspace),
+            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setUserName(dbProject.getUpdateBy()).setWorkspace(workspace),
             (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setRefProjectId(appInstanceToRefProjectId.get(appInstance)),
             (structureOperation, structureRequestRef) -> {
                 ProjectUpdateRequestRef projectUpdateRequestRef = (ProjectUpdateRequestRef) structureRequestRef;
@@ -219,28 +220,28 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     }
 
     // 1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程 新增dss_project调用
-    private Map<AppInstance, Long> createAppConnProject(ProjectCreateRequest dssProjectCreateRequest, Workspace workspace) {
+    private Map<AppInstance, Long> createAppConnProject(ProjectCreateRequest dssProjectCreateRequest, Workspace workspace, String username) {
         final Map<AppInstance, Long> projectMap = new HashMap<>(10);
         final Map<AppConn, List<AppInstance>> appConnListMap = new HashMap<>(10);
         DSSProject dssProject = new DSSProject();
         BeanUtils.copyProperties(dssProjectCreateRequest, dssProject);
+        dssProject.setCreateBy(username);
+        dssProject.setCreateTime(new Date());
+        dssProject.setUsername(username);
         DSSProjectPrivilege privilege = DSSProjectPrivilege.newBuilder().setAccessUsers(dssProjectCreateRequest.getAccessUsers())
                 .setEditUsers(dssProjectCreateRequest.getEditUsers())
                 .setReleaseUsers(dssProjectCreateRequest.getReleaseUsers()).build();
         try {
             tryProjectOperation(null, workspace, ProjectService::getProjectCreationOperation,
                     dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject)
-                            .setDSSProjectPrivilege(privilege), null,
+                            .setDSSProjectPrivilege(privilege).setUserName(username), null,
                     (structureOperation, structureRequestRef) -> ((ProjectCreationOperation) structureOperation).createProject((DSSProjectContentRequestRef) structureRequestRef),
                     (pair, projectResponseRef) -> {
                         projectMap.put(pair.right, projectResponseRef.getRefProjectId());
-                        if (appConnListMap.containsKey(pair.left)) {
-                            appConnListMap.get(pair.left).add(pair.right);
-                        } else {
-                            appConnListMap.put(pair.left, new ArrayList<AppInstance>(){{
-                                add(pair.right);
-                            }});
+                        if (!appConnListMap.containsKey(pair.left)) {
+                            appConnListMap.put(pair.left, new ArrayList<>());
                         }
+                        appConnListMap.get(pair.left).add(pair.right);
                     }, "create refProject " + dssProjectCreateRequest.getName());
         } catch (RuntimeException e) {
             LOGGER.error("create appconn project failed:", e);

@@ -15,8 +15,6 @@
         <div class="app-list-main">
           <div class="app-list-tabs">
             <porjectComponent
-              ref="project"
-              @open-workflow="openWorkflow"
             ></porjectComponent>
             <appProcess></appProcess>
           </div>
@@ -89,11 +87,8 @@ export default {
   computed: {
   },
   methods: {
-    // 进入工作流
-    openWorkflow() {
-
-    },
-    init(){
+    init() {
+      sessionStorage.removeItem(`work_flow_lists_${this.workspaceId}`)
       this.$router.app.$on("getChangeCookies", () => {
         // 因为会重复注册一次，所以要触发后清除事件
         this.$router.app.$off("getChangeCookies");

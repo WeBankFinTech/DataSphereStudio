@@ -478,7 +478,7 @@ export default {
     }
   },
   data() {
-
+    const username = this.getUserName()
     return {
       // 发布前保存
       saveingComment: false,
@@ -495,7 +495,7 @@ export default {
       json: null,
       // 工作流级别的参数
       props: [
-        {'user.to.proxy': ''}
+        {'user.to.proxy': username}
       ],
       // 调度设置参数
       scheduleParams: {},

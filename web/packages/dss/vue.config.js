@@ -95,6 +95,8 @@ Object.keys(conf).forEach(item=> {
     confs.push(`${item}: '${conf[item]}'`)
   } else if(typeof conf[item] == 'object') {
     confs.push(`${item}: ${JSON.stringify(conf[item])}`)
+  } else {
+    confs.push(`${item}: ${conf[item]}`)
   }
 })
 

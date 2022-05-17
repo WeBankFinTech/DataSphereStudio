@@ -33,11 +33,12 @@ import java.util.List;
 import java.util.Map;
 
 
-public class AzkanbanBuilder extends Builder{
+public class AzkanbanBuilder extends Builder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzkanbanBuilder.class);
 
-    private static final String RUN_DATE_KEY ="run_date";
+    private static final String RUN_DATE_KEY = "run_date";
+    private static final String RUN_DATE_HOUR_KEY = "run_date_h";
     private Map<String, String> jobProps;
 
     public AzkanbanBuilder setJobProps(Map<String, String> jobProps) {
@@ -53,7 +54,7 @@ public class AzkanbanBuilder extends Builder{
 
     @Override
     protected LinkisJob creatLinkisJob(boolean isLinkisType) {
-        if(isLinkisType){
+        if (isLinkisType) {
             AzkabanCommonLinkisJob linkisJob = new AzkabanCommonLinkisJob();
             linkisJob.setJobProps(this.jobProps);
             return linkisJob;
@@ -69,13 +70,13 @@ public class AzkanbanBuilder extends Builder{
         job.setCode(jobProps.get(LinkisJobTypeConf.COMMAND));
 
         Map<String, Object> params = new HashMap<>();
-        if(jobProps.containsKey("run_date")){
+        if (jobProps.containsKey("run_date")) {
             params.put("run_date", jobProps.get("run_date"));
         }
         job.setParams(params);
 
         Map<String, Object> runtimeMap = new HashMap<>();
-        if (null != job.getRuntimeParams()){
+        if (null != job.getRuntimeParams()) {
             runtimeMap = job.getRuntimeParams();
         }
 
@@ -94,18 +95,19 @@ public class AzkanbanBuilder extends Builder{
     protected void fillLinkisJobInfo(LinkisJob linkisJob) {
         linkisJob.setConfiguration(findConfiguration(LinkisJobExecutionConfiguration.NODE_CONF_PREFIX));
         Map<String, Object> variables = findVariables(LinkisJobExecutionConfiguration.FLOW_VARIABLE_PREFIX);
-        //只有工作流参数中没有设置,我们才会去进行替换
-        //改为不管工作流是否设置，在 Schedulis 这边都需要统一使用 Schedulis 设置的 run_date,防止出现批量调度的误导作用
-        if(jobProps.containsKey(RUN_DATE_KEY)){
-            if(variables.containsKey(RUN_DATE_KEY)){
-                //去掉工作流设置的变量
-                variables.remove(RUN_DATE_KEY);
-            }
-            variables.put(RUN_DATE_KEY, jobProps.get(RUN_DATE_KEY));
-            LOGGER.info("Put run_date to variables"+jobProps.get(RUN_DATE_KEY));
-        }
+        // 只有工作流参数中没有设置,我们才会去进行替换
+        // 改为不管工作流是否设置，在 Schedulis 这边都需要统一使用 Schedulis 设置的 run_date和un_date_h,防止出现批量调度的误导作用
+        setNewRunDateVariable(variables, RUN_DATE_KEY);
+        setNewRunDateVariable(variables, RUN_DATE_HOUR_KEY);
         linkisJob.setVariables(variables);
         linkisJob.setSource(getSource());
+    }
+
+    private void setNewRunDateVariable(Map<String, Object> variables, String replaceVar) {
+        if (jobProps.containsKey(replaceVar)) {
+            variables.put(replaceVar, jobProps.get(replaceVar));
+            LOGGER.info("Put {} to variables,value: {}", replaceVar, jobProps.get(replaceVar));
+        }
     }
 
     @Override

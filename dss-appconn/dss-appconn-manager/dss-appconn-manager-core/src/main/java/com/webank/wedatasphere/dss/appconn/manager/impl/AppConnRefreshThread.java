@@ -17,7 +17,7 @@ public class AppConnRefreshThread implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(AppConnRefreshThread.class);
 
     private AbstractAppConnManager appConnManager;
-    private List<? extends AppConnInfo> appConnInfos;
+    private volatile List<? extends AppConnInfo> appConnInfos;
 
     public AppConnRefreshThread(AbstractAppConnManager appConnManager,
                                 List<? extends AppConnInfo> appConnInfos) {
@@ -46,7 +46,7 @@ public class AppConnRefreshThread implements Runnable {
         LOGGER.info("Fetched appConn infos list => {}.", appConnInfos);
         appConnInfos.forEach(appConnInfo -> {
             Optional<? extends AppConnInfo> oldOne = this.appConnInfos.stream().filter(old -> old.getAppConnName().equals(appConnInfo.getAppConnName())).findAny();
-            if(!oldOne.isPresent() || !oldOne.get().getAppConnResource().equals(appConnInfo.getAppConnResource())) {
+            if(!oldOne.isPresent() || isChanged(oldOne.get(), appConnInfo)) {
                 LOGGER.warn("AppConn info {} has updated, now try to refresh it.", appConnInfo.getAppConnName());
                 try {
                     appConnManager.reloadAppConn(appConnInfo);
@@ -60,5 +60,15 @@ public class AppConnRefreshThread implements Runnable {
         // now, do not support to delete exists AppConn, since deletion operation is very dangerous.
         this.appConnInfos = appConnInfos;
         LOGGER.info("all AppConns have refreshed.");
+    }
+
+    private boolean isChanged(AppConnInfo one, AppConnInfo other) {
+        if(one.getAppConnResource() == null && other.getAppConnResource() == null) {
+            return false;
+        } else if(one.getAppConnResource() == null || other.getAppConnResource() == null) {
+            return true;
+        } else {
+            return !one.getAppConnResource().equals(other.getAppConnResource());
+        }
     }
 }

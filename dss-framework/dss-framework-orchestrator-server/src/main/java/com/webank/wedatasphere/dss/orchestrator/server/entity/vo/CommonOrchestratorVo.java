@@ -46,7 +46,7 @@ public class CommonOrchestratorVo {
     }
 
     public String getType() {
-        return WORK_FLOW;
+        return type;
     }
 
     public void setType(String type) {

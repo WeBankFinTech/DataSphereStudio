@@ -25,8 +25,6 @@ public class MdAnalysis {
 
     private final static Pattern ATTR_PATTERN2 = Pattern.compile("(?<=\\()(.+?)(?=\\))", Pattern.CASE_INSENSITIVE);
 
-    private final static Pattern ATTR_PATTERN1 = Pattern.compile("<a[^>]*href=(\"([^\"]*)\"|'([^']*)'|([^\\s>]*))[^>]*>");
-
     private static int ROOT_COUNT = 0;
 
     private static int Y = 0;
@@ -188,25 +186,6 @@ public class MdAnalysis {
         HtmlRenderer renderer = HtmlRenderer.builder(OPTIONS).build();
         Node document = parser.parse(htmlContent);
         return renderer.render(document);
-    }
-
-    public static String changeHtmlTagA(String htmlContent)throws IOException{
-        if(StringUtils.isEmpty(htmlContent)){
-            return htmlContent;
-        }
-        //判断是否含有<a>标签
-        if(!htmlContent.contains("<a href")){
-            return htmlContent;
-        }
-        Matcher matcher = ATTR_PATTERN1.matcher(htmlContent);
-        String tagA = "";
-        String href = "";
-        if (matcher.find()) {
-            tagA = matcher.group(0);
-            href = matcher.group(2);
-        }
-        String replaceContent = htmlContent.replace(tagA, "<a target=\"_blank\" href = "+"\"/_book" + href +"\"" +">");
-        return replaceContent;
     }
 
     private static String matcherDir(String line) {

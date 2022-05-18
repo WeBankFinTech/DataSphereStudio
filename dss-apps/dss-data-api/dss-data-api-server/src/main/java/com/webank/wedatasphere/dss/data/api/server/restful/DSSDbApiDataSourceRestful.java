@@ -119,7 +119,7 @@ public class DSSDbApiDataSourceRestful {
                 try {
                     connection.close();
                 } catch (SQLException e) {
-                    return Message.error(e.getMessage());
+                     throw new SQLException(e.getMessage());
                 }
             }
         }

@@ -22,7 +22,7 @@ public abstract class AbstractOptionalOperation<K extends RequestRef, V extends 
     }
 
     @Override
-    public void setOptionalService(OptionalService optionalService) {
+    public final void setOptionalService(OptionalService optionalService) {
         service = optionalService;
     }
 

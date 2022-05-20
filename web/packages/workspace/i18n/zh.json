@@ -114,6 +114,7 @@
       "permissionsName": "权限名",
       "editorSuccess": "修改成功",
       "editorSuccessName": "修改分类{name}成功",
+      "homeSetting": "首页设置",
       "addRole": "新增角色",
       "roleName": "角色名称",
       "permissionsEditor": "权限修改",

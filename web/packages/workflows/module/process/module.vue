@@ -478,7 +478,7 @@ export default {
     }
   },
   data() {
-
+    const username = this.getUserName()
     return {
       // 发布前保存
       saveingComment: false,
@@ -495,7 +495,7 @@ export default {
       json: null,
       // 工作流级别的参数
       props: [
-        {'user.to.proxy': ''}
+        {'user.to.proxy': username}
       ],
       // 调度设置参数
       scheduleParams: {},
@@ -1377,10 +1377,6 @@ export default {
     // 保存请求
     saveRequest(json, comment, f, cb) {
       const updateTime = Date.now();
-      // 如果保存的时候代理用户为空加上默认用户
-      if (!this.props[0]['user.to.proxy']) {
-        this.props[0]['user.to.proxy'] = this.getUserName();
-      }
       const paramsJson = JSON.parse(JSON.stringify(Object.assign(json, {
         comment: comment,
         type: this.type,

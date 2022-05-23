@@ -10,7 +10,14 @@
         </Table>
       </div>
     </div>
-
+    <div  v-if="homepagedata && homepagedata.datalist.length" class="hoempage-table">
+      <h4 style="margin:10px 0px;" class="menu-permission-title">{{$t('message.workspaceManagement.homeSetting')}}</h4>
+      <Table width="1100" border highlight-row :columns="homepagedata.column" :data="homepagedata.datalist">
+        <template style="color:#4ACA6D;"  slot="action">
+          <Button type="warning" size="small" disabled>{{$t('message.workspaceManagement.editor')}}</Button>
+        </template>
+      </Table>
+    </div>
     <Modal
       v-model="creatershow"
       :title="$t('message.workspaceManagement.addRole')">
@@ -67,6 +74,7 @@ export default {
       modifyshow: false,
       creatershow: false,
       userlist: [],
+      homepagedata: null,
       workspaceId: '',
       useradd: {
         roleName: '',
@@ -93,17 +101,25 @@ export default {
     this.workspaceId =parseInt(this.$route.query.workspaceId)
   },
   mounted() {
+    this.gethomepagedata()
   },
   methods: {
     isAdmin() {
       const isAdmin = this.getIsAdmin()
       const workspaceRoles = storage.get(`workspaceRoles`) || [];
-      console.log(workspaceRoles , isAdmin)
       if (isAdmin || workspaceRoles.indexOf('admin') > -1) {
         return true;
       } else {
         return false;
       }
+    },
+    gethomepagedata() {
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceHomepageSettings`, {
+        workspaceId: this.workspaceId,
+      }, 'get').then((rst) => {
+        let data = rst.homepageSettings.roleHomepages
+        this.homepagedata = this.gethomepagetable(data)
+      })
     },
     gethomepagetable(data){
       let columns = [];

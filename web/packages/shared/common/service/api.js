@@ -136,16 +136,16 @@ let showLoginTips = false
 const api = {
   instance: instance,
   error: {
-    '-1': function(res) {
+    '-1': function (res) {
       if (res.data && res.data.enableSSO && res.data.SSOURL) {
         return window.location.replace(res.data.SSOURL);
       }
-      if (window.location.href.indexOf('/#/login') < 0 ) {
+      if (window.location.href.indexOf('/#/login') < 0) {
         window.location.href = '/#/login'
       }
       if (!showLoginTips) {
         showLoginTips = true
-        setTimeout(()=>{
+        setTimeout(() => {
           showLoginTips = false
         }, 5000)
         throw new Error('您尚未登录，请先登录!');
@@ -160,7 +160,7 @@ const api = {
   },
 };
 
-const getData = function(data) {
+const getData = function (data) {
   let _arr = ['codePath', 'messagePath', 'resultPath'];
   let res = {};
   _arr.forEach((item) => {
@@ -180,9 +180,9 @@ const getData = function(data) {
   return res;
 };
 const API_ERR_MSG = '后台接口异常，请联系开发处理！'
-const success = function(response) {
+const success = function (response) {
   if (util.isNull(api.constructionOfResponse.codePath) || util.isNull(api.constructionOfResponse.successCode) ||
-        util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
+     util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
     console.error('【FEX】Api配置错误: 请调用setConstructionOfResponse来设置API的响应结构');
     return;
   }
@@ -211,29 +211,37 @@ const success = function(response) {
     let code = res.codePath;
     let message = res.messagePath;
     let result = res.resultPath;
+    const throwErr = function (msg) {
+      const err = new Error(msg)
+      if (!data.solution) {
+        err.solution = data.solution
+        err.response = response
+      }
+      throw err;
+    }
     // 兼容 dolphin 返回数据结构
     if (data.msg) {
       if (data.code != api.constructionOfResponse.successCode) {
         if (api.error[data.code]) {
           api.error[data.code](response);
-          throw new Error('');
+          throwErr('');
         } else {
-          throw new Error(data.msg || API_ERR_MSG);
+          throwErr(data.msg || API_ERR_MSG);
         }
       }
     } else {
       if (code != api.constructionOfResponse.successCode) {
         if (api.error[code]) {
           api.error[code](response);
-          throw new Error('');
+          throwErr('');
         } else {
-          throw new Error(message || API_ERR_MSG);
+          throwErr(message || API_ERR_MSG);
         }
       }
     }
     if (result) {
       let len = 0
-      let hasBigData = Object.values(result).some(item=>{
+      let hasBigData = Object.values(result).some(item => {
         if (Array.isArray(item)) {
           len = item.length > len ? item.length : len
           return len > 200
@@ -249,7 +257,7 @@ const success = function(response) {
   }
 };
 
-const fail = function(error) {
+const fail = function (error) {
   let _message = '';
   let response = error.response;
   console.log('error', error);
@@ -274,7 +282,7 @@ const fail = function(error) {
   throw error;
 };
 
-const param = function(url, data, option) {
+const param = function (url, data, option) {
   let method = 'post';
   if (util.isNull(url)) {
     return console.error('请传入URL');
@@ -323,32 +331,90 @@ const param = function(url, data, option) {
 };
 
 let showApiErrorTips = true
-const action = function(url, data, option) {
+const action = function (url, data, option) {
   return param(url, data, option)
     .then(success, fail)
-    .then(function(response) {
+    .then(function (response) {
       return response;
     })
-    .catch(function(error) {
+    .catch(function (error) {
+      const showErrMsg = function () {
+        const msg = error.message || error.msg
+        if (window.$APP_CONF && window.$APP_CONF.error_report && error.response.config.url.indexOf('dss/framework/guide/reportProblem') < 0) {
+          const msgErrModal = Message.error({
+            duration: 10,
+            closable: true,
+            render: (h) => {
+              return h('div', {
+                class: 'g-err-msg-div',
+                style: {
+                  'text-align': 'center',
+                  padding: '10px'
+                }
+              }, [
+                h('div', {
+                  style: {
+                    'max-width': '400px',
+                    'min-width': '200px',
+                    padding: '10px',
+                    'word-break': 'break-all',
+                    'margin-bottom': '20px'
+                  }
+                }, msg),
+                h('button', {
+                  class: 'ivu-btn ivu-btn-default ivu-btn-small',
+                  on: {
+                    click: () => {
+                      if (error.solution && error.solution.solutionUrl) {
+                        window.open(error.solution.solutionUrl, '_blank')
+                      } else if(error.response) {
+                        // 上报
+                        action('/dss/framework/guide/reportProblem', {
+                          requestUrl: error.response.config.url,
+                          queryParams: error.response.config.params,
+                          requestBody: error.response.config.data,
+                          requestHeaders: {Cookie: document.cookie, ...error.response.config.headers},
+                          responseBody: error.response.data
+                        }).then(()=>{
+                          Message.success('错误已上报')
+                        })
+                      }
+                      msgErrModal()
+                    }
+                  }
+                }, error.solution &&  error.solution.solutionUrl ? '查看解决方案' : '上报错误')
+              ])
+            }
+          })
+          setTimeout(()=>{
+            document.querySelectorAll('.g-err-msg-div').forEach(ele => {
+              ele.parentElement.parentElement.style.textAlign = 'left'
+              ele.parentElement.style.display = 'block'
+              ele.parentElement.style.padding = 0
+            })
+          })
+        } else {
+          Message.error(msg);
+          throw error;
+        }
+      }
       if (error.message === API_ERR_MSG || error.msg === API_ERR_MSG) {
         if (showApiErrorTips) {
           showApiErrorTips = false
           setTimeout(() => {
             showApiErrorTips = true
           }, 3000)
-          Message.error(error.message || error.msg);
-          throw error;
+          showErrMsg()
         }
       } else {
-        Message.error(error.message || error.msg);
-        throw error;
+        showErrMsg()
       }
     });
 };
 
 api.fetch = action;
 
-api.option = function(option) {
+api.option = function (option) {
   if (option.root) {
     instance.defaults.baseURL = option.root;
   }
@@ -356,23 +422,23 @@ api.option = function(option) {
     instance.defaults.timeout = option.timeout;
   }
   if (option.config && util.isObject(option.config)) {
-    Object.keys(option.config).forEach(function(key) {
+    Object.keys(option.config).forEach(function (key) {
       instance.defaults[key] = option.config[key];
     });
   }
 };
 
-api.setError = function(option) {
+api.setError = function (option) {
   if (option && util.isObject(option)) {
     util.merge(api.error, option);
   }
 };
 
-api.setResponse = function(constructionOfResponse) {
+api.setResponse = function (constructionOfResponse) {
   this.constructionOfResponse = constructionOfResponse;
 };
 
-api.getToken = function() {
+api.getToken = function () {
   return storage.get("token", true);
 }
 export default api;

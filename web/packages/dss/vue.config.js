@@ -22,7 +22,7 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const VirtualModulesPlugin = require('webpack-virtual-modules');
 const webpack = require("webpack");
-const { apps, exts, conf} = require('./config.json')
+const { apps, exts, conf} = require('../../config.json')
 
 
 // 指定module打包, 不指定则打包全部子应用
@@ -95,6 +95,8 @@ Object.keys(conf).forEach(item=> {
     confs.push(`${item}: '${conf[item]}'`)
   } else if(typeof conf[item] == 'object') {
     confs.push(`${item}: ${JSON.stringify(conf[item])}`)
+  } else {
+    confs.push(`${item}: ${conf[item]}`)
   }
 })
 

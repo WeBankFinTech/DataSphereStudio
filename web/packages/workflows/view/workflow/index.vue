@@ -1113,7 +1113,7 @@ export default {
               overflow: 'hidden'
             },
             attrs: {
-              title: item.name
+              title: `名称：${item.name}\n描述：${item.description||''}`
             }
           }, [item.name]),
           (item.canWrite ? projectAdd : ''),
@@ -1140,7 +1140,7 @@ export default {
               overflow: 'hidden'
             },
             attrs: {
-              title: item.name
+              title: `名称：${item.name}\n描述：${item.description||''}`
             }
           },
           item.name

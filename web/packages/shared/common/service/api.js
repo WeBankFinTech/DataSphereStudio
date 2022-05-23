@@ -340,7 +340,7 @@ const action = function (url, data, option) {
     .catch(function (error) {
       const showErrMsg = function () {
         const msg = error.message || error.msg
-        if (window.$APP_CONF && window.$APP_CONF.error_report && error.response.config.url.indexOf('dss/framework/guide/reportProblem') < 0) {
+        if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && error.response.config.url.indexOf('dss/framework/guide/reportProblem') < 0) {
           const msgErrModal = Message.error({
             duration: 10,
             closable: true,

@@ -14,12 +14,12 @@
         :key="index">
         <span
           class="job-manager-title"
-          v-if="jobList.length && checkJobLength(type.en)">{{ type.cn }}</span>
+          v-if="jobList.length && checkJobLength(type)">{{ type }}</span>
         <div
           v-for="(item, subIndex) in jobList"
           :key="subIndex">
           <div
-            v-if="item.requestApplicationName === type.en"
+            v-if="item.requestApplicationName === type"
             class="job-manager-item-wrapper"
             :style="getClass(item)"
             :class="{'actived': item.isActive}"
@@ -98,33 +98,40 @@ export default {
     },
   },
   methods: {
-    getJobList() {
-      if(this.loading) return;
+    getJobCat() {
+      return api.fetch('/configuration/getCategory', {
+      }, 'get').then(res => {
+        if (res && res.Category) {
+          return res.Category.map(it => it.categoryName)
+        }
+        return []
+      })
+    },
+    async getJobList() {
+      if (this.loading) return;
       this.jobList = [];
       this.loading = true;
-      api.fetch('/jobhistory/list', {
-        pageSize: 100,
-        status: 'Running,Inited,Scheduled',
-      }, 'get').then((rst) => {
+      try {
+        this.jobTypeList = await this.getJobCat()
+        const rst = await api.fetch('/jobhistory/list', {
+          pageSize: 100,
+          status: 'Running,Inited,Scheduled',
+        }, 'get')
         this.loading = false;
         // 剔除requestApplicationName为 "nodeexecution" 的task
         let tasks = rst.tasks.filter(item => item.requestApplicationName !== "nodeexecution" && item.requestApplicationName !== "CLI")
         this.dispatch('Footer:updateRunningJob', tasks.length);
-        this.jobTypeList = [
-          { 'en': 'IDE', 'cn': this.$t('message.common.resourceSimple.YS') },
-          { 'en': 'Visualis', 'cn': this.$t('message.common.resourceSimple.ZH') },
-          { 'en': 'flowexecution', 'cn': this.$t('message.common.resourceSimple.FLOW1') },
-          { 'en': 'scheduler', 'cn': this.$t('message.common.resourceSimple.FLOW2')}];
+
         tasks.forEach((item) => {
           const tmpItem = Object.assign({}, item, { isActive: false, fileName: this.convertJson(item) });
           this.jobList.push(tmpItem);
         });
         this.jobList = orderBy(this.jobList, ['status', 'fileName']);
         this.$emit('update-job', tasks.length);
-      }).catch((err) => {
+      } catch (err) {
         this.loading = false;
         console.error(err)
-      });
+      }
     },
     // 删除当前工作
     killJob() {

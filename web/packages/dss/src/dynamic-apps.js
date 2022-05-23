@@ -1,10 +1,12 @@
+const apps = require('dynamic-modules')
+console.log(apps, 'apps')
+window.$APP_CONF =  apps.conf
+
 import { merge } from 'lodash'
 import { subAppRoutes } from "./common-router"
 // 根据module参数配置要打包的应用，生成的虚拟模块
 // 子应用可以有独立的顶层路由配置layout，header，footer，可配置micro_module参数
 
-const apps = require('dynamic-modules')
-console.log(apps, 'apps')
 let subRoutes = subAppRoutes
 const appsRoutes = Object.values(apps.appsRoutes)
 

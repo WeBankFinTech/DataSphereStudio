@@ -192,6 +192,8 @@
         "TDZDH": "Jump to line",
         "GBYFJC": "Close syntax check",
         "DKYFJC": "Open syntax check",
+        "GBKBTS": "Close DB/Table suggest",
+        "DKKBTS": "Open DB/Table suggest",
         "GYFSYGWYF": "This is highly dangerous syntax, please be cautious!"
       },
       "resourceSimple": {

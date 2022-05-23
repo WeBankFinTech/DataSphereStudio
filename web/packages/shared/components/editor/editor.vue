@@ -54,7 +54,8 @@ export default {
       editor: null,
       editorModel: null,
       decorations: null,
-      isParserClose: true,// 默认关闭语法验证
+      isParserClose: true, // 默认关闭语法验证
+      dbtbsuggest: true, // 默认打开库表联想
       closeParser: null,
       openParser: null,
       sqlParser: null,
@@ -375,6 +376,43 @@ export default {
         contextMenuOrder: 1.9,
         run(editor) {
           editor.trigger('gotoLine', 'editor.action.gotoLine');
+        },
+      });
+
+      // 打开、关闭库表联想
+      this.closeDbTbSuggest = this.editor.createContextKey('closeDbTbSuggest', this.dbtbsuggest);
+      this.openDbTbSuggest = this.editor.createContextKey('openDbTbSuggest', !this.dbtbsuggest);
+      this.editor.addAction({
+        id: 'closeDbTbSuggest',
+        label: this.$t('message.common.monacoMenu.GBKBTS'),
+        keybindings: [],
+        keybindingContext: null,
+        // 用于控制右键菜单的显示
+        precondition: 'closeDbTbSuggest',
+        contextMenuGroupId: 'control',
+        contextMenuOrder: 2.2,
+        run() {
+          vm.dbtbsuggest = false;
+          // 控制右键菜单的显示
+          vm.openDbTbSuggest.set(true);
+          vm.closeDbTbSuggest.set(false);
+          storage.set('close_db_table_suggest', true)
+        },
+      });
+
+      this.editor.addAction({
+        id: 'openDbTbSuggest',
+        label: this.$t('message.common.monacoMenu.DKKBTS'),
+        keybindings: [],
+        keybindingContext: null,
+        precondition: 'openDbTbSuggest',
+        contextMenuGroupId: 'control',
+        contextMenuOrder: 2.3,
+        run() {
+          vm.dbtbsuggest = true;
+          vm.openDbTbSuggest.set(false);
+          vm.closeDbTbSuggest.set(true);
+          storage.set('close_db_table_suggest', false)
         },
       });
 

@@ -4,11 +4,7 @@
     @click="choose"
     @mouseover="mouseover"
     @mouseout="mouseout">
-    <!-- <span
-      :class="work.logo"
-      class="workbench-title-logo">
-    </span> -->
-    <SvgIcon class='workbench-title-logo' :icon-class="work.logo" :color="iconColor[work.logo]"/>
+    <SvgIcon class='workbench-title-logo' :icon-class="work.logo" :color="work.color"/>
     <span
       v-if="!(node && index === 0)"
       :title="work.filepath || work.filename"
@@ -52,19 +48,6 @@ export default {
   data() {
     return {
       isHover: false,
-      iconColor: {
-        'fi-bi': '#9771E7',
-        'fi-spark': '#FF9900',
-        'fi-hive': '#F4CF38',
-        'fi-storage': '#4DB091',
-        'fi-scala': '#ED4014',
-        'fi-jdbc': '#444444',
-        'fi-python': '#3573A6',
-        'fi-spark-python': '#3573A6',
-        'fi-r': '#2D8CF0',
-        'fi-txt': '#444444',
-        'fi-log': '#444444',
-      },
     };
   },
   methods: {

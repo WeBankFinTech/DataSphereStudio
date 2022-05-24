@@ -267,7 +267,7 @@ export default {
     },
     async report({row}) {
       const res = await api.fetch(`/jobhistory/${row.taskID}/get`, 'get') || { task: {}}
-      api.fetch('/dss/framework/guide/reportProblem', {
+      api.fetch('/dss//guide/solution/reportProblem', {
         requestUrl: '',
         queryParams: {},
         requestBody: {},

@@ -213,7 +213,7 @@ const success = function (response) {
     let result = res.resultPath;
     const throwErr = function (msg) {
       const err = new Error(msg)
-      if (!data.solution) {
+      if (data.solution) {
         err.solution = data.solution
         err.response = response
       }
@@ -340,7 +340,7 @@ const action = function (url, data, option) {
     .catch(function (error) {
       const showErrMsg = function () {
         const msg = error.message || error.msg
-        if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && error.response.config.url.indexOf('dss/framework/guide/reportProblem') < 0) {
+        if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0) {
           const msgErrModal = Message.error({
             duration: 10,
             closable: true,
@@ -369,7 +369,7 @@ const action = function (url, data, option) {
                         window.open(error.solution.solutionUrl, '_blank')
                       } else if(error.response) {
                         // 上报
-                        action('/dss/framework/guide/reportProblem', {
+                        action('/dss/guide/solution/reportProblem', {
                           requestUrl: error.response.config.url,
                           queryParams: error.response.config.params,
                           requestBody: error.response.config.data,

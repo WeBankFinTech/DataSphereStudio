@@ -137,11 +137,7 @@ export default {
           align: 'center',
           className: 'history-failed',
           width: 220,
-          renderType: 'a',
-          renderParams: {
-            hasDoc: this.checkIfHasDoc,
-            action: this.linkTo,
-          },
+          renderType: 'a'
         }, {
           title: this.$t('message.scripts.history.columns.control.title'),
           key: 'control',
@@ -153,10 +149,19 @@ export default {
           renderParams: [{
             label: this.$t('message.scripts.history.columns.control.view'),
             action: this.viewHistory,
-            isHide: this.$route.name !== 'Home',
           }, {
             label: this.$t('message.scripts.history.columns.control.download'),
             action: this.downloadLog,
+          }, {
+            label: '查看解决方案',
+            action: this.viewFAQ,
+            style: { color: '#ed4014'},
+            isHide: (data)=> { return window.$APP_CONF && window.$APP_CONF.error_report && data && data.solution && data.solution.solutionUrl}
+          }, {
+            label: '上报错误',
+            action: this.report,
+            style: { color: '#ed4014'},
+            isHide: (data)=> { return window.$APP_CONF && window.$APP_CONF.error_report && data && data.status === 'Failed' && (!data.solution || !data.solution.solutionUrl)}
           }],
         },
       ];
@@ -257,22 +262,24 @@ export default {
       }
       return match.lang;
     },
-    linkTo(params) {
-      this.$router.push({
-        path: '/console/FAQ',
-        query: {
-          errCode: parseInt(params.row.failedReason),
-          isSkip: true,
-        },
-      });
+    viewFAQ({ row }) {
+      row.solution && window.open(row.solution.solutionUrl, '_blank')
     },
-    checkIfHasDoc(params) {
-      const errCodeList = [11011, 11012, 11013, 11014, 11015, 11016, 11017];
-      const errCode = parseInt(params.row.failedReason);
-      if (errCodeList.indexOf(errCode) !== -1) {
-        return true;
-      }
-      return false;
+    async report({row}) {
+      const res = await api.fetch(`/jobhistory/${row.taskID}/get`, 'get') || { task: {}}
+      api.fetch('/dss/framework/guide/reportProblem', {
+        requestUrl: '',
+        queryParams: {},
+        requestBody: {},
+        requestHeaders: {},
+        responseBody: {
+          taskID: row.taskID,
+          errCode: res.task.errCode,
+          errDesc: res.task.errDesc
+        }
+      }).then(()=>{
+        this.$Message.success('错误已上报')
+      })
     }
   },
 };

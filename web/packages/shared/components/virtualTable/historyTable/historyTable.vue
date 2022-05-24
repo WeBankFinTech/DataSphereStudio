@@ -209,10 +209,18 @@ export default {
     renderButton(value, cell, params) {
       const getList = (h) => {
         const list = [];
-        params.forEach((item) => {
+        params.filter(item =>{
+          if (typeof item.isHide === 'function') {
+            return item.isHide(cell)
+          }
+          return item.isHide !== false
+        }).forEach((item) => {
           list.push(h('button', {
             class: {
               'render-btn': true,
+            },
+            style: {
+              ...item.style
             },
             on: {
               click: () => {
@@ -277,14 +285,9 @@ export default {
           },
           on: {
             click: () => {
-              let valid = true;
-              if (params.hasDoc) {
-                valid = params.hasDoc({ row: cell });
-              }
-              if (valid) {
+              if (params && params.action) {
                 params.action({ row: cell });
               }
-
             },
           },
         }, value);

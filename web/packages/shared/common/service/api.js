@@ -215,8 +215,8 @@ const success = function (response) {
       const err = new Error(msg)
       if (data.solution) {
         err.solution = data.solution
-        err.response = response
       }
+      err.response = response
       throw err;
     }
     // 兼容 dolphin 返回数据结构
@@ -340,7 +340,8 @@ const action = function (url, data, option) {
     .catch(function (error) {
       const showErrMsg = function () {
         const msg = error.message || error.msg
-        if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0) {
+        const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
+        if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
           const msgErrModal = Message.error({
             duration: 10,
             closable: true,

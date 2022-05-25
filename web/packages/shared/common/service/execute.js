@@ -476,6 +476,7 @@ Execute.prototype.updateLastHistory = function(option, cb) {
       this.trigger('history', {
         taskID: task.taskID,
         execID: '',
+        solution: res.solution,
         createDate: task.createdTime,
         runningTime: task.costTime,
         // 这里改成使用execute的status是因为数据库中在大结果集的情况下可能会发生状态不翻转的情况，但websocket推送的状态是对的
@@ -485,9 +486,10 @@ Execute.prototype.updateLastHistory = function(option, cb) {
       if (task.progress === 1) {
         this.trigger('costTime', task.costTime);
       }
-    }).catch(() => {
+    }).catch((error) => {
       this.trigger('history', {
         taskID: this.taskID,
+        solution: error && error.solution,
         status: this.status,
         isPartialUpdate: true,
       });

@@ -355,11 +355,12 @@ const action = function (url, data, option) {
               }, [
                 h('div', {
                   style: {
-                    'max-width': '400px',
-                    'min-width': '200px',
+                    'max-width': '600px',
+                    'min-width': '400px',
                     padding: '10px',
                     'word-break': 'break-all',
-                    'margin-bottom': '20px'
+                    'margin-bottom': '20px',
+                    'text-align': 'left'
                   }
                 }, msg),
                 h('button', {
@@ -373,8 +374,8 @@ const action = function (url, data, option) {
                         action('/dss/guide/solution/reportProblem', {
                           requestUrl: error.response.config.url,
                           queryParams: error.response.config.params,
-                          requestBody: error.response.config.data,
-                          requestHeaders: {Cookie: document.cookie, ...error.response.config.headers},
+                          requestBody: typeof error.response.config.data === 'string' ? JSON.parse(error.response.config.data) : error.response.config.data,
+                          requestHeaders: { Cookie: document.cookie, ...error.response.config.headers },
                           responseBody: error.response.data
                         }).then(()=>{
                           Message.success('错误已上报')
@@ -392,6 +393,9 @@ const action = function (url, data, option) {
               ele.parentElement.parentElement.style.textAlign = 'left'
               ele.parentElement.style.display = 'block'
               ele.parentElement.style.padding = 0
+              ele.parentElement.parentElement.querySelector('span').innerText = "Error"
+              ele.parentElement.parentElement.style.background ="rgb(251, 233, 233)"
+              ele.parentElement.parentElement.style.border ="1px solid #eaa8a8"
             })
           })
         } else {

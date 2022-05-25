@@ -209,7 +209,7 @@ export default {
     renderButton(value, cell, params) {
       const getList = (h) => {
         const list = [];
-        params.filter(item =>{
+        params.filter(item => {
           if (typeof item.isHide === 'function') {
             return item.isHide(cell)
           }

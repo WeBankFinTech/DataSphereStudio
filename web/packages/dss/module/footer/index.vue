@@ -55,9 +55,7 @@ export default {
         pageSize: 100,
         status: 'Running,Inited,Scheduled',
       }, 'get').then((rst) => {
-        // 剔除requestApplicationName为 "nodeexecution" 的task
-        let tasks = rst.tasks.filter(item => item.requestApplicationName !== "nodeexecution" && item.requestApplicationName !== "CLI")
-        this.num = tasks.length;
+        this.num = rst.tasks.length;
       });
     },
     'Footer:updateRunningJob'(num) {

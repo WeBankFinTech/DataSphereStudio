@@ -298,4 +298,16 @@ public class FlowRestfulApi {
         List<ExtraToolBarsVO> barsVOList = flowService.getExtraToolBars(workspace.getWorkspaceId(), getExtraToolBarsRequest.getProjectId());
         return Message.ok().data("extraBars", barsVOList);
     }
+
+
+    @RequestMapping(value = "/deleteFlowEditLock", method = RequestMethod.DELETE)
+    public Message deleteFlowEditLock(HttpServletRequest req, @RequestParam(name = "flowId") Long flowId) throws DSSErrorException {
+        if (flowId == null) {
+            throw new DSSErrorException(60068, "delete flowEditLock failed,flowId is null");
+        }
+        DSSFlowEditLockManager.deleteLock(flowId);
+        return Message.ok();
+    }
+
+
 }

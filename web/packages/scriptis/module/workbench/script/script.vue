@@ -1352,12 +1352,14 @@ export default {
     },
     convertSettingParams(params) {
       const variable = isEmpty(params.variable) ? {} : util.convertArrayToObject(params.variable);
-      const configuration = isEmpty(params.variable) ? {} : {
+      const configuration = isEmpty(params.configuration) ? {} : {
         special: {},
         runtime: {},
         startup: {},
+        ...params.configuration
       };
       return {
+        ...params,
         variable,
         configuration,
       };

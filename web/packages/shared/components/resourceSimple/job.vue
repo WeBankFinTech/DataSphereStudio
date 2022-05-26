@@ -118,16 +118,14 @@ export default {
           status: 'Running,Inited,Scheduled',
         }, 'get')
         this.loading = false;
-        // 剔除requestApplicationName为 "nodeexecution" 的task
-        let tasks = rst.tasks.filter(item => item.requestApplicationName !== "nodeexecution" && item.requestApplicationName !== "CLI")
-        this.dispatch('Footer:updateRunningJob', tasks.length);
+        this.dispatch('Footer:updateRunningJob', rst.tasks.length);
 
-        tasks.forEach((item) => {
+        rst.tasks.forEach((item) => {
           const tmpItem = Object.assign({}, item, { isActive: false, fileName: this.convertJson(item) });
           this.jobList.push(tmpItem);
         });
         this.jobList = orderBy(this.jobList, ['status', 'fileName']);
-        this.$emit('update-job', tasks.length);
+        this.$emit('update-job', rst.tasks.length);
       } catch (err) {
         this.loading = false;
         console.error(err)

@@ -89,6 +89,9 @@
                 <Checkbox v-model="allDownload">{{$t('message.common.toolbar.all')}}</Checkbox>
               </Row>
             </div>
+            <Row v-if="download.format == 2">
+              <Checkbox v-model="autoFormat">{{$t('message.common.toolbar.autoformat')}}</Checkbox>
+            </Row>
             <Row class="confirm">
               <Col span="10">
                 <Button @click="cancelPopup('download')">{{$t('message.common.cancel')}}</Button>
@@ -215,6 +218,7 @@ export default {
       isIconLabelShow: true,
       iconSize: 14,
       allDownload: false, // 是否下载全部结果集
+      autoFormat: false,
       extComponents
     };
   },
@@ -283,7 +287,7 @@ export default {
             temPath = temPath.substring(0, temPath.lastIndexOf('/'));
             apiPath = `${this.getResultUrl}/resultsetsToExcel`
           }
-          let querys = 'path=' + temPath + '&charset=' + charset + '&outputFileType=' + splitor + '&nullValue=' + nullValue + '&outputFileName=' + filename;
+          let querys = 'path=' + temPath + '&charset=' + charset + '&outputFileType=' + splitor + '&nullValue=' + nullValue + '&outputFileName=' + filename + '&autoFormat=' + this.autoFormat;
           // 如果是api执行页获取结果集，需要带上taskId
           if(this.getResultUrl !== 'filesystem') {
             querys += `&taskId=${this.comData.taskID}`

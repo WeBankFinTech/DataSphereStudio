@@ -388,6 +388,21 @@ export default {
         )
         .then((res) => {
           this.loadingTree = false;
+          if (this.$route.query.projectID) {
+            let index
+            let it
+            res.projects.find((item, idx) => {
+              if (item.id == this.$route.query.projectID) {
+                index = idx
+                it = item
+              }
+            })
+            if (it) {
+              res.projects.splice(index, 1)
+              res.projects.unshift(it)
+            }
+          }
+          
           if (this.modeOfKey == "streamis_prod") {
             this.projectsTree = res.projects
               .filter((n) => {

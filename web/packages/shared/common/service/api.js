@@ -347,7 +347,7 @@ const action = function (url, data, option) {
           return
         }
         const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
-        if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
+        if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
           const msgErrModal = Message.error({
             duration: 4,
             closable: true,
@@ -355,7 +355,6 @@ const action = function (url, data, option) {
               return h('div', {
                 class: 'g-err-msg-div',
                 style: {
-                  'text-align': 'center',
                   padding: '10px'
                 }
               }, [
@@ -363,7 +362,6 @@ const action = function (url, data, option) {
                   style: {
                     'max-width': '600px',
                     'min-width': '400px',
-                    padding: '10px',
                     'word-break': 'break-all',
                     'margin-bottom': '20px',
                     'text-align': 'left'
@@ -371,6 +369,10 @@ const action = function (url, data, option) {
                 }, msg),
                 h('button', {
                   class: 'ivu-btn ivu-btn-default ivu-btn-small',
+                  style: {
+                    background: '#ec6565',
+                    color: '#fff'
+                  },
                   on: {
                     click: () => {
                       if (error.solution && error.solution.solutionUrl) {
@@ -399,15 +401,21 @@ const action = function (url, data, option) {
               ele.parentElement.parentElement.style.textAlign = 'left'
               ele.parentElement.style.display = 'block'
               ele.parentElement.style.padding = 0
-              ele.parentElement.parentElement.querySelector('span').innerText = "Error"
+              ele.parentElement.parentElement.querySelector('span').innerText = "错误提示"
               ele.parentElement.parentElement.style.background ="rgb(251, 233, 233)"
               ele.parentElement.parentElement.style.border ="1px solid #eaa8a8"
+              ele.parentElement.parentElement.style.color ="#333"
+              ele.parentElement.parentElement.style.position ="absolute"
+              ele.parentElement.parentElement.style.right ="10px"
             })
           })
         } else {
-          Message.error(msg);
+          Message.error({content: msg, duration: 4});
           throw error;
         }
+        setTimeout(() => {
+          lastMsg = ''
+        }, 4000)
       }
       if (error.message === API_ERR_MSG || error.msg === API_ERR_MSG) {
         if (showApiErrorTips) {

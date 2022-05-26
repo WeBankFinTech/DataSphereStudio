@@ -331,6 +331,7 @@ const param = function (url, data, option) {
 };
 
 let showApiErrorTips = true
+let lastMsg = ''
 const action = function (url, data, option) {
   return param(url, data, option)
     .then(success, fail)
@@ -340,6 +341,11 @@ const action = function (url, data, option) {
     .catch(function (error) {
       const showErrMsg = function () {
         const msg = error.message || error.msg
+        if (lastMsg !== msg ) {
+          lastMsg = msg
+        } else {
+          return
+        }
         const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
         if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
           const msgErrModal = Message.error({

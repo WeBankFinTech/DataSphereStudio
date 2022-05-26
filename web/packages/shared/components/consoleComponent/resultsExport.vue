@@ -75,7 +75,6 @@
 <script>
 import { isEmpty, cloneDeep, throttle} from 'lodash';
 import util from '@dataspherestudio/shared/common/util';
-import storage from '@dataspherestudio/shared/common/helper/storage';
 import directoryDialog from '@dataspherestudio/shared/components/directoryDialog/index.vue';
 export default {
   name: 'ResultsExport',
@@ -220,12 +219,20 @@ export default {
           });
         });
       } else {
-        params.timestamp = Date.now()
-        storage.set('result-export-scriptis', params, 'local')
         this.$router.push({
           path: '/home',
           query: { workspaceId: this.$route.query.workspaceId }
         });
+        setTimeout(() => {
+          this.dispatch('Workbench:add', params , (f) => {
+            if (!f) {
+              return;
+            }
+            this.$nextTick(() => {
+              this.dispatch('Workbench:run', { id: md5Path });
+            });
+          });
+        }, 3000);
       }
     },
     reset() {

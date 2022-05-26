@@ -213,8 +213,8 @@ const success = function (response) {
     let result = res.resultPath;
     const throwErr = function (msg) {
       const err = new Error(msg)
-      if (data.solution) {
-        err.solution = data.solution
+      if (result && result.solution) {
+        err.solution = result.solution
       }
       err.response = response
       throw err;
@@ -343,7 +343,7 @@ const action = function (url, data, option) {
         const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
         if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
           const msgErrModal = Message.error({
-            duration: 10,
+            duration: 4,
             closable: true,
             render: (h) => {
               return h('div', {

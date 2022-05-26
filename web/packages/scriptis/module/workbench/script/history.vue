@@ -267,19 +267,21 @@ export default {
     },
     async report({row}) {
       const res = await api.fetch(`/jobhistory/${row.taskID}/get`, 'get') || { task: {}}
-      api.fetch('/dss//guide/solution/reportProblem', {
-        requestUrl: '',
-        queryParams: {},
-        requestBody: {},
-        requestHeaders: {},
-        responseBody: {
-          taskID: row.taskID,
-          errCode: res.task.errCode,
-          errDesc: res.task.errDesc
-        }
-      }).then(()=>{
-        this.$Message.success('错误已上报')
-      })
+      if (res.task && res.task.errCode) {
+        api.fetch('/dss/guide/solution/reportProblem', {
+          requestUrl: `/jobhistory/${row.taskID}/get`,
+          queryParams: {},
+          requestBody: {},
+          requestHeaders: {},
+          responseBody: {
+            taskID: row.taskID,
+            errCode: res.task.errCode,
+            errDesc: res.task.errDesc
+          }
+        }).then(()=>{
+          this.$Message.success('错误已上报')
+        })
+      }
     }
   },
 };

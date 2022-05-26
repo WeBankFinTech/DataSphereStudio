@@ -341,7 +341,7 @@ const action = function (url, data, option) {
     .catch(function (error) {
       const showErrMsg = function () {
         const msg = error.message || error.msg
-        if (lastMsg !== msg ) {
+        if (lastMsg !== msg  && msg) {
           lastMsg = msg
         } else {
           return

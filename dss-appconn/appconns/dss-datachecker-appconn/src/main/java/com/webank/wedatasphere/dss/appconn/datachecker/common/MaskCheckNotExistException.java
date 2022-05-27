@@ -14,21 +14,11 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker.standard;
+package com.webank.wedatasphere.dss.appconn.datachecker.common;
 
-import com.webank.wedatapshere.dss.appconn.datachecker.service.DataCheckerExecuteService;
-import com.webank.wedatasphere.dss.standard.app.development.standard.OnlyExecutionDevelopmentStandard;
+public class MaskCheckNotExistException extends Exception {
 
-public class DataCheckerDevelopmentStandard extends OnlyExecutionDevelopmentStandard {
-
-    @Override
-    protected DataCheckerExecuteService createRefExecutionService() {
-        return new DataCheckerExecuteService();
+    public MaskCheckNotExistException(final String message) {
+        super(message);
     }
-
-    @Override
-    public void init() {
-    }
-
-
 }

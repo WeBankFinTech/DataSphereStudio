@@ -15,7 +15,6 @@
 </template>
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
-import { setTimeout } from 'timers';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 export default {
   name: 'OrchestratorPublish',

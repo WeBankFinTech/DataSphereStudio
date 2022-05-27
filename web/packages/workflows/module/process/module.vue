@@ -399,7 +399,6 @@ import clickoutside from '@dataspherestudio/shared/common/helper/clickoutside';
 import associateScript from './component/associateScript.vue';
 import { throttle, debounce } from 'lodash';
 import { NODETYPE, ext } from '@/workflows/service/nodeType';
-import { setTimeout, clearTimeout } from 'timers';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import util from '@dataspherestudio/shared/common/util';
@@ -912,7 +911,7 @@ export default {
         this.loading = false;
         this.locked = true;
         if (this.updateLockTimer) {
-          this.clearTimeout(this.updateLockTimer)
+          clearTimeout(this.updateLockTimer)
         }
         this.$emit('close')
       });

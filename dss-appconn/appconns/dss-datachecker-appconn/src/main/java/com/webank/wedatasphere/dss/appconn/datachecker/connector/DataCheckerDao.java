@@ -14,13 +14,13 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker.connector;
+package com.webank.wedatasphere.dss.appconn.datachecker.connector;
 
 import com.alibaba.druid.pool.DruidDataSource;
 
-import com.webank.wedatapshere.dss.appconn.datachecker.DataChecker;
-import com.webank.wedatapshere.dss.appconn.datachecker.common.MaskCheckNotExistException;
-import com.webank.wedatapshere.dss.appconn.datachecker.utils.HttpUtils;
+import com.webank.wedatasphere.dss.appconn.datachecker.DataChecker;
+import com.webank.wedatasphere.dss.appconn.datachecker.common.MaskCheckNotExistException;
+import com.webank.wedatasphere.dss.appconn.datachecker.utils.HttpUtils;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;

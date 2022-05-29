@@ -193,6 +193,8 @@
         "TDZDH": "跳到指定行",
         "GBYFJC": "关闭语法检查",
         "DKYFJC": "打开语法检查",
+        "GBKBTS": "关闭库表联想",
+        "DKKBTS": "打开库表联想",
         "GYFSYGWYF": "该语法属于高危语法，请谨慎操作！"
       },
       "resourceSimple": {
@@ -314,6 +316,7 @@
         "resultGroup": "结果集",
         "all": "是否全量",
         "downloadMode": "下载方式：",
+        "autoformat": "自动格式化：",
         "deepAnalysis": "分 析 进 阶",
         "success": {
           "download": "下载成功，请到本地的download文件夹查看！"

@@ -25,11 +25,20 @@ import storage from '@dataspherestudio/shared/common/helper/storage';
  * @param {*} lang
  */
 const getHiveList = async (monaco, lang) => {
-  const userInfoName = storage.get('baseInfo', 'local') ? storage.get('baseInfo', 'local').username : null;
+  const closeSuggest = storage.get('close_db_table_suggest')
   let dbInfoProposals = [];
   let tableInfoProposals = [];
   let udfProposals = [];
   let variableProposals = [];
+  if (closeSuggest) {
+    return {
+      dbInfoProposals,
+      tableInfoProposals,
+      udfProposals,
+      variableProposals,
+    };
+  }
+  const userInfoName = storage.get('baseInfo', 'local') ? storage.get('baseInfo', 'local').username : null;
   if (userInfoName) {
     const userName = userInfoName;
     const globalCache = await globalcache.getCache(userName);

@@ -27,7 +27,7 @@ public abstract class DSSToRelConversionOperation<K extends DSSToRelConversionRe
         extends AbstractOperation<K, V> implements ConversionOperation<K, V> {
 
     @Override
-    public void setConversionService(ConversionService conversionService) {
+    public final void setConversionService(ConversionService conversionService) {
         this.service =  conversionService;
     }
 

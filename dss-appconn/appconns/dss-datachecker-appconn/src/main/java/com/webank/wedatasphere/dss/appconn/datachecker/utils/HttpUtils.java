@@ -14,13 +14,13 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker.utils;
+package com.webank.wedatasphere.dss.appconn.datachecker.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
-import com.webank.wedatapshere.dss.appconn.datachecker.DataChecker;
+import com.webank.wedatasphere.dss.appconn.datachecker.DataChecker;
 import okhttp3.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;

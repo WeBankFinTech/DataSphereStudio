@@ -76,7 +76,7 @@ public abstract class LongTermRefExecutionOperation<K extends RefExecutionReques
 
     /**
      * 获取已提交给第三方 AppConn 的 refJob 的结果。
-     * 请注意：该方法只在 {@code state()} 方法返回的状态为成功时才会被调用。
+     * 请注意：该方法只在 {@code state()} 方法返回的状态为完成时才会被调用。
      * @param action 包含了 executionId 的 RefExecutionAction
      * @return 返回 refJob 的结果
      * @throws ExternalOperationFailedException 获取结果失败时抛出该异常

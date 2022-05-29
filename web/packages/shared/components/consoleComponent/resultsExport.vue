@@ -39,6 +39,12 @@
           </RadioGroup>
         </FormItem>
         <FormItem
+          v-if="exportOption.format == 2"
+          :label="$t('message.common.toolbar.autoformat')"
+        >
+          <Checkbox v-model="exportOption.autoFormat"></Checkbox>
+        </FormItem>
+        <FormItem
           :label="$t('message.common.resultsExport.formItems.path.label')"
           prop="path">
           <directory-dialog
@@ -69,7 +75,6 @@
 <script>
 import { isEmpty, cloneDeep, throttle} from 'lodash';
 import util from '@dataspherestudio/shared/common/util';
-import storage from '@dataspherestudio/shared/common/helper/storage';
 import directoryDialog from '@dataspherestudio/shared/components/directoryDialog/index.vue';
 export default {
   name: 'ResultsExport',
@@ -96,7 +101,8 @@ export default {
       exportOption: {
         name: '',
         path: '',
-        format: '1'
+        format: '1',
+        autoFormat: false
       },
       fileTree: [],
       hdfsComponent: null,
@@ -196,6 +202,13 @@ export default {
         noLoadCache: true,
         code
       }
+      if (this.exportOption.format === '2') {
+        params.params =  {
+          runtime: {
+            'wds.linkis.pipeline.export.excel.auto_format.enable': this.exportOption.autoFormat
+          }
+        }
+      }
       if (this.$route.name === 'Home') {
         this.dispatch('Workbench:add', params , (f) => {
           if (!f) {
@@ -206,12 +219,20 @@ export default {
           });
         });
       } else {
-        params.timestamp = Date.now()
-        storage.set('result-export-scriptis', params, 'local')
-        this.$router.push({ 
+        this.$router.push({
           path: '/home',
           query: { workspaceId: this.$route.query.workspaceId }
         });
+        setTimeout(() => {
+          this.dispatch('Workbench:add', params , (f) => {
+            if (!f) {
+              return;
+            }
+            this.$nextTick(() => {
+              this.dispatch('Workbench:run', { id: md5Path });
+            });
+          });
+        }, 3000);
       }
     },
     reset() {

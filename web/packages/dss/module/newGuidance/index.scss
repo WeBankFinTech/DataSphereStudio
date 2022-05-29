@@ -173,12 +173,12 @@
 
         .block2 {
             margin-left: 8px;
-            width      : 222px;
+            width      : 258px;
         }
 
         .block3 {
             width      : 110px;
-            margin-left: 20px;
+            margin-left: 110px;
         }
 
         .block4 {
@@ -204,7 +204,7 @@
         }
 
         .img3 {
-            margin-left: 116px;
+            margin-left: 245px;
         }
 
         .img4 {
@@ -248,7 +248,7 @@
 
         .desc3 {
             width      : 130px;
-            margin-left: 40px;
+            margin-left: 125px;
         }
 
         .desc4 {
@@ -312,7 +312,7 @@
 
     .item3 {
         display   : inline-block;
-        margin-top: 83px;
+        margin-top: 97px;
 
         .dashed {
             width : 65px;
@@ -747,7 +747,7 @@
 #mask7 {
     position      : fixed;
     right         : 0;
-    bottom        : 173px;
+    bottom        : 158px;
     z-index       : 1003;
     display       : flex;
     flex-direction: column;
@@ -869,7 +869,7 @@
         margin-right  : 0.5px;
         height        : 100vh;
         pointer-events: auto;
-        animation: rainbow 0.3s forwards;
+        width: 655px;
     }
 
     .item1 {
@@ -998,3 +998,7 @@
     0% { width: 0; }
     100% { width: 405px; }
   }
+
+.luBanLogo {
+  display: none
+}

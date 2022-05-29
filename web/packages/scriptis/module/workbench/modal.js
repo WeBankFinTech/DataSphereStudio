@@ -15,23 +15,7 @@
  *
  */
 
-let logoList = [
-  { rule: /\.(bi)$/i, logo: 'fi-bi' },
-  { rule: /\.(sql)$/i, logo: 'fi-spark' },
-  { rule: /\.(hql)$/i, logo: 'fi-hive' },
-  { rule: /\.(fql)$/i, logo: 'fi-flink-sql' },
-  { rule: /\.(out)$/i, logo: 'fi-storage' },
-  { rule: /\.scala$/i, logo: 'fi-scala' },
-  { rule: /\.jdbc$/i, logo: 'fi-jdbc' },
-  { rule: /\.python$/i, logo: 'fi-python' },
-  { rule: /\.py$/i, logo: 'fi-spark-python' },
-  { rule: /\.r$/i, logo: 'fi-r' },
-  { rule: /\.qmlsql$/i, logo: 'fi-spark' },
-  { rule: /\.qmlpy$/i, logo: 'fi-python' },
-  { rule: /\.txt$/i, logo: 'fi-txt' },
-  { rule: /\.log$/i, logo: 'fi-log' },
-  { rule: /\.psql$/i, logo: 'fi-presto' },
-];
+import ScriptConf from '@dataspherestudio/shared/common/config/scriptis'
 
 /**
  *  基础
@@ -79,13 +63,26 @@ export class Work {
      * 根据文件后缀判断logo
      */
   get logo() {
-    let logos = logoList.filter((item) => {
+    let logos = ScriptConf.filter((item) => {
       return item.rule.test(this.filename);
     });
     if (logos.length > 0) {
       return logos[0].logo;
     } else {
       return 'javascript: void 0';
+    }
+  }
+  /**
+   * 根据文件后缀判断logo 颜色
+   */
+  get color() {
+    let logos = ScriptConf.filter((item) => {
+      return item.rule.test(this.filename);
+    });
+    if (logos.length > 0) {
+      return logos[0].color;
+    } else {
+      return '#444444';
     }
   }
 }

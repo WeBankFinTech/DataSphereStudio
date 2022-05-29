@@ -15,12 +15,8 @@ VALUES (2, @scriptis_appconn_id, 'DEV', '/home', '', ''),
 (4, @apiservice_appconn_id, 'DEV', '/apiservices', '', '');
 
 DELETE FROM dss_workspace;
-insert into `dss_workspace`(`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`)
-values('defaultWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','1','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop','project');
-
-DELETE FROM dss_workspace_user_role;
-select @defaultWorkspaceId:=id from dss_workspace where name='bdapWorkspace';
-insert  into `dss_workspace_user_role`(`workspace_id`,`username`,`create_time`,`created_by`,`user_id`) values (@defaultWorkspaceId,'hadoop','2021-09-06 14:39:17','hadoop',NULL);
+insert into `dss_workspace`(`id`, `name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`)
+values(224, 'bdapWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','1','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop','project');
 
 DELETE FROM dss_user;
 INSERT INTO `dss_user` VALUES (100,'hadoop_test','hadoop_test',1,101,1,'','','','0',NULL,'2021-11-17 09:33:45','2021-11-17 09:51:55',NULL),
@@ -85,7 +81,12 @@ INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `u
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('7','-1','apiUser','数据服务用户','2020-08-21 11:35:02','通用角色数据服务用户');
 
 DELETE FROM dss_workspace_user_role;
-insert  into `dss_workspace_user_role`(`id`,`workspace_id`,`username`,`role_id`,`create_time`,`created_by`,`user_id`) values (473,323,'hadoop',1,'2021-09-06 14:39:17','hadoop',0),(474,323,'hadoop',2,'2021-09-06 14:39:17','hadoop',0),(475,323,'hadoop',3,'2021-09-06 14:39:17','hadoop',0),(476,323,'hadoop',4,'2021-09-06 14:39:17','hadoop',0),(477,323,'hadoop',5,'2021-09-06 14:39:17','hadoop',0),(478,323,'hadoop',6,'2021-09-06 14:39:17','hadoop',0),(479,323,'hadoop',7,'2021-09-06 14:39:17','hadoop',0);
+select @defaultWorkspaceId:=id from dss_workspace where name='bdapWorkspace';
+insert  into `dss_workspace_user_role`(`workspace_id`,`username`,`role_id`,`create_time`,`created_by`,`user_id`) values
+(@defaultWorkspaceId,'hadoop',1,'2021-09-06 14:39:17','hadoop',0),(@defaultWorkspaceId,'hadoop',2,'2021-09-06 14:39:17','hadoop',0),
+(@defaultWorkspaceId,'hadoop',3,'2021-09-06 14:39:17','hadoop',0),(@defaultWorkspaceId,'hadoop',4,'2021-09-06 14:39:17','hadoop',0),
+(@defaultWorkspaceId,'hadoop',5,'2021-09-06 14:39:17','hadoop',0),(@defaultWorkspaceId,'hadoop',6,'2021-09-06 14:39:17','hadoop',0),
+(@defaultWorkspaceId,'hadoop',7,'2021-09-06 14:39:17','hadoop',0);
 
 DELETE FROM dss_workflow_node;
 insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('1','python','-1','linkis.python.python','2','1','1','1','0','icons/python.icon');

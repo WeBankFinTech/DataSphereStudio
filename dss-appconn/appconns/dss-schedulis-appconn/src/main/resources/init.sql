@@ -1,4 +1,7 @@
 -- 适用于第一次安装时
+select @schedulis_appconnId:=id from `dss_appconn` where `appconn_name` = 'schedulis';
+delete from `dss_appconn_instance` where `appconn_id` = @schedulis_appconnId;
+
 delete from dss_appconn where appconn_name = "schedulis";
 INSERT INTO `dss_appconn` (`appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`)
 VALUES ('schedulis', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/schedulis', '');

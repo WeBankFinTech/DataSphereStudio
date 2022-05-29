@@ -24,6 +24,7 @@ public class DSSProject implements Project {
     private String name;
     private String description;
     private String createBy;
+    private String updateBy;
 
     private String username;
     private Date createTime;
@@ -142,6 +143,14 @@ public class DSSProject implements Project {
 
     public void setWorkspaceName(String workspaceName) {
         this.workspaceName = workspaceName;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
     }
 
     @Override

@@ -32,7 +32,7 @@ public abstract class AbstractDevelopmentOperation<K extends DevelopmentRequestR
     }
 
     @Override
-    public void setDevelopmentService(DevelopmentService service) {
+    public final void setDevelopmentService(DevelopmentService service) {
         this.service = service;
     }
 }

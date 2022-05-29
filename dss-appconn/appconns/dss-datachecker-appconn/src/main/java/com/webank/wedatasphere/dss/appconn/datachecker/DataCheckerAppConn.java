@@ -14,9 +14,9 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker;
+package com.webank.wedatasphere.dss.appconn.datachecker;
 
-import com.webank.wedatapshere.dss.appconn.datachecker.standard.DataCheckerDevelopmentStandard;
+import com.webank.wedatasphere.dss.appconn.datachecker.standard.DataCheckerDevelopmentStandard;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.appconn.core.impl.AbstractAppConn;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;

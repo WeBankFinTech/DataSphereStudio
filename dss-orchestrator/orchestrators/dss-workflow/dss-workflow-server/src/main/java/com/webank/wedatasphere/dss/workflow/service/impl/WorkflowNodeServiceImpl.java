@@ -88,9 +88,9 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
     }
 
     private <T extends DevelopmentService> T getDevelopmentService(AppConn appConn, List<DSSLabel> dssLabels,
-                                                               BiFunction<DevelopmentIntegrationStandard, AppInstance, T> getDevelopmentService) {
+                                                                   BiFunction<DevelopmentIntegrationStandard, AppInstance, T> getDevelopmentService) {
         DevelopmentIntegrationStandard developmentIntegrationStandard = ((OnlyDevelopmentAppConn) appConn).getOrCreateDevelopmentStandard();
-        if(developmentIntegrationStandard == null) {
+        if (developmentIntegrationStandard == null) {
             throw new ExternalOperationFailedException(50020, appConn.getAppDesc().getAppName() + " does not exists development standard, please ask admin to check the AppConn.");
         }
         AppInstance appInstance;
@@ -119,7 +119,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                     requestRef.getDSSJobContent().put(DSSJobContentConstant.ORCHESTRATION_NAME, node.getFlowName());
                     return ((RefCreationOperation) developmentOperation).createRef(requestRef);
                 }, (developmentRequestRef, refJobContentResponseRef) -> {
-                    if(developmentRequestRef instanceof ProjectRefRequestRef) {
+                    if (developmentRequestRef instanceof ProjectRefRequestRef) {
                         Long projectRefId = ((ProjectRefRequestRef) developmentRequestRef).getRefProjectId();
                         refJobContentResponseRef.getRefJobContent().put(DSSWorkFlowConstant.REF_PROJECT_ID_KEY, projectRefId);
                     }
@@ -136,7 +136,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
         String name;
-        if(StringUtils.isBlank(node.getName())) {
+        if (StringUtils.isBlank(node.getName())) {
             name = node.getJobContent().get(DSSWorkFlowConstant.TITLE_KEY).toString();
         } else {
             name = node.getName();
@@ -146,18 +146,19 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 dssJobContentRequestRef -> dssJobContentRequestRef.setDSSJobContent(node.getParams()),
                 refJobContentRequestRef -> {
                     refJobContentRequestRef.setRefJobContent(node.getJobContent());
-                    if(refJobContentRequestRef instanceof QueryJumpUrlRequestRef) {
+                    if (refJobContentRequestRef instanceof QueryJumpUrlRequestRef) {
                         ((QueryJumpUrlRequestRef) refJobContentRequestRef).setSSOUrlBuilderOperation(getSSOUrlBuilderOperation(appConn, node.getWorkspace()));
                     }
                 },
                 dssContextRequestRef -> dssContextRequestRef.setContextId(node.getContextId()),
                 projectRefRequestRef -> {
                     Long refProjectId;
-                    if(node.getJobContent().containsKey(DSSWorkFlowConstant.REF_PROJECT_ID_KEY)) {
-                        refProjectId = DSSCommonUtils.parseToLong(node.getJobContent().get(DSSWorkFlowConstant.REF_PROJECT_ID_KEY));
-                    } else {
-                        refProjectId = parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), node.getDssLabels());
-                    }
+                    //todo 第一次导入时用的是dev的refProjectId
+//                    if (node.getJobContent().containsKey(DSSWorkFlowConstant.REF_PROJECT_ID_KEY)) {
+//                        refProjectId = DSSCommonUtils.parseToLong(node.getJobContent().get(DSSWorkFlowConstant.REF_PROJECT_ID_KEY));
+//                    } else {
+                    refProjectId = parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), node.getDssLabels());
+//                    }
                     projectRefRequestRef.setDSSProjectId(node.getProjectId()).setRefProjectId(refProjectId).setProjectName(node.getProjectName());
                 },
                 (developmentOperation, developmentRequestRef) -> {
@@ -175,7 +176,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
     @Override
     public void deleteNode(String userName, CommonAppConnNode node) throws ExternalOperationFailedException {
         tryNodeOperation(userName, node, this::getRefCRUDService, developmentService -> ((RefCRUDService) developmentService).getRefDeletionOperation(),
-            (developmentOperation, developmentRequestRef) -> ((RefDeletionOperation) developmentOperation).deleteRef((RefJobContentRequestRef) developmentRequestRef), null, "delete");
+                (developmentOperation, developmentRequestRef) -> ((RefDeletionOperation) developmentOperation).deleteRef((RefJobContentRequestRef) developmentRequestRef), null, "delete");
     }
 
     @Override
@@ -223,7 +224,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 (appConn, dssLabels) -> getDevelopmentService(appConn, dssLabels, DevelopmentIntegrationStandard::getRefExportService),
                 developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
                 (developmentOperation, developmentRequestRef) ->
-                    ((RefExportOperation) developmentOperation).exportRef((RefJobContentRequestRef) developmentRequestRef)
+                        ((RefExportOperation) developmentOperation).exportRef((RefJobContentRequestRef) developmentRequestRef)
                 , null, "export");
     }
 
@@ -237,7 +238,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 developmentService -> ((RefImportService) developmentService).getRefImportOperation(),
                 (developmentOperation, developmentRequestRef) -> {
                     ImportRequestRef importRequestRef = (ImportRequestRef) developmentRequestRef;
-                    if(importRequestRef.isLinkisBMLResources()) {
+                    if (importRequestRef.isLinkisBMLResources()) {
                         importRequestRef.setResourceMap(getBmlResourceMap.get());
                     } else {
                         importRequestRef.setResourceMap(getStreamResourceMap.get());
@@ -254,9 +255,9 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 (appConn, dssLabels) -> getDevelopmentService(appConn, dssLabels, DevelopmentIntegrationStandard::getRefQueryService),
                 developmentService -> ((RefQueryService) developmentService).getRefQueryOperation(),
                 (developmentOperation, developmentRequestRef) ->
-                    ((RefQueryOperation) developmentOperation).query((RefJobContentRequestRef) developmentRequestRef)
+                        ((RefQueryOperation) developmentOperation).query((RefJobContentRequestRef) developmentRequestRef)
                 , null, "query");
-        if(responseRef instanceof QueryJumpUrlResponseRef) {
+        if (responseRef instanceof QueryJumpUrlResponseRef) {
             return ((QueryJumpUrlResponseRef) responseRef).getJumpUrl();
         } else {
             throw new ExternalOperationFailedException(50025, "AppConn " + node.getNodeType() + " don't support to get jumpUrl!");
@@ -264,7 +265,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
     }
 
     private String getOrcVersion(Long flowId) throws IOException, DSSErrorException {
-        if(flowId == null) {
+        if (flowId == null) {
             return null;
         }
         DSSFlow dssFlow = dssFlowService.getFlow(flowId);
@@ -272,7 +273,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
     }
 
     private SSOUrlBuilderOperation getSSOUrlBuilderOperation(AppConn appConn, Workspace workspace) {
-        if(!(appConn instanceof OnlySSOAppConn)) {
+        if (!(appConn instanceof OnlySSOAppConn)) {
             return null;
         }
         SSOUrlBuilderOperation ssoUrlBuilderOperation = ((OnlySSOAppConn) appConn).getOrCreateSSOStandard().getSSOBuilderService().createSSOUrlBuilderOperation();

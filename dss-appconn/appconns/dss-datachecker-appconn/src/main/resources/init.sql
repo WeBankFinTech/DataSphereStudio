@@ -1,4 +1,7 @@
 -- TODO 这里只适用于第一次安装时。如果是更新的话dss_appconn表不能先删除再插入，因为其他表如dss_workspace_appconn_role关联了appconn_id(不能变)，需要使用update、alter语句更新
+select @datachecker_appconnId:=id from `dss_appconn` where `appconn_name` = 'datachecker';
+delete from `dss_appconn_instance` where `appconn_id` = @datachecker_appconnId;
+
 delete from dss_appconn where appconn_name = "datachecker";
 INSERT INTO `dss_appconn` (`appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`)
 VALUES ('datachecker', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.datachecker.DataCheckerAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/datachecker', '');
@@ -8,13 +11,13 @@ select @datachecker_appconnId:=id from `dss_appconn` where `appconn_name` = 'dat
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
 VALUES (@datachecker_appconnId, 'DEV', 'datachecker', '', '');
 
+delete from dss_workflow_node where appconn_name = "datachecker";
 insert into `dss_workflow_node` (`name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`)
 values('datachecker','datachecker','linkis.appconn.datachecker','0','0','1','1','0','icons/datachecker.icon');
 
 select @datachecker_nodeId:=id from `dss_workflow_node` where `node_type` = 'linkis.appconn.datachecker';
 
 delete from `dss_workflow_node_to_group` where `node_id`=@datachecker_nodeId;
-
 delete from `dss_workflow_node_to_ui` where `workflow_node_id`=@datachecker_nodeId;
 
 -- 查找节点所属组的id

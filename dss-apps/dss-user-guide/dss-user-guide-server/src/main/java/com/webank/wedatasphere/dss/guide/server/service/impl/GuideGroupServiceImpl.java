@@ -125,7 +125,7 @@ public class GuideGroupServiceImpl extends ServiceImpl<GuideGroupMapper, GuideGr
         if (!StringUtils.isEmpty(mdFilePath)) {
             String content = MdAnalysis.readMd(mdFilePath);
             guideContent.setContent(content);
-            guideContent.setContentHtml(MdAnalysis.changeHtmlTagA(MdAnalysis.markdown2Html(mdFilePath)));
+            guideContent.setContentHtml(MdAnalysis.markdown2Html(mdFilePath));
         }
         guideContent.setType(type);
         guideContent.setTitle(map.get(tag.getKey()).get("title"));

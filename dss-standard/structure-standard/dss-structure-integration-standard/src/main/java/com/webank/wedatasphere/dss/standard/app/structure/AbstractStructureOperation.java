@@ -15,7 +15,7 @@ public abstract class AbstractStructureOperation<K extends RequestRef, V extends
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public void setStructureService(StructureService service) {
+    public final void setStructureService(StructureService service) {
         this.service = service;
     }
 

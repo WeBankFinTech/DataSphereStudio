@@ -18,7 +18,7 @@ public abstract class SSOUserOperation<K extends RequestRef, V extends ResponseR
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public void setSSOUserService(SSOUserService service) {
+    public final void setSSOUserService(SSOUserService service) {
         this.service = service;
     }
 

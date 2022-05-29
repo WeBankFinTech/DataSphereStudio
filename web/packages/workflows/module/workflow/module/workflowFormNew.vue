@@ -19,7 +19,6 @@
       prop="orchestratorName">
       <Input
         :disabled="isPublished"
-        :maxlength=21
         v-model="workflowDataCurrent.orchestratorName"
         :placeholder="$t('message.workflow.inputFlowName')"
       ></Input>
@@ -153,7 +152,7 @@ export default {
       return {
         orchestratorName: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
+          { message: `${this.$t('message.workflow.nameLength')}150`, max: 150 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
         ],
         description: [

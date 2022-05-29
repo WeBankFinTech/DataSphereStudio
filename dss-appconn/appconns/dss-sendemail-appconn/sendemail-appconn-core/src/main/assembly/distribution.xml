@@ -67,6 +67,15 @@
             <outputDirectory>icons</outputDirectory>
         </fileSet>
 
+        <fileSet>
+            <directory>${basedir}/src/main/resources</directory>
+            <includes>
+                <include>init.sql</include>
+            </includes>
+            <fileMode>0777</fileMode>
+            <outputDirectory>db</outputDirectory>
+        </fileSet>
+
     </fileSets>
 
 </assembly>

@@ -302,7 +302,7 @@ export default {
       this.treeFold = !this.treeFold;
       setTimeout(()=>{
         eventbus.emit('workflow.fold.left.tree');
-      },400)
+      }, 600)
     },
     // 获取开发流程基本数据
     getDevProcessData(data) {
@@ -388,6 +388,21 @@ export default {
         )
         .then((res) => {
           this.loadingTree = false;
+          if (this.$route.query.projectID) {
+            let index
+            let it
+            res.projects.find((item, idx) => {
+              if (item.id == this.$route.query.projectID) {
+                index = idx
+                it = item
+              }
+            })
+            if (it) {
+              res.projects.splice(index, 1)
+              res.projects.unshift(it)
+            }
+          }
+          
           if (this.modeOfKey == "streamis_prod") {
             this.projectsTree = res.projects
               .filter((n) => {
@@ -1113,7 +1128,7 @@ export default {
               overflow: 'hidden'
             },
             attrs: {
-              title: item.name
+              title: `名称：${item.name}\n描述：${item.description||''}`
             }
           }, [item.name]),
           (item.canWrite ? projectAdd : ''),
@@ -1140,7 +1155,7 @@ export default {
               overflow: 'hidden'
             },
             attrs: {
-              title: item.name
+              title: `名称：${item.name}\n描述：${item.description||''}`
             }
           },
           item.name

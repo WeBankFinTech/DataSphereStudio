@@ -123,7 +123,7 @@ public class DataCheckerDao {
                         if (null != action.getExecutionRequestRefContext()) {
                             if (checkRes) {
                                 action.getExecutionRequestRefContext().appendLog("Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " has arrived");
-                                log.info("Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " has arrived");
+                                log.info("sourceType：" + proObjectMap.get(DataChecker.SOURCE_TYPE) + ", Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " has arrived");
                             } else {
                                 action.getExecutionRequestRefContext().appendLog("sourceType：" + proObjectMap.get(DataChecker.SOURCE_TYPE) + ", Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " not arrived");
                                 log.info("sourceType：" + proObjectMap.get(DataChecker.SOURCE_TYPE) + ", Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " not arrived");

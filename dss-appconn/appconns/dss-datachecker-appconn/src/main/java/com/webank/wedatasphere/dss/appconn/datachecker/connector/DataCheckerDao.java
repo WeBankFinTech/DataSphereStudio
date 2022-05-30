@@ -59,6 +59,8 @@ public class DataCheckerDao {
     private static final String SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION =
             "SELECT * FROM desktop_bdapimport WHERE bdap_db_name = ? AND bdap_table_name = ? AND target_partition_name = ? " +
                     "AND (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(STR_TO_DATE(modify_time, '%Y-%m-%d %H:%i:%s'))) <= ? AND status = '1';";
+    private static final String HIVE_SOURCE_TYPE = "hivedb";
+    private static final String MASK_SOURCE_TYPE = "maskdb";
 
     private static DataSource jobDS;
     private static DataSource bdpDS;
@@ -94,7 +96,7 @@ public class DataCheckerDao {
         log.info("=============================Data Check Start==========================================");
 
         String dataCheckerInfo = props.getProperty(DataChecker.DATA_OBJECT);
-        if(null!=action.getExecutionRequestRefContext()) {
+        if (null != action.getExecutionRequestRefContext()) {
             action.getExecutionRequestRefContext().appendLog("=============================Data Check Start==========================================");
 //            action.getExecutionRequestRefContext().appendLog("Database table partition info : " + dataCheckerInfo);
         }
@@ -107,16 +109,16 @@ public class DataCheckerDao {
 //		log.info("(DataChecker info) time scape : " + timeScape);
         List<Map<String, String>> dataObjectList = extractProperties(props);
         log.info("DataObjectList size is " + dataObjectList.size());
-        dataObjectList.forEach(checkObject->{
+        dataObjectList.forEach(checkObject -> {
             log.info(checkObject.keySet().toString());
         });
 
         try (Connection jobConn = jobDS.getConnection();
              Connection bdpConn = bdpDS.getConnection()) {
-            List<Boolean> allCheckRes  = dataObjectList
+            List<Boolean> allCheckRes = dataObjectList
                     .stream()
                     .map(proObjectMap -> {
-                        log.info("Begin to Check dataObject:"+proObjectMap.entrySet().toString());
+                        log.info("Begin to Check dataObject:" + proObjectMap.entrySet().toString());
                         boolean checkRes = getDataCheckResult(proObjectMap, jobConn, bdpConn, props, log);
                         if (null != action.getExecutionRequestRefContext()) {
                             if (checkRes) {
@@ -129,7 +131,7 @@ public class DataCheckerDao {
                         }
                         return checkRes;
                     }).collect(Collectors.toList());
-            boolean flag =allCheckRes.stream().allMatch(res ->res.equals(true));
+            boolean flag = allCheckRes.stream().allMatch(res -> res.equals(true));
             if (flag) {
                 log.info("=============================Data Check End==========================================");
                 if (null != action.getExecutionRequestRefContext()) {
@@ -143,7 +145,7 @@ public class DataCheckerDao {
         }
 
         log.info("=============================Data Check End==========================================");
-        if(null!=action.getExecutionRequestRefContext()) {
+        if (null != action.getExecutionRequestRefContext()) {
             action.getExecutionRequestRefContext().appendLog("=============================Data Check End==========================================");
         }
         return false;
@@ -170,11 +172,17 @@ public class DataCheckerDao {
         Predicate<Map<String, String>> isNotOdsDB = isOdsDB.negate();
         Predicate<Map<String, String>> isCheckMetadata = (hasDataSource.and(isJobDataSource)).or(hasNotDataSource.and(isNotOdsDB));
         Predicate<Map<String, String>> isCheckMask = (hasDataSource.and(isBdpDataSource)).or(hasNotDataSource.and(isOdsDB));
-        return isCheckMetadata.test(proObjectMap)
-                ? getJobTotalCount(proObjectMap, jobConn, log) > 0
-                : isCheckMask.test(proObjectMap) &&
-                (getBdpTotalCount(proObjectMap, bdpConn, log, props) > 0
-                        || "success".equals(fetchMaskCode(proObjectMap, log, props).get("maskStatus")));
+        if (isCheckMetadata.test(proObjectMap)) {
+            proObjectMap.put(DataChecker.SOURCE_TYPE, HIVE_SOURCE_TYPE);
+            return getJobTotalCount(proObjectMap, jobConn, log) > 0;
+        } else {
+            if (isCheckMask.test(proObjectMap)) {
+                proObjectMap.put(DataChecker.SOURCE_TYPE, MASK_SOURCE_TYPE);
+                return (getBdpTotalCount(proObjectMap, bdpConn, log, props) > 0 || "success".equals(fetchMaskCode(proObjectMap, log, props).get("maskStatus")));
+            }
+            return false;
+        }
+
     }
 
     private void sleep(long sleepTime) {

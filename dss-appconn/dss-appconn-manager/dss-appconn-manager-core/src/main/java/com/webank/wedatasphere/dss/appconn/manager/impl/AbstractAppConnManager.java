@@ -63,14 +63,18 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     }
 
     public static AppConnManager getAppConnManager() {
-        if(appConnManager != null) {
+        if (appConnManager != null && ((AbstractAppConnManager) appConnManager).isLoaded) {
             return appConnManager;
         }
         synchronized (AbstractAppConnManager.class) {
-            if(appConnManager == null) {
+            if (appConnManager == null) {
                 appConnManager = ClassUtils.getInstanceOrDefault(AppConnManager.class, new AppConnManagerImpl());
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
+            } else {
+                if (!((AbstractAppConnManager) appConnManager).isLoaded) {
+                    appConnManager.init();
+                }
             }
         }
         return appConnManager;
@@ -82,7 +86,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         LOGGER.info("The instance of AppConnInfoService is {}.", appConnInfoService.getClass().getName());
         appConnResourceService = createAppConnResourceService();
         LOGGER.info("The instance of AppConnResourceService is {}.", appConnResourceService.getClass().getName());
-        if(!lazyLoad && !isLoaded) {
+        if (!lazyLoad && !isLoaded) {
             loadAppConns();
             isLoaded = true;
         }
@@ -95,8 +99,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     protected void loadAppConns() {
         LOGGER.info("Begin to init all AppConns.");
         List<? extends AppConnInfo> appConnInfos = appConnInfoService.getAppConnInfos();
-        if(appConnInfos == null || appConnInfos.isEmpty()) {
-            if(appConns.isEmpty()) {
+        if (appConnInfos == null || appConnInfos.isEmpty()) {
+            if (appConns.isEmpty()) {
                 throw new DSSRuntimeException("No AppConnInfos returned when the first time init AppConnList.");
             }
             LOGGER.warn("No AppConnInfos returned, ignore it.");
@@ -108,16 +112,16 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         Map<String, AppConn> appConns = new HashMap<>();
         Consumer<AppConnInfo> loadAndAdd = DSSExceptionUtils.handling(appConnInfo -> {
             AppConn appConn = loadAppConn(appConnInfo);
-            if(appConn != null) {
+            if (appConn != null) {
                 appConns.put(appConnInfo.getAppConnName().toLowerCase(), appConn);
             }
         });
         appConnInfos.forEach(DSSExceptionUtils.handling(appConnInfo -> {
-            if(appConns.containsKey(appConnInfo.getAppConnName())) {
+            if (appConns.containsKey(appConnInfo.getAppConnName())) {
                 return;
             }
-            if(StringUtils.isNotBlank(appConnInfo.getReference())) {
-                if(!appConns.containsKey(appConnInfo.getReference())) {
+            if (StringUtils.isNotBlank(appConnInfo.getReference())) {
+                if (!appConns.containsKey(appConnInfo.getReference())) {
                     AppConnInfo referenceAppConnInfo = appConnInfos.stream().filter(info -> info.getAppConnName().equals(appConnInfo.getReference()))
                             .findAny().orElseThrow(() -> new DSSRuntimeException("cannot find the reference appConn " + appConnInfo.getReference() +
                                     " for appConn " + appConnInfo.getAppConnName()));
@@ -142,7 +146,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         String appConnHome = appConnResourceService.getAppConnHome(appConnInfo);
         LOGGER.info("Try to load AppConn {} with home path {}.", appConnInfo.getAppConnName(), appConnHome);
         AppConn appConn = appConnLoader.getAppConn(appConnInfo.getAppConnName(),
-            appConnInfo.getClassName(), appConnHome);
+                appConnInfo.getClassName(), appConnHome);
         AppDescImpl appDesc = loadAppDesc(appConnInfo);
         appConn.setAppDesc(appDesc);
         appConn.init();
@@ -153,7 +157,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     protected AppConn loadAppConn(AppConnInfo appConnInfo, AppConn referenceAppConn) throws Exception {
         LOGGER.info("Ready to load AppConn {} with referenceAppConn {}, the appConnInfo are {}.", appConnInfo.getAppConnName(),
                 referenceAppConn.getClass().getSimpleName(), appConnInfo);
-        if(appConnInfo.getAppConnResource() != null) {
+        if (appConnInfo.getAppConnResource() != null) {
             String appConnHome = appConnResourceService.getAppConnHome(appConnInfo);
             LOGGER.warn("Because AppConn {} is a referenced AppConn, we only download its resources(since not null) to home path {}, but never load AppConn by it.",
                     appConnInfo.getAppConnName(), appConnHome);
@@ -175,18 +179,18 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             copyProperties(appConnInfo.getAppConnName(), instanceBean, appInstance);
             appDesc.addAppInstance(appInstance);
         }
-        if(appDesc.getAppInstances().isEmpty()) {
+        if (appDesc.getAppInstances().isEmpty()) {
             LOGGER.warn("The AppConn {} has no appInstance, maybe this AppConn is a reference AppConn? If not, please check the database info.", appConnInfo.getAppConnName());
         }
         appDesc.setAppName(appConnInfo.getAppConnName());
         return appDesc;
     }
 
-    private void copyProperties(String appConnName, AppInstanceInfo appInstanceInfo, AppInstanceImpl appInstance){
+    private void copyProperties(String appConnName, AppInstanceInfo appInstanceInfo, AppInstanceImpl appInstance) {
         appInstance.setBaseUrl(appInstanceInfo.getUrl());
         Map<String, Object> config = new HashMap<>();
-        if(StringUtils.isNotEmpty(appInstanceInfo.getEnhanceJson())){
-            try{
+        if (StringUtils.isNotEmpty(appInstanceInfo.getEnhanceJson())) {
+            try {
                 config = DSSCommonUtils.COMMON_GSON.fromJson(appInstanceInfo.getEnhanceJson(), Map.class);
             } catch (Exception e) {
                 LOGGER.error("The json of AppConn {} is not a correct json. content: {}.", appConnName, appInstanceInfo.getEnhanceJson(), e);
@@ -194,20 +198,20 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             }
         }
         appInstance.setConfig(config);
-        if(StringUtils.isNotBlank(appInstanceInfo.getHomepageUri())) {
+        if (StringUtils.isNotBlank(appInstanceInfo.getHomepageUri())) {
             appInstance.setHomepageUri(appInstanceInfo.getHomepageUri());
         }
         //TODO should use Linkis labelFactory to new labels.
         List<DSSLabel> labels = Arrays.stream(appInstanceInfo.getLabels().split(",")).map(EnvDSSLabel::new)
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
         appInstance.setLabels(labels);
         appInstance.setId(appInstanceInfo.getId());
     }
 
     private void lazyLoadAppConns() {
-        if(lazyLoad && !isLoaded) {
+        if (lazyLoad && !isLoaded) {
             synchronized (this.appConns) {
-                if(lazyLoad && !isLoaded) {
+                if (lazyLoad && !isLoaded) {
                     loadAppConns();
                 }
             }
@@ -230,7 +234,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     @Override
     public void reloadAppConn(String appConnName) {
         AppConnInfo appConnInfo = appConnInfoService.getAppConnInfo(appConnName);
-        if(appConnInfo == null) {
+        if (appConnInfo == null) {
             throw new DSSRuntimeException("Cannot get any info about AppConn " + appConnName);
         }
         reloadAppConn(appConnInfo);
@@ -247,9 +251,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         lazyLoadAppConns();
         AppConn appConn;
         try {
-            if(StringUtils.isNotBlank(appConnInfo.getReference())) {
+            if (StringUtils.isNotBlank(appConnInfo.getReference())) {
                 AppConn referenceAppConn = getAppConn(appConnInfo.getReference());
-                if(referenceAppConn == null) {
+                if (referenceAppConn == null) {
                     throw new DSSRuntimeException("Load AppConn " + appConnInfo.getAppConnName() +
                             " failed! Caused by: The reference AppConn " + appConnInfo.getReference() + " is not exists.");
                 }
@@ -265,7 +269,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             exception.initCause(e);
             throw exception;
         }
-        if(appConn == null) {
+        if (appConn == null) {
             return;
         }
         synchronized (this.appConns) {

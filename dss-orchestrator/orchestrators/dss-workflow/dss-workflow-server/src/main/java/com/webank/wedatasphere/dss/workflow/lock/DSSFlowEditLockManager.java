@@ -167,12 +167,14 @@ public class DSSFlowEditLockManager {
         }
     }
 
-    public static void deleteLock(long flowId) throws DSSErrorException {
+    public static void deleteLock(String flowEditLock) throws DSSErrorException {
         try {
+            DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
+            Long flowId = Optional.ofNullable(dssFlowEditLock).map(DSSFlowEditLock::getFlowID).get();
             lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowId);
         } catch (Exception e) {
-            LOGGER.error("flowEditLock delete failed，flowId：{}", flowId, e);
-            throw new DSSErrorException(60059, "工作流编辑锁主动释放失败，flowId:" + flowId + "");
+            LOGGER.error("flowEditLock delete failed，flowId：{}", flowEditLock, e);
+            throw new DSSErrorException(60059, "工作流编辑锁主动释放失败，flowId:" + flowEditLock + "");
         }
     }
 

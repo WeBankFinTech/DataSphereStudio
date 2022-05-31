@@ -1464,7 +1464,8 @@ export default {
     getFlowEditLock() {
       const data = storage.get("flowEditLock") || {}
       const key = this.getUserName()
-      return (data[key] || []).find(it => it.flowId == this.newFlowId && it.projectId == this.$route.query.projectID)
+      const item = (data[key] || []).find(it => it.flowId == this.newFlowId && it.projectId == this.$route.query.projectID)
+      return item && item.lock
     },
     updateLock() {
       const flowEditLock = this.getFlowEditLock()

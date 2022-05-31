@@ -1465,6 +1465,7 @@ export default {
     },
     updateLock() {
       const flowEditLock = this.getFlowEditLock()
+      if (!flowEditLock) return
       api.fetch(`${this.$API_PATH.WORKFLOW_PATH}updateFlowEditLock`, {
         flowEditLock,
         labels: this.getCurrentDsslabels()

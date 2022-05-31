@@ -75,6 +75,8 @@ public class LinkisJobConverter implements NodeConverter {
         StringBuilder stringBuilder = new StringBuilder();
         map.forEach((k,v)->{
             if(v != null) {
+                //for value contains "\n"
+                v = v.replace("\n", ";");
                 stringBuilder.append(k).append("=").append(v).append("\n");
             }
         });

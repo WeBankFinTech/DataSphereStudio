@@ -259,7 +259,6 @@ public class FlowRestfulApi {
         Boolean isNotHaveLock = saveFlowRequest.getNotHaveLock();
         String userName = SecurityFilter.getLoginUsername(req);
         String version;
-        String newFlowEditLock;
         synchronized (DSSWorkFlowConstant.saveFlowLock.intern(flowID)) {
             if (isNotHaveLock != null && isNotHaveLock.booleanValue()) {
                 version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
@@ -268,11 +267,9 @@ public class FlowRestfulApi {
             if (StringUtils.isBlank(flowEditLock)) {
                 throw new DSSErrorException(60057, "工作流编辑锁不能为空");
             }
-            // 锁更新操作，保证保存后的锁是最新的
-            newFlowEditLock = DSSFlowEditLockManager.updateLock(flowEditLock);
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
         }
-        return Message.ok().data("flowVersion", version).data("flowEditLock", newFlowEditLock);
+        return Message.ok().data("flowVersion", version).data("flowEditLock", flowEditLock);
     }
 
     /**

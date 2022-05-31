@@ -15,12 +15,8 @@ VALUES (2, @scriptis_appconn_id, 'DEV', '/home', '', ''),
 (4, @apiservice_appconn_id, 'DEV', '/apiservices', '', '');
 
 DELETE FROM dss_workspace;
-insert into `dss_workspace`(`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`)
-values('defaultWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','1','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop','project');
-
-DELETE FROM dss_workspace_user_role;
-select @defaultWorkspaceId:=id from dss_workspace where name='bdapWorkspace';
-insert  into `dss_workspace_user_role`(`workspace_id`,`username`,`create_time`,`created_by`,`user_id`) values (@defaultWorkspaceId,'hadoop','2021-09-06 14:39:17','hadoop',NULL);
+insert into `dss_workspace`(`id`, `name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`)
+values(224, 'bdapWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','1','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop','project');
 
 DELETE FROM dss_user;
 INSERT INTO `dss_user` VALUES (100,'hadoop_test','hadoop_test',1,101,1,'','','','0',NULL,'2021-11-17 09:33:45','2021-11-17 09:51:55',NULL),
@@ -64,14 +60,16 @@ INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `descrip
 INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('4','数据质量','data quality','数据质量','数据质量描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('5','管理员功能','administrator function','管理员功能','管理员功能描述','0',NULL,NULL,NULL,NULL,NULL,NULL);
 insert into `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) values('6','数据应用','data application','数据应用','数据应用描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
+insert into `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) values('7','应用开发','application development','应用开发','应用开发描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 
 DELETE FROM dss_workspace_menu_appconn;
 INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
-VALUES (@scriptis_appconn_id, 5, 'Scriptis', '即席查询', 'Scriptis is a one-stop interactive data exploration analysis tool built by WeDataSphere, uses Linkis as the kernel.', 'Scriptis是微众银行微数域(WeDataSphere)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。', 'scripts development,IDE', '脚本开发,IDE', 1, 'enter Scriptis', '进入Scriptis', 'user manual', '用户手册', 'http://127.0.0.1:8088/wiki/scriptis/manual/workspace_cn.html', 'shujukaifa-logo', null, null, null, null, null, 'shujukaifa-icon');
-INSERT INTO dss_workspace_menu_appconn (id, appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
+VALUES (@scriptis_appconn_id, 2, 'Scriptis', '即席查询', 'Scriptis is a one-stop interactive data exploration analysis tool built by WeDataSphere, uses Linkis as the kernel.', 'Scriptis是微众银行微数域(WeDataSphere)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。', 'scripts development,IDE', '脚本开发,IDE', 1, 'enter Scriptis', '进入Scriptis', 'user manual', '用户手册', 'http://127.0.0.1:8088/wiki/scriptis/manual/workspace_cn.html', 'shujukaifa-logo', null, null, null, null, null, 'shujukaifa-icon');
+INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
 VALUES (@workflow_appconn_id, 2, 'workflow', '工作流开发', '工作流开发', '工作流开发', null, null, 1, 'Enter workflow', '进入 工作流开发', null, null, null, null, null, null, null, null, null, null);
-INSERT INTO dss_workspace_menu_appconn (id, appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
-VALUES (@apiservice_appconn_id, 2, 'dataService', '数据服务', '/dataService', '/dataService', null, null, 1, 'Enter dataService', '进入 数据服务', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
+VALUES (@apiservice_appconn_id, 7, 'dataService', '数据服务', '/dataService', '/dataService', null, null, 1, 'Enter dataService', '进入 数据服务', null, null, null, null, null, null, null, null, null, null);
+
 
 DELETE FROM dss_workspace_role;
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('1','-1','admin','管理员','2020-07-13 02:43:35','通用角色管理员');
@@ -83,18 +81,23 @@ INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `u
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('7','-1','apiUser','数据服务用户','2020-08-21 11:35:02','通用角色数据服务用户');
 
 DELETE FROM dss_workspace_user_role;
-insert  into `dss_workspace_user_role`(`id`,`workspace_id`,`username`,`role_id`,`create_time`,`created_by`,`user_id`) values (473,323,'hadoop',1,'2021-09-06 14:39:17','hadoop',0),(474,323,'hadoop',2,'2021-09-06 14:39:17','hadoop',0),(475,323,'hadoop',3,'2021-09-06 14:39:17','hadoop',0),(476,323,'hadoop',4,'2021-09-06 14:39:17','hadoop',0),(477,323,'hadoop',5,'2021-09-06 14:39:17','hadoop',0),(478,323,'hadoop',6,'2021-09-06 14:39:17','hadoop',0),(479,323,'hadoop',7,'2021-09-06 14:39:17','hadoop',0);
+select @defaultWorkspaceId:=id from dss_workspace where name='bdapWorkspace';
+insert  into `dss_workspace_user_role`(`workspace_id`,`username`,`role_id`,`create_time`,`created_by`,`user_id`) values
+(@defaultWorkspaceId,'hadoop',1,'2021-09-06 14:39:17','hadoop',0),(@defaultWorkspaceId,'hadoop',2,'2021-09-06 14:39:17','hadoop',0),
+(@defaultWorkspaceId,'hadoop',3,'2021-09-06 14:39:17','hadoop',0),(@defaultWorkspaceId,'hadoop',4,'2021-09-06 14:39:17','hadoop',0),
+(@defaultWorkspaceId,'hadoop',5,'2021-09-06 14:39:17','hadoop',0),(@defaultWorkspaceId,'hadoop',6,'2021-09-06 14:39:17','hadoop',0),
+(@defaultWorkspaceId,'hadoop',7,'2021-09-06 14:39:17','hadoop',0);
 
 DELETE FROM dss_workflow_node;
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('1','python','-1','linkis.python.python','2','1','1','1','0','icons/python.icon');
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('2','pyspark','-1','linkis.spark.py','2','1','1','1','0','icons/pyspark.icon');
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('3','sql','-1','linkis.spark.sql','2','1','1','1','0','icons/sql.icon');
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('4','scala','-1','linkis.spark.scala','2','1','1','1','0','icons/scala.icon');
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('5','hql','-1','linkis.hive.hql','2','1','1','1','0','icons/hql.icon');
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('6','jdbc','-1','linkis.jdbc.jdbc','2','1','1','1','0','icons/jdbc.icon');
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('7','shell','-1','linkis.shell.sh','2','1','1','1','0','icons/shell.icon');
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('10','connector','-1','linkis.control.empty',NULL,'0','1','1','0','icons/connector.icon');
-insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('12','subFlow','-1','workflow.subflow','2','1','1','0','1','icons/subFlow.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('1','python','scriptis','linkis.python.python','2','1','1','1','0','icons/python.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('2','pyspark','scriptis','linkis.spark.py','2','1','1','1','0','icons/pyspark.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('3','sql','scriptis','linkis.spark.sql','2','1','1','1','0','icons/sql.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('4','scala','scriptis','linkis.spark.scala','2','1','1','1','0','icons/scala.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('5','hql','scriptis','linkis.hive.hql','2','1','1','1','0','icons/hql.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('6','jdbc','scriptis','linkis.jdbc.jdbc','2','1','1','1','0','icons/jdbc.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('7','shell','scriptis','linkis.shell.sh','2','1','1','1','0','icons/shell.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('10','connector','scriptis','linkis.control.empty',NULL,'0','1','1','0','icons/connector.icon');
+insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('12','subFlow','scriptis','workflow.subflow','2','1','1','0','1','icons/subFlow.icon');
 
 DELETE FROM dss_workflow_node_group;
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (1,'数据交换','Data exchange',NULL,1);

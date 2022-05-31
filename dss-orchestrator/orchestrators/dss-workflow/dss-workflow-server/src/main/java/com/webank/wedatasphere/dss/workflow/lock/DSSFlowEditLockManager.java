@@ -166,6 +166,15 @@ public class DSSFlowEditLockManager {
         }
     }
 
+    public static void deleteLock(long flowId) throws DSSErrorException {
+        try {
+            lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowId);
+        } catch (Exception e) {
+            LOGGER.error("flowEditLock delete failed，flowId：{}", flowId, e);
+            throw new DSSErrorException(60059, "工作流编辑锁主动释放失败，flowId:" + flowId + "");
+        }
+    }
+
     public static String updateLock(String lock) throws DSSErrorException {
         if (StringUtils.isBlank(lock)) {
             throw new DSSErrorException(60066, "update workflow failed because you do not have flowEditLock!");

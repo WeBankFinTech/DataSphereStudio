@@ -122,4 +122,4 @@ executeSQL $1
 echo ""
 
 echo "Step3: load the plugin of $APPCONN_NAME AppConn in DSS."
-sh $SOURCE_ROOT/bin/appconn-refresh.sh
+sh $SOURCE_ROOT/bin/appconn-refresh.sh $APPCONN_NAME

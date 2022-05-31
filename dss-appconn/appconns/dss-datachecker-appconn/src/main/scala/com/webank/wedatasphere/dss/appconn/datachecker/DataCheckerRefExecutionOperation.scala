@@ -14,8 +14,7 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker
-
+package com.webank.wedatasphere.dss.appconn.datachecker
 
 import java.util
 import java.util.{Properties, UUID}

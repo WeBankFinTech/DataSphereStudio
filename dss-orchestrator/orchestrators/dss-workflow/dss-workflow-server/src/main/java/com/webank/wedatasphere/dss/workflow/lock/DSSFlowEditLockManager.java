@@ -129,7 +129,8 @@ public class DSSFlowEditLockManager {
                 throw new DSSErrorException(60055, "acquire lock failed");
             }
         } else if (flowEditLock != null) {
-            lock = flowEditLock.getLockContent();
+            lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowID);
+            lock = generateLock(flowID, username, owner);
         } else {
             // 插入锁,获取到数据库自增id
             lock = generateLock(flowID, username, owner);

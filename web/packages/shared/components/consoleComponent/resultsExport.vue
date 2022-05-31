@@ -204,8 +204,10 @@ export default {
       }
       if (this.exportOption.format === '2') {
         params.params =  {
-          runtime: {
-            'wds.linkis.pipeline.export.excel.auto_format.enable': this.exportOption.autoFormat
+          configuration: {
+            runtime: {
+              'wds.linkis.pipeline.export.excel.auto_format.enable': this.exportOption.autoFormat
+            }
           }
         }
       }

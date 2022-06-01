@@ -13,6 +13,7 @@ import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 const types = {
   code: {
     theme: 'defaultView',
+    wordWrap: 'on',
   },
   log: {
     language: 'log',

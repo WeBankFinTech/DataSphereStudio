@@ -13,12 +13,15 @@
  * limitations under the License.
  *
  */
-
 package com.webank.wedatasphere.dss.appconn.visualis.utils;
 
 import org.apache.linkis.httpclient.request.DownloadAction;
 import org.apache.linkis.httpclient.request.GetAction;
 import org.apache.linkis.httpclient.request.UserAction;
+import org.apache.http.HttpResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import scala.Function0;
 
 import java.io.InputStream;
 
@@ -27,11 +30,8 @@ public class VisualisDownloadAction extends GetAction implements DownloadAction,
     private String user;
     private String url;
     private InputStream inputStream;
+    private HttpResponse response;
 
-    @Override
-    public void write(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
 
     public InputStream getInputStream() {
         return inputStream;
@@ -55,4 +55,68 @@ public class VisualisDownloadAction extends GetAction implements DownloadAction,
     public String getURL() {
         return url;
     }
+
+
+    @Override
+    public HttpResponse getResponse() {
+        return this.response;
+    }
+
+    @Override
+    public void setResponse(HttpResponse response) {
+        this.response = response;
+    }
+
+
+    @Override
+    public void write(InputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
+
+    @Override
+    public void write( InputStream inputStream, HttpResponse response) {
+        this.inputStream = inputStream;
+        this.response = response;
+    }
+
+    @Override
+    public void trace(Function0<String> message) {
+    }
+
+    @Override
+    public void debug(Function0<String> message) {
+    }
+
+    @Override
+    public void info(Function0<String> message) {
+    }
+
+    @Override
+    public void info(Function0<String> message, Throwable t) {
+    }
+
+    @Override
+    public void warn(Function0<String> message) {
+    }
+
+    @Override
+    public void warn(Function0<String> message, Throwable t) {
+    }
+
+    @Override
+    public void error( Function0<String> message,  Throwable t) {
+    }
+
+    @Override
+    public void error(Function0<String> message) {
+    }
+
+    @Override
+    public Logger logger() {
+        return LoggerFactory.getLogger(getClass());
+    }
+
+
+
 }

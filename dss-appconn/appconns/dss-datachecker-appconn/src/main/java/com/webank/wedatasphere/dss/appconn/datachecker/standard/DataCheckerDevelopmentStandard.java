@@ -14,16 +14,21 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker.service;
+package com.webank.wedatasphere.dss.appconn.datachecker.standard;
 
-import com.webank.wedatapshere.dss.appconn.datachecker.DataCheckerRefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExecutionService;
+import com.webank.wedatasphere.dss.appconn.datachecker.service.DataCheckerExecuteService;
+import com.webank.wedatasphere.dss.standard.app.development.standard.OnlyExecutionDevelopmentStandard;
 
-public class DataCheckerExecuteService extends AbstractRefExecutionService {
+public class DataCheckerDevelopmentStandard extends OnlyExecutionDevelopmentStandard {
 
     @Override
-    protected DataCheckerRefExecutionOperation createRefExecutionOperation() {
-        return new DataCheckerRefExecutionOperation();
+    protected DataCheckerExecuteService createRefExecutionService() {
+        return new DataCheckerExecuteService();
     }
+
+    @Override
+    public void init() {
+    }
+
 
 }

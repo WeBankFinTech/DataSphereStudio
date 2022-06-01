@@ -14,11 +14,16 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker.common;
+package com.webank.wedatasphere.dss.appconn.datachecker.service;
 
-public class MaskCheckNotExistException extends Exception {
+import com.webank.wedatasphere.dss.appconn.datachecker.DataCheckerRefExecutionOperation;
+import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExecutionService;
 
-    public MaskCheckNotExistException(final String message) {
-        super(message);
+public class DataCheckerExecuteService extends AbstractRefExecutionService {
+
+    @Override
+    protected DataCheckerRefExecutionOperation createRefExecutionOperation() {
+        return new DataCheckerRefExecutionOperation();
     }
+
 }

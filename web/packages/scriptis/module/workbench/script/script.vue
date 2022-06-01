@@ -667,6 +667,7 @@ export default {
               failedReason: ret.failedReason
             };
           }
+          newItem.solution = ret.solution
           if (index === -1) {
             this.script.history.unshift(newItem);
             this.dispatch('IndexedDB:appendHistory', {
@@ -772,6 +773,7 @@ export default {
             api.fetch(`/jobhistory/${findHis.taskID}/get`, 'get')
               .then((res) => {
                 newItem = {
+                  solution: res.solution,
                   taskID: res.task.taskID,
                   createDate: res.task.createdTime,
                   execID: res.task.strongerExecId,
@@ -1350,12 +1352,14 @@ export default {
     },
     convertSettingParams(params) {
       const variable = isEmpty(params.variable) ? {} : util.convertArrayToObject(params.variable);
-      const configuration = isEmpty(params.variable) ? {} : {
+      const configuration = isEmpty(params.configuration) ? {} : {
         special: {},
         runtime: {},
         startup: {},
+        ...params.configuration
       };
       return {
+        ...params,
         variable,
         configuration,
       };

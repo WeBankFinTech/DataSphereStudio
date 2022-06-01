@@ -259,7 +259,6 @@ public class FlowRestfulApi {
         Boolean isNotHaveLock = saveFlowRequest.getNotHaveLock();
         String userName = SecurityFilter.getLoginUsername(req);
         String version;
-        String newFlowEditLock;
         synchronized (DSSWorkFlowConstant.saveFlowLock.intern(flowID)) {
             if (isNotHaveLock != null && isNotHaveLock.booleanValue()) {
                 version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
@@ -268,11 +267,9 @@ public class FlowRestfulApi {
             if (StringUtils.isBlank(flowEditLock)) {
                 throw new DSSErrorException(60057, "工作流编辑锁不能为空");
             }
-            // 锁更新操作，保证保存后的锁是最新的
-            newFlowEditLock = DSSFlowEditLockManager.updateLock(flowEditLock);
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
         }
-        return Message.ok().data("flowVersion", version).data("flowEditLock", newFlowEditLock);
+        return Message.ok().data("flowVersion", version).data("flowEditLock", flowEditLock);
     }
 
     /**
@@ -298,4 +295,16 @@ public class FlowRestfulApi {
         List<ExtraToolBarsVO> barsVOList = flowService.getExtraToolBars(workspace.getWorkspaceId(), getExtraToolBarsRequest.getProjectId());
         return Message.ok().data("extraBars", barsVOList);
     }
+
+
+    @RequestMapping(value = "/deleteFlowEditLock", method = RequestMethod.DELETE)
+    public Message deleteFlowEditLock(HttpServletRequest req, @RequestParam(name = "flowId") Long flowId) throws DSSErrorException {
+        if (flowId == null) {
+            throw new DSSErrorException(60068, "delete flowEditLock failed,flowId is null");
+        }
+        DSSFlowEditLockManager.deleteLock(flowId);
+        return Message.ok();
+    }
+
+
 }

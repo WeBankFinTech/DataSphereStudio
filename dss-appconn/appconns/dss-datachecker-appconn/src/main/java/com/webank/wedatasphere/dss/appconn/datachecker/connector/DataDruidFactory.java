@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker.connector;
+package com.webank.wedatasphere.dss.appconn.datachecker.connector;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.commons.lang3.StringUtils;

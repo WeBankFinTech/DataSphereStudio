@@ -1181,36 +1181,18 @@ export default {
       }
     },
     convertSettingParams(params) {
-      let variable = []
-      let configuration = {
+      const variable = isEmpty(params.variable) ? [] : util.convertObjectToArray(params.variable);
+      const configuration = isEmpty(params.configuration) ? {} : {
         special: {},
-        runtime: {
-          args: "",
-          env: [],
-        },
+        runtime: {},
         startup: {},
-      }
-      if (!isEmpty(params)) {
-        variable = isEmpty(params.variable)
-          ? []
-          : util.convertObjectToArray(params.variable)
-        configuration = isEmpty(params.configuration)
-          ? {}
-          : {
-            special: {},
-            runtime: {
-              args: params.configuration.runtime.args || "",
-              env: isEmpty(params.configuration.runtime.env)
-                ? []
-                : util.convertObjectToArray(params.configuration.runtime.env),
-            },
-            startup: {},
-          }
-      }
+        ...params.configuration
+      };
       return {
+        ...params,
         variable,
         configuration,
-      }
+      };
     },
     resize() {
       this.toggleCtrlBtn(this)

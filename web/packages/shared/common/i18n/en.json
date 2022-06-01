@@ -309,6 +309,7 @@
         "resultGroup": "Result Group",
         "all": "all",
         "downloadMode": "Download Mode :",
+        "autoformat": "Format",
         "deepAnalysis": "Deep Analysis",
         "success": {
           "download": "Successfully downloaded, please check from the local download directory!"

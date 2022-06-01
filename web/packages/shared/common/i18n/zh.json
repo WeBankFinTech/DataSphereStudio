@@ -316,6 +316,7 @@
         "resultGroup": "结果集",
         "all": "是否全量",
         "downloadMode": "下载方式：",
+        "autoformat": "自动格式化：",
         "deepAnalysis": "分 析 进 阶",
         "success": {
           "download": "下载成功，请到本地的download文件夹查看！"

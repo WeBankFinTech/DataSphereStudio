@@ -129,7 +129,8 @@ public class DSSFlowEditLockManager {
                 throw new DSSErrorException(60055, "acquire lock failed");
             }
         } else if (flowEditLock != null) {
-            lock = flowEditLock.getLockContent();
+            lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowID);
+            lock = generateLock(flowID, username, owner);
         } else {
             // 插入锁,获取到数据库自增id
             lock = generateLock(flowID, username, owner);
@@ -163,6 +164,15 @@ public class DSSFlowEditLockManager {
             DSSFlowEditLock personalFlowEditLock = lockMapper.getPersonalFlowEditLock(flowID, null);
             String userName = Optional.ofNullable(personalFlowEditLock).map(DSSFlowEditLock::getUsername).orElse(null);
             throw new DSSErrorException(DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE, "用户" + userName + "已锁定编辑");
+        }
+    }
+
+    public static void deleteLock(long flowId) throws DSSErrorException {
+        try {
+            lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowId);
+        } catch (Exception e) {
+            LOGGER.error("flowEditLock delete failed，flowId：{}", flowId, e);
+            throw new DSSErrorException(60059, "工作流编辑锁主动释放失败，flowId:" + flowId + "");
         }
     }
 

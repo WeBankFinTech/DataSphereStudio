@@ -1,4 +1,6 @@
 -- TODO 这里只适用于第一次安装时。如果是更新的话dss_appconn表不能先删除再插入，因为其他表如dss_workspace_appconn_role关联了appconn_id(不能变)，需要使用update、alter语句更新
+select @sendemail_appconnId:=id from `dss_appconn` where `appconn_name` = 'sendemail';
+delete from `dss_appconn_instance` where `appconn_id` = @sendemail_appconnId;
 
 INSERT INTO `dss_appconn` (`appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`)
 VALUES ('sendemail', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.sendemail.SendEmailAppConn', 'DSS_INSTALL_HOME_VAL/dss-appconns/sendemail', '');

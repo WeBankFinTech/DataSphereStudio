@@ -192,7 +192,7 @@ const success = function (response) {
       window.location.href = '/newhome'
       throw new Error('token失效，请重新进入之前页面!');
     }
-    if (util.isString(response.data)) {
+    if (util.isString(response.data) && response.data) {
       data = JSON.parse(response.data);
     } else if (util.isObject(response.data)) {
       // 兼容ds blob流下载
@@ -213,10 +213,10 @@ const success = function (response) {
     let result = res.resultPath;
     const throwErr = function (msg) {
       const err = new Error(msg)
-      if (!data.solution) {
-        err.solution = data.solution
-        err.response = response
+      if (result && result.solution) {
+        err.solution = result.solution
       }
+      err.response = response
       throw err;
     }
     // 兼容 dolphin 返回数据结构
@@ -267,7 +267,7 @@ const fail = function (error) {
     _message = API_ERR_MSG;
     if (response && response.data) {
       let data;
-      if (util.isString(response.data)) {
+      if (util.isString(response.data) && response.data) {
         data = JSON.parse(response.data);
       } else if (util.isObject(response.data)) {
         data = response.data;
@@ -331,6 +331,7 @@ const param = function (url, data, option) {
 };
 
 let showApiErrorTips = true
+let lastMsg = ''
 const action = function (url, data, option) {
   return param(url, data, option)
     .then(success, fail)
@@ -340,40 +341,49 @@ const action = function (url, data, option) {
     .catch(function (error) {
       const showErrMsg = function () {
         const msg = error.message || error.msg
-        if (process.env.NODE_ENV === "production" && window.$APP_CONF && window.$APP_CONF.error_report && error.response.config.url.indexOf('dss/framework/guide/reportProblem') < 0) {
+        if (lastMsg !== msg  && msg) {
+          lastMsg = msg
+        } else {
+          return
+        }
+        const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
+        if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
           const msgErrModal = Message.error({
-            duration: 10,
+            duration: 4,
             closable: true,
             render: (h) => {
               return h('div', {
                 class: 'g-err-msg-div',
                 style: {
-                  'text-align': 'center',
                   padding: '10px'
                 }
               }, [
                 h('div', {
                   style: {
-                    'max-width': '400px',
-                    'min-width': '200px',
-                    padding: '10px',
+                    'max-width': '600px',
+                    'min-width': '400px',
                     'word-break': 'break-all',
-                    'margin-bottom': '20px'
+                    'margin-bottom': '20px',
+                    'text-align': 'left'
                   }
                 }, msg),
                 h('button', {
                   class: 'ivu-btn ivu-btn-default ivu-btn-small',
+                  style: {
+                    background: '#ec6565',
+                    color: '#fff'
+                  },
                   on: {
                     click: () => {
                       if (error.solution && error.solution.solutionUrl) {
                         window.open(error.solution.solutionUrl, '_blank')
                       } else if(error.response) {
                         // 上报
-                        action('/dss/framework/guide/reportProblem', {
+                        action('/dss/guide/solution/reportProblem', {
                           requestUrl: error.response.config.url,
                           queryParams: error.response.config.params,
-                          requestBody: error.response.config.data,
-                          requestHeaders: {Cookie: document.cookie, ...error.response.config.headers},
+                          requestBody: typeof error.response.config.data === 'string' ? JSON.parse(error.response.config.data) : error.response.config.data,
+                          requestHeaders: { Cookie: document.cookie, ...error.response.config.headers },
                           responseBody: error.response.data
                         }).then(()=>{
                           Message.success('错误已上报')
@@ -391,12 +401,21 @@ const action = function (url, data, option) {
               ele.parentElement.parentElement.style.textAlign = 'left'
               ele.parentElement.style.display = 'block'
               ele.parentElement.style.padding = 0
+              ele.parentElement.parentElement.querySelector('span').innerText = "错误提示"
+              ele.parentElement.parentElement.style.background ="rgb(251, 233, 233)"
+              ele.parentElement.parentElement.style.border ="1px solid #eaa8a8"
+              ele.parentElement.parentElement.style.color ="#333"
+              ele.parentElement.parentElement.style.position ="absolute"
+              ele.parentElement.parentElement.style.right ="10px"
             })
           })
         } else {
-          Message.error(msg);
+          Message.error({content: msg, duration: 4});
           throw error;
         }
+        setTimeout(() => {
+          lastMsg = ''
+        }, 4000)
       }
       if (error.message === API_ERR_MSG || error.msg === API_ERR_MSG) {
         if (showApiErrorTips) {

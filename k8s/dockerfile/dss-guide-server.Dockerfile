@@ -1,4 +1,4 @@
-FROM nm.hub.com/luban/base:1.0.0
+FROM base:1.0.0
 
 WORKDIR /opt/dss
 

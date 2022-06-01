@@ -399,7 +399,6 @@ import clickoutside from '@dataspherestudio/shared/common/helper/clickoutside';
 import associateScript from './component/associateScript.vue';
 import { throttle, debounce } from 'lodash';
 import { NODETYPE, ext } from '@/workflows/service/nodeType';
-import { setTimeout, clearTimeout } from 'timers';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import util from '@dataspherestudio/shared/common/util';
@@ -912,7 +911,7 @@ export default {
         this.loading = false;
         this.locked = true;
         if (this.updateLockTimer) {
-          this.clearTimeout(this.updateLockTimer)
+          clearTimeout(this.updateLockTimer)
         }
         this.$emit('close')
       });
@@ -1454,18 +1453,23 @@ export default {
       }
     },
     setFlowEditLock(flowEditLock) {
-      const data = storage.get("flowEditLock") || {}
-      const key = this.newFlowId + this.getUserName()
-      data[key] = flowEditLock
-      storage.set("flowEditLock", data);
+      let data = storage.get("flowEditLock") || {}
+      const key = this.getUserName()
+      const updateList = (data[key] || []).filter(it => it.projectId != this.$route.query.projectID)
+      updateList.push({ flowId: this.newFlowId, lock: flowEditLock, projectId: this.$route.query.projectID })
+      storage.set("flowEditLock", {
+        [key]: updateList
+      });
     },
     getFlowEditLock() {
-      const data = storage.get("flowEditLock")
-      const key = this.newFlowId + this.getUserName()
-      return data && data[key]
+      const data = storage.get("flowEditLock") || {}
+      const key = this.getUserName()
+      const item = (data[key] || []).find(it => it.flowId == this.newFlowId && it.projectId == this.$route.query.projectID)
+      return item && item.lock
     },
     updateLock() {
       const flowEditLock = this.getFlowEditLock()
+      if (!flowEditLock) return
       api.fetch(`${this.$API_PATH.WORKFLOW_PATH}updateFlowEditLock`, {
         flowEditLock,
         labels: this.getCurrentDsslabels()

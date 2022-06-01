@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-footer">
+  <div class="layout-footer" @mousemove="onMouseMove" :style="{'pointer-events': `${isMouseDown ? 'initial' : 'none'}`}">
     <div ref="footerChannel" class="tool-btns" @mousedown.prevent.stop="onMouseDown">
       <template v-if="!min">
         <div class="footer-btn footer-doc" @click="toggleGuide">
@@ -49,30 +49,7 @@ export default {
     }, 500);
   },
   mounted() {
-    const footerChannel = this.$refs.footerChannel;
     this.positionInfo = { x: 0, y: 0}
-    document.onmousemove = (e) => {
-      if (!this.isMouseDown) return
-      let x = e.clientX - this.positionInfo.x
-      let y = e.clientY - this.positionInfo.y
-      if (x > document.documentElement.clientWidth - 40) {
-        x =  document.documentElement.clientWidth - 40
-      }
-      if (y > document.documentElement.clientHeight - 160) {
-        y =  document.documentElement.clientHeight - 160
-      }
-      if (x < 20) {
-        x = 20
-      }
-      if (y < 20) {
-        y = 20
-      }
-      footerChannel.style.left = x + 'px';
-      footerChannel.style.top = y + 'px';
-      if (Math.abs(e.movementX) > 10 || Math.abs(e.movementY) > 10) {
-        this.isMouseMove = true;
-      }
-    }
     document.onselectstart = () => {
       return false;
     }
@@ -123,6 +100,29 @@ export default {
       }
       this.isMouseMove = false;
       this.isMouseDown = true;
+    },
+    onMouseMove(e) {
+      const footerChannel = this.$refs.footerChannel;
+      if (!this.isMouseDown) return
+      let x = e.clientX - this.positionInfo.x
+      let y = e.clientY - this.positionInfo.y
+      if (x > document.documentElement.clientWidth - 40) {
+        x =  document.documentElement.clientWidth - 40
+      }
+      if (y > document.documentElement.clientHeight - 160) {
+        y =  document.documentElement.clientHeight - 160
+      }
+      if (x < 20) {
+        x = 20
+      }
+      if (y < 20) {
+        y = 20
+      }
+      footerChannel.style.left = x + 'px';
+      footerChannel.style.top = y + 'px';
+      if (Math.abs(e.movementX) > 10 || Math.abs(e.movementY) > 10) {
+        this.isMouseMove = true;
+      }
     },
     resetChannelPosition() {
       this.min = false

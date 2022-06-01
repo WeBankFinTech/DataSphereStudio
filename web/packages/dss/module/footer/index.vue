@@ -13,7 +13,7 @@
         </resource-simple>
         <div class="footer-btn footer-channel"
           :title="msg"
-          @click.prevent.stop="toast">
+          @click="toast">
           <SvgIcon class="footer-channel-job" icon-class="job" />
           <span class="footer-channel-job-num">{{ num }}</span>
         </div>
@@ -54,7 +54,6 @@ export default {
     this.positionInfo = { x: 0, y: 0}
     document.onmousemove = debounce((e) => {
       if (!this.isMouseDown) return
-      this.isMouseMove = true;
       let x = e.clientX - this.positionInfo.x
       let y = e.clientY - this.positionInfo.y
       if (x > document.documentElement.clientWidth - 40) {
@@ -71,6 +70,9 @@ export default {
       }
       footerChannel.style.left = x + 'px';
       footerChannel.style.top = y + 'px';
+      if (Math.abs(e.movementX) > 10 || Math.abs(e.movementY) > 10) {
+        this.isMouseMove = true;
+      }
     })
     document.onselectstart = () => {
       return false;
@@ -105,14 +107,14 @@ export default {
       this[method](num);
     },
     toast() {
-      // 取消拖动后自动点击事件
-      if (this.isMouseMove) {
-        return;
+      if (!this.isMouseMove) {
+        this.$refs.resourceSimple.open();
       }
-      this.$refs.resourceSimple.open();
     },
     toggleGuide() {
-      this.guideShow = !this.guideShow;
+      if (!this.isMouseMove) {
+        this.guideShow = !this.guideShow;
+      }
     },
     onMouseDown(e) {
       const footerChannel = this.$refs.footerChannel;
@@ -120,16 +122,8 @@ export default {
         x: e.clientX - footerChannel.offsetLeft,
         y: e.clientY - footerChannel.offsetTop
       }
+      this.isMouseMove = false;
       this.isMouseDown = true;
-      document.onselectstart = () => {
-        return false;
-      }
-    },
-    oMouseUp() {
-      document.onselectstart = () => {
-        return true;
-      }
-      this.isMouseDown = false;
     },
     resetChannelPosition() {
       this.min = false

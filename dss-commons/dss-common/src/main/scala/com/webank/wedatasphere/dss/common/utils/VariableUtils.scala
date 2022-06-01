@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.common.utils
 
 import java.text.SimpleDateFormat
 import java.util
+import java.util.concurrent.{ExecutorService, Executors}
 import java.util.{Calendar, Date}
 
 import org.apache.linkis.common.exception.LinkisCommonErrorException
@@ -34,9 +35,6 @@ object VariableUtils extends Logging {
   val RUN_DATE = "run_date"
   val RUN_TODAY = "run_today"
   val RUN_MON = "run_mon"
-
-  var run_today: CustomDateType = null
-  var run_mon: CustomMonType = null
 
   val dateFormatLocal = new ThreadLocal[SimpleDateFormat]() {
     override protected def initialValue = new SimpleDateFormat("yyyyMMdd")
@@ -65,6 +63,7 @@ object VariableUtils extends Logging {
     variables foreach {
       case (RUN_DATE, value) if nameAndType.get(RUN_DATE).isEmpty =>
         val run_date_str = value.asInstanceOf[String]
+        info(s"replaceStr:${run_date_str}")
         if (StringUtils.isNotEmpty(run_date_str)) {
           run_date = new CustomDateType(run_date_str, false)
           nameAndType(RUN_DATE) = DateType(run_date)
@@ -73,8 +72,10 @@ object VariableUtils extends Logging {
         nameAndType(key) = Utils.tryCatch[VariableType](DoubleValue(value.toDouble))(_ => StringType(value))
       case _ =>
     }
-    if(!nameAndType.contains(RUN_DATE) || null == run_date){
-      run_date = new CustomDateType(getYesterday(false), false)
+    if (!nameAndType.contains(RUN_DATE) || null == run_date) {
+      val getYesterdayValue = getYesterday(false)
+      info(s"getYesterday:${getYesterdayValue}")
+      run_date = new CustomDateType(getYesterdayValue, false)
       nameAndType(RUN_DATE) = DateType(new CustomDateType(run_date.toString, false))
     }
     initAllDateVars(run_date, nameAndType)
@@ -92,31 +93,33 @@ object VariableUtils extends Logging {
     /*
    Variables based on run_today
    */
-//    if (nameAndType.get(RUN_TODAY).isEmpty || null == run_today) {
-//      run_today = new CustomDateType(getToday(false), false)
-//      nameAndType(RUN_TODAY) = DateType(new CustomDateType(run_today.toString, false))
-//    }
-    run_today = new CustomDateType(new CustomDateType(run_date.toString, false) + 1, false)
-    nameAndType(RUN_TODAY)=DateType(new CustomDateType(run_today.toString, false))
+    //    if (nameAndType.get(RUN_TODAY).isEmpty || null == run_today) {
+    //      run_today = new CustomDateType(getToday(false), false)
+    //      nameAndType(RUN_TODAY) = DateType(new CustomDateType(run_today.toString, false))
+    //    }
+
+    val run_today = new CustomDateType(getToday(false, run_date + 1), false)
+    nameAndType(RUN_TODAY) = DateType(new CustomDateType(run_today.toString, false))
     nameAndType("run_today_std") = DateType(new CustomDateType(run_today.getStdDate))
     nameAndType("run_month_now_begin") = MonthType(new CustomMonthType(new CustomMonthType(run_today.toString, false) - 1, false))
     nameAndType("run_month_now_begin_std") = MonthType(new CustomMonthType(new CustomMonthType(run_today.toString, false) - 1))
     nameAndType("run_month_now_end") = MonthType(new CustomMonthType(new CustomMonthType(run_today.toString, false) - 1, false, true))
     nameAndType("run_month_now_end_std") = MonthType(new CustomMonthType(new CustomMonthType(run_today.toString, false) - 1, true, true))
 
-//    if (nameAndType.get(RUN_MON).isEmpty || null == run_mon) {
-//      run_mon = new CustomMonType(getMonthDay(false), false)
-//      nameAndType(RUN_MON) = MonType(new CustomMonType(run_mon.toString, false))
-//    }
+    //    if (nameAndType.get(RUN_MON).isEmpty || null == run_mon) {
+    //      run_mon = new CustomMonType(getMonthDay(false), false)
+    //      nameAndType(RUN_MON) = MonType(new CustomMonType(run_mon.toString, false))
+    //    }
 
-    run_mon = new CustomMonType(new CustomMonthType(run_today.toString, false) - 1, false)
-    nameAndType(RUN_MON) = MonType(new CustomMonType(run_mon.toString, false))
-
+    // calculate run_mon base on run_date
+    val run_mon = new CustomMonType(getMonthDay(false, run_date.getDate), false)
+    nameAndType("run_mon") = MonType(new CustomMonType(run_mon.toString, false))
     nameAndType("run_mon_std") = MonType(new CustomMonType(run_mon.toString, true, false))
     nameAndType("run_mon_start") = MonType(new CustomMonType(run_mon.toString, false, false))
     nameAndType("run_mon_start_std") = MonType(new CustomMonType(run_mon.toString, true, false))
     nameAndType("run_mon_end") = MonType(new CustomMonType(run_mon.toString, false, true))
     nameAndType("run_mon_end_std") = MonType(new CustomMonType(run_mon.toString, true, true))
+
 
     nameAndType("run_quarter_begin") = QuarterType(new CustomQuarterType(run_date.toString, false))
     nameAndType("run_quarter_begin_std") = QuarterType(new CustomQuarterType(run_date.toString))
@@ -136,27 +139,27 @@ object VariableUtils extends Logging {
   }
 
   /**
-    * Parse and replace the value of the variable
-    * 1.Get the expression and calculations
-    * 2.Print user log
-    * 3.Assemble code
-    *
-    * @param replaceStr        : replaceStr
-    * @param nameAndType : variable name and Type
-    * @return
-    */
+   * Parse and replace the value of the variable
+   * 1.Get the expression and calculations
+   * 2.Print user log
+   * 3.Assemble code
+   *
+   * @param replaceStr  : replaceStr
+   * @param nameAndType : variable name and Type
+   * @return
+   */
   private def parserVar(replaceStr: String, nameAndType: mutable.Map[String, VariableType]): String = {
     val parseCode = new StringBuilder
     val codes = codeReg.split(replaceStr)
     var i = 0
-    codeReg.findAllIn(replaceStr).foreach{ str =>
+    codeReg.findAllIn(replaceStr).foreach { str =>
       i = i + 1
-      calReg.findFirstMatchIn(str).foreach{ ma =>
+      calReg.findFirstMatchIn(str).foreach { ma =>
         val name = ma.group(1)
         val signal = ma.group(2)
         val bValue = ma.group(3)
         if (StringUtils.isBlank(name)) {
-          throw new LinkisCommonErrorException(20041,s"[$str] with empty variable name.")
+          throw new LinkisCommonErrorException(20041, s"[$str] with empty variable name.")
         }
         val replacedStr = nameAndType.get(name.trim).map { varType =>
           if (StringUtils.isNotBlank(signal)) {
@@ -179,11 +182,11 @@ object VariableUtils extends Logging {
   }
 
   /**
-    * Get Yesterday"s date
-    *
-    * @param std :2017-11-16
-    * @return
-    */
+   * Get Yesterday"s date
+   *
+   * @param std :2017-11-16
+   * @return
+   */
   private def getYesterday(std: Boolean = true): String = {
     val dateFormat = dateFormatLocal.get()
     val dateFormat_std = dateFormatStdLocal.get()
@@ -196,28 +199,28 @@ object VariableUtils extends Logging {
     }
   }
 
-//  /**
-//    * Get Month"s date
-//    *
-//    * @param std   :2017-11-01
-//    * @param isEnd :01 or 30,31
-//    * @return
-//    */
-//  private[utils] def getMonth(date: Date, std: Boolean = true, isEnd: Boolean = false): String = {
-//    val dateFormat = dateFormatLocal.get()
-//    val dateFormat_std = dateFormatStdLocal.get()
-//    val cal = Calendar.getInstance()
-//    cal.setTime(date)
-//    cal.set(Calendar.DATE, 1)
-//    if (isEnd) {
-//      cal.roll(Calendar.DATE, -1)
-//    }
-//    if (std) {
-//      dateFormat_std.format(cal.getTime)
-//    } else {
-//      dateFormat.format(cal.getTime)
-//    }
-//  }
+  //  /**
+  //    * Get Month"s date
+  //    *
+  //    * @param std   :2017-11-01
+  //    * @param isEnd :01 or 30,31
+  //    * @return
+  //    */
+  //  private[utils] def getMonth(date: Date, std: Boolean = true, isEnd: Boolean = false): String = {
+  //    val dateFormat = dateFormatLocal.get()
+  //    val dateFormat_std = dateFormatStdLocal.get()
+  //    val cal = Calendar.getInstance()
+  //    cal.setTime(date)
+  //    cal.set(Calendar.DATE, 1)
+  //    if (isEnd) {
+  //      cal.roll(Calendar.DATE, -1)
+  //    }
+  //    if (std) {
+  //      dateFormat_std.format(cal.getTime)
+  //    } else {
+  //      dateFormat.format(cal.getTime)
+  //    }
+  //  }
 
   /**
    * Get Today"s date
@@ -225,10 +228,13 @@ object VariableUtils extends Logging {
    * @param std :2017-11-16
    * @return
    */
-  def getToday(std: Boolean = true): String = {
+  def getToday(std: Boolean = true, dateString: String = null): String = {
     val dateFormat = dateFormatLocal.get()
     val dateFormat_std = dateFormatStdLocal.get()
     val cal: Calendar = Calendar.getInstance()
+    if (dateString != null) {
+      cal.setTime(dateFormat.parse(dateString))
+    }
     if (std) {
       dateFormat_std.format(cal.getTime)
     } else {
@@ -242,14 +248,13 @@ object VariableUtils extends Logging {
    * @param std 202106
    * @return
    */
-  def getMonthDay(std: Boolean = true): String = {
+  def getMonthDay(std: Boolean = true, date: Date = null): String = {
     val dateFormat = dateFormatMonLocal.get()
     val dateFormat_std = dateFormatMonStdLocal.get()
-    val cal: Calendar = Calendar.getInstance()
     if (std) {
-      dateFormat_std.format(cal.getTime)
+      dateFormat_std.format(date)
     } else {
-      dateFormat.format(cal.getTime)
+      dateFormat.format(date)
     }
   }
 
@@ -293,6 +298,7 @@ object VariableUtils extends Logging {
 
   /**
    * get 1st day or last day of a Quarter
+   *
    * @param std
    * @param isEnd
    * @param date
@@ -304,14 +310,14 @@ object VariableUtils extends Logging {
     val cal: Calendar = Calendar.getInstance()
     cal.setTime(date)
     cal.set(Calendar.DATE, 1)
-    val monthDigit: Int = cal.get(Calendar.MONTH)//get method with MONTH field returns 0-11
-    if (0<= monthDigit && monthDigit <= 2) {
+    val monthDigit: Int = cal.get(Calendar.MONTH) //get method with MONTH field returns 0-11
+    if (0 <= monthDigit && monthDigit <= 2) {
       cal.set(Calendar.MONTH, 0)
-    } else if (3<= monthDigit && monthDigit <= 5) {
+    } else if (3 <= monthDigit && monthDigit <= 5) {
       cal.set(Calendar.MONTH, 3)
-    } else if (6<= monthDigit && monthDigit <= 8) {
+    } else if (6 <= monthDigit && monthDigit <= 8) {
       cal.set(Calendar.MONTH, 6)
-    } else if (9<= monthDigit && monthDigit <= 11) {
+    } else if (9 <= monthDigit && monthDigit <= 11) {
       cal.set(Calendar.MONTH, 9)
     }
     if (isEnd) {
@@ -327,6 +333,7 @@ object VariableUtils extends Logging {
 
   /**
    * get 1st day or last day of a HalfYear
+   *
    * @param std
    * @param isEnd
    * @param date
@@ -339,9 +346,9 @@ object VariableUtils extends Logging {
     cal.setTime(date)
     cal.set(Calendar.DATE, 1)
     val monthDigit: Int = cal.get(Calendar.MONTH) //get method with MONTH field returns 0-11
-    if (0<= monthDigit && monthDigit <= 5) {
+    if (0 <= monthDigit && monthDigit <= 5) {
       cal.set(Calendar.MONTH, 0)
-    } else if (6<= monthDigit && monthDigit <= 11) {
+    } else if (6 <= monthDigit && monthDigit <= 11) {
       cal.set(Calendar.MONTH, 6)
     }
     if (isEnd) {
@@ -357,6 +364,7 @@ object VariableUtils extends Logging {
 
   /**
    * get 1st day or last day of a year
+   *
    * @param std
    * @param isEnd
    * @param date
@@ -381,41 +389,55 @@ object VariableUtils extends Logging {
   }
 
 
-    def main(args: Array[String]): Unit = {
-      val code = "--@set a=1\n--@set b=2\nselect ${a +2},${a   + 1},${a},${a },${run_mon_start},${b}"
+  def main(args: Array[String]): Unit = {
+    val code = "--@set a=1\n--@set b=2\nselect ${a +2},${a   + 1},${a},${a },${run_mon},${run_mon_std},${b}"
 
-      val args:java.util.Map[String, Any] = new util.HashMap[String, Any]()
-      args.put(RUN_DATE, "20181030")
+    val args: java.util.Map[String, Any] = new util.HashMap[String, Any]()
+    args.put(RUN_DATE, "20181030")
 
-      val str = VariableUtils.replace(code,args)
-      println(str)
+    val str = VariableUtils.replace(code, args)
+    println(str)
+    val fixedThreadPool = Executors.newFixedThreadPool(300)
 
-//      println("************code**************")
-//      var preSQL = ""
-//      var endSQL = ""
-//      var sql = "select * from (select * from utf_8_test limit 20) t ;"
-//      if (sql.contains("limit")) {
-//        preSQL = sql.substring(0, sql.lastIndexOf("limit")).trim
-//        endSQL = sql.substring(sql.lastIndexOf("limit")).trim
-//      } else if (sql.contains("LIMIT")) {
-//        preSQL = sql.substring(0, sql.lastIndexOf("limit")).trim
-//        endSQL = sql.substring(sql.lastIndexOf("limit")).trim
-//      }
-//      println(preSQL)
-//      println(endSQL)
-      /* val yestd = new CustomDateType("2017-11-11",false)
-       println(yestd)*/
+    val task1 = new Runnable {
+      override def run(): Unit = {
+        //        println("task1 running")
+        println(Thread.currentThread().getName)
+        val str = VariableUtils.replace(code, args)
+        println(str)
+        //        println("task1 complete")
+      }
     }
 
+
+    for(a <- 1 to 1000) {
+      fixedThreadPool.execute(task1)
+    }
+
+    //      println("************code**************")
+    //      var preSQL = ""
+    //      var endSQL = ""
+    //      var sql = "select * from (select * from utf_8_test limit 20) t ;"
+    //      if (sql.contains("limit")) {
+    //        preSQL = sql.substring(0, sql.lastIndexOf("limit")).trim
+    //        endSQL = sql.substring(sql.lastIndexOf("limit")).trim
+    //      } else if (sql.contains("LIMIT")) {
+    //        preSQL = sql.substring(0, sql.lastIndexOf("limit")).trim
+    //        endSQL = sql.substring(sql.lastIndexOf("limit")).trim
+    //      }
+    //      println(preSQL)
+    //      println(endSQL)
+    /* val yestd = new CustomDateType("2017-11-11",false)
+     println(yestd)*/
+  }
+
 }
-
-
-
 
 
 trait VariableType {
 
   def getValue: String
+
   def calculator(signal: String, bValue: String): String
 
 }
@@ -426,7 +448,7 @@ case class DateType(value: CustomDateType) extends VariableType {
   def calculator(signal: String, bValue: String): String = signal match {
     case "+" => value + bValue.toInt
     case "-" => value - bValue.toInt
-    case _ => throw new LinkisCommonErrorException(20046,s"Date class is not supported to uss：$signal.")
+    case _ => throw new LinkisCommonErrorException(20046, s"Date class is not supported to uss：$signal.")
   }
 }
 
@@ -462,7 +484,7 @@ case class QuarterType(value: CustomQuarterType) extends VariableType {
     signal match {
       case "+" => value + bValue.toInt
       case "-" => value - bValue.toInt
-      case _ => throw new LinkisCommonErrorException(20046,s"Date class is not supported to uss：${signal}")
+      case _ => throw new LinkisCommonErrorException(20046, s"Date class is not supported to uss：${signal}")
     }
   }
 }
@@ -474,7 +496,7 @@ case class HalfYearType(value: CustomHalfYearType) extends VariableType {
     signal match {
       case "+" => value + bValue.toInt
       case "-" => value - bValue.toInt
-      case _ => throw new LinkisCommonErrorException(20046,s"Date class is not supported to uss：${signal}")
+      case _ => throw new LinkisCommonErrorException(20046, s"Date class is not supported to uss：${signal}")
     }
   }
 }
@@ -486,7 +508,7 @@ case class YearType(value: CustomYearType) extends VariableType {
     signal match {
       case "+" => value + bValue.toInt
       case "-" => value - bValue.toInt
-      case _ => throw new LinkisCommonErrorException(20046,s"Date class is not supported to uss：${signal}")
+      case _ => throw new LinkisCommonErrorException(20046, s"Date class is not supported to uss：${signal}")
     }
   }
 }
@@ -499,7 +521,7 @@ case class LongType(value: Long) extends VariableType {
     case "-" => val res = value - bValue.toLong; res.toString
     case "*" => val res = value * bValue.toLong; res.toString
     case "/" => val res = value / bValue.toLong; res.toString
-    case _ => throw new LinkisCommonErrorException(20047,s"Int class is not supported to uss：$signal.")
+    case _ => throw new LinkisCommonErrorException(20047, s"Int class is not supported to uss：$signal.")
   }
 }
 
@@ -511,10 +533,10 @@ case class DoubleValue(value: Double) extends VariableType {
     case "-" => val res = value - bValue.toDouble; doubleOrLong(res).toString
     case "*" => val res = value * bValue.toDouble; doubleOrLong(res).toString
     case "/" => val res = value / bValue.toDouble; doubleOrLong(res).toString
-    case _ => throw new LinkisCommonErrorException(20047,s"Double class is not supported to uss：$signal.")
+    case _ => throw new LinkisCommonErrorException(20047, s"Double class is not supported to uss：$signal.")
   }
 
-  private def doubleOrLong(d:Double):AnyVal = {
+  private def doubleOrLong(d: Double): AnyVal = {
     if (d.asInstanceOf[Long] == d) d.asInstanceOf[Long] else d
   }
 
@@ -528,10 +550,10 @@ case class FloatType(value: Float) extends VariableType {
     case "-" => val res = value - bValue.toFloat; floatOrLong(res).toString
     case "*" => val res = value * bValue.toFloat; floatOrLong(res).toString
     case "/" => val res = value / bValue.toLong; floatOrLong(res).toString
-    case _ => throw new LinkisCommonErrorException(20048,s"Float class is not supported to use：$signal.")
+    case _ => throw new LinkisCommonErrorException(20048, s"Float class is not supported to use：$signal.")
   }
 
-  private def floatOrLong(f:Float):AnyVal = {
+  private def floatOrLong(f: Float): AnyVal = {
     if (f.asInstanceOf[Long] == f) f.asInstanceOf[Long] else f
   }
 
@@ -542,51 +564,53 @@ case class StringType(value: String) extends VariableType {
 
   def calculator(signal: String, bValue: String): String = signal match {
     case "+" => value + bValue
-    case _ => throw new LinkisCommonErrorException(20049,s"String class is not supported to uss：$signal.")
+    case _ => throw new LinkisCommonErrorException(20049, s"String class is not supported to uss：$signal.")
   }
 }
 
 import VariableUtils._
+
 class CustomDateType(date: String, std: Boolean = true) {
-  protected val dateFormat = dateFormatLocal.get()
-  protected val dateFormat_std = dateFormatStdLocal.get()
+
+
+
   def -(days: Int): String = {
     if (std) {
-      dateFormat_std.format(DateUtils.addDays(dateFormat_std.parse(date), -days))
+      dateFormatStdLocal.get().format(DateUtils.addDays( dateFormatStdLocal.get().parse(date), -days))
     } else {
-      dateFormat.format(DateUtils.addDays(dateFormat.parse(date), -days))
+      dateFormatLocal.get().format(DateUtils.addDays(dateFormatLocal.get().parse(date), -days))
     }
   }
 
   def +(days: Int): String = {
     if (std) {
-      dateFormat_std.format(DateUtils.addDays(dateFormat_std.parse(date), days))
+      dateFormatStdLocal.get().format(DateUtils.addDays( dateFormatStdLocal.get().parse(date), days))
     } else {
-      dateFormat.format(DateUtils.addDays(dateFormat.parse(date), days))
+      dateFormatLocal.get().format(DateUtils.addDays(dateFormatLocal.get().parse(date), days))
     }
   }
 
   def getDate: Date = {
     if (std) {
-      dateFormat_std.parse(date)
+      dateFormatStdLocal.get().parse(date)
     } else {
-      dateFormat.parse(date)
+      dateFormatLocal.get().parse(date)
     }
   }
 
   def getStdDate: String = {
     if (std) {
-      dateFormat_std.format(dateFormat_std.parse(date))
+      dateFormatStdLocal.get().format( dateFormatStdLocal.get().parse(date))
     } else {
-      dateFormat_std.format(dateFormat.parse(date))
+      dateFormatStdLocal.get().format(dateFormatLocal.get().parse(date))
     }
   }
 
   override def toString: String = {
     if (std) {
-      dateFormat_std.format(dateFormat_std.parse(date))
+      dateFormatStdLocal.get().format( dateFormatStdLocal.get().parse(date))
     } else {
-      dateFormat.format(dateFormat.parse(date))
+      dateFormatLocal.get().format(dateFormatLocal.get().parse(date))
     }
   }
 }
@@ -594,29 +618,27 @@ class CustomDateType(date: String, std: Boolean = true) {
 
 class CustomMonthType(date: String, std: Boolean = true, isEnd: Boolean = false) {
 
-  val dateFormat = new SimpleDateFormat("yyyyMMdd")
-
   def -(months: Int): String = {
     if (std) {
-      VariableUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), -months))
+      VariableUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormatLocal.get().parse(date), -months))
     } else {
-      VariableUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), -months))
+      VariableUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormatLocal.get().parse(date), -months))
     }
   }
 
   def +(months: Int): String = {
     if (std) {
-      VariableUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), months))
+      VariableUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormatLocal.get().parse(date), months))
     } else {
-      VariableUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), months))
+      VariableUtils.getMonth(std, isEnd, DateUtils.addMonths(dateFormatLocal.get().parse(date), months))
     }
   }
 
   override def toString: String = {
     if (std) {
-      VariableUtils.getMonth(std, isEnd, dateFormat.parse(date))
+      VariableUtils.getMonth(std, isEnd, dateFormatLocal.get().parse(date))
     } else {
-      val v = dateFormat.parse(date)
+      val v = dateFormatLocal.get().parse(date)
       VariableUtils.getMonth(std, isEnd, v)
     }
   }
@@ -625,118 +647,111 @@ class CustomMonthType(date: String, std: Boolean = true, isEnd: Boolean = false)
 
 class CustomMonType(date: String, std: Boolean = true, isEnd: Boolean = false) {
 
-    val dateFormat = new SimpleDateFormat("yyyyMM")
-
-    def -(months: Int): String = {
-      if (std) {
-        VariableUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), -months))
-      } else {
-        VariableUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), -months))
-      }
+  def -(months: Int): String = {
+    if (std) {
+      VariableUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormatMonLocal.get().parse(date), -months))
+    } else {
+      VariableUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormatMonLocal.get().parse(date), -months))
     }
-
-    def +(months: Int): String = {
-      if (std) {
-        VariableUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), months))
-      } else {
-        VariableUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormat.parse(date), months))
-      }
-    }
-
-    override def toString: String = {
-      if (std) {
-        VariableUtils.getMon(std, isEnd, dateFormat.parse(date))
-      } else {
-        val v = dateFormat.parse(date)
-        VariableUtils.getMon(std, isEnd, v)
-      }
-    }
-
   }
 
-  /*
-   Given a Date, convert into Quarter
-   */
-  class CustomQuarterType(date: String, std: Boolean = true, isEnd: Boolean = false) {
-
-    val dateFormat = new SimpleDateFormat("yyyyMMdd")
-
-    def getCurrentQuarter(date: String) = {
-      dateFormat.parse(VariableUtils.getQuarter(false, false, dateFormat.parse(date)))
+  def +(months: Int): String = {
+    if (std) {
+      VariableUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormatMonLocal.get().parse(date), months))
+    } else {
+      VariableUtils.getMon(std, isEnd, DateUtils.addMonths(dateFormatMonLocal.get().parse(date), months))
     }
-
-    def -(quarters: Int): String = {
-      VariableUtils.getQuarter(std, isEnd, DateUtils.addMonths(getCurrentQuarter(date), -quarters * 3))
-    }
-
-    def +(quarters: Int): String = {
-      VariableUtils.getQuarter(std, isEnd, DateUtils.addMonths(getCurrentQuarter(date), quarters * 3))
-    }
-
-    override def toString: String = {
-      if (std) {
-        VariableUtils.getQuarter(std, isEnd, dateFormat.parse(date))
-      } else {
-        val v = dateFormat.parse(date)
-        VariableUtils.getQuarter(std, isEnd, v)
-      }
-    }
-
   }
 
-  /*
-   Given a Date, convert into HalfYear
-   */
-  class CustomHalfYearType(date: String, std: Boolean = true, isEnd: Boolean = false) {
-
-    val dateFormat = new SimpleDateFormat("yyyyMMdd")
-
-    def getCurrentHalfYear(date: String) = {
-      dateFormat.parse(VariableUtils.getHalfYear(false, false, dateFormat.parse(date)))
+  override def toString: String = {
+    if (std) {
+      VariableUtils.getMon(std, isEnd, dateFormatMonLocal.get().parse(date))
+    } else {
+      val v = dateFormatMonLocal.get().parse(date)
+      VariableUtils.getMon(std, isEnd, v)
     }
-
-    def -(halfYears: Int): String = {
-      VariableUtils.getHalfYear(std, isEnd, DateUtils.addMonths(getCurrentHalfYear(date), -halfYears * 6))
-    }
-
-    def +(halfYears: Int): String = {
-      VariableUtils.getHalfYear(std, isEnd, DateUtils.addMonths(getCurrentHalfYear(date), halfYears * 6))
-    }
-
-    override def toString: String = {
-      if (std) {
-        VariableUtils.getHalfYear(std, isEnd, dateFormat.parse(date))
-      } else {
-        val v = dateFormat.parse(date)
-        VariableUtils.getHalfYear(std, isEnd, v)
-      }
-    }
-
   }
 
-  /*
-   Given a Date convert into Year
-   */
-  class CustomYearType(date: String, std: Boolean = true, isEnd: Boolean = false) {
+}
 
-    val dateFormat = new SimpleDateFormat("yyyyMMdd")
+/*
+ Given a Date, convert into Quarter
+ */
+class CustomQuarterType(date: String, std: Boolean = true, isEnd: Boolean = false) {
 
-    def -(years: Int): String = {
-      VariableUtils.getYear(std, isEnd, DateUtils.addYears(dateFormat.parse(date), -years))
-    }
 
-    def +(years: Int): String = {
-      VariableUtils.getYear(std, isEnd, DateUtils.addYears(dateFormat.parse(date), years))
-    }
-
-    override def toString: String = {
-      if (std) {
-        VariableUtils.getYear(std, isEnd, dateFormat.parse(date))
-      } else {
-        val v = dateFormat.parse(date)
-        VariableUtils.getYear(std, isEnd, v)
-      }
-    }
-
+  def getCurrentQuarter(date: String) = {
+    dateFormatLocal.get().parse(VariableUtils.getQuarter(false, false, dateFormatLocal.get().parse(date)))
   }
 
+  def -(quarters: Int): String = {
+    VariableUtils.getQuarter(std, isEnd, DateUtils.addMonths(getCurrentQuarter(date), -quarters * 3))
+  }
+
+  def +(quarters: Int): String = {
+    VariableUtils.getQuarter(std, isEnd, DateUtils.addMonths(getCurrentQuarter(date), quarters * 3))
+  }
+
+  override def toString: String = {
+    if (std) {
+      VariableUtils.getQuarter(std, isEnd, dateFormatLocal.get().parse(date))
+    } else {
+      val v = dateFormatLocal.get().parse(date)
+      VariableUtils.getQuarter(std, isEnd, v)
+    }
+  }
+
+}
+
+/*
+ Given a Date, convert into HalfYear
+ */
+class CustomHalfYearType(date: String, std: Boolean = true, isEnd: Boolean = false) {
+
+
+  def getCurrentHalfYear(date: String) = {
+    dateFormatLocal.get().parse(VariableUtils.getHalfYear(false, false, dateFormatLocal.get().parse(date)))
+  }
+
+  def -(halfYears: Int): String = {
+    VariableUtils.getHalfYear(std, isEnd, DateUtils.addMonths(getCurrentHalfYear(date), -halfYears * 6))
+  }
+
+  def +(halfYears: Int): String = {
+    VariableUtils.getHalfYear(std, isEnd, DateUtils.addMonths(getCurrentHalfYear(date), halfYears * 6))
+  }
+
+  override def toString: String = {
+    if (std) {
+      VariableUtils.getHalfYear(std, isEnd, dateFormatLocal.get().parse(date))
+    } else {
+      val v = dateFormatLocal.get().parse(date)
+      VariableUtils.getHalfYear(std, isEnd, v)
+    }
+  }
+
+}
+
+/*
+ Given a Date convert into Year
+ */
+class CustomYearType(date: String, std: Boolean = true, isEnd: Boolean = false) {
+
+  def -(years: Int): String = {
+    VariableUtils.getYear(std, isEnd, DateUtils.addYears(dateFormatLocal.get().parse(date), -years))
+  }
+
+  def +(years: Int): String = {
+    VariableUtils.getYear(std, isEnd, DateUtils.addYears(dateFormatLocal.get().parse(date), years))
+  }
+
+  override def toString: String = {
+    if (std) {
+      VariableUtils.getYear(std, isEnd, dateFormatLocal.get().parse(date))
+    } else {
+      val v = dateFormatLocal.get().parse(date)
+      VariableUtils.getYear(std, isEnd, v)
+    }
+  }
+
+}

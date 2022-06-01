@@ -27,7 +27,6 @@
 import resourceSimpleModule from '@dataspherestudio/shared/components/resourceSimple';
 import Guide from './guide.vue'
 import api from '@dataspherestudio/shared/common/service/api';
-import { debounce } from "lodash"
 export default {
   components: {
     resourceSimple: resourceSimpleModule.component,
@@ -52,7 +51,7 @@ export default {
   mounted() {
     const footerChannel = this.$refs.footerChannel;
     this.positionInfo = { x: 0, y: 0}
-    document.onmousemove = debounce((e) => {
+    document.onmousemove = (e) => {
       if (!this.isMouseDown) return
       let x = e.clientX - this.positionInfo.x
       let y = e.clientY - this.positionInfo.y
@@ -73,7 +72,7 @@ export default {
       if (Math.abs(e.movementX) > 10 || Math.abs(e.movementY) > 10) {
         this.isMouseMove = true;
       }
-    })
+    }
     document.onselectstart = () => {
       return false;
     }

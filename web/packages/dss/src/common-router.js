@@ -2,7 +2,7 @@ export const subAppRoutes = {
   path: '',
   name: 'layout',
   component: () => import('../view/layout.vue'),
-  redirect: '/', //
+  redirect: '/login',
   meta: {
     publicPage: true, // 权限公开
   },

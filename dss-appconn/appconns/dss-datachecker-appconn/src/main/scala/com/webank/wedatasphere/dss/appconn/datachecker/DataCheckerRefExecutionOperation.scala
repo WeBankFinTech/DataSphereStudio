@@ -14,8 +14,7 @@
  *
  */
 
-package com.webank.wedatapshere.dss.appconn.datachecker
-
+package com.webank.wedatasphere.dss.appconn.datachecker
 
 import java.util
 import java.util.{Properties, UUID}
@@ -60,7 +59,13 @@ class DataCheckerRefExecutionOperation
           properties.put(record._1, "")
         }else {
           if (record._1.equalsIgnoreCase("job.desc")) {
-            val rows = record._2.asInstanceOf[String].split("\n")
+            val descValue = record._2.asInstanceOf[String]
+            var rows=Array.empty[String]
+            if (descValue.contains("\n")) {
+              rows = descValue.split("\n")
+            }else{
+              rows= descValue.split(";")
+            }
             rows.foreach(row => if (row.contains("=")) {
               val endLocation = row.indexOf("=")
               val rowKey = row.substring(0, endLocation)

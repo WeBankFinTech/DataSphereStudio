@@ -25,6 +25,7 @@
         ref="job"
         v-if="switcher === 'job'"
         :dispatch="dispatch"
+        @update-job="updateJob"
         @close-modal="close"
         @change-loading="changeLoading"
         @change-job-disabled="changeJobDisabled"/>
@@ -204,6 +205,9 @@ export default {
     engineDisabledChange(params) {
       this.engineDisable = params;
     },
+    updateJob(num) {
+      this.$emit('update-job', num)
+    }
   },
 };
 </script>

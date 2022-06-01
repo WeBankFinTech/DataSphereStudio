@@ -192,7 +192,7 @@ const success = function (response) {
       window.location.href = '/newhome'
       throw new Error('token失效，请重新进入之前页面!');
     }
-    if (util.isString(response.data)) {
+    if (util.isString(response.data) && response.data) {
       data = JSON.parse(response.data);
     } else if (util.isObject(response.data)) {
       // 兼容ds blob流下载
@@ -267,7 +267,7 @@ const fail = function (error) {
     _message = API_ERR_MSG;
     if (response && response.data) {
       let data;
-      if (util.isString(response.data)) {
+      if (util.isString(response.data) && response.data) {
         data = JSON.parse(response.data);
       } else if (util.isObject(response.data)) {
         data = response.data;

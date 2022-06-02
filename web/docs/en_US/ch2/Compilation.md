@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-Install Node.js on your computer. Download Link:  [http://nodejs.cn/download/](http://nodejs.cn/download/). Recommend using the latest stable version.
+Install Node.js on your computer. Download Link:  [http://nodejs.cn/download/](http://nodejs.cn/download/). Latest version may not compatible use tested version recommend（v10.16.2、v-14.15.0）. If you don't have front-end development experience，please use in Linux instead of Windows
 
 **Only do this step at the first time.**
 

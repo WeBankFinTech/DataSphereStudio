@@ -30,10 +30,7 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.cs.DSSCSHelper;
 import com.webank.wedatasphere.dss.workflow.entity.*;
-import com.webank.wedatasphere.dss.workflow.entity.request.AppConnNodeUrlRequest;
-import com.webank.wedatasphere.dss.workflow.entity.request.BatchDeleteAppConnNodeRequest;
-import com.webank.wedatasphere.dss.workflow.entity.request.CreateExternalNodeRequest;
-import com.webank.wedatasphere.dss.workflow.entity.request.UpdateExternalNodeRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeGroupVO;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeInfoVO;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeUiVO;
@@ -212,18 +209,18 @@ public class NodeRestfulApi {
     }
 
     @RequestMapping(value = "/deleteAppConnNode",method = RequestMethod.POST)
-    public Message deleteExternalNode(HttpServletRequest req, @RequestBody UpdateExternalNodeRequest updateExternalNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
+    public Message deleteExternalNode(HttpServletRequest req, @RequestBody DeleteExternalNodeRequest deleteExternalNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
-        Long projectID = updateExternalNodeRequest.getProjectID();
-        String nodeType = updateExternalNodeRequest.getNodeType();
-        Map<String, Object> params = updateExternalNodeRequest.getParams();
+        Long projectID = deleteExternalNodeRequest.getProjectID();
+        String nodeType = deleteExternalNodeRequest.getNodeType();
+        Map<String, Object> params = deleteExternalNodeRequest.getParams();
         CommonAppConnNode node = new CommonAppConnNode();
         if(params!=null){
             logger.info("DeletepwdExternalNode request params is " + params + ",nodeType:" + nodeType);
             node.setProjectId(projectID);
             node.setNodeType(nodeType);
-            String label = updateExternalNodeRequest.getLabels().getRoute();
+            String label = deleteExternalNodeRequest.getLabels().getRoute();
             params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
             params.put("workspace", workspace);
             functionInvoker.nodeServiceFunction(userName, params, node, FunctionPool.deleteNode);

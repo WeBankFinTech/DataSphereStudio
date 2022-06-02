@@ -50,9 +50,6 @@ export default {
   },
   mounted() {
     this.positionInfo = { x: 0, y: 0}
-    document.onselectstart = () => {
-      return false;
-    }
     document.onmouseup = () => {
       this.isMouseDown = false;
     }

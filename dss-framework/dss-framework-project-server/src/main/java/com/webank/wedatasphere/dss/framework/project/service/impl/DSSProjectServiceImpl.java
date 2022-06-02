@@ -278,7 +278,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                     }
                 }, workspace, ProjectService::getProjectDeletionOperation,
                 null,
-                (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setProjectName(dssProjectDO.getName()).setRefProjectId(appInstanceToRefProjectId.get(appInstance)),
+                (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setProjectName(dssProjectDO.getName())
+                        .setRefProjectId(appInstanceToRefProjectId.get(appInstance)).setUserName(username),
                 (structureOperation, structureRequestRef) -> ((ProjectDeletionOperation) structureOperation).deleteProject((RefProjectContentRequestRef) structureRequestRef),
                 null, "delete refProject " + dssProjectDO.getName());
         }

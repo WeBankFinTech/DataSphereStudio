@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @since 0.5.0
  */
 public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConversionRequestRef<K>>
-    extends DSSToRelConversionOperation<K, ResponseRef> {
+        extends DSSToRelConversionOperation<K, ResponseRef> {
 
     private List<WorkflowToRelConverter> workflowToRelConverters;
     private WorkflowToRelSynchronizer workflowToRelSynchronizer;
@@ -39,10 +39,12 @@ public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConv
         workflowToRelSynchronizer = AppStandardClassUtils.getInstance(getAppConnName()).getInstanceOrWarn(WorkflowToRelSynchronizer.class);
         workflowToRelSynchronizer.setDSSToRelConversionOperation(this);
         JsonToFlowParser parser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
-        if(parser instanceof AbstractJsonToFlowParser) {
+        if (parser instanceof AbstractJsonToFlowParser) {
             String packageName = WorkflowParser.class.getPackage().getName();
             List<WorkflowParser> workflowParsers = AppStandardClassUtils.getInstance(getAppConnName()).getInstances(WorkflowParser.class).stream()
-                    .filter(p -> !p.getClass().getName().startsWith(packageName)).collect(Collectors.toList());
+                    .filter(p -> !p.getClass().getName().startsWith(packageName) &&
+                            ((AbstractJsonToFlowParser) parser).getWorkflowParsers().stream().noneMatch(l -> l.getClass().getName()
+                                    .equals(p.getClass().getName()))).collect(Collectors.toList());
             ((AbstractJsonToFlowParser) parser).addWorkflowParsers(workflowParsers);
         }
     }
@@ -57,10 +59,10 @@ public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConv
         return ResponseRef.newInternalBuilder().success();
     }
 
-    protected ConvertedRel tryConvert(PreConversionRel rel){
+    protected ConvertedRel tryConvert(PreConversionRel rel) {
         ConvertedRel convertedRel = null;
-        for (WorkflowToRelConverter workflowToRelConverter: workflowToRelConverters) {
-            if(convertedRel == null) {
+        for (WorkflowToRelConverter workflowToRelConverter : workflowToRelConverters) {
+            if (convertedRel == null) {
                 convertedRel = workflowToRelConverter.convertToRel(rel);
             } else {
                 convertedRel = workflowToRelConverter.convertToRel(convertedRel);

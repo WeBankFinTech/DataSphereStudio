@@ -105,7 +105,7 @@ export default {
       } else {
         // util.windowOpen(item.url);
         this.$router.push({
-          name: 'commonIframe',
+          path: `/commonIframe/${item.title}`,
           query: {
             ...this.$route.query,
             __noreplace: 1,

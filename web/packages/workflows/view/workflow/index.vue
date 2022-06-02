@@ -1036,11 +1036,9 @@ export default {
       if (item && item.lock) {
         api
           .fetch(
-            `${this.$API_PATH.WORKFLOW_PATH}deleteFlowEditLock?flowEditLock=${item.lock}`,
-            {
-              flowId
-            },
-            "delete"
+            `${this.$API_PATH.WORKFLOW_PATH}deleteFlowEditLock/${item.lock}`,
+            {},
+            "post"
           )
       }
     },

@@ -138,12 +138,14 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         if (!dbProject.getName().equalsIgnoreCase(projectModifyRequest.getName())) {
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
         }
-        //1.统一修改各个接入的第三方的系统的工程状态信息
-        //2.修改dss_project_user 工程与用户关系
-        projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
         //调用第三方的工程修改接口
         dbProject.setUsername(username);
         modifyThirdProject(projectModifyRequest, dbProject, workspace);
+
+        //1.统一修改各个接入的第三方的系统的工程状态信息
+        //2.修改dss_project_user 工程与用户关系
+        projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
+
         //3.修改dss_project DSS基本工程信息
         dssProjectService.modifyProject(username, projectModifyRequest);
     }

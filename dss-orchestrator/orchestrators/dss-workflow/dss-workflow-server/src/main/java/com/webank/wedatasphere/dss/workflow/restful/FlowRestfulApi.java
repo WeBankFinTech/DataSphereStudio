@@ -263,9 +263,6 @@ public class FlowRestfulApi {
                 version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
                 return Message.ok().data("flowVersion", version).data("flowEditLock", null);
             }
-            if (StringUtils.isBlank(flowEditLock)) {
-                throw new DSSErrorException(60057, "工作流编辑锁不能为空");
-            }
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
         }
         return Message.ok().data("flowVersion", version).data("flowEditLock", flowEditLock);

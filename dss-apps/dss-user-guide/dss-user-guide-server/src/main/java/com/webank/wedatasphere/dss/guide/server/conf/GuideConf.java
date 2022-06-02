@@ -10,7 +10,7 @@ public interface GuideConf {
     /**gitbook路径*/
     CommonVars<String> HOST_GITBOOK_PATH = CommonVars.apply("host.gitbook.path", "/appcom/Install/ApacheInstall/gitbook_books");
 
-    CommonVars<String> HOST_IP_ADDRESS = CommonVars.apply("target.ip.address", "***REMOVED***");
+    CommonVars<String> HOST_IP_ADDRESS = CommonVars.apply("target.ip.address", "127.0.0.1");
 
     CommonVars<String> TARGET_GITBOOK_PATH = CommonVars.apply("target.gitbook.path", "/appcom/Install/ApacheInstall");
 

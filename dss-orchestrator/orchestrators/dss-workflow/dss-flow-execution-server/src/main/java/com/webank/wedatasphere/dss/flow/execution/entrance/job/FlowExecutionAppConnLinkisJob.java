@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.job;
 
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.AbstractAppConnLinkisJob;
-import org.apache.commons.lang3.StringUtils;
+
 
 
 public class FlowExecutionAppConnLinkisJob extends AbstractAppConnLinkisJob {
@@ -33,13 +33,7 @@ public class FlowExecutionAppConnLinkisJob extends AbstractAppConnLinkisJob {
 
     @Override
     public String getUser() {
-        //Proxy user check put into parser
-        String proxyUser = getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
-        if(StringUtils.isNotEmpty(proxyUser)){
-            return proxyUser;
-        }else {
-            return getSubmitUser();
-        }
+         return getSubmitUser();
         //return getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
     }
 

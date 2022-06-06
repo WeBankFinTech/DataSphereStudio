@@ -17,8 +17,6 @@
 package com.webank.wedatasphere.dss.flow.execution.entrance.job.parser
 
 import java.util
-
-import com.webank.wedatasphere.dss.common.protocol.{ProxyUserCheckRequest, ResponseProxyUserCheck}
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration._
 import com.webank.wedatasphere.dss.flow.execution.entrance.exception.FlowExecutionErrorException
@@ -28,9 +26,7 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUt
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl
-import org.apache.commons.lang3.StringUtils
 import org.apache.linkis.common.utils.Logging
 import org.apache.linkis.entrance.execute.EntranceJob
 import org.springframework.core.annotation.Order
@@ -49,13 +45,11 @@ class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
     val flowContext = flowEntranceJob.getFlowContext
     if(null == flow) throw new FlowExecutionErrorException(90101, "This fow of job is empty ")
     val nodes = flow.getWorkflowNodes
-    var proxyUser= flowEntranceJob.getUser
     for (node <- nodes) {
 
       val nodeName = node.getName
       val propsMap = new util.HashMap[String, String]()
-      proxyUser = if (node.getDSSNode.getUserProxy == null) flowEntranceJob.getUser else node.getDSSNode.getUserProxy
-
+      val proxyUser = if (node.getDSSNode.getUserProxy == null) flowEntranceJob.getUser else node.getDSSNode.getUserProxy
       propsMap.put(FLOW_NAME, flow.getName)
       propsMap.put(JOB_ID, nodeName)
       val  projectName =flowEntranceJob.asInstanceOf[EntranceJob].getJobRequest.getSource.get("projectName")
@@ -101,24 +95,7 @@ class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
       nodeRunner.setNode(node)
       pendingNodeMap.put(nodeName, nodeRunner)
     }
-    //Avoid double judgment,for all node use the same proxy user
-    if(StringUtils.isNotEmpty(proxyUser) && !checkFlowProxyByUserName(flowEntranceJob.getUser,proxyUser)){
-      throw  new FlowExecutionErrorException(90103,s"Current User ${flowEntranceJob.getUser} can not use proxy user ${proxyUser}")
-    }
     info(s"${flowEntranceJob.getId} finished to parse node of flow")
-  }
-
-  private def checkFlowProxyByUserName(userName: String,proxyUser: String): Boolean = {
-    logger.info("Send query proxy user  is " + userName + ",and proxy user is" + proxyUser)
-    if(userName.equalsIgnoreCase(proxyUser)){
-      true
-    }else {
-      val req = ProxyUserCheckRequest(userName, proxyUser)
-      val response: ResponseProxyUserCheck = DSSSenderServiceFactory.getOrCreateServiceInstance.getProjectServerSender
-        .ask(req).asInstanceOf[ResponseProxyUserCheck]
-      logger.info("Send query proxy user  response is " + response.canProxy + ",and proxy user is" + response.proxyUserList)
-      response.canProxy
-    }
   }
 
 }

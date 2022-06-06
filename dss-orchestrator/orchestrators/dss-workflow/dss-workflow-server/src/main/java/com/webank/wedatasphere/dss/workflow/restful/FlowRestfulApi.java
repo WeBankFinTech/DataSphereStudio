@@ -28,7 +28,6 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
-import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.exception.DSSWorkflowErrorException;
@@ -264,9 +263,6 @@ public class FlowRestfulApi {
                 version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
                 return Message.ok().data("flowVersion", version).data("flowEditLock", null);
             }
-            if (StringUtils.isBlank(flowEditLock)) {
-                throw new DSSErrorException(60057, "工作流编辑锁不能为空");
-            }
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
         }
         return Message.ok().data("flowVersion", version).data("flowEditLock", flowEditLock);
@@ -297,14 +293,13 @@ public class FlowRestfulApi {
     }
 
 
-    @RequestMapping(value = "/deleteFlowEditLock", method = RequestMethod.DELETE)
-    public Message deleteFlowEditLock(HttpServletRequest req, @RequestParam(name = "flowId") Long flowId) throws DSSErrorException {
-        if (flowId == null) {
-            throw new DSSErrorException(60068, "delete flowEditLock failed,flowId is null");
+    @RequestMapping(value = "/deleteFlowEditLock/{flowEditLock}", method = RequestMethod.POST)
+    public Message deleteFlowEditLock(HttpServletRequest req, @PathVariable("flowEditLock") String flowEditLock) throws DSSErrorException {
+        if (StringUtils.isBlank(flowEditLock)) {
+            throw new DSSErrorException(60068, "delete flowEditLock failed,flowEditLock is null");
         }
-        DSSFlowEditLockManager.deleteLock(flowId);
+        DSSFlowEditLockManager.deleteLock(flowEditLock);
         return Message.ok();
     }
-
 
 }

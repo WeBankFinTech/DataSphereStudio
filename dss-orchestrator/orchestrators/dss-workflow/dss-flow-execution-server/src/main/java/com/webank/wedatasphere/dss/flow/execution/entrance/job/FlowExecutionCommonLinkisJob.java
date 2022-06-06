@@ -40,12 +40,7 @@ public class FlowExecutionCommonLinkisJob extends AbstractCommonLinkisJob {
 
     @Override
     public String getUser() {
-        String proxyUser = getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
-        if(StringUtils.isNotEmpty(proxyUser)){
-            return proxyUser;
-        }else {
-            return getSubmitUser();
-        }
+        return getSubmitUser();
         //return getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
     }
 

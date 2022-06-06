@@ -24,7 +24,7 @@ export const subAppRoutes = {
   },
   children: [
     {
-      path: '/commonIframe',
+      path: '/commonIframe/:appName',
       name: 'commonIframe',
       meta: {
         publicPage: true,

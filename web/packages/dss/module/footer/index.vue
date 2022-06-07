@@ -86,7 +86,8 @@ export default {
     },
     toggleGuide() {
       if (!this.isMouseMove) {
-        this.guideShow = !this.guideShow;
+        window.open("/_book/", '_blank');
+        // this.guideShow = !this.guideShow;
       }
     },
     onMouseDown(e) {

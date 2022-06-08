@@ -20,7 +20,7 @@
  */
 import util from '@dataspherestudio/shared/common/util';
 import axios from 'axios';
-import { Message } from 'iview';
+import { Message, Notice } from 'iview';
 import cache from './apiCache';
 import qs from './querystring'
 import storage from "./storage"
@@ -182,7 +182,7 @@ const getData = function (data) {
 const API_ERR_MSG = '后台接口异常，请联系开发处理！'
 const success = function (response) {
   if (util.isNull(api.constructionOfResponse.codePath) || util.isNull(api.constructionOfResponse.successCode) ||
-     util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
+      util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
     console.error('【FEX】Api配置错误: 请调用setConstructionOfResponse来设置API的响应结构');
     return;
   }
@@ -332,6 +332,7 @@ const param = function (url, data, option) {
 
 let showApiErrorTips = true
 let lastMsg = ''
+let isHoverNotice = false
 const action = function (url, data, option) {
   return param(url, data, option)
     .then(success, fail)
@@ -348,9 +349,12 @@ const action = function (url, data, option) {
         }
         const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
         if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
-          const msgErrModal = Message.error({
+          const noticeName = 'err_' + Date.now()
+          Notice.error({
+            name: noticeName,
             duration: 4,
             closable: true,
+            title: '错误提示',
             render: (h) => {
               return h('div', {
                 class: 'g-err-msg-div',
@@ -360,8 +364,6 @@ const action = function (url, data, option) {
               }, [
                 h('div', {
                   style: {
-                    'max-width': '600px',
-                    'min-width': '400px',
                     'word-break': 'break-all',
                     'margin-bottom': '20px',
                     'text-align': 'left'
@@ -389,11 +391,14 @@ const action = function (url, data, option) {
                           Message.success('错误已上报')
                         })
                       }
-                      msgErrModal()
+                      Notice.close(noticeName)
                     }
                   }
                 }, error.solution &&  error.solution.solutionUrl ? '查看解决方案' : '上报错误')
               ])
+            },
+            onClose: () => {
+              return !isHoverNotice
             }
           })
           setTimeout(()=>{
@@ -401,16 +406,20 @@ const action = function (url, data, option) {
               ele.parentElement.parentElement.style.textAlign = 'left'
               ele.parentElement.style.display = 'block'
               ele.parentElement.style.padding = 0
-              ele.parentElement.parentElement.querySelector('span').innerText = "错误提示"
               ele.parentElement.parentElement.style.background ="rgb(251, 233, 233)"
               ele.parentElement.parentElement.style.border ="1px solid #eaa8a8"
               ele.parentElement.parentElement.style.color ="#333"
-              ele.parentElement.parentElement.style.position ="absolute"
-              ele.parentElement.parentElement.style.right ="10px"
+              ele.parentElement.parentElement.addEventListener('mouseover', ()=> {
+                isHoverNotice = true
+              }, false)
+              ele.parentElement.parentElement.addEventListener('mouseout', ()=> {
+                isHoverNotice = false
+              }, false)
             })
           })
+
         } else {
-          Message.error({content: msg, duration: 4});
+          Notice.error({desc: msg,  title: '错误提示', duration: 4});
           throw error;
         }
         setTimeout(() => {

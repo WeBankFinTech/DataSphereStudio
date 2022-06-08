@@ -254,7 +254,6 @@ public class FlowRestfulApi {
         String workspaceName = saveFlowRequest.getWorkspaceName();
         String projectName = saveFlowRequest.getProjectName();
 
-        String flowEditLock = saveFlowRequest.getFlowEditLock();
         Boolean isNotHaveLock = saveFlowRequest.getNotHaveLock();
         String userName = SecurityFilter.getLoginUsername(req);
         String version;
@@ -265,7 +264,7 @@ public class FlowRestfulApi {
             }
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
         }
-        return Message.ok().data("flowVersion", version).data("flowEditLock", flowEditLock);
+        return Message.ok().data("flowVersion", version);
     }
 
     /**

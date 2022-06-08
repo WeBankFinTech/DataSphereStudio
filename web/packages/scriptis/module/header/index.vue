@@ -106,7 +106,7 @@ export default {
       const url =
         location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console'
       this.$router.push({
-        name: 'commonIframe',
+        path: '/commonIframe/linkis',
         query: {
           workspaceId: this.$route.query.workspaceId,
           url

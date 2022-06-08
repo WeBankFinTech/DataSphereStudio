@@ -361,6 +361,7 @@ export default {
   @include guide-box-shadow(#dee4ec, #192235);
   border-radius: 2px;
   text-align:left;
+  cursor: auto;
   .guide-header {
     position: relative;
     height: 48px;

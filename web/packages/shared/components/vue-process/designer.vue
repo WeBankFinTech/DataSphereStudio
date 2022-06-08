@@ -340,6 +340,9 @@ export default {
       this.shapeFold = !this.shapeFold;
       this.$emit('toggle-shape', this.shapeFold);
       commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: !this.shapeFold ? 180 : 0 });
+      setTimeout(() => {
+        this.layoutView()
+      }, 400)
     },
     moveShape(e) {
       if (this.state.disabled) return;

@@ -282,7 +282,6 @@ public class FlowRestfulApi {
         return Message.ok().data("flowEditLock", DSSFlowEditLockManager.updateLock(flowEditLock));
     }
 
-
     @RequestMapping(value = "/getExtraToolBars", method = RequestMethod.POST)
     public Message getExtraToolBars(HttpServletRequest req, @RequestBody GetExtraToolBarsRequest getExtraToolBarsRequest) throws DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
@@ -294,9 +293,6 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "/deleteFlowEditLock/{flowEditLock}", method = RequestMethod.POST)
     public Message deleteFlowEditLock(HttpServletRequest req, @PathVariable("flowEditLock") String flowEditLock) throws DSSErrorException {
-        if (StringUtils.isBlank(flowEditLock)) {
-            throw new DSSErrorException(60068, "delete flowEditLock failed,flowEditLock is null");
-        }
         DSSFlowEditLockManager.deleteLock(flowEditLock);
         return Message.ok();
     }

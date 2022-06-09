@@ -1,18 +1,21 @@
 <template>
-  <div class="layout-footer">
-    <resource-simple
-      ref="resourceSimple"
-      :dispatch="dispatch"
-      @update-job="updateJob">
-    </resource-simple>
-    <div class="footer-btn footer-channel"
-      :title="msg"
-      ref="footerChannel"
-      @mousedown.prevent.stop="onMouseDown"
-      @mouseup.prevent.stop="oMouseUp"
-      @click.prevent.stop="toast">
-      <SvgIcon class="footer-channel-job" icon-class="job" />
-      <span class="footer-channel-job-num">{{ num }}</span>
+  <div class="layout-footer" @mousemove="onMouseMove" :style="{'pointer-events': `${isMouseDown ? 'initial' : 'none'}`}">
+    <div ref="footerChannel" class="tool-btns" @mousedown.prevent.stop="onMouseDown">
+      <template v-if="!min">
+        <resource-simple
+          ref="resourceSimple"
+          :dispatch="dispatch"
+          @update-job="updateJob">
+        </resource-simple>
+        <div class="footer-btn footer-channel"
+          :title="msg"
+          @click="toast">
+          <SvgIcon class="footer-channel-job" icon-class="job" />
+          <span class="footer-channel-job-num">{{ num }}</span>
+        </div>
+        <Icon type="md-arrow-dropdown" class="min_arrow" @click="min=true" />
+      </template>
+      <Icon v-else type="md-arrow-dropup"  class="show_arrow" @click="min=false" />
     </div>
   </div>
 </template>
@@ -27,10 +30,9 @@ export default {
     return {
       num: 0,
       msg: '',
-      moveX: null,
-      moveY: null,
-      isMouseDrop: false,
-      isMouseMove: false,
+      min: false,
+      isMouseDown: false,
+      isMouseMove: false
     };
   },
   created() {
@@ -38,6 +40,13 @@ export default {
     setTimeout(() => {
       this.getRunningJob();
     }, 500);
+  },
+  mounted() {
+    this.positionInfo = { x: 0, y: 0}
+    document.onmouseup = () => {
+      this.isMouseDown = false;
+    }
+    window.addEventListener('resize', this.resetChannelPosition)
   },
   watch: {
     '$route'() {
@@ -64,72 +73,53 @@ export default {
       this[method](num);
     },
     toast() {
-      // 取消拖动后自动点击事件
-      if (this.isMouseMove) {
-        return;
+      if (!this.isMouseMove) {
+        this.$refs.resourceSimple.open();
       }
-      this.$refs.resourceSimple.open();
     },
     onMouseDown(e) {
-      e = e || window.event;
       const footerChannel = this.$refs.footerChannel;
-      this.moveX = e.clientX - footerChannel.offsetLeft;
-      this.moveY = e.clientY - footerChannel.offsetTop;
-      this.isMouseDrop = true;
-      this.isMouseMove = false;
-      // 阻止拖拽过程中选中文本
-      document.onselectstart = () => {
-        return false;
+      this.positionInfo = {
+        x: e.clientX - footerChannel.offsetLeft,
+        y: e.clientY - footerChannel.offsetTop
       }
-      // 这里无法在元素上使用@mousemove，否则拖动会有卡顿
-      // 使用setTimeout是防止点击的同时会触发move事件，这时正常的点击事件是不会触发的。
-      setTimeout(() => {
-        document.onmousemove = (e) => {
-
-          if (this.isMouseDrop) {
-            this.isMouseMove = true;
-            const footerChannel = this.$refs.footerChannel;
-            let x = e.clientX - this.moveX;
-            let y = e.clientY - this.moveY;
-            // 限制拖动范围
-            let maxX = document.documentElement.clientWidth - 120;
-            let maxY = document.documentElement.clientHeight - 60;
-            if (this.moveX <= 0) {
-              maxX = document.documentElement.scrollWidth - 120;
-            }
-            if (this.moveY <= 0) {
-              maxY = document.documentElement.scrollHeight - 60;
-            }
-            x = Math.min(maxX, Math.max(0, x));
-            y = Math.min(maxY, Math.max(0, y));
-            if(e.clientX > maxX+120 || e.clientY > maxY+60 || e.clientX < 0 || e.clientY < 0){
-              this.oMouseUp()
-            }
-            footerChannel.style.left = x + 'px';
-            footerChannel.style.top = y + 'px';
-          }
-        }
-      }, 0)
+      this.isMouseMove = false;
+      this.isMouseDown = true;
     },
-    oMouseUp() {
-      // 清空onmousemove方法
-      document.onmousemove = null;
-      this.isMouseDrop = false;
-      setTimeout(() => {
-        this.isMouseMove = false;
-      }, 200)
-      // 恢复document的文本选中功能
-      document.onselectstart = () => {
-        return true;
+    onMouseMove(e) {
+      const footerChannel = this.$refs.footerChannel;
+      if (!this.isMouseDown) return
+      let x = e.clientX - this.positionInfo.x
+      let y = e.clientY - this.positionInfo.y
+      if (x > document.documentElement.clientWidth - 40) {
+        x =  document.documentElement.clientWidth - 40
+      }
+      if (y > document.documentElement.clientHeight - 160) {
+        y =  document.documentElement.clientHeight - 160
+      }
+      if (x < 20) {
+        x = 20
+      }
+      if (y < 20) {
+        y = 20
+      }
+      footerChannel.style.left = x + 'px';
+      footerChannel.style.top = y + 'px';
+      if (Math.abs(e.movementX) > 10 || Math.abs(e.movementY) > 10) {
+        this.isMouseMove = true;
       }
     },
     resetChannelPosition() {
+      this.min = false
       const footerChannel = this.$refs.footerChannel;
       if (footerChannel) {
-        footerChannel.style.left = document.documentElement.clientWidth - 120 + 'px';
-        footerChannel.style.top = document.documentElement.clientHeight - 60 + 'px';
+        footerChannel.style.left = document.documentElement.clientWidth - 80 + 'px';
+        footerChannel.style.top = document.documentElement.clientHeight - 180 + 'px';
       }
     }
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.resetChannelPosition)
   },
 };
 </script>

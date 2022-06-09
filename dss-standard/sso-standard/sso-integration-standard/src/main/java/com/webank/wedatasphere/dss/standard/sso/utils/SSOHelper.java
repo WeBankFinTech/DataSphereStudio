@@ -99,8 +99,10 @@ public class SSOHelper {
 
     public static Workspace setAndGetWorkspace(HttpServletRequest request, HttpServletResponse response, long workspaceId, String workspaceName) {
         boolean isWorkspaceExists = Arrays.stream(request.getCookies())
-                .anyMatch(cookie -> WORKSPACE_ID_COOKIE_KEY.equals(cookie.getName()) && workspaceId == Long.parseLong(cookie.getValue()));
-        if(isWorkspaceExists) {
+                .anyMatch(cookie -> WORKSPACE_ID_COOKIE_KEY.equals(cookie.getName()) && workspaceId == Long.parseLong(cookie.getValue())) &&
+                Arrays.stream(request.getCookies())
+                        .anyMatch(cookie -> WORKSPACE_NAME_COOKIE_KEY.equals(cookie.getName()) && workspaceName.equals(cookie.getValue()));
+        if (isWorkspaceExists) {
             LOGGER.warn("workspace {} already exists in DSS cookies, ignore to set it again.", workspaceName);
             return getWorkspace(request);
         }
@@ -108,10 +110,10 @@ public class SSOHelper {
         String domain = getCookieDomain(request.getHeader("Referer"));
         Cookie workspaceIdCookie = new Cookie(WORKSPACE_ID_COOKIE_KEY, workspaceIdStr);
         workspaceIdCookie.setPath("/");
-        workspaceIdCookie.setDomain(domain);
+//        workspaceIdCookie.setDomain(domain);
         Cookie workspaceNameCookie = new Cookie(WORKSPACE_NAME_COOKIE_KEY, workspaceName);
         workspaceNameCookie.setPath("/");
-        workspaceNameCookie.setDomain(domain);
+//        workspaceNameCookie.setDomain(domain);
         response.addCookie(workspaceIdCookie);
         response.addCookie(workspaceNameCookie);
         Workspace workspace = new Workspace();

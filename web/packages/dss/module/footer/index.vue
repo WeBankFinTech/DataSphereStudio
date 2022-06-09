@@ -1,11 +1,10 @@
 <template>
-  <div class="layout-footer" @mousemove="onMouseMove" :style="{'pointer-events': `${isMouseDown ? 'initial' : 'none'}`}">
+  <div class="layout-footer" @mousemove="onMouseMove" :style="{'pointer-events': `${(isMouseDown || guideShow) ? 'initial' : 'none'}`}">
     <div ref="footerChannel" class="tool-btns" @mousedown.prevent.stop="onMouseDown">
       <template v-if="!min">
         <div class="footer-btn footer-doc" @click="toggleGuide">
           <SvgIcon icon-class="question" />
         </div>
-        <Guide :show="guideShow" @on-toggle="toggleGuide" ref="Guide"/>
         <resource-simple
           ref="resourceSimple"
           :dispatch="dispatch"
@@ -21,6 +20,7 @@
       </template>
       <Icon v-else type="md-arrow-dropup"  class="show_arrow" @click="min=false" />
     </div>
+    <Guide :show="guideShow" @on-toggle="toggleGuide" ref="Guide"/>
   </div>
 </template>
 <script>
@@ -86,7 +86,8 @@ export default {
     },
     toggleGuide() {
       if (!this.isMouseMove) {
-        this.guideShow = !this.guideShow;
+        window.open("/_book/", '_blank');
+        // this.guideShow = !this.guideShow;
       }
     },
     onMouseDown(e) {

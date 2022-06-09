@@ -1,0 +1,26 @@
+diff --git a/node_modules/iview/dist/iview.js b/node_modules/iview/dist/iview.js
+index 1de5eb9..64cbf03 100644
+--- a/node_modules/iview/dist/iview.js
++++ b/node_modules/iview/dist/iview.js
+@@ -20972,9 +20972,10 @@ exports.default = {
+                 this.closeTimer = null;
+             }
+         },
+-        close: function close() {
++        close: function close(flag) {
+             this.clearCloseTimer();
+-            this.onClose();
++            const ret = this.onClose();
++            if (ret === false && flag === 'auto') return
+             this.$parent.close(this.name);
+         },
+         handleEnter: function handleEnter(el) {
+@@ -21001,7 +21002,7 @@ exports.default = {
+             this.closeTimer = setTimeout(function () {
+                 (0, _newArrowCheck3.default)(this, _this);
+ 
+-                this.close();
++                this.close('auto');
+             }.bind(this), this.duration * 1000);
+         }
+ 

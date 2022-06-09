@@ -45,7 +45,6 @@ let requireComponent = []
 let requireComponentVue = []
 let appsRoutes = []
 let appsI18n = []
-let headers = []
 let confs = []
 
 Object.entries(apps).forEach(item => {
@@ -53,10 +52,7 @@ Object.entries(apps).forEach(item => {
     requireComponent.push(`require.context('@/${item[1].module}',true,/([a-z|A-Z])+\\/index\.js$/)`)
     requireComponentVue.push(`require.context('@/${item[1].module}',true,/([a-z|A-Z])+.vue$/)`)
   }
-  // 获取个模块header
-  if (item[1].header) {
-    headers.push(`${item[0]}: require('@/${item[1].header}/index.js')`)
-  }
+
   // 处理路由
   if (item[1].routes) {
     appsRoutes.push(`${item[0]}: require('@/${item[1].routes}')`)
@@ -109,7 +105,6 @@ const virtualModules = new VirtualModulesPlugin({
     requireComponent: [${requireComponent.join(',')}],
     requireComponentVue: [${requireComponentVue.join(',')}],
     microModule: ${JSON.stringify(process.env.npm_config_micro_module) || false},
-    headers:{${headers.join(',')}},
     conf: {${confs.join(',')}}
   };`
 });

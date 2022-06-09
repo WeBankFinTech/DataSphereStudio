@@ -6,8 +6,7 @@
       "i18n": {
         "en": "workspace/i18n/en.json",
         "zh-CN": "workspace/i18n/zh.json"
-      },
-      "header": ""
+      }
     },
     "scriptis": {
       "routes": "scriptis/router",
@@ -15,8 +14,7 @@
       "i18n": {
         "en": "scriptis/i18n/common/en.json",
         "zh-CN": "scriptis/i18n/common/zh.json"
-      },
-      "header": "scriptis/module/header"
+      }
     },
     "workflows": {
       "routes": "workflows/router",
@@ -24,8 +22,7 @@
       "i18n": {
         "en": "workflows/i18n/common/en.json",
         "zh-CN": "workflows/i18n/common/zh.json"
-      },
-      "header": "workflows/module/header"
+      }
     },
     "dataService": {
       "routes": "dataService/router",
@@ -33,8 +30,7 @@
       "i18n": {
         "en": "dataService/i18n/en.json",
         "zh-CN": "dataService/i18n/zh.json"
-      },
-      "header": "dataService/module/header"
+      }
     },
     "dataGovernance": {
       "routes": "dataGovernance/router",
@@ -42,8 +38,7 @@
       "i18n": {
         "en": "dataGovernance/i18n/en.json",
         "zh-CN": "dataGovernance/i18n/zh.json"
-      },
-      "header": "dataGovernance/module/header"
+      }
     },
     "dolphinScheduler": {
       "routes": "dolphinScheduler/router",
@@ -51,8 +46,7 @@
       "i18n": {
         "en": "dolphinScheduler/i18n/en.json",
         "zh-CN": "dolphinScheduler/i18n/zh.json"
-      },
-      "header": ""
+      }
     }
   },
   "exts": {

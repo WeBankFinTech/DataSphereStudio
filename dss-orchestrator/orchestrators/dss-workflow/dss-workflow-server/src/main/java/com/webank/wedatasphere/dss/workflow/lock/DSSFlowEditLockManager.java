@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import org.apache.linkis.DataWorkCloudApplication;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
@@ -169,9 +170,11 @@ public class DSSFlowEditLockManager {
 
     public static void deleteLock(String flowEditLock) throws DSSErrorException {
         try {
-            DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
-            Long flowId = Optional.ofNullable(dssFlowEditLock).map(DSSFlowEditLock::getFlowID).get();
-            lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowId);
+            if (StringUtils.isNotBlank(flowEditLock)) {
+                DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
+                Long flowId = Optional.ofNullable(dssFlowEditLock).map(DSSFlowEditLock::getFlowID).get();
+                lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowId);
+            }
         } catch (Exception e) {
             LOGGER.error("flowEditLock delete failed，flowId：{}", flowEditLock, e);
             throw new DSSErrorException(60059, "工作流编辑锁主动释放失败，flowId:" + flowEditLock + "");

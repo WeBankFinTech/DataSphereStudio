@@ -2189,18 +2189,18 @@ export default {
           // Succees, Failed, Cancelled, Timeout
           this.workflowIsExecutor = false;
           if (status === 'Succeed') {
-            this.$Message.success(this.$t('message.workflow.projectDetail.workflowRunSuccess'))
+            this.$Notice.success({desc: this.$t('message.workflow.projectDetail.workflowRunSuccess')})
           }
           if (status === 'Failed') {
-            this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunFail'))
+            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunFail')})
             this.flowExecutorNode(execID, true);
           }
           if (status === 'Cancelled') {
-            this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunCanceled'))
+            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunCanceled')})
             this.flowExecutorNode(execID, true);
           }
           if (status === 'Timeout') {
-            this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunOvertime'))
+            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunOvertime')})
             this.flowExecutorNode(execID, true);
           }
           // 清掉当前工作流执行的缓存
@@ -2221,7 +2221,7 @@ export default {
           this.retryTimes = 0
           this.flowExecutorNode(execID, true);
         }
-        this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunFail'))
+        this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunFail')})
       })
     },
     flowExecutorNode(execID, end = false) {

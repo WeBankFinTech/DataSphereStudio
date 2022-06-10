@@ -373,7 +373,8 @@ const action = function (url, data, option) {
                   class: 'ivu-btn ivu-btn-default ivu-btn-small',
                   style: {
                     background: '#ec6565',
-                    color: '#fff'
+                    color: '#fff',
+                    display: error.solution ? 'inline-block' : ''
                   },
                   on: {
                     click: () => {
@@ -394,7 +395,7 @@ const action = function (url, data, option) {
                       Notice.close(noticeName)
                     }
                   }
-                }, error.solution &&  error.solution.solutionUrl ? '查看解决方案' : '上报错误')
+                }, error.solution && error.solution.solutionUrl ? '查看解决方案' : '上报错误')
               ])
             },
             onClose: () => {

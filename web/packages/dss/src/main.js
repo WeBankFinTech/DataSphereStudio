@@ -68,6 +68,9 @@ Vue.config.productionTip = false
 Vue.prototype.$Message.config({
   duration: 3
 })
+Vue.prototype.$Notice.config({
+  duration: 4
+})
 
 // 全局变量
 Vue.prototype.$API_PATH = API_PATH;

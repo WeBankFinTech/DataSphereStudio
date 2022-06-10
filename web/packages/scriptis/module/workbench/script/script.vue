@@ -52,6 +52,10 @@
                 @click.native="showPanelTab(comp.name)" />
             </template>
           </div>
+          <span class="workbench-tab-full-btn" @click="configLogPanel">
+            <Icon :type="scriptViewState.bottomPanelFull?'md-contract':'md-expand'" />
+            {{ scriptViewState.bottomPanelFull ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}
+          </span>
         </div>
         <div class="workbench-container">
           <we-progress
@@ -1152,10 +1156,18 @@ export default {
       }
       this.debounceLocalLogShow();
     },
-    configLogPanel(name) {
+    configLogPanel() {
+      let bottomContentHeight
+      if (this.scriptViewState.bottomPanelFull) {
+        bottomContentHeight = this._last_bottom_panel_height
+      } else {
+        this._last_bottom_panel_height = this.scriptViewState.bottomContentHeight
+        bottomContentHeight = this.$el.clientHeight + 30
+      }
       this.scriptViewState = {
         ...this.scriptViewState,
-        bottomPanelFull: name == 'fullScreen'
+        bottomContentHeight,
+        bottomPanelFull: !this.scriptViewState.bottomPanelFull
       }
     },
     changeResultSet(data, cb) {
@@ -1374,36 +1386,46 @@ export default {
   @import '@dataspherestudio/shared/common/style/variables.scss';
   .editor-panel {
     position: relative;
-  .script-line{
-    position: absolute;
-    width: 100%;
-    height: 6px;
-    left: 0;
-    bottom: -2px;
-    z-index: 3;
-    border-bottom: 1px solid #dcdee2;
-  @include border-color($border-color-base, $dark-base-color);
-  @include bg-color($light-base-color, $dark-base-color);
-    cursor: ns-resize;
-  }
-  &.full-screen {
-     top: 54px !important;
-     right: 0;
-     bottom: 0;
-     left: 0;
-     position: fixed;
-     z-index: 100;
-     background-color: #fff;
-     height: 100% !important;
-   }
-  .new-sidebar-spin {
-  @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
-  }
+    .script-line {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      left: 0;
+      bottom: -2px;
+      z-index: 3;
+      border-bottom: 1px solid #dcdee2;
+      @include border-color($border-color-base, $dark-base-color);
+      @include bg-color($light-base-color, $dark-base-color);
+      cursor: ns-resize;
+    }
+    &.full-screen {
+      top: 54px !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      position: fixed;
+      z-index: 9999;
+      background-color: #fff;
+      height: 100% !important;
+    }
+    .new-sidebar-spin {
+      @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
+    }
   }
   .log-panel {
     border-top: $border-width-base $border-style-base $border-color-base;
     @include border-color($border-color-base, $dark-border-color-base);
     @include bg-color($light-base-color, $dark-base-color);
+    &.full-screen {
+      top: 54px !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      position: fixed;
+      z-index: 9999;
+      background-color: #fff;
+      height: 100% !important;
+    }
     .workbench-tabs {
       position: $relative;
       height: 100%;
@@ -1465,6 +1487,16 @@ export default {
               border-top: 1px solid $border-color-base;
               @include border-color($border-color-base, $dark-border-color-base);
             }
+          }
+        }
+        .workbench-tab-full-btn {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding-right: 8px;
+          cursor: pointer;
+          &:hover {
+            @include font-color($primary-color, $dark-primary-color);
           }
         }
       }

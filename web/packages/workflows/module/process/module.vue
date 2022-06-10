@@ -341,11 +341,6 @@
           @click="workflowPublish">{{$t('message.workflow.ok')}}</Button>
       </div>
     </Modal>
-    <module v-model="showDispatchHistoryModel" width="1500" :footerDisable="false">
-      <div class="schedulisIframe">
-        <iframe class="iframeClass" :src="schedulislSrc" frameborder="0" width="100%" height="100%"/>
-      </div>
-    </module>
     <Modal
       v-model="workflowExportShow"
       :title="$t('message.workflow.exportWorkflow')"
@@ -404,9 +399,9 @@ import mixin from '@dataspherestudio/shared/common/service/mixin';
 import util from '@dataspherestudio/shared/common/util';
 import plugin from '@dataspherestudio/shared/common/util/plugin';
 import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
-import module from './component/modal.vue';
 import moment from 'moment';
 import { getPublishStatus } from '@/workflows/service/api.js';
+import module from './index';
 
 const extComponents = plugin.emitHook('workflow_bottom_panel') || {}
 export default {
@@ -416,8 +411,7 @@ export default {
     resource,
     nodeParameter,
     associateScript,
-    console,
-    module
+    console
   },
   mixins: [mixin],
   directives: {
@@ -484,9 +478,6 @@ export default {
       // 是否为父工作流
       isRootFlow: true,
       name: '',
-      versionId: '',
-      // 0 未发布过 1发布过
-      state: '',
       shapes: [],
       // 原始数据
       originalData: null,
@@ -517,14 +508,11 @@ export default {
       },
       // 是否有改变
       jsonChange: false,
-      publishChangeCount: 0,
       loading: false,
       repetitionNameShow: false,
       repeatTitles: [],
       nodebaseinfoShow: false, // 自定义节点信息弹窗展示
       clickCurrentNode: {}, // 当前点击的节点
-      timerClick: '',
-
       viewOptions: {
         showBaseInfoOnAdd: false, // 不显示默认的拖拽添加节点弹出的基础信息面板
         shapeView: true, // 左侧shape列表
@@ -534,8 +522,6 @@ export default {
       addNodeShow: false, // 创建节点的弹窗显示
       cacheNode: null,
       addNodeTitle: this.$t('message.workflow.process.createSubFlow'), // 创建节点时弹窗的title
-      IframeProjectLoading: false,
-      // nodeBasicInfoData: [], // 后台返回的节点基本信息
       workflowIsExecutor: false, // 当前工作流是否再执行
       openningNode: null, // 上一次打开控制台的节点
       shapeWidth: 0, // 流程图插件左侧工具栏的宽度
@@ -545,14 +531,11 @@ export default {
       executorStatusTimer: '',
       workflowExecutorCache: [],
       isDispatch: false,
-      showDispatchHistoryModel: false,
-      schedulislSrc: '', // 调度历史跳转的url
       contextID: '',
       pubulishFlowComment: '',
       pubulishShow: false,
       flowVersion: '',
       isFlowPubulish: false,
-      // bmlVersion: '',
       workflowExportShow: false,
       exportDesc: '',
       exporTChangeVersion: false,
@@ -684,7 +667,6 @@ export default {
   },
   watch: {
     jsonChange(val) {
-      this.publishChangeCount += 1;
       this.$emit('isChange', val);
     },
     workflowExecutorCache() {
@@ -918,7 +900,6 @@ export default {
     },
     convertJson(flow) {
       this.name = flow.name;
-      this.state = flow.state;
       this.isRootFlow = flow.rootFlow;
       this.rank = flow.rank; // 工作流层级
       let json;
@@ -2313,16 +2294,6 @@ export default {
       time=0;
       return timeResult;
     },
-    // 新建widget节点的弹框里，绑定view下拉框
-    // handleBindViewChange(key) {
-    //   // 更新当前选择的view的值 this.selectBindView
-    //   for (let i = 0; i < this.sqlNodeList.length; i++) {
-    //     if (key === this.sqlNodeList[i].key) {
-    //       this.selectBindView = this.sqlNodeList[i]
-    //       break
-    //     }
-    //   }
-    // },
     workflowPublishIsShow() {
       // 已经在发布不能再点击
       if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.publishing'))
@@ -2414,7 +2385,6 @@ export default {
                 });
               }
               this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
-              this.publishChangeCount = 0;
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
               this.refreshOpen(this.getBaseInfo)
             } else if (res.status === 'failed') {

@@ -1,7 +1,9 @@
 <template>
   <div
     ref="bottomPanel"
-    class="log-panel">
+    class="log-panel"
+    :class="{'full-screen': scriptViewState.bottomPanelFull}"
+  >
     <div class="workbench-tabs">
       <div class="workbench-tab-wrapper">
         <div class="workbench-tab">
@@ -28,6 +30,10 @@
         </div>
         <div
           class="workbench-tab-button">
+          <span class="workbench-tab-full-btn" @click="toggleFull">
+            <Icon :type="scriptViewState.bottomPanelFull?'md-contract':'md-expand'" />
+            {{ scriptViewState.bottomPanelFull ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}
+          </span>
           <Icon
             type="ios-close"
             size="20"
@@ -93,7 +99,8 @@ export default {
       scriptViewState: {
         showPanel: 'progress',
         cacheLogScroll: 0,
-        bottomContentHeight: this.height || '250'
+        bottomContentHeight: this.height || '250',
+        bottomPanelFull: false
       },
       isBottomPanelFull: false,
       isLogShow: false,
@@ -524,7 +531,22 @@ export default {
         }
       });
       return tmpLogs;
-    }
+    },
+    toggleFull() {
+      let bottomContentHeight
+      if (this.scriptViewState.bottomPanelFull) {
+        bottomContentHeight = this._last_bottom_panel_height
+      } else {
+        this._last_bottom_panel_height = this.scriptViewState.bottomContentHeight
+        bottomContentHeight = this.$parent.$el.clientHeight + 50
+      }
+      window.console.log(bottomContentHeight)
+      this.scriptViewState = {
+        ...this.scriptViewState,
+        bottomContentHeight,
+        bottomPanelFull: !this.scriptViewState.bottomPanelFull
+      }
+    },
   }
 }
 </script>
@@ -535,6 +557,17 @@ export default {
     border-top: $border-width-base $border-style-base $border-color-base;
     @include border-color($border-color-base, $dark-border-color-base);
     @include bg-color($light-base-color, $dark-base-color);
+    &.full-screen {
+      top: 54px !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      position: fixed;
+      z-index: 9999;
+      background-color: #fff;
+      height: 100% !important;
+      width: 100% !important;
+    }
     .workbench-tabs {
       position: $relative;
       height: 100%;
@@ -598,12 +631,11 @@ export default {
           }
         }
         .workbench-tab-button {
-          flex: 0 0 30px;
+          flex: 0 0 120px;
           text-align: center;
           background-color: $body-background;
           .ivu-icon {
               font-size: $font-size-base;
-              margin-top: 8px;
               cursor: pointer;
           }
         }
@@ -621,6 +653,17 @@ export default {
                 width: 100%;
             }
         }
+      }
+    }
+    .workbench-tab-full-btn {
+      display: inline-block;
+      line-height: 32px;
+      align-items: center;
+      padding-right: 8px;
+      height: 32px;
+      cursor: pointer;
+      &:hover {
+        @include font-color($primary-color, $dark-primary-color);
       }
     }
   }

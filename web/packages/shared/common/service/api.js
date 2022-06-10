@@ -374,7 +374,7 @@ const action = function (url, data, option) {
                   style: {
                     background: '#ec6565',
                     color: '#fff',
-                    display: error.solution ? 'inline-block' : ''
+                    display: error.solution ? 'inline-block' : 'none'
                   },
                   on: {
                     click: () => {

@@ -74,7 +74,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 //        try{
         logger.info("Begin to get an execID");
         DSSWorkspace workspace = SSOHelper.getWorkspace(req);
-        json.put(TaskConstant.UMUSER, SecurityFilter.getLoginUsername(req));
+        json.put(TaskConstant.EXECUTE_USER, SecurityFilter.getLoginUsername(req));
         Map<String, Object> params = (Map<String, Object>) json.get("params");
         params.put("workspace", workspace);
         String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();

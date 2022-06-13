@@ -181,11 +181,8 @@ export default {
         return subArray.includes(item.key) && item.node.isChange;
       });
       // 子工作流关闭时，查询是否有子节点没有保存，是否一起关闭
-      if (changeList.length > 0 && currentTab.node.type === NODETYPE.FLOW) {
+      if (changeList.length > 0 || (currentTab.node &&currentTab.node.isChange)) {
         let text = `<p>${this.$t("message.workflow.process.index.WBCSFGB")}</p>`;
-        if (currentTab.node.isChange) {
-          text = `<p>${this.$t("message.workflow.process.index.GGZLWBC")}</p>`;
-        }
         this.$Modal.confirm({
           title: this.$t("message.workflow.process.index.GBTS"),
           content: text,
@@ -199,7 +196,6 @@ export default {
               this.choose(this.tabs.length - 1);
             } else {
               this.tabs.splice(index, 1);
-              // this.choose(this.tabs.length - 1);
             }
             this.updateProjectCacheByTab();
           },

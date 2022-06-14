@@ -362,8 +362,9 @@ const action = function (url, data, option) {
                 h('div', {
                   style: {
                     'word-break': 'break-all',
-                    'margin-bottom': '20px',
-                    'text-align': 'left'
+                    'margin-bottom': '10px',
+                    'text-align': 'left',
+                    'line-height': '18px'
                   }
                 }, msg),
                 h('button', {

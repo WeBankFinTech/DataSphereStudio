@@ -48,7 +48,7 @@ export default Object.freeze([{
   scriptType: 'psql', // 脚本类型
   abbr: 'psql',
   logo: 'fi-presto-sql',
-  color: '#FF9900',
+  color: '#3a3837',
   isCanBeNew: true, // 是否能新建
   label: 'Psql',
   isCanBeOpen: true, // 是否能双击打开

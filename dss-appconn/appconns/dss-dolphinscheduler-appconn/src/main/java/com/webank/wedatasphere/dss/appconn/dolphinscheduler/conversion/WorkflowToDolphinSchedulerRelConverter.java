@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConverter {
 
@@ -50,7 +51,7 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
         }
         DolphinSchedulerWorkflow.ProcessDefinitionJson processDefinitionJson =
             new DolphinSchedulerWorkflow.ProcessDefinitionJson();
-        processDefinitionJson.setGlobalParams(workflow.getFlowProperties());
+        processDefinitionJson.setGlobalParams(convertGlobalParams(workflow.getFlowProperties()));
         Map<String, DolphinSchedulerWorkflow.LocationInfo> locations = new HashMap<>();
         for (WorkflowNode workflowNode : workflow.getWorkflowNodes()) {
             DSSNode node = workflowNode.getDSSNode();
@@ -77,5 +78,18 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
         dolphinSchedulerWorkflow.setConnects(connects);
 
         return dolphinSchedulerWorkflow;
+    }
+
+    private List<Map<String, Object>> convertGlobalParams(List<Map<String, Object>> globalParams) {
+        return globalParams.stream().map(map -> {
+            Map<String, Object> ret = new HashMap<>();
+            map.forEach((k, v) -> {
+                ret.put("prop", k);
+                ret.put("value", v);
+                ret.put("type", "VARCHAR");
+                ret.put("direct", "INPUT");
+            });
+            return ret;
+        }).collect(Collectors.toList());
     }
 }

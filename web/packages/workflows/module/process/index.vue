@@ -28,7 +28,10 @@
               alt
             />
             <div :title="item.title" class="process-tab-name">{{ item.title }}</div>
-            <SvgIcon v-show="!item.isHover && item.node && item.node.isChange && checkEditable(query)" class="process-tab-unsave-icon" icon-class="fi-radio-on2"/>
+            <SvgIcon v-show="!item.isHover && item.node && item.node.isChange && checkEditable(query)"
+              class="process-tab-unsave-icon"
+              :style="{ color: item.node && item.node.isChange ? '#ed4014' : '' }"
+              icon-class="fi-radio-on2"/>
             <Icon
               v-if="item.isHover && (item.close || query.product)"
               type="md-close"

@@ -54,7 +54,7 @@ public class NodeConverter {
         DolphinSchedulerTaskParam taskParams = new DolphinSchedulerTaskParam();
         try {
             List<String> scriptList = new ArrayList<>();
-            BiConsumer<String, String> addLine = (key, value) -> scriptList.add(String.format("export %s=\"%s\"", key, value));
+            BiConsumer<String, String> addLine = (key, value) -> scriptList.add(String.format("export %s='%s'", key, value));
             BiConsumer<String, Object> addObjectLine = (key, value) -> {
                 if(value == null) {
                     return;
@@ -71,7 +71,8 @@ public class NodeConverter {
             addObjectLine.accept("JOB_SOURCE", sourceMap);
             addLine.accept("CONTEXT_ID", workflow.getContextID());
             addLine.accept("LINKIS_GATEWAY_URL", Configuration.getGateWayURL());
-            addLine.accept("RUN_DATE", "${system.biz.date}");
+            //todo
+//            addLine.accept("RUN_DATE", "${system.biz.date}");
             addObjectLine.accept("JOB_LABELS", new EnvDSSLabel(SchedulerConf.JOB_LABEL.getValue()).getValue());
             if(CollectionUtils.isNotEmpty(workflow.getFlowResources())) {
                 addObjectLine.accept("FLOW_RESOURCES", workflow.getFlowResources());

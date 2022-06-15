@@ -2,6 +2,9 @@
   <div class="layout-footer" @mousemove="onMouseMove" :style="{'pointer-events': `${isMouseDown ? 'initial' : 'none'}`}">
     <div ref="footerChannel" class="tool-btns" @mousedown.prevent.stop="onMouseDown">
       <template v-if="!min">
+        <div class="footer-btn footer-doc" @click="toggleGuide">
+          <SvgIcon icon-class="question" />
+        </div>
         <resource-simple
           ref="resourceSimple"
           :dispatch="dispatch"
@@ -71,6 +74,11 @@ export default {
     updateJob(num) {
       const method = 'Footer:updateRunningJob';
       this[method](num);
+    },
+    toggleGuide() {
+      if (!this.isMouseMove) {
+        window.open("/_book/", '_blank');
+      }
     },
     toast() {
       if (!this.isMouseMove) {

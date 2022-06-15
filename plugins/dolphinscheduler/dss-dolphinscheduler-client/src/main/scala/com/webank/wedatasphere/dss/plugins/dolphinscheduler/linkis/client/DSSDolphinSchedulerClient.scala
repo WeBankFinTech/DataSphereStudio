@@ -38,6 +38,7 @@ object DSSDolphinSchedulerClient extends Logging {
       }
     }
     getAndSet("LINKIS_TYPE", LinkisJobTypeConf.LINKIS_TYPE)
+    getAndSet("LINKIS_VERSION", LinkisJobTypeConf.LINKIS_VERSION)
     getAndSet("RUN_DATE", LinkisJobTypeConf.RUN_DATE)
     getAndSet("CONTEXT_ID", LinkisJobExecutionConfiguration.FLOW_CONTEXTID)
     getAndSet("LINKIS_GATEWAY_URL", LinkisJobExecutionConfiguration.LINKIS_URL_1_X.key)

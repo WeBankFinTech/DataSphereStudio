@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conversion;
 
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerConvertedRel;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
@@ -65,6 +66,7 @@ public class NodeConverter {
             };
             addLine.accept("LINKIS_TYPE", dssNode.getNodeType());
             addLine.accept("PROXY_USER", dssNode.getUserProxy());
+            addLine.accept("LINKIS_VERSION", DolphinSchedulerConf.LINKIS_1_X_VERSION.getValue());
             addObjectLine.accept("JOB_COMMAND", dssNode.getJobContent());
             addObjectLine.accept("JOB_PARAMS", dssNode.getParams());
             addObjectLine.accept("JOB_RESOURCES", dssNode.getResources());

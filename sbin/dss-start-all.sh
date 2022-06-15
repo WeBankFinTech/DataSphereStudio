@@ -85,6 +85,22 @@ function startDssProject(){
 	SERVER_NAME=dss-framework-project-server
 	SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
 	startApp
+	sleep 15
+
+ echo "------------------------Start check whether the  project service is registered to eureka successfully-----------------------------"
+  #project服务启动并注册到eureka后再启动其他服务
+  while [[ -z $result ]]
+  do
+    sleep 5
+    if [ -z $EUREKA_USERNAME ] || [ -z $EUREKA_PASSWORD ];
+      then
+        response=`curl  http://${EUREKA_INSTALL_IP}:${EUREKA_PORT}/eureka/apps/DSS-FRAMEWORK-PROJECT-SERVER`
+      else
+        response=`curl  http://${EUREKA_USENAME}:${EUREKA_PASSWORD}@${EUREKA_INSTALL_IP}:${EUREKA_PORT}/eureka/apps/DSS-FRAMEWORK-PROJECT-SERVER`
+    fi
+  result=$(echo $response |grep 'DSS-FRAMEWORK-PROJECT-SERVER')
+  done
+  echo "------------------------the   project service is registered to eureka successfully------------------------------------------------"
 
 	SERVER_NAME=dss-framework-orchestrator-server
 	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP

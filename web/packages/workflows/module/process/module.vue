@@ -903,7 +903,7 @@ export default {
       },'get').then((res) => {
         let json = this.convertJson(res.flow);
         let flowEditLock = res.flow.flowEditLock;
-        if (flowEditLock) {
+        if (flowEditLock && !this.myReadonly) {
           this.setFlowEditLock(flowEditLock);
         }
         this.initAction(json);
@@ -1469,7 +1469,7 @@ export default {
     },
     updateLock() {
       const flowEditLock = this.getFlowEditLock()
-      if (!flowEditLock) return
+      if (!flowEditLock || this.myReadonly) return
       api.fetch(`${this.$API_PATH.WORKFLOW_PATH}updateFlowEditLock`, {
         flowEditLock,
         labels: this.getCurrentDsslabels()

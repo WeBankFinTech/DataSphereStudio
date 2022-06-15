@@ -14,6 +14,9 @@ DSS_FILE_NAME="dss-$DSS_VERSION"
 ###  Linkis EUREKA  information.  # Microservices Service Registration Discovery Center
 EUREKA_INSTALL_IP=127.0.0.1
 EUREKA_PORT=20303
+### If EUREKA  has no safety verification, please do not fill in
+EUREKA_USERNAME=
+EUREKA_PASSWORD=
 
 ### Specifies the user workspace, which is used to store the user's script files and log files.
 ### Generally local directory

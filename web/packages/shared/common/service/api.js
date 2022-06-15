@@ -357,23 +357,22 @@ const action = function (url, data, option) {
             title: '错误提示',
             render: (h) => {
               return h('div', {
-                class: 'g-err-msg-div',
-                style: {
-                  padding: '10px'
-                }
+                class: 'g-err-msg-div'
               }, [
                 h('div', {
                   style: {
                     'word-break': 'break-all',
-                    'margin-bottom': '20px',
-                    'text-align': 'left'
+                    'margin-bottom': '10px',
+                    'text-align': 'left',
+                    'line-height': '18px'
                   }
                 }, msg),
                 h('button', {
                   class: 'ivu-btn ivu-btn-default ivu-btn-small',
                   style: {
                     background: '#ec6565',
-                    color: '#fff'
+                    color: '#fff',
+                    display: error.solution ? 'inline-block' : 'none'
                   },
                   on: {
                     click: () => {
@@ -394,7 +393,7 @@ const action = function (url, data, option) {
                       Notice.close(noticeName)
                     }
                   }
-                }, error.solution &&  error.solution.solutionUrl ? '查看解决方案' : '上报错误')
+                }, error.solution && error.solution.solutionUrl ? '查看解决方案' : '上报错误')
               ])
             },
             onClose: () => {

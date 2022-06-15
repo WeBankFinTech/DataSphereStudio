@@ -21,7 +21,9 @@
         type="md-close"
         style="opacity: 0.65;"
         @click.stop="remove"/>
-      <SvgIcon v-show="!isHover && work.unsave && work.type !== 'historyScript'" icon-class="fi-radio-on2"/>
+      <SvgIcon v-show="!isHover && work.unsave && work.type !== 'historyScript'"
+        :style="{ color: work.unsave ? '#ed4014' : '' }"
+        icon-class="fi-radio-on2"/>
       <Spin
         v-show="!isHover && work.data && work.data.running"
         size="small">

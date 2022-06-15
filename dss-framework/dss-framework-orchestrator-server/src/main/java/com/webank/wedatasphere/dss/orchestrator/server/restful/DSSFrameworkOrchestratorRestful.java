@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +53,13 @@ public class DSSFrameworkOrchestratorRestful {
     private OrchestratorFrameworkService orchestratorFrameworkService;
     @Autowired
     private OrchestratorService orchestratorService;
+
+    @PostConstruct
+    public void init() {
+        LOGGER.info("First, try to load all AppConn...");
+        AppConnManager.getAppConnManager();
+        LOGGER.info("All AppConn have loaded successfully.");
+    }
 
     /**
      * 创建编排模式

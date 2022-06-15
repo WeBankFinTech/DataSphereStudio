@@ -39,23 +39,14 @@ export default {
     window.addEventListener('message', this.msgEvent, false)
   },
   methods: {
-    // 获取需要在创建的时候填写的参数
-    getCreatePrams(node) {
-      const createParams = {}
-      node.nodeUiVOS.filter((item) => item.baseInfo)
-        .map(item => item.key).map(item => {
-          createParams[item] = node[item];
-        })
-      return createParams;
-    },
     getUrl() {
-      const createParams = this.getCreatePrams(this.node);
       const params = {
         nodeType: this.node.type,
         projectID: +this.$route.query.projectID,
         params: {
           ...this.node.jobContent,
-          ...createParams
+          title: this.node.title,
+          desc: this.node.desc
         },
         labels: {
           route: this.getCurrentDsslabels()

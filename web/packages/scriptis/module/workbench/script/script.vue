@@ -1004,7 +1004,7 @@ export default {
       clearTimeout(this.autoSaveTimer);
       if (!this.work.saveAs && this.work && this.work.data) {
         this.autoSaveTimer = setTimeout(() => {
-          this.save();
+          this.save(true);
         }, 1000 * 60 * 5);
       }
     },
@@ -1066,7 +1066,7 @@ export default {
           this.work.unsave = true;
         });
     },
-    async save() {
+    async save(auto) {
       if (this.node && Object.keys(this.node).length > 0) {
         this.nodeSave();
       } else {
@@ -1124,8 +1124,10 @@ export default {
               });
             }
           }
-        } else {
+        } else if(auto !== true) {
           this.$Message.warning(this.$t('message.scripts.warning.empty'));
+        } else {
+          return
         }
         this.autoSave();
       }

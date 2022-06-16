@@ -74,7 +74,7 @@ public class NodeConverter {
             addLine.accept("CONTEXT_ID", workflow.getContextID());
             addLine.accept("LINKIS_GATEWAY_URL", Configuration.getGateWayURL());
             //todo
-//            addLine.accept("RUN_DATE", "${system.biz.date}");
+            addLine.accept("RUN_DATE", "${global_run_date}");
             addObjectLine.accept("JOB_LABELS", new EnvDSSLabel(SchedulerConf.JOB_LABEL.getValue()).getValue());
             if(CollectionUtils.isNotEmpty(workflow.getFlowResources())) {
                 addObjectLine.accept("FLOW_RESOURCES", workflow.getFlowResources());

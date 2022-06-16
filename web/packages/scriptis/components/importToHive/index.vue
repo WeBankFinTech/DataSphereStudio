@@ -52,7 +52,7 @@
             <directory-dialog
               :height="226"
               :tree="tree"
-              :is-hide="!!firstStep.exportPath"
+              :is-hide="hideDir"
               :load-data-fn="loadDataFn"
               :filter-node="filterNode"
               :path="firstStep.exportPath"
@@ -446,6 +446,7 @@ export default {
       lastScrollEnd: 0,
       isFullScreen: false,
       directoryHeight: 280,
+      hideDir: false
     };
   },
   computed: {
@@ -512,8 +513,10 @@ export default {
       }
       this.resetSecondStep();
       this.resetFirstStep();
+      this.hideDir = false
       if (path) {
         this.firstStep.exportPath = path;
+        this.hideDir = true
       }
       this.firstStep.type = this.fsType;
       this.modal.show = true;

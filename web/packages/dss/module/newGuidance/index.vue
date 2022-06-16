@@ -3,13 +3,11 @@
     <div v-if="currentStep === 1" key="1">
       <div id="mask1">
         <div class="description">
-          <p>你好，我是{{$APP_CONF.app_name}}的卡通形象。</p>
-          <br />
           <p>
-            {{$APP_CONF.app_name}}是<span>微众银行开源合作共建的一站式大数据开发与服务平台</span>，他可以对于数据进行全生命周期的运营管理，帮助企业快速开发基于大数据分析建模能力的业务系统和构建数据运营能力。
+            DataSphere Studio（简称 DSS）是微众银行自研的数据应用开发管理集成框架，以工作流式的图形化拖拽开发体验，将满足从数据交换、脱敏清洗、分析探索、质量检测、数据建模、可视化展现、邮件发送到定时调度等，数据应用开发全流程场景需求。
           </p>
           <br />
-          <p>下面，让我来带你认识一下{{$APP_CONF.app_name}}的操作界面，请跟着页面引导操作吧。</p>
+          <p>下面，让我们一起来熟悉一下DataSphereStudio的操作界面吧！</p>
         </div>
         <div id="confirm1">
           <div class="next" @click="next()">我知道了</div>
@@ -231,30 +229,7 @@
         <div class="selected" @click="maskFooterClick()"></div>
       </div>
     </div>
-    <div v-else-if="currentStep === 8" key="8">
-      <div id="mask8">
-        <div class="item1">
-          <div class="desc proc">
-            这是<span>帮助文档</span>，点击步骤可弹出对应操作图示。点击常见问题可跳出至外部页查看对应问题答案。点击【前往用户手册】可以跳至外部用户手册页。
-          </div>
-          <div id="confirm8">
-            <div class="skip" @click="skip()">跳过</div>
-            <div class="prev" @click="prev()">上一步</div>
-            <div class="next" @click="next()">下一步</div>
-            <img
-              class="luBanLogo"
-              src="~@/dss/assets/images/luBanLogo.png"
-              alt=""
-            />
-          </div>
-        </div>
-        <div class="arrow">
-          <img src="~@/dss/assets/images/6-1.svg" alt="" />
-        </div>
-        <div class="selected"></div>
-      </div>
-    </div>
-    <div v-show="currentStep === 9">
+    <div v-show="currentStep === 8">
       <div id="mask9">
         <div class="description">
           <p>
@@ -360,9 +335,6 @@ export default {
           select6.style.width = userMenu.clientWidth - 10 + "px"
           select6.style.height = userMenu.clientHeight + "px"
         })
-      } else if (this.currentStep === 8) {
-        this.$parent.$refs.layoutFooter.toggleGuide();
-        this.currentStep -= 1;
       } else {
         this.currentStep -= 1;
       }
@@ -428,10 +400,6 @@ export default {
         this.$parent.$refs.layoutFooter.toggleGuide();
         this.$parent.$refs.layoutFooter.$refs.Guide.flag = false;
       } else if (this.currentStep === 8) {
-        foot.setAttribute("style", "z-index: 1000");
-        this.$parent.$refs.layoutFooter.toggleGuide();
-        this.currentStep += 1;
-      } else if (this.currentStep === 9) {
         navM.addEventListener(
           "click",
           this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu
@@ -454,9 +422,6 @@ export default {
       );
       if (this.currentStep === 4) {
         this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu();
-      }
-      if (this.currentStep === 8) {
-        this.$parent.$refs.layoutFooter.toggleGuide();
       }
       this.currentStep = 0;
       if (!this.$parent.$refs.layoutFooter.$refs.Guide.flag) {

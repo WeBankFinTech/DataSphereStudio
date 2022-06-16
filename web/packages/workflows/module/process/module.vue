@@ -280,7 +280,7 @@
       <Form
         v-if="createNodeParamsList.length > 0"
         label-position="left"
-        :label-width="110"
+        :label-width="130"
         ref="addFlowfoForm"
         :model="clickCurrentNode"
         :rules="formRules">
@@ -903,7 +903,7 @@ export default {
       },'get').then((res) => {
         let json = this.convertJson(res.flow);
         let flowEditLock = res.flow.flowEditLock;
-        if (flowEditLock) {
+        if (flowEditLock && !this.myReadonly) {
           this.setFlowEditLock(flowEditLock);
         }
         this.initAction(json);
@@ -1469,7 +1469,7 @@ export default {
     },
     updateLock() {
       const flowEditLock = this.getFlowEditLock()
-      if (!flowEditLock) return
+      if (!flowEditLock || this.myReadonly) return
       api.fetch(`${this.$API_PATH.WORKFLOW_PATH}updateFlowEditLock`, {
         flowEditLock,
         labels: this.getCurrentDsslabels()
@@ -2017,13 +2017,13 @@ export default {
           this.originalData = this.json;
         })
       } else {
-        const createParams = this.getCreatePrams(node);
         const params = {
           nodeType: node.type,
           projectID: +this.$route.query.projectID,
           params: {
             ...node.jobContent,
-            ...createParams
+            title: node.title,
+            desc: node.desc
           },
           labels: {
             route: this.getCurrentDsslabels()
@@ -2189,18 +2189,18 @@ export default {
           // Succees, Failed, Cancelled, Timeout
           this.workflowIsExecutor = false;
           if (status === 'Succeed') {
-            this.$Message.success(this.$t('message.workflow.projectDetail.workflowRunSuccess'))
+            this.$Notice.success({desc: this.$t('message.workflow.projectDetail.workflowRunSuccess')})
           }
           if (status === 'Failed') {
-            this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunFail'))
+            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunFail')})
             this.flowExecutorNode(execID, true);
           }
           if (status === 'Cancelled') {
-            this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunCanceled'))
+            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunCanceled')})
             this.flowExecutorNode(execID, true);
           }
           if (status === 'Timeout') {
-            this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunOvertime'))
+            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunOvertime')})
             this.flowExecutorNode(execID, true);
           }
           // 清掉当前工作流执行的缓存
@@ -2221,7 +2221,7 @@ export default {
           this.retryTimes = 0
           this.flowExecutorNode(execID, true);
         }
-        this.$Message.error(this.$t('message.workflow.projectDetail.workflowRunFail'))
+        this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunFail')})
       })
     },
     flowExecutorNode(execID, end = false) {

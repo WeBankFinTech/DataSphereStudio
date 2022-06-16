@@ -58,7 +58,7 @@ class HttpSSORequestOperation(private val appName: String) extends SSORequestOpe
 }
 object HttpSSORequestOperation extends Logging {
 
-  val MAX_ACTIVE_TIME = ByteTimeUtils.timeStringAsMs("15m")
+  val MAX_ACTIVE_TIME = ByteTimeUtils.timeStringAsMs("35m")
 
   private val httpClientLastAccessMap = new ConcurrentHashMap[String, Long]
   private val httpClientMap = new util.HashMap[String, Client]

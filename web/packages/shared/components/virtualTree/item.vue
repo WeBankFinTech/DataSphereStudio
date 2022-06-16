@@ -1,7 +1,7 @@
 <template>
   <li
     class="node-item v-ellipsis"
-    :class="{[item.iconCls]:true, [`level-${item.level}`]: true}"
+    :class="{[`level-${item.level}`]: true}"
   >
     <template v-if="render">
       <render-node

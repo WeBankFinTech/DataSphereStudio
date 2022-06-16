@@ -1293,6 +1293,9 @@ export default {
         path: option.resultLocation,
       }, 'get');
       if (rst.dirFileTrees) {
+        if (['Succeed','Failed','Cancelled'].indexOf(this.script.status) < 0) {
+          return
+        }
         // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
         this.script.resultSet = 0
         this.script.resultList = rst.dirFileTrees.children.sort((a, b) => parseInt(a.name, 10) - parseInt(b.name,

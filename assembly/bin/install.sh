@@ -375,16 +375,4 @@ ENV_FLAG="dev"
 installDssProject
 
 echo "Congratulations! You have installed DSS $DSS_VERSION successfully, please use sbin/dss-start-all.sh to start it!"
-## todo 启动dss所有服务，然后选择
-echo "Now begin to start all dss servers, please wait some time."
-sh $SERVER_HOME/sbin/dss-start-all.sh
-
-sleep 15
-echo "end to start all dss servers."
-echo "now begin to install default appconn: datachecker."
-sh $SERVER_HOME/bin/appconn-install.sh datachecker
-echo "now begin to install default appconn: eventchecker."
-sh $SERVER_HOME/bin/appconn-install.sh eventchecker
-echo "now begin to install default appconn: sendemail."
-sh $SERVER_HOME/bin/appconn-install.sh sendemail
 

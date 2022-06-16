@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.workflow.restful;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -42,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
@@ -62,6 +64,13 @@ public class FlowRestfulApi {
     private DSSFlowService dssFlowService;
     @Autowired
     private WorkFlowManager workFlowManager;
+
+    @PostConstruct
+    public void init() {
+        LOGGER.info("First, try to load all AppConn...");
+        AppConnManager.getAppConnManager();
+        LOGGER.info("All AppConn have loaded successfully.");
+    }
 
     /**
      * 添加subflow节点
@@ -171,7 +180,6 @@ public class FlowRestfulApi {
      */
 
     @RequestMapping(value = "updateFlowBaseInfo", method = RequestMethod.POST)
-//    @ProjectPrivChecker
     public Message updateFlowBaseInfo(HttpServletRequest req, @RequestBody UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
         Long flowID = updateFlowBaseInfoRequest.getId();
         String name = updateFlowBaseInfoRequest.getName();
@@ -224,7 +232,6 @@ public class FlowRestfulApi {
     }
 
     @RequestMapping(value = "deleteFlow", method = RequestMethod.POST)
-//    @ProjectPrivChecker
     public Message deleteFlow(HttpServletRequest req, @RequestBody DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
         Long flowID = deleteFlowRequest.getId();
         boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure().booleanValue();
@@ -282,7 +289,6 @@ public class FlowRestfulApi {
         return Message.ok().data("flowEditLock", DSSFlowEditLockManager.updateLock(flowEditLock));
     }
 
-
     @RequestMapping(value = "/getExtraToolBars", method = RequestMethod.POST)
     public Message getExtraToolBars(HttpServletRequest req, @RequestBody GetExtraToolBarsRequest getExtraToolBarsRequest) throws DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
@@ -294,9 +300,6 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "/deleteFlowEditLock/{flowEditLock}", method = RequestMethod.POST)
     public Message deleteFlowEditLock(HttpServletRequest req, @PathVariable("flowEditLock") String flowEditLock) throws DSSErrorException {
-        if (StringUtils.isBlank(flowEditLock)) {
-            throw new DSSErrorException(60068, "delete flowEditLock failed,flowEditLock is null");
-        }
         DSSFlowEditLockManager.deleteLock(flowEditLock);
         return Message.ok();
     }

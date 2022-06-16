@@ -198,7 +198,7 @@ export default {
       let isOpen = this.openNode[item._id]
       if (item.dataType === 'field') { // 表字段
         return h('span', {
-          class: 'node-name'
+          class: `node-name ${item.iconCls}`,
         }, [
           h('span', {
             class: 'v-hivetable-type',
@@ -241,7 +241,7 @@ export default {
         ])
       } else {
         return h('span', {
-          class: 'node-name',
+          class: `node-name ${item.iconCls}`,
           attrs: {
             'data-open': isOpen ? 'open' : '',
             title: item.name

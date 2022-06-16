@@ -1004,7 +1004,7 @@ export default {
       clearTimeout(this.autoSaveTimer);
       if (!this.work.saveAs && this.work && this.work.data) {
         this.autoSaveTimer = setTimeout(() => {
-          this.save();
+          this.save(true);
         }, 1000 * 60 * 5);
       }
     },
@@ -1066,7 +1066,7 @@ export default {
           this.work.unsave = true;
         });
     },
-    async save() {
+    async save(auto) {
       if (this.node && Object.keys(this.node).length > 0) {
         this.nodeSave();
       } else {
@@ -1124,8 +1124,10 @@ export default {
               });
             }
           }
-        } else {
+        } else if(auto !== true) {
           this.$Message.warning(this.$t('message.scripts.warning.empty'));
+        } else {
+          return
         }
         this.autoSave();
       }
@@ -1291,6 +1293,9 @@ export default {
         path: option.resultLocation,
       }, 'get');
       if (rst.dirFileTrees) {
+        if (['Succeed','Failed','Cancelled'].indexOf(this.script.status) < 0) {
+          return
+        }
         // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
         this.script.resultSet = 0
         this.script.resultList = rst.dirFileTrees.children.sort((a, b) => parseInt(a.name, 10) - parseInt(b.name,

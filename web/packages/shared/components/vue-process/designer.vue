@@ -1,6 +1,6 @@
 <template>
   <div :style="getStyle()" :class="{'show-toolbar': showActionView}" class="designer" @mousemove="moveShape" @mouseup="stopMoveShape">
-    <ShapeView v-if="showViews.shapeView" ref="shapeView" :shapes="myShapes" :shapeFold="shapeFold" @on-toggle-shape="toggleShape" />
+    <ShapeView v-show="showViews.shapeView && !shapeFold" ref="shapeView" :shapes="myShapes" :shapeFold="shapeFold" @on-toggle-shape="toggleShape" />
     <div class="designer-expand" v-if="shapeFold" @click="toggleShape">
       <SvgIcon icon-class="unfold" />
     </div>
@@ -340,6 +340,9 @@ export default {
       this.shapeFold = !this.shapeFold;
       this.$emit('toggle-shape', this.shapeFold);
       commit(this.$store, 'UPDATE_SHAPE_OPTIONS', { viewWidth: !this.shapeFold ? 180 : 0 });
+      setTimeout(() => {
+        this.layoutView()
+      }, 400)
     },
     moveShape(e) {
       if (this.state.disabled) return;

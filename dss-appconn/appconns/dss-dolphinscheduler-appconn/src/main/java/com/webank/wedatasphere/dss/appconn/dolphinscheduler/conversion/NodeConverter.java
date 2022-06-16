@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.conversion;
 
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.conf.DolphinSchedulerConf;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerConvertedRel;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTask;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerTaskParam;
@@ -54,7 +55,7 @@ public class NodeConverter {
         DolphinSchedulerTaskParam taskParams = new DolphinSchedulerTaskParam();
         try {
             List<String> scriptList = new ArrayList<>();
-            BiConsumer<String, String> addLine = (key, value) -> scriptList.add(String.format("export %s=\"%s\"", key, value));
+            BiConsumer<String, String> addLine = (key, value) -> scriptList.add(String.format("export %s='%s'", key, value));
             BiConsumer<String, Object> addObjectLine = (key, value) -> {
                 if(value == null) {
                     return;
@@ -65,13 +66,15 @@ public class NodeConverter {
             };
             addLine.accept("LINKIS_TYPE", dssNode.getNodeType());
             addLine.accept("PROXY_USER", dssNode.getUserProxy());
+            addLine.accept("LINKIS_VERSION", DolphinSchedulerConf.LINKIS_1_X_VERSION.getValue());
             addObjectLine.accept("JOB_COMMAND", dssNode.getJobContent());
             addObjectLine.accept("JOB_PARAMS", dssNode.getParams());
             addObjectLine.accept("JOB_RESOURCES", dssNode.getResources());
             addObjectLine.accept("JOB_SOURCE", sourceMap);
             addLine.accept("CONTEXT_ID", workflow.getContextID());
             addLine.accept("LINKIS_GATEWAY_URL", Configuration.getGateWayURL());
-            addLine.accept("RUN_DATE", "${system.biz.date}");
+            //todo
+            addLine.accept("RUN_DATE", "${global_run_date}");
             addObjectLine.accept("JOB_LABELS", new EnvDSSLabel(SchedulerConf.JOB_LABEL.getValue()).getValue());
             if(CollectionUtils.isNotEmpty(workflow.getFlowResources())) {
                 addObjectLine.accept("FLOW_RESOURCES", workflow.getFlowResources());

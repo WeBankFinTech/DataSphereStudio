@@ -52,6 +52,12 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
         DolphinSchedulerWorkflow.ProcessDefinitionJson processDefinitionJson =
             new DolphinSchedulerWorkflow.ProcessDefinitionJson();
         processDefinitionJson.setGlobalParams(convertGlobalParams(workflow.getFlowProperties()));
+        processDefinitionJson.getGlobalParams().add(new HashMap<String, Object>() {{
+            put("prop", "global_run_date");
+            put("value", "${system.biz.date}");
+            put("type", "VARCHAR");
+            put("direct", "IN");
+        }});
         Map<String, DolphinSchedulerWorkflow.LocationInfo> locations = new HashMap<>();
         for (WorkflowNode workflowNode : workflow.getWorkflowNodes()) {
             DSSNode node = workflowNode.getDSSNode();
@@ -87,7 +93,7 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
                 ret.put("prop", k);
                 ret.put("value", v);
                 ret.put("type", "VARCHAR");
-                ret.put("direct", "INPUT");
+                ret.put("direct", "IN");
             });
             return ret;
         }).collect(Collectors.toList());

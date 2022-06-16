@@ -280,7 +280,7 @@
       <Form
         v-if="createNodeParamsList.length > 0"
         label-position="left"
-        :label-width="110"
+        :label-width="130"
         ref="addFlowfoForm"
         :model="clickCurrentNode"
         :rules="formRules">
@@ -2022,8 +2022,8 @@ export default {
           projectID: +this.$route.query.projectID,
           params: {
             ...node.jobContent,
-            title: this.node.title,
-            desc: this.node.desc
+            title: node.title,
+            desc: node.desc
           },
           labels: {
             route: this.getCurrentDsslabels()

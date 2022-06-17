@@ -36,6 +36,7 @@
             :placeholder="$t('message.scripts.newDialog.placeholder')"
             style="width: 360px;"></Input>
           <span>{{ ext }}</span>
+          <a target="_blank" v-if="scriptHelpLink" style="float:right" :href="scriptHelpLink">脚本使用说明</a>
         </FormItem>
         <FormItem
           v-else
@@ -200,6 +201,19 @@ export default {
         return `${this.$t('message.scripts.constants.add')}${this.type}`;
       }
       return `${this.$t('message.scripts.constants.rename')}${this.type}`;
+    },
+    scriptHelpLink() {
+      const linkmap = {
+        Scala: '/_book/知识库/语言教程/使用案例/Scala脚本案例.html',
+        Hive: '/_book/知识库/语言教程/使用案例/Hive脚本案例.html',
+        Sparksql: '/_book/知识库/语言教程/使用案例/SparkSql脚本案例.html',
+        Python: '/_book/知识库/语言教程/使用案例/Python脚本案例.html',
+        PythonSpark: '/_book/知识库/语言教程/使用案例/PySpark脚本案例.html',
+        Shell: '/_book/知识库/语言教程/使用案例/shell脚本案例.html',
+        mllab: '/_book/知识库/语言教程/使用案例/Mllab使用案例.html'
+      }
+      const item = this.scriptType.find((o) => o.scriptType === this.newForm.scriptType);
+      return item ? linkmap[item.label] || '' : ''
     }
   },
   methods: {

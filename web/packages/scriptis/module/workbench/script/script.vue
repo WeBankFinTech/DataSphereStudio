@@ -1263,28 +1263,43 @@ export default {
         this.script.status = option.status;
         return;
       }
-      const url = '/filesystem/openLog';
-      const rst = await api.fetch(url, {
-        path: option.logPath,
-      }, 'get');
-      if (rst) {
-        const log = {
-          all: '',
-          error: '',
-          warning: '',
-          info: ''
-        };
-        const convertLogs = util.convertLog(rst.log);
-        Object.keys(convertLogs).forEach((key) => {
-          if (convertLogs[key]) {
-            log[key] += convertLogs[key] + '\n';
-          }
-        });
-        this.script.status = option.status;
-        this.script.log = log;
-        this.script.logLine = rst.fromLine;
-        // 把新创建的scriptViewState挂到script对象上
-        this.script.scriptViewState = { ...this.scriptViewState };
+      let params;
+      let url;
+      if (['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.script.status) === -1) {
+        url = `/entrance/${this.work.execID}/log`
+        params = {
+          fromLine: 1,
+          size: -1,
+        }
+      } else {
+        url = '/filesystem/openLog';
+        params = {
+          path: option.logPath,
+        }
+      }
+      try {
+        const rst = await api.fetch(url, params, 'get');
+        if (rst) {
+          const log = {
+            all: '',
+            error: '',
+            warning: '',
+            info: ''
+          };
+          const convertLogs = util.convertLog(rst.log);
+          Object.keys(convertLogs).forEach((key) => {
+            if (convertLogs[key]) {
+              log[key] += convertLogs[key] + '\n';
+            }
+          });
+          this.script.status = option.status;
+          this.script.log = log;
+          this.script.logLine = rst.fromLine;
+          // 把新创建的scriptViewState挂到script对象上
+          this.script.scriptViewState = { ...this.scriptViewState };
+        }
+      } catch (error) {
+        console.error(error)
       }
     },
     async getResult(option) {
@@ -1293,6 +1308,9 @@ export default {
         path: option.resultLocation,
       }, 'get');
       if (rst.dirFileTrees) {
+        if (['Succeed','Failed','Cancelled'].indexOf(this.script.status) < 0) {
+          return
+        }
         // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
         this.script.resultSet = 0
         this.script.resultList = rst.dirFileTrees.children.sort((a, b) => parseInt(a.name, 10) - parseInt(b.name,

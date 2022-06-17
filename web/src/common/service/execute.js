@@ -288,7 +288,7 @@ Execute.prototype.queryLog = function() {
     .then((rst) => {
       this.fromLine = rst.fromLine;
       this.handleLines = this.handleLines || {}
-      if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) { 
+      if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) {
         return  Promise.resolve();
       } else if(this.fromLine) {
         this.handleLines[fromLine+'_'+this.fromLine] = 1
@@ -376,6 +376,7 @@ Execute.prototype.getFirstResult = function() {
       taskID: this.taskID,
       status: this.status,
     });
+    const pageSize = 5000;
     let params = {
       path: this.currentResultPath,
       pageSize,
@@ -385,7 +386,7 @@ Execute.prototype.getFirstResult = function() {
       params.taskId = this.taskID
     }
     const url = `/${this.getResultUrl}/openFile`;
-    const pageSize = 5000;
+
     api.fetch(url, params, 'get')
       .then((rst) => {
         this.trigger('result', rst);

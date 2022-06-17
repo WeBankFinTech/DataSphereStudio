@@ -192,6 +192,7 @@ export default {
       this.dispatch('Workbench:add', {
         id: md5Id, // 唯一标识，就算文件名修改，它都能标识它是它
         taskID: params.row.taskID,
+        execID: params.row.execID,
         filename: name,
         filepath: '',
         // saveAs表示临时脚本，需要关闭或保存时另存

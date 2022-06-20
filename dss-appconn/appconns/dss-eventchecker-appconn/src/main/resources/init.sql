@@ -30,7 +30,7 @@ VALUES ('eventchecker', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.e
 select @eventchecker_appconnId:=id from `dss_appconn` where `appconn_name` = 'eventchecker';
 
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
-VALUES (@eventchecker_appconnId, 'DEV', 'eventchecker', '', '');
+VALUES (@eventchecker_appconnId, 'DEV', 'eventchecker', '{\"msg.eventchecker.jdo.option.name\": \"msg\",\"msg.eventchecker.jdo.option.url\": \"EVENTCHECKER_JDBC_URL\",\"msg.eventchecker.jdo.option.username\": \"EVENTCHECKER_JDBC_USERNAME\",\"msg.eventchecker.jdo.option.password\": \"EVENTCHECKER_JDBC_PASSWORD\"}', '');
 
 insert into `dss_workflow_node` (`name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`)
 values('eventsender','eventchecker','linkis.appconn.eventchecker.eventsender','0','0','1','1','0','icons/eventsender.icon');

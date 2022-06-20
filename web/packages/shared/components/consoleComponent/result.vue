@@ -134,7 +134,6 @@
 import util from '@dataspherestudio/shared/common/util';
 import Table from '@dataspherestudio/shared/components/virtualTable';
 import WbTable from '@dataspherestudio/shared/components/table';
-import WeWaterMask from '@dataspherestudio/shared/components/watermark';
 import WeToolbar from './toolbar.vue';
 import resultSetList from './resultSetList.vue';
 import filter from './filter.vue';
@@ -152,7 +151,6 @@ export default {
     WbTable,
     WeTable: Table.WeTable,
     WeToolbar,
-    WeWaterMask,
     resultSetList,
     WeFilterView: filter,
   },

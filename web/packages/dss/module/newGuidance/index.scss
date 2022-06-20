@@ -312,12 +312,13 @@
 
     .item3 {
         display   : inline-block;
-        margin-top: 97px;
+        margin-top: 153px;
 
         .dashed {
             width : 65px;
             height: 54px;
             border: 2px dashed #ffffff;
+            margin-right: 27px;
         }
 
         .block1 {
@@ -746,8 +747,8 @@
 // 第七步
 #mask7 {
     position      : fixed;
-    right         : 0;
-    bottom        : 158px;
+    right         : 27px;
+    bottom        : 103px;
     z-index       : 1003;
     display       : flex;
     flex-direction: column;

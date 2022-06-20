@@ -265,11 +265,13 @@
 }
 
 .footerSuspension {
-    position: fixed;
+    position: absolute;
     bottom  : 0;
     right   : 0;
     z-index : 1003;
     display : flex;
+    width: 383px;
+    height: 250px;
 
     .item1 {
 
@@ -290,7 +292,7 @@
 
         .desc2 {
             width        : 200px;
-            margin-top   : 61px;
+            margin-top   : 65px;
             margin-bottom: 130px;
         }
     }
@@ -311,18 +313,15 @@
     }
 
     .item3 {
+        position: relative;
+        bottom: -48px;
         display   : inline-block;
-        margin-top: 153px;
 
         .dashed {
             width : 65px;
-            height: 54px;
+            height: 64px;
             border: 2px dashed #ffffff;
             margin-right: 27px;
-        }
-
-        .block1 {
-            margin-bottom: 7px;
         }
     }
 }

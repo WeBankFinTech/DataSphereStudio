@@ -8,7 +8,8 @@ VALUES ('sendemail', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.send
 select @sendemail_appconnId:=id from `dss_appconn` where `appconn_name` = 'sendemail';
 
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
-VALUES (@sendemail_appconnId, 'DEV', 'sendemail', '', '');
+VALUES (@sendemail_appconnId, 'DEV', 'sendemail', '{"email.host":"EMAIL_HOST","email.port":"EMAIL_PORT","email.username":"EMAIL_USERNAME","email.password":"EMAIL_PASSWORD","email.protocol":"EMAIL_PROTOCOL"}', '');
+
 
 insert into `dss_workflow_node` (`name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`)
 values('sendemail','sendemail','linkis.appconn.sendemail','0','0','1','1','0','icons/sendemail.icon');

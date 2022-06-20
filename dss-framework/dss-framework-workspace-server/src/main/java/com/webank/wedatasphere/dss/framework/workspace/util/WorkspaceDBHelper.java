@@ -192,42 +192,30 @@ public class WorkspaceDBHelper {
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()),
                 getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()),
-                getAppConnIdByName(CommonAppConnEnum.VISUALIS.getName()), 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()),
                 getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //运维
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()),
                 getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()),
-                getAppConnIdByName(CommonAppConnEnum.VISUALIS.getName()), 1, updateTime, username));
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()),
                 getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //开发人员
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()),
                 getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()),
-                getAppConnIdByName(CommonAppConnEnum.VISUALIS.getName()), 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()),
                 getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //分析人员
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                 getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
-                getAppConnIdByName(CommonAppConnEnum.VISUALIS.getName()), 1, updateTime, username));
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                 getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //运营人员
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()),
                 getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()),
-                getAppConnIdByName(CommonAppConnEnum.VISUALIS.getName()), 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()),
                 getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //领导
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()),
                 getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()),
-                getAppConnIdByName(CommonAppConnEnum.VISUALIS.getName()), 1, updateTime, username));
         dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()),
                 getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
 

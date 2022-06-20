@@ -100,6 +100,7 @@
 </template>
 <script>
 import directoryDialog from '@dataspherestudio/shared/components/directoryDialog/index.vue';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 export default {
   name: 'NewDialog',
   components: {
@@ -203,17 +204,9 @@ export default {
       return `${this.$t('message.scripts.constants.rename')}${this.type}`;
     },
     scriptHelpLink() {
-      const linkmap = {
-        Scala: '/_book/知识库/语言教程/使用案例/Scala脚本案例.html',
-        Hive: '/_book/知识库/语言教程/使用案例/Hive脚本案例.html',
-        Sparksql: '/_book/知识库/语言教程/使用案例/SparkSql脚本案例.html',
-        Python: '/_book/知识库/语言教程/使用案例/Python脚本案例.html',
-        PythonSpark: '/_book/知识库/语言教程/使用案例/PySpark脚本案例.html',
-        Shell: '/_book/知识库/语言教程/使用案例/shell脚本案例.html',
-        mllab: '/_book/知识库/语言教程/使用案例/Mllab使用案例.html'
-      }
+      const baseinfo = storage.get("baseInfo", "local") || {}
       const item = this.scriptType.find((o) => o.scriptType === this.newForm.scriptType);
-      return item ? linkmap[item.label] || '' : ''
+      return item ? baseinfo[item.label+'UsageGuide'] || '' : ''
     }
   },
   methods: {

@@ -37,7 +37,7 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
   override def receiveAndReply(message: Any, sender: Sender): Any = message match {
 
     case reqCreateFlow: RequestCreateWorkflow =>
-      val dssFlow = workflowManager.createWorkflow(reqCreateFlow.getUserName, reqCreateFlow.getWorkflowName,
+      val dssFlow = workflowManager.createWorkflow(reqCreateFlow.getUserName, reqCreateFlow.getProjectId, reqCreateFlow.getWorkflowName,
         reqCreateFlow.getContextIDStr, reqCreateFlow.getDescription,
         reqCreateFlow.getParentFlowID, reqCreateFlow.getUses,
         reqCreateFlow.getLinkedAppConnNames, reqCreateFlow.getDssLabels, reqCreateFlow.getOrcVersion,

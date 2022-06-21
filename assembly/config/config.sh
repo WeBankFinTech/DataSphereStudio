@@ -18,17 +18,9 @@ EUREKA_PORT=20303
 EUREKA_USERNAME=
 EUREKA_PASSWORD=
 
-### Specifies the user workspace, which is used to store the user's script files and log files.
-### Generally local directory
-WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
-### Path to store job ResultSet file or hdfs path
-RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 ### Linkis Gateway  information
 GATEWAY_INSTALL_IP=127.0.0.1
 GATEWAY_PORT=9001
-
-#for azkaban
-WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler
 
 ################### The install Configuration of all Micro-Services #####################
 #
@@ -72,14 +64,16 @@ DSS_GUIDE_SERVER_INSTALL_IP=127.0.0.1
 DSS_GUIDE_SERVER_PORT=9210
 
 ############## ############## dss_appconn_instance configuration   start   ############## ##############
+####eventchecker表的地址，一般就是dss数据库
 EVENTCHECKER_JDBC_URL="jdbc:mysql://127.0.0.1:3306/dss_linkis?characterEncoding=UTF-8"
 EVENTCHECKER_JDBC_USERNAME=hadoop
 EVENTCHECKER_JDBC_PASSWORD=hadoop
 
+#### hive地址
 DATACHECKER_JOB_JDBC_URL="jdbc:mysql://127.0.0.1:3306/hive_gz_bdap_test_01?useUnicode=true"
 DATACHECKER_JOB_JDBC_USERNAME=hadoop
 DATACHECKER_JOB_JDBC_PASSWORD=hadoop
-
+#### 元数据库，可配置成和DATACHECKER_JOB的一致
 DATACHECKER_BDP_JDBC_URL="jdbc:mysql://127.0.0.1:3306/uat2_metastore?characterEncoding=UTF-8"
 DATACHECKER_BDP_JDBC_USERNAME=hadoop
 DATACHECKER_BDP_JDBC_PASSWORD=hadoop

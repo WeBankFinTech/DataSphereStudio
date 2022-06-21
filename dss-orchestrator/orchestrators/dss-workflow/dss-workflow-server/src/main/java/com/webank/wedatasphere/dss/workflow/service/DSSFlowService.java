@@ -38,7 +38,7 @@ public interface DSSFlowService {
      * 通过flowID获取最新版本的dwsFlow，版本信息在latestVersion
      * @return
      */
-    DSSFlow getFlow(Long flowId) throws DSSErrorException;
+    DSSFlow getFlow(Long flowId);
 
     void updateFlowBaseInfo(DSSFlow dssFlow) throws DSSErrorException;
 
@@ -52,8 +52,6 @@ public interface DSSFlowService {
                     String workspaceName,
                     String projectName
     ) throws DSSErrorException;
-
-    Integer getParentRank(Long flowId);
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,

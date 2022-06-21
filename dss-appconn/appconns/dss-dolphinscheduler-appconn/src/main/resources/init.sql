@@ -22,3 +22,7 @@ delete from dss_workspace_dictionary where dic_key = "pom_work_flow_ds";
 delete from dss_workspace_dictionary where dic_key = "pom_work_flow_ds_DAG";
 insert  into `dss_workspace_dictionary`(`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (0,'p_orchestrator_mode','DS工作流','Workflow_DS','pom_work_flow_ds','radio',NULL,NULL,NULL,NULL,0,'gongzuoliu-icon',1,'工程编排模式-DS工作流','SYSTEM','2022-03-21 14:25:35',NULL,'2022-03-21 14:25:35');
 insert  into `dss_workspace_dictionary`(`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (0,'pom_work_flow_ds','DAG','DAG','pom_work_flow_ds_DAG',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-DS工作流-DAG','SYSTEM','2022-03-21 14:25:35',NULL,'2022-03-21 14:25:35');
+
+INSERT INTO dss_workspace_dictionary
+(workspace_id, parent_key, dic_name, dic_name_en, dic_key, dic_value, dic_value_en, title, title_en, url, url_type, icon, order_num, remark, create_user, create_time, update_user, update_time)
+VALUES(0, 'p_develop_process', '调度中心', 'Scheduler Center', 'pdp_scheduler_center', 'scheduler', NULL, NULL, NULL, NULL, 0, 'kaifa-icon', 1, '工程开发流程-调度中心', 'SYSTEM', '2020-12-28 17:32:35.0', NULL, '2021-02-22 17:49:02.0');

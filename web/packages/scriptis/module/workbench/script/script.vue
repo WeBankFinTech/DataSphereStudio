@@ -1318,6 +1318,7 @@ export default {
         if (this.script.resultList.length) {
           const currentResultPath = rst.dirFileTrees.children[0].path;
           const url2 = `/filesystem/openFile`;
+          if (!currentResultPath) return
           api.fetch(url2, {
             path: currentResultPath,
             page: 1,

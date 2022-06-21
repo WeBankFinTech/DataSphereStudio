@@ -2,6 +2,7 @@
   <div class="dynamic-form">
     <div class="dynamic-form-header-wrap">
       <h4 class="dynamic-form-header-title">{{ title }}</h4>
+      <a target="_blank" href="/_book/知识库/用户手册/Scriptis/Scriptis自定义参数使用指引.html">使用帮助</a>
     </div>
     <Form ref="dynamicForm" :model="formDynamic" class="dynamic-form-content">
       <FormItem v-for="(item, index) in formDynamic.list" :key="index">

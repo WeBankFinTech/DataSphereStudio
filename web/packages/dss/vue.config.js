@@ -22,9 +22,12 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const VirtualModulesPlugin = require('webpack-virtual-modules');
 const webpack = require("webpack");
-const { apps, exts, conf} = require('../../config.json')
+const { apps, exts, conf, version } = require('../../config.json')
 const child_process = require('child_process');
 
+if (version) {
+  process.env.VUE_APP_VERSION = version
+}
 // 指定module打包, 不指定则打包全部子应用
 // npm run serve --module=scriptis
 let modules = process.env.npm_config_module || ''

@@ -14,15 +14,10 @@ DSS_FILE_NAME="dss-$DSS_VERSION"
 ###  Linkis EUREKA  information.  # Microservices Service Registration Discovery Center
 EUREKA_INSTALL_IP=127.0.0.1
 EUREKA_PORT=20303
-### If EUREKA  has no safety verification, please do not fill in
-EUREKA_USERNAME=
-EUREKA_PASSWORD=
+### If EUREKA  has safety verification, please fill in username and password
+#EUREKA_USERNAME=
+#EUREKA_PASSWORD=
 
-### Specifies the user workspace, which is used to store the user's script files and log files.
-### Generally local directory
-WORKSPACE_USER_ROOT_PATH=file:///tmp/linkis/
-### Path to store job ResultSet file or hdfs path
-RESULT_SET_ROOT_PATH=hdfs:///tmp/linkis
 ### Linkis Gateway  information
 GATEWAY_INSTALL_IP=127.0.0.1
 GATEWAY_PORT=9001
@@ -72,9 +67,9 @@ DSS_GUIDE_SERVER_INSTALL_IP=127.0.0.1
 DSS_GUIDE_SERVER_PORT=9210
 
 ############## ############## dss_appconn_instance configuration   start   ############## ##############
-EVENTCHECKER_JDBC_URL="jdbc:mysql://127.0.0.1:3306/dss_linkis?characterEncoding=UTF-8"
-EVENTCHECKER_JDBC_USERNAME=hadoop
-EVENTCHECKER_JDBC_PASSWORD=hadoop
+EVENTCHECKER_JDBC_URL="jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DB?characterEncoding=UTF-8"
+EVENTCHECKER_JDBC_USERNAME=$MYSQL_USER
+EVENTCHECKER_JDBC_PASSWORD=$MYSQL_PASSWORD
 
 DATACHECKER_JOB_JDBC_URL="jdbc:mysql://127.0.0.1:3306/hive_gz_bdap_test_01?useUnicode=true"
 DATACHECKER_JOB_JDBC_USERNAME=hadoop

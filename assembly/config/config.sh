@@ -22,9 +22,6 @@ EUREKA_PORT=20303
 GATEWAY_INSTALL_IP=127.0.0.1
 GATEWAY_PORT=9001
 
-#for azkaban
-WDS_SCHEDULER_PATH=file:///appcom/tmp/wds/scheduler
-
 ################### The install Configuration of all Micro-Services #####################
 #
 #    NOTICE:
@@ -67,14 +64,16 @@ DSS_GUIDE_SERVER_INSTALL_IP=127.0.0.1
 DSS_GUIDE_SERVER_PORT=9210
 
 ############## ############## dss_appconn_instance configuration   start   ############## ##############
+####eventchecker表的地址，一般就是dss数据库
 EVENTCHECKER_JDBC_URL="jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DB?characterEncoding=UTF-8"
 EVENTCHECKER_JDBC_USERNAME=$MYSQL_USER
 EVENTCHECKER_JDBC_PASSWORD=$MYSQL_PASSWORD
 
+#### hive地址
 DATACHECKER_JOB_JDBC_URL="jdbc:mysql://127.0.0.1:3306/hive_gz_bdap_test_01?useUnicode=true"
 DATACHECKER_JOB_JDBC_USERNAME=hadoop
 DATACHECKER_JOB_JDBC_PASSWORD=hadoop
-
+#### 元数据库，可配置成和DATACHECKER_JOB的一致
 DATACHECKER_BDP_JDBC_URL="jdbc:mysql://127.0.0.1:3306/uat2_metastore?characterEncoding=UTF-8"
 DATACHECKER_BDP_JDBC_USERNAME=hadoop
 DATACHECKER_BDP_JDBC_PASSWORD=hadoop

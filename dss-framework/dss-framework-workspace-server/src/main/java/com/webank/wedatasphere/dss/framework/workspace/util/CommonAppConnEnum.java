@@ -6,8 +6,7 @@ public enum CommonAppConnEnum {
      * 需要和dss_appconn插入的name一致
      */
     WORKFLOW("workflow"),
-    SCRIPTIS("scriptis"),
-    VISUALIS("visualis");
+    SCRIPTIS("scriptis");
 
     private String name;
 

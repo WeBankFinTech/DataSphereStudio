@@ -1,11 +1,11 @@
 <template>
-  <div 
-    class="waterMask" 
+  <div
+    class="waterMask"
     ref="root">
-    <canvas 
-      ref="single" 
+    <canvas
+      ref="single"
       class="single"/>
-    <canvas 
+    <canvas
       ref="repeat" />
   </div>
 </template>
@@ -13,8 +13,8 @@
 export default {
   props: {
     text: {
-      type: String,
-      default: '', 
+      type: [String, Function],
+      default: '',
     },
   },
   data() {
@@ -23,6 +23,11 @@ export default {
       repeat: null,
       root: null,
     };
+  },
+  watch: {
+    text(v) {
+      this.updateCanvas(v)
+    }
   },
   mounted() {
     this.single = this.$refs.single;
@@ -43,7 +48,10 @@ export default {
       singleCtx.font = '12px 宋体';
       singleCtx.rotate(-10 * Math.PI / 180);
       singleCtx.fillStyle = 'rgba(0,0,0,0.2)';
-      singleCtx.fillText(text, 10, 85); 
+      if (typeof text === 'function') {
+        text = text()
+      }
+      singleCtx.fillText(text, 10, 85);
     },
     generateRepeat() {
       const root = this.root;
@@ -54,8 +62,8 @@ export default {
       repeat.height = h;
       const repeatCtx = repeat.getContext('2d');
       repeatCtx.clearRect(0, 0, w, h);
-      const pat = repeatCtx.createPattern(this.single, 'repeat'); 
-      repeatCtx.fillStyle = pat;  
+      const pat = repeatCtx.createPattern(this.single, 'repeat');
+      repeatCtx.fillStyle = pat;
       repeatCtx.fillRect(0, 0, w, h);
     },
     updateCanvas(text) {

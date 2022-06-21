@@ -1304,13 +1304,13 @@ export default {
     },
     async getResult(option) {
       const url1 = `/filesystem/getDirFileTrees`;
+      if (['Succeed','Failed','Cancelled'].indexOf(this.script.status) < 0) {
+        return
+      }
       const rst = await api.fetch(url1, {
         path: option.resultLocation,
       }, 'get');
       if (rst.dirFileTrees) {
-        if (['Succeed','Failed','Cancelled'].indexOf(this.script.status) < 0) {
-          return
-        }
         // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
         this.script.resultSet = 0
         this.script.resultList = rst.dirFileTrees.children.sort((a, b) => parseInt(a.name, 10) - parseInt(b.name,
@@ -1318,6 +1318,7 @@ export default {
         if (this.script.resultList.length) {
           const currentResultPath = rst.dirFileTrees.children[0].path;
           const url2 = `/filesystem/openFile`;
+          if (!currentResultPath) return
           api.fetch(url2, {
             path: currentResultPath,
             page: 1,

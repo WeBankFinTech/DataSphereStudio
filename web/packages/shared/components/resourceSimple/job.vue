@@ -98,21 +98,11 @@ export default {
     },
   },
   methods: {
-    getJobCat() {
-      return api.fetch('/configuration/getCategory', {
-      }, 'get').then(res => {
-        if (res && res.Category) {
-          return res.Category.map(it => it.categoryName)
-        }
-        return []
-      })
-    },
     async getJobList() {
       if (this.loading) return;
       this.jobList = [];
       this.loading = true;
       try {
-        this.jobTypeList = await this.getJobCat()
         const rst = await api.fetch('/jobhistory/list', {
           pageSize: 100,
           status: 'Running,Inited,Scheduled',
@@ -123,6 +113,9 @@ export default {
         rst.tasks.forEach((item) => {
           const tmpItem = Object.assign({}, item, { isActive: false, fileName: this.convertJson(item) });
           this.jobList.push(tmpItem);
+          if (this.jobTypeList.indexOf(item.requestApplicationName) < 0) {
+            this.jobTypeList.push(item.requestApplicationName)
+          }
         });
         this.jobList = orderBy(this.jobList, ['status', 'fileName']);
         this.$emit('update-job', rst.tasks.length);

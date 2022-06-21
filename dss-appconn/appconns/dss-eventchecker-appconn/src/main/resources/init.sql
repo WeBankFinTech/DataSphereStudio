@@ -61,6 +61,10 @@ select @eventchecker_node_ui_lable_name_7:=id from `dss_workflow_node_ui` where 
 select @eventchecker_node_ui_lable_name_8:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.name' limit 1;
 select @eventchecker_node_ui_lable_name_9:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.body' limit 1;
 select @eventchecker_node_ui_lable_name_10:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.type' limit 1;
+
+select @receiver_node_ui_lable_name_1:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.type' order by id desc limit 1;
+select @receiver_node_ui_lable_name_2:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.topic' order by id desc limit 1;
+select @receiver_node_ui_lable_name_3:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.name' order by id desc limit 1;
 -- eventreceiver ui
 select @eventchecker_node_ui_lable_name_11:=id from `dss_workflow_node_ui` where `lable_name` = 'max.receive.hours' limit 1;
 select @eventchecker_node_ui_lable_name_12:=id from `dss_workflow_node_ui` where `lable_name` = 'query.frequency' limit 1;
@@ -84,9 +88,9 @@ INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@event
 INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_3);
 INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_4);
 INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_5);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_7);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_8);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_10);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @receiver_node_ui_lable_name_2);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @receiver_node_ui_lable_name_3);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @receiver_node_ui_lable_name_1);
 INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_11);
 INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_12);
 INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_13);

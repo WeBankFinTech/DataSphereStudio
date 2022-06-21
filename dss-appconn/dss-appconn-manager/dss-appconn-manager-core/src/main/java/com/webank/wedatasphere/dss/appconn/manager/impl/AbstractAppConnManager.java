@@ -63,7 +63,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     }
 
     public static AppConnManager getAppConnManager() {
-        if (appConnManager != null && ((AbstractAppConnManager) appConnManager).isLoaded) {
+        if (appConnManager != null) {
             return appConnManager;
         }
         synchronized (AbstractAppConnManager.class) {
@@ -71,10 +71,6 @@ public abstract class AbstractAppConnManager implements AppConnManager {
                 appConnManager = ClassUtils.getInstanceOrDefault(AppConnManager.class, new AppConnManagerImpl());
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
-            } else {
-                if (!((AbstractAppConnManager) appConnManager).isLoaded) {
-                    appConnManager.init();
-                }
             }
         }
         return appConnManager;

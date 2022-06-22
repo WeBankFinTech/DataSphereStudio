@@ -34,9 +34,18 @@ public interface ThirdlyRequestRef {
     class CopyRequestRefImpl extends DevelopmentRequestRefImpl<CopyRequestRefImpl>
             implements CopyRequestRef<CopyRequestRefImpl>, ProjectRefRequestRef<CopyRequestRefImpl> {}
 
+    class CopyWithDSSJobContentRequestRefImpl extends DevelopmentRequestRefImpl<CopyWithDSSJobContentRequestRefImpl>
+            implements CopyRequestRef<CopyWithDSSJobContentRequestRefImpl>, ProjectRefRequestRef<CopyWithDSSJobContentRequestRefImpl>,
+            DSSJobContentRequestRef<CopyWithDSSJobContentRequestRefImpl> {}
+
     class CopyWitContextRequestRefImpl extends DevelopmentRequestRefImpl<CopyWitContextRequestRefImpl>
             implements CopyRequestRef<CopyWitContextRequestRefImpl>, ProjectRefRequestRef<CopyWitContextRequestRefImpl>,
             DSSContextRequestRef<CopyWitContextRequestRefImpl> {}
+
+    class CopyWitContextAndDSSJobContentRequestRefImpl extends DevelopmentRequestRefImpl<CopyWitContextAndDSSJobContentRequestRefImpl>
+            implements CopyRequestRef<CopyWitContextAndDSSJobContentRequestRefImpl>,
+            DSSContextRequestRef<CopyWitContextAndDSSJobContentRequestRefImpl>, ProjectRefRequestRef<CopyWitContextAndDSSJobContentRequestRefImpl>,
+            DSSJobContentRequestRef<CopyWitContextAndDSSJobContentRequestRefImpl>{}
 
     class ImportRequestRefImpl extends DevelopmentRequestRefImpl<ImportRequestRefImpl>
             implements ImportRequestRef<ImportRequestRefImpl>, ProjectRefRequestRef<ImportRequestRefImpl> {}
@@ -75,4 +84,12 @@ public interface ThirdlyRequestRef {
     class QueryJumpUrlWithContextRequestRefImpl extends DevelopmentRequestRefImpl<QueryJumpUrlWithContextRequestRefImpl>
             implements QueryJumpUrlRequestRef<QueryJumpUrlWithContextRequestRefImpl>, ProjectRefRequestRef<QueryJumpUrlWithContextRequestRefImpl>,
             DSSContextRequestRef<QueryJumpUrlWithContextRequestRefImpl> {}
+
+    class QueryJumpUrlWithDSSJobContentRequestRefImpl extends DevelopmentRequestRefImpl<QueryJumpUrlWithDSSJobContentRequestRefImpl>
+            implements QueryJumpUrlRequestRef<QueryJumpUrlWithDSSJobContentRequestRefImpl>, ProjectRefRequestRef<QueryJumpUrlWithDSSJobContentRequestRefImpl>,
+            DSSJobContentRequestRef<QueryJumpUrlWithDSSJobContentRequestRefImpl>{}
+
+    class QueryJumpUrlWithContextAndDSSJobContentRequestRefImpl extends DevelopmentRequestRefImpl<QueryJumpUrlWithContextAndDSSJobContentRequestRefImpl>
+            implements QueryJumpUrlRequestRef<QueryJumpUrlWithContextAndDSSJobContentRequestRefImpl>, ProjectRefRequestRef<QueryJumpUrlWithContextAndDSSJobContentRequestRefImpl>,
+            DSSContextRequestRef<QueryJumpUrlWithContextAndDSSJobContentRequestRefImpl>, DSSJobContentRequestRef<QueryJumpUrlWithContextAndDSSJobContentRequestRefImpl> {}
 }

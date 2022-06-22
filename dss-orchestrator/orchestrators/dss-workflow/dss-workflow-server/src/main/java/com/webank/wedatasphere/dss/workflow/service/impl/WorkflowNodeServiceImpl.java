@@ -138,12 +138,15 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         return DevelopmentOperationUtils.tryDevelopmentOperation(() -> developmentServiceFunction.apply(appConn, node.getDssLabels()),
                 developmentOperationFunction,
                 dssJobContentRequestRef -> {
-                    dssJobContentRequestRef.setDSSJobContent(new HashMap<>(node.getParams()));
+                    dssJobContentRequestRef.setDSSJobContent(new HashMap<>());
                     String orcVersion;
                     try {
                         orcVersion = getOrcVersion(node.getFlowId());
                     } catch (Exception e) {
                         throw new ExternalOperationFailedException(50205, "get workflow version failed.", e);
+                    }
+                    if(node.getParams() != null) {
+                        dssJobContentRequestRef.getDSSJobContent().putAll(node.getParams());
                     }
                     dssJobContentRequestRef.getDSSJobContent().put(DSSJobContentConstant.ORC_VERSION_KEY, orcVersion);
                     dssJobContentRequestRef.getDSSJobContent().put(DSSJobContentConstant.ORCHESTRATION_ID, node.getFlowId());

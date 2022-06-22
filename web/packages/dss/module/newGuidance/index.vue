@@ -397,8 +397,6 @@ export default {
         this.currentStep += 1;
       } else if (this.currentStep === 7) {
         this.currentStep += 1;
-        this.$parent.$refs.layoutFooter.toggleGuide();
-        this.$parent.$refs.layoutFooter.$refs.Guide.flag = false;
       } else if (this.currentStep === 8) {
         navM.addEventListener(
           "click",

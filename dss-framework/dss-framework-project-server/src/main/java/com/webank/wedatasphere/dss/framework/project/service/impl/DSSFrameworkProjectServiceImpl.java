@@ -256,7 +256,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                 StructureOperationUtils.tryProjectOperation(() -> ((OnlyStructureAppConn) key).getOrCreateStructureStandard().getProjectService(appInstance),
                         ProjectService::getProjectDeletionOperation, null,
                         refProjectContentRequestRef -> refProjectContentRequestRef.setRefProjectId(projectMap.get(appInstance))
-                                .setProjectName(dssProjectCreateRequest.getName()).setWorkspace(workspace),
+                                .setProjectName(dssProjectCreateRequest.getName()).setWorkspace(workspace).setUserName(username),
                         (structureOperation, structureRequestRef) -> ((ProjectDeletionOperation) structureOperation).deleteProject((RefProjectContentRequestRef) structureRequestRef),
                         "delete refProject " + dssProjectCreateRequest.getName());
             }));

@@ -1,38 +1,34 @@
 <template>
   <div class="layout">
     <router-view/>
-    <div v-if="watermark.show" id="watermark"></div>
+    <water-mark
+      v-if="watermark.show"
+      :text="waterMarkText"
+      ref="watermask"></water-mark>
   </div>
 </template>
 <script>
 import elementResizeEvent from '@dataspherestudio/shared/common/helper/elementResizeEvent';
-import WaterMark from '@dataspherestudio/shared/components/watermark/watermark';
+import WaterMark from '@dataspherestudio/shared/components/watermark';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import moment from 'moment'
 
 export default {
   name: 'App',
+  components: {
+    WaterMark
+  },
   data() {
     return {
-      watermark: {}
+      watermark: {},
+      waterMarkText: ''
     }
   },
   mounted() {
     this.watermark = this.$APP_CONF.watermark || { template: '', show: false }
-    if (this.watermark.show) {
-      this.resizeWaterMark();
-      elementResizeEvent.bind(this.$el, this.resizeWaterMark);
-    }
+    this.getMaskText()
   },
   methods: {
-    resizeWaterMark() {
-      new WaterMark(this.$el.querySelector('#watermark'), {
-        text: this.getMaskText,
-        fontSize: 14,
-        color: localStorage.getItem('theme')==='dark' ? '#eee' : '#000',
-        timeupdate: this.watermark.timeupdate
-      })
-    },
     getUserName() {
       return storage.get("baseInfo", "local")
         ? storage.get("baseInfo", "local").username
@@ -43,9 +39,15 @@ export default {
         username: this.getUserName(),
         time: moment(new Date()).format("YYYY-MM-DD HH:mm")
       }
-      return this.watermark.template.replace(/\$\{([^}]*)}/g, function (a, b) {
+      this.waterMarkText = this.watermark.template.replace(/\$\{([^}]*)}/g, function (a, b) {
         return obj[b]
       })
+      if (this.watermark.timeupdate) {
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
+          this.getMaskText()
+        }, this.watermark.timeupdate)
+      }
     },
   },
   beforeDestroy() {

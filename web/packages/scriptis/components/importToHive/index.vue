@@ -34,6 +34,7 @@
           <!-- <p v-if="!isXlsType" class="step-form-title">{{ $t('message.scripts.importToHive.LY') }}</p> -->
           <FormItem
             :label="$t('message.scripts.importToHive.LX')"
+            v-show="!hideDir"
           >
             <Select
               v-model="firstStep.type"

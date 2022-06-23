@@ -59,7 +59,7 @@ import static com.webank.wedatasphere.dss.framework.project.utils.ProjectOperati
 
 public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSFrameworkProjectServiceImpl.class);
-    public static final int MAX_PROJECT_NAME_SIZE = 64;
+    public static final int MAX_PROJECT_NAME_SIZE = 150;
     public static final int MAX_PROJECT_DESC_SIZE = 2048;
     @Autowired
     private DSSProjectService dssProjectService;
@@ -256,7 +256,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                 StructureOperationUtils.tryProjectOperation(() -> ((OnlyStructureAppConn) key).getOrCreateStructureStandard().getProjectService(appInstance),
                         ProjectService::getProjectDeletionOperation, null,
                         refProjectContentRequestRef -> refProjectContentRequestRef.setRefProjectId(projectMap.get(appInstance))
-                                .setProjectName(dssProjectCreateRequest.getName()).setWorkspace(workspace),
+                                .setProjectName(dssProjectCreateRequest.getName()).setWorkspace(workspace).setUserName(username),
                         (structureOperation, structureRequestRef) -> ((ProjectDeletionOperation) structureOperation).deleteProject((RefProjectContentRequestRef) structureRequestRef),
                         "delete refProject " + dssProjectCreateRequest.getName());
             }));

@@ -56,7 +56,7 @@ public class WorkflowRefCreationOperation
                 dssOrchestratorInfo.getLinkedAppConnNames() : new ArrayList<>();
         String uses = dssOrchestratorInfo.getUses() != null ?
                 dssOrchestratorInfo.getUses() : "uses";
-        RequestCreateWorkflow requestCreateWorkflow = new RequestCreateWorkflow(userName, workflowName,
+        RequestCreateWorkflow requestCreateWorkflow = new RequestCreateWorkflow(userName, dssOrchestratorInfo.getProjectId(), workflowName,
                 contextId, description, parentFlowId, uses, linkedAppConnNames, dssLabels, orcVersion, schedulerAppConnName);
 
         ResponseCreateWorkflow responseCreateWorkflow = (ResponseCreateWorkflow) sender.ask(requestCreateWorkflow);

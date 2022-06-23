@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.workflow.restful;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -42,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
@@ -62,6 +64,13 @@ public class FlowRestfulApi {
     private DSSFlowService dssFlowService;
     @Autowired
     private WorkFlowManager workFlowManager;
+
+    @PostConstruct
+    public void init() {
+        LOGGER.info("First, try to load all AppConn...");
+        AppConnManager.getAppConnManager();
+        LOGGER.info("All AppConn have loaded successfully.");
+    }
 
     /**
      * 添加subflow节点
@@ -87,7 +96,7 @@ public class FlowRestfulApi {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(addFlowRequest.getLabels().getRoute()));
         String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
-        DSSFlow dssFlow = workFlowManager.createWorkflow(userName, name, contextId, description, parentFlowID,
+        DSSFlow dssFlow = workFlowManager.createWorkflow(userName, null, name, contextId, description, parentFlowID,
                 uses, new ArrayList<>(), dssLabelList, null, null);
 
         // TODO: 2019/5/16 空值校验，重复名校验
@@ -171,7 +180,6 @@ public class FlowRestfulApi {
      */
 
     @RequestMapping(value = "updateFlowBaseInfo", method = RequestMethod.POST)
-//    @ProjectPrivChecker
     public Message updateFlowBaseInfo(HttpServletRequest req, @RequestBody UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
         Long flowID = updateFlowBaseInfoRequest.getId();
         String name = updateFlowBaseInfoRequest.getName();
@@ -224,7 +232,6 @@ public class FlowRestfulApi {
     }
 
     @RequestMapping(value = "deleteFlow", method = RequestMethod.POST)
-//    @ProjectPrivChecker
     public Message deleteFlow(HttpServletRequest req, @RequestBody DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
         Long flowID = deleteFlowRequest.getId();
         boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure().booleanValue();

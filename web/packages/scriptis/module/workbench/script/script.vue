@@ -1008,7 +1008,7 @@ export default {
       clearTimeout(this.autoSaveTimer);
       if (!this.work.saveAs && this.work && this.work.data) {
         this.autoSaveTimer = setTimeout(() => {
-          this.save();
+          this.save(true);
         }, 1000 * 60 * 5);
       }
     },
@@ -1070,7 +1070,7 @@ export default {
           this.work.unsave = true;
         });
     },
-    async save() {
+    async save(auto) {
       if (this.node && Object.keys(this.node).length > 0) {
         this.nodeSave();
       } else {
@@ -1128,8 +1128,10 @@ export default {
               });
             }
           }
-        } else {
+        } else if(auto !== true) {
           this.$Message.warning(this.$t('message.scripts.warning.empty'));
+        } else {
+          return
         }
         this.autoSave();
       }
@@ -1273,32 +1275,50 @@ export default {
         this.script.status = option.status;
         return;
       }
-      const url = '/filesystem/openLog';
-      const rst = await api.fetch(url, {
-        path: option.logPath,
-      }, 'get');
-      if (rst) {
-        const log = {
-          all: '',
-          error: '',
-          warning: '',
-          info: ''
-        };
-        const convertLogs = util.convertLog(rst.log);
-        Object.keys(convertLogs).forEach((key) => {
-          if (convertLogs[key]) {
-            log[key] += convertLogs[key] + '\n';
-          }
-        });
-        this.script.status = option.status;
-        this.script.log = log;
-        this.script.logLine = rst.fromLine;
-        // 把新创建的scriptViewState挂到script对象上
-        this.script.scriptViewState = { ...this.scriptViewState };
+      let params;
+      let url;
+      if (['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.script.status) === -1) {
+        url = `/entrance/${this.work.execID}/log`
+        params = {
+          fromLine: 1,
+          size: -1,
+        }
+      } else {
+        url = '/filesystem/openLog';
+        params = {
+          path: option.logPath,
+        }
+      }
+      try {
+        const rst = await api.fetch(url, params, 'get');
+        if (rst) {
+          const log = {
+            all: '',
+            error: '',
+            warning: '',
+            info: ''
+          };
+          const convertLogs = util.convertLog(rst.log);
+          Object.keys(convertLogs).forEach((key) => {
+            if (convertLogs[key]) {
+              log[key] += convertLogs[key] + '\n';
+            }
+          });
+          this.script.status = option.status;
+          this.script.log = log;
+          this.script.logLine = rst.fromLine;
+          // 把新创建的scriptViewState挂到script对象上
+          this.script.scriptViewState = { ...this.scriptViewState };
+        }
+      } catch (error) {
+        console.error(error)
       }
     },
     async getResult(option) {
       const url1 = `/filesystem/getDirFileTrees`;
+      if (['Succeed','Failed','Cancelled'].indexOf(this.script.status) < 0) {
+        return
+      }
       const rst = await api.fetch(url1, {
         path: option.resultLocation,
       }, 'get');
@@ -1310,6 +1330,7 @@ export default {
         if (this.script.resultList.length) {
           const currentResultPath = rst.dirFileTrees.children[0].path;
           const url2 = `/filesystem/openFile`;
+          if (!currentResultPath) return
           api.fetch(url2, {
             path: currentResultPath,
             page: 1,

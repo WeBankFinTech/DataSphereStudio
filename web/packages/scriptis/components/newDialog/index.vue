@@ -36,6 +36,7 @@
             :placeholder="$t('message.scripts.newDialog.placeholder')"
             style="width: 360px;"></Input>
           <span>{{ ext }}</span>
+          <a target="_blank" v-if="scriptHelpLink" style="float:right" :href="scriptHelpLink">脚本使用说明</a>
         </FormItem>
         <FormItem
           v-else
@@ -99,6 +100,7 @@
 </template>
 <script>
 import directoryDialog from '@dataspherestudio/shared/components/directoryDialog/index.vue';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 export default {
   name: 'NewDialog',
   components: {
@@ -200,6 +202,11 @@ export default {
         return `${this.$t('message.scripts.constants.add')}${this.type}`;
       }
       return `${this.$t('message.scripts.constants.rename')}${this.type}`;
+    },
+    scriptHelpLink() {
+      const baseinfo = storage.get("baseInfo", "local") || {}
+      const item = this.scriptType.find((o) => o.scriptType === this.newForm.scriptType);
+      return item ? baseinfo[item.label+'UsageGuide'] || '' : ''
     }
   },
   methods: {

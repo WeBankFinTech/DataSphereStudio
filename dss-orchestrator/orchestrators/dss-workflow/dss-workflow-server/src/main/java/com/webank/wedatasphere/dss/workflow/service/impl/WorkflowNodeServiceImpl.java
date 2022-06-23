@@ -24,7 +24,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationResponse;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.*;
 import com.webank.wedatasphere.dss.standard.app.development.ref.*;
@@ -56,6 +55,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -104,21 +104,11 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     @Override
     public Map<String, Object> createNode(String userName, CommonAppConnNode node) throws ExternalOperationFailedException {
-        String orcVersion;
-        try {
-            orcVersion = getOrcVersion(node.getFlowId());
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(50205, "get workflow version failed.", e);
-        }
         RefJobContentResponseRef responseRef = tryNodeOperation(userName, node, this::getRefCRUDService,
                 developmentService -> ((RefCRUDService) developmentService).getRefCreationOperation(),
-                (developmentOperation, developmentRequestRef) -> {
-                    DSSJobContentRequestRef requestRef = (DSSJobContentRequestRef) developmentRequestRef;
-                    requestRef.getDSSJobContent().put(DSSJobContentConstant.ORC_VERSION_KEY, orcVersion);
-                    requestRef.getDSSJobContent().put(DSSJobContentConstant.ORCHESTRATION_ID, node.getFlowId());
-                    requestRef.getDSSJobContent().put(DSSJobContentConstant.ORCHESTRATION_NAME, node.getFlowName());
-                    return ((RefCreationOperation) developmentOperation).createRef(requestRef);
-                }, (developmentRequestRef, refJobContentResponseRef) -> {
+                (developmentOperation, developmentRequestRef) ->
+                    ((RefCreationOperation) developmentOperation).createRef((DSSJobContentRequestRef) developmentRequestRef)
+                , (developmentRequestRef, refJobContentResponseRef) -> {
                     if (developmentRequestRef instanceof ProjectRefRequestRef) {
                         Long projectRefId = ((ProjectRefRequestRef) developmentRequestRef).getRefProjectId();
                         refJobContentResponseRef.getRefJobContent().put(DSSWorkFlowConstant.REF_PROJECT_ID_KEY, projectRefId);
@@ -141,9 +131,27 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         } else {
             name = node.getName();
         }
+        if(node.getProjectId() == null || node.getProjectId() <= 0) {
+            DSSFlow dssFlow = dssFlowService.getFlow(node.getFlowId());
+            node.setProjectId(dssFlow.getProjectID());
+        }
         return DevelopmentOperationUtils.tryDevelopmentOperation(() -> developmentServiceFunction.apply(appConn, node.getDssLabels()),
                 developmentOperationFunction,
-                dssJobContentRequestRef -> dssJobContentRequestRef.setDSSJobContent(node.getParams()),
+                dssJobContentRequestRef -> {
+                    dssJobContentRequestRef.setDSSJobContent(new HashMap<>());
+                    String orcVersion;
+                    try {
+                        orcVersion = getOrcVersion(node.getFlowId());
+                    } catch (Exception e) {
+                        throw new ExternalOperationFailedException(50205, "get workflow version failed.", e);
+                    }
+                    if(node.getParams() != null) {
+                        dssJobContentRequestRef.getDSSJobContent().putAll(node.getParams());
+                    }
+                    dssJobContentRequestRef.getDSSJobContent().put(DSSJobContentConstant.ORC_VERSION_KEY, orcVersion);
+                    dssJobContentRequestRef.getDSSJobContent().put(DSSJobContentConstant.ORCHESTRATION_ID, node.getFlowId());
+                    dssJobContentRequestRef.getDSSJobContent().put(DSSJobContentConstant.ORCHESTRATION_NAME, node.getFlowName());
+                },
                 refJobContentRequestRef -> {
                     refJobContentRequestRef.setRefJobContent(node.getJobContent());
                     if (refJobContentRequestRef instanceof QueryJumpUrlRequestRef) {
@@ -264,7 +272,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         }
     }
 
-    private String getOrcVersion(Long flowId) throws IOException, DSSErrorException {
+    private String getOrcVersion(Long flowId) throws IOException {
         if (flowId == null) {
             return null;
         }

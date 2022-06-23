@@ -357,16 +357,14 @@ const action = function (url, data, option) {
             title: '错误提示',
             render: (h) => {
               return h('div', {
-                class: 'g-err-msg-div',
-                style: {
-                  padding: '10px'
-                }
+                class: 'g-err-msg-div'
               }, [
                 h('div', {
                   style: {
                     'word-break': 'break-all',
-                    'margin-bottom': '20px',
-                    'text-align': 'left'
+                    'margin-bottom': '10px',
+                    'text-align': 'left',
+                    'line-height': '18px'
                   }
                 }, msg),
                 h('button', {

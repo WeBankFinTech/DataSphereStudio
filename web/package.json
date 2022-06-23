@@ -3,7 +3,7 @@
     "version": "1.1.4",
     "private": true,
     "scripts": {
-        "serve": "cd packages/dss && npm run serve",
+        "serve": "npm run postinstall && cd packages/dss && npm run serve",
         "build": "npm run postinstall && cd packages/dss && npm run build",
         "lint": "vue-cli-service lint --no-fix",
         "fix": "vue-cli-service lint --fix",

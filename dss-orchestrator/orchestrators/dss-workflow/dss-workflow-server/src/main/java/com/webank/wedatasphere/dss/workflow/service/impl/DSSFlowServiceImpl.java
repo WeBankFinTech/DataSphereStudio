@@ -43,7 +43,6 @@ import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
-import com.webank.wedatasphere.dss.workflow.io.scheduler.NodeCopyJob;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
@@ -65,13 +64,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME;
-import static com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool.nodeExportThreadPool;
 
 @Service
 public class DSSFlowServiceImpl implements DSSFlowService {
@@ -278,11 +273,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public Integer getParentRank(Long parentFlowID) {
-        return getFlowByID(parentFlowID).getRank();
-    }
-
-    @Override
     public Long getParentFlowID(Long flowID) {
         return flowMapper.getParentFlowID(flowID);
     }
@@ -478,6 +468,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 oldNode.setDssLabels(dssLabels);
                 oldNode.setFlowName(dssFlow.getName());
                 oldNode.setProjectId(dssFlow.getProjectID());
+                oldNode.setProjectName(projectName);
                 newNode.setName(oldNode.getName());
                 Map<String, Object> jobContent = workflowNodeService.copyNode(userName, newNode, oldNode, version);
                 nodeJsonMap.put("jobContent", jobContent);

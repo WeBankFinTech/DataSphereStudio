@@ -37,4 +37,6 @@ object LinkisJobTypeConf {
   val PROXY_USER = "proxy.user"
   val FLOW_SUBMIT_USER = "submit.user"
 
-  }
+  val LINKIS_VERSION = "linkis.version"
+
+}

@@ -88,6 +88,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
     @Override
     public DSSFlow createWorkflow(String userName,
+                                  Long projectId,
                                   String flowName,
                                   String contextIdStr,
                                   String description,
@@ -99,6 +100,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                   String schedulerAppConn) throws DSSErrorException, JsonProcessingException {
         DSSFlow dssFlow = new DSSFlow();
         dssFlow.setName(flowName);
+        dssFlow.setProjectID(projectId);
         dssFlow.setDescription(description);
         dssFlow.setCreator(userName);
         dssFlow.setCreateTime(new Date());
@@ -124,10 +126,11 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             dssFlow = flowService.addFlow(dssFlow, contextIdStr, orcVersion, schedulerAppConn);
         } else {
             dssFlow.setRootFlow(false);
-            Integer rank = flowService.getParentRank(parentFlowId);
-            // TODO: 2019/6/3 并发问题考虑for update
-            dssFlow.setRank(rank + 1);
+            DSSFlow parentFlow = flowService.getFlowByID(parentFlowId);
+            // TODO 并发问题考虑 for update，由于加了工作流编辑锁，暂时可忽略
+            dssFlow.setRank(parentFlow.getRank() + 1);
             dssFlow.setHasSaved(true);
+            dssFlow.setProjectID(parentFlow.getProjectID());
             dssFlow = flowService.addSubFlow(dssFlow, parentFlowId, contextIdStr, orcVersion, schedulerAppConn);
         }
         return dssFlow;

@@ -29,7 +29,7 @@ export class Work {
     // 唯一标识
     this.id = option.id;
     // 执行id
-    this.execID = null;
+    this.execID = option.execID || null;
     // 历史脚本才用得到，只/api/jobhistory/${id}/get请求使用
     this.taskID = option.taskID;
     // 文件名

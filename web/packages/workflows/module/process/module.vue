@@ -280,7 +280,7 @@
       <Form
         v-if="createNodeParamsList.length > 0"
         label-position="left"
-        :label-width="110"
+        :label-width="130"
         ref="addFlowfoForm"
         :model="clickCurrentNode"
         :rules="formRules">
@@ -944,10 +944,42 @@ export default {
     change(obj) {
       this.json = obj;
       this.changeNum++
-      if (this.changeNum > 2) {
+      const change = this.checkChange(obj)
+      this.lastObj = JSON.parse(JSON.stringify(obj))
+      if (this.changeNum > 2 && change) {
         this.heartBeat();
         this.jsonChange = true;
       }
+    },
+    checkChange(obj) {
+      // 剔除单击节点选中导致的change
+      const helpFn = function(obj = {}) {
+        const temp = { nodes: [], edges: [] }
+        if (obj.nodes) {
+          obj.nodes.forEach(item => {
+            const nodeItem = {}
+            Object.keys(item).forEach(k => {
+              if(k !== 'selected') {
+                nodeItem[k] = item[k]
+              }
+            })
+            temp.nodes.push(nodeItem)
+          })
+        }
+        if (obj.edges) {
+          obj.edges.forEach(item => {
+            const link = {}
+            Object.keys(item).forEach(k => {
+              if(k !== 'selected') {
+                link[k] = item[k]
+              }
+            })
+            temp.edges.push(link)
+          })
+        }
+        return JSON.stringify(temp)
+      }
+      return helpFn(obj) !== helpFn(this.lastObj)
     },
     initNode(arg) {
       if(this.clickCurrentNode.id === arg.id) return; // 多出点击时，避免数据初始化
@@ -1998,13 +2030,13 @@ export default {
           this.originalData = this.json;
         })
       } else {
-        const createParams = this.getCreatePrams(node);
         const params = {
           nodeType: node.type,
           projectID: +this.$route.query.projectID,
           params: {
             ...node.jobContent,
-            ...createParams
+            title: node.title,
+            desc: node.desc
           },
           labels: {
             route: this.getCurrentDsslabels()

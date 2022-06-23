@@ -38,6 +38,7 @@ object DSSDolphinSchedulerClient extends Logging {
       }
     }
     getAndSet("LINKIS_TYPE", LinkisJobTypeConf.LINKIS_TYPE)
+    getAndSet("LINKIS_VERSION", LinkisJobTypeConf.LINKIS_VERSION)
     getAndSet("RUN_DATE", LinkisJobTypeConf.RUN_DATE)
     getAndSet("CONTEXT_ID", LinkisJobExecutionConfiguration.FLOW_CONTEXTID)
     getAndSet("LINKIS_GATEWAY_URL", LinkisJobExecutionConfiguration.LINKIS_URL_1_X.key)
@@ -47,7 +48,7 @@ object DSSDolphinSchedulerClient extends Logging {
     getAndSet("JOB_COMMAND", LinkisJobTypeConf.JOB_COMMAND)
     getAndSet("JOB_RESOURCES", LinkisJobTypeConf.JOB_RESOURCES)
     getAndSet("FLOW_RESOURCES", LinkisJobTypeConf.FLOW_RESOURCES)
-    getAndSet("FLOW_PROPERTIES", LinkisJobTypeConf.FLOW_RESOURCES)
+    getAndSet("FLOW_PROPERTIES", LinkisJobTypeConf.FLOW_PROPERTIES)
     getAndSet("JOB_LABELS", LinkisJobTypeConf.JOB_LABELS)
     val job: Job = new DolphinSchedulerJobBuilder(jobProps).build()
     job.setLogObj(logObj)

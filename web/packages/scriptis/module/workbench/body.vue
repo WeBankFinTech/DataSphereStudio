@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 100%;">
+  <div style="height: 100%; overflow-y:auto">
     <scriptView
       v-if="work.type=='workspaceScript' || work.type=='hdfsScript' || work.type=='node' || work.type=='historyScript'"
       :readonly="readonly"

@@ -30,8 +30,9 @@ VALUES ('eventchecker', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.e
 select @eventchecker_appconnId:=id from `dss_appconn` where `appconn_name` = 'eventchecker';
 
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
-VALUES (@eventchecker_appconnId, 'DEV', 'eventchecker', '', '');
+VALUES (@eventchecker_appconnId, 'DEV', 'eventchecker', '{\"msg.eventchecker.jdo.option.name\": \"msg\",\"msg.eventchecker.jdo.option.url\": \"EVENTCHECKER_JDBC_URL\",\"msg.eventchecker.jdo.option.username\": \"EVENTCHECKER_JDBC_USERNAME\",\"msg.eventchecker.jdo.option.password\": \"EVENTCHECKER_JDBC_PASSWORD\"}', '');
 
+delete from dss_workflow_node where name in ('eventsender', 'eventreceiver');
 insert into `dss_workflow_node` (`name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`)
 values('eventsender','eventchecker','linkis.appconn.eventchecker.eventsender','0','0','1','1','0','icons/eventsender.icon');
 insert into `dss_workflow_node` (`name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`)
@@ -60,6 +61,10 @@ select @eventchecker_node_ui_lable_name_7:=id from `dss_workflow_node_ui` where 
 select @eventchecker_node_ui_lable_name_8:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.name' limit 1;
 select @eventchecker_node_ui_lable_name_9:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.body' limit 1;
 select @eventchecker_node_ui_lable_name_10:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.type' limit 1;
+
+select @receiver_node_ui_lable_name_1:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.type' order by id desc limit 1;
+select @receiver_node_ui_lable_name_2:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.topic' order by id desc limit 1;
+select @receiver_node_ui_lable_name_3:=id from `dss_workflow_node_ui` where `lable_name` = 'msg.name' order by id desc limit 1;
 -- eventreceiver ui
 select @eventchecker_node_ui_lable_name_11:=id from `dss_workflow_node_ui` where `lable_name` = 'max.receive.hours' limit 1;
 select @eventchecker_node_ui_lable_name_12:=id from `dss_workflow_node_ui` where `lable_name` = 'query.frequency' limit 1;
@@ -78,16 +83,16 @@ INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@event
 INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_9);
 INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_10);
 -- eventreceiver
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_1);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_2);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_3);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_4);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_5);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_7);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_8);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_10);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_11);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_12);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_13);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_14);
-INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventsender_nodeId, @eventchecker_node_ui_lable_name_15);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_1);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_2);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_3);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_4);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_5);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @receiver_node_ui_lable_name_2);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @receiver_node_ui_lable_name_3);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @receiver_node_ui_lable_name_1);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_11);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_12);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_13);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_14);
+INSERT INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@eventreceiver_nodeId, @eventchecker_node_ui_lable_name_15);

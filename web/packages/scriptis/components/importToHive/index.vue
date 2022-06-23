@@ -2,10 +2,15 @@
   <Modal
     v-model="modal.show"
     :width="modal.width"
+    :fullscreen="isFullScreen"
   >
-    <p slot="header">
-      {{$t('message.scripts.importToHive.DRWJ')}}
-    </p>
+    <div slot="header">
+      <span>{{$t('message.scripts.importToHive.DRWJ')}}</span>
+      <span @click="fullScreenModal" class="full-btn">
+        <Icon :type="isFullScreen?'md-contract':'md-expand'" />
+        {{isFullScreen?'取消全屏':'全屏展示'}}
+      </span>
+    </div>
     <!-- content -->
     <div
       class="we-import-to-hive"
@@ -29,6 +34,7 @@
           <!-- <p v-if="!isXlsType" class="step-form-title">{{ $t('message.scripts.importToHive.LY') }}</p> -->
           <FormItem
             :label="$t('message.scripts.importToHive.LX')"
+            v-show="!hideDir"
           >
             <Select
               v-model="firstStep.type"
@@ -47,10 +53,12 @@
             <directory-dialog
               :height="226"
               :tree="tree"
+              :is-hide="hideDir"
               :load-data-fn="loadDataFn"
               :filter-node="filterNode"
               :path="firstStep.exportPath"
               :fs-type="firstStep.type"
+              :is-root-default-open="true"
               @set-node="setNode"/>
           </FormItem>
           <template v-if="firstStep.exportPath && (isTxtType || isXlsType)">
@@ -437,6 +445,9 @@ export default {
       },
       lastScrollStart: 0,
       lastScrollEnd: 0,
+      isFullScreen: false,
+      directoryHeight: 280,
+      hideDir: false
     };
   },
   computed: {
@@ -503,13 +514,17 @@ export default {
       }
       this.resetSecondStep();
       this.resetFirstStep();
+      this.hideDir = false
       if (path) {
         this.firstStep.exportPath = path;
+        this.hideDir = true
       }
       this.firstStep.type = this.fsType;
       this.modal.show = true;
       this.modal.step = 0;
       this.validator.isLeaf = true;
+      this.isFullScreen = false;
+      this.directoryHeight = 280;
     },
 
     close() {
@@ -817,8 +832,25 @@ export default {
           toGetCheck(this, data);
         }, 300)
       }
-    }
+    },
+    fullScreenModal() {
+      this.isFullScreen = !this.isFullScreen
+      if (this.isFullScreen ) {
+        this.directoryHeight = window.innerHeight - 200
+      } else {
+        this.directoryHeight = 280
+      }
+    },
   },
 };
 </script>
 <style lang="scss" src="./index.scss"></style>
+<style scoped>
+.full-btn {
+  float: right;
+  margin-right: 30px;
+  padding-top: 5px;
+  cursor: pointer;
+  color: #2d8cf0
+}
+</style>

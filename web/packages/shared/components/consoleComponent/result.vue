@@ -110,10 +110,11 @@
         :list="script.resultList"
         @change="changeSet">
       </result-set-list>
-      <div class="page">
+      <div class="page"
+        v-if="resultType === '2' && !result.hugeData"
+      >
         <Page
           :transfer="true"
-          v-if="resultType === '2' && !result.hugeData"
           ref="page"
           :total="tableData.total"
           :page-size-opts="page.sizeOpts"
@@ -124,6 +125,7 @@
           show-sizer
           @on-change="change"
           @on-page-size-change="changeSize" />
+        <span v-if="tableData.total>=5000">前端只展示5000条数据</span>
       </div>
     </div>
   </div>
@@ -132,7 +134,6 @@
 import util from '@dataspherestudio/shared/common/util';
 import Table from '@dataspherestudio/shared/components/virtualTable';
 import WbTable from '@dataspherestudio/shared/components/table';
-import WeWaterMask from '@dataspherestudio/shared/components/watermark';
 import WeToolbar from './toolbar.vue';
 import resultSetList from './resultSetList.vue';
 import filter from './filter.vue';
@@ -150,7 +151,6 @@ export default {
     WbTable,
     WeTable: Table.WeTable,
     WeToolbar,
-    WeWaterMask,
     resultSetList,
     WeFilterView: filter,
   },
@@ -660,12 +660,12 @@ export default {
     align-items: center;
     justify-content: center;
     .page {
-      display: inline-block;
-      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .set {
       width: 90px;
-      // padding-right: 20px;
     }
   }
 }

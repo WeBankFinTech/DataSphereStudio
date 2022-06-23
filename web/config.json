@@ -32,6 +32,14 @@
         "zh-CN": "dataService/i18n/zh.json"
       }
     },
+    "apiServices": {
+      "routes": "apiServices/router",
+      "module": "apiServices/module",
+      "i18n": {
+        "en": "apiServices/i18n/en.json",
+        "zh-CN": "apiServices/i18n/zh.json"
+      }
+    },
     "dataGovernance": {
       "routes": "dataGovernance/router",
       "module": "dataGovernance/module",
@@ -55,10 +63,13 @@
     "app_name": "DataSphere Studio",
     "app_logo": "dss/assets/images/dssLogo.png",
     "user_guide": "",
+    "hide_view_tb_detail": true,
+    "hide_view_db_detail": true,
     "watermark": {
       "show": false,
       "template": "${username} ${time}",
       "timeupdate": 60000
     }
-  }
+  },
+  "version": "1.1.0"
 }

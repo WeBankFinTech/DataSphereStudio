@@ -86,8 +86,11 @@ export default {
     },
     toggleGuide() {
       if (!this.isMouseMove) {
-        window.open("/_book/", '_blank');
-        // this.guideShow = !this.guideShow;
+        if (this.$APP_CONF.faq_link) {
+          window.open("/_book/", '_blank');
+          return
+        }
+        this.guideShow = !this.guideShow;
       }
     },
     onMouseDown(e) {

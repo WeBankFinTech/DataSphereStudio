@@ -9,7 +9,7 @@ VALUES ('datachecker', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.da
 select @datachecker_appconnId:=id from `dss_appconn` where `appconn_name` = 'datachecker';
 
 INSERT INTO `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
-VALUES (@datachecker_appconnId, 'DEV', 'datachecker', '', '');
+VALUES (@datachecker_appconnId, 'DEV', 'datachecker', '{\"job.datachecker.jdo.option.name\":\"job\",\"job.datachecker.jdo.option.url\":\"DATACHECKER_JOB_JDBC_URL\",\"job.datachecker.jdo.option.username\":\"DATACHECKER_JOB_JDBC_USERNAME\",\"job.datachecker.jdo.option.password\":\"DATACHECKER_JOB_JDBC_PASSWORD\",\"bdp.datachecker.jdo.option.name\":\"bdp\",\"bdp.datachecker.jdo.option.url\":\"DATACHECKER_BDP_JDBC_URL\",\"bdp.datachecker.jdo.option.username\":\"DATACHECKER_BDP_JDBC_USERNAME\",\"bdp.datachecker.jdo.option.password\":\"DATACHECKER_BDP_JDBC_PASSWORD\",\"bdp.datachecker.jdo.option.login.type\":\"base64\",\"bdp.mask.url\":\"http://BDP_MASK_IP:BDP_MASK_PORT/api/v1/mask-status?\",\"bdp.mask.app.id\":\"wtss\",\"bdp.mask.app.token\":\"20a0ccdfc0\"}', '');
 
 delete from dss_workflow_node where appconn_name = "datachecker";
 insert into `dss_workflow_node` (`name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`)

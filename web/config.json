@@ -55,6 +55,8 @@
     "app_name": "DataSphere Studio",
     "app_logo": "dss/assets/images/dssLogo.png",
     "user_guide": "",
+    "hide_view_tb_detail": true,
+    "hide_view_db_detail": true,
     "watermark": {
       "show": false,
       "template": "${username} ${time}",

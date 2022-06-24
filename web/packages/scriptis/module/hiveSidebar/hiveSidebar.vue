@@ -35,7 +35,7 @@
         <we-menu-item @select="pasteName">
           {{ $t('message.scripts.database.contextMenu.db.pasteName') }}
         </we-menu-item>
-        <we-menu-item @select="describeDb">
+        <we-menu-item v-if="!$APP_CONF.hide_view_db_detail" @select="describeDb">
           查看库信息
         </we-menu-item>
         <we-menu-item class="ctx-divider"/>
@@ -53,7 +53,7 @@
         <we-menu-item
           @select="openDeleteDialog"
           v-if="!model">{{ $t('message.scripts.database.contextMenu.tb.deleteTable') }}</we-menu-item>
-        <we-menu-item v-show="nodekeyshow" @select="describeTable">{{ $t('message.scripts.database.contextMenu.tb.viewTable') }}</we-menu-item>
+        <we-menu-item v-show="nodekeyshow && !$APP_CONF.hide_view_tb_detail" @select="describeTable">{{ $t('message.scripts.database.contextMenu.tb.viewTable') }}</we-menu-item>
         <we-menu-item
           v-if="isAllowToExport && !model"
           @select="openExportDialog">{{ $t('message.scripts.database.contextMenu.tb.exportTable') }}</we-menu-item>

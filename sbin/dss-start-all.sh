@@ -107,10 +107,6 @@ function startDssProject(){
 #  fi
 #  echo "------------------------the project service is registered to eureka successfully------------------------------------------------"
 
-	SERVER_NAME=dss-framework-orchestrator-server
-	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
-	startApp
-
 	SERVER_NAME=dss-apiservice-server
 	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
 	startApp
@@ -118,10 +114,6 @@ function startDssProject(){
 	SERVER_NAME=dss-scriptis-server
   SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
   startApp
-
-	SERVER_NAME=dss-workflow-server
-	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
-	startApp
 
 	SERVER_NAME=dss-flow-execution-server
 	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
@@ -138,6 +130,14 @@ function startDssProject(){
   SERVER_NAME=dss-guide-server
 	SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
   startApp
+
+  SERVER_NAME=dss-framework-orchestrator-server
+	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
+	startApp
+
+	SERVER_NAME=dss-workflow-server
+	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
+	startApp
 
 }
 

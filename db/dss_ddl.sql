@@ -558,17 +558,17 @@ CREATE TABLE `dss_workspace_menu_appconn` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `dss_workspace_user`;  -- delete this table
-CREATE TABLE `dss_workspace_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` bigint(20) DEFAULT NULL,
-  `username` varchar(32) DEFAULT NULL,
-  `join_time` datetime DEFAULT NULL,
-  `created_by` varchar(255) DEFAULT NULL,
-  `user_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
+--DROP TABLE IF EXISTS `dss_workspace_user`;  -- delete this table
+--CREATE TABLE `dss_workspace_user` (
+--  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+--  `workspace_id` bigint(20) DEFAULT NULL,
+--  `username` varchar(32) DEFAULT NULL,
+--  `join_time` datetime DEFAULT NULL,
+--  `created_by` varchar(255) DEFAULT NULL,
+--  `user_id` bigint(20) DEFAULT NULL,
+--  PRIMARY KEY (`id`),
+--  UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
+--) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
 
 DROP TABLE IF EXISTS `dss_workspace_user_role`;  -- use this table
 CREATE TABLE `dss_workspace_user_role` (

@@ -51,8 +51,8 @@ CREATE TABLE `dss_apiservice_api_version` (
    `creator` varchar(50) DEFAULT NULL COMMENT '创建者',
    `create_time`timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `status` tinyint(1) default '1' COMMENT '0表示被禁用，1表示正在运行',
-   `metadata_info` varchar(5000) NOT NULL COMMENT '发布者库表信息',
-   `auth_id` varchar(200) NOT NULL COMMENT '用于与datamap交互的UUID',
+   `metadata_info` varchar(5000)  COMMENT '发布者库表信息',
+   `auth_id` varchar(200) COMMENT '用于与datamap交互的UUID',
    `datamap_order_no` varchar(200) DEFAULT NULL COMMENT 'datamap审批单号码',
    PRIMARY KEY(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='服务api版本表';

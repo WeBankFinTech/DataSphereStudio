@@ -14,20 +14,38 @@ import org.apache.linkis.common.conf.CommonVars
 import org.apache.linkis.common.utils.{Logging, Utils}
 
 object DSSDolphinSchedulerClient extends Logging {
-  val DEFAULT_PROPERTY_FILE_NAME = "linkis.properties"
-  val DEFAULT_CONFIG_DIR = "conf"
-  val CHARSET_NAME = "utf-8"
-
-  val logObj: LinkisJobExecutionLog = new LinkisJobExecutionLog {
-    override def info(message: Object, t: Throwable): Unit =
-      if(message != null) logger.info(message.toString, t) else if(t != null) logger.info(null, t)
-    override def warn(message: Object, t: Throwable): Unit =
-      if(message != null) logger.warn(message.toString, t) else if(t != null) logger.warn(null, t)
-    override def error(message: Object, t: Throwable): Unit =
-      if(message != null) logger.error(message.toString, t) else if(t != null) logger.error(null, t)
-  }
 
   def main(args: Array[String]): Unit = {
+
+    val dsVersion = CommonVars("DS_VERSION", "").getValue
+    info(s"The DolphinScheduler Version => $dsVersion.")
+
+    val logObj: LinkisJobExecutionLog = if(StringUtils.isNotBlank(dsVersion) && dsVersion.startsWith("2.")) {
+      new LinkisJobExecutionLog {
+        override def info(message: Object, t: Throwable): Unit =
+          if(message != null) logger.info(message.toString, t) else if(t != null) logger.info(null, t)
+        override def warn(message: Object, t: Throwable): Unit =
+          if(message != null) logger.warn(message.toString, t) else if(t != null) logger.warn(null, t)
+        override def error(message: Object, t: Throwable): Unit =
+          if(message != null) logger.error(message.toString, t) else if(t != null) logger.error(null, t)
+      }
+    } else {
+      warn("For the lower DolphinScheduler versions(< 2.0), we will parse the yarn applicationId to application__\\d+_\\d+.")
+      warn("Why? Because the lower DolphinScheduler versions will block the thread until the yarn application is completed.")
+      // For more information, please visit the class AbstractCommandExecutor in DolphinScheduler (line 222 ~ 231).
+      new LinkisJobExecutionLog {
+        private implicit def parseYarnApplication(message: Object): String = message match {
+          case str: String if str.contains(" application_") =>
+            str.replaceAll(" application_", " application__")
+          case str: String => str
+          case obj if obj != null => obj.toString
+          case _ => ""
+        }
+        override def info(message: Object, t: Throwable): Unit = logger.info(message, t)
+        override def warn(message: Object, t: Throwable): Unit = logger.warn(message, t)
+        override def error(message: Object, t: Throwable): Unit = logger.error(message, t)
+      }
+    }
 
     val jobProps = new util.HashMap[String, String]
     val getAndSet = (fromKey: String, toKey: String) => {

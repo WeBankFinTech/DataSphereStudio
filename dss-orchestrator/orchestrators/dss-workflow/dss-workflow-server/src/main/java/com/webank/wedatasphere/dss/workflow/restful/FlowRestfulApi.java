@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.workflow.restful;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -67,9 +67,7 @@ public class FlowRestfulApi {
 
     @PostConstruct
     public void init() {
-        LOGGER.info("First, try to load all AppConn...");
-        AppConnManager.getAppConnManager();
-        LOGGER.info("All AppConn have loaded successfully.");
+        AppConnManagerUtils.autoLoadAppConnManager();
     }
 
     /**

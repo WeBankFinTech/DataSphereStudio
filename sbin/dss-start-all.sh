@@ -87,20 +87,25 @@ function startDssProject(){
 	startApp
 	sleep 15
 
- echo "------------------------Start check whether the  project service is registered to eureka successfully-----------------------------"
+ echo "------------------------Start to check whether the project service is registered to eureka successfully-----------------------------"
   #project服务启动并注册到eureka后再启动其他服务
-  while [[ -z $result ]]
+  i=1
+  while [[ -z $result ]] && [[ $i -le 24 ]]
   do
     sleep 5
-    if [ -z $EUREKA_USERNAME ] || [ -z $EUREKA_PASSWORD ];
-      then
+    if [ -z $EUREKA_USERNAME ] || [ -z $EUREKA_PASSWORD ];then
         response=`curl  http://${EUREKA_INSTALL_IP}:${EUREKA_PORT}/eureka/apps/DSS-FRAMEWORK-PROJECT-SERVER`
-      else
+    else
         response=`curl  http://${EUREKA_USENAME}:${EUREKA_PASSWORD}@${EUREKA_INSTALL_IP}:${EUREKA_PORT}/eureka/apps/DSS-FRAMEWORK-PROJECT-SERVER`
     fi
+    let i++
   result=$(echo $response |grep 'DSS-FRAMEWORK-PROJECT-SERVER')
   done
-  echo "------------------------the   project service is registered to eureka successfully------------------------------------------------"
+  if [[ $i -eq 25 ]]; then
+      echo "the project server start failed in two minutes,please check the log to find more error details."
+      exit
+  fi
+  echo "------------------------the project service is registered to eureka successfully------------------------------------------------"
 
 	SERVER_NAME=dss-framework-orchestrator-server
 	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP

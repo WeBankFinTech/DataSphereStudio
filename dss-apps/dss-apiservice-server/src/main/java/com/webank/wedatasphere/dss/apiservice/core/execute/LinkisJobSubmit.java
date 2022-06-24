@@ -36,11 +36,15 @@ public class LinkisJobSubmit {
     private static final Map<String, UJESClient> ujesClientMap = new HashMap<>();
 
     public static UJESClient getClient() {
+        return getClient(new HashMap<>(0));
+    }
+
+    public static UJESClient getClient(Map<String, String> params) {
         return getUJESClient(
-                Configuration.GATEWAY_URL().getValue(),
-                ApiServiceConfiguration.LINKIS_ADMIN_USER.getValue(),
-                ApiServiceConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(),
-                new HashMap<>(0));
+                Configuration.GATEWAY_URL().getValue(params),
+                ApiServiceConfiguration.LINKIS_ADMIN_USER.getValue(params),
+                ApiServiceConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(params),
+                params);
     }
 
 

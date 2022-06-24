@@ -192,27 +192,31 @@ export default {
           okText: this.$t("message.workflow.process.index.QRGB"),
           cancelText: this.$t("message.workflow.process.index.QX"),
           onOk: () => {
-            // 删除线先判断删除的是否是当前正在打开的tab，如果打开到最后一个tab，如果没有打开还是在当前的tab
+            let active = this.active
             if (this.active === index) {
               // 删除的就是当前打开的
               this.tabs.splice(index, 1);
-              this.choose(this.tabs.length - 1);
+              active = this.tabs.length - 1;
             } else {
               this.tabs.splice(index, 1);
+              active = index < active ? active - 1 : active
             }
+            this.choose(active);
             this.updateProjectCacheByTab();
           },
           onCancel: () => {}
         });
       } else {
-        // 删除线先判断删除的是否是当前正在打开的tab，如果打开到最后一个tab，如果没有打开还是在当前的tab
+        let active = this.active
         if (this.active === index) {
           // 删除的就是当前打开的
           this.tabs.splice(index, 1);
-          this.choose(this.tabs.length - 1);
+          active = this.tabs.length - 1;
         } else {
           this.tabs.splice(index, 1);
+          active = index < active ? active - 1 : active
         }
+        this.choose(active);
         this.updateProjectCacheByTab();
       }
     },

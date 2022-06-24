@@ -172,8 +172,9 @@ public class DSSFlowEditLockManager {
         try {
             if (StringUtils.isNotBlank(flowEditLock)) {
                 DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
-                Long flowId = Optional.ofNullable(dssFlowEditLock).map(DSSFlowEditLock::getFlowID).get();
-                lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowId);
+                if (dssFlowEditLock != null) {
+                    lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), dssFlowEditLock.getFlowID());
+                }
             }
         } catch (Exception e) {
             LOGGER.error("flowEditLock delete failed，flowId：{}", flowEditLock, e);

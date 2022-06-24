@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
-import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
@@ -56,9 +56,7 @@ public class DSSFrameworkOrchestratorRestful {
 
     @PostConstruct
     public void init() {
-        LOGGER.info("First, try to load all AppConn...");
-        AppConnManager.getAppConnManager();
-        LOGGER.info("All AppConn have loaded successfully.");
+        AppConnManagerUtils.autoLoadAppConnManager();
     }
 
     /**

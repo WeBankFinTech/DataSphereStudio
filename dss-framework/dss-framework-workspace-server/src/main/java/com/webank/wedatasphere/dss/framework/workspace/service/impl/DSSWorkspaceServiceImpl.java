@@ -590,7 +590,23 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese, String type) {
+        checkScriptis(workspaceId, username, "dingyiding");
         return isChinese ? workspaceMapper.getWorkspaceFavoritesCn(username, workspaceId, type) : workspaceMapper.getWorkspaceFavoritesEn(username, workspaceId, type);
+    }
+
+    /**
+     * 保证Scriptis入口一直在页面上方
+     *
+     * @param workspaceId
+     * @param username
+     * @param type
+     */
+    private void checkScriptis(Long workspaceId, String username, String type) {
+        Long scriptisMenuAppId = dssWorkspaceMapper.getMenuAppIdByName("Scriptis");
+        int exists = dssWorkspaceMapper.getByMenuAppIdAndUser(scriptisMenuAppId, workspaceId, username, type);
+        if (exists < 1) {
+            addFavorite(username, workspaceId, scriptisMenuAppId, type);
+        }
     }
 
     @Override

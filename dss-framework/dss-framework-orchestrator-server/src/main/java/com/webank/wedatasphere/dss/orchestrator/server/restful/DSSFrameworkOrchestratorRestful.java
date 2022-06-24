@@ -67,20 +67,15 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path = "createOrchestrator", method = RequestMethod.POST)
-    public Message createOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorCreateRequest createRequest) {
+    public Message createOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorCreateRequest createRequest) throws Exception{
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
-        try {
-            //保存编排模式
-            //todo 先注释掉
-            // orchestratorService.saveOrchestrator(createRequest,null,username);
-            CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.createOrchestrator(username, createRequest, workspace);
-            return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
-        } catch (Exception e) {
-            LOGGER.error("Failed to create orchestrator {} for user {}", createRequest, username, e);
-            return Message.error("创建工作流编排模式失败:" + e.getMessage());
-        }
+        //保存编排模式
+        //todo 先注释掉
+        // orchestratorService.saveOrchestrator(createRequest,null,username);
+        CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.createOrchestrator(username, createRequest, workspace);
+        return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
     }
 
     /**
@@ -109,19 +104,12 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path = "modifyOrchestrator", method = RequestMethod.POST)
-    public Message modifyOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorModifyRequest modifyRequest) {
+    public Message modifyOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorModifyRequest modifyRequest) throws Exception{
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         LOGGER.info("workspace is {}", workspace.getWorkspaceName());
-        try {
-            CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.modifyOrchestrator(username, modifyRequest, workspace);
-            //保存编排模式
-//            orchestratorService.updateOrchestrator(modifyRequest, username);
-            return Message.ok("修改工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
-        } catch (Exception e) {
-            LOGGER.error("Failed to create orchestrator {} for user {}", modifyRequest, username, e);
-            return Message.error("修改工作流编排模式失败:" + e.getMessage());
-        }
+        CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.modifyOrchestrator(username, modifyRequest, workspace);
+        return Message.ok("修改工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
     }
 
     /**
@@ -132,16 +120,11 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path = "deleteOrchestrator", method = RequestMethod.POST)
-    public Message deleteOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) {
+    public Message deleteOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        try {
-            orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
-            return Message.ok("删除工作流编排模式成功");
-        } catch (Exception e) {
-            LOGGER.error("Failed to delete orchestrator {} for user {}.", deleteRequest.getId(), username, e);
-            return Message.error("删除工作流编排模式失败:" + ExceptionUtils.getRootCauseMessage(e));
-        }
+        orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
+        return Message.ok("删除工作流编排模式成功");
     }
 
     @RequestMapping(path = "orchestratorLevels", method = RequestMethod.GET)

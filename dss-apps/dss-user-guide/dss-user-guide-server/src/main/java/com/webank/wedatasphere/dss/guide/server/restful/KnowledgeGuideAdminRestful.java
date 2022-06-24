@@ -49,6 +49,8 @@ public class KnowledgeGuideAdminRestful {
 
     private final static String SHELL_COMMAND_HOST_IP = "hostname -i";
 
+    private final static String MODEL_GITBOOK_SYNC = "gitbook";
+
 
     /**
      * 知识库目录接口
@@ -210,20 +212,22 @@ public class KnowledgeGuideAdminRestful {
         logger.info("开始执行定时任务...");
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             try {
-                String hostIp = ShellUtils.callShellQuery(SHELL_COMMAND_HOST_IP);
-                //如果不是当前节点，则需要拷贝文件
-                if (!StringUtils.equals(hostIp, GuideConf.HOST_IP_ADDRESS.getValue())) {
-                    //判断文件是否存在
-                    boolean flag = FileUtils.fileExist(savePath);
-                    if (flag) {
-                        //删除文件
-                        ShellUtils.callShellByExec(delMkdir);
+                if (StringUtils.equals(GuideConf.GUIDE_SYNC_MODEL.getValue(), MODEL_GITBOOK_SYNC)) {
+                    String hostIp = ShellUtils.callShellQuery(SHELL_COMMAND_HOST_IP);
+                    //如果不是当前节点，则需要拷贝文件
+                    if (!StringUtils.equals(hostIp, GuideConf.HOST_IP_ADDRESS.getValue())) {
+                        //判断文件是否存在
+                        boolean flag = FileUtils.fileExist(savePath);
+                        if (flag) {
+                            //删除文件
+                            ShellUtils.callShellByExec(delMkdir);
+                        }
+                        //拷贝文件到相应节点
+                        ShellUtils.callShellByExec(scpCommand);
                     }
-                    //拷贝文件到相应节点
-                    ShellUtils.callShellByExec(scpCommand);
                 }
-                //guideCatalogService.syncKnowledge(summaryPath,GuideConf.SUMMARY_IGNORE_MODEL.getValue());
-                //guideGroupService.asyncGuide(summaryPath,GuideConf.SUMMARY_IGNORE_MODEL.getValue());
+                guideCatalogService.syncKnowledge(summaryPath, GuideConf.SUMMARY_IGNORE_MODEL.getValue());
+                guideGroupService.asyncGuide(summaryPath, GuideConf.SUMMARY_IGNORE_MODEL.getValue());
             } catch (Exception e) {
                 logger.error("定时任务执行异常：" + e);
                 throw new RuntimeException(e);

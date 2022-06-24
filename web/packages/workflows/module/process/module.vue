@@ -972,13 +972,15 @@ export default {
     },
     checkChange(obj) {
       // 剔除单击节点选中导致的change
+      // createTime,lastUpdateTime 流程图产生的数据
+      // params 动态添加的，手动保存会更新jsonchange标志位
       const helpFn = function(obj = {}) {
         const temp = { nodes: [], edges: [] }
         if (obj.nodes) {
           obj.nodes.forEach(item => {
             const nodeItem = {}
             Object.keys(item).forEach(k => {
-              if(k !== 'selected') {
+              if(['selected','createTime','lastUpdateTime', 'params'].indexOf(k) < 0) {
                 nodeItem[k] = item[k]
               }
             })
@@ -989,7 +991,7 @@ export default {
           obj.edges.forEach(item => {
             const link = {}
             Object.keys(item).forEach(k => {
-              if(k !== 'selected') {
+              if(['selected','createTime','lastUpdateTime', 'params'].indexOf(k) < 0) {
                 link[k] = item[k]
               }
             })

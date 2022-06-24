@@ -1,0 +1,262 @@
+{
+  "message": {
+    "apiServices": {
+      "viewAll": "View All",
+      "viewValid": "View Valid",
+      "deleted": "Deleted",
+      "delete": "Delete",
+      "enterDetele": "confirm Detele",
+      "enterDeteleName": "Are you sure to delete {name}?",
+      "publishing": "Publishing",
+      "confirm": "Confirm",
+      "modifyRemarks": "Modify Remarks",
+      "save": "Save",
+      "open": "Open",
+      "title": "Data Service",
+      "back": "Back",
+      "tableDisplay": "Table",
+      "cardDisplay": "Card",
+      "display": "Display",
+      "action": "Aciton",
+      "kill": {
+        "title": "Execution Notice",
+        "desc": "Stopped executing this script"
+      },
+      "date": {
+        "label": " Start Date",
+        "placeholder": "Please choose the start date"
+      },
+      "query": {
+        "apiName": "Data Service Title",
+        "tag": "Tag",
+        "status": "Service Status",
+        "commiter": "Commiter",
+        "buttonText": "Query",
+        "clearButtonText": "Clear",
+        "stop": "Stop",
+        "comment": "Comment",
+        "more": "More"
+      },
+      "formTitle": {
+        "dataApiManage": "Data API Manage"
+      },
+      "shortcuts": {
+        "week": "Recent Week",
+        "month": "Recent Month",
+        "threeMonths": "Recent Three Months"
+      },
+      "placeholder": {
+        "enterName": "Please enter the name",
+        "apiName": "Enter API Name",
+        "tag": "Select Tag",
+        "scope": "Select Scope",
+        "description": "Enter Description",
+        "visibleRole": "Select Visible Role",
+        "emter": "Enter",
+        "startDate": "Please choose the start date",
+        "dateAndTime": "Select Date And Time",
+        "inputSubmitter": "Input Submitter"
+      },
+      "label": {
+        "apiName": "API Name：",
+        "tag": "Tag：",
+        "name": "Name",
+        "parameter": "Parameter Info：",
+        "scope": "Scope：",
+        "description": "Description：",
+        "visibleRole": "Visible Role：",
+        "test": "Test：",
+        "applicant": "Applicant：",
+        "status": "Status：",
+        "find": "Find",
+        "path": "API Path：",
+        "submitter": "Submitter",
+        "scriptsPath": "Scripts Path："
+      },
+      "buttonText": {
+        "enter": "Enter",
+        "maintained": "Being maintained",
+        "refresh": "Refresh Status"
+      },
+      "tip": {
+        "success": "Success",
+        "cannotBeEmpty": "Cannot Be Empty",
+        "failed": "Failed",
+        "disableConfirmTitle": "Disable Confirm",
+        "disableConfirm": "Are you sure you want to disable the {name} API ?",
+        "enableConfirmTitle": "Enable Confirm",
+        "enableConfirm": "Are you sure you want to enable the {name} API ?"
+      },
+      "apiTable": {
+        "user": "User",
+        "duration": "Duration",
+        "reason": "Reason",
+        "ip_whitelist": "Ip Whitelist",
+        "apply_time": "Apply Time",
+        "caller": "Caller",
+        "access": "Access",
+        "version": "Version",
+        "scriptPath": "Script Path",
+        "creator": "Creator",
+        "publishDateStr": "Publish DateStr",
+        "updateDateStr": "Update Date",
+        "apiName": "Data Service Name",
+        "apiPath": "API Path",
+        "status": "Status",
+        "type": "Type",
+        "describe": "Describe",
+        "calledCount": "Call count",
+        "responsiblePerson": "Responsible Person",
+        "belongTo": "Belong To",
+        "tag": "Tag",
+        "operation": {
+          "title": "Operation",
+          "test": "Test",
+          "copy": "Copy",
+          "disable": "Disable",
+          "enable": "Enable",
+          "manager": "Manager",
+          "update": "Update",
+          "view": "View"
+        },
+        "reconfirm": {
+          "title": "Confirm",
+          "disable": "Confirm disable this API？",
+          "enable": "Confirm enable this API？"
+        }
+      },
+      "view": {
+        "scriptPath": "Script Path:",
+        "scriptContent": "Script Content:"
+      },
+      "enable": "Running",
+      "disable": "Stop",
+      "normal": "Normal",
+      "expired": "Expired",
+      "all": "All",
+      "updateApiModal": {
+        "modalTitle": "Update API",
+        "selectApi": "API Name",
+        "apiPath": "API Path",
+        "apiVersion": "API Version",
+        "apiVersionUpgrade": "New Version",
+        "paramConfirm": "Please confirm param"
+      },
+      "paramTable": {
+        "paramName": "Param Name",
+        "paramType": "Param Type",
+        "require": {
+          "title": "Require",
+          "yes": "Yes",
+          "no": "No",
+          "hide": "Hide"
+        },
+        "defaultValue": "Default Value",
+        "displayName": "Display Name",
+        "describe": "Describe"
+      },
+      "rule": {
+        "nameRule": "Please input api name!",
+        "pathRule": "Please input api path!",
+        "pathRegRule": "Api path illegal!",
+        "requestTypeRule": "Please select request type!",
+        "protocolRule": "Please select protocol!",
+        "contentLengLimit": "Length limit 255",
+        "pathRepeat": "Api path exists",
+        "nameRepeat": "Api name exists"
+      },
+      "visible": {
+        "workspace": "Workspace",
+        "personal": "Personal",
+        "public": "Public"
+      },
+      "apiInfo": {
+        "title": "API Info",
+        "authorize": "Token Authorize",
+        "set": "Set",
+        "tag": "Tag",
+        "metrics": "API Metrics",
+        "monthCall": "Call Total This Month",
+        "weekCall": "Call Total This Week",
+        "dayCall": "Call Total Today",
+        "averageTime": "Average Call Time",
+        "callSuccess": "Success Percent",
+        "topQps": "TOP QPS",
+        "use": "API Call Info",
+        "selectCallTime": "Select Call Time",
+        "version": "Version",
+        "callStatus": "Call Info",
+        "callUser": "Caller",
+        "callApp": "CallApp",
+        "callIp": "Call IP",
+        "callTime": "Call Time",
+        "callVersion": "Call Version",
+        "operation": "Operation",
+        "query": {
+          "clearButtonText": "Clear",
+          "buttonText": "Query"
+        }
+      },
+      "apiSetForm": {
+        "flowLimitation": "Flow Limitation",
+        "defaultSetting": "Default Setting",
+        "advancedSetting": "Advanced Setting",
+        "form": {
+          "MaxConcurrentNumber": "Max Concurrent Number：",
+          "MaxSimultaneousQuery": "Max Simultaneous Query：",
+          "MaxTimeQuery": "Max Time Query：",
+          "defaultVersion": "Default Version：",
+          "defaultConfigurationParameter": "Default Configuration Parameter：",
+          "defaultVariable": "Default Variable：",
+          "approvalNo": "Approval No："
+        }
+      },
+      "apiTestInfo": {
+        "title": "API Test",
+        "testApi": "Test API",
+        "apiVersion": "Version",
+        "search": "Search",
+        "params": "Screening criteria",
+        "moreParams": "More filters",
+        "paramsMore": "More filters",
+        "selectParams": "已选择过滤条件",
+        "allSelect": "全选",
+        "allSelectParams": "可选择参数列表",
+        "paramTable": {
+          "paramName": "Param Name",
+          "paramType": "Param Type",
+          "description": "Param Description",
+          "require": {
+            "title": "Require",
+            "yes": "YES",
+            "no": "NO"
+          },
+          "defaultValue": "Test Value"
+        },
+        "testResult": "Test Result"
+      },
+      "apiVersionInfo": {
+        "title": "API Version",
+        "params": "params",
+        "versionInfoTable": {
+          "version": "Version",
+          "status": "Status",
+          "source": "Source",
+          "creator": "Publisher",
+          "publishDate": "Publish Time",
+          "updateDate": "Update Time",
+          "operation": "Operation",
+          "query": {
+            "title": "Query",
+            "clear": "Clear",
+            "publishDate": "Select Publish Time"
+          }
+        }
+      },
+      "notice": {
+        "publishSuccess": "Publish Success"
+      },
+      "tagPlaceholder": "tag，click enter add"
+    }
+  }
+}

@@ -311,10 +311,10 @@ CREATE TABLE `dss_workspace_download_audit`  (
 DROP TABLE IF EXISTS `dss_workflow`;
 CREATE TABLE `dss_workflow` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(128) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   `state` tinyint(1) DEFAULT NULL,
   `source` varchar(255) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `description` varchar(1024) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `creator` varchar(32) DEFAULT NULL,
   `is_root_flow` tinyint(1) DEFAULT NULL,

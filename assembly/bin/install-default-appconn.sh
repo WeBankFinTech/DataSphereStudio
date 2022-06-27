@@ -9,6 +9,8 @@ else
   source ~/.bashrc
 fi
 
+shellDir=`dirname $0`
+workDir=`cd ${shellDir}/..;pwd`
 
 function isSuccess(){
 if [ $? -ne 0 ]; then
@@ -29,9 +31,9 @@ echo "########################################################################"
 echo "###################### Begin to install DSS Default Appconn ######################"
 echo "########################################################################"
 echo "now begin to install default appconn: datachecker."
-sh ./bin/appconn-install.sh datachecker
+sh ${workDir}/bin/appconn-install.sh datachecker
 echo "now begin to install default appconn: eventchecker."
-sh ./bin/appconn-install.sh eventchecker
+sh ${workDir}/bin/appconn-install.sh eventchecker
 echo "now begin to install default appconn: sendemail."
-sh ./bin/appconn-install.sh sendemail
+sh ${workDir}/bin/appconn-install.sh sendemail
 isSuccess "install DSS Default Appconn"

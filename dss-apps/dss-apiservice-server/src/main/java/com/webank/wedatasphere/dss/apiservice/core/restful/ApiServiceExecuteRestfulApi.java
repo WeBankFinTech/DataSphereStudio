@@ -171,9 +171,9 @@ public class ApiServiceExecuteRestfulApi {
     public Message openFile(HttpServletRequest req,
                              @RequestParam(required = false, name = "path") String path,
                              @RequestParam(required = false, name = "taskId") String taskId,
-                             @DefaultValue("1") @RequestParam(required = false, name = "page") Integer page,
-                             @DefaultValue("5000") @RequestParam(required = false, name = "pageSize") Integer pageSize,
-                             @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset) {
+                             @RequestParam(required = false, name = "page", defaultValue = "1") Integer page,
+                             @RequestParam(required = false, name = "pageSize", defaultValue = "5000") Integer pageSize,
+                             @RequestParam(required = false, name = "charset", defaultValue = "utf-8") String charset) {
         String userName = SecurityFilter.getLoginUsername(req);
         logger.info("User {} wants to open resultSet file {} in task {}.", userName, path, taskId);
         if (!isNumber(taskId)) {
@@ -208,12 +208,12 @@ public class ApiServiceExecuteRestfulApi {
             HttpServletResponse resp,
             @RequestParam(required = false, name = "path") String path,
             @RequestParam(required = false, name = "taskId") String taskId,
-            @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
-            @DefaultValue("csv") @RequestParam(required = false, name = "outputFileType") String outputFileType,
-            @DefaultValue(",") @RequestParam(required = false, name = "csvSeperator") String csvSeperator,
-            @DefaultValue("downloadResultset") @RequestParam(required = false, name = "outputFileName") String outputFileName,
-            @DefaultValue("result") @RequestParam(required = false, name = "sheetName") String sheetName,
-            @DefaultValue("NULL") @RequestParam(required = false, name = "nullValue") String nullValue) throws ApiServiceQueryException, IOException {
+            @RequestParam(required = false, name = "charset", defaultValue = "utf-8") String charset,
+            @RequestParam(required = false, name = "outputFileType", defaultValue = "csv") String outputFileType,
+            @RequestParam(required = false, name = "csvSeperator", defaultValue = ",") String csvSeperator,
+            @RequestParam(required = false, name = "outputFileName", defaultValue = "downloadResultset") String outputFileName,
+            @RequestParam(required = false, name = "sheetName", defaultValue = "result") String sheetName,
+            @RequestParam(required = false, name = "nullValue", defaultValue = "NULL") String nullValue) throws ApiServiceQueryException, IOException {
         String userName = SecurityFilter.getLoginUsername(req);
         logger.info("User {} wants to download resultSet file {} as {} in task {}.", userName, path, outputFileType, taskId);
         if (!isNumber(taskId)) {

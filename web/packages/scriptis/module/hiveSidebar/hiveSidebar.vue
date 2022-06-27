@@ -146,6 +146,10 @@ export default {
       if (this.currentAcitved.dataType !== 'tb') {
         return false;
       }
+      const baseinfo = storage.get("baseInfo", "local") || {}
+      if (baseinfo.exportTableEnable === false) {
+        return false
+      }
       return this.checkAllow(this.currentAcitved.dbName);
     },
     navList() {

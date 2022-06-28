@@ -268,7 +268,7 @@ INSERT INTO dss_appconn_instance
 (appconn_id, label, url, enhance_json, homepage_uri)
 VALUES(22, 'DEV', '/home', '', '');
 INSERT INTO dss_appconn_instance
-(id, appconn_id, label, url, enhance_json, homepage_uri)
+(appconn_id, label, url, enhance_json, homepage_uri)
 VALUES(24, 'DEV', '/apiservices', '', '');
 
 update dss_appconn set id=id+1000;

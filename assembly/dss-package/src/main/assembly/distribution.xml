@@ -189,17 +189,6 @@
       </includes>
     </fileSet>
 
-    <!--dss-visualis-appconn-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-appconn/appconns/dss-visualis-appconn/target/out/
-      </directory>
-      <outputDirectory>dss-appconns</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
-
     <!--dss-sso-appconn-->
     <fileSet>
       <directory>

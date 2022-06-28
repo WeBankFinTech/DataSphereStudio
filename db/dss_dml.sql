@@ -203,7 +203,7 @@ select @node_ui_source_type:=id from dss_workflow_node_ui where `key`='source.ty
 select @node_ui_check_object:=id from dss_workflow_node_ui where `key`='check.object';
 select @node_ui_max_check_hours:=id from dss_workflow_node_ui where `key`='max.check.hours';
 select @node_ui_job_desc:=id from dss_workflow_node_ui where `key`='job.desc';
-select @node_ui_bindViewKey:=id from dss_workflow_node_ui where `key`='bindViewKey';
+select @node_ui_upStreams:=id from dss_workflow_node_ui where `key`='upStreams';
 select @node_ui_executeUser:=id from dss_workflow_node_ui where `key`='executeUser';
 select @node_ui_ReuseEngine:=id from dss_workflow_node_ui where `key`='ReuseEngine';
 
@@ -373,7 +373,7 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_to,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_itsm,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_subject,55);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_bindViewKey,55);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_upStreams,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (39,32);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (39,41);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (39,46);
@@ -388,7 +388,7 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (4
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_ReuseEngine,59);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_spark_driver_memory,60);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_spark_executor_memory,60);
-insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validata_id`) values (@node_ui_job_desc,61);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_job_desc,61);
 
 
 DELETE FROM dss_workspace_appconn_role;

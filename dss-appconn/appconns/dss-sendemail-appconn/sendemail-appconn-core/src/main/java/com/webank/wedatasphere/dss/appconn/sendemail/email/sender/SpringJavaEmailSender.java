@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.appconn.sendemail.email.Email;
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.Attachment;
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException;
 
+import java.util.Base64;
 import java.util.Properties;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
@@ -41,10 +42,10 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
     public SpringJavaEmailSender() {
         try {
             Properties prop = new Properties();
-            prop.put("mail.smtp.auth", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_AUTH().getValue()));
-            prop.put("mail.smtp.starttls.enable", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue()));
-            prop.put("mail.smtp.starttls.required", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED().getValue()));
-            prop.put("mail.smtp.ssl.enable", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue()));
+            prop.put("mail.smtp.auth", SendEmailAppConnConfiguration.EMAIL_SMTP_AUTH().getValue());
+            prop.put("mail.smtp.starttls.enable", SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue());
+            prop.put("mail.smtp.starttls.required", SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED().getValue());
+            prop.put("mail.smtp.ssl.enable", SendEmailAppConnConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue());
             prop.put("mail.smtp.timeout", Integer.parseInt(SendEmailAppConnConfiguration.EMAIL_SMTP_TIMEOUT().getValue()));
             javaMailSender.setJavaMailProperties(prop);
         } catch (Exception e) {
@@ -69,11 +70,11 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
     private MimeMessage parseToMimeMessage(Email email) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
-            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
-            if (StringUtils.isBlank(email.getFrom())) {
+            MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "utf-8");
+            if (StringUtils.isBlank(javaMailSender.getUsername())) {
                 messageHelper.setFrom(SendEmailAppConnConfiguration.DEFAULT_EMAIL_FROM().getValue());
             } else {
-                messageHelper.setFrom(email.getFrom());
+                messageHelper.setFrom(javaMailSender.getUsername());
             }
             messageHelper.setSubject(email.getSubject());
             messageHelper.setTo(email.getTo());
@@ -84,7 +85,7 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
                 messageHelper.setBcc(email.getBcc());
             }
             for (Attachment attachment : email.getAttachments()) {
-                messageHelper.addAttachment(attachment.getName(), new ByteArrayDataSource(attachment.getBase64Str(), attachment.getMediaType()));
+                messageHelper.addAttachment(attachment.getName(), new ByteArrayDataSource(Base64.getMimeDecoder().decode(attachment.getBase64Str()), attachment.getMediaType()));
             }
             messageHelper.setText(email.getContent(), true);
         } catch (Exception e) {

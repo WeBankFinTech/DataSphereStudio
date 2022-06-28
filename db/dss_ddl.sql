@@ -311,10 +311,10 @@ CREATE TABLE `dss_workspace_download_audit`  (
 DROP TABLE IF EXISTS `dss_workflow`;
 CREATE TABLE `dss_workflow` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `name` varchar(128) DEFAULT NULL,
+  `name` varchar(255) DEFAULT NULL,
   `state` tinyint(1) DEFAULT NULL,
   `source` varchar(255) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
+  `description` varchar(1024) DEFAULT NULL,
   `create_time` datetime DEFAULT NULL,
   `creator` varchar(32) DEFAULT NULL,
   `is_root_flow` tinyint(1) DEFAULT NULL,
@@ -558,17 +558,17 @@ CREATE TABLE `dss_workspace_menu_appconn` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `dss_workspace_user`;  -- delete this table
-CREATE TABLE `dss_workspace_user` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `workspace_id` bigint(20) DEFAULT NULL,
-  `username` varchar(32) DEFAULT NULL,
-  `join_time` datetime DEFAULT NULL,
-  `created_by` varchar(255) DEFAULT NULL,
-  `user_id` bigint(20) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
+--DROP TABLE IF EXISTS `dss_workspace_user`;  -- delete this table
+--CREATE TABLE `dss_workspace_user` (
+--  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+--  `workspace_id` bigint(20) DEFAULT NULL,
+--  `username` varchar(32) DEFAULT NULL,
+--  `join_time` datetime DEFAULT NULL,
+--  `created_by` varchar(255) DEFAULT NULL,
+--  `user_id` bigint(20) DEFAULT NULL,
+--  PRIMARY KEY (`id`),
+--  UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
+--) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
 
 DROP TABLE IF EXISTS `dss_workspace_user_role`;  -- use this table
 CREATE TABLE `dss_workspace_user_role` (

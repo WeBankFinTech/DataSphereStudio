@@ -28,8 +28,10 @@ import com.webank.wedatasphere.dss.apiservice.core.token.JwtManager;
 import com.webank.wedatasphere.dss.apiservice.core.util.ApiUtils;
 import com.webank.wedatasphere.dss.apiservice.core.util.AssertUtil;
 import com.webank.wedatasphere.dss.apiservice.core.vo.MessageVo;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -127,64 +129,77 @@ public class ApiServiceExecuteRestfulApi {
     }
 
     @RequestMapping(value = "/getDirFileTrees",method = RequestMethod.GET)
-    public void getDirFileTrees(HttpServletRequest req, HttpServletResponse resp,
+    public Message getDirFileTrees(HttpServletRequest req, HttpServletResponse resp,
                                 @RequestParam(required = false, name = "path") String path,
-                                @RequestParam(required = false, name = "taskId") String taskId) throws IOException, ApiServiceQueryException {
+                                @RequestParam(required = false, name = "taskId") String taskId) {
         String userName = SecurityFilter.getLoginUsername(req);
-        if (StringUtils.isEmpty(path)) {
-            throw new  ApiServiceQueryException(80004, path);
-        }
         if (!isNumber(taskId)) {
-            throw new  ApiServiceQueryException(80005, "请求参数taskId非法");
+            return Message.error("请求参数 taskId 非法.");
+        } else if(StringUtils.isEmpty(taskId)){
+            return Message.error("taskId 为空.");
         }
-        String dirFileTree="";
+        if (StringUtils.isEmpty(path)) {
+            return Message.error("path 为空.");
+        }
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId);
-        if(null != apiServiceJob && userName.equals(apiServiceJob.getSubmitUser())) {
+        if(apiServiceJob == null) {
+            return Message.error("当前用户不存在运行的TaskId: " + taskId);
+        } else if(userName.equals(apiServiceJob.getSubmitUser())) {
             JobExecuteResult jobExecuteResult = new JobExecuteResult();
             jobExecuteResult.setTaskID(taskId);
             jobExecuteResult.setUser(apiServiceJob.getProxyUser());
-            Map<String, String> props = new HashMap<>();
-            UJESClient client = LinkisJobSubmit.getClient(props);
-
-
-            dirFileTree = ExecuteCodeHelper.getResultList(jobExecuteResult, client, path);
-        }else{
-            dirFileTree="当前用户不存在运行的TaskId: "+taskId;
+            UJESClient client = LinkisJobSubmit.getClient();
+            String dirFileTree = ExecuteCodeHelper.getResultList(jobExecuteResult, client, path);
+            return DSSCommonUtils.COMMON_GSON.fromJson(dirFileTree, Message.class);
+        } else {
+            return Message.error("You are not the submitUser, cannot open the resultSet.");
         }
-        resp.getWriter().println(dirFileTree);
+    }
+
+    private void writeMessage(HttpServletResponse resp, Message message) throws IOException {
+        if(message == null) {
+            return;
+        } else {
+            resp.setStatus(Message.messageToHttpStatus(message));
+        }
+        String str = DSSCommonUtils.COMMON_GSON.toJson(message);
+        resp.getWriter().println(str);
         resp.getWriter().flush();
     }
 
-
     @RequestMapping(value = "/openFile",method = RequestMethod.GET)
-    public void openFile(HttpServletRequest req,
+    public Message openFile(HttpServletRequest req,
                              @RequestParam(required = false, name = "path") String path,
                              @RequestParam(required = false, name = "taskId") String taskId,
-                             @DefaultValue("1") @RequestParam(required = false, name = "page") Integer page,
-                             @DefaultValue("5000") @RequestParam(required = false, name = "pageSize") Integer pageSize,
-                             @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
-                             HttpServletResponse resp) throws IOException, ApiServiceQueryException {
-        if (!isNumber(taskId)) {
-            new ApiServiceQueryException(80003, "请求参数taskId非法");
-        }
+                             @RequestParam(required = false, name = "page", defaultValue = "1") Integer page,
+                             @RequestParam(required = false, name = "pageSize", defaultValue = "5000") Integer pageSize,
+                             @RequestParam(required = false, name = "charset", defaultValue = "utf-8") String charset) {
         String userName = SecurityFilter.getLoginUsername(req);
+        logger.info("User {} wants to open resultSet file {} in task {}.", userName, path, taskId);
+        if (!isNumber(taskId)) {
+            return Message.error("请求参数 taskId 非法.");
+        } else if(StringUtils.isEmpty(taskId)){
+            return Message.error("taskId 为空.");
+        }
         if (StringUtils.isEmpty(path)) {
-            throw new  ApiServiceQueryException(80004, path);
+            return Message.error("path 为空.");
         }
-        if(StringUtils.isEmpty(taskId)){
-            throw new  ApiServiceQueryException(80005, "taskId is null");
-        }
-        String fileContent="";
+
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId);
-        if(null != apiServiceJob && userName.equals(apiServiceJob.getSubmitUser())) {
-            Map<String, String> props = new HashMap<>();
-            UJESClient client = LinkisJobSubmit.getClient(props);
-            fileContent = ExecuteCodeHelper.getResultContent(apiServiceJob.getProxyUser(), path, pageSize, client);
-        }else{
-            fileContent="当前用户不存在运行的TaskId: "+taskId;
+        if(apiServiceJob == null) {
+            return Message.error("您不存在运行的TaskId: "+taskId);
+        } else if (userName.equals(apiServiceJob.getSubmitUser())) {
+            UJESClient client = LinkisJobSubmit.getClient();
+            try {
+                String fileContent = ExecuteCodeHelper.getResultContent(apiServiceJob.getProxyUser(), path, pageSize, client);
+                return DSSCommonUtils.COMMON_GSON.fromJson(fileContent, Message.class);
+            } catch (Exception e) {
+                logger.error("User {} fetch resultSet {} failed.", userName, path, e);
+                return Message.error("Get resultSet failed! Reason: " + ExceptionUtils.getRootCauseMessage(e));
+            }
+        } else {
+            return Message.error("You are not the submitUser, cannot open the resultSet.");
         }
-        resp.getWriter().println(fileContent);
-        resp.getWriter().flush();
     }
 
     @RequestMapping(value = "resultsetToExcel",method = RequestMethod.GET)
@@ -193,14 +208,24 @@ public class ApiServiceExecuteRestfulApi {
             HttpServletResponse resp,
             @RequestParam(required = false, name = "path") String path,
             @RequestParam(required = false, name = "taskId") String taskId,
-            @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
-            @DefaultValue("csv") @RequestParam(required = false, name = "outputFileType") String outputFileType,
-            @DefaultValue(",") @RequestParam(required = false, name = "csvSeperator") String csvSeperator,
-            @DefaultValue("downloadResultset") @RequestParam(required = false, name = "outputFileName") String outputFileName,
-            @DefaultValue("result") @RequestParam(required = false, name = "sheetName") String sheetName,
-            @DefaultValue("NULL") @RequestParam(required = false, name = "nullValue") String nullValue) throws ApiServiceQueryException, IOException {
+            @RequestParam(required = false, name = "charset", defaultValue = "utf-8") String charset,
+            @RequestParam(required = false, name = "outputFileType", defaultValue = "csv") String outputFileType,
+            @RequestParam(required = false, name = "csvSeperator", defaultValue = ",") String csvSeperator,
+            @RequestParam(required = false, name = "outputFileName", defaultValue = "downloadResultset") String outputFileName,
+            @RequestParam(required = false, name = "sheetName", defaultValue = "result") String sheetName,
+            @RequestParam(required = false, name = "nullValue", defaultValue = "NULL") String nullValue) throws ApiServiceQueryException, IOException {
+        String userName = SecurityFilter.getLoginUsername(req);
+        logger.info("User {} wants to download resultSet file {} as {} in task {}.", userName, path, outputFileType, taskId);
         if (!isNumber(taskId)) {
-            new ApiServiceQueryException(80016, "请求参数taskId非法");
+            writeMessage(resp, Message.error("请求参数 taskId 非法."));
+            return;
+        } else if(StringUtils.isEmpty(taskId)){
+            writeMessage(resp, Message.error("taskId 为空."));
+            return;
+        }
+        if (StringUtils.isEmpty(path)) {
+            writeMessage(resp, Message.error("path 为空."));
+            return;
         }
         resp.addHeader("Content-Disposition", "attachment;filename="
                 + new String(outputFileName.getBytes("UTF-8"), "ISO8859-1") + "." + outputFileType);
@@ -214,19 +239,18 @@ public class ApiServiceExecuteRestfulApi {
                 resp.addHeader("Content-Type", XLSX_RESPONSE_CONTENT_TYPE);
                 break;
             default:
-                new ApiServiceQueryException(80015,"不支持的下载类型");
+                writeMessage(resp, Message.error("不支持的下载类型."));
+                return;
 
         }
 
-        String userName = SecurityFilter.getLoginUsername(req);
-        if (StringUtils.isEmpty(path)) {
-            throw new  ApiServiceQueryException(80005, path);
-        }
-        InputStream inputStream;
+        InputStream inputStream = null;
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId);
-        if(null != apiServiceJob && userName.equals(apiServiceJob.getSubmitUser())) {
-            Map<String, String> props = new HashMap<>();
-            UJESClient client = LinkisJobSubmit.getClient(props);
+        if(null == apiServiceJob) {
+            writeMessage(resp, Message.error("您不存在运行的TaskId: "+taskId));
+            return;
+        } else if(userName.equals(apiServiceJob.getSubmitUser())) {
+            UJESClient client = LinkisJobSubmit.getClient();
             inputStream = ExecuteCodeHelper.downloadResultSet(apiServiceJob.getProxyUser(),
                                                            path,
                                                            charset,
@@ -236,10 +260,6 @@ public class ApiServiceExecuteRestfulApi {
                                                            sheetName,
                                                            nullValue,
                                                            client);
-        } else{
-            resp.getWriter().println("当前用户不存在运行的TaskId");
-            resp.getWriter().flush();
-            return;
         }
         try {
             IOUtils.copy(inputStream, resp.getOutputStream());
@@ -257,8 +277,7 @@ public class ApiServiceExecuteRestfulApi {
         String username = SecurityFilter.getLoginUsername(req);
         ApiServiceJob apiServiceJob = queryService.getJobByTaskId(taskId.toString());
         if (null != apiServiceJob && username.equals(apiServiceJob.getSubmitUser())) {
-            Map<String, String> props = new HashMap<>();
-            UJESClient client = LinkisJobSubmit.getClient(props);
+            UJESClient client = LinkisJobSubmit.getClient();
             JobExecuteResult jobExecuteResult = apiServiceJob.getJobExecuteResult();
             jobExecuteResult.setUser(apiServiceJob.getProxyUser());
             Map<String, Object> vo = ExecuteCodeHelper.getTaskInfoById(jobExecuteResult, client);

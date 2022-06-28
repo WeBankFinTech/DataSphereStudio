@@ -73,6 +73,7 @@ public class NodeConverter {
             addObjectLine.accept("JOB_SOURCE", sourceMap);
             addLine.accept("CONTEXT_ID", workflow.getContextID());
             addLine.accept("LINKIS_GATEWAY_URL", Configuration.getGateWayURL());
+            addLine.accept("DS_VERSION", DolphinSchedulerConf.DS_VERSION.getValue());
             //todo
             addLine.accept("RUN_DATE", "${global_run_date}");
             addObjectLine.accept("JOB_LABELS", new EnvDSSLabel(SchedulerConf.JOB_LABEL.getValue()).getValue());

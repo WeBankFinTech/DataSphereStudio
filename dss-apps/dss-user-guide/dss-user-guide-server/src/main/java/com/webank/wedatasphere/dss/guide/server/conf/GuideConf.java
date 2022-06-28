@@ -16,4 +16,6 @@ public interface GuideConf {
 
     CommonVars<String> SUMMARY_IGNORE_MODEL = CommonVars.apply("summary.ignore.model","km");
 
+    CommonVars<String> GUIDE_SYNC_MODEL = CommonVars.apply("guide.sync.model","gitbook");
+
 }

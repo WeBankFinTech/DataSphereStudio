@@ -372,7 +372,7 @@ const action = function (url, data, option) {
                   style: {
                     background: '#ec6565',
                     color: '#fff',
-                    display: error.solution ? 'inline-block' : 'none'
+                    display: error.solution !== undefined ? 'inline-block' : 'none'
                   },
                   on: {
                     click: () => {
@@ -419,11 +419,7 @@ const action = function (url, data, option) {
 
         } else {
           Notice.error({desc: msg,  title: '错误提示', duration: 4});
-          throw error;
         }
-        setTimeout(() => {
-          lastMsg = ''
-        }, 4000)
       }
       if (error.message === API_ERR_MSG || error.msg === API_ERR_MSG) {
         if (showApiErrorTips) {
@@ -436,6 +432,10 @@ const action = function (url, data, option) {
       } else {
         showErrMsg()
       }
+      setTimeout(() => {
+        lastMsg = ''
+      }, 4000)
+      throw error;
     });
 };
 

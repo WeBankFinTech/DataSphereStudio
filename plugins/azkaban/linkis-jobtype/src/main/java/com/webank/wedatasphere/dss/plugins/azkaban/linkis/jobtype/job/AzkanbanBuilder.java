@@ -38,7 +38,7 @@ public class AzkanbanBuilder extends Builder {
     private static final Logger LOGGER = LoggerFactory.getLogger(AzkanbanBuilder.class);
 
     private static final String RUN_DATE_KEY = "run_date";
-    private static final String RUN_DATE_HOUR_KEY = "run_date_h";
+    private static final String RUN_DATE_HOUR_KEY = "run_today_h";
     private Map<String, String> jobProps;
 
     public AzkanbanBuilder setJobProps(Map<String, String> jobProps) {

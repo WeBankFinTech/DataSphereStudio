@@ -36,6 +36,10 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
+import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
+import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
+import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
@@ -50,6 +54,8 @@ import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
@@ -95,6 +101,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public DSSFlow getFlowByID(Long id) {
         return flowMapper.selectFlowByID(id);
     }
+
 
     @Override
     public DSSFlow getFlowWithJsonAndSubFlowsByID(Long rootFlowId) {
@@ -182,6 +189,34 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         DSSFlow.setFlowJson(query.get("string").toString());
         return DSSFlow;
     }
+
+    @Override
+    public List<String> getSubFlowContextIdsByFlowId(Long flowId) throws ErrorException {
+        ArrayList<String> contextIdList = new ArrayList<>();
+        // 1.查询是否有子工作流
+        List<Long> subFlowIdList = getSubFlowIdsByFlowId(flowId);
+        if (subFlowIdList == null || subFlowIdList.isEmpty()) {
+            return contextIdList;
+        }
+        //2.获取子工作流 contextId
+        JsonToFlowParser jsonToFlowParser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
+        for (Long subFlowId : subFlowIdList) {
+            DSSFlow dssFlow = getFlow(subFlowId);
+            Workflow workflow = jsonToFlowParser.parse(dssFlow);
+            String contextIDStr = ((WorkflowWithContextImpl) workflow).getContextID();
+            if (StringUtils.isNotBlank(contextIDStr)) {
+                // 获取需要清理的contextId
+                contextIdList.add(SerializeHelper.deserializeContextID(contextIDStr).getContextId());
+            }
+        }
+        return contextIdList;
+    }
+
+    @Override
+    public List<Long> getSubFlowIdsByFlowId(Long flowId) {
+        return flowMapper.selectSubFlowIdsByFlowId(flowId);
+    }
+
 
     @Lock
     @Transactional(rollbackFor = DSSErrorException.class)

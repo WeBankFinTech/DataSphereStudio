@@ -14,7 +14,7 @@
       ref="projectForm"
       :model="projectDataCurrent"
       :rules="formValid"
-      v-if="ProjectShow"
+      class="project_form"
     >
       <FormItem
         :label="$t('message.workflow.projectDetail.projectName')"
@@ -378,6 +378,7 @@ export default {
             if (success) this.ProjectShow = false;
             this.submiting = false;
           });
+          this.$refs.projectForm.resetFields();
         } else {
           this.submiting = false;
           this.$Message.warning(this.$t("message.workflow.failedNotice"));
@@ -386,6 +387,7 @@ export default {
     },
     Cancel() {
       this.ProjectShow = false;
+      this.$refs.projectForm.resetFields();
       this.projectData.business = this.originBusiness;
     },
     addTag(label) {
@@ -418,5 +420,11 @@ export default {
   margin-left: 10px;
   font-size: 16px;
   color: black;
+}
+.project_form {
+  height: 60vh;
+  overflow-y: auto;
+  padding: 5px;
+  max-height: 500px;
 }
 </style>

@@ -321,7 +321,7 @@ CREATE TABLE `dss_workflow` (
   `rank` int(10) DEFAULT NULL,
   `project_id` bigint(20) DEFAULT NULL,
   `has_saved` tinyint(1) DEFAULT NULL,
-  `uses` varchar(255) DEFAULT NULL,
+  `uses` varchar(500) DEFAULT NULL,
   `bml_version` varchar(255) DEFAULT NULL,
   `resource_id` varchar(255) DEFAULT NULL,
   `linked_appconn_names` varchar(255) DEFAULT NULL,

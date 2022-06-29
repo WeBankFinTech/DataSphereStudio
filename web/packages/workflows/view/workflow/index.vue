@@ -316,6 +316,11 @@ export default {
           this.currentProjectData.devProcessList.includes(item.dicValue)
         )
         : [];
+      // 切换项目，若项目没有对应模式，自动切换第一个
+      const checkHasMode = this.selectDevprocess.some(it => it.dicValue === this.modeOfKey)
+      if (this.selectDevprocess.length > 0 && !checkHasMode) {
+        this.handleChangeButton(this.selectDevprocess[0])
+      }
     },
     // 获取编排列表
     getSelectOrchestratorList() {
@@ -515,7 +520,6 @@ export default {
         this.modeOfKey = "streamis_prod"
         return;
       }
-      console.log(node)
       if (node && node.children.length < 1 && node.type === 'project') {
         this.currentTreeId = node.id;
         if (node.id != this.$route.query.projectID) {
@@ -1024,10 +1028,12 @@ export default {
       this.current = {};
       this.tabId = "";
       const routerMap =  { scheduler: 'Scheduler', dev: 'Workflow', prod: 'ScheduleCenter'}
-      this.$router.push({
-        name: routerMap[item.dicValue],
-        query: this.$route.query,
-      });
+      if (routerMap[item.dicValue]) {
+        this.$router.push({
+          name: routerMap[item.dicValue],
+          query: this.$route.query,
+        });
+      }
     },
     deleteEditLock(flowId) {
       const data = storage.get("flowEditLock") || {}

@@ -54,5 +54,8 @@ public interface FlowMapper {
     DSSFlowRelation selectFlowRelation(@Param("flowID") Long flowID, @Param("parentFlowID") Long parentFlowID);
 
     @Select("select creator from dss_flow where id = #{flowId}")
-    String getCreatorById(@Param("flowId")Long flowId);
+    String getCreatorById(@Param("flowId") Long flowId);
+
+    @Select("SELECT flow_id from dss_workflow_relation where parent_flow_id = #{flowId}")
+    List<Long> selectSubFlowIdsByFlowId(Long flowId);
 }

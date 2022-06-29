@@ -21,7 +21,7 @@ import java.util
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations}
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
@@ -101,6 +101,8 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
 
     case requestConvertOrchestrator: RequestConvertOrchestrations =>
       workflowManager.convertWorkflow(requestConvertOrchestrator)
+    case requestSubFlowContextIds : RequestSubFlowContextIds =>
+      workflowManager.getSubFlowContextIdsByFlowId(requestSubFlowContextIds)
 
     case _ => throw new DSSErrorException(90000, "Not support protocol " + message)
   }

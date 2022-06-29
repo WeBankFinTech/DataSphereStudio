@@ -20,9 +20,11 @@ import com.google.gson.*;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.exception.ErrorCode;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
@@ -76,8 +78,9 @@ public class ContextServiceImpl implements ContextService {
             return SerializeHelper.serializeContextID(contextID);
         } catch (Exception e) {
             logger.error("createContextID error. workspace : {}, project : {}, flow : {}, version : {}, user : {}", workspace, project, flow, version, user, e);
+            throw new DSSRuntimeException(50032, "Try to ask Linkis for creating a new contextId failed(向Linkis请求创建一个ContextID失败)! Linkis error msg: " +
+                    ExceptionUtils.getRootCauseMessage(e), e);
         }
-        return null;
     }
 
     @Override

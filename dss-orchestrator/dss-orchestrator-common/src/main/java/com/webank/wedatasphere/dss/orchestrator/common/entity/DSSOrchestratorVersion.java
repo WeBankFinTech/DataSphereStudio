@@ -38,6 +38,8 @@ public class DSSOrchestratorVersion {
     private String updater;
     private String content;
     private String contextId;
+    //有效标示 0:无效；1：有效，默认是有效
+    private Integer validFlag;
 
 
     public Long getId() {
@@ -128,6 +130,14 @@ public class DSSOrchestratorVersion {
         this.contextId = contextId;
     }
 
+    public Integer getValidFlag() {
+        return validFlag;
+    }
+
+    public void setValidFlag(Integer validFlag) {
+        this.validFlag = validFlag;
+    }
+
     /**
      * 提取出contextId
      */
@@ -162,6 +172,7 @@ public class DSSOrchestratorVersion {
                 ", updater='" + updater + '\'' +
                 ", content='" + content + '\'' +
                 ", contextId='" + contextId + '\'' +
+                ", validFlag='" + validFlag + '\'' +
                 '}';
     }
 }

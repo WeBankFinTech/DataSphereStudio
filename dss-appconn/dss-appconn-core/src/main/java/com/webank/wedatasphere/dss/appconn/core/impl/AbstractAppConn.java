@@ -26,12 +26,13 @@ import com.webank.wedatasphere.dss.standard.common.core.AppIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public abstract class AbstractAppConn implements AppConn {
@@ -64,7 +65,7 @@ public abstract class AbstractAppConn implements AppConn {
      * and returning as standard type to initialize the specifications owned by appconn.
      * */
     @Override
-    public final void init() throws AppConnErrorException {
+    public void init() throws AppConnErrorException {
         initialize();
         appStandards = Arrays.stream(getClass().getDeclaredMethods()).map(method -> {
             String methodName = method.getName();

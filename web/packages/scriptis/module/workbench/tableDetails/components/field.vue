@@ -81,7 +81,7 @@ export default {
     return {
       searchText: '',
       searchColList: [],
-      editModelShow: true,
+      editModelShow: false,
       fieldModel: {},
       tableColumns: [
         { title: this.$t('message.scripts.tableDetails.ZDM'), key: 'name', className: 'field-table-name' },

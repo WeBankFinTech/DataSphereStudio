@@ -1,7 +1,5 @@
 <template>
-  <div style="height: 100%;">
-    <bankHome />
-  </div>
+  <bankHome style="height: 100%; overflow-y:auto"/>
 </template>
 
 <script>

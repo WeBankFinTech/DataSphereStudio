@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.orchestrator.db.dao;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import org.apache.ibatis.annotations.*;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -123,4 +122,8 @@ public interface OrchestratorMapper {
     List<DSSOrchestratorInfo> queryOrchestratorInfos(@Param("params") Map<String, Object> params);
 
     DSSOrchestratorRefOrchestration getRefOrchestrationId(@Param("orchestratorId") Long orchestratorId);
+
+    List<DSSOrchestratorVersion> getHistoryOrcVersion(@Param("version") String version);
+
+    void batchUpdateOrcInfo(@Param("list") List<DSSOrchestratorVersion> historyOrcVersion);
 }

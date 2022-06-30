@@ -40,22 +40,22 @@
     </virtual-list>
     <Modal v-model="editModelShow" :title="$t('message.scripts.createTable.titleModel')" :footer-hide="true">
       <Form :model="fieldModel" :label-width="80">
-        <Form-item prop="name" label="����">
+        <Form-item prop="name" label="名称">
           <Input v-model="fieldModel.name" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="type" label="����">
+        <Form-item prop="type" label="类型">
           <RadioGroup v-model="fieldModel.type">
-            <Radio label="index" disabled>ָ��</Radio>
-            <Radio label="dimension" disabled>ά��</Radio>
+            <Radio label="index" disabled>指标</Radio>
+            <Radio label="dimension" disabled>维度</Radio>
           </RadioGroup>
         </Form-item>
-        <Form-item prop="business" label="ҵ��ھ�">
+        <Form-item prop="business" label="业务口径">
           <Input v-model="fieldModel.business" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="calculate" label="����ھ�">
+        <Form-item prop="calculate" label="计算指标">
           <Input v-model="fieldModel.calculate" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="formula" label="���㹫ʽ">
+        <Form-item prop="formula" label="计算公式">
           <Input v-model="fieldModel.formula" type="textarea" placeholder="" :disabled="true"></Input>
         </Form-item>
       </Form>

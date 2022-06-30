@@ -239,4 +239,42 @@
         from dss_orchestrator_ref_orchestration_relation
         where orchestrator_id = #{orchestratorId}
     </select>
+
+
+    <select id="getHistoryOrcVersion"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        SELECT
+        b.orchestrator_id ,
+        b.context_id ,
+        b.app_id,
+        b.id
+        FROM
+        dss_release_task a
+        LEFT JOIN dss_orchestrator_version_info b ON
+        a.orchestrator_version_id = b.id
+        left join dss_orchestrator_info c on
+        c.id = b.orchestrator_id
+        left join (
+        select
+        orchestrator_id, max(version) as maxVersion
+        from
+        dss_orchestrator_version_info
+        group by
+        orchestrator_id
+        HAVING
+        max(version) &gt;= #{version}) tmp on
+        b.orchestrator_id = tmp.orchestrator_id
+        where
+        a.status = 'Success'
+        and b.version &lt; tmp.maxVersion
+        and b.context_id is not null
+        order by a.id desc
+    </select>
+
+    <update id="batchUpdateOrcInfo" parameterType="java.util.List">
+        update dss_orchestrator_version_info set context_id ='' where id in
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item.id}
+        </foreach>
+    </update>
 </mapper>

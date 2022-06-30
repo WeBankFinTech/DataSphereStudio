@@ -21,9 +21,14 @@ import com.webank.wedatasphere.dss.appconn.sendemail.email.EmailSender;
 import org.apache.linkis.common.utils.Utils;
 import scala.runtime.BoxedUnit;
 
+import java.util.Map;
 import java.util.concurrent.Future;
 
 public abstract class AbstractEmailSender implements EmailSender {
+
+    @Override
+    public void init(Map<String, String> properties) {
+    }
 
     @Override
     public Future<BoxedUnit> sendAsync(Email email) {

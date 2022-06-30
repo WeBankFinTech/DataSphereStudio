@@ -79,6 +79,17 @@
       </includes>
     </fileSet>
 
+    <!--dss-framework-migrate-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-framework/framework-plugins/dss-framework-migrate-server/target/
+      </directory>
+      <outputDirectory>lib/dss-framework/dss-framework-project-server</outputDirectory>
+      <includes>
+        <include>*${dss.version}.jar</include>
+      </includes>
+    </fileSet>
+
     <!--dss-framework-orchestrator-server-->
     <fileSet>
       <directory>
@@ -178,10 +189,21 @@
       </includes>
     </fileSet>
 
-    <!--dss-visualis-appconn-->
+    <!--dss-sso-appconn-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-appconn/appconns/dss-visualis-appconn/target/out/
+        ${basedir}/../../dss-appconn/appconns/dss-sso-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-scriptis-appconn-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-scriptis-appconn/target/out/
       </directory>
       <outputDirectory>dss-appconns</outputDirectory>
       <includes>
@@ -204,6 +226,16 @@
     <fileSet>
       <directory>
         ${basedir}/../../dss-appconn/appconns/dss-sendemail-appconn/sendemail-appconn-core/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-dolphinscheduler-appconn/target/out/
       </directory>
       <outputDirectory>dss-appconns</outputDirectory>
       <includes>
@@ -244,9 +276,42 @@
     <!--dss-datapipe-server-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-apps/dss-datapipe-server/target/out/dss-datapipe-server/lib/
+        ${basedir}/../../dss-apps/dss-scriptis-server/target/out/dss-scriptis-server/lib/
       </directory>
-      <outputDirectory>lib/dss-apps/dss-datapipe-server</outputDirectory>
+      <outputDirectory>lib/dss-apps/dss-scriptis-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-data-api-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-data-api/dss-data-api-server/target/out/dss-data-api-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-data-api/dss-data-api-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-data-governance-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-data-governance/dss-data-governance-server/target/out/dss-data-governance-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-data-governance/dss-data-governance-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <!--dss-guide-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-apps/dss-user-guide/dss-user-guide-server/target/out/dss-user-guide-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-guide/dss-guide-server</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>

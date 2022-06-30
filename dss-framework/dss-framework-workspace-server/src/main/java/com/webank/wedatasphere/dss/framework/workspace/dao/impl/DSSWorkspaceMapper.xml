@@ -25,15 +25,6 @@
         <id property="lastUpdateUser" column="last_update_user"/>
     </resultMap>
 
-    <resultMap id="dss_menu_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu">
-        <id property="upperMenuId" column="upper_menu_id"/>
-        <id property="active" column="is_active"/>
-        <id property="component" column="is_component"/>
-        <id property="frontName" column="front_name"/>
-        <id property="icon" column="icon"/>
-        <id property="applicationId" column="application_id"/>
-    </resultMap>
-
     <resultMap id="dss_workspace_user_map" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser">
         <id property="joinTime" column="join_time"/>
         <id property="creator" column="created_by"/>
@@ -49,13 +40,13 @@
     </resultMap>
 
     <sql id="dss_workspace_main">
-        id,`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`
+       id,`name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`
     </sql>
 
     <insert id="createWorkSpace" useGeneratedKeys="true" keyProperty="id"  parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
         INSERT INTO dss_workspace(<include refid = "dss_workspace_main" />)
         VALUES
-        (#{id},#{name},#{label},#{description},#{createBy},#{createTime},#{department},#{product},#{source},#{lastUpdateTime},#{lastUpdateUser})
+        (#{id},#{name},#{label},#{description},#{createBy},#{createTime},#{department},#{product},#{source},#{lastUpdateTime},#{lastUpdateUser},#{workspaceType})
     </insert>
 
     <sql id="dss_add_workspace_user">
@@ -63,19 +54,25 @@
     </sql>
 
     <select id="getWorkspaces" resultMap="dss_workspace">
-        SELECT * from dss_workspace where id in (select workspace_id from dss_workspace_user WHERE username = #{username})
+        SELECT * from dss_workspace where id in (select distinct workspace_id from dss_workspace_user_role WHERE username = #{username}) order by create_time desc
     </select>
 
     <select id="getMenuId" resultType="java.lang.Integer">
-        SELECT menu_id from dss_menu_role WHERE role_id = #{roleId} and workspace_id = #{workspaceId} and priv >= 1
+        SELECT menu_id from dss_workspace_menu_role WHERE role_id = #{roleId} and workspace_id = #{workspaceId} and priv >= 1
     </select>
 
-    <select id="getSpaceMenu" resultMap="dss_menu_map">
-        SELECT * from dss_menu WHERE id = #{menuId}
+    <select id="getUserMenuAppConnId" resultType="java.lang.Long">
+        SELECT DISTINCT(doma.id)
+        FROM dss_workspace_user_role dwur
+        LEFT JOIN dss_workspace_appconn_role dcr ON dwur.role_id = dcr.role_id
+        LEFT JOIN dss_workspace_menu_appconn doma ON dcr.appconn_id = doma.appconn_id
+        WHERE dwur.workspace_id=#{workspaceId} AND dwur.username=#{username}
+        AND dcr.workspace_id=#{workspaceId} AND dcr.priv>0
+        AND doma.appconn_id IS NOT NULL
     </select>
 
     <select id="getDSSWorkspaceMenuPriv" resultMap="dss_workspace_menu_priv_map">
-        SELECT * from dss_menu_role where workspace_id = #{workspaceId}
+        SELECT * from dss_workspace_menu_role where workspace_id = #{workspaceId}
     </select>
 
 </mapper>

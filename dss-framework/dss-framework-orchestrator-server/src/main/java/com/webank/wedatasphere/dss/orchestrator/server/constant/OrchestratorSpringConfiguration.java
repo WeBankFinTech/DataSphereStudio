@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.constant;
 
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.impl.OrchestratorFrameworkServiceImpl;
 import com.webank.wedatasphere.dss.orchestrator.server.service.impl.OrchestratorPluginServiceImpl;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +31,12 @@ public class OrchestratorSpringConfiguration {
     @ConditionalOnMissingBean
     public OrchestratorPluginService createOrchestratorPluginService() {
         return new OrchestratorPluginServiceImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OrchestratorFrameworkService createOrchestratorFrameworkService() {
+        return new OrchestratorFrameworkServiceImpl();
     }
 
 }

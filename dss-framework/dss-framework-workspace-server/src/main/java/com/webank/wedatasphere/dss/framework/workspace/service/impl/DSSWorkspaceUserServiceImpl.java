@@ -41,14 +41,14 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
 
     @Autowired
-    StaffInfoGetter staffInfoGetter;
+    private StaffInfoGetter staffInfoGetter;
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator) {
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
         roles.forEach(role ->{
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, role, userName, creator);
+            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, role, userName, creator, 0L);
         });
     }
 
@@ -56,7 +56,6 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteWorkspaceUser(String userName, int workspaceId) {
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
-        dssWorkspaceUserMapper.removeUserInWorkspace(userName, workspaceId);
     }
 
     @Override
@@ -92,8 +91,23 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public    List<Integer>   getUserWorkspaceIds(String userName){
+    public List<Integer> getUserWorkspaceIds(String userName) {
         List<Integer> tempWorkspaceIds = dssWorkspaceUserMapper.getWorkspaceIds(userName);
-        return  tempWorkspaceIds;
+        return tempWorkspaceIds;
+    }
+
+    @Override
+    public List<String> getWorkspaceEditUsers(int workspaceId) {
+        return dssWorkspaceUserMapper.getWorkspaceEditUsers(workspaceId);
+    }
+
+    @Override
+    public List<String> getWorkspaceReleaseUsers(int workspaceId) {
+        return dssWorkspaceUserMapper.getWorkspaceReleaseUsers(workspaceId);
+    }
+
+    @Override
+    public Long getCountByUsername(String username,int workspaceId){
+        return dssWorkspaceUserMapper.getCountByUsername(username,workspaceId);
     }
 }

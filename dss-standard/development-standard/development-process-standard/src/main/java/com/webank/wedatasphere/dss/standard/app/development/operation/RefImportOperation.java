@@ -16,12 +16,27 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.operation;
 
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public interface RefImportOperation<K extends RequestRef> extends DevelopmentOperation<K, ResponseRef> {
+/**
+ * 通过传入 Linkis BML 物料或 InputStream 字节流，第三方 AppConn 需支持将其转换成一个 refJob。
+ * @param <K>
+ */
+public interface RefImportOperation<K extends ImportRequestRef<K>>
+        extends DevelopmentOperation<K, RefJobContentResponseRef> {
 
-    ResponseRef importRef(K requestRef) throws ExternalOperationFailedException;
+    /**
+     * The resourceMap in {@code ImportRequestRef} is the content of {@code ExportRequestRef} exported.
+     * <br>
+     * Now, DSS only supports to import Linkis BML resources or {@code InputStream},
+     * so if you want to choose Linkis BML resources to ex/import, the resourceMap is consisted of `resourceId`
+     * and `version`, otherwise the resourceMap is consisted of inputStream.
+     * <br/>
+     * For more information about {@code requestRef}, please see {@code ImportRequestRef}.
+     * @return a refJobContent related to a only third appConn refJob which created by the resourceMap.
+     */
+    RefJobContentResponseRef importRef(K requestRef) throws ExternalOperationFailedException;
 
 }

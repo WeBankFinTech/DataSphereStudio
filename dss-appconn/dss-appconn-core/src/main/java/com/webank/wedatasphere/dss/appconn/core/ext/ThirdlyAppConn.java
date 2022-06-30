@@ -17,7 +17,8 @@
 package com.webank.wedatasphere.dss.appconn.core.ext;
 
 /**
- * Including the first, second and third level standards
+ * {@code OnlySSOAppConn}、{@code OnlyStructureAppConn} 和 {@code OnlyDevelopmentAppConn} 的子类。
+ * 表示第三方系统既想打通 SSO 和组织结构，又想作为 DSS 工作流的一个节点集成进来。
  * */
 public interface ThirdlyAppConn extends OnlySSOAppConn, OnlyStructureAppConn, OnlyDevelopmentAppConn{
 }

@@ -19,7 +19,11 @@ package com.webank.wedatasphere.dss.standard.app.sso.request;
 
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
 
-
+/**
+ * 提供通用的、可以向与 DSS 集成的第三方 AppConn 系统发送前端或后台请求的服务能力。
+ * <br/>
+ * 强烈推荐不要修改 AbstractOnlySSOAppConn 的体系结构，直接使用 DSS 系统默认提供的 OriginSSORequestServiceImpl
+ */
 public interface SSORequestService extends AppService {
 
     SSORequestOperation createSSORequestOperation(String appName);

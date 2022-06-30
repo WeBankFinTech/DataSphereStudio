@@ -22,15 +22,48 @@ import java.util.List;
 
 public class NodeInfo implements Serializable {
     private Integer id;
-    private String icon;
+    /**
+     * 工作流节点图标路径，每个工作流节点的图标都存储在对应的 AppConn 之中
+     */
+    private String iconPath;
+    /**
+     * 工作流节点类型，必须以 linkis.[appconn/engineconn]开头。
+     * 例如：
+     *  1. 如果是 sparkSQL，则必须是：linkis.spark.sql
+     *  2. 如果是 Visualis 的 widget，则必须是：linkis.appconn.visualis.widget
+     */
     private String nodeType;
+    /**
+     * 所关联的 AppConn 的 id
+     */
     private Integer appConnId;
+    /**
+     * 所关联的 AppConn 的 name
+     */
     private String appConnName;
-    private Boolean submitToScheduler; //是否可以提交执行
+    /**
+     * 【保留字段】表示是否可以发布给调度系统
+     */
+    private Boolean submitToScheduler;
+    /**
+     * 节点是否支持拷贝
+     */
     private Boolean enableCopy;
+    /**
+     * 该节点在拖拽到工作流画布前，是否需要先弹窗创建
+     */
     private Boolean shouldCreationBeforeNode;
+    /**
+     * 是否支持跳转URL，即工作流节点是否支持Iframe嵌入
+     */
     private Boolean supportJump;
-    private String jumpUrl;
+    /**
+     * 跳转类型：1 表示是外部节点，2 表示是 Scriptis 节点。如果 supportJump 为 false，则该字段无意义。
+     */
+    private int jumpType;
+    /**
+     * 节点名
+     */
     private String name;
     private List<NodeUi> nodeUis;
 
@@ -58,12 +91,12 @@ public class NodeInfo implements Serializable {
         this.id = id;
     }
 
-    public String getIcon() {
-        return icon;
+    public String getIconPath() {
+        return iconPath;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setIconPath(String iconPath) {
+        this.iconPath = iconPath;
     }
 
     public String getNodeType() {
@@ -122,11 +155,11 @@ public class NodeInfo implements Serializable {
         this.supportJump = supportJump;
     }
 
-    public String getJumpUrl() {
-        return jumpUrl;
+    public int getJumpType() {
+        return jumpType;
     }
 
-    public void setJumpUrl(String jumpUrl) {
-        this.jumpUrl = jumpUrl;
+    public void setJumpType(int jumpType) {
+        this.jumpType = jumpType;
     }
 }

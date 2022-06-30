@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-@TableName(value = "dss_menu_role")
+@TableName(value = "dss_workspace_menu_role")
 public class DSSMenuRole implements Serializable {
 
     private static final long serialVersionUID=1L;

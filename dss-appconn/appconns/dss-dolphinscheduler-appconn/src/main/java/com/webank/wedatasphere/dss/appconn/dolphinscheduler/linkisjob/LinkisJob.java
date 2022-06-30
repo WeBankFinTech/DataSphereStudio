@@ -20,9 +20,6 @@ package com.webank.wedatasphere.dss.appconn.dolphinscheduler.linkisjob;
 
 import java.util.Map;
 
-/**
- * Created by v_wbjftang on 2019/11/1.
- */
 public class LinkisJob {
     private String name;
     private String type;

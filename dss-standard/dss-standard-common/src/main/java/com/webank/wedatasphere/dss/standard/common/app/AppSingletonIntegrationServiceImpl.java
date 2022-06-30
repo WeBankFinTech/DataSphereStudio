@@ -35,6 +35,7 @@ public class AppSingletonIntegrationServiceImpl<O extends Operation, T extends A
                 return null;
             }
             initOperation(t);
+            t.init();
             appOperations.add(t);
             return t;
         };

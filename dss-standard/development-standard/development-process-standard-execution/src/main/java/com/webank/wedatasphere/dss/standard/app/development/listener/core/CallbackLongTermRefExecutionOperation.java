@@ -17,16 +17,18 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.core;
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionResponseRef;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.CompletedExecutionResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
 import com.webank.wedatasphere.dss.standard.app.development.listener.conf.RefExecutionConfiguration;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.AsyncExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public abstract class CallbackLongTermRefExecutionOperation extends LongTermRefExecutionOperation {
+public abstract class CallbackLongTermRefExecutionOperation<K extends RefExecutionRequestRef<K>>
+        extends LongTermRefExecutionOperation<K> {
 
     protected Map<RefExecutionAction, AsyncExecutionResponseRef> asyncResponses = new ConcurrentHashMap<RefExecutionAction, AsyncExecutionResponseRef>();
 
@@ -37,16 +39,18 @@ public abstract class CallbackLongTermRefExecutionOperation extends LongTermRefE
 
     public abstract void acceptCallback(Map<String, Object> callbackMap);
 
-    protected void markCompleted(RefExecutionAction action, CompletedExecutionResponseRef resultResponse) {
+    protected void markCompleted(RefExecutionAction action, ExecutionResponseRef resultResponse) {
         AsyncExecutionResponseRef response = asyncResponses.get(action);
         asyncResponses.remove(action);
         response.setCompleted(resultResponse);
     }
 
     @Override
-    protected AsyncExecutionResponseRef createAsyncResponseRef(ExecutionRequestRef requestRef, RefExecutionAction action) {
-        AsyncExecutionResponseRef response = super.createAsyncResponseRef(requestRef, action);
-        response.setAskStatePeriod(RefExecutionConfiguration.CALLBACK_REF_EXECUTION_REFRESH_INTERVAL().getValue().toLong());
+    protected AsyncExecutionResponseRef createAsyncResponseRef(K requestRef, RefExecutionAction action) {
+        AsyncExecutionResponseRef oldResponse = super.createAsyncResponseRef(requestRef, action);
+        AsyncExecutionResponseRef response = AsyncExecutionResponseRef.newBuilder().setAsyncExecutionResponseRef(oldResponse)
+            .setAskStatePeriod(RefExecutionConfiguration.CALLBACK_REF_EXECUTION_REFRESH_INTERVAL().getValue().toLong())
+                .build();
         asyncResponses.put(action, response);
         return response;
     }

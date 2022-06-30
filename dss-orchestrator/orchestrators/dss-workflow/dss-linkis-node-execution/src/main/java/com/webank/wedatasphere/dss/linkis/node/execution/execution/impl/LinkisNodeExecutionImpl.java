@@ -27,10 +27,6 @@ import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobRuntimeParamsParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLService;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.impl.BuildJobActionImpl;
-import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.CodeParser;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParser;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisUjesClientUtils;
 import org.apache.linkis.common.exception.LinkisException;
@@ -83,10 +79,10 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         synchronized (clientMap) {
             if(!clientMap.containsKey(linkisUrl)) {
                 UJESClient client = LinkisUjesClientUtils.getUJESClient(
-                    linkisUrl,
-                    LinkisJobExecutionConfiguration.LINKIS_ADMIN_USER.getValue(props),
-                    LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(props),
-                    props);
+                        linkisUrl,
+                        LinkisJobExecutionConfiguration.LINKIS_ADMIN_USER.getValue(props),
+                        LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(props),
+                        props);
                 clientMap.put(linkisUrl, client);
                 job.getLogObj().info("Create a new Linkis client by " + linkisUrl);
                 return client;
@@ -178,7 +174,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         while (retryCnt++ < MAX_RETRY_TIMES) {
             try {
                 openLogResult = getClient(job).openLog(OpenLogAction.newBuilder().setLogPath(logPath).setProxyUser(user).build());
-                job.getLogObj().info("persisted-log-result:" + LinkisJobExecutionUtils.gson.toJson(openLogResult));
+                //job.getLogObj().info("persisted-log-result:" + LinkisJobExecutionUtils.gson.toJson(openLogResult));
                 if (openLogResult == null ||
                         0 != openLogResult.getStatus() ||
                         StringUtils.isBlank(openLogResult.getLog()[LinkisJobExecutionUtils.IDX_FOR_LOG_TYPE_ALL])) {
@@ -241,7 +237,7 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
                 //ignore
             }
             if (progress >= 0){
-                job.getLogObj().info("Update Progress info:" + progress);
+                job.getLogObj().info("Update Progress info: " + progress);
             }
             JobInfoResult oldJobInfo = jobInfo;
             try{
@@ -260,7 +256,8 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
             printJobLog(job);
         }
         if (!jobInfo.isSucceed()) {
-            //printJobLog(job);
+            Utils.sleepQuietly(LinkisJobExecutionConfiguration.LINKIS_JOB_REQUEST_STATUS_TIME.getValue(job.getJobProps()));
+            printJobLog(job);
             throw new LinkisJobExecutionErrorException(90101, "Failed to execute Job: " + jobInfo.getMessage());
         }
     }
@@ -289,7 +286,11 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
 
     @Override
     public void cancel(Job job) throws Exception {
-        getClient(job).kill(job.getJobExecuteResult());
+        try {
+            getClient(job).kill(job.getJobExecuteResult());
+        } catch (Exception e) {
+            job.getLogObj().error("linkis execute kill operation failed,reason:" + e.getMessage() + "");
+        }
     }
 
     @Override

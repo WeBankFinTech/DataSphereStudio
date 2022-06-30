@@ -19,19 +19,19 @@ package com.webank.wedatasphere.dss.orchestrator.converter.standard.operation;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.ConversionService;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.DSSToRelConversionService;
+import com.webank.wedatasphere.dss.standard.app.sso.operation.AbstractOperation;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
 
-public abstract class DSSToRelConversionOperation implements ConversionOperation<DSSToRelConversionRequestRef, ResponseRef> {
-
-    private DSSToRelConversionService conversionService;
+public abstract class DSSToRelConversionOperation<K extends DSSToRelConversionRequestRef<K>, V extends ResponseRef>
+        extends AbstractOperation<K, V> implements ConversionOperation<K, V> {
 
     @Override
-    public void setConversionService(ConversionService conversionService) {
-        this.conversionService = (DSSToRelConversionService) conversionService;
+    public final void setConversionService(ConversionService conversionService) {
+        this.service =  conversionService;
     }
 
     public DSSToRelConversionService getConversionService() {
-        return this.conversionService;
+        return (DSSToRelConversionService) this.service;
     }
 }

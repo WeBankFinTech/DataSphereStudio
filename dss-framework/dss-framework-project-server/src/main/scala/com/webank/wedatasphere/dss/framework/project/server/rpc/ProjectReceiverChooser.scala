@@ -16,10 +16,15 @@
 
 package com.webank.wedatasphere.dss.framework.project.server.rpc
 
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest
-import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService
-import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
+import com.webank.wedatasphere.dss.common.protocol.ProxyUserCheckRequest
+import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRelationRequest}
+import com.webank.wedatasphere.dss.framework.admin.service.DssProxyUserService
+import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestProjectImportOrchestrator, RequestProjectUpdateOrcVersion}
 import javax.annotation.PostConstruct
+import org.apache.linkis.protocol.usercontrol.{RequestUserListFromWorkspace, RequestUserWorkspace}
+import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -27,17 +32,31 @@ import org.springframework.stereotype.Component
 @Component
 class ProjectReceiverChooser extends ReceiverChooser {
 
+  @Autowired
+  private var projectService: DSSProjectService = _
 
   @Autowired
-  var projectService: DSSProjectService = _
+  private var dssWorkspaceUserService: DSSWorkspaceUserService = _
+
+  @Autowired
+  private var dssProjectUserService: DSSProjectUserService = _
+
+  @Autowired
+  private var dssProxyUserService : DssProxyUserService= _
 
   private var receiver: Option[ProjectReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new ProjectReceiver(projectService))
+  def init(): Unit = receiver = Some(new ProjectReceiver(projectService, dssWorkspaceUserService, dssProjectUserService,dssProxyUserService))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: ProjectRelationRequest => receiver
+    case _: RequestUserWorkspace => receiver
+    case _: RequestUserListFromWorkspace => receiver
+    case _: ProjectInfoRequest => receiver
+    case _: RequestProjectImportOrchestrator => receiver
+    case _: RequestProjectUpdateOrcVersion => receiver
+    case _: ProxyUserCheckRequest => receiver
     case _ => None
   }
 }

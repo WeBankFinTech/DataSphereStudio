@@ -20,9 +20,20 @@ import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorExc
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 
-
+/**
+ * 向与 DSS 集成的第三方 AppConn 系统发送前端或后台请求。
+ * @param <T>
+ * @param <R>
+ */
 public interface SSORequestOperation<T, R> extends Operation {
 
+    /**
+     * 提供通用的、可以向与 DSS 集成的第三方 AppConn 系统发送前端或后台请求的操作能力。
+     * @param urlBuilder 向第三方 AppConn 系统发起请求的 URL 构造器
+     * @param req Http 请求实体
+     * @return Http 请求结果
+     * @throws AppStandardErrorException Http 请求失败则抛出该异常
+     */
     R requestWithSSO(SSOUrlBuilderOperation urlBuilder, T req) throws AppStandardErrorException;
 
 }

@@ -70,7 +70,6 @@ public class JwtManager {
     public static SecretKey generalKey() {
         byte[] encodedKey = Base64.decode(JWT_SECERT);
         SecretKey key = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
-        LOG.info("token key str:"+key.toString());
         return key;
     }
 

@@ -18,47 +18,64 @@ package com.webank.wedatasphere.dss.standard.app.sso;
 
 import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
-import com.webank.wedatasphere.dss.standard.app.sso.plugin.SSOIntegrationConf;
+import org.apache.linkis.common.conf.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class Workspace implements DSSWorkspace {
 
+    protected long workspaceId;
     protected String workspaceName;
+    protected Map<String, String> cookies = new HashMap<>();
+    protected String dssUrl = Configuration.GATEWAY_URL().getValue();
 
-    protected transient SSOUrlBuilderOperation ssoUrlBuilderOperation;
+    @Override
+    public long getWorkspaceId() {
+        return workspaceId;
+    }
 
-    private String operationStr;
+    public void setWorkspaceId(long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
 
     @Override
     public String getWorkspaceName() {
         return this.workspaceName;
     }
 
-
     public void setWorkspaceName(String workspaceName) {
         this.workspaceName = workspaceName;
     }
 
-
-    public SSOUrlBuilderOperation getSSOUrlBuilderOperation() {
-        if (this.ssoUrlBuilderOperation == null) {
-            this.ssoUrlBuilderOperation = SSOUrlBuilderOperationImpl.restore(operationStr);
-        }
-        return this.ssoUrlBuilderOperation;
+    public Map<String, String> getCookies() {
+        return cookies;
     }
 
-
-    public void setSSOUrlBuilderOperation(SSOUrlBuilderOperation ssoUrlBuilderOperation) {
-        this.ssoUrlBuilderOperation = ssoUrlBuilderOperation;
-        this.operationStr = SSOIntegrationConf.gson().toJson(ssoUrlBuilderOperation);
+    public void addCookie(String key, String value) {
+        cookies.put(key, value);
     }
 
-    public String getOperationStr() {
-        return operationStr;
+    public void setCookies(Map<String, String> cookies) {
+        this.cookies = cookies;
     }
 
-    public void setOperationStr(String operationStr) {
-        this.operationStr = operationStr;
+    public String getDssUrl() {
+        return dssUrl;
+    }
+
+    public void setDssUrl(String dssUrl) {
+        this.dssUrl = dssUrl;
+    }
+
+    @Override
+    public String toString() {
+        return "Workspace{" +
+                "workspaceId=" + workspaceId +
+                ", workspaceName='" + workspaceName + '\'' +
+                ", cookies=" + cookies +
+                ", dssUrl='" + dssUrl + '\'' +
+                '}';
     }
 }

@@ -1,0 +1,22 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.webank.wedatasphere.dss.guide.server.dao.GuideContentMapper">
+
+    <insert id="batchInsert" keyColumn="id" keyProperty="id" parameterType="map" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into dss_guide_content
+        (group_id, `path`, title, title_alias, seq, `type`, content, content_html, create_by,
+        create_time, update_by, update_time, is_delete)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.groupId}, #{item.path}, #{item.title},
+            #{item.titleAlias}, #{item.seq}, #{item.type},
+            #{item.content}, #{item.contentHtml},
+            #{item.createBy}, #{item.createTime}, #{item.updateBy},
+            #{item.updateTime}, #{item.isDelete})
+        </foreach>
+    </insert>
+
+    <select id="initContentId">
+        truncate table dss_guide_content;
+    </select>
+</mapper>

@@ -34,4 +34,11 @@ public interface Workflow extends Flow {
 
     List<Map<String, Object>> getFlowProperties();
 
+    Long getCreateTime();
+
+    Long getUpdateTime();
+
+    String getUpdateUser();
+
+
 }

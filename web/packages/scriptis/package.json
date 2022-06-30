@@ -1,0 +1,8 @@
+{
+  "name": "@dataspherestudio/scriptis",
+  "version": "1.1.4",
+  "dependencies": {
+    "@dataspherestudio/shared": "^1.1.4",
+    "vuedraggable": "2.24.3"
+  }
+}

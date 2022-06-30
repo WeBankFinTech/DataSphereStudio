@@ -16,15 +16,15 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.standard;
 
+import com.webank.wedatasphere.dss.appconn.scheduler.AbstractSchedulerStructureIntegrationStandard;
 import com.webank.wedatasphere.dss.appconn.schedulis.service.SchedulisProjectService;
-import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 
 
 /**
  * Schedulis's engineering integration specification is a singleton.
  */
-public class SchedulisStructureStandard  extends AbstractStructureIntegrationStandard {
+public class SchedulisStructureStandard  extends AbstractSchedulerStructureIntegrationStandard {
 
     private volatile static SchedulisStructureStandard instance;
 

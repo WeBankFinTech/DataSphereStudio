@@ -19,20 +19,21 @@ package com.webank.wedatasphere.dss.framework.workspace.util;
 
 public enum CommonRoleEnum {
     /**
-     * 通用角色的枚举
+     * 通用角色的枚举，name必须和数据库一致
      */
     ADMIN(1, "admin", "管理员"),
-    MAINTENANCE(2, "maintaince","运维人员"),
+    MAINTENANCE(2, "maintenance", "运维人员"),
     DEVELOPER(3, "developer", "开发人员"),
     ANALYSER(4, "analyser", "分析用户"),
     OPERATOR(5, "operator", "运营用户"),
-    BOSS(6, "boss", "领导");
+    BOSS(6, "boss", "领导"),
+    APIUSER(7, "apiUser", "数据服务用户");
 
     private int id;
     private String name;
     private String frontName;
 
-    private CommonRoleEnum(int id, String name, String frontName){
+    private CommonRoleEnum(int id, String name, String frontName) {
         this.id = id;
         this.name = name;
         this.frontName = frontName;

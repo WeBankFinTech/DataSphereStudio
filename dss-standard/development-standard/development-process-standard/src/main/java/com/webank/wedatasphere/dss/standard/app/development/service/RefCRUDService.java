@@ -22,19 +22,43 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreatio
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.CreateRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.DeleteRequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.DSSJobContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateRequestRef;
 
+/**
+ * Job 管理规范，主要用于管理第三方 AppConn 的 Job（命名为 refJob）。
+ * <br/>
+ * 建议直接继承 AbstractRefCRUDService
+ */
 public interface RefCRUDService extends DevelopmentService {
 
-     <K extends CreateRequestRef> RefCreationOperation<K> getRefCreationOperation();
+     /**
+      * 第三方应用工具的 Job（命名为 refJob）的创建操作。
+      * @param <K> DSSJobContentRequestRef 的实现类
+      * @return RefCreationOperation 的实现类
+      */
+     <K extends DSSJobContentRequestRef<K>> RefCreationOperation<K> getRefCreationOperation();
 
-     <K extends CopyRequestRef> RefCopyOperation<K> getRefCopyOperation();
+     /**
+      * 第三方应用工具的 Job（命名为 refJob）的复制操作。
+      * @param <K> CopyRequestRef 的实现类
+      * @return RefCopyOperation 的实现类
+      */
+     <K extends CopyRequestRef<K>> RefCopyOperation<K> getRefCopyOperation();
 
-     <K extends RequestRef> RefUpdateOperation<K> getRefUpdateOperation();
+     /**
+      * 第三方应用工具的 Job（命名为 refJob）的更新操作。
+      * @param <K> UpdateRequestRef 的实现类
+      * @return RefUpdateOperation 的实现类
+      */
+     <K extends UpdateRequestRef<K>> RefUpdateOperation<K> getRefUpdateOperation();
 
-     <K extends DeleteRequestRef> RefDeletionOperation<K> getRefDeletionOperation();
+     /**
+      * 第三方应用工具的 Job（命名为 refJob）的删除操作。
+      * @param <K> RefJobContentRequestRef 的实现类
+      * @return RefDeletionOperation 的实现类
+      */
+     <K extends RefJobContentRequestRef<K>> RefDeletionOperation<K> getRefDeletionOperation();
 
 }

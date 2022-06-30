@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutio
 import org.apache.linkis.filesystem.WorkspaceClientFactory;
 import org.apache.linkis.filesystem.request.WorkspaceClient;
 import org.apache.linkis.filesystem.response.ScriptFromBMLResponse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,9 @@ import org.apache.commons.lang.StringUtils;
 public class CodeParser implements JobParser {
 
     private static final Pattern pb = Pattern.compile("((project)|(flow)|(node))://[^\\s\"]+[$\\s]{0,1}", Pattern.CASE_INSENSITIVE);
-
+    private  WorkspaceClient client1X = null;
+    private  WorkspaceClient client0X = null;
+    private final Object clientLocker = new Object();
     @Override
     public void parseJob(Job job) throws Exception{
         if (! ( job instanceof CommonLinkisJob) ) {
@@ -82,13 +85,38 @@ public class CodeParser implements JobParser {
 
     private Map<String, Object> getExecutionParams(BMLResource bmlResource,  CommonLinkisJob linkisAppConnJob) {
         Map<String, Object> map = new HashMap<>();
-        WorkspaceClient client = WorkspaceClientFactory.getClient(linkisAppConnJob.getSubmitUser(), LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(linkisAppConnJob.getJobProps()),
-            LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
-        ScriptFromBMLResponse response = client.requestOpenScriptFromBML(bmlResource.getResourceId(), bmlResource.getVersion(), bmlResource.getFileName());
+        ScriptFromBMLResponse response = getOrCreateWorkSpaceClient(linkisAppConnJob).requestOpenScriptFromBML(bmlResource.getResourceId(), bmlResource.getVersion(), bmlResource.getFileName());
         linkisAppConnJob.getLogObj().info("Get execution code from workspace client,bml resource id "+bmlResource.getResourceId()+", version is "+bmlResource.getVersion());
         map.put("executionCode", response.scriptContent());
         map.put("params", response.metadata());
         return map;
+    }
+
+    private WorkspaceClient getOrCreateWorkSpaceClient(CommonLinkisJob linkisAppConnJob) {
+        Map<String, String> props = linkisAppConnJob.getJobProps();
+        if(LinkisJobExecutionConfiguration.isLinkis1_X(props)) {
+            if (null == client1X) {
+                synchronized (clientLocker) {
+                    if (null == client1X) {
+                        this.client1X = WorkspaceClientFactory.getClient(linkisAppConnJob.getSubmitUser(), LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(linkisAppConnJob.getJobProps()),
+                                LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+                    }
+                }
+            }
+            linkisAppConnJob.getLogObj().info("Use workspace client1X:"+LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+            return client1X;
+        }else{
+            if (null == client0X) {
+                synchronized (clientLocker) {
+                    if (null == client0X) {
+                        this.client0X = WorkspaceClientFactory.getClient(linkisAppConnJob.getSubmitUser(), LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(linkisAppConnJob.getJobProps()),
+                                LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+                    }
+                }
+            }
+            linkisAppConnJob.getLogObj().info("Use workspace client0X:"+LinkisURLService.Factory.getLinkisURLService().getLinkisURL(linkisAppConnJob));
+            return client0X;
+        }
     }
 
     private   ArrayList<String> getResourceNames(String code){

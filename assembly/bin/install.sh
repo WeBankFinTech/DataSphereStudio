@@ -44,7 +44,7 @@ function isSuccess(){
       echo "Failed to " + $1
       exit 1
   else
-      echo "Succeed to" + $1
+      echo "Succeed to " + $1
   fi
 }
 
@@ -56,6 +56,7 @@ function checkJava(){
 checkJava
 
 dos2unix -q ${workDir}/config/*
+isSuccess "execute dos2unix -q ${workDir}/config/*"
 dos2unix -q ${workDir}/bin/*
 
 echo "step1:load config"
@@ -106,11 +107,32 @@ function replaceCommonIp() {
     DSS_FLOW_EXECUTION_SERVER_PORT=9006
   fi
 
-  if [ -z "$DSS_DATAPIPE_SERVER_INSTALL_IP" ]; then
-    DSS_DATAPIPE_SERVER_INSTALL_IP=$LOCAL_IP
+  if [ -z "$DSS_SCRIPTIS_SERVER_INSTALL_IP" ]; then
+    DSS_SCRIPTIS_SERVER_INSTALL_IP=$LOCAL_IP
   fi
-  if [ -z "$DSS_DATAPIPE_SERVER_PORT" ]; then
-    DSS_DATAPIPE_SERVER_PORT=9008
+  if [ -z "$DSS_SCRIPTIS_SERVER_PORT" ]; then
+    DSS_SCRIPTIS_SERVER_PORT=9008
+  fi
+
+  if [ -z "$DSS_DATA_API_SERVER_INSTALL_IP" ]; then
+    DSS_DATA_API_SERVER_INSTALL_IP=$LOCAL_IP
+  fi
+  if [ -z "$DSS_DATA_API_SERVER_PORT" ]; then
+    DSS_DATA_API_SERVER_PORT=9208
+  fi
+
+  if [ -z "$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP" ]; then
+    DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP=$LOCAL_IP
+  fi
+  if [ -z "$DSS_DATA_GOVERNANCE_SERVER_PORT" ]; then
+    DSS_DATA_GOVERNANCE_SERVER_PORT=9209
+  fi
+
+  if [ -z "$DSS_GUIDE_SERVER_INSTALL_IP" ]; then
+    DSS_GUIDE_SERVER_INSTALL_IP=$LOCAL_IP
+  fi
+  if [ -z "$DSS_GUIDE_SERVER_PORT" ]; then
+    DSS_GUIDE_SERVER_PORT=9210
   fi
 
  if [[ $GATEWAY_INSTALL_IP == "127.0.0.1" ]] || [ -z "$GATEWAY_INSTALL_IP" ]; then
@@ -122,13 +144,13 @@ function replaceCommonIp() {
     EUREKA_INSTALL_IP=$LOCAL_IP
  fi
 }
-##提换真实的IP
+##替换真实的IP
 replaceCommonIp
 
 EUREKA_URL=http://$EUREKA_INSTALL_IP:$EUREKA_PORT/eureka/
 
 ## excecute sql
-source ${workDir}/bin/excecuteSQL.sh
+source ${workDir}/bin/executeSQL.sh
 
 function changeCommonConf(){
   sed -i "s#defaultZone:.*#defaultZone: $EUREKA_URL#g" $CONF_APPLICATION_YML
@@ -158,7 +180,7 @@ function changeConf(){
 
 UPLOAD_PUBLIC_IPS=""
 ##function start
-function uploadProjectFile(){
+function uploadServiceFile(){
   if [[ $SERVER_IP == "127.0.0.1" ]]; then
     SERVER_IP=$local_host
   fi
@@ -186,7 +208,7 @@ function installPackage(){
     echo "ERROR:SERVER_NAME is null "
     exit 1
   fi
-  uploadProjectFile
+  uploadServiceFile
   # change configuration
   changeConf
 }
@@ -215,16 +237,18 @@ function installDssProject() {
   SERVER_HOME=$DSS_INSTALL_HOME
   if [ "$SERVER_HOME" == "" ]
   then
-  export SERVER_HOME=${workDir}/DssInstall
+    export SERVER_HOME=${workDir}/DSSInstall
   fi
   if [ -d $SERVER_HOME ] && [ "$SERVER_HOME" != "$workDir" ]; then
-   rm -r $SERVER_HOME-bak
-   echo "mv  $SERVER_HOME  $SERVER_HOME-bak"
-   mv  $SERVER_HOME  $SERVER_HOME-bak
+    rm -r $SERVER_HOME-bak
+    echo "mv  $SERVER_HOME  $SERVER_HOME-bak"
+    mv  $SERVER_HOME  $SERVER_HOME-bak
   fi
   echo "create dir SERVER_HOME: $SERVER_HOME"
-  sudo mkdir -p $SERVER_HOME;sudo chown -R $deployUser:$deployUser $SERVER_HOME
+  sudo mkdir -p $SERVER_HOME
   isSuccess "Create the dir of  $SERVER_HOME"
+  sudo chown -R $deployUser:$deployUser $SERVER_HOME
+  isSuccess "chown -R $deployUser:$deployUser $SERVER_HOME"
 
   #echo ""
   SERVER_NAME=dss-framework-project-server
@@ -250,7 +274,7 @@ function installDssProject() {
   CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
   CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
-  ###install project-Server
+  ###install orchestrator-Server
   installPackage
   #echo ""
 
@@ -267,16 +291,16 @@ function installDssProject() {
   installPackage
   #echo ""
 
-  SERVER_NAME=dss-datapipe-server
-  SERVER_IP=$DSS_DATAPIPE_SERVER_INSTALL_IP
-  SERVER_PORT=$DSS_DATAPIPE_SERVER_PORT
+  SERVER_NAME=dss-scriptis-server
+  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_SCRIPTIS_SERVER_PORT
   UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-apps/$SERVER_NAME
   LIB_PATH=$SERVER_HOME/lib/dss-apps
   LOG_PATH=$SERVER_HOME/logs/dss-apps/$SERVER_NAME
   CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
   CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
-  ###install dss-datapipe-server
+  ###install dss-scriptis-server
   installPackage
   #echo ""
 
@@ -306,6 +330,43 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   ###install dss-workflow-server
   installPackage
+
+  ###install dss-data-api-server
+  SERVER_NAME=dss-data-api-server
+  SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_DATA_API_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-data-api/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-data-api
+  LOG_PATH=$SERVER_HOME/logs/dss-data-api/$SERVER_NAME
+  CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
+  CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
+  CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
+  installPackage
+
+  ###install dss-data-governance-server
+  SERVER_NAME=dss-data-governance-server
+  SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_DATA_GOVERNANCE_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-data-governance/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-data-governance
+  LOG_PATH=$SERVER_HOME/logs/dss-data-governance/$SERVER_NAME
+  CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
+  CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
+  CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
+  installPackage
+
+  ###install dss-guide-server
+  SERVER_NAME=dss-guide-server
+  SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_GUIDE_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-guide/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-guide
+  LOG_PATH=$SERVER_HOME/logs/dss-guide/$SERVER_NAME
+  CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
+  CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
+  CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
+  installPackage
+
   #echo "-----------------DSS install end--------------------"
   #echo ""
 
@@ -314,3 +375,4 @@ ENV_FLAG="dev"
 installDssProject
 
 echo "Congratulations! You have installed DSS $DSS_VERSION successfully, please use sbin/dss-start-all.sh to start it!"
+

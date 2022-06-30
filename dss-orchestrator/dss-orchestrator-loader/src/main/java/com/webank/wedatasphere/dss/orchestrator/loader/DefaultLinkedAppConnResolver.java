@@ -18,24 +18,15 @@ package com.webank.wedatasphere.dss.orchestrator.loader;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 
 
 @Component
 class DefaultLinkedAppConnResolver implements LinkedAppConnResolver  {
-
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultLinkedAppConnResolver.class);
-
-
-    static{
-        LOGGER.info("component resolver inited");
-    }
 
     @Override
     public List<AppConn> resolveAppConnByUser(String userName, String workspaceName, String typeName) {

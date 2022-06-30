@@ -24,6 +24,7 @@ import com.google.gson._
 import com.webank.wedatasphere.dss.common.entity.Resource
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.flow.execution.entrance.exception.FlowExecutionErrorException
+import com.webank.wedatasphere.dss.flow.execution.entrance.strategy.StrategyFactory
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode
@@ -36,11 +37,14 @@ import org.apache.linkis.manager.label.utils.LabelUtil
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters.asScalaBufferConverter
 
-
 object FlowExecutionUtils {
 
-  def isSkippedNode(node: WorkflowNode):Boolean = {
-    FlowExecutionEntranceConfiguration.SKIP_NODES.getValue.split(",").exists(_.equalsIgnoreCase(node.getNodeType))
+  def isSkippedNode(node: WorkflowNode, paramsMap: java.util.Map[String, Any]): Boolean = {
+    val executeStrategy = paramsMap.get("executeStrategy")
+    if (executeStrategy != null) {
+      return StrategyFactory.getNodeSkipStrategy(executeStrategy.toString).isSkippedNode(node, paramsMap, isReversedChoose = false)
+    }
+    false
   }
 
   def getRunTypeLabel(labels: util.List[Label[_]]): CodeLanguageLabel = {
@@ -50,7 +54,7 @@ object FlowExecutionUtils {
     }.map(_.asInstanceOf[CodeLanguageLabel]).getOrElse(throw new FlowExecutionErrorException(90106, "Cannot find runType label."))
   }
 
-  def isSignalNode(jobType: String) : Boolean = {
+  def isSignalNode(jobType: String): Boolean = {
     FlowExecutionEntranceConfiguration.SIGNAL_NODES.getValue.split(",").exists(_.equalsIgnoreCase(jobType))
   }
 
@@ -59,13 +63,13 @@ object FlowExecutionUtils {
 
   def resourcesAdaptation(resources: util.List[Resource]): util.ArrayList[BMLResource] = {
     val bmlResources = new util.ArrayList[BMLResource]()
-    for (resource <- resources){
+    for (resource <- resources) {
       bmlResources.add(resourceConvertToBMLResource(resource))
     }
     bmlResources
   }
 
-  def resourceConvertToBMLResource(resource: Resource):BMLResource = {
+  def resourceConvertToBMLResource(resource: Resource): BMLResource = {
     val bmlResource = new BMLResource()
     bmlResource.setFileName(resource.getFileName)
     bmlResource.setResourceId(resource.getResourceId)
@@ -83,6 +87,7 @@ object FlowExecutionUtils {
     persistTask.setSubmitUser(jobReq.getSubmitUser)
     persistTask.setUmUser(jobReq.getExecuteUser)
     persistTask.setSource(jobReq.getSource)
+    //    persistTask.setExecutionCode(jobReq.getExecutionCode)
     if (null != jobReq.getLabels) {
       val labelMap = new util.HashMap[String, String](jobReq.getLabels.size())
       jobReq.getLabels.asScala.map(l => l.getLabelKey -> l.getStringValue).foreach(kv => labelMap.put(kv._1, kv._2))
@@ -97,7 +102,7 @@ object FlowExecutionUtils {
     if (null != jobReq.getCreatedTime) persistTask.setCreatedTime(new Date(jobReq.getCreatedTime.getTime))
     if (null != jobReq.getUpdatedTime) persistTask.setUpdatedTime(new Date(jobReq.getUpdatedTime.getTime))
     persistTask.setInstance(jobReq.getInstances)
-//    if (null != jobReq.getMetrics) persistTask.set(gson.toJson(jobReq.getMetrics))
+    //    if (null != jobReq.getMetrics) persistTask.set(gson.toJson(jobReq.getMetrics))
     val engineType = LabelUtil.getEngineType(jobReq.getLabels)
     persistTask.setEngineType(engineType)
     persistTask
@@ -106,7 +111,7 @@ object FlowExecutionUtils {
   implicit val gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").serializeNulls
     .registerTypeAdapter(classOf[java.lang.Double], new JsonSerializer[java.lang.Double] {
       override def serialize(t: lang.Double, `type`: Type, jsonSerializationContext: JsonSerializationContext): JsonElement =
-        if(t == t.longValue()) new JsonPrimitive(t.longValue()) else new JsonPrimitive(t)
+        if (t == t.longValue()) new JsonPrimitive(t.longValue()) else new JsonPrimitive(t)
     }).create
 
 }

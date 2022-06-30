@@ -1,11 +1,5 @@
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
-/**
- * The type Request query scheduler workflow status.
- *
- * @author yuxin.yuan
- * @date 2021/11/01
- */
 public class RequestQuerySchedulerWorkflowStatus {
     private String username;
     private Long orchestratorId;

@@ -1,0 +1,82 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.webank.wedatasphere.dss.guide.server.dao.GuideGroupMapper">
+
+    <resultMap id="guideGroupMap" type="com.webank.wedatasphere.dss.guide.server.entity.GuideGroup">
+        <result property="id" column="id"/>
+        <result property="path" column="path"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <collection property="children" ofType="com.webank.wedatasphere.dss.guide.server.entity.GuideContent" columnPrefix="children_">
+            <result property="id" column="id"></result>
+            <result property="groupId" column="group_id"></result>
+            <result property="path" column="path"></result>
+            <result property="title" column="title"></result>
+            <result property="titleAlias" column="title_alias"></result>
+            <result property="seq" column="seq"></result>
+            <result property="type" column="type"></result>
+            <result property="content" column="content"></result>
+            <result property="contentHtml" column="content_html"></result>
+            <result property="createBy" column="create_by"></result>
+            <result property="updateBy" column="update_by"></result>
+            <result property="createTime" column="create_time"></result>
+            <result property="updateTime" column="update_time"></result>
+        </collection>
+    </resultMap>
+
+
+    <select id="getAllGuideGroupDetails" resultMap="guideGroupMap">
+        SELECT a.*,
+               b.id AS children_id,
+               b.group_id AS children_group_id,
+               b.path AS children_path,
+               b.title AS children_title,
+               b.title_alias AS children_title_alias,
+               b.seq AS children_seq,
+               b.type AS children_type,
+               b.content AS children_content,
+               b.content_html AS children_content_html,
+               b.create_by AS children_create_by,
+               b.create_time AS children_create_time,
+               b.update_by AS children_update_by,
+               b.update_time AS children_update_time
+        FROM dss_guide_group a
+        LEFT JOIN (SELECT * FROM dss_guide_content WHERE is_delete =0) b ON a.id = b.group_id
+        WHERE a.is_delete =0
+    </select>
+
+    <select id="getGuideGroupByPath" resultMap="guideGroupMap">
+        SELECT a.id,
+               a.title,
+               a.description,
+               a.path,
+               b.id AS children_id,
+               b.title AS children_title,
+               b.title_alias AS children_title_alias,
+               b.seq AS children_seq,
+               b.type AS children_type,
+               b.content_html AS children_content_html,
+               b.create_by AS children_create_by,
+               b.create_time AS children_create_time,
+               b.update_by AS children_update_by,
+               b.update_time AS children_update_time
+        FROM dss_guide_group a
+        LEFT JOIN (SELECT * FROM dss_guide_content WHERE is_delete =0) b ON a.id = b.group_id
+        WHERE a.is_delete =0 AND a.path = #{path}
+    </select>
+
+    <insert id="batchInsert" parameterType="map" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into dss_guide_group
+        (`id`,`path`, title, description, create_by, create_time, update_by, update_time, is_delete)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.path}, #{item.title}, #{item.description},
+            #{item.createBy}, #{item.createTime}, #{item.updateBy},
+            #{item.updateTime}, #{item.isDelete})
+        </foreach>
+    </insert>
+</mapper>

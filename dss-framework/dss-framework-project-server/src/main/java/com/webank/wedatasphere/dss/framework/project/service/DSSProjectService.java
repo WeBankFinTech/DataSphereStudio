@@ -16,20 +16,22 @@
 
 package com.webank.wedatasphere.dss.framework.project.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+
+import java.util.List;
+import java.util.Map;
 
 public interface DSSProjectService  extends IService<DSSProjectDO> {
 
@@ -39,6 +41,13 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     void modifyProject(String username, ProjectModifyRequest modifyRequest) throws DSSProjectErrorException;
 
+    /**
+     * 旧工程导入到新环境的，修改新环境工程相关字段
+     * @param updateProject  旧工程（91）
+     * @param dbProject      数据库工程（246）
+     * @throws Exception
+     */
+    void modifyOldProject(DSSProjectDO updateProject, DSSProjectDO dbProject);
 
     DSSProjectDO getProjectByName(String name);
 
@@ -55,12 +64,21 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     Long getAppConnProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) throws Exception;
 
-    void deleteProject(Long projectId);
+    Long getAppConnProjectId(Long appInstanceId, Long dssProjectId);
+
+    void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace)  throws Exception;
 
     List<String> getProjectAbilities(String username);
 
 
-    Long importOrchestrator(RequestProjectImportOrchestrator orchestratorInfo) throws Exception;
     boolean isDeleteProjectAuth(Long projectId, String username) throws DSSProjectErrorException ;
+
+    /**
+     * 查询已删除工程list
+     * @param projectRequest
+     * @return
+     */
+    List<ProjectResponse> getDeletedProjects(ProjectQueryRequest projectRequest);
+
 
 }

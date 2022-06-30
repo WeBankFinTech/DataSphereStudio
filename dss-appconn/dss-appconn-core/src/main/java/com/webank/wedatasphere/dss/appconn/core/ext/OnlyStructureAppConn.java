@@ -19,6 +19,9 @@ package com.webank.wedatasphere.dss.appconn.core.ext;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.standard.app.structure.StructureIntegrationStandard;
 
+/**
+ * 如果您的第三方系统想与 DSS 统一组织结构，如：工程的统一创建、更新、删除等管理操作，角色权限管理的统一管理，则需继承该 AppConn。
+ */
 public interface OnlyStructureAppConn extends AppConn {
 
     StructureIntegrationStandard getOrCreateStructureStandard();

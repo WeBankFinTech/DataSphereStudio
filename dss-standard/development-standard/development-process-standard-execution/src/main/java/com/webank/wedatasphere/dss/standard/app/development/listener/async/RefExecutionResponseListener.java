@@ -16,11 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.async;
 
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.CompletedExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef;
 
 
 public interface RefExecutionResponseListener extends RefExecutionListener {
 
-    void onRefExecutionCompleted(CompletedExecutionResponseRef response);
+    void onRefExecutionCompleted(ExecutionResponseRef response);
 
 }

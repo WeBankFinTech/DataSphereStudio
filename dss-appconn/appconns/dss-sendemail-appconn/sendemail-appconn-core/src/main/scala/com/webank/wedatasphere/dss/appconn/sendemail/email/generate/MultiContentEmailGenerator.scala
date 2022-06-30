@@ -20,14 +20,14 @@ import com.webank.wedatasphere.dss.appconn.sendemail.cs.EmailCSHelper
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
 import org.apache.linkis.storage.resultset.ResultSetFactory
 
 class MultiContentEmailGenerator extends AbstractEmailGenerator {
 
   override protected def createEmail(): AbstractEmail = new MultiContentEmail
 
-  override protected def generateEmailContent(requestRef: ExecutionRequestRef, email: AbstractEmail): Unit = email match {
+  override protected def generateEmailContent(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl, email: AbstractEmail): Unit = email match {
     case multiContentEmail: MultiContentEmail =>
       val runtimeMap = getRuntimeMap(requestRef)
       val refContext = getExecutionRequestRefContext(requestRef)

@@ -18,6 +18,8 @@ package com.webank.wedatasphere.dss.common.entity;
 
 public interface DSSWorkspace {
 
+    long getWorkspaceId();
+
     String getWorkspaceName();
 
 }

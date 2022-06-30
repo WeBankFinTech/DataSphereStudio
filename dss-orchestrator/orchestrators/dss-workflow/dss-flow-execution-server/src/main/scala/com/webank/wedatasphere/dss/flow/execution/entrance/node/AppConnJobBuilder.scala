@@ -69,11 +69,7 @@ object AppConnJobBuilder {
         job.setCode(jobProps.get(FlowExecutionEntranceConfiguration.COMMAND))
       job.setParams(new util.HashMap[String,AnyRef]())
       val runtimeMap = new util.HashMap[String, AnyRef]()
-      //update by peaceWong add contextID to runtimeMap
-      if (null != jobProps.get(FlowExecutionEntranceConfiguration.CONTEXT_ID)){
-        runtimeMap.put(FlowExecutionEntranceConfiguration.CONTEXT_ID, jobProps.get(FlowExecutionEntranceConfiguration.CONTEXT_ID))
-      }
-      runtimeMap.put(FlowExecutionEntranceConfiguration.NODE_NAME,jobProps.get(FlowExecutionEntranceConfiguration.JOB_ID))
+      runtimeMap.put(FlowExecutionEntranceConfiguration.NODE_NAME, jobProps.get(FlowExecutionEntranceConfiguration.JOB_ID))
       runtimeMap.put(FlowExecutionEntranceConfiguration.WORKSPACE, jobProps.get(FlowExecutionEntranceConfiguration.WORKSPACE))
       runtimeMap.put(DSSCommonUtils.DSS_LABELS_KEY, jobProps.get(DSSCommonUtils.DSS_LABELS_KEY))
       job.setRuntimeParams(runtimeMap)
@@ -107,7 +103,6 @@ object AppConnJobBuilder {
       }
     }
 
-
     private def getSource: util.Map[String, String] = {
       val source = new util.HashMap[String, String]()
       source.put("projectName", jobProps.get(FlowExecutionEntranceConfiguration.PROJECT_NAME))
@@ -116,6 +111,6 @@ object AppConnJobBuilder {
       source
     }
 
-
+    override protected def getContextID(job: Job): String = jobProps.get(FlowExecutionEntranceConfiguration.CONTEXT_ID)
   }
 }

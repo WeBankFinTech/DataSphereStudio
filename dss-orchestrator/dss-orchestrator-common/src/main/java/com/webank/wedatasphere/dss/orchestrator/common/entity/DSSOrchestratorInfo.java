@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.orchestrator.common.entity;
 import java.util.Date;
 import java.util.List;
 
-
 public class DSSOrchestratorInfo implements DSSOrchestration {
 
     private Long id;
@@ -43,6 +42,18 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
     private String uuid;
 
     private String secondaryType;
+
+    private Long workspaceId;
+
+    private String orchestratorMode;
+
+    private String orchestratorWay;
+
+    private String orchestratorLevel;
+
+    private String updateUser;
+
+    private Date updateTime;
 
     public DSSOrchestratorInfo() {
 
@@ -185,6 +196,54 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     public void setProjectId(long projectId) {
         this.projectId = projectId;
+    }
+
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
+    public String getOrchestratorMode() {
+        return orchestratorMode;
+    }
+
+    public void setOrchestratorMode(String orchestratorMode) {
+        this.orchestratorMode = orchestratorMode;
+    }
+
+    public String getOrchestratorWay() {
+        return orchestratorWay;
+    }
+
+    public void setOrchestratorWay(String orchestratorWay) {
+        this.orchestratorWay = orchestratorWay;
+    }
+
+    public String getOrchestratorLevel() {
+        return orchestratorLevel;
+    }
+
+    public void setOrchestratorLevel(String orchestratorLevel) {
+        this.orchestratorLevel = orchestratorLevel;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 
     @Override

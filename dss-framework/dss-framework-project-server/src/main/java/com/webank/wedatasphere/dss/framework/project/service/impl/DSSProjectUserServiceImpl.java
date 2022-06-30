@@ -16,20 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
-import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
@@ -40,14 +30,23 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectUserUtils;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import org.apache.commons.collections.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DSSProjectUserServiceImpl implements DSSProjectUserService {
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @Autowired
-    private DSSProjectUserMapper  projectUserMapper;
+    private DSSProjectUserMapper projectUserMapper;
     @Autowired
     @Qualifier("projectServerBMLService")
     private BMLService bmlService;
@@ -56,6 +55,7 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
 
     /**
      * 是否有修改工程权限
+     *
      * @param projectId
      * @param username
      * @return
@@ -64,51 +64,28 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
     public boolean isEditProjectAuth(Long projectId, String username) throws DSSProjectErrorException {
         //校验当前登录用户是否含有修改权限
         QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<DSSProjectUser>();
-        queryWrapper.eq("project_id",projectId);
-        queryWrapper.eq("username",username);
-        queryWrapper.ge("priv",ProjectUserPrivEnum.PRIV_EDIT.getRank());//编辑权限
+        queryWrapper.eq("project_id", projectId);
+        queryWrapper.eq("username", username);
+        queryWrapper.ge("priv", ProjectUserPrivEnum.PRIV_EDIT.getRank());//编辑权限
         long count = projectUserMapper.selectCount(queryWrapper);
-        if(count == 0 && !isProjectOwner(projectId, username)){
-            DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getCode(),ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getMsg(), DSSProjectErrorException.class);
+        if (count == 0 && !isProjectOwner(projectId, username)) {
+            DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_AUTH.getMsg(), DSSProjectErrorException.class);
         }
         return true;
-    }
-    /**
-     * 根据用户名和工程id获取工程权限
-     * @param projectId
-     * @param username
-     * @return
-     */
-    @Override
-    public List<DSSProjectUser> getEditProjectList(Long projectId, String username){
-        QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<DSSProjectUser>();
-        queryWrapper.eq("project_id",projectId);
-        queryWrapper.eq("username",username);
-        return projectUserMapper.selectList(queryWrapper);
     }
 
     /**
      * 保存工程与用户关系
+     *
      * @param projectID
      * @param request
      */
     @Override
-    public void saveProjectUser(Long projectID,String username, ProjectCreateRequest request)throws Exception{
+    public void saveProjectUser(Long projectID, String username, ProjectCreateRequest request, Workspace workspace) throws Exception {
         //將创建人默认为发布权限
         List<String> releaseUsers = request.getReleaseUsers();
-        if(!request.getEditUsers().contains(username)){
-            request.getEditUsers().add(username);
-        }
-        if(releaseUsers == null){
-            releaseUsers = new ArrayList<>();
-        }
-        if(!releaseUsers.contains(username)){
-            releaseUsers.add(username);
-        }
-
         //批量保存
-        saveBatch(request.getWorkspaceId(),projectID,releaseUsers,request.getEditUsers(),request.getAccessUsers());
-
+        saveBatch(request.getWorkspaceId(), projectID, releaseUsers, request.getEditUsers(), request.getAccessUsers());
         //获取所有编辑权限的用户
         List<String> sumEditUsers = ProjectUserUtils.getEditUserList(releaseUsers, request.getEditUsers());
         //去bml建一个工程
@@ -117,27 +94,18 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
 
     /**
      * 修改工程与用户关系
+     *
      * @param dbProject
      * @param modifyRequest
      */
     @Override
-    public void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest modifyRequest, String loginuser) throws Exception{
+    public void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest modifyRequest, String loginuser, Workspace workspace) throws Exception {
         projectUserMapper.deleteAllPriv(dbProject.getId());
         //將创建人默认为发布权限
         List<String> releaseUsers = modifyRequest.getReleaseUsers();
-        String username = dbProject.getCreateBy();
-        if(!modifyRequest.getEditUsers().contains(username)){
-            modifyRequest.getEditUsers().add(username);
-        }
-        if(releaseUsers == null){
-            releaseUsers = new ArrayList<>();
-        }
-        if(!releaseUsers.contains(username)){
-            releaseUsers.add(username);
-        }
-
+        String username = dbProject.getUsername();
         //批量保存
-        saveBatch(modifyRequest.getWorkspaceId(),dbProject.getId(),releaseUsers,modifyRequest.getEditUsers(),modifyRequest.getAccessUsers());
+        saveBatch(modifyRequest.getWorkspaceId(), dbProject.getId(), releaseUsers, modifyRequest.getEditUsers(), modifyRequest.getAccessUsers());
 
         //获取所有编辑权限的用户
         List<String> sumEditUsers = ProjectUserUtils.getEditUserList(releaseUsers, modifyRequest.getEditUsers());
@@ -146,27 +114,26 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
     }
 
 
-
     @Override
     public List<DSSProjectUser> getListByParam(Long workspaceId, String username) {
         QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("workspace_id",workspaceId);
-        queryWrapper.eq("username",username);
-        queryWrapper.ge("priv",ProjectUserPrivEnum.PRIV_ACCESS.getRank());
+        queryWrapper.eq("workspace_id", workspaceId);
+        queryWrapper.eq("username", username);
+        queryWrapper.ge("priv", ProjectUserPrivEnum.PRIV_ACCESS.getRank());
         List<DSSProjectUser> DSSProjectUserList = projectUserMapper.selectList(queryWrapper);
         return DSSProjectUserList;
     }
 
     //批量保存
-    public void saveBatch(Long workspaceId,Long projectID,List<String> releaseUsers,List<String> editUsers,List<String> accessUsers){
+    public void saveBatch(Long workspaceId, Long projectID, List<String> releaseUsers, List<String> editUsers, List<String> accessUsers) {
         List<String> realReleaseUsers = releaseUsers.stream().distinct().collect(Collectors.toList());
         List<String> realEditUsers = editUsers.stream().distinct().collect(Collectors.toList());
         List<String> realAccessUsers = accessUsers.stream().distinct().collect(Collectors.toList());
         List<DSSProjectUser> addList = new ArrayList<>();
-        addList.addAll(ProjectUserUtils.createPUser(workspaceId,projectID,realReleaseUsers,ProjectUserPrivEnum.PRIV_RELEASE.getRank()));
-        addList.addAll(ProjectUserUtils.createPUser(workspaceId,projectID,realEditUsers, ProjectUserPrivEnum.PRIV_EDIT.getRank()));
-        addList.addAll(ProjectUserUtils.createPUser(workspaceId,projectID,realAccessUsers,ProjectUserPrivEnum.PRIV_ACCESS.getRank()));
-        if(CollectionUtils.isEmpty(addList)){
+        addList.addAll(ProjectUserUtils.createPUser(workspaceId, projectID, realReleaseUsers, ProjectUserPrivEnum.PRIV_RELEASE.getRank()));
+        addList.addAll(ProjectUserUtils.createPUser(workspaceId, projectID, realEditUsers, ProjectUserPrivEnum.PRIV_EDIT.getRank()));
+        addList.addAll(ProjectUserUtils.createPUser(workspaceId, projectID, realAccessUsers, ProjectUserPrivEnum.PRIV_ACCESS.getRank()));
+        if (CollectionUtils.isEmpty(addList)) {
             return;
         }
         //分批插入
@@ -205,6 +172,11 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         return projectUserMapper.selectList(queryWrapper);
     }
 
+    @Override
+    public List<DSSProjectUser> getProjectPriv(Long projectId) {
+        return projectUserMapper.getPrivsByProjectId(projectId);
+    }
+
     private boolean isProjectOwner(Long projectId, String username) {
         QueryWrapper<DSSProjectDO> queryWrapper = new QueryWrapper<DSSProjectDO>();
         queryWrapper.eq("id", projectId);
@@ -217,6 +189,12 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
         QueryWrapper<DSSProjectUser> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("username").eq("project_id", projectId).ge("priv", privEnum.getRank());
         return projectUserMapper.selectList(queryWrapper);
+    }
+
+
+    @Override
+    public boolean isWorkspaceUser(Long workspaceId, String username) {
+        return projectUserMapper.isWorkspaceUser(workspaceId, username).longValue() > 0;
     }
 
 }

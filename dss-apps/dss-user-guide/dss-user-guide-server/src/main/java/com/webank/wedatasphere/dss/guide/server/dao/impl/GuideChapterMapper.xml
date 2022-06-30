@@ -1,0 +1,32 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.webank.wedatasphere.dss.guide.server.dao.GuideChapterMapper">
+    <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.guide.server.entity.GuideChapter">
+        <id column="id" jdbcType="BIGINT" property="id" />
+        <result column="catalog_id" jdbcType="BIGINT" property="catalogId" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="title_alias" jdbcType="VARCHAR" property="titleAlias" />
+        <result column="content" jdbcType="LONGVARCHAR" property="content" />
+        <result column="content_html" jdbcType="LONGVARCHAR" property="contentHtml" />
+        <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id, catalog_id, title, title_alias, content, content_html, create_by, create_time,
+        update_by, update_time
+    </sql>
+    <insert id="batchInsert" keyColumn="id" keyProperty="id" parameterType="map" useGeneratedKeys="true">
+        insert into dss_guide_chapter
+        (catalog_id, title, title_alias, content, content_html, create_by, create_time, update_by,
+        update_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.catalogId,jdbcType=BIGINT}, #{item.title,jdbcType=VARCHAR}, #{item.titleAlias,jdbcType=VARCHAR},
+            #{item.content,jdbcType=LONGVARCHAR}, #{item.contentHtml,jdbcType=LONGVARCHAR},
+            #{item.createBy,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR},
+            #{item.updateTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+</mapper>

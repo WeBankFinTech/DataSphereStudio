@@ -16,21 +16,25 @@
 
 package com.webank.wedatasphere.dss.workflow.io.input.impl;
 
-import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
-import com.webank.wedatasphere.dss.workflow.io.input.InputRelationService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
+import com.webank.wedatasphere.dss.workflow.io.scheduler.NodeImportJob;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +46,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool.nodeExportThreadPool;
 
 @Service
 public class WorkFlowInputServiceImpl implements WorkFlowInputService {
@@ -61,36 +70,40 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
     private NodeParser nodeParser;
 
     @Autowired
-    private InputRelationService inputRelationService;
-
-    @Autowired
     private FlowMapper flowMapper;
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
     @Override
     public void inputWorkFlow(String userName,
-                              String workspaceName,
                               DSSFlow dssFlow,
-                              String version,
                               String projectName,
                               String inputProjectPath,
                               Long parentFlowId,
                               Workspace workspace,
                               String orcVersion,
-                              String contextId) throws DSSErrorException, IOException {
+                              String contextId,
+                              List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
         //todo 不同服务共享导入工程文件包,可采用共享存储
         String flowInputPath = inputProjectPath + File.separator + dssFlow.getName();
         String flowJsonPath = flowInputPath + File.separator + dssFlow.getName() + ".json";
-        String creator = dssFlow.getCreator();
         String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
-        String updateFlowJson = updateFlowContextId(flowJson, contextId);
-        updateFlowJson = inputWorkFlowNodes(userName, projectName, updateFlowJson, dssFlow, flowInputPath, workspace, orcVersion);
+        String updateFlowJson = updateFlowContextIdAndVersion(userName,
+                workspace.getWorkspaceName(),
+                projectName,
+                flowJson,
+                dssFlow,
+                parentFlowId,
+                contextId,
+                orcVersion);
+        updateFlowJson = inputWorkFlowNodes(userName, projectName, updateFlowJson, dssFlow,
+                flowInputPath, workspace, orcVersion, dssLabels);
         List<? extends DSSFlow> subFlows = dssFlow.getChildren();
         if (subFlows != null) {
             for (DSSFlow subFlow : subFlows) {
-                inputWorkFlow(userName, workspaceName, subFlow, version, projectName, inputProjectPath, dssFlow.getId(), workspace, orcVersion,contextId);
+                inputWorkFlow(userName, subFlow, projectName, inputProjectPath, dssFlow.getId(),
+                        workspace, orcVersion, contextId, dssLabels);
             }
         }
 
@@ -104,19 +117,35 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
 
     }
 
-    private String updateFlowContextId(String flowJson, String contextId) throws IOException {
 
-//        String contextID = contextService.checkAndInitContext(flowJson, parentFlowIdStr, workspace, projectName, flowName, flowVersion, userName);
-        String updatedFlowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "contextID", contextId);
-        return updatedFlowJson;
+    private String updateFlowContextIdAndVersion(String userName,
+                                                 String workspaceName,
+                                                 String projectName,
+                                                 String flowJson,
+                                                 DSSFlow dssFlow,
+                                                 Long parentFlowId,
+                                                 String contextId,
+                                                 String orcVersion) throws IOException, DSSErrorException {
+
+        String parentFlowIdStr = null;
+        if (parentFlowId != null) {
+            parentFlowIdStr = parentFlowId.toString();
+        }
+        if (!dssFlow.getRootFlow()) {
+            contextId = contextService.checkAndInitContext(flowJson, parentFlowIdStr, workspaceName, projectName, dssFlow.getName(), orcVersion, userName);
+            logger.info("create subflow contextID is " + contextId);
+        }
+        return workFlowParser.updateFlowJsonWithMap(flowJson, MapUtils.newCommonMap(CSCommonUtils.CONTEXT_ID_STR, contextId, DSSJobContentConstant.ORC_VERSION_KEY, orcVersion));
     }
 
-    private String inputWorkFlowNodes(String userName, String projectName, String flowJson, DSSFlow dssFlow, String flowPath, Workspace workspace, String orcVersion) throws DSSErrorException, IOException {
+    private String inputWorkFlowNodes(String userName, String projectName, String flowJson,
+                                      DSSFlow dssFlow, String flowPath, Workspace workspace,
+                                      String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
         List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
         if (nodeJsonList == null) {
-            throw new DSSErrorException(90073, "工作流内没有工作流节点，导入失败" + dssFlow.getName());
+            throw new DSSErrorException(90073, "工作流内没有工作流节点，导入失败 " + dssFlow.getName());
         }
-        String updateContextId = workFlowParser.getValueWithKey(flowJson, "contextID");
+        String updateContextId = workFlowParser.getValueWithKey(flowJson, CSCommonUtils.CONTEXT_ID_STR);
         if (nodeJsonList.size() == 0) {
             return flowJson;
         }
@@ -129,13 +158,21 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 // TODO: 2020/3/20 暂时注视掉appconn相关
                 String updateNodeJson = nodeInputService.uploadResourceToBml(userName, nodeJson, workFlowResourceSavePath, projectName);
                 updateNodeJson = nodeInputService.uploadAppConnResource(userName, projectName,
-                        dssFlow, updateNodeJson, updateContextId, appConnResourceSavePath, workspace, orcVersion);
-
+                        dssFlow, updateNodeJson, updateContextId, appConnResourceSavePath,
+                        workspace, orcVersion, dssLabels);
+                //兼容0.x的key修改
+                if(updateNodeJson.contains("wds.linkis.yarnqueue")) {
+                    updateNodeJson = updateNodeJson.replace("wds.linkis.yarnqueue", "wds.linkis.rm.yarnqueue");
+                }
                 Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
                 //更新subflowID
                 String nodeType = nodeJsonMap.get("jobType").toString();
-                if ("workflow.subflow".equals(nodeType)) {
+                if(nodeType.contains("appjoint")){
+                    nodeJsonMap.replace("jobType",nodeType.replace("appjoint","appconn"));
+                }
+                if ("workflow.subflow".equals(nodeType) && CollectionUtils.isNotEmpty(subflows)) {
                     String subFlowName = nodeJsonMap.get("title").toString();
+                    logger.info("subflows:{}", subflows);
                     List<DSSFlow> DSSFlowList = subflows.stream().filter(subflow ->
                             subflow.getName().equals(subFlowName)
                     ).collect(Collectors.toList());
@@ -158,6 +195,62 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
 
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
 
+    }
+
+
+    private String inputWorkFlowNodes_for_multi_thread(String userName, String projectName, String flowJson,
+                                      DSSFlow dssFlow, String flowPath, Workspace workspace,
+                                      String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
+        List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
+        if (nodeJsonList == null) {
+            throw new DSSErrorException(90073, "工作流内没有工作流节点，导入失败 " + dssFlow.getName());
+        }
+        String updateContextId = workFlowParser.getValueWithKey(flowJson, CSCommonUtils.CONTEXT_ID_STR);
+        if (nodeJsonList.size() == 0) {
+            return flowJson;
+        }
+        List<DSSFlow> subflows = (List<DSSFlow>) dssFlow.getChildren();
+        String workFlowResourceSavePath = flowPath + File.separator + "resource" + File.separator;
+        String appConnResourceSavePath = flowPath + File.separator + "appconn-resource";
+//        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
+        List<Map<String, Object>> nodeJsonListRes = Collections.synchronizedList(new ArrayList<>());
+        CountDownLatch cdl = new CountDownLatch(nodeJsonList.size());
+        AtomicInteger failedCount = new AtomicInteger(0);
+        if (nodeJsonList.size() > 0) {
+            for (String nodeJson : nodeJsonList) {
+                NodeImportJob.ImportJobEntity jobEntity = new NodeImportJob.ImportJobEntity();
+                jobEntity.setDssFlow(dssFlow);
+                jobEntity.setNodeJson(nodeJson);
+                jobEntity.setUserName(userName);
+                jobEntity.setProjectName(projectName);
+                jobEntity.setWorkFlowResourceSavePath(workFlowResourceSavePath);
+                jobEntity.setAppConnResourceSavePath(appConnResourceSavePath);
+                jobEntity.setDssLabels(dssLabels);
+                jobEntity.setWorkspace(workspace);
+                jobEntity.setUpdateContextId(updateContextId);
+                jobEntity.setSubflows(subflows);
+                jobEntity.setOrcVersion(orcVersion);
+                NodeImportJob nodeImportJob = new NodeImportJob();
+                nodeImportJob.setNodeInputService(nodeInputService);
+                nodeImportJob.setJobEntity(jobEntity);
+                nodeImportJob.setFailedCount(failedCount);
+                nodeImportJob.setCountDownLatch(cdl);
+                nodeImportJob.setNodeJsonListRes(nodeJsonListRes);
+                nodeExportThreadPool.submit(nodeImportJob);
+            }
+        }
+        // 用户需要等待所有节点导入完成
+        boolean success = false;
+        try {
+            success = cdl.await(30, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            logger.error("failed to import node for workflow:{}", dssFlow.getName(), e);
+            throw new DSSErrorException(90071, "导入节点超时！");
+        }
+        if (failedCount.get() > 0) {
+            throw new DSSErrorException(90074, "有节点导入失败，请重试！");
+        }
+        return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
     }
 
     private String uploadFlowResourceToBml(String userName, String flowJson, String flowResourcePath, String projectName) throws IOException {
@@ -194,8 +287,8 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
 //        if (resourceId != null) {
 //            bmlReturnMap = bmlService.update(userName, resourceId, flowJson);
 //        } else {
-            //上传文件获取resourceId和version save应该是已经有
-            bmlReturnMap = bmlService.upload(userName, flowJson, UUID.randomUUID().toString() + ".json", projectName);
+        //上传文件获取resourceId和version save应该是已经有
+        bmlReturnMap = bmlService.upload(userName, flowJson, UUID.randomUUID().toString() + ".json", projectName);
 //        }
 
         dssFlow.setCreator(userName);
@@ -212,20 +305,18 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
      * @param projectId 新环境的projectID
      * @param userName
      * @param dssFlows
-     * @param sourceEnv
      * @return
      */
     @Override
     public List<DSSFlow> persistenceFlow(Long projectId, String userName, List<DSSFlow> dssFlows,
-                                         List<DSSFlowRelation> dssFlowRelations, IOEnv sourceEnv) {
+                                         List<DSSFlowRelation> dssFlowRelations) {
         List<DSSFlow> rootFlows = dssFlows.stream().filter(DSSFlow::getRootFlow).collect(Collectors.toList());
-        return rootFlows.stream().map(rf -> setSubFlow(rf, dssFlows, dssFlowRelations, sourceEnv, projectId, userName, null))
+        return rootFlows.stream().map(rf -> setSubFlow(rf, dssFlows, dssFlowRelations, projectId, userName, null))
                 .collect(Collectors.toList());
     }
 
     public DSSFlow setSubFlow(DSSFlow dssFlow, List<DSSFlow> dssFlows,
                               List<DSSFlowRelation> dssFlowRelations,
-                              IOEnv sourceEnv,
                               Long projectId,
                               String username, DSSFlow parentFlow) {
         DSSFlow cyFlow = new DSSFlow();
@@ -255,7 +346,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 dssFlow.setChildren(new ArrayList<DSSFlow>());
             }
             dssFlow.addChildren(subDSSFlow);
-            setSubFlow(subDSSFlow, dssFlows, dssFlowRelations, sourceEnv, projectId, username, cyFlow);
+            setSubFlow(subDSSFlow, dssFlows, dssFlowRelations, projectId, username, cyFlow);
         }
         return cyFlow;
     }

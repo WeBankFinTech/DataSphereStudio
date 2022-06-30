@@ -27,4 +27,7 @@ public interface StaffInfoGetter {
 
     String getFullOrgNameByUsername(String username);
 
+    List<String> getAllDepartments();
+
+
 }

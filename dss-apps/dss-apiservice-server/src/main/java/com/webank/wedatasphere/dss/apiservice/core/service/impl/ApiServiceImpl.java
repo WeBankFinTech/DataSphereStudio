@@ -95,8 +95,7 @@ public class ApiServiceImpl implements ApiService {
     public void buildClient() {
         LOG.info("build client start ======");
         client = BmlClientFactory.createBmlClient();
-        Map<String, String> props = new HashMap<>();
-        ujesClient = LinkisJobSubmit.getClient(props);
+        ujesClient = LinkisJobSubmit.getClient();
         LOG.info("build client end =======");
     }
 

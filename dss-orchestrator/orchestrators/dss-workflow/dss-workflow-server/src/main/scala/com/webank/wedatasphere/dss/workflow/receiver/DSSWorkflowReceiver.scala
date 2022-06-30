@@ -16,41 +16,32 @@
 
 package com.webank.wedatasphere.dss.workflow.receiver
 
-
 import java.util
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations, RequestQuerySchedulerWorkflowStatus,ResponseOperateOrchestrator}
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
 import com.webank.wedatasphere.dss.workflow.common.protocol._
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam
 import org.apache.linkis.rpc.{Receiver, Sender}
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Component
 
 import scala.concurrent.duration.Duration
 
-
-@Component
-class DSSWorkflowReceiver extends Receiver {
-
-  @Autowired
-  var workflowManager: WorkFlowManager = _
-
-
+class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
   override def receive(message: Any, sender: Sender): Unit = {}
 
   override def receiveAndReply(message: Any, sender: Sender): Any = message match {
 
     case reqCreateFlow: RequestCreateWorkflow =>
-      val dssFlow: DSSFlow = workflowManager.createWorkflow(reqCreateFlow.getUserName, reqCreateFlow.getWorkflowName,
+      val dssFlow = workflowManager.createWorkflow(reqCreateFlow.getUserName, reqCreateFlow.getProjectId, reqCreateFlow.getWorkflowName,
         reqCreateFlow.getContextIDStr, reqCreateFlow.getDescription,
         reqCreateFlow.getParentFlowID, reqCreateFlow.getUses,
-        reqCreateFlow.getLinkedAppConnNames, reqCreateFlow.getDssLabels)
+        reqCreateFlow.getLinkedAppConnNames, reqCreateFlow.getDssLabels, reqCreateFlow.getOrcVersion,
+        reqCreateFlow.getSchedulerAppConnName)
       val responseCreateWorkflow = new ResponseCreateWorkflow()
       responseCreateWorkflow.setDssFlow(dssFlow)
       responseCreateWorkflow
@@ -80,29 +71,27 @@ class DSSWorkflowReceiver extends Receiver {
       val dssFlowImportParam: DSSFlowImportParam = new DSSFlowImportParam()
       dssFlowImportParam.setProjectID(requestImportWorkflow.getProjectId)
       dssFlowImportParam.setProjectName(requestImportWorkflow.getProjectName)
-      dssFlowImportParam.setSourceEnv(requestImportWorkflow.getSourceEnv)
       dssFlowImportParam.setUserName(requestImportWorkflow.getUserName)
-      dssFlowImportParam.setVersion(requestImportWorkflow.getBmlVersion)
       dssFlowImportParam.setOrcVersion(requestImportWorkflow.getOrcVersion)
-      dssFlowImportParam.setWorkspaceName(requestImportWorkflow.getWorkspaceName)
-      dssFlowImportParam.setWorkspace(DSSCommonUtils.COMMON_GSON.fromJson(requestImportWorkflow.getWorkspaceStr, classOf[Workspace]))
+      dssFlowImportParam.setWorkspace(requestImportWorkflow.getWorkspace)
       dssFlowImportParam.setContextId(requestImportWorkflow.getContextId)
       val dssFlows = workflowManager.importWorkflow(requestImportWorkflow.getUserName,
         requestImportWorkflow.getResourceId,
         requestImportWorkflow.getBmlVersion,
-        dssFlowImportParam)
+        dssFlowImportParam, requestImportWorkflow.getDssLabels)
       import scala.collection.JavaConversions._
-      val dssFlowIds = dssFlows.map(dssFlow => dssFlow.getId).toList
+      val dssFlowIds = dssFlows.map(dssFlow => (dssFlow.getId, dssFlow.getFlowJson)).toMap
       new ResponseImportWorkflow(JobStatus.Success, dssFlowIds)
 
     case requestCopyWorkflow: RequestCopyWorkflow =>
-      val copyFlow: DSSFlow = workflowManager.copyRootflowWithSubflows(requestCopyWorkflow.getUserName,
+      val copyFlow: DSSFlow = workflowManager.copyRootFlowWithSubFlows(requestCopyWorkflow.getUserName,
         requestCopyWorkflow.getRootFlowId,
-        requestCopyWorkflow.getWorkspaceName,
+        requestCopyWorkflow.getWorkspace,
         requestCopyWorkflow.getProjectName,
         requestCopyWorkflow.getContextIdStr,
-        requestCopyWorkflow.getVersion,
-        requestCopyWorkflow.getDescription)
+        requestCopyWorkflow.getOrcVersion,
+        requestCopyWorkflow.getDescription,
+        requestCopyWorkflow.getDssLabels)
       new ResponseCopyWorkflow(copyFlow)
 
     case requestQueryWorkFlow: RequestQueryWorkFlow =>
@@ -112,10 +101,6 @@ class DSSWorkflowReceiver extends Receiver {
 
     case requestConvertOrchestrator: RequestConvertOrchestrations =>
       workflowManager.convertWorkflow(requestConvertOrchestrator)
-
-    case requestQuerySchedulerWorkflowStatus: RequestQuerySchedulerWorkflowStatus =>
-      workflowManager
-        .getSchedulerWorkflowStatus(requestQuerySchedulerWorkflowStatus.getUsername, requestQuerySchedulerWorkflowStatus.getOrchestratorId)
 
     case _ => throw new DSSErrorException(90000, "Not support protocol " + message)
   }

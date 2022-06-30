@@ -36,8 +36,6 @@ public class UpdateWorkspaceUserRequest implements Serializable {
         this.workspaceId = workspaceId;
     }
 
-
-
     public List<Integer> getRoles() {
         return roles;
     }

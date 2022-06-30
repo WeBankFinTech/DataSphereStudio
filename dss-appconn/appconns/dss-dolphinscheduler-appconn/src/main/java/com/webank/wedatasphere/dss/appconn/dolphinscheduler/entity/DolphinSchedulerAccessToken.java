@@ -4,18 +4,14 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-/**
- * The type Dolphin scheduler access token.
- *
- * @author yuxin.yuan
- * @date 2021/06/09
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DolphinSchedulerAccessToken {
 
     private int id;
 
     private int userId;
+
+    private String userName;
 
     private String token;
 
@@ -35,6 +31,14 @@ public class DolphinSchedulerAccessToken {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getToken() {

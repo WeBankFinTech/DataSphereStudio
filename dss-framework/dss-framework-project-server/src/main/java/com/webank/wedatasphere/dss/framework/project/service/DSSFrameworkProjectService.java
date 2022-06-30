@@ -16,23 +16,26 @@
 
 package com.webank.wedatasphere.dss.framework.project.service;
 
+import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
-
 public interface DSSFrameworkProjectService {
 
     DSSProjectDetailVo getProjectSettings(Long projectId);
 
-
+    /**
+     * 1. 首先要去所有满足工程结构的规范的去建工程，首先必须要满足建工程的 AppConn 进行进工程
+     * 2. 自己创建工程
+     * 3. 如果第三方系统创建失败，最多重试一次
+     * 4. 如果本身失败了，则进行回滚
+     * @param projectCreateRequest
+     * @return
+     */
     DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace) throws Exception;
 
-    void modifyProject(ProjectModifyRequest projectModifyRequest, String username) throws Exception;
-
-    void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace)
-        throws Exception;
+    void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
 }

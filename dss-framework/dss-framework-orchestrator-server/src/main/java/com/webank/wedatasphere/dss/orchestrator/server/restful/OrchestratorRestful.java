@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.AddOrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OpenOrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.QueryOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.RollbackOrchestratorRequest;
@@ -49,33 +47,8 @@ public class OrchestratorRestful {
     @Autowired
     OrchestratorService orchestratorService;
 
-    @RequestMapping(path ="addOrchestrator", method = RequestMethod.POST)
-    public Message addOrchestrator(HttpServletRequest req, @RequestBody AddOrchestratorRequest addOrchestratorRequest) throws Exception {
-        String userName = SecurityFilter.getLoginUsername(req);
-        String name = addOrchestratorRequest.getName();
-        String workspaceName = addOrchestratorRequest.getWorkspaceName();
-        String projectName = addOrchestratorRequest.getProjectName();
-        String typeStr = addOrchestratorRequest.getType();
-        String desc = addOrchestratorRequest.getDesc();
-        Long projectID = addOrchestratorRequest.getProjectID();
-        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(addOrchestratorRequest.getLabels().getRoute()));
-        DSSOrchestratorInfo dssOrchestratorInfo = new DSSOrchestratorInfo();
-        dssOrchestratorInfo.setName(name);
-        dssOrchestratorInfo.setCreator(userName);
-        dssOrchestratorInfo.setDesc(desc);
-        dssOrchestratorInfo.setType(typeStr);
-        OrchestratorVo orchestratorVo = orchestratorService.createOrchestrator(userName,
-                workspaceName,
-                projectName,
-                projectID,
-                desc,
-                dssOrchestratorInfo,
-                dssLabelList);
-        return Message.ok().data("OrchestratorVo", orchestratorVo);
-    }
-
-    @RequestMapping(path ="rollbackOrchestrator", method = RequestMethod.POST)
-    public Message rollbackOrchestrator(HttpServletRequest request,@RequestBody RollbackOrchestratorRequest rollbackOrchestratorRequest) {
+    @RequestMapping(path = "rollbackOrchestrator", method = RequestMethod.POST)
+    public Message rollbackOrchestrator(HttpServletRequest request, @RequestBody RollbackOrchestratorRequest rollbackOrchestratorRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Long orchestratorId = rollbackOrchestratorRequest.getOrchestratorId();
         String version = rollbackOrchestratorRequest.getVersion();
@@ -94,14 +67,14 @@ public class OrchestratorRestful {
         }
     }
 
-    @RequestMapping(path ="openOrchestrator", method = RequestMethod.POST)
-    public Message openOrchestrator(HttpServletRequest req,@RequestBody OpenOrchestratorRequest openOrchestratorRequest) throws Exception {
+    @RequestMapping(path = "openOrchestrator", method = RequestMethod.POST)
+    public Message openOrchestrator(HttpServletRequest req, @RequestBody OpenOrchestratorRequest openOrchestratorRequest) throws Exception {
         String openUrl = "";
         String userName = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(openOrchestratorRequest.getLabels().getRoute()));
-        String workspaceName = openOrchestratorRequest.getWorkspaceName();
         Long orchestratorId = openOrchestratorRequest.getOrchestratorId();
-        openUrl = orchestratorService.openOrchestrator(userName, workspaceName, orchestratorId, dssLabelList);
+        openUrl = orchestratorService.openOrchestrator(userName, workspace, orchestratorId, dssLabelList);
         OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
         LOGGER.info("open url is {}, orcId is {}, dssLabels is {}", openUrl, orchestratorId, dssLabelList);
         return Message.ok().data("OrchestratorOpenUrl", openUrl).
@@ -115,7 +88,7 @@ public class OrchestratorRestful {
      * @return
      * @throws Exception
      */
-    @RequestMapping(path ="getVersionByOrchestratorId", method = RequestMethod.POST)
+    @RequestMapping(path = "getVersionByOrchestratorId", method = RequestMethod.POST)
     public Message getVersionByOrchestratorId(@RequestBody QueryOrchestratorVersion queryOrchestratorVersion) throws Exception {
         List list = orchestratorService.getVersionByOrchestratorId(queryOrchestratorVersion.getOrchestratorId());
         return Message.ok().data("list", list);

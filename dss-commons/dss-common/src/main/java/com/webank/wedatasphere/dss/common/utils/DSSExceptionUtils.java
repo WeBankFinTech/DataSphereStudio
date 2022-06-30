@@ -16,18 +16,18 @@
 
 package com.webank.wedatasphere.dss.common.utils;
 
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.exception.ThrowingConsumer;
 import com.webank.wedatasphere.dss.common.exception.ThrowingFunction;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.common.exception.WarnException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Constructor;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DSSExceptionUtils {
 
@@ -39,8 +39,8 @@ public class DSSExceptionUtils {
             try {
                 throwingConsumer.accept(i);
             } catch (Exception e) {
-                LOGGER.error("execute failed,reason:",e);
-                throw new DSSRuntimeException(e.getMessage());
+                LOGGER.error("execute failed, reason: ", e);
+                throw new DSSRuntimeException(ExceptionUtils.getRootCauseMessage(e));
             }
         };
     }
@@ -51,8 +51,8 @@ public class DSSExceptionUtils {
             try {
                 return throwingFunction.accept(i);
             } catch (Exception e) {
-                LOGGER.error("execute failed,reason:",e);
-                throw new DSSRuntimeException(e.getMessage());
+                LOGGER.error("execute failed,reason:", e);
+                throw new DSSRuntimeException(ExceptionUtils.getRootCauseMessage(e));
             }
         };
     }
@@ -63,7 +63,7 @@ public class DSSExceptionUtils {
             try {
                 return throwingFunction.accept(i);
             } catch (Exception e) {
-                LOGGER.error("execute failed,reason:",e);
+                LOGGER.error("execute failed,reason:", e);
                 throw new DSSRuntimeException(53320, ExceptionUtils.getRootCauseMessage(e));
             }
         };
@@ -76,30 +76,30 @@ public class DSSExceptionUtils {
         try {
             Constructor<T> constructor = clazz.getConstructor(int.class, String.class);
             errorException = constructor.newInstance(errorCode, errorDesc);
-            errorException.setErrCode(errorCode);
-            errorException.setDesc(errorDesc);
         } catch (Exception e) {
+            if(throwable == null) {
+                throw new DSSRuntimeException(errorCode, errorDesc, e);
+            }
             throw new DSSRuntimeException(errorCode, errorDesc, throwable);
         }
-        errorException.initCause(throwable);
+        errorException.setErrCode(errorCode);
+        errorException.setDesc(errorDesc);
+        if(throwable != null) {
+            errorException.initCause(throwable);
+        }
         throw errorException;
     }
 
 
     public static <T extends ErrorException> void dealErrorException(int errorCode, String errorDesc,
-                                                                     Class<T> clazz) throws T {
-        T errorException;
-        try {
-            Constructor<T> constructor = clazz.getConstructor(int.class, String.class);
-            errorException = constructor.newInstance(errorCode, errorDesc);
-            errorException.setErrCode(errorCode);
-            errorException.setDesc(errorDesc);
-        } catch (Exception e) {
-            throw new DSSRuntimeException(errorCode, errorDesc, e);
-        }
-        throw errorException;
+                                                                      Class<T> clazz) throws T {
+        dealErrorException(errorCode, errorDesc, null, clazz);
     }
 
+    public static <T extends WarnException> void dealWarnException(int errorCode, String errorDesc,
+                                                                   Class<T> clazz) {
+        dealWarnException(errorCode, errorDesc, null, clazz);
+    }
 
     public static <T extends WarnException> void dealWarnException(int errorCode, String errorDesc, Throwable throwable,
                                                                    Class<T> clazz) {
@@ -107,11 +107,16 @@ public class DSSExceptionUtils {
         try {
             Constructor<T> constructor = clazz.getConstructor(int.class, String.class);
             warnException = constructor.newInstance(errorCode, errorDesc);
-            warnException.setErrCode(errorCode);
-            warnException.setDesc(errorDesc);
-            warnException.initCause(throwable);
         } catch (Exception e) {
+            if(throwable == null) {
+                throw new DSSRuntimeException(errorCode, errorDesc, e);
+            }
             throw new DSSRuntimeException(errorCode, errorDesc, throwable);
+        }
+        warnException.setErrCode(errorCode);
+        warnException.setDesc(errorDesc);
+        if(throwable != null) {
+            warnException.initCause(throwable);
         }
         throw warnException;
     }

@@ -1,17 +1,12 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.standard;
 
+import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerOrchestrationService;
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.service.DolphinSchedulerProjectService;
-import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureIntegrationStandard;
+import com.webank.wedatasphere.dss.appconn.scheduler.AbstractSchedulerStructureIntegrationStandard;
+import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 
-
-/**
- * The type Dolphin scheduler structure standard.
- *
- * @author yuxin.yuan
- * @date 2021/10/18
- */
-public class DolphinSchedulerStructureStandard extends AbstractStructureIntegrationStandard {
+public class DolphinSchedulerStructureStandard extends AbstractSchedulerStructureIntegrationStandard {
 
     private static volatile DolphinSchedulerStructureStandard instance;
 
@@ -33,5 +28,10 @@ public class DolphinSchedulerStructureStandard extends AbstractStructureIntegrat
     @Override
     protected ProjectService createProjectService() {
         return new DolphinSchedulerProjectService();
+    }
+
+    @Override
+    protected OrchestrationService createOrchestrationService() {
+        return new DolphinSchedulerOrchestrationService();
     }
 }

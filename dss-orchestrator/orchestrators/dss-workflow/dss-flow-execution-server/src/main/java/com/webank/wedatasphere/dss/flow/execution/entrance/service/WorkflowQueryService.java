@@ -16,12 +16,13 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.service;
 
+import org.apache.linkis.governance.common.entity.job.JobRequest;
 import org.apache.linkis.governance.common.entity.task.*;
 
 
 public interface WorkflowQueryService {
 
-    ResponsePersist add(RequestInsertTask requestInsertTask);
+    ResponsePersist add(RequestInsertTask requestInsertTask, JobRequest jobRequest);
 
     ResponsePersist change(RequestUpdateTask requestUpdateTask);
 

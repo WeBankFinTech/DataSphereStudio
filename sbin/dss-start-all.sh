@@ -36,78 +36,84 @@ if [ "$DSS_CONF_DIR" = "" ]; then
   export DSS_CONF_DIR=$DSS_HOME/conf
 fi
 
-source "$DSS_CONF_DIR"/config.sh
+local_host="`hostname --fqdn`"
+source $DSS_HOME/sbin/common.sh
+source $DSS_CONF_DIR/config.sh
 
-function isSuccess(){
-  if [ $? -ne 0 ]; then
-      echo "ERROR:  " + $1
-      exit 1
-  else
-      echo "INFO:" + $1
-  fi
+function startApp(){
+echo "<-------------------------------->"
+echo "Begin to start $SERVER_NAME"
+SERVER_START_CMD="sh $DSS_INSTALL_HOME/sbin/dss-daemon.sh restart $SERVER_NAME"
+if test -z "$SERVER_IP"
+then
+  SERVER_IP=$local_host
+fi
+executeCMD $SERVER_IP "$SERVER_START_CMD"
+echo "End to start $SERVER_NAME"
+echo "<-------------------------------->"
+sleep 1
 }
 
-
-#if there is no DSS_INSTALL_HOME，we need to source config again
-if [ -z ${DSS_INSTALL_HOME} ]; then
-    echo "Warning: DSS_INSTALL_HOME does not exist, we will source config"
-    if [ ! -f "${CONF_FILE}" ]; then
-        echo "Error: can not find config file, start applications failed"
-        exit 1
-    else
-        source ${CONF_FILE}
-    fi
+function checkServer() {
+echo "<-------------------------------->"
+echo "Begin to check $SERVER_NAME"
+SERVER_CHECK_CMD="sh $DSS_HOME/sbin/dss-daemon.sh status $SERVER_NAME"
+if test -z "$SERVER_IP"
+then
+  SERVER_IP=$local_host
 fi
 
+executeCMD $SERVER_IP "$SERVER_CHECK_CMD"
 
-local_host="`hostname --fqdn`"
-function startApp(){
-  echo "<-------------------------------->"
-  echo "Begin to start $SERVER_NAME"
-  if test -z "$SERVER_IP"
-  then
-    SERVER_IP=$local_host
-  fi
-
-  #echo "Is local "$flag
-  #if [ $flag == "0" ];then
-  #   eval $SERVER_START_CMD
-  #else
-  #   SERVER_BIN=$INSTALL_HOME/sbin
-  #   SERVER_START_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/* > /dev/null 2>&1;sh $INSTALL_HOME/sbin/daemon.sh $COMMAND $SERVER_NAME > /dev/null 2>&1 &"
-  #   ssh  $SERVER_IP $SERVER_START_CMD
-  #fi
-
-  if [[ $SERVER_IP == "127.0.0.1" ]];then
-      SERVER_IP=$local_host
-  fi
-  SERVER_BIN=$DSS_INSTALL_HOME/sbin
-  SERVER_START_CMD="source ~/.bash_profile;cd ${SERVER_BIN}; dos2unix ./* > /dev/null 2>&1; dos2unix ../conf/$SERVER_NAME/* > /dev/null 2>&1;sh daemon.sh start $SERVER_NAME > /dev/null 2>&1 &"
-  ssh  $SERVER_IP $SERVER_START_CMD
-  isSuccess "End to start $SERVER_NAME"
-  echo "<-------------------------------->"
-  sleep 1
+if [ $? -ne 0 ]; then
+      ALL_SERVER_NAME=$SERVER_NAME
+      LOG_PATH=$DSS_HOME/logs/$ALL_SERVER_NAME.log
+      echo "ERROR: your $ALL_SERVER_NAME microservice is not start successful !!! ERROR logs as follows :"
+      echo "Please check  detail log, log path :$LOG_PATH"
+      echo '<---------------------------------------------------->'
+      executeCMD $ALL_SERVER_NAME "tail -n 50 $LOG_PATH"
+      echo '<---------------------------------------------------->'
+      echo "Please check  detail log, log path :$LOG_PATH"
+      exit 1
+fi
+echo "<-------------------------------->"
+sleep 3
 }
 
 
 function startDssProject(){
-  loadConfig
-
 	SERVER_NAME=dss-framework-project-server
 	SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
-	startApp		
-
-	SERVER_NAME=dss-framework-orchestrator-server
-	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
 	startApp
+	sleep 5
+
+# echo "------------------------Start to check whether the project service is registered to eureka successfully-----------------------------"
+#  #project服务启动并注册到eureka后再启动其他服务
+#  i=1
+#  while [[ -z $result ]] && [[ $i -le 24 ]]
+#  do
+#    sleep 5
+#    if [ -z $EUREKA_USERNAME ] || [ -z $EUREKA_PASSWORD ];then
+#        response=`curl  http://${EUREKA_INSTALL_IP}:${EUREKA_PORT}/eureka/apps/DSS-FRAMEWORK-PROJECT-SERVER`
+#    else
+#        response=`curl  http://${EUREKA_USENAME}:${EUREKA_PASSWORD}@${EUREKA_INSTALL_IP}:${EUREKA_PORT}/eureka/apps/DSS-FRAMEWORK-PROJECT-SERVER`
+#    fi
+#    let i++
+#  result=$(echo $response |grep 'DSS-FRAMEWORK-PROJECT-SERVER')
+#  done
+#  if [[ $i -eq 25 ]]; then
+#      echo "the project server start failed in two minutes,please check the log to find more error details."
+#      exit
+#  fi
+#  echo "------------------------the project service is registered to eureka successfully------------------------------------------------"
 
 	SERVER_NAME=dss-apiservice-server
 	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
 	startApp
 
-	SERVER_NAME=dss-workflow-server
-	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
-	startApp
+	SERVER_NAME=dss-scriptis-server
+  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
+  startApp
 
 	SERVER_NAME=dss-flow-execution-server
 	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
@@ -125,9 +131,51 @@ function startDssProject(){
 	SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
   startApp
 
-	##SERVER_NAME=visualis-server
-  ##SERVER_IP=$VISUALIS_SERVER_INSTALL_IP
-  ##startApp
+  SERVER_NAME=dss-framework-orchestrator-server
+	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
+	startApp
+
+	SERVER_NAME=dss-workflow-server
+	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
+	startApp
+
 }
 
+function checkDssService(){
+	SERVER_NAME=dss-framework-project-server
+	SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
+	checkServer
+
+	SERVER_NAME=dss-framework-orchestrator-server
+	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
+	checkServer
+
+	SERVER_NAME=dss-apiservice-server
+	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
+	checkServer
+
+	SERVER_NAME=dss-scriptis-server
+  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
+  checkServer
+
+	SERVER_NAME=dss-workflow-server
+	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
+	checkServer
+
+	SERVER_NAME=dss-flow-execution-server
+	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
+	checkServer
+
+	SERVER_NAME=dss-data-api-server
+  SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
+  checkServer
+
+  SERVER_NAME=dss-guide-server
+  SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
+  checkServer
+}
+
+
+
 startDssProject
+checkDssService

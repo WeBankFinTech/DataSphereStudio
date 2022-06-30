@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -8,18 +9,15 @@ import org.apache.commons.collections.CollectionUtils;
 
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 
-/**
- * The type Dolphin scheduler flow.
- *
- * @author yuxin.yuan
- * @date 2021/04/29
- */
 public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
+
     private ProcessDefinitionJson processDefinitionJson;
 
     private Map<String, LocationInfo> locations;
 
     private List<Connect> connects;
+
+    private String releaseState;
 
     public ProcessDefinitionJson getProcessDefinitionJson() {
         return processDefinitionJson;
@@ -45,7 +43,16 @@ public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
         this.connects = connects;
     }
 
+    public String getReleaseState() {
+        return releaseState;
+    }
+
+    public void setReleaseState(String releaseState) {
+        this.releaseState = releaseState;
+    }
+
     public static class ProcessDefinitionJson {
+        private List<Map<String, Object>> globalParams = new ArrayList<>(0);
         private List<DolphinSchedulerTask> tasks;
 
         public List<DolphinSchedulerTask> getTasks() {
@@ -61,6 +68,13 @@ public class DolphinSchedulerWorkflow extends WorkflowWithContextImpl {
                 tasks = new LinkedList<>();
             }
             tasks.add(task);
+        }
+        public List<Map<String, Object>> getGlobalParams() {
+            return globalParams;
+        }
+
+        public void setGlobalParams(List<Map<String, Object>> globalParams) {
+            this.globalParams = globalParams;
         }
     }
 

@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSFavorite;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser01;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.*;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,25 +38,16 @@ public interface WorkspaceMapper {
 
     void addWorkSpace(DSSWorkspace dssWorkspace);
 
-    List<HomepageDemoMenuVo> getHomepageDemoMenusEn();
-    List<HomepageDemoMenuVo> getHomepageDemoMenusCn();
-
-    List<HomepageDemoInstanceVo> getHomepageInstancesByMenuIdCn(Long id);
-    List<HomepageDemoInstanceVo> getHomepageInstancesByMenuIdEn(Long id);
-
-    List<HomepageVideoVo> getHomepageVideosEn();
-    List<HomepageVideoVo> getHomepageVideosCn();
-
     DSSWorkspace getWorkspaceById(@Param("workspaceId") Long workspaceId);
 
-    List<OnestopMenuVo> getManagementMenuCn();
-    List<OnestopMenuVo> getManagementMenuEn();
+    List<WorkspaceMenuVo> getManagementMenuCn();
+    List<WorkspaceMenuVo> getManagementMenuEn();
 
-    List<OnestopMenuVo> getApplicationMenuCn();
-    List<OnestopMenuVo> getApplicationMenuEn();
+    List<WorkspaceMenuVo> getAppConnMenuCn();
+    List<WorkspaceMenuVo> getAppConnMenuEn();
 
-    List<OnestopMenuAppInstanceVo> getMenuAppInstancesCn(Long id);
-    List<OnestopMenuAppInstanceVo> getMenuAppInstancesEn(Long id);
+    List<WorkspaceMenuAppconnVo> getMenuAppInstancesCn(Long id);
+    List<WorkspaceMenuAppconnVo> getMenuAppInstancesEn(Long id);
 
     List<WorkspaceFavoriteVo> getWorkspaceFavoritesCn(@Param("username") String username, @Param("workspaceId") Long workspaceId,@Param("type") String  type);
 
@@ -68,5 +58,5 @@ public interface WorkspaceMapper {
     void deleteFavorite(@Param("username") String username,@Param("applicationId") Long applicationId, @Param("workspaceId") Long workspaceId,@Param("type") String type);
 
     String getDepartName(@Param("id") Long id);
-    List<DSSWorkspaceUser01> getWorkspaceUsers(@Param("id") Long id);
+
 }

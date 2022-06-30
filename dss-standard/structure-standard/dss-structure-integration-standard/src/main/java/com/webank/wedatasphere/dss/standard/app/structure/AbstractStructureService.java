@@ -26,7 +26,6 @@ public class AbstractStructureService extends AppSingletonIntegrationServiceImpl
     @Override
     protected void initOperation(StructureOperation operation) {
         operation.setStructureService(this);
-        operation.init();
         super.initOperation(operation);
     }
 

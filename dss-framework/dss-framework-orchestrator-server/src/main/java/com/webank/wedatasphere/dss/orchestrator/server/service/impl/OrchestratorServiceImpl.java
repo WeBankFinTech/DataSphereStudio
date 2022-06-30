@@ -68,15 +68,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Service
+@EnableScheduling
 public class OrchestratorServiceImpl implements OrchestratorService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorServiceImpl.class);
@@ -441,31 +445,33 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
+    @Scheduled(cron = " 0 0 3 * * ?")
     public void batchClearContextId() {
+        LOGGER.info("--------------------{} start clear old contextId------------------------", LocalDateTime.now());
         ArrayList<String> contextIdList = new ArrayList();
-
-        // 1、先去查询dss_orchestrator_version_info表，筛选出发布过两次及以上的编排，并获取老的发布记录。
-        List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
-        if (historyOrcVersionList == null || historyOrcVersionList.isEmpty()) {
-            return;
-        }
-        List<DSSLabel> dssLabels = Lists.newArrayList(new EnvDSSLabel("dev"));
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
-        // 2、根据appIds去查询子工作流contextId
-        for (DSSOrchestratorVersion orcInfo : historyOrcVersionList) {
-            RequestSubFlowContextIds requestSubFlowContextIds = new RequestSubFlowContextIds(orcInfo.getAppId());
-            ResponseSubFlowContextIds response = (ResponseSubFlowContextIds) sender.ask(requestSubFlowContextIds);
-            if (response != null) {
-                List<String> subFlowContextIdList = response.getContextIdList();
-                if (subFlowContextIdList != null && subFlowContextIdList.size() > 0) {
-                    contextIdList.addAll(subFlowContextIdList);
-                }
-            }
-            contextIdList.add(orcInfo.getContextId());
-        }
-        // 3、调用linkis接口批量删除contextId
-        ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
         try {
+            // 1、先去查询dss_orchestrator_version_info表，筛选出发布过两次及以上的编排，并获取老的发布记录。
+            List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
+            if (historyOrcVersionList == null || historyOrcVersionList.isEmpty()) {
+                return;
+            }
+            List<DSSLabel> dssLabels = Lists.newArrayList(new EnvDSSLabel("dev"));
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
+            // 2、根据appIds去查询子工作流contextId
+            for (DSSOrchestratorVersion orcInfo : historyOrcVersionList) {
+                RequestSubFlowContextIds requestSubFlowContextIds = new RequestSubFlowContextIds(orcInfo.getAppId());
+                ResponseSubFlowContextIds response = (ResponseSubFlowContextIds) sender.ask(requestSubFlowContextIds);
+                if (response != null) {
+                    List<String> subFlowContextIdList = response.getContextIdList();
+                    if (subFlowContextIdList != null && subFlowContextIdList.size() > 0) {
+                        contextIdList.addAll(subFlowContextIdList);
+                    }
+                }
+                contextIdList.add(orcInfo.getContextId());
+            }
+            // 3、调用linkis接口批量删除contextId
+            ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
+
             // 每次处理1000条数据
             if (contextIdList.size() < DSSOrchestratorConstant.MAX_CLEAR_SIZE) {
                 //contextClient.batchClearContextByHAID(contextIdList);
@@ -475,7 +481,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 int count = (size + len - 1) / len;
                 for (int i = 0; i < count; i++) {
                     List<String> subList = contextIdList.subList(i * len, (Math.min((i + 1) * len, size)));
-                    LOGGER.info("批次清理contextId,第{}批", i + 1);
+                    LOGGER.info("clear linkis contextId by batch,{} batch", i + 1);
                     //contextClient.batchClearContextByHAID(subList);
                     Thread.sleep(500);
                 }
@@ -489,15 +495,14 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 int count = (size + len - 1) / len;
                 for (int i = 0; i < count; i++) {
                     List<DSSOrchestratorVersion> subHistoryList = historyOrcVersionList.subList(i * len, (Math.min((i + 1) * len, size)));
-                    LOGGER.info("批次清理contextId,第{}批", i + 1);
+                    LOGGER.info("update dss contextId by batch,{} batch", i + 1);
                     orchestratorMapper.batchUpdateOrcInfo(subHistoryList);
                     Thread.sleep(500);
                 }
-
             }
-
+            LOGGER.info("--------------------{} end clear old contextId------------------------", LocalDateTime.now());
         } catch (Exception e) {
-            LOGGER.error("调用linkis批量清理contextId接口失败，", e);
+            LOGGER.error("execute linkis batch clear csId failed，", e);
         }
     }
 

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMetricsMapper">
+    <select id="queryProcessInstanceListOrderByDuration"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select instance.id, instance.process_definition_id, instance.command_type, instance.executor_id,
+        instance.name, instance.state, instance.schedule_time, instance.start_time, instance.end_time,
+        instance.run_times, instance.recovery, instance.host
+        from t_ds_process_instance instance
+        join t_ds_process_definition define ON instance.process_definition_id = define.id
+        where instance.is_sub_process=0
+        and define.project_id = #{projectId}
+        and instance.end_time is not null
+        <if test="processDefinitionId != 0 and processDefinitionId != null">
+            and instance.process_definition_id = #{processDefinitionId}
+        </if>
+        <if test="startTime != null ">
+            and instance.start_time >= #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
+        </if>
+        <if test="executorId != 0">
+            and instance.executor_id = #{executorId}
+        </if>
+        order by instance.end_time - instance.start_time desc
+    </select>
+    <select id="queryProcessInstanceListByStartTime"
+            resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select instance.id, instance.state, instance.start_time
+        from t_ds_process_instance instance
+        join t_ds_process_definition define ON instance.process_definition_id = define.id
+        where instance.is_sub_process=0
+        and define.project_id = #{projectId}
+        and instance.state = #{state}
+        and instance.start_time >= #{startTime} and instance.start_time <![CDATA[ <]]> #{endTime}
+        <if test="processDefinitionId != 0 and processDefinitionId != null">
+            and instance.process_definition_id = #{processDefinitionId}
+        </if>
+        <if test="executorId != 0">
+            and instance.executor_id = #{executorId}
+        </if>
+    </select>
+</mapper>

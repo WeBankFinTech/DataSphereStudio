@@ -55,6 +55,22 @@ export default Object.freeze([{
   flowType: 'psql'
 },
 {
+  rule: /\.(tsql)$/i, // 后缀
+  lang: 'hql', // 脚本语言
+  executable: true, // 是否可执行
+  application: 'trino',
+  runType: 'tsql',
+  ext: '.tsql',
+  scriptType: 'tsql', // 脚本类型
+  abbr: 'tsql',
+  logo: 'fi-trino-sql',
+  color: '#3a3837',
+  isCanBeNew: true, // 是否能新建
+  label: 'Tsql',
+  isCanBeOpen: true, // 是否能双击打开
+  flowType: 'tsql'
+},
+{
   rule: /\.(fql)$/i,
   lang: 'sql',
   executable: true,

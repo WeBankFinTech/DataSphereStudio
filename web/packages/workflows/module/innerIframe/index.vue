@@ -6,8 +6,9 @@
       </div>
     </template>
     <template v-else>
-      <iframe :src="`${url}?projectName=${this.projectName}`" width="100%" frameborder="0"></iframe>
+      <iframe ref="ifr" :src="`${url}?projectName=${this.projectName}`"   width="100%" frameborder="0"></iframe>
     </template>
+    <Spin v-if="projectName && loading" fix>加载中，请稍后...</Spin>
   </div>
 </template>
 
@@ -28,11 +29,18 @@ export default {
         if (appItem) applicationItem = appItem
       }
     })
+    const ifr = this.$refs.ifr;
+    if (ifr) {
+      ifr.onload = () => {
+        this.loading = false
+      }
+    }
     this.url = applicationItem.appInstances && applicationItem.appInstances[0] && applicationItem.appInstances[0].homepageUri;
   },
   data() {
     return {
       url: '',
+      loading: true
     }
   },
   props: {

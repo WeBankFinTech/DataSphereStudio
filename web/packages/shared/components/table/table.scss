@@ -1,0 +1,182 @@
+@import '@dataspherestudio/shared/common/style/variables.scss';
+
+.tableBody {
+  width: 100%;
+}
+.top-td {
+  border-right: 1px solid #e8eaec;
+  height: 40px;
+  white-space: nowrap;
+  overflow: hidden;
+  box-sizing: border-box;
+  text-align: center;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  font-weight: 600;
+  border-bottom: 1px solid #e8eaec;
+  font-size: 12px;
+  overflow: hidden;
+  position: relative;
+  @include bg-color(rgb(94, 157, 224), $dark-menu-base-color);
+  @include border-color(#e8eaec, $dark-border-color-base);
+}
+.top-td .text {
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-td .sort-icon {
+  display: inline-block;
+  width: 14px;
+  height: 12px;
+  margin-top: -1px;
+  vertical-align: middle;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+}
+.sort-icon  i {
+  display: block;
+  height: 6px;
+  line-height: 6px;
+  overflow: hidden;
+  position: absolute;
+  transition: color 0.2s ease-in-out;
+  font-size: 16px;
+  font-family: Ionicons;
+  font-style: normal;
+  font-weight: 400;
+  font-variant: normal;
+  text-transform: none;
+  text-rendering: auto;
+  color: $dark-text-color;
+}
+.sort-icon i:first-child {
+  top: 0;
+}
+.sort-icon i:last-child {
+  bottom: 0;
+}
+.sort-icon i:hover {
+  @include font-color(#fff, $dark-text-color);
+}
+.sort-icon i.on {
+  @include font-color(#fff, $dark-text-color);
+}
+.sort-icon-arrow-down:before {
+  content: "\F33D";
+}
+.sort-icon-arrow-up:before {
+  content: "\F33D";
+}
+.table-bottom {
+  position: absolute;
+  top: 41px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: auto;
+}
+.table-top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+
+.table-bottom-load {
+  position: absolute;
+  z-index: 99;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.15);
+  opacity: 0.3;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
+.table-bottom-load .icon {
+  font-size: 30px;
+  animation: ani-demo-spin 2s linear infinite;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+.table-bottom-load .msg {
+  margin-top: 10px;
+  line-height: 30px;
+  @include font-color(#000, $dark-text-color);
+}
+@keyframes ani-demo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.table-div {
+  width: inherit;
+  max-width: 100%;
+  font-size: 12px;
+  box-sizing: border-box;
+  position: relative;
+  margin: auto;
+  border: 1px solid #e8eaec;
+  overflow: auto;
+  @include font-color(#495060, $dark-text-color);
+  @include border-color(#e8eaec, $dark-border-color-base);
+}
+.bottom-td {
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+  text-align: center;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  border-bottom: 1px solid #e8eaec;
+  border-right: 1px solid #e8eaec;
+  transition: background-color 0.2s ease-in-out;
+  @include border-color(#e8eaec, $dark-border-color-base);
+}
+.trselect td {
+  @include bg-color(#ebf7ff, $dark-active-menu-item);
+  &:hover {
+    @include bg-color(#ebf7ff, $dark-active-menu-item)
+  }
+}
+.trhover:hover td {
+  @include bg-color(#ebf7ff, $dark-active-menu-item);
+}
+.no-data-tip {
+  height: 100%;
+  padding-left: 100px;
+  display: flex;
+  align-items: center;
+}
+.resize-bar {
+  position: absolute;
+  width: 10px;
+  height: 100%;
+  bottom: 0;
+  right: -5px;
+  cursor: col-resize;
+  z-index: 1;
+}
+.drag-line {
+  position: absolute;
+  top: 0;
+  width: 0px;
+  border-left: .5px dashed #eee;
+  height: 100%;
+  z-index: 1;
+  display: none;
+  pointer-events: none;
+}

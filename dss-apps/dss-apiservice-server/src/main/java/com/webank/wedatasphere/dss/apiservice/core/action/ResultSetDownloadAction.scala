@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.apiservice.core.action
 
 import org.apache.linkis.httpclient.request.{DownloadAction, GetAction}
 import org.apache.linkis.ujes.client.request.UJESJobAction
+import org.apache.http.HttpResponse
 
 import scala.tools.nsc.interpreter.InputStream
 
@@ -27,9 +28,16 @@ class ResultSetDownloadAction extends GetAction with  DownloadAction with UJESJo
 
   private var inputStream: InputStream = _
 
+  private var response: HttpResponse = _
+
   override def write(inputStream: InputStream): Unit = this.inputStream = inputStream
 
   def getInputStream: InputStream = inputStream
 
   override def suffixURLs: Array[String] = Array("filesystem", "resultsetToExcel")
+
+
+   def getResponse: HttpResponse = response
+
+   def setResponse(response: HttpResponse): Unit = this.response = response
 }

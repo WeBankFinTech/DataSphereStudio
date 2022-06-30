@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.common.entity.project;
 
 import java.util.Date;
-import java.util.List;
 
 public class DSSProject implements Project {
 
@@ -25,21 +24,21 @@ public class DSSProject implements Project {
     private String name;
     private String description;
     private String createBy;
+    private String updateBy;
 
     private String username;
     private Date createTime;
     private Date updateTime;
-
+    //产品
     private String product;
+    //应用领域
     private Integer applicationArea;
+    //业务
     private String business;
     private Integer workspaceId;
     private String workspaceName;
 
-    //stitched
-    private List<String> viewUsers;
-    private List<String> editUsers;
-    private List<String> executeUsers;
+    private Boolean editable;
 
 
     @Override
@@ -138,36 +137,20 @@ public class DSSProject implements Project {
         this.workspaceId = workspaceId;
     }
 
-    public List<String> getViewUsers() {
-        return viewUsers;
-    }
-
-    public void setViewUsers(List<String> viewUsers) {
-        this.viewUsers = viewUsers;
-    }
-
-    public List<String> getEditUsers() {
-        return editUsers;
-    }
-
-    public void setEditUsers(List<String> editUsers) {
-        this.editUsers = editUsers;
-    }
-
-    public List<String> getExecuteUsers() {
-        return executeUsers;
-    }
-
-    public void setExecuteUsers(List<String> executeUsers) {
-        this.executeUsers = executeUsers;
-    }
-
     public String getWorkspaceName() {
         return workspaceName;
     }
 
     public void setWorkspaceName(String workspaceName) {
         this.workspaceName = workspaceName;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
     }
 
     @Override
@@ -185,9 +168,7 @@ public class DSSProject implements Project {
                 ", business='" + business + '\'' +
                 ", workspaceId=" + workspaceId +
                 ", workspaceName='" + workspaceName + '\'' +
-                ", viewUsers=" + viewUsers +
-                ", editUsers=" + editUsers +
-                ", executeUsers=" + executeUsers +
+                ", editable=" + editable +
                 '}';
     }
 }

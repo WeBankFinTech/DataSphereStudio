@@ -19,11 +19,10 @@ package com.webank.wedatasphere.dss.orchestrator.server.receiver
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
 import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
-import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
 import javax.annotation.PostConstruct
+import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
-
 
 
 @Component
@@ -41,18 +40,18 @@ class DSSOrchestratorChooser extends ReceiverChooser {
   var receiver: Option[DSSOrchestratorReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService,orchestratorPluginService,orchestratorContext))
+  def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService, orchestratorPluginService, orchestratorContext))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
-    case _: RequestCreateOrchestrator => receiver
-    case _: RequestUpdateOrchestrator => receiver
-    case _: RequestDeleteOrchestrator => receiver
     case _: RequestExportOrchestrator => receiver
     case _: RequestImportOrchestrator => receiver
     case _: RequestQueryOrchestrator => receiver
     case _: RequestFrameworkConvertOrchestration => receiver
     case _: RequestFrameworkConvertOrchestrationStatus => receiver
+    case _: RequestAddVersionAfterPublish => receiver
     case _: RequestOrchestratorVersion => receiver
+    case _: RequestOrchestratorInfos => receiver
+    case _: RequestQueryByIdOrchestrator => receiver
     case _ => None
   }
 }

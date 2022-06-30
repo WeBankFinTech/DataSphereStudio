@@ -16,12 +16,13 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.framework.workspace.service.impl.DSSWorkspaceServiceImpl;
 import com.webank.wedatasphere.dss.framework.workspace.service.impl.DefaultStaffInfoGetter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 
 @Configuration
@@ -29,8 +30,13 @@ public class WorkspaceSpringConfig {
 
     @Bean
     @ConditionalOnMissingBean
-    public StaffInfoGetter getStaffInfoGetter(){
+    public StaffInfoGetter getStaffInfoGetter() {
         return new DefaultStaffInfoGetter();
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public DSSWorkspaceService createDSSWorkspaceService() {
+        return new DSSWorkspaceServiceImpl();
+    }
 }

@@ -17,16 +17,13 @@
 package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
 import com.webank.wedatasphere.dss.appconn.eventchecker.execution.EventCheckerRefExecutionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExecutionService;
 
 public class EventCheckerExecuteService extends AbstractRefExecutionService {
 
     @Override
-    public RefExecutionOperation createRefExecutionOperation() {
-        EventCheckerRefExecutionOperation eventCheckerRefExecutionOperation = new EventCheckerRefExecutionOperation();
-        eventCheckerRefExecutionOperation.setDevelopmentService(this);
-        return eventCheckerRefExecutionOperation;
+    protected EventCheckerRefExecutionOperation createRefExecutionOperation() {
+        return new EventCheckerRefExecutionOperation();
     }
 
 }

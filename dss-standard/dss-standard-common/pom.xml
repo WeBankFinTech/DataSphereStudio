@@ -21,7 +21,7 @@
   <parent>
     <artifactId>dss</artifactId>
     <groupId>com.webank.wedatasphere.dss</groupId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
@@ -42,12 +42,6 @@
       <artifactId>dss-common</artifactId>
       <version>${dss.version}</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.reflections</groupId>
-      <artifactId>reflections</artifactId>
-      <version>${reflections.version}</version>
     </dependency>
 
   </dependencies>

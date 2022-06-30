@@ -16,11 +16,14 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.email
 
+import java.util
 import java.util.concurrent.Future
 
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
 
 trait EmailSender {
+
+  def init(properties: util.Map[String, String]): Unit
 
   @throws(classOf[EmailSendFailedException])
   def send(email: Email): Unit

@@ -52,7 +52,7 @@
         <Form-item prop="business" label="业务口径">
           <Input v-model="fieldModel.business" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="calculate" label="计算指标">
+        <Form-item prop="calculate" label="计算口径">
           <Input v-model="fieldModel.calculate" placeholder="" :disabled="true"></Input>
         </Form-item>
         <Form-item prop="formula" label="计算公式">

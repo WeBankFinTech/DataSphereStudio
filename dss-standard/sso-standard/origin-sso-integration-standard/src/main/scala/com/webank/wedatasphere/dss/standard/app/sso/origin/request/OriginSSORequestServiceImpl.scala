@@ -16,22 +16,15 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.origin.request
 
-import java.util
+/**
+ * 通常用于请求与 DSS 打通了一级规范的第三方系统，是默认的使用方案
+ */
+class OriginSSORequestServiceImpl extends HttpSSORequestServiceImpl {
 
-import com.webank.wedatasphere.dss.standard.app.sso.request.{SSORequestOperation, SSORequestService}
-import com.webank.wedatasphere.dss.standard.common.service.AppServiceImpl
-import org.apache.linkis.httpclient.request.HttpAction
-import org.apache.linkis.httpclient.response.HttpResult
+  override protected def createHttpSSORequestOperation(appName: String): HttpSSORequestOperation =
+    new OriginSSORequestOperation(appName)
 
-
-class OriginSSORequestServiceImpl extends AppServiceImpl with SSORequestService {
-
-  private val ssoRequestServices = new util.HashMap[String, OriginSSORequestOperation]
-
-  override def createSSORequestOperation(appName: String): SSORequestOperation[HttpAction, HttpResult] = {
-    if(!ssoRequestServices.containsKey(appName)) synchronized {
-      if(!ssoRequestServices.containsKey(appName)) ssoRequestServices.put(appName, new OriginSSORequestOperation(appName))
-    }
-    ssoRequestServices.get(appName)
+  override def createSSORequestOperation(appName: String): OriginSSORequestOperation = {
+    super.createSSORequestOperation(appName).asInstanceOf[OriginSSORequestOperation]
   }
 }

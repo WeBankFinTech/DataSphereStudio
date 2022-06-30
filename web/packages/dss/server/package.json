@@ -1,0 +1,20 @@
+{
+  "name": "koa-mayql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=dev node index.js",
+    "test": "cross-env NODE_ENV=test node index.js",
+    "prd": "cross-env NODE_ENV=prd node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cross-env": "^7.0.3",
+    "koa": "^2.6.2",
+    "koa-body": "^4.2.0",
+    "koa-router": "^10.0.0",
+    "mysql": "^2.16.0"
+  }
+}

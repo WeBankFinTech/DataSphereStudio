@@ -16,15 +16,18 @@
 
 package com.webank.wedatasphere.dss.standard.app.structure.status;
 
-import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-
-import java.util.List;
-
-
 public interface AppStatus {
 
-    boolean isHealthy();
+    /**
+     * 返回第三方系统的状态，其中：0 代表健康，为绿色；1 代表繁忙，为黄色；2 代表响应慢，为橙色；3 代表失联，为灰色
+     * @return 返回状态
+     */
+    int getStatus();
 
-    List<AppInstance> getUnreachableAppInstance();
+    /**
+     * 当 {@code getStatus()} 非 0 时，请返回诊断信息
+     * @return 诊断信息
+     */
+    String getUnHealthyMsg();
 
 }

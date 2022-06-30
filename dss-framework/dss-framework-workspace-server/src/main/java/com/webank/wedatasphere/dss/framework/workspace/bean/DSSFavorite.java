@@ -16,7 +16,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
 
-public class DSSFavorite extends BaseEntity{
+public class DSSFavorite extends BaseEntity {
 
     private Long id;
 
@@ -24,9 +24,10 @@ public class DSSFavorite extends BaseEntity{
 
     private Long workspaceId;
 
-    private Long menuApplicationId;
+    private Long menuAppConnId;
 
     private Integer order;
+    private String type;
 
     public Long getId() {
         return id;
@@ -52,12 +53,12 @@ public class DSSFavorite extends BaseEntity{
         this.workspaceId = workspaceId;
     }
 
-    public Long getMenuApplicationId() {
-        return menuApplicationId;
+    public Long getMenuAppConnId() {
+        return menuAppConnId;
     }
 
-    public void setMenuApplicationId(Long menuApplicationId) {
-        this.menuApplicationId = menuApplicationId;
+    public void setMenuAppConnId(Long menuApplicationId) {
+        this.menuAppConnId = menuApplicationId;
     }
 
     public Integer getOrder() {
@@ -66,5 +67,13 @@ public class DSSFavorite extends BaseEntity{
 
     public void setOrder(Integer order) {
         this.order = order;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

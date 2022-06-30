@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.orchestrator.loader;
 
 
-import com.webank.wedatasphere.dss.appconn.core.exception.AppConnErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 
@@ -30,12 +29,10 @@ public interface OrchestratorLoader {
      * @param userName
      * @param workspaceName
      * @param typeName
-     * @param appConnName    唯一标识一种类型的AppConn,比如workflowOrchestratorAppConn
      * @return
      */
     DSSOrchestrator loadOrchestrator(String userName,
                                      String workspaceName,
                                      String typeName,
-                                     String appConnName,
-                                     List<DSSLabel> dssLabels) throws AppConnErrorException;
+                                     List<DSSLabel> dssLabels);
 }

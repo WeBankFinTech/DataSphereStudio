@@ -16,41 +16,29 @@
 
 package com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job;
 
-import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Builder;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.CommonLinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
-import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLService;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
-import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
-public class AzkanbanBuilder extends Builder{
+public class AzkanbanBuilder extends Builder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AzkanbanBuilder.class);
 
+    private static final String RUN_DATE_KEY = "run_date";
+    private static final String RUN_DATE_HOUR_KEY = "run_date_h";
     private Map<String, String> jobProps;
 
     public AzkanbanBuilder setJobProps(Map<String, String> jobProps) {
@@ -66,7 +54,7 @@ public class AzkanbanBuilder extends Builder{
 
     @Override
     protected LinkisJob creatLinkisJob(boolean isLinkisType) {
-        if(isLinkisType){
+        if (isLinkisType) {
             AzkabanCommonLinkisJob linkisJob = new AzkabanCommonLinkisJob();
             linkisJob.setJobProps(this.jobProps);
             return linkisJob;
@@ -82,83 +70,44 @@ public class AzkanbanBuilder extends Builder{
         job.setCode(jobProps.get(LinkisJobTypeConf.COMMAND));
 
         Map<String, Object> params = new HashMap<>();
-        if(jobProps.containsKey("run_date")){
+        if (jobProps.containsKey("run_date")) {
             params.put("run_date", jobProps.get("run_date"));
         }
         job.setParams(params);
 
         Map<String, Object> runtimeMap = new HashMap<>();
-        if (null != job.getRuntimeParams()){
+        if (null != job.getRuntimeParams()) {
             runtimeMap = job.getRuntimeParams();
         }
-        //update by peaceWong add contextID to runtimeMap
-        if (jobProps.containsKey(LinkisJobExecutionConfiguration.FLOW_CONTEXTID)){
-            runtimeMap.put("contextID", jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID).replace("/", "\\"));
-        }
+
         runtimeMap.put("nodeName", jobProps.get(LinkisJobTypeConf.JOB_ID));
 
         runtimeMap.put(LinkisJobTypeConf.DSS_LABELS_KEY, jobProps.get(LinkisJobTypeConf.DSS_LABELS_KEY));
-        //to put a workspace for linkis job
-        String workspace = "";
-        try {
-            workspace = getWorkspace(job.getUser(), job);
-        } catch (Exception e) {
-           LOGGER.error("Failed to get workspace", e);
-        }
-        runtimeMap.put("workspace", workspace);
         job.setRuntimeParams(runtimeMap);
     }
 
-    private String getWorkspace(String user, Job job) throws Exception {
-        String linkisUrl = LinkisURLService.Factory.getLinkisURLService().getDefaultLinkisURL(job);
-        String token = LinkisJobExecutionConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(job.getJobProps());
-        String dssUrl = linkisUrl.endsWith("/") ? linkisUrl + "api/rest_j/v1/dss/framework/project/getWorkSpaceStr"
-                : linkisUrl + "/api/rest_j/v1/dss/framework/project/getWorkSpaceStr";
-        HttpGet httpGet = new HttpGet(dssUrl);
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("Token-User", user));
-        params.add(new BasicNameValuePair("Token-Code", token));
-        httpGet.addHeader("Token-User", user);
-        httpGet.addHeader("Token-Code", token);
-        CookieStore cookieStore = new BasicCookieStore();
-        CloseableHttpClient httpClient = null;
-        CloseableHttpResponse response = null;
-        HttpClientContext context;
-        String responseContent;
-        try {
-            httpClient = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
-            context = HttpClientContext.create();
-            response = httpClient.execute(httpGet, context);
-            HttpEntity entity = response.getEntity();
-            responseContent = EntityUtils.toString(entity,"utf-8");
-            Gson gson = new Gson();
-            Map resultMap = gson.fromJson(responseContent, Map.class);
-            Object obj = resultMap.get("data");
-            if (obj instanceof Map){
-                if (null != ((Map) obj).get("workspaceStr")){
-                    return ((Map) obj).get("workspaceStr").toString();
-                }else {
-                    return "";
-                }
-            }
-        } finally {
-            IOUtils.closeQuietly(response);
-            IOUtils.closeQuietly(httpClient);
-        }
-        return "";
+    @Override
+    protected String getContextID(Job job) {
+        return jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID);
     }
-
 
     @Override
     protected void fillLinkisJobInfo(LinkisJob linkisJob) {
         linkisJob.setConfiguration(findConfiguration(LinkisJobExecutionConfiguration.NODE_CONF_PREFIX));
         Map<String, Object> variables = findVariables(LinkisJobExecutionConfiguration.FLOW_VARIABLE_PREFIX);
-        //只有工作流参数中没有设置,我们才会去进行替换
-        if(jobProps.containsKey("run_date") && !variables.containsKey("run_date")){
-            variables.put("run_date", jobProps.get("run_date"));
-        }
+        // 只有工作流参数中没有设置,我们才会去进行替换
+        // 改为不管工作流是否设置，在 Schedulis 这边都需要统一使用 Schedulis 设置的 run_date和un_date_h,防止出现批量调度的误导作用
+        setNewRunDateVariable(variables, RUN_DATE_KEY);
+        setNewRunDateVariable(variables, RUN_DATE_HOUR_KEY);
         linkisJob.setVariables(variables);
         linkisJob.setSource(getSource());
+    }
+
+    private void setNewRunDateVariable(Map<String, Object> variables, String replaceVar) {
+        if (jobProps.containsKey(replaceVar)) {
+            variables.put(replaceVar, jobProps.get(replaceVar));
+            LOGGER.info("Put {} to variables,value: {}", replaceVar, jobProps.get(replaceVar));
+        }
     }
 
     @Override

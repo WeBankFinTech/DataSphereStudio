@@ -56,11 +56,6 @@ public class DSSWorkspacePrivRestful {
         return Message.ok().data("workspaceMenuPrivs", workspaceMenuPrivs);
     }
 
-    @RequestMapping(path ="getWorkspaceComponentPrivs", method = RequestMethod.GET)
-    public Message getWorkspaceComponentPrivs(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId){
-        return Message.ok("接口废弃");
-    }
-
     @RequestMapping(path ="getWorkspaceHomepageSettings", method = RequestMethod.GET)
     public Message getWorkspaceHomepageSettings(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId){
         String username = SecurityFilter.getLoginUsername(request);

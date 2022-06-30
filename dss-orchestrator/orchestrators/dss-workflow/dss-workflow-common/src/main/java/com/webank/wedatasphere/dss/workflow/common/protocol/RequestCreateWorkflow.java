@@ -24,6 +24,7 @@ import java.util.List;
 public class RequestCreateWorkflow {
 
     private String userName;
+    private Long projectId;
     private String workflowName;
     private String contextIDStr;
     private  String description;
@@ -31,16 +32,22 @@ public class RequestCreateWorkflow {
     private  String  uses;
     private List<String > linkedAppConnNames;
     private List<DSSLabel> dssLabels;
+    private String orcVersion;
+    private String schedulerAppConnName;
 
     public RequestCreateWorkflow(String userName,
+                                 Long projectId,
                                  String workflowName,
                                  String contextIDStr,
                                  String description,
                                  Long parentFlowID,
                                  String uses,
                                  List<String> linkedAppConnNames,
-                                 List<DSSLabel> dssLabels) {
+                                 List<DSSLabel> dssLabels,
+                                 String orcVersion,
+                                 String schedulerAppConnName) {
         this.userName = userName;
+        this.projectId = projectId;
         this.workflowName = workflowName;
         this.contextIDStr = contextIDStr;
         this.description = description;
@@ -48,6 +55,8 @@ public class RequestCreateWorkflow {
         this.uses = uses;
         this.linkedAppConnNames = linkedAppConnNames;
         this.dssLabels =dssLabels;
+        this.orcVersion = orcVersion;
+        this.schedulerAppConnName = schedulerAppConnName;
     }
 
     public String getUserName() {
@@ -56,6 +65,14 @@ public class RequestCreateWorkflow {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     public String getWorkflowName() {
@@ -111,5 +128,21 @@ public class RequestCreateWorkflow {
 
     public void setDssLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
+    }
+
+    public String getOrcVersion() {
+        return orcVersion;
+    }
+
+    public void setOrcVersion(String orcVersion) {
+        this.orcVersion = orcVersion;
+    }
+
+    public String getSchedulerAppConnName() {
+        return schedulerAppConnName;
+    }
+
+    public void setSchedulerAppConnName(String schedulerAppConnName) {
+        this.schedulerAppConnName = schedulerAppConnName;
     }
 }

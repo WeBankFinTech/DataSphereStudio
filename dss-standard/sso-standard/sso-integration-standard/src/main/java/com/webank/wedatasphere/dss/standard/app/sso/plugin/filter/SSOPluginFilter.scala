@@ -57,7 +57,7 @@ abstract class SSOPluginFilter extends Filter {
         if(wrappedReq != req) {
           wrappedReq.getCookies.foreach(resp.addCookie)
         }
-        info(s"DSS User: $username succeed to login.")
+        info(s"DSS User: $username succeed to login. ")
         (ssoMsg.getRedirectUrl, ssoMsg.getWorkspaceName, wrappedReq)
       } else {
         (dssMsg.getRedirectUrl, dssMsg.getWorkspaceName, req)

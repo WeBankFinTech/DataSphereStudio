@@ -17,21 +17,28 @@
 package com.webank.wedatasphere.dss.appconn.scheduler;
 
 import com.webank.wedatasphere.dss.appconn.core.impl.AbstractOnlySSOAppConn;
-import com.webank.wedatasphere.dss.workflow.conversion.WorkflowConversionIntegrationStandard;
+import com.webank.wedatasphere.dss.orchestrator.converter.standard.AbstractConversionIntegrationStandard;
+import com.webank.wedatasphere.dss.orchestrator.converter.standard.ConversionIntegrationStandard;
+import com.webank.wedatasphere.dss.workflow.conversion.ProjectConversionIntegrationStandard;
 
 public abstract class AbstractSchedulerAppConn extends AbstractOnlySSOAppConn implements SchedulerAppConn {
 
-    private WorkflowConversionIntegrationStandard workflowConversionIntegrationStandard;
+    private ConversionIntegrationStandard conversionIntegrationStandard;
 
-    @Override
-    protected void initialize() {
-        workflowConversionIntegrationStandard = new WorkflowConversionIntegrationStandard();
+    protected ConversionIntegrationStandard createConversionIntegrationStandard() {
+        return new ProjectConversionIntegrationStandard();
     }
 
     @Override
-    public WorkflowConversionIntegrationStandard getOrCreateWorkflowConversionStandard() {
-        workflowConversionIntegrationStandard.setSSORequestService(this.getOrCreateSSOStandard().getSSORequestService());
-        workflowConversionIntegrationStandard.setAppConnName(getAppDesc().getAppName());
-        return workflowConversionIntegrationStandard;
+    protected void initialize() {
+        conversionIntegrationStandard = createConversionIntegrationStandard();
+        if(conversionIntegrationStandard instanceof AbstractConversionIntegrationStandard) {
+            ((AbstractConversionIntegrationStandard) conversionIntegrationStandard).setAppConn(this);
+        }
+    }
+
+    @Override
+    public ConversionIntegrationStandard getOrCreateConversionStandard() {
+        return conversionIntegrationStandard;
     }
 }

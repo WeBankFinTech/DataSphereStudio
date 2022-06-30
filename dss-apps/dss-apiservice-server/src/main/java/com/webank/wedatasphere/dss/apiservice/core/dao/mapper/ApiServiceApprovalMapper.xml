@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ /*
-  ~  * Copyright 2019 WeBank
-  ~  *
-  ~  * Licensed under the Apache License, Version 2.0 (the "License");
-  ~  *  you may not use this file except in compliance with the License.
-  ~  * You may obtain a copy of the License at
-  ~  *
-  ~  * http://www.apache.org/licenses/LICENSE-2.0
-  ~  *
-  ~  * Unless required by applicable law or agreed to in writing, software
-  ~  * distributed under the License is distributed on an "AS IS" BASIS,
-  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~  * See the License for the specific language governing permissions and
-  ~  * limitations under the License.
-  ~  */
+  ~ Copyright 2019 WeBank
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.webank.wedatasphere.dss.apiservice.core.dao.ApiServiceApprovalDao">
 
-    <resultMap id="approvalMap" type="com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo">
+    <resultMap id="approvalMap" type="ApprovalVo">
         <result property="id" column="id"/>
         <result property="apiId" column="api_id"/>
         <result property="apiVersionId" column="api_version_id"/>
@@ -44,14 +42,14 @@
         `status`, `create_time`, `update_time`, `approval_no`
     </sql>
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ApprovalVo">
         <![CDATA[INSERT INTO `dss_apiservice_approval`(]]>
         <include refid="fields"/>
         <![CDATA[) VALUES(#{apiId}, #{apiVersionId}, #{approvalName}, #{applyUser}, #{executeUser}, #{creator},
                         #{status}, #{createTime}, #{updateTime}, #{approvalNo})]]>
     </insert>
 
-    <select id="queryByApprovalNo" parameterType="java.lang.String" resultMap="approvalMap">
+    <select id="queryByApprovalNo" parameterType="String" resultMap="approvalMap">
         <![CDATA[SELECT]]>
         <include refid="fields_query"/>
         <![CDATA[ FROM `dss_apiservice_approval` ]]>
@@ -60,25 +58,25 @@
         </where>
     </select>
 
-    <update id="setApprovalStatusSuccess" parameterType="java.lang.String">
+    <update id="setApprovalStatusSuccess" parameterType="String">
         UPDATE `dss_apiservice_approval`
         SET `status` = 3
         WHERE `approval_no` = #{approvalNo}
     </update>
 
-    <update id="setApprovalStatusFailed" parameterType="java.lang.String">
+    <update id="setApprovalStatusFailed" parameterType="String">
         UPDATE `dss_apiservice_approval`
         SET `status` = 4
         WHERE `approval_no` = #{approvalNo}
     </update>
 
-    <update id="setApprovalStatusInit" parameterType="java.lang.String">
+    <update id="setApprovalStatusInit" parameterType="String">
         UPDATE `dss_apiservice_approval`
         SET `status` = 1
         WHERE `approval_no` = #{approvalNo}
     </update>
 
-    <update id="setApprovalStatusApplying" parameterType="java.lang.String">
+    <update id="setApprovalStatusApplying" parameterType="String">
         UPDATE `dss_apiservice_approval`
         SET `status` = 2
         WHERE `approval_no` = #{approvalNo}
@@ -90,13 +88,13 @@
         WHERE `approval_no` = #{approvalNo}
     </update>
 
-    <delete id="deleteApproval" parameterType="java.lang.String">
+    <delete id="deleteApproval" parameterType="String">
         DELETE FROM
         `dss_apiservice_approval`
         WHERE `approval_no` = #{approvalNo}
     </delete>
 
-    <select id="queryByVersionId" parameterType="java.lang.Long" resultMap="approvalMap">
+    <select id="queryByVersionId" parameterType="Long" resultMap="approvalMap">
         <![CDATA[SELECT]]>
         <include refid="fields_query"/>
         <![CDATA[ FROM `dss_apiservice_approval` ]]>

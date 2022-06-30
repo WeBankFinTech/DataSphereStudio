@@ -28,16 +28,18 @@ public class ResponseOperateOrchestrator {
         return jobStatus;
     }
 
-    public void setJobStatus(JobStatus jobStatus) {
+    public ResponseOperateOrchestrator setJobStatus(JobStatus jobStatus) {
         this.jobStatus = jobStatus;
+        return this;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public ResponseOperateOrchestrator setMessage(String message) {
         this.message = message;
+        return this;
     }
 
     public boolean isCompleted() {

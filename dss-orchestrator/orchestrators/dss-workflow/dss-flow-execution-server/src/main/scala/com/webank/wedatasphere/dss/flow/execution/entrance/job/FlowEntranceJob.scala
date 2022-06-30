@@ -138,7 +138,7 @@ class FlowEntranceJob(persistManager:PersistenceManager) extends EntranceExecuti
       super.kill()
       Utils.tryAndWarn(this.killNodes)
       Utils.tryAndWarn(transitionCompleted(ErrorExecuteResponse(s"execute job(${getId}) failed!", new FlowExecutionErrorException(90101, s"This Flow killed by user"))))
-   }
+    }
   }
 
   override def cancel(): Unit = if (! SchedulerEventState.isCompleted(this.getState)) this synchronized  {
@@ -165,7 +165,7 @@ class FlowEntranceJob(persistManager:PersistenceManager) extends EntranceExecuti
     val runners = new ArrayBuffer[NodeRunner]()
     runners.addAll(this.getFlowContext.getRunningNodes.values())
     for (node <- runners) {
-      node.cancel()
+      Utils.tryAndWarn(node.cancel())
     }
 
 

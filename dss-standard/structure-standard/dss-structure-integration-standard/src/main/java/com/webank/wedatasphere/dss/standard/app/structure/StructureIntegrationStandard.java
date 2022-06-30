@@ -21,24 +21,38 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService
 import com.webank.wedatasphere.dss.standard.app.structure.role.RoleService;
 import com.webank.wedatasphere.dss.standard.app.structure.status.AppStatusService;
 import com.webank.wedatasphere.dss.standard.common.core.AppIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.common.core.AppStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
-
+/**
+ * DSS 的二级规范，为组织结构规范。组织结构规范主要提供了以下的能力：
+ * 1. 工程管理服务能力。工程管理服务用于打通 DSS 与第三方应用的工程体系。
+ * 2. 角色管理服务能力。角色管理服务用于打通 DSS 与第三方应用的角色体系。
+ * 3. 第三方应用状态管理能力。主要用于确认第三方应用的状态。
+ * <br/>
+ * 建议用户直接继承 {@code AbstractStructureIntegrationStandard}
+ */
 public interface StructureIntegrationStandard extends AppIntegrationStandard<SSORequestService> {
 
     /**
-     * 统一角色规范，用于打通DSS与各集成接入系统的角色体系
-     * @return
+     * 统一角色规范，用于打通DSS与各集成接入系统的角色体系。
+     * 该规范为预留规范，DSS 框架层暂未与这两个规范进行对接，用户直接返回 null 即可。
+     * @param appInstance AppInstance 实例
+     * @return 直接返回 null 即可
      */
     RoleService getRoleService(AppInstance appInstance);
 
     /**
      * 统一工程规范，用于打通DSS与各集成接入系统的工程体系
-     * @return
+     * @param appInstance AppInstance 实例
+     * @return ProjectService 实现类
      */
     ProjectService getProjectService(AppInstance appInstance);
 
+    /**
+     * 第三方应用状态检查规范。该规范为预留规范，DSS 框架层暂未与这两个规范进行对接，用户直接返回 null 即可。
+     * @param appInstance AppInstance 实例
+     * @return 直接返回 null 即可
+     */
     AppStatusService getAppStateService(AppInstance appInstance);
 
     @Override

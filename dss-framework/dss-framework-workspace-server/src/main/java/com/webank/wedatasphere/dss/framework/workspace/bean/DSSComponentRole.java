@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-@TableName(value = "dss_component_role")
+@TableName(value = "dss_workspace_appconn_role")
 public class DSSComponentRole implements Serializable {
     private static final long serialVersionUID=1L;
 

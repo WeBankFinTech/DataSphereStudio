@@ -38,31 +38,25 @@ public interface WorkspaceMapper {
 
     void addWorkSpace(DSSWorkspace dssWorkspace);
 
-    List<HomepageDemoMenuVo> getHomepageDemoMenusEn();
-    List<HomepageDemoMenuVo> getHomepageDemoMenusCn();
-
-    List<HomepageDemoInstanceVo> getHomepageInstancesByMenuIdCn(Long id);
-    List<HomepageDemoInstanceVo> getHomepageInstancesByMenuIdEn(Long id);
-
-    List<HomepageVideoVo> getHomepageVideosEn();
-    List<HomepageVideoVo> getHomepageVideosCn();
-
     DSSWorkspace getWorkspaceById(@Param("workspaceId") Long workspaceId);
 
-    List<OnestopMenuVo> getManagementMenuCn();
-    List<OnestopMenuVo> getManagementMenuEn();
+    List<WorkspaceMenuVo> getManagementMenuCn();
+    List<WorkspaceMenuVo> getManagementMenuEn();
 
-    List<OnestopMenuVo> getApplicationMenuCn();
-    List<OnestopMenuVo> getApplicationMenuEn();
+    List<WorkspaceMenuVo> getAppConnMenuCn();
+    List<WorkspaceMenuVo> getAppConnMenuEn();
 
-    List<OnestopMenuAppInstanceVo> getMenuAppInstancesCn(Long id);
-    List<OnestopMenuAppInstanceVo> getMenuAppInstancesEn(Long id);
+    List<WorkspaceMenuAppconnVo> getMenuAppInstancesCn(Long id);
+    List<WorkspaceMenuAppconnVo> getMenuAppInstancesEn(Long id);
 
-    List<WorkspaceFavoriteVo> getWorkspaceFavoritesCn(@Param("username") String username, @Param("workspaceId") Long workspaceId);
+    List<WorkspaceFavoriteVo> getWorkspaceFavoritesCn(@Param("username") String username, @Param("workspaceId") Long workspaceId,@Param("type") String  type);
 
-    List<WorkspaceFavoriteVo> getWorkspaceFavoritesEn(@Param("username") String username, @Param("workspaceId") Long workspaceId);
+    List<WorkspaceFavoriteVo> getWorkspaceFavoritesEn(@Param("username") String username, @Param("workspaceId") Long workspaceId,@Param("type") String  type);
 
     void addFavorite(DSSFavorite dssFavorite);
 
-    void deleteFavorite(Long favouritesId);
+    void deleteFavorite(@Param("username") String username,@Param("applicationId") Long applicationId, @Param("workspaceId") Long workspaceId,@Param("type") String type);
+
+    String getDepartName(@Param("id") Long id);
+
 }

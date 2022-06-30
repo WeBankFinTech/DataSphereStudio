@@ -16,37 +16,24 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
-import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowUrlResponseRef;
-import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
-import com.webank.wedatasphere.dss.standard.app.development.ref.OpenRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryJumpUrlOperation;
+import com.webank.wedatasphere.dss.standard.app.development.ref.QueryJumpUrlResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.impl.OnlyDevelopmentRequestRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 
-public class WorkflowRefQueryOperation implements RefQueryOperation<OpenRequestRef> {
-
-    protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
-    private DevelopmentService developmentService;
+public class WorkflowRefQueryOperation
+        extends AbstractDevelopmentOperation<OnlyDevelopmentRequestRef.QueryJumpUrlRequestRefImpl, QueryJumpUrlResponseRef>
+        implements RefQueryJumpUrlOperation<OnlyDevelopmentRequestRef.QueryJumpUrlRequestRefImpl, QueryJumpUrlResponseRef> {
 
     @Override
-    public WorkflowUrlResponseRef query(OpenRequestRef ref) throws ExternalOperationFailedException {
-        EnvDSSLabel label = (EnvDSSLabel) ref.getDSSLabels().stream().filter(EnvDSSLabel.class::isInstance)
-                .findFirst().orElseThrow(() -> new DSSRuntimeException(50321, "Not exists EnvDSSLabel."));
-        String urlStr = "router/workflow/editable?labels=" + label.getEnv();
-        if (LOGGER.isDebugEnabled()){
-            LOGGER.debug("url for  {} is {}", ref.getName(), urlStr);
-        }
-        WorkflowUrlResponseRef workflowUrlResponseRef = new WorkflowUrlResponseRef();
-        workflowUrlResponseRef.setUrl(urlStr);
-        return workflowUrlResponseRef;
+    public QueryJumpUrlResponseRef query(OnlyDevelopmentRequestRef.QueryJumpUrlRequestRefImpl ref) {
+        // Now only support to fetch workflow open url, not support other orchestrations.
+        return ref.getDSSLabels().stream().filter(EnvDSSLabel.class::isInstance).findFirst().map(label -> {
+            String urlStr = "router/workflow/editable?labels=" + ((EnvDSSLabel) label).getEnv();
+            return QueryJumpUrlResponseRef.newBuilder().setJumpUrl(urlStr).success();
+        }).orElseThrow(() -> new ExternalOperationWarnException(50321, "Not exists EnvDSSLabel, cannot fetch orchestration open url."));
     }
 
-    @Override
-    public void setDevelopmentService(DevelopmentService service) {
-        this.developmentService =service;
-    }
 }

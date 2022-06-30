@@ -42,9 +42,13 @@ trait AbstractEmailContentGenerator extends EmailContentGenerator {
       val timeStr = sdf.format(new Date)
       title = title.replace("YYYY-MM-DD", timeStr)
     } else {
-      val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-      val timeStr = sdf.format(new Date)
-      title = title + timeStr
+      if (title.contains("NO_TIMESTAMP")) {
+        title = title.replaceAll("NO_TIMESTAMP", "")
+      } else {
+        val sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        val timeStr = sdf.format(new Date)
+        title = title + timeStr
+      }
     }
     email.setSubject(title)
   }

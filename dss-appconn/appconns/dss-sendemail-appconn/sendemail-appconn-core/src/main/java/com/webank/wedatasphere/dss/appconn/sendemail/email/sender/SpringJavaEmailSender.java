@@ -16,40 +16,54 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.email.sender;
 
-import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnConfiguration;
 import com.webank.wedatasphere.dss.appconn.sendemail.email.Email;
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.Attachment;
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException;
-
-import java.util.Properties;
-import javax.mail.internet.MimeMessage;
-import javax.mail.util.ByteArrayDataSource;
-
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.conf.CommonVars;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
-public class SpringJavaEmailSender extends AbstractEmailSender {
+import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
+import java.util.Map;
+import java.util.Properties;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
+import static com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnConfiguration.*;
+
+public class SpringJavaEmailSender extends AbstractEmailSender {
 
     private static final Logger logger = LoggerFactory.getLogger(SpringJavaEmailSender.class);
 
     private JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
 
-    public SpringJavaEmailSender() {
-        try {
-            Properties prop = new Properties();
-            prop.put("mail.smtp.auth", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_AUTH().getValue()));
-            prop.put("mail.smtp.starttls.enable", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_ENABLE().getValue()));
-            prop.put("mail.smtp.starttls.required", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_STARTTLS_REQUIRED().getValue()));
-            prop.put("mail.smtp.ssl.enable", Boolean.parseBoolean(SendEmailAppConnConfiguration.EMAIL_SMTP_SSL_ENABLED().getValue()));
-            prop.put("mail.smtp.timeout", Integer.parseInt(SendEmailAppConnConfiguration.EMAIL_SMTP_TIMEOUT().getValue()));
-            javaMailSender.setJavaMailProperties(prop);
-        } catch (Exception e) {
-            logger.error("Failed to read mail properties, roll back to default values.", e);
-        }
+    @Override
+    public void init(Map<String, String> properties) {
+        Properties prop = new Properties();
+        prop.put("mail.smtp.auth", Boolean.parseBoolean(EMAIL_SMTP_AUTH().getValue(properties)));
+        prop.put("mail.smtp.starttls.enable", Boolean.parseBoolean(EMAIL_SMTP_STARTTLS_ENABLE().getValue(properties)));
+        prop.put("mail.smtp.starttls.required", Boolean.parseBoolean(EMAIL_SMTP_STARTTLS_REQUIRED().getValue(properties)));
+        prop.put("mail.smtp.ssl.enable", Boolean.parseBoolean(EMAIL_SMTP_SSL_ENABLED().getValue(properties)));
+        prop.put("mail.smtp.timeout", EMAIL_SMTP_TIMEOUT().getValue(properties));
+        javaMailSender.setJavaMailProperties(prop);
+        BiConsumer<Consumer<String>, CommonVars<String>> setProp = (consumer, c) -> {
+            String value = c.getValue(properties);
+            if(StringUtils.isBlank(value)) {
+                throw new ExternalOperationFailedException(84002, "The value of " + c.key() + " in sendEmail AppConn is null, please set it in appconn.properties of sendEmail AppConn.");
+            } else {
+                consumer.accept(value);
+            }
+        };
+        setProp.accept(javaMailSender::setHost, EMAIL_HOST());
+        javaMailSender.setPort(EMAIL_PORT().getValue(properties));
+        setProp.accept(javaMailSender::setUsername, EMAIL_USERNAME());
+        setProp.accept(javaMailSender::setPassword, EMAIL_PASSWORD());
+        javaMailSender.setProtocol(EMAIL_PROTOCOL().getValue(properties));
     }
 
     @Override
@@ -71,7 +85,7 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
             if (StringUtils.isBlank(email.getFrom())) {
-                messageHelper.setFrom(SendEmailAppConnConfiguration.DEFAULT_EMAIL_FROM().getValue());
+                messageHelper.setFrom(DEFAULT_EMAIL_FROM().getValue());
             } else {
                 messageHelper.setFrom(email.getFrom());
             }
@@ -91,9 +105,5 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
             logger.error("Send mail failed", e);
         }
         return message;
-    }
-
-    public JavaMailSenderImpl getJavaMailSender() {
-        return javaMailSender;
     }
 }

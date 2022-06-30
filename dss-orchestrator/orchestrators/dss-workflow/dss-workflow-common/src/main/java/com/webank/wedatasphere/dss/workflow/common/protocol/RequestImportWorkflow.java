@@ -16,8 +16,10 @@
 
 package com.webank.wedatasphere.dss.workflow.common.protocol;
 
-import com.webank.wedatasphere.dss.common.entity.IOEnv;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
+import java.util.List;
 
 public class RequestImportWorkflow {
     private String userName;
@@ -25,12 +27,10 @@ public class RequestImportWorkflow {
     private String bmlVersion;
     private Long projectId;
     private String projectName;
-    private IOEnv sourceEnv;
     private String orcVersion;
-    private String workspaceName;
-    private String workspaceStr;
+    private Workspace workspace;
     private String contextId;
-
+    private List<DSSLabel> dssLabels;
 
     public String getContextId() {
         return contextId;
@@ -82,14 +82,6 @@ public class RequestImportWorkflow {
         this.projectName = projectName;
     }
 
-    public IOEnv getSourceEnv() {
-        return sourceEnv;
-    }
-
-    public void setSourceEnv(IOEnv sourceEnv) {
-        this.sourceEnv = sourceEnv;
-    }
-
     public String getOrcVersion() {
         return orcVersion;
     }
@@ -98,20 +90,20 @@ public class RequestImportWorkflow {
         this.orcVersion = orcVersion;
     }
 
-    public String getWorkspaceName() {
-        return workspaceName;
+    public Workspace getWorkspace() {
+        return workspace;
     }
 
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 
-    public String getWorkspaceStr() {
-        return workspaceStr;
+    public List<DSSLabel> getDssLabels() {
+        return dssLabels;
     }
 
-    public void setWorkspaceStr(String workspaceStr) {
-        this.workspaceStr = workspaceStr;
+    public void setDssLabels(List<DSSLabel> dssLabels) {
+        this.dssLabels = dssLabels;
     }
 
     public RequestImportWorkflow(String userName,
@@ -119,21 +111,19 @@ public class RequestImportWorkflow {
                                  String bmlVersion,
                                  Long projectId,
                                  String projectName,
-                                 IOEnv sourceEnv,
                                  String orcVersion,
-                                 String workspaceName,
-                                 String workspaceStr,
-                                 String contextId) {
+                                 Workspace workspace,
+                                 String contextId,
+                                 List<DSSLabel> dssLabels) {
         this.userName = userName;
         this.resourceId = resourceId;
         this.bmlVersion = bmlVersion;
         this.projectId = projectId;
         this.projectName = projectName;
-        this.sourceEnv = sourceEnv;
         this.orcVersion = orcVersion;
-        this.workspaceName = workspaceName;
-        this.workspaceStr = workspaceStr;
+        this.workspace = workspace;
         this.contextId = contextId;
+        this.dssLabels = dssLabels;
     }
 
 

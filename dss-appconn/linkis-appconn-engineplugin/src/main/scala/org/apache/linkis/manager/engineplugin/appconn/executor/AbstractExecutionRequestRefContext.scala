@@ -25,18 +25,15 @@ import org.apache.linkis.common.io.{FsPath, MetaData, Record}
 import org.apache.linkis.common.utils.{Logging, Utils}
 import org.apache.linkis.engineconn.computation.executor.execute.EngineExecutionContext
 import org.apache.linkis.manager.engineplugin.appconn.conf.AppConnEngineConnConfiguration
-import org.apache.linkis.protocol.UserWithCreator
 import org.apache.linkis.rpc.Sender
 import org.apache.linkis.storage.FSFactory
 import org.apache.linkis.storage.fs.FileSystem
 import org.apache.linkis.storage.resultset.{ResultSetFactory, ResultSetReader}
 
-import scala.collection.JavaConversions._
-
-abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineExecutionContext, userWithCreator: UserWithCreator)
+abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineExecutionContext,
+                                                  user: String,
+                                                  submitUser: String)
   extends ExecutionRequestRefContext with Logging {
-
-  private var storePath: String = _
 
   override def getRuntimeMap: util.Map[String, AnyRef] = engineExecutorContext.getProperties
 
@@ -44,17 +41,9 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
 
   override def updateProgress(progress: Float): Unit = engineExecutorContext.pushProgress(progress, Array.empty)
 
-  /**
-    * Get the operation user of this node.
-    */
-  override def getUser: String = userWithCreator.user
+  override def getSubmitUser: String = submitUser
 
-  override def setStorePath(storePath: String): Unit = {
-    this.storePath = storePath
-    engineExecutorContext.setStorePath(storePath)
-  }
-
-  override def getStorePath: String = storePath
+  override def getUser: String = user
 
   override def createTableResultSetWriter[M <: MetaData, R <: Record](): ResultSetWriter[M, R] =
     createTableResultSetWriter(null)
@@ -94,7 +83,7 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
   override def getGatewayUrl: String = {
     val instances = Utils.tryThrow {
       Sender.getInstances(AppConnEngineConnConfiguration.GATEWAY_SPRING_APPLICATION.getValue)
-    }{ t => new AppConnExecutionErrorException(75538, "获取gateway的url失败", t)}
+    } { t => new AppConnExecutionErrorException(75538, "获取gateway的url失败", t) }
     if (instances.length == 0) throw new AppConnExecutionErrorException(75538, "获取gateway的url失败")
     instances(0).getInstance
   }
@@ -107,7 +96,7 @@ abstract class AbstractExecutionRequestRefContext(engineExecutorContext: EngineE
       case fileSystem: FileSystem =>
         fileSystem.init(new util.HashMap[String, String])
         Utils.tryFinally {
-          import  scala.collection.JavaConverters._
+          import scala.collection.JavaConverters._
           fileSystem.listPathWithError(new FsPath(resultSetLocation)).getFsPaths.asScala.toArray[FsPath]
         }(Utils.tryQuietly(fileSystem.close()))
     }

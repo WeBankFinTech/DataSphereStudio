@@ -21,16 +21,14 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.0.1</version>
+        <version>1.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dss-appconn-core</artifactId>
 
     <properties>
-        <!-- /pom.xml 里已定义
-        <fasterxml.jackson.version>2.12.6.1</fasterxml.jackson.version>
-        -->
+        <fasterxml.jackson.version>2.11.0</fasterxml.jackson.version>
         <commons-collections.version>3.2.2</commons-collections.version>
     </properties>
 
@@ -68,13 +66,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${fasterxml.jackson-databind.version}</version>
+            <version>${fasterxml.jackson.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${fasterxml.jackson-annotations.version}</version>
+            <version>${fasterxml.jackson.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

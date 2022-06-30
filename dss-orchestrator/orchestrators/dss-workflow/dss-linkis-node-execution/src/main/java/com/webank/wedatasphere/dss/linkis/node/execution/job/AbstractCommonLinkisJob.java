@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

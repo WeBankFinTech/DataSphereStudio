@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.appconn.sendemail;
 
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.appconn.core.impl.AbstractAppConn;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecutionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExecutionService;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefExecutionService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
@@ -26,32 +25,11 @@ import com.webank.wedatasphere.dss.standard.app.development.standard.OnlyExecuti
 
 public class SendEmailAppConn extends AbstractAppConn implements OnlyDevelopmentAppConn {
 
-    private DevelopmentIntegrationStandard standard;
+    private EmailDevelopmentIntegrationStandard standard;
 
     @Override
     protected void initialize() {
-        standard = new OnlyExecutionDevelopmentStandard() {
-            @Override
-            public void close() {
-            }
-
-            @Override
-            protected RefExecutionService createRefExecutionService() {
-                return new AbstractRefExecutionService() {
-                    private RefExecutionOperation refExecutionOperation = new SendEmailRefExecutionOperation();
-
-                    @Override
-                    public RefExecutionOperation createRefExecutionOperation() {
-                        return refExecutionOperation;
-                    }
-                };
-            }
-
-            @Override
-            public void init() {
-
-            }
-        };
+        standard = new EmailDevelopmentIntegrationStandard();
     }
 
     @Override

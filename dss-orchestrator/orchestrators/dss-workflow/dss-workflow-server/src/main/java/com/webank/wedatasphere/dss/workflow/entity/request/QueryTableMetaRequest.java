@@ -5,8 +5,17 @@ import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 public class QueryTableMetaRequest {
 
     private String contextID;
+    private String nodeName;
     private String contextKey;
     private LabelRouteVO labels;
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
+    }
 
     public String getContextID() {
         return contextID;

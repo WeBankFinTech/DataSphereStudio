@@ -25,4 +25,6 @@ object AppConnEngineConnConfiguration {
 
   val CONCURRENT_LIMIT = CommonVars("wds.linkis.engineconn.appconn.conncurrent.limit", 100)
 
+  val ENGINE_DEFAULT_LIMIT = CommonVars("wds.linkis.jdbc.default.limit", 5000)
+
 }

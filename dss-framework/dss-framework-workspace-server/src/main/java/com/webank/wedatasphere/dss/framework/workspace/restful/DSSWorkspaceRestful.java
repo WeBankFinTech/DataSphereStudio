@@ -16,15 +16,18 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
+import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceMenuService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -43,7 +46,7 @@ public class DSSWorkspaceRestful {
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
     @Autowired
-    private DSSWorkspaceMenuService dssWorkspaceMenuService;
+    private DssAdminUserService dssUserService;
     @Autowired
     private WorkspaceDBHelper workspaceDBHelper;
 
@@ -58,7 +61,7 @@ public class DSSWorkspaceRestful {
         String description = createWorkspaceRequest.getDescription();
         String stringTags = createWorkspaceRequest.getTags();
         String productName = createWorkspaceRequest.getProductName();
-        int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName);
+        int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName,"");
         return Message.ok().data("workspaceId", workspaceId).data("workspaceName",workSpaceName);
     }
 
@@ -92,9 +95,14 @@ public class DSSWorkspaceRestful {
     }
 
     @RequestMapping(path ="getWorkspaceHomePage", method = RequestMethod.GET)
-    public Message getWorkspaceHomePage(HttpServletRequest request, @RequestParam(required = false, name = "micro_module") String moduleName){
+    public Message getWorkspaceHomePage(HttpServletRequest request, @RequestParam(required = false, name = "micro_module") String moduleName) throws Exception{
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(request);
+        Workspace workspace = new Workspace();
+        try {
+            SSOHelper.addWorkspaceInfo(request, workspace);
+        } catch (AppStandardWarnException ignored) {} // ignore it.
+        dssUserService.insertOrUpdateUser(username, workspace);
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username,moduleName);
         return Message.ok().data("workspaceHomePage", dssWorkspaceHomePageVO);
     }

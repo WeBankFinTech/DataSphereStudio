@@ -23,6 +23,7 @@ public class AppConnInfoImpl implements AppConnInfo {
     private String appConnName;
     private String className;
     private Resource appConnResource;
+    private String reference;
 
     public void setAppConnName(String appConnName) {
         this.appConnName = appConnName;
@@ -49,5 +50,24 @@ public class AppConnInfoImpl implements AppConnInfo {
     @Override
     public Resource getAppConnResource() {
         return appConnResource;
+    }
+
+    @Override
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    @Override
+    public String toString() {
+        return "AppConnInfoImpl{" +
+                "appConnName='" + appConnName + '\'' +
+                ", className='" + className + '\'' +
+                ", appConnResource=" + appConnResource +
+                ", reference='" + reference + '\'' +
+                '}';
     }
 }

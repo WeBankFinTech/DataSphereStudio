@@ -46,6 +46,7 @@ import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.Consts;
 import org.apache.ibatis.annotations.Param;
+//import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,9 +79,6 @@ public class ApiServiceImpl implements ApiService {
     private ApiServiceTokenManagerDao apiServiceTokenManagerDao;
 
     @Autowired
-    ApiServiceApprovalDao apiServiceApprovalDao;
-
-    @Autowired
     TokenAuth tokenAuth;
 
 
@@ -97,8 +95,7 @@ public class ApiServiceImpl implements ApiService {
     public void buildClient() {
         LOG.info("build client start ======");
         client = BmlClientFactory.createBmlClient();
-        Map<String, String> props = new HashMap<>();
-        ujesClient = LinkisJobSubmit.getClient(props);
+        ujesClient = LinkisJobSubmit.getClient();
         LOG.info("build client end =======");
     }
 
@@ -139,7 +136,9 @@ public class ApiServiceImpl implements ApiService {
             //todo update by query
             apiVersionVo.setMetadataInfo("default");
             apiServiceVersionDao.insert(apiVersionVo);
-            addApprovalToDB(apiService,apiVersionVo.getId(),apiVersionVo.getAuthId());
+
+
+
             // insert linkis_oneservice_params
             List<ParamVo> params = apiService.getParams();
             if (params != null && !params.isEmpty()) {
@@ -200,7 +199,7 @@ public class ApiServiceImpl implements ApiService {
             //顺序不能改变，版本信息依赖审批单信息
             apiServiceVersionDao.insert(apiVersionVo);
 
-            addApprovalToDB(apiService,apiVersionVo.getId(),apiVersionVo.getAuthId());
+//            addApprovalToDB(apiService,apiVersionVo.getId(),apiVersionVo.getAuthId());
 
             // insert linkis_oneservice_params
             List<ParamVo> params = apiService.getParams();
@@ -244,7 +243,7 @@ public class ApiServiceImpl implements ApiService {
                     apiService.setCreator(maxTargetApiVersionVo.getCreator());
                     apiService.setId(maxTargetApiVersionVo.getApiId());
                     apiServiceDao.updateToTarget(apiService);
-                    LOG.info("Update to other Api Service, ID: " + apiService.getTargetServiceId() + ",resourceId:" + maxTargetApiVersionVo.getBmlResourceId());
+//                    Log.info("Update to other Api Service, ID: " + apiService.getTargetServiceId() + ",resourceId:" + maxTargetApiVersionVo.getBmlResourceId());
 
 
                     String version = updateResult.get("version");
@@ -285,7 +284,7 @@ public class ApiServiceImpl implements ApiService {
                         }
                     }
 
-                    addApprovalToDB(apiService, apiServiceVersionVo.getId(), apiServiceVersionVo.getAuthId());
+//                    addApprovalToDB(apiService, apiServiceVersionVo.getId(), apiServiceVersionVo.getAuthId());
 
                     //insert a token record for self
                     genTokenForPublisher(apiService, apiServiceVersionVo.getId());
@@ -303,26 +302,6 @@ public class ApiServiceImpl implements ApiService {
             }
             throw e;
         }
-    }
-
-    public void addApprovalToDB(ApiServiceVo apiService, Long apiVersionId, String approvalNumber) {
-
-        ApprovalVo approvalVo = apiService.getApprovalVo();
-        // 需要插入审批单记录
-        approvalVo.setApiId(apiService.getId() != null ? apiService.getId() : 0);
-        approvalVo.setApiVersionId(apiVersionId != null ? apiVersionId : 0);
-        approvalVo.setApprovalNo(approvalNumber != null ? approvalNumber : "");
-        approvalVo.setCreator(apiService.getCreator() != null ? apiService.getCreator() : "");
-        approvalVo.setStatus(3);
-        approvalVo.setCreateTime(new Date());
-        approvalVo.setUpdateTime(new Date());
-        if (StringUtils.isEmpty(approvalVo.getExecuteUser())) {
-            approvalVo.setExecuteUser(approvalVo.getCreator());
-        }
-        if (approvalVo.getApprovalName() == null) {
-            approvalVo.setApprovalName("");
-        }
-        apiServiceApprovalDao.insert(approvalVo);
     }
 
     @Override
@@ -368,11 +347,6 @@ public class ApiServiceImpl implements ApiService {
     @Override
     public List<ApiServiceVo> queryByWorkspaceId(Integer workspaceId, String userName){
         List<ApiServiceVo> result = apiServiceDao.queryByWorkspaceId(workspaceId,userName);
-        result.stream().forEach(apiServiceVo -> {
-            ApiVersionVo apiVersionVo = getMaxVersion(apiServiceVo.getId());
-            ApprovalVo approvalVo =apiServiceApprovalDao.queryByVersionId(apiVersionVo.getId());
-            apiServiceVo.setApprovalVo(approvalVo);
-        });
         return result;
     }
 

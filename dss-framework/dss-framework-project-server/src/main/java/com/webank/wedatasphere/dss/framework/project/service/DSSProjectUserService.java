@@ -18,12 +18,13 @@ package com.webank.wedatasphere.dss.framework.project.service;
 
 import java.util.List;
 
-import com.webank.wedatasphere.dss.framework.project.contant.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 public interface DSSProjectUserService {
 
@@ -41,17 +42,6 @@ public interface DSSProjectUserService {
     boolean isEditProjectAuth(Long projectId,String username) throws DSSProjectErrorException;
 
     /**
-     * 根据用户名和工程id获取工程权限
-     *
-     * @param projectId
-     *            the project id
-     * @param username
-     *            the username
-     * @return edit project list
-     */
-    List<DSSProjectUser> getEditProjectList(Long projectId, String username);
-
-    /**
      * 保存工程与用户关系
      *
      * @param projectID
@@ -63,7 +53,7 @@ public interface DSSProjectUserService {
      * @throws Exception
      *             the exception
      */
-    void saveProjectUser(Long projectID, String username, ProjectCreateRequest dssProjectCreateRequest)throws Exception;
+    void saveProjectUser(Long projectID, String username, ProjectCreateRequest dssProjectCreateRequest, Workspace workspace)throws Exception;
 
     /**
      * 修改工程与用户关系
@@ -77,7 +67,7 @@ public interface DSSProjectUserService {
      * @throws Exception
      *             the exception
      */
-    void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest projectModifyRequest, String loginuser)throws Exception;
+    void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest projectModifyRequest, String loginuser,Workspace workspace)throws Exception;
 
 
     List<DSSProjectUser> getListByParam(Long workspaceId, String username);
@@ -86,6 +76,10 @@ public interface DSSProjectUserService {
     boolean isAdminByUsername(Long workspaceId,String username);
 
     List<DSSProjectUser> getProjectUserPriv(Long projectId, String username);
+
+    List<DSSProjectUser> getProjectPriv(Long projectId);
+
+    boolean isWorkspaceUser(Long workspaceId,String username);
 
     /**
      * 获取某个项目下指定权限的用户名合.

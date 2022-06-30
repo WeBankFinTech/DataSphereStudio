@@ -62,6 +62,16 @@
             <lineEnding>unix</lineEnding>
         </fileSet>
 
+        <fileSet>
+            <directory>${basedir}/src/main/resources</directory>
+            <includes>
+                <include>init.sql</include>
+            </includes>
+            <fileMode>0777</fileMode>
+            <outputDirectory>db</outputDirectory>
+<!--            <lineEnding>unix</lineEnding>-->
+        </fileSet>
+
     </fileSets>
 
 </assembly>

@@ -21,10 +21,6 @@ package com.webank.wedatasphere.dss.workflow.common.entity;
 import java.util.Date;
 import java.util.List;
 
-/**
- * created by cooperyang on 2020/3/22
- * Description:
- */
 public class DSSReleasedFlowVO {
     private Integer id;
     private String workflowName;

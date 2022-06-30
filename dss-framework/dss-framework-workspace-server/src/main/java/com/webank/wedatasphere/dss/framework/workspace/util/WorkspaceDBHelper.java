@@ -17,38 +17,22 @@
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplicationBean;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSOnestopMenu;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSRole;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponent;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentPriv;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepage;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuComponentUrl;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceMenuRole;
+import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
+import com.webank.wedatasphere.dss.framework.workspace.bean.*;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
-import org.apache.linkis.common.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-/**
- * created by cooperyang on 2020/3/17
- * Description:一个数据库的helper类，这个类可以将一些数据load到内存，比如menu信息，role的信息等
- */
 @Component
 public class WorkspaceDBHelper {
 
@@ -57,16 +41,11 @@ public class WorkspaceDBHelper {
     @Autowired
     private DSSWorkspaceRoleMapper dssWorkspaceRoleMapper;
 
-
-    private List<DSSRole> dssRoles;
+    private List<DSSWorkspaceRole> dssRoles;
 
     private final Object lock = new Object();
 
-    private List<DSSOnestopMenu> dssOnestopMenus;
-
-    private List<DSSWorkspaceMenuComponentUrl> dssWorkspaceMenuComponentUrls;
-
-    private List<DSSWorkspaceComponent> dssWorkspaceComponents;
+    private List<DSSWorkspaceMenu> dssWorkspaceMenus;
 
     private List<DSSApplicationBean> dssApplicationBeans;
 
@@ -88,7 +67,7 @@ public class WorkspaceDBHelper {
             @Override
             public void run() {
                 synchronized (lock) {
-                    dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
+                    dssWorkspaceMenus = dssWorkspaceRoleMapper.getWorkspaceMenus();
                 }
             }
         }, 0, 1, TimeUnit.MINUTES);
@@ -97,25 +76,7 @@ public class WorkspaceDBHelper {
             @Override
             public void run() {
                 synchronized (lock) {
-                    dssWorkspaceMenuComponentUrls = dssWorkspaceRoleMapper.getMenuComponentUrl();
-                }
-            }
-        }, 0, 1, TimeUnit.MINUTES);
-
-        Utils.defaultScheduler().scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    dssWorkspaceComponents = dssWorkspaceRoleMapper.getComponents();
-                }
-            }
-        }, 0, 1, TimeUnit.MINUTES);
-
-        Utils.defaultScheduler().scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (lock) {
-                    dssApplicationBeans = dssWorkspaceRoleMapper.getDSSApplications();
+                    dssApplicationBeans = dssWorkspaceRoleMapper.getDSSAppConns();
                 }
             }
         }, 0, 1, TimeUnit.MINUTES);
@@ -130,10 +91,10 @@ public class WorkspaceDBHelper {
                     String developerUrl =
                             dssApplicationBeans.stream().
                                     filter(dssApplicationBean -> "workflow".equals(dssApplicationBean.getName().toLowerCase())).
-                                    findFirst().map(DSSApplicationBean::getHomepageUrl).orElse(defaultUrl);
+                                    findFirst().map(WorkspaceDBHelper.this::getHomepageUrl).orElse(defaultUrl);
                     String analyserUrl = dssApplicationBeans.stream().
                             filter(dssApplicationBean -> "linkis".equals(dssApplicationBean.getName().toLowerCase())).
-                            findFirst().map(DSSApplicationBean::getHomepageUrl).orElse(defaultUrl);
+                            findFirst().map(WorkspaceDBHelper.this::getHomepageUrl).orElse(defaultUrl);
                     dssHomepageNameMap.put("/workspace", "工作空间首页");
                     dssHomepageNameMap.put(developerUrl, "工作流开发");
                     dssHomepageNameMap.put(analyserUrl, "意书(Scriptis)");
@@ -143,81 +104,60 @@ public class WorkspaceDBHelper {
         }, 1, 1, TimeUnit.MINUTES);
     }
 
+    private String getHomepageUrl(DSSApplicationBean bean) {
+        return AppInstanceConstants.getHomepageUrl(bean.getUrl(), bean.getHomepageUri(), null, null);
+    }
+
     public void retrieveFromDB() {
         synchronized (lock) {
-            dssApplicationBeans = dssWorkspaceRoleMapper.getDSSApplications();
-            dssWorkspaceComponents = dssWorkspaceRoleMapper.getComponents();
-            dssWorkspaceMenuComponentUrls = dssWorkspaceRoleMapper.getMenuComponentUrl();
-            dssOnestopMenus = dssWorkspaceRoleMapper.getOnestopMenus();
+            dssApplicationBeans = dssWorkspaceRoleMapper.getDSSAppConns();
+            dssWorkspaceMenus = dssWorkspaceRoleMapper.getWorkspaceMenus();
             dssRoles = dssWorkspaceRoleMapper.getRoles();
         }
     }
 
-
     public List<DSSWorkspaceMenuRole> generateDefaultWorkspaceMenuRole(int workspaceId, String username) {
         List<DSSWorkspaceMenuRole> list = new ArrayList<>();
         Date date = new Date(System.currentTimeMillis());
-        //管理员的权限,全部可以见
-        // list.add(new DSSWorkspaceMenuRole(workspaceId, 1,1,1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 1, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 1, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 1, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 4, 1, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 5, 1, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 6, 1, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 7, 1, 1, date, username));
-        //运维用户
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 2, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 2, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 2, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 4, 2, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 5, 2, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 6, 2, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 7, 2, 1, date, username));
-        //开发用户
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 3, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 3, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 3, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 4, 3, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 5, 3, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 6, 3, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 7, 3, 0, date, username));
+        //todo 需要确定各角色默认的菜单权限
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.ADMIN.getName()), 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.ADMIN.getName()), 1, date, username));
 
-        //分析用户
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 4, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 4, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 4, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 4, 4, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 5, 4, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 6, 4, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 7, 4, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), 0, date, username));
 
-        //运营用户
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 5, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 5, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 5, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 4, 5, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 5, 5, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 6, 5, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 7, 5, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), 0, date, username));
 
-        //数据服务
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 6, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 6, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 6, 1, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 4, 6, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 5, 6, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 6, 6, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 7, 6, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), 1, date, username));
 
-        //访客
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 7, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 2, 7, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 3, 7, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 4, 7, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 5, 7, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 6, 7, 0, date, username));
-        list.add(new DSSWorkspaceMenuRole(workspaceId, 7, 7, 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), 0, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), 0, date, username));
+
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.DATA_ANALYSIS.getName()),
+                getRoleIdByName(CommonRoleEnum.BOSS.getName()), 1, date, username));
+        list.add(new DSSWorkspaceMenuRole(workspaceId, getMenuIdByName(CommonMenuEnum.PRODUCTION_OPERATION.getName()),
+                getRoleIdByName(CommonRoleEnum.BOSS.getName()), 1, date, username));
+
+//        if (StringUtils.isNotBlank(ApplicationConf.ESB_APPID)) {
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 1, 1, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 2, 1, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 3, 0, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 4, 0, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 5, 0, date, username));
+//            list.add(new DSSWorkspaceMenuRole(workspaceId, 1, 6, 1, date, username));
+//        }
         return list;
     }
 
@@ -228,18 +168,18 @@ public class WorkspaceDBHelper {
         String developerUrl =
                 dssApplicationBeans.stream().
                         filter(dssApplicationBean -> "workflow".equals(dssApplicationBean.getName().toLowerCase())).
-                        findFirst().map(DSSApplicationBean::getHomepageUrl).orElse(defaultUrl);
+                        findFirst().map(this::getHomepageUrl).orElse(defaultUrl);
         String analyserUrl = dssApplicationBeans.stream().
                 filter(dssApplicationBean -> "linkis".equals(dssApplicationBean.getName().toLowerCase())).
-                findFirst().map(DSSApplicationBean::getHomepageUrl).orElse(defaultUrl);
+                findFirst().map(this::getHomepageUrl).orElse(defaultUrl);
         List<DSSWorkspaceHomepage> dssWorkspaceHomepages = new ArrayList<>();
         Date date = new Date(System.currentTimeMillis());
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 1, defaultUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 2, maintenanceUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 3, developerUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 4, analyserUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 5, defaultUrl, date));
-        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, 6, defaultUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()), defaultUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()), maintenanceUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()), developerUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()), analyserUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()), defaultUrl, date));
+        dssWorkspaceHomepages.add(new DSSWorkspaceHomepage(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()), defaultUrl, date));
         return dssWorkspaceHomepages;
     }
 
@@ -248,160 +188,64 @@ public class WorkspaceDBHelper {
                                                                                   String username) {
         List<DSSWorkspaceComponentPriv> dssWorkspaceComponentPrivs = new ArrayList<>();
         Date updateTime = new Date(System.currentTimeMillis());
+        //admin 添加所有appconn组件的访问权限
+        new HashSet<>(getAppConnIds()).forEach(id -> {
+            dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ADMIN.getName()),
+                    id, 1, updateTime, username));
+        });
 
-      //管理员
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 4, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 5, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 6, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 7, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 8, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 9, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 10, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 11, 1, updateTime, username));
         //运维
-
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 1, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 4, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 5, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 6, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 7, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 8, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 9, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 10, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 11, 0, updateTime, username));
-
-        //开发
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 2, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 4, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 5, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 6, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 7, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 8, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 9, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 10, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 11, 0, updateTime, username));
-
-        //分析
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 1, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 2, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 3, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 4, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 5, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 6, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 7, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 8, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 9, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 10, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 11, 0, updateTime, username));
-        //运营
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 1, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 2, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 3, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 4, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 5, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 6, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 7, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 8, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 9, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 10, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 11, 0, updateTime, username));
-
-        //数据服务
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 1, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 2, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 3, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 4, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 5, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 6, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 7, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 8, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 9, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 10, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 11, 0, updateTime, username));
-        //访客
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 7, 1, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 7, 2, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 7, 3, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 7, 4, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 7, 5, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 7, 6, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 7, 7, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 7, 8, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 9, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 10, 0, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 11, 0, updateTime, username));
-
-
-      /*  //admin
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 2, 1, updateTime, username));
-        //dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 4, 1, updateTime, username));
-        //运维
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 2, 1, updateTime, username));
-        //dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 4, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()),
+                getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.MAINTENANCE.getName()),
+                getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //开发人员
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 2, 1, updateTime, username));
-        //dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 4, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()),
+                getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.DEVELOPER.getName()),
+                getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //分析人员
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 2, 1, updateTime, username));
-        //dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 4, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+                getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+                getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //运营人员
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 2, 1, updateTime, username));
-        //dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 4, 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()),
+                getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.OPERATOR.getName()),
+                getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
         //领导
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 1, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 2, 1, updateTime, username));
-        //dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 3, 1, updateTime, username));
-        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 4, 1, updateTime, username));*/
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()),
+                getAppConnIdByName(CommonAppConnEnum.SCRIPTIS.getName()), 1, updateTime, username));
+        dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, getRoleIdByName(CommonRoleEnum.BOSS.getName()),
+                getAppConnIdByName(CommonAppConnEnum.WORKFLOW.getName()), 1, updateTime, username));
 
+        /* if(StringUtils.isNotBlank(ApplicationConf.ESB_APPID)){
+            dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 1, 3, 1, updateTime, username));
+            dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 2, 3, 1, updateTime, username));
+            dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 3, 3, 1, updateTime, username));
+            dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 4, 3, 1, updateTime, username));
+            dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 5, 3, 1, updateTime, username));
+            dssWorkspaceComponentPrivs.add(new DSSWorkspaceComponentPriv(workspaceId, 6, 3, 1, updateTime, username));
+        }*/
         return dssWorkspaceComponentPrivs;
     }
 
 
-    public List<DSSRole> getRoles() {
+    public List<DSSWorkspaceRole> getRoles() {
         return this.dssRoles;
     }
 
 
-    public List<DSSRole> getRoles(int workspaceId) {
+    public List<DSSWorkspaceRole> getRoles(int workspaceId) {
         return this.dssRoles.stream().
                 filter(dssRole -> dssRole.getWorkspaceId() == workspaceId || dssRole.getWorkspaceId() == -1).
                 collect(Collectors.toList());
     }
 
 
-    public List<String> getComponentUrlsById(int componentId) {
-        Optional<DSSWorkspaceMenuComponentUrl> optional = dssWorkspaceMenuComponentUrls.
-                stream().filter(obj -> obj.getMenuId() == componentId).
-                findFirst();
-        if (optional.isPresent()) {
-            int applicationId = optional.get().getDssApplicationId();
-            String homepageUrl = dssWorkspaceRoleMapper.getEntryUrl(applicationId);
-            return Collections.singletonList(homepageUrl);
-        } else {
-            return null;
-        }
-    }
-
-
     public String getRoleFrontName(int roleId) {
-        DSSRole role = dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(null);
+        DSSWorkspaceRole role = dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(null);
         if (role != null) {
             return role.getFrontName();
         } else {
@@ -416,7 +260,7 @@ public class WorkspaceDBHelper {
         return dssRoles.stream().
                 filter(dssRole -> roleName.equals(dssRole.getName())).
                 findFirst().
-                map(DSSRole::getId).
+                map(DSSWorkspaceRole::getId).
                 orElse(-1);
     }
 
@@ -425,7 +269,7 @@ public class WorkspaceDBHelper {
         return getRoles(workspaceId).stream().map(this::changeToRoleVO).collect(Collectors.toList());
     }
 
-    private DSSWorkspaceRoleVO changeToRoleVO(DSSRole dssRole) {
+    private DSSWorkspaceRoleVO changeToRoleVO(DSSWorkspaceRole dssRole) {
         DSSWorkspaceRoleVO vo = new DSSWorkspaceRoleVO();
         vo.setRoleFrontName(dssRole.getFrontName());
         vo.setRoleId(dssRole.getId());
@@ -433,24 +277,49 @@ public class WorkspaceDBHelper {
         return vo;
     }
 
-    public DSSOnestopMenu getMenuNameById(int menuId) {
-        if (dssOnestopMenus.stream().anyMatch(dssMenu -> dssMenu.getId() == menuId)) {
-            return dssOnestopMenus.stream().filter(dssMenu -> dssMenu.getId() == menuId).findFirst().get();
+    public DSSWorkspaceMenu getMenuNameById(int menuId) {
+        if (dssWorkspaceMenus.stream().anyMatch(dssMenu -> dssMenu.getId() == menuId)) {
+            return dssWorkspaceMenus.stream().filter(dssMenu -> dssMenu.getId() == menuId).findFirst().get();
         } else {
             return null;
         }
     }
 
-
-    public String getRoleNameById(int roleId) {
-        return dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(new DSSRole()).getName();
+    public int getMenuIdByName(String name) {
+        if (dssWorkspaceMenus.stream().anyMatch(dssMenu -> dssMenu.getName().equals(name))) {
+            return dssWorkspaceMenus.stream().filter(dssMenu -> dssMenu.getName().equals(name)).findFirst().get().getId();
+        } else {
+            return -1;
+        }
     }
 
-    public DSSApplicationBean getComponent(int componentId) {
+
+    public String getRoleNameById(int roleId) {
+        return dssRoles.stream().filter(dssRole -> dssRole.getId() == roleId).findFirst().orElse(new DSSWorkspaceRole()).getName();
+    }
+
+    public DSSApplicationBean getAppConn(int appConnId) {
         return dssApplicationBeans.stream().
-                filter(dssApplicationBean -> dssApplicationBean.getId() == componentId).
+                filter(dssApplicationBean -> dssApplicationBean.getId() == appConnId).
                 findFirst().
                 orElse(null);
+    }
+
+    public DSSApplicationBean getAppConn(String appConnName) {
+        return dssApplicationBeans.stream().
+                filter(dssApplicationBean -> dssApplicationBean.getName().equalsIgnoreCase(appConnName)).
+                findFirst().
+                orElse(null);
+    }
+
+    public Integer getAppConnIdByName(String appConnName) {
+        return dssApplicationBeans.stream().
+                filter(l -> l.getName().equalsIgnoreCase(appConnName)).
+                findFirst().get().getId();
+    }
+
+    public List<Integer> getAppConnIds() {
+        return dssApplicationBeans.stream().map(DSSApplicationBean::getId).collect(Collectors.toList());
     }
 
     public String getHomepageName(String homepage) {
@@ -458,11 +327,7 @@ public class WorkspaceDBHelper {
     }
 
     public List<Integer> getAllMenuIds() {
-        return dssOnestopMenus.stream().map(DSSOnestopMenu::getId).collect(Collectors.toList());
-    }
-
-    public List<Integer> getAllComponentIds() {
-        return dssWorkspaceComponents.stream().map(DSSWorkspaceComponent::getId).collect(Collectors.toList());
+        return dssWorkspaceMenus.stream().map(DSSWorkspaceMenu::getId).collect(Collectors.toList());
     }
 
 }

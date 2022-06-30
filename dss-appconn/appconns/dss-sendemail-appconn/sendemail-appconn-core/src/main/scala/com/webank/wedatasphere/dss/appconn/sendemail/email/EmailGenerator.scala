@@ -16,10 +16,10 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.email
 
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
 
 trait EmailGenerator {
 
-  def generateEmail(requestRef: ExecutionRequestRef): Email
+  def generateEmail(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): Email
 
 }

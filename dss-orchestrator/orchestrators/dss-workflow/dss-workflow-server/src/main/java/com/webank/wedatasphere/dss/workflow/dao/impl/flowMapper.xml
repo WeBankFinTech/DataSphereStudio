@@ -38,7 +38,7 @@
 
 
     <insert id="insertFlowRelation">
-        INSERT INTO dss_flow_relation (flow_id,parent_flow_id)
+        INSERT INTO dss_workflow_relation (flow_id,parent_flow_id)
         VALUES
         (#{flowID},#{parentFlowID})
     </insert>
@@ -56,7 +56,7 @@
     </update>
 
     <select id="selectSubFlowIDByParentFlowID" resultType="java.lang.Long">
-        SELECT fr.flow_id FROM `dss_flow_relation` fr WHERE fr.parent_flow_id = #{parentFlowID}
+        SELECT fr.flow_id FROM `dss_workflow_relation` fr WHERE fr.parent_flow_id = #{parentFlowID}
     </select>
 
     <select id="listRootFlowIDsByProjectID" resultType="java.lang.Long">
@@ -73,7 +73,7 @@
     <delete id="deleteFlowRelation">
         DELETE
         FROM
-            dss_flow_relation
+            dss_workflow_relation
         WHERE flow_id = #{flowID}
     </delete>
 
@@ -81,7 +81,7 @@
         SELECT
             parent_flow_id
         FROM
-            `dss_flow_relation`
+            `dss_workflow_relation`
         WHERE
             flow_id = #{flowID}
     </select>
@@ -97,19 +97,19 @@
 
 
     <select id="getParentFlowID" resultType="java.lang.Long">
-        SELECT parent_flow_id  FROM  dss_flow_relation WHERE  flow_id = #{flowID}
+        SELECT parent_flow_id  FROM  dss_workflow_relation WHERE  flow_id = #{flowID}
     </select>
 
 
     <select id="selectSavedSubFlowIDByParentFlowID" resultType="java.lang.Long">
         SELECT fr.flow_id FROM
-        `dss_flow_relation` fr,
+        `dss_workflow_relation` fr,
         `dss_workflow` fl
         WHERE fr.parent_flow_id = #{parentFlowID} AND fr.flow_id = fl.id AND fl.has_saved = 1
     </select>
 
     <select id="listFlowRelation" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation">
-        select * from dss_flow_relation where
+        select * from dss_workflow_relation where
         <foreach collection="flowIDs" item="flowID" index="i" separator="," open="flow_id in (" close=")">
             #{flowID}
         </foreach>
@@ -135,7 +135,7 @@
     </update>
 
     <select id="selectFlowRelation" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation">
-        select * from dss_flow_relation where flow_id = #{flowID} and parent_flow_id = #{parentFlowID}
+        select * from dss_workflow_relation where flow_id = #{flowID} and parent_flow_id = #{parentFlowID}
     </select>
 
 </mapper>

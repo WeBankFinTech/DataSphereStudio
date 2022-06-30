@@ -49,7 +49,7 @@ public class EventChecker implements Runnable{
 	private String jobId;
 	private int execId;
 	private EventCheckerService wbDao=null;
-	EventCheckerExecutionAction backAction = null;
+	private EventCheckerExecutionAction backAction = null;
 	public Long maxWaitTime;
 	public int queryFrequency;
 
@@ -128,7 +128,7 @@ public class EventChecker implements Runnable{
 
 	}
 
-	public  boolean   receiveMsg(){
+	public boolean receiveMsg(){
 		boolean success = false;
 		if(p.getProperty(MSGTYPE).equals("RECEIVE")) {
 			if (checkParamMap(p, RECEIVER)) {

@@ -18,7 +18,12 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
 import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.flow.execution.entrance.dao.TaskMapper;
+import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
+import com.webank.wedatasphere.dss.flow.execution.entrance.enums.ExecuteStrategyEnum;
+import com.webank.wedatasphere.dss.flow.execution.entrance.service.WorkflowExecutionInfoService;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.log.LogUtils;
 import org.apache.linkis.entrance.EntranceServer;
 import org.apache.linkis.entrance.annotation.EntranceServerBeanAnnotation;
@@ -30,15 +35,20 @@ import org.apache.linkis.protocol.constants.TaskConstant;
 import org.apache.linkis.protocol.utils.ZuulEntranceUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.scheduler.queue.Job;
+import org.apache.linkis.scheduler.queue.SchedulerEventState;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import scala.Option;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @RequestMapping(path = "/dss/flow/entrance")
@@ -49,9 +59,13 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 
     private static final Logger logger = LoggerFactory.getLogger(FlowEntranceRestfulApi.class);
 
+    @Autowired
+    private WorkflowExecutionInfoService workflowExecutionInfoService;
+    @Autowired
+    private TaskMapper taskMapper;
     @Override
     @EntranceServerBeanAnnotation.EntranceServerAutowiredAnnotation
-    public void setEntranceServer(EntranceServer entranceServer){
+    public void setEntranceServer(EntranceServer entranceServer) {
         super.setEntranceServer(entranceServer);
         this.entranceServer = entranceServer;
     }
@@ -69,8 +83,34 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 //        try{
         logger.info("Begin to get an execID");
         DSSWorkspace workspace = SSOHelper.getWorkspace(req);
-        json.put(TaskConstant.UMUSER, SecurityFilter.getLoginUsername(req));
+        String umUser = SecurityFilter.getLoginUsername(req);
+        json.put(TaskConstant.UMUSER, umUser);
+        json.put(TaskConstant.EXECUTE_USER, umUser);
         Map<String, Object> params = (Map<String, Object>) json.get("params");
+        //失败节点重新执行功能，通过isReExecute字段来判断
+        if (json.containsKey(ExecuteStrategyEnum.IS_RE_EXECUTE.getName())) {
+            params.put("executeStrategy", ExecuteStrategyEnum.IS_RE_EXECUTE.getValue());
+            try {
+                String flowIdStr = BDPJettyServerHelper.jacksonJson().readValue(json.get("executionCode").toString(), Map.class).get("flowId").toString();
+                String succeedJobIdsStr = workflowExecutionInfoService.getSucceedJobsByFlowId(Long.parseLong(flowIdStr));
+                if (StringUtils.isNotEmpty(succeedJobIdsStr)) {
+                    params.put("nodeID", succeedJobIdsStr);
+                }
+            } catch (Exception e) {
+                logger.error("re execute job failed:", e);
+            }
+        } else if (json.containsKey(ExecuteStrategyEnum.IS_SELECTED_EXECUTE.getName())) {
+            //选中节点执行功能，通过isSelectedExecute字段来判断
+            params.put("executeStrategy", ExecuteStrategyEnum.IS_SELECTED_EXECUTE.getValue());
+            String nodeID = Optional.ofNullable(json.get("nodeID").toString()).orElseThrow(() -> {
+                logger.error("execute selected node failed because nodeID is empty");
+                return new NullPointerException();
+            });
+            params.put("nodeID", nodeID);
+        } else {
+            //默认为执行功能
+            params.put("executeStrategy", ExecuteStrategyEnum.IS_EXECUTE.getValue());
+        }
         params.put("workspace", workspace);
         String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
@@ -89,13 +129,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         message.data("execID", execID);
         message.data("taskID", taskID);
         logger.info("End to get an an execID: {}, taskID: {}", execID, taskID);
-//        }catch(ErrorException e){
-//            message = Message.error(e.getDesc());
-//            message.setStatus(1);
-//            message.setMethod("/api/entrance/execute");
-//        }
         return message;
-
     }
 
     @Override
@@ -103,17 +137,29 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
     public Message status(@PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
-        Option<Job> job = Option.apply(null);
+        Option<Job> job;
         try {
             job = entranceServer.getJob(realId);
         } catch (Exception e) {
             logger.warn("获取任务 {} 状态时出现错误", realId, e);
-            //如果获取错误了,证明在内存中已经没有了,去jobhistory找寻一下taskID代表的任务的状态，然后返回
+            //如果获取错误了,证明在内存中已经没有了,去flow task表里面找寻一下taskID代表的任务的状态，然后返回
             long realTaskID = Long.parseLong(taskID);
-            String status = JobHistoryHelper.getStatusByTaskID(realTaskID);
+            WorkflowQueryTask queryTask = new WorkflowQueryTask();
+            queryTask.setTaskID(realTaskID);
+            List<WorkflowQueryTask> taskList = taskMapper.selectTask(queryTask);
             message = Message.ok();
+            if (null == taskList || taskList.size() != 1) {
+                int size = 0;
+                if (null != taskList) {
+                    size = taskList.size();
+                }
+                logger.error("Got {} task for taskID : {}", size, realTaskID);
+                message = Message.error("Got " + size + " task for taskId : " + realTaskID);
+            } else {
+                String status = taskList.get(0).getStatus();
+                message.data("status", status).data("execID", id);
+            }
             message.setMethod("/api/entrance/" + id + "/status");
-            message.data("status", status).data("execID", id);
             return message;
         }
         if (job.isDefined()) {
@@ -124,6 +170,53 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
             message = Message.error("ID The corresponding job is empty and cannot obtain the corresponding task status.(ID 对应的job为空，不能获取相应的任务状态)");
         }
         return message;
+    }
+
+    @RequestMapping(path = {"/{id}/kill"},method = {RequestMethod.GET})
+    public Message kill(@PathVariable("id") String id, @RequestParam(value = "taskID",required = false) Long taskID) {
+        String realId = ZuulEntranceUtils.parseExecID(id)[3];
+        Option job;
+        try {
+            job = this.entranceServer.getJob(realId);
+        } catch (Exception var10) {
+            logger.warn("can not find a job in entranceServer, will force to kill it", var10);
+            JobHistoryHelper.forceKill(taskID);
+            Message message = Message.ok("Forced Kill task (强制杀死任务)");
+            message.setMethod("/api/entrance/" + id + "/kill");
+            message.setStatus(0);
+            return message;
+        }
+        Message message;
+        if (job.isEmpty()) {
+            logger.warn("can not find a job in entranceServer, will force to kill it");
+            JobHistoryHelper.forceKill(taskID);
+            message = Message.ok("Forced Kill task (强制杀死任务)");
+            message.setMethod("/api/entrance/" + id + "/kill");
+            message.setStatus(0);
+            return message;
+        } else {
+            try {
+                logger.info("begin to kill job {} ", ((Job)job.get()).getId());
+                ((Job)job.get()).kill();
+                message = Message.ok("Successfully killed the job(成功kill了job)");
+                message.setMethod("/api/entrance/" + id + "/kill");
+                message.setStatus(0);
+                message.data("execID", id);
+                if (job.get() instanceof EntranceJob) {
+                    EntranceJob entranceJob = (EntranceJob)job.get();
+                    JobRequest jobReq = entranceJob.getJobRequest();
+                    entranceJob.updateJobRequestStatus(SchedulerEventState.Cancelled().toString());
+                    this.entranceServer.getEntranceContext().getOrCreatePersistenceManager().createPersistenceEngine().updateIfNeeded(jobReq);
+                }
+                logger.info("end to kill job {} ", ((Job)job.get()).getId());
+            } catch (Throwable var9) {
+                logger.error("kill job {} failed ", ((Job)job.get()).getId(), var9);
+                message = Message.error("An exception occurred while killing the job, kill failed(kill job的时候出现了异常，kill失败)");
+                message.setMethod("/api/entrance/" + id + "/kill");
+                message.setStatus(1);
+            }
+            return message;
+        }
     }
 
     private void pushLog(String log, Job job) {

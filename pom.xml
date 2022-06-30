@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 
     <modules>
         <module>dss-commons</module>
@@ -31,19 +31,18 @@
         <module>dss-orchestrator</module>
         <module>dss-appconn</module>
         <module>dss-framework</module>
-      <!--  <module>dss-apps/dss-apiservice-server</module>
-        <module>dss-apps/dss-datapipe-server</module>-->
-<!--        <module>plugins/azkaban/linkis-jobtype</module>-->
+        <module>dss-apps/dss-apiservice-server</module>
+        <module>dss-apps/dss-scriptis-server</module>
+        <module>dss-apps/dss-user-guide</module>
+        <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/dss-gateway-support</module>
-        <module>dss-data-api</module>
-        <module>dss-data-governance</module>
-        <module>dss-guide</module>
         <module>assembly</module>
+        <module>plugins/dolphinscheduler</module>
     </modules>
 
     <properties>
-        <dss.version>1.0.1</dss.version>
-        <linkis.version>1.0.3</linkis.version>
+        <dss.version>1.1.0</dss.version>
+        <linkis.version>1.1.1</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
@@ -62,11 +61,8 @@
         <commons.math.version>3.1.1</commons.math.version>
         <commons.lang3.version>3.8.1</commons.lang3.version>
         <commons.lang.version>2.6</commons.lang.version>
-        <reflections.version>0.9.10</reflections.version>
-        <jersey-bean-validation.version>2.21</jersey-bean-validation.version>
-        <aspectj.version>1.9.5</aspectj.version>
-        <xstream.version>1.4.15</xstream.version>
-        <jersey.version>2.16</jersey.version>
+        <xstream.version>1.4.19</xstream.version>
+        <jersey.version>2.30.1</jersey.version>
     </properties>
 
     <dependencyManagement>

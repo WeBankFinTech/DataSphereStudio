@@ -18,10 +18,17 @@ package com.webank.wedatasphere.dss.orchestrator.server.service;
 
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchestratorInfos;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
 import java.util.List;
 
 
@@ -33,7 +40,7 @@ public interface OrchestratorService {
      * @return
      */
     OrchestratorVo createOrchestrator(String userName,
-                                      String workspaceName,
+                                      Workspace workspace,
                                       String projectName,
                                       Long projectId,
                                       String description,
@@ -47,7 +54,7 @@ public interface OrchestratorService {
      * @param dssOrchestratorInfo
      */
     void updateOrchestrator(String userName,
-                            String workspaceName,
+                            Workspace workspace,
                             DSSOrchestratorInfo dssOrchestratorInfo,
                             List<DSSLabel> dssLabels) throws Exception;
 
@@ -57,7 +64,7 @@ public interface OrchestratorService {
      * @param orchestratorInfoId
      */
     void deleteOrchestrator(String userName,
-                            String workspaceName,
+                            Workspace workspace,
                             String projectName,
                             Long orchestratorInfoId,
                             List<DSSLabel> dssLabels) throws Exception;
@@ -72,6 +79,15 @@ public interface OrchestratorService {
     OrchestratorVo getOrchestratorVoById(Long orchestratorId);
 
     /**
+     * 获取一个指定版本编排
+     *
+     * @param orchestratorId 編排id
+     * @param orcVersionId   编排版本id
+     * @return 编排
+     */
+    OrchestratorVo getOrchestratorVoByIdAndOrcVersionId(Long orchestratorId, Long orcVersionId);
+
+    /**
      * 根据一个集合查找
      *
      * @param orchestratorIds
@@ -80,7 +96,8 @@ public interface OrchestratorService {
 
     List<OrchestratorVo> getOrchestratorVoList(List<Long> orchestratorIds);
 
-    String openOrchestrator(String userName, String workspaceName, Long orchestratorId, List<DSSLabel> dssLabels) throws Exception;
+    String openOrchestrator(String userName, Workspace workspace, Long orchestratorId, List<DSSLabel> dssLabels) throws Exception;
+
     /**
      * 获取编排模式下的版本号
      *
@@ -89,11 +106,17 @@ public interface OrchestratorService {
      */
     List<DSSOrchestratorVersion> getVersionByOrchestratorId(Long orchestratorId);
 
-//    OrchestratorInfo getOrchestratorInfo(String username, Long workflowId);
-
     List<DSSOrchestratorVersion> getOrchestratorVersions(String username, Long projectId, Long orchestratorId);
 
     String rollbackOrchestrator(String username, Long projectId, String projectName,
                                 Long orchestratorId, String version, DSSLabel dssLabel, Workspace workspace) throws Exception;
 
+    //**** new method
+    void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String orchestratorName) throws DSSFrameworkErrorException;
+
+    Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest) throws DSSFrameworkErrorException;
+
+    List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username);
+
+    ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos);
 }

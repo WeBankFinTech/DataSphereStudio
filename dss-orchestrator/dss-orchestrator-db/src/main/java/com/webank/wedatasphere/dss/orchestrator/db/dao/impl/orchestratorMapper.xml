@@ -267,7 +267,7 @@
         where
         a.status = 'Success'
         and b.version &lt; tmp.maxVersion
-        and b.context_id is not null
+        and b.context_id != ''
         order by a.id desc
     </select>
 

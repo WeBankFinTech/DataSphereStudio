@@ -16,16 +16,27 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.utils;
 
-import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import org.apache.commons.lang.StringUtils;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class AzkabanUtils {
-    public static String handleAzkabanEntity(String entityString) throws IOException {
-        Gson gson = new Gson();
-        Object object = gson.fromJson(entityString, Object.class);
+
+    public static String handleAzkabanEntity(String entityString) {
+        if(StringUtils.isNotBlank(entityString)){
+            if(entityString.startsWith("{") && entityString.endsWith("}")){
+                Map resMap = DSSCommonUtils.COMMON_GSON.fromJson(entityString, Map.class);
+                if(resMap.containsKey("error")){
+                    return (String)resMap.get("error");
+                }
+            }
+            if(entityString.contains("<div class=\"container-full\">") && entityString.contains("<div class=\"login\">")){
+                return "The SSO login status is invalid.Please refresh the browser and log in again!";
+            }
+        }
+
+        Object object = DSSCommonUtils.COMMON_GSON.fromJson(entityString, Object.class);
         String status = null;
         String message = null;
         if (object instanceof Map) {
@@ -43,24 +54,5 @@ public class AzkabanUtils {
             }
         }
         return "success";
-    }
-
-    public static String getValueFromEntity(String entityString, String searchKey) throws IOException {
-        Gson gson = new Gson();
-        Object object = gson.fromJson(entityString, Object.class);
-        String status = null;
-        String valueStr = null;
-        if (object instanceof Map) {
-            Map map = (Map) object;
-            if (map.get("status") != null) {
-                status = map.get("status").toString();
-            }
-            if (StringUtils.isNotEmpty(status) && status.equals("success")) {
-                if (null != map.get(searchKey)) {
-                    valueStr = map.get(searchKey).toString();
-                }
-            }
-        }
-        return valueStr;
     }
 }

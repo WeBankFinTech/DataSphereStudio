@@ -43,6 +43,9 @@ public class StaffInfo {
     @JsonProperty(value = "PersonGroup")
     private String personGroup;
 
+    public StaffInfo(){
+    }
+
     public StaffInfo(String id,String englishName, String orgFullName){
         this.id = id;
         this.englishName = englishName;

@@ -50,11 +50,11 @@ import static org.hamcrest.Matchers.equalTo;
 
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
+//@RunWith(SpringJUnit4ClassRunner.class)
 //@MapperScan(annotationClass = Repository.class, basePackages = "com.webank.wedatasphere.dss.apiservice.dao" )
-@SpringBootTest(classes = {DataWorkCloudApplication.class})
+//@SpringBootTest(classes = {DataWorkCloudApplication.class})
 public class TestApiServiceDBOperation {
-    private static DbSetupTracker dbSetupTracker = new DbSetupTracker();
+    /*private static DbSetupTracker dbSetupTracker = new DbSetupTracker();
     @Autowired
     ApiService apiService;
     @Autowired
@@ -153,5 +153,5 @@ public class TestApiServiceDBOperation {
 
         );
 
-    }
+    }*/
 }

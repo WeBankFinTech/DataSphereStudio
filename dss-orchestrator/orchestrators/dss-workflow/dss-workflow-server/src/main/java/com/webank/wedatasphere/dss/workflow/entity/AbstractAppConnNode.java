@@ -17,28 +17,28 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
 
-
 import java.util.Map;
 
 
 public abstract class AbstractAppConnNode {
 
-    String projectName;
+    private String projectName;
 
-    long projectId;
+    private Long projectId;
 
+    private String flowName;
 
-    String flowName;
+    private Long flowId;
 
-    long flowId;
+    private String nodeName;
 
-    String nodeName;
+    private String nodeId;
 
-    String nodeId;
+    private String nodeType;
 
-    String nodeType;
+    private String contextId;
 
-    Map<String, Object> jobContent;
+    private Map<String, Object> jobContent;
 
     public AbstractAppConnNode(String projectName, long projectId, String flowName, long flowId,
                                String nodeName, String nodeTye, Map<String, Object> jobContent){
@@ -56,11 +56,18 @@ public abstract class AbstractAppConnNode {
     }
 
 
+    public String getContextId() {
+        return contextId;
+    }
+
+    public void setContextId(String contextId) {
+        this.contextId = contextId;  }
+
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
 
-    public void setProjectId(long projectId) {
+    public void setProjectId(Long projectId) {
         this.projectId = projectId;
     }
 
@@ -68,11 +75,9 @@ public abstract class AbstractAppConnNode {
         this.flowName = flowName;
     }
 
-    public void setFlowId(long flowId) {
+    public void setFlowId(Long flowId) {
         this.flowId = flowId;
     }
-
-
 
     public String getId() {
         return this.nodeId;
@@ -104,7 +109,7 @@ public abstract class AbstractAppConnNode {
     }
 
 
-    public long getProjectId() {
+    public Long getProjectId() {
         return this.projectId;
     }
 
@@ -118,7 +123,7 @@ public abstract class AbstractAppConnNode {
     }
 
 
-    public long getFlowId() {
+    public Long getFlowId() {
         return this.flowId;
     }
 

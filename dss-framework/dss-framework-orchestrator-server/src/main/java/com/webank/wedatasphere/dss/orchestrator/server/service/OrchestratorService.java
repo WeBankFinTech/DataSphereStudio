@@ -119,4 +119,7 @@ public interface OrchestratorService {
     List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username);
 
     ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos);
+
+    void batchClearContextId();
+
 }

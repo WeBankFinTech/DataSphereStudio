@@ -16,8 +16,11 @@
 
 package com.webank.wedatasphere.dss.workflow.conf;
 
+import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import com.webank.wedatasphere.dss.workflow.service.impl.PublishServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +31,12 @@ public class WorkflowServerSpringConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public PublishService createPublishService() {
-        return new PublishServiceImpl();
+    public PublishService createPublishService(@Autowired DSSFlowService dssFlowService,
+                                               @Autowired WorkFlowParser workFlowParser) {
+        PublishServiceImpl publishService = new PublishServiceImpl();
+        publishService.setDssFlowService(dssFlowService);
+        publishService.setWorkFlowParser(workFlowParser);
+        return publishService;
     }
 
 }

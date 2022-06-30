@@ -17,36 +17,35 @@
 package com.webank.wedatasphere.dss.orchestrator.common.protocol;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
 import java.util.List;
 
 
 public class RequestExportOrchestrator {
 
     private String userName;
-    private String workspaceName;
     private Long orchestratorId;
     private Long orcVersionId;
     private String projectName;
     private List<DSSLabel> dssLabels;
     private Boolean addOrcVersion;
-    private String workspaceStr;
+    private Workspace workspace;
 
     public RequestExportOrchestrator(String userName,
-                                     String workspaceName,
                                      Long orchestratorId,
                                      Long orcVersionId,
                                      String projectName,
                                      List<DSSLabel> dssLabels,
                                      Boolean addOrcVersion,
-                                     String workspaceStr) {
+                                     Workspace workspace) {
         this.userName = userName;
-        this.workspaceName = workspaceName;
         this.orcVersionId = orcVersionId;
         this.orchestratorId = orchestratorId;
         this.projectName = projectName;
         this.dssLabels = dssLabels;
         this.addOrcVersion = addOrcVersion;
-        this.workspaceStr = workspaceStr;
+        this.workspace = workspace;
     }
 
     public String getUserName() {
@@ -55,14 +54,6 @@ public class RequestExportOrchestrator {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getWorkspaceName() {
-        return workspaceName;
-    }
-
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
     }
 
     public Long getOrcVersionId() {
@@ -105,11 +96,11 @@ public class RequestExportOrchestrator {
         this.orchestratorId = orchestratorId;
     }
 
-    public String getWorkspaceStr() {
-        return workspaceStr;
+    public Workspace getWorkspace() {
+        return workspace;
     }
 
-    public void setWorkspaceStr(String workspaceStr) {
-        this.workspaceStr = workspaceStr;
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
     }
 }

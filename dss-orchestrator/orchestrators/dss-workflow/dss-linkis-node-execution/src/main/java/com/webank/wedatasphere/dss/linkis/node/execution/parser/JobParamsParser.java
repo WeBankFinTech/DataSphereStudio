@@ -16,8 +16,11 @@
 
 package com.webank.wedatasphere.dss.linkis.node.execution.parser;
 
+import com.webank.wedatasphere.dss.linkis.node.execution.job.AppConnLinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
+import org.apache.linkis.protocol.utils.TaskUtils;
+
 import java.util.Map;
 
 
@@ -35,7 +38,12 @@ public class JobParamsParser implements JobParser {
             // put configuration
             Map<String, Object> configuration = linkisJob.getConfiguration();
             putParamsMap(job.getParams(), "configuration", configuration);
+
             linkisJob.getLogObj().info("Finished to  put variable and configuration");
+        }
+        // set the variable to runtimeMap since AppConn may need it.
+        if(job instanceof AppConnLinkisJob) {
+            job.getRuntimeParams().put("variables", TaskUtils.getVariableMap(job.getParams()));
         }
     }
 

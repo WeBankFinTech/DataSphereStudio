@@ -17,9 +17,7 @@
 package com.webank.wedatasphere.dss.standard.app.sso.builder.impl;
 
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
-import com.webank.wedatasphere.dss.standard.app.sso.plugin.SSOIntegrationConf;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
-import org.apache.linkis.common.conf.CommonVars;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -35,6 +33,7 @@ public class SSOUrlBuilderOperationImpl implements SSOUrlBuilderOperation {
     private static final String SSO_REDIRECT_URL_FORMAT = "%s?redirect=%s&dssurl=%s&cookies=%s&workspace=%s&appName=%s";
     private String workspaceName;
     private Map<String, String> cookies = new HashMap<>();
+    private Map<String, String> queryParameters = new HashMap<>();
     private String dssUrl;
     private String redirectUrl;
     private String reqUrl;
@@ -85,15 +84,29 @@ public class SSOUrlBuilderOperationImpl implements SSOUrlBuilderOperation {
     }
 
     @Override
+    public SSOUrlBuilderOperation addQueryParameter(String key, String value) {
+        queryParameters.put(key, value);
+        return this;
+    }
+
+    @Override
     public String getBuiltUrl() throws AppStandardErrorException {
         String cookieStr = cookies.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue())
             .collect(Collectors.joining(";"));
+        String url;
         if(StringUtils.isNotBlank(redirectUrl)) {
-            return String.format(SSO_REDIRECT_URL_FORMAT, reqUrl, redirectUrl, urlEncode(dssUrl),
-                urlEncode(cookieStr), workspaceName, appName);
+            url = String.format(SSO_REDIRECT_URL_FORMAT, reqUrl, redirectUrl, urlEncode(dssUrl),
+                urlEncode(cookieStr), urlEncode(workspaceName), appName);
         } else {
-            return String.format(SSO_URL_FORMAT, reqUrl, urlEncode(dssUrl),
-                urlEncode(cookieStr), workspaceName, appName);
+            url = String.format(SSO_URL_FORMAT, reqUrl, urlEncode(dssUrl),
+                urlEncode(cookieStr), urlEncode(workspaceName), appName);
+        }
+        if(queryParameters.isEmpty()) {
+            return url;
+        } else {
+            String queryParameterStr = queryParameters.entrySet().stream().map(entry -> entry.getKey() + "=" + urlEncode(entry.getValue()))
+                    .collect(Collectors.joining("&"));
+            return url + "&" + queryParameterStr;
         }
     }
 
@@ -133,15 +146,4 @@ public class SSOUrlBuilderOperationImpl implements SSOUrlBuilderOperation {
         return operation;
     }
 
-    public static SSOUrlBuilderOperation restore(String operationStr){
-        Map operationMap = SSOIntegrationConf.gson().fromJson(operationStr, Map.class);
-        SSOUrlBuilderOperationImpl operation = new SSOUrlBuilderOperationImpl();
-        if(operationMap.get("appName") != null) operation.appName = operationMap.get("appName").toString();
-        if(operationMap.get("cookies") != null) operation.cookies = (Map<String, String>) operationMap.get("cookies");
-        if(operationMap.get("dssUrl") != null) operation.dssUrl = operationMap.get("dssUrl").toString();
-        if(operationMap.get("redirectUrl") != null) operation.redirectUrl = operationMap.get("redirectUrl").toString();
-        if(operationMap.get("reqUrl") != null) operation.reqUrl = operationMap.get("reqUrl").toString();
-        if(operationMap.get("workspaceName") != null) operation.workspaceName = operationMap.get("workspaceName").toString();
-        return operation;
-    }
 }

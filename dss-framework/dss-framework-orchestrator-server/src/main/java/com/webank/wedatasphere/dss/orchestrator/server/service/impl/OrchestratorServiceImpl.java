@@ -457,13 +457,11 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             ResponseSubFlowContextIds response = (ResponseSubFlowContextIds) sender.ask(requestSubFlowContextIds);
             if (response != null) {
                 List<String> subFlowContextIdList = response.getContextIdList();
-                if (subFlowContextIdList.isEmpty()) {
-                    contextIdList.add(orcInfo.getContextId());
-                } else {
+                if (subFlowContextIdList != null && subFlowContextIdList.size() > 0) {
                     contextIdList.addAll(subFlowContextIdList);
-                    contextIdList.add(orcInfo.getContextId());
                 }
             }
+            contextIdList.add(orcInfo.getContextId());
         }
         // 3、调用linkis接口批量删除contextId
         ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
@@ -499,7 +497,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             }
 
         } catch (Exception e) {
-            LOGGER.error("调用linkis定时清理老contextId失败，", e);
+            LOGGER.error("调用linkis批量清理contextId接口失败，", e);
         }
     }
 

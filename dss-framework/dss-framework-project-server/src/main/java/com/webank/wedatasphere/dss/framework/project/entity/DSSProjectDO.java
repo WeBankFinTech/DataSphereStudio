@@ -102,6 +102,8 @@ public class DSSProjectDO implements Serializable {
      */
     private String orchestratorMode;
 
+    private Integer visible;
+
     public Long getId() {
         return id;
     }
@@ -310,9 +312,17 @@ public class DSSProjectDO implements Serializable {
         this.orchestratorMode = orchestratorMode;
     }
 
+    public Integer getVisible() {
+        return visible;
+    }
+
+    public void setVisible(Integer visible) {
+        this.visible = visible;
+    }
+
     @Override
     public String toString() {
-        return "DSSProject{" +
+        return "DSSProjectDO{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", source='" + source + '\'' +
@@ -339,6 +349,7 @@ public class DSSProjectDO implements Serializable {
                 ", updateByStr='" + updateByStr + '\'' +
                 ", devProcess='" + devProcess + '\'' +
                 ", orchestratorMode='" + orchestratorMode + '\'' +
+                ", visible=" + visible +
                 '}';
     }
 }

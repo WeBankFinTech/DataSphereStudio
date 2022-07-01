@@ -27,21 +27,26 @@ import java.util.Map;
 
 public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
 
-
+    /**
+     * 导出Orchestrator基本信息和工作流基本信息
+     */
     Map<String,Object> exportOrchestrator(String userName,
-        String workspaceName,
-        Long orchestratorId,
-        Long orcVersionId,
-        String projectName,
-        List<DSSLabel> dssLabels,
-        boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
+                                          Long orchestratorId,
+                                          Long orcVersionId,
+                                          String projectName,
+                                          List<DSSLabel> dssLabels,
+                                          boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
 
     Long orchestratorVersionIncrease(Long orcId,
-        String userName,
-        String comment,
-        String workspaceName,
-        DSSOrchestratorInfo dssOrchestratorInfo,
-        String projectName,
-        List<DSSLabel> dssLabels) throws DSSErrorException;
+                                     String userName,
+                                     String comment,
+                                     Workspace workspace,
+                                     DSSOrchestratorInfo dssOrchestratorInfo,
+                                     String projectName,
+                                     List<DSSLabel> dssLabels) throws DSSErrorException;
+
+    Long addVersionAfterPublish(String userName, Workspace workspace,
+                                Long orchestratorId, Long orcVersionId, String projectName,
+                                List<DSSLabel> dssLabels,String comment) throws DSSErrorException;
 
 }

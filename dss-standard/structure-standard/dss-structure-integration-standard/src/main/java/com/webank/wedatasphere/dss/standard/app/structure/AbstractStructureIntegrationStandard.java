@@ -23,8 +23,6 @@ import com.webank.wedatasphere.dss.standard.app.structure.status.AppStatusServic
 import com.webank.wedatasphere.dss.standard.common.core.AbstractAppIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
-import java.io.IOException;
-
 public abstract class AbstractStructureIntegrationStandard extends AbstractAppIntegrationStandard<StructureService, SSORequestService>
     implements StructureIntegrationStandard {
 
@@ -48,23 +46,22 @@ public abstract class AbstractStructureIntegrationStandard extends AbstractAppIn
     }
 
     @Override
-    public RoleService getRoleService(AppInstance appInstance) {
+    public final RoleService getRoleService(AppInstance appInstance) {
         return getOrCreate(appInstance, this::createRoleService, RoleService.class);
     }
 
     @Override
-    public ProjectService getProjectService(AppInstance appInstance) {
+    public final ProjectService getProjectService(AppInstance appInstance) {
         return getOrCreate(appInstance, this::createProjectService, ProjectService.class);
     }
 
     @Override
-    public AppStatusService getAppStateService(AppInstance appInstance) {
+    public final AppStatusService getAppStateService(AppInstance appInstance) {
         return getOrCreate(appInstance, this::createAppStatusService, AppStatusService.class);
     }
 
     @Override
-    public void close() throws IOException {
-
+    public void close() {
     }
 
 }

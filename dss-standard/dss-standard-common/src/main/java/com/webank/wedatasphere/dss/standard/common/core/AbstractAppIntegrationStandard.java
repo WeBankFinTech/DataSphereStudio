@@ -30,8 +30,8 @@ import java.util.function.Supplier;
 public abstract class AbstractAppIntegrationStandard<Service extends AppIntegrationService, SSORequestService extends AppService>
     implements AppIntegrationStandard<SSORequestService> {
 
-    private final Map<AppInstance, List<Service>> appServices = new HashMap<>();
-    private SSORequestService ssoRequestService;
+    protected final Map<AppInstance, List<Service>> appServices = new HashMap<>();
+    protected SSORequestService ssoRequestService;
 
     protected <T extends Service> T getOrCreate(AppInstance appInstance, Supplier<T> create, Class<T> clazz) {
         Supplier<T> createAndPut = () -> {

@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateO
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -42,32 +43,35 @@ public interface WorkFlowManager {
      * @return
      */
    DSSFlow createWorkflow(String userName,
+                          Long projectId,
                           String workflowName,
                           String contextIDStr,
                           String description,
                           Long parentFlowID,
                           String uses,
                           List<String> linkedAppConnNames,
-                          List<DSSLabel> dssLabels
-                           ) throws DSSErrorException, JsonProcessingException;
+                          List<DSSLabel> dssLabels,
+                          String orcVersion,
+                          String schedulerAppConn) throws DSSErrorException, JsonProcessingException;
 
 
     /**
      * 根据已有的flow内容，拷贝一份新的flow,区分BML文件，用于绑定不同的版本
      * @param userName
      * @param rootFlowId
-     * @param contextIDStr
+     * @param contextIdStr
      * @param description
      * @return
      * @throws DSSErrorException
      */
-    DSSFlow copyRootflowWithSubflows(String userName,
-                                              long rootFlowId,
-                                              String workspaceName,
-                                              String projectName,
-                                              String contextIDStr,
-                                              String version,
-                                              String description) throws DSSErrorException, IOException;
+    DSSFlow copyRootFlowWithSubFlows(String userName,
+                                     Long rootFlowId,
+                                     Workspace workspace,
+                                     String projectName,
+                                     String contextIdStr,
+                                     String orcVersion,
+                                     String description,
+                                     List<DSSLabel> dssLabels) throws DSSErrorException, IOException;
 
     DSSFlow queryWorkflow(String userName, Long rootFlowId) throws DSSErrorException;
 
@@ -90,11 +94,12 @@ public interface WorkFlowManager {
                                      Workspace workspace,
                                      List<DSSLabel> dssLabels) throws Exception;
 
-   List<DSSFlow>  importWorkflow(String userName,
+   List<DSSFlow> importWorkflow(String userName,
                                   String resourceId,
                                   String bmlVersion,
-                                  DSSFlowImportParam dssFlowImportParam) throws Exception;
+                                  DSSFlowImportParam dssFlowImportParam,
+                                  List<DSSLabel> dssLabels) throws Exception;
 
-    public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException;
+    ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException;
 
 }

@@ -27,7 +27,6 @@ import org.apache.linkis.engineconn.computation.executor.execute.EngineExecution
 import org.apache.linkis.governance.common.entity.job.JobRequestWithDetail
 import org.apache.linkis.governance.common.protocol.job.{JobReqQuery, JobRespProtocol}
 import org.apache.linkis.manager.label.entity.Label
-import org.apache.linkis.protocol.UserWithCreator
 import org.apache.linkis.rpc.Sender
 
 import scala.collection.JavaConversions._
@@ -35,8 +34,8 @@ import scala.collection.JavaConversions._
 /**
   * Only jobhistory of linkis1.0 is applicable.
   */
-class ExecutionRequestRefContextImpl(engineExecutorContext: EngineExecutionContext, userWithCreator: UserWithCreator)
-  extends AbstractExecutionRequestRefContext(engineExecutorContext, userWithCreator) {
+class ExecutionRequestRefContextImpl(engineExecutorContext: EngineExecutionContext, user: String, submitUser: String)
+  extends AbstractExecutionRequestRefContext(engineExecutorContext, user, submitUser) {
 
   private val jobHistorySender:Sender = Sender.getSender(RefExecutionConfiguration.JOB_HISTORY_APPLICATION_NAME.getValue)
 

@@ -1,0 +1,88 @@
+/*!
+ * Copyright 2019 WeBank
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+// Color
+$primary-color: #2E92F7;
+$dark-primary-color: #4B8FF3;
+
+$workspace-background: #F4F7FB;  //$workspace-background
+$dark-workspace-background: #151A23;
+
+$background-color-header: #0B203C;
+$dark-background-color-header: #151A23;
+
+// base
+$light-base-color: $body-background; // #FFFFFF
+$dark-base-color: #1E232D;
+$dark-menu-base-color: #2A303C;
+$dark-submenu-color:  #242A36;
+$dark-input-placeholder-color:  rgba(255,255,255,0.25);
+$dark-border-color: #404A5D;
+$dark-disable-color: #3C4352;
+$dark-disable-text-color: rgba(255,255,255,0.25);
+
+// workspace text color
+$light-text-color: rgba(0,0,0,0.65);
+$dark-text-color: rgba(255,255,255,0.65);   //$text-desc-color: rgba(0,0,0,0.65);
+
+// border color
+$border-color-base: $border-color-base; //#dcdee2
+$dark-border-color-base: rgba(255,255,255,0.20);
+
+// $dark-text-color: #F4F7FB;
+
+// workspace title color
+$workspace-title-color: $text-title-color;  //rgba(0, 0, 0, 0.85)
+$dark-workspace-title-color: rgba(255,255,255,0.85);
+
+$workspace-name-color:  #044B93;
+$dark-workspace-name-color: #FFFFFF;
+
+$light-text-desc-color: rgba(0, 0, 0, 0.45);
+$dark-text-desc-color: rgba(255, 255, 255, 0.45);
+// workspace body backround color
+$workspace-body-bg-color: $light-base-color; // #FFFFFF
+$dark-workspace-body-bg-color: $dark-base-color;
+
+// appProcess color
+$app-process-bg-color: $light-base-color;
+$dark-app-process-bg-color: #2A303C;
+
+$hover-color-base: #ECF4FF; //#F3F3F3 
+$dark-hover-color-base: rgba(75,143,243,0.50);
+
+$active-menu-item: #ECEFF4;
+$dark-active-menu-item:  #252A35;
+
+$menu-list-bg-color: $light-base-color;
+$dark-menu-list-bg-color: #3A404B;
+// workflow
+$workflow-body-bg-color: #F8F9FC;
+$dark-workflow-body-bg-color: $dark-base-color;
+
+$header-tool-bg-color: #F7F7F7;
+$dark-header-tool-bg-color: $dark-base-color;
+
+$dark-workflow-bg-color: #2A303C;
+$dark-workflow-font-color: rgba(255,255,255,0.65);
+
+$dark-header-bg-color: #242934;
+
+$suspanding-panel-bg-color: #061528;
+
+$disabled-bg-color: #f3f3f3;
+$dark-disabled-bg-color: #252A35;

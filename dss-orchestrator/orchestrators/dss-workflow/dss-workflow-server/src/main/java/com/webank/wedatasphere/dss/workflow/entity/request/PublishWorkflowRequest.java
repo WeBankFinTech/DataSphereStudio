@@ -8,6 +8,38 @@ public class PublishWorkflowRequest {
     private String comment;
     private LabelRouteVO labels;
 
+    private String dssLabel;
+    private Integer orchestratorId;
+    private Integer orchestratorVersionId;
+
+    public Integer getOrchestratorId() {
+        return orchestratorId;
+    }
+
+    public void setOrchestratorId(Integer orchestratorId) {
+        this.orchestratorId = orchestratorId;
+    }
+
+    public Integer getOrchestratorVersionId() {
+        return orchestratorVersionId;
+    }
+
+    public void setOrchestratorVersionId(Integer orchestratorVersionId) {
+        this.orchestratorVersionId = orchestratorVersionId;
+    }
+
+
+
+    public String getDssLabel() {
+        return dssLabel;
+    }
+
+    public void setDssLabel(String dssLabel) {
+        this.dssLabel = dssLabel;
+    }
+
+
+
     public Long getWorkflowId() {
         return workflowId;
     }

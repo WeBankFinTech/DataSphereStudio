@@ -19,6 +19,8 @@ package com.webank.wedatasphere.dss.workflow.conversion;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.AbstractConversionIntegrationStandard;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.DSSToRelConversionService;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.RelToOrchestratorConversionService;
+import com.webank.wedatasphere.dss.standard.app.development.service.RefQueryService;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.service.WorkflowToRelConversionService;
 
 
@@ -29,8 +31,4 @@ public class WorkflowConversionIntegrationStandard extends AbstractConversionInt
         return new WorkflowToRelConversionService();
     }
 
-    @Override
-    protected RelToOrchestratorConversionService createRelToDSSConversionService() {
-        return null;
-    }
 }

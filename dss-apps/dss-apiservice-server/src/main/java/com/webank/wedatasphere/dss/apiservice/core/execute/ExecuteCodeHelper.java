@@ -16,12 +16,13 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.execute;
 
-
+import com.webank.wedatasphere.dss.apiservice.core.action.ApiServiceGetAction;
 import com.webank.wedatasphere.dss.apiservice.core.action.ResultSetDownloadAction;
+import com.webank.wedatasphere.dss.apiservice.core.action.ResultWorkspaceIds;
 import com.webank.wedatasphere.dss.apiservice.core.config.ApiServiceConfiguration;
 import com.webank.wedatasphere.dss.apiservice.core.exception.ApiExecuteException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.utils.Utils;
-import org.apache.linkis.httpclient.response.Result;
 import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.request.ResultSetAction;
 import org.apache.linkis.ujes.client.request.ResultSetListAction;
@@ -29,7 +30,6 @@ import org.apache.linkis.ujes.client.response.JobExecuteResult;
 import org.apache.linkis.ujes.client.response.JobInfoResult;
 import org.apache.linkis.ujes.client.response.JobLogResult;
 import org.apache.linkis.ujes.client.response.ResultSetListResult;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,10 +70,50 @@ public class ExecuteCodeHelper {
     }
 
 
-    public static  void waitForComplete(ApiServiceExecuteJob job,UJESClient client) throws Exception {
+    public static Map<String,Object>  getMetaDataInfoByExecute(String user,
+                                             String executeCode,
+                                             Map<String, Object> params,
+                                             String scriptPath) throws Exception {
+        Map<String,Object>  resultMap = new HashMap<>();
+        UJESClient client = LinkisJobSubmit.getClient();
+        ApiServiceExecuteJob job = new DefaultApiServiceJob();
+        //sql代码封装成scala执行
+        job.setCode(ExecuteCodeHelper.packageCodeToRelease(executeCode));
+        job.setEngineType("spark");
+        job.setRunType("scala");
+        job.setUser(user);
+        job.setParams(null);
+        // pattern注入
+        job.setRuntimeParams((Map<String,Object>) params.get("variable"));
+        job.setScriptePath(scriptPath);
+        JobExecuteResult jobExecuteResult = LinkisJobSubmit.execute(job, client, "IDE");
+        job.setJobExecuteResult(jobExecuteResult);
+        try {
+            waitForComplete(job, client);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to execute job", e);
+            String reason = getLog(job, client);
+            LOGGER.error("Reason for failure: " + reason);
+            throw new ApiExecuteException(800024,"获取库表信息失败，执行脚本出错！");
+        }
+        int resultSize = getResultSize(job, client);
+        for(int i =0; i < resultSize; i++){
+            String result = getResult(job, i, ApiServiceConfiguration.RESULT_PRINT_SIZE.getValue(),client);
+            LOGGER.info("The content of the " + (i + 1) + "th resultset is :"
+                    +  result);
+            resultMap.put(Integer.toString(i),result);
+
+        }
+
+        LOGGER.info("Finished to execute job");
+        return  resultMap;
+    }
+
+
+    public static  void waitForComplete(ApiServiceExecuteJob job, UJESClient client) throws Exception {
         JobInfoResult jobInfo = client.getJobInfo(job.getJobExecuteResult());
         while (!jobInfo.isCompleted()) {
-            LOGGER.info("Update Progress info:" + getProgress(job,client));
+            LOGGER.info("Update Progress info:" + getProgress(job, client));
             LOGGER.info("<----linkis log ---->");
             Utils.sleepQuietly(ApiServiceConfiguration.LINKIS_JOB_REQUEST_STATUS_TIME.getValue(job.getJobProps()));
             jobInfo = client.getJobInfo(job.getJobExecuteResult());
@@ -84,7 +124,7 @@ public class ExecuteCodeHelper {
     }
 
 
-    public static void cancel(ApiServiceExecuteJob job,UJESClient client) throws Exception {
+    public static void cancel(ApiServiceExecuteJob job,UJESClient client) {
         client.kill(job.getJobExecuteResult());
     }
 
@@ -98,10 +138,10 @@ public class ExecuteCodeHelper {
         return client.getJobInfo(job.getJobExecuteResult()).isCompleted();
     }
 
-    public static  String getResult(ApiServiceExecuteJob job, int index, int maxSize,UJESClient client) {
+    public static  String getResult(ApiServiceExecuteJob job, int index, int maxSize, UJESClient client) {
         String resultContent = null;
         JobInfoResult jobInfo = client.getJobInfo(job.getJobExecuteResult());
-        String[] resultSetList = jobInfo.getResultSetList(LinkisJobSubmit.getClient(job.getJobProps()));
+        String[] resultSetList = jobInfo.getResultSetList(client);
         if (resultSetList != null && resultSetList.length > 0) {
             Object fileContent = client.resultSet(ResultSetAction.builder()
                     .setPath(resultSetList[index])
@@ -118,10 +158,10 @@ public class ExecuteCodeHelper {
     }
 
 
-    public static  int getResultSize(ApiServiceExecuteJob job,UJESClient client) {
+    public static  int getResultSize(ApiServiceExecuteJob job, UJESClient client) {
         JobInfoResult jobInfo = client.getJobInfo(job.getJobExecuteResult());
         if (jobInfo.isSucceed()) {
-            String[] resultSetList = jobInfo.getResultSetList(LinkisJobSubmit.getClient(job.getJobProps()));
+            String[] resultSetList = jobInfo.getResultSetList(client);
             if (resultSetList != null && resultSetList.length > 0) {
                 return resultSetList.length;
             }
@@ -155,14 +195,11 @@ public class ExecuteCodeHelper {
 
 
 
-    public static  String getResultContent(String user, String path, int maxSize,UJESClient client) {
-
-        String fileContent = client.resultSet(ResultSetAction.builder()
+    public static  String getResultContent(String user, String path, int maxSize, UJESClient client) {
+        return client.resultSet(ResultSetAction.builder()
                     .setPath(path)
                     .setUser(user)
                     .setPageSize(maxSize).build()).getResponseBody();
-
-        return fileContent;
     }
 
     public static InputStream downloadResultSet(String user,
@@ -195,16 +232,20 @@ public class ExecuteCodeHelper {
 
 
     public static  Map<String, Object> getTaskInfoById(JobExecuteResult jobExecuteResult, UJESClient client) {
-
-        Map<String, Object> taskInfo = (Map<String, Object>)client.getJobInfo(jobExecuteResult).getTask();
-
-        return taskInfo;
+        return (Map<String, Object>) client.getJobInfo(jobExecuteResult).getTask();
     }
 
 
 
 
+    public static String getUserWorkspaceIds(String userName,UJESClient client){
+        ApiServiceGetAction apiServiceGetAction = new ApiServiceGetAction();
+        apiServiceGetAction.setUser(userName);
+        apiServiceGetAction.setParameter("userName",userName);
+        ResultWorkspaceIds userWorkspaceIds = (ResultWorkspaceIds)client.executeUJESJob(apiServiceGetAction);
+        return userWorkspaceIds.getUserWorkspaceIds();
 
+    }
 
 
 

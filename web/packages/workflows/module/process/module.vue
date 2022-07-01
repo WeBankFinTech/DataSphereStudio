@@ -683,7 +683,9 @@ export default {
       this.workflowExeteId = currentExecutorFlow[0].execID
       this.workflowTaskId = currentExecutorFlow[0].taskID
     }
-    this.getToolbarsConfig()
+    if (!this.myReadonly) {
+      this.getToolbarsConfig()
+    }
     // 基础信息
     this.setShapes().then(() => {
       this.getBaseInfo();

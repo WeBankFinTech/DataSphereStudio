@@ -40,9 +40,13 @@ export default {
   },
   methods: {
     getUrl() {
+      let workspaceId = this.$route.query.workspaceId;
+      let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+      const item = workFlowLists.find(it => (it.query && it.query.flowId == this.$route.query.flowId))
       const params = {
         nodeType: this.node.type,
         projectID: +this.$route.query.projectID,
+        flowId: item && item.query.appId,
         params: {
           ...this.node.jobContent,
           title: this.node.title,

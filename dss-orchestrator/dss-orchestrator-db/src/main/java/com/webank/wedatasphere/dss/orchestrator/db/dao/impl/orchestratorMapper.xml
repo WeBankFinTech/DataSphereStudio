@@ -262,11 +262,11 @@
         group by
         orchestrator_id
         HAVING
-        max(version) &gt;= #{version}) tmp on
+        substring(max(version),2)  &gt; #{remainVersion}) tmp on
         b.orchestrator_id = tmp.orchestrator_id
         where
         a.status = 'Success'
-        and b.version &lt; tmp.maxVersion
+        and  substring(b.version,2) + #{remainVersion} &lt; substring(tmp.maxVersion,2)
         and b.context_id != ''
         order by a.id desc
     </select>

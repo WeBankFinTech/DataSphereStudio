@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.common.label;
 
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,21 @@ public class DSSLabelUtil {
         LabelInstanceFactory labelInstanceFactory = new LabelInstanceFactory(labelParam);
         EnvDSSLabel envDSSLabel = labelInstanceFactory.getEnvDssLabel();
         return envDSSLabel;
+    }
+
+    public static boolean isDevEnv(List<DSSLabel> dssLabels){
+        for(DSSLabel dssLabel : dssLabels){
+            String userEnv = null;
+            if(dssLabel instanceof EnvDSSLabel){
+                userEnv = ((EnvDSSLabel)dssLabel).getEnv();
+            }else{
+                userEnv = dssLabel.getValue().get(dssLabel.getLabelKey());
+            }
+            if(DSSCommonUtils.ENV_LABEL_VALUE_DEV.equalsIgnoreCase(userEnv)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {

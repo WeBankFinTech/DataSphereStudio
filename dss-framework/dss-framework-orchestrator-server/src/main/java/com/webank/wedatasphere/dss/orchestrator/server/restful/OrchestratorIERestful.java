@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
 import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
@@ -76,25 +77,15 @@ public class OrchestratorIERestful {
             String userName = SecurityFilter.getLoginUsername(req);
             //调用工具类生产label
             List<DSSLabel> dssLabelList = getDSSLabelList(labels);
-//            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-//                    .path("/downloadFile/")
-//                    .path(fileName)
-//                    .toUriString();
-//            java.nio.file.Path targetLocation = DSSFileService.fileStorageLocation.resolve(fileName);
             Workspace workspace = SSOHelper.getWorkspace(req);
             //3、打包新的zip包上传BML
-//            InputStream inputStream = bmlService.readLocalResourceFile(userName, targetLocation.toAbsolutePath().toString());
             Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
                     fileName, projectName);
             try {
-                importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(userName,
-                        workspace.getWorkspaceName(),
-                        projectName,
-                        projectID,
-                        resultMap.get("resourceId").toString(),
-                        resultMap.get("version").toString(),
-                        dssLabelList,
-                        workspace);
+                RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
+                        projectID, resultMap.get("resourceId").toString(),
+                        resultMap.get("version").toString(), null, dssLabelList, workspace);
+                importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
             } catch (Exception e) {
                 logger.error("Import orchestrator failed for ", e);
                 throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());
@@ -109,8 +100,8 @@ public class OrchestratorIERestful {
                               @RequestParam(defaultValue = "exportOrc",required = false, name = "outputFileName") String outputFileName,
                               @RequestParam(defaultValue = "utf-8",required = false, name = "charset") String charset,
                               @RequestParam(defaultValue = "zip",required = false, name = "outputFileType") String outputFileType,
-                              @RequestParam(required = false, name = "projectName") String projectName,
-                              @RequestParam(required = false, name = "orchestratorId") Long orchestratorId,
+                              @RequestParam(name = "projectName") String projectName,
+                              @RequestParam(name = "orchestratorId") Long orchestratorId,
                               @RequestParam(required = false, name = "orcVersionId") Long orcVersionId,
                               @RequestParam(defaultValue = "false",required = false, name = "addOrcVersion") Boolean addOrcVersion,
                               @RequestParam(required = false, name = "labels") String labels) throws DSSErrorException, IOException {
@@ -121,18 +112,17 @@ public class OrchestratorIERestful {
         String userName = SecurityFilter.getLoginUsername(req);
         List<DSSLabel> dssLabelList = getDSSLabelList(labels);
         Map<String, Object> res = null;
-        OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
+        OrchestratorVo orchestratorVo;
+        if (orcVersionId != null) {
+            orchestratorVo = orchestratorService.getOrchestratorVoByIdAndOrcVersionId(orchestratorId, orcVersionId);
+        } else {
+            orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
+        }
         orcVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
         logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
             res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,
-                    workspace.getWorkspaceName(),
-                    orchestratorId,
-                    orcVersionId,
-                    projectName,
-                    dssLabelList,
-                    addOrcVersion,
-                    workspace);
+                    orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace);
         } catch (Exception e) {
             logger.error("export orchestrator failed for ", e);
             throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());

@@ -19,7 +19,7 @@
 <mapper namespace="com.webank.wedatasphere.dss.framework.workspace.dao.DSSMenuRoleMapper">
 
     <insert id="insertBatch" parameterType="java.util.List">
-        insert into dss_menu_role (workspace_id,menu_id,role_id,priv, update_time,updateby)
+        insert into dss_workspace_menu_role (workspace_id,menu_id,role_id,priv, update_time,updateby)
         values
         <foreach collection="list" item="item" index="index" separator=",">
             ( #{item.workspaceId},#{item.menuId},#{item.roleId},

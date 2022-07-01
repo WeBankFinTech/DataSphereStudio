@@ -1,0 +1,34 @@
+@charset "utf-8";
+@import "./default";
+@import "./_theme";
+/*引入配置 所有演示相关必须走函数引用，方便后续换肤*/
+@mixin bg-color($color, $darkColor) {
+  background-color: $color;
+
+  [data-theme="dark"] & {
+    background-color: $darkColor;
+  }
+}
+@mixin font-color($color, $darkColor) {
+  color: $color;
+
+  [data-theme="dark"] & {
+    color: $darkColor;
+  }
+}
+@mixin border-color($color, $darkColor) {
+  border-color: $color;
+
+  [data-theme="dark"] & {
+    border-color: $darkColor;
+  }
+}
+
+@mixin guide-box-shadow($color, $darkColor) {
+  box-shadow: -2px 0 10px 0 $color;
+
+  [data-theme="dark"] & {
+    box-shadow: -2px 0 10px 0 $darkColor;
+  }
+}
+

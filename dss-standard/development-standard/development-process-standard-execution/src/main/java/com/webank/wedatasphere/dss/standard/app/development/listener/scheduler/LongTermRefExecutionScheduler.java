@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.listener.scheduler;
 
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionResponseRef;
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.AsyncExecutionResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.LongTermRefExecutionAction;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.AsyncResponseRef;
 

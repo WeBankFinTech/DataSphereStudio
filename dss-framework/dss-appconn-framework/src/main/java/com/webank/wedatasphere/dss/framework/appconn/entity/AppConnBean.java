@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.appconn.entity;
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.common.entity.Resource;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -34,12 +35,11 @@ public class AppConnBean implements AppConnInfo, Serializable {
     private Boolean isExternal;
 
     // todo:目前通过这两个字段在classpath下加载类。
-    // todo:未来这两个字段的作用是在bml和默认应用的。
+    // 未来这两个字段的作用是在bml和默认应用的。
     private String reference;
     private String resource;
     private Resource resourceObj;
     private String className;
-    private String appConnClassPath;
 
     private List<AppInstanceBean> appInstanceBeans;
 
@@ -93,6 +93,7 @@ public class AppConnBean implements AppConnInfo, Serializable {
         isExternal = external;
     }
 
+    @Override
     public String getReference() {
         return reference;
     }
@@ -135,21 +136,12 @@ public class AppConnBean implements AppConnInfo, Serializable {
         this.className = className;
     }
 
-    public String getAppConnClassPath() {
-        return appConnClassPath;
-    }
-
-    public void setAppConnClassPath(String appConnClassPath) {
-        this.appConnClassPath = appConnClassPath;
-    }
-
     @Override
     public String toString() {
         return "AppConnBean{" +
                 "id=" + id +
                 ", appConnName='" + appConnName + '\'' +
                 ", className='" + className + '\'' +
-                ", appConnClassPath='" + appConnClassPath + '\'' +
                 '}';
     }
 }

@@ -16,7 +16,10 @@
 
 package com.webank.wedatasphere.dss.appconn.core.ext;
 
-
+/**
+ * {@code OnlySSOAppConn} 和 {@code OnlyStructureAppConn} 的子类。
+ * 表示第三方系统既想打通 SSO，又想打通组织结构。
+ */
 public interface SecondlyAppConn extends OnlySSOAppConn, OnlyStructureAppConn {
 
 }

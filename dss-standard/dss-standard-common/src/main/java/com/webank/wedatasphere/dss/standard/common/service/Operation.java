@@ -25,4 +25,6 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
  */
 public interface Operation<K extends RequestRef, V extends ResponseRef> {
 
+    default void init() {}
+
 }

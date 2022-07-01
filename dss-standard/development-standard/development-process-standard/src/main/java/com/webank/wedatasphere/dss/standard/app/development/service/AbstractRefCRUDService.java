@@ -21,37 +21,37 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreatio
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.CreateRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.ref.DeleteRequestRef;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.DSSJobContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.UpdateRequestRef;
 
 public abstract class AbstractRefCRUDService extends AbstractDevelopmentService implements RefCRUDService {
 
-    protected abstract <K extends CreateRequestRef> RefCreationOperation<K> createRefCreationOperation();
+    protected abstract <K extends DSSJobContentRequestRef<K>> RefCreationOperation<K> createRefCreationOperation();
 
-    protected abstract <K extends CopyRequestRef> RefCopyOperation<K> createRefCopyOperation();
+    protected abstract <K extends CopyRequestRef<K>> RefCopyOperation<K> createRefCopyOperation();
 
-    protected abstract <K extends RequestRef> RefUpdateOperation<K> createRefUpdateOperation();
+    protected abstract <K extends UpdateRequestRef<K>> RefUpdateOperation<K> createRefUpdateOperation();
 
-    protected abstract <K extends DeleteRequestRef> RefDeletionOperation<K> createRefDeletionOperation();
+    protected abstract <K extends RefJobContentRequestRef<K>> RefDeletionOperation<K> createRefDeletionOperation();
 
     @Override
-    public <K extends CreateRequestRef> RefCreationOperation<K> getRefCreationOperation() {
+    public <K extends DSSJobContentRequestRef<K>> RefCreationOperation<K> getRefCreationOperation() {
         return getOrCreate(this::createRefCreationOperation, RefCreationOperation.class);
     }
 
     @Override
-    public <K extends CopyRequestRef> RefCopyOperation<K> getRefCopyOperation() {
+    public <K extends CopyRequestRef<K>> RefCopyOperation<K> getRefCopyOperation() {
          return getOrCreate(this::createRefCopyOperation, RefCopyOperation.class);
     }
 
     @Override
-    public <K extends RequestRef> RefUpdateOperation<K> getRefUpdateOperation() {
+    public <K extends UpdateRequestRef<K>> RefUpdateOperation<K> getRefUpdateOperation() {
         return getOrCreate(this::createRefUpdateOperation, RefUpdateOperation.class);
     }
 
     @Override
-    public <K extends DeleteRequestRef> RefDeletionOperation<K> getRefDeletionOperation() {
+    public <K extends RefJobContentRequestRef<K>> RefDeletionOperation<K> getRefDeletionOperation() {
         return getOrCreate(this::createRefDeletionOperation, RefDeletionOperation.class);
     }
 

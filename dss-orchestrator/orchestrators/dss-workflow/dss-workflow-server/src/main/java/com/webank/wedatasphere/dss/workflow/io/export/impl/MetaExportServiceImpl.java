@@ -40,7 +40,7 @@ public class MetaExportServiceImpl implements MetaExportService {
     public void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException {
 
         try (
-                OutputStream outputStream = generateOutputStream(savePath)
+            OutputStream outputStream = generateOutputStream(savePath)
         ) {
             exportFlowBaseInfo(allDSSFlows, outputStream);
             exportFlowRelation(allFlowRelations, outputStream);
@@ -65,13 +65,13 @@ public class MetaExportServiceImpl implements MetaExportService {
 
     private void exportFlowRelation(List<DSSFlowRelation> flowRelations, OutputStream outputStream) throws IOException {
 
-        MetaWriter.of("dss_flow_relation", DSSFlowRelation.class).data(flowRelations).write(outputStream);
+        MetaWriter.of("dss_workflow_relation", DSSFlowRelation.class).data(flowRelations).write(outputStream);
 
     }
 
     private InputStream exportFlowRelation(List<DSSFlowRelation> flowRelations) throws IOException {
 
-        return MetaWriter.of("dss_flow_relation", DSSFlowRelation.class).data(flowRelations).write();
+        return MetaWriter.of("dss_workflow_relation", DSSFlowRelation.class).data(flowRelations).write();
 
     }
 

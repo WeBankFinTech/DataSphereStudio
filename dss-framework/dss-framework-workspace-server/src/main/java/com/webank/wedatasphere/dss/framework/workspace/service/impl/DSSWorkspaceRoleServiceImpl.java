@@ -16,7 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSRole;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSApplicationBean;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceRole;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
@@ -46,7 +47,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addWorkspaceRole(String roleName, int workspaceId, List<Integer> menuIds, List<Integer> componentIds, String username) {
-        DSSRole dssRole = new DSSRole();
+        DSSWorkspaceRole dssRole = new DSSWorkspaceRole();
         dssRole.setWorkspaceId(workspaceId);
         dssRole.setFrontName(roleName);
         dssRole.setName(roleName);
@@ -54,18 +55,18 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
         dssRole.setDescription("workspace{ " + workspaceId + " }添加的role");
         dssWorkspaceRoleMapper.addNewRole(dssRole);
         List<Integer> allMenuIds = workspaceDBHelper.getAllMenuIds();
-        if (menuIds.size() > 0){
+        if (menuIds.size() > 0) {
             dssWorkspaceRoleMapper.updateRoleMenu(dssRole.getId(), workspaceId, menuIds, username, 1);
         }
-        if (menuIds.size() < allMenuIds.size()){
+        if (menuIds.size() < allMenuIds.size()) {
             allMenuIds.removeAll(menuIds);
             dssWorkspaceRoleMapper.updateRoleMenu(dssRole.getId(), workspaceId, allMenuIds, username, 0);
         }
-        List<Integer> allComponentIds = workspaceDBHelper.getAllComponentIds();
-        if (componentIds.size() > 0){
+        List<Integer> allComponentIds = workspaceDBHelper.getAppConnIds();
+        if (componentIds.size() > 0) {
             dssWorkspaceRoleMapper.updateRoleComponent(dssRole.getId(), workspaceId, componentIds, username, 1);
         }
-        if (componentIds.size() < allComponentIds.size()){
+        if (componentIds.size() < allComponentIds.size()) {
             allComponentIds.removeAll(componentIds);
             dssWorkspaceRoleMapper.updateRoleComponent(dssRole.getId(), workspaceId, allComponentIds, username, 0);
         }
@@ -82,9 +83,9 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
     public Integer getWorkspaceIdByUser(String username) {
         List<Integer> workspaceIds = dssWorkspaceRoleMapper.getWorkspaceIds(username);
         Integer defaultWorkspaceId = dssWorkspaceRoleMapper.getDefaultWorkspaceId(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
-        if (workspaceIds.isEmpty()){
+        if (workspaceIds.isEmpty()) {
             return defaultWorkspaceId;
-        } else if (workspaceIds.size() == 1){
+        } else if (workspaceIds.size() == 1) {
             return workspaceIds.get(0);
         } else {
             workspaceIds.remove(defaultWorkspaceId);
@@ -95,14 +96,18 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
     @Override
     public int getApiPriv(String username, Integer workspaceId, String roleName, String appName) {
         int roleId = dssWorkspaceRoleMapper.getRoleId(roleName, -1);
-        int componentId = dssWorkspaceRoleMapper.getComponentId(appName);
-        int count = dssWorkspaceRoleMapper.getCount(workspaceId, componentId, roleId);
-        if (count >= 1){
-            Integer tmpPriv = dssWorkspaceRoleMapper.getPriv(workspaceId, roleId, componentId);
-            return tmpPriv!=null ? tmpPriv.intValue() : 0;
-        }else{
-            Integer tmpPriv = dssWorkspaceRoleMapper.getPriv(-1,roleId, componentId);
-            return tmpPriv!=null ? tmpPriv.intValue() : 0;
+        DSSApplicationBean applicationBean = workspaceDBHelper.getAppConn(appName);
+        if (applicationBean == null) {
+            return -1;
+        }
+        int appconnId = applicationBean.getId();
+        int count = dssWorkspaceRoleMapper.getCount(workspaceId, appconnId, roleId);
+        if (count >= 1) {
+            Integer tmpPriv = dssWorkspaceRoleMapper.getPriv(workspaceId, roleId, appconnId);
+            return tmpPriv != null ? tmpPriv : 0;
+        } else {
+            Integer tmpPriv = dssWorkspaceRoleMapper.getPriv(-1, roleId, appconnId);
+            return tmpPriv != null ? tmpPriv : 0;
         }
     }
 }

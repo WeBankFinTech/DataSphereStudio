@@ -17,11 +17,15 @@
 package com.webank.wedatasphere.dss.standard.app.structure;
 
 
+import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
 
-public interface StructureOperation extends Operation {
+public interface StructureOperation<K extends RequestRef, V extends ResponseRef>
+        extends Operation<K, V> {
 
+    @Override
     void init();
 
     void setStructureService(StructureService service);

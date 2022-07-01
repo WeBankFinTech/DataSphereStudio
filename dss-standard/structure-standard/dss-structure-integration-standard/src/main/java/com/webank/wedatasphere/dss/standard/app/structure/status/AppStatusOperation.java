@@ -17,10 +17,18 @@
 package com.webank.wedatasphere.dss.standard.app.structure.status;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 
+/**
+ * 检查第三方系统的状态，如果发现该第三方系统出现异常，以便及时告警或展示给到前端使用用户。
+ */
+public interface AppStatusOperation
+        extends StructureOperation<RequestRef, AppStatusResponseRef> {
 
-public interface AppStatusOperation extends StructureOperation {
-
+    /**
+     * 无入参，仅用于检查第三方系统的状态。
+     * @return 返回心跳结果
+     */
     AppStatusResponseRef heartbeat();
 
 }

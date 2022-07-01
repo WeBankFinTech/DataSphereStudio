@@ -35,6 +35,8 @@ public interface SSOUrlBuilderOperation extends Operation {
 
     SSOUrlBuilderOperation redirectTo(String redirectUrl);
 
+    SSOUrlBuilderOperation addQueryParameter(String key, String value);
+
     SSOUrlBuilderOperation copy();
 
     String getBuiltUrl() throws AppStandardErrorException;

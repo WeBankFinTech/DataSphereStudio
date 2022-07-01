@@ -16,13 +16,11 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.origin.plugin
 
-import com.webank.wedatasphere.dss.common.utils.IoUtils
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg
 import com.webank.wedatasphere.dss.standard.app.sso.origin.client.HttpClient
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.AbstractSSOMsgParseOperation
 import org.apache.linkis.common.utils.Utils
 import org.apache.linkis.httpclient.Client
-import org.apache.commons.io.IOUtils
 
 
 class OriginSSOMsgParseOperation extends AbstractSSOMsgParseOperation {

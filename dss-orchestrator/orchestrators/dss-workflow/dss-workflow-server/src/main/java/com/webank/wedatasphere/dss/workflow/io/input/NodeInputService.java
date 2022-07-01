@@ -17,14 +17,22 @@
 package com.webank.wedatasphere.dss.workflow.io.input;
 
 
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface NodeInputService {
+
     String uploadResourceToBml(String userName, String nodeJson, String inputResourcePath, String projectName) throws IOException;
-    String uploadAppConnResource(String userName, String projectName, DSSFlow DSSFlow, String nodeJson, String flowContextId, String appConnResourcePath, Workspace workspace, String orcVerson) throws  IOException;
+
+    String uploadAppConnResource(String userName, String projectName, DSSFlow dssFlow,
+                                 String nodeJson, String flowContextId, String appConnResourcePath,
+                                 Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException,IOException;
+
     String updateNodeSubflowID(String nodeJson, long subflowID) throws IOException;
 
 }

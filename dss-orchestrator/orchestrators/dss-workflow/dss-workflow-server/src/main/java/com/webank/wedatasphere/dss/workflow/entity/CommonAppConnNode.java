@@ -15,7 +15,10 @@
  */
 
 package com.webank.wedatasphere.dss.workflow.entity;
-import java.util.ArrayList;
+
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +26,8 @@ import java.util.Map;
 public class CommonAppConnNode extends AbstractAppConnNode {
 
     private Map<String, Object> params;
+    private List<DSSLabel> dssLabels;
+    private Workspace workspace;
 
     public CommonAppConnNode(String projectName, long projectId , String flowName, long flowId, String nodeName,
                              String type, Map<String, Object> jobContent){
@@ -33,7 +38,6 @@ public class CommonAppConnNode extends AbstractAppConnNode {
 
     }
 
-
     public void setParams(Map<String, Object> params){
         this.params = params;
     }
@@ -42,4 +46,19 @@ public class CommonAppConnNode extends AbstractAppConnNode {
         return this.params;
     }
 
+    public List<DSSLabel> getDssLabels() {
+        return dssLabels;
+    }
+
+    public void setDssLabels(List<DSSLabel> dssLabels) {
+        this.dssLabels = dssLabels;
+    }
+
+    public Workspace getWorkspace() {
+        return workspace;
+    }
+
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
+    }
 }

@@ -22,6 +22,16 @@
         SELECT id FROM `dss_user` WHERE username = #{userName}
     </select>
 
+    <select id="getWorkspaceEditUsers" resultType="java.lang.String">
+        SELECT username FROM `dss_workspace_user_role`
+        WHERE workspace_id = #{workspaceId} AND role_id = 3
+    </select>
+
+    <select id="getWorkspaceReleaseUsers" resultType="java.lang.String">
+        SELECT username FROM `dss_workspace_user_role`
+        WHERE workspace_id = #{workspaceId} AND role_id = 2
+    </select>
+
     <select id="getUserName" resultType="java.lang.String">
         SELECT username FROM `dss_user` WHERE id = #{userID}
     </select>

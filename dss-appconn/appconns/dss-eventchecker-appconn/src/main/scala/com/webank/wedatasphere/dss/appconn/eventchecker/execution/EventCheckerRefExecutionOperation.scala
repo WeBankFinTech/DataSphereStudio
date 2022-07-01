@@ -19,27 +19,18 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.execution
 import java.util.{Properties, UUID}
 
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker
-import com.webank.wedatasphere.dss.standard.app.development.listener.{ExecutionLogListener, ExecutionResultListener}
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AsyncExecutionRequestRef, AsyncExecutionResponseRef, CompletedExecutionResponseRef, RefExecutionAction, RefExecutionState}
+import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
-import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
+import org.apache.commons.io.IOUtils
 import org.apache.linkis.common.log.LogUtils
 import org.apache.linkis.common.utils.Utils
 import org.apache.linkis.storage.LineRecord
-import org.apache.commons.io.IOUtils
-import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
-import org.slf4j.LoggerFactory;
 
 
-class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation with Killable with Procedure{
-
-
-
-  private var service:DevelopmentService = _
-  private val logger = LoggerFactory.getLogger(classOf[EventCheckerRefExecutionOperation])
-  private var killTag = false
-
+class EventCheckerRefExecutionOperation
+  extends LongTermRefExecutionOperation[RefExecutionRequestRef.RefExecutionContextRequestRef] with Killable with Procedure {
 
 
   override def progress(action: RefExecutionAction): Float = {
@@ -49,48 +40,44 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
 
   override def log(action: RefExecutionAction): String = {
     action match {
-      case action: EventCheckerExecutionAction => {
-        if (!action.state.isCompleted) {
+      case action: EventCheckerExecutionAction =>
+        if (!action.getState.isCompleted) {
           LogUtils.generateInfo("EventChecker is sending or waiting for message")
         } else {
           LogUtils.generateInfo("EventChecker successfully received or send  message")
         }
-      }
       case _ => LogUtils.generateERROR("Error NodeExecutionAction for log")
     }
   }
 
   override def kill(action: RefExecutionAction): Boolean = {
-    killTag = true
     action match {
       case longTermAction: EventCheckerExecutionAction =>
         longTermAction.setKilledFlag(true)
         longTermAction.setState(RefExecutionState.Killed)
         true
+      case _ => {
+        logger.error("EventChecker kill failed for error action")
+        false
+      }
     }
+
   }
 
-  protected def putErrorMsg(errorMsg: String, t: Throwable, action: EventCheckerExecutionAction): EventCheckerExecutionAction = t match {
-
-    case t: Exception =>
-      val response = action.response
-      response.setErrorMsg(errorMsg)
-      response.setException(t)
-      response.setIsSucceed(false)
-      action
+  protected def putErrorMsg(errorMsg: String, t: Throwable, action: EventCheckerExecutionAction): EventCheckerExecutionAction = {
+    action.setExecutionResponseRef(new ExecutionResponseRefBuilder().setErrorMsg(errorMsg).setException(t).error())
+    action
   }
 
-  override def submit(requestRef: ExecutionRequestRef): RefExecutionAction = {
-   val asyncExecutionRequestRef = requestRef.asInstanceOf[AsyncExecutionRequestRef]
+  override def submit(requestRef: RefExecutionRequestRef.RefExecutionContextRequestRef): RefExecutionAction = {
     val nodeAction = new EventCheckerExecutionAction()
-    nodeAction.setId(UUID.randomUUID().toString())
+    nodeAction.setId(UUID.randomUUID().toString)
     import scala.collection.JavaConversions.mapAsScalaMap
     val InstanceConfig = this.service.getAppInstance.getConfig
-    val scalaParams: scala.collection.mutable.Map[String, Object] =asyncExecutionRequestRef.getExecutionRequestRefContext().getRuntimeMap()
+    val scalaParams: scala.collection.mutable.Map[String, Object] = requestRef.getExecutionRequestRefContext.getRuntimeMap
     val properties = new Properties()
     InstanceConfig.foreach { record =>
-      logger.info("request params key : " + record._1 + ",value : " + record._2)
-      if(null == record._2){
+      if(null == record._2) {
         properties.put(record._1, "")}
       else {
         properties.put(record._1, record._2.toString)
@@ -99,23 +86,22 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
     scalaParams.foreach { case (key, value) =>
       if (key != null && value != null) properties.put(key, value.toString)
     }
-    Utils.tryCatch({
+    Utils.tryCatch{
       val ec = new EventChecker(properties, nodeAction)
       ec.run()
       nodeAction.setEc(ec)
-    })(t => {
+    } (t => {
       logger.error("EventChecker run failed for " + t.getMessage, t)
       putErrorMsg("EventChecker run failed!" + t.getMessage, t, nodeAction)
     })
-
     nodeAction
   }
 
   override def state(action: RefExecutionAction): RefExecutionState = {
     action match {
-      case action: EventCheckerExecutionAction => {
+      case action: EventCheckerExecutionAction =>{
         action.getExecutionRequestRefContext.appendLog("EventCheck is running!")
-        if (action.state.isCompleted) return action.state
+        if (action.getState.isCompleted) return action.getState
         if (action.eventType.equals("RECEIVE")) {
           Utils.tryCatch(action.ec.receiveMsg())(t => {
             action.setState(RefExecutionState.Failed)
@@ -123,23 +109,21 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
             putErrorMsg("EventChecker run failed!" + t.getMessage, t, action)
             false
           })
-          if(killTag) {
-            killTag = false
-            return RefExecutionState.Killed
-          }
         }
-        action.state
+        action.getState
       }
-      case _ => RefExecutionState.Failed
+      case _ => {
+        logger.error("EventChecker run failed for error action")
+        RefExecutionState.Failed
+      }
     }
   }
 
-  override def result(action: RefExecutionAction): CompletedExecutionResponseRef = {
-    val response = new EventCheckerCompletedExecutionResponseRef(200)
+  override def result(action: RefExecutionAction): ExecutionResponseRef = {
     action match {
-      case action: EventCheckerExecutionAction => {
-        if (action.state.equals(RefExecutionState.Success)) {
-          val resultSetWriter =action.getExecutionRequestRefContext.createTextResultSetWriter()
+      case action: EventCheckerExecutionAction =>
+        if (action.getState.equals(RefExecutionState.Success)) {
+          val resultSetWriter = action.getExecutionRequestRefContext.createTextResultSetWriter()
           var resultStr = "EventChecker runs successfully!"
           if (action.saveKeyAndValue != null) {
             resultStr = action.saveKeyAndValue
@@ -149,34 +133,22 @@ class EventCheckerRefExecutionOperation  extends LongTermRefExecutionOperation w
             resultSetWriter.addMetaData(null)
             resultSetWriter.addRecord(new LineRecord(resultStr))
           }(IOUtils.closeQuietly(resultSetWriter))
-          response.setIsSucceed(true)
-        } else {
-          response.setException(action.response.getException)
-          response.setIsSucceed(false)
-        }
-        response
-      }
+          new ExecutionResponseRefBuilder().success()
+        } else if(action.getExecutionResponseRef != null) action.getExecutionResponseRef
+        else new ExecutionResponseRefBuilder().error()
       case _ =>
-        response.setIsSucceed(false);
-        response
+        new ExecutionResponseRefBuilder().error()
     }
 
   }
 
-  override def createAsyncResponseRef(requestRef: ExecutionRequestRef, action: RefExecutionAction): AsyncExecutionResponseRef = {
+  override def createAsyncResponseRef(requestRef: RefExecutionRequestRef.RefExecutionContextRequestRef, action: RefExecutionAction): AsyncExecutionResponseRef = {
     action match {
-      case action: EventCheckerExecutionAction => {
-        val response = super.createAsyncResponseRef(requestRef,action)
-        response.setAction(action)
-        response.setMaxLoopTime(action.ec.maxWaitTime)
-        response.setAskStatePeriod(action.ec.queryFrequency)
-        response
-      }
+      case action: EventCheckerExecutionAction =>
+        val response = super.createAsyncResponseRef(requestRef, action)
+        new AsyncExecutionResponseRef.Builder().setMaxLoopTime(action.ec.maxWaitTime)
+          .setAskStatePeriod(action.ec.queryFrequency).setAsyncExecutionResponseRef(response).build()
     }
-  }
-
-  override def setDevelopmentService(service: DevelopmentService): Unit = {
-    this.service = service
   }
 
 }

@@ -17,11 +17,24 @@
 package com.webank.wedatasphere.dss.standard.app.structure.project;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
 
-public interface ProjectUpdateOperation extends StructureOperation {
+public interface ProjectUpdateOperation<R extends ProjectUpdateRequestRef<R>>
+        extends StructureOperation<R, ResponseRef> {
 
-    ProjectResponseRef updateProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException;
+    /**
+     * Try to update the related refProject in third-party AppConn.
+     * Usually, DSS only want to update the projectName, description and permissions info in third-party refProject,
+     * so the refProjectId is always exists and can not be changeable.
+     * <br>
+     * Notice: do not try to change the refProjectId already related with the third-party refProject.
+     * @param projectRef contains the DSS project info updated.
+     * @return the result of update, just success or failure.
+     * @throws ExternalOperationFailedException
+     */
+    ResponseRef updateProject(R projectRef) throws ExternalOperationFailedException;
 
 }

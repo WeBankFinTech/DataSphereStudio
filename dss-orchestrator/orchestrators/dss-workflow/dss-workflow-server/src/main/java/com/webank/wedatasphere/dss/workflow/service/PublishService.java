@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.workflow.service;
 
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+
 import java.util.Map;
 
 public interface PublishService {
@@ -26,6 +27,6 @@ public interface PublishService {
     String submitPublish(String publishUser, Long workflowId,
         Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception;
 
-
     ResponseConvertOrchestrator getStatus(String username, String taskId) throws Exception;
+
 }

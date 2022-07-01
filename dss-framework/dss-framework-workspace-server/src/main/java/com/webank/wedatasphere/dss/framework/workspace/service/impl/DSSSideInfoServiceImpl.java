@@ -22,9 +22,13 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.Sidebar;
 import com.webank.wedatasphere.dss.framework.workspace.bean.SidebarContent;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SidebarContentVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SidebarVO;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceInfoMapper;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.SidebarContentMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.SidebarMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSSideInfoService;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
+import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -46,10 +50,13 @@ public class DSSSideInfoServiceImpl implements DSSSideInfoService {
     private SidebarMapper sidebarMapper;
     @Autowired
     private SidebarContentMapper sidebarContentMapper;
-
+    @Autowired
+    private DSSWorkspaceInfoMapper dssWorkspaceInfoMapper;
+    @Autowired
+    private DSSWorkspaceService workspaceService;
 
     @Override
-    public List<SidebarVO> getSidebarVOList(String username, Integer workspaceId,boolean isEnglish) {
+    public List<SidebarVO> getSidebarVOList(String username, Long workspaceId,boolean isEnglish) {
         //查询所在工作空间以及默认空间的侧边栏
         List<SidebarVO> retList = new ArrayList<>();
         QueryWrapper<Sidebar> sidebarQueryWrapper = new QueryWrapper<>();
@@ -62,17 +69,17 @@ public class DSSSideInfoServiceImpl implements DSSSideInfoService {
         //查询所在工作空间以及默认空间的侧边栏对应的侧边栏-内容
         List<Integer> sideBarIds = sidebarList.stream().map(Sidebar::getId).collect(Collectors.toList());
         QueryWrapper<SidebarContent> sidebarQueryContentWrapper = new QueryWrapper<>();
-        sidebarQueryContentWrapper.in("workspace_id", Arrays.asList(workspaceId,0));
+        sidebarQueryContentWrapper.in("workspace_id", Arrays.asList(workspaceId.intValue(),0));
         sidebarQueryContentWrapper.in("sidebar_id", sideBarIds);
         sidebarQueryContentWrapper.orderByAsc("order_num");
         List<SidebarContent> sidebarContentList = sidebarContentMapper.selectList(sidebarQueryContentWrapper);
 
         //封装返回数据
-        return getSidebarVOS(retList, sidebarList, sidebarContentList,isEnglish);
+        return getSidebarVOS(username, workspaceId,retList, sidebarList, sidebarContentList,isEnglish);
     }
 
     //封装返回数据
-    private List<SidebarVO> getSidebarVOS(List<SidebarVO> retList, List<Sidebar> sidebarList, List<SidebarContent> sidebarContentList,boolean isEnglish) {
+    private List<SidebarVO> getSidebarVOS(String username, Long workspaceId,List<SidebarVO> retList, List<Sidebar> sidebarList, List<SidebarContent> sidebarContentList,boolean isEnglish) {
         Map<Integer,List<SidebarContent>> contentMap = new HashMap<>();
         for(SidebarContent sidebarContent : sidebarContentList){
             Integer sidebarId = sidebarContent.getSidebarId();
@@ -89,6 +96,11 @@ public class DSSSideInfoServiceImpl implements DSSSideInfoService {
             List<SidebarContent> sidebarContents = contentMap.get(sidebar.getId());
             if(!CollectionUtils.isEmpty(sidebarContents)){
                 for (SidebarContent  sidebarContent : sidebarContents){
+                    if(DSSWorkspaceConstant.WORKSPACE_MANAGEMENT_NAME.equals(sidebarContent.getTitle())){
+                        if(!workspaceService.isAdminUser(workspaceId,username)){
+                            continue;
+                        }
+                    }
                     SidebarContentVO sidebarContentVO = new SidebarContentVO();
                     BeanUtils.copyProperties(sidebarContent,sidebarContentVO);
                     international(isEnglish,sidebarContent,sidebarContentVO);

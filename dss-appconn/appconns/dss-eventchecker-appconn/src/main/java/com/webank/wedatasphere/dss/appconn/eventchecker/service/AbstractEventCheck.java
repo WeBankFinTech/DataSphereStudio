@@ -49,12 +49,10 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
     String msg;
     String afterSend;
 
-    DataSource getMsgDS(Properties props, Logger log){
+    DataSource getMsgDS(Properties props, Logger log) {
+        msgDS = EventDruidFactory.getMsgInstance(props, log);
         if (msgDS == null) {
-            msgDS = EventDruidFactory.getMsgInstance(props, log);
-            if (msgDS == null) {
-                log.error("Error getting Druid DataSource instance");
-            }
+            log.error("Error getting Druid DataSource instance");
         }
         return msgDS;
     }

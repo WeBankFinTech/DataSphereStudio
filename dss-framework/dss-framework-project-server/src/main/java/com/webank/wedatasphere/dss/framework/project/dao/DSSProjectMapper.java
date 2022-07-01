@@ -15,7 +15,6 @@
  */
 
 package com.webank.wedatasphere.dss.framework.project.dao;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.po.DSSProjectPo;
@@ -30,7 +29,6 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
-
 @Mapper
 public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
@@ -41,7 +39,6 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
     @Select("select `name` from dss_project where `id` = #{projectId}")
     String getProjectNameById(@Param("projectId") Long projectId);
-
 
     @Select("select `id` from dss_project where `workspace_id` = #{workspaceId} and visible = #{visible}")
     List<Long> getProjectIdsByWorkspaceId(@Param("workspaceId") Long workspaceId,@Param("visible")int visible);
@@ -60,16 +57,17 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
             "where `project_id` = #{dssProjectId} and `appconn_instance_id` = #{appInstanceId}")
     Long getAppConnProjectId(@Param("appInstanceId")Long appInstanceId, @Param("dssProjectId")Long dssProjectId);
 
-
     @Update("update dss_project set `visible` = 0 where `id` = #{projectId}")
     void deleteProject(@Param("projectId")Long projectId);
 
-    @Select("SELECT a.url FROM dss_appconn_instance a LEFT JOIN dss_appconn b ON a.appconn_id = b.id WHERE b.appconn_name=#{schedulisName} LIMIT 1")
-    String getSchedualisUrl(@Param("schedulisName")String schedulisName);
+    List<QueryProjectVo> getListForAdmin(ProjectQueryRequest projectRequest);
 
-    @Select("SELECT a.appconn_instance_project_id FROM dss_appconn_project_relation a WHERE a.appconn_instance_id = 1 AND a.project_id = #{projectId} LIMIT 1")
-    Long getSchedulisProjectId(@Param("projectId")Long projectId);
+    @Update("DELETE FROM dss_project where `id` = #{projectId}")
+    void deleteProjectInfo(@Param("projectId") Long projectId);
 
-    @Update("update dss_appconn_project_relation set appconn_instance_project_id = #{schedulisProjectId} WHERE appconn_instance_id = 1 AND  project_id = #{projectId} ")
-    int updateSchedulisProjectId(@Param("schedulisProjectId")Long schedulisProjectId,@Param("projectId")Long projectId);
+    /**
+     * 获取已删除的工程
+     *
+     */
+    List<QueryProjectVo> getDeletedProjects(ProjectQueryRequest projectRequest);
 }

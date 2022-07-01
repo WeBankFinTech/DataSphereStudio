@@ -445,17 +445,17 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    @Scheduled(cron = " 0 0 3 * * ?")
+    @Scheduled(cron = "${wds.dss.server.scheduling.clear.cs.cron}")
     public void batchClearContextId() {
         LOGGER.info("--------------------{} start clear old contextId------------------------", LocalDateTime.now());
         ArrayList<String> contextIdList = new ArrayList();
         try {
             // 1、先去查询dss_orchestrator_version_info表，筛选出发布过两次及以上的编排，并获取老的发布记录。
-            List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
+            List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue(),"time");
             if (historyOrcVersionList == null || historyOrcVersionList.isEmpty()) {
                 return;
             }
-            List<DSSLabel> dssLabels = Lists.newArrayList(new EnvDSSLabel("dev"));
+            List<DSSLabel> dssLabels = Lists.newArrayList(new EnvDSSLabel(OrchestratorConf.DSS_CS_CLEAR_ENV.getValue()));
             Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
             // 2、根据appIds去查询子工作流contextId
             for (DSSOrchestratorVersion orcInfo : historyOrcVersionList) {
@@ -474,6 +474,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
             // 每次处理1000条数据
             if (contextIdList.size() < DSSOrchestratorConstant.MAX_CLEAR_SIZE) {
+                LOGGER.info("clear old contextId, contextIds：{}", contextIdList.toString());
                 //contextClient.batchClearContextByHAID(contextIdList);
             } else {
                 int len = DSSOrchestratorConstant.MAX_CLEAR_SIZE;
@@ -481,7 +482,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 int count = (size + len - 1) / len;
                 for (int i = 0; i < count; i++) {
                     List<String> subList = contextIdList.subList(i * len, (Math.min((i + 1) * len, size)));
-                    LOGGER.info("clear linkis contextId by batch,{} batch", i + 1);
+                    LOGGER.info("clear old contextId by batch, {} batch, contextIds：{}", i + 1, subList.toString());
                     //contextClient.batchClearContextByHAID(subList);
                     Thread.sleep(500);
                 }
@@ -495,7 +496,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 int count = (size + len - 1) / len;
                 for (int i = 0; i < count; i++) {
                     List<DSSOrchestratorVersion> subHistoryList = historyOrcVersionList.subList(i * len, (Math.min((i + 1) * len, size)));
-                    LOGGER.info("update dss contextId by batch,{} batch", i + 1);
+                    LOGGER.info("update dss contextId by batch, {} batch", i + 1);
                     orchestratorMapper.batchUpdateOrcInfo(subHistoryList);
                     Thread.sleep(500);
                 }

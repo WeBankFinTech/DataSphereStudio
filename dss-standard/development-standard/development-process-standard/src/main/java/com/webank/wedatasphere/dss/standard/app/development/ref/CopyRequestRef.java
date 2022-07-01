@@ -17,5 +17,22 @@
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
 
-public interface CopyRequestRef extends WorkspaceRequestRef {
+public interface CopyRequestRef<R extends RefJobContentRequestRef<R>>
+        extends RefJobContentRequestRef<R> {
+
+    default R setNewVersion(String version) {
+        setParameter("newVersion", version);
+        return (R) this;
+    }
+
+    /**
+     * The new version comes from DSS Orchestrator framework.
+     * When the orchestrator, such as DSSWorkflow, added a new version, we hope all nodes of this workflow,
+     * can also update a new version.
+     * @return the new version of the orchestrator, such as DSSWorkflow.
+     */
+    default String getNewVersion() {
+        return (String) getParameter("newVersion");
+    }
+
 }

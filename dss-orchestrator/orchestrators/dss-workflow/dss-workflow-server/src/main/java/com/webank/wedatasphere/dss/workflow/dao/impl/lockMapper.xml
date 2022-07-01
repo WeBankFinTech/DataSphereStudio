@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.workflow.dao.LockMapper">
+
+    <sql id="flow_lock">
+        `id`,`flow_id`,`create_time`,`update_time`,`owner`,`is_expire`,`lock_content`,username
+    </sql>
+
+    <update id="compareAndSwap" parameterType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
+        update dss_workflow_edit_lock
+        <set>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isExpire != null">is_expire = #{isExpire},</if>
+        </set>
+        <where>lock_content = #{lockContent}</where>
+    </update>
+
+    <select id="getPersonalFlowEditLock" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
+        select
+        <include refid="flow_lock"/>
+        from dss_workflow_edit_lock where flow_id = #{flowID} and
+        <if test="owner != null and owner != ''">owner = #{owner} and </if>
+        is_expire = false
+    </select>
+
+    <select id="flowNotExistEditLock" resultType="java.lang.Boolean">
+        select COUNT(*) = 0 from dss_workflow_edit_lock where flow_id = #{flowID}
+        and is_expire = false and owner !=#{owner} and #{timeout} >= now() - update_time
+    </select>
+
+    <select id="getFlowEditLockByID" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
+        select
+        <include refid="flow_lock"/>
+        from dss_workflow_edit_lock where flow_id = #{flowId}
+    </select>
+
+    <select id="getFlowEditLockByLockContent" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
+        select
+        <include refid="flow_lock"/>
+        from dss_workflow_edit_lock where lock_content = #{lock_content}
+    </select>
+
+    <insert id="insertLock" useGeneratedKeys="true" keyProperty="id"
+            parameterType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock">
+        insert into dss_workflow_edit_lock(<include refid="flow_lock"/>)
+        values(#{id},#{flowID},#{createTime},#{updateTime},#{owner},#{isExpire},#{lockContent},#{username})
+    </insert>
+
+    <delete id="clearExpire">
+        delete from dss_workflow_edit_lock where  update_time &lt;= #{expireTime} or flow_id = #{flowId}
+    </delete>
+
+    <delete id="deleteALL">
+        delete from dss_workflow_edit_lock
+    </delete>
+
+</mapper>

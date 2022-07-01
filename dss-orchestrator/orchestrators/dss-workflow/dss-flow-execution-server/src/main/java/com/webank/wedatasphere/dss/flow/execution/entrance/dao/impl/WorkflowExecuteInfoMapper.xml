@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.flow.execution.entrance.dao.WorkflowExecuteInfoMapper">
+
+    <sql id="execute_info_list">
+        task_id,flow_id,version,status,failed_jobs,Pending_jobs,skipped_jobs,succeed_jobs,running_jobs,createtime
+    </sql>
+
+    <insert id="insert" parameterType="com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowExecuteInfo">
+        INSERT INTO dss_workflow_execute_info(<include refid="execute_info_list"/>)
+        VALUES
+        (#{taskId},#{flowId},#{version},#{status},#{failedJobs},#{PendingJobs},#{skippedJobs},#{succeedJobs},#{runningJobs},#{createtime})
+    </insert>
+
+    <select id="getExecuteInfoByFlowId" resultType="com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowExecuteInfo">
+        select
+        <include refid="execute_info_list"/>
+        from dss_workflow_execute_info where flow_id = #{flowId} and status = 0 order by id desc limit 1
+    </select>
+
+    <select id="getExecuteInfoByFlowIdAndVersion" resultType="com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowExecuteInfo">
+        select id,flow_id,version,succeed_jobs
+        from dss_workflow_execute_info where flow_id = #{flowId} and version = #{version} order by id desc limit 1
+    </select>
+
+    <update id="updateWorkflowExecuteInfo" parameterType="com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowExecuteInfo">
+        update dss_workflow_execute_info set task_id = #{taskId},status = #{status},
+        failed_jobs = #{failedJobs},Pending_jobs = #{PendingJobs},skipped_jobs = #{skippedJobs},
+        succeed_jobs = #{succeedJobs},running_jobs = #{runningJobs},updatetime = now() where id = #{id}
+    </update>
+
+</mapper>

@@ -1,10 +1,7 @@
 #!/bin/bash
 #
 # description:  ecm start cmd
-# @author:      peacewong
-# @created:     01.16.2021
 #
-# Modified for Linkis 1.0.0
 
 # get log directory
 cd `dirname $0`
@@ -36,9 +33,15 @@ then
   export SERVER_HEAP_SIZE="512M"
 fi
 
+DEBUG_PORT=
+if [ "$DEBUG_PORT" ];
+then
+   export DEBUG_CMD="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=$DEBUG_PORT"
+fi
+
 if test -z "$SERVER_JAVA_OPTS"
 then
-  export SERVER_JAVA_OPTS="-DserviceName=$SERVER_SUFFIX -Xmx$SERVER_HEAP_SIZE -XX:+UseG1GC -Xloggc:$SERVER_LOG_PATH/$SERVER_SUFFIX.log"
+  export SERVER_JAVA_OPTS="-DserviceName=$SERVER_SUFFIX -Xmx$SERVER_HEAP_SIZE -XX:+UseG1GC -Xloggc:$SERVER_LOG_PATH/$SERVER_SUFFIX.gc $DEBUG_CMD"
 fi
 
 export SERVER_CLASS=com.webank.wedatasphere.dss.workflow.DSSWorkflowServerApplication

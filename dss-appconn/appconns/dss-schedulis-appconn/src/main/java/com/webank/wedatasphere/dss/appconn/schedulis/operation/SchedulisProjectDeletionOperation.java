@@ -16,55 +16,50 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
-import com.webank.wedatasphere.dss.appconn.schedulis.ref.SchedulisProjectResponseRef;
-import com.webank.wedatasphere.dss.appconn.schedulis.utils.SSORequestWTSS;
-import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisExceptionUtils;
-import com.webank.wedatasphere.dss.standard.app.structure.StructureService;
+import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
+import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.standard.app.structure.AbstractStructureOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectResponseRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class SchedulisProjectDeletionOperation implements ProjectDeletionOperation {
+public class SchedulisProjectDeletionOperation
+        extends AbstractStructureOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl, ResponseRef>
+        implements ProjectDeletionOperation<RefProjectContentRequestRef.RefProjectContentRequestRefImpl> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulisProjectDeletionOperation.class);
-
-    private ProjectService schedulisProjectService;
     private String managerUrl;
 
-    public SchedulisProjectDeletionOperation(){
+    @Override
+    protected String getAppConnName() {
+        return SchedulisAppConn.SCHEDULIS_APPCONN_NAME;
     }
 
     @Override
     public void init() {
-        managerUrl = this.schedulisProjectService.getAppInstance().getBaseUrl().endsWith("/") ? this.schedulisProjectService.getAppInstance().getBaseUrl() + "manager" :
-                this.schedulisProjectService.getAppInstance().getBaseUrl() + "/manager";
+        super.init();
+        managerUrl = getBaseUrl().endsWith("/") ? getBaseUrl() + "manager" :
+                getBaseUrl() + "/manager";
     }
 
     @Override
-    public void setStructureService(StructureService service) {
-        schedulisProjectService = (ProjectService) service;
-        init();
-    }
-
-    @Override
-    public ProjectResponseRef deleteProject(ProjectRequestRef projectRef) throws ExternalOperationFailedException {
+    public ResponseRef deleteProject(RefProjectContentRequestRef.RefProjectContentRequestRefImpl projectRef) throws ExternalOperationFailedException {
         try {
-            Map<String, Object> params = new HashMap<>();
-            params.put("project", projectRef.getName());
+            Map<String, Object> params = new HashMap<>(2);
+            params.put("project", projectRef.getProjectName());
             params.put("delete", "true");
-            String responseContent =SSORequestWTSS.requestWTSSWithSSOGet(this.managerUrl,params,this.schedulisProjectService.getSSORequestService(),projectRef.getWorkspace());
-            LOGGER.info(" deleteWtssProject --response-->{}",responseContent);
+            String responseContent = SchedulisHttpUtils.getHttpGetResult(this.managerUrl, params, ssoRequestOperation, projectRef.getWorkspace());
+            logger.info("delete Schedulis Project with response: {}.", responseContent);
         } catch (Exception e){
-            SchedulisExceptionUtils.dealErrorException(60052, "failed to delete project in schedulis", e,
+            DSSExceptionUtils.dealWarnException(60052, "failed to delete project in Schedulis.", e,
                     ExternalOperationFailedException.class);
         }
-        return new SchedulisProjectResponseRef();
+        return ProjectResponseRef.newExternalBuilder().success();
     }
 
 }

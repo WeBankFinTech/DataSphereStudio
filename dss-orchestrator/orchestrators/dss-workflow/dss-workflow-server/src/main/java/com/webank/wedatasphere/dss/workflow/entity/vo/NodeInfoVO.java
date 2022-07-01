@@ -25,18 +25,12 @@ public class NodeInfoVO {
     private String image;
     //nodeType
     private String type;
-    private Integer applicationId;
-    private Boolean submitToScheduler; //是否可以提交执行
     private Boolean enableCopy;
     private Boolean shouldCreationBeforeNode;
-    private Boolean supportJump;
-    private String jumpUrl;
+    private Boolean supportJump;  // 是否支持跳转URL，即工作流节点是否支持Iframe嵌入
+    private int jumpType;  // 跳转类型：1 表示是外部节点，2 表示是 Scriptis 节点
     //name
     private String title;
-    //前台插件参数 默认false
-    private boolean editParam;
-    //前台插件参数 默认false
-    private boolean editBaseInfo;
 
     private List<NodeUiVO> nodeUiVOS;
 
@@ -72,22 +66,6 @@ public class NodeInfoVO {
         this.type = type;
     }
 
-    public Integer getApplicationId() {
-        return applicationId;
-    }
-
-    public void setApplicationId(Integer applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    public Boolean getSubmitToScheduler() {
-        return submitToScheduler;
-    }
-
-    public void setSubmitToScheduler(Boolean submitToScheduler) {
-        this.submitToScheduler = submitToScheduler;
-    }
-
     public Boolean getEnableCopy() {
         return enableCopy;
     }
@@ -112,14 +90,6 @@ public class NodeInfoVO {
         this.supportJump = supportJump;
     }
 
-    public String getJumpUrl() {
-        return jumpUrl;
-    }
-
-    public void setJumpUrl(String jumpUrl) {
-        this.jumpUrl = jumpUrl;
-    }
-
     public String getTitle() {
         return title;
     }
@@ -128,19 +98,11 @@ public class NodeInfoVO {
         this.title = title;
     }
 
-    public boolean isEditParam() {
-        return editParam;
+    public int getJumpType() {
+        return jumpType;
     }
 
-    public void setEditParam(boolean editParam) {
-        this.editParam = editParam;
-    }
-
-    public boolean isEditBaseInfo() {
-        return editBaseInfo;
-    }
-
-    public void setEditBaseInfo(boolean editBaseInfo) {
-        this.editBaseInfo = editBaseInfo;
+    public void setJumpType(int jumpType) {
+        this.jumpType = jumpType;
     }
 }

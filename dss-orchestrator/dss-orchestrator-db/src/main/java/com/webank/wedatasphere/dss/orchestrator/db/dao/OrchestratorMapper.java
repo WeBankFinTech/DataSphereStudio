@@ -123,7 +123,7 @@ public interface OrchestratorMapper {
 
     DSSOrchestratorRefOrchestration getRefOrchestrationId(@Param("orchestratorId") Long orchestratorId);
 
-    List<DSSOrchestratorVersion> getHistoryOrcVersion(@Param("version") String version);
+    List<DSSOrchestratorVersion> getHistoryOrcVersion(@Param("remainVersion") int remainVersion,String maxCreateTime);
 
     void batchUpdateOrcInfo(@Param("list") List<DSSOrchestratorVersion> historyOrcVersion);
 }

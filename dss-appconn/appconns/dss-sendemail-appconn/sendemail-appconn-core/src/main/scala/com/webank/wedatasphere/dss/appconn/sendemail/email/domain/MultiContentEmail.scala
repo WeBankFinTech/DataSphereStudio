@@ -30,4 +30,6 @@ class MultiContentEmail extends AbstractEmail {
 
   def getEmailContents: Array[EmailContent[_]] = emailContents.toIterator.toArray
 
+
+
 }

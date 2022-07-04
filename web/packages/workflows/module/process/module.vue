@@ -920,6 +920,7 @@ export default {
             return node;
           });
         }
+        this.orcVersion = json.orcVersion
       }
       return json;
     },
@@ -1400,7 +1401,8 @@ export default {
         props: this.props,
         resources: this.resources,
         scheduleParams: this.scheduleParams,
-        contextID: this.contextID
+        contextID: this.contextID,
+        orcVersion: this.orcVersion
       })));
       if (this.schedulerAppConnName !== undefined) {
         paramsJson.schedulerAppConnName = this.schedulerAppConnName

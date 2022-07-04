@@ -350,6 +350,9 @@ const action = function (url, data, option) {
       return response;
     })
     .catch(function (error) {
+      if (error && error.response && error.response.data && error.response.data.data) {
+        error.solution = error.response.data.data.solution
+      }
       const showErrMsg = function () {
         const msg = error.message || error.msg
         if (lastMsg !== msg  && msg) {

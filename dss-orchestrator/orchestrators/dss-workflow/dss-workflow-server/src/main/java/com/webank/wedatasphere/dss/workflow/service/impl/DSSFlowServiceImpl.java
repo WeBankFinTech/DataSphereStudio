@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
@@ -311,6 +312,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                 String projectName, String version, String contextIdStr,
                                 String description, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
+        if(dssFlow == null) {
+            throw new DSSErrorException(50030, "Workflow " + rootFlowId + " is not exists[工作流不存在，请检查是否已被删除].");
+        }
+        logger.info("User {} try to copy workflow {} in project {} with newVersion {} and contextId {}.", userName,
+                dssFlow.getName(), projectName, version, contextIdStr);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels);
@@ -348,7 +354,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJson = bmlService.readFlowJsonFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
-        String updateFlowJson = updateFlowContextId(flowJson, contextIdStr);
+        String updateFlowJson = updateFlowContextIdAndVersion(flowJson, contextIdStr, version);
         //重新上传工作流资源
         updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson, projectName, rootFlow);
         //上传节点的资源或调用appconn的copyRef
@@ -408,8 +414,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return dssFlow;
     }
 
-    private String updateFlowContextId(String flowJson, String contextIdStr) throws IOException {
-        return workFlowParser.updateFlowJsonWithKey(flowJson, CSCommonUtils.CONTEXT_ID_STR, contextIdStr);
+    private String updateFlowContextIdAndVersion(String flowJson, String contextIdStr, String orcVersion) throws IOException {
+        return workFlowParser.updateFlowJsonWithMap(flowJson, MapUtils.newCommonMap(CSCommonUtils.CONTEXT_ID_STR, contextIdStr,
+                DSSJobContentConstant.ORC_VERSION_KEY, orcVersion));
     }
 
     private String updateWorkFlowNodeJson(String userName, String projectName,

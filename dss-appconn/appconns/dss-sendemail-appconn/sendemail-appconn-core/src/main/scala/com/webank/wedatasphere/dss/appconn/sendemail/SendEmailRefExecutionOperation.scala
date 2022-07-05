@@ -62,7 +62,7 @@ class SendEmailRefExecutionOperation
       sendEmailAppConnHooks.foreach(_.preSend(requestRef, email))
       email
     }{ t =>
-      return putErrorMsg("解析邮件内容失败！", t)
+      return putErrorMsg(t.getMessage, t)
     }
     Utils.tryCatch {
       emailSender.send(email)

@@ -7,6 +7,7 @@ import java.util.Map;
 public class AppConnNodeUrlRequest {
 
     private Long projectID;
+    private Long flowId;
     private String nodeType;
     private Map<String, Object> params;
     private LabelRouteVO labels;
@@ -42,4 +43,13 @@ public class AppConnNodeUrlRequest {
     public void setLabels(LabelRouteVO labels) {
         this.labels = labels;
     }
+
+    public Long getFlowId() {
+        return flowId;
+    }
+
+    public void setFlowId(Long flowId) {
+        this.flowId = flowId;
+    }
+
 }

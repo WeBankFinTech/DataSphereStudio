@@ -4,7 +4,7 @@
     @click="choose"
     @mouseover="mouseover"
     @mouseout="mouseout">
-    <SvgIcon class='workbench-title-logo' :icon-class="work.logo" :color="work.color"/>
+    <SvgIcon class='workbench-title-logo' v-if="work.logo" :icon-class="work.logo" :color="work.color"/>
     <span
       v-if="!(node && index === 0)"
       :title="work.filepath || work.filename"

@@ -163,7 +163,8 @@ public class NodeRestfulApi {
         Map<String, Object> params = createExternalNodeRequest.getParams();
         String nodeId = createExternalNodeRequest.getNodeID();
 
-        logger.info("try to create a {} node for workflow {}, params is {}.", nodeType, flowId, params);
+        logger.info("User {} try to create a {} node for workflow {} in projectId {}, params is {}.",
+                userName, nodeType, flowId, projectId, params);
         CommonAppConnNode node = new CommonAppConnNode();
         node.setNodeType(nodeType);
         node.setFlowId(flowId);
@@ -209,13 +210,15 @@ public class NodeRestfulApi {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         Long projectId = updateExternalNodeRequest.getProjectID();
+        Long flowId = updateExternalNodeRequest.getFlowID();
         String nodeType = updateExternalNodeRequest.getNodeType();
         Map<String, Object> params = updateExternalNodeRequest.getParams();
-        logger.info("UpdateExternalNode request params is " + params + ", nodeType:" + nodeType);
+        logger.info("User {} try to update ExternalNode request with projectId {}, flowId {}, params is {}, nodeType: {}.",
+                userName, projectId, flowId, params, nodeType);
         CommonAppConnNode node = new CommonAppConnNode();
         node.setProjectId(projectId);
         node.setNodeType(nodeType);
-        node.setFlowId(updateExternalNodeRequest.getFlowID());
+        node.setFlowId(flowId);
         String label = updateExternalNodeRequest.getLabels().getRoute();
         node.setDssLabels(Collections.singletonList(new EnvDSSLabel(label)));
         node.setWorkspace(workspace);
@@ -230,8 +233,11 @@ public class NodeRestfulApi {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         Long projectId = updateExternalNodeRequest.getProjectID();
+        Long flowId = updateExternalNodeRequest.getFlowID();
         String nodeType = updateExternalNodeRequest.getNodeType();
         Map<String, Object> params = updateExternalNodeRequest.getParams();
+        logger.info("User {} with the workflow {} in project {} try to delete externalNode with params: {}, nodeType: {}.",
+                userName, flowId, projectId, params, nodeType);
         CommonAppConnNode node = new CommonAppConnNode();
         String label = updateExternalNodeRequest.getLabels().getRoute();
         node.setDssLabels(Collections.singletonList(new EnvDSSLabel(label)));
@@ -239,7 +245,7 @@ public class NodeRestfulApi {
         node.setProjectId(projectId);
         node.setNodeType(nodeType);
         node.setJobContent(params);
-        node.setFlowId(updateExternalNodeRequest.getFlowID());
+        node.setFlowId(flowId);
         node.setName(updateExternalNodeRequest.getName());
         workflowNodeService.deleteNode(userName, node);
         return Message.ok().data("result", node.getJobContent());
@@ -255,7 +261,8 @@ public class NodeRestfulApi {
             String nodeType = json.get("nodeType").toString();
             Long flowId = (Long) json.get("flowID");
             Map<String, Object> params = (Map<String, Object>) json.get("params");
-            logger.info("DeletepExternalNode request params is " + params + ", nodeType:" + nodeType);
+            logger.info("User {} try to delete ExternalNode with projectId {}, flowId {}, params is {}, nodeType: {}.",
+                    userName, projectId, flowId, params, nodeType);
             CommonAppConnNode node = new CommonAppConnNode();
             String label = ((Map<String, Object>) json.get("labels")).get("route").toString();
             node.setDssLabels(Collections.singletonList(new EnvDSSLabel(label)));
@@ -275,14 +282,17 @@ public class NodeRestfulApi {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         Long projectId = appConnNodeUrlRequest.getProjectID();
+        Long flowId = appConnNodeUrlRequest.getFlowId();
         String nodeType = appConnNodeUrlRequest.getNodeType();
         Map<String, Object> params = appConnNodeUrlRequest.getParams();
-        logger.info("getAppConnNodeUrl request params is " + params + ", nodeType:" + nodeType);
+        logger.info("User {} with the workflow {} in project {} try to getAppConnNodeUrl with params: {}, nodeType: {}.",
+                userName, flowId, projectId, params, nodeType);
         CommonAppConnNode node = new CommonAppConnNode();
         node.setWorkspace(workspace);
         node.setProjectId(projectId);
         node.setNodeType(nodeType);
         node.setJobContent(params);
+        node.setFlowId(flowId);
         String label = appConnNodeUrlRequest.getLabels().getRoute();
         node.setDssLabels(Collections.singletonList(new EnvDSSLabel(label)));
         String jumpUrl = workflowNodeService.getNodeJumpUrl(params, node, userName);

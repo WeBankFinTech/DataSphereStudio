@@ -240,13 +240,18 @@ export default {
           item.name
         ])
       } else {
-        return h('span', {
+        let nodeObj = {
           class: `node-name ${item.iconCls}`,
           attrs: {
-            'data-open': isOpen ? 'open' : '',
-            title: item.name
+            'data-open': isOpen ? 'open' : ''
           }
-        }, [item.name])
+        }
+        if (item.dataType === 'tb' && item.createdAt) {
+          let createdAt = new Date(item.createdAt*1000)
+          createdAt = createdAt.toLocaleDateString().replace(/\//g, "-") + " " + createdAt.toTimeString().substr(0, 8)
+          nodeObj.attrs.title = `${item.createdBy}\n${createdAt}`
+        }
+        return h('span', nodeObj, [item.name])
       }
     },
     resize() {

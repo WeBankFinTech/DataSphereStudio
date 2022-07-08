@@ -25,10 +25,11 @@ CREATE TABLE `dss_appconn_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='dss instance的实例表';
 
-
+/*
 ---------------------------------------------------------------------
 -------------------  DSS Orchestrator Framework ---------------------
 ---------------------------------------------------------------------
+*/
 
 DROP TABLE IF EXISTS `dss_orchestrator_info`;
 CREATE TABLE `dss_orchestrator_info` (
@@ -81,10 +82,11 @@ CREATE TABLE `dss_orchestrator_ref_orchestration_relation` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=326 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
-
+/*
 ---------------------------------------------------------------------
 -------------------  DSS Project Framework ---------------------
 ---------------------------------------------------------------------
+*/
 
 DROP TABLE IF EXISTS `dss_project`;
 CREATE TABLE `dss_project` (
@@ -139,9 +141,11 @@ CREATE TABLE `dss_appconn_project_relation` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
+/*
 ---------------------------------------------------------------------
 ---------------------  DSS Workspace Framework ----------------------
 ---------------------------------------------------------------------
+*/
 
 DROP TABLE IF EXISTS `dss_workspace`;
 CREATE TABLE `dss_workspace` (
@@ -304,9 +308,11 @@ CREATE TABLE `dss_workspace_download_audit`  (
 	 PRIMARY KEY (`id`)
 ) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = '文件下载审计';
 
+/*
 ---------------------------------------------------------------------
 ---------------------------  DSS Workflow ---------------------------
 ---------------------------------------------------------------------
+*/
 
 DROP TABLE IF EXISTS `dss_workflow`;
 CREATE TABLE `dss_workflow` (
@@ -558,17 +564,6 @@ CREATE TABLE `dss_workspace_menu_appconn` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
---DROP TABLE IF EXISTS `dss_workspace_user`;  -- delete this table
---CREATE TABLE `dss_workspace_user` (
---  `id` bigint(20) NOT NULL AUTO_INCREMENT,
---  `workspace_id` bigint(20) DEFAULT NULL,
---  `username` varchar(32) DEFAULT NULL,
---  `join_time` datetime DEFAULT NULL,
---  `created_by` varchar(255) DEFAULT NULL,
---  `user_id` bigint(20) DEFAULT NULL,
---  PRIMARY KEY (`id`),
---  UNIQUE KEY `workspace_id` (`workspace_id`,`username`)
---) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户表';
 
 DROP TABLE IF EXISTS `dss_workspace_user_role`;  -- use this table
 CREATE TABLE `dss_workspace_user_role` (
@@ -582,29 +577,6 @@ CREATE TABLE `dss_workspace_user_role` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
 
-
-
---DROP TABLE IF EXISTS `event_queue`;
---CREATE TABLE `event_queue` (
---  `msg_id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '消息ID号',
---  `sender` varchar(45) NOT NULL COMMENT '消息发送者',
---  `send_time` datetime NOT NULL COMMENT '消息发送时间',
---  `topic` varchar(45) NOT NULL COMMENT '消息主题',
---  `msg_name` varchar(45) NOT NULL COMMENT '消息名称',
---  `msg` varchar(250) DEFAULT NULL COMMENT '消息内容',
---  `send_ip` varchar(45) NOT NULL,
---  PRIMARY KEY (`msg_id`)
---) ENGINE=InnoDB AUTO_INCREMENT=21068 DEFAULT CHARSET=utf8 COMMENT='azkaban调取系统消息队列表';
---
---DROP TABLE IF EXISTS `event_status`;
---CREATE TABLE `event_status` (
---  `receiver` varchar(45) NOT NULL COMMENT '消息接收者',
---  `receive_time` datetime NOT NULL COMMENT '消息接收时间',
---  `topic` varchar(45) NOT NULL COMMENT '消息主题',
---  `msg_name` varchar(45) NOT NULL COMMENT '消息名称',
---  `msg_id` int(11) NOT NULL COMMENT '消息的最大消费id',
---  PRIMARY KEY (`receiver`,`topic`,`msg_name`)
---) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='消息消费状态表';
 
 DROP TABLE IF EXISTS `dss_proxy_user`;
 CREATE TABLE `dss_proxy_user` (

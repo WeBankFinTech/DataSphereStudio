@@ -29,6 +29,7 @@ class AbstractEmail extends Email {
   private var to: String = _
   private var cc: String = _
   private var bcc: String = _
+  private var emialType: String = _
 
   override def getContent: String = content
   override def setContent(content: String): Unit = this.content = content
@@ -52,4 +53,7 @@ class AbstractEmail extends Email {
 
   override def getBcc: String = bcc
   override def setBcc(bcc: String): Unit = this.bcc = bcc
+
+  override def getEmailType: String = emialType
+  override def setEmailType(emailType: String): Unit = this.emialType = emailType
 }

@@ -478,11 +478,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private DSSWorkspace getWorkspace(Supplier<DSSWorkspace> workspaceSupplier, String username) throws DSSErrorException {
         DSSWorkspace dssWorkSpace = workspaceSupplier.get();
         if (dssWorkSpace == null) {
-            throw new DSSErrorException(30022, "workspace is not exists.");
+            throw new DSSFrameworkWarnException(30022, "workspace is not exists.");
         }
         List<String> users = dssWorkspaceUserMapper.getAllWorkspaceUsers(dssWorkSpace.getId());
         if (!users.contains(username)) {
-            throw new DSSErrorException(30021, "You have no permission to access this workspace " + dssWorkSpace.getName());
+            throw new DSSFrameworkWarnException(30021, "You have no permission to access this workspace " + dssWorkSpace.getName());
         }
         String originDepartId = dssWorkSpace.getDepartment();
         if (StringUtils.isNotBlank(originDepartId)) {

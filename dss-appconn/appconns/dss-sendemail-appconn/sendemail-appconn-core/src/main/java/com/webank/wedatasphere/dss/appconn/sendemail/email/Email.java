@@ -41,4 +41,6 @@ public interface Email {
     String getBcc();
     void setBcc(String bcc);
 
+    String getEmailType();
+    void setEmailType(String emailType);
 }

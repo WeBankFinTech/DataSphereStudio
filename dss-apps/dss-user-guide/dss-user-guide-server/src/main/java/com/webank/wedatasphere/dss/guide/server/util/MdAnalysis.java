@@ -64,7 +64,7 @@ public class MdAnalysis {
             try {
                 fr.close();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                logger.error(String.valueOf(e));
             }
         }
         return sb.toString();

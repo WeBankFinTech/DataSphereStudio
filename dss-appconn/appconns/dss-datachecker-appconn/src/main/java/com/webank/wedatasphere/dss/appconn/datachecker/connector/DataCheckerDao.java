@@ -66,13 +66,9 @@ public class DataCheckerDao {
     private static DataSource bdpDS;
     private static DataCheckerDao instance;
 
-    public static DataCheckerDao getInstance() {
+    public synchronized static DataCheckerDao getInstance() {
         if (instance == null) {
-            synchronized (DataCheckerDao.class) {
-                if (instance == null) {
-                    instance = new DataCheckerDao();
-                }
-            }
+            instance = new DataCheckerDao();
         }
         return instance;
     }
@@ -250,10 +246,17 @@ public class DataCheckerDao {
             }
             partitionName = partitionName.replace("\'", "").replace("\"", "");
             tableName = tableName.split("\\{")[0];
-            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_PARTITION);
-            pstmt.setString(1, dbName);
-            pstmt.setString(2, tableName);
-            pstmt.setString(3, partitionName);
+            PreparedStatement pstmt = null;
+            try {
+                pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_PARTITION);
+                pstmt.setString(1, dbName);
+                pstmt.setString(2, tableName);
+                pstmt.setString(3, partitionName);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } finally {
+                pstmt.close();
+            }
             return pstmt;
         } else if (dataObjectArray.length == 2) {
             PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_TABLE);
@@ -280,15 +283,24 @@ public class DataCheckerDao {
             tableName = tableName.split("\\{")[0];
         }
         PreparedStatement pstmt = null;
-        if (timeScape.equals("NULL")) {
-            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
-        } else {
-            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
-            pstmt.setInt(4, Integer.valueOf(timeScape) * 3600);
+        try {
+            if (timeScape.equals("NULL")) {
+                pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
+            } else {
+                pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
+                pstmt.setInt(4, Integer.valueOf(timeScape) * 3600);
+            }
+            pstmt.setString(1, dbName);
+            pstmt.setString(2, tableName);
+            pstmt.setString(3, partitionName);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
+        } finally {
+            pstmt.close();
+            conn.close();
         }
-        pstmt.setString(1, dbName);
-        pstmt.setString(2, tableName);
-        pstmt.setString(3, partitionName);
         return pstmt;
     }
 

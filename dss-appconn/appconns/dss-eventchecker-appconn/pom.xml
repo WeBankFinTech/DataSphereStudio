@@ -34,6 +34,20 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-appconn-core</artifactId>
             <version>${dss.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-gateway-httpclient-support</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-httpclient</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -70,6 +84,7 @@
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-cs-client</artifactId>
             <version>${linkis.version}</version>
+            <scope>provided</scope>
             <exclusions>
                 <exclusion>
                     <artifactId>linkis-common</artifactId>

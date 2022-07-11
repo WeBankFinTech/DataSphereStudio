@@ -16,11 +16,14 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.email.generate
 
+import com.google.gson.internal.LinkedTreeMap
 import com.webank.wedatasphere.dss.appconn.sendemail.cs.EmailCSHelper
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
+import org.apache.commons.lang3.StringUtils
 import org.apache.linkis.storage.resultset.ResultSetFactory
 
 class MultiContentEmailGenerator extends AbstractEmailGenerator {
@@ -44,6 +47,10 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
                 case ResultSetFactory.TEXT_TYPE => throw new EmailSendFailedException(80003 ,"text result set is not allowed")//new FileEmailContent(fsPath)
               }
               multiContentEmail.addEmailContent(emailContent)
+            }
+            if (StringUtils.isBlank(multiContentEmail.getEmailType)) {
+              val emailType = refContext.fetchLinkisJob(jobId).getParams.get("labels").asInstanceOf[LinkedTreeMap[_,_]].get("codeType").toString
+              multiContentEmail.setEmailType(emailType)
             }
           }
         case "file" => throw new EmailSendFailedException(80003 ,"file content is not allowed") //addContentEmail(c => new FileEmailContent(new FsPath(c)))

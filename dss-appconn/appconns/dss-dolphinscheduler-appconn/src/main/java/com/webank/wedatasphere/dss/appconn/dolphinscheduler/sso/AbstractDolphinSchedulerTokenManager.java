@@ -39,6 +39,8 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
     protected String baseUrl;
     protected SSORequestOperation ssoRequestOperation;
 
+    private static final Object lock = new Object();
+
     @Override
     public String getBaseUrl() {
         return baseUrl;
@@ -66,7 +68,7 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
         if(userTokens.containsKey(userName)) {
             return userTokens.get(userName).getUserId();
         }
-        synchronized (userName.intern()) {
+        synchronized (lock) {
             if(userTokens.containsKey(userName)) {
                 return userTokens.get(userName).getUserId();
             }

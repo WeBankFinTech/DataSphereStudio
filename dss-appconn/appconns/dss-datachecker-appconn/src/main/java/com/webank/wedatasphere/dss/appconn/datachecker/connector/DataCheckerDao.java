@@ -250,17 +250,11 @@ public class DataCheckerDao {
             pstmt.setString(1, dbName);
             pstmt.setString(2, tableName);
             pstmt.setString(3, partitionName);
-            if(pstmt != null){
-                pstmt.close();
-            }
             return pstmt;
         } else if (dataObjectArray.length == 2) {
             PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_TABLE);
             pstmt.setString(1, dbName);
             pstmt.setString(2, tableName);
-            if(pstmt != null){
-                pstmt.close();
-            }
             return pstmt;
         } else {
             throw new SQLException("Error for  DataObject format!");
@@ -292,8 +286,6 @@ public class DataCheckerDao {
             pstmt.setString(1, dbName);
             pstmt.setString(2, tableName);
             pstmt.setString(3, partitionName);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
         } finally {

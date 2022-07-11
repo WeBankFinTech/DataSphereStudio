@@ -23,21 +23,17 @@ import java.util.Properties;
 public class EventCheckerService {
     private static EventCheckerService instance;
 
-    public static EventCheckerService getInstance() {
+    public synchronized static EventCheckerService getInstance() {
         if (instance == null) {
-            synchronized (EventCheckerService.class) {
-                if (instance == null) {
-                    instance = new EventCheckerService();
-                }
-            }
+            instance = new EventCheckerService();
         }
         return instance;
     }
 
     public boolean sendMsg(int jobId, Properties props, Logger log) {
-        if(props!=null){
-            return new EventCheckSender(props).sendMsg(jobId,props,log);
-        }else{
+        if (props != null) {
+            return new EventCheckSender(props).sendMsg(jobId, props, log);
+        } else {
             log.error("create EventCheckSender failed {}");
             return false;
         }
@@ -51,9 +47,9 @@ public class EventCheckerService {
      * when the set target is not exceeded.
      */
     public boolean reciveMsg(int jobId, Properties props, Logger log) {
-        if(props!=null){
-            return new DefaultEventcheckReceiver(props).reciveMsg(jobId,props,log);
-        }else{
+        if (props != null) {
+            return new DefaultEventcheckReceiver(props).reciveMsg(jobId, props, log);
+        } else {
             log.error("create EventCheckSender failed {}");
             return false;
         }

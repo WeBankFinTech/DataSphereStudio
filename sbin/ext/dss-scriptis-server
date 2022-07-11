@@ -15,7 +15,7 @@ if [ "$DSS_CONF_DIR" = "" ]; then
   export DSS_CONF_DIR=$DSS_HOME/conf
 fi
 
-SERVER_SUFFIX="dss-flow-execution-server"
+SERVER_SUFFIX="dss-scriptis-server"
 ## set log
 if [ "$DSS_LOG_DIR" = "" ]; then
   export DSS_LOG_DIR="$DSS_HOME/logs"
@@ -41,7 +41,7 @@ then
   export SERVER_JAVA_OPTS="-DserviceName=$SERVER_SUFFIX -Xmx$SERVER_HEAP_SIZE -XX:+UseG1GC -Xloggc:$SERVER_LOG_PATH/$SERVER_SUFFIX.gc $DEBUG_CMD"
 fi
 
-export SERVER_CLASS=com.webank.wedatasphere.dss.flow.execution.entrance.DSSFowExecutionServerApplication
+export SERVER_CLASS=com.webank.wedatasphere.dss.scriptis.DSSScriptisServerApplication
 
 ## conf dir
 export SERVER_CONF_PATH=$DSS_CONF_DIR:$DSS_CONF_DIR/$SERVER_SUFFIX
@@ -56,7 +56,7 @@ if [ ! -r "$DSS_COMMONS_LIB" ] ; then
 fi
 
 ## server lib
-export SERVER_LIB=$DSS_HOME/lib/dss-orchestrator/$SERVER_SUFFIX
+export SERVER_LIB=$DSS_HOME/lib/dss-apps/$SERVER_SUFFIX
 
 
 if [ ! -r "$SERVER_LIB" ] ; then

@@ -1,0 +1,50 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: dss-web-config
+data:
+  default.conf: |
+        server {
+            listen       8085;# 访问端口
+            server_name  localhost;
+            #charset koi8-r;
+            #access_log  /var/log/nginx/host.access.log  main;
+
+            location /dss/visualis {
+            root   /root/install_shell/dss-linkis/web; # 静态文件目录
+            autoindex on;
+            }
+
+            location /dss/linkis {
+             root   /root/install_shell/dss-linkis/web; # linkis管理台的静态文件目录
+             autoindex on;
+            }
+
+            location / {
+            root   /usr/share/nginx/html; # 静态文件目录
+            index  index.html index.html;
+            }
+
+            location /ws {
+            proxy_pass http://10.0.2.101:9001;#后端Linkis的地址
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection upgrade;
+            }
+
+            location /api {
+            proxy_pass http://10.0.2.101:9001; #后端Linkis的地址
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header x_real_ipP $remote_addr;
+            proxy_set_header remote_addr $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_http_version 1.1;
+            proxy_connect_timeout 4s;
+            proxy_read_timeout 600s;
+            proxy_send_timeout 12s;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection upgrade;
+            }
+        }
+

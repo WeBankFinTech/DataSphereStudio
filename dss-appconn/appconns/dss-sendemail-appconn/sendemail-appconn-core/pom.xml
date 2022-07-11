@@ -33,6 +33,20 @@
             <artifactId>dss-appconn-core</artifactId>
             <version>${dss.version}</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-gateway-httpclient-support</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -40,6 +54,56 @@
             <artifactId>dss-common</artifactId>
             <version>${dss.version}</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-mybatis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-cs-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-gateway-authentication</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-gateway-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-gateway-server-support</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-gateway-httpclient-support</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-instance-label-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-rpc</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-protocol</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-label-common</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -79,6 +143,7 @@
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-cs-client</artifactId>
             <version>${linkis.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

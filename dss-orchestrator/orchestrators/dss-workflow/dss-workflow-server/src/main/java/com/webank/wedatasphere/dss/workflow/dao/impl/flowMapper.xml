@@ -138,4 +138,24 @@
         select * from dss_workflow_relation where flow_id = #{flowID} and parent_flow_id = #{parentFlowID}
     </select>
 
+    <select id="selectResourcesByWorkflowIds" parameterType="java.util.List" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        select resource_id, creator from dss_workflow where id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectSubFlowIdsByFlowIds" resultMap="SubFlowInfoMap">
+        SELECT parent_flow_id ,flow_id from dss_workflow_relation where parent_flow_id in
+        <foreach collection="list" item="flowId" separator="," open="(" close=")">
+            #{flowId}
+        </foreach>
+    </select>
+
+    <resultMap type="com.webank.wedatasphere.dss.workflow.entity.vo.FlowInfoVo" id="SubFlowInfoMap">
+        <id property="parentFlowId" column="parent_flow_id"/>
+        <collection property="subFlowList" ofType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation">
+            <result property="flowID" column="flow_id"/>
+        </collection>
+    </resultMap>
 </mapper>

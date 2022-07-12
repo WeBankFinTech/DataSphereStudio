@@ -56,6 +56,10 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       workflowManager.deleteWorkflow(reqDeleteFlow.userName, reqDeleteFlow.flowID)
       new ResponseDeleteWorkflow(JobStatus.Success)
 
+    case reqDelBmlSource: RequestDeleteBmlSource =>
+      workflowManager.batchDeleteBmlResource(reqDelBmlSource.getFlowIdList)
+      new ResponseDeleteWorkflow(JobStatus.Success)
+
     case reqExportFlow: RequestExportWorkflow =>
       val dssExportFlowResource: util.Map[String, AnyRef] = workflowManager.exportWorkflow(
         reqExportFlow.userName,
@@ -101,8 +105,8 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
 
     case requestConvertOrchestrator: RequestConvertOrchestrations =>
       workflowManager.convertWorkflow(requestConvertOrchestrator)
-    case requestSubFlowContextIds : RequestSubFlowContextIds =>
-      workflowManager.getSubFlowContextIdsByFlowId(requestSubFlowContextIds)
+    case requestWorkflowIdList : RequestSubFlowContextIds =>
+      workflowManager.getSubFlowContextIdsByFlowIds(requestWorkflowIdList)
 
     case _ => throw new DSSErrorException(90000, "Not support protocol " + message)
   }

@@ -23,8 +23,6 @@ import java.util.List;
 
 public interface PreConversionRel {
 
-    List<Workflow> getWorkflows();
-
     DSSToRelConversionRequestRef getDSSToRelConversionRequestRef();
 
 }

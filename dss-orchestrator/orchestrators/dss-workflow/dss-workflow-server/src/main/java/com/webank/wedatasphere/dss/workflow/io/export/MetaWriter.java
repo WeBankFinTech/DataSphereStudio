@@ -118,7 +118,9 @@ public class MetaWriter<T> {
                 line.add(null);
             }
         }
-        table.add(reduce(line));
+        //        table.add(reduce(line));
+        //防止出现描述内容带有换行符，导致发布时导出的内容格式错乱
+        table.add(reduce(line).replaceAll("[\n\r]"," "));
     }
 
     private String reduce(List<String> strs) {
@@ -137,17 +139,6 @@ public class MetaWriter<T> {
                 .filter(n -> !ignoreFields.contains(n))
                 .collect(Collectors.toList());
         table.add(reduce(fields));
-    }
-
-    /**
-     * 驼峰转_
-     *
-     * @param str
-     * @return
-     */
-    private String unCamel(String str) {
-        // TODO: 2020/3/9
-        return null;
     }
 
     /**

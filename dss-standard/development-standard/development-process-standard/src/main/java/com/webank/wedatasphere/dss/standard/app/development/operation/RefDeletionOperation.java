@@ -16,12 +16,20 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.operation;
 
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
+import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 
-public interface RefDeletionOperation<K extends RequestRef> extends DevelopmentOperation<K, ResponseRef> {
+public interface RefDeletionOperation<K extends RefJobContentRequestRef<K>> extends DevelopmentOperation<K, ResponseRef> {
 
-    void deleteRef(K requestRef) throws ExternalOperationFailedException;
+    /**
+     * 该方法会尝试请求第三方应用工具，在 refProject 下删除第三方 AppConn 的 refJob。
+     * 如果删除成功，请返回一个带有成功标识的 {@code ResponseRef}，例如：ResponseRef.newExternalBuilder().success()；
+     * 否则请返回一个带有错误信息的 ResponseRef，例如：ResponseRef.newExternalBuilder().error("error msg.")
+     * @param requestRef 包含了第三方 refJob 信息的 requestRef
+     * @return 包含了成功或失败标识的 ResponseRef
+     * @throws ExternalOperationFailedException 删除失败时抛出该异常
+     */
+    ResponseRef deleteRef(K requestRef) throws ExternalOperationFailedException;
 
 }

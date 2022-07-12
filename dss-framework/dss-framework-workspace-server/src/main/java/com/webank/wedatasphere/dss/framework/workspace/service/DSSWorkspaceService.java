@@ -82,7 +82,7 @@ public interface DSSWorkspaceService {
 
     Long addFavorite(String username, Long workspaceId, Long menuApplicationId,String type);
 
-    Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type);
+    Long deleteFavorite(String username, Long appconnId, Long workspaceId,String type);
 
 
     boolean checkAdminByWorkspace(String username, int workspaceId);

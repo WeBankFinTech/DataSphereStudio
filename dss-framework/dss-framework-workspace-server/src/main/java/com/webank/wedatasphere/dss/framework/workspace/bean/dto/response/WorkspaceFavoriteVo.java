@@ -26,8 +26,6 @@ public class WorkspaceFavoriteVo {
 
     private String name;
 
-    private String url;
-
     private String icon;
 
     private String title;
@@ -39,6 +37,7 @@ public class WorkspaceFavoriteVo {
     public void setId(Long id) {
         this.id = id;
     }
+
     public String getName() {
         return name;
     }
@@ -53,14 +52,6 @@ public class WorkspaceFavoriteVo {
 
     public void setMenuApplicationId(Long menuApplicationId) {
         this.menuApplicationId = menuApplicationId;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public String getIcon() {
@@ -95,4 +86,5 @@ public class WorkspaceFavoriteVo {
     public int hashCode() {
         return Objects.hashCode(name);
     }
+
 }

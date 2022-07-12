@@ -33,26 +33,36 @@ import java.util.concurrent.TimeUnit;
 
 public class LinkisJobSubmit {
 
+    private static final Map<String, UJESClient> ujesClientMap = new HashMap<>();
 
+    public static UJESClient getClient() {
+        return getClient(new HashMap<>(0));
+    }
 
-    public  static UJESClient getClient(Map<String, String> props) {
-
-        UJESClient   client = getUJESClient(
-                Configuration.GATEWAY_URL().getValue(props),
-                ApiServiceConfiguration.LINKIS_ADMIN_USER.getValue(props),
-                ApiServiceConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(props),
-                props);
-
-        return client;
+    public static UJESClient getClient(Map<String, String> params) {
+        return getUJESClient(
+                Configuration.GATEWAY_URL().getValue(params),
+                ApiServiceConfiguration.LINKIS_ADMIN_USER.getValue(params),
+                ApiServiceConfiguration.LINKIS_AUTHOR_USER_TOKEN.getValue(params),
+                params);
     }
 
 
     public static UJESClient getUJESClient(String url, String user, String token, Map<String, String> jobProps){
-        return new UJESClientImpl(getClientConfig(url,user,token, jobProps));
+        String key = url + user + token;
+        if(ujesClientMap.containsKey(key)) {
+            return ujesClientMap.get(key);
+        }
+        synchronized (LinkisJobSubmit.class) {
+            if(!ujesClientMap.containsKey(key)) {
+                ujesClientMap.put(key, new UJESClientImpl(getClientConfig(url,user,token, jobProps)));
+            }
+        }
+        return ujesClientMap.get(key);
     }
 
     public static DWSClientConfig getClientConfig(String url, String user, String token, Map<String, String> jobProps){
-        DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
+        return ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(url)
                 .connectionTimeout(ApiServiceConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
                 .discoveryEnabled(false).discoveryFrequency(1, TimeUnit.MINUTES)
@@ -62,7 +72,6 @@ public class LinkisJobSubmit {
                 .setAuthenticationStrategy(new TokenAuthenticationStrategy())
                 .setAuthTokenKey(user).setAuthTokenValue(token)))
                 .setDWSVersion(ApiServiceConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
-        return clientConfig;
     }
 
 

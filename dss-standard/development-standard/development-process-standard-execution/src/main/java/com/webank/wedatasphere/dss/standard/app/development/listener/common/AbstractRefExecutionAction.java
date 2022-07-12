@@ -19,10 +19,12 @@ package com.webank.wedatasphere.dss.standard.app.development.listener.common;
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext;
 
 
-public abstract class AbstractRefExecutionAction implements RefExecutionAction {
+public abstract class AbstractRefExecutionAction implements RefExecutionAction, LongTermRefExecutionAction {
 
     private String id;
     private ExecutionRequestRefContext executionRequestRefContext;
+    private RefExecutionState state;
+    private int schedulerId;
 
     public String getId() {
         return id;
@@ -49,5 +51,23 @@ public abstract class AbstractRefExecutionAction implements RefExecutionAction {
 
     public void setExecutionRequestRefContext(ExecutionRequestRefContext executionRequestRefContext) {
         this.executionRequestRefContext = executionRequestRefContext;
+    }
+
+    public RefExecutionState getState() {
+        return state;
+    }
+
+    public void setState(RefExecutionState state) {
+        this.state = state;
+    }
+
+    @Override
+    public int getSchedulerId() {
+        return schedulerId;
+    }
+
+    @Override
+    public void setSchedulerId(int schedulerId) {
+        this.schedulerId = schedulerId;
     }
 }

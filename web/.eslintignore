@@ -1,2 +1,4 @@
 iconfont.js
+packages/dss/server/*
+packages/dss/dist/*/*
 "*.min.js"

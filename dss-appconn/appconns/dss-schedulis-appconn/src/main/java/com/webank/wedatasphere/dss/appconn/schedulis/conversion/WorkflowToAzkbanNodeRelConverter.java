@@ -26,16 +26,18 @@ import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRel;
+import com.webank.wedatasphere.dss.workflow.conversion.entity.ProjectPreConversionRel;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelConverter;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.List;
 
 
 public class WorkflowToAzkbanNodeRelConverter implements WorkflowToRelConverter {
@@ -50,7 +52,7 @@ public class WorkflowToAzkbanNodeRelConverter implements WorkflowToRelConverter 
 
     @Override
     public ConvertedRel convertToRel(PreConversionRel rel) {
-        rel.getWorkflows().forEach(this::convertNode);
+        ((ProjectPreConversionRel) rel).getWorkflows().forEach(this::convertNode);
         return (ConvertedRel) rel;
     }
 

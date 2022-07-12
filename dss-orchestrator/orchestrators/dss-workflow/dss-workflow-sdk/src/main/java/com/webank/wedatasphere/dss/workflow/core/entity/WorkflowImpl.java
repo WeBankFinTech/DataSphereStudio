@@ -19,13 +19,13 @@ package com.webank.wedatasphere.dss.workflow.core.entity;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSJsonFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.Flow;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class WorkflowImpl implements Workflow {
-
     private Long id;
     private String name;
     private String description;
@@ -39,6 +39,9 @@ public class WorkflowImpl implements Workflow {
     private List<Map<String, Object>> flowProperties;
     private DSSJsonFlow jsonFlow;
     private Workflow parentWorkflow;
+    private Long createTime;
+    private Long updateTime;
+    private String updateUser;
 
     public DSSJsonFlow getJsonFlow() {
         return jsonFlow;
@@ -98,6 +101,18 @@ public class WorkflowImpl implements Workflow {
     }
 
     public void setFlowProperties(List<Map<String, Object>> flowProperties) {
+        try{
+            if(CollectionUtils.isNotEmpty(flowProperties)){
+                flowProperties.forEach(a->{
+                    String key = "user.to.proxy";
+                    if(a.containsKey(key)){
+                        this.setUpdateUser((String)a.get(key));
+                    }
+                });
+            }
+        }catch (Exception e){
+            e.fillInStackTrace();
+        }
         this.flowProperties = flowProperties;
     }
 
@@ -161,6 +176,41 @@ public class WorkflowImpl implements Workflow {
         if(null!=children) {
             this.children = children.stream().map(f -> (WorkflowImpl) f).collect(Collectors.toList());
         }
+    }
+
+    @Override
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    @Override
+    public Long getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Long updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
     }
 
 }

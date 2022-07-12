@@ -17,12 +17,22 @@
 package com.webank.wedatasphere.dss.standard.app.structure.role;
 
 import com.webank.wedatasphere.dss.standard.app.structure.StructureOperation;
+import com.webank.wedatasphere.dss.standard.app.structure.role.ref.RefRoleContentRequestRef;
+import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 
-import java.util.Map;
+/**
+ * 请求第三方系统删除关联的第三方 refRole。
+ * @param <R>
+ */
+public interface RoleDeletionOperation<R extends RefRoleContentRequestRef<R>>
+        extends StructureOperation<R, ResponseRef> {
 
-
-public interface RoleDeletionOperation extends StructureOperation {
-
-    RoleResponseRef deleteRole(String workspaceName, Role role);
+    /**
+     * 请求第三方系统删除关联的第三方 refRole。
+     * 删除时，请基于 requestRef.getRefRoleId() 进行删除。
+     * @param requestRef 包含了 refRoleId 信息的 RequestRef
+     * @return 成功返回 ResponseRef.newExternalBuilder().success() 即可，失败请带上 error 信息
+     */
+    ResponseRef deleteRole(R requestRef);
 
 }

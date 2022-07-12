@@ -17,15 +17,12 @@
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
 
-
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 
 import java.util.List;
 
 
 public interface DSSWorkspaceUserService {
-
 
     void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator);
 
@@ -36,4 +33,10 @@ public interface DSSWorkspaceUserService {
     List<String> getAllWorkspaceUsers(int workspaceId);
 
     List<Integer> getUserWorkspaceIds(String userName);
+
+    List<String> getWorkspaceEditUsers(int workspaceId);
+
+    List<String> getWorkspaceReleaseUsers(int workspaceId);
+
+    Long getCountByUsername(String username,int workspaceId);
 }

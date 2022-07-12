@@ -17,13 +17,12 @@
 package com.webank.wedatasphere.dss.standard.app.development.operation;
 
 
-
+import com.webank.wedatasphere.dss.standard.app.development.ref.DevelopmentRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
-import com.webank.wedatasphere.dss.standard.common.entity.ref.RequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.service.Operation;
 
-public interface DevelopmentOperation<K extends RequestRef, V extends ResponseRef> extends Operation<K,V> {
+public interface DevelopmentOperation<K extends DevelopmentRequestRef<K>, V extends ResponseRef> extends Operation<K, V> {
 
     void setDevelopmentService(DevelopmentService service);
 

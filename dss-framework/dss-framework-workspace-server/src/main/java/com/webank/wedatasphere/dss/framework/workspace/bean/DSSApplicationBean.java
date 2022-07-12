@@ -20,8 +20,19 @@ package com.webank.wedatasphere.dss.framework.workspace.bean;
 public class DSSApplicationBean {
     private Integer id;
     private String name;
-    private String homepageUrl;
-    private String projectUrl;
+    private String url;
+    private String homepageUri;
+    private String label;
+
+    public DSSApplicationBean() {
+    }
+
+    public DSSApplicationBean(String name, String url, String homepageUri, String label) {
+        this.name = name;
+        this.url = url;
+        this.homepageUri = homepageUri;
+        this.label = label;
+    }
 
     public Integer getId() {
         return id;
@@ -39,19 +50,27 @@ public class DSSApplicationBean {
         this.name = name;
     }
 
-    public String getHomepageUrl() {
-        return homepageUrl;
+    public String getHomepageUri() {
+        return homepageUri;
     }
 
-    public void setHomepageUrl(String homepageUrl) {
-        this.homepageUrl = homepageUrl;
+    public void setHomepageUri(String homepageUri) {
+        this.homepageUri = homepageUri;
     }
 
-    public String getProjectUrl() {
-        return projectUrl;
+    public String getLabel() {
+        return label;
     }
 
-    public void setProjectUrl(String projectUrl) {
-        this.projectUrl = projectUrl;
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

@@ -48,6 +48,10 @@ case class ResponseExportWorkflow(resourceId: String, version: String, flowID: L
 
 case class RequestQueryWorkFlow(userName: String, rootFlowId: Long)
 
+case class ProxyUserCheckRequest(userName: String, proxyUser: String)
+
+case class ResponseProxyUserCheck(canProxy: Boolean,proxyUserList:java.util.List[String])
+
 
 
 

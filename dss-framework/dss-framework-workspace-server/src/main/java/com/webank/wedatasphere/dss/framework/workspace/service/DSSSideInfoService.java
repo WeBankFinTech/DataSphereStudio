@@ -24,5 +24,5 @@ import java.util.List;
 
 public interface DSSSideInfoService {
 
-    List<SidebarVO> getSidebarVOList(String username, Integer workspaceId,boolean isEnglish);
+    List<SidebarVO> getSidebarVOList(String username, Long workspaceId,boolean isEnglish);
 }

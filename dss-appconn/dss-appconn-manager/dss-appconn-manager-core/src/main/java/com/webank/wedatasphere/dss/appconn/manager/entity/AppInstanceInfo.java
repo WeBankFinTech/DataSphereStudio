@@ -22,9 +22,7 @@ public interface AppInstanceInfo {
 
     String getUrl();
 
-    String getHomepageUrl();
-
-    String getRedirectUrl();
+    String getHomepageUri();
 
     String getLabels();
 

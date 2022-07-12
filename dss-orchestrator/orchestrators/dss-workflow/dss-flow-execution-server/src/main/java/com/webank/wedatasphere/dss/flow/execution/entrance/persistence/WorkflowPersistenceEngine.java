@@ -64,9 +64,8 @@ public class WorkflowPersistenceEngine extends AbstractPersistenceEngine {
         RequestPersistTask requestPersistTask = FlowExecutionUtils.jobRequest2RequestPersistTask(jobRequest);
         BeanUtils.copyProperties(requestPersistTask, requestInsertTask);
         ResponsePersist responsePersist = null;
-
         try {
-            responsePersist = workflowQueryService.add(requestInsertTask);
+            responsePersist = workflowQueryService.add(requestInsertTask,jobRequest);
         } catch (Exception e) {
             throw new EntranceRPCException(20020, "sender rpc failed", e);
         }

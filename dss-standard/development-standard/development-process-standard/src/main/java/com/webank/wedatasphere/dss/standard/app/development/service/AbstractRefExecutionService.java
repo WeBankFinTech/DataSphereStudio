@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.RefExecuti
 
 public abstract class AbstractRefExecutionService extends AbstractDevelopmentService implements RefExecutionService {
 
-   public abstract RefExecutionOperation createRefExecutionOperation();
+   protected abstract RefExecutionOperation createRefExecutionOperation();
 
    @Override
    public RefExecutionOperation getRefExecutionOperation() {

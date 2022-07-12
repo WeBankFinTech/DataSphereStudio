@@ -17,17 +17,13 @@
 package com.webank.wedatasphere.dss.appconn.sendemail.hook
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.Email
-import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.AsyncExecutionRequestRef
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
 
 abstract class AbstractSendEmailRefExecutionHook extends SendEmailRefExecutionHook {
 
-  protected def getExecutionRequestRefContext(requestRef: ExecutionRequestRef): ExecutionRequestRefContext = requestRef match {
-    case async: AsyncExecutionRequestRef => async.getExecutionRequestRefContext
-    case _ => throw new EmailSendFailedException(80002, "ExecutionRequestRefContext is empty!")
-  }
+  protected def getExecutionRequestRefContext(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): ExecutionRequestRefContext =
+    requestRef.getExecutionRequestRefContext
 
-  override def preSend(requestRef: ExecutionRequestRef, email: Email): Unit = {}
+  override def preSend(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl, email: Email): Unit = {}
 }

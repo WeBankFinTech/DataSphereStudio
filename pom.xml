@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright 2019 WeBank
+  ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
+  ~  you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
   ~ http://www.apache.org/licenses/LICENSE-2.0
@@ -22,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
 
     <modules>
         <module>dss-commons</module>
@@ -31,21 +32,22 @@
         <module>dss-appconn</module>
         <module>dss-framework</module>
         <module>dss-apps/dss-apiservice-server</module>
-        <module>dss-apps/dss-datapipe-server</module>
+        <module>dss-apps/dss-scriptis-server</module>
+        <module>dss-apps/dss-user-guide</module>
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>
+        <module>plugins/dolphinscheduler</module>
     </modules>
 
     <properties>
-        <dss.version>1.0.1</dss.version>
+        <dss.version>1.1.0</dss.version>
         <linkis.version>1.1.1</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
-        <gson.version>2.9.0</gson.version>
-        <fasterxml.jackson-databind.version>2.13.3</fasterxml.jackson-databind.version>
-        <fasterxml.jackson-annotations.version>2.13.3</fasterxml.jackson-annotations.version>
+        <gson.version>2.8.5</gson.version>
+        <fasterxml.jackson.version>2.11.3</fasterxml.jackson.version>
         <org.codehaus.jackson.version>1.9.13</org.codehaus.jackson.version>
         <math3.version>3.1.1</math3.version>
         <httpclient.version>4.5.4</httpclient.version>
@@ -59,13 +61,8 @@
         <commons.math.version>3.1.1</commons.math.version>
         <commons.lang3.version>3.8.1</commons.lang3.version>
         <commons.lang.version>2.6</commons.lang.version>
-        <reflections.version>0.9.10</reflections.version>
-        <jersey-bean-validation.version>2.21</jersey-bean-validation.version>
-        <aspectj.version>1.9.5</aspectj.version>
         <xstream.version>1.4.19</xstream.version>
-        <jersey.version>2.16</jersey.version>
-        <junit.version>4.13.1</junit.version>
-        <mysql.version>5.1.49</mysql.version>
+        <jersey.version>2.30.1</jersey.version>
     </properties>
 
     <dependencyManagement>
@@ -108,7 +105,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${fasterxml.jackson-databind.version}</version>
+                <version>${fasterxml.jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
@@ -127,6 +124,19 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Releases</name>
+            <url>https://127.0.0.1/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Snapshot</name>
+            <url>https://127.0.0.1/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <pluginManagement>
@@ -215,8 +225,8 @@
                     </executions>
                     <configuration>
                         <scalaVersion>${scala.version}</scalaVersion>
-                        <recompileMode>incremental</recompileMode>
-                        <useZincServer>true</useZincServer>
+                        <recompileMode>all</recompileMode>
+<!--                        <useZincServer>true</useZincServer>-->
                     </configuration>
                 </plugin>
                 <plugin>
@@ -237,22 +247,5 @@
             </plugin>
         </plugins>
     </build>
-    <distributionManagement>
-        <repository>
-            <id>webank-releases</id>
-            <name>webank-releases</name>
-        </repository>
-        <snapshotRepository>
-            <id>webank-snapshots</id>
-            <name>webank-snapshots</name>
-        </snapshotRepository>
-    </distributionManagement>
-    <profiles>
-        <profile>
-            <id>product</id>
-            <properties>
-                <project.release.version>1.0.0-SNAPSHOT</project.release.version>
-            </properties>
-        </profile>
-    </profiles>
+
 </project>

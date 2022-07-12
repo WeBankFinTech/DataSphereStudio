@@ -26,4 +26,6 @@ public interface AppConnInfo {
 
     Resource getAppConnResource();
 
+    String getReference();
+
 }

@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.standard.common.service;
 
-import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -44,7 +44,7 @@ public class AppServiceImpl implements AppService {
             try {
                 return (Operation) methodList.get(0).invoke(this);
             } catch (ReflectiveOperationException e) {
-                throw new AppStandardWarnException(80020, "Not exists operation: " + clazzSimpleName, e);
+                throw new ExternalOperationWarnException(80020, "Not exists operation: " + clazzSimpleName, e);
             }
         } else if(methodList.isEmpty()) {
             return notFoundOperation(clazz);
@@ -54,18 +54,18 @@ public class AppServiceImpl implements AppService {
     }
 
     protected Operation notFoundOperation(Class<? extends Operation> clazz) {
-        throw new AppStandardWarnException(80020, "Not exists operation: " + clazz.getSimpleName());
+        throw new ExternalOperationWarnException(80020, "Not exists operation: " + clazz.getSimpleName());
     }
 
     protected Operation multiFoundOperation(Class<? extends Operation> clazz) {
-        throw new AppStandardWarnException(80020, "Multi exists operations: " + clazz.getSimpleName());
+        throw new ExternalOperationWarnException(80020, "Multi exists operations: " + clazz.getSimpleName());
     }
 
     @Override
     public boolean isOperationExists(Class<? extends Operation> clazz) {
         try{
             return createOperation(clazz) != null;
-        } catch (AppStandardWarnException e) {
+        } catch (ExternalOperationWarnException e) {
             return false;
         }
     }

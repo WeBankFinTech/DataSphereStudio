@@ -20,8 +20,7 @@ public class AppInstanceInfoImpl implements AppInstanceInfo {
 
     private Long id;
     private String url;
-    private String homepageUrl;
-    private String redirectUrl;
+    private String homepageUri;
     private String labels;
     private String enhanceJson;
 
@@ -44,21 +43,12 @@ public class AppInstanceInfoImpl implements AppInstanceInfo {
     }
 
     @Override
-    public String getHomepageUrl() {
-        return homepageUrl;
+    public String getHomepageUri() {
+        return homepageUri;
     }
 
-    public void setHomepageUrl(String homepageUrl) {
-        this.homepageUrl = homepageUrl;
-    }
-
-    @Override
-    public String getRedirectUrl() {
-        return redirectUrl;
-    }
-
-    public void setRedirectUrl(String redirectUrl) {
-        this.redirectUrl = redirectUrl;
+    public void setHomepageUri(String homepageUri) {
+        this.homepageUri = homepageUri;
     }
 
     @Override
@@ -77,5 +67,16 @@ public class AppInstanceInfoImpl implements AppInstanceInfo {
 
     public void setEnhanceJson(String enhanceJson) {
         this.enhanceJson = enhanceJson;
+    }
+
+    @Override
+    public String toString() {
+        return "AppInstanceInfoImpl{" +
+                "id=" + id +
+                ", url='" + url + '\'' +
+                ", homepageUrl='" + homepageUri + '\'' +
+                ", labels='" + labels + '\'' +
+                ", enhanceJson='" + enhanceJson + '\'' +
+                '}';
     }
 }

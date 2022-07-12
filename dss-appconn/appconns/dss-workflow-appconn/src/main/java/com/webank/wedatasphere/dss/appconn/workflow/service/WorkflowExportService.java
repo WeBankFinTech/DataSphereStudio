@@ -17,15 +17,12 @@
 package com.webank.wedatasphere.dss.appconn.workflow.service;
 
 import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowRefExportOperation;
-import com.webank.wedatasphere.dss.appconn.workflow.ref.WorkflowExportRequestRef;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefExportService;
 
 public class WorkflowExportService extends AbstractRefExportService {
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected RefExportOperation<WorkflowExportRequestRef> createRefExportOperation() {
+    protected WorkflowRefExportOperation createRefExportOperation() {
         return new WorkflowRefExportOperation();
     }
 

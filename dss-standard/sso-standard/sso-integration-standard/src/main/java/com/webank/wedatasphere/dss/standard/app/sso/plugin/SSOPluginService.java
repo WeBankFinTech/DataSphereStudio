@@ -20,7 +20,10 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOBuilderService;
 import com.webank.wedatasphere.dss.standard.common.service.AppService;
 import java.io.Closeable;
 
-
+/**
+ * 与 `SSOBuilderService` 对应，第三方系统在引入 DSS SSO Jar 后，
+ * 该Jar 会使用该 Service 解析第三方系统的后台 `HttpServletRequest`，获取所需的 DSS 实体信息
+ */
 public interface SSOPluginService extends AppService, Closeable {
 
     void setSSOBuilderService(SSOBuilderService ssoBuilderService);

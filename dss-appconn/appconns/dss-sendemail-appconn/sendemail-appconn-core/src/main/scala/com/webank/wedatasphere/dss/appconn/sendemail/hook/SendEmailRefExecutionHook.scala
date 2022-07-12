@@ -18,14 +18,14 @@ package com.webank.wedatasphere.dss.appconn.sendemail.hook
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.Email
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
-import com.webank.wedatasphere.dss.standard.app.development.ref.ExecutionRequestRef
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
 
 
 trait SendEmailRefExecutionHook {
 
   @throws(classOf[EmailSendFailedException])
-  def preGenerate(requestRef: ExecutionRequestRef): Unit
+  def preGenerate(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl): Unit
 
-  def preSend(requestRef: ExecutionRequestRef, email: Email): Unit
+  def preSend(requestRef: RefExecutionRequestRef.RefExecutionRequestRefImpl, email: Email): Unit
 
 }

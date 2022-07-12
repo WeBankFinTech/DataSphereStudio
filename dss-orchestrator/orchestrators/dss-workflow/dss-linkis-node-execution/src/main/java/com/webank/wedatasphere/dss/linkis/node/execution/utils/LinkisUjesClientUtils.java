@@ -17,36 +17,63 @@
 package com.webank.wedatasphere.dss.linkis.node.execution.utils;
 
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration;
+import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.linkis.common.exception.LinkisRetryException;
+import org.apache.linkis.common.utils.DefaultRetryHandler;
+import org.apache.linkis.common.utils.RetryHandler;
 import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfig;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfigBuilder;
 import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.UJESClientImpl;
 
+import java.net.ConnectException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
 public class LinkisUjesClientUtils {
 
-    public static DWSClientConfig getClientConfig(String url, String user, String token, Map<String, String> jobProps){
-        DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
+    public static DWSClientConfig getClientConfig(String url, String user, String token, Map<String, String> jobProps) {
+        return ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder()
                 .addServerUrl(url)
                 .connectionTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
                 .discoveryEnabled(false).discoveryFrequency(1, TimeUnit.MINUTES)
-                .loadbalancerEnabled(true)
-                .maxConnectionSize(5)
+                .loadbalancerEnabled(false)
+                .maxConnectionSize(LinkisJobExecutionConfiguration.MAX_HTTP_CONNECTION_COUNT.getValue())
                 .retryEnabled(false).readTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
                 .setAuthenticationStrategy(new TokenAuthenticationStrategy())
                 .setAuthTokenKey(user).setAuthTokenValue(token)))
                 .setDWSVersion(LinkisJobExecutionConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
-        return clientConfig;
     }
 
-    public static UJESClient getUJESClient(String url, String user, String token, Map<String, String> jobProps){
-        return new UJESClientImpl(getClientConfig(url,user,token, jobProps));
+    public static DWSClientConfig getClientConfig1_X(String url, String user, String token, Map<String, String> jobProps) {
+        RetryHandler retryHandler = new DefaultRetryHandler();
+        retryHandler.addRetryException(LinkisRetryException.class);
+        retryHandler.addRetryException(ConnectTimeoutException.class);
+        retryHandler.addRetryException(ConnectException.class);
+        DWSClientConfigBuilder builder = (DWSClientConfigBuilder) DWSClientConfigBuilder.newBuilder()
+                .addServerUrl(url)
+                .connectionTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
+                .maxConnectionSize(LinkisJobExecutionConfiguration.MAX_HTTP_CONNECTION_COUNT.getValue())
+                .readTimeout(LinkisJobExecutionConfiguration.LINKIS_CONNECTION_TIMEOUT.getValue(jobProps))
+                .setAuthenticationStrategy(new TokenAuthenticationStrategy())
+                .setAuthTokenKey(user).setAuthTokenValue(token)
+                .retryEnabled(true)
+                .setRetryHandler(retryHandler);
+        builder.setDWSVersion(LinkisJobExecutionConfiguration.LINKIS_API_VERSION.getValue(jobProps)).build();
+        if(LinkisJobExecutionConfiguration.LINKIS_DISCOVERY_ENABLE.getValue()) {
+            builder.discoveryEnabled(true).discoveryFrequency(10, TimeUnit.MINUTES)
+                    .loadbalancerEnabled(true);
+        }
+        return builder.build();
     }
 
-
-
+    public static UJESClient getUJESClient(String url, String user, String token, Map<String, String> jobProps) {
+        if (LinkisJobExecutionConfiguration.isLinkis1_X(jobProps)) {
+            return new UJESClientImpl(getClientConfig1_X(url, user, token, jobProps));
+        } else {
+            return new UJESClientImpl(getClientConfig(url, user, token, jobProps));
+        }
+    }
 }

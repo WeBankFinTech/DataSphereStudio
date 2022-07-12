@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreat
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
+import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 public interface DSSFrameworkProjectService {
@@ -38,4 +39,6 @@ public interface DSSFrameworkProjectService {
     DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace) throws Exception;
 
     void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
+
+    void checkProjectName(String name, Workspace workspace,String username) throws DSSProjectErrorException;
 }

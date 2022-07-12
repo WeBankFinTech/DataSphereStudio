@@ -93,7 +93,12 @@ public class ProjectInfoWorkflowToRelConverter implements WorkflowToRelConverter
             File zipFile = new File(projectZip);
             if (zipFile.exists()) {
                 LOGGER.info("exist project zip{} before publish ,now remove it", projectZip);
-                zipFile.delete();
+                boolean flag = zipFile.delete();
+                if(flag){
+                    LOGGER.info("zip file delete success!");
+                }else {
+                    LOGGER.info("zip file delete failed!");
+                }
             }
         } catch (Exception e) {
             LOGGER.error("delete project dir or zip failed,reaseon:", e);

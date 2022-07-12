@@ -451,7 +451,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    @Scheduled(cron = "${wds.dss.server.scheduling.clear.cs.cron}")
+    @Scheduled(cron = "0 0 3 * * ?")
     public void batchClearContextId() {
         LOGGER.info("--------------------{} start clear old contextId------------------------", LocalDateTime.now());
         List<String> contextIdList = new ArrayList();

@@ -16,24 +16,20 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.execution
 
-import com.webank.wedatasphere.dss.appconn.eventchecker.EventCheckerCompletedExecutionResponseRef
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.{AbstractRefExecutionAction, LongTermRefExecutionAction, RefExecutionState}
+import com.webank.wedatasphere.dss.standard.app.development.listener.common.AbstractRefExecutionAction
+import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef
 
-class EventCheckerExecutionAction extends AbstractRefExecutionAction with LongTermRefExecutionAction {
-  private[this] var _state: RefExecutionState = _
-  private var schedulerId: Int = _
+class EventCheckerExecutionAction extends AbstractRefExecutionAction {
 
-  def state: RefExecutionState = _state
+  private var response: ExecutionResponseRef = _
 
-  def setState(value: RefExecutionState): Unit = {
-    _state = value
-  }
+  def setExecutionResponseRef(response: ExecutionResponseRef): Unit =
+    this.response = response
 
+  def getExecutionResponseRef: ExecutionResponseRef = response
 
-  val response = new EventCheckerCompletedExecutionResponseRef(200)
-
-  private[this] var _saveKeyAndValue: String = null
+  private[this] var _saveKeyAndValue: String = _
 
   def saveKeyAndValue: String = _saveKeyAndValue
 
@@ -49,15 +45,11 @@ class EventCheckerExecutionAction extends AbstractRefExecutionAction with LongTe
     _eventType = value
   }
 
-  private[this] var _ec: EventChecker = null
+  private[this] var _ec: EventChecker = _
 
   def ec: EventChecker = _ec
 
   def setEc(value: EventChecker): Unit = {
     _ec = value
   }
-
-  override def setSchedulerId(schedulerId: Int): Unit = this.schedulerId = schedulerId
-
-  override def getSchedulerId: Int = schedulerId
 }

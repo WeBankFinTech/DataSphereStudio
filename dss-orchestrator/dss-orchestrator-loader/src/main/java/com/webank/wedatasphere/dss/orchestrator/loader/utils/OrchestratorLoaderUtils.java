@@ -19,13 +19,11 @@ package com.webank.wedatasphere.dss.orchestrator.loader.utils;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.NoSuchAppInstanceException;
-
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
-
 
 @Component
 public class OrchestratorLoaderUtils {
@@ -48,33 +45,22 @@ public class OrchestratorLoaderUtils {
         orchestratorLoaderUtils = this;
     }
 
-
-    public static ImmutablePair<AppInstance,DevelopmentIntegrationStandard> getOrcDevelopStandard(String userName,
-                                                                                                  String workspaceName,
-                                                                                                  DSSOrchestratorInfo dssOrchestratorInfo,
-                                                                                                  List<DSSLabel> dssLabels) throws NoSuchAppInstanceException {
-        DSSOrchestrator dssOrchestrator = orchestratorLoaderUtils.orchestratorManager.getOrCreateOrchestrator(userName,
-                workspaceName, dssOrchestratorInfo.getType(), dssOrchestratorInfo.getAppConnName(), dssLabels);
-        if (null != dssOrchestrator) {
-            AppConn orchestratorAppConn = dssOrchestrator.getAppConn();
-
-            if(orchestratorAppConn instanceof OnlyDevelopmentAppConn) {
-                DevelopmentIntegrationStandard  developmentIntegrationStandard = ((OnlyDevelopmentAppConn) orchestratorAppConn).getOrCreateDevelopmentStandard();
-
-                //todo labels判别
-                List<AppInstance> appInstance = orchestratorAppConn.getAppDesc().getAppInstancesByLabels(dssLabels);
-                if (appInstance.size() > 0 && null != developmentIntegrationStandard) {
-                   return new ImmutablePair<>(appInstance.get(0),developmentIntegrationStandard);
-
-                }else{
-                    return null;
-                }
+    public static ImmutablePair<AppInstance, DevelopmentIntegrationStandard> getOrchestratorDevelopmentStandard(
+            DSSOrchestrator dssOrchestrator, List<DSSLabel> dssLabels) throws NoSuchAppInstanceException {
+        AppConn orchestratorAppConn = dssOrchestrator.getAppConn();
+        if(orchestratorAppConn instanceof OnlyDevelopmentAppConn) {
+            DevelopmentIntegrationStandard  developmentIntegrationStandard = ((OnlyDevelopmentAppConn) orchestratorAppConn).getOrCreateDevelopmentStandard();
+            List<AppInstance> appInstance = orchestratorAppConn.getAppDesc().getAppInstancesByLabels(dssLabels);
+            if (appInstance.size() > 0 && null != developmentIntegrationStandard) {
+                return new ImmutablePair<>(appInstance.get(0), developmentIntegrationStandard);
+            } else {
+                throw new NoSuchAppInstanceException(50635, "The binding AppConn of Orchestrator " + dssOrchestrator.getName() +
+                        " has no appInstance.");
             }
         } else {
-            LOGGER.error("Can not get dssOrchestrator from manager");
-            return null;
+            throw new NoSuchAppInstanceException(50635, "The binding AppConn of Orchestrator " + dssOrchestrator.getName() +
+                    " has not implements OnlyDevelopmentAppConn.");
         }
-
-        return null;
     }
+
 }

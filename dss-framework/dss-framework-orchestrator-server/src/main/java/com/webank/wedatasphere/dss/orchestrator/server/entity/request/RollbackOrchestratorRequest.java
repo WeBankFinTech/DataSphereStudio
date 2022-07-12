@@ -49,4 +49,15 @@ public class RollbackOrchestratorRequest {
     public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
+
+    @Override
+    public String toString() {
+        return "RollbackOrchestratorRequest{" +
+                "orchestratorId=" + orchestratorId +
+                ", version='" + version + '\'' +
+                ", projectId=" + projectId +
+                ", projectName='" + projectName + '\'' +
+                ", labels=" + labels +
+                '}';
+    }
 }

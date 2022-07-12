@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.common
 
-import javax.ws.rs.core.Response
 import org.apache.linkis.common.utils.Logging
 import org.apache.linkis.server.{Message, catchIt}
 import org.aspectj.lang.ProceedingJoinPoint

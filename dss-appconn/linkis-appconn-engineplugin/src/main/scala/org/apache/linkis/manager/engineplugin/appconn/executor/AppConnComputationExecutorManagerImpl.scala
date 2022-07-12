@@ -20,6 +20,7 @@ import org.apache.linkis.engineconn.computation.executor.creation.ComputationExe
 import org.apache.linkis.manager.label.entity.Label
 
 
+
 class AppConnComputationExecutorManagerImpl extends ComputationExecutorManagerImpl {
 
   override protected def getLabelKey(labels: Array[Label[_]]): String = "appconn"

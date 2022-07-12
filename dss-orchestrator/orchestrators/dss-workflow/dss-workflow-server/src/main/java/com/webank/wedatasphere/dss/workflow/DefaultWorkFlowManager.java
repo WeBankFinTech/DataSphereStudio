@@ -255,11 +255,16 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public ResponseSubFlowContextIds getSubFlowContextIdsByFlowId(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException {
-        List<String> contextIdList = flowService.getSubFlowContextIdsByFlowId(requestSubFlowContextIds.getFlowId());
+    public ResponseSubFlowContextIds getSubFlowContextIdsByFlowIds(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException {
+        List<String> contextIdList = flowService.getSubFlowContextIdsByFlowIds(requestSubFlowContextIds.getFlowIdList());
         ResponseSubFlowContextIds responseSubFlowContextIds = new ResponseSubFlowContextIds();
         responseSubFlowContextIds.setContextIdList(contextIdList);
         return responseSubFlowContextIds;
+    }
+
+    @Override
+    public void batchDeleteBmlResource(List<Long> flowIdList) {
+        flowService.batchDeleteBmlResource(flowIdList);
     }
 
     private ResponseOperateOrchestrator convert(RequestConvertOrchestrations requestConversionWorkflow,

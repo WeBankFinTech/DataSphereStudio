@@ -45,6 +45,7 @@ import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
+import com.webank.wedatasphere.dss.workflow.entity.vo.FlowInfoVo;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
@@ -191,30 +192,30 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public List<String> getSubFlowContextIdsByFlowId(Long flowId) throws ErrorException {
+    public List<String> getSubFlowContextIdsByFlowIds(List<Long> flowIdList) throws ErrorException {
         ArrayList<String> contextIdList = new ArrayList<>();
-        // 1.查询是否有子工作流
-        List<Long> subFlowIdList = getSubFlowIdsByFlowId(flowId);
-        if (subFlowIdList == null || subFlowIdList.isEmpty()) {
+        // 查出工作流的父子关系
+        List<FlowInfoVo> flowInfoVoList = flowMapper.selectSubFlowIdsByFlowIds(flowIdList);
+        if (flowInfoVoList == null || flowInfoVoList.isEmpty()) {
             return contextIdList;
         }
-        //2.获取子工作流 contextId
+        // 获取子工作流 contextId
         JsonToFlowParser jsonToFlowParser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
-        for (Long subFlowId : subFlowIdList) {
-            DSSFlow dssFlow = getFlow(subFlowId);
-            Workflow workflow = jsonToFlowParser.parse(dssFlow);
-            String contextIDStr = ((WorkflowWithContextImpl) workflow).getContextID();
-            if (StringUtils.isNotBlank(contextIDStr)) {
-                // 获取需要清理的contextId
-                contextIdList.add(SerializeHelper.deserializeContextID(contextIDStr).getContextId());
+        for (FlowInfoVo flowInfoVo : flowInfoVoList) {
+            List<DSSFlowRelation> subFlowList = flowInfoVo.getSubFlowList();
+            if (subFlowList != null && subFlowList.size() > 0) {
+                for (DSSFlowRelation flowRelation : subFlowList) {
+                    DSSFlow dssFlow = getFlow(flowRelation.getFlowID());
+                    Workflow workflow = jsonToFlowParser.parse(dssFlow);
+                    String contextIDStr = ((WorkflowWithContextImpl) workflow).getContextID();
+                    if (StringUtils.isNotBlank(contextIDStr)) {
+                        // 获取需要清理的contextId
+                        contextIdList.add(SerializeHelper.deserializeContextID(contextIDStr).getContextId());
+                    }
+                }
             }
         }
         return contextIdList;
-    }
-
-    @Override
-    public List<Long> getSubFlowIdsByFlowId(Long flowId) {
-        return flowMapper.selectSubFlowIdsByFlowId(flowId);
     }
 
 
@@ -229,6 +230,25 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             throw new DSSErrorException(90003, "工作流名不能重复");
         }
     }
+
+    @Override
+    public void batchDeleteBmlResource(List<Long> flowIdList) {
+        List<Long> newFlowList = new ArrayList<>(flowIdList);
+        List<FlowInfoVo> flowInfoVos = flowMapper.selectSubFlowIdsByFlowIds(flowIdList);
+        for (FlowInfoVo flowInfoVo : flowInfoVos) {
+            List<DSSFlowRelation> subFlowList = flowInfoVo.getSubFlowList();
+            if (subFlowList != null && subFlowList.size() > 0) {
+                subFlowList.forEach(dssFlowRelation -> newFlowList.add(dssFlowRelation.getFlowID()));
+            }
+        }
+        List<DSSFlow> dssFlowList = flowMapper.selectResourcesByWorkflowIds(newFlowList);
+        if (dssFlowList != null && dssFlowList.size() > 0) {
+            for (DSSFlow dssFlow : dssFlowList) {
+                bmlService.deleteBmlResource(dssFlow.getCreator(), dssFlow.getResourceId());
+            }
+        }
+    }
+
 
     @Lock
     @Transactional(rollbackFor = DSSErrorException.class)

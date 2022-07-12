@@ -42,16 +42,18 @@ public class DssAuditController {
             sql = sql.substring(0,2000);
             dssScriptDownloadAudit.setSql(sql);
         }
+        LOGGER.info("user {} try to saveScriptDownload, params:{}", userName, dssScriptDownloadAudit);
         dssScriptDownloadService.save(dssScriptDownloadAudit);
         Message message = Message.ok();
         return message;
     }
 
-
     @RequestMapping(path = "script/download/query", method = RequestMethod.GET)
-    public Message getScriptDownload(@RequestParam(required = false) String userName,@RequestParam(required = false) String startTime,@RequestParam(required = false) String endTime,@RequestParam Integer pn) {
+    public Message getScriptDownload(@RequestParam(required = false) String userName, @RequestParam(required = false) String startTime,
+                                     @RequestParam(required = false) String endTime, @RequestParam Integer pn) {
         PageHelper.startPage(pn, 10, true);
-        List<DssScriptDownloadAudit> userPage = dssScriptDownloadService.getDownloadAuditList(userName,startTime,endTime);
+        LOGGER.info("user {} try to queryScriptDownload, startTime:{}, endTime:{}, page:{}", userName, startTime, endTime, pn);
+        List<DssScriptDownloadAudit> userPage = dssScriptDownloadService.getDownloadAuditList(userName, startTime, endTime);
         PageInfo<DssScriptDownloadAudit> pageInfo = new PageInfo<>(userPage);
         Message message = Message.ok().data("data", pageInfo);
         return message;

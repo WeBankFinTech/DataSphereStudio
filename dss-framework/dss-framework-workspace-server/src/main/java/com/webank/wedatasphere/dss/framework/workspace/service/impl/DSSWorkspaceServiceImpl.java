@@ -625,9 +625,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public Long deleteFavorite(String username, Long applicationId, Long workspaceId, String type) {
-        workspaceMapper.deleteFavorite(username, applicationId, workspaceId, type);
-        return applicationId;
+    public Long deleteFavorite(String username, Long appconnId, Long workspaceId, String type) {
+        workspaceMapper.deleteFavorite(username, appconnId, workspaceId, type);
+        return appconnId;
     }
 
 

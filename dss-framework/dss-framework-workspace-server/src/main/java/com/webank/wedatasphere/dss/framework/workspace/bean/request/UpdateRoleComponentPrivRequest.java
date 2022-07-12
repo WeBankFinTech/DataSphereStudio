@@ -1,6 +1,5 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean.request;
 
-import org.codehaus.jackson.JsonNode;
 
 import java.io.Serializable;
 import java.util.Map;

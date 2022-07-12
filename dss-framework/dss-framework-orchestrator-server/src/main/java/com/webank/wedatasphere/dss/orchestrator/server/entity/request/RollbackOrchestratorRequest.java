@@ -3,13 +3,13 @@ package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 
 public class RollbackOrchestratorRequest {
-
     private Long orchestratorId;
     private String version;
     private Long projectId;
     private String projectName;
 
     private LabelRouteVO labels;
+
     public Long getOrchestratorId() {
         return orchestratorId;
     }

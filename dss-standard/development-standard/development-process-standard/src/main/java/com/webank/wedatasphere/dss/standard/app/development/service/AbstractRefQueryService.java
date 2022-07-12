@@ -16,15 +16,25 @@
 
 package com.webank.wedatasphere.dss.standard.app.development.service;
 
+import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryJumpUrlOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefQueryOperation;
 
 
 public abstract class AbstractRefQueryService extends AbstractDevelopmentService implements RefQueryService {
 
-    protected abstract RefQueryOperation createRefQueryOperation();
+    protected abstract RefQueryJumpUrlOperation createRefQueryOperation();
 
     @Override
-    public RefQueryOperation getRefQueryOperation() {
-        return getOrCreate(this::createRefQueryOperation, RefQueryOperation.class);
+    public RefQueryJumpUrlOperation getRefQueryOperation() {
+        return getOrCreate(this::createRefQueryOperation, RefQueryJumpUrlOperation.class);
+    }
+
+    @Override
+    public RefQueryOperation getExtraRefQueryOperation(Class<RefQueryOperation> clazz) {
+        return getOrCreate(() -> createExtraRefQueryOperation(clazz), clazz);
+    }
+
+    protected RefQueryOperation createExtraRefQueryOperation(Class<RefQueryOperation> clazz) {
+        return null;
     }
 }

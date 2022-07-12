@@ -16,21 +16,20 @@
 
 package com.webank.wedatasphere.dss.workflow.entity;
 
-import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 
 public class DSSFlowImportParam {
 
-    String workspaceName;
-    Long projectID;
-    String projectName;
-    String version;
-    String orcVersion;
-    //TODO 目前只支持一个rootflow导入，只带了一个ContextID
-    String contextId;
-    IOEnv sourceEnv;
-    Workspace workspace;
+    private Long projectID;
+    private String projectName;
+    private String orcVersion;
+    /**
+     * 目前只支持一个rootflow导入，只带了一个ContextID
+      */
+    private String contextId;
+    private Workspace workspace;
+    private String userName;
 
     public String getUserName() {
         return userName;
@@ -38,16 +37,6 @@ public class DSSFlowImportParam {
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    String userName;
-
-    public String getWorkspaceName() {
-        return workspaceName;
-    }
-
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
     }
 
     public Long getProjectID() {
@@ -66,28 +55,12 @@ public class DSSFlowImportParam {
         this.projectName = projectName;
     }
 
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
     public String getOrcVersion() {
         return orcVersion;
     }
 
     public void setOrcVersion(String orcVersion) {
         this.orcVersion = orcVersion;
-    }
-
-    public IOEnv getSourceEnv() {
-        return sourceEnv;
-    }
-
-    public void setSourceEnv(IOEnv sourceEnv) {
-        this.sourceEnv = sourceEnv;
     }
 
     public Workspace getWorkspace() {

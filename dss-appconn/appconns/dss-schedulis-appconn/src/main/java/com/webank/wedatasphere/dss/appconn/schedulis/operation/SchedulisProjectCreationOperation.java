@@ -71,7 +71,7 @@ public class SchedulisProjectCreationOperation
         params.put("description", requestRef.getDSSProject().getDescription());
         try {
             String entStr = SchedulisHttpUtils.getHttpPostResult(projectUrl, params, ssoRequestOperation, requestRef.getWorkspace());
-            logger.error("新建工程 {}, Schedulis 返回的信息是 {}.", requestRef.getName(), entStr);
+            logger.info("新建工程 {}, Schedulis 返回的信息是 {}.", requestRef.getDSSProject().getName(), entStr);
             String message = AzkabanUtils.handleAzkabanEntity(entStr);
             if (!"success".equals(message)) {
                 throw new ExternalOperationFailedException(90008, "Schedulis 新建工程失败, 原因: " + message);

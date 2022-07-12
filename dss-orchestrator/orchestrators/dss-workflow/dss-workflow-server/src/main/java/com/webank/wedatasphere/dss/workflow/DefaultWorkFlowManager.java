@@ -177,7 +177,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                               String projectName, Workspace workspace,
                                               List<DSSLabel> dssLabels) throws Exception {
         DSSFlow dssFlow = flowService.getFlowByID(flowId);
-        String exportPath = workFlowExportService.exportFlowInfo(dssProjectId, projectName, flowId, userName, workspace,dssLabels);
+        String exportPath = workFlowExportService.exportFlowInfo(dssProjectId, projectName, flowId, userName, workspace, dssLabels);
         InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
         return bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
     }
@@ -255,11 +255,16 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public ResponseSubFlowContextIds getSubFlowContextIdsByFlowId(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException {
-        List<String> contextIdList = flowService.getSubFlowContextIdsByFlowId(requestSubFlowContextIds.getFlowId());
+    public ResponseSubFlowContextIds getSubFlowContextIdsByFlowIds(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException {
+        List<String> contextIdList = flowService.getSubFlowContextIdsByFlowIds(requestSubFlowContextIds.getFlowIdList());
         ResponseSubFlowContextIds responseSubFlowContextIds = new ResponseSubFlowContextIds();
         responseSubFlowContextIds.setContextIdList(contextIdList);
         return responseSubFlowContextIds;
+    }
+
+    @Override
+    public void batchDeleteBmlResource(List<Long> flowIdList) {
+        flowService.batchDeleteBmlResource(flowIdList);
     }
 
     private ResponseOperateOrchestrator convert(RequestConvertOrchestrations requestConversionWorkflow,

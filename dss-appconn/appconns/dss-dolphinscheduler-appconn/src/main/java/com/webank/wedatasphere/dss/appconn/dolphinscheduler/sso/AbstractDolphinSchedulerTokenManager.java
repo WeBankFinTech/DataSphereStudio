@@ -39,6 +39,10 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
     protected String baseUrl;
     protected SSORequestOperation ssoRequestOperation;
 
+    private static final Object lock_1 = new Object();
+
+    private static final Object lock_2 = new Object();
+
     @Override
     public String getBaseUrl() {
         return baseUrl;
@@ -66,7 +70,7 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
         if(userTokens.containsKey(userName)) {
             return userTokens.get(userName).getUserId();
         }
-        synchronized (userName.intern()) {
+        synchronized (lock_1) {
             if(userTokens.containsKey(userName)) {
                 return userTokens.get(userName).getUserId();
             }
@@ -107,7 +111,7 @@ public abstract class AbstractDolphinSchedulerTokenManager implements DolphinSch
         }
         DolphinSchedulerAccessToken userToken = null;
         Integer userId;
-        synchronized (userName.intern()) {
+        synchronized (lock_2) {
             userId = fetchUserId(userName);
             if(userId == null) {
                 // 用户不存在，创建该用户

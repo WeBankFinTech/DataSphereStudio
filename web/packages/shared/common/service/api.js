@@ -193,7 +193,12 @@ const success = function (response) {
       throw new Error('token失效，请重新进入之前页面!');
     }
     if (util.isString(response.data) && response.data) {
-      data = JSON.parse(response.data);
+      try {
+        data = JSON.parse(response.data);
+      } catch (e) {
+        console.log(e, response.data)
+        throw new Error(API_ERR_MSG);
+      }
     } else if (util.isObject(response.data)) {
       // 兼容ds blob流下载
       if (response.status === 200 && !response.data.data && !response.data.msg && response.data.code != api.constructionOfResponse.successCode) {
@@ -268,7 +273,12 @@ const fail = function (error) {
     if (response && response.data) {
       let data;
       if (util.isString(response.data) && response.data) {
-        data = JSON.parse(response.data);
+        try {
+          data = JSON.parse(response.data);
+        } catch (e) {
+          //
+        }
+
       } else if (util.isObject(response.data)) {
         data = response.data;
       }
@@ -340,6 +350,9 @@ const action = function (url, data, option) {
       return response;
     })
     .catch(function (error) {
+      if (error && error.response && error.response.data && error.response.data.data) {
+        error.solution = error.response.data.data.solution
+      }
       const showErrMsg = function () {
         const msg = error.message || error.msg
         if (lastMsg !== msg  && msg) {
@@ -380,10 +393,16 @@ const action = function (url, data, option) {
                         window.open(error.solution.solutionUrl, '_blank')
                       } else if(error.response) {
                         // 上报
+                        let requestBody = error.response.config.data
+                        try {
+                          requestBody = typeof error.response.config.data === 'string' ? JSON.parse(error.response.config.data) : error.response.config.data
+                        } catch (e) {
+                          //
+                        }
                         action('/dss/guide/solution/reportProblem', {
                           requestUrl: error.response.config.url,
                           queryParams: error.response.config.params,
-                          requestBody: typeof error.response.config.data === 'string' ? JSON.parse(error.response.config.data) : error.response.config.data,
+                          requestBody,
                           requestHeaders: { Cookie: document.cookie, ...error.response.config.headers },
                           responseBody: error.response.data
                         }).then(()=>{

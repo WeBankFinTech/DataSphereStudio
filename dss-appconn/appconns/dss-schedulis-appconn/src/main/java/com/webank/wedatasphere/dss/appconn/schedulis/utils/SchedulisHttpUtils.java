@@ -56,7 +56,7 @@ public class SchedulisHttpUtils {
             return previewResult.getResponseBody();
         } else {
             logger.error("request Schedulis failed, responseBody is {}.", previewResult.getResponseBody());
-            throw new ExternalOperationFailedException(50063, "request Schedulis failed.");
+            throw new ExternalOperationFailedException(50063, "request Schedulis failed." + previewResult.getResponseBody());
         }
     }
 

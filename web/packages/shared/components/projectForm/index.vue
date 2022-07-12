@@ -256,14 +256,20 @@ export default {
         let username = storage.get("baseInfo", "local")
           ? storage.get("baseInfo", "local").username
           : null;
-        if (
-          (currentWorkspaceName &&
-            username &&
-            value.match(currentWorkspaceName)) ||
-          value.match(username)
-        ) {
+        // 校验是否重名
+        let repeat = false
+        if (Array.isArray(this.$parent.dataList)) {
+          repeat = this.$parent.dataList.some( item => {
+            return item.dwsProjectList && item.dwsProjectList.some(it => it.name === value)
+          })
+        }
+        if ((currentWorkspaceName && username && value.match(currentWorkspaceName)) || value.match(username)) {
           callback(
             new Error(this.$t("message.workflow.projectDetail.validateName"))
+          );
+        } else if(repeat && this.actionType === 'add') {
+          callback(
+            new Error(this.$t("message.workflow.projectDetail.nameUnrepeatable"))
           );
         } else {
           callback();

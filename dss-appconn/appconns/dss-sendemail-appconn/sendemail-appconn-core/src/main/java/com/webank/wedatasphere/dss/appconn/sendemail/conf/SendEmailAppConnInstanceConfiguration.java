@@ -28,10 +28,12 @@ import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.HtmlEma
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.PictureEmailContentParser$;
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser.TableEmailContentParser$;
 import com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailRefExecutionHook;
-import com.webank.wedatasphere.dss.common.utils.ClassUtils;
-import java.util.List;
+import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class SendEmailAppConnInstanceConfiguration {
 
@@ -48,9 +50,14 @@ public class SendEmailAppConnInstanceConfiguration {
     private static final SendEmailRefExecutionHook[] sendEmailRefExecutionHooks = createSendEmailRefExecutionHooks();
 
     private static EmailSender createEmailSender() {
-        EmailSender emailSender = ClassUtils.getInstanceOrDefault(EmailSender.class, new SpringJavaEmailSender());
-        logger.info("Try to use {} to instance a EmailSender.", emailSender.getClass().getSimpleName());
-        return emailSender;
+        String emailSenderClassName = SendEmailAppConnConfiguration.EMAIL_SENDER_CLASS().getValue();
+        try {
+            logger.info("Use user config EmailSender by conf:{}", emailSenderClassName);
+            return (EmailSender)SendEmailAppConnInstanceConfiguration.class.getClassLoader().loadClass(emailSenderClassName).newInstance();
+        } catch (Exception e) {
+            logger.warn("{} can not be instanced, use SpringJavaEmailSender by default.", emailSenderClassName, e);
+            return new SpringJavaEmailSender();
+        }
     }
 
     private static EmailContentGenerator[] createEmailContentGenerators() {
@@ -63,9 +70,22 @@ public class SendEmailAppConnInstanceConfiguration {
     }
 
     private static SendEmailRefExecutionHook[] createSendEmailRefExecutionHooks() {
-        List<SendEmailRefExecutionHook> hooks = ClassUtils.getInstances(SendEmailRefExecutionHook.class);
-        logger.info("SendEmailRefExecutionHook list is {}.", hooks);
-        return hooks.toArray(new SendEmailRefExecutionHook[0]);
+        String hookClasses = SendEmailAppConnConfiguration.EMAIL_HOOK_CLASSES().getValue();
+        logger.info("Use email hook class: {}", hookClasses);
+        return Arrays.stream(hookClasses.split(",")).map(clazz -> {
+            SendEmailRefExecutionHook sendEmailRefExecutionHook = null;
+            try {
+                sendEmailRefExecutionHook = (SendEmailRefExecutionHook)SendEmailAppConnInstanceConfiguration.class.getClassLoader().loadClass(clazz).newInstance();
+                logger.info("Get hook class instance is : {}", sendEmailRefExecutionHook.getClass().getName());
+            } catch (InstantiationException e) {
+                logger.warn("{} can not be instanced", clazz, e);
+            } catch (IllegalAccessException e) {
+                logger.warn("{} can not be instanced", clazz, e);
+            } catch (ClassNotFoundException e) {
+                logger.warn("{} can not be instanced", clazz, e);
+            }
+            return sendEmailRefExecutionHook;
+        }).filter(hook -> null!= hook).toArray(SendEmailRefExecutionHook[]::new);
     }
 
     public static EmailSender getEmailSender() {

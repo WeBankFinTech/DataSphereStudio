@@ -16,10 +16,19 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSMenu;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.*;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomepageSettingVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.common.exception.ErrorException;
 
 import java.util.List;
@@ -28,18 +37,17 @@ import java.util.List;
 public interface DSSWorkspaceService {
 
 
-    int createWorkspace(String workspaceName, String tags, String userName, String description, String department, String productName) throws ErrorException;
+    int createWorkspace(String workspaceName, String tags, String userName, String description, String department, String productName,String workspaceType) throws ErrorException;
 
-    void addWorkspaceUser(List<Integer> roleIds, int workspaceId, String userName, String creater);
+    void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creater, String userId);
 
     List<DSSWorkspace> getWorkspaces(String userName);
 
-    DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName);
-
-    List<DSSMenu> getWorkspaceMenus(String userName, String workspaceId);
+    DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName,String moduleName) throws DSSErrorException;
 
     List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
                                                String roleName, int pageNow, int pageSize, List<Long> total);
+
 
     List<DSSWorkspaceRoleVO> getWorkspaceRoles(int workspaceId);
 
@@ -58,29 +66,28 @@ public interface DSSWorkspaceService {
     List<DSSWorkspaceUserVO> getWorkspaceUsersByRole(int workspaceId, String roleName, List<Long> totals,
                                                      int pageNow, int pageSize);
 
-    List<DSSWorkspace> getWorkspaces();
-
     Long addWorkspace(String userName, String name, String department, String label, String description);
 
     boolean existWorkspaceName(String name);
 
     List<WorkspaceDepartmentVo> getWorkSpaceDepartments();
 
-    List<HomepageDemoMenuVo> getHomepageDemos(boolean isChinese);
+    List<WorkspaceMenuVo> getWorkspaceAppConns(Long workspaceId, String username, boolean isChinese) throws DSSErrorException;
 
-    List<HomepageVideoVo> getHomepageVideos(boolean isChinese);
+    DSSWorkspace getWorkspacesById(Long id, String username) throws DSSErrorException;
 
-    List<OnestopMenuVo> getWorkspaceManagements(Long workspaceId, String username, boolean isChinese);
+    DSSWorkspace getWorkspacesByName(String workspaceName, String username) throws DSSErrorException;
 
-    List<OnestopMenuVo> getWorkspaceApplications(Long workspaceId, String username, boolean isChinese);
+    List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese,String type);
 
-    DSSWorkspace getWorkspacesById(Long id);
+    Long addFavorite(String username, Long workspaceId, Long menuApplicationId,String type);
 
-    List<WorkspaceFavoriteVo> getWorkspaceFavorites(Long workspaceId, String username, boolean isChinese);
+    Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type);
 
-    Long addFavorite(String username, Long workspaceId, Long menuApplicationId);
 
-    Long deleteFavorite(String username, Long favouritesId);
+    boolean checkAdminByWorkspace(String username, int workspaceId);
 
+    //是否为超级管理员
+    public boolean isAdminUser(Long workspaceId, String username);
 
 }

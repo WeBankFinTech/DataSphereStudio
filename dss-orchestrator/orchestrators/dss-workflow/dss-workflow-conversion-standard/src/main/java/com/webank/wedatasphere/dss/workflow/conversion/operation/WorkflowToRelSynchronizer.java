@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.conversion.operation;
 
+import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
@@ -23,10 +24,8 @@ import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 
 public interface WorkflowToRelSynchronizer {
 
-    void setAppInstance(AppInstance appInstance);
+    void setDSSToRelConversionOperation(DSSToRelConversionOperation dssToRelConversionOperation);
 
     void syncToRel(ConvertedRel convertedRel);
-
-    void setSSORequestService(SSORequestService ssoRequestService);
 
 }

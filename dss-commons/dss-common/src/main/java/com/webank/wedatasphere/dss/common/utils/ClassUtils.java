@@ -18,12 +18,13 @@ package com.webank.wedatasphere.dss.common.utils;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.reflections.Reflections;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.reflections.Reflections;
 
 public class ClassUtils {
 
@@ -52,6 +53,10 @@ public class ClassUtils {
 
     public static <T> List<T> getInstances(Class<T> clazz) {
         return CLASS_HELPER.getInstances(clazz);
+    }
+
+    public static <T> List<T> getInstances(Class<T> clazz, Predicate<Class<? extends T>> filterOp) {
+        return CLASS_HELPER.getInstances(clazz, filterOp);
     }
 
     public static <T> List<Class<? extends T>> getClasses(Class<T> clazz) {
@@ -104,9 +109,13 @@ public class ClassUtils {
         }
 
         public <T> List<T> getInstances(Class<T> clazz) {
+            return getInstances(clazz, c -> true);
+        }
+
+        public <T> List<T> getInstances(Class<T> clazz, Predicate<Class<? extends T>> filterOp) {
             return getReflections(clazz).getSubTypesOf(clazz)
-                .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c))
-                .map(DSSExceptionUtils.map(Class::newInstance)).collect(Collectors.toList());
+                    .stream().filter(c -> !org.apache.linkis.common.utils.ClassUtils.isInterfaceOrAbstract(c) && filterOp.test(c))
+                    .map(DSSExceptionUtils.map(Class::newInstance)).collect(Collectors.toList());
         }
 
         public <T> List<Class<? extends T>> getClasses(Class<T> clazz) {

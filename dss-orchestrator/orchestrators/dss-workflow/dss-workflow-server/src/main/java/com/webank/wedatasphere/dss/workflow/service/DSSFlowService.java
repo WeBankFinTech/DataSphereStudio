@@ -41,12 +41,11 @@ public interface DSSFlowService {
      */
     DSSFlow getFlow(Long flowId);
 
-    List<String> getSubFlowContextIdsByFlowId(Long flowId) throws ErrorException;
-
-    List<Long>  getSubFlowIdsByFlowId(Long flowId);
+    List<String> getSubFlowContextIdsByFlowIds(List<Long> flowIdList) throws ErrorException;
 
     void updateFlowBaseInfo(DSSFlow dssFlow) throws DSSErrorException;
 
+    void batchDeleteBmlResource(List<Long> flowIdList);
 
     void batchDeleteFlow(List<Long> flowIdlist);
 

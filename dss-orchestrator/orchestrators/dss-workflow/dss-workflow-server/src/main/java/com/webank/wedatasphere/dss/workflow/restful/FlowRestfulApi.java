@@ -232,7 +232,7 @@ public class FlowRestfulApi {
     @RequestMapping(value = "deleteFlow", method = RequestMethod.POST)
     public Message deleteFlow(HttpServletRequest req, @RequestBody DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
         Long flowID = deleteFlowRequest.getId();
-        boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure().booleanValue();
+        boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure();
         // TODO: 2019/6/13  projectVersionID的更新校验
         //state为true代表曾经发布过
         if (flowService.getFlowByID(flowID).getState() && !sure) {

@@ -31,6 +31,8 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +45,9 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 @RestController
 public class DSSWorkspaceRestful {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceRestful.class);
+
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
     @Autowired
@@ -61,6 +66,7 @@ public class DSSWorkspaceRestful {
         String description = createWorkspaceRequest.getDescription();
         String stringTags = createWorkspaceRequest.getTags();
         String productName = createWorkspaceRequest.getProductName();
+        LOGGER.info("user {} begin to createWorkspace, workSpaceName:{}, description:{}", userName, workSpaceName, description);
         int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName,"");
         return Message.ok().data("workspaceId", workspaceId).data("workspaceName",workSpaceName);
     }

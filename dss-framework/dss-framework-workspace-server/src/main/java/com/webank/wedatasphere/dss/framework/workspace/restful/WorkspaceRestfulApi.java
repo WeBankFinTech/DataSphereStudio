@@ -44,6 +44,7 @@ import java.util.Set;
 @RestController
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 public class WorkspaceRestfulApi {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkspaceRestfulApi.class);
 
     @Autowired
@@ -194,33 +195,19 @@ public class WorkspaceRestfulApi {
 //        Long menuApplicationId = json.get("menuApplicationId").getLongValue();
         Long menuApplicationId = Long.valueOf(json.get("menuApplicationId"));
         String type = json.get("type") == null ? "" : json.get("type");
+        LOGGER.info("user {} begin to addFavorite, menuApplicationId:{}, type:{}", username, menuApplicationId, type);
         Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, menuApplicationId, type);
         return Message.ok().data("favoriteId", favoriteId);
     }
 
 
-    @RequestMapping(path = "/workspaces/{workspaceId}/favorites/{applicationId}", method = RequestMethod.POST)
-    public Message deleteFavorite(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("applicationId") Long applicationId, @RequestBody Map<String, String> json) {
+    @RequestMapping(path = "/workspaces/{workspaceId}/favorites/{appconnId}", method = RequestMethod.POST)
+    public Message deleteFavorite(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("appconnId") Long appconnId, @RequestBody Map<String, String> json) {
         String username = SecurityFilter.getLoginUsername(req);
         String type = json.get("type") == null ? "" : json.get("type");
-        Long favoriteId = dssWorkspaceService.deleteFavorite(username, applicationId, workspaceId, type);
+        LOGGER.info("user {} begin to deleteFavorite, appconnId:{}, type:{}", username, appconnId, type);
+        Long favoriteId = dssWorkspaceService.deleteFavorite(username, appconnId, workspaceId, type);
         return Message.ok().data("favoriteId", favoriteId);
     }
-
-
-    @RequestMapping(path = "/workspaces/{workspaceId}/favorites/{applicationId}", method = RequestMethod.GET)
-    public Message deleteFavorite1(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("applicationId") Long applicationId, @RequestParam(value = "type", required = false) String type) {
-        String username = SecurityFilter.getLoginUsername(req);
-        Long favoriteId = dssWorkspaceService.deleteFavorite(username, applicationId, workspaceId, type);
-        return Message.ok().data("favoriteId", favoriteId);
-    }
-
-    @RequestMapping(path = "/workspaces/{workspaceId}/favorites/{favouritesId}", method = RequestMethod.DELETE)
-    public Message deleteFavorite2(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("favouritesId") Long favouritesId, @RequestParam(value = "type", required = false) String type) {
-        String username = SecurityFilter.getLoginUsername(req);
-        Long favoriteId = dssWorkspaceService.deleteFavorite(username, favouritesId, workspaceId, type);
-        return Message.ok().data("favoriteId", favoriteId);
-    }
-
 
 }

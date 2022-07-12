@@ -163,9 +163,11 @@ class BMLService extends JavaLog {
   }
 
 
+
   private def inputstremToString(inputStream: InputStream): String = {
     scala.io.Source.fromInputStream(inputStream).mkString
   }
+
 
   def createBmlProject(username: String, projectName: String, editUsers: util.List[String],
                        accessUsers: util.List[String]): Unit = {
@@ -197,6 +199,16 @@ class BMLService extends JavaLog {
       logger.info(s"attach $username and $projectName success")
     } else {
       logger.error(s"attach $username and $projectName failed")
+    }
+  }
+
+  def deleteBmlResource(username: String, resourceId: String): Unit = {
+    val client = getBmlClient(username)
+    val response = client.deleteResource(username, resourceId)
+    if (response.isSuccess) {
+      logger.info(s"delete $username bml  resource file success, resourceId: $resourceId")
+    } else {
+      logger.error(s"delete $username bml resource file failed, resourceId: $resourceId")
     }
   }
 

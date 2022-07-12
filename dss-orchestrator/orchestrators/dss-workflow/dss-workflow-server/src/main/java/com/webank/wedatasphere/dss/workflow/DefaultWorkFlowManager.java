@@ -114,7 +114,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         dssFlow.setLinkedAppConnNames(String.join(",", linkedAppConnNames));
         Map<String, String> dssLabelList = new HashMap<>(1);
         if (null != dssLabels) {
-            dssLabels.stream().map(DSSLabel::getValue).forEach(a -> {
+            dssLabels.stream().map(DSSLabel::getValue).forEach(a->{
                 dssLabelList.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, a.get(EnvDSSLabel.DSS_ENV_LABEL_KEY));
             });
         } else {
@@ -219,7 +219,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
 
     @Override
     public ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) {
-        if (requestConversionWorkflow.getOrchestrationIdMap() == null || requestConversionWorkflow.getOrchestrationIdMap().isEmpty()) {
+        if(requestConversionWorkflow.getOrchestrationIdMap() == null || requestConversionWorkflow.getOrchestrationIdMap().isEmpty()) {
             logger.info("the project {} has no workflow, the conversion by user {} is ignored.", requestConversionWorkflow.getProject().getName(),
                     requestConversionWorkflow.getUserName());
             return ResponseOperateOrchestrator.failed("No workflow found, publish is ignored.");
@@ -235,7 +235,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         List<ResponseOperateOrchestrator> responseList = new ArrayList<>();
         flows.stream().map(DSSExceptionUtils.map(flow -> {
             String schedulerAppConnName = workFlowParser.getValueWithKey(flow.getFlowJson(), DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME);
-            if (StringUtils.isBlank(schedulerAppConnName)) {
+            if(StringUtils.isBlank(schedulerAppConnName)) {
                 // 向下兼容老版本
                 schedulerAppConnName = DEFAULT_SCHEDULER_APP_CONN.getValue();
             }
@@ -246,7 +246,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             responseList.add(response);
         });
         List<ResponseOperateOrchestrator> failedResponseList = responseList.stream().filter(ResponseOperateOrchestrator::isFailed).collect(Collectors.toList());
-        if (!failedResponseList.isEmpty()) {
+        if(!failedResponseList.isEmpty()) {
             return ResponseOperateOrchestrator.failed("由于该 Project 包含指向多个调度系统的工作流，发布过程中有一部分失败了。失败部分如下："
                     + failedResponseList.stream().map(ResponseOperateOrchestrator::getMessage).collect(Collectors.joining("; ")));
         } else {
@@ -255,16 +255,11 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public ResponseSubFlowContextIds getSubFlowContextIdsByFlowIds(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException {
-        List<String> contextIdList = flowService.getSubFlowContextIdsByFlowIds(requestSubFlowContextIds.getFlowIdList());
+    public ResponseSubFlowContextIds getSubFlowContextIdsByFlowId(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException {
+        List<String> contextIdList = flowService.getSubFlowContextIdsByFlowId(requestSubFlowContextIds.getFlowId());
         ResponseSubFlowContextIds responseSubFlowContextIds = new ResponseSubFlowContextIds();
         responseSubFlowContextIds.setContextIdList(contextIdList);
         return responseSubFlowContextIds;
-    }
-
-    @Override
-    public void batchDeleteBmlResource(List<Long> flowIdList) {
-        flowService.batchDeleteBmlResource(flowIdList);
     }
 
     private ResponseOperateOrchestrator convert(RequestConvertOrchestrations requestConversionWorkflow,
@@ -282,20 +277,20 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         requestRef.setDSSProject((DSSProject) requestConversionWorkflow.getProject())
                 .setUserName(requestConversionWorkflow.getUserName())
                 .setWorkspace((Workspace) requestConversionWorkflow.getWorkspace());
-        if (requestRef instanceof ProjectToRelConversionRequestRef) {
+        if(requestRef instanceof ProjectToRelConversionRequestRef) {
             Map<String, Long> orchestrationMap = flowInfos.stream().filter(pair -> flows.contains(pair.getKey()))
                     .map(pair -> new ImmutablePair<>(pair.getKey().getName(), pair.getValue()))
                     .collect(HashMap::new, (map, pair) -> map.put(pair.getKey(), pair.getValue()), HashMap::putAll);
             ((ProjectToRelConversionRequestRef) requestRef).setDSSOrcList(flows).setRefOrchestrationId(orchestrationMap);
-        } else if (requestRef instanceof OrchestrationToRelConversionRequestRef) {
-            flowInfos.stream().filter(pair -> pair.getKey() == flows.get(0)).forEach(pair ->
+        } else if(requestRef instanceof OrchestrationToRelConversionRequestRef) {
+            flowInfos.stream().filter(pair -> pair.getKey() == flows.get(0)).forEach( pair ->
                     ((OrchestrationToRelConversionRequestRef) requestRef).setDSSOrchestration(pair.getKey())
                             .setRefOrchestrationId(pair.getValue())
             );
         }
-        try {
+        try{
             ResponseRef responseRef = operation.convert(requestRef);
-            if (responseRef.isFailed()) {
+            if(responseRef.isFailed()) {
                 logger.error("user {} convert workflow(s) {} to {} failed, Reason: {}.", requestConversionWorkflow.getUserName(),
                         convertFlowStr, schedulerAppConnName, responseRef.getErrorMsg());
                 return ResponseOperateOrchestrator.failed("workflow(s) " + convertFlowStr + " publish to " + schedulerAppConnName + "failed! Reason: "

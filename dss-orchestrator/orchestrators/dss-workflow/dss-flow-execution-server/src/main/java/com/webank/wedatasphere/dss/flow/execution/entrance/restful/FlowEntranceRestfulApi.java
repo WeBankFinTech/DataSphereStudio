@@ -81,7 +81,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
     public Message execute(HttpServletRequest req, @RequestBody Map<String, Object> json) {
         Message message = null;
 //        try{
-        logger.info("Begin to get an execID");
+        logger.info("Begin to get an execID, the request params is:{}", json);
         DSSWorkspace workspace = SSOHelper.getWorkspace(req);
         String umUser = SecurityFilter.getLoginUsername(req);
         json.put(TaskConstant.UMUSER, umUser);
@@ -135,6 +135,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
     @Override
     @RequestMapping(value = "/{id}/status",method = RequestMethod.GET)
     public Message status(@PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
+        logger.info("Begin to get status for execId:{}", id);
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job;
@@ -169,11 +170,13 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         } else {
             message = Message.error("ID The corresponding job is empty and cannot obtain the corresponding task status.(ID 对应的job为空，不能获取相应的任务状态)");
         }
+        logger.info("End to get status for execId:{}", id);
         return message;
     }
 
     @RequestMapping(path = {"/{id}/kill"},method = {RequestMethod.GET})
     public Message kill(@PathVariable("id") String id, @RequestParam(value = "taskID",required = false) Long taskID) {
+        logger.info("Begin to kill task:{}", id);
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option job;
         try {

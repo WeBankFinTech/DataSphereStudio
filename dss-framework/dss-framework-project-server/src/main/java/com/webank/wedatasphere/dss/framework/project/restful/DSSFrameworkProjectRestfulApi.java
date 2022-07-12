@@ -65,6 +65,7 @@ public class DSSFrameworkProjectRestfulApi {
     public Message getAllProjects(HttpServletRequest request, @RequestBody ProjectQueryRequest projectRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
+        LOGGER.info("user {} begin to getAllProjects, projectId:{}", username, projectRequest.getId());
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
         Message message = Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
         return message;
@@ -89,6 +90,7 @@ public class DSSFrameworkProjectRestfulApi {
         if (!releaseUsers.contains(username)) {
             releaseUsers.add(username);
         }
+        LOGGER.info("user {} begin to create project, request params:{}", username, projectCreateRequest);
         DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
         if (dssProjectVo != null) {
             return Message.ok("创建工程成功").data("project", dssProjectVo);
@@ -98,9 +100,10 @@ public class DSSFrameworkProjectRestfulApi {
     }
 
     @RequestMapping(path = "checkProjectName", method = RequestMethod.GET)
-    public Message createProject(HttpServletRequest request, @RequestParam(name = "name") String name) {
+    public Message checkProjectName(HttpServletRequest request, @RequestParam(name = "name") String name) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
+        LOGGER.info("user {} begin to checkProjectName: {}", username, name);
         try {
             dssFrameworkProjectService.checkProjectName(name,workspace,username);
         } catch (DSSProjectErrorException e) {
@@ -140,6 +143,7 @@ public class DSSFrameworkProjectRestfulApi {
         if (!releaseUsers.contains(createUsername)) {
             releaseUsers.add(createUsername);
         }
+        LOGGER.info("user {} begin to modifyProject, params:{}", username, projectModifyRequest);
         dssFrameworkProjectService.modifyProject(projectModifyRequest, dbProject, username, workspace);
         return Message.ok("修改工程成功");
     }
@@ -157,6 +161,7 @@ public class DSSFrameworkProjectRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(request);
         // 检查是否具有删除项目权限
         projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
+        LOGGER.info("user {} begin to deleteProject, params:{}", username, projectDeleteRequest);
         projectService.deleteProject(username, projectDeleteRequest, workspace);
         return Message.ok("删除工程成功");
     }

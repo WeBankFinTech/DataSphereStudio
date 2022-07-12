@@ -2,14 +2,10 @@ package com.webank.wedatasphere.dss.workflow.common.protocol;
 
 import java.util.List;
 
-/**
- * Description
- */
-
-public class RequestSubFlowContextIds {
+public class RequestDeleteBmlSource {
     private List<Long> flowIdList;
 
-    public RequestSubFlowContextIds(List<Long> flowIdList) {
+    public RequestDeleteBmlSource(List<Long> flowIdList) {
         this.flowIdList = flowIdList;
     }
 

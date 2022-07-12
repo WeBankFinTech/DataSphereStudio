@@ -35,10 +35,7 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -98,6 +95,18 @@ public class DSSFrameworkProjectRestfulApi {
         } else {
             return Message.error("创建工程失败");
         }
+    }
+
+    @RequestMapping(path = "checkProjectName", method = RequestMethod.GET)
+    public Message createProject(HttpServletRequest request, @RequestParam(name = "name") String name) {
+        String username = SecurityFilter.getLoginUsername(request);
+        Workspace workspace = SSOHelper.getWorkspace(request);
+        try {
+            dssFrameworkProjectService.checkProjectName(name,workspace,username);
+        } catch (DSSProjectErrorException e) {
+            return Message.error(e.getDesc());
+        }
+        return Message.ok("项目名检测成功");
     }
 
     /**

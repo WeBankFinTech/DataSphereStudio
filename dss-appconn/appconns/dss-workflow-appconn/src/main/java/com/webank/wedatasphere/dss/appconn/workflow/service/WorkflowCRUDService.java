@@ -16,37 +16,33 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.service;
 
-import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowTaskCopyOperation;
-import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowTaskDeletionOperation;
-import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowTaskUpdateOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreationOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
-import com.webank.wedatasphere.dss.standard.app.development.operation.RefUpdateOperation;
+import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowRefCopyOperation;
+import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowRefCreationOperation;
+import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowRefDeletionOperation;
+import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowRefUpdateOperation;
 import com.webank.wedatasphere.dss.standard.app.development.service.AbstractRefCRUDService;
-import com.webank.wedatasphere.dss.appconn.workflow.opertion.WorkflowTaskCreationOperation;
 
 
 public class WorkflowCRUDService extends AbstractRefCRUDService {
 
     @Override
-    protected RefCreationOperation createRefCreationOperation() {
-        return new WorkflowTaskCreationOperation();
+    protected WorkflowRefCreationOperation createRefCreationOperation() {
+        return new WorkflowRefCreationOperation();
     }
 
     @Override
-    protected RefCopyOperation createRefCopyOperation() {
-        return new WorkflowTaskCopyOperation();
+    protected WorkflowRefCopyOperation createRefCopyOperation() {
+        return new WorkflowRefCopyOperation();
     }
 
     @Override
-    protected RefUpdateOperation createRefUpdateOperation() {
-        return new WorkflowTaskUpdateOperation();
+    protected WorkflowRefUpdateOperation createRefUpdateOperation() {
+        return new WorkflowRefUpdateOperation();
     }
 
     @Override
-    protected RefDeletionOperation createRefDeletionOperation() {
-        return new WorkflowTaskDeletionOperation();
+    protected WorkflowRefDeletionOperation createRefDeletionOperation() {
+        return new WorkflowRefDeletionOperation();
     }
 
 }

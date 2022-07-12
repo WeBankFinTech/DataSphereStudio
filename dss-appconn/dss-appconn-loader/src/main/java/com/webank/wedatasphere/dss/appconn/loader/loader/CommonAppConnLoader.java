@@ -23,18 +23,23 @@ import com.webank.wedatasphere.dss.appconn.loader.exception.NoSuchAppConnExcepti
 import com.webank.wedatasphere.dss.appconn.loader.utils.AppConnUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.common.utils.AppStandardClassUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.conf.BDPConfiguration;
 import org.apache.linkis.common.exception.ErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Properties;
 
 public class CommonAppConnLoader implements AppConnLoader {
 
     private static final String LIB_NAME = "lib";
+    private static final String APP_CONN_PROPERTIES_NAME = "appconn.properties";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonAppConnLoader.class);
 
@@ -69,14 +74,29 @@ public class CommonAppConnLoader implements AppConnLoader {
             Thread.currentThread().setContextClassLoader(currentClassLoader);
             DSSExceptionUtils.dealErrorException(70062, fullClassName + " class not found ", e, ErrorException.class);
         }
-        if (clazz == null) {
-            Thread.currentThread().setContextClassLoader(currentClassLoader);
-            return null;
+        AppConn retAppConn = (AppConn) clazz.newInstance();
+        // 加载 appconn.properties
+        File appConnPropertiesPathUrl;
+        if (StringUtils.isNotEmpty(homePath)){
+            appConnPropertiesPathUrl = new File(homePath, APP_CONN_PROPERTIES_NAME);
         } else {
-            AppConn retAppConn = (AppConn) clazz.newInstance();
-            Thread.currentThread().setContextClassLoader(currentClassLoader);
-            LOGGER.info("AppConn is {}, retAppConn is {}.", appConnName, retAppConn.getClass().getName());
-            return retAppConn;
+            appConnPropertiesPathUrl = Paths.get(AppConnUtils.getAppConnHomePath(), appConnName, APP_CONN_PROPERTIES_NAME).toFile();
         }
+        if(appConnPropertiesPathUrl.exists() && appConnPropertiesPathUrl.isFile()) {
+            Properties properties = new Properties();
+            properties.load(FileUtils.openInputStream(appConnPropertiesPathUrl));
+            if(!properties.isEmpty()) {
+                LOGGER.info("AppConn {} try to load {}, the properties is {}.", appConnName, APP_CONN_PROPERTIES_NAME, properties);
+                properties.forEach((key, value) -> {
+                    if(key != null && StringUtils.isNotBlank((String) key) &&
+                            value != null && StringUtils.isNotBlank((String) value)) {
+                        BDPConfiguration.setIfNotExists((String) key, (String) value);
+                    }
+                });
+            }
+        }
+        Thread.currentThread().setContextClassLoader(currentClassLoader);
+        LOGGER.info("Loaded appConn {} with class {}.", appConnName, retAppConn.getClass().getName());
+        return retAppConn;
     }
 }

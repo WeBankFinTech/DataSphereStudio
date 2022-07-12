@@ -92,16 +92,8 @@ public class IoUtils {
 
     }
 
-    public static IOType readIOType(String basepath)throws IOException{
-        return IOType.valueOf(readIOProperties("type",basepath));
-    }
-
     public static void generateIOEnv(String basePath) throws IOException {
         generateIOProperties("env",getDSSServerEnv().name(),basePath);
-    }
-
-    public static IOEnv readIOEnv(String basePath) throws IOException {
-        return IOEnv.valueOf(readIOProperties("env",basePath));
     }
 
     public static IOEnv getDSSServerEnv(){

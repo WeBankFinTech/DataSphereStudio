@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.converter.standard;
 
+import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.ConversionService;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.DSSToRelConversionService;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.service.RelToOrchestratorConversionService;
@@ -23,25 +24,32 @@ import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.core.AbstractAppIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardErrorException;
+
 import java.io.IOException;
 
 
 public abstract class AbstractConversionIntegrationStandard extends AbstractAppIntegrationStandard<ConversionService, SSORequestService>
     implements ConversionIntegrationStandard {
 
-    private String appConnName;
+    private AppConn appConn;
 
     protected abstract DSSToRelConversionService createDSSToRelConversionService();
 
-    protected abstract RelToOrchestratorConversionService createRelToDSSConversionService();
+    /**
+     * 预留接口，用于支持将调度系统的工作流，转换成DSS编排
+     * @return 目前返回 null 即可
+     */
+    protected RelToOrchestratorConversionService createRelToDSSConversionService() {
+        return null;
+    }
 
     @Override
-    public DSSToRelConversionService getDSSToRelConversionService(AppInstance appInstance) {
+    public final DSSToRelConversionService getDSSToRelConversionService(AppInstance appInstance) {
         return getOrCreate(appInstance, this::createDSSToRelConversionService, DSSToRelConversionService.class);
     }
 
     @Override
-    public RelToOrchestratorConversionService getRelToDSSConversionService(AppInstance appInstance) {
+    public final RelToOrchestratorConversionService getRelToDSSConversionService(AppInstance appInstance) {
         return getOrCreate(appInstance, this::createRelToDSSConversionService, RelToOrchestratorConversionService.class);
     }
 
@@ -57,13 +65,17 @@ public abstract class AbstractConversionIntegrationStandard extends AbstractAppI
     }
 
     @Override
-    public String getAppConnName() {
-        return appConnName;
+    public AppConn getAppConn() {
+        return appConn;
+    }
+
+    public void setAppConn(AppConn appConn) {
+        this.appConn = appConn;
     }
 
     @Override
-    public void setAppConnName(String appConnName) {
-        this.appConnName = appConnName;
+    public String getAppConnName() {
+        return appConn.getAppDesc().getAppName();
     }
 
     @Override

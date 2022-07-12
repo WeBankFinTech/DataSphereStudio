@@ -90,22 +90,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     + ", project desc length is " + projectCreateRequest.getDescription().length(), DSSProjectErrorException.class);
         }
 
-        //判断工程是否存在相同的名称
-        DSSProjectDO dbProject = dssProjectService.getProjectByName(projectCreateRequest.getName());
-        if (dbProject != null) {
-            DSSExceptionUtils.dealErrorException(60022, String.format("project name %s has already been exists.", projectCreateRequest.getName()), DSSProjectErrorException.class);
-        }
-
-        List<String> appConnNameList = new ArrayList<>(1);
-        //判断已有组件是否已经存在相同的工程名称
-        try {
-            isExistSameProjectName(projectCreateRequest, workspace, appConnNameList, username);
-        } catch (Exception e) {
-            throw new DSSProjectErrorException(71000, "向第三方应用发起检查工程名是否重复失败，原因：" + ExceptionUtils.getRootCauseMessage(e), e);
-        }
-        if (!appConnNameList.isEmpty()) {
-            throw new DSSProjectErrorException(71000, String.join(", ", appConnNameList) + " 已存在相同项目名称，请重新命名!");
-        }
+        this.checkProjectName(projectCreateRequest.getName(),workspace,username);
 
         Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace, username);
         //3.保存dss_project
@@ -123,6 +108,27 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         return dssProjectVo;
     }
 
+
+    @Override
+    public void checkProjectName(String name, Workspace workspace, String username) throws DSSProjectErrorException {
+        //判断工程是否存在相同的名称
+        DSSProjectDO dbProject = dssProjectService.getProjectByName(name);
+        if (dbProject != null) {
+            DSSExceptionUtils.dealErrorException(60022, String.format("project name %s has already been exists.", name), DSSProjectErrorException.class);
+        }
+        List<String> appConnNameList = new ArrayList<>(1);
+        //判断已有组件是否已经存在相同的工程名称
+        ProjectCreateRequest projectCreateRequest = new ProjectCreateRequest();
+        projectCreateRequest.setName(name);
+        try {
+            isExistSameProjectName(projectCreateRequest, workspace, appConnNameList, username);
+        } catch (Exception e) {
+            throw new DSSProjectErrorException(71000, "向第三方应用发起检查工程名是否重复失败，原因：" + ExceptionUtils.getRootCauseMessage(e), e);
+        }
+        if (!appConnNameList.isEmpty()) {
+            throw new DSSProjectErrorException(71000, String.join(", ", appConnNameList) + " 已存在相同项目名称，请重新命名!");
+        }
+    }
 
     @Override
     public void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception {

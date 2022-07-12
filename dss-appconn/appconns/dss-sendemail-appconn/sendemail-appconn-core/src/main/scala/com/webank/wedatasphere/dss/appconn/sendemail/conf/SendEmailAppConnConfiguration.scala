@@ -25,7 +25,8 @@ object SendEmailAppConnConfiguration {
 
   val EMAIL_HOOK_CLASSES = CommonVars("wds.dss.appconn.email.hook.classes",
     "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailItsmCheckHook," +
-      "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailContentLimitHook")
+      "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailVisualisContentLimitHook," +
+      "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailTableauCheckHook")
 
   val EMAIL_IMAGE_HEIGHT = CommonVars("wds.dss.appconn.email.image.height", 500)
   val EMAIL_IMAGE_WIDTH = CommonVars("wds.dss.appconn.email.image.width", 1920)
@@ -44,4 +45,6 @@ object SendEmailAppConnConfiguration {
   val EMAIL_SMTP_SSL_ENABLED = CommonVars("wds.dss.appconn.email.smtp.ssl.enable", "true")
   val EMAIL_SMTP_TIMEOUT: CommonVars[Integer] = CommonVars("wds.dss.appconn.email.smtp.timeout", 25000)
 
+  val EMAIL_ENTITY_CLASSES = CommonVars("wds.dss.appconn.email.hook.entity.classes","com.webank.wedatasphere.dss.appconn.sendemail.hook.entity.newvisualis.NewVisualisEmailInfo," +
+    "com.webank.wedatasphere.dss.appconn.sendemail.hook.entity.visualis.VisualisEmailInfo")
 }

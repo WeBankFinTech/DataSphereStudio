@@ -2379,15 +2379,15 @@ export default {
       if (type === 'publish') {
         typeName = this.$t('message.workflow.process.publish')
       }
-      const timer = setTimeout(() => {
+      this.timer = setTimeout(() => {
         timeoutValue += 2000;
         getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
             if (res.status === 'init' || res.status === 'running') {
-              clearTimeout(timer);
+              clearTimeout(this.timer);
               this.checkResult(id, timeoutValue, type);
             } else if (res.status === 'success') {
-              clearTimeout(timer);
+              clearTimeout(this.timer);
               this.isFlowPubulish = false;
               // 如果是导出成功需要下载文件
               if (type === 'export' && res.msg) {
@@ -2408,7 +2408,7 @@ export default {
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
               this.refreshOpen(this.getBaseInfo)
             } else if (res.status === 'failed') {
-              clearTimeout(timer);
+              clearTimeout(this.timer);
               this.isFlowPubulish = false;
               this.$Modal.error({
                 title: this.$t('message.workflow.workflowFail', { name: typeName }),
@@ -2420,10 +2420,12 @@ export default {
               this.refreshOpen(this.getBaseInfo)
             }
           } else {
-            clearTimeout(timer);
+            clearTimeout(this.timer);
             this.isFlowPubulish = false;
             this.$Message.warning(this.$t('message.workflow.projectDetail.workflowRunOvertime'));
           }
+          // 扩展插件发布历史列表更新
+          eventbus.emit('get_publish_status', res)
         }).catch(()=> {
           this.isFlowPubulish = false;
           this.refreshOpen(this.getBaseInfo)
@@ -2562,19 +2564,18 @@ export default {
         }
       }
     },
-    checkLastPublish(cb) {
+    async checkLastPublish(cb) {
       const publishTaskId = this.getTaskId()
       if (publishTaskId) {
-        getPublishStatus(publishTaskId, this.getCurrentDsslabels()).then((res) => {
-          if (res.status === 'running') {
-            this.isFlowPubulish = true
-            this.checkResult(publishTaskId, 0, 'publish')
-            // 打开发布历史panel
-            if (cb) {
-              cb()
-            }
+        const res = await getPublishStatus(publishTaskId, this.getCurrentDsslabels())
+        if (res.status === 'running') {
+          this.isFlowPubulish = true
+          this.checkResult(publishTaskId, 0, 'publish')
+          // 打开发布历史panel
+          if (cb) {
+            cb()
           }
-        })
+        }
       }
     }
   }

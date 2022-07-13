@@ -220,16 +220,15 @@ export default {
       let showversionTip = false
       if (chromeVersion) {
         chromeVersion = Number(chromeVersion.split('/')[1].split('.')[0]);
-        showversionTip = chromeVersion <= 66
+        showversionTip = chromeVersion <= 66 || chromeVersion >= 80
       } else {
         showversionTip = true
       }
       if (showversionTip) {
-        this.$Message.warning({
-          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + '，': ''}为了更好地体验推荐使用Chrome 78 版本`,
-          duration: 5,
-          closable: true
-        })
+        this.$Modal.confirm({
+          title: "提示",
+          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + '，': ''}为了更好地体验推荐使用Chrome 78 版本${this.$APP_CONF.update_chrome?'，<a href="'+this.$APP_CONF.update_chrome+'">升级指引</a>':''}`
+        });
       }
     }
   },

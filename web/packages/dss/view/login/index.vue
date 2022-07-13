@@ -87,6 +87,7 @@ export default {
   mounted() {
     const workspaceId = this.getCurrentWorkspaceId()
     storage.remove('close_db_table_suggest')
+    storage.remove('chrome_version_tip')
     sessionStorage.removeItem(`work_flow_lists_${workspaceId}`)
   },
   methods: {

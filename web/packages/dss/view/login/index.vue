@@ -220,13 +220,13 @@ export default {
       let showversionTip = false
       if (chromeVersion) {
         chromeVersion = Number(chromeVersion.split('/')[1].split('.')[0]);
-        showversionTip = chromeVersion <= 88
+        showversionTip = chromeVersion <= 66
       } else {
         showversionTip = true
       }
       if (showversionTip) {
         this.$Message.warning({
-          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + ',': ''}为了更好地体验推荐使用Chrome 78 版本`,
+          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + '，': ''}为了更好地体验推荐使用Chrome 78 版本`,
           duration: 5,
           closable: true
         })

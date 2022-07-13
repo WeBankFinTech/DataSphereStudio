@@ -402,6 +402,7 @@ import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
 import moment from 'moment';
 import { getPublishStatus } from '@/workflows/service/api.js';
 import module from './index';
+import nodeIcons from './nodeicon'
 
 const extComponents = plugin.emitHook('workflow_bottom_panel') || {}
 export default {
@@ -547,25 +548,6 @@ export default {
       locked: false,
       newOrchestratorVersionId: this.orchestratorVersionId,
       extraToolbar: [],
-      // 工作流icon
-      workFlowImage: {
-        'sql': require('./images/workflow/sql.png'),
-        'python': require('./images/workflow/python.png'),
-        'pyspark': require('./images/workflow/pyspark.png'),
-        'scala': require('./images/workflow/scala.png'),
-        'hql': require('./images/workflow/hql.png'),
-        'shell': require('./images/workflow/shell.png'),
-        'display': require('./images/workflow/display.png'),
-        'dashboard': require('./images/workflow/dashboard.png'),
-        'widget': require('./images/workflow/widget.png'),
-        'mlss': require('./images/workflow/mlss.png'),
-        'eventreceiver': require('./images/workflow/eventreceiver.png'),
-        'eventsender': require('./images/workflow/eventsender.png'),
-        'datachecker': require('./images/workflow/datachecker.png'),
-        'connector': require('./images/workflow/connector.png'),
-        'subFlow': require('./images/workflow/subflow.png'),
-        'sendemail': require('./images/workflow/sendemail.png'),
-      },
       extComponents
     };
   },
@@ -932,8 +914,8 @@ export default {
           if (item.children.length > 0) {
             item.children = item.children.map((subItem) => {
               // svg绘制的点太多，导致动画卡顿，使用图片代替
-              if (this.workFlowImage[subItem.title]) {
-                subItem.image = this.workFlowImage[subItem.title];
+              if (nodeIcons[subItem.title]) {
+                subItem.image = nodeIcons[subItem.title];
               } else if (subItem.image) {
                 subItem.image = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(subItem.image)))
               }
@@ -2558,10 +2540,6 @@ export default {
       const key = `${username}-workflow-${this.orchestratorId}-taskId`;
       return key
     },
-    isCurrentOrchestrator(){
-      const username = this.getUserName();
-      return this.getTaskKey().replace(this.orchestratorId, '') ===  `${username}-workflow--taskId`;
-    },
     setTaskId(taskId) {
       const key = this.getTaskKey();
       storage.set(key, taskId);
@@ -2582,6 +2560,21 @@ export default {
             this.nodeDelete(selectNodes[0])
           }
         }
+      }
+    },
+    checkLastPublish(cb) {
+      const publishTaskId = this.getTaskId()
+      if (publishTaskId) {
+        getPublishStatus(publishTaskId, this.getCurrentDsslabels()).then((res) => {
+          if (res.status === 'running') {
+            this.isFlowPubulish = true
+            this.checkResult(publishTaskId, 0, 'publish')
+            // 打开发布历史panel
+            if (cb) {
+              cb()
+            }
+          }
+        })
       }
     }
   }

@@ -15,7 +15,7 @@
             <span class="project-nav-tree-top-t-txt">项目</span>
             <div class="project-nav-tree-top-t-icon">
               <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
-                <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;"/>
+                <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
                 <DropdownMenu slot="list">
                   <DropdownItem
                     v-for="(item) in sortTypeList"

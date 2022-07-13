@@ -87,8 +87,8 @@ export default {
   mounted() {
     const workspaceId = this.getCurrentWorkspaceId()
     storage.remove('close_db_table_suggest')
-    storage.remove('chrome_version_tip')
     sessionStorage.removeItem(`work_flow_lists_${workspaceId}`)
+    this.checkChromeVersion()
   },
   methods: {
     logout() {
@@ -209,6 +209,28 @@ export default {
         this.baseInfo = { username: this.loginForm.user, isAdmin: rst.admin }
         storage.set('baseInfo', this.baseInfo, 'local');
       })
+    },
+    checkChromeVersion() {
+      let arr = navigator.userAgent.split(' ');
+      let chromeVersion = '';
+      for(let i=0;i < arr.length;i++){
+        if(/chrome/i.test(arr[i]))
+          chromeVersion = arr[i]
+      }
+      let showversionTip = false
+      if (chromeVersion) {
+        chromeVersion = Number(chromeVersion.split('/')[1].split('.')[0]);
+        showversionTip = chromeVersion <= 88
+      } else {
+        showversionTip = true
+      }
+      if (showversionTip) {
+        this.$Message.warning({
+          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + ',': ''}为了更好地体验推荐使用Chrome 78 版本`,
+          duration: 5,
+          closable: true
+        })
+      }
     }
   },
 };

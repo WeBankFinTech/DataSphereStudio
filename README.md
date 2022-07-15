@@ -115,7 +115,7 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;Please follow [Compile Guide](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Development_Documentation/Compilation_Documentation.md) to compile DSS from source code.
 
- &nbsp; &nbsp; &nbsp; &nbsp;Please refer to [Deployment Documents](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_Deployment/DSS_Single-Server_Deployment_Documentation.md) to do the deployment.
+ &nbsp; &nbsp; &nbsp; &nbsp;Please refer to [Deployment Documents](https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_Deployment/DSS%26Linkis_one-click_deployment_document_stand-alone_version.md) to do the deployment.
 
 ## Examples and Guidance
 

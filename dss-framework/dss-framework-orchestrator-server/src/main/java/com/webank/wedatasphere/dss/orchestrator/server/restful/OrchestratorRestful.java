@@ -57,6 +57,7 @@ public class OrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(request);
         DSSLabel envDSSLabel = new EnvDSSLabel(rollbackOrchestratorRequest.getLabels().getRoute());
         try {
+            LOGGER.info("user {} begin to rollbackOrchestrator, params:{}", username, rollbackOrchestratorRequest);
             String newVersion = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, envDSSLabel, workspace);
             Message message = Message.ok("回滚版本成功").data("newVersion", newVersion);
             return message;
@@ -74,6 +75,7 @@ public class OrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(req);
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(openOrchestratorRequest.getLabels().getRoute()));
         Long orchestratorId = openOrchestratorRequest.getOrchestratorId();
+        LOGGER.info("user {} try to openOrchestrator, params:{}", userName, openOrchestratorRequest);
         openUrl = orchestratorService.openOrchestrator(userName, workspace, orchestratorId, dssLabelList);
         OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
         LOGGER.info("open url is {}, orcId is {}, dssLabels is {}", openUrl, orchestratorId, dssLabelList);

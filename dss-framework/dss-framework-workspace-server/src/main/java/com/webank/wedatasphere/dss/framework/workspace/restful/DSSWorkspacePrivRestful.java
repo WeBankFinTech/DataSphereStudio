@@ -27,6 +27,8 @@ import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +43,8 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 @RestController
 public class DSSWorkspacePrivRestful {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspacePrivRestful.class);
 
     @Autowired
     DSSWorkspaceService dssWorkspaceService;
@@ -69,6 +73,7 @@ public class DSSWorkspacePrivRestful {
         int menuId = updateRoleMenuPrivRequest.getMenuId();
         int workspaceId = updateRoleMenuPrivRequest.getWorkspaceId();
         Map<String, Boolean> menuPrivs = updateRoleMenuPrivRequest.getMenuPrivs();
+        LOGGER.info("user {} begin to updateRoleMenuPriv, menuId:{}, menuPrivs:{}", updater, menuId, menuPrivs);
         List<Pair<Integer, Boolean>> pairs = new ArrayList<>();
         for(String key : menuPrivs.keySet()){
             Integer roleId = dssWorkspacePrivService.getRoleId(workspaceId, key);
@@ -85,9 +90,10 @@ public class DSSWorkspacePrivRestful {
     public Message updateRoleComponentPriv(HttpServletRequest request,@RequestBody UpdateRoleComponentPrivRequest updateRoleComponentPrivRequest){
         //todo 更新工作空间中角色对于component的权限
         String username = SecurityFilter.getLoginUsername(request);
-        int menuId = updateRoleComponentPrivRequest.getComponentId();
+        int appconnId = updateRoleComponentPrivRequest.getComponentId();
         int workspaceId = updateRoleComponentPrivRequest.getWorkspaceId();
         Map<String,Boolean> componentPrivs = updateRoleComponentPrivRequest.getComponentPrivs();
+        LOGGER.info("user {} begin to updateRoleMenuPriv, appconnId:{}, componentPrivs:{}", username, appconnId, componentPrivs);
         List<Pair<Integer, Boolean>> pairs = new ArrayList<>();
         for (String key : componentPrivs.keySet()){
             Integer roleId = dssWorkspacePrivService.getRoleId(workspaceId, key);
@@ -96,7 +102,7 @@ public class DSSWorkspacePrivRestful {
             }
             pairs.add(new Pair<Integer, Boolean>(roleId, componentPrivs.get(key)));
         }
-        dssWorkspacePrivService.updateRoleComponentPriv(workspaceId, menuId, username, pairs);
+        dssWorkspacePrivService.updateRoleComponentPriv(workspaceId, appconnId, username, pairs);
         return Message.ok().data("updateRoleComponentPriv","更新组件权限成功");
     }
 

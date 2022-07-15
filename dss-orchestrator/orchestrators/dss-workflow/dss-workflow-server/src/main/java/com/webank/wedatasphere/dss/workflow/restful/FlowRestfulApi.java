@@ -92,12 +92,14 @@ public class FlowRestfulApi {
         Long parentFlowID = addFlowRequest.getParentFlowID();
         String uses = addFlowRequest.getUses();
         List<DSSLabel> dssLabelList = new ArrayList<>();
+        LOGGER.info("User {} begin to add flow, name:{}, projectName:{}", userName, name, projectName);
         dssLabelList.add(new EnvDSSLabel(addFlowRequest.getLabels().getRoute()));
         String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
         DSSFlow dssFlow = workFlowManager.createWorkflow(userName, null, name, contextId, description, parentFlowID,
                 uses, new ArrayList<>(), dssLabelList, null, null);
 
         // TODO: 2019/5/16 空值校验，重复名校验
+        LOGGER.info("User {} end to add flow, name:{}, projectName:{}", userName, name, projectName);
         return Message.ok().data("flow", dssFlow);
     }
 
@@ -109,6 +111,7 @@ public class FlowRestfulApi {
         String comment = publishWorkflowRequest.getComment();
         Workspace workspace = SSOHelper.getWorkspace(request);
         String publishUser = SecurityFilter.getLoginUsername(request);
+        LOGGER.info("User {} begin to publish workflow, flowId:{}", publishUser, workflowId);
         Message message;
         try {
             String taskId = publishService.submitPublish(publishUser, workflowId, labels, workspace, comment);

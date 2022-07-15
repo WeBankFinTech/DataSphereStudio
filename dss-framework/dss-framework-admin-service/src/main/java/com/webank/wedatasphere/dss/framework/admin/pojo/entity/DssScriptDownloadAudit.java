@@ -83,4 +83,15 @@ public class DssScriptDownloadAudit {
         this.createTime = createTime;
     }
 
+    @Override
+    public String toString() {
+        return "DssScriptDownloadAudit{" +
+                "id=" + id +
+                ", creator='" + creator + '\'' +
+                ", tenant='" + tenant + '\'' +
+                ", path='" + path + '\'' +
+                ", sql='" + sql + '\'' +
+                ", createTime=" + createTime +
+                '}';
+    }
 }

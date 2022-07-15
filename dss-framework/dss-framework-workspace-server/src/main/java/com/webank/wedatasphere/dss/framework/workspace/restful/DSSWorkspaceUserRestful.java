@@ -127,6 +127,7 @@ public class DSSWorkspaceUserRestful {
         if (!dssWorkspaceService.isAdminUser((long) workspaceId, creator)) {
             return Message.error("无权限进行该操作");
         }
+        LOGGER.info("begin to addWorkspaceUser:{}, workspaceId:{}, roles:{}", userName, workspaceId, roles);
         dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);
         return Message.ok();
     }
@@ -140,6 +141,7 @@ public class DSSWorkspaceUserRestful {
             return Message.error("无权限进行该操作");
         }
         String userName = updateWorkspaceUserRequest.getUserName();
+        LOGGER.info("begin to updateWorkspaceUser:{}, workspaceId:{}, roles:{}", userName, workspaceId, roles);
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
         return Message.ok();
     }
@@ -153,6 +155,7 @@ public class DSSWorkspaceUserRestful {
         if (!dssWorkspaceService.checkAdmin(creator) || !dssWorkspaceService.checkAdminByWorkspace(creator, workspaceId)) {
             return Message.error("无权限进行该操作");
         }
+        LOGGER.info("admin {} begin to deleteWorkspaceUser:{}, workspaceId:{}", creator, userName, workspaceId);
         dssWorkspaceUserService.deleteWorkspaceUser(userName, workspaceId);
         return Message.ok();
     }

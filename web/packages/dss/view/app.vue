@@ -48,7 +48,7 @@ export default {
           this.getMaskText()
         }, this.watermark.timeupdate)
       }
-    },
+    }
   },
   beforeDestroy() {
     elementResizeEvent.unbind(this.$el);

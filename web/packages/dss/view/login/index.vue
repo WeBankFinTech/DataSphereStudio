@@ -227,7 +227,7 @@ export default {
       if (showversionTip) {
         this.$Modal.confirm({
           title: "提示",
-          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + '，': ''}为了更好地体验推荐使用Chrome 78 版本${this.$APP_CONF.update_chrome?'，<a href="'+this.$APP_CONF.update_chrome+'">升级指引</a>':''}`
+          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + '，': ''}为了更好地体验推荐使用Chrome 78 版本${this.$APP_CONF.update_chrome?'，<a href="'+this.$APP_CONF.update_chrome+'">升级指引</a>':'，请联系管理员'}`
         });
       }
     }

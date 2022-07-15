@@ -477,6 +477,8 @@ Execute.prototype.updateLastHistory = function(option, cb) {
         taskID: task.taskID,
         execID: '',
         solution: res.solution,
+        errCode: task.errCode,
+        errDesc: task.errDesc,
         createDate: task.createdTime,
         runningTime: task.costTime,
         // 这里改成使用execute的status是因为数据库中在大结果集的情况下可能会发生状态不翻转的情况，但websocket推送的状态是对的

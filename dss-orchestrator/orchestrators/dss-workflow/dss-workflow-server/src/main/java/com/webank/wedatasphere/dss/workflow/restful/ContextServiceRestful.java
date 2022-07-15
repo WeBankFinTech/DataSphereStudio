@@ -22,6 +22,8 @@ import com.webank.wedatasphere.dss.workflow.entity.request.QueryTableMetaRequest
 import com.webank.wedatasphere.dss.workflow.entity.request.TablesRequest;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class ContextServiceRestful {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private CSTableService csTableService;
 
@@ -42,6 +46,7 @@ public class ContextServiceRestful {
         String userName = SecurityFilter.getLoginUsername(req);
         String contextIDStr = tablesRequest.getContextID();
         String nodeName = tablesRequest.getNodeName();
+        logger.info("Begin to get cs tables, contextId:{}, nodeName:{}", contextIDStr, nodeName);
         return Message.ok().data("tables", csTableService.queryTables("default", contextIDStr, nodeName));
     }
 
@@ -50,6 +55,7 @@ public class ContextServiceRestful {
         String userName = SecurityFilter.getLoginUsername(req);
         String contextIDStr = queryTableMetaRequest.getContextID();
         String contextKeyStr = queryTableMetaRequest.getContextKey();
+        logger.info("Begin to get cs columns, contextId:{}, contextKey:{}", contextIDStr, contextKeyStr);
         return Message.ok().data("columns", csTableService.queryTableMeta("default", contextIDStr, contextKeyStr));
     }
 

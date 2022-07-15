@@ -105,11 +105,11 @@ public class DSSFrameworkProjectRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("user {} begin to checkProjectName: {}", username, name);
         try {
-            dssFrameworkProjectService.checkProjectName(name,workspace,username);
+            dssFrameworkProjectService.checkProjectName(name, workspace, username);
         } catch (DSSProjectErrorException e) {
-            return Message.error(e.getDesc());
+            return Message.error(e.getDesc()).data("repeat", false);
         }
-        return Message.ok("项目名检测成功");
+        return Message.ok("项目名检测成功").data("repeat", true);
     }
 
     /**

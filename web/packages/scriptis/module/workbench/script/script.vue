@@ -60,6 +60,7 @@
         <div class="workbench-container">
           <we-progress
             v-if="bottomTab.show_progress"
+            ref="progressTab"
             :script="script"
             :script-view-state="scriptViewState"
             :execute="execute"
@@ -259,7 +260,7 @@ export default {
       if (this.work.specialSetting) {
         supportedMode = find(this.getSupportModes(), (p) => p.runType === this.work.specialSetting.runType);
       }
-      // 判断特殊字符的文件, 后台编译可能会因为文件名存在特殊字符报错，所以无法运行
+      // 判断特殊字符的文�?, 后台编译可能会因为文件名存在特殊字符报错，所以无法运�?
       const regLeal = /^[.\w\u4e00-\u9fa5-]{1,200}\.[A-Za-z]+$/;
       const islegal = regLeal.test(this.work.filename);
       this.work.data = this.script = new Script(Object.assign({}, supportedMode, {
@@ -272,11 +273,11 @@ export default {
         readOnly: this.readonly
       }));
       delete this.work.specialSetting;
-      // 把新创建的scriptViewState挂到script对象上
+      // 把新创建的scriptViewState挂到script对象�?
       this.script.scriptViewState = this.scriptViewState;
     }
 
-    // 删掉无用的code和params，因为已经存储在script对象中
+    // 删掉无用的code和params，因为已经存储在script对象�?
     delete this.work.code;
     delete this.work.params;
     this.script.oldData = this.script.data;
@@ -321,7 +322,7 @@ export default {
     });
     let cacheWork = await this.getCacheWork(this.work);
     this._running_scripts_key = 'running_scripts_' + this.userName;
-    if (cacheWork) { // 点击运行后脚本正在执行中未关掉Tab刷新页面时执行进度恢复
+    if (cacheWork) { // 点击运行后脚本正在执行中未关掉Tab刷新页面时执行进度恢�?
       let {
         data,
         taskID,
@@ -341,10 +342,10 @@ export default {
         this.work.execID = execID;
         this.work.taskID = taskID;
       }
-    } else { // 脚本正在执行中关掉了Tab，之后再打开页面，执行进度恢复
+    } else { // 脚本正在执行中关掉了Tab，之后再打开页面，执行进度恢�?
       let runningScripts = storage.get(this._running_scripts_key, 'local') || {};
       if (runningScripts[this.script.id]) {
-        // 存在execID表示任务已经在执行，否则任务已提交或排尚未真正执行
+        // 存在execID表示任务已经在执行，否则任务已提交或排尚未真正执�?
         if (runningScripts[this.script.id].execID) {
           this.script.steps = runningScripts[this.script.id].steps;
           this.script.progress = runningScripts[this.script.id].progress;
@@ -402,14 +403,14 @@ export default {
     window.onbeforeunload = null;
   },
   methods: {
-    // panel 分割线拖动调整大小
+    // panel 分割线拖动调整大�?
     resizePanel() {
       if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
         this.scriptViewState.topPanelHeight = this.$refs.topPanel.$el.clientHeight
         this.scriptViewState.bottomContentHeight = this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight;
       }
     },
-    // 浏览器窗口缩放
+    // 浏览器窗口缩�?
     resize() {
       if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
         this.scriptViewState.topPanelHeight = this.$el.clientHeight * 0.6
@@ -561,7 +562,7 @@ export default {
           this.resetData();
           this.execute.start();
         }
-        // 运行时，如果是临时脚本且未保存状态时，弹出一个警告的提醒，否则直接保存。
+        // 运行时，如果是临时脚本且未保存状态时，弹出一个警告的提醒，否则直接保存�??
         if (!this.work.filepath && this.work.unsave && !this.node) {
           this.$Notice.warning({
             title: this.$t('message.scripts.notice.unsave.title'),
@@ -627,7 +628,7 @@ export default {
           const index = findIndex(this.script.history, (o) => o.taskID == ret.taskID);
           const findHis = find(this.script.history, (o) => o.taskID == ret.taskID);
           let newItem = null;
-          // 这里针对的是导入导出脚本，executionCode为object的情况
+          // 这里针对的是导入导出脚本，executionCode为object的情�?
           const code = typeof (this.script.executionCode) === 'string' && this.script.executionCode ? this.script
             .executionCode : this.script.data;
           if (findHis) {
@@ -641,7 +642,7 @@ export default {
                 createDate: findHis.createDate,
                 execID: ret.execID || findHis.execID,
                 runningTime: findHis.runningTime,
-                // executionCode代表是选中某段代码进行执行的
+                // executionCode代表是�?�中某段代码进行执行�?
                 data: code,
                 status: ret.status,
                 fileName: this.script.fileName,
@@ -684,6 +685,19 @@ export default {
               tabId: this.script.id,
               ...this.script.history,
             });
+          }
+          // 有错误码停留进度tab，无错误码打�?日志定位第一行错�?
+          if (this.$refs.progressTab) {
+            this.$refs.progressTab.updateErrorMsg({
+              solution: ret.solution,
+              errDesc: ret.errDesc,
+              errCode: ret.errCode,
+              status: ret.status,
+              taskId: ret.taskID
+            })
+          }
+          if (!ret.errCode && ret.status == 'Failed') {
+            this.showPanelTab('log')
           }
         });
         this.execute.on('result', (ret) => {
@@ -733,7 +747,7 @@ export default {
             return;
           }
           this._execute_last_progress = progress;
-          // 这里progressInfo可能只是个空数组，或者数据第一个数据是一个空对象
+          // 这里progressInfo可能只是个空数组，或者数据第�?个数据是�?个空对象
           if (progressInfo.length && !isEmpty(progressInfo[0])) {
             progressInfo.forEach((newProgress) => {
               let newId = newProgress.id;
@@ -807,7 +821,7 @@ export default {
             const lastStep = last(this.script.steps);
             if (this.script.steps.indexOf(status) === -1) {
               this.script.steps.push(status);
-              // 针对可能有WaitForRetry状态后，后台会重新推送Scheduled或running状态的时候
+              // 针对可能有WaitForRetry状�?�后，后台会重新推�?�Scheduled或running状�?�的时�??
             } else if (lastStep !== status) {
               this.script.steps.push(status);
             }
@@ -823,19 +837,19 @@ export default {
           this.dispatch('WebSocket:send', data);
         });
         this.execute.on('error', (type) => {
-          // 执行错误的时候resolve，用于改变modal框中的loading状态
+          // 执行错误的时候resolve，用于改变modal框中的loading状�??
           cb && cb(type || 'error');
-          if (this.scriptViewState.showPanel !== 'history') {
-            this.showPanelTab('history');
-            this.isLogShow = true;
-          }
+          // if (this.scriptViewState.showPanel !== 'history') {
+          //   this.showPanelTab('history');
+          //   this.isLogShow = true;
+          // }
           this.dispatch('IndexedDB:appendLog', {
             tabId: this.script.id,
             rst: this.script.log,
           });
         });
         this.execute.on('stateEnd', () => {
-          // 执行成功的时候resolve，用于改变modal框中的loading状态
+          // 执行成功的时候resolve，用于改变modal框中的loading状�??
           cb && cb('end');
           this.dispatch('IndexedDB:appendLog', {
             tabId: this.script.id,
@@ -863,7 +877,7 @@ export default {
                   'line-height': '20px',
                 },
               },
-              `${this.work.filename} ${type}${this.$root.$t('message.scripts.notice.querySuccess.render')}：${costTime}！`
+              `${this.work.filename} ${type}${this.$root.$t('message.scripts.notice.querySuccess.render')}�?${costTime}！`
               );
             },
             name,
@@ -898,29 +912,7 @@ export default {
                   'word-break': 'break-all',
                   'line-height': '20px',
                 },
-              }, label),
-              h('span',{
-                style: {
-                  color: 'red',
-                  position: 'absolute',
-                  right: '10px',
-                  bottom: '0px',
-                  display: 'none',
-                  cursor: 'pointer'
-                },
-                on: {
-                  click: () => {
-                    if (type === 'error') {
-                      // 先根据执行的最新的任务记录获取错误码后查询是否有贴
-                      const failedReason = this.work.data.history[0].failedReason
-                      const errorCode = parseInt(failedReason) || '';
-                      const errorDesc = failedReason.substring(errorCode.toString().length, failedReason.length)
-                      this.checkErrorCode(errorCode, errorDesc);
-                    }
-                  }
-                }
-              }, '发布提问')
-              ])
+              }, label)])
             },
           });
         });
@@ -932,30 +924,6 @@ export default {
           });
         });
       }
-    },
-    checkErrorCode(errorCode, errorDesc) {
-      api.fetch('/kn/isErrorDuplicate', {
-        errorCode
-      }, 'get').then((res) => {
-        if (res.isDuplicate) {
-          // 如果有就打开新浏览器跳转
-        } else {
-          // 没有就发帖
-          this.postMessage(errorCode, errorDesc);
-        }
-      })
-    },
-    // 发帖
-    postMessage(errorCode, errorDesc) {
-      api.fetch('/kn/posting', {
-        title: `errorDesc问题讨论`,
-        content: {
-          errorCode,
-          errorDesc
-        }
-      }, 'post').then((res) => {
-        window.console.log(res, '发帖成功')
-      })
     },
     resetData() {
       // upgrade only one time
@@ -1000,7 +968,7 @@ export default {
         });
       } else {
         cb();
-        this.script.steps = []; // socket downgrade事件之前点击运行，终止运行loading后恢复
+        this.script.steps = []; // socket downgrade事件之前点击运行，终止运行loading后恢�?
         this.script.running = false;
       }
     },
@@ -1030,7 +998,7 @@ export default {
       // 删除节点json里的contextId
       delete this.node.params.configuration.runtime.contextID;
       delete this.node.params.configuration.runtime.nodeName;
-      // 除了执行，其他的都不需要contextID
+      // 除了执行，其他的都不�?要contextID
       let tempParams = JSON.parse(JSON.stringify(params));
       delete tempParams.metadata.configuration.runtime.contextID;
       delete tempParams.metadata.configuration.runtime.nodeName;
@@ -1052,9 +1020,9 @@ export default {
 
           });
           this.work.unsave = false;
-          // 提交最新的内容，更新script.data和script.oldData
+          // 提交�?新的内容，更新script.data和script.oldData
           this.script.oldData = this.script.data;
-          // 保存时更新下缓存。
+          // 保存时更新下缓存�?
           // 加入用户名来区分不同账户下的tab
           this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
           this.dispatch('IndexedDB:updateGlobalCache', {
@@ -1062,7 +1030,7 @@ export default {
             work: this.work,
           });
           this.saveLoading = false;
-          // 和后台有确认次值只是用在资源管理器的运行任务名字展示上，对其他无影响
+          // 和后台有确认次�?�只是用在资源管理器的运行任务名字展示上，对其他无影�?
           return this.node.title;
         }).catch(() => {
           // this.$Message.error(this.$t('message.scripts.saveErr'));
@@ -1088,7 +1056,7 @@ export default {
               const timeout = setTimeout(() => {
                 this.saveLoading = true;
               }, 2000);
-                // 保存时更新下缓存。
+                // 保存时更新下缓存�?
               if (this.script.data !== this.work.data.data) {
                 this.work.data.data = this.script.data;
               }
@@ -1099,9 +1067,9 @@ export default {
                   clearTimeout(timeout);
                   this.saveLoading = false;
                   this.$Message.success(this.$t('message.scripts.constants.success.save'));
-                  // 提交最新的内容，更新script.data和script.oldData
+                  // 提交�?新的内容，更新script.data和script.oldData
                   this.script.oldData = this.script.data;
-                  // 保存完后，需要去设置参数的原始值，用于在子模块判断unsave的值
+                  // 保存完后，需要去设置参数的原始�?�，用于在子模块判断unsave的�??
                   if (this.$refs.editor.$refs.setting) {
                     this.$refs.editor.$refs.setting.origin = JSON.stringify(this.script.params);
                   }
@@ -1116,7 +1084,7 @@ export default {
                 });
               });
             } else {
-              // 保存时候判断是否为临时脚本
+              // 保存时�?�判断是否为临时脚本
               this.$Modal.confirm({
                 title: this.$t('message.scripts.confirmModal.title'),
                 content: this.$t('message.scripts.confirmModal.content'),
@@ -1199,9 +1167,9 @@ export default {
               result = {
                 'headRows': ret.metadata,
                 'bodyRows': ret.fileContent,
-                // 如果totalLine是null，就显示为0
+                // 如果totalLine是null，就显示�?0
                 'total': ret.totalLine ? ret.totalLine : 0,
-                // 如果内容为null,就显示暂无数据
+                // 如果内容为null,就显示暂无数�?
                 'type': ret.fileContent ? ret.type : 0,
                 'path': resultPath,
                 'current': 1,
@@ -1307,7 +1275,7 @@ export default {
           this.script.status = option.status;
           this.script.log = log;
           this.script.logLine = rst.fromLine;
-          // 把新创建的scriptViewState挂到script对象上
+          // 把新创建的scriptViewState挂到script对象�?
           this.script.scriptViewState = { ...this.scriptViewState };
         }
       } catch (error) {
@@ -1323,7 +1291,7 @@ export default {
         path: option.resultLocation,
       }, 'get');
       if (rst.dirFileTrees) {
-        // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
+        // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排�?
         this.script.resultSet = 0
         this.script.resultList = rst.dirFileTrees.children.sort((a, b) => parseInt(a.name, 10) - parseInt(b.name,
           10));

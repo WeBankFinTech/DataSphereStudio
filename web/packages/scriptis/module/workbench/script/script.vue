@@ -60,6 +60,7 @@
         <div class="workbench-container">
           <we-progress
             v-if="bottomTab.show_progress"
+            ref="progressTab"
             :script="script"
             :script-view-state="scriptViewState"
             :execute="execute"
@@ -685,6 +686,19 @@ export default {
               ...this.script.history,
             });
           }
+          // 有错误码停留进度tab，无错误码打开日志定位第一行错误
+          if (this.$refs.progressTab) {
+            this.$refs.progressTab.updateErrorMsg({
+              solution: ret.solution,
+              errDesc: ret.errDesc,
+              errCode: ret.errCode,
+              status: ret.status,
+              taskId: ret.taskID
+            })
+          }
+          if (!ret.errCode && ret.status == 'Failed') {
+            this.showPanelTab('log')
+          }
         });
         this.execute.on('result', (ret) => {
           this.showPanelTab('result');
@@ -825,10 +839,10 @@ export default {
         this.execute.on('error', (type) => {
           // 执行错误的时候resolve，用于改变modal框中的loading状态
           cb && cb(type || 'error');
-          if (this.scriptViewState.showPanel !== 'history') {
-            this.showPanelTab('history');
-            this.isLogShow = true;
-          }
+          // if (this.scriptViewState.showPanel !== 'history') {
+          //   this.showPanelTab('history');
+          //   this.isLogShow = true;
+          // }
           this.dispatch('IndexedDB:appendLog', {
             tabId: this.script.id,
             rst: this.script.log,
@@ -898,29 +912,7 @@ export default {
                   'word-break': 'break-all',
                   'line-height': '20px',
                 },
-              }, label),
-              h('span',{
-                style: {
-                  color: 'red',
-                  position: 'absolute',
-                  right: '10px',
-                  bottom: '0px',
-                  display: 'none',
-                  cursor: 'pointer'
-                },
-                on: {
-                  click: () => {
-                    if (type === 'error') {
-                      // 先根据执行的最新的任务记录获取错误码后查询是否有贴
-                      const failedReason = this.work.data.history[0].failedReason
-                      const errorCode = parseInt(failedReason) || '';
-                      const errorDesc = failedReason.substring(errorCode.toString().length, failedReason.length)
-                      this.checkErrorCode(errorCode, errorDesc);
-                    }
-                  }
-                }
-              }, '发布提问')
-              ])
+              }, label)])
             },
           });
         });
@@ -932,30 +924,6 @@ export default {
           });
         });
       }
-    },
-    checkErrorCode(errorCode, errorDesc) {
-      api.fetch('/kn/isErrorDuplicate', {
-        errorCode
-      }, 'get').then((res) => {
-        if (res.isDuplicate) {
-          // 如果有就打开新浏览器跳转
-        } else {
-          // 没有就发帖
-          this.postMessage(errorCode, errorDesc);
-        }
-      })
-    },
-    // 发帖
-    postMessage(errorCode, errorDesc) {
-      api.fetch('/kn/posting', {
-        title: `errorDesc问题讨论`,
-        content: {
-          errorCode,
-          errorDesc
-        }
-      }, 'post').then((res) => {
-        window.console.log(res, '发帖成功')
-      })
     },
     resetData() {
       // upgrade only one time

@@ -75,6 +75,7 @@ public class NodeRestfulApi {
 
     @RequestMapping(value = "/listNodeType",method = RequestMethod.GET)
     public Message listNodeType(HttpServletRequest req) {
+        logger.info("Begin to invoke listNodeType.");
         Function<NodeGroup, String> supplier = internationalization(req, NodeGroup::getNameEn, NodeGroup::getName);
         List<NodeGroupVO> groupVos = new ArrayList<>();
         //cache
@@ -163,7 +164,7 @@ public class NodeRestfulApi {
         Map<String, Object> params = createExternalNodeRequest.getParams();
         String nodeId = createExternalNodeRequest.getNodeID();
 
-        logger.info("try to create a {} node for workflow {}, params is {}.", nodeType, flowId, params);
+        logger.info("user {} try to create a {} node for workflow {}, params is {}.", userName, nodeType, flowId, params);
         CommonAppConnNode node = new CommonAppConnNode();
         node.setNodeType(nodeType);
         node.setFlowId(flowId);
@@ -211,7 +212,7 @@ public class NodeRestfulApi {
         Long projectId = updateExternalNodeRequest.getProjectID();
         String nodeType = updateExternalNodeRequest.getNodeType();
         Map<String, Object> params = updateExternalNodeRequest.getParams();
-        logger.info("UpdateExternalNode request params is " + params + ", nodeType:" + nodeType);
+        logger.info("user {} try to updateExternalNode, request params is:{} ", userName, params);
         CommonAppConnNode node = new CommonAppConnNode();
         node.setProjectId(projectId);
         node.setNodeType(nodeType);
@@ -232,6 +233,7 @@ public class NodeRestfulApi {
         Long projectId = updateExternalNodeRequest.getProjectID();
         String nodeType = updateExternalNodeRequest.getNodeType();
         Map<String, Object> params = updateExternalNodeRequest.getParams();
+        logger.info("user {} try to deleteExternalNode, request params is:{}, nodeType:{} ", userName, params, nodeType);
         CommonAppConnNode node = new CommonAppConnNode();
         String label = updateExternalNodeRequest.getLabels().getRoute();
         node.setDssLabels(Collections.singletonList(new EnvDSSLabel(label)));
@@ -277,7 +279,7 @@ public class NodeRestfulApi {
         Long projectId = appConnNodeUrlRequest.getProjectID();
         String nodeType = appConnNodeUrlRequest.getNodeType();
         Map<String, Object> params = appConnNodeUrlRequest.getParams();
-        logger.info("getAppConnNodeUrl request params is " + params + ", nodeType:" + nodeType);
+        logger.info("user {} try to getAppConnNodeUrl, request params is:{}, nodeType:{}", userName, params, nodeType);
         CommonAppConnNode node = new CommonAppConnNode();
         node.setWorkspace(workspace);
         node.setProjectId(projectId);

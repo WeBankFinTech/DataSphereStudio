@@ -13,13 +13,41 @@
         <div class="project-nav-tree-top">
           <div class="project-nav-tree-top-t">
             <span class="project-nav-tree-top-t-txt">项目</span>
-            <span class="project-nav-tree-top-t-icon">
+            <div class="project-nav-tree-top-t-icon">
+              <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
+                <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
+                <DropdownMenu slot="list">
+                  <DropdownItem
+                    v-for="(item) in sortTypeList"
+                    :name="item.value"
+                    :key="item.value"
+                  >{{ item.lable}}</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+              <Dropdown class="projcat-icon" @on-click="filerSort($event,'filter')">
+                <Icon :type="{all: 'ios-funnel-outline',owner:'ios-person-add',share:'md-share'}[filterBar.cat] " class="icon" size="16"></Icon>
+                <DropdownMenu slot="list">
+                  <DropdownItem
+                    name="all"
+                    key="all"
+                  >所有项目</DropdownItem>
+                  <DropdownItem
+                    name="owner"
+                    key="owner"
+                  >个人项目</DropdownItem>
+                  <DropdownItem
+                    name="share"
+                    key="share"
+                  >共享项目</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
               <SvgIcon
                 icon-class="dev_center_flod"
+                class="icon"
                 style="opacity: 0.65"
                 @click="handleTreeToggle"
               />
-            </span>
+            </div>
           </div>
         </div>
         <virtual-tree
@@ -235,8 +263,22 @@ export default {
         show: false
       },
       height: 500,
-      openNode: {}
-    };
+      openNode: {},
+      filterBar: {
+        sort: 'updateTime',
+        cat: 'all'
+      },
+      sortTypeList: [
+        {
+          lable: this.$t('message.workflow.projectDetail.sortUpdateTime'),
+          value: 'updateTime'
+        },
+        {
+          lable: this.$t('message.workflow.projectDetail.sortName'),
+          value: 'name'
+        }
+      ]
+    }
   },
   filters,
   watch: {
@@ -259,7 +301,22 @@ export default {
   },
   mounted() {
     // 获取所有project展示tree
-    this.getAllProjects(() => {
+    this.getAllProjects((res) => {
+      if (this.$route.query.projectID) {
+        let index
+        let it
+        res.projects.find((item, idx) => {
+          if (item.id == this.$route.query.projectID) {
+            index = idx
+            it = item
+          }
+        })
+        if (it) {
+          res.projects.splice(index, 1)
+          res.projects.unshift(it)
+        }
+      }
+      this.setVirtualRolesForProj(res)
       this.updateBread();
       this.tryOpenWorkFlow();
     });
@@ -393,54 +450,7 @@ export default {
         )
         .then((res) => {
           this.loadingTree = false;
-          if (this.$route.query.projectID) {
-            let index
-            let it
-            res.projects.find((item, idx) => {
-              if (item.id == this.$route.query.projectID) {
-                index = idx
-                it = item
-              }
-            })
-            if (it) {
-              res.projects.splice(index, 1)
-              res.projects.unshift(it)
-            }
-          }
-
-          if (this.modeOfKey == "streamis_prod") {
-            this.projectsTree = res.projects
-              .filter((n) => {
-                return (
-                  n.devProcessList &&
-                  n.releaseUsers &&
-                  n.releaseUsers.indexOf(this.getUserName()) !== -1
-                );
-              })
-              .map((n) => {
-                setVirtualRoles(n, this.getUserName());
-                return {
-                  id: n.id,
-                  name: n.name,
-                  type: "streamis_prod",
-                  canWrite: n.canWrite(),
-                };
-              });
-            if (!this.$route.query.projectID) {
-              this.handleTreeClick({item: this.projectsTree[0]});
-            }
-          } else {
-            this.projectsTree = res.projects.map((n) => {
-              setVirtualRoles(n, this.getUserName());
-              return {
-                id: n.id,
-                name: n.name,
-                type: "project",
-                canWrite: n.canWrite(),
-              };
-            });
-          }
-          callback();
+          callback(res);
         });
     },
     // 获取project下工作流
@@ -1217,6 +1227,106 @@ export default {
     resize() {
       this.height = this.$el.clientHeight
     },
+    setVirtualRolesForProj(res) {
+      if (this.modeOfKey == "streamis_prod") {
+        this.projectsTree = res.projects
+          .filter((n) => {
+            return (
+              n.devProcessList &&
+                  n.releaseUsers &&
+                  n.releaseUsers.indexOf(this.getUserName()) !== -1
+            );
+          })
+          .map((n) => {
+            setVirtualRoles(n, this.getUserName());
+            return {
+              id: n.id,
+              name: n.name,
+              type: "streamis_prod",
+              canWrite: n.canWrite(),
+            };
+          });
+        if (!this.$route.query.projectID) {
+          this.handleTreeClick({item: this.projectsTree[0]});
+        }
+      } else {
+        this.projectsTree = res.projects.map((n) => {
+          setVirtualRoles(n, this.getUserName());
+          return {
+            id: n.id,
+            name: n.name,
+            type: "project",
+            canWrite: n.canWrite(),
+            children: n.children || []
+          };
+        });
+      }
+    },
+    /**
+     * 排序+筛选
+     */
+    filerSort(name, type) {
+      // 保存已经加载项目下工作流数据
+      if (!this.flowData) {
+        this.flowData = {}
+      }
+      this.projectsTree.forEach(it => {
+        if (it.children) {
+          this.flowData[it.id] = it.children
+        }
+      })
+      const filterFn = () => {
+        let sortName = this.filterBar.sort
+        let filterCat = this.filterBar.cat
+        if (type === 'sort') {
+          sortName = name
+        } else {
+          filterCat = name
+        }
+        // 先排序，再按分类筛选
+        this.sortTypeChange(sortName)
+        const projs = this.changeCatType(filterCat)
+        this.setVirtualRolesForProj({projects: projs})
+      }
+      if (this.rawProjects) {
+        filterFn()
+      } else {
+        this.getAllProjects((res) => {
+          this.rawProjects = res;
+          filterFn()
+        })
+      }
+    },
+    sortTypeChange(name = this.filterBar.sort) {
+      this.filterBar.sort = name
+      if (!this.rawProjects) return []
+      this.rawProjects.projects.sort((a, b) => {
+        if (name === 'updateTime') {
+          return b[name] - a[name]
+        } else {
+          return a[name].localeCompare(b[name])
+        }
+      })
+    },
+    changeCatType(type = this.filterBar.cat) {
+      this.filterBar.cat = type
+      const curUser = this.getUserName()
+      // 筛选
+      if (!this.rawProjects) return []
+      const projs = this.rawProjects.projects.filter(item => {
+        if (this.flowData && this.flowData[item.id]) {
+          item.children = this.flowData[item.id]
+        }
+        if (type === 'owner') {
+          return item.createBy === curUser
+        } else if(type === 'share') {
+          return item.createBy !== curUser
+        } else {
+          return true
+        }
+      })
+      return projs
+    }
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resize);

@@ -1,0 +1,77 @@
+{
+  "message": {
+    "scripts": {
+      "apiPublish": {
+        "title": "发布为数据API",
+        "button": {
+          "addApi": "新建数据API",
+          "updateApi": "更新数据API"
+        },
+        "addApiModal": {
+          "modalTitle": "数据服务API新增",
+          "contentTitle": "基本信息补充",
+          "paramConfirmTitle": "参数确认",
+          "apiName": "API 名称",
+          "apiPath": "API Path",
+          "protocol": "协议",
+          "requestType": "请求方式",
+          "tag": "标签",
+          "visible": "可见范围",
+          "describe": "描述",
+          "cancel": "取消",
+          "nextStep": "下一步",
+          "approvalName": "审批单名称",
+          "applyUser": "申请用户",
+          "proxyUser": "代理执行用户",
+          "back": "上一步",
+          "confirm": "确认",
+          "comment": "备注"
+        },
+        "updateApiModal": {
+          "modalTitle": "数据服务API更新",
+          "apiVersionUpgrade": "生成新版本",
+          "paramConfirm": "请确认参数"
+        },
+        "paramTable": {
+          "paramName": "参数名称",
+          "paramType": "参数类型",
+          "require": {
+            "title": "是否必填",
+            "yes": "是",
+            "no": "否",
+            "hide": "隐藏"
+          },
+          "defaultValue": "默认值",
+          "displayName": "展示名",
+          "describe": "描述"
+        },
+        "rule": {
+          "nameRule": "请填写API名称",
+          "approvalName": "请填写名称",
+          "pathRule": "请填写API路径",
+          "pathRegRule": "API路径不合法",
+          "requestTypeRule": "请选择请求方式",
+          "protocolRule": "请选择协议",
+          "valueRule": "必须以字母开头，且只支持字母、数字、下划线！",
+          "contentLengthLimit": "长度不能大于150",
+          "contentLengthLimit50": "长度不能大于50",
+          "contentLengthLimitTwo": "长度不能大于200",
+          "pathRepeat": "API路径已存在",
+          "nameRepeat": "API名称已存在",
+          "chineseCheck": "只支持中文",
+          "chineseName": "API中文名称"
+        },
+        "visible": {
+          "workspace": "工作空间",
+          "personal": "个人",
+          "public": "公开",
+          "grantView": "授权可见"
+        },
+        "notice": {
+          "publishSuccess": "发布成功"
+        },
+        "tagPlaceholder": "标签，按 enter 创建"
+      }
+    }
+  }
+}

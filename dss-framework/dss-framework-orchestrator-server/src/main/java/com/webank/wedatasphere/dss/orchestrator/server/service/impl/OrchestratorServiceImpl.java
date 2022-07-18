@@ -71,9 +71,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,8 +82,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-@PropertySource("classpath:dss-framework-orchestrator-server.properties")
-@EnableScheduling
 public class OrchestratorServiceImpl implements OrchestratorService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorServiceImpl.class);
@@ -451,7 +446,6 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    @Scheduled(cron = "${wds.dss.server.scheduling.clear.cs.cron}")
     public void batchClearContextId() {
         LOGGER.info("--------------------{} start clear old contextId------------------------", LocalDateTime.now());
         try {

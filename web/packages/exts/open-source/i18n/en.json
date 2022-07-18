@@ -1,0 +1,77 @@
+{
+  "message": {
+    "scripts": {
+      "apiPublish": {
+        "title": "PublishAPI",
+        "button": {
+          "addApi": "API Add",
+          "updateApi": "API Update"
+        },
+        "addApiModal": {
+          "modalTitle": "Add API",
+          "contentTitle": "Base Info",
+          "paramConfirmTitle": "Params Confirm",
+          "apiName": "API Name",
+          "apiPath": "API Path",
+          "protocol": "Protocol",
+          "requestType": "Request Type",
+          "tag": "Tag",
+          "visible": "Visible",
+          "describe": "Describe",
+          "nextStep": "Next",
+          "back": "Back",
+          "cancel": "Cancel",
+          "approvalName": "Approval Name",
+          "applyUser": "Apply User",
+          "proxyUser": "Proxy User",
+          "confirm": "Confirm",
+          "comment": "Comment"
+        },
+        "updateApiModal": {
+          "modalTitle": "Update API",
+          "apiVersionUpgrade": "New Version",
+          "paramConfirm": "Please confirm param"
+        },
+        "paramTable": {
+          "paramName": "Param Name",
+          "paramType": "Param Type",
+          "require": {
+            "title": "Require",
+            "yes": "Yes",
+            "no": "No",
+            "hide": "Hide"
+          },
+          "defaultValue": "Default Value",
+          "displayName": "Display Name",
+          "describe": "Describe"
+        },
+        "rule": {
+          "nameRule": "Please input api name!",
+          "approvalName": "Please input name!",
+          "pathRule": "Please input api path!",
+          "pathRegRule": "Api path illegal!",
+          "requestTypeRule": "Please select request type!",
+          "protocolRule": "Please select protocol!",
+          "valueRule": "Started with alphabetic characters, only alphanumeric and underscore are allowed!",
+          "contentLengthLimit": "Length limit 155",
+          "contentLengthLimit50": "Length limit 50",
+          "contentLengthLimitTwo": "Length limit 200",
+          "pathRepeat": "Api path exists",
+          "nameRepeat": "Api name exists",
+          "chineseCheck": "Chainese only",
+          "chineseName": "Chinese name of API"
+        },
+        "visible": {
+          "workspace": "Workspace",
+          "personal": "Personal",
+          "public": "Public",
+          "grantView": "Grant View"
+        },
+        "notice": {
+          "publishSuccess": "Publish Success"
+        },
+        "tagPlaceholder": "tag，click enter add"
+      }
+    }
+  }
+}

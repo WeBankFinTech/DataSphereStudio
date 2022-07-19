@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
+import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -44,7 +45,9 @@ import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
@@ -546,7 +549,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     private List<WorkspaceMenuVo> getMenuAppInstances(List<WorkspaceMenuVo> menuVos, List<Long> userMenuAppConnIds,
-                                                      DSSWorkspace workspace,
+                                                      DSSWorkspace dssworkspace, Workspace workspace,
                                                       boolean isChinese) {
         for (WorkspaceMenuVo menuVo : menuVos) {
             Long menuId = menuVo.getId();
@@ -556,11 +559,19 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 menuAppconn.setAccessable(userMenuAppConnIds.contains(menuAppconn.getId()));
                 AppConn appConn = AppConnManager.getAppConnManager().getAppConn(menuAppconn.getName());
                 List<DSSApplicationBean> instanceList = new ArrayList<>();
+                SSOUrlBuilderOperation operation;
+                if(appConn instanceof OnlySSOAppConn) {
+                    operation = ((OnlySSOAppConn) appConn).getOrCreateSSOStandard().getSSOBuilderService().createSSOUrlBuilderOperation();
+                    SSOHelper.setSSOUrlBuilderOperation(operation, workspace);
+                    operation.setAppName(appConn.getAppDesc().getAppName());
+                } else {
+                    operation = null;
+                }
                 appConn.getAppDesc().getAppInstances().forEach(appInstance -> {
                     String label = String.join(",", appInstance.getLabels().stream()
                             .map(l -> ((EnvDSSLabel) l).getEnv()).toArray(String[]::new));
                     String selectedName = getAppInstanceTitle(appConn, appInstance, isChinese);
-                    String homepageUri = AppInstanceConstants.getHomepageUrl(appInstance, (long) workspace.getId(), workspace.getName());
+                    String homepageUri = AppInstanceConstants.getHomepageUrl(appInstance, operation, (long) dssworkspace.getId(), dssworkspace.getName());
                     instanceList.add(new DSSApplicationBean(selectedName, appInstance.getBaseUrl(),
                             homepageUri, label));
                 });
@@ -580,12 +591,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public List<WorkspaceMenuVo> getWorkspaceAppConns(Long workspaceId, String username,
+    public List<WorkspaceMenuVo> getWorkspaceAppConns(Workspace workspace, Long workspaceId, String username,
                                                       boolean isChinese) throws DSSErrorException {
         DSSWorkspace dssWorkspace = getWorkspacesById(workspaceId, username);
         List<WorkspaceMenuVo> appconnMenuVos = isChinese ? workspaceMapper.getAppConnMenuCn() : workspaceMapper.getAppConnMenuEn();
         List<Long> userMenuAppConnIds = dssWorkspaceMapper.getUserMenuAppConnId(username, workspaceId);
-        return getMenuAppInstances(appconnMenuVos, userMenuAppConnIds, dssWorkspace, isChinese);
+        return getMenuAppInstances(appconnMenuVos, userMenuAppConnIds, dssWorkspace, workspace, isChinese);
     }
 
     @Override

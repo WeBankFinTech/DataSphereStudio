@@ -161,9 +161,10 @@ public class WorkspaceRestfulApi {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
         List<WorkspaceMenuVo> appconns;
         try {
-            appconns = dssWorkspaceService.getWorkspaceAppConns(workspaceId, username, isChinese);
+            appconns = dssWorkspaceService.getWorkspaceAppConns(workspace, workspaceId, username, isChinese);
         } catch (DSSErrorException e) {
             LOGGER.warn("{} get appconns from workspace {} failed.", username, workspaceId, e);
             return Message.error(e);

@@ -326,6 +326,7 @@ CREATE TABLE `dss_workflow` (
   `resource_id` varchar(255) DEFAULT NULL,
   `linked_appconn_names` varchar(255) DEFAULT NULL,
   `dss_labels` varchar(255) DEFAULT NULL,
+  `metrics` varchar(1024) NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=455 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 

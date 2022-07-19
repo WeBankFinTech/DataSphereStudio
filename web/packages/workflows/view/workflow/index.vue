@@ -58,6 +58,7 @@
           :render="renderNode"
           :open="openNode"
           :height="height - 30"
+          @we-open-node="openNodeChange"
           @we-click="handleTreeClick" />
         <Spin v-show="loadingTree" size="large" fix />
       </div>
@@ -266,7 +267,7 @@ export default {
       openNode: {},
       filterBar: {
         sort: 'updateTime',
-        cat: 'all'
+        cat: this.$route.query.viewState || 'all'
       },
       sortTypeList: [
         {
@@ -285,13 +286,20 @@ export default {
     tabList(val) {
       this.updateTabList(val)
     },
-    "$route.query"() {
+    "$route.query"(v) {
       this.tabList = [];
       this.getAreaMap();
       this.getProjectData(()=>{
         this.updateBread();
         this.tryOpenWorkFlow();
       });
+      if (v.projectID) {
+        this.currentTreeId = +v.projectID;
+        this.openNode = {
+          ...this.openNode,
+          [this.currentTreeId]: true
+        }
+      }
     }
   },
   created() {
@@ -320,6 +328,13 @@ export default {
       this.updateBread();
       this.tryOpenWorkFlow();
     });
+    if (this.$route.query.projectID) {
+      this.currentTreeId = +this.$route.query.projectID;
+      this.openNode = {
+        ...this.openNode,
+        [this.currentTreeId]: true
+      }
+    }
     this.height = this.$el.clientHeight
     window.addEventListener('resize', this.resize);
   },
@@ -518,6 +533,9 @@ export default {
           this.refreshFlow = true;
         });
     },
+    openNodeChange(v) {
+      this.openNode = {...v}
+    },
     handleTreeClick({item}) {
       const node = item
       // 切换到开发模式
@@ -544,8 +562,6 @@ export default {
             query,
           })
           this.updateBread();
-        } else {
-          this.openNode[node.id] = !this.openNode[node.id]
         }
       } else if (node && node.type === 'flow') {
         const { canContinue } = this.hasOpenedTab({id: node.id, version: node.orchestratorVersionId})
@@ -703,15 +719,6 @@ export default {
           this.tabList = curProjectCachedTab
         }
       }
-      setTimeout(()=>{
-        if (!this.$route.query.flowId) {
-          this.currentTreeId = +this.$route.query.projectID;
-          this.openNode = {
-            ...this.openNode,
-            [this.currentTreeId]: true
-          }
-        }
-      }, 50)
     },
     tryOpenWorkFlow() {
       // this.modeOfKey不能为空
@@ -778,10 +785,6 @@ export default {
           return item;
         }
       });
-      this.openNode = {
-        ...this.openNode,
-        [project.id]: true
-      }
     },
     // 确认新增工程 || 确认修改
     ProjectConfirm(projectData, callback) {

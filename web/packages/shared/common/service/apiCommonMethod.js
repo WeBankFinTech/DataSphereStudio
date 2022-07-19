@@ -50,6 +50,9 @@ const AddFavorite = (workspaceId, data) => api.fetch(`${API_PATH.WORKSPACE_PATH}
 // 删除收藏菜单
 const RemoveFavorite = (data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${data.workspaceId}/favorites/${data.applicationId}`, data, 'post')
 
+// 检查项目重名
+const CheckProjectNameRepeat = (name) => api.fetch(`${API_PATH.PROJECT_PATH}checkProjectName`, {name}, 'get')
+
 export {
   GetDicSecondList,
   GetAreaMap,
@@ -65,5 +68,6 @@ export {
   GetFavorites,
   AddFavorite,
   RemoveFavorite,
-  GetCollections
+  GetCollections,
+  CheckProjectNameRepeat
 }

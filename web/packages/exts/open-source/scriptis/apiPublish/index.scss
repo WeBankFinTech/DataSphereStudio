@@ -1,0 +1,37 @@
+@import "@dataspherestudio/shared/common/style/variables.scss";
+.api-module-title{
+  font-size: $font-size-base;
+  color: $title-color;
+}
+.verificationValue {
+  .ivu-input {
+    color: red!important;
+    border-color: red;
+  }
+}
+.api-module-content-title{
+  font-size: $font-size-small;
+  color: $title-color;
+  text-align: center;
+}
+
+.workbench-body-navbar-item {
+  margin: 0 16px;
+  cursor: pointer;
+  color: rgba($text-color, 0.8);
+  &.disabled {
+      color: rgba($text-color, 0.5);
+  }
+  &:hover {
+      color: $link-active-color;
+      &.disabled {
+          color: rgba($text-color, 0.5);
+      }
+  }
+  .ivu-icon {
+      font-size: 16px;
+  }
+  .navbar-item-name {
+      margin-left: 1px;
+  }
+}

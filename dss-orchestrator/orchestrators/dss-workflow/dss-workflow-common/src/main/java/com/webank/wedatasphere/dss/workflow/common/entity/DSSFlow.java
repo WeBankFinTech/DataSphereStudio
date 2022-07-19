@@ -47,6 +47,16 @@ public class DSSFlow implements Flow {
 
     private String bmlVersion;
 
+    private String metrics;
+
+    public String getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(String metrics) {
+        this.metrics = metrics;
+    }
+
     public String getFlowJson() {
         return flowJson;
     }

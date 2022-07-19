@@ -21,6 +21,8 @@ import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImp
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 
 @Configuration
 public class OrchestratorSpringConf {
@@ -29,5 +31,14 @@ public class OrchestratorSpringConf {
     public ContextService createContextService(){
         return ContextServiceImpl.getInstance();
     }
+
+    @Bean
+    public ScheduledThreadPoolExecutor scheduledExecutorService() {
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
+        return executor;
+    }
+
+
+
 
 }

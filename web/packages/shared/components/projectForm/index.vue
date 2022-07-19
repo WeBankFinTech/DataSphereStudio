@@ -191,6 +191,7 @@ import _ from "lodash";
 import {
   GetWorkspaceUserList,
   GetDicList,
+  CheckProjectNameRepeat
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 export default {
   components: {
@@ -249,7 +250,7 @@ export default {
   },
   computed: {
     formValid() {
-      let validateName = (rule, value, callback) => {
+      let validateName = async (rule, value, callback) => {
         let currentWorkspaceName = storage.get("currentWorkspace")
           ? storage.get("currentWorkspace").name
           : null;
@@ -257,17 +258,18 @@ export default {
           ? storage.get("baseInfo", "local").username
           : null;
         // 校验是否重名
-        let repeat = false
-        if (Array.isArray(this.$parent.dataList)) {
-          repeat = this.$parent.dataList.some( item => {
-            return item.dwsProjectList && item.dwsProjectList.some(it => it.name === value)
-          })
+        let repeat
+        try {
+          const res = await CheckProjectNameRepeat(value)
+          repeat = res.repeat
+        } catch (error) {
+          //
         }
         if ((currentWorkspaceName && username && value.match(currentWorkspaceName)) || value.match(username)) {
           callback(
             new Error(this.$t("message.workflow.projectDetail.validateName"))
           );
-        } else if(repeat && this.actionType === 'add') {
+        } else if (repeat && this.actionType === 'add') {
           callback(
             new Error(this.$t("message.workflow.projectDetail.nameUnrepeatable"))
           );

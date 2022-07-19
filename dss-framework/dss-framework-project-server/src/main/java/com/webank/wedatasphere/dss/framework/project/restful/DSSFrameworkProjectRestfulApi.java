@@ -107,9 +107,9 @@ public class DSSFrameworkProjectRestfulApi {
         try {
             dssFrameworkProjectService.checkProjectName(name, workspace, username);
         } catch (DSSProjectErrorException e) {
-            return Message.error(e.getDesc()).data("repeat", false);
+            return Message.error(e.getDesc()).data("repeat", true);
         }
-        return Message.ok("项目名检测成功").data("repeat", true);
+        return Message.ok("项目名检测成功").data("repeat", false);
     }
 
     /**

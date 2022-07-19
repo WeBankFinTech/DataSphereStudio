@@ -70,6 +70,9 @@ export default {
   watch: {
     list() {
       this.refresData()
+    },
+    open(v) {
+      this.refresData(v)
     }
   },
   data() {

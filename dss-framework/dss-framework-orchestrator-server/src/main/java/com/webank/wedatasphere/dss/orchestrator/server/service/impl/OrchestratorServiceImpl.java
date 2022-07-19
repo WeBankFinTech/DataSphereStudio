@@ -71,9 +71,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,8 +82,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-@PropertySource("classpath:dss-framework-orchestrator-server.properties")
-@EnableScheduling
 public class OrchestratorServiceImpl implements OrchestratorService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorServiceImpl.class);
@@ -451,16 +446,16 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    @Scheduled(cron = "0 0 3 * * ?")
     public void batchClearContextId() {
         LOGGER.info("--------------------{} start clear old contextId------------------------", LocalDateTime.now());
-        List<String> contextIdList = new ArrayList();
         try {
-            // 1、先去查询dss_orchestrator_version_info表，筛选出发布过30次及以上的编排，并获取老的发布记录。
-            List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue(),"time");
+            // 1、先去查询dss_orchestrator_version_info表，筛选出发布过n次及以上的编排，并获取老的发布记录。
+            List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
             if (historyOrcVersionList == null || historyOrcVersionList.isEmpty()) {
+                LOGGER.info("--------------------{} end clear old contextId------------------------", LocalDateTime.now());
                 return;
             }
+            List<String> contextIdList = historyOrcVersionList.stream().map(DSSOrchestratorVersion::getContextId).collect(Collectors.toList());
             // 2、将dss_orchestrator_version_info表contextId置空（不管cs清理是否成功，这部分数据都是废弃数据，可以先做清理）
             if (historyOrcVersionList.size() < DSSOrchestratorConstant.MAX_CLEAR_SIZE) {
                 orchestratorMapper.batchUpdateOrcInfo(historyOrcVersionList);
@@ -481,7 +476,10 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             List<Long> workflowIdList = historyOrcVersionList.stream().map(orcInfo -> orcInfo.getAppId()).collect(Collectors.toList());
             ResponseSubFlowContextIds response = (ResponseSubFlowContextIds) sender.ask(new RequestSubFlowContextIds(workflowIdList));
             if (response != null) {
-                contextIdList.addAll(response.getContextIdList());
+                List<String> subContextIdList = response.getContextIdList();
+                if (subContextIdList != null && subContextIdList.size() > 0) {
+                    contextIdList.addAll(response.getContextIdList());
+                }
             }
             // 4、调用linkis接口批量删除contextId
             ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
@@ -505,14 +503,14 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             // 5、删除历史bml文件
             LOGGER.info("--------------------{} start clear old bml resource------------------------", LocalDateTime.now());
             ResponseDeleteBmlSource responseDeleteBmlSource = (ResponseDeleteBmlSource) sender.ask(new RequestDeleteBmlSource(workflowIdList));
-            if(responseDeleteBmlSource.getJobStatus() == JobStatus.Success) {
+            if (responseDeleteBmlSource.getJobStatus() == JobStatus.Success) {
                 LOGGER.info("--------------------{} end clear old bml resource------------------------", LocalDateTime.now());
-            }else{
+            } else {
                 LOGGER.warn("--------------------{}  clear old bml resource failed------------------------", LocalDateTime.now());
             }
 
         } catch (Exception e) {
-            LOGGER.error("execute linkis batch clear csId failed，", e);
+            LOGGER.warn("execute linkis batch clear csId failed，", e);
         }
     }
 

@@ -452,6 +452,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             // 1、先去查询dss_orchestrator_version_info表，筛选出发布过n次及以上的编排，并获取老的发布记录。
             List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
             if (historyOrcVersionList == null || historyOrcVersionList.isEmpty()) {
+                LOGGER.info("--------------------{} end clear old contextId------------------------", LocalDateTime.now());
                 return;
             }
             List<String> contextIdList = historyOrcVersionList.stream().map(DSSOrchestratorVersion::getContextId).collect(Collectors.toList());

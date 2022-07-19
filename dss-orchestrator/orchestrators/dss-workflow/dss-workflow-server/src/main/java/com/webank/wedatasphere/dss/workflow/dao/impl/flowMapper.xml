@@ -129,6 +129,7 @@
             <if test="uses != null">uses=#{uses},</if>
             <if test="resourceId != null">resource_id=#{resourceId},</if>
             <if test="bmlVersion != null">bml_version=#{bmlVersion},</if>
+            <if test="metrics != null">metrics=#{metrics},</if>
             <if test="linkedAppConnNames != null">linked_appconn_names=#{linkedAppConnNames},</if>
         </trim>
         WHERE id =#{id}

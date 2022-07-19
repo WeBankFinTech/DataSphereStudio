@@ -292,6 +292,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         dssFlow.setDescription(comment);
         dssFlow.setResourceId(bmlReturnMap.get("resourceId").toString());
         dssFlow.setBmlVersion(bmlReturnMap.get("version").toString());
+        updateMetrics(dssFlow, jsonFlow);
         //todo 数据库增加版本更新
         flowMapper.updateFlowInputInfo(dssFlow);
 
@@ -303,6 +304,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         String version = bmlReturnMap.get("version").toString();
         return version;
+    }
+
+    private void updateMetrics(DSSFlow dssFlow, String flowJson) {
+        Map<String, Object> metricsMap = new HashMap<>();
+        List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(flowJson);
+        metricsMap.put("totalNodes", nodes == null ? 0 : nodes.size());
+        if (nodes != null) {
+            Map<String, Long> mapCnt = nodes.stream().collect(Collectors.groupingBy(DSSNode::getNodeType, Collectors.counting()));
+            metricsMap.putAll(mapCnt);
+        }
+        dssFlow.setMetrics(new Gson().toJson(metricsMap));
     }
 
     public boolean isEqualTwoJson(String oldJsonNode, String newJsonNode) {
@@ -366,11 +378,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                 String projectName, String version, String contextIdStr,
                                 String description, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
-        if(dssFlow == null) {
-            throw new DSSErrorException(50030, "Workflow " + rootFlowId + " is not exists[工作流不存在，请检查是否已被删除].");
-        }
-        logger.info("User {} try to copy workflow {} in project {} with newVersion {} and contextId {}.", userName,
-                dssFlow.getName(), projectName, version, contextIdStr);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels);

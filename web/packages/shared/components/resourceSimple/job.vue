@@ -103,13 +103,8 @@ export default {
       this.jobList = [];
       this.loading = true;
       try {
-        const rst = await api.fetch('/jobhistory/list', {
-          pageSize: 100,
-          status: 'Running,Inited,Scheduled',
-        }, 'get')
+        const rst = await api.fetch('/jobhistory/listundone', {}, 'get')
         this.loading = false;
-        this.dispatch('Footer:updateRunningJob', rst.tasks.length);
-
         rst.tasks.forEach((item) => {
           const tmpItem = Object.assign({}, item, { isActive: false, fileName: this.convertJson(item) });
           this.jobList.push(tmpItem);
@@ -118,7 +113,6 @@ export default {
           }
         });
         this.jobList = orderBy(this.jobList, ['status', 'fileName']);
-        this.$emit('update-job', rst.tasks.length);
       } catch (err) {
         this.loading = false;
         console.error(err)

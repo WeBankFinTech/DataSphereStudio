@@ -25,7 +25,6 @@
         ref="job"
         v-if="switcher === 'job'"
         :dispatch="dispatch"
-        @update-job="updateJob"
         @close-modal="close"
         @change-loading="changeLoading"
         @change-job-disabled="changeJobDisabled"/>
@@ -33,6 +32,7 @@
         ref="engine"
         v-else-if="switcher === 'session'"
         @disabled="engineDisabledChange"
+        @update-job="updateJob"
         @change-loading="changeLoading"/>
       <queue
         ref="queue"

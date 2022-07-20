@@ -132,10 +132,7 @@
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
 export default {
-  name: 'Job',
-  filters: {
-
-  },
+  name: 'Engine',
   data() {
     return {
       btnSize: 'small',
@@ -280,6 +277,7 @@ export default {
             this.otherEngineList.push(item);
           }
         });
+        this.$emit('update-job', res.engines.length);
         // 根据状态改变数据
         this.getClassListAction(this.ideSelectData, this.ideEngineList, this.ideClassList);
         this.getClassListAction(this.boardSelectData, this.boardEngineList, this.boardClassList);

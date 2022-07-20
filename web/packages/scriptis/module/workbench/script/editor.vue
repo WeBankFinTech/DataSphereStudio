@@ -136,9 +136,6 @@ export default {
     };
   },
   computed: {
-    listenResource() {
-      return this.script.running;
-    },
     isHdfs() {
       return this.work.filepath.indexOf('hdfs') === 0;
     },
@@ -147,17 +144,6 @@ export default {
     }
   },
   watch: {
-    listenResource(val) {
-      if (!val) {
-        api.fetch('/jobhistory/list', {
-          pageSize: 100,
-          status: 'Running,Inited,Scheduled',
-        }, 'get').then((rst) => {
-          this.dispatch('Footer:updateRunningJob', rst.tasks.length);
-        }).catch(() => {
-        });
-      }
-    },
     'work.unsave'(val) {
       if (!val) {
         this.$refs.setting.origin = JSON.stringify(this.script.params);

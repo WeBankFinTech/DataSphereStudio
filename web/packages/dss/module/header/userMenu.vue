@@ -64,7 +64,7 @@ export default {
           this.clearCache();
           break;
         case 'logout':
-          this.getRunningJob();
+          this.logout();
           break;
         case 'changeLang':
           this.changeLang();
@@ -92,9 +92,6 @@ export default {
         onCancel: () => {
         },
       });
-    },
-    getRunningJob() {
-      this.logout();
     },
     logout() {
       api.fetch('/user/logout', {}).then(() => {

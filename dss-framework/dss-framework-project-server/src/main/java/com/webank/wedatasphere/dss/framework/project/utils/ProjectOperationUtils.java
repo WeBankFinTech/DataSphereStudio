@@ -52,7 +52,7 @@ public class ProjectOperationUtils {
                             (structureOperation, structureRequestRef) -> {
                                 structureRequestRef.setDSSLabels(appInstance.getLabels()).setWorkspace(workspace);
                                 return responseRefConsumer.apply(structureOperation, (K) structureRequestRef);
-                            }, errorMsg);
+                            }, appConn.getAppDesc().getAppName() + " try to " + errorMsg);
                     if(dealResponseRefConsumer != null) {
                         dealResponseRefConsumer.accept(new ImmutablePair<>(appConn, appInstance), responseRef);
                     }

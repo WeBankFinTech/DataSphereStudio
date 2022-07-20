@@ -141,7 +141,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                     dssJobContentRequestRef.setDSSJobContent(new HashMap<>());
                     String orcVersion;
                     try {
-                        orcVersion = getOrcVersion(node.getFlowId());
+                        orcVersion = getOrcVersion(node);
                     } catch (Exception e) {
                         throw new ExternalOperationFailedException(50205, "get workflow version failed.", e);
                     }
@@ -203,7 +203,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
     public Map<String, Object> copyNode(String userName, CommonAppConnNode newNode,
                                         CommonAppConnNode oldNode, String orcVersion) throws IOException, DSSErrorException {
         if (StringUtils.isBlank(orcVersion)) {
-            orcVersion = getOrcVersion(oldNode.getFlowId());
+            orcVersion = getOrcVersion(oldNode);
         }
         String finalOrcVersion = orcVersion;
         RefJobContentResponseRef responseRef = tryNodeOperation(userName, oldNode,
@@ -272,11 +272,14 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         }
     }
 
-    private String getOrcVersion(Long flowId) throws IOException {
-        if (flowId == null) {
-            return null;
+    private String getOrcVersion(CommonAppConnNode node) throws IOException {
+        if (node.getFlowId() == null) {
+            throw new NullPointerException("The flowId is null, please ask admin for help!");
         }
-        DSSFlow dssFlow = dssFlowService.getFlow(flowId);
+        DSSFlow dssFlow = dssFlowService.getFlow(node.getFlowId());
+        if(StringUtils.isBlank(node.getFlowName())) {
+            node.setFlowName(dssFlow.getName());
+        }
         return workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSJobContentConstant.ORC_VERSION_KEY);
     }
 

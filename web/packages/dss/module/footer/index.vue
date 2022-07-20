@@ -62,11 +62,9 @@ export default {
   },
   methods: {
     getRunningJob() {
-      api.fetch('/jobhistory/list', {
-        pageSize: 100,
-        status: 'Running,Inited,Scheduled',
-      }, 'get').then((rst) => {
-        this.num = rst.tasks.length;
+      // 换成展示引擎数
+      api.fetch('/linkisManager/rm/engines').then((rst) => {
+        this.num = rst.engines.length;
       });
     },
     'Footer:updateRunningJob'(num) {

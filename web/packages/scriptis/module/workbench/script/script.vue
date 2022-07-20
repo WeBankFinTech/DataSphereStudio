@@ -600,9 +600,7 @@ export default {
           this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
           cb && cb('start');
         });
-        this.execute.on('updateResource', (num) => {
-          this.dispatch('Footer:updateRunningJob', num);
-        });
+
         this.execute.on('log', (logs) => {
           let hasLogInfo = Array.isArray(logs) ? logs.some((it) => it.length > 0) : logs;
           if (!hasLogInfo) {

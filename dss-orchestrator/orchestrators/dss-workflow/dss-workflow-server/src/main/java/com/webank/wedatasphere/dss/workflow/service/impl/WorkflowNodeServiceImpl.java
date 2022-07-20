@@ -172,7 +172,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 (developmentOperation, developmentRequestRef) -> {
                     developmentRequestRef.setDSSLabels(node.getDssLabels()).setUserName(userName).setWorkspace(node.getWorkspace()).setName(name).setType(node.getNodeType());
                     return requestRefOperationFunction.apply(developmentOperation, (K) developmentRequestRef);
-                }, responseRefConsumer, operation + " workflow node " + name);
+                }, responseRefConsumer, appConn.getAppDesc().getAppName() + " try to " + operation + " workflow node " + name);
     }
 
     private Long parseProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) {

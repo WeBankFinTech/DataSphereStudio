@@ -5,8 +5,12 @@ import com.webank.wedatasphere.dss.standard.app.development.operation.Developmen
 import com.webank.wedatasphere.dss.standard.app.development.ref.*;
 import com.webank.wedatasphere.dss.standard.app.development.service.DevelopmentService;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.linkis.common.exception.WarnException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +57,21 @@ public class DevelopmentOperationUtils {
         if(projectRefRequestRefConsumer != null && requestRef instanceof ProjectRefRequestRef) {
             projectRefRequestRefConsumer.accept((ProjectRefRequestRef) requestRef);
         }
-        V responseRef = requestRefOperationFunction.apply(operation, requestRef);
+        V responseRef;
+        try {
+            responseRef = requestRefOperationFunction.apply(operation, requestRef);
+        } catch (WarnException e) {
+            String error;
+            if(StringUtils.isBlank(e.getDesc())) {
+                error = String.format("%s failed, no detail error returned by this AppConn, please ask admin for help.", errorMsg);
+            } else {
+                error = String.format("%s failed. Caused by: %s.", errorMsg, e.getDesc());
+            }
+            throw new ExternalOperationFailedException(50010, error, e);
+        } catch (RuntimeException e) {
+            String error = String.format("%s failed. Caused by: %s.", errorMsg, ExceptionUtils.getRootCauseMessage(e));
+            throw new ExternalOperationFailedException(50010, error, e);
+        }
         if(responseRef.isFailed()) {
             LOGGER.error("{} failed. Caused by: {}.", errorMsg, responseRef.getErrorMsg());
             DSSExceptionUtils.dealWarnException(61123,

@@ -58,10 +58,7 @@ export default {
   },
   methods: {
     getRunningJob() {
-      api.fetch('/jobhistory/list', {
-        pageSize: 100,
-        status: 'Running,Inited,Scheduled',
-      }, 'get').then((rst) => {
+      api.fetch('/jobhistory/listundone', {}, 'get').then((rst) => {
         this.num = rst.tasks.length;
       });
     },

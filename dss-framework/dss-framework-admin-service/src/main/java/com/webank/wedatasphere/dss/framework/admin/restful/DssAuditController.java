@@ -1,4 +1,5 @@
 package com.webank.wedatasphere.dss.framework.admin.restful;
+
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssScriptDownloadAudit;
@@ -35,7 +36,7 @@ public class DssAuditController {
         String userName = SecurityFilter.getLoginUsername(request);
         dssScriptDownloadAudit.setCreator(userName);
         String sql = dssScriptDownloadAudit.getSql();
-        if(sql.length() > 2000){
+        if (sql.length() > 2000) {
             sql = sql.substring(0, 2000);
             dssScriptDownloadAudit.setSql(sql);
         }

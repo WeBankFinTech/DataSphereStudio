@@ -188,6 +188,7 @@ public class ApiServiceCoreRestfulApi {
             }
 
             String userName = SecurityFilter.getLoginUsername(req);
+            LOG.info("user {} begin to create api, params: {}", userName, apiService);
             Set<ConstraintViolation<ApiServiceVo>> result = beanValidator.validate(apiService, Default.class);
             if (result.size() > 0) {
                 throw new ConstraintViolationException(result);
@@ -276,6 +277,7 @@ public class ApiServiceCoreRestfulApi {
             }
 
             String userName = SecurityFilter.getLoginUsername(req);
+            LOG.info("user {} try to update service api, params: {}", userName, apiService);
 //            Bean validation
             Set<ConstraintViolation<ApiServiceVo>> result = beanValidator.validate(apiService, Default.class);
             if (result.size() > 0) {
@@ -421,6 +423,7 @@ public class ApiServiceCoreRestfulApi {
             if (null == id) {
                 return Message.error("'api service api id' is missing[缺少api id]");
             }
+            LOG.info("user {} begin to disable service api, id: {}", userName, id);
             boolean resultFlag = apiService.disableApi(id,userName);
             return Message.ok().data("result", resultFlag);
         }, "/apiservice/apiDisable", "Fail to disable api[禁用api失败]");
@@ -434,6 +437,7 @@ public class ApiServiceCoreRestfulApi {
             if (null == id) {
                 return Message.error("'api service api id' is missing[缺少api id]");
             }
+            LOG.info("user {} begin to enable service api, id: {}", userName, id);
             boolean resultFlag = apiService.enableApi(id,userName);
             return Message.ok().data("result", resultFlag);
         }, "/apiservice/apiEnable", "Fail to enable api[启用api失败]");
@@ -448,6 +452,7 @@ public class ApiServiceCoreRestfulApi {
             if (null == id) {
                 return Message.error("'api service api id' is missing[缺少api id]");
             }
+            LOG.info("user {} try to delete service api, id: {}", userName, id);
             boolean resultFlag = apiService.deleteApi(id,userName);
             return Message.ok().data("result", resultFlag);
         }, "/apiservice/apiDelete", "Fail to delete api[删除api失败]");
@@ -464,9 +469,10 @@ public class ApiServiceCoreRestfulApi {
             if (null == id) {
                 return Message.error("'api service api id' is missing[缺少api id]");
             }
+            LOG.info("user {} try to update comment, params: {}", userName, apiCommentUpdateRequest);
             boolean resultFlag = apiService.updateComment(id,comment,userName);
             return Message.ok().data("result", resultFlag);
-        }, "/apiservice/apiDelete", "Fail to delete api[删除api失败]");
+        }, "/apiservice/apiDelete", "Fail to update comment api[更新评论失败]");
     }
 
 

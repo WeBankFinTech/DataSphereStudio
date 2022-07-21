@@ -60,6 +60,7 @@ public class DssProxyUserController {
                 } else if (StringUtils.isEmpty(userRep.getProxyUserName())) {
                     DSSExceptionUtils.dealErrorException(100102, "Proxy user name is empty", DSSAdminErrorException.class);
                 } else if (dssProxyUserService.isExists(userRep.getUserName(), userRep.getProxyUserName())) {
+                    LOGGER.info("user {} try to add user cookie, params: {}", username, userRep);
                     for (Cookie cookie : req.getCookies()) {
                         if (null != cookie && cookie.getName().equalsIgnoreCase(PROXY_USER_TICKET_ID_STRING)) {
                             cookie.setValue(null);

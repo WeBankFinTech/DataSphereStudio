@@ -1,5 +1,4 @@
 package com.webank.wedatasphere.dss.framework.admin.restful;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssScriptDownloadAudit;
@@ -9,7 +8,6 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.apache.linkis.server.Message;
 
@@ -35,17 +33,15 @@ public class DssAuditController {
     @RequestMapping(path = "script/download/save", method = RequestMethod.POST)
     public Message saveScriptDownload(@RequestBody @Valid DssScriptDownloadAudit dssScriptDownloadAudit, HttpServletRequest request) {
         String userName = SecurityFilter.getLoginUsername(request);
-//        String userName = "demo";
         dssScriptDownloadAudit.setCreator(userName);
         String sql = dssScriptDownloadAudit.getSql();
-        if(sql.length()>2000){
-            sql = sql.substring(0,2000);
+        if(sql.length() > 2000){
+            sql = sql.substring(0, 2000);
             dssScriptDownloadAudit.setSql(sql);
         }
         LOGGER.info("user {} try to saveScriptDownload, params:{}", userName, dssScriptDownloadAudit);
         dssScriptDownloadService.save(dssScriptDownloadAudit);
-        Message message = Message.ok();
-        return message;
+        return Message.ok();
     }
 
     @RequestMapping(path = "script/download/query", method = RequestMethod.GET)
@@ -55,8 +51,7 @@ public class DssAuditController {
         LOGGER.info("user {} try to queryScriptDownload, startTime:{}, endTime:{}, page:{}", userName, startTime, endTime, pn);
         List<DssScriptDownloadAudit> userPage = dssScriptDownloadService.getDownloadAuditList(userName, startTime, endTime);
         PageInfo<DssScriptDownloadAudit> pageInfo = new PageInfo<>(userPage);
-        Message message = Message.ok().data("data", pageInfo);
-        return message;
+        return Message.ok().data("data", pageInfo);
     }
 }
 

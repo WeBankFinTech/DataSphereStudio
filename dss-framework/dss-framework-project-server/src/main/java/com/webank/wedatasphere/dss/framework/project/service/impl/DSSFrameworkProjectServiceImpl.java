@@ -78,7 +78,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     @Transactional(rollbackFor = Exception.class)
     public DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace) throws Exception {
         //1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程
-        //2.开始创建appconn的相关的工程，如果失败了，抛异常，然后进行数据库进行回滚
+        //2.开始创建appconn的相关的工程，如果失败了，抛异常，然后数据库进行回滚
         boolean isWorkspaceUser = projectUserService.isWorkspaceUser(projectCreateRequest.getWorkspaceId(), username);
         //非管理员
         if (!isWorkspaceUser) {
@@ -86,7 +86,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
         //增加名称长度限制
         if(projectCreateRequest.getName().length()> MAX_PROJECT_NAME_SIZE || projectCreateRequest.getDescription().length() > MAX_PROJECT_DESC_SIZE){
-            DSSExceptionUtils.dealErrorException(60021,"project name or desc is too long for project name length is " + projectCreateRequest.getName().length()
+            DSSExceptionUtils.dealErrorException(60021,"Project name or desc is too long and project name length is " + projectCreateRequest.getName().length()
                     + ", project desc length is " + projectCreateRequest.getDescription().length(), DSSProjectErrorException.class);
         }
 
@@ -214,7 +214,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                                         Workspace workspace,
                                         List<String> appConnNameList,
                                         String username) throws ExternalOperationFailedException {
-        LOGGER.info("begin to check whether the project name {} is already exists in third-party AppConn...", dssProjectCreateRequest.getName());
+        LOGGER.info("Begin to check whether the project name {} is already exists in third-party AppConn...", dssProjectCreateRequest.getName());
         tryProjectOperation(null, workspace, ProjectService::getProjectSearchOperation,
                 null,
                 (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setProjectName(dssProjectCreateRequest.getName()).setUserName(username),
@@ -252,7 +252,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                         appConnListMap.get(pair.left).add(pair.right);
                     }, "create refProject " + dssProjectCreateRequest.getName());
         } catch (RuntimeException e) {
-            LOGGER.error("create appconn project failed:", e);
+            LOGGER.error("create appconn project failed, possible reasons include appconn creating project transaction timeout or creating transaction rollback exception, etc.:", e);
             if(!STRICT_PROJECT_CREATE_MODE) {
                 throw e;
             }

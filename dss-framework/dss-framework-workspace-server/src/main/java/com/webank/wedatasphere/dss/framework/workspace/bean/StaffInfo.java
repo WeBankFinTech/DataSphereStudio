@@ -16,31 +16,29 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.bean;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
+import com.google.gson.annotations.SerializedName;
 
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class StaffInfo {
-    @JsonProperty(value = "ID")
+    @SerializedName(value = "ID")
     private String id;
-    @JsonProperty(value = "StaffID")
+    @SerializedName(value = "StaffID")
     private String staffId;
-    @JsonProperty(value = "OID")
+    @SerializedName(value = "OID")
     private String oId;
-    @JsonProperty(value = "ChineseName")
+    @SerializedName(value = "ChineseName")
     private String chineseName;
-    @JsonProperty(value = "EnglishName")
+    @SerializedName(value = "EnglishName")
     private String englishName;
-    @JsonProperty(value = "FullName")
+    @SerializedName(value = "FullName")
     private String fullName;
-    @JsonProperty(value = "OrgName")
+    @SerializedName(value = "OrgName")
     private String orgName;
-    @JsonProperty(value = "OrgFullName")
+    @SerializedName(value = "OrgFullName")
     private String orgFullName;
-    @JsonProperty(value = "Status")
+    @SerializedName(value = "Status")
     private String status;
-    @JsonProperty(value = "PersonGroup")
+    @SerializedName(value = "PersonGroup")
     private String personGroup;
 
     public StaffInfo(){

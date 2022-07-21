@@ -25,7 +25,7 @@ public class LdapServiceImpl implements LdapService {
         basicAttributes.put("cn", userName);
         basicAttributes.put("uid", userName);
         basicAttributes.put("userPassword", pwd);
-        ctx.createSubcontext("uid="+userName+","+baseDN, basicAttributes);
+        ctx.createSubcontext("uid=" + userName + "," + baseDN, basicAttributes);
         LdapUtils.closeContext(ctx);
     }
 
@@ -46,13 +46,12 @@ public class LdapServiceImpl implements LdapService {
         LdapContext ctx = LdapUtils.connectLDAP(adminName, adminPassword, ldapUrl);
         SearchControls searchCtls = new SearchControls();
         searchCtls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        String searchFilter = "uid="+userName;
-        String searchBase = baseDN;
-        String returnedAtts[] = { "cn" };
+        String searchFilter = "uid=" + userName;
+        String[] returnedAtts = { "cn" };
         searchCtls.setReturningAttributes(returnedAtts);
         boolean exist = false;
 
-        NamingEnumeration entries = ctx.search(searchBase, searchFilter, searchCtls);
+        NamingEnumeration entries = ctx.search(baseDN, searchFilter, searchCtls);
         if(entries.hasMore()){
             exist = true;
         }
@@ -60,10 +59,5 @@ public class LdapServiceImpl implements LdapService {
         return  exist;
 
         }
-
-
-    public static void main(String[] args) throws NamingException {
-
-    }
 
 }

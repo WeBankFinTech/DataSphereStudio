@@ -104,6 +104,7 @@ public class DssProxyUserController {
             }else  if (dssProxyUserService.isExists(userRep.getUserName(),userRep.getProxyUserName())) {
                 DSSExceptionUtils.dealErrorException(100107, "Failed to add proxy user，'userName：" + userRep.getUserName() + ",proxyName："+userRep.getProxyUserName()+" already exists", DSSAdminErrorException.class);
             }
+            LOGGER.info("Add proxy user {}", username);
             dssProxyUserService.insertProxyUser(userRep);
             return Message.ok("Success to add proxy user");
         } catch (Exception exception) {

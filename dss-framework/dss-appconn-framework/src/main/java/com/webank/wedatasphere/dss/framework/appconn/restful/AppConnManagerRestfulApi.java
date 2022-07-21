@@ -21,12 +21,14 @@ import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnQualityChecker;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
+
+import static com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf.APPCONN_UPLOAD_THREAD_NUM;
 
 @RequestMapping(path = "/dss/framework/project/appconn", produces = {"application/json"})
 @RestController
@@ -51,8 +58,11 @@ public class AppConnManagerRestfulApi {
     @Autowired
     private List<AppConnQualityChecker> appConnQualityCheckers;
 
+    private ExecutorService uploadThreadPool = Utils.newFixedThreadPool(APPCONN_UPLOAD_THREAD_NUM.getValue(), "Upload-Appconn-Thread-", false);
+
+
     @PostConstruct
-    public void init() {
+    public void init() throws InterruptedException {
         if (AppConnConf.IS_APPCONN_MANAGER.getValue()) {
             LOGGER.info("First, try to load all AppConn...");
             AppConnManager.getAppConnManager().listAppConns().forEach(appConn -> {
@@ -62,18 +72,29 @@ public class AppConnManagerRestfulApi {
             LOGGER.info("All AppConn have loaded successfully.");
             LOGGER.info("Last, try to scan AppConn plugins and upload AppConn resources...");
             // reference不为空，说明是引用的其他appconn，不用上传appconn目录
-            appConnInfoService.getAppConnInfos().stream().filter(l -> StringUtils.isBlank(l.getReference()))
-                    .forEach(DSSExceptionUtils.handling(appConnInfo -> {
-                LOGGER.info("Try to scan AppConn {}.", appConnInfo.getAppConnName());
-                appConnResourceUploadService.upload(appConnInfo.getAppConnName());
-            }));
+            List<AppConnInfo> uploadList = appConnInfoService.getAppConnInfos().stream().filter(l -> StringUtils.isBlank(l.getReference())).collect(Collectors.toList());
+            CountDownLatch cdl = new CountDownLatch(uploadList.size());
+            uploadList.forEach(appConnInfo -> {
+                uploadThreadPool.submit(() -> {
+                    LOGGER.info("Try to scan AppConn {}.", appConnInfo.getAppConnName());
+                    try {
+                        appConnResourceUploadService.upload(appConnInfo.getAppConnName());
+                    } catch (Exception e) {
+                        LOGGER.error("Error happened when uploading appconn:{}", appConnInfo.getAppConnName());
+                        throw new DSSRuntimeException(ExceptionUtils.getRootCauseMessage(e));
+                    }
+                    cdl.countDown();
+                });
+            });
+            cdl.await();
             LOGGER.info("All AppConn plugins has scanned.");
+            uploadThreadPool.shutdown();
         } else {
             LOGGER.info("Not appConn manager, will not scan plugins.");
         }
     }
 
-    @RequestMapping(path ="listAppConnInfos", method = RequestMethod.GET)
+    @RequestMapping(path = "listAppConnInfos", method = RequestMethod.GET)
     public Message listAppConnInfos() {
         List<? extends AppConnInfo> appConnInfos = appConnInfoService.getAppConnInfos();
         Message message = Message.ok("Get AppConnInfo list succeed.");
@@ -81,7 +102,7 @@ public class AppConnManagerRestfulApi {
         return message;
     }
 
-    @RequestMapping(path ="{appConnName}/get", method = RequestMethod.GET)
+    @RequestMapping(path = "{appConnName}/get", method = RequestMethod.GET)
     public Message get(@PathVariable("appConnName") String appConnName) {
         LOGGER.info("try to get appconn info:{}.", appConnName);
         AppConnInfo appConnInfo = appConnInfoService.getAppConnInfo(appConnName);
@@ -90,7 +111,7 @@ public class AppConnManagerRestfulApi {
         return message;
     }
 
-    @RequestMapping(path ="{appConnName}/getAppInstances", method = RequestMethod.GET)
+    @RequestMapping(path = "{appConnName}/getAppInstances", method = RequestMethod.GET)
     public Message getAppInstancesByAppConnInfo(@PathVariable("appConnName") String appConnName) {
         LOGGER.info("try to get instances for appconn: {}.", appConnName);
         List<? extends AppInstanceInfo> appInstanceInfos = appConnInfoService.getAppInstancesByAppConnName(appConnName);
@@ -99,7 +120,7 @@ public class AppConnManagerRestfulApi {
         return message;
     }
 
-    @RequestMapping(path ="{appConnName}/load", method = RequestMethod.GET)
+    @RequestMapping(path = "{appConnName}/load", method = RequestMethod.GET)
     public Message load(@PathVariable("appConnName") String appConnName) {
         LOGGER.info("Try to reload AppConn {}.", appConnName);
         try {

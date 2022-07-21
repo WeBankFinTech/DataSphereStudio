@@ -100,12 +100,8 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("user {} begin to checkProjectName: {}", username, name);
-        try {
-            dssFrameworkProjectService.checkProjectName(name, workspace, username);
-        } catch (DSSProjectErrorException e) {
-            return Message.error(e.getDesc()).data("repeat", true);
-        }
-        return Message.ok("项目名检测成功").data("repeat", false);
+        return DSSExceptionUtils.getMessage(() -> dssFrameworkProjectService.checkProjectName(name, workspace, username),
+                () -> Message.ok().data("repeat", false), String.format("用户 %s 创建工程 %s 失败. ", username, name));
     }
 
     /**
@@ -119,7 +115,7 @@ public class DSSFrameworkProjectRestfulApi {
     public Message modifyProject(HttpServletRequest request, @RequestBody ProjectModifyRequest projectModifyRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-        if(projectModifyRequest.getId() == null || projectModifyRequest.getId() < 0) {
+        if (projectModifyRequest.getId() == null || projectModifyRequest.getId() < 0) {
             return Message.error("project id is null, cannot modify it.");
         }
         LOGGER.info("user {} begin to modify project in workspace {}, params: {}.", username, workspace.getWorkspaceName(), projectModifyRequest);

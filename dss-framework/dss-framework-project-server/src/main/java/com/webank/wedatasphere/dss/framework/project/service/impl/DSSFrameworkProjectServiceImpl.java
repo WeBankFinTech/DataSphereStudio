@@ -43,6 +43,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.conf.CommonVars;
+import org.apache.linkis.common.exception.WarnException;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,19 +79,20 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     @Transactional(rollbackFor = Exception.class)
     public DSSProjectVo createProject(ProjectCreateRequest projectCreateRequest, String username, Workspace workspace) throws Exception {
         //1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程
-        //2.开始创建appconn的相关的工程，如果失败了，抛异常，然后数据库进行回滚
+        //2.开始创建appconn的相关的工程，如果失败了，抛异常，然后进行数据库进行回滚
         boolean isWorkspaceUser = projectUserService.isWorkspaceUser(projectCreateRequest.getWorkspaceId(), username);
         //非管理员
         if (!isWorkspaceUser) {
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_USER_NOT_IN_WORKSPACE.getCode(), ProjectServerResponse.PROJECT_USER_NOT_IN_WORKSPACE.getMsg(), DSSProjectErrorException.class);
         }
         //增加名称长度限制
-        if(projectCreateRequest.getName().length()> MAX_PROJECT_NAME_SIZE || projectCreateRequest.getDescription().length() > MAX_PROJECT_DESC_SIZE){
-            DSSExceptionUtils.dealErrorException(60021,"Project name or desc is too long and project name length is " + projectCreateRequest.getName().length()
-                    + ", project desc length is " + projectCreateRequest.getDescription().length(), DSSProjectErrorException.class);
+        if(projectCreateRequest.getName().length()> MAX_PROJECT_NAME_SIZE){
+            DSSExceptionUtils.dealErrorException(60021,"project name is too long. the length must be less than " + MAX_PROJECT_NAME_SIZE, DSSProjectErrorException.class);
+        } else if(projectCreateRequest.getDescription().length() > MAX_PROJECT_DESC_SIZE) {
+            DSSExceptionUtils.dealErrorException(60021,"project description is too long. the length must be less than " + MAX_PROJECT_DESC_SIZE, DSSProjectErrorException.class);
         }
 
-        this.checkProjectName(projectCreateRequest.getName(),workspace,username);
+        this.checkProjectName(projectCreateRequest.getName(), workspace, username);
 
         Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace, username);
         //3.保存dss_project
@@ -122,8 +124,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         projectCreateRequest.setName(name);
         try {
             isExistSameProjectName(projectCreateRequest, workspace, appConnNameList, username);
+        } catch (WarnException e) {
+            throw new DSSProjectErrorException(71000, "向第三方应用发起检查工程名是否重复失败. " + e.getDesc(), e);
         } catch (Exception e) {
-            throw new DSSProjectErrorException(71000, "向第三方应用发起检查工程名是否重复失败，原因：" + ExceptionUtils.getRootCauseMessage(e), e);
+            throw new DSSProjectErrorException(71000, "向第三方应用发起检查工程名是否重复失败. 原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
         if (!appConnNameList.isEmpty()) {
             throw new DSSProjectErrorException(71000, String.join(", ", appConnNameList) + " 已存在相同项目名称，请重新命名!");
@@ -214,7 +218,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                                         Workspace workspace,
                                         List<String> appConnNameList,
                                         String username) throws ExternalOperationFailedException {
-        LOGGER.info("Begin to check whether the project name {} is already exists in third-party AppConn...", dssProjectCreateRequest.getName());
+        LOGGER.info("begin to check whether the project name {} is already exists in third-party AppConn...", dssProjectCreateRequest.getName());
         tryProjectOperation(null, workspace, ProjectService::getProjectSearchOperation,
                 null,
                 (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setProjectName(dssProjectCreateRequest.getName()).setUserName(username),
@@ -224,7 +228,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     if(responseRef.getRefProjectId() != null && responseRef.getRefProjectId() > 0 && projectService.isProjectNameUnique()) {
                         appConnNameList.add(pair.getLeft().getAppDesc().getAppName());
                     }
-                }, "check project name " + dssProjectCreateRequest.getName() + " whether third-party refProject is exists");
+                }, "check project name " + dssProjectCreateRequest.getName() + " whether it is exists");
     }
 
     // 1.新建DSS工程,这样才能进行回滚,如果后面去DSS工程，可能会由于DSS工程建立失败了，但是仍然无法去回滚第三方系统的工程 新增dss_project调用
@@ -252,20 +256,34 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                         appConnListMap.get(pair.left).add(pair.right);
                     }, "create refProject " + dssProjectCreateRequest.getName());
         } catch (RuntimeException e) {
-            LOGGER.error("create appconn project failed, possible reasons include appconn creating project transaction timeout or creating transaction rollback exception, etc.:", e);
+            LOGGER.error("create AppConn project failed!", e);
             if(!STRICT_PROJECT_CREATE_MODE) {
                 throw e;
             }
+            LOGGER.warn("Strict project create mode is opened, now try to delete the projects {} created in external AppConns.", dssProjectCreateRequest.getName());
             // 如果创建失败并且是严格创建模式
             // 如果一个AppInstance实例是失败的，那么我们将所有已经建的工程给撤销掉
-            appConnListMap.forEach((key, value) -> value.forEach(appInstance -> {
-                StructureOperationUtils.tryProjectOperation(() -> ((OnlyStructureAppConn) key).getOrCreateStructureStandard().getProjectService(appInstance),
-                        ProjectService::getProjectDeletionOperation, null,
-                        refProjectContentRequestRef -> refProjectContentRequestRef.setRefProjectId(projectMap.get(appInstance))
-                                .setProjectName(dssProjectCreateRequest.getName()).setWorkspace(workspace).setUserName(username),
-                        (structureOperation, structureRequestRef) -> ((ProjectDeletionOperation) structureOperation).deleteProject((RefProjectContentRequestRef) structureRequestRef),
-                        "delete refProject " + dssProjectCreateRequest.getName());
-            }));
+            try {
+                appConnListMap.forEach((key, value) -> value.forEach(appInstance -> {
+                    LOGGER.warn("{} try to delete the create-failed project {} with AppInstance {}!", key.getAppDesc().getAppName(), dssProjectCreateRequest.getName(), appInstance.getBaseUrl());
+                    StructureOperationUtils.tryProjectOperation(() -> ((OnlyStructureAppConn) key).getOrCreateStructureStandard().getProjectService(appInstance),
+                            ProjectService::getProjectDeletionOperation, null,
+                            refProjectContentRequestRef -> refProjectContentRequestRef.setRefProjectId(projectMap.get(appInstance))
+                                    .setProjectName(dssProjectCreateRequest.getName()).setWorkspace(workspace).setUserName(username),
+                            (structureOperation, structureRequestRef) -> ((ProjectDeletionOperation) structureOperation).deleteProject((RefProjectContentRequestRef) structureRequestRef),
+                            key.getAppDesc().getAppName() + " try to delete refProject " + dssProjectCreateRequest.getName());
+                }));
+            } catch (RuntimeException e1) {
+                // 原则上，如果删除失败，只是会存在一个无用的工程，不会对用户的使用造成影响
+                LOGGER.error("try to delete the create-failed project {} in AppConn failed!", dssProjectCreateRequest.getName(), e1);
+                String errorMsg;
+                if(e instanceof WarnException) {
+                    errorMsg = String.format("%s. please notify the admin that try to rollback the created projects in external AppConn failed.", ((WarnException) e).getDesc());
+                } else {
+                    errorMsg = String.format("create project failed, Reason: %s. please notify the admin that try to rollback the created projects in external AppConn failed.", ExceptionUtils.getRootCauseMessage(e));
+                }
+                throw new ExternalOperationFailedException(50009, errorMsg, e);
+            }
             throw e;
         }
         return projectMap;

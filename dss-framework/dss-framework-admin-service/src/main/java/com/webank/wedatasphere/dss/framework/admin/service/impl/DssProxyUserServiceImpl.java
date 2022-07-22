@@ -22,26 +22,20 @@ public class DssProxyUserServiceImpl implements DssProxyUserService {
 
     @Override
     public List<String> getProxyUserNameList(String userName) {
-        List<DssProxyUser> userList = dssProxyUserMapper.selectProxyUserList(userName);;
-        List<String> proxyUserNameList=userList.stream().map(dssProxyUser -> dssProxyUser.getProxyUserName()).collect(Collectors.toList());
-        return  proxyUserNameList;
+        List<DssProxyUser> userList = dssProxyUserMapper.selectProxyUserList(userName);
+        return userList.stream().map(DssProxyUser::getProxyUserName).collect(Collectors.toList());
     }
 
     @Override
     public int insertProxyUser(DssProxyUser dssProxyUser) {
-        int rows = dssProxyUserMapper.insertUser(dssProxyUser);
-        return rows;
+        return dssProxyUserMapper.insertUser(dssProxyUser);
     }
 
     @Override
     public boolean isExists(String userName, String proxyUserName) {
-        List<DssProxyUser> res= dssProxyUserMapper.getProxyUserList(userName,proxyUserName);
-        if(DS_PROXY_SELF_ENABLE.getValue() && userName.equalsIgnoreCase(proxyUserName)){
+        List<DssProxyUser> res = dssProxyUserMapper.getProxyUserList(userName,proxyUserName);
+        if (DS_PROXY_SELF_ENABLE.getValue() && userName.equalsIgnoreCase(proxyUserName)){
            return true;
-        }else if(res.size()==0){
-            return false;
-        }else {
-            return true;
-        }
+        }else {return res.size() != 0;}
     }
 }

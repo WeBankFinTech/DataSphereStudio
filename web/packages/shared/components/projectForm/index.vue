@@ -3,8 +3,8 @@
     v-model="ProjectShow"
     :title="
       actionType === 'add'
-        ? $t('message.workflow.projectDetail.createProject')
-        : $t('message.workflow.projectDetail.editorProject')
+        ? $t('message.common.projectDetail.createProject')
+        : $t('message.common.projectDetail.editorProject')
     "
     :closable="false"
   >
@@ -17,7 +17,7 @@
       class="project_form"
     >
       <FormItem
-        :label="$t('message.workflow.projectDetail.projectName')"
+        :label="$t('message.common.projectDetail.projectName')"
         prop="name"
       >
         <Input
@@ -28,7 +28,7 @@
       </FormItem>
       <FormItem
         v-if="!framework"
-        :label="$t('message.workflow.projectDetail.product')"
+        :label="$t('message.common.projectDetail.product')"
         prop="product"
       >
         <Input
@@ -38,12 +38,12 @@
         </Input>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.appArea')"
+        :label="$t('message.common.projectDetail.appArea')"
         prop="applicationArea"
       >
         <Select
           v-model="projectDataCurrent.applicationArea"
-          :placeholder="$t('message.workflow.projectDetail.selectAppArea')"
+          :placeholder="$t('message.common.projectDetail.selectAppArea')"
         >
           <Option
             v-for="(item, index) in applicationAreaMap"
@@ -54,14 +54,14 @@
         </Select>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.publishPermissions')"
+        :label="$t('message.common.projectDetail.publishPermissions')"
         prop="releaseUsers"
       >
         <luban-select
           v-model="projectDataCurrent.releaseUsers"
           multiple
           filterable
-          :placeholder="$t('message.workflow.projectDetail.userAllowedPublish')"
+          :placeholder="$t('message.common.projectDetail.userAllowedPublish')"
         >
           <Option
             v-for="(item, index) in releaseUsers"
@@ -72,7 +72,7 @@
         </luban-select>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.editPermissions')"
+        :label="$t('message.common.projectDetail.editPermissions')"
         prop="editUsers"
       >
         <luban-select
@@ -80,7 +80,7 @@
           :disabled-tags="[projectDataCurrent.createBy]"
           multiple
           filterable
-          :placeholder="$t('message.workflow.projectDetail.usersAllowedToEdit')"
+          :placeholder="$t('message.common.projectDetail.usersAllowedToEdit')"
         >
           <Option
             v-for="(item, index) in editUsersMap"
@@ -92,7 +92,7 @@
         </luban-select>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.viewPermissions')"
+        :label="$t('message.common.projectDetail.viewPermissions')"
         prop="accessUsers"
       >
         <luban-select
@@ -100,7 +100,7 @@
           :disabled-tags="[projectDataCurrent.createBy]"
           multiple
           filterable
-          :placeholder="$t('message.workflow.projectDetail.usersAllowedToView')"
+          :placeholder="$t('message.common.projectDetail.usersAllowedToView')"
         >
           <Option
             v-for="(item, index) in accessUsersMap"
@@ -112,7 +112,7 @@
         </luban-select>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.devProcess')"
+        :label="$t('message.common.projectDetail.devProcess')"
         prop="devProcessList"
       >
         <CheckboxGroup v-model="projectDataCurrent.devProcessList">
@@ -128,7 +128,7 @@
       </FormItem>
       <FormItem
         v-if="framework"
-        :label="$t('message.workflow.projectDetail.orchestratorMode')"
+        :label="$t('message.common.projectDetail.orchestratorMode')"
         prop="orchestratorModeList"
       >
         <CheckboxGroup v-model="projectDataCurrent.orchestratorModeList">
@@ -145,25 +145,25 @@
         </CheckboxGroup>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.business')"
+        :label="$t('message.common.projectDetail.business')"
         prop="business"
       >
         <we-tag
-          :new-label="$t('message.workflow.projectDetail.addBusiness')"
+          :new-label="$t('message.common.projectDetail.addBusiness')"
           :tag-list="projectDataCurrent.business"
           @add-tag="addTag"
           @delete-tag="deleteTag"
         ></we-tag>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.projectDesc')"
+        :label="$t('message.common.projectDetail.projectDesc')"
         prop="description"
       >
         <Input
           v-model="projectDataCurrent.description"
           type="textarea"
           :placeholder="
-            $t('message.workflow.projectDetail.pleaseInputProjectDesc')
+            $t('message.common.projectDetail.pleaseInputProjectDesc')
           "
         ></Input>
       </FormItem>
@@ -269,11 +269,11 @@ export default {
         }
         if ((currentWorkspaceName && username && value.match(currentWorkspaceName)) || value.match(username)) {
           callback(
-            new Error(this.$t("message.workflow.projectDetail.validateName"))
+            new Error(this.$t("message.common.projectDetail.validateName"))
           );
         } else if (repeat && this.actionType === 'add') {
           callback(
-            new Error(this.$t("message.workflow.projectDetail.nameUnrepeatable"))
+            new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
           );
         } else {
           callback();
@@ -299,7 +299,7 @@ export default {
           {
             required: true,
             message: this.$t(
-              "message.workflow.projectDetail.pleaseInputProjectDesc"
+              "message.common.projectDetail.pleaseInputProjectDesc"
             ),
             trigger: "blur",
           },
@@ -307,14 +307,14 @@ export default {
         product: [
           {
             required: true,
-            message: this.$t("message.workflow.projectDetail.selectProduct"),
+            message: this.$t("message.common.projectDetail.selectProduct"),
             trigger: "change",
           },
         ],
         applicationArea: [
           {
             required: true,
-            message: this.$t("message.workflow.projectDetail.selectAppArea"),
+            message: this.$t("message.common.projectDetail.selectAppArea"),
             trigger: "change",
             type: "number",
           },
@@ -322,7 +322,7 @@ export default {
         devProcessList: [
           {
             required: true,
-            message: this.$t("message.workflow.projectDetail.pleaseSelect"),
+            message: this.$t("message.common.projectDetail.pleaseSelect"),
             trigger: "blur",
             type: "array",
           },
@@ -330,7 +330,7 @@ export default {
         orchestratorModeList: [
           {
             required: true,
-            message: this.$t("message.workflow.projectDetail.pleaseSelect"),
+            message: this.$t("message.common.projectDetail.pleaseSelect"),
             trigger: "blur",
             type: "array",
           },
@@ -339,7 +339,7 @@ export default {
         //   {
         //     required: true,
         //     message: this.$t(
-        //       "message.workflow.projectDetail.userAllowedPublish"
+        //       "message.common.projectDetail.userAllowedPublish"
         //     ),
         //     trigger: "change",
         //     type: "array",

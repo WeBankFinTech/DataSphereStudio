@@ -18,6 +18,7 @@ public class DssScriptDownloadServiceImpl extends ServiceImpl<DssAuditMapper, Ds
     @Autowired
     public DssAuditMapper dssAuditMapper;
 
+    @Override
     public List<DssScriptDownloadAudit> getDownloadAuditList(String userName, String startIme, String endTime) {
         return dssAuditMapper.getDownloadAuditList(userName, startIme, endTime);
     }

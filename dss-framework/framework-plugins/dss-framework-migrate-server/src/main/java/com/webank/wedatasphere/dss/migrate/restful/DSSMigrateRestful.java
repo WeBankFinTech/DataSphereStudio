@@ -591,7 +591,7 @@ public class DSSMigrateRestful {
         // 1，获取项目下所有的工作流
         // 获取工作空间id，没有就报错
         List<DSSWorkspace> workspaces = dssWorkspaceService.getWorkspaces(username);
-        long workspaceId = 0l;
+        long workspaceId = 0L;
         DSSWorkspace dssWorkspace = workspaces.stream().filter((w) -> w.getName().equals(workspaceName)).findFirst().get();
         if (null == dssWorkspace) {
             LOG.error("Cannot find workspace {}, please create it first.", workspaceName);
@@ -644,7 +644,7 @@ public class DSSMigrateRestful {
                                 // 注意，正序
                                 if (o1 < o2) {
                                     return -1;
-                                } else if (o1 == o2) {
+                                } else if (o1.equals(o2)) {
                                     return 0;
                                 } else {
                                     return 1;

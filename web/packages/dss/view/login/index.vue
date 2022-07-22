@@ -224,10 +224,15 @@ export default {
       } else {
         showversionTip = true
       }
-      if (showversionTip) {
+      const hasTip = storage.get('chrome-version-tip', 'local')
+      if (showversionTip && !hasTip) {
         this.$Modal.confirm({
           title: "提示",
-          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + '，': ''}为了更好地体验推荐使用Chrome 78 版本${this.$APP_CONF.update_chrome?'，<a href="'+this.$APP_CONF.update_chrome+'">升级指引</a>':'，请联系管理员'}`
+          cancelText: '不在提示',
+          onCancel: () => {
+            storage.set('chrome-version-tip', true , 'local');
+          },
+          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + '，': ''}为了更好地体验推荐使用Chrome 78 版本${this.$APP_CONF.update_chrome?'，<a href="'+this.$APP_CONF.update_chrome+'">查看指引</a>':'，请联系管理员'}`
         });
       }
     }

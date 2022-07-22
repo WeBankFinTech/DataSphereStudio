@@ -258,10 +258,12 @@ export default {
           ? storage.get("baseInfo", "local").username
           : null;
         // 校验是否重名
-        let repeat
+        let repeat = false
         try {
-          const res = await CheckProjectNameRepeat(value)
-          repeat = res.repeat
+          if (this.actionType === 'add') {
+            const res = await CheckProjectNameRepeat(value)
+            repeat = res.repeat
+          }
         } catch (error) {
           //
         }

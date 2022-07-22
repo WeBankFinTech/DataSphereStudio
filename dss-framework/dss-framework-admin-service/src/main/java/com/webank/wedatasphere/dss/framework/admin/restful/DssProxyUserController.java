@@ -60,6 +60,7 @@ public class DssProxyUserController {
                 } else if (StringUtils.isEmpty(userRep.getProxyUserName())) {
                     DSSExceptionUtils.dealErrorException(100102, "Proxy user name is empty", DSSAdminErrorException.class);
                 } else if (dssProxyUserService.isExists(userRep.getUserName(), userRep.getProxyUserName())) {
+                    LOGGER.info("user {} try to add user cookie, params: {}", username, userRep);
                     for (Cookie cookie : req.getCookies()) {
                         if (null != cookie && cookie.getName().equalsIgnoreCase(PROXY_USER_TICKET_ID_STRING)) {
                             cookie.setValue(null);
@@ -104,6 +105,7 @@ public class DssProxyUserController {
             }else  if (dssProxyUserService.isExists(userRep.getUserName(),userRep.getProxyUserName())) {
                 DSSExceptionUtils.dealErrorException(100107, "Failed to add proxy user，'userName：" + userRep.getUserName() + ",proxyName："+userRep.getProxyUserName()+" already exists", DSSAdminErrorException.class);
             }
+            LOGGER.info("Add proxy user {}", username);
             dssProxyUserService.insertProxyUser(userRep);
             return Message.ok("Success to add proxy user");
         } catch (Exception exception) {

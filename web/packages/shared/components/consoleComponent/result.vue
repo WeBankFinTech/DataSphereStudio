@@ -357,6 +357,9 @@ export default {
 
           return strA - strB;
         }
+        if (['timestamp'].includes(valueType.toLowerCase()) && typeof strA === 'string') {
+          return strA.localeCompare(strB)
+        }
         const charAry = strA.split('');
         for (const i in charAry) {
           if ((this.charCompare(strA[i], strB[i]) !== 0)) {

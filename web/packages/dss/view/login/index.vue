@@ -86,7 +86,6 @@ export default {
   },
   mounted() {
     const workspaceId = this.getCurrentWorkspaceId()
-    storage.remove('close_db_table_suggest')
     sessionStorage.removeItem(`work_flow_lists_${workspaceId}`)
     this.checkChromeVersion()
   },
@@ -228,7 +227,7 @@ export default {
       if (showversionTip && !hasTip) {
         this.$Modal.confirm({
           title: "提示",
-          cancelText: '不在提示',
+          cancelText: '不再提示',
           onCancel: () => {
             storage.set('chrome-version-tip', true , 'local');
           },

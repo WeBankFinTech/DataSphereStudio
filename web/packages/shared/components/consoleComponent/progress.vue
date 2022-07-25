@@ -17,7 +17,7 @@
     <!-- 错误信息 -->
     <div v-if="taskInfo.errCode || taskInfo.solution" class="alert-tips" :class="errTipColor">
       <Icon type="ios-alert-outline" size="14" />
-      <span style="padding-left: 10px; flex:1">{{ taskInfo.errDesc}} </span>
+      <span style="padding-left: 10px; flex:1">{{ `${taskInfo.errCode ? taskInfo.errCode + ',' : ''}${taskInfo.errDesc}` }} </span>
       <Button
         type="error"
         size="small"
@@ -161,8 +161,8 @@ export default {
     },
     errTipColor() {
       return {
-        'warn-color': this.taskInfo.status == 'Succeed' && this.taskInfo.status == 'Failed',
-        'error-color': this.taskInfo.status == 'Succeed' || this.taskInfo.status == 'Failed'
+        'warn-color': this.taskInfo.status != 'Failed',
+        'error-color': this.taskInfo.status == 'Failed'
       }
     }
   },

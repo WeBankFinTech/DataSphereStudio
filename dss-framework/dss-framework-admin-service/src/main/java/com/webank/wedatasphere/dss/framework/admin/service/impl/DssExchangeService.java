@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.framework.admin.service;
+package com.webank.wedatasphere.dss.framework.admin.service.impl;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

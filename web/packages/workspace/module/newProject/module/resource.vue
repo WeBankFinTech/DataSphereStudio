@@ -22,7 +22,7 @@
             type="ios-cloud-upload"
             size="52"
             style="color: #3399ff"/>
-          <p class="el-upload__text">{{$t('message.workflow.projectDetail.resourceUpload')}}</p>
+          <p class="el-upload__text">{{$t('message.common.projectDetail.resourceUpload')}}</p>
         </div>
       </Upload>
     </div>
@@ -116,20 +116,20 @@ export default {
         }
       }
       if (isInFlag && !this.isRipetition) {
-        this.$Message.warning(this.$t('message.workflow.projectDetail.fileExist'));
+        this.$Message.warning(this.$t('message.common.projectDetail.fileExist'));
         return false;
       } else if (!regLeaf.test(file.name)) {
-        this.$Message.warning(this.$t('message.workflow.projectDetail.uploadNameWar'));
+        this.$Message.warning(this.$t('message.common.projectDetail.uploadNameWar'));
         return false;
       } else if (sizeResult) {
-        this.$Message.warning(this.$t('message.workflow.projectDetail.uploadLimit'));
+        this.$Message.warning(this.$t('message.common.projectDetail.uploadLimit'));
         return false;
       }
     },
     // 成功时的回调
     handleSuccess(response, file, fileList) {
       if (response.status === 0) {
-        this.$Message.success(this.$t('message.workflow.projectDetail.uploadSuccess', { name: file.name }));
+        this.$Message.success(this.$t('message.common.projectDetail.uploadSuccess', { name: file.name }));
         if (this.isRipetition) { // 支持同名上传，后者覆盖前者
           remove(fileList, (item) => item.name === file.name && item.resourceId !== file.resourceId);
           remove(this.uploadFiles, (item) => item.name === file.name);
@@ -160,7 +160,7 @@ export default {
       }
     },
     exceededSize() {
-      this.$Message.warning(this.$t('message.workflow.projectDetail.uploadOver'));
+      this.$Message.warning(this.$t('message.common.projectDetail.uploadOver'));
     },
     handleRemove(file) {
       api.fetch('/bml/deleteResource', {
@@ -168,11 +168,11 @@ export default {
       }, 'post').then(() => {
         remove(this.uploadFiles, (item) => item.resourceId === file.resourceId);
         this.$emit('update-resources', this.uploadFiles);
-        this.$Message.success(this.$t('message.workflow.projectDetail.resourceDeleteSuccess'));
+        this.$Message.success(this.$t('message.common.projectDetail.resourceDeleteSuccess'));
       });
     },
     handlePreview(file) {
-      this.$Message.success(this.$t('message.workflow.projectDetail.copyNotice'));
+      this.$Message.success(this.$t('message.common.projectDetail.copyNotice'));
       util.executeCopy(file.name);
     },
   },

@@ -66,7 +66,7 @@ public class DSSWorkspaceRestful {
     public Message createWorkspace(HttpServletRequest request, @RequestBody CreateWorkspaceRequest createWorkspaceRequest)throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(request);
         if (!dssWorkspaceService.checkAdmin(userName)){
-            return Message.error("您好，您不是管理员,没有权限建立工作空间");
+            return Message.error("您好，您不是管理员，没有权限建立工作空间");
         }
         String workSpaceName = createWorkspaceRequest.getWorkspaceName();
         String department = createWorkspaceRequest.getDepartment();
@@ -113,6 +113,7 @@ public class DSSWorkspaceRestful {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = new Workspace();
         try {
+            LOGGER.info("Put gateway url and cookies into workspace.");
             SSOHelper.addWorkspaceInfo(request, workspace);
         } catch (AppStandardWarnException ignored) {} // ignore it.
         dssUserService.insertOrUpdateUser(username, workspace);
@@ -221,7 +222,7 @@ public class DSSWorkspaceRestful {
     public Message addWorkspace(HttpServletRequest req, @RequestBody Map<String, String> json) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
         if (!dssWorkspaceService.checkAdmin(userName)) {
-            return Message.error("您好，您不是管理员,没有权限建立工作空间");
+            return Message.error("您好，您不是管理员，没有权限建立工作空间");
 
         }
         String name = json.get("name");
@@ -243,9 +244,10 @@ public class DSSWorkspaceRestful {
         String header = req.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
         List<WorkspaceMenuVo> appconns;
         try {
-            appconns = dssWorkspaceService.getWorkspaceAppConns(workspaceId, username, isChinese);
+            appconns = dssWorkspaceService.getWorkspaceAppConns(workspace, workspaceId, username, isChinese);
         } catch (DSSErrorException e) {
             LOGGER.warn("{} get appconns from workspace {} failed.", username, workspaceId, e);
             return Message.error(e);

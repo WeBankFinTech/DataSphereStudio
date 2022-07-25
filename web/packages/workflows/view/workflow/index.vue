@@ -159,10 +159,10 @@
     <!-- 删除项目弹窗 -->
     <Modal
       v-model="deleteProjectShow"
-      :title="$t('message.workflow.projectDetail.deleteProject')"
+      :title="$t('message.common.projectDetail.deleteProject')"
       @on-ok="deleteProjectConfirm"
     >
-      {{ $t("message.workflow.projectDetail.confirmDeleteProject")
+      {{ $t("message.common.projectDetail.confirmDeleteProject")
       }}{{ deleteProjectItem.name }}?
       <br />
       <br />
@@ -255,7 +255,7 @@ export default {
       dataList: [
         {
           id: 1,
-          name: this.$t("message.workflow.projectDetail.WCYDXM"),
+          name: this.$t("message.common.projectDetail.WCYDXM"),
           dwsProjectList: [],
         },
       ],
@@ -271,11 +271,11 @@ export default {
       },
       sortTypeList: [
         {
-          lable: this.$t('message.workflow.projectDetail.sortUpdateTime'),
+          lable: this.$t('message.common.projectDetail.sortUpdateTime'),
           value: 'updateTime'
         },
         {
-          lable: this.$t('message.workflow.projectDetail.sortName'),
+          lable: this.$t('message.common.projectDetail.sortName'),
           value: 'name'
         }
       ]
@@ -628,7 +628,7 @@ export default {
           this.loading = false;
           if (res.warmMsg) {
             this.$Modal.confirm({
-              title: this.$t("message.workflow.projectDetail.deleteTitle"),
+              title: this.$t("message.common.projectDetail.deleteTitle"),
               content: res.warmMsg,
               onOk: () => {
                 params.sure = true;
@@ -642,7 +642,7 @@ export default {
                   .then(() => {
                     this.$Message.success(
                       `${this.$t(
-                        "message.workflow.projectDetail.deleteProject"
+                        "message.common.projectDetail.deleteProject"
                       )}${this.deleteProjectItem.name}${this.$t(
                         "message.workflow.success"
                       )}`
@@ -822,7 +822,7 @@ export default {
             typeof callback == "function" && callback(true);
             this.$Message.success(
               `${this.$t(
-                "message.workflow.projectDetail.createProject"
+                "message.common.projectDetail.createProject"
               )}${this.$t("message.workflow.success")}`
             );
             setTimeout(() => {
@@ -858,7 +858,7 @@ export default {
             typeof callback == "function" && callback(true);
             this.getProjectData();
             this.$Message.success(
-              this.$t("message.workflow.projectDetail.eidtorProjectSuccess", {
+              this.$t("message.common.projectDetail.eidtorProjectSuccess", {
                 name: projectData.name,
               })
             );

@@ -28,25 +28,25 @@ export default {
     const manageMenus = [
       {
         icon: 'base-2',
-        name: i18n.$t('message.workspaceManagement.baseInfo'),
+        name: i18n.t('message.workspaceManagement.baseInfo'),
         path: 'productsettings',
         children: [],
       },
       {
         icon: 'user',
-        name: i18n.$t('message.workspaceManagement.userInfo'),
+        name: i18n.t('message.workspaceManagement.userInfo'),
         path: 'usertable',
         children: [],
       },
       {
         icon: 'control',
-        name: i18n.$t('message.workspaceManagement.authInfo'),
+        name: i18n.t('message.workspaceManagement.authInfo'),
         path: 'jurisdiction',
         children: [],
       },
       // {
       //   icon: 'add',
-      //   name: i18n.$t('message.workspaceManagement.dataSourceAdministration'),
+      //   name: i18n.t('message.workspaceManagement.dataSourceAdministration'),
       //   path: 'dataSourceAdministration',
       //   children: [],
       // },

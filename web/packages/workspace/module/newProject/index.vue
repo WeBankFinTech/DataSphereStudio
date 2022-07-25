@@ -39,7 +39,7 @@
         <Input
           search
           class="search-input"
-          :placeholder="$t('message.workflow.projectDetail.SRMCSS')"
+          :placeholder="$t('message.common.projectDetail.SRMCSS')"
           @on-change="searchProject($event, 1)"
         />
       </div>
@@ -108,10 +108,10 @@
     </Modal>
     <Modal
       v-model="deleteProjectShow"
-      :title="$t('message.workflow.projectDetail.deleteProject')"
+      :title="$t('message.common.projectDetail.deleteProject')"
       @on-ok="deleteProjectConfirm"
     >
-      {{$t('message.workflow.projectDetail.confirmDeleteProject')}}{{ deleteProjectItem.name }}?
+      {{$t('message.common.projectDetail.confirmDeleteProject')}}{{ deleteProjectItem.name }}?
       <br />
       <br />
       <Checkbox v-model="ifDelOtherSys">同步删除所有第三方系统的工程</Checkbox>
@@ -160,7 +160,7 @@ export default {
       dataList: [
         {
           id: 1,
-          name: this.$t('message.workflow.projectDetail.WCYDXM'),
+          name: this.$t('message.common.projectDetail.WCYDXM'),
           dwsProjectList: []
         }
       ],
@@ -187,17 +187,17 @@ export default {
     sortTypeList() {
       return [
         {
-          lable: this.$t('message.workflow.projectDetail.sortUpdateTime'),
+          lable: this.$t('message.common.projectDetail.sortUpdateTime'),
           value: 'updateTime'
         },
         {
-          lable: this.$t('message.workflow.projectDetail.sortName'),
+          lable: this.$t('message.common.projectDetail.sortName'),
           value: 'name'
         }
       ]
     },
     tips() {
-      return this.$t('message.workflow.projectDetail.tips', {app_name: this.$APP_CONF.app_name})
+      return this.$t('message.common.projectDetail.tips', {app_name: this.$APP_CONF.app_name})
     }
   },
   watch: {
@@ -240,7 +240,7 @@ export default {
         this.cacheData = this.dataList
         this.dataList.forEach(item => {
           this.sortType[item.id] = this.$t(
-            'message.workflow.projectDetail.updteTime'
+            'message.common.projectDetail.updteTime'
           )
         })
         this.sortTypeChange()
@@ -278,7 +278,7 @@ export default {
           this.cacheData = this.dataList
           this.dataList.forEach(item => {
             this.sortType[item.id] = this.$t(
-              'message.workflow.projectDetail.updteTime'
+              'message.common.projectDetail.updteTime'
             )
           })
           this.sortTypeChange()
@@ -308,7 +308,7 @@ export default {
       ) {
         typeof callback == "function" && callback();
         return this.$Message.warning(
-          this.$t('message.workflow.projectDetail.nameUnrepeatable')
+          this.$t('message.common.projectDetail.nameUnrepeatable')
         )
       }
       this.loading = true
@@ -323,7 +323,7 @@ export default {
             typeof callback == "function" && callback(true);
             this.$Message.success(
               `${this.$t(
-                'message.workflow.projectDetail.createProject'
+                'message.common.projectDetail.createProject'
               )}${this.$t('message.workflow.success')}`
             )
             this.getclassListData().then(data => {
@@ -370,7 +370,7 @@ export default {
           .then(() => {
             typeof callback == "function" && callback(true);
             this.$Message.success(
-              this.$t('message.workflow.projectDetail.eidtorProjectSuccess', {
+              this.$t('message.common.projectDetail.eidtorProjectSuccess', {
                 name: projectParams.name
               })
             )
@@ -405,7 +405,7 @@ export default {
           this.loading = false
           if (res.warmMsg) {
             this.$Modal.confirm({
-              title: this.$t('message.workflow.projectDetail.deleteTitle'),
+              title: this.$t('message.common.projectDetail.deleteTitle'),
               content: res.warmMsg,
               onOk: () => {
                 params.sure = true
@@ -419,7 +419,7 @@ export default {
                   .then(() => {
                     this.$Message.success(
                       `${this.$t(
-                        'message.workflow.projectDetail.deleteProject'
+                        'message.common.projectDetail.deleteProject'
                       )}${this.deleteProjectItem.name}${this.$t(
                         'message.workflow.success'
                       )}`
@@ -541,7 +541,7 @@ export default {
       this.init()
       this.currentForm = 'copyForm'
       this.currentProjectData = project
-      this.commonTitle = this.$t('message.workflow.projectDetail.projectCopy')
+      this.commonTitle = this.$t('message.common.projectDetail.projectCopy')
       this.projectModelShow = true
     },
     projectExport(classifyId, project) {
@@ -563,7 +563,7 @@ export default {
             )
           )
             return this.$Message.warning(
-              this.$t('message.workflow.projectDetail.nameUnrepeatable')
+              this.$t('message.common.projectDetail.nameUnrepeatable')
             )
         }
         this.$refs.publish.ProjectCopy(copyCheckName)
@@ -621,10 +621,10 @@ export default {
         return -1
       })
       return list.sort(a => {
-        if (a.name === this.$t('message.workflow.projectDetail.WDGZL')) {
+        if (a.name === this.$t('message.common.projectDetail.WDGZL')) {
           return -1
         }
-        if (a.name === this.$t('message.workflow.projectDetail.WCYDXM')) {
+        if (a.name === this.$t('message.common.projectDetail.WCYDXM')) {
           return -1
         }
       })
@@ -654,8 +654,8 @@ export default {
     sortTypeChange(name = 'updateTime', id) {
       this.sortType[id] =
         name === 'updateTime'
-          ? this.$t('message.workflow.projectDetail.updteTime')
-          : this.$t('message.workflow.projectDetail.name')
+          ? this.$t('message.common.projectDetail.updteTime')
+          : this.$t('message.common.projectDetail.name')
       this.dataList = this.dataList.map(item => {
         if (!id || id === item.id) {
           item.dwsProjectList = item.dwsProjectList.sort((a, b) => {

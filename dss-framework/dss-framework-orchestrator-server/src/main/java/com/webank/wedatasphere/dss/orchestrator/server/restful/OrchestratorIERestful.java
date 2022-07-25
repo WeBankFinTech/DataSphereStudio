@@ -79,6 +79,7 @@ public class OrchestratorIERestful {
             List<DSSLabel> dssLabelList = getDSSLabelList(labels);
             Workspace workspace = SSOHelper.getWorkspace(req);
             //3、打包新的zip包上传BML
+            logger.info("User {} begin to import orchestrator file", userName);
             Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
                     fileName, projectName);
             try {

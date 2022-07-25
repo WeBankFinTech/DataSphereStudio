@@ -1,6 +1,11 @@
 package com.webank.wedatasphere.dss.appconn.manager.impl;
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
+import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,17 +52,26 @@ public class AppConnRefreshThread implements Runnable {
         appConnInfos.forEach(appConnInfo -> {
             Optional<? extends AppConnInfo> oldOne = this.appConnInfos.stream().filter(old -> old.getAppConnName().equals(appConnInfo.getAppConnName())).findAny();
             if(!oldOne.isPresent() || isChanged(oldOne.get(), appConnInfo)) {
-                LOGGER.warn("AppConn info {} has updated, now try to refresh it.", appConnInfo.getAppConnName());
-                try {
-                    appConnManager.reloadAppConn(appConnInfo);
-                } catch (Exception e) {
-                    // If update failed, it seems like some error happened in this AppConn.
-                    // this AppConn will not be refreshed any more, unless the admin changes the AppConn plugin files to optimize it.
-                    LOGGER.warn("Reload AppConn {} failed, ignore it", appConnInfo.getAppConnName(), e);
+                LOGGER.warn("The appConnInfo of AppConn {} has changed, now try to refresh it.", appConnInfo.getAppConnName());
+                LOGGER.warn("The new appConnInfo of AppConn {} is {}.", appConnInfo.getAppConnName(), appConnInfo);
+                reloadAppConn(appConnInfo);
+            } else {
+                List<? extends AppInstanceInfo> appInstanceInfos = appConnManager.appConnInfoService.getAppInstancesByAppConnInfo(appConnInfo);
+                List<AppInstance> oldAppInstanceList = appConnManager.getAppConn(appConnInfo.getAppConnName()).getAppDesc().getAppInstances();
+                if(isChanged(appInstanceInfos, oldAppInstanceList)) {
+                    LOGGER.warn("The appInstanceInfo of AppConn {} has changed, now try to refresh it.", appConnInfo.getAppConnName());
+                    LOGGER.warn("The new appInstanceInfo of AppConn {} is {}.", appConnInfo.getAppConnName(), appInstanceInfos);
+                    reloadAppConn(appConnInfo);
                 }
             }
         });
-        // now, do not support to delete exists AppConn, since deletion operation is very dangerous.
+        // Now, try to delete not exists AppConn.
+        // Since deletion is very dangerous, it is not suggested to do this operation.
+        this.appConnInfos.stream().filter(appConnInfo -> appConnInfos.stream().noneMatch(newOne -> appConnInfo.getAppConnName().equals(newOne.getAppConnName())))
+                .forEach(appConnInfo -> {
+                    LOGGER.warn("The AppConn {} is not exists in DSS DB, it seems like that admin has deleted it, now try to delete it.", appConnInfo.getAppConnName());
+                    appConnManager.deleteAppConn(appConnInfo);
+                });
         this.appConnInfos = appConnInfos;
         LOGGER.info("all AppConns have refreshed.");
     }
@@ -69,6 +83,33 @@ public class AppConnRefreshThread implements Runnable {
             return true;
         } else {
             return !one.getAppConnResource().equals(other.getAppConnResource());
+        }
+    }
+
+    private boolean isChanged(List<? extends AppInstanceInfo> one, List<AppInstance> other) {
+        if(one == null && other == null) {
+            return false;
+        } else if(CollectionUtils.isEmpty(one) || CollectionUtils.isEmpty(other) || one.size() != other.size()) {
+            return true;
+        } else {
+            // 判断条件为：一种是找不到 ID 相同的，一种是 ID 相同但是属性有变化
+            // 这里不判断标签，因为标签是不会改动的
+            return one.stream().anyMatch(newOne -> other.stream().noneMatch(otherOne -> otherOne.getId().equals(newOne.getId()))
+                    || other.stream().anyMatch(otherOne -> otherOne.getId().equals(newOne.getId())
+                        && (!StringUtils.equals(newOne.getUrl(), otherOne.getBaseUrl())
+                                || !StringUtils.equals(newOne.getHomepageUri(), otherOne.getHomepageUri())
+                                || !StringUtils.equals(newOne.getEnhanceJson(), DSSCommonUtils.COMMON_GSON.toJson(otherOne.getConfig()))))
+            );
+        }
+    }
+
+    private void reloadAppConn(AppConnInfo appConnInfo) {
+        try {
+            appConnManager.reloadAppConn(appConnInfo);
+        } catch (Exception e) {
+            // If update failed, it seems like some error happened in this AppConn.
+            // this AppConn will not be refreshed any more, unless the admin changes the AppConn plugin files to optimize it.
+            LOGGER.warn("Reload AppConn {} failed, ignore it", appConnInfo.getAppConnName(), e);
         }
     }
 }

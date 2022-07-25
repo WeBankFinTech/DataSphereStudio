@@ -275,4 +275,17 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         LOGGER.info("Reloaded AppConn {}.", appConnInfo.getAppConnName());
     }
 
+    void deleteAppConn(AppConnInfo appConnInfo) {
+        lazyLoadAppConns();
+        if(this.appConns.containsKey(appConnInfo.getAppConnName())) {
+            synchronized (this.appConns) {
+                if(this.appConns.containsKey(appConnInfo.getAppConnName())) {
+                    this.appConns.remove(appConnInfo.getAppConnName());
+                    appConnList = Collections.unmodifiableList(new ArrayList<>(appConns.values()));
+                    LOGGER.info("Deleted AppConn {}.", appConnInfo.getAppConnName());
+                }
+            }
+        }
+    }
+
 }

@@ -59,6 +59,11 @@ public class AppStandardClassUtils extends ClassHelper {
         return CLASS_LOADER_MAP.get(appConnName);
     }
 
+    public static ClassLoader removeClassLoader(String appConnName){
+        return CLASS_LOADER_MAP.remove(appConnName);
+    }
+
+
     public static AppStandardClassUtils getInstance(String appConnName) {
         if(!INSTANCES.containsKey(appConnName)) {
             synchronized (AppStandardClassUtils.class) {

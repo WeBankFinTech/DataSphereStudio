@@ -56,6 +56,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RequestMapping(path = "/dss/framework/release", produces = {"application/json"})
@@ -102,14 +103,13 @@ public class DSSMigrateRestful {
         //4.上传到bml
         //5.通过resourceId 和 version 导入到 dev的 orchestrator-server
         String userName = SecurityFilter.getLoginUsername(req);
-//        List<FormDataBodyPart> files = form.getFields("file");
         if (files == null || files.size() <= 0) {
             LOG.error("files are null, can not continue");
             return Message.error("no files to import");
         }
         //只取第一个文件
         MultipartFile p = files.get(0);
-        String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
+        String fileName = new String(Objects.requireNonNull(p.getOriginalFilename()).getBytes("ISO8859-1"), StandardCharsets.UTF_8);
         InputStream is = null;
         OutputStream os = null;
         try {
@@ -121,8 +121,6 @@ public class DSSMigrateRestful {
             is = p.getInputStream();
             os = IoUtils.generateExportOutputStream(inputPath);
             IOUtils.copy(is, os);
-//            Workspace workspace = new Workspace();
-            Cookie[] cookies = req.getCookies();
             Workspace workspace = getWorkspace(req);
             migrateService.migrate(userName, inputPath, workspace);
         } catch (Exception e) {
@@ -183,7 +181,6 @@ public class DSSMigrateRestful {
         }
         ssoUrlBuilderOperation.setDSSUrl(gateWayUrl);
         ssoUrlBuilderOperation.setWorkspace(workspace.getWorkspaceName());
-//        workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
         return workspace;
     }
 
@@ -209,17 +206,13 @@ public class DSSMigrateRestful {
                                   @RequestParam(value = "dssLabels", required = false) String dssLabels,
                                   @RequestParam(name = "file") List<MultipartFile> files) throws Exception {
         String userName = SecurityFilter.getLoginUsername(req);
-//        List<FormDataBodyPart> files = form.getFields("file");
         if (files == null || files.size() <= 0) {
             LOG.error("files are null, can not continue");
             return Message.error("no files to import");
         }
         //只取第一个文件
-//        FormDataBodyPart p = files.get(0);
         MultipartFile p = files.get(0);
-//        FormDataContentDisposition fileDetail = p.getFormDataContentDisposition();
-//        String fileName = new String(fileDetail.getFileName().getBytes("ISO8859-1"), "UTF-8");
-        String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
+        String fileName = new String(Objects.requireNonNull(p.getOriginalFilename()).getBytes("ISO8859-1"), StandardCharsets.UTF_8);
         InputStream is = null;
         OutputStream os = null;
         Message responseMsg = Message.ok();
@@ -269,7 +262,7 @@ public class DSSMigrateRestful {
 //            mkdir(orcPath);
             orchestratorInfo.setProjectId(projectVo.getId());
             orchestratorInfo.setName(flowName);
-            String oldUUID = migrateService.queryOrcUUIDByName(new Long(dssWorkspace.getId()), projectVo.getId(), flowName);
+            String oldUUID = migrateService.queryOrcUUIDByName((long) dssWorkspace.getId(), projectVo.getId(), flowName);
             if (null != oldUUID) {
                 orchestratorInfo.setUUID(oldUUID);
             } else {

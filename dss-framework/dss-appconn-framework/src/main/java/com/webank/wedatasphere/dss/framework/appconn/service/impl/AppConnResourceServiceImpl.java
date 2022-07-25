@@ -76,11 +76,6 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
         } else if (!appConnPath.isDirectory()) {
             throw new AppConnNotExistsErrorException(20350, "AppConn home path " + appConnPath.getPath() + " is not a directory.");
         }
-        File zipFile = new File(appConnPath.getPath() + ".zip");
-        if (zipFile.exists() && !zipFile.delete()) {
-            throw new AppConnNotExistsErrorException(20001, "No permission to delete old zip file " + zipFile);
-        }
-        ZipHelper.zip(appConnPath.getPath(), false);
         AppConnBean appConnBean = appConnMapper.getAppConnBeanByName(appConnName);
         AppConnResource appConnResource;
         File indexFile = null;
@@ -91,7 +86,7 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
             appConnResource = AppConnServiceUtils.stringToResource(appConnBean.getResource());
             indexFile = AppConnIndexFileUtils.getIndexFile(appConnPath);
             if (appConnPath.lastModified() == appConnResource.getLastModifiedTime()
-                    && zipFile.length() == appConnResource.getSize() && AppConnIndexFileUtils.isLatestIndex(appConnPath, appConnResource.getResource())) {
+                    && AppConnIndexFileUtils.isLatestIndex(appConnPath, appConnResource.getResource())) {
                 LOGGER.info("No necessary to update the AppConn {}, since it's packages has no changes in path {}.", appConnName, appConnPath.getPath());
                 return;
             }
@@ -99,6 +94,11 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
             // If resource is not exists, this is the first time to upload this AppConn.
             appConnResource = new AppConnResource();
         }
+        File zipFile = new File(appConnPath.getPath() + ".zip");
+        if (zipFile.exists() && !zipFile.delete()) {
+            throw new AppConnNotExistsErrorException(20001, "No permission to delete old zip file " + zipFile);
+        }
+        ZipHelper.zip(appConnPath.getPath(), false);
         // At first, upload appConn file to BML
         Resource resource = new Resource();
         InputStream inputStream = null;

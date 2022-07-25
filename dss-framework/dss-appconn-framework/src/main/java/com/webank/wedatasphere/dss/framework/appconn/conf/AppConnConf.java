@@ -15,6 +15,8 @@ public class AppConnConf {
 
     public static final CommonVars<String> DEVELOPMENT_QUALITY_CHECKER_IGNORE_LIST = CommonVars.apply("wds.dss.appconn.checker.development.ignore.list", "");
 
+    public static final CommonVars<Integer> APPCONN_UPLOAD_THREAD_NUM = CommonVars.apply("wds.dss.appconn.upload.thread.num", 5);
+
     public static final List<String> DISABLED_APP_CONNS = getDisabledAppConns();
 
     private static List<String> getDisabledAppConns() {

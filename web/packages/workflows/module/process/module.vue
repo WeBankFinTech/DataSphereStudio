@@ -2190,18 +2190,18 @@ export default {
           // Succees, Failed, Cancelled, Timeout
           this.workflowIsExecutor = false;
           if (status === 'Succeed') {
-            this.$Notice.success({desc: this.$t('message.workflow.projectDetail.workflowRunSuccess')})
+            this.$Notice.success({desc: this.$t('message.common.projectDetail.workflowRunSuccess')})
           }
           if (status === 'Failed') {
-            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunFail')})
+            this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunFail')})
             this.flowExecutorNode(execID, true);
           }
           if (status === 'Cancelled') {
-            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunCanceled')})
+            this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunCanceled')})
             this.flowExecutorNode(execID, true);
           }
           if (status === 'Timeout') {
-            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunOvertime')})
+            this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunOvertime')})
             this.flowExecutorNode(execID, true);
           }
           // 清掉当前工作流执行的缓存
@@ -2222,7 +2222,7 @@ export default {
           this.retryTimes = 0
           this.flowExecutorNode(execID, true);
         }
-        this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunFail')})
+        this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunFail')})
       })
     },
     flowExecutorNode(execID, end = false) {
@@ -2361,7 +2361,7 @@ export default {
         this.pubulishShow = false;
         this.isFlowPubulish = false;
         this.saveingComment = false;
-        this.$Message.error(this.$t('message.workflow.projectDetail.publishFailed'));
+        this.$Message.error(this.$t('message.common.projectDetail.publishFailed'));
       })
     },
     clickToolItem(item) {
@@ -2422,7 +2422,7 @@ export default {
           } else {
             clearTimeout(this.timer);
             this.isFlowPubulish = false;
-            this.$Message.warning(this.$t('message.workflow.projectDetail.workflowRunOvertime'));
+            this.$Message.warning(this.$t('message.common.projectDetail.workflowRunOvertime'));
           }
           // 扩展插件发布历史列表更新
           eventbus.emit('get_publish_status', res)

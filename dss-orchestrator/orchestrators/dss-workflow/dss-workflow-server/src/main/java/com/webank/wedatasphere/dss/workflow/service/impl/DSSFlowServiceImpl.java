@@ -378,11 +378,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                 String projectName, String version, String contextIdStr,
                                 String description, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
-        if (dssFlow == null) {
-            throw new DSSErrorException(50030, "Workflow " + rootFlowId + " is not exists[工作流不存在，请检查是否已被删除].");
-        }
-        logger.info("User {} try to copy workflow {} in project {} with newVersion {} and contextId {}.", userName,
-                dssFlow.getName(), projectName, version, contextIdStr);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels);

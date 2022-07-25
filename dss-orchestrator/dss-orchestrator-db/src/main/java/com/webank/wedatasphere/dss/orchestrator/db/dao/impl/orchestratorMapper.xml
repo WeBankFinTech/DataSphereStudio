@@ -155,7 +155,7 @@
     <select id="getVersionByOrchestratorId"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT * FROM dss_orchestrator_version_info
-        WHERE orchestrator_id = #{orchestratorId} and valid_flag = 1
+        WHERE orchestrator_id = #{orchestratorId} and valid_flag = 1 and context_id != ''
         ORDER BY id DESC
     </select>
 
@@ -266,7 +266,7 @@
         b.orchestrator_id = tmp.orchestrator_id
         where
         a.status = 'Success'
-        and  substring(b.version,2) + #{remainVersion} &lt; substring(tmp.maxVersion,2)
+        and  substring(b.version,2) + #{remainVersion} &lt;= substring(tmp.maxVersion,2)
         and b.context_id != ''
         order by a.id desc
     </select>

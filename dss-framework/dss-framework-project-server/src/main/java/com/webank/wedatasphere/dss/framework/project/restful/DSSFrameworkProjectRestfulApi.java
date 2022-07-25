@@ -23,7 +23,6 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDelet
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
-import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
@@ -90,13 +89,10 @@ public class DSSFrameworkProjectRestfulApi {
         if (!releaseUsers.contains(username)) {
             releaseUsers.add(username);
         }
-        LOGGER.info("user {} begin to create project, request params:{}", username, projectCreateRequest);
-        DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
-        if (dssProjectVo != null) {
-            return Message.ok("创建工程成功").data("project", dssProjectVo);
-        } else {
-            return Message.error("创建工程失败");
-        }
+        LOGGER.info("User {} begin to create project in workspace {}, request params: {}.", username, workspace.getWorkspaceName(), projectCreateRequest);
+        return DSSExceptionUtils.getMessage(() -> dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace),
+                dssProjectVo -> Message.ok("创建工程成功.").data("project", dssProjectVo),
+                String.format("用户 %s 创建工程 %s 失败. ", username, projectCreateRequest.getName()));
     }
 
     @RequestMapping(path = "checkProjectName", method = RequestMethod.GET)
@@ -104,12 +100,8 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("user {} begin to checkProjectName: {}", username, name);
-        try {
-            dssFrameworkProjectService.checkProjectName(name, workspace, username);
-        } catch (DSSProjectErrorException e) {
-            return Message.error(e.getDesc()).data("repeat", true);
-        }
-        return Message.ok("项目名检测成功").data("repeat", false);
+        return DSSExceptionUtils.getMessage(() -> dssFrameworkProjectService.checkProjectName(name, workspace, username),
+                () -> Message.ok().data("repeat", false), String.format("用户 %s 创建工程 %s 失败. ", username, name));
     }
 
     /**
@@ -123,12 +115,15 @@ public class DSSFrameworkProjectRestfulApi {
     public Message modifyProject(HttpServletRequest request, @RequestBody ProjectModifyRequest projectModifyRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
+        if (projectModifyRequest.getId() == null || projectModifyRequest.getId() < 0) {
+            return Message.error("project id is null, cannot modify it.");
+        }
+        LOGGER.info("user {} begin to modify project in workspace {}, params: {}.", username, workspace.getWorkspaceName(), projectModifyRequest);
         DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
         //工程不存在
         if (dbProject == null) {
-            LOGGER.error("{} project id is null, can not modify", projectModifyRequest.getName());
-            DSSExceptionUtils.dealErrorException(60021,
-                    String.format("%s project id is null, can not modify", projectModifyRequest.getName()), DSSProjectErrorException.class);
+            LOGGER.error("project {} is not exists.", projectModifyRequest.getName());
+            return Message.error(String.format("project %s is not exists.", projectModifyRequest.getName()));
         }
         String createUsername = dbProject.getUsername();
         //將创建人默认为发布权限和編輯权限
@@ -143,9 +138,9 @@ public class DSSFrameworkProjectRestfulApi {
         if (!releaseUsers.contains(createUsername)) {
             releaseUsers.add(createUsername);
         }
-        LOGGER.info("user {} begin to modifyProject, params:{}", username, projectModifyRequest);
-        dssFrameworkProjectService.modifyProject(projectModifyRequest, dbProject, username, workspace);
-        return Message.ok("修改工程成功");
+        return DSSExceptionUtils.getMessage(() -> dssFrameworkProjectService.modifyProject(projectModifyRequest, dbProject, username, workspace),
+                () -> Message.ok("修改工程成功."),
+                String.format("用户 %s 修改工程 %s 失败. ", username, projectModifyRequest.getName()));
     }
 
     /**
@@ -159,11 +154,14 @@ public class DSSFrameworkProjectRestfulApi {
     public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-        // 检查是否具有删除项目权限
-        projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
         LOGGER.info("user {} begin to deleteProject, params:{}", username, projectDeleteRequest);
-        projectService.deleteProject(username, projectDeleteRequest, workspace);
-        return Message.ok("删除工程成功");
+        return DSSExceptionUtils.getMessage(() -> {
+                    // 检查是否具有删除项目权限
+                    projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
+                    projectService.deleteProject(username, projectDeleteRequest, workspace);
+                },
+                () -> Message.ok("删除工程成功."),
+                String.format("用户 %s 删除工程失败. ", username));
     }
 
     @RequestMapping(path = "listApplicationAreas", method = RequestMethod.GET)

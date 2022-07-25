@@ -6,11 +6,11 @@
     :model="copyProjectData"
     :rules="copyFormValid">
     <FormItem
-      :label="$t('message.workflow.projectDetail.projectName')"
+      :label="$t('message.common.projectDetail.projectName')"
       prop="name">
       <Input
         v-model="copyProjectData.name"
-        :placeholder="$t('message.workflow.projectDetail.inputProjectName')"></Input>
+        :placeholder="$t('message.common.projectDetail.inputProjectName')"></Input>
     </FormItem>
   </Form>
 </template>
@@ -61,7 +61,7 @@ export default {
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
         ],
         version: [
-          { required: true, message: this.$t('message.workflow.projectDetail.selectVersion'), trigger: 'blur' },
+          { required: true, message: this.$t('message.common.projectDetail.selectVersion'), trigger: 'blur' },
         ],
 
       }
@@ -73,9 +73,9 @@ export default {
         if (valid) {
           // 调用复制接口
           api.fetch(`${this.$API_PATH.PROJECT_PATH}copyProject`, {
-            projectId: this.currentProjectData.id, 
-            copyProjectName: this.copyProjectData.name, 
-            workspaceId: +this.$route.query.workspaceId 
+            projectId: this.currentProjectData.id,
+            copyProjectName: this.copyProjectData.name,
+            workspaceId: +this.$route.query.workspaceId
           }, 'post').then((res) => {
             this.$Message.success('复制请求发送成功')
             this.queryCopyStatus(res.projectId)
@@ -94,7 +94,7 @@ export default {
       try {
         const res = await api.fetch(`${this.$API_PATH.PROJECT_PATH}getCopyProjectInfo`, {
           copyProjectId,
-          workspaceId: +this.$route.query.workspaceId 
+          workspaceId: +this.$route.query.workspaceId
         }, 'post')
         clearTimeout(this.queryTimer)
         const name = copyProjectId + '_copy';

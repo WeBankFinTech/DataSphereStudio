@@ -540,7 +540,6 @@ export default {
         this._last_bottom_panel_height = this.scriptViewState.bottomContentHeight
         bottomContentHeight = this.$parent.$el.clientHeight + 50
       }
-      window.console.log(bottomContentHeight)
       this.scriptViewState = {
         ...this.scriptViewState,
         bottomContentHeight,
@@ -563,7 +562,7 @@ export default {
       bottom: 0 !important;
       left: 0 !important;
       position: fixed;
-      z-index: 9999;
+      z-index: 1050;
       background-color: #fff;
       height: 100% !important;
       width: 100% !important;

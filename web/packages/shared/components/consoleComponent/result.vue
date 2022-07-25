@@ -354,7 +354,6 @@ export default {
         }
         // 如果为整数型大小
         if (['int', 'float', 'double', 'long', 'short', 'bigint', 'decimal'].includes(valueType.toLowerCase())) {
-
           return strA - strB;
         }
         if (['timestamp'].includes(valueType.toLowerCase()) && typeof strA === 'string') {

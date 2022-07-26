@@ -407,6 +407,9 @@ export default {
             newDest: path,
           }).then(() => {
             cb(true);
+            if (this.currentNode && this.currentNode.data) {
+              this.currentNode.data.path = path
+            }
           }).catch(() => {
             cb(false);
           });
@@ -458,6 +461,8 @@ export default {
           this.refresh('delete');
           this.currentNode.remove();
           this.loading = false;
+          this.currentNode = { ...this.$refs.weFileTree.$refs.tree.root };
+          this.currentNode.data = { ...this.currentNode.data[0] };
         }).catch(() => {
           this.loading = false;
         });

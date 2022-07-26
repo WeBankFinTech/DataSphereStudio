@@ -485,19 +485,22 @@ export default {
             cb(false);
             return this.$Message.error(`${this.$t('message.scripts.constants.error.fileExists')}：${path}`);
           }
-          // 如果不重名要判断该文件是否在tab中打开，如果代开阻止修改
+          // 判断是否在tab中打开，如果打开阻止修改
           this.dispatch('Workbench:isOpenTab', {
             newLabel: args.label,
             oldLabel: args.node.name,
             oldDest: args.node.path,
           }, (isOpenTab) => {
             if (isOpenTab) {
-              return this.$Message.error(`已打开的脚本不支持修改后缀名`);
+              return this.$Message.error(`存在已打开脚本不支持修改`);
             } else {
               api.fetch('/filesystem/rename', {
                 oldDest: args.node.path,
                 newDest: path,
               }).then(() => {
+                if (this.currentNode && this.currentNode.data) {
+                  this.currentNode.data.path = path
+                }
                 cb(true);
               }).catch(() => {
                 cb(false);
@@ -556,6 +559,8 @@ export default {
             this.$Message.success(this.$t('message.scripts.constants.success.delete'));
             this.refresh('delete');
             this.currentNode.remove();
+            this.currentNode = { ...this.$refs.weFileTree.$refs.tree.root };
+            this.currentNode.data = { ...this.currentNode.data[0] };
           }).catch(() => {
             this.loading = false;
           });

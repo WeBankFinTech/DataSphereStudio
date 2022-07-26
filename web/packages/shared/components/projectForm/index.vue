@@ -385,10 +385,13 @@ export default {
         if (valid) {
           this.submiting = true;
           this.$emit("confirm", this.projectDataCurrent, (success) => {
-            if (success) this.ProjectShow = false;
+            if (success) {
+              this.$refs.projectForm.resetFields();
+              this.ProjectShow = false;
+            }
             this.submiting = false;
           });
-          this.$refs.projectForm.resetFields();
+
         } else {
           this.submiting = false;
           this.$Message.warning(this.$t("message.workflow.failedNotice"));

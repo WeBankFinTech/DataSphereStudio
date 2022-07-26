@@ -609,22 +609,25 @@ export default {
         })
     },
     "Workbench:isOpenTab"({ newLabel, oldLabel, oldDest }, cb) {
-      // 先判断是否有修改后缀，如果有返回false, 如果有在判断是否在tab中存在
-      const newSuffix = newLabel.substr(
-        newLabel.lastIndexOf("."),
-        newLabel.length
-      )
-      const oldSuffix = oldLabel.substr(
-        oldLabel.lastIndexOf("."),
-        oldLabel.length
-      )
-      if (oldSuffix !== newSuffix) {
-        const work = this.worklist.find((work) => work.filepath === oldDest)
-        if (work) {
-          cb(true)
-        } else {
+      if (oldLabel.indexOf('.') > -1) {
+        // 重命名文件
+        // 先判断是否有修改后缀，如果有返回false, 如果有在判断是否在tab中存在
+        const newSuffix = newLabel.substr(
+          newLabel.lastIndexOf("."),
+          newLabel.length
+        )
+        const oldSuffix = oldLabel.substr(
+          oldLabel.lastIndexOf("."),
+          oldLabel.length
+        )
+        if (oldSuffix !== newSuffix) {
           cb(false)
         }
+      }
+      // 重命名文件、目录，是否存在已打开
+      const work = this.worklist.find((work) => work.filepath.indexOf(oldDest) > -1)
+      if (work) {
+        cb(true)
       } else {
         cb(false)
       }

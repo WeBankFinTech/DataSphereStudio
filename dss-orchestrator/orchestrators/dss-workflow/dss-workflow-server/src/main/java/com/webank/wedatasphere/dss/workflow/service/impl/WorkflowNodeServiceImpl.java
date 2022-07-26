@@ -143,7 +143,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                     try {
                         orcVersion = getOrcVersion(node);
                     } catch (Exception e) {
-                        throw new ExternalOperationFailedException(50205, "get workflow version failed.", e);
+                        throw new ExternalOperationFailedException(50205, "Get workflow version failed." + e.getMessage(), e);
                     }
                     if(node.getParams() != null) {
                         dssJobContentRequestRef.getDSSJobContent().putAll(node.getParams());
@@ -280,6 +280,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         if(StringUtils.isBlank(node.getFlowName())) {
             node.setFlowName(dssFlow.getName());
         }
+
         return workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSJobContentConstant.ORC_VERSION_KEY);
     }
 

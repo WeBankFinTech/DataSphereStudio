@@ -15,10 +15,11 @@
       :costTime="costTime"
       v-if="steps.length"></steps>
     <!-- 错误信息 -->
-    <div v-if="taskInfo.errCode || taskInfo.solution" class="alert-tips" :class="errTipColor">
-      <Icon type="ios-alert-outline" size="14" />
-      <span style="padding-left: 10px; flex:1">{{ `${taskInfo.errCode ? taskInfo.errCode + ',' : ''}${taskInfo.errDesc}` }} </span>
+    <div v-if="taskInfo.failedReason || taskInfo.solution" class="alert-tips" :class="errTipColor">
+      <Icon :type="taskInfo.status == 'Failed'?'ios-close-circle-outline':'ios-alert-outline'" size="14" />
+      <span style="padding-left: 10px; flex:1">{{taskInfo.failedReason}} </span>
       <Button
+        v-if="taskInfo.solution !== undefined"
         type="error"
         size="small"
         @click="clickTipButton"
@@ -163,6 +164,21 @@ export default {
       return {
         'warn-color': this.taskInfo.status != 'Failed',
         'error-color': this.taskInfo.status == 'Failed'
+      }
+    }
+  },
+  mounted() {
+    if (this.steps.length && this.taskInfo.errCode === undefined && this.script.history) {
+      const ret  = this.script.history[0]
+      if (ret) {
+        this.taskInfo = {
+          solution: ret.solution,
+          errDesc: ret.errDesc,
+          errCode: ret.errCode,
+          status: ret.status,
+          taskId: ret.taskID,
+          failedReason: ret.failedReason
+        }
       }
     }
   },

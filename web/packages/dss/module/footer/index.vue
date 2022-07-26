@@ -64,7 +64,9 @@ export default {
     getRunningJob() {
       // 换成展示引擎数
       api.fetch('/linkisManager/rm/engines').then((rst) => {
-        this.num = rst.engines.length;
+        if (rst.engines) {
+          this.num = rst.engines.length;
+        }
       });
     },
     'Footer:updateRunningJob'(num) {

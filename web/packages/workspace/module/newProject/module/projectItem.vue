@@ -135,16 +135,11 @@ export default {
     },
     typelist() {
       return this.dataList.filter(item => item.showInCardList !== false).length
-    },
-    pageNumer() {
-      return Math.ceil(this.dataList.length / this.pagination.size);
     }
   },
   watch: {
-    pageNumer(val) {
-      if (val < this.pagination.current && val !== 0) {
-        this.pagination.current = val;
-      }
+    dataList() {
+      this.pagination.current = 1
     }
   },
   mounted() {
@@ -214,6 +209,7 @@ export default {
       this.pagination.current = page;
     },
     pageSizeChange(size) {
+      this.pagination.current = 1
       this.pagination.size = size;
     },
     // showResourceView(classifyId, project) {

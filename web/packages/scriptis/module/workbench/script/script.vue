@@ -648,6 +648,8 @@ export default {
                 data: code,
                 status: ret.status,
                 fileName: this.script.fileName,
+                errDesc: ret.errDesc,
+                errCode: ret.errCode,
                 failedReason: ret.failedReason
               };
             } else {
@@ -659,6 +661,8 @@ export default {
                 data: code,
                 status: ret.status,
                 fileName: this.script.fileName,
+                errDesc: ret.errDesc,
+                errCode: ret.errCode,
                 failedReason: ret.failedReason
               };
             }
@@ -671,7 +675,9 @@ export default {
               data: code,
               status: ret.status,
               fileName: this.script.fileName,
-              failedReason: ret.failedReason
+              failedReason: ret.failedReason,
+              errDesc: ret.errDesc,
+              errCode: ret.errCode,
             };
           }
           newItem.solution = ret.solution
@@ -695,7 +701,8 @@ export default {
               errDesc: ret.errDesc,
               errCode: ret.errCode,
               status: ret.status,
-              taskId: ret.taskID
+              taskId: ret.taskID,
+              failedReason: ret.errCode + ret.errDesc
             })
           }
           if (!ret.errCode && ret.status == 'Failed') {

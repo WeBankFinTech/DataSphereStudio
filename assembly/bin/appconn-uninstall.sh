@@ -93,15 +93,15 @@ echo ""
 echo "Step3: Clear the plugin of $APPCONN_NAME AppConn in DSS."
 deleteDML
 echo ""
-echo "Now try to refresh the plugin of ${APPCONN_NAME} AppConn in all DSS micro-services."
+echo "Now try to delete the plugin of ${APPCONN_NAME} AppConn in all DSS micro-services."
 echo "The following 2 ways can take effect:"
-echo "1. Restart dss-framework-project micro-services, we will use $SOURCE_ROOT/sbin/dss-daemon.sh restart dss-framework-project to restart, it will spend 1 minute."
+echo "1. Restart DSS, we will use sh $SOURCE_ROOT/sbin/dss-start-all.sh to restart, it will spend 1 minute."
 echo "2. Do nothing, just wait for 5 minutes. Since the DSS micro-services will refresh all the AppConn plugins every 10 minutes."
 echo ""
 read -p "Please input the choise: "  choise
 if [[ '1' = "$choise" ]]; then
   echo "You chose to restart dss-framework-project micro-services, now try to restart ..."
-  sh $SOURCE_ROOT/sbin/dss-daemon.sh restart dss-framework-project
+  sh $SOURCE_ROOT/sbin/dss-start-all.sh
 else
   echo "You chose to wait for 5 minutes."
 fi

@@ -412,6 +412,10 @@ export default {
     },
     // 浏览器窗口缩�?
     resize() {
+      if (this.scriptViewState.bottomPanelFull) {
+        this.scriptViewState.bottomContentHeight = this.$el.clientHeight + 30
+        return
+      }
       if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
         this.scriptViewState.topPanelHeight = this.$el.clientHeight * 0.6
         this.scriptViewState.bottomContentHeight = this.$el.clientHeight * 0.4;
@@ -644,6 +648,8 @@ export default {
                 data: code,
                 status: ret.status,
                 fileName: this.script.fileName,
+                errDesc: ret.errDesc,
+                errCode: ret.errCode,
                 failedReason: ret.failedReason
               };
             } else {
@@ -655,6 +661,8 @@ export default {
                 data: code,
                 status: ret.status,
                 fileName: this.script.fileName,
+                errDesc: ret.errDesc,
+                errCode: ret.errCode,
                 failedReason: ret.failedReason
               };
             }
@@ -667,7 +675,9 @@ export default {
               data: code,
               status: ret.status,
               fileName: this.script.fileName,
-              failedReason: ret.failedReason
+              failedReason: ret.failedReason,
+              errDesc: ret.errDesc,
+              errCode: ret.errCode,
             };
           }
           newItem.solution = ret.solution
@@ -691,7 +701,8 @@ export default {
               errDesc: ret.errDesc,
               errCode: ret.errCode,
               status: ret.status,
-              taskId: ret.taskID
+              taskId: ret.taskID,
+              failedReason: ret.errCode + ret.errDesc
             })
           }
           if (!ret.errCode && ret.status == 'Failed') {
@@ -1391,7 +1402,7 @@ export default {
       bottom: 0 !important;
       left: 0 !important;
       position: fixed;
-      z-index: 9999;
+      z-index: 1050;
       background-color: #fff;
       height: 100% !important;
     }
@@ -1409,7 +1420,7 @@ export default {
       bottom: 0 !important;
       left: 0 !important;
       position: fixed;
-      z-index: 9999;
+      z-index: 1050;
       background-color: #fff;
       height: 100% !important;
     }

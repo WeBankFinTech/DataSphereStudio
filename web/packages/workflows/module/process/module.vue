@@ -2019,6 +2019,7 @@ export default {
         })
       } else {
         const params = {
+          flowID: this.newFlowId,
           nodeType: node.type,
           projectID: +this.$route.query.projectID,
           params: {

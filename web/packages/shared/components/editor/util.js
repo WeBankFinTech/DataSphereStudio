@@ -25,7 +25,7 @@ import storage from '@dataspherestudio/shared/common/helper/storage';
  * @param {*} lang
  */
 const getHiveList = async (monaco, lang) => {
-  const closeSuggest = storage.get('close_db_table_suggest')
+  const closeSuggest = storage.get('close_db_table_suggest', 'local')
   let dbInfoProposals = [];
   let tableInfoProposals = [];
   let udfProposals = [];

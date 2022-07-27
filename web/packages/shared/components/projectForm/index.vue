@@ -184,7 +184,6 @@
   </Modal>
 </template>
 <script>
-import storage from '@dataspherestudio/shared/common/helper/storage';
 import tag from "@dataspherestudio/shared/components/tag/index.vue";
 import lubanSelect from "@dataspherestudio/shared/components/select/index.vue";
 import _ from "lodash";
@@ -251,12 +250,6 @@ export default {
   computed: {
     formValid() {
       let validateName = async (rule, value, callback) => {
-        let currentWorkspaceName = storage.get("currentWorkspace")
-          ? storage.get("currentWorkspace").name
-          : null;
-        let username = storage.get("baseInfo", "local")
-          ? storage.get("baseInfo", "local").username
-          : null;
         // 校验是否重名
         let repeat = false
         try {
@@ -267,11 +260,7 @@ export default {
         } catch (error) {
           //
         }
-        if ((currentWorkspaceName && username && value.match(currentWorkspaceName)) || value.match(username)) {
-          callback(
-            new Error(this.$t("message.common.projectDetail.validateName"))
-          );
-        } else if (repeat && this.actionType === 'add') {
+        if (repeat && this.actionType === 'add') {
           callback(
             new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
           );
@@ -385,10 +374,13 @@ export default {
         if (valid) {
           this.submiting = true;
           this.$emit("confirm", this.projectDataCurrent, (success) => {
-            if (success) this.ProjectShow = false;
+            if (success) {
+              this.$refs.projectForm.resetFields();
+              this.ProjectShow = false;
+            }
             this.submiting = false;
           });
-          this.$refs.projectForm.resetFields();
+
         } else {
           this.submiting = false;
           this.$Message.warning(this.$t("message.workflow.failedNotice"));

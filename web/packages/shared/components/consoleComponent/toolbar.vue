@@ -22,8 +22,7 @@
           :transfer="true"
           :width="200"
           v-model="popup.download"
-          placement="right"
-          popper-class="we-poptip">
+          placement="right">
           <div @click.stop="openPopup('download')">
             <SvgIcon :style="{ 'font-size': '20px' }" icon-class="downLoad" color="#515a6e" />
             <span v-if="isIconLabelShow" :title="$t('message.common.download')" class="v-toolbar-icon">{{ $t('message.common.download') }}</span>
@@ -357,17 +356,6 @@ export default {
     left: 40px;
     margin-left: -$toolbarWidth;
     @include bg-color($light-base-color, $dark-menu-base-color);
-    .we-poptip {
-      padding: 12px;
-      line-height: 28px;
-      .confirm {
-        margin-top: 10px;
-      }
-      .title {
-        margin: 10px 0;
-        text-align: center;
-      }
-    }
     .we-toolbar {
       width: 100%;
       height: 100%;

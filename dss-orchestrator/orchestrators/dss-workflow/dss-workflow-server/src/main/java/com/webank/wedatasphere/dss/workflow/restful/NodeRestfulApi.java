@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -87,7 +88,7 @@ public class NodeRestfulApi {
                 try {
                     return transfer(n, req);
                 } catch (IOException e) {
-                    logger.error("listNodeType get icons failed.", e);
+                    logger.error("ListNodeType get AppConn {} icons failed.", n.getAppConnName(), e);
                     throw new DSSRuntimeException(81200, e.getMessage(), e);
                 }
             }).collect(Collectors.toList()));
@@ -146,9 +147,9 @@ public class NodeRestfulApi {
         String appConnHomePath = AppConnManager.getAppConnManager().getAppConnHomePath(nodeInfo.getAppConnName());
         File iconPath = new File(appConnHomePath, nodeInfo.getIconPath());
         if(!iconPath.exists()) {
-            throw new IOException("Get icon failed. Caused by: " + iconPath + " not exists.");
+            throw new IOException("Get icon failed. Caused by: AppConn " + nodeInfo.getAppConnName() + "'s " + iconPath + " not exists.");
         } else if(!iconPath.isFile()) {
-            throw new IOException("Get icon failed. Caused by: " + iconPath + " is not a file.");
+            throw new IOException("Get icon failed. Caused by: AppConn " + nodeInfo.getAppConnName() + "'s " + iconPath + " is not a file.");
         }
         return FileUtils.readFileToString(iconPath);
     }
@@ -163,7 +164,7 @@ public class NodeRestfulApi {
         Map<String, Object> params = createExternalNodeRequest.getParams();
         String nodeId = createExternalNodeRequest.getNodeID();
 
-        logger.info("user {} try to create a {} node for workflow {}, params is {}.", userName, nodeType, flowId, params);
+        logger.info("User {} try to create a {} node for workflow {}, params is {}.", userName, nodeType, flowId, params);
         CommonAppConnNode node = new CommonAppConnNode();
         node.setNodeType(nodeType);
         node.setFlowId(flowId);
@@ -194,7 +195,7 @@ public class NodeRestfulApi {
                 dssNodes = workFlowParser.getWorkFlowNodes(flowContent).stream()
                         .filter(dssNode -> ArrayUtils.contains(upStreams, dssNode.getId())).collect(Collectors.toList());
                 if(dssNodes.isEmpty() && upStreams.length > 0) {
-                    return Message.error("create node failed! Caused by: the banding up-stream nodes are not exists(绑定的上游节点不存在).");
+                    return Message.error("Create node failed! Caused by: the banding up-stream nodes are not exists(绑定的上游节点不存在).");
                 }
                 params.put(DSSJobContentConstant.UP_STREAM_KEY, dssNodes);
             }
@@ -277,7 +278,7 @@ public class NodeRestfulApi {
     }
 
     @RequestMapping(value = "/getAppConnNodeUrl",method = RequestMethod.POST)
-    public Message getAppConnNodeUrl(HttpServletRequest req, @RequestBody AppConnNodeUrlRequest appConnNodeUrlRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
+    public Message getAppConnNodeUrl(HttpServletRequest req, @RequestBody AppConnNodeUrlRequest appConnNodeUrlRequest) {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         Long projectId = appConnNodeUrlRequest.getProjectID();

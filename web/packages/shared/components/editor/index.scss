@@ -20,7 +20,9 @@
 .we-editor{
 	height: 100%;
 	width: 100%;
-
+  .monaco-menu .monaco-action-bar.vertical .action-menu-item {
+    height: 1.6em;
+  }
 	.monaco-menu-container a:hover {
 		color: #fff !important;
 	}

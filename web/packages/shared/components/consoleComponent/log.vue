@@ -104,6 +104,14 @@ export default {
       if (this.$refs.logEditor.editor) {
         this.$refs.logEditor.editor.revealLine(val);
       }
+    },
+    logs() {
+      if (this.$refs.logEditor.editor) {
+        const firstError = this.logs.all.split('\n').findIndex(line => line.indexOf('ERROR') > -1)
+        setTimeout(() => {
+          this.$refs.logEditor.editor.revealLine(firstError > 0 ? firstError + 1 : 1);
+        }, 1200);
+      }
     }
   },
   computed: {
@@ -113,10 +121,6 @@ export default {
   },
   mounted() {
     elementResizeEvent.bind(this.$el, this.resize);
-    if ( this.$refs.logEditor.editor) {
-      const firstError = this.logs.all.split('\n').findIndex(line => line.indexOf('ERROR') > -1)
-      this.$refs.logEditor.editor.revealLine(firstError > 0 ? firstError : 1);
-    }
   },
   beforeDestroy() {
     elementResizeEvent.unbind(this.$el);

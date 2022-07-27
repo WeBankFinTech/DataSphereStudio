@@ -195,6 +195,8 @@
         "DKYFJC": "打开语法检查",
         "GBKBTS": "关闭库表联想",
         "DKKBTS": "打开库表联想",
+        "DKZDHH": "自动换行",
+        "GBZDHH": "关闭自动换行",
         "GYFSYGWYF": "该语法属于高危语法，请谨慎操作！"
       },
       "resourceSimple": {
@@ -374,7 +376,6 @@
         "WCYDXM": "我参与的项目",
         "SRMCSS": "请输入名称搜索",
         "XJ": "新建",
-        "validateName": "名字不能包含当前工作空间名或用户名",
         "editPermissions": "编辑权限",
         "usersAllowedToEdit": "请选择可编辑用户",
         "viewPermissions": "查看权限",

@@ -376,7 +376,6 @@
         "WCYDXM": "我参与的项目",
         "SRMCSS": "请输入名称搜索",
         "XJ": "新建",
-        "validateName": "名字不能包含当前工作空间名或用户名",
         "editPermissions": "编辑权限",
         "usersAllowedToEdit": "请选择可编辑用户",
         "viewPermissions": "查看权限",

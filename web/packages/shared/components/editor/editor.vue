@@ -51,12 +51,15 @@ export default {
     application: String,
   },
   data() {
+    const closeSuggest = storage.get('close_db_table_suggest', 'local')
+    const autobreak = storage.get('editor_auto_breakline', 'local')
     return {
       editor: null,
       editorModel: null,
       decorations: null,
       isParserClose: true, // 默认关闭语法验证
-      dbtbsuggest: true, // 默认打开库表联想
+      dbtbsuggest: !closeSuggest, // 默认打开库表联想
+      autobreak: autobreak, // 默认关闭自动换行
       closeParser: null,
       openParser: null,
       sqlParser: null,
@@ -397,7 +400,7 @@ export default {
           // 控制右键菜单的显示
           vm.openDbTbSuggest.set(true);
           vm.closeDbTbSuggest.set(false);
-          storage.set('close_db_table_suggest', true)
+          storage.set('close_db_table_suggest', true, 'local')
         },
       });
 
@@ -413,7 +416,46 @@ export default {
           vm.dbtbsuggest = true;
           vm.openDbTbSuggest.set(false);
           vm.closeDbTbSuggest.set(true);
-          storage.set('close_db_table_suggest', false)
+          storage.set('close_db_table_suggest', false, 'local')
+        },
+      });
+
+      // 打开、关闭自动换行
+      this.closeAutoBreak = this.editor.createContextKey('closeAutoBreak', this.autobreak);
+      this.openAutoBreak = this.editor.createContextKey('openAutoBreak', !this.autobreak);
+      this.editor.addAction({
+        id: 'closeAutoBreak',
+        label: this.$t('message.common.monacoMenu.GBZDHH'),
+        keybindings: [],
+        keybindingContext: null,
+        // 用于控制右键菜单的显示
+        precondition: 'closeAutoBreak',
+        contextMenuGroupId: 'control',
+        contextMenuOrder: 2.4,
+        run() {
+          vm.autobreak = false;
+          // 控制右键菜单的显示
+          vm.openAutoBreak.set(true);
+          vm.closeAutoBreak.set(false);
+          storage.set('editor_auto_breakline', true, 'local');
+          vm.editor.updateOptions({wordWrap: 'off'});
+        },
+      });
+
+      this.editor.addAction({
+        id: 'openAutoBreak',
+        label: this.$t('message.common.monacoMenu.DKZDHH'),
+        keybindings: [],
+        keybindingContext: null,
+        precondition: 'openAutoBreak',
+        contextMenuGroupId: 'control',
+        contextMenuOrder: 2.5,
+        run() {
+          vm.autobreak = true;
+          vm.openAutoBreak.set(false);
+          vm.closeAutoBreak.set(true);
+          storage.set('editor_auto_breakline', false, 'local');
+          vm.editor.updateOptions({wordWrap: 'on'});
         },
       });
 

@@ -72,8 +72,7 @@ public class AppConnManagerRestfulApi {
             });
             LOGGER.info("All AppConn have loaded successfully.");
             LOGGER.info("Last, try to scan AppConn plugins and upload AppConn resources...");
-            // reference不为空，说明是引用的其他appconn，不用上传appconn目录
-            List<AppConnInfo> uploadList = appConnInfoService.getAppConnInfos().stream().filter(l -> StringUtils.isBlank(l.getReference())).collect(Collectors.toList());
+            List<? extends AppConnInfo> uploadList = appConnInfoService.getAppConnInfos();
             CountDownLatch cdl = new CountDownLatch(uploadList.size());
             AtomicInteger failedCnt = new AtomicInteger(0);
             uploadList.forEach(appConnInfo -> {

@@ -194,6 +194,8 @@
         "DKYFJC": "Open syntax check",
         "GBKBTS": "Close DB/Table suggest",
         "DKKBTS": "Open DB/Table suggest",
+        "DKZDHH": "Auto Break",
+        "GBZDHH": "Close auto break",
         "GYFSYGWYF": "This is highly dangerous syntax, please be cautious!"
       },
       "resourceSimple": {
@@ -375,7 +377,6 @@
         "WCYDXM": "My cooperative project",
         "SRMCSS": "Please enter a name to seatch",
         "XJ": "Add",
-        "validateName": "Name cannot contain current Workspace name and user name!",
         "editPermissions": "Edit Permissions",
         "usersAllowedToEdit": "Users Allowed To Edit",
         "viewPermissions": "View Permissions",

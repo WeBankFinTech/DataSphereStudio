@@ -377,7 +377,6 @@
         "WCYDXM": "My cooperative project",
         "SRMCSS": "Please enter a name to seatch",
         "XJ": "Add",
-        "validateName": "Name cannot contain current Workspace name and user name!",
         "editPermissions": "Edit Permissions",
         "usersAllowedToEdit": "Users Allowed To Edit",
         "viewPermissions": "View Permissions",

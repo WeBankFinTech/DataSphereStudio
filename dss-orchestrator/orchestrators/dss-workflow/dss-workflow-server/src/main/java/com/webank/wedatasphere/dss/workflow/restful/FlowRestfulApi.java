@@ -220,8 +220,11 @@ public class FlowRestfulApi {
         if (dssFlow != null) {
             // 尝试获取工作流编辑锁
             try {
-                String flowEditLock = DSSFlowEditLockManager.tryAcquireLock(dssFlow, username, ticketId);
-                dssFlow.setFlowEditLock(flowEditLock);
+                //只有父工作流才有锁，子工作流复用父工作流的锁
+                if(dssFlow.getRootFlow()) {
+                    String flowEditLock = DSSFlowEditLockManager.tryAcquireLock(dssFlow, username, ticketId);
+                    dssFlow.setFlowEditLock(flowEditLock);
+                }
             } catch (DSSErrorException e) {
                 if (DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
                     return Message.error(e.getDesc());

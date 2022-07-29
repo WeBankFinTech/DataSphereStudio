@@ -42,6 +42,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf.APPCONN_UPLOAD_THREAD_NUM;
@@ -71,22 +72,25 @@ public class AppConnManagerRestfulApi {
             });
             LOGGER.info("All AppConn have loaded successfully.");
             LOGGER.info("Last, try to scan AppConn plugins and upload AppConn resources...");
-            // reference不为空，说明是引用的其他appconn，不用上传appconn目录
-            List<AppConnInfo> uploadList = appConnInfoService.getAppConnInfos().stream().filter(l -> StringUtils.isBlank(l.getReference())).collect(Collectors.toList());
+            List<? extends AppConnInfo> uploadList = appConnInfoService.getAppConnInfos();
             CountDownLatch cdl = new CountDownLatch(uploadList.size());
+            AtomicInteger failedCnt = new AtomicInteger(0);
             uploadList.forEach(appConnInfo -> {
                 uploadThreadPool.submit(() -> {
                     LOGGER.info("Try to scan AppConn {}.", appConnInfo.getAppConnName());
                     try {
                         appConnResourceUploadService.upload(appConnInfo.getAppConnName());
                     } catch (Exception e) {
-                        LOGGER.error("Error happened when uploading appconn:{}", appConnInfo.getAppConnName());
-                        throw new DSSRuntimeException(ExceptionUtils.getRootCauseMessage(e));
+                        LOGGER.error("Error happened when uploading appconn:{}, error:", appConnInfo.getAppConnName(), e);
+                        failedCnt.getAndIncrement();
                     }
                     cdl.countDown();
                 });
             });
             cdl.await();
+            if (failedCnt.get() > 0) {
+                throw new DSSRuntimeException("Error happened when uploading appconn, service startup terminated.");
+            }
             LOGGER.info("All AppConn plugins has scanned.");
             uploadThreadPool.shutdown();
         } else {
@@ -113,7 +117,7 @@ public class AppConnManagerRestfulApi {
 
     @RequestMapping(path = "{appConnName}/getAppInstances", method = RequestMethod.GET)
     public Message getAppInstancesByAppConnInfo(@PathVariable("appConnName") String appConnName) {
-        LOGGER.info("try to get instances for appconn: {}.", appConnName);
+        LOGGER.debug("try to get instances for appconn: {}.", appConnName);
         List<? extends AppInstanceInfo> appInstanceInfos = appConnInfoService.getAppInstancesByAppConnName(appConnName);
         Message message = Message.ok("Get AppInstance list succeed.");
         message.data("appInstanceInfos", appInstanceInfos);

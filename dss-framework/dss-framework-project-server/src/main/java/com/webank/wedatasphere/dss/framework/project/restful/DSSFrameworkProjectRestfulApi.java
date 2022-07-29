@@ -101,7 +101,7 @@ public class DSSFrameworkProjectRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("user {} begin to checkProjectName: {}", username, name);
         return DSSExceptionUtils.getMessage(() -> dssFrameworkProjectService.checkProjectName(name, workspace, username),
-                () -> Message.ok().data("repeat", false), String.format("用户 %s 创建工程 %s 失败. ", username, name));
+                () -> Message.ok().data("repeat", false), String.format("用户 %s，创建工程名 %s 失败. ", username, name));
     }
 
     /**

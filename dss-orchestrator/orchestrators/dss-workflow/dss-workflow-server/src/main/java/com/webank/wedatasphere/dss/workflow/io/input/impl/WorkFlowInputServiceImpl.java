@@ -173,18 +173,18 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 if ("workflow.subflow".equals(nodeType) && CollectionUtils.isNotEmpty(subflows)) {
                     String subFlowName = nodeJsonMap.get("title").toString();
                     logger.info("subflows:{}", subflows);
-                    List<DSSFlow> DSSFlowList = subflows.stream().filter(subflow ->
+                    List<DSSFlow> dssFlowList = subflows.stream().filter(subflow ->
                             subflow.getName().equals(subFlowName)
                     ).collect(Collectors.toList());
-                    if (DSSFlowList.size() == 1) {
-                        updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, DSSFlowList.get(0).getId());
+                    if (dssFlowList.size() == 1) {
+                        updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, dssFlowList.get(0).getId());
                         nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
                         nodeJsonListRes.add(nodeJsonMap);
-                    } else if (DSSFlowList.size() > 1) {
+                    } else if (dssFlowList.size() > 1) {
                         logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
                         throw new DSSErrorException(90077, "工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
                     } else {
-                        logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                        logger.error("工程内未能找到子工作流节点，导入失败" + subFlowName);
                         throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                     }
                 } else {

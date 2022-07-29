@@ -71,12 +71,18 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
     @Override
     public void upload(String appConnName) throws DSSErrorException {
         File appConnPath = new File(AppConnUtils.getAppConnHomePath(), appConnName);
+        AppConnBean appConnBean = appConnMapper.getAppConnBeanByName(appConnName);
         if (!appConnPath.exists()) {
-            throw new AppConnNotExistsErrorException(20350, "AppConn home path " + appConnPath.getPath() + " not exists.");
+            //没有reference，必须有appconn目录
+            if (StringUtils.isBlank(appConnBean.getReference())) {
+                throw new AppConnNotExistsErrorException(20350, "AppConn home path " + appConnPath.getPath() + " not exists.");
+            } else {
+                LOGGER.info("Appconn {} references other appConns and has no directory, so no upload is required", appConnName);
+                return;
+            }
         } else if (!appConnPath.isDirectory()) {
             throw new AppConnNotExistsErrorException(20350, "AppConn home path " + appConnPath.getPath() + " is not a directory.");
         }
-        AppConnBean appConnBean = appConnMapper.getAppConnBeanByName(appConnName);
         AppConnResource appConnResource;
         File indexFile = null;
         if (appConnBean == null) {
@@ -105,11 +111,11 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
         if (appConnResource.getResource() != null) {
             try {
                 inputStream = new FileInputStream(zipFile.getPath());
-                BmlUpdateResponse response = bmlClient.updateResource(Utils.getJvmUser(), appConnResource.getResource().getResourceId(), zipFile.getPath(),inputStream);
+                BmlUpdateResponse response = bmlClient.updateResource(Utils.getJvmUser(), appConnResource.getResource().getResourceId(), zipFile.getPath(), inputStream);
                 resource.setResourceId(appConnResource.getResource().getResourceId());
                 resource.setVersion(response.version());
             } catch (FileNotFoundException e) {
-                throw new AppConnNotExistsErrorException(20351, "AppConn update to bml failed"+e.getMessage());
+                throw new AppConnNotExistsErrorException(20351, "AppConn update to bml failed" + e.getMessage());
             } finally {
                 IOUtils.closeQuietly(inputStream);
             }
@@ -122,7 +128,7 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
                 resource.setResourceId(response.resourceId());
                 resource.setVersion(response.version());
             } catch (FileNotFoundException e) {
-                throw new AppConnNotExistsErrorException(20352, "AppConn update to bml failed"+e.getMessage());
+                throw new AppConnNotExistsErrorException(20352, "AppConn update to bml failed" + e.getMessage());
             } finally {
                 IOUtils.closeQuietly(inputStream);
             }

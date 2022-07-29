@@ -486,7 +486,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             // 每次处理1000条数据
             if (contextIdList.size() < DSSOrchestratorConstant.MAX_CLEAR_SIZE) {
                 LOGGER.info("clear old contextId, contextIds：{}", contextIdList.toString());
-                //contextClient.batchClearContextByHAID(contextIdList);
+                contextClient.batchClearContextByHAID(contextIdList);
             } else {
                 int len = DSSOrchestratorConstant.MAX_CLEAR_SIZE;
                 int size = contextIdList.size();
@@ -494,7 +494,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 for (int i = 0; i < count; i++) {
                     List<String> subList = contextIdList.subList(i * len, (Math.min((i + 1) * len, size)));
                     LOGGER.info("clear old contextId by batch, {} batch, contextIds：{}", i + 1, subList.toString());
-                    //contextClient.batchClearContextByHAID(subList);
+                    contextClient.batchClearContextByHAID(subList);
                     Thread.sleep(500);
                 }
             }

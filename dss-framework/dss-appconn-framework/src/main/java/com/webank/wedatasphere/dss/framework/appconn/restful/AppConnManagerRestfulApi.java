@@ -117,7 +117,7 @@ public class AppConnManagerRestfulApi {
 
     @RequestMapping(path = "{appConnName}/getAppInstances", method = RequestMethod.GET)
     public Message getAppInstancesByAppConnInfo(@PathVariable("appConnName") String appConnName) {
-        LOGGER.info("try to get instances for appconn: {}.", appConnName);
+        LOGGER.debug("try to get instances for appconn: {}.", appConnName);
         List<? extends AppInstanceInfo> appInstanceInfos = appConnInfoService.getAppInstancesByAppConnName(appConnName);
         Message message = Message.ok("Get AppInstance list succeed.");
         message.data("appInstanceInfos", appInstanceInfos);

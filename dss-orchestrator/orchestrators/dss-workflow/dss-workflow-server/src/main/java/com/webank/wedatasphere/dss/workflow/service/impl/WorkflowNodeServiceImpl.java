@@ -97,7 +97,11 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         try {
             appInstance = appConn.getAppDesc().getAppInstancesByLabels(dssLabels).get(0);
         } catch (NoSuchAppInstanceException e) {
-            throw new ExternalOperationFailedException(50020, "cannot find the appInstance with label " + dssLabels.get(0).getStringValue());
+            if (dssLabels.get(0).getStringValue() == null){
+                throw new ExternalOperationFailedException(50020, "未正确退出生产中心或流失生产中，请刷新页面后重试！");
+            }
+            throw new ExternalOperationFailedException(50020, "Cannot find the appInstance with label " + dssLabels.get(0).getStringValue() +
+                    ". (在" + dssLabels.get(0).getStringValue() + "中心找不到" + appConn.getAppDesc().getAppName() + "实例)");
         }
         return getDevelopmentService.apply(developmentIntegrationStandard, appInstance);
     }

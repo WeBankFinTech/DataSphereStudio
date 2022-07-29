@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
@@ -112,25 +113,18 @@ public class FlowRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(request);
         String publishUser = SecurityFilter.getLoginUsername(request);
         LOGGER.info("User {} begin to publish workflow, flowId:{}", publishUser, workflowId);
-        Message message;
-        try {
-            String taskId = publishService.submitPublish(publishUser, workflowId, labels, workspace, comment);
-            LOGGER.info("submit publish task ok ,taskId is {}.", taskId);
-            if (DSSWorkFlowConstant.PUBLISHING_ERROR_CODE.equals(taskId)) {
-                message = Message.error("发布工程已经含有工作流，正在发布中，请稍后再试");
-            } else if (StringUtils.isNotEmpty(taskId)) {
-                message = Message.ok("生成工作流发布任务成功").data("releaseTaskId", taskId);
-            } else {
-                LOGGER.error("taskId {} is error.", taskId);
-                message = Message.error("发布工作流失败");
-            }
-        } catch (DSSWorkflowErrorException e) {
-            throw e;
-        } catch (final Throwable t) {
-            LOGGER.error("failed to submit publish task for workflow id {}.", workflowId, t);
-            message = Message.error("发布工作流失败");
-        }
-        return message;
+
+        return DSSExceptionUtils.getMessage(() -> publishService.submitPublish(publishUser, workflowId, labels, workspace, comment),
+                taskId -> {
+                if (DSSWorkFlowConstant.PUBLISHING_ERROR_CODE.equals(taskId)) {
+                    return Message.error("发布工程已经含有工作流，正在发布中，请稍后再试");
+                } else if (StringUtils.isNotEmpty(taskId)) {
+                    return Message.ok("生成工作流发布任务成功").data("releaseTaskId", taskId);
+                } else {
+                    LOGGER.error("taskId {} is error.", taskId);
+                    return Message.error("发布工作流失败");
+                }},
+                String.format("用户 %s 发布工作流 %s 失败.", publishUser, workflowId));
     }
 
     /**

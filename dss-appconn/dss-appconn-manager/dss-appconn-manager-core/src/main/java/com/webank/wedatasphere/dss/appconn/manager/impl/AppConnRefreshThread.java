@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.appconn.manager.impl;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,6 +61,7 @@ public class AppConnRefreshThread implements Runnable {
                 List<AppInstance> oldAppInstanceList = appConnManager.getAppConn(appConnInfo.getAppConnName()).getAppDesc().getAppInstances();
                 if(isChanged(appInstanceInfos, oldAppInstanceList)) {
                     LOGGER.warn("The appInstanceInfo of AppConn {} has changed, now try to refresh it.", appConnInfo.getAppConnName());
+                    LOGGER.warn("The old appInstanceInfo of AppConn {} is {}.", appConnInfo.getAppConnName(), oldAppInstanceList);
                     LOGGER.warn("The new appInstanceInfo of AppConn {} is {}.", appConnInfo.getAppConnName(), appInstanceInfos);
                     reloadAppConn(appConnInfo);
                 }
@@ -87,18 +89,20 @@ public class AppConnRefreshThread implements Runnable {
     }
 
     private boolean isChanged(List<? extends AppInstanceInfo> one, List<AppInstance> other) {
-        if(one == null && other == null) {
+        if (CollectionUtils.isEmpty(one) && CollectionUtils.isEmpty(other)) {
             return false;
-        } else if(CollectionUtils.isEmpty(one) || CollectionUtils.isEmpty(other) || one.size() != other.size()) {
+        } else if (CollectionUtils.isEmpty(one) || CollectionUtils.isEmpty(other) || one.size() != other.size()) {
             return true;
         } else {
             // 判断条件为：一种是找不到 ID 相同的，一种是 ID 相同但是属性有变化
             // 这里不判断标签，因为标签是不会改动的
             return one.stream().anyMatch(newOne -> other.stream().noneMatch(otherOne -> otherOne.getId().equals(newOne.getId()))
                     || other.stream().anyMatch(otherOne -> otherOne.getId().equals(newOne.getId())
-                        && (!StringUtils.equals(newOne.getUrl(), otherOne.getBaseUrl())
-                                || !StringUtils.equals(newOne.getHomepageUri(), otherOne.getHomepageUri())
-                                || !StringUtils.equals(newOne.getEnhanceJson(), DSSCommonUtils.COMMON_GSON.toJson(otherOne.getConfig()))))
+                    && (!StringUtils.equals(newOne.getUrl(), otherOne.getBaseUrl())
+                    || ((StringUtils.isNotEmpty(newOne.getHomepageUri()) || StringUtils.isNotEmpty(otherOne.getHomepageUri()))
+                    && !StringUtils.equals(newOne.getHomepageUri(), otherOne.getHomepageUri()))
+                    || ((StringUtils.isNotEmpty(newOne.getEnhanceJson()) || MapUtils.isNotEmpty(otherOne.getConfig())) &&
+                    !StringUtils.equals(newOne.getEnhanceJson(), DSSCommonUtils.COMMON_GSON.toJson(otherOne.getConfig())))))
             );
         }
     }

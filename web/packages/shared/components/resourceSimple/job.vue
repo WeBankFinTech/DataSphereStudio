@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <Spin
-      v-if="loading"
-      size="large"
-      fix/>
+  <Spin
+    v-if="loading"
+    size="large"
+    fix/>
+  <div v-else >
     <div class="job-manager">
       <div
         class="job-manager-empty"
@@ -105,7 +105,7 @@ export default {
       try {
         const rst = await api.fetch('/jobhistory/listundone', {}, 'get')
         this.loading = false;
-        rst.tasks.forEach((item) => {
+        (rst.tasks||[]).forEach((item) => {
           const tmpItem = Object.assign({}, item, { isActive: false, fileName: this.convertJson(item) });
           this.jobList.push(tmpItem);
           if (this.jobTypeList.indexOf(item.requestApplicationName) < 0) {

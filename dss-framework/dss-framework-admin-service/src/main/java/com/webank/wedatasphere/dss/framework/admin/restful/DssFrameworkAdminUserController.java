@@ -58,6 +58,7 @@ public class DssFrameworkAdminUserController extends BaseController {
         user.setParams(params);
         startPage();
         List<DssAdminUser> userList = dssAdminUserService.selectUserList(user);
+        LOGGER.info("try to get DssAdminUser list, userList:{}", userList);
         return getDataTable(userList);
     }
 

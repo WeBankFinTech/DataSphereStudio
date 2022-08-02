@@ -25,11 +25,12 @@ public class DssFrameworkAdminDeptController {
 
     @RequestMapping(path = "list", method = RequestMethod.GET)
     public Message listAll(@RequestParam(value = "parentId", required = false) Long parentId, @RequestParam(value = "deptName", required = false) String deptName) {
-
+        LOGGER.info("begin to get dept list...parentId:{}, deptName:{}",parentId, deptName);
         DssAdminDept dept = new DssAdminDept();
         dept.setParentId(parentId);
         dept.setDeptName(deptName);
         List<DssAdminDept> list = dssAdminDeptService.selectDeptList(dept);
+        LOGGER.info("get dept list finish, list:{}", list);
         return Message.ok().data("deptList", list).message("成功");
     }
 

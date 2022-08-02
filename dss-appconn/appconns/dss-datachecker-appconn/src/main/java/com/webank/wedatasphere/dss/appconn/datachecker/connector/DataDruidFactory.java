@@ -28,34 +28,45 @@ public class DataDruidFactory {
     private static DruidDataSource bdpInstance;
     private static DruidDataSource msgInstance;
 
-    public synchronized static DruidDataSource getJobInstance(Properties props, Logger log) {
-        if (jobInstance == null) {
-            try {
-                jobInstance = createDataSource(props, log, "Job");
-            } catch (Exception e) {
-                throw new RuntimeException("Error creating Druid DataSource", e);
+    public static DruidDataSource getJobInstance(Properties props, Logger log) {
+        if (jobInstance == null ) {
+            synchronized (DataDruidFactory.class) {
+                if(jobInstance == null) {
+                    try {
+                        jobInstance = createDataSource(props, log, "Job");
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error creating Druid DataSource", e);
+                    }
+                }
             }
         }
         return jobInstance;
     }
-
-    public synchronized static DruidDataSource getBDPInstance(Properties props, Logger log) {
-        if (bdpInstance == null) {
-            try {
-                bdpInstance = createDataSource(props, log, "BDP");
-            } catch (Exception e) {
-                throw new RuntimeException("Error creating Druid DataSource", e);
+    public static DruidDataSource getBDPInstance(Properties props, Logger log) {
+        if (bdpInstance == null ) {
+            synchronized (DataDruidFactory.class) {
+                if(bdpInstance == null) {
+                    try {
+                        bdpInstance = createDataSource(props, log, "BDP");
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error creating Druid DataSource", e);
+                    }
+                }
             }
         }
         return bdpInstance;
     }
 
-    public synchronized static DruidDataSource getMsgInstance(Properties props, Logger log) {
-        if (msgInstance == null) {
-            try {
-                msgInstance = createDataSource(props, log, "Msg");
-            } catch (Exception e) {
-                throw new RuntimeException("Error creating Druid DataSource", e);
+    public static DruidDataSource getMsgInstance(Properties props, Logger log) {
+        if (msgInstance == null ) {
+            synchronized (DataDruidFactory.class) {
+                if(msgInstance == null) {
+                    try {
+                        msgInstance = createDataSource(props, log, "Msg");
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error creating Druid DataSource", e);
+                    }
+                }
             }
         }
         return msgInstance;

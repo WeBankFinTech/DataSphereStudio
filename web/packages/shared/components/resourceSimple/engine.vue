@@ -1,9 +1,9 @@
 <template>
-  <div class="engine-box">
-    <Spin
-      v-if="loading"
-      size="large"
-      fix/>
+  <Spin
+    v-if="loading"
+    size="large"
+    fix/>
+  <div v-else class="engine-box">
     <div
       class="engine-content"
       v-if="ideEngineList.length > 0">

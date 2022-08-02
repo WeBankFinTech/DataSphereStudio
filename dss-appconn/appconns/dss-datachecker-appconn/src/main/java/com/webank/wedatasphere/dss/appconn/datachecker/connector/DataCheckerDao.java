@@ -63,9 +63,13 @@ public class DataCheckerDao {
     private static DataSource bdpDS;
     private static DataCheckerDao instance;
 
-    public synchronized static DataCheckerDao getInstance() {
+    public static DataCheckerDao getInstance() {
         if (instance == null) {
-            instance = new DataCheckerDao();
+            synchronized (DataCheckerDao.class) {
+                if (instance == null) {
+                    instance = new DataCheckerDao();
+                }
+            }
         }
         return instance;
     }

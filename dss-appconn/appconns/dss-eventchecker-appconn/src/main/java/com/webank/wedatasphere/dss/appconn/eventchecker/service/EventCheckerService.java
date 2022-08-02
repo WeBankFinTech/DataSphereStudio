@@ -23,9 +23,13 @@ import java.util.Properties;
 public class EventCheckerService {
     private static EventCheckerService instance;
 
-    public synchronized static EventCheckerService getInstance() {
+    public static EventCheckerService getInstance() {
         if (instance == null) {
-            instance = new EventCheckerService();
+            synchronized (EventCheckerService.class) {
+                if (instance == null) {
+                    instance = new EventCheckerService();
+                }
+            }
         }
         return instance;
     }

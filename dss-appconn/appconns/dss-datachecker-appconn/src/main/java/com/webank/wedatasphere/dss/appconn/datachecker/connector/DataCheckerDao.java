@@ -31,10 +31,7 @@ import org.slf4j.Logger;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -288,9 +285,6 @@ public class DataCheckerDao {
             pstmt.setString(3, partitionName);
         } catch (NumberFormatException e) {
             throw new RuntimeException(e);
-        } finally {
-            pstmt.close();
-            conn.close();
         }
         return pstmt;
     }

@@ -18,7 +18,7 @@
       <div v-show="state.isFormatted  && !state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.returnFormat')" @click="clickToolItem('format')">
         <Icon name="ziyuanxhdpi" />
       </div>
-      <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.searchNode')" @click="clickToolItem('search')">
+      <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.search')" @click="clickToolItem('search')">
         <Icon name="search" />
       </div>
     </div>

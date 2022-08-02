@@ -13,7 +13,7 @@
 
 </template>
 <script>
-import monaco from "./monaco-loader";
+import monacoLoader from "./monaco-loader";
 import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 
 const defaultToolbar = {
@@ -124,11 +124,9 @@ export default {
 
   mounted() {
     document.addEventListener('keyup', this.esc, false);
-    this.initMonaco(monaco)
+    monacoLoader(this.initMonaco)
     this.changeTheme(localStorage.getItem('theme'));
     eventbus.on('monaco.change', this.changeTheme);
-    this.monaco = monaco;
-
   },
 
   beforeDestroy() {
@@ -145,6 +143,7 @@ export default {
       }
     },
     initMonaco(monaco) {
+      this.monaco = monaco;
       const options = Object.assign({
         value: this.value,
         theme: this.theme,
@@ -234,10 +233,10 @@ export default {
 
     changeTheme(theme) {
       if (theme == 'dark') {
-        monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
+        this.monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
       }
       if (theme == 'light') {
-        monaco.editor.setTheme('logview');
+        this.monaco.editor.setTheme('logview');
       }
     },
   }

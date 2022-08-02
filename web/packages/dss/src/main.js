@@ -37,7 +37,11 @@ import 'iview/dist/styles/iview.css'
 import '@dataspherestudio/shared/common/style/theme/default.less'
 
 // Icon
-import '@dataspherestudio/shared/components/svgIcon/index.js'
+import SvgIcon from '@dataspherestudio/shared/components/svgIcon/index.vue'// svg component
+// register globally
+Vue.component('SvgIcon', SvgIcon)
+import('@dataspherestudio/shared/components/svgIcon/index.js')
+
 import '../module/index.js'
 
 // 扩展模块

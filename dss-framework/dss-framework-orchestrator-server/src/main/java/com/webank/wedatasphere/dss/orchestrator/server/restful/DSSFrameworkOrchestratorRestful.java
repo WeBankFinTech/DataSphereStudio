@@ -88,6 +88,7 @@ public class DSSFrameworkOrchestratorRestful {
     public Message getAllOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorRequest orchestratorRequest) {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
+            LOGGER.info("user {} begin to geyAllOrchestrator, requestBody:{}", username, orchestratorRequest);
             return Message.ok("获取编排模式成功").data("page", orchestratorService.getListByPage(orchestratorRequest, username));
         } catch (Exception e) {
             LOGGER.error("getAllOrchestratorError ", e);
@@ -132,6 +133,7 @@ public class DSSFrameworkOrchestratorRestful {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         List<OrchestratorLevelEnum> levels = Arrays.asList(OrchestratorLevelEnum.values());
+        LOGGER.info("user {} try to get OrchestratorLevels, workspaceId:{}, result:{}", username, workspace.getWorkspaceId(),levels);
         return Message.ok("获取编排重要级别列表成功").data("orchestratorLevels", levels);
     }
 }

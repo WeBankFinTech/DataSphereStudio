@@ -27,28 +27,34 @@ import pythonKeyword from './keyword/python';
 import sasKeyword from './keyword/sas';
 import shKeyword from './keyword/sh';
 
-import * as monaco from 'monaco-editor';
+/**
+ * loader
+ */
+export default function(cb) {
+  import('monaco-editor').then((monaco)=>{
+    const languagesList = monaco.languages.getLanguages();
+    const findLang = find(languagesList, (lang) => {
+      return lang.id === 'hql';
+    });
+    if (!findLang) {
+    // 注册languages
+      hql.register(monaco);
+      log.register(monaco);
+      sas.register(monaco);
+      sh.register(monaco);
+      out.register(monaco);
+      // 注册theme
+      defaultView.register(monaco);
+      logview.register(monaco);
 
-const languagesList = monaco.languages.getLanguages();
-const findLang = find(languagesList, (lang) => {
-  return lang.id === 'hql';
-});
-if (!findLang) {
-  // 注册languages
-  hql.register(monaco);
-  log.register(monaco);
-  sas.register(monaco);
-  sh.register(monaco);
-  out.register(monaco);
-  // 注册theme
-  defaultView.register(monaco);
-  logview.register(monaco);
-
-  // 注册关键字联想
-  hqlKeyword.register(monaco);
-  pythonKeyword.register(monaco);
-  sasKeyword.register(monaco);
-  shKeyword.register(monaco);
+      // 注册关键字联想
+      hqlKeyword.register(monaco);
+      pythonKeyword.register(monaco);
+      sasKeyword.register(monaco);
+      shKeyword.register(monaco);
+      if(cb) {
+        cb(monaco)
+      }
+    }
+  });
 }
-
-export default monaco;

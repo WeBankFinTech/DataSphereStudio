@@ -41,6 +41,7 @@ public class DssProxyUserController {
         String username = SecurityFilter.getLoginUsername(request);
 
         List<DssProxyUser> userList = dssProxyUserService.selectProxyUserList(username);
+        LOGGER.info("user {} try to get proxy list. userList:{}", username, userList);
         List<String> proxyUserNameList=userList.stream().map(dssProxyUser -> dssProxyUser.getProxyUserName()).collect(Collectors.toList());
         if(DS_PROXY_SELF_ENABLE.getValue()) {
             proxyUserNameList.add(username);
@@ -52,6 +53,7 @@ public class DssProxyUserController {
     public Message setProxyUserCookie(@RequestBody DssProxyUser userRep, HttpServletRequest req, HttpServletResponse resp) {
 
         String username = SecurityFilter.getLoginUsername(req);
+        LOGGER.info("user {} try to add yser cookie, params:{}", username, userRep);
         String trustCode = DS_TRUST_TOKEN.getValue();
         try {
             if (userRep.getUserName().equals(username)) {
@@ -93,7 +95,7 @@ public class DssProxyUserController {
     @RequestMapping(path = "proxy/add", method = RequestMethod.POST)
     public Message add(@RequestBody DssProxyUser userRep, HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
-
+        LOGGER.info("user {} try to add proxy, params:{}", username, userRep);
         try {
             if(!username.equals(DSS_PROXY_ADMIN_NAME.getValue())){
                 DSSExceptionUtils.dealErrorException(100104, "Only administrators can add proxy users", DSSAdminErrorException.class);

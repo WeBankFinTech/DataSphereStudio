@@ -150,6 +150,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
         //调用第三方的工程修改接口
         dbProject.setUsername(username);
+        dbProject.setApplicationArea(Integer.valueOf(projectModifyRequest.getApplicationArea()));
+        dbProject.setDescription(projectModifyRequest.getDescription());
+        dbProject.setBusiness(projectModifyRequest.getBusiness());
+        dbProject.setProduct(projectModifyRequest.getProduct());
         modifyThirdProject(projectModifyRequest, dbProject, workspace);
 
         //1.统一修改各个接入的第三方的系统的工程状态信息

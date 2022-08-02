@@ -63,9 +63,13 @@ public class DataCheckerDao {
     private static DataSource bdpDS;
     private static DataCheckerDao instance;
 
-    public synchronized static DataCheckerDao getInstance() {
+    public static DataCheckerDao getInstance() {
         if (instance == null) {
-            instance = new DataCheckerDao();
+            synchronized (DataCheckerDao.class) {
+                if (instance == null) {
+                    instance = new DataCheckerDao();
+                }
+            }
         }
         return instance;
     }
@@ -273,19 +277,15 @@ public class DataCheckerDao {
             tableName = tableName.split("\\{")[0];
         }
         PreparedStatement pstmt = null;
-        try {
-            if (timeScape.equals("NULL")) {
-                pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
-            } else {
-                pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
-                pstmt.setInt(4, Integer.valueOf(timeScape) * 3600);
-            }
-            pstmt.setString(1, dbName);
-            pstmt.setString(2, tableName);
-            pstmt.setString(3, partitionName);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException(e);
+        if (timeScape.equals("NULL")) {
+            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
+        } else {
+            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
+            pstmt.setInt(4, Integer.valueOf(timeScape) * 3600);
         }
+        pstmt.setString(1, dbName);
+        pstmt.setString(2, tableName);
+        pstmt.setString(3, partitionName);
         return pstmt;
     }
 

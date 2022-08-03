@@ -100,6 +100,9 @@
         SELECT parent_flow_id  FROM  dss_workflow_relation WHERE  flow_id = #{flowID}
     </select>
 
+    <select id="getSubflowName" resultType="java.lang.String">
+        SELECT dw.name from dss_workflow dw left join dss_workflow_relation dwr on dw.id = dwr.flow_id where dwr.parent_flow_id = #{parentFlowID}
+    </select>
 
     <select id="selectSavedSubFlowIDByParentFlowID" resultType="java.lang.Long">
         SELECT fr.flow_id FROM

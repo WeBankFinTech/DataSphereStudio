@@ -62,5 +62,5 @@ public interface FlowMapper {
 
     List<DSSFlow> selectResourcesByWorkflowIds(@Param("list") List<Long> flowIdList);
 
-
+    List<String> getSubflowName(Long parentFlowID);
 }

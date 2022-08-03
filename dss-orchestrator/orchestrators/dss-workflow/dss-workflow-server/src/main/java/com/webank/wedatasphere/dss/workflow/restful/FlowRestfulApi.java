@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
@@ -32,7 +33,6 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
-import com.webank.wedatasphere.dss.workflow.exception.DSSWorkflowErrorException;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
@@ -50,6 +50,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
+
+
 
 @RestController
 @RequestMapping(path = "/dss/workflow", produces = {"application/json"})
@@ -86,11 +88,15 @@ public class FlowRestfulApi {
         String userName = SecurityFilter.getLoginUsername(req);
         // TODO: 2019/5/23 flowName工程名下唯一校验
         String name = addFlowRequest.getName();
+        Long parentFlowID = addFlowRequest.getParentFlowID();
+        // 判断parentFlowID中是否已存在名称未name的subflow
+        if (flowService.checkExistSameSubflow(parentFlowID, name)){
+            return Message.error("子工作流名不能重复");
+        }
         String workspaceName = addFlowRequest.getWorkspaceName();
         String projectName = addFlowRequest.getProjectName();
         String version = addFlowRequest.getVersion();
         String description = addFlowRequest.getDescription();
-        Long parentFlowID = addFlowRequest.getParentFlowID();
         String uses = addFlowRequest.getUses();
         List<DSSLabel> dssLabelList = new ArrayList<>();
         LOGGER.info("User {} begin to add flow, name:{}, projectName:{}", userName, name, projectName);
@@ -103,6 +109,8 @@ public class FlowRestfulApi {
         LOGGER.info("User {} end to add flow, name:{}, projectName:{}", userName, name, projectName);
         return Message.ok().data("flow", dssFlow);
     }
+
+
 
     @RequestMapping(value = "publishWorkflow", method = RequestMethod.POST)
     public Message publishWorkflow(HttpServletRequest request, @RequestBody PublishWorkflowRequest publishWorkflowRequest) throws Exception {
@@ -205,7 +213,13 @@ public class FlowRestfulApi {
                        @RequestParam(required = false, name = "flowId") Long flowID,
                        @RequestParam(required = false, name = "isNotHaveLock") Boolean isNotHaveLock) throws DSSErrorException {
         String username = SecurityFilter.getLoginUsername(req);
-        DSSFlow dssFlow = flowService.getFlow(flowID);
+        LOGGER.info("User {} start to open workflow {}", username, flowID);
+        DSSFlow dssFlow;
+        try {
+            dssFlow = flowService.getFlow(flowID);
+        } catch (NullPointerException e) {
+            return Message.error("The workflow is not exists, please check to delete. (打开了不存在的工作流，请确保是否已删除.)");
+        }
         if (isNotHaveLock != null && isNotHaveLock) {
             return Message.ok().data("flow", dssFlow);
         }
@@ -252,12 +266,16 @@ public class FlowRestfulApi {
      * @throws IOException
      */
     @RequestMapping(value = "saveFlow", method = RequestMethod.POST)
-//    @ProjectPrivChecker
     public Message saveFlow(HttpServletRequest req, @RequestBody SaveFlowRequest saveFlowRequest) throws DSSErrorException, IOException {
         Long flowID = saveFlowRequest.getId();
         String jsonFlow = saveFlowRequest.getJson();
+
         String workspaceName = saveFlowRequest.getWorkspaceName();
         String projectName = saveFlowRequest.getProjectName();
+        // 判断工作流中是否存在命名相同的节点
+        if (checkExistSameFlow(jsonFlow)){
+            return Message.error("It exists same flow.(存在相同的节点)");
+        }
 
         Boolean isNotHaveLock = saveFlowRequest.getNotHaveLock();
         String userName = SecurityFilter.getLoginUsername(req);
@@ -271,6 +289,7 @@ public class FlowRestfulApi {
         }
         return Message.ok().data("flowVersion", version);
     }
+
 
     /**
      * 工作流编辑锁更新接口
@@ -300,6 +319,13 @@ public class FlowRestfulApi {
     public Message deleteFlowEditLock(HttpServletRequest req, @PathVariable("flowEditLock") String flowEditLock) throws DSSErrorException {
         DSSFlowEditLockManager.deleteLock(flowEditLock);
         return Message.ok();
+    }
+
+    private boolean checkExistSameFlow(String jsonFlow) {
+        Map firstLevelMap = DSSCommonUtils.COMMON_GSON.fromJson(jsonFlow, Map.class);
+        List<Map> secondLevelList = (List<Map>) firstLevelMap.get("nodes");
+        long distinctSize = secondLevelList.stream().map(s -> s.get("title")).distinct().count();
+        return distinctSize < secondLevelList.size();
     }
 
 }

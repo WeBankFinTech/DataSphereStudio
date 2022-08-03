@@ -182,7 +182,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public DSSFlow getFlow(Long flowID) {
+    public DSSFlow getFlow(Long flowID) throws NullPointerException{
         DSSFlow DSSFlow = getFlowByID(flowID);
         //todo update
         String userName = DSSFlow.getCreator();
@@ -382,6 +382,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels);
         return flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
+    }
+
+    @Override
+    public boolean checkExistSameSubflow(Long parentFlowID, String name) {
+        List<String> subflowName = flowMapper.getSubflowName(parentFlowID);
+        return subflowName.stream().anyMatch(s -> s.equals(name));
     }
 
     private DSSFlow copyFlowAndSetSubFlowInDB(DSSFlow dssFlow,

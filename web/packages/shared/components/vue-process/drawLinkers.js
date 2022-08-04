@@ -197,6 +197,15 @@ function drawLink(ctx, link, state ) {
 }
 
 function drawLinkers(ctx, links, state) {
+  // 先画未选中的
+  links = links.filter(link => {
+    if (link.fill =='#3399ff') { // 选中的颜色
+      return true
+    } else {
+      drawLink(ctx, link, state)
+      return false
+    }
+  })
   links.forEach(link => {
     drawLink(ctx, link, state)
   })

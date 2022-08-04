@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.project.restful;
 
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
@@ -46,6 +47,7 @@ import java.util.List;
 @RestController
 public class DSSFrameworkProjectRestfulApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSFrameworkProjectRestfulApi.class);
+    private static final int MAX_DESC_LENGTH = ProjectConf.MAX_DESC_LENGTH.getValue();
     @Autowired
     DSSFrameworkProjectService dssFrameworkProjectService;
     @Autowired
@@ -117,6 +119,9 @@ public class DSSFrameworkProjectRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(request);
         if (projectModifyRequest.getId() == null || projectModifyRequest.getId() < 0) {
             return Message.error("project id is null, cannot modify it.");
+        }
+        if (projectModifyRequest.getDescription().length()> MAX_DESC_LENGTH){
+            return Message.error("The project description information is too long, exceeding the maximum length:" +MAX_DESC_LENGTH);
         }
         LOGGER.info("user {} begin to modify project in workspace {}, params: {}.", username, workspace.getWorkspaceName(), projectModifyRequest);
         DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());

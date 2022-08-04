@@ -281,6 +281,10 @@ export default {
             cb()
           }
           this.init()
+        }).catch(()=>{
+          if (cb) {
+            cb()
+          }
         });
     },
     noticeParent(projectId) {
@@ -296,23 +300,29 @@ export default {
       this.init();
     },
     // 确认新增工作流
-    ProjectConfirm(orchestratorData) {
-      orchestratorData.labels = { route: this.getCurrentDsslabels() };
+    ProjectConfirm({data, cb}) {
+      data.labels = { route: this.getCurrentDsslabels() };
       this.loading = true;
       if (this.actionType === "add") {
         api
           .fetch(
             `${this.$API_PATH.ORCHESTRATOR_PATH}createOrchestrator`,
-            orchestratorData,
+            data,
             "post"
           )
           .then(() => {
             this.$Message.success(this.$t("message.workflow.createdSuccess"));
             this.getParams();
             this.getFlowData(this.params);
+            if (cb) {
+              cb(true)
+            }
           })
           .catch(() => {
             this.loading = false;
+            if (cb) {
+              cb()
+            }
           });
       } else {
         const {
@@ -326,7 +336,7 @@ export default {
           description,
           uses,
           labels
-        } = orchestratorData;
+        } = data;
         api
           .fetch(
             `${this.$API_PATH.ORCHESTRATOR_PATH}modifyOrchestrator`,
@@ -348,11 +358,14 @@ export default {
             this.loading = false;
             this.$Message.success(
               this.$t("message.workflow.eitorSuccess", {
-                name: orchestratorData.orchestratorName
+                name: data.orchestratorName
               })
             );
             this.getParams();
             this.getFlowData(this.params);
+            if (cb) {
+              cb(true)
+            }
             setTimeout(() => {
               this.$router.go(0);
             }, 1500);
@@ -360,6 +373,9 @@ export default {
           .catch(() => {
             this.loading = false;
             this.currentOrchetratorData.uses = this.$refs.workflowForm.originBusiness;
+            if (cb) {
+              cb()
+            }
           });
       }
     },

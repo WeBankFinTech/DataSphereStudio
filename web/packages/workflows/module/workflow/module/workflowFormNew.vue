@@ -204,7 +204,6 @@ export default {
               this.submiting = false;
             }
           });
-
         } else {
           this.$Message.warning(this.$t('message.workflow.failedNotice'));
         }

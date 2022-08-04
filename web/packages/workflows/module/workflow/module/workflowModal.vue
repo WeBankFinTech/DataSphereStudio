@@ -109,6 +109,11 @@ export default {
         }
         this.init()
       })
+        .catch(() => {
+          if (cb) {
+            cb()
+          }
+        });
     },
     init() {
       this.currentOrchetratorData = {

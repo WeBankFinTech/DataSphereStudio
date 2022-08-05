@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
@@ -120,10 +121,10 @@ public class DSSFrameworkProjectRestfulApi {
         if (projectModifyRequest.getId() == null || projectModifyRequest.getId() < 0) {
             return Message.error("project id is null, cannot modify it.");
         }
-        if (projectModifyRequest.getDescription().length()> MAX_DESC_LENGTH){
-            return Message.error("The project description information is too long, exceeding the maximum length:" +MAX_DESC_LENGTH);
+        if (projectModifyRequest.getDescription().length() > MAX_DESC_LENGTH) {
+            return Message.error("The project description information is too long, exceeding the maximum length:" + MAX_DESC_LENGTH);
         }
-        LOGGER.info("user {} begin to modify project in workspace {}, params: {}.", username, workspace.getWorkspaceName(), projectModifyRequest);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "modify project", projectModifyRequest);
         DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
         //工程不存在
         if (dbProject == null) {

@@ -167,8 +167,8 @@
       @click="clickBaseInfo">
       <div class="process-module-param-modal-header">
         <h5>{{$t('message.workflow.process.baseInfo')}}</h5>
-        <div v-if="!myReadonly" class="save-button">
-          <Button size="small" @click.stop="saveNodeParameter"
+        <div class="save-button">
+          <Button  v-if="!myReadonly" size="small" @click.stop="saveNodeParameter"
             :disabled="false">{{$t('message.workflow.process.nodeParameter.BC')}}
           </Button>
         </div>
@@ -843,6 +843,8 @@ export default {
     },
     getBaseInfo() {
       this.loading = true;
+      this.clickCurrentNode = {};
+      this.nodebaseinfoShow = false;
       this.changeNum = 0;
       this.getOriginJson();
     },
@@ -1665,10 +1667,6 @@ export default {
     },
     // 单击节点出来的右边的弹框的保存事件
     saveNode(node) { // 保存节点参数配置
-      this.saveNodeFunction(node)
-    },
-    // saveNode函数里面可以复用的代码
-    saveNodeFunction(node) {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonly'));
       this.saveNodeBaseInfo(node);
     },

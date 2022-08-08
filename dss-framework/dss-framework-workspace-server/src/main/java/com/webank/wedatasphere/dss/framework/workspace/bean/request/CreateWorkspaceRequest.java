@@ -50,4 +50,15 @@ public class CreateWorkspaceRequest implements Serializable {
     public void setProductName(String productName) {
         this.productName = productName;
     }
+
+    @Override
+    public String toString() {
+        return "CreateWorkspaceRequest{" +
+                "workspaceName='" + workspaceName + '\'' +
+                ", department='" + department + '\'' +
+                ", description='" + description + '\'' +
+                ", tags='" + tags + '\'' +
+                ", productName='" + productName + '\'' +
+                '}';
+    }
 }

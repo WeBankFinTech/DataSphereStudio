@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
@@ -62,10 +63,10 @@ public class DSSWorkspaceRestful {
     @Autowired
     private DSSWorkspaceRoleService dssWorkspaceRoleService;
 
-    @RequestMapping(path ="createWorkspace", method = RequestMethod.POST)
-    public Message createWorkspace(HttpServletRequest request, @RequestBody CreateWorkspaceRequest createWorkspaceRequest)throws ErrorException {
+    @RequestMapping(path = "createWorkspace", method = RequestMethod.POST)
+    public Message createWorkspace(HttpServletRequest request, @RequestBody CreateWorkspaceRequest createWorkspaceRequest) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(request);
-        if (!dssWorkspaceService.checkAdmin(userName)){
+        if (!dssWorkspaceService.checkAdmin(userName)) {
             return Message.error("您好，您不是管理员，没有权限建立工作空间");
         }
         String workSpaceName = createWorkspaceRequest.getWorkspaceName();
@@ -73,9 +74,9 @@ public class DSSWorkspaceRestful {
         String description = createWorkspaceRequest.getDescription();
         String stringTags = createWorkspaceRequest.getTags();
         String productName = createWorkspaceRequest.getProductName();
-        LOGGER.info("user {} begin to createWorkspace, workSpaceName:{}, description:{}", userName, workSpaceName, description);
-        int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName,"");
-        return Message.ok().data("workspaceId", workspaceId).data("workspaceName",workSpaceName);
+        AuditLogUtils.printLog(userName, null, "create workspace", createWorkspaceRequest);
+        int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName, "");
+        return Message.ok().data("workspaceId", workspaceId).data("workspaceName", workSpaceName);
     }
 
     @RequestMapping(path ="listDepartments", method = RequestMethod.GET)
@@ -276,10 +277,9 @@ public class DSSWorkspaceRestful {
     @RequestMapping(path = "/workspaces/{workspaceId}/favorites", method = RequestMethod.POST)
     public Message addFavorite(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @RequestBody Map<String, String> json) {
         String username = SecurityFilter.getLoginUsername(req);
-//        Long menuApplicationId = json.get("menuApplicationId").getLongValue();
         Long menuApplicationId = Long.valueOf(json.get("menuApplicationId"));
         String type = json.get("type") == null ? "" : json.get("type");
-        LOGGER.info("user {} begin to addFavorite, menuApplicationId:{}, type:{}", username, menuApplicationId, type);
+        AuditLogUtils.printLog(username, String.valueOf(workspaceId), "add favorite for menuApplicationId: " + menuApplicationId, json);
         Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, menuApplicationId, type);
         return Message.ok().data("favoriteId", favoriteId);
     }
@@ -289,7 +289,7 @@ public class DSSWorkspaceRestful {
     public Message deleteFavorite(HttpServletRequest req, @PathVariable("workspaceId") Long workspaceId, @PathVariable("appconnId") Long appconnId, @RequestBody Map<String, String> json) {
         String username = SecurityFilter.getLoginUsername(req);
         String type = json.get("type") == null ? "" : json.get("type");
-        LOGGER.info("user {} begin to deleteFavorite, appconnId:{}, type:{}", username, appconnId, type);
+        AuditLogUtils.printLog(username, String.valueOf(workspaceId), "delete favorite for appconn: " + appconnId, json);
         Long favoriteId = dssWorkspaceService.deleteFavorite(username, appconnId, workspaceId, type);
         return Message.ok().data("favoriteId", favoriteId);
     }

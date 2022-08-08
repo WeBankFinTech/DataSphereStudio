@@ -43,4 +43,14 @@ public class UpdateWorkspaceUserRequest implements Serializable {
     public void setRoles(List<Integer> roles) {
         this.roles = roles;
     }
+
+    @Override
+    public String toString() {
+        return "UpdateWorkspaceUserRequest{" +
+                "workspaceId=" + workspaceId +
+                ", userName='" + userName + '\'' +
+                ", roles=" + roles +
+                ", userId='" + userId + '\'' +
+                '}';
+    }
 }

@@ -92,7 +92,8 @@ public class DSSFrameworkProjectRestfulApi {
         if (!releaseUsers.contains(username)) {
             releaseUsers.add(username);
         }
-        LOGGER.info("User {} begin to create project in workspace {}, request params: {}.", username, workspace.getWorkspaceName(), projectCreateRequest);
+//        LOGGER.info("User {} begin to create project in workspace {}, request params: {}.", username, workspace.getWorkspaceName(), projectCreateRequest);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "create project", projectCreateRequest);
         return DSSExceptionUtils.getMessage(() -> dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace),
                 dssProjectVo -> Message.ok("创建工程成功.").data("project", dssProjectVo),
                 String.format("用户 %s 创建工程 %s 失败. ", username, projectCreateRequest.getName()));
@@ -160,7 +161,7 @@ public class DSSFrameworkProjectRestfulApi {
     public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-        LOGGER.info("user {} begin to deleteProject, params:{}", username, projectDeleteRequest);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "delete project", projectDeleteRequest);
         return DSSExceptionUtils.getMessage(() -> {
                     // 检查是否具有删除项目权限
                     projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);

@@ -33,4 +33,13 @@ public class UpdateRoleMenuPrivRequest implements Serializable {
     public void setMenuPrivs(Map<String, Boolean> menuPrivs) {
         this.menuPrivs = menuPrivs;
     }
+
+    @Override
+    public String toString() {
+        return "UpdateRoleMenuPrivRequest{" +
+                "menuId=" + menuId +
+                ", workspaceId=" + workspaceId +
+                ", menuPrivs=" + menuPrivs +
+                '}';
+    }
 }

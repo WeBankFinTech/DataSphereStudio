@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddWorkspaceRoleRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
@@ -58,7 +59,7 @@ public class DSSWorkspaceRoleRestful {
         String roleName = addWorkspaceRoleRequest.getRoleName();
         List<Integer> menuIds = addWorkspaceRoleRequest.getMenuIds();
         List<Integer> componentIds = addWorkspaceRoleRequest.getComponentIds();
-        LOGGER.info("user {} begin to addWorkspaceRole, workspaceId:{}, roleName:{}", username, workspaceId, roleName);
+        AuditLogUtils.printLog(username, String.valueOf(workspaceId), "add workspace role", addWorkspaceRoleRequest);
         if (!dssWorkspaceService.checkAdmin(username) || !dssWorkspaceService.checkAdminByWorkspace(username, workspaceId)) {
             return Message.error("无权限进行该操作");
         }

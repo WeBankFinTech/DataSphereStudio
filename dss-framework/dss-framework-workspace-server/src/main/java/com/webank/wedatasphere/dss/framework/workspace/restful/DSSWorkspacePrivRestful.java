@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateRoleComponentPrivRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateRoleMenuPrivRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomepageSettingVO;
@@ -24,6 +25,8 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivV
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspacePrivService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -67,15 +70,15 @@ public class DSSWorkspacePrivRestful {
         return Message.ok().data("homepageSettings", dssWorkspaceHomepageSettingVO);
     }
 
-    @RequestMapping(path ="updateRoleMenuPriv", method = RequestMethod.POST)
-    public Message updateRoleMenuPriv(HttpServletRequest request,@RequestBody UpdateRoleMenuPrivRequest updateRoleMenuPrivRequest){
+    @RequestMapping(path = "updateRoleMenuPriv", method = RequestMethod.POST)
+    public Message updateRoleMenuPriv(HttpServletRequest request, @RequestBody UpdateRoleMenuPrivRequest updateRoleMenuPrivRequest) {
         String updater = SecurityFilter.getLoginUsername(request);
         int menuId = updateRoleMenuPrivRequest.getMenuId();
         int workspaceId = updateRoleMenuPrivRequest.getWorkspaceId();
         Map<String, Boolean> menuPrivs = updateRoleMenuPrivRequest.getMenuPrivs();
-        LOGGER.info("user {} begin to updateRoleMenuPriv, menuId:{}, menuPrivs:{}", updater, menuId, menuPrivs);
+        AuditLogUtils.printLog(updater, null, "update role-menu priv", updateRoleMenuPrivRequest);
         List<Pair<Integer, Boolean>> pairs = new ArrayList<>();
-        for(String key : menuPrivs.keySet()){
+        for (String key : menuPrivs.keySet()) {
             Integer roleId = dssWorkspacePrivService.getRoleId(workspaceId, key);
             if (roleId == null) {
                 roleId = workspaceDBHelper.getRoleIdByName(key);
@@ -93,7 +96,7 @@ public class DSSWorkspacePrivRestful {
         int appconnId = updateRoleComponentPrivRequest.getComponentId();
         int workspaceId = updateRoleComponentPrivRequest.getWorkspaceId();
         Map<String,Boolean> componentPrivs = updateRoleComponentPrivRequest.getComponentPrivs();
-        LOGGER.info("user {} begin to updateRoleMenuPriv, appconnId:{}, componentPrivs:{}", username, appconnId, componentPrivs);
+        AuditLogUtils.printLog(username, null, "update role-component priv", updateRoleComponentPrivRequest);
         List<Pair<Integer, Boolean>> pairs = new ArrayList<>();
         for (String key : componentPrivs.keySet()){
             Integer roleId = dssWorkspacePrivService.getRoleId(workspaceId, key);

@@ -67,7 +67,7 @@
         "visibleRole": "可见角色：",
         "test": "测试：",
         "applicant": "申请人：",
-        "status": "状态：",
+        "status": "状态",
         "path": "API路径：",
         "submitter": "提交人",
         "find": "查询",

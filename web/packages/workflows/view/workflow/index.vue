@@ -546,6 +546,19 @@ export default {
 
       if ( node.type == "streamis_prod" ) {
         this.modeOfKey = "streamis_prod"
+        if (node.id != this.$route.query.projectID) {
+          // 跨工程，会监听projectID
+          const query = {
+            workspaceId: this.$route.query.workspaceId,
+            projectID: node.id,
+            projectName: node.name,
+          };
+          this.$router.replace({
+            name: "Workflow",
+            query,
+          })
+          this.updateBread();
+        }
         return;
       }
       if (node && node.children.length < 1 && node.type === 'project') {
@@ -1200,6 +1213,10 @@ export default {
           class: 'node-name',
           attrs: {
             'data-open': isOpen ? 'open' : ''
+          },
+          style: {
+            padding: '0 10px',
+            color: isActive ? 'rgb(45, 140, 240)' : ''
           }
         }, [item.name])
       }

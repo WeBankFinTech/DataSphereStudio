@@ -188,6 +188,10 @@ public class FlowRestfulApi {
         String name = updateFlowBaseInfoRequest.getName();
         String description = updateFlowBaseInfoRequest.getDescription();
         String uses = updateFlowBaseInfoRequest.getUses();
+        Long parentFlowID = flowService.getParentFlowID(flowID);
+        if (flowService.checkExistSameSubflow(parentFlowID, name)){
+            return Message.error("子工作流名不能重复");
+        }
         // TODO: 2019/6/13  projectVersionID的更新校验
         //这里可以不做事务
         DSSFlow dssFlow = new DSSFlow();

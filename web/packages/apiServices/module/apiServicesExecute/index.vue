@@ -14,9 +14,9 @@
       <Row class="content-top">
         <i-col span="10">
           <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
-          <Form ref="searchFrom" class="search-from" :label-width="80" :model="conditionResult">
+          <Form ref="searchFrom" class="search-from" :label-width="100" :model="conditionResult">
             <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="[{
-              required: false,
+              required: item.required,
               message: $t('message.apiServices.placeholder.emter'),
               trigger: 'blur'
             }]">
@@ -292,6 +292,7 @@ export default {
       padding-right: 20px;
       position: relative;
       line-height: 1.2;
+      display: flex;
     }
     .label-class {
       overflow: hidden;

@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
@@ -127,7 +128,7 @@ public class DSSWorkspaceUserRestful {
         if (!dssWorkspaceService.isAdminUser((long) workspaceId, creator)) {
             return Message.error("无权限进行该操作");
         }
-        LOGGER.info("begin to addWorkspaceUser:{}, workspaceId:{}, roles:{}", userName, workspaceId, roles);
+        AuditLogUtils.printLog(userName, workspace.getWorkspaceName(), "add workspace user", updateWorkspaceUserRequest);
         dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);
         return Message.ok();
     }
@@ -141,7 +142,7 @@ public class DSSWorkspaceUserRestful {
             return Message.error("无权限进行该操作");
         }
         String userName = updateWorkspaceUserRequest.getUserName();
-        LOGGER.info("begin to updateWorkspaceUser:{}, workspaceId:{}, roles:{}", userName, workspaceId, roles);
+        AuditLogUtils.printLog(userName, String.valueOf(workspaceId), "update workspace user", updateWorkspaceUserRequest);
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
         return Message.ok();
     }
@@ -155,7 +156,7 @@ public class DSSWorkspaceUserRestful {
         if (!dssWorkspaceService.checkAdmin(creator) || !dssWorkspaceService.checkAdminByWorkspace(creator, workspaceId)) {
             return Message.error("无权限进行该操作");
         }
-        LOGGER.info("admin {} begin to deleteWorkspaceUser:{}, workspaceId:{}", creator, userName, workspaceId);
+        AuditLogUtils.printLog(userName, String.valueOf(workspaceId), "delete workspace user", deleteWorkspaceUserRequest);
         dssWorkspaceUserService.deleteWorkspaceUser(userName, workspaceId);
         return Message.ok();
     }

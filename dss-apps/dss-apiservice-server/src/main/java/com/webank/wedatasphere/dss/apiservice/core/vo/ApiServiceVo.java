@@ -276,4 +276,36 @@ public class ApiServiceVo {
         this.aliasName = aliasName;
     }
 
+    @Override
+    public String toString() {
+        return "ApiServiceVo{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", aliasName='" + aliasName + '\'' +
+                ", path='" + path + '\'' +
+                ", protocol=" + protocol +
+                ", method='" + method + '\'' +
+                ", tag='" + tag + '\'' +
+                ", scope='" + scope + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", type='" + type + '\'' +
+                ", runType='" + runType + '\'' +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                ", creator='" + creator + '\'' +
+                ", modifier='" + modifier + '\'' +
+                ", scriptPath='" + scriptPath + '\'' +
+                ", approvalVo=" + approvalVo +
+                ", latestVersionId=" + latestVersionId +
+                ", userToken='" + userToken + '\'' +
+                ", params=" + params +
+                ", metadata=" + metadata +
+                ", content='" + content + '\'' +
+                ", versionVos=" + versionVos +
+                ", workspaceId=" + workspaceId +
+                ", targetServiceId=" + targetServiceId +
+                ", comment='" + comment + '\'' +
+                '}';
+    }
 }

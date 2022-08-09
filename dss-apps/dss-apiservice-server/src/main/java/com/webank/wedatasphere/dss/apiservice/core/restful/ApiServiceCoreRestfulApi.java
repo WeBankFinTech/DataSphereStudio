@@ -26,6 +26,7 @@ import com.webank.wedatasphere.dss.apiservice.core.vo.ApiServiceVo;
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApiVersionVo;
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApprovalVo;
 import com.webank.wedatasphere.dss.apiservice.core.vo.QueryParamVo;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
@@ -132,6 +133,7 @@ public class ApiServiceCoreRestfulApi {
 
             apiService.setCreator(userName);
             apiService.setModifier(userName);
+            AuditLogUtils.printLog(userName, String.valueOf(apiService.getWorkspaceId()),"add api service",apiService);
             this.apiService.save(apiService);
             return Message.ok().data("insert_id", apiService.getId()).data("approval_no",approvalVo.getApprovalNo());
         }, "/apiservice/api", "Fail to insert service api[新增服务api失败]");
@@ -206,6 +208,7 @@ public class ApiServiceCoreRestfulApi {
 
             apiService.setCreator(userName);
             apiService.setModifier(userName);
+            AuditLogUtils.printLog(userName, String.valueOf(apiService.getWorkspaceId()),"save api service by app",apiService);
             this.apiService.saveByApp(apiService);
             return Message.ok().data("insert_id", apiService.getId()).data("approval_no",approvalVo.getApprovalNo());
         }, "/apiservice/api", "Fail to insert service api[新增服务api失败]");
@@ -286,6 +289,7 @@ public class ApiServiceCoreRestfulApi {
             apiService.setLatestVersionId(apiServiceVersionId);
             apiService.setModifier(userName);
             apiService.setModifyTime(Calendar.getInstance().getTime());
+            AuditLogUtils.printLog(userName, String.valueOf(apiService.getWorkspaceId()),"update api service",apiService);
             this.apiService.update(apiService);
             return Message.ok().data("update_id", apiServiceVersionId);
         }, "/apiservice/api/" + apiServiceVersionId, "Fail to update service api[更新服务api失败]");
@@ -424,6 +428,7 @@ public class ApiServiceCoreRestfulApi {
                 return Message.error("'api service api id' is missing[缺少api id]");
             }
             LOG.info("user {} begin to disable service api, id: {}", userName, id);
+            AuditLogUtils.printLog(userName, null,"disable service api",id);
             boolean resultFlag = apiService.disableApi(id,userName);
             return Message.ok().data("result", resultFlag);
         }, "/apiservice/apiDisable", "Fail to disable api[禁用api失败]");
@@ -438,6 +443,7 @@ public class ApiServiceCoreRestfulApi {
                 return Message.error("'api service api id' is missing[缺少api id]");
             }
             LOG.info("user {} begin to enable service api, id: {}", userName, id);
+            AuditLogUtils.printLog(userName, null,"enable service api",id);
             boolean resultFlag = apiService.enableApi(id,userName);
             return Message.ok().data("result", resultFlag);
         }, "/apiservice/apiEnable", "Fail to enable api[启用api失败]");
@@ -453,6 +459,7 @@ public class ApiServiceCoreRestfulApi {
                 return Message.error("'api service api id' is missing[缺少api id]");
             }
             LOG.info("user {} try to delete service api, id: {}", userName, id);
+            AuditLogUtils.printLog(userName, null,"delete service api",id);
             boolean resultFlag = apiService.deleteApi(id,userName);
             return Message.ok().data("result", resultFlag);
         }, "/apiservice/apiDelete", "Fail to delete api[删除api失败]");
@@ -469,7 +476,7 @@ public class ApiServiceCoreRestfulApi {
             if (null == id) {
                 return Message.error("'api service api id' is missing[缺少api id]");
             }
-            LOG.info("user {} try to update comment, params: {}", userName, apiCommentUpdateRequest);
+            AuditLogUtils.printLog(userName, null,"update comment",comment);
             boolean resultFlag = apiService.updateComment(id,comment,userName);
             return Message.ok().data("result", resultFlag);
         }, "/apiservice/apiDelete", "Fail to update comment api[更新评论失败]");

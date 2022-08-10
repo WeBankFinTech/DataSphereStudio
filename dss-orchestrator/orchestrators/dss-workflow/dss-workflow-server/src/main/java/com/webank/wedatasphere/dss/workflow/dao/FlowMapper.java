@@ -56,11 +56,5 @@ public interface FlowMapper {
 
     @Select("select creator from dss_flow where id = #{flowId}")
     String getCreatorById(@Param("flowId") Long flowId);
-
-
-    List<FlowInfoVo> selectSubFlowIdsByFlowIds(@Param("list") List<Long> flowIdList);
-
-    List<DSSFlow> selectResourcesByWorkflowIds(@Param("list") List<Long> flowIdList);
-
     List<String> getSubflowName(Long parentFlowID);
 }

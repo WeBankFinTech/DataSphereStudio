@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
@@ -99,9 +100,10 @@ public class FlowRestfulApi {
         String description = addFlowRequest.getDescription();
         String uses = addFlowRequest.getUses();
         List<DSSLabel> dssLabelList = new ArrayList<>();
-        LOGGER.info("User {} begin to add flow, name:{}, projectName:{}", userName, name, projectName);
         dssLabelList.add(new EnvDSSLabel(addFlowRequest.getLabels().getRoute()));
+        AuditLogUtils.printLog( userName, workspaceName,"create context id", projectName);
         String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
+        AuditLogUtils.printLog( userName, workspaceName,"create workflow", contextId);
         DSSFlow dssFlow = workFlowManager.createWorkflow(userName, null, name, contextId, description, parentFlowID,
                 uses, new ArrayList<>(), dssLabelList, null, null);
 
@@ -120,7 +122,7 @@ public class FlowRestfulApi {
         String comment = publishWorkflowRequest.getComment();
         Workspace workspace = SSOHelper.getWorkspace(request);
         String publishUser = SecurityFilter.getLoginUsername(request);
-        LOGGER.info("User {} begin to publish workflow, flowId:{}", publishUser, workflowId);
+        AuditLogUtils.printLog( publishUser, workspace.getWorkspaceName(),"publish Workflow", workflowId);
 
         return DSSExceptionUtils.getMessage(() -> publishService.submitPublish(publishUser, workflowId, labels, workspace, comment),
                 taskId -> {
@@ -184,6 +186,8 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "updateFlowBaseInfo", method = RequestMethod.POST)
     public Message updateFlowBaseInfo(HttpServletRequest req, @RequestBody UpdateFlowBaseInfoRequest updateFlowBaseInfoRequest) throws DSSErrorException {
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
         Long flowID = updateFlowBaseInfoRequest.getId();
         String name = updateFlowBaseInfoRequest.getName();
         String description = updateFlowBaseInfoRequest.getDescription();
@@ -199,6 +203,7 @@ public class FlowRestfulApi {
         dssFlow.setName(name);
         dssFlow.setDescription(description);
         dssFlow.setUses(uses);
+        AuditLogUtils.printLog( username, workspace.getWorkspaceName(),"update Flow BaseInfo", dssFlow);
         flowService.updateFlowBaseInfo(dssFlow);
         return Message.ok();
     }
@@ -249,6 +254,8 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "deleteFlow", method = RequestMethod.POST)
     public Message deleteFlow(HttpServletRequest req, @RequestBody DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
         Long flowID = deleteFlowRequest.getId();
         boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure();
         // TODO: 2019/6/13  projectVersionID的更新校验
@@ -256,6 +263,7 @@ public class FlowRestfulApi {
         if (flowService.getFlowByID(flowID).getState() && !sure) {
             return Message.ok().data("warmMsg", "该工作流曾经发布过，删除将会将该工作流的所有版本都删除，是否继续？");
         }
+        AuditLogUtils.printLog( username, workspace.getWorkspaceName(),"delete Flow", flowID);
         flowService.batchDeleteFlow(Arrays.asList(flowID));
         return Message.ok();
     }
@@ -271,6 +279,8 @@ public class FlowRestfulApi {
      */
     @RequestMapping(value = "saveFlow", method = RequestMethod.POST)
     public Message saveFlow(HttpServletRequest req, @RequestBody SaveFlowRequest saveFlowRequest) throws DSSErrorException, IOException {
+        String username = SecurityFilter.getLoginUsername(req);
+
         Long flowID = saveFlowRequest.getId();
         String jsonFlow = saveFlowRequest.getJson();
 
@@ -289,6 +299,7 @@ public class FlowRestfulApi {
                 version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
                 return Message.ok().data("flowVersion", version).data("flowEditLock", null);
             }
+            AuditLogUtils.printLog( username, workspaceName,"save Flow", flowID);
             version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
         }
         return Message.ok().data("flowVersion", version);
@@ -304,9 +315,12 @@ public class FlowRestfulApi {
      */
     @RequestMapping(value = "/updateFlowEditLock", method = RequestMethod.GET)
     public Message updateFlowEditLock(HttpServletRequest req, @RequestParam(required = false, name = "flowEditLock") String flowEditLock) throws DSSErrorException {
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
         if (StringUtils.isBlank(flowEditLock)) {
             throw new DSSErrorException(60067, "update flowEditLock failed,because flowEditLock is empty");
         }
+        AuditLogUtils.printLog( username, workspace.getWorkspaceName(),"update Flow EditLock", flowEditLock);
         return Message.ok().data("flowEditLock", DSSFlowEditLockManager.updateLock(flowEditLock));
     }
 
@@ -321,6 +335,9 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "/deleteFlowEditLock/{flowEditLock}", method = RequestMethod.POST)
     public Message deleteFlowEditLock(HttpServletRequest req, @PathVariable("flowEditLock") String flowEditLock) throws DSSErrorException {
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+        AuditLogUtils.printLog( username, workspace.getWorkspaceName(),"delete Flow EditLock", flowEditLock);
         DSSFlowEditLockManager.deleteLock(flowEditLock);
         return Message.ok();
     }

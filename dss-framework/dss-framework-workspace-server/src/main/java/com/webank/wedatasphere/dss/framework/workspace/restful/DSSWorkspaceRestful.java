@@ -222,6 +222,7 @@ public class DSSWorkspaceRestful {
     @RequestMapping(path = "/workspaces", method = RequestMethod.POST)
     public Message addWorkspace(HttpServletRequest req, @RequestBody Map<String, String> json) throws ErrorException {
         String userName = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
         if (!dssWorkspaceService.checkAdmin(userName)) {
             return Message.error("您好，您不是管理员，没有权限建立工作空间");
 
@@ -236,6 +237,7 @@ public class DSSWorkspaceRestful {
         String workspaceType = json.get("workspace_type");
 
         String productName = "DSS";
+        AuditLogUtils.printLog(userName,workspace.getWorkspaceName(),"create workspace", json);
         int workspaceId = dssWorkspaceService.createWorkspace(name, label, userName, description, department, productName, workspaceType);
         return Message.ok().data("workspaceId", workspaceId);
     }

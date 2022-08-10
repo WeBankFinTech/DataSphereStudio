@@ -616,7 +616,7 @@ export default {
         if (keywordMatch) {
           const matchList = keywordMatch[0].split(' ');
           const match = matchList[matchList.length - 1];
-          const list = getReturnList(match, shellProposals, 'insertText');
+          const list = getReturnList({match, prsoposals: shellProposals, fieldString: 'insertText'});
           return list;
         }
         return [];

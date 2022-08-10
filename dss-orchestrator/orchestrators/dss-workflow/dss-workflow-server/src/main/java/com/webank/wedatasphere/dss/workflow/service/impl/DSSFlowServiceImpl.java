@@ -194,28 +194,30 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public List<String> getSubFlowContextIdsByFlowIds(List<Long> flowIdList) throws ErrorException {
         ArrayList<String> contextIdList = new ArrayList<>();
-        // 查出工作流的父子关系
-        List<FlowInfoVo> flowInfoVoList = flowMapper.selectSubFlowIdsByFlowIds(flowIdList);
-        if (flowInfoVoList == null || flowInfoVoList.isEmpty()) {
-            return contextIdList;
-        }
-        // 获取子工作流 contextId
-        JsonToFlowParser jsonToFlowParser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
-        for (FlowInfoVo flowInfoVo : flowInfoVoList) {
-            List<DSSFlowRelation> subFlowList = flowInfoVo.getSubFlowList();
-            if (subFlowList != null && subFlowList.size() > 0) {
-                for (DSSFlowRelation flowRelation : subFlowList) {
-                    DSSFlow dssFlow = getFlow(flowRelation.getFlowID());
-                    Workflow workflow = jsonToFlowParser.parse(dssFlow);
-                    String contextIDStr = ((WorkflowWithContextImpl) workflow).getContextID();
-                    if (StringUtils.isNotBlank(contextIDStr)) {
-                        // 获取需要清理的contextId
-                        contextIdList.add(SerializeHelper.deserializeContextID(contextIDStr).getContextId());
-                    }
-                }
-            }
+        // 查出所有子工作流的上下文ID
+        for(Long flowId:flowIdList) {
+            generateSubFlowContextIdByFlowID(flowId,contextIdList);
         }
         return contextIdList;
+    }
+
+    private void generateSubFlowContextIdByFlowID(Long flowId, ArrayList<String> contextIdList){
+        List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
+        if(subFlowIDs.size()>0) {
+            // 获取子工作流 contextId
+            JsonToFlowParser jsonToFlowParser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
+            for (Long subFlowID : subFlowIDs) {
+                DSSFlow dssFlow = getFlow(subFlowID);
+                Workflow workflow = jsonToFlowParser.parse(dssFlow);
+                String contextIDStr = ((WorkflowWithContextImpl) workflow).getContextID();
+                if (StringUtils.isNotBlank(contextIDStr)) {
+                    // 获取需要清理的contextId
+                    contextIdList.add(SerializeHelper.deserializeContextID(contextIDStr).getContextId());
+                }
+                //获取下一层的subflow的上下文Id
+                generateSubFlowContextIdByFlowID(subFlowID,contextIdList);
+            }
+        }
     }
 
 
@@ -228,24 +230,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         } catch (DuplicateKeyException e) {
             logger.info(e.getMessage());
             throw new DSSErrorException(90003, "工作流名不能重复");
-        }
-    }
-
-    @Override
-    public void batchDeleteBmlResource(List<Long> flowIdList) {
-        List<Long> newFlowList = new ArrayList<>(flowIdList);
-        List<FlowInfoVo> flowInfoVos = flowMapper.selectSubFlowIdsByFlowIds(flowIdList);
-        for (FlowInfoVo flowInfoVo : flowInfoVos) {
-            List<DSSFlowRelation> subFlowList = flowInfoVo.getSubFlowList();
-            if (subFlowList != null && subFlowList.size() > 0) {
-                subFlowList.forEach(dssFlowRelation -> newFlowList.add(dssFlowRelation.getFlowID()));
-            }
-        }
-        List<DSSFlow> dssFlowList = flowMapper.selectResourcesByWorkflowIds(newFlowList);
-        if (dssFlowList != null && dssFlowList.size() > 0) {
-            for (DSSFlow dssFlow : dssFlowList) {
-                bmlService.deleteBmlResource(dssFlow.getCreator(), dssFlow.getResourceId());
-            }
         }
     }
 

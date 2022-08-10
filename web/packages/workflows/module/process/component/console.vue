@@ -365,7 +365,7 @@ export default {
     showPanelTab(type) {
       this.scriptViewState.showPanel = type;
       this.script.showPanel = type;
-      this.updateNodeCache('showPanel');
+      this.updateNodeCache(type);
       if (type === 'log') {
         this.localLogShow();
       }
@@ -482,10 +482,10 @@ export default {
             }
           } else {
             this.createScript();
+            this.$nextTick(() => {
+              this.createExecute(needQuery);
+            })
           }
-          this.$nextTick(() => {
-            this.createExecute(needQuery);
-          })
         }
       })
     },

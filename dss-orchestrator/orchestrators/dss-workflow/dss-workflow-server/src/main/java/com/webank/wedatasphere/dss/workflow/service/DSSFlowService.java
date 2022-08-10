@@ -45,8 +45,6 @@ public interface DSSFlowService {
 
     void updateFlowBaseInfo(DSSFlow dssFlow) throws DSSErrorException;
 
-    void batchDeleteBmlResource(List<Long> flowIdList);
-
     void batchDeleteFlow(List<Long> flowIdlist);
 
     String saveFlow(Long flowId,

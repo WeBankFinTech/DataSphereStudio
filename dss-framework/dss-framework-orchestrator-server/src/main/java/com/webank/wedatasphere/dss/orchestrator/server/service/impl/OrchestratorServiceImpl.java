@@ -460,7 +460,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 }
                 List<String> contextIdList = historyOrcVersionList.stream().map(DSSOrchestratorVersion::getContextId).collect(Collectors.toList());
 
-                // 2、根据appIds去查询子工作流contextId
+                // 2、根据appIds去查询子工作流contextId,必须保证标签绝对正确，否则可能清理了错误的工作流上下文ID
                 List<DSSLabel> dssLabels = Lists.newArrayList(new EnvDSSLabel(OrchestratorConf.DSS_CS_CLEAR_ENV.getValue()));
                 Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
                 List<Long> workflowIdList = historyOrcVersionList.stream().map(orcInfo -> orcInfo.getAppId()).collect(Collectors.toList());

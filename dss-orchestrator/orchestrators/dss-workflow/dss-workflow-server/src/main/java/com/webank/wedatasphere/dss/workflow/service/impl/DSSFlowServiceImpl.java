@@ -201,7 +201,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return contextIdList;
     }
 
-    private void generateSubFlowContextIdByFlowID(Long flowId, ArrayList<String> contextIdList){
+    private void generateSubFlowContextIdByFlowID(Long flowId, ArrayList<String> contextIdList) throws ErrorException{
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
         if(subFlowIDs.size()>0) {
             // 获取子工作流 contextId

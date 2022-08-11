@@ -450,7 +450,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         LOGGER.info("--------------------{} start clear old contextId------------------------", LocalDateTime.now());
         try {
             // 1、先去查询dss_orchestrator_version_info表，筛选出发布过n次及以上的编排，并获取老的发布记录。
-            //为了不影响正常使用，需要频繁下载工作流bml文件，每次只拿100条工作流进行清理
+            //为了不影响正常使用，需要频繁下载工作流bml文件，每次只拿50条工作流进行清理
             List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
             while (historyOrcVersionList.size()>0) {
                 LOGGER.info("Clear historyOrcVersionList size is "+ historyOrcVersionList.size());
@@ -471,6 +471,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                         contextIdList.addAll(response.getContextIdList());
                     }
                 }
+                LOGGER.info("Clear contextIdList size is "+ contextIdList.size());
                 // 3、调用linkis接口批量删除contextId
                 ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
                 // 每次处理1000条数据
@@ -485,7 +486,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                         List<String> subList = contextIdList.subList(i * len, (Math.min((i + 1) * len, size)));
                         LOGGER.info("clear old contextId by batch, {} batch, contextIds：{}", i + 1, subList.toString());
                         contextClient.batchClearContextByHAID(subList);
-                        Thread.sleep(1000);
+                        Thread.sleep(2000);
                     }
                 }
                 LOGGER.info("--------------------{} end clear old contextId------------------------", LocalDateTime.now());

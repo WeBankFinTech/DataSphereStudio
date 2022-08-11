@@ -244,31 +244,28 @@
     <select id="getHistoryOrcVersion"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT
-        b.orchestrator_id ,
-        b.context_id ,
-        b.app_id,
-        b.id
+        a.orchestrator_id ,
+        a.context_id ,
+        a.app_id,
+        a.id
         FROM
-        dss_release_task a
-        LEFT JOIN dss_orchestrator_version_info b ON
-        a.orchestrator_version_id = b.id
-        left join dss_orchestrator_info c on
-        c.id = b.orchestrator_id
-        left join (
+        dss_orchestrator_version_info a
+        inner join (
         select
         orchestrator_id, max(version) as maxVersion
         from
         dss_orchestrator_version_info
+        where context_id != ''
         group by
         orchestrator_id
         HAVING
-        substring(max(version),2)  &gt; #{remainVersion}) tmp on
-        b.orchestrator_id = tmp.orchestrator_id
+        substring(maxVersion,2)  &gt; #{remainVersion}) b on
+        a.orchestrator_id = b.orchestrator_id
         where
-        a.status = 'Success'
-        and  substring(b.version,2) + #{remainVersion} &lt;= substring(tmp.maxVersion,2)
-        and b.context_id != ''
+        substring(a.version,2) + #{remainVersion} &lt;= substring(b.maxVersion,2)
+        and a.context_id != ''
         order by a.id desc
+        limit 50
     </select>
 
     <update id="batchUpdateOrcInfo" parameterType="java.util.List">

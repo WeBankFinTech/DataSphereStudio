@@ -255,7 +255,7 @@
         orchestrator_id, max(version) as maxVersion
         from
         dss_orchestrator_version_info
-        where b.context_id != ''
+        where context_id != ''
         group by
         orchestrator_id
         HAVING
@@ -263,9 +263,9 @@
         a.orchestrator_id = b.orchestrator_id
         where
         substring(a.version,2) + #{remainVersion} &lt;= substring(b.maxVersion,2)
-        and b.context_id != ''
+        and a.context_id != ''
         order by a.id desc
-        limit 100
+        limit 50
     </select>
 
     <update id="batchUpdateOrcInfo" parameterType="java.util.List">

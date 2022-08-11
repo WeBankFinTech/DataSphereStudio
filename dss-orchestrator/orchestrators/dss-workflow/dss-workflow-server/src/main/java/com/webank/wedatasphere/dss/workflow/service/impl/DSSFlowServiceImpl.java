@@ -405,6 +405,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJson = bmlService.readFlowJsonFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
+        //copy subflow need new contextID
+        if(!rootFlow.getRootFlow()) {
+            contextIdStr = contextService.checkAndInitContext(flowJson, parentFlowId.toString(), workspace.getWorkspaceName(), projectName, rootFlow.getName(), version, userName);
+            logger.info("update subflow contextID :" + contextIdStr + ",flow name is " + rootFlow.getName());
+        }
         String updateFlowJson = updateFlowContextIdAndVersion(flowJson, contextIdStr, version);
         //重新上传工作流资源
         updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson, projectName, rootFlow);

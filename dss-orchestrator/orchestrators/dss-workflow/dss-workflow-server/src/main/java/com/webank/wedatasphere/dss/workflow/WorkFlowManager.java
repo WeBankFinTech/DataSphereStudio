@@ -115,7 +115,4 @@ public interface WorkFlowManager {
      */
     ResponseSubFlowContextIds getSubFlowContextIdsByFlowIds(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException;
 
-    void batchDeleteBmlResource(List<Long> flowIdList);
-
-
 }

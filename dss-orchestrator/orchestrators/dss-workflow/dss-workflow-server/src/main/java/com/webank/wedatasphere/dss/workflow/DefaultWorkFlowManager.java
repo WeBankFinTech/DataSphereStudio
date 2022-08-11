@@ -262,10 +262,6 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         return responseSubFlowContextIds;
     }
 
-    @Override
-    public void batchDeleteBmlResource(List<Long> flowIdList) {
-        flowService.batchDeleteBmlResource(flowIdList);
-    }
 
     private ResponseOperateOrchestrator convert(RequestConvertOrchestrations requestConversionWorkflow,
                                                 String schedulerAppConnName,

@@ -265,7 +265,7 @@
         substring(a.version,2) + #{remainVersion} &lt;= substring(b.maxVersion,2)
         and a.context_id != ''
         order by a.id desc
-        limit 100
+        limit 50
     </select>
 
     <update id="batchUpdateOrcInfo" parameterType="java.util.List">

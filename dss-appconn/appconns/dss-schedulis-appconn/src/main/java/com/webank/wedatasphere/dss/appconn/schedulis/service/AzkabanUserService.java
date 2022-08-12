@@ -26,10 +26,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -74,7 +71,7 @@ public class AzkabanUserService {
                             }
                             return userEntity;
                         }
-                ).collect(Collectors.toList());
+                ).filter(Objects::nonNull).collect(Collectors.toList());
                 synchronized (entityList) {
                     entityList.clear();
                     entityList.addAll(newEntityList);

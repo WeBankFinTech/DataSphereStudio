@@ -232,6 +232,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         newOrchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
+        orchestratorVo.setOrchestratorVersion(orchestratorInfo.getOrchestratorLevel());
+        orchestratorVo.setOrchestratorName(orchestratorInfo.getName());
+        orchestratorVo.setOrchestratorId(orchestratorInfo.getId());
         return orchestratorVo;
     }
 

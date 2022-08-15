@@ -196,6 +196,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                     userName, "system", userId);
+            int workspace0xId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
+            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+                    userName, "system", userId);
             String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()));
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
                 homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
@@ -560,7 +563,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 AppConn appConn = AppConnManager.getAppConnManager().getAppConn(menuAppconn.getName());
                 List<DSSApplicationBean> instanceList = new ArrayList<>();
                 SSOUrlBuilderOperation operation;
-                if(appConn instanceof OnlySSOAppConn) {
+                if (appConn instanceof OnlySSOAppConn) {
                     operation = ((OnlySSOAppConn) appConn).getOrCreateSSOStandard().getSSOBuilderService().createSSOUrlBuilderOperation();
                     SSOHelper.setSSOUrlBuilderOperation(operation, workspace);
                     operation.setAppName(appConn.getAppDesc().getAppName());

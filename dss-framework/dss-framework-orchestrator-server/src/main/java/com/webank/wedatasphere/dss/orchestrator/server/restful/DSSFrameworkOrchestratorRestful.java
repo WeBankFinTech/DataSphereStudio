@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
@@ -28,7 +30,6 @@ import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrame
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -54,6 +55,8 @@ public class DSSFrameworkOrchestratorRestful {
     private OrchestratorFrameworkService orchestratorFrameworkService;
     @Autowired
     private OrchestratorService orchestratorService;
+    @Autowired
+    private HttpServletRequest httpServletRequest;
 
     @PostConstruct
     public void init() {
@@ -62,31 +65,28 @@ public class DSSFrameworkOrchestratorRestful {
 
     /**
      * 创建编排模式
-     *
-     * @param httpServletRequest
      * @param createRequest
      * @return
      */
     @RequestMapping(path = "createOrchestrator", method = RequestMethod.POST)
-    public Message createOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorCreateRequest createRequest) throws Exception{
+    public Message createOrchestrator(@RequestBody OrchestratorCreateRequest createRequest) throws Exception{
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "create orchestrator", createRequest);
         //todo 先注释掉
         // orchestratorService.saveOrchestrator(createRequest,null,username);
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.createOrchestrator(username, createRequest, workspace);
+        AuditLogUtils.printLog(username,workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(), createRequest.getOrchestratorName(), OperateTypeEnum.CREATE, createRequest);
         return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
     }
 
     /**
      * 查询所有的编排模式
-     *
-     * @param httpServletRequest
      * @param orchestratorRequest
      * @return
      */
     @RequestMapping(path = "getAllOrchestrator", method = RequestMethod.POST)
-    public Message getAllOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorRequest orchestratorRequest) {
+    public Message getAllOrchestrator(@RequestBody OrchestratorRequest orchestratorRequest) {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
             LOGGER.info("user {} begin to geyAllOrchestrator, requestBody:{}", username, orchestratorRequest);
@@ -99,38 +99,36 @@ public class DSSFrameworkOrchestratorRestful {
 
     /**
      * 修改编排模式
-     *
-     * @param httpServletRequest
      * @param modifyRequest
      * @return
      */
     @RequestMapping(path = "modifyOrchestrator", method = RequestMethod.POST)
-    public Message modifyOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorModifyRequest modifyRequest) throws Exception{
+    public Message modifyOrchestrator(@RequestBody OrchestratorModifyRequest modifyRequest) throws Exception{
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "modify orchestrator", modifyRequest);
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.modifyOrchestrator(username, modifyRequest, workspace);
+        AuditLogUtils.printLog(username,workspace.getWorkspaceId(), workspace.getWorkspaceName(),TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(),modifyRequest.getOrchestratorName(),OperateTypeEnum.UPDATE, modifyRequest);
         return Message.ok("修改工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
     }
 
     /**
      * 删除编排模式
-     *
-     * @param httpServletRequest
      * @param deleteRequest
      * @return
      */
     @RequestMapping(path = "deleteOrchestrator", method = RequestMethod.POST)
-    public Message deleteOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
+    public Message deleteOrchestrator( @RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "delete orchestrator", deleteRequest);
-        orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
+        CommonOrchestratorVo orchestratorVo= orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
+        AuditLogUtils.printLog(username,workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(),orchestratorVo.getOrchestratorName(),OperateTypeEnum.DELETE, deleteRequest);
         return Message.ok("删除工作流编排模式成功");
     }
 
     @RequestMapping(path = "orchestratorLevels", method = RequestMethod.GET)
-    public Message getOrchestratorLevels(HttpServletRequest httpServletRequest) {
+    public Message getOrchestratorLevels() {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         List<OrchestratorLevelEnum> levels = Arrays.asList(OrchestratorLevelEnum.values());

@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
@@ -55,9 +57,11 @@ public class DSSWorkspaceUserRestful {
     private WorkspaceDBHelper workspaceDBHelper;
     @Autowired
     private DSSWorkspaceUserService dssWorkspaceUserService;
+    @Autowired
+    private HttpServletRequest httpServletRequest;
 
     @RequestMapping(path = "getWorkspaceUsers", method = RequestMethod.GET)
-    public Message getWorkspaceUsers(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) String workspaceId,
+    public Message getWorkspaceUsers( @RequestParam(WORKSPACE_ID_STR) String workspaceId,
                                      @RequestParam(required = false, name = "pageNow") Integer pageNow, @RequestParam(required = false, name = "pageSize") Integer pageSize,
                                      @RequestParam(required = false, name = "department") String department, @RequestParam(required = false, name = "userName") String username,
                                      @RequestParam(required = false, name = "roleName") String roleName) {
@@ -86,10 +90,10 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path = "getAllWorkspaceUsers", method = RequestMethod.GET)
-    public Message getAllWorkspaceUsers(HttpServletRequest request) {
+    public Message getAllWorkspaceUsers() {
         DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
         // workspaceId改为从cookie取
-        int workspaceId = (int) SSOHelper.getWorkspace(request).getWorkspaceId();
+        int workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
         dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
 //        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
 //        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
@@ -100,8 +104,8 @@ public class DSSWorkspaceUserRestful {
 
 
     @RequestMapping(path = "existUserInWorkspace", method = RequestMethod.GET)
-    public Message existUserInWorkspace(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId, @RequestParam("queryUserName") String queryUserName) {
-        String username = SecurityFilter.getLoginUsername(request);
+    public Message existUserInWorkspace(@RequestParam(WORKSPACE_ID_STR) int workspaceId, @RequestParam("queryUserName") String queryUserName) {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
         List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
         boolean existFlag = users.stream().anyMatch(user -> user.equalsIgnoreCase(queryUserName));
         LOGGER.info("Check exist user result:" + existFlag + ", query user  is " + queryUserName + ",workSpace id is " + workspaceId);
@@ -110,11 +114,11 @@ public class DSSWorkspaceUserRestful {
 
 
     @RequestMapping(path = "addWorkspaceUser", method = RequestMethod.POST)
-    public Message addWorkspaceUser(HttpServletRequest request, @RequestBody UpdateWorkspaceUserRequest updateWorkspaceUserRequest) {
+    public Message addWorkspaceUser(@RequestBody UpdateWorkspaceUserRequest updateWorkspaceUserRequest) {
         //todo 工作空间添加用户
-        String creator = SecurityFilter.getLoginUsername(request);
+        String creator = SecurityFilter.getLoginUsername(httpServletRequest);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
-        Workspace workspace = SSOHelper.getWorkspace(request);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
         if (workspace.getWorkspaceId() != workspaceId) {
             return Message.error("cookie 中的 workspaceId 与请求添加用户的 workspace 不同！");
@@ -128,48 +132,53 @@ public class DSSWorkspaceUserRestful {
         if (!dssWorkspaceService.isAdminUser((long) workspaceId, creator)) {
             return Message.error("无权限进行该操作");
         }
-        AuditLogUtils.printLog(userName, workspace.getWorkspaceName(), "add workspace user", updateWorkspaceUserRequest);
         dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);
+        AuditLogUtils.printLog(userName,workspaceId, workspace.getWorkspaceName(), TargetTypeEnum.WORKSPACE,workspaceId,
+                workspace.getWorkspaceName(), OperateTypeEnum.ADD_USERS,updateWorkspaceUserRequest);
         return Message.ok();
     }
 
     @RequestMapping(path = "updateWorkspaceUser", method = RequestMethod.POST)
-    public Message updateWorkspaceUser(HttpServletRequest request, @RequestBody UpdateWorkspaceUserRequest updateWorkspaceUserRequest) {
-        String creator = SecurityFilter.getLoginUsername(request);
+    public Message updateWorkspaceUser( @RequestBody UpdateWorkspaceUserRequest updateWorkspaceUserRequest) {
+        String creator = SecurityFilter.getLoginUsername(httpServletRequest);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
+        String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
         if (!dssWorkspaceService.isAdminUser(Long.valueOf(workspaceId), creator)) {
             return Message.error("无权限进行该操作");
         }
         String userName = updateWorkspaceUserRequest.getUserName();
-        AuditLogUtils.printLog(userName, String.valueOf(workspaceId), "update workspace user", updateWorkspaceUserRequest);
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
+        AuditLogUtils.printLog(userName,workspaceId, workspaceName, TargetTypeEnum.WORKSPACE,workspaceId,
+                workspaceName, OperateTypeEnum.UPDATE_USERS,updateWorkspaceUserRequest);
         return Message.ok();
     }
 
     @RequestMapping(path = "deleteWorkspaceUser", method = RequestMethod.POST)
-    public Message deleteWorkspaceUser(HttpServletRequest request, @RequestBody DeleteWorkspaceUserRequest deleteWorkspaceUserRequest) {
+    public Message deleteWorkspaceUser( @RequestBody DeleteWorkspaceUserRequest deleteWorkspaceUserRequest) {
         //todo 删除工作空间中的用户
         String userName = deleteWorkspaceUserRequest.getUserName();
         int workspaceId = deleteWorkspaceUserRequest.getWorkspaceId();
-        String creator = SecurityFilter.getLoginUsername(request);
+        String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
+        String creator = SecurityFilter.getLoginUsername(httpServletRequest);
         if (!dssWorkspaceService.checkAdmin(creator) || !dssWorkspaceService.checkAdminByWorkspace(creator, workspaceId)) {
             return Message.error("无权限进行该操作");
         }
-        AuditLogUtils.printLog(userName, String.valueOf(workspaceId), "delete workspace user", deleteWorkspaceUserRequest);
         dssWorkspaceUserService.deleteWorkspaceUser(userName, workspaceId);
+        AuditLogUtils.printLog(userName,workspaceId, workspaceName, TargetTypeEnum.WORKSPACE,workspaceId,
+                workspaceName, OperateTypeEnum.UPDATE_USERS,deleteWorkspaceUserRequest);
         return Message.ok();
     }
 
     @RequestMapping(path = "listAllUsers", method = RequestMethod.GET)
-    public Message listAllUsers(HttpServletRequest request) {
+    public Message listAllUsers() {
         List<StaffInfoVO> dssUsers = dssWorkspaceUserService.listAllDSSUsers();
         return Message.ok().data("users", dssUsers);
     }
 
     @RequestMapping(path = "getWorkspaceIdByUserName", method = RequestMethod.GET)
-    public Message getWorkspaceIdByUserName(HttpServletRequest request, @RequestParam(required = false, name = "userName") String userName) {
-        String loginUserName = SecurityFilter.getLoginUsername(request);
+    public Message getWorkspaceIdByUserName( @RequestParam(required = false, name = "userName") String userName) {
+        String loginUserName = SecurityFilter.getLoginUsername(httpServletRequest);
         String queryUserName = userName;
         if (StringUtils.isEmpty(userName)) {
             queryUserName = loginUserName;

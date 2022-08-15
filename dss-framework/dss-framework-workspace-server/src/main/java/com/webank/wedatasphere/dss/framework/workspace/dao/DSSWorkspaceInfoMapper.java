@@ -25,7 +25,7 @@ import org.apache.ibatis.annotations.*;
 public interface DSSWorkspaceInfoMapper {
 
     @Select("select name from dss_workspace where id = #{workspaceId} ")
-    String getWorkspaceNameById(@Param("workspaceId") int workspaceId);
+    String getWorkspaceNameById(@Param("workspaceId") long workspaceId);
 
     @Select("select id from dss_workspace where name = #{workspaceName}")
     Integer getWorkspaceIdByName(@Param("workspaceName") String workspaceName);

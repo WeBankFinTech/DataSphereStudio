@@ -17,7 +17,10 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddWorkspaceRoleRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
@@ -46,7 +49,7 @@ public class DSSWorkspaceRoleRestful {
     private DSSWorkspaceRoleService dssWorkspaceRoleService;
 
     @RequestMapping(path = "getWorkspaceRoles", method = RequestMethod.GET)
-    public Message getWorkspaceRoles(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId) {
+    public Message getWorkspaceRoles(@RequestParam(WORKSPACE_ID_STR) int workspaceId) {
         //todo 获取工作空间中所有的角色
         List<DSSWorkspaceRoleVO> workspaceRoles = dssWorkspaceService.getWorkspaceRoles(workspaceId);
         return Message.ok().data("workspaceRoles", workspaceRoles);
@@ -59,16 +62,18 @@ public class DSSWorkspaceRoleRestful {
         String roleName = addWorkspaceRoleRequest.getRoleName();
         List<Integer> menuIds = addWorkspaceRoleRequest.getMenuIds();
         List<Integer> componentIds = addWorkspaceRoleRequest.getComponentIds();
-        AuditLogUtils.printLog(username, String.valueOf(workspaceId), "add workspace role", addWorkspaceRoleRequest);
         if (!dssWorkspaceService.checkAdmin(username) || !dssWorkspaceService.checkAdminByWorkspace(username, workspaceId)) {
             return Message.error("无权限进行该操作");
         }
-        dssWorkspaceRoleService.addWorkspaceRole(roleName, workspaceId, menuIds, componentIds, username);
+        DSSWorkspaceRole dssRole = dssWorkspaceRoleService.addWorkspaceRole(roleName, workspaceId, menuIds, componentIds, username);
+        String workspaceName = dssWorkspaceService.getWorkspaceName((long) workspaceId);
+        AuditLogUtils.printLog(username, workspaceId,workspaceName, TargetTypeEnum.WORKSPACE_ROLE,dssRole.getId(),roleName,
+                OperateTypeEnum.CREATE, addWorkspaceRoleRequest);
         return Message.ok("创建角色成功");
     }
 
     @RequestMapping(path = "deleteWorkspaceRole", method = RequestMethod.POST)
-    public Message deleteWorkspaceRole(HttpServletRequest request) {
+    public Message deleteWorkspaceRole() {
 
         return null;
     }

@@ -46,7 +46,7 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
     val width: Int = bufferedImage.getWidth
     val height: Int = bufferedImage.getHeight
     // 只支持修改visualis图片大小，后续如果有新增其他类型的邮件需要修改图片大小，需要在if中加上该邮件类型
-    val imagesCuts = if (email.getEmailType.contains("visualis") && height > EMAIL_IMAGE_HEIGHT.getValue) {
+    val imagesCuts = if (height > EMAIL_IMAGE_HEIGHT.getValue) {
       val numOfCut = Math.ceil(height.toDouble / EMAIL_IMAGE_HEIGHT.getValue).toInt
       val realHeight = height / numOfCut
       (0 until numOfCut).map(i => bufferedImage.getSubimage(0, i * realHeight, width, realHeight)).toArray
@@ -63,7 +63,7 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
       var iHeight = image.getHeight
       var iWidth = image.getWidth
 
-      if (email.getEmailType.contains("visualis") && iWidth > EMAIL_IMAGE_WIDTH.getValue) {
+      if (iWidth > EMAIL_IMAGE_WIDTH.getValue) {
         iHeight = ((EMAIL_IMAGE_WIDTH.getValue.toDouble / iWidth.toDouble) * iHeight.toDouble).toInt
         iWidth = EMAIL_IMAGE_WIDTH.getValue
       }

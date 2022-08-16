@@ -686,6 +686,17 @@ export default {
     eventbus.on('workflow.fold.left.tree', () => {
       refs.process && refs.process.layoutView()
     });
+    eventbus.on('workflow.copying', (data) => {
+      if (data.source.orchestratorId == this.orchestratorId) {
+        this.locked = true
+        this.$Notice.info({
+          title: '提示',
+          desc: '复制过程中，不允许编辑工作流',
+          duration: 0,
+          name: this.orchestratorId
+        });
+      }
+    });
   },
   beforeDestroy() {
     if (this.timer) {

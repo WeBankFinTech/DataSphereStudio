@@ -3,7 +3,6 @@
     :class="{'is-empty': isEmpty}"
     class="we-file-tree">
     <we-tree
-      v-if="fsType === 'workBench'"
       ref="tree"
       :data="tree"
       :node-props="nodeProps"
@@ -37,10 +36,6 @@ export default {
     loading: {
       type: Boolean,
       default: false,
-    },
-    fsType: {
-      type: String,
-      default: 'workBench',
     },
     tree: {
       type: Array,

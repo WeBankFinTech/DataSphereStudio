@@ -1,0 +1,121 @@
+<template>
+  <div>
+    <Table :columns="columnData" :data="copyHistory" :height="200"></Table>
+    <div class="version-page-bar">
+      <Page
+        ref="page"
+        :total="page.totalSize"
+        :page-size-opts="page.sizeOpts"
+        :page-size="page.pageSize"
+        :current="page.pageNow"
+        class-name="page"
+        size="small"
+        show-total
+        show-sizer
+        @on-change="change"
+        @on-page-size-change="changeSize" />
+    </div>
+  </div>
+  </div>
+</template>
+<script>
+import api from '@dataspherestudio/shared/common/service/api';
+import mixin from '@dataspherestudio/shared/common/service/mixin';
+export default {
+  props: {
+    orchestratorId: {
+      type: [Number, String],
+      default: null
+    },
+    orchestratorVersionId: {
+      type: [Number, String],
+      default: null
+    }
+  },
+  mixins: [mixin],
+  data() {
+    return {
+      columnData: [
+        {
+          title: 'ID',
+          key: 'id'
+        },
+        {
+          title: '状态',
+          key: 'status'
+        },
+        {
+          title: '复制人',
+          key: 'userName'
+        },
+        {
+          title: '复制时间',
+          key: 'startTime'
+        },
+        {
+          title: '错误信息',
+          key: 'exceptionInfo',
+          width: '180',
+          align: 'center',
+          render: (h, scope) => {
+            return h(
+              "span",
+              {
+                style: {
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                },
+                attrs: {
+                  title: scope.row.exceptionInfo
+                }
+              }, scope.row.exceptionInfo
+            );
+          }
+        }
+      ],
+      copyHistory: [],
+      page: {
+        totalSize: 0,
+        sizeOpts: [4, 15, 30, 45],
+        pageSize: 4,
+        pageNow: 1
+      }
+    }
+  },
+  methods: {
+    getHistoryData() {
+      return api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}listOrchestratorCopyHistory`, {
+        orchestratorId: this.orchestratorId,
+      },'get').then((res) => {
+        this.copyHistory = res.orchestratorCopyHistory || []
+        this.page.totalSize = res.totalPage
+      }).catch(() => {
+        this.loading = false;
+      });
+    },
+    // 切换分页
+    change(val) {
+      this.page.pageNow = val;
+      this.getHistoryData();
+    },
+    // 页容量变化
+    changeSize(val) {
+      this.page.pageSize = val;
+      this.page.pageNow = 1;
+      this.getHistoryData();
+    },
+  },
+  mounted() {
+    this.getHistoryData()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+  .version-page-bar {
+    text-align: center;
+    height: 30px;
+    padding-top: 4px;
+  }
+</style>

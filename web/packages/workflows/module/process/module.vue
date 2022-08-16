@@ -371,15 +371,12 @@
       :height="consoleHeight"
       :style="getConsoleStyle"
       @close-console="closeConsole"></console>
-    <component
-      v-if="extComponents.name"
-      :is="extComponents.component"
+    <BottomTab
       :orchestratorId="orchestratorId"
       :orchestratorVersionId="orchestratorVersionId"
       :appId="flowId"
       :product="product"
       :readonly="readonly"
-      @event-from-ext="eventFromExt"
     />
   </div>
 </template>
@@ -397,14 +394,13 @@ import { NODETYPE, ext } from '@/workflows/service/nodeType';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import util from '@dataspherestudio/shared/common/util';
-import plugin from '@dataspherestudio/shared/common/util/plugin';
 import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
 import moment from 'moment';
 import { getPublishStatus } from '@/workflows/service/api.js';
 import module from './index';
-import nodeIcons from './nodeicon'
+import nodeIcons from './nodeicon';
+import BottomTab from './component/bottomTab.vue'
 
-const extComponents = plugin.emitHook('workflow_bottom_panel') || {}
 export default {
   components: {
     vueProcess,
@@ -412,7 +408,8 @@ export default {
     resource,
     nodeParameter,
     associateScript,
-    console
+    console,
+    BottomTab
   },
   mixins: [mixin],
   directives: {
@@ -548,7 +545,6 @@ export default {
       locked: false,
       newOrchestratorVersionId: this.orchestratorVersionId,
       extraToolbar: [],
-      extComponents
     };
   },
   computed: {
@@ -676,12 +672,6 @@ export default {
     this.getConsoleParams();
     document.addEventListener('keyup', this.onKeyUp)
     this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
-    // todo mixin ? 事件命名空间？
-    plugin.on('call_app_method', (fn, args) => {
-      if (typeof this[fn] === 'function') {
-        this.fn(...args)
-      }
-    })
     const refs = this.$refs
     eventbus.on('workflow.fold.left.tree', () => {
       refs.process && refs.process.layoutView()

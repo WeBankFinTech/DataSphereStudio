@@ -76,7 +76,6 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private OrchestratorManager orchestratorManager;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> exportOrchestrator(String userName, Long orchestratorId, Long orcVersionId, String projectName,
                                                   List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
         //1、导出info信息
@@ -173,7 +172,6 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             dssOrchestratorVersion.setUpdater(userName);
         }
         updateCommentVersion.setUpdateTime(new Date());
-        orchestratorMapper.updateOrchestratorVersion(updateCommentVersion);
 
         //要求AppConn对应第三方应用拷贝一个新的app出来关联，如工作流，需要新建一个新的工作流进行关联。
         //1、生成上下文ContextId
@@ -198,6 +196,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
         //update appConn node contextId
         dssOrchestratorVersion.setFormatContextId(contextId);
+        orchestratorMapper.updateOrchestratorVersion(updateCommentVersion);
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
         return dssOrchestratorVersion.getId();
     }

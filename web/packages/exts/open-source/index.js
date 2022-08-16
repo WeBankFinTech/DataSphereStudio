@@ -1,4 +1,5 @@
 import ApiPublish from './scriptis/apiPublish/index.vue'
+import CopyHistory from './workflows/bottomTab/copyHistory.vue'
 
 /**
  * 插件绑定
@@ -17,4 +18,16 @@ export default function () {
       component: ApiPublish
     }
   })
+
+  // workflows: 工作流开发底部TAB面板包括版本比对，历史版本，执行历史
+  this.bindHook('workflow_bottom_panel', function () {
+    return [
+      {
+        name: '复制历史',
+        icon: 'md-paper-plane',
+        component: CopyHistory
+      }
+    ]
+  })
+
 }

@@ -430,8 +430,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public String getWorkspaceName(String workspaceId) {
-        return dssWorkspaceInfoMapper.getWorkspaceNameById(Integer.parseInt(workspaceId));
+    public String getWorkspaceName(Long workspaceId) {
+        return dssWorkspaceInfoMapper.getWorkspaceNameById(workspaceId);
     }
 
     @Override

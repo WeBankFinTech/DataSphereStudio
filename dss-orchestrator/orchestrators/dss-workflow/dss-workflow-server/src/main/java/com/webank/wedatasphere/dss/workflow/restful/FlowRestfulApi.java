@@ -295,7 +295,7 @@ public class FlowRestfulApi {
         String workspaceName = saveFlowRequest.getWorkspaceName();
         String projectName = saveFlowRequest.getProjectName();
         // 判断工作流中是否存在命名相同的节点
-        if (checkExistSameFlow(jsonFlow)){
+        if (flowService.checkIsExistSameFlow(jsonFlow)) {
             return Message.error("It exists same flow.(存在相同的节点)");
         }
 
@@ -343,13 +343,6 @@ public class FlowRestfulApi {
     public Message deleteFlowEditLock(HttpServletRequest req, @PathVariable("flowEditLock") String flowEditLock) throws DSSErrorException {
         DSSFlowEditLockManager.deleteLock(flowEditLock);
         return Message.ok();
-    }
-
-    private boolean checkExistSameFlow(String jsonFlow) {
-        Map firstLevelMap = DSSCommonUtils.COMMON_GSON.fromJson(jsonFlow, Map.class);
-        List<Map> secondLevelList = (List<Map>) firstLevelMap.get("nodes");
-        long distinctSize = secondLevelList.stream().map(s -> s.get("title")).distinct().count();
-        return distinctSize < secondLevelList.size();
     }
 
 }

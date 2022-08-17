@@ -71,8 +71,7 @@ public class DSSFrameworkProjectRestfulApi {
         projectRequest.setUsername(username);
         LOGGER.info("user {} begin to getAllProjects, projectId:{}", username, projectRequest.getId());
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
-        Message message = Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
-        return message;
+        return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
     }
 
     /**
@@ -218,8 +217,7 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
         List<ProjectResponse> dssProjectVos = projectService.getDeletedProjects(projectRequest);
-        Message message = Message.ok("获取工作空间已删除的工程成功").data("projects", dssProjectVos);
-        return message;
+        return Message.ok("获取工作空间已删除的工程成功").data("projects", dssProjectVos);
     }
 
 

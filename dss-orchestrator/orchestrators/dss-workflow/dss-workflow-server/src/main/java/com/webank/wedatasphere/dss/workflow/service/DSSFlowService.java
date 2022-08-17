@@ -64,4 +64,6 @@ public interface DSSFlowService {
     List<ExtraToolBarsVO> getExtraToolBars(long workspaceId, long projectId);
 
     boolean checkExistSameSubflow(Long parentFlowID, String name);
+
+    boolean checkIsExistSameFlow(String jsonFlow);
 }

@@ -101,7 +101,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             }
             LOGGER.info("{} 开始导出Orchestrator: {} 版本ID为: {}.", userName, dssOrchestratorInfo.getName(), orcVersionId);
 
-            //2、导出第三方应用信息，如工作流、Visualis、Qualities
+            //2、导出第三方应用信息，如工作流、Visualis、Qualitis
             DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
                     dssLabels);
             ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,

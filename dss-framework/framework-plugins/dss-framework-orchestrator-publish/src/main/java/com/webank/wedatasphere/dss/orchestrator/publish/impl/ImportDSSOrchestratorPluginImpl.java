@@ -49,7 +49,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.InputStream;
@@ -76,7 +75,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private OrchestratorManager orchestratorManager;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception {
         String userName = requestImportOrchestrator.getUserName();
         String projectName = requestImportOrchestrator.getProjectName();
@@ -115,8 +113,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                         .dealErrorException(61002, "The same orchestration name already exists", DSSErrorException.class);
             }
             importDssOrchestratorInfo.setId(existFlag.getId());
-            //如果Orchestrator已经导入过，目前只更新版本信息，并更新基础信息name,其它信息不修改。
-            orchestratorMapper.updateOrchestrator(importDssOrchestratorInfo);
         } else {
             //判断是否存在相同名称的编排名称
             if (StringUtils.isNotBlank(uuid)) {
@@ -137,7 +133,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             if (StringUtils.isEmpty(importDssOrchestratorInfo.getOrchestratorWay())) {
                 importDssOrchestratorInfo.setOrchestratorWay(",pom_work_flow_DAG,");
             }
-            orchestratorMapper.addOrchestrator(importDssOrchestratorInfo);
         }
         String flowZipPath = inputPath + File.separator + "orc_flow.zip";
         //3、上传工作流zip包到bml
@@ -170,9 +165,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setFormatContextId(contextId);
         LOGGER.info("Create a new ContextId for import: {} ", contextId);
 
-        dssOrchestratorVersion.setUpdateTime(new Date());
-        orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
-
         //6、导出第三方应用信息，如工作流、Visualis、Qualities
         DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
                 workspace.getWorkspaceName(), importDssOrchestratorInfo.getType(), dssLabels);
@@ -191,7 +183,14 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 }, "import");
         long orchestrationId = (Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);
         String orchestrationContent = (String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY);
-
+        if(null != existFlag){
+            //如果Orchestrator已经导入过，目前只更新版本信息，并更新基础信息name,其它信息不修改。
+            orchestratorMapper.updateOrchestrator(importDssOrchestratorInfo);
+        }else{
+            orchestratorMapper.addOrchestrator(importDssOrchestratorInfo);
+        }
+        dssOrchestratorVersion.setUpdateTime(new Date());
+        orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
         //更新返回內容
         dssOrchestratorVersion.setAppId(orchestrationId);
         dssOrchestratorVersion.setContent(orchestrationContent);

@@ -24,6 +24,7 @@ import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
+import com.webank.wedatasphere.dss.common.entity.node.Node;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -372,6 +373,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public boolean checkExistSameSubflow(Long parentFlowID, String name) {
         List<String> subflowName = flowMapper.getSubflowName(parentFlowID);
         return subflowName.stream().anyMatch(s -> s.equals(name));
+    }
+
+    @Override
+    public boolean checkIsExistSameFlow(String jsonFlow) {
+        List<DSSNode> workFlowNodes = workFlowParser.getWorkFlowNodes(jsonFlow);
+        long distinctSize = workFlowNodes.stream().map(Node::getName).distinct().count();
+        return distinctSize < workFlowNodes.size();
     }
 
     private DSSFlow copyFlowAndSetSubFlowInDB(DSSFlow dssFlow,

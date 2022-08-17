@@ -16,6 +16,9 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationCreationOperation;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationDeletionOperation;
@@ -31,21 +34,26 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.*;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
 import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelation;
 import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelationManager;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
+import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
+import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
+import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -56,14 +64,14 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -79,6 +87,22 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private OrchestratorService newOrchestratorService;
     @Autowired
     private OrchestratorManager orchestratorManager;
+    @Autowired
+    private OrchestratorCopyJobMapper orchestratorCopyJobMapper;
+    @Autowired
+    private ExportDSSOrchestratorPlugin exportDSSOrchestratorPlugin;
+    @Autowired
+    private ImportDSSOrchestratorPlugin importDSSOrchestratorPlugin;
+
+
+    private final ThreadFactory orchestratorCopyThreadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("dss-orchestrator—copy-thread-%d")
+            .setDaemon(false)
+            .build();
+
+    private final ExecutorService orchestratorCopyThreadPool = new ThreadPoolExecutor(5, 200, 0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(1024), orchestratorCopyThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+
 
     /**
      * 1.拿到的dss orchestrator的appconn
@@ -236,6 +260,91 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorVo.setOrchestratorName(orchestratorInfo.getName());
         orchestratorVo.setOrchestratorId(orchestratorInfo.getId());
         return orchestratorVo;
+    }
+
+    @Override
+    public CommonOrchestratorVo copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
+
+        //开始写入复制信息到编排复制任务历史表
+        DSSOrchestratorCopyInfo orchestratorCopyInfo = new DSSOrchestratorCopyInfo();
+        orchestratorCopyInfo.setId(UUID.randomUUID().toString());
+        orchestratorCopyInfo.setUsername(username);
+        orchestratorCopyInfo.setCopying(1);
+        orchestratorCopyInfo.setSourceOrchestratorId(orchestratorCopyRequest.getSourceOrchestratorId());
+        orchestratorCopyInfo.setSourceOrchestratorName(orchestratorCopyRequest.getSourceOrchestratorName());
+        orchestratorCopyInfo.setTargetOrchestratorName(orchestratorCopyRequest.getTargetOrchestratorName());
+        orchestratorCopyInfo.setWorkflowNodeSuffix(orchestratorCopyRequest.getWorkflowNodeSuffix());
+        orchestratorCopyInfo.setWorkspaceId(orchestratorCopyRequest.getWorkspaceId());
+        orchestratorCopyJobMapper.insertOrchestratorCopyInfo(orchestratorCopyInfo);
+
+        orchestratorCopyThreadPool.submit(() -> {
+            try {
+                Thread.sleep(20000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        });
+
+//        orchestratorCopyThreadPool.submit(() -> {
+//            try {
+//                //给工程和编排上锁，防止被编辑或删除
+//
+//                //导出编排
+//                Map<String, Object> exportOrchestratorInfo = exportDSSOrchestratorPlugin.exportOrchestrator(username, orchestratorCopyRequest.getSourceOrchestratorId(), null, orchestratorCopyRequest.getSourceProjectName(),
+//                        Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), false, workspace);
+//                //map中包含的key有resourceId, version, orcVersionId
+//                //导入编排
+//                RequestImportOrchestrator requestImportOrchestrator = new RequestImportOrchestrator(username, orchestratorCopyRequest.getTargetProjectName(), orchestratorCopyRequest.getTargetProjectId(),
+//                        exportOrchestratorInfo.get("resourceId").toString(), exportOrchestratorInfo.get("version").toString(), orchestratorCopyRequest.getTargetOrchestratorName(),
+//                        Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), workspace);
+//                importDSSOrchestratorPlugin.importOrchestrator(requestImportOrchestrator);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        });
+
+
+
+        return null;
+    }
+
+    @Override
+    public List<OrchestratorCopyHistory> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception {
+
+        PageHelper.startPage(currentPage, pageSize);
+        List<DSSOrchestratorCopyInfo> orchestratorCopyInfoList = orchestratorCopyJobMapper.getOrchestratorCopyInfo(orchestratorId, currentPage, pageSize);
+
+        if (CollectionUtils.isEmpty(orchestratorCopyInfoList)){
+            return Lists.newArrayList();
+        }
+        List<OrchestratorCopyHistory> orchestratorCopyHistoryList = new ArrayList<>();
+        OrchestratorCopyHistory orchestratorCopyHistory;
+        for (DSSOrchestratorCopyInfo orchestratorCopyInfo: orchestratorCopyInfoList) {
+            orchestratorCopyHistory = new OrchestratorCopyHistory();
+            orchestratorCopyHistory.setId(orchestratorId);
+            orchestratorCopyHistory.setUsername(username);
+            orchestratorCopyHistory.setWorkspaceName(workspace.getWorkspaceName());
+            orchestratorCopyHistory.setCopying(orchestratorCopyInfo.isCopying());
+            orchestratorCopyHistory.setSourceOrchestratorName(orchestratorCopyInfo.getSourceOrchestratorName());
+            orchestratorCopyHistory.setTargetOrchestratorName(orchestratorCopyInfo.getTargetOrchestratorName());
+            orchestratorCopyHistory.setSourceProjectName(orchestratorCopyInfo.getSourceProjectName());
+            orchestratorCopyHistory.setTargetProjectName(orchestratorCopyInfo.getTargetProjectName());
+            orchestratorCopyHistory.setExceptionInfo(orchestratorCopyInfo.getExceptionInfo());
+            orchestratorCopyHistory.setStatus(orchestratorCopyInfo.isStatus());
+            orchestratorCopyHistory.setStartTime(orchestratorCopyInfo.getStartTime());
+            orchestratorCopyHistory.setEndTime(orchestratorCopyInfo.getEndTime());
+            orchestratorCopyHistory.setWorkflowNodeSuffix(orchestratorCopyInfo.getWorkflowNodeSuffix());
+            orchestratorCopyHistory.setMicroserverName(orchestratorCopyInfo.getMicroserverName());
+            orchestratorCopyHistoryList.add(orchestratorCopyHistory);
+        }
+
+        return orchestratorCopyHistoryList;
+    }
+
+    @Override
+    public Boolean getOrchestratorCopyStatus(Long sourceOrchestratorId) {
+        return StringUtils.isNotBlank(orchestratorCopyJobMapper.getOrchestratorCopyStatus(sourceOrchestratorId));
     }
 
     protected ImmutablePair<OrchestrationService, AppInstance> getOrchestrationService(DSSOrchestratorInfo dssOrchestratorInfo,

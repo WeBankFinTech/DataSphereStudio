@@ -1,7 +1,5 @@
 package com.webank.wedatasphere.dss.orchestrator.server.entity.vo;
 
-import java.util.Date;
-import java.util.List;
 
 public class OrchestratorCopyHistory {
 
@@ -41,12 +39,12 @@ public class OrchestratorCopyHistory {
     /**
      * 复制开始时间
      */
-    private Date startTime;
+    private String startTime;
 
     /**
      * 复制结束时间
      */
-    private Date endTime;
+    private String endTime;
 
     public Long getId() {
         return id;
@@ -140,19 +138,19 @@ public class OrchestratorCopyHistory {
         isCopying = copying;
     }
 
-    public Date getStartTime() {
+    public String getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 
-    public Date getEndTime() {
+    public String getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Date endTime) {
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 

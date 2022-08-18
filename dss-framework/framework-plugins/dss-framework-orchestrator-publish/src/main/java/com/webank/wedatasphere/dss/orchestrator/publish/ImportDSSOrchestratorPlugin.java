@@ -38,5 +38,12 @@ public interface ImportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
      */
     Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception;
 
+    /**
+     * 导入复制的编排
+     * @param requestImportOrchestrator
+     * @return
+     * @throws Exception
+     */
+    Long importCopyOrchestrator(RequestImportOrchestrator requestImportOrchestrator, String suffix) throws Exception;
 
 }

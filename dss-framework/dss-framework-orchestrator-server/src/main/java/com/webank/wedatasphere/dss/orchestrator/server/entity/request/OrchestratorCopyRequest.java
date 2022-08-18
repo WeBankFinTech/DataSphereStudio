@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 @XmlRootElement
 public class OrchestratorCopyRequest {
@@ -32,6 +33,16 @@ public class OrchestratorCopyRequest {
 
     @NotNull(message = "目标工作流节点后缀")
     private String workflowNodeSuffix;
+
+    private List<String> dssLabels;
+
+    public List<String> getDssLabels() {
+        return dssLabels;
+    }
+
+    public void setDssLabels(List<String> dssLabels) {
+        this.dssLabels = dssLabels;
+    }
 
     public Long getSourceOrchestratorId() {
         return sourceOrchestratorId;
@@ -117,6 +128,7 @@ public class OrchestratorCopyRequest {
                 ", targetProjectName='" + targetProjectName + '\'' +
                 ", workspaceId=" + workspaceId +
                 ", workflowNodeSuffix='" + workflowNodeSuffix + '\'' +
+                ", dssLabels=" + dssLabels +
                 '}';
     }
 }

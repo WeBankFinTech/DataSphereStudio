@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Table :columns="columnData" :data="copyHistory" :height="200"></Table>
+    <Table :columns="columnData" :data="tableData" :height="200"></Table>
     <div class="version-page-bar">
       <Page
         ref="page"
@@ -83,13 +83,18 @@ export default {
       }
     }
   },
+  computed: {
+    tableData() {
+      return this.copyHistory.slice((this.page.pageNow -1 ) * this.page.pageSize, this.page.pageNow * this.page.pageSize)
+    }
+  },
   methods: {
     getHistoryData() {
       return api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}listOrchestratorCopyHistory`, {
         orchestratorId: this.orchestratorId,
       },'get').then((res) => {
-        this.copyHistory = res.orchestratorCopyHistory || []
-        this.page.totalSize = res.totalPage
+        this.copyHistory = res.copyJobHistory || []
+        this.page.totalSize = this.copyHistory.length
       }).catch(() => {
         this.loading = false;
       });
@@ -97,13 +102,11 @@ export default {
     // 切换分页
     change(val) {
       this.page.pageNow = val;
-      this.getHistoryData();
     },
     // 页容量变化
     changeSize(val) {
       this.page.pageSize = val;
       this.page.pageNow = 1;
-      this.getHistoryData();
     },
   },
   mounted() {

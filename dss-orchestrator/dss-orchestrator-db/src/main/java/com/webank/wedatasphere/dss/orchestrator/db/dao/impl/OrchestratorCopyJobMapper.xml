@@ -32,7 +32,7 @@
         #{targetProjectName}, #{workspaceId}, #{workflowNodeSuffix}, #{microserverName}, #{exceptionInfo}, #{status}, #{isCopying}, #{successNode}, #{startTime}, #{endTime})
     </insert>
 
-    <select id="getOrchestratorCopyInfo" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+    <select id="getOrchestratorCopyInfoList" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
         SELECT * FROM `dss_orchestrator_copy_info` WHERE source_orchestrator_id = #{orchestratorId} order by start_time desc
     </select>
 

@@ -70,6 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiFunction;
@@ -80,6 +81,8 @@ import java.util.stream.Collectors;
 public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkService {
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    private static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
 
     @Autowired
     private OrchestratorMapper orchestratorMapper;
@@ -264,6 +267,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public CommonOrchestratorVo copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
+        //校验编排名是可用
+        newOrchestratorService.isExistSameNameBeforeCreate(workspace.getWorkspaceId(), orchestratorCopyRequest.getTargetProjectId(), orchestratorCopyRequest.getTargetOrchestratorName());
+        //判断用户对项目是否有权限
+        DSSProject sourceProject = validateOperation(orchestratorCopyRequest.getSourceProjectId(), username);
+        DSSProject targetProject = validateOperation(orchestratorCopyRequest.getTargetProjectId(), username);
 
         //开始写入复制信息到编排复制任务历史表
         DSSOrchestratorCopyInfo orchestratorCopyInfo = new DSSOrchestratorCopyInfo();
@@ -273,18 +281,30 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorCopyInfo.setSourceOrchestratorId(orchestratorCopyRequest.getSourceOrchestratorId());
         orchestratorCopyInfo.setSourceOrchestratorName(orchestratorCopyRequest.getSourceOrchestratorName());
         orchestratorCopyInfo.setTargetOrchestratorName(orchestratorCopyRequest.getTargetOrchestratorName());
+        orchestratorCopyInfo.setSourceProjectName(sourceProject.getName());
+        orchestratorCopyInfo.setTargetProjectName(targetProject.getName());
         orchestratorCopyInfo.setWorkflowNodeSuffix(orchestratorCopyRequest.getWorkflowNodeSuffix());
         orchestratorCopyInfo.setWorkspaceId(orchestratorCopyRequest.getWorkspaceId());
+        orchestratorCopyInfo.setStartTime(new Date(System.currentTimeMillis()));
         orchestratorCopyJobMapper.insertOrchestratorCopyInfo(orchestratorCopyInfo);
 
-        orchestratorCopyThreadPool.submit(() -> {
-            try {
-                Thread.sleep(20000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        //导出编排
+        Map<String, Object> exportOrchestratorInfo = exportDSSOrchestratorPlugin.exportOrchestrator(username, orchestratorCopyRequest.getSourceOrchestratorId(), null, orchestratorCopyRequest.getSourceProjectName(),
+                Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), false, workspace);
+        //map中包含的key有resourceId, version, orcVersionId
+        //导入编排
+        RequestImportOrchestrator requestImportOrchestrator = new RequestImportOrchestrator(username, orchestratorCopyRequest.getSourceProjectName(), orchestratorCopyRequest.getSourceProjectId(),
+                exportOrchestratorInfo.get("resourceId").toString(), exportOrchestratorInfo.get("version").toString(), orchestratorCopyRequest.getTargetOrchestratorName(),
+                Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), workspace, orchestratorCopyRequest.getTargetProjectId(), targetProject.getName());
+        importDSSOrchestratorPlugin.importCopyOrchestrator(requestImportOrchestrator, orchestratorCopyRequest.getWorkflowNodeSuffix());
 
-        });
+        DSSOrchestratorInfo sourceOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorCopyRequest.getSourceOrchestratorId());
+        orchestratorCopyInfo.setCopying(0);
+        orchestratorCopyInfo.setEndTime(new Date(System.currentTimeMillis()));
+        orchestratorCopyInfo.setType(sourceOrchestratorInfo.getType());
+        orchestratorCopyInfo.setSuccessNode(null);
+        orchestratorCopyInfo.setExceptionInfo(null);
+        orchestratorCopyInfo.setMicroserverName(null);
 
 //        orchestratorCopyThreadPool.submit(() -> {
 //            try {
@@ -295,10 +315,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 //                        Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), false, workspace);
 //                //map中包含的key有resourceId, version, orcVersionId
 //                //导入编排
-//                RequestImportOrchestrator requestImportOrchestrator = new RequestImportOrchestrator(username, orchestratorCopyRequest.getTargetProjectName(), orchestratorCopyRequest.getTargetProjectId(),
+//                RequestImportOrchestrator requestImportOrchestrator = new RequestImportOrchestrator(username, orchestratorCopyRequest.getSourceProjectName(), orchestratorCopyRequest.getSourceProjectId(),
 //                        exportOrchestratorInfo.get("resourceId").toString(), exportOrchestratorInfo.get("version").toString(), orchestratorCopyRequest.getTargetOrchestratorName(),
 //                        Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), workspace);
 //                importDSSOrchestratorPlugin.importOrchestrator(requestImportOrchestrator);
+//
+//
+//
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
@@ -311,9 +334,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public List<OrchestratorCopyHistory> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception {
-
+        if (currentPage == null) {
+            currentPage = 1;
+        }
+        if (pageSize == null) {
+            pageSize = 4;
+        }
         PageHelper.startPage(currentPage, pageSize);
-        List<DSSOrchestratorCopyInfo> orchestratorCopyInfoList = orchestratorCopyJobMapper.getOrchestratorCopyInfo(orchestratorId, currentPage, pageSize);
+
+        List<DSSOrchestratorCopyInfo> orchestratorCopyInfoList = orchestratorCopyJobMapper.getOrchestratorCopyInfoList(orchestratorId);
 
         if (CollectionUtils.isEmpty(orchestratorCopyInfoList)){
             return Lists.newArrayList();
@@ -332,13 +361,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             orchestratorCopyHistory.setTargetProjectName(orchestratorCopyInfo.getTargetProjectName());
             orchestratorCopyHistory.setExceptionInfo(orchestratorCopyInfo.getExceptionInfo());
             orchestratorCopyHistory.setStatus(orchestratorCopyInfo.isStatus());
-            orchestratorCopyHistory.setStartTime(orchestratorCopyInfo.getStartTime());
-            orchestratorCopyHistory.setEndTime(orchestratorCopyInfo.getEndTime());
+            orchestratorCopyHistory.setStartTime(SDF.format(orchestratorCopyInfo.getStartTime()));
+            orchestratorCopyHistory.setEndTime(SDF.format(orchestratorCopyInfo.getEndTime()));
             orchestratorCopyHistory.setWorkflowNodeSuffix(orchestratorCopyInfo.getWorkflowNodeSuffix());
             orchestratorCopyHistory.setMicroserverName(orchestratorCopyInfo.getMicroserverName());
             orchestratorCopyHistoryList.add(orchestratorCopyHistory);
         }
-
         return orchestratorCopyHistoryList;
     }
 

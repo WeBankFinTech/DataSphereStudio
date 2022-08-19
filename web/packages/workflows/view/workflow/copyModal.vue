@@ -125,6 +125,7 @@ export default {
         workspaceId: +this.$route.query.workspaceId,
         ...this.formState,
         sourceProjectId: this.formState.sourceProjectId,
+        labels: {route: this.getCurrentDsslabels() },
       }
       return api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}copyOrchestrator`, params, "post")
     },

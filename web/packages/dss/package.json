@@ -1,9 +1,9 @@
 {
   "name": "@dataspherestudio/dss",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "dependencies": {
-    "@dataspherestudio/scriptis": "^1.1.5",
-    "@dataspherestudio/shared": "^1.1.5"
+    "@dataspherestudio/scriptis": "^1.1.6",
+    "@dataspherestudio/shared": "^1.1.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "3.12.1",

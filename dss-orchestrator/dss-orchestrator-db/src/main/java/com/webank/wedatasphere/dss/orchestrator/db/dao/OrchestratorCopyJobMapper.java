@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface OrchestratorCopyJobMapper {
 
-    List<DSSOrchestratorCopyInfo> getOrchestratorCopyInfo(Long orchestratorId, Integer currentPage, Integer pageSize);
+    List<DSSOrchestratorCopyInfo> getOrchestratorCopyInfoList(Long orchestratorId);
 
     String getOrchestratorCopyStatus(Long sourceOrchestratorId);
 

@@ -139,8 +139,8 @@ public class DSSFrameworkOrchestratorRestful {
         }
 
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
-                orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.COPY,orchestratorCopyRequest);
+//        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+//                orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.COPY,orchestratorCopyRequest);
 
         return Message.ok("复制工作流已经开始，正在后台复制中...").data("targetOrchestratorId", orchestratorCopyRequest.getTargetOrchestratorName());
 
@@ -154,8 +154,8 @@ public class DSSFrameworkOrchestratorRestful {
      */
     @RequestMapping(path = "listOrchestratorCopyHistory", method = RequestMethod.GET)
     public Message listOrchestratorCopyHistory(@RequestParam(name = "orchestratorId") Long orchestratorId,
-                                               @RequestParam(name = "currentPage") Integer currentPage,
-                                               @RequestParam(name = "pageSize") Integer pageSize) throws Exception{
+                                               @RequestParam(required = false, name = "currentPage") Integer currentPage,
+                                               @RequestParam(required = false, name = "pageSize") Integer pageSize) throws Exception{
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         List<OrchestratorCopyHistory> orchestratorCopyHistory = orchestratorFrameworkService.getOrchestratorCopyHistory(username, workspace, orchestratorId, currentPage, pageSize);

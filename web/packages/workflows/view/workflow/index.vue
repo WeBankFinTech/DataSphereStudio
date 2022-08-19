@@ -957,29 +957,6 @@ export default {
           res.canContinue = false
         }
       }
-      // 判断是否在复制中
-      try {
-        const data = await api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}listOrchestratorCopyHistory`, {}, 'get')
-        // A复制到B
-        // 被复制工作流A可以打开，不能编辑
-        // 复制后工作流B不可以打开
-        const copying =  data.orchestratorCopyHistory.find(it => it.isCopying)
-        if (copying && copying.sourceOrchestratorName === params.name) {
-          clearTimeout(this.this.copyingTipTimer)
-          this.copyingTipTimer = setTimeout(() => {
-            eventbus.emit('workflow.copying', {
-              source: {
-                orchestratorId: params.id
-              }
-            })}, 2000)
-        }
-        if (copying && copying.targetOrchestratorName === params.name) {
-          res.canContinue = false
-          this.$Message.warning('当前工作流未完成复制，无法打开');
-        }
-      } catch (error) {
-        //
-      }
       return res
     },
     /**

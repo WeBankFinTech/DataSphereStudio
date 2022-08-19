@@ -15,4 +15,8 @@ public interface OrchestratorCopyJobMapper {
     String getOrchestratorCopyStatus(Long sourceOrchestratorId);
 
     void insertOrchestratorCopyInfo(DSSOrchestratorCopyInfo dssOrchestratorCopyInfo);
+
+    void updateCopyStatus(DSSOrchestratorCopyInfo dssOrchestratorCopyInfo);
+
+    void updateErrorMsgById(DSSOrchestratorCopyInfo dssOrchestratorCopyInfo);
 }

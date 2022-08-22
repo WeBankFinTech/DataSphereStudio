@@ -226,6 +226,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         }
         logger.info("user {} try to convert workflowId(s) {} in project {} to SchedulerAppConn(s).", requestConversionWorkflow.getUserName(),
                 requestConversionWorkflow.getOrchestrationIdMap().keySet(), requestConversionWorkflow.getProject().getName());
+        //第一步：从db、bml中获取所有的所有的工作流和子工作流的元信息
         //TODO try to optimize it by select db in batch.
         List<ImmutablePair<DSSFlow, Long>> flowInfos = requestConversionWorkflow.getOrchestrationIdMap().entrySet()
                 .stream().map(entry -> new ImmutablePair<>(flowService.getFlowWithJsonAndSubFlowsByID(entry.getKey()), entry.getValue()))
@@ -240,10 +241,12 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                 schedulerAppConnName = DEFAULT_SCHEDULER_APP_CONN.getValue();
             }
             return new ImmutablePair<>(schedulerAppConnName, flow);
-        })).collect(Collectors.groupingBy(ImmutablePair::getKey)).forEach((appConnName, pairList) -> {
-            List<DSSFlow> selectedFlows = pairList.stream().map(ImmutablePair::getValue).collect(Collectors.toList());
-            ResponseOperateOrchestrator response = convert(requestConversionWorkflow, appConnName, selectedFlows, flowInfos);
-            responseList.add(response);
+        })).collect(Collectors.groupingBy(ImmutablePair::getKey))
+                .forEach((appConnName, pairList) -> {
+                            List<DSSFlow> selectedFlows = pairList.stream().map(ImmutablePair::getValue).collect(Collectors.toList());
+                            //第二步：把各DSSFlow发布到调度系统（appConnName）中
+                            ResponseOperateOrchestrator response = convert(requestConversionWorkflow, appConnName, selectedFlows, flowInfos);
+                            responseList.add(response);
         });
         List<ResponseOperateOrchestrator> failedResponseList = responseList.stream().filter(ResponseOperateOrchestrator::isFailed).collect(Collectors.toList());
         if(!failedResponseList.isEmpty()) {
@@ -279,17 +282,20 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                 .setUserName(requestConversionWorkflow.getUserName())
                 .setWorkspace((Workspace) requestConversionWorkflow.getWorkspace());
         if(requestRef instanceof ProjectToRelConversionRequestRef) {
+            //要发布整个项目
             Map<String, Long> orchestrationMap = flowInfos.stream().filter(pair -> flows.contains(pair.getKey()))
                     .map(pair -> new ImmutablePair<>(pair.getKey().getName(), pair.getValue()))
                     .collect(HashMap::new, (map, pair) -> map.put(pair.getKey(), pair.getValue()), HashMap::putAll);
             ((ProjectToRelConversionRequestRef) requestRef).setDSSOrcList(flows).setRefOrchestrationId(orchestrationMap);
         } else if(requestRef instanceof OrchestrationToRelConversionRequestRef) {
+            //要发布整个工作流
             flowInfos.stream().filter(pair -> pair.getKey() == flows.get(0)).forEach( pair ->
                     ((OrchestrationToRelConversionRequestRef) requestRef).setDSSOrchestration(pair.getKey())
                             .setRefOrchestrationId(pair.getValue())
             );
         }
         try{
+            //把（多个）工作流转化成第三方调度系统，即发布到第三方调度系统做调度。
             ResponseRef responseRef = operation.convert(requestRef);
             if(responseRef.isFailed()) {
                 logger.error("user {} convert workflow(s) {} to {} failed, Reason: {}.", requestConversionWorkflow.getUserName(),

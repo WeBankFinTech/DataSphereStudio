@@ -16,14 +16,16 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.IoUtils;
-import com.webank.wedatasphere.dss.common.utils.MapUtils;
-import com.webank.wedatasphere.dss.common.utils.ZipHelper;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -86,8 +88,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private ContextService contextService;
     @Autowired
     private OrchestratorManager orchestratorManager;
-    @Autowired
-    private WorkFlowParser workFlowParser;
 
     @Override
     public Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception {
@@ -245,7 +245,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             // 修改原有的json内容
             String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
             Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(flowJson, Map.class);
-            List<DSSNode> workflowNodes = workFlowParser.getWorkFlowNodes(flowJson);
+            List<DSSNode> workflowNodes = getWorkFlowNodes(flowJson);
             String finalNodeSuffix = nodeSuffix;
             List<DSSNode> targetWorkflowNodes = workflowNodes.stream().peek(s -> {
                 String name = s.getName();
@@ -367,15 +367,12 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         return dssOrchestratorVersion.getOrchestratorId();
     }
 
-    public void synProjectOrchestrator(DSSOrchestratorInfo importDssOrchestratorInfo, DSSOrchestratorVersion dssOrchestratorVersion, List<DSSLabel> dssLabels) {
-        //Is dev environment
-        if (DSSLabelUtil.isDevEnv(dssLabels)) {
-            RequestProjectImportOrchestrator projectImportOrchestrator = new RequestProjectImportOrchestrator();
-            BeanUtils.copyProperties(importDssOrchestratorInfo, projectImportOrchestrator);
-            projectImportOrchestrator.setVersionId(dssOrchestratorVersion.getId());
-            //保存工程级别的编排模式
-            DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                    .ask(projectImportOrchestrator);
-        }
+    private List<DSSNode> getWorkFlowNodes(String workFlowJson) {
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
+        JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
+        List<DSSNode> dwsNodes = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
+        }.getType());
+        return dwsNodes;
     }
 }

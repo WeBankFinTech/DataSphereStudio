@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class OrchestratorCopyJob implements Runnable{
+public class OrchestratorCopyJob implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorCopyJob.class);
 
@@ -32,7 +32,7 @@ public class OrchestratorCopyJob implements Runnable{
 
     protected OrchestratorCopyEnv orchestratorCopyEnv;
 
-    private DSSOrchestratorCopyInfo orchestratorCopyInfo;
+    private DSSOrchestratorCopyInfo orchestratorCopyInfo = new DSSOrchestratorCopyInfo();
 
     private final Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
@@ -41,13 +41,12 @@ public class OrchestratorCopyJob implements Runnable{
         try {
             importOrchestrator();
         } catch (Exception e) {
-//            LOGGER.error("Copy {} for {} error ", orchestratorCopyVo.getOrchestrator().getName(), orchestratorCopyVo.getCopyProjectName(), e);
+            LOGGER.error("Copy {} for {} error ", orchestratorCopyVo.getOrchestrator().getName(), e);
         }
     }
 
 
     public void importOrchestrator() throws Exception {
-
         //开始写入复制信息到编排复制任务历史表
         orchestratorCopyInfo.setId(UUID.randomUUID().toString());
         orchestratorCopyInfo.setUsername(orchestratorCopyVo.getUsername());
@@ -65,7 +64,7 @@ public class OrchestratorCopyJob implements Runnable{
         orchestratorCopyEnv.getOrchestratorCopyJobMapper().insertOrchestratorCopyInfo(orchestratorCopyInfo);
 
         OrchestratorExportResult exportResult = exportOrc();
-        if (exportResult != null){
+        if (exportResult != null) {
             importOrc(exportResult);
         }
 
@@ -115,11 +114,11 @@ public class OrchestratorCopyJob implements Runnable{
             //map中包含的key有resourceId, version, orcVersionId
             Map<String, Object> exportOrchestratorInfo = orchestratorCopyEnv.getExportDSSOrchestratorPlugin()
                     .exportOrchestrator(username, sourceOrchestratorId, sourceOrchestratorVersion.getId(),
-                    sourceProjectName, Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), false, workspace);
+                            sourceProjectName, Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), false, workspace);
 
-            if (!exportOrchestratorInfo.isEmpty()){
-                exportResult.setOrchestratorVersionId((Long) exportOrchestratorInfo.get("orcVersionId"));
-                exportResult.setBmlResourceList(Lists.newArrayList(new BmlResource(exportOrchestratorInfo.get("resourceId").toString(), exportOrchestratorInfo.get("version").toString())));
+            if (!exportOrchestratorInfo.isEmpty()) {
+                exportResult = new OrchestratorExportResult(Lists.newArrayList(new BmlResource(exportOrchestratorInfo.get("resourceId").toString(),
+                        exportOrchestratorInfo.get("version").toString())), (Long) exportOrchestratorInfo.get("orcVersionId"));
             }
 
         } catch (Exception e) {
@@ -186,11 +185,11 @@ public class OrchestratorCopyJob implements Runnable{
 
         }
 
-        LOGGER.info("Import orchestrator {} of project {} to orchestrator {} of project {}",orchestrator.getName(), orchestratorCopyVo.getSourceProjectName(),
+        LOGGER.info("Import orchestrator {} of project {} to orchestrator {} of project {}", orchestrator.getName(), orchestratorCopyVo.getSourceProjectName(),
                 orchestratorCopyVo.getTargetOrchestratorName(), orchestratorCopyVo.getTargetProjectName());
     }
 
-    private Boolean isExistFlow(DSSOrchestratorVersion sourceOrchestratorVersion, String username){
+    private Boolean isExistFlow(DSSOrchestratorVersion sourceOrchestratorVersion, String username) {
 
         Long appId = sourceOrchestratorVersion.getAppId();
         RequestQueryWorkFlow requestQueryWorkFlow = new RequestQueryWorkFlow(username, appId);

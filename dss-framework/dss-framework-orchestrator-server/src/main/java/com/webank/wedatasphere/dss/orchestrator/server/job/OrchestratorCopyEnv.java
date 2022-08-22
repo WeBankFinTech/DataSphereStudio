@@ -8,7 +8,9 @@ import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlu
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class OrchestratorCopyEnv {
 
     @Autowired

@@ -9,7 +9,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCop
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.orchestratorCopy.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.orchestratorCopy.OrchestratorExportResult;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyVo;
@@ -112,14 +112,10 @@ public class OrchestratorCopyJob implements Runnable {
         OrchestratorExportResult exportResult = null;
         try {
             //map中包含的key有resourceId, version, orcVersionId
-            Map<String, Object> exportOrchestratorInfo = orchestratorCopyEnv.getExportDSSOrchestratorPlugin()
+            BmlResource exportOrchestratorInfo = orchestratorCopyEnv.getExportDSSOrchestratorPlugin()
                     .exportOrchestrator(username, sourceOrchestratorId, sourceOrchestratorVersion.getId(),
-                            sourceProjectName, Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), false, workspace);
-
-            if (!exportOrchestratorInfo.isEmpty()) {
-                exportResult = new OrchestratorExportResult(Lists.newArrayList(new BmlResource(exportOrchestratorInfo.get("resourceId").toString(),
-                        exportOrchestratorInfo.get("version").toString())), (Long) exportOrchestratorInfo.get("orcVersionId"));
-            }
+                    sourceProjectName, Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), false, workspace).getBmlResource();
+            exportResult.setBmlResourceList(Lists.newArrayList(exportOrchestratorInfo));
 
         } catch (Exception e) {
             //保存错误信息

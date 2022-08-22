@@ -31,13 +31,29 @@
         (#{id}, #{username}, #{type}, #{sourceOrchestratorId}, #{sourceOrchestratorName}, #{targetOrchestratorName}, #{sourceProjectName},
         #{targetProjectName}, #{workspaceId}, #{workflowNodeSuffix}, #{microserverName}, #{exceptionInfo}, #{status}, #{isCopying}, #{successNode}, #{startTime}, #{endTime})
     </insert>
-    <update id="updateCopyStatus">
 
-
+    <update id="updateCopyStatus" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        UPDATE dss_orchestrator_copy_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="isCopying != null">`is_copying`=#{isCopying},</if>
+            <if test="endTime != null">`end_time`=#{endTime},</if>
+            <if test="successNode != null">`success_node`=#{successNode},</if>
+            <if test="status != null">`status`=#{status}</if>
+        </trim>
+        WHERE id = #{id}
     </update>
-    <update id="updateErrorMsgById">
 
 
+    <update id="updateErrorMsgById" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        UPDATE dss_orchestrator_copy_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="isCopying != null">`is_copying`=#{isCopying},</if>
+            <if test="endTime != null">`end_time`=#{endTime},</if>
+            <if test="successNode != null">`success_node`=#{successNode},</if>
+            <if test="status != null">`status`=#{status},</if>
+            <if test="exceptionInfo != null">`exception_info`=#{exceptionInfo}</if>
+        </trim>
+        WHERE id = #{id}
     </update>
 
     <select id="getOrchestratorCopyInfoList" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">

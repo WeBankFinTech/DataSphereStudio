@@ -1,16 +1,10 @@
 package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.google.common.collect.Lists;
-import com.webank.wedatasphere.dss.appconn.core.AppConn;
-import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
-import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.RequestQueryWorkFlow;
-import com.webank.wedatasphere.dss.common.protocol.ResponseImportOrchestrator;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -20,7 +14,6 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.orchestratorCopy.O
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyVo;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
-import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflow;
 import org.apache.commons.collections.CollectionUtils;
@@ -40,8 +33,6 @@ public class OrchestratorCopyJob implements Runnable{
     protected OrchestratorCopyEnv orchestratorCopyEnv;
 
     private DSSOrchestratorCopyInfo orchestratorCopyInfo;
-
-//    private static final String ORC_FRAMEWORK_NAME = ReleaseConf.ORCHESTRATOR_APPCONN_NAME.getValue();
 
     private final Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
@@ -73,12 +64,10 @@ public class OrchestratorCopyJob implements Runnable{
         orchestratorCopyInfo.setMicroserverName("Orchestrator server");
         orchestratorCopyEnv.getOrchestratorCopyJobMapper().insertOrchestratorCopyInfo(orchestratorCopyInfo);
 
-
         OrchestratorExportResult exportResult = exportOrc();
         if (exportResult != null){
             importOrc(exportResult);
         }
-
 
         orchestratorCopyInfo.setCopying(0);
         orchestratorCopyInfo.setEndTime(new Date());
@@ -133,11 +122,6 @@ public class OrchestratorCopyJob implements Runnable{
                 exportResult.setBmlResourceList(Lists.newArrayList(new BmlResource(exportOrchestratorInfo.get("resourceId").toString(), exportOrchestratorInfo.get("version").toString())));
             }
 
-//            exportResult = this.orchestratorCopyEnv.getExportService().export(username,
-//                    sourceProjectId, sourceOrchestratorId,
-//                    sourceOrchestratorVersion.getId(), sourceProjectName,
-//                    workspace.getWorkspaceName(), orchestratorCopyVo.getDssLabel(),
-//                    orchestratorCopyVo.getWorkspace());
         } catch (Exception e) {
             //保存错误信息
             String errorMsg = "ExportOrcError: " + e.getMessage();
@@ -166,12 +150,6 @@ public class OrchestratorCopyJob implements Runnable{
      */
     public void importOrc(OrchestratorExportResult exportResult) throws ErrorException {
         LOGGER.info("Begin to import orc {} for project {} and orc resource is {}", orchestratorCopyVo.getOrchestrator().getName(), orchestratorCopyVo.getSourceProjectName(), exportResult.getBmlResourceList());
-//        AppConn appConn = AppConnManager.getAppConnManager().getAppConn(ORC_FRAMEWORK_NAME);
-//        DevelopmentIntegrationStandard standard = ((OnlyDevelopmentAppConn) appConn).getOrCreateDevelopmentStandard();
-//        if (standard == null) {
-//            LOGGER.error("developStandard is null, can not do import operation");
-//            DSSExceptionUtils.dealErrorException(60096, "developStandard is null, can not do import operation", DSSFrameworkErrorException.class);
-//        }
         List<DSSLabel> dssLabelList = Collections.singletonList(orchestratorCopyVo.getDssLabel());
         DSSOrchestratorInfo orchestrator = orchestratorCopyVo.getOrchestrator();
         Workspace workspace = orchestratorCopyVo.getWorkspace();

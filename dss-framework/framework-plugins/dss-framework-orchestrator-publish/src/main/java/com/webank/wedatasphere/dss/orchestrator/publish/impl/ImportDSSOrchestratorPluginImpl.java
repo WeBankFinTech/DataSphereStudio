@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
@@ -36,6 +37,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
+import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -44,19 +46,27 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefImportService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
+import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
+import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.orchestrator.publish.impl.ExportDSSOrchestratorPluginImpl.DEFAULT_ORC_NAME;
 
@@ -67,6 +77,8 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     @Autowired
     private MetaInputService metaInputService;
     @Autowired
+    private MetaExportService metaExportService;
+    @Autowired
     private OrchestratorMapper orchestratorMapper;
     @Autowired
     private BMLService bmlService;
@@ -74,6 +86,8 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private ContextService contextService;
     @Autowired
     private OrchestratorManager orchestratorManager;
+    @Autowired
+    private WorkFlowParser workFlowParser;
 
     @Override
     public Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception {
@@ -205,7 +219,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     public Long importCopyOrchestrator(RequestImportOrchestrator requestImportOrchestrator, String nodeSuffix) throws Exception {
         String userName = requestImportOrchestrator.getUserName();
         String projectName = requestImportOrchestrator.getProjectName();
-        Long projectId = requestImportOrchestrator.getProjectId();
         String resourceId = requestImportOrchestrator.getResourceId();
         String version = requestImportOrchestrator.getBmlVersion();
         List<DSSLabel> dssLabels = requestImportOrchestrator.getDssLabels();
@@ -216,18 +229,55 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         String targetOrchestratorName = requestImportOrchestrator.getOrchestratorName();
 
         //1、下载BML的Orchestrator的导入包
-        String inputZipPath = IoUtils.generateIOPath(userName, projectName, DEFAULT_ORC_NAME + ".zip");
+        String inputZipPath = IoUtils.generateIOPath(userName, targetProjectName, DEFAULT_ORC_NAME + ".zip");
         bmlService.downloadToLocalPath(userName, resourceId, version, inputZipPath);
         String inputPath = ZipHelper.unzip(inputZipPath);
 
         //TODO 需要对zip包中json内容进行修改，每个节点都需要加上后缀，主要修改meta.txt和各flow的json，需要验证下资源文件的保存方式
+        if (StringUtils.isBlank(nodeSuffix)){
+            nodeSuffix = "copy";
+        }
+        //修改flow的json文件
         List<DSSFlow> dssFlows = metaInputService.inputFlow(inputPath);
         for (DSSFlow dssFlow: dssFlows) {
             String flowInputPath = inputPath + File.separator + dssFlow.getName();
             String flowJsonPath = flowInputPath + File.separator + dssFlow.getName() + ".json";
+            // 修改原有的json内容
             String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
+            Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(flowJson, Map.class);
+            List<DSSNode> workflowNodes = workFlowParser.getWorkFlowNodes(flowJson);
+            String finalNodeSuffix = nodeSuffix;
+            List<DSSNode> targetWorkflowNodes = workflowNodes.stream().peek(s -> {
+                String name = s.getName();
+                s.setName(name + "_" + finalNodeSuffix);
+            }).collect(Collectors.toList());
+            flowJsonObject.replace("nodes", targetWorkflowNodes);
+            String updatedJson = BDPJettyServerHelper.jacksonJson().writeValueAsString(flowJsonObject);
+            //修改文件路径
+            StringBuilder newFlowJsonPath;
+            StringBuilder newFlowInputPath;
+            if (dssFlow.getRootFlow()){
+                //采用递归的方式对children节点进行修改
+                dssFlow.setName(targetOrchestratorName);
+                dssFlow.setCreateTime(new Date());
+                dssFlow.setProjectID(targetProjectId);
+                newFlowInputPath = new StringBuilder(inputPath + File.separator + targetOrchestratorName);
+                newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + targetOrchestratorName + ".json");
+            }else {
 
+                newFlowInputPath = new StringBuilder(inputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix);
+                newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix + ".json");
+            }
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(newFlowJsonPath.toString()));
+            bufferedWriter.write(updatedJson);
+            bufferedWriter.flush();
+            bufferedWriter.close();
         }
+        //修改meta.txt
+        List<DSSFlowRelation> dssFlowRelations = metaInputService.inputFlowRelation(inputPath);
+
+
+//        metaExportService.exportFlowBaseInfo();
 
 
         //2、导入Info信息(导入冲突处理)

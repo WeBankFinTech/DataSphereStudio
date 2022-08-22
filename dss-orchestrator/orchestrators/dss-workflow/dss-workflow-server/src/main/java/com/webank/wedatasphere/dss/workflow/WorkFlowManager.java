@@ -105,6 +105,14 @@ public interface WorkFlowManager {
                                  DSSFlowImportParam dssFlowImportParam,
                                  List<DSSLabel> dssLabels) throws Exception;
 
+    /**
+     * 将工作流转化为调度系统的工作流，即发布工作流到调度系统，成为一次调度任务。
+     * 1.从db、物料包中拿到工作流的元数据信息（flowjson)
+     * 2.将工作流打包，发到调度系统
+     * @param requestConversionWorkflow
+     * @return
+     * @throws DSSErrorException
+     */
     ResponseOperateOrchestrator convertWorkflow(RequestConvertOrchestrations requestConversionWorkflow) throws DSSErrorException;
 
     /**

@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportEntity;
+import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,12 @@ public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
     /**
      * 导出Orchestrator基本信息和工作流，并放到BML中。
      */
-    BmlResource exportOrchestrator(String userName,
-                                   Long orchestratorId,
-                                   Long orcVersionId,
-                                   String projectName,
-                                   List<DSSLabel> dssLabels,
-                                   boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
+    OrchestratorExportResult exportOrchestrator(String userName,
+                                                Long orchestratorId,
+                                                Long orcVersionId,
+                                                String projectName,
+                                                List<DSSLabel> dssLabels,
+                                                boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
 
     /**
      * 批量导出多个工作流，返回在bml中的resourceId和versionId

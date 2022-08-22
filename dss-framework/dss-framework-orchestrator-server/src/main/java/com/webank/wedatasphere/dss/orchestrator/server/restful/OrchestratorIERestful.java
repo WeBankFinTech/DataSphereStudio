@@ -124,7 +124,7 @@ public class OrchestratorIERestful {
         logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
             res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,
-                    orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace);
+                    orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace).getBmlResource();
         } catch (Exception e) {
             logger.error("export orchestrator failed for ", e);
             throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());

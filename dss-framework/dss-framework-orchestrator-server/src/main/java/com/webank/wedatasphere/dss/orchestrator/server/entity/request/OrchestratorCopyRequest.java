@@ -1,5 +1,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -34,14 +36,14 @@ public class OrchestratorCopyRequest {
     @NotNull(message = "目标工作流节点后缀")
     private String workflowNodeSuffix;
 
-    private List<String> dssLabels;
+    private LabelRouteVO labels;
 
-    public List<String> getDssLabels() {
-        return dssLabels;
+    public LabelRouteVO getLabels() {
+        return labels;
     }
 
-    public void setDssLabels(List<String> dssLabels) {
-        this.dssLabels = dssLabels;
+    public void setLabels(LabelRouteVO labels) {
+        this.labels = labels;
     }
 
     public Long getSourceOrchestratorId() {
@@ -128,7 +130,7 @@ public class OrchestratorCopyRequest {
                 ", targetProjectName='" + targetProjectName + '\'' +
                 ", workspaceId=" + workspaceId +
                 ", workflowNodeSuffix='" + workflowNodeSuffix + '\'' +
-                ", dssLabels=" + dssLabels +
+                ", labels=" + labels +
                 '}';
     }
 }

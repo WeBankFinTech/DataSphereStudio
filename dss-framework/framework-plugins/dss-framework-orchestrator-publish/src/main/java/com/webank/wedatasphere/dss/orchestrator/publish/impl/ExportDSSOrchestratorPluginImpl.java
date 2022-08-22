@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -34,8 +35,10 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
+import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
+import com.webank.wedatasphere.dss.standard.app.development.operation.DevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefExportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.*;
@@ -55,6 +58,8 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import static com.webank.wedatasphere.dss.common.utils.ZipHelper.zipExportProject;
 
@@ -76,8 +81,8 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private OrchestratorManager orchestratorManager;
 
     @Override
-    public Map<String, Object> exportOrchestrator(String userName, Long orchestratorId, Long orcVersionId, String projectName,
-                                                  List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
+    public BmlResource exportOrchestrator(String userName, Long orchestratorId, Long orcVersionId, String projectName,
+                                          List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
         //1、导出info信息
         if (orcVersionId == null || orcVersionId < 0){
             LOGGER.info("orchestratorVersionId is {}.", orcVersionId);
@@ -104,16 +109,27 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             //2、导出第三方应用信息，如工作流、Visualis、Qualitis
             DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
                     dssLabels);
-            ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
-                    workspace, dssLabels, DevelopmentIntegrationStandard::getRefExportService,
+
+            BiFunction<DevelopmentOperation, DevelopmentRequestRef, ExportResponseRef> responseRefConsumer = (developmentOperation, developmentRequestRef) -> {
+                RefJobContentRequestRef requestRef = (RefJobContentRequestRef) developmentRequestRef;
+                requestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId()));
+                return ((RefExportOperation) developmentOperation).exportRef(requestRef);
+            };
+
+            Consumer<ProjectRefRequestRef> projectRefRequestRefConsumer = projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setRefProjectId(dssOrchestratorVersion.getProjectId());
+
+            ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(
+                    dssOrchestratorInfo,
+                    dssOrchestrator,
+                    userName,
+                    workspace,
+                    dssLabels,
+                    DevelopmentIntegrationStandard::getRefExportService,
                     developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
                     null,
-                    projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setRefProjectId(dssOrchestratorVersion.getProjectId()),
-                    (developmentOperation, developmentRequestRef) -> {
-                        RefJobContentRequestRef requestRef = (RefJobContentRequestRef) developmentRequestRef;
-                        requestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId()));
-                        return ((RefExportOperation) developmentOperation).exportRef(requestRef);
-                    }, "export");
+                    projectRefRequestRefConsumer,
+                    responseRefConsumer,
+                    "export");
             String resourceId = (String) responseRef.getResourceMap().get(ImportRequestRef.RESOURCE_ID_KEY);
             String version = (String) responseRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY);
             bmlService.downloadToLocalPath(userName, resourceId, version, orcExportSaveBasePath + "orc_flow.zip");
@@ -123,23 +139,29 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
             //3、打包新的zip包上传BML
             InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
-            Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
+            BmlResource uploadResult = bmlService.upload(userName, inputStream,
                     dssOrchestratorInfo.getName() + ".OrcExport", projectName);
 
             //4、判断导出后是否改变Orc的版本
             if (addOrcVersion) {
-                Long orcIncreaseVersionId = orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
+                orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
                         userName, dssOrchestratorInfo.getComment(),
                         workspace, dssOrchestratorInfo, projectName, dssLabels);
-                resultMap.put("orcVersionId", orcIncreaseVersionId);
-            } else {
-                resultMap.put("orcVersionId", orcVersionId);
             }
-            return resultMap;
+            return uploadResult;
             //4、返回BML存储信息
         } else {
             throw new DSSErrorException(90038, "该Orchestrator的版本号不存在，请检查版本号是否正确.");
         }
+    }
+
+    @Override
+    public BmlResource exportMultiOrchestrator(String userName,
+                            List<OrchestratorExportEntity> orchestrators,
+                            String projectName,
+                            List<DSSLabel> dssLabels,
+                            boolean addOrcVersion, Workspace workspace) throws DSSErrorException{
+        return null;
     }
 
     @Override

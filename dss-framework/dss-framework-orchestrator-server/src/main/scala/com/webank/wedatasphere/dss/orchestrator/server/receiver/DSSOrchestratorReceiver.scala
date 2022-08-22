@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.common.protocol.{ResponseExportOrchestrator, 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
+import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult
 import com.webank.wedatasphere.dss.orchestrator.publish.{ExportDSSOrchestratorPlugin, ImportDSSOrchestratorPlugin}
 import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
 import org.apache.linkis.rpc.{Receiver, Sender}
@@ -36,7 +37,7 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
   override def receiveAndReply(message: Any, sender: Sender): Any = message match {
 
     case reqExportOrchestrator: RequestExportOrchestrator =>
-      val dssExportOrcResource: util.Map[String, AnyRef] = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestrator(
+      val dssExportOrcResource: OrchestratorExportResult = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestrator(
         reqExportOrchestrator.getUserName,
         reqExportOrchestrator.getOrchestratorId,
         reqExportOrchestrator.getOrcVersionId,
@@ -44,8 +45,8 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
         reqExportOrchestrator.getDssLabels,
         reqExportOrchestrator.getAddOrcVersion,
         reqExportOrchestrator.getWorkspace)
-      ResponseExportOrchestrator(dssExportOrcResource.get("resourceId").toString,
-        dssExportOrcResource.get("version").toString, dssExportOrcResource.get("orcVersionId").asInstanceOf[Long]
+      ResponseExportOrchestrator(dssExportOrcResource.getBmlResource.getResourceId,
+        dssExportOrcResource.getBmlResource.getVersion, dssExportOrcResource.getOrcVersionId.asInstanceOf[Long]
       )
 
     case requestImportOrchestrator: RequestImportOrchestrator =>

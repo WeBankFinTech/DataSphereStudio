@@ -36,6 +36,7 @@ import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportEntity;
+import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
 import com.webank.wedatasphere.dss.standard.app.development.operation.DevelopmentOperation;
@@ -81,8 +82,8 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private OrchestratorManager orchestratorManager;
 
     @Override
-    public BmlResource exportOrchestrator(String userName, Long orchestratorId, Long orcVersionId, String projectName,
-                                          List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
+    public OrchestratorExportResult exportOrchestrator(String userName, Long orchestratorId, Long orcVersionId, String projectName,
+                                                       List<DSSLabel> dssLabels, boolean addOrcVersion, Workspace workspace) throws DSSErrorException {
         //1、导出info信息
         if (orcVersionId == null || orcVersionId < 0){
             LOGGER.info("orchestratorVersionId is {}.", orcVersionId);
@@ -144,11 +145,11 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
             //4、判断导出后是否改变Orc的版本
             if (addOrcVersion) {
-                orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
+                orcVersionId = orchestratorVersionIncrease(dssOrchestratorInfo.getId(),
                         userName, dssOrchestratorInfo.getComment(),
                         workspace, dssOrchestratorInfo, projectName, dssLabels);
             }
-            return uploadResult;
+            return new OrchestratorExportResult(uploadResult,String.valueOf(orcVersionId));
             //4、返回BML存储信息
         } else {
             throw new DSSErrorException(90038, "该Orchestrator的版本号不存在，请检查版本号是否正确.");

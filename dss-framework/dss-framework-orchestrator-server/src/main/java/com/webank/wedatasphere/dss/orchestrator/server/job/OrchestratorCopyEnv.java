@@ -6,7 +6,6 @@ import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
-import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,14 +18,8 @@ public class OrchestratorCopyEnv {
     @Autowired
     private OrchestratorMapper orchestratorMapper;
 
-//    @Autowired
-//    private ExportService exportService;
-
     @Autowired
     private BMLService bmlService;
-
-    @Autowired
-    private WorkFlowParser workFlowParser;
 
     @Autowired
     private OrchestratorFrameworkService orchestratorFrameworkService;
@@ -45,14 +38,6 @@ public class OrchestratorCopyEnv {
         this.orchestratorCopyJobMapper = orchestratorCopyJobMapper;
     }
 
-//    public ExportService getExportService() {
-//        return exportService;
-//    }
-//
-//    public void setExportService(ExportService exportService) {
-//        this.exportService = exportService;
-//    }
-
     public OrchestratorMapper getOrchestratorMapper() {
         return orchestratorMapper;
     }
@@ -69,13 +54,6 @@ public class OrchestratorCopyEnv {
         this.bmlService = bmlService;
     }
 
-    public WorkFlowParser getWorkFlowParser() {
-        return workFlowParser;
-    }
-
-    public void setWorkFlowParser(WorkFlowParser workFlowParser) {
-        this.workFlowParser = workFlowParser;
-    }
 
     public OrchestratorFrameworkService getOrchestratorFrameworkService() {
         return orchestratorFrameworkService;

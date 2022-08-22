@@ -197,7 +197,7 @@ public class OrchestratorCopyJob implements Runnable{
         ResponseQueryWorkflow responseQueryWorkflow = (ResponseQueryWorkflow) workflowSender.ask(requestQueryWorkFlow);
         Map<String, Object> query = orchestratorCopyEnv.getBmlService().query(username, responseQueryWorkflow.getDssFlow().getResourceId(), responseQueryWorkflow.getDssFlow().getBmlVersion());
         String flowJson = query.get("string").toString();
-        List<String> workFlowNodesJsonList = orchestratorCopyEnv.getWorkFlowParser().getWorkFlowNodesJson(flowJson);
+        List<String> workFlowNodesJsonList = DSSCommonUtils.getWorkFlowNodesJson(flowJson);
         return CollectionUtils.isEmpty(workFlowNodesJsonList);
 
     }

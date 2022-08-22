@@ -245,7 +245,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             // 修改原有的json内容
             String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
             Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(flowJson, Map.class);
-            List<DSSNode> workflowNodes = getWorkFlowNodes(flowJson);
+            List<DSSNode> workflowNodes = DSSCommonUtils.getWorkFlowNodes(flowJson);
             String finalNodeSuffix = nodeSuffix;
             List<DSSNode> targetWorkflowNodes = workflowNodes.stream().peek(s -> {
                 String name = s.getName();
@@ -367,12 +367,4 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         return dssOrchestratorVersion.getOrchestratorId();
     }
 
-    private List<DSSNode> getWorkFlowNodes(String workFlowJson) {
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
-        JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
-        List<DSSNode> dwsNodes = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
-        }.getType());
-        return dwsNodes;
-    }
 }

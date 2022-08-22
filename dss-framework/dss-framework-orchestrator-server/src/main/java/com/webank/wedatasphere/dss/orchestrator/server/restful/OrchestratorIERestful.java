@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
@@ -80,12 +81,12 @@ public class OrchestratorIERestful {
             Workspace workspace = SSOHelper.getWorkspace(req);
             //3、打包新的zip包上传BML
             logger.info("User {} begin to import orchestrator file", userName);
-            Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
+            BmlResource resultMap = bmlService.upload(userName, inputStream,
                     fileName, projectName);
             try {
                 RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
-                        projectID, resultMap.get("resourceId").toString(),
-                        resultMap.get("version").toString(), null, dssLabelList, workspace);
+                        projectID, resultMap.getResourceId(),
+                        resultMap.getVersion(), null, dssLabelList, workspace);
                 importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
             } catch (Exception e) {
                 logger.error("Import orchestrator failed for ", e);
@@ -112,7 +113,7 @@ public class OrchestratorIERestful {
         Workspace workspace = SSOHelper.getWorkspace(req);
         String userName = SecurityFilter.getLoginUsername(req);
         List<DSSLabel> dssLabelList = getDSSLabelList(labels);
-        Map<String, Object> res = null;
+        BmlResource res;
         OrchestratorVo orchestratorVo;
         if (orcVersionId != null) {
             orchestratorVo = orchestratorService.getOrchestratorVoByIdAndOrcVersionId(orchestratorId, orcVersionId);
@@ -130,8 +131,8 @@ public class OrchestratorIERestful {
         }
         if (null != res) {
             Map<String, Object> downRes = bmlService.download(userName,
-                    res.get("resourceId").toString(),
-                    res.get("version").toString());
+                    res.getResourceId(),
+                    res.getVersion());
 
             InputStream inputStream = (InputStream) downRes.get("is");
             try {

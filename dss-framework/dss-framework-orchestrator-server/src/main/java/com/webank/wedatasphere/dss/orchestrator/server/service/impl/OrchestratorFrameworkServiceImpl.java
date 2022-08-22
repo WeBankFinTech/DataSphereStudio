@@ -282,6 +282,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSProject targetProject = validateOperation(orchestratorCopyRequest.getTargetProjectId(), username);
 
         DSSOrchestratorInfo sourceOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorCopyRequest.getSourceOrchestratorId());
+        if (sourceOrchestratorInfo == null) {
+            LOGGER.error("orchestrator: {} not found.", orchestratorCopyRequest.getSourceOrchestratorName());
+            return null;
+        }
 
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo();
         orchestratorCopyVo.setOrchestrator(sourceOrchestratorInfo);

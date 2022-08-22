@@ -232,12 +232,13 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     @Override
     public ExportResponseRef exportNode(String userName, CommonAppConnNode node) {
-        return tryNodeOperation(userName, node,
+        return tryNodeOperation(userName,
+                node,
                 (appConn, dssLabels) -> getDevelopmentService(appConn, dssLabels, DevelopmentIntegrationStandard::getRefExportService),
                 developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
-                (developmentOperation, developmentRequestRef) ->
-                        ((RefExportOperation) developmentOperation).exportRef((RefJobContentRequestRef) developmentRequestRef)
-                , null, "export");
+                (developmentOperation, developmentRequestRef) -> ((RefExportOperation) developmentOperation).exportRef((RefJobContentRequestRef) developmentRequestRef),
+                null,
+                "export");
     }
 
     @Override

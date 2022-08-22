@@ -20,6 +20,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -152,9 +153,9 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         String flowZipPath = inputPath + File.separator + "orc_flow.zip";
         //3、上传工作流zip包到bml
         InputStream inputStream = bmlService.readLocalResourceFile(userName, flowZipPath);
-        Map<String, Object> resultMap = bmlService.upload(userName, inputStream, importDssOrchestratorInfo.getName() + "_orc_flow.zip", projectName);
-        String orcResourceId = resultMap.get("resourceId").toString();
-        String orcBmlVersion = resultMap.get("version").toString();
+        BmlResource resultMap = bmlService.upload(userName, inputStream, importDssOrchestratorInfo.getName() + "_orc_flow.zip", projectName);
+        String orcResourceId = resultMap.getResourceId();
+        String orcBmlVersion = resultMap.getVersion();
 
         //4、导入版本Version信息
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
@@ -306,10 +307,10 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
         //3、上传工作流zip包到bml
         InputStream inputStream = bmlService.readLocalResourceFile(userName, flowZipPath);
-        Map<String, Object> resultMap = bmlService.upload(userName, inputStream, importDssOrchestratorInfo.getName() + "_orc_flow.zip", targetProjectName);
+        BmlResource resultMap = bmlService.upload(userName, inputStream, importDssOrchestratorInfo.getName() + "_orc_flow.zip", targetProjectName);
 
-        String orcResourceId = resultMap.get("resourceId").toString();
-        String orcBmlVersion = resultMap.get("version").toString();
+        String orcResourceId = resultMap.getResourceId();
+        String orcBmlVersion = resultMap.getVersion();
 
         //4、导入版本Version信息
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();

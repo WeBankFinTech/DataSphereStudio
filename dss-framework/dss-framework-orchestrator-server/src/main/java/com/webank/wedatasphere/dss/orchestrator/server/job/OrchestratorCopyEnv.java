@@ -17,8 +17,8 @@ public class OrchestratorCopyEnv {
     @Autowired
     private OrchestratorMapper orchestratorMapper;
 
-    @Autowired
-    private ExportService exportService;
+//    @Autowired
+//    private ExportService exportService;
 
     @Autowired
     private BMLService bmlService;
@@ -43,13 +43,13 @@ public class OrchestratorCopyEnv {
         this.orchestratorCopyJobMapper = orchestratorCopyJobMapper;
     }
 
-    public ExportService getExportService() {
-        return exportService;
-    }
-
-    public void setExportService(ExportService exportService) {
-        this.exportService = exportService;
-    }
+//    public ExportService getExportService() {
+//        return exportService;
+//    }
+//
+//    public void setExportService(ExportService exportService) {
+//        this.exportService = exportService;
+//    }
 
     public OrchestratorMapper getOrchestratorMapper() {
         return orchestratorMapper;

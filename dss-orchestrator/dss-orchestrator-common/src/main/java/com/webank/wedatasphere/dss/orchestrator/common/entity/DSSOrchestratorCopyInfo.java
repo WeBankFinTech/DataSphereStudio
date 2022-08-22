@@ -169,8 +169,8 @@ public class DSSOrchestratorCopyInfo {
         isCopying = copying;
     }
 
-    public List<String> getSuccessNode() {
-        return successNode;
+    public String getSuccessNode() {
+        return successNode == null ? null : String.join(",", successNode);
     }
 
     public void setSuccessNode(List<String> successNode) {

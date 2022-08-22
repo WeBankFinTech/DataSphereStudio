@@ -109,7 +109,7 @@ public class OrchestratorCopyJob implements Runnable {
         }
 
         //如果含有节点的工作流
-        OrchestratorExportResult exportResult = null;
+        OrchestratorExportResult exportResult = new OrchestratorExportResult();
         try {
             //map中包含的key有resourceId, version, orcVersionId
             BmlResource exportOrchestratorInfo = orchestratorCopyEnv.getExportDSSOrchestratorPlugin()

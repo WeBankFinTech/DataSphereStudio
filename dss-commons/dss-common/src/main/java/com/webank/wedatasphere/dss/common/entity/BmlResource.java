@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.orchestrator.server.entity.orchestratorCopy;
+package com.webank.wedatasphere.dss.common.entity;
 
 public class BmlResource {
 
@@ -9,6 +9,9 @@ public class BmlResource {
     public BmlResource(String resourceId, String version) {
         this.resourceId = resourceId;
         this.version = version;
+    }
+
+    public BmlResource() {
     }
 
     public String getResourceId() {

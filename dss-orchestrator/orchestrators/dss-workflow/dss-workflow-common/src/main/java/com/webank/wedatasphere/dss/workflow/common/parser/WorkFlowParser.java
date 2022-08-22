@@ -40,6 +40,12 @@ public interface WorkFlowParser {
 
     String updateFlowJsonWithMap(String workFlowJson, Map<String, Object> props) throws JsonProcessingException;
 
+    /**
+     * 获取工作流中的某个字段
+     * @param workFlowJson 工作流大json
+     * @param key 字段名
+     * @return 字段值
+     */
     String getValueWithKey(String workFlowJson, String key) throws IOException;
 
 }

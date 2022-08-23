@@ -97,14 +97,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Autowired
     private OrchestratorCopyJobMapper orchestratorCopyJobMapper;
     @Autowired
-    private ExportDSSOrchestratorPlugin exportDSSOrchestratorPlugin;
-    @Autowired
-    private ImportDSSOrchestratorPlugin importDSSOrchestratorPlugin;
-    @Autowired
-    private OrchestratorService orchestratorService;
-    @Autowired
     private OrchestratorCopyEnv orchestratorCopyEnv;
-
 
     private final ThreadFactory orchestratorCopyThreadFactory = new ThreadFactoryBuilder()
             .setNameFormat("dss-orchestrator—copy-thread-%d")
@@ -113,7 +106,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     private final ExecutorService orchestratorCopyThreadPool = new ThreadPoolExecutor(5, 200, 0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(1024), orchestratorCopyThreadFactory, new ThreadPoolExecutor.AbortPolicy());
-
 
     /**
      * 1.拿到的dss orchestrator的appconn
@@ -274,7 +266,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
     @Override
-    public CommonOrchestratorVo copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
+    public void copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
         //校验编排名是可用
         newOrchestratorService.isExistSameNameBeforeCreate(workspace.getWorkspaceId(), orchestratorCopyRequest.getTargetProjectId(), orchestratorCopyRequest.getTargetOrchestratorName());
         //判断用户对项目是否有权限
@@ -284,7 +276,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSOrchestratorInfo sourceOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorCopyRequest.getSourceOrchestratorId());
         if (sourceOrchestratorInfo == null) {
             LOGGER.error("orchestrator: {} not found.", orchestratorCopyRequest.getSourceOrchestratorName());
-            return null;
         }
 
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo();
@@ -303,10 +294,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);
         orchestratorCopyJob.setOrchestratorCopyEnv(orchestratorCopyEnv);
-
         orchestratorCopyThreadPool.submit(orchestratorCopyJob);
-
-        return null;
     }
 
     @Override

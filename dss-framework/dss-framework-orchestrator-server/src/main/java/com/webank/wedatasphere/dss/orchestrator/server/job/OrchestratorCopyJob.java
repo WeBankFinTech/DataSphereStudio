@@ -45,7 +45,6 @@ public class OrchestratorCopyJob implements Runnable {
         }
     }
 
-
     private void copyOrchestrator() throws Exception {
         //开始写入复制信息到编排复制任务历史表
         orchestratorCopyInfo.setId(UUID.randomUUID().toString());
@@ -73,7 +72,6 @@ public class OrchestratorCopyJob implements Runnable {
         orchestratorCopyInfo.setSuccessNode(Lists.newArrayList("All"));
         orchestratorCopyInfo.setStatus(1);
         orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateCopyStatus(orchestratorCopyInfo);
-
     }
 
     private OrchestratorExportResult exportOrc() throws Exception {
@@ -106,7 +104,7 @@ public class OrchestratorCopyJob implements Runnable {
 
             return null;
         }
-        //如果含有节点的工作流
+        //如果是含有节点的工作流
         try {
              return orchestratorCopyEnv.getExportDSSOrchestratorPlugin()
                     .exportOrchestrator(username, sourceOrchestratorId, sourceOrchestratorVersion.getId(),

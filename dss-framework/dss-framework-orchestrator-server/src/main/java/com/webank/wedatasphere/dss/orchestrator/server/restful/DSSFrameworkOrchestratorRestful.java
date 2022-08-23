@@ -138,13 +138,11 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("当前工作流正在被复制，不允许再次复制");
         }
 
-        CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace);
-//        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
-//                orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.COPY,orchestratorCopyRequest);
+        orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorCopyRequest.getSourceOrchestratorId(), orchestratorCopyRequest.getSourceOrchestratorName(), OperateTypeEnum.COPY,orchestratorCopyRequest);
 
         return Message.ok("复制工作流已经开始，正在后台复制中...").data("targetOrchestratorId", orchestratorCopyRequest.getTargetOrchestratorName());
-
-//        return Message.ok("复制" + orchestratorVo.getType() + "已经开始，" + orchestratorVo.getType() + "正在后台复制中...").data("targetOrchestratorId", orchestratorCopyRequest.getTargetOrchestratorName());
     }
 
     /**

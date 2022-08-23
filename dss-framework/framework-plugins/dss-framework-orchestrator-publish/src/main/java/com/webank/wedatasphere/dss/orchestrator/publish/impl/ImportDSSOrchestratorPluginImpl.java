@@ -246,20 +246,17 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             flowJsonObject.replace("nodes", targetWorkflowNodes);
             String updatedJson = DSSCommonUtils.COMMON_GSON.toJson(flowJsonObject);
             //修改json文件保存路径
-            StringBuilder newFlowJsonPath;
-            StringBuilder newFlowInputPath;
-            if (dssFlow.getRootFlow()) {
-                newFlowInputPath = new StringBuilder(sourceProjectDir + File.separator + targetOrchestratorName);
-                newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + targetOrchestratorName + ".json");
-            }else {
-                newFlowInputPath = new StringBuilder(sourceProjectDir + File.separator + dssFlow.getName() + "_" + nodeSuffix);
-                newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix + ".json");
-            }
-            FileUtils.forceMkdir(new File(newFlowInputPath.toString()));
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(newFlowJsonPath.toString()));
+            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(flowJsonPath));
             bufferedWriter.write(updatedJson);
             bufferedWriter.flush();
             bufferedWriter.close();
+            if (dssFlow.getRootFlow()) {
+                FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + targetOrchestratorName + ".json"));
+                FileUtils.moveDirectory(new File(flowInputPath), new File(inputPath + File.separator + targetOrchestratorName));
+            } else {
+                FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + dssFlow.getName() + ".json"));
+                FileUtils.moveDirectory(new File(flowInputPath), new File(inputPath + File.separator + dssFlow.getName()));
+            }
         }
         //修改meta.txt并保存
         modifyFlowMeta(dssFlows, targetOrchestratorName, targetProjectId, nodeSuffix);

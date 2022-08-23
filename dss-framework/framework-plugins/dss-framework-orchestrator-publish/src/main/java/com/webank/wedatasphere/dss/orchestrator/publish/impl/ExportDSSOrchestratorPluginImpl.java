@@ -110,13 +110,13 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             //2、导出第三方应用信息，如工作流、Visualis、Qualitis
             DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
                     dssLabels);
-
+            //定义操作结果处理器
             BiFunction<DevelopmentOperation, DevelopmentRequestRef, ExportResponseRef> responseRefConsumer = (developmentOperation, developmentRequestRef) -> {
                 RefJobContentRequestRef requestRef = (RefJobContentRequestRef) developmentRequestRef;
                 requestRef.setRefJobContent(MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssOrchestratorVersion.getAppId()));
                 return ((RefExportOperation) developmentOperation).exportRef(requestRef);
             };
-
+            //定义项目相关的处理器，处着编排的RequestRef的项目相关信息
             Consumer<ProjectRefRequestRef> projectRefRequestRefConsumer = projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setRefProjectId(dssOrchestratorVersion.getProjectId());
 
             ExportResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(
@@ -125,7 +125,9 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                     userName,
                     workspace,
                     dssLabels,
+                    //指明DevelopmentService是RefExportService
                     DevelopmentIntegrationStandard::getRefExportService,
+                    //指明operation是ExportOperation
                     developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
                     null,
                     projectRefRequestRefConsumer,

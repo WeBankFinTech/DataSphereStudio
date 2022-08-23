@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.*;
 
 /**
+ * operation工具
  * @author enjoyyin
  * @date 2022-03-12
  * @since 0.5.0
@@ -25,6 +26,24 @@ public class DevelopmentOperationUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DevelopmentOperationUtils.class);
 
+    /**
+     * 执行operation。
+     * 先通过getDevelopmentService和getDevelopmentOperation获取operation，在根据operation中的requestRef不同实现以及不同的
+     * RequestRefConsumer先对requestRef做处理，最后执行operation得到 ResponseRef结果后返回
+     *
+     * @param getDevelopmentService DevelopmentService获取器
+     * @param getDevelopmentOperation operation获取器
+     * @param jobContentRequestRefConsumer  对RequestRef的jobContent处理器。如果处理器不为空，且requestRef是DSSJobContentRequestRef的话，会本执行此处理器
+     * @param refJobContentRequestRefConsumer 对RequestRef的refJobContent处理器。如果处理不为空，且requestRef是RefJobContentRequestRef的话，会执行此处理器
+     * @param contextRequestRefConsumer 对RequestRef的context处理器。如果处理不为空，且requestRef是DSSContextRequestReff的话，会执行此处理器
+     * @param projectRefRequestRefConsumer 对RequestRef的project处理器。如果处理不为空，且requestRef是ProjectRefRequestRef的话，会执行此处理器
+     * @param requestRefOperationFunction operation的执行器，由外部传入
+     * @param responseRefConsumer
+     * @param errorMsg
+     * @return
+     * @param <K>
+     * @param <V>
+     */
     public static <K extends DevelopmentRequestRef, V extends ResponseRef> V tryDevelopmentOperation(Supplier<DevelopmentService> getDevelopmentService,
                                                                                 Function<DevelopmentService, DevelopmentOperation> getDevelopmentOperation,
                                                                                 Consumer<DSSJobContentRequestRef> jobContentRequestRefConsumer,

@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
@@ -236,18 +237,18 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             // 修改原有的json内容
             String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
             Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(flowJson, Map.class);
-            List<DSSNode> workflowNodes = DSSCommonUtils.getWorkFlowNodes(flowJson);
+            List<DSSNodeDefault> workflowNodes = DSSCommonUtils.getWorkFlowNodes(flowJson);
             String finalNodeSuffix = nodeSuffix;
-            List<DSSNode> targetWorkflowNodes = workflowNodes.stream().peek(s -> {
+            List<DSSNodeDefault> targetWorkflowNodes = workflowNodes.stream().peek(s -> {
                 String name = s.getName();
                 s.setName(name + "_" + finalNodeSuffix);
             }).collect(Collectors.toList());
             flowJsonObject.replace("nodes", targetWorkflowNodes);
-            String updatedJson = BDPJettyServerHelper.jacksonJson().writeValueAsString(flowJsonObject);
+            String updatedJson = DSSCommonUtils.COMMON_GSON.toJson(flowJsonObject);
             //修改json文件保存路径
             StringBuilder newFlowJsonPath;
             StringBuilder newFlowInputPath;
-            if (dssFlow.getRootFlow()){
+            if (dssFlow.getRootFlow()) {
                 newFlowInputPath = new StringBuilder(sourceProjectDir + File.separator + targetOrchestratorName);
                 newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + targetOrchestratorName + ".json");
             }else {

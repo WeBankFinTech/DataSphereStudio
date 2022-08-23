@@ -225,10 +225,13 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         if (StringUtils.isBlank(nodeSuffix)){
             nodeSuffix = "copy";
         }
+        String flowZipPath = inputPath + File.separator + "orc_flow.zip";
+        ZipHelper.unzip(flowZipPath);
+        String sourceProjectDir = inputPath + File.separator + projectName;
         //修改flow的json文件
-        List<DSSFlow> dssFlows = metaInputService.inputFlow(inputPath);
+        List<DSSFlow> dssFlows = metaInputService.inputFlow(sourceProjectDir);
         for (DSSFlow dssFlow: dssFlows) {
-            String flowInputPath = inputPath + File.separator + dssFlow.getName();
+            String flowInputPath = sourceProjectDir + File.separator + dssFlow.getName();
             String flowJsonPath = flowInputPath + File.separator + dssFlow.getName() + ".json";
             // 修改原有的json内容
             String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
@@ -245,12 +248,13 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             StringBuilder newFlowJsonPath;
             StringBuilder newFlowInputPath;
             if (dssFlow.getRootFlow()){
-                newFlowInputPath = new StringBuilder(inputPath + File.separator + targetOrchestratorName);
+                newFlowInputPath = new StringBuilder(sourceProjectDir + File.separator + targetOrchestratorName);
                 newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + targetOrchestratorName + ".json");
             }else {
-                newFlowInputPath = new StringBuilder(inputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix);
+                newFlowInputPath = new StringBuilder(sourceProjectDir + File.separator + dssFlow.getName() + "_" + nodeSuffix);
                 newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix + ".json");
             }
+            FileUtils.forceMkdir(new File(newFlowInputPath.toString()));
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(newFlowJsonPath.toString()));
             bufferedWriter.write(updatedJson);
             bufferedWriter.flush();
@@ -258,8 +262,8 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         }
         //修改meta.txt并保存
         modifyFlowMeta(dssFlows, targetOrchestratorName, targetProjectId, nodeSuffix);
-        List<DSSFlowRelation> dssFlowRelations = metaInputService.inputFlowRelation(inputPath);
-        metaExportService.exportFlowBaseInfo(dssFlows, dssFlowRelations, inputPath);
+        List<DSSFlowRelation> dssFlowRelations = metaInputService.inputFlowRelation(sourceProjectDir);
+        metaExportService.exportFlowBaseInfo(dssFlows, dssFlowRelations, sourceProjectDir);
 
         //2、导入Info信息(导入冲突处理)
         List<DSSOrchestratorInfo> dssOrchestratorInfos = metaInputService.importOrchestrator(inputPath);
@@ -283,13 +287,11 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             importDssOrchestratorInfo.setOrchestratorWay(",pom_work_flow_DAG,");
         }
 
-        String flowZipPath = inputPath + File.separator + "orc_flow.zip";
-
         // rename orc_flow.zip from source projectName to target projectName.
         FileUtils.delete(new File(flowZipPath));
         FileUtils.moveDirectory(new File(inputPath + File.separator + projectName), new File(inputPath + File.separator + targetProjectName));
         ZipHelper.zip(inputPath + File.separator + targetProjectName);
-        FileUtils.moveFile(new File(inputPath + File.separator + targetProjectName), new File(flowZipPath));
+        FileUtils.moveFile(new File(inputPath + File.separator + targetProjectName + ".zip"), new File(flowZipPath));
 
 
         //3、上传工作流zip包到bml
@@ -356,17 +358,16 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     }
 
     private void modifyFlowMeta(List<DSSFlow> dssFlows, String targetOrchestratorName, Long targetProjectId, String flowNodeSuffix) {
-        for (DSSFlow dssFlow: dssFlows) {
+        for (DSSFlow dssFlow : dssFlows) {
             dssFlow.setCreateTime(new Date());
             dssFlow.setProjectID(targetProjectId);
-            if (dssFlow.getChildren() != null){
+            if (dssFlow.getChildren() != null) {
                 modifyFlowMeta((List<DSSFlow>) dssFlow.getChildren(), null, targetProjectId, flowNodeSuffix);
+            }
+            if (dssFlow.getRootFlow()) {
+                dssFlow.setName(targetOrchestratorName);
             } else {
-                if (dssFlow.getRootFlow()) {
-                    dssFlow.setName(targetOrchestratorName);
-                } else {
-                    dssFlow.setName(dssFlow.getName() + "_" + flowNodeSuffix);
-                }
+                dssFlow.setName(dssFlow.getName() + "_" + flowNodeSuffix);
             }
         }
     }

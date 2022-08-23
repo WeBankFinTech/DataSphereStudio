@@ -45,6 +45,14 @@ public class OrchestratorLoaderUtils {
         orchestratorLoaderUtils = this;
     }
 
+    /**
+     * 根据标签和编排资源配置，解析出合适的AppInstance，并得到编排对应实现（比如工作流实现）的DevelopmentIntegrationStandard。
+     * 以pair的方式返回AppInstance和的DevelopmentIntegrationStandard
+     * @param dssOrchestrator 编排资源
+     * @param dssLabels 标签
+     * @return AppInstance和的DevelopmentIntegrationStandard 对
+     * @throws NoSuchAppInstanceException 如果编排不存在实现实例
+     */
     public static ImmutablePair<AppInstance, DevelopmentIntegrationStandard> getOrchestratorDevelopmentStandard(
             DSSOrchestrator dssOrchestrator, List<DSSLabel> dssLabels) throws NoSuchAppInstanceException {
         AppConn orchestratorAppConn = dssOrchestrator.getAppConn();

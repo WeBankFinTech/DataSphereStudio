@@ -28,6 +28,9 @@ import java.util.List;
 @Component
 class DefaultLinkedAppConnResolver implements LinkedAppConnResolver  {
 
+    /**
+     * 当前实现是获取所有系统中注册过的appconn，并没有根据条件做过滤
+     */
     @Override
     public List<AppConn> resolveAppConnByUser(String userName, String workspaceName, String typeName) {
         //todo 后面可以使用数据库表来定义用户可以加载的AppConn.

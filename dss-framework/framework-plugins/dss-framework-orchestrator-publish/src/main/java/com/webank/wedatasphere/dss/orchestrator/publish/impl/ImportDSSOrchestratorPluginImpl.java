@@ -54,6 +54,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
@@ -61,10 +62,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -303,7 +301,15 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             importDssOrchestratorInfo.setOrchestratorWay(",pom_work_flow_DAG,");
         }
 
+
         String flowZipPath = inputPath + File.separator + "orc_flow.zip";
+
+        // rename orc_flow.zip from source projectName to target projectName.
+        FileUtils.delete(new File(flowZipPath));
+        FileUtils.moveDirectory(new File(inputPath + File.separator + projectName), new File(inputPath + File.separator + targetProjectName));
+        ZipHelper.zip(inputPath + File.separator + targetProjectName);
+        FileUtils.moveFile(new File(inputPath + File.separator + targetProjectName), new File(flowZipPath));
+
 
         //3、上传工作流zip包到bml
         InputStream inputStream = bmlService.readLocalResourceFile(userName, flowZipPath);

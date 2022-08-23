@@ -16,13 +16,8 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
-import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
@@ -31,7 +26,6 @@ import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
@@ -43,22 +37,17 @@ import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlu
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefImportService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
-import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
-import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -252,18 +241,13 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             }).collect(Collectors.toList());
             flowJsonObject.replace("nodes", targetWorkflowNodes);
             String updatedJson = BDPJettyServerHelper.jacksonJson().writeValueAsString(flowJsonObject);
-            //修改文件路径
+            //修改json文件保存路径
             StringBuilder newFlowJsonPath;
             StringBuilder newFlowInputPath;
             if (dssFlow.getRootFlow()){
-                //采用递归的方式对children节点进行修改
-                dssFlow.setName(targetOrchestratorName);
-                dssFlow.setCreateTime(new Date());
-                dssFlow.setProjectID(targetProjectId);
                 newFlowInputPath = new StringBuilder(inputPath + File.separator + targetOrchestratorName);
                 newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + targetOrchestratorName + ".json");
             }else {
-
                 newFlowInputPath = new StringBuilder(inputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix);
                 newFlowJsonPath = new StringBuilder(newFlowInputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix + ".json");
             }
@@ -272,12 +256,10 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             bufferedWriter.flush();
             bufferedWriter.close();
         }
-        //修改meta.txt
+        //修改meta.txt并保存
+        modifyFlowMeta(dssFlows, targetOrchestratorName, targetProjectId, nodeSuffix);
         List<DSSFlowRelation> dssFlowRelations = metaInputService.inputFlowRelation(inputPath);
-
-
-//        metaExportService.exportFlowBaseInfo();
-
+        metaExportService.exportFlowBaseInfo(dssFlows, dssFlowRelations, inputPath);
 
         //2、导入Info信息(导入冲突处理)
         List<DSSOrchestratorInfo> dssOrchestratorInfos = metaInputService.importOrchestrator(inputPath);
@@ -300,7 +282,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         if (StringUtils.isEmpty(importDssOrchestratorInfo.getOrchestratorWay())) {
             importDssOrchestratorInfo.setOrchestratorWay(",pom_work_flow_DAG,");
         }
-
 
         String flowZipPath = inputPath + File.separator + "orc_flow.zip";
 
@@ -374,4 +355,19 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         return dssOrchestratorVersion.getOrchestratorId();
     }
 
+    private void modifyFlowMeta(List<DSSFlow> dssFlows, String targetOrchestratorName, Long targetProjectId, String flowNodeSuffix) {
+        for (DSSFlow dssFlow: dssFlows) {
+            dssFlow.setCreateTime(new Date());
+            dssFlow.setProjectID(targetProjectId);
+            if (dssFlow.getChildren() != null){
+                modifyFlowMeta((List<DSSFlow>) dssFlow.getChildren(), null, targetProjectId, flowNodeSuffix);
+            } else {
+                if (dssFlow.getRootFlow()) {
+                    dssFlow.setName(targetOrchestratorName);
+                } else {
+                    dssFlow.setName(dssFlow.getName() + "_" + flowNodeSuffix);
+                }
+            }
+        }
+    }
 }

@@ -79,11 +79,11 @@ public class DSSCommonUtils {
         throw new DSSRuntimeException(90322, "parse the return of externalSystem failed, the value is null.");
     }
 
-    public static List<DSSNode> getWorkFlowNodes(String workFlowJson) {
+    public static List<DSSNodeDefault> getWorkFlowNodes(String workFlowJson) {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
-        List<DSSNode> dwsNodes = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
+        List<DSSNodeDefault> dwsNodes = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
         }.getType());
         return dwsNodes;
     }

@@ -303,7 +303,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
         dssOrchestratorVersion.setAppId(null);
         dssOrchestratorVersion.setComment("orchestrator copy");
-        //这个Id是不是需要写入后importDssOrchestratorInfo生成的自增id
         dssOrchestratorVersion.setOrchestratorId(importDssOrchestratorInfo.getId());
         dssOrchestratorVersion.setContent("");
         dssOrchestratorVersion.setProjectId(targetProjectId);
@@ -320,8 +319,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             dssOrchestratorVersion.setVersion(OrchestratorUtils.generateNewVersion());
         }
 
-        //TODO 所有信息都要转换成target信息
-        //5、生成上下文ContextId
+        //5、生成上下文ContextId，所有信息都要转换成target信息
         String contextId = contextService.createContextID(workspace.getWorkspaceName(), targetProjectName, importDssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
         dssOrchestratorVersion.setFormatContextId(contextId);
         LOGGER.info("Create a new ContextId {} for copy a new orchestrator.", contextId);
@@ -345,7 +343,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         String orchestrationContent = (String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY);
 
         orchestratorMapper.addOrchestrator(importDssOrchestratorInfo);
-
+        //此处需要获取ID后再写入
         dssOrchestratorVersion.setOrchestratorId(importDssOrchestratorInfo.getId());
         dssOrchestratorVersion.setUpdateTime(new Date());
         dssOrchestratorVersion.setAppId(orchestrationId);

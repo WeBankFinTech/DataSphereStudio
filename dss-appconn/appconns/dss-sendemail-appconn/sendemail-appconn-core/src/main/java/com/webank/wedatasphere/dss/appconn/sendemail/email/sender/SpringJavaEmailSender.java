@@ -98,10 +98,12 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
             if (StringUtils.isNotBlank(email.getBcc())) {
                 messageHelper.setBcc(email.getBcc());
             }
+            messageHelper.setText(email.getContent(), true);
             for (Attachment attachment : email.getAttachments()) {
+                messageHelper.addInline(attachment.getName(), new ByteArrayDataSource(Base64.getMimeDecoder().decode(attachment.getBase64Str()), attachment.getMediaType()));
                 messageHelper.addAttachment(attachment.getName(), new ByteArrayDataSource(Base64.getMimeDecoder().decode(attachment.getBase64Str()), attachment.getMediaType()));
             }
-            messageHelper.setText(email.getContent(), true);
+
         } catch (Exception e) {
             logger.error("Send mail failed", e);
         }

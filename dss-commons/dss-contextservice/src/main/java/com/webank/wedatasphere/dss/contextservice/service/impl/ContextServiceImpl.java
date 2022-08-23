@@ -179,9 +179,9 @@ public class ContextServiceImpl implements ContextService {
                             saveContextResource(contextIDStr, nodeRes, contextClient,
                                     CSCommonUtils.NODE_PREFIX, json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString());
                         }
-                        if (json.has(DSSCommonUtils.NODE_PROP_NAME)) {
-                            JsonObject nodePropObj = json.get(DSSCommonUtils.NODE_PROP_NAME).getAsJsonObject();
-                        }
+//                        if (json.has(DSSCommonUtils.NODE_PROP_NAME)) {
+//                            JsonObject nodePropObj = json.get(DSSCommonUtils.NODE_PROP_NAME).getAsJsonObject();
+//                        }
                     }
                 }
                 // 保存info信息

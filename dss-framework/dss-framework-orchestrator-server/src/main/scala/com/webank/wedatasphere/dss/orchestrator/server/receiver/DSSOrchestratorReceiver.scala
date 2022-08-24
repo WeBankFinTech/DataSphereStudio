@@ -46,7 +46,7 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
         reqExportOrchestrator.getAddOrcVersion,
         reqExportOrchestrator.getWorkspace)
       ResponseExportOrchestrator(dssExportOrcResource.getBmlResource.getResourceId,
-        dssExportOrcResource.getBmlResource.getVersion, dssExportOrcResource.getOrcVersionId.asInstanceOf[Long]
+        dssExportOrcResource.getBmlResource.getVersion, dssExportOrcResource.getOrcVersionId.toLong
       )
 
     case requestImportOrchestrator: RequestImportOrchestrator =>

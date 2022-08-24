@@ -121,11 +121,10 @@ public class OrchestratorCopyJob implements Runnable {
             orchestratorCopyInfo.setStatus(0);
             orchestratorCopyInfo.setExceptionInfo(errorMsg);
             orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateErrorMsgById(orchestratorCopyInfo);
-
             LOGGER.error("ExportOrcError: sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
                     sourceProjectName, targetProjectName, orchestratorInfo.getName(), targetOrchestratorName, e);
+            throw new RuntimeException("Export Orc error when copying orc.", e);
         }
-        return null;
     }
 
     /**
@@ -166,10 +165,9 @@ public class OrchestratorCopyJob implements Runnable {
             orchestratorCopyInfo.setExceptionInfo(errorMsg);
 
             orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateErrorMsgById(orchestratorCopyInfo);
-
             LOGGER.error("ImportOrcError: sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
                     orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), orchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(), e);
-
+            throw new RuntimeException("Import Orc error when copying orc.", e);
         }
 
         LOGGER.info("Import orchestrator {} of project {} to orchestrator {} of project {}", orchestrator.getName(), orchestratorCopyVo.getSourceProjectName(),

@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.io.input.impl;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -260,9 +261,9 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         if (resourceList != null) {
             resourceList.forEach(resource -> {
                 InputStream resourceInputStream = readFlowResource(userName, resource, flowResourcePath);
-                Map<String, Object> bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
-                resource.setResourceId(bmlReturnMap.get("resourceId").toString());
-                resource.setVersion(bmlReturnMap.get("version").toString());
+                BmlResource bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
+                resource.setResourceId(bmlReturnMap.getResourceId());
+                resource.setVersion(bmlReturnMap.getVersion());
             });
             if (resourceList.size() == 0) {
                 return flowJson;

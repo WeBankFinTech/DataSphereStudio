@@ -16,12 +16,11 @@
 
 package com.webank.wedatasphere.dss.workflow.receiver
 
-import java.util
-
+import com.webank.wedatasphere.dss.common.entity.BmlResource
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations}
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
@@ -57,14 +56,14 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       new ResponseDeleteWorkflow(JobStatus.Success)
 
     case reqExportFlow: RequestExportWorkflow =>
-      val dssExportFlowResource: util.Map[String, AnyRef] = workflowManager.exportWorkflow(
+      val dssExportFlowResource: BmlResource = workflowManager.exportWorkflow(
         reqExportFlow.userName,
         reqExportFlow.flowID,
         reqExportFlow.projectId,
         reqExportFlow.projectName,
         DSSCommonUtils.COMMON_GSON.fromJson(reqExportFlow.workspaceStr, classOf[Workspace]),
         reqExportFlow.dssLabelList)
-      ResponseExportWorkflow(dssExportFlowResource.get("resourceId").toString, dssExportFlowResource.get("version").toString,
+      ResponseExportWorkflow(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
         reqExportFlow.flowID)
 
     case requestImportWorkflow: RequestImportWorkflow =>

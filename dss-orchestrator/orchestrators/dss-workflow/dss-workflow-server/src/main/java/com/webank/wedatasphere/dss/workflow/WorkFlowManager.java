@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.workflow;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
@@ -91,13 +92,23 @@ public interface WorkFlowManager {
     void deleteWorkflow(String userName,
                         Long flowID) throws DSSErrorException;
 
-
-    Map<String, Object> exportWorkflow(String userName,
-                                       Long flowID,
-                                       Long dssProjectId,
-                                       String projectName,
-                                       Workspace workspace,
-                                       List<DSSLabel> dssLabels) throws Exception;
+    /**
+     * 导出工作流
+     * @param userName
+     * @param flowID
+     * @param dssProjectId
+     * @param projectName
+     * @param workspace
+     * @param dssLabels
+     * @return 导出的工作流，以Bml资源的形式返回
+     * @throws Exception
+     */
+    BmlResource exportWorkflow(String userName,
+                               Long flowID,
+                               Long dssProjectId,
+                               String projectName,
+                               Workspace workspace,
+                               List<DSSLabel> dssLabels) throws Exception;
 
     List<DSSFlow> importWorkflow(String userName,
                                  String resourceId,

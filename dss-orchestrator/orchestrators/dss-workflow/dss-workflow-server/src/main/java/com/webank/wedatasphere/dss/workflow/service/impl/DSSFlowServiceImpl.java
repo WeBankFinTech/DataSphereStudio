@@ -21,6 +21,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
@@ -453,9 +454,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             bmlService.downloadToLocalPath(userName, resource.getResourceId(), resource.getVersion(), flowResourcePath);
             //重新上传resource
             InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, flowResourcePath);
-            Map<String, Object> bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
-            resource.setResourceId(bmlReturnMap.get("resourceId").toString());
-            resource.setVersion(bmlReturnMap.get("version").toString());
+            BmlResource bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
+            resource.setResourceId(bmlReturnMap.getResourceId());
+            resource.setVersion(bmlReturnMap.getVersion());
         });
         //更新flowJson的resources
         return workFlowParser.updateFlowJsonWithKey(flowJson, "resources", resourceList);

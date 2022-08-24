@@ -33,9 +33,11 @@ public interface OrchestratorFrameworkService {
 
     CommonOrchestratorVo deleteOrchestrator(String username, OrchestratorDeleteRequest orchestratorDeleteRequest, Workspace workspace) throws Exception;
 
-    void copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception;
+    String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception;
 
     List<OrchestratorCopyHistory> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception;
 
     Boolean getOrchestratorCopyStatus(Long sourceOrchestratorId);
+
+    DSSOrchestratorCopyInfo getOrchestratorCopyInfoById(String copyInfoId);
 }

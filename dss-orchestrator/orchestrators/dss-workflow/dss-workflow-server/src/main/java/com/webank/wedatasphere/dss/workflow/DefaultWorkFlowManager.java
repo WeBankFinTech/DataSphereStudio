@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.workflow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -173,9 +174,9 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public Map<String, Object> exportWorkflow(String userName, Long flowId, Long dssProjectId,
-                                              String projectName, Workspace workspace,
-                                              List<DSSLabel> dssLabels) throws Exception {
+    public BmlResource exportWorkflow(String userName, Long flowId, Long dssProjectId,
+                                      String projectName, Workspace workspace,
+                                      List<DSSLabel> dssLabels) throws Exception {
         DSSFlow dssFlow = flowService.getFlowByID(flowId);
         String exportPath = workFlowExportService.exportFlowInfo(dssProjectId, projectName, flowId, userName, workspace, dssLabels);
         InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);

@@ -35,7 +35,6 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
-import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
@@ -156,15 +155,6 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         } else {
             throw new DSSErrorException(90038, "该Orchestrator的版本号不存在，请检查版本号是否正确.");
         }
-    }
-
-    @Override
-    public BmlResource exportMultiOrchestrator(String userName,
-                            List<OrchestratorExportEntity> orchestrators,
-                            String projectName,
-                            List<DSSLabel> dssLabels,
-                            boolean addOrcVersion, Workspace workspace) throws DSSErrorException{
-        return null;
     }
 
     @Override

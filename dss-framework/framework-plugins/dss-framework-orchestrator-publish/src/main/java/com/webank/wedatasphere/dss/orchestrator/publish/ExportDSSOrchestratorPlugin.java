@@ -16,16 +16,13 @@
 
 package com.webank.wedatasphere.dss.orchestrator.publish;
 
-import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
-import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import java.util.List;
-import java.util.Map;
 
 
 public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
@@ -39,23 +36,6 @@ public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
                                                 String projectName,
                                                 List<DSSLabel> dssLabels,
                                                 boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
-
-    /**
-     * 批量导出多个工作流，返回在bml中的resourceId和versionId
-     * @param userName  操作人
-     * @param projectName 项目名
-     * @param dssLabels 环境label
-     * @param addOrcVersion 是否增加编排版本
-     * @param workspace 工作空间信息
-     * @return 导出结果，以bml中的resourceId和versionId形式返回
-     * @throws DSSErrorException
-     */
-    BmlResource exportMultiOrchestrator(String userName,
-                                          List<OrchestratorExportEntity> orchestrators,
-                                          String projectName,
-                                          List<DSSLabel> dssLabels,
-                                          boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
-
     Long orchestratorVersionIncrease(Long orcId,
                                      String userName,
                                      String comment,

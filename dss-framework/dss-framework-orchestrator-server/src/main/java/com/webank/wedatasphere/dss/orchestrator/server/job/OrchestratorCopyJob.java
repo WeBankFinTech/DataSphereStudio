@@ -49,7 +49,7 @@ public class OrchestratorCopyJob implements Runnable {
         //开始写入复制信息到编排复制任务历史表
         orchestratorCopyInfo.setId(UUID.randomUUID().toString());
         orchestratorCopyInfo.setUsername(orchestratorCopyVo.getUsername());
-        orchestratorCopyInfo.setCopying(1);
+        orchestratorCopyInfo.setIsCopying(1);
         orchestratorCopyInfo.setSourceOrchestratorId(orchestratorCopyVo.getOrchestrator().getId());
         orchestratorCopyInfo.setSourceOrchestratorName(orchestratorCopyVo.getOrchestrator().getName());
         orchestratorCopyInfo.setTargetOrchestratorName(orchestratorCopyVo.getTargetOrchestratorName());
@@ -67,7 +67,7 @@ public class OrchestratorCopyJob implements Runnable {
             importOrc(exportResult);
         }
 
-        orchestratorCopyInfo.setCopying(0);
+        orchestratorCopyInfo.setIsCopying(0);
         orchestratorCopyInfo.setEndTime(new Date());
         orchestratorCopyInfo.setSuccessNode(Lists.newArrayList("All"));
         orchestratorCopyInfo.setStatus(1);
@@ -116,7 +116,7 @@ public class OrchestratorCopyJob implements Runnable {
                 errorMsg = errorMsg.substring(0, 999);
             }
 
-            orchestratorCopyInfo.setCopying(0);
+            orchestratorCopyInfo.setIsCopying(0);
             orchestratorCopyInfo.setEndTime(new Date());
             orchestratorCopyInfo.setSuccessNode(Lists.newArrayList("ZERO"));
             orchestratorCopyInfo.setStatus(0);
@@ -159,7 +159,7 @@ public class OrchestratorCopyJob implements Runnable {
                 errorMsg = errorMsg.substring(0, 999);
             }
 
-            orchestratorCopyInfo.setCopying(0);
+            orchestratorCopyInfo.setIsCopying(0);
             orchestratorCopyInfo.setEndTime(new Date());
             orchestratorCopyInfo.setSuccessNode(Lists.newArrayList("ZERO"));
             orchestratorCopyInfo.setStatus(0);

@@ -254,8 +254,8 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + targetOrchestratorName + ".json"));
                 FileUtils.moveDirectory(new File(flowInputPath), new File(sourceProjectDir + File.separator + targetOrchestratorName));
             } else {
-                FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + dssFlow.getName() + ".json"));
-                FileUtils.moveDirectory(new File(flowInputPath), new File(sourceProjectDir + File.separator + dssFlow.getName()));
+                FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix + ".json"));
+                FileUtils.moveDirectory(new File(flowInputPath), new File(sourceProjectDir + File.separator + dssFlow.getName() + "_" + nodeSuffix));
             }
         }
         //修改meta.txt并保存

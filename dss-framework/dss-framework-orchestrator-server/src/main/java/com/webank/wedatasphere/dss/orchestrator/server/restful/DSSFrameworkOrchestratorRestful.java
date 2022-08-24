@@ -61,23 +61,25 @@ public class DSSFrameworkOrchestratorRestful {
 
     /**
      * 创建编排模式
+     *
      * @param createRequest
      * @return
      */
     @RequestMapping(path = "createOrchestrator", method = RequestMethod.POST)
-    public Message createOrchestrator(@RequestBody OrchestratorCreateRequest createRequest) throws Exception{
+    public Message createOrchestrator(@RequestBody OrchestratorCreateRequest createRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         //todo 先注释掉
         // orchestratorService.saveOrchestrator(createRequest,null,username);
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.createOrchestrator(username, createRequest, workspace);
-        AuditLogUtils.printLog(username,workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                 orchestratorVo.getOrchestratorId(), createRequest.getOrchestratorName(), OperateTypeEnum.CREATE, createRequest);
         return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
     }
 
     /**
      * 查询所有的编排模式
+     *
      * @param orchestratorRequest
      * @return
      */
@@ -95,65 +97,83 @@ public class DSSFrameworkOrchestratorRestful {
 
     /**
      * 修改编排模式
+     *
      * @param modifyRequest
      * @return
      */
     @RequestMapping(path = "modifyOrchestrator", method = RequestMethod.POST)
-    public Message modifyOrchestrator(@RequestBody OrchestratorModifyRequest modifyRequest) throws Exception{
+    public Message modifyOrchestrator(@RequestBody OrchestratorModifyRequest modifyRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.modifyOrchestrator(username, modifyRequest, workspace);
-        AuditLogUtils.printLog(username,workspace.getWorkspaceId(), workspace.getWorkspaceName(),TargetTypeEnum.ORCHESTRATOR,
-                orchestratorVo.getOrchestratorId(),modifyRequest.getOrchestratorName(),OperateTypeEnum.UPDATE, modifyRequest);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(), modifyRequest.getOrchestratorName(), OperateTypeEnum.UPDATE, modifyRequest);
         return Message.ok("修改工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
     }
 
     /**
      * 删除编排模式
+     *
      * @param deleteRequest
      * @return
      */
     @RequestMapping(path = "deleteOrchestrator", method = RequestMethod.POST)
-    public Message deleteOrchestrator( @RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
+    public Message deleteOrchestrator(@RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        CommonOrchestratorVo orchestratorVo= orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
-        AuditLogUtils.printLog(username,workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
-                orchestratorVo.getOrchestratorId(),orchestratorVo.getOrchestratorName(),OperateTypeEnum.DELETE, deleteRequest);
+        CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.DELETE, deleteRequest);
         return Message.ok("删除工作流编排模式成功");
     }
 
     /**
      * 复制编排模式
+     *
      * @param orchestratorCopyRequest
      * @return
      * @throws Exception
      */
-    @RequestMapping(path = "copyOrchestrator",method = RequestMethod.POST)
+    @RequestMapping(path = "copyOrchestrator", method = RequestMethod.POST)
     public Message copyOrchestrator(@RequestBody OrchestratorCopyRequest orchestratorCopyRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
 
-        if (orchestratorFrameworkService.getOrchestratorCopyStatus(orchestratorCopyRequest.getSourceOrchestratorId())){
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(orchestratorCopyRequest.getSourceOrchestratorId())) {
             return Message.error("当前工作流正在被复制，不允许再次复制");
         }
 
-        orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace);
+        String copyJobId = orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
-                orchestratorCopyRequest.getSourceOrchestratorId(), orchestratorCopyRequest.getSourceOrchestratorName(), OperateTypeEnum.COPY,orchestratorCopyRequest);
+                orchestratorCopyRequest.getSourceOrchestratorId(), orchestratorCopyRequest.getSourceOrchestratorName(), OperateTypeEnum.COPY, orchestratorCopyRequest);
 
-        return Message.ok("复制工作流已经开始，正在后台复制中...").data("targetOrchestratorId", orchestratorCopyRequest.getTargetOrchestratorName());
+        return Message.ok("复制工作流已经开始，正在后台复制中...").data("copyJobId", copyJobId);
+    }
+
+    /**
+     * 获取编排复制任务状态
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(path = "/{id}/copyInfo", method = RequestMethod.GET)
+    public Message getCopyJobStatus(@PathVariable("id") String copyInfoId) throws Exception {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+
+        return Message.ok("获取编排复制任务状态成功").data("orchestratorCopyInfo", orchestratorFrameworkService.getOrchestratorCopyInfoById(copyInfoId));
     }
 
     /**
      * 查看编排复制历史
+     *
      * @param orchestratorId
      * @return
      */
     @RequestMapping(path = "listOrchestratorCopyHistory", method = RequestMethod.GET)
     public Message listOrchestratorCopyHistory(@RequestParam(name = "orchestratorId") Long orchestratorId,
                                                @RequestParam(required = false, name = "currentPage") Integer currentPage,
-                                               @RequestParam(required = false, name = "pageSize") Integer pageSize) throws Exception{
+                                               @RequestParam(required = false, name = "pageSize") Integer pageSize) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         List<OrchestratorCopyHistory> orchestratorCopyHistory = orchestratorFrameworkService.getOrchestratorCopyHistory(username, workspace, orchestratorId, currentPage, pageSize);
@@ -165,7 +185,7 @@ public class DSSFrameworkOrchestratorRestful {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         List<OrchestratorLevelEnum> levels = Arrays.asList(OrchestratorLevelEnum.values());
-        LOGGER.info("user {} try to get OrchestratorLevels, workspaceId:{}, result:{}", username, workspace.getWorkspaceId(),levels);
+        LOGGER.info("user {} try to get OrchestratorLevels, workspaceId:{}, result:{}", username, workspace.getWorkspaceId(), levels);
         return Message.ok("获取编排重要级别列表成功").data("orchestratorLevels", levels);
     }
 }

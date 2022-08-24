@@ -60,6 +60,10 @@
         SELECT * FROM `dss_orchestrator_copy_info` WHERE source_orchestrator_id = #{orchestratorId} order by start_time desc
     </select>
 
+    <select id="getOrchestratorCopyInfoById" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        SELECT * FROM `dss_orchestrator_copy_info` WHERE id = #{id}
+    </select>
+
     <select id="getOrchestratorCopyStatus" resultType="java.lang.String">
         SELECT id FROM `dss_orchestrator_copy_info` WHERE source_orchestrator_id = #{sourceOrchestratorId} AND is_copying = 1;
     </select>

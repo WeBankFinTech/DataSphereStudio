@@ -153,7 +153,7 @@ public class DSSOrchestratorCopyInfo {
         this.exceptionInfo = exceptionInfo;
     }
 
-    public Integer isStatus() {
+    public Integer getStatus() {
         return status;
     }
 
@@ -161,12 +161,12 @@ public class DSSOrchestratorCopyInfo {
         this.status = status;
     }
 
-    public Integer isCopying() {
+    public Integer getIsCopying() {
         return isCopying;
     }
 
-    public void setCopying(Integer copying) {
-        isCopying = copying;
+    public void setIsCopying(Integer isCopying) {
+        this.isCopying = isCopying;
     }
 
     public String getSuccessNode() {

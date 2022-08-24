@@ -323,13 +323,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             orchestratorCopyHistory.setId(orchestratorId);
             orchestratorCopyHistory.setUsername(username);
             orchestratorCopyHistory.setWorkspaceName(workspace.getWorkspaceName());
-            orchestratorCopyHistory.setCopying(orchestratorCopyInfo.isCopying());
+            orchestratorCopyHistory.setIsCopying(orchestratorCopyInfo.getIsCopying());
             orchestratorCopyHistory.setSourceOrchestratorName(orchestratorCopyInfo.getSourceOrchestratorName());
             orchestratorCopyHistory.setTargetOrchestratorName(orchestratorCopyInfo.getTargetOrchestratorName());
             orchestratorCopyHistory.setSourceProjectName(orchestratorCopyInfo.getSourceProjectName());
             orchestratorCopyHistory.setTargetProjectName(orchestratorCopyInfo.getTargetProjectName());
             orchestratorCopyHistory.setExceptionInfo(orchestratorCopyInfo.getExceptionInfo());
-            orchestratorCopyHistory.setStatus(orchestratorCopyInfo.isStatus());
+            orchestratorCopyHistory.setStatus(orchestratorCopyInfo.getStatus());
             orchestratorCopyHistory.setStartTime(SDF.format(orchestratorCopyInfo.getStartTime()));
             orchestratorCopyHistory.setEndTime(SDF.format(orchestratorCopyInfo.getEndTime()));
             orchestratorCopyHistory.setWorkflowNodeSuffix(orchestratorCopyInfo.getWorkflowNodeSuffix());

@@ -62,7 +62,7 @@ public class OrchestrationDevelopmentOperationUtils {
         ImmutablePair<AppInstance, DevelopmentIntegrationStandard> standMap =
                 OrchestratorLoaderUtils.getOrchestratorDevelopmentStandard(dssOrchestrator, dssLabels);
         //第二步，执行这个APPInstance上实现的DevelopmentIntegrationStandard。
-        //至于要之心DevelopmentIntegrationStandard里的什么operation，就需要根据外部传入的getDevelopmentService和getDevelopmentOperation决定
+        //至于要执行DevelopmentIntegrationStandard里的什么operation，就需要根据外部传入的getDevelopmentService和getDevelopmentOperation决定
         return DevelopmentOperationUtils.tryDevelopmentRequestRefOperation(
                 //目的是让下游得到DevelopmentService。
                 // 根据不同的AppInstance，getDevelopmentService可以返回不同是实现类，比如是一个WorkflowExportService。

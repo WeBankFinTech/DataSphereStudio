@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OpenOrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.QueryOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.RollbackOrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
@@ -46,6 +47,8 @@ public class OrchestratorRestful {
     private final static Logger LOGGER = LoggerFactory.getLogger(OrchestratorRestful.class);
     @Autowired
     OrchestratorService orchestratorService;
+    @Autowired
+    private OrchestratorFrameworkService orchestratorFrameworkService;
 
     @RequestMapping(path = "rollbackOrchestrator", method = RequestMethod.POST)
     public Message rollbackOrchestrator(HttpServletRequest request, @RequestBody RollbackOrchestratorRequest rollbackOrchestratorRequest) {
@@ -75,6 +78,9 @@ public class OrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(req);
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(openOrchestratorRequest.getLabels().getRoute()));
         Long orchestratorId = openOrchestratorRequest.getOrchestratorId();
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(orchestratorId)){
+            return Message.error("当前工作流正在被复制，不允许被打开，请稍后");
+        }
         LOGGER.info("user {} try to openOrchestrator, params:{}", userName, openOrchestratorRequest);
         openUrl = orchestratorService.openOrchestrator(userName, workspace, orchestratorId, dssLabelList);
         OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);

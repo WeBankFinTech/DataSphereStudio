@@ -19,4 +19,6 @@ public interface OrchestratorCopyJobMapper {
     void updateCopyStatus(DSSOrchestratorCopyInfo dssOrchestratorCopyInfo);
 
     void updateErrorMsgById(DSSOrchestratorCopyInfo dssOrchestratorCopyInfo);
+
+    DSSOrchestratorCopyInfo getOrchestratorCopyInfoById(String id);
 }

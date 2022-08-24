@@ -266,7 +266,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
     @Override
-    public void copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
+    public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
         //校验编排名是可用
         newOrchestratorService.isExistSameNameBeforeCreate(workspace.getWorkspaceId(), orchestratorCopyRequest.getTargetProjectId(), orchestratorCopyRequest.getTargetOrchestratorName());
         //判断用户对项目是否有权限
@@ -294,7 +294,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);
         orchestratorCopyJob.setOrchestratorCopyEnv(orchestratorCopyEnv);
+        orchestratorCopyJob.getOrchestratorCopyInfo().setId(UUID.randomUUID().toString());
+
         orchestratorCopyThreadPool.submit(orchestratorCopyJob);
+
+        return orchestratorCopyJob.getOrchestratorCopyInfo().getId();
     }
 
     @Override
@@ -338,6 +342,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Override
     public Boolean getOrchestratorCopyStatus(Long sourceOrchestratorId) {
         return StringUtils.isNotBlank(orchestratorCopyJobMapper.getOrchestratorCopyStatus(sourceOrchestratorId));
+    }
+
+    @Override
+    public DSSOrchestratorCopyInfo getOrchestratorCopyInfoById(String copyInfoId) {
+        return orchestratorCopyJobMapper.getOrchestratorCopyInfoById(copyInfoId);
     }
 
     protected ImmutablePair<OrchestrationService, AppInstance> getOrchestrationService(DSSOrchestratorInfo dssOrchestratorInfo,

@@ -47,7 +47,6 @@ public class OrchestratorCopyJob implements Runnable {
 
     private void copyOrchestrator() throws Exception {
         //开始写入复制信息到编排复制任务历史表
-        orchestratorCopyInfo.setId(UUID.randomUUID().toString());
         orchestratorCopyInfo.setUsername(orchestratorCopyVo.getUsername());
         orchestratorCopyInfo.setCopying(1);
         orchestratorCopyInfo.setSourceOrchestratorId(orchestratorCopyVo.getOrchestrator().getId());

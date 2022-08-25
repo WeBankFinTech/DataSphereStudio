@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import org.apache.commons.math3.util.Pair;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public interface OrchestratorFrameworkService {
 
     String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception;
 
-    List<OrchestratorCopyHistory> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception;
+    Pair<Long, List<OrchestratorCopyHistory>> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception;
 
     Boolean getOrchestratorCopyStatus(Long sourceOrchestratorId);
 

@@ -87,7 +87,7 @@ export default {
     verificationValue (row) {
       let flag;
       if(row.defaultValue.length > 1024 && Number(row.type) !== 4) {
-        this.$Message.error({ content: '默认字符不能超过1024个字符！' });
+        this.$Message.error({ content: '不能超过1024个字符！' });
         flag = true;
       } else if(row.type == 4 && row.defaultValue.split('\n').length > 5000) {
         this.$Message.error({ content: '行数过多请分批查询！' });

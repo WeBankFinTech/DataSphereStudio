@@ -287,7 +287,9 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
         // rename orc_flow.zip from source projectName to target projectName.
         FileUtils.delete(new File(flowZipPath));
-        FileUtils.moveDirectory(new File(inputPath + File.separator + projectName), new File(inputPath + File.separator + targetProjectName));
+        if (!projectName.equals(targetProjectName)) {
+            FileUtils.moveDirectory(new File(inputPath + File.separator + projectName), new File(inputPath + File.separator + targetProjectName));
+        }
         ZipHelper.zip(inputPath + File.separator + targetProjectName);
         FileUtils.moveFile(new File(inputPath + File.separator + targetProjectName + ".zip"), new File(flowZipPath));
 

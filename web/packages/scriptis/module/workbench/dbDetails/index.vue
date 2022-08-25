@@ -28,7 +28,7 @@
       class="current-spin"
       fix>
       <Icon type="ios-loading" size="18" class="spin-icon-load"></Icon>
-      <div>数据加载中，请耐心等候</div>
+      <div>数据加载中，请耐心等待</div>
     </Spin>
   </div>
 </template>

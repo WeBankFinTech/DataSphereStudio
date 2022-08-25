@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
-import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
@@ -40,8 +39,6 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCop
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
 import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelation;
@@ -50,8 +47,6 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
-import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
-import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
@@ -69,6 +64,7 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +82,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     @Autowired
     private OrchestratorMapper orchestratorMapper;
@@ -266,7 +262,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
     @Override
-    public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
+    public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception {
         //校验编排名是可用
         newOrchestratorService.isExistSameNameBeforeCreate(workspace.getWorkspaceId(), orchestratorCopyRequest.getTargetProjectId(), orchestratorCopyRequest.getTargetOrchestratorName());
         //判断用户对项目是否有权限
@@ -302,26 +298,21 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
     @Override
-    public List<OrchestratorCopyHistory> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception {
-        if (currentPage == null) {
-            currentPage = 1;
-        }
-        if (pageSize == null) {
-            pageSize = 4;
-        }
-        PageHelper.startPage(currentPage, pageSize);
+    public Pair<Long, List<OrchestratorCopyHistory>> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception {
+        long total = 0L;
 
         List<DSSOrchestratorCopyInfo> orchestratorCopyInfoList = orchestratorCopyJobMapper.getOrchestratorCopyInfoList(orchestratorId);
-
-        if (CollectionUtils.isEmpty(orchestratorCopyInfoList)){
-            return Lists.newArrayList();
+        if (CollectionUtils.isEmpty(orchestratorCopyInfoList)) {
+            return new Pair<>(total, Lists.newArrayList());
         }
-        List<OrchestratorCopyHistory> orchestratorCopyHistoryList = new ArrayList<>();
+        total = orchestratorCopyInfoList.size();
+
+        List < OrchestratorCopyHistory > orchestratorCopyHistoryList = new ArrayList<>();
         OrchestratorCopyHistory orchestratorCopyHistory;
-        for (DSSOrchestratorCopyInfo orchestratorCopyInfo: orchestratorCopyInfoList) {
+        for (DSSOrchestratorCopyInfo orchestratorCopyInfo : orchestratorCopyInfoList) {
             orchestratorCopyHistory = new OrchestratorCopyHistory();
             orchestratorCopyHistory.setId(orchestratorId);
-            orchestratorCopyHistory.setUsername(username);
+            orchestratorCopyHistory.setUsername(orchestratorCopyInfo.getUsername());
             orchestratorCopyHistory.setWorkspaceName(workspace.getWorkspaceName());
             orchestratorCopyHistory.setIsCopying(orchestratorCopyInfo.getIsCopying());
             orchestratorCopyHistory.setSourceOrchestratorName(orchestratorCopyInfo.getSourceOrchestratorName());
@@ -336,7 +327,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             orchestratorCopyHistory.setMicroserverName(orchestratorCopyInfo.getMicroserverName());
             orchestratorCopyHistoryList.add(orchestratorCopyHistory);
         }
-        return orchestratorCopyHistoryList;
+        return new Pair<>(total, orchestratorCopyHistoryList);
     }
 
     @Override

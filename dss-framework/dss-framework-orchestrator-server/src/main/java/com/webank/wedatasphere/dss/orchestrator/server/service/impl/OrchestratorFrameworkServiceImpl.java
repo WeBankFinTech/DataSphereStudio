@@ -277,20 +277,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if (sourceOrchestratorInfo == null) {
             LOGGER.error("orchestrator: {} not found.", orchestratorCopyRequest.getSourceOrchestratorName());
         }
-
-        OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo();
-        orchestratorCopyVo.setOrchestrator(sourceOrchestratorInfo);
-        orchestratorCopyVo.setUsername(username);
-        orchestratorCopyVo.setDssLabel(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV));
-        orchestratorCopyVo.setTargetOrchestratorName(orchestratorCopyRequest.getTargetOrchestratorName());
-        orchestratorCopyVo.setSourceProjectId(sourceProject.getId());
-        orchestratorCopyVo.setWorkspace(workspace);
-        orchestratorCopyVo.setSourceProjectName(sourceProject.getName());
-        orchestratorCopyVo.setTargetProjectId(targetProject.getId());
-        orchestratorCopyVo.setCopyTaskId(null);
-        orchestratorCopyVo.setWorkflowNodeSuffix(orchestratorCopyRequest.getWorkflowNodeSuffix());
-        orchestratorCopyVo.setTargetProjectName(targetProject.getName());
-
+        OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username,sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
+                targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
+                orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV),
+                workspace).setCopyTaskId(null).build();
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);
         orchestratorCopyJob.setOrchestratorCopyEnv(orchestratorCopyEnv);
@@ -319,21 +309,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         List<OrchestratorCopyHistory> orchestratorCopyHistoryList = new ArrayList<>();
         OrchestratorCopyHistory orchestratorCopyHistory;
         for (DSSOrchestratorCopyInfo orchestratorCopyInfo: orchestratorCopyInfoList) {
-            orchestratorCopyHistory = new OrchestratorCopyHistory();
-            orchestratorCopyHistory.setId(orchestratorId);
-            orchestratorCopyHistory.setUsername(username);
-            orchestratorCopyHistory.setWorkspaceName(workspace.getWorkspaceName());
-            orchestratorCopyHistory.setIsCopying(orchestratorCopyInfo.getIsCopying());
-            orchestratorCopyHistory.setSourceOrchestratorName(orchestratorCopyInfo.getSourceOrchestratorName());
-            orchestratorCopyHistory.setTargetOrchestratorName(orchestratorCopyInfo.getTargetOrchestratorName());
-            orchestratorCopyHistory.setSourceProjectName(orchestratorCopyInfo.getSourceProjectName());
-            orchestratorCopyHistory.setTargetProjectName(orchestratorCopyInfo.getTargetProjectName());
-            orchestratorCopyHistory.setExceptionInfo(orchestratorCopyInfo.getExceptionInfo());
-            orchestratorCopyHistory.setStatus(orchestratorCopyInfo.getStatus());
-            orchestratorCopyHistory.setStartTime(SDF.format(orchestratorCopyInfo.getStartTime()));
-            orchestratorCopyHistory.setEndTime(SDF.format(orchestratorCopyInfo.getEndTime()));
-            orchestratorCopyHistory.setWorkflowNodeSuffix(orchestratorCopyInfo.getWorkflowNodeSuffix());
-            orchestratorCopyHistory.setMicroserverName(orchestratorCopyInfo.getMicroserverName());
+            orchestratorCopyHistory = new OrchestratorCopyHistory(orchestratorId, username, workspace.getWorkspaceName(),
+                    orchestratorCopyInfo.getSourceOrchestratorName(), orchestratorCopyInfo.getTargetOrchestratorName(),
+                    orchestratorCopyInfo.getSourceProjectName(), orchestratorCopyInfo.getTargetProjectName(), orchestratorCopyInfo.getWorkflowNodeSuffix(),
+                    orchestratorCopyInfo.getMicroserverName(), orchestratorCopyInfo.getExceptionInfo(), orchestratorCopyInfo.getStatus(),
+                    orchestratorCopyInfo.getIsCopying(), SDF.format(orchestratorCopyInfo.getStartTime()), SDF.format(orchestratorCopyInfo.getEndTime()));
             orchestratorCopyHistoryList.add(orchestratorCopyHistory);
         }
         return orchestratorCopyHistoryList;

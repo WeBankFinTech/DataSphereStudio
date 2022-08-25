@@ -52,6 +52,17 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
 
     private String workspaceName;
 
+    public OrchestratorCreateRequest(String orchestratorName, List<String> orchestratorWays, String orchestratorLevel, List<String> dssLabels, String uses, String description, String projectName, String workspaceName) {
+        this.orchestratorName = orchestratorName;
+        this.orchestratorWays = orchestratorWays;
+        this.orchestratorLevel = orchestratorLevel;
+        this.dssLabels = dssLabels;
+        this.uses = uses;
+        this.description = description;
+        this.projectName = projectName;
+        this.workspaceName = workspaceName;
+    }
+
     public List<String> getDssLabels() {
         return dssLabels;
     }

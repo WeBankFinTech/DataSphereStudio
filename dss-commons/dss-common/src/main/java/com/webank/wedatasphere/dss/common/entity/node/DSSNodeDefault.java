@@ -25,6 +25,7 @@ import java.util.Map;
 public class DSSNodeDefault implements DSSNode {
     private Layout layout;
     private String id;
+    private String key;
     private String jobType;
     private String lastUpdateTime;
     private Map<String, Object> params;

@@ -185,12 +185,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Override
     public DSSFlow getFlow(Long flowID) throws NullPointerException{
-        DSSFlow DSSFlow = getFlowByID(flowID);
+        DSSFlow dssFlow = getFlowByID(flowID);
         //todo update
-        String userName = DSSFlow.getCreator();
-        Map<String, Object> query = bmlService.query(userName, DSSFlow.getResourceId(), DSSFlow.getBmlVersion());
-        DSSFlow.setFlowJson(query.get("string").toString());
-        return DSSFlow;
+        String userName = dssFlow.getCreator();
+        Map<String, Object> query = bmlService.query(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion());
+        dssFlow.setFlowJson(query.get("string").toString());
+        return dssFlow;
     }
 
     @Override

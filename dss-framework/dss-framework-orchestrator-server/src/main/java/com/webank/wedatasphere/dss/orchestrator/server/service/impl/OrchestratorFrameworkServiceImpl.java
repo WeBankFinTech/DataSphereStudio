@@ -82,7 +82,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
+    private static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private OrchestratorMapper orchestratorMapper;

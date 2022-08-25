@@ -211,7 +211,7 @@
       ></div>
       <div id="mask7">
         <div class="item1">
-          <div class="desc">这是<span>帮助文档</span>，请试着点击他。</div>
+          <div class="desc">这是<span>帮助文档</span>，请试着点击它。</div>
           <div id="confirm7">
             <div class="skip" @click="skip()">跳过</div>
             <div class="prev" @click="prev()">上一步</div>

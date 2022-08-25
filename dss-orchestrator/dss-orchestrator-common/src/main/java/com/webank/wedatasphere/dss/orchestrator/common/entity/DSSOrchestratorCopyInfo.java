@@ -57,6 +57,9 @@ public class DSSOrchestratorCopyInfo {
      */
     private Date endTime;
 
+    public DSSOrchestratorCopyInfo() {
+    }
+
     public DSSOrchestratorCopyInfo(String username, String type, Long workspaceId, Long sourceOrchestratorId,
                                    String sourceOrchestratorName, String targetOrchestratorName,
                                    String sourceProjectName, String targetProjectName, String workflowNodeSuffix,

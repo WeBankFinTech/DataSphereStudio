@@ -46,6 +46,9 @@ public class OrchestratorCopyHistory {
      */
     private String endTime;
 
+    public OrchestratorCopyHistory() {
+    }
+
     public OrchestratorCopyHistory(Long id, String username, String workspaceName, String sourceOrchestratorName, String targetOrchestratorName, String sourceProjectName, String targetProjectName, String workflowNodeSuffix, String microserverName, String exceptionInfo, Integer status, Integer isCopying, String startTime, String endTime) {
         this.id = id;
         this.username = username;

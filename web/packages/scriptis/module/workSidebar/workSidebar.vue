@@ -119,7 +119,7 @@
       :tree="hdfsTree"
       :load-data-fn="loadHdfsDataFn"
       :fs-type="fsType"
-      title="导入至HDFS"
+      :title="$t('message.scripts.contextMenu.importToHdfs')"
       @import="importToHdfs"
       @set-node="setNode"/>
     <we-import-to-hive

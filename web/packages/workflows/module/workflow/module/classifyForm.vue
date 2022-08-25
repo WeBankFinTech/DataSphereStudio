@@ -87,7 +87,7 @@ export default {
           this.$emit('addProjectClassifyConfirm', this.projectData);
           this.ClassifyShow = false;
         } else {
-          this.$Message.warning('验证项未通过，请检查后再试！');
+          this.$Message.warning(this.$t('message.workflow.failedNotice'));
         }
       });
     },

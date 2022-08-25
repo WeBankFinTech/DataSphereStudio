@@ -34,11 +34,13 @@
 
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
+import mixin from '@dataspherestudio/shared/common/service/mixin';
 export default {
   model: {
     prop: '_visible',
     event: '_changeVisible',
   },
+  mixins: [mixin],
   computed: {
     visible: {
       get() {

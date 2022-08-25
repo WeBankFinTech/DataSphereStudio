@@ -5,7 +5,7 @@ public class OrchestratorCopyHistory {
 
     private Long id;
 
-    private String username;
+    private String userName;
 
     private String workspaceName;
 
@@ -48,7 +48,7 @@ public class OrchestratorCopyHistory {
 
     public OrchestratorCopyHistory(Long id, String username, String workspaceName, String sourceOrchestratorName, String targetOrchestratorName, String sourceProjectName, String targetProjectName, String workflowNodeSuffix, String microserverName, String exceptionInfo, Integer status, Integer isCopying, String startTime, String endTime) {
         this.id = id;
-        this.username = username;
+        this.userName = username;
         this.workspaceName = workspaceName;
         this.sourceOrchestratorName = sourceOrchestratorName;
         this.targetOrchestratorName = targetOrchestratorName;
@@ -71,9 +71,9 @@ public class OrchestratorCopyHistory {
         this.id = id;
     }
 
-    public String getUsername() { return username; }
+    public String getUserName() { return userName; }
 
-    public void setUsername(String username) { this.username = username; }
+    public void setUsername(String username) { this.userName = username; }
 
     public String getWorkspaceName() {
         return workspaceName;
@@ -175,7 +175,7 @@ public class OrchestratorCopyHistory {
     public String toString() {
         return "OrchestratorCopyHistory{" +
                 "id=" + id +
-                "username=" + username +
+                "username=" + userName +
                 ", workspaceName='" + workspaceName + '\'' +
                 ", sourceOrchestratorName='" + sourceOrchestratorName + '\'' +
                 ", targetOrchestratorName='" + targetOrchestratorName + '\'' +

@@ -51,7 +51,7 @@ public class OrchestratorCopyJob implements Runnable {
         orchestratorCopyInfo = new DSSOrchestratorCopyInfo(orchestratorCopyVo.getUsername(), sourceOrchestrator.getType(), orchestratorCopyVo.getWorkspace().getWorkspaceId(),
                 sourceOrchestrator.getId(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(),
                 orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), orchestratorCopyVo.getWorkflowNodeSuffix(),
-                "Orchestrator server", 1, new Date());
+                "Orchestrator server", 1, new Date(), new Date());
         orchestratorCopyEnv.getOrchestratorCopyJobMapper().insertOrchestratorCopyInfo(orchestratorCopyInfo);
 
         OrchestratorExportResult exportResult = exportOrc();

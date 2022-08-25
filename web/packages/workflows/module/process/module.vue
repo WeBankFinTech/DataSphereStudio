@@ -679,11 +679,12 @@ export default {
     eventbus.on('workflow.copying', (data) => {
       if (data.source.orchestratorId == this.orchestratorId) {
         this.locked = true
+        this.$Notice.close('copy_workflow_ing')
         this.$Notice.info({
           title: '提示',
           desc: '复制过程中，不允许编辑工作流',
           duration: 0,
-          name: this.orchestratorId
+          name: 'copy_workflow_ing'
         });
       }
     });

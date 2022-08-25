@@ -10,104 +10,115 @@ public class OrchestratorCopyVo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String username;
-    private Long sourceProjectId;
-    private String sourceProjectName;
-    private Long targetProjectId;
-    private String targetProjectName;
-    private DSSOrchestratorInfo orchestrator;
-    private String targetOrchestratorName;
-    private String workflowNodeSuffix;
-    private DSSLabel dssLabel;
-    private Workspace workspace;
-    private Long copyTaskId;
+    private final String username;
+    private final Long sourceProjectId;
+    private final String sourceProjectName;
+    private final Long targetProjectId;
+    private final String targetProjectName;
+    private final DSSOrchestratorInfo orchestrator;
+    private final String targetOrchestratorName;
+    private final String workflowNodeSuffix;
+    private final DSSLabel dssLabel;
+    private final Workspace workspace;
+    private final Long copyTaskId;
+
+    private OrchestratorCopyVo(Builder builder) {
+        this.username = builder.username;
+        this.sourceProjectId = builder.sourceProjectId;
+        this.sourceProjectName = builder.sourceProjectName;
+        this.targetProjectId = builder.targetProjectId;
+        this.targetProjectName = builder.targetProjectName;
+        this.orchestrator = builder.orchestrator;
+        this.targetOrchestratorName = builder.targetOrchestratorName;
+        this.workflowNodeSuffix = builder.workflowNodeSuffix;
+        this.dssLabel = builder.dssLabel;
+        this.workspace = builder.workspace;
+        this.copyTaskId = builder.copyTaskId;
+    }
+
+
+    public static class Builder {
+
+        private final String username;
+        private final Long sourceProjectId;
+        private final String sourceProjectName;
+        private final Long targetProjectId;
+        private final String targetProjectName;
+        private final DSSOrchestratorInfo orchestrator;
+        private final String targetOrchestratorName;
+        private final String workflowNodeSuffix;
+        private final DSSLabel dssLabel;
+        private final Workspace workspace;
+        private Long copyTaskId;
+
+        public Builder(String username, Long sourceProjectId, String sourceProjectName, Long targetProjectId,
+                       String targetProjectName, DSSOrchestratorInfo orchestrator, String targetOrchestratorName,
+                       String workflowNodeSuffix, DSSLabel dssLabel, Workspace workspace) {
+            this.username = username;
+            this.sourceProjectId = sourceProjectId;
+            this.sourceProjectName = sourceProjectName;
+            this.targetProjectId = targetProjectId;
+            this.targetProjectName = targetProjectName;
+            this.orchestrator = orchestrator;
+            this.targetOrchestratorName = targetOrchestratorName;
+            this.workflowNodeSuffix = workflowNodeSuffix;
+            this.dssLabel = dssLabel;
+            this.workspace = workspace;
+        }
+
+        public Builder setCopyTaskId(Long copyTaskId){
+            this.copyTaskId = copyTaskId;
+            return this;
+        }
+
+        public OrchestratorCopyVo build(){
+            return new OrchestratorCopyVo(this);
+        }
+    }
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public Long getSourceProjectId() {
         return sourceProjectId;
     }
 
-    public void setSourceProjectId(Long sourceProjectId) {
-        this.sourceProjectId = sourceProjectId;
-    }
-
     public String getSourceProjectName() {
         return sourceProjectName;
-    }
-
-    public void setSourceProjectName(String sourceProjectName) {
-        this.sourceProjectName = sourceProjectName;
     }
 
     public Long getTargetProjectId() {
         return targetProjectId;
     }
 
-    public void setTargetProjectId(Long targetProjectId) {
-        this.targetProjectId = targetProjectId;
-    }
-
     public String getTargetProjectName() {
         return targetProjectName;
-    }
-
-    public void setTargetProjectName(String targetProjectName) {
-        this.targetProjectName = targetProjectName;
     }
 
     public DSSOrchestratorInfo getOrchestrator() {
         return orchestrator;
     }
 
-    public void setOrchestrator(DSSOrchestratorInfo orchestrator) {
-        this.orchestrator = orchestrator;
-    }
-
     public String getTargetOrchestratorName() {
         return targetOrchestratorName;
-    }
-
-    public void setTargetOrchestratorName(String targetOrchestratorName) {
-        this.targetOrchestratorName = targetOrchestratorName;
     }
 
     public String getWorkflowNodeSuffix() {
         return workflowNodeSuffix;
     }
 
-    public void setWorkflowNodeSuffix(String workflowNodeSuffix) {
-        this.workflowNodeSuffix = workflowNodeSuffix;
-    }
-
     public DSSLabel getDssLabel() {
         return dssLabel;
-    }
-
-    public void setDssLabel(DSSLabel dssLabel) {
-        this.dssLabel = dssLabel;
     }
 
     public Workspace getWorkspace() {
         return workspace;
     }
 
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
-
     public Long getCopyTaskId() {
         return copyTaskId;
     }
 
-    public void setCopyTaskId(Long copyTaskId) {
-        this.copyTaskId = copyTaskId;
-    }
 }
 

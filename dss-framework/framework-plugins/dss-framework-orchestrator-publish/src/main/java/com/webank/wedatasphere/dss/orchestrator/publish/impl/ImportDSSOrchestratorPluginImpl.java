@@ -222,7 +222,6 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         bmlService.downloadToLocalPath(userName, resourceId, version, inputZipPath);
         String inputPath = ZipHelper.unzip(inputZipPath);
 
-        //TODO 需要对zip包中json内容进行修改，每个节点都需要加上后缀，主要修改meta.txt和各flow的json，需要验证下资源文件的保存方式
         if (StringUtils.isBlank(nodeSuffix)){
             nodeSuffix = "copy";
         }
@@ -232,6 +231,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         //修改flow的json文件
         List<DSSFlow> dssFlows = metaInputService.inputFlow(sourceProjectDir);
         for (DSSFlow dssFlow: dssFlows) {
+            LOGGER.info("Start to modify dssFlow {} json.", dssFlow.getName());
             String flowInputPath = sourceProjectDir + File.separator + dssFlow.getName();
             String flowJsonPath = flowInputPath + File.separator + dssFlow.getName() + ".json";
             // 修改原有的json内容
@@ -251,15 +251,21 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             bufferedWriter.flush();
             bufferedWriter.close();
             if (dssFlow.getRootFlow()) {
-                FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + targetOrchestratorName + ".json"));
+                LOGGER.info("Modify dssFlow {} json to dssFlow {} json.", dssFlow.getName(), targetOrchestratorName);
+                if (!targetOrchestratorName.equals(dssFlow.getName())){
+                    FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + targetOrchestratorName + ".json"));
+                }
                 FileUtils.moveDirectory(new File(flowInputPath), new File(sourceProjectDir + File.separator + targetOrchestratorName));
             } else {
+                LOGGER.info("Modify dssFlow {} json to dssFlow {} json.", dssFlow.getName(), dssFlow.getName() + "_" + nodeSuffix);
                 FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + dssFlow.getName() + "_" + nodeSuffix + ".json"));
                 FileUtils.moveDirectory(new File(flowInputPath), new File(sourceProjectDir + File.separator + dssFlow.getName() + "_" + nodeSuffix));
             }
         }
         //修改meta.txt并保存
+        LOGGER.info("Modify dssFlows meta.txt");
         modifyFlowMeta(dssFlows, targetOrchestratorName, targetProjectId, nodeSuffix);
+
         List<DSSFlowRelation> dssFlowRelations = metaInputService.inputFlowRelation(sourceProjectDir);
         metaExportService.exportFlowBaseInfo(dssFlows, dssFlowRelations, sourceProjectDir);
 
@@ -287,7 +293,9 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
 
         // rename orc_flow.zip from source projectName to target projectName.
         FileUtils.delete(new File(flowZipPath));
-        FileUtils.moveDirectory(new File(inputPath + File.separator + projectName), new File(inputPath + File.separator + targetProjectName));
+        if (!projectName.equals(targetProjectName)) {
+            FileUtils.moveDirectory(new File(inputPath + File.separator + projectName), new File(inputPath + File.separator + targetProjectName));
+        }
         ZipHelper.zip(inputPath + File.separator + targetProjectName);
         FileUtils.moveFile(new File(inputPath + File.separator + targetProjectName + ".zip"), new File(flowZipPath));
 

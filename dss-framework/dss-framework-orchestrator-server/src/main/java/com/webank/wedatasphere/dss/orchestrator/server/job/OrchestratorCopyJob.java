@@ -32,7 +32,7 @@ public class OrchestratorCopyJob implements Runnable {
 
     protected OrchestratorCopyEnv orchestratorCopyEnv;
 
-    private DSSOrchestratorCopyInfo orchestratorCopyInfo = new DSSOrchestratorCopyInfo();
+    private DSSOrchestratorCopyInfo orchestratorCopyInfo;
 
     private final Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
@@ -47,18 +47,11 @@ public class OrchestratorCopyJob implements Runnable {
 
     private void copyOrchestrator() throws Exception {
         //开始写入复制信息到编排复制任务历史表
-        orchestratorCopyInfo.setUsername(orchestratorCopyVo.getUsername());
-        orchestratorCopyInfo.setIsCopying(1);
-        orchestratorCopyInfo.setSourceOrchestratorId(orchestratorCopyVo.getOrchestrator().getId());
-        orchestratorCopyInfo.setSourceOrchestratorName(orchestratorCopyVo.getOrchestrator().getName());
-        orchestratorCopyInfo.setTargetOrchestratorName(orchestratorCopyVo.getTargetOrchestratorName());
-        orchestratorCopyInfo.setSourceProjectName(orchestratorCopyVo.getSourceProjectName());
-        orchestratorCopyInfo.setTargetProjectName(orchestratorCopyVo.getTargetProjectName());
-        orchestratorCopyInfo.setWorkflowNodeSuffix(orchestratorCopyVo.getWorkflowNodeSuffix());
-        orchestratorCopyInfo.setWorkspaceId(orchestratorCopyVo.getWorkspace().getWorkspaceId());
-        orchestratorCopyInfo.setStartTime(new Date());
-        orchestratorCopyInfo.setType(orchestratorCopyVo.getOrchestrator().getType());
-        orchestratorCopyInfo.setMicroserverName("Orchestrator server");
+        DSSOrchestratorInfo sourceOrchestrator = orchestratorCopyVo.getOrchestrator();
+        orchestratorCopyInfo = new DSSOrchestratorCopyInfo(orchestratorCopyVo.getUsername(), sourceOrchestrator.getType(), orchestratorCopyVo.getWorkspace().getWorkspaceId(),
+                sourceOrchestrator.getId(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(),
+                orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), orchestratorCopyVo.getWorkflowNodeSuffix(),
+                "Orchestrator server", 1, new Date(), new Date());
         orchestratorCopyEnv.getOrchestratorCopyJobMapper().insertOrchestratorCopyInfo(orchestratorCopyInfo);
 
         OrchestratorExportResult exportResult = exportOrc();
@@ -88,17 +81,13 @@ public class OrchestratorCopyJob implements Runnable {
         DSSOrchestratorVersion sourceOrchestratorVersion = orchestratorCopyEnv.getOrchestratorMapper().getLatestOrchestratorVersionById(sourceOrchestratorId);
         if (isExistFlow(sourceOrchestratorVersion, username)) {
 
-            OrchestratorCreateRequest orchestratorCreateRequest = new OrchestratorCreateRequest();
+            OrchestratorCreateRequest orchestratorCreateRequest = new OrchestratorCreateRequest(targetOrchestratorName,
+                    Lists.newArrayList(orchestratorInfo.getOrchestratorWay()), orchestratorInfo.getOrchestratorLevel(),
+                    Lists.newArrayList(orchestratorCopyVo.getDssLabel().toString()), orchestratorInfo.getUses(), orchestratorInfo.getDescription(),
+                    targetProjectName, workspace.getWorkspaceName());
             orchestratorCreateRequest.setProjectId(targetProjectId);
-            orchestratorCreateRequest.setWorkspaceName(workspace.getWorkspaceName());
-            orchestratorCreateRequest.setDescription(orchestratorInfo.getDescription());
-            orchestratorCreateRequest.setOrchestratorWays(Lists.newArrayList(orchestratorInfo.getOrchestratorWay()));
-            orchestratorCreateRequest.setOrchestratorLevel(orchestratorInfo.getOrchestratorLevel());
-            orchestratorCreateRequest.setOrchestratorMode(orchestratorInfo.getOrchestratorLevel());
+            orchestratorCreateRequest.setOrchestratorMode(orchestratorInfo.getOrchestratorMode());
             orchestratorCreateRequest.setWorkspaceId(workspace.getWorkspaceId());
-            orchestratorCreateRequest.setUses(orchestratorInfo.getUses());
-            orchestratorCreateRequest.setProjectName(targetProjectName);
-            orchestratorCreateRequest.setOrchestratorName(targetOrchestratorName);
             orchestratorCopyEnv.getOrchestratorFrameworkService().createOrchestrator(username, orchestratorCreateRequest, workspace);
 
             return null;

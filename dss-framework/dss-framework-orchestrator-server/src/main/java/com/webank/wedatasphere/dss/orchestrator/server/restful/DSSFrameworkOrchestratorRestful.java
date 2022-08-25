@@ -29,6 +29,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrame
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -147,7 +148,7 @@ public class DSSFrameworkOrchestratorRestful {
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                 orchestratorCopyRequest.getSourceOrchestratorId(), orchestratorCopyRequest.getSourceOrchestratorName(), OperateTypeEnum.COPY, orchestratorCopyRequest);
 
-        return Message.ok("复制工作流已经开始，正在后台复制中...").data("copyJobId", copyJobId);
+        return Message.ok("复制工作流已经开始，正在后台复制中，复制状态可以从复制历史查看...").data("copyJobId", copyJobId);
     }
 
     /**
@@ -176,8 +177,8 @@ public class DSSFrameworkOrchestratorRestful {
                                                @RequestParam(required = false, name = "pageSize") Integer pageSize) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        List<OrchestratorCopyHistory> orchestratorCopyHistory = orchestratorFrameworkService.getOrchestratorCopyHistory(username, workspace, orchestratorId, currentPage, pageSize);
-        return Message.ok("查找工作流复制历史成功").data("copyJobHistory", orchestratorCopyHistory);
+        Pair<Long, List<OrchestratorCopyHistory>> result = orchestratorFrameworkService.getOrchestratorCopyHistory(username, workspace, orchestratorId, currentPage, pageSize);
+        return Message.ok("查找工作流复制历史成功").data("copyJobHistory", result.getSecond()).data("total", result.getFirst());
     }
 
     @RequestMapping(path = "orchestratorLevels", method = RequestMethod.GET)

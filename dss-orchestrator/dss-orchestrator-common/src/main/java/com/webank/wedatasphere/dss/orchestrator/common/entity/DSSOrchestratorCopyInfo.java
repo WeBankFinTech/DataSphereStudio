@@ -60,10 +60,15 @@ public class DSSOrchestratorCopyInfo {
     public DSSOrchestratorCopyInfo() {
     }
 
-    public DSSOrchestratorCopyInfo(String username, String type, Long workspaceId, Long sourceOrchestratorId,
+    public DSSOrchestratorCopyInfo(String id) {
+            this.id = id;
+    }
+
+    public DSSOrchestratorCopyInfo(String id, String username, String type, Long workspaceId, Long sourceOrchestratorId,
                                    String sourceOrchestratorName, String targetOrchestratorName,
                                    String sourceProjectName, String targetProjectName, String workflowNodeSuffix,
                                    String microserverName, Integer isCopying, Date startTime, Date endTime) {
+        this.id = id;
         this.username = username;
         this.type = type;
         this.workspaceId = workspaceId;

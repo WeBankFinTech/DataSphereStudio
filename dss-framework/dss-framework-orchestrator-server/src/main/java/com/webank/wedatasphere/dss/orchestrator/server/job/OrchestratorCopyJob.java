@@ -32,7 +32,7 @@ public class OrchestratorCopyJob implements Runnable {
 
     protected OrchestratorCopyEnv orchestratorCopyEnv;
 
-    private DSSOrchestratorCopyInfo orchestratorCopyInfo;
+    private DSSOrchestratorCopyInfo orchestratorCopyInfo = new DSSOrchestratorCopyInfo(UUID.randomUUID().toString());
 
     private final Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
@@ -48,7 +48,7 @@ public class OrchestratorCopyJob implements Runnable {
     private void copyOrchestrator() throws Exception {
         //开始写入复制信息到编排复制任务历史表
         DSSOrchestratorInfo sourceOrchestrator = orchestratorCopyVo.getOrchestrator();
-        orchestratorCopyInfo = new DSSOrchestratorCopyInfo(orchestratorCopyVo.getUsername(), sourceOrchestrator.getType(), orchestratorCopyVo.getWorkspace().getWorkspaceId(),
+        orchestratorCopyInfo = new DSSOrchestratorCopyInfo(orchestratorCopyInfo.getId(), orchestratorCopyVo.getUsername(), sourceOrchestrator.getType(), orchestratorCopyVo.getWorkspace().getWorkspaceId(),
                 sourceOrchestrator.getId(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(),
                 orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), orchestratorCopyVo.getWorkflowNodeSuffix(),
                 "Orchestrator server", 1, new Date(), new Date());

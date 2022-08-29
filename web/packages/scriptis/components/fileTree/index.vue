@@ -21,7 +21,7 @@
       @node-contextmenu="dispatch('work-bench-contextMenu', $event, arguments)"
       @node-check="dispatch('work-bench-check', $event, arguments)"
       @node-dblclick="dispatch('work-bench-dblclick', $event, arguments)"/>
-    <div v-if="!loading && isEmpty">暂无数据，请点击<a @click="refresh">刷新</a>重试！</div>
+    <div v-if="!loading && isEmpty">暂无数据，请点击<a @click="refresh">刷新</a>{{ $t('message.scripts.retry') }}</div>
     <Spin
       v-if="loading"
       size="large"
@@ -141,11 +141,11 @@ export default {
         const reg = /^[\w\u4e00-\u9fa5]{1,200}$/;
         if (!reg.test(label)) {
           if (len === 0) {
-            msg = '文件夹名称不得为空！';
+            msg = this.$t('message.scripts.folderempty');
           } else if (len >= 200) {
-            msg = '文件夹名称超过200字符！';
+            msg = this.$t('message.scripts.foldernameLen');
           } else {
-            msg = '文件夹名称只支持大写、小写字母、数字、下划线和中文!';
+            msg = this.$t('message.scripts.foldernamestyle');
           }
         }
       } else {
@@ -167,15 +167,15 @@ export default {
         const extReg = /\.(hql|sql)$/i;
         if (!reg.test(label)) {
           if (len === 0) {
-            msg = '脚本名称不得为空！';
+            msg = this.$t('message.scripts.scriptNameEmpty');
           } else if (!prefix.length) {
-            msg = '脚本前缀名不得为空！';
+            msg = this.$t('message.scripts.scriptPrefix');
           } else if (!isHaveSuffix) {
-            msg = '后缀名不得为空！';
+            msg = this.$t('message.scripts.scriptSuffix');
           } else if (pointNum > 1) {
             msg = '存在非法字符"."！';
           } else if (prefix.length >= 200) {
-            msg = '脚本前缀名称超过200字符！';
+            msg = this.$t('message.scripts.Scriptprefix200 ');
           } else {
             let unRegString = '';
             try {

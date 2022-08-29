@@ -12,7 +12,7 @@
       <div class="project-nav-tree">
         <div class="project-nav-tree-top">
           <div class="project-nav-tree-top-t">
-            <span class="project-nav-tree-top-t-txt">项目</span>
+            <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
             <div class="project-nav-tree-top-t-icon">
               <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
                 <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
@@ -30,15 +30,15 @@
                   <DropdownItem
                     name="all"
                     key="all"
-                  >所有项目</DropdownItem>
+                  >{{ $t('message.workflow.AllProj') }}</DropdownItem>
                   <DropdownItem
                     name="owner"
                     key="owner"
-                  >个人项目</DropdownItem>
+                  >{{ $t('message.workflow.Individual') }}</DropdownItem>
                   <DropdownItem
                     name="share"
                     key="share"
-                  >共享项目</DropdownItem>
+                  >{{ $t('message.workflow.ShareProj') }}</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
               <SvgIcon
@@ -166,10 +166,10 @@
       }}{{ deleteProjectItem.name }}?
       <br />
       <br />
-      <Checkbox v-model="ifDelOtherSys">同步删除所有第三方系统的工程</Checkbox>
+      <Checkbox v-model="ifDelOtherSys">{{ $t('message.workflow.Simultaneously') }}</Checkbox>
     </Modal>
     <!-- flow 基础属性 -->
-    <Modal v-model="baseprop.show" :footer-hide="true" class="prop-modal" title="基础属性">
+    <Modal v-model="baseprop.show" :footer-hide="true" class="prop-modal" :title="$t('message.workflow.Essential')">
       <div class="prop-item">
         <span class="label-prop"> 创建用户；</span> {{ baseprop.createUser }}
       </div>
@@ -222,7 +222,7 @@ export default {
       tabList: [],
       current: {},
       modeOfKey: "dev",
-      modeName: "开发中心",
+      modeName: this.$t('message.workflow.Development'),
       currentMode: null,
       applicationAreaMap: [],
       orchestratorModeList: {},
@@ -1051,7 +1051,7 @@ export default {
           this.currentProjectData.releaseUsers.indexOf(this.getUserName()) ===
             -1)
       ) {
-        return this.$Message.warning("无运维权限");
+        return this.$Message.warning(this.$t('message.workflow.Nopermission'));
       }
       // 使用的地方很多，存在缓存全局获取
       storage.set("currentDssLabels", this.modeOfKey);
@@ -1125,8 +1125,8 @@ export default {
             <SvgIcon icon-class="more_more" />
           </div>
           <DropdownMenu slot="list">
-            <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>配置</DropdownItem>
-            <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>删除</DropdownItem>
+            <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
+            <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       )
@@ -1150,11 +1150,11 @@ export default {
             <SvgIcon icon-class="more_more" />
           </div>
           <DropdownMenu slot="list">
-            {item.editable && <DropdownItem name="config_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_flow', item)}}>配置</DropdownItem>}
-            {item.editable && <DropdownItem name="delete_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_flow', item)}}>删除</DropdownItem>}
-            {(item.editable || item.canPublish) && <DropdownItem name="copy_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'copy_flow', item)}}>复制</DropdownItem>}
-            <DropdownItem name="viewVersion" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'viewVersion', item)}}>查看版本</DropdownItem>
-            <DropdownItem name="baseprop" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'baseprop', item)}}>基础属性</DropdownItem>
+            {item.editable && <DropdownItem name="config_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_flow', item)}}>{this.$t('message.workflow.Configuration') }</DropdownItem>}
+            {item.editable && <DropdownItem name="delete_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_flow', item)}}>{this.$t('message.workflow.Delete') }</DropdownItem>}
+            {(item.editable || item.canPublish) && <DropdownItem name="copy_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'copy_flow', item)}}>{this.$t('message.workflow.Copy') }</DropdownItem>}
+            <DropdownItem name="viewVersion" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'viewVersion', item)}}>{this.$t('message.workflow.Show') }</DropdownItem>
+            <DropdownItem name="baseprop" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'baseprop', item)}}>{this.$t('message.workflow.Essential') }</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       )

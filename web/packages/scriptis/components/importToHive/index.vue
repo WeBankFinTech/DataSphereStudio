@@ -8,7 +8,7 @@
       <span>{{$t('message.scripts.importToHive.DRWJ')}}</span>
       <span @click="fullScreenModal" class="full-btn">
         <Icon :type="isFullScreen?'md-contract':'md-expand'" />
-        {{isFullScreen?'取消全屏':'全屏展示'}}
+        {{isFullScreen?$t('message.scripts.cancelfullscreen'):$t('message.scripts.fullscreen')}}
       </span>
     </div>
     <!-- content -->
@@ -711,7 +711,7 @@ export default {
       let poptipValidate = {
         fieldName: {
           pattern: /^[a-zA-Z0-9_]+$/,
-          message: '字段名只支持大小写字母、数字和下划线',
+          message: this.$t('message.scripts.fieldnamestyle'),
         },
         length: {
           pattern: /^[0-9]+$/,
@@ -796,7 +796,7 @@ export default {
       if (this.secondStep.fields.length > 1) {
         this.secondStep.fields.splice(index, 1);
       } else if (this.secondStep.fields.length === 1) {
-        this.$Message.warning('无法删除所有的字段！');
+        this.$Message.warning(this.$t('message.scripts.unableDel'));
       }
     },
     // 在滚动字段列表时，需要对列表名称是否符合规范进行验证

@@ -28,7 +28,7 @@ export default {
       document.body.appendChild(inputEl);
       inputEl.select(); // 选择对象;
       document.execCommand("Copy"); // 执行浏览器复制命令
-      this.$Message.info('复制成功');
+      this.$Message.info(this.$t('message.common.dss.copied'));
       inputEl.remove();
     },
   }

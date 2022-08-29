@@ -1,7 +1,7 @@
 <template>
   <div class="access-component-wrap">
     <div class="head-menu">
-      <Button type="primary" @click="handleAddGroup">添加目录</Button>
+      <Button type="primary" @click="handleAddGroup">{{ $t('message.workspace.AddDir') }}</Button>
     </div>
     <library-admin-tree
       class="tree-container"
@@ -26,11 +26,11 @@
         :rules="groupRule"
         v-show="modalType === 'catalog'"
       >
-        <FormItem label="目录名称" prop="title">
+        <FormItem :label="$t('message.workspace.DirectoryName')" prop="title">
           <Input
             type="text"
             v-model="catalogForm.title"
-            placeholder="请输入目录名称"
+            :placeholder="$t('message.workspace.Please')"
             style="width: 300px"
           ></Input>
         </FormItem>
@@ -42,17 +42,17 @@
         :rules="contentRule"
         v-show="modalType !== 'catalog'"
       >
-        <FormItem label="节点类型" prop="type">
+        <FormItem :label="$t('message.workspace.NodeType')" prop="type">
           <RadioGroup v-model="contentForm.type">
-            <Radio label="chapter" :disabled="!!contentForm.id">文档</Radio>
-            <Radio label="catalog" :disabled="!!contentForm.id">目录</Radio>
+            <Radio label="chapter" :disabled="!!contentForm.id">{{ $t('message.workspace.Documents') }}</Radio>
+            <Radio label="catalog" :disabled="!!contentForm.id">{{ $t('message.workspace.Directory') }}</Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="节点标题" prop="title">
+        <FormItem :label="$t('message.workspace.NodeTitle')" prop="title">
           <Input
             type="text"
             v-model="contentForm.title"
-            placeholder="请输入标题"
+            :placeholder="$t('message.workspace.inputTitle')"
             style="width: 300px"
           >
           </Input>
@@ -60,14 +60,14 @@
       </Form>
       <slot name="footer">
         <div class="modalFooter">
-          <Button @click="handleModalCancel()" size="large">取消</Button>
+          <Button @click="handleModalCancel()" size="large">{{ $t('message.workspace.Cancel') }}</Button>
           <Button
             type="primary"
             size="large"
             :loading="submitLoading"
             @click="handleModalOk()"
             style="margin-left: 10px"
-          >确认</Button
+          >{{ $t('message.workspace.Confirm') }}</Button
           >
         </div>
       </slot>
@@ -105,7 +105,7 @@ export default {
         description: "",
       },
       groupRule: {
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
+        title: [{ required: true, message: this.$t('message.workspace.inputTitle'), trigger: "blur" }],
       },
       contentForm: {
         catalogId: -1,
@@ -114,9 +114,9 @@ export default {
       },
       contentRule: {
         type: [
-          { required: true, message: "请选择节点类型", trigger: "change" },
+          { required: true, message: this.$t('message.workspace.chooseNodeType'), trigger: "change" },
         ],
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
+        title: [{ required: true, message: this.$t('message.workspace.inputTitle'), trigger: "blur" }],
       },
     };
   },
@@ -269,7 +269,7 @@ export default {
     },
     handleDeleteClick(node) {
       this.$Modal.confirm({
-        title: "确认删除吗",
+        title: this.$t('message.workspace.ConfirmDel'),
         content: "",
         onOk: () => {
           if (node.type == 'chapter') {
@@ -278,7 +278,7 @@ export default {
             });
           } else {
             if (this.haveChildren(this.nodes, node)) {
-              this.$Message.info("该目录下还有所属内容，不能删除");
+              this.$Message.info(this.$t('message.workspace.Cannot'));
             } else {
               DeleteCatalog(node.id).then(() => {
                 if (node.parentId == -1) {
@@ -299,7 +299,7 @@ export default {
         if (node.parentId == -1) {
           this.showModal({
             type: "catalog",
-            op: "修改",
+            op: this.$t('message.workspace.Edit'),
           });
           this.catalogForm = {
             id: node.id,
@@ -309,7 +309,7 @@ export default {
         } else {
           this.showModal({
             type: "chapter",
-            op: "修改",
+            op: this.$t('message.workspace.Edit'),
           });
           this.contentForm = {
             catalogId: node.parentId,
@@ -321,7 +321,7 @@ export default {
       } else {
         this.showModal({
           type: "chapter",
-          op: "修改",
+          op: this.$t('message.workspace.Edit'),
         });
         this.contentForm = {
           catalogId: node.catalogId,
@@ -334,7 +334,7 @@ export default {
     handleAddClick(node) {
       this.showModal({
         type: "chapter",
-        op: "新增",
+        op: this.$t('message.workspace.Add'),
       });
       this.contentForm = {
         catalogId: node.id,
@@ -345,7 +345,7 @@ export default {
     handleAddGroup() {
       this.showModal({
         type: "catalog",
-        op: "新增",
+        op: this.$t('message.workspace.Add'),
       });
     },
     showModal(payload) {

@@ -35,7 +35,7 @@
             type="primary"
             size="small"
             @click.stop="namagement(row.id)"
-          >管理</Button>
+          >{{ $t('message.workspace.Management') }}</Button>
         </div>
       </template>
     </Table>
@@ -79,7 +79,7 @@ export default {
           ellipsis: true
         },
         {
-          title: '操作',
+          title: this.$t('message.workspace.Operation'),
           slot: "action",
           align: "center",
         }

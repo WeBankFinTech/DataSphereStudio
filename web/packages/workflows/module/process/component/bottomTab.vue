@@ -30,7 +30,7 @@
       <span  @click="toggleSize" class="tab-menu-item" :class="{close: minSize}">
         <Icon :type="minSize?'ios-arrow-forward':'ios-arrow-back'" size="16"/>
         <Icon type="ios-options" size="20"/>
-        收起
+        {{ $t('message.workflow.Fold') }}
       </span>
     </div>
   </div>

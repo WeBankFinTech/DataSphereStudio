@@ -265,8 +265,8 @@ export default {
     },
     downloadConfirm() {
       this.$Modal.confirm({
-        title: '提示',
-        content: '当前进行数据下载，可能涉及敏感数据，请保障数据的安全',
+        title: this.$t('message.common.Prompt'),
+        content: this.$t('message.common.safetips'),
         onOk: async () => {
           const splitor = this.download.format === '1' ? 'csv' : 'xlsx';
           const charset = this.download.coding === '1' ? 'utf-8' : 'gbk';

@@ -106,6 +106,9 @@ public class DSSFrameworkOrchestratorRestful {
     public Message modifyOrchestrator(@RequestBody OrchestratorModifyRequest modifyRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(modifyRequest.getId())) {
+            return Message.error("当前工作流正在被复制，不允许编辑");
+        }
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.modifyOrchestrator(username, modifyRequest, workspace);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                 orchestratorVo.getOrchestratorId(), modifyRequest.getOrchestratorName(), OperateTypeEnum.UPDATE, modifyRequest);
@@ -122,6 +125,9 @@ public class DSSFrameworkOrchestratorRestful {
     public Message deleteOrchestrator(@RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(deleteRequest.getId())) {
+            return Message.error("当前工作流正在被复制，不允许删除");
+        }
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                 orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.DELETE, deleteRequest);

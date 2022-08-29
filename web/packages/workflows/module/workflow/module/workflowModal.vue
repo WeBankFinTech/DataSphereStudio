@@ -4,7 +4,7 @@
     v-model="mergeModalShow"
     @on-cancel="ProjectMergeCancel"
     :footer-hide="true"
-    title="添加工作流"
+    :title="$t('message.workflow.Addworkflow')"
   >
     <WorkflowFormNew
       v-if="mergeModalShow"

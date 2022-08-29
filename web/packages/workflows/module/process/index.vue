@@ -129,7 +129,7 @@ export default {
             isChange: false,
             type: "workflow.subflow"
           },
-          key: "工作流",
+          key: '工作流',
           isHover: false
         }
       ],

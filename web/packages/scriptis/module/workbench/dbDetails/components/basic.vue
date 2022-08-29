@@ -37,19 +37,19 @@ export default {
     return {
       info: [
         {
-          title: '库基本信息',
+          title: this.$t('message.scripts.dbinfs'),
           children: [{
             key: 'dbName',
-            title: '库名',
+            title: this.$t('message.scripts.dbname'),
           }, {
             key: 'dbSize',
-            title: '库大小',
+            title: this.$t('message.scripts.dbsize'),
           }, {
             key: 'dbCapacity',
-            title: '库配额',
+            title: this.$t('message.scripts.dbquota'),
           }, {
             key: 'tableQuantity',
-            title: '表数量'
+            title: this.$t('message.scripts.tablenum')
           }],
         }
       ],

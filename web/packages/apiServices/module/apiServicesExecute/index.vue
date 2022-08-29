@@ -87,10 +87,10 @@ export default {
     verificationValue (row) {
       let flag;
       if(row.defaultValue.length > 1024 && Number(row.type) !== 4) {
-        this.$Message.error({ content: '不能超过1024个字符！' });
+        this.$Message.error({ content: this.$t('message.apiServices.more1024') });
         flag = true;
       } else if(row.type == 4 && row.defaultValue.split('\n').length > 5000) {
-        this.$Message.error({ content: '行数过多请分批查询！' });
+        this.$Message.error({ content: this.$t('message.apiServices.moreline') });
         flag = true;
       } else {
         flag = false
@@ -159,10 +159,10 @@ export default {
       this.showConditionList = this.conditionList.filter((item) => this.selectCondition.includes(item.id));
     },
     search() {
-      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: '超出限制请修改！' });
+      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: this.$t('message.apiServices.outlimit') });
       // 后续的执行逻辑
       if (this.excuteLoading) { // 停止执行
-        if(!(this.apiData && this.apiData.execID)) return this.$Message.error({ content: '任务暂时未生成返回，请稍后再试或联系管理员！' });
+        if(!(this.apiData && this.apiData.execID)) return this.$Message.error({ content: this.$t('message.apiServices.uninittask') });
         api.fetch(`/entrance/${this.apiData.execID}/kill`, {taskID: this.apiData.taskID}, 'get').then(() => {
           // kill成功后，去查kill后的状态
           this.$refs.currentConsole.killExecute(true);

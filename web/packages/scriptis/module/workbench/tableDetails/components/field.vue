@@ -52,22 +52,22 @@
     </div>
     <Modal v-model="editModelShow" :title="$t('message.scripts.createTable.titleModel')" :footer-hide="true">
       <Form :model="fieldModel" :label-width="80">
-        <Form-item prop="name" label="名称">
+        <Form-item prop="name" :label="$t('message.scripts.Name')">
           <Input v-model="fieldModel.name" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="type" label="类型">
+        <Form-item prop="type" :label="$t('message.scripts.Type')">
           <RadioGroup v-model="fieldModel.type">
-            <Radio label="index" disabled>指标</Radio>
-            <Radio label="dimension" disabled>维度</Radio>
+            <Radio label="index" disabled>{{ $t('message.scripts.Metrics') }}</Radio>
+            <Radio label="dimension" disabled>{{ $t('message.scripts.Dimensions') }}</Radio>
           </RadioGroup>
         </Form-item>
-        <Form-item prop="business" label="业务口径">
+        <Form-item prop="business" :label="$t('message.scripts.busst')">
           <Input v-model="fieldModel.business" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="calculate" label="计算口径">
+        <Form-item prop="calculate" :label="$t('message.scripts.calcst')">
           <Input v-model="fieldModel.calculate" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="formula" label="计算公式">
+        <Form-item prop="formula" :label="$t('message.scripts.Formula')">
           <Input v-model="fieldModel.formula" type="textarea" placeholder="" :disabled="true"></Input>
         </Form-item>
       </Form>
@@ -96,7 +96,7 @@ export default {
       editModelShow: false,
       fieldModel: {},
       tableColumns: [
-        { title: '序号', key: 'index', width: '5%' },
+        { title: this.$t('message.scripts.Serial'), key: 'index', width: '5%' },
         { title: this.$t('message.scripts.tableDetails.ZDM'), key: 'name', width: '10%' },
         { title: this.$t('message.scripts.tableDetails.ZDLX'), key: 'type', width: '10%'  },
         { title: this.$t('message.scripts.tableDetails.BM'), key: 'alias', width: '10%'  },

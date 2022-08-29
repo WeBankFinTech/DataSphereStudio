@@ -333,8 +333,8 @@ export default {
             if (hiveList.length > 30000) {
               that.$Notice.warning({
                 duration: 0,
-                title: '提示',
-                desc: '库表数据量较大可能导致编写脚本时卡顿，可在编辑器右键菜单选择关闭库表联想解决'
+                title: this.$t('message.scripts.propmpt'),
+                desc: this.$t('message.scripts.largedatatip')
               })
             }
           })

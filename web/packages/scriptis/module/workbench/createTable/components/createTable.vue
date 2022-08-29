@@ -53,29 +53,29 @@
     <Modal v-model="editModelShow" :title="$t('message.scripts.createTable.titleModel')">
       <Form ref="modelForm" :model="fieldModel" :label-width="80">
         <Form-item prop="name"
-          :rules="modelRule.name" label="名称">
+          :rules="modelRule.name" :label="$t('message.scripts.Name')">
           <Input v-model="fieldModel.name" placeholder=""></Input>
         </Form-item>
-        <Form-item prop="type" :rules="modelRule.type" label="类型">
+        <Form-item prop="type" :rules="modelRule.type" :label="$t('message.scripts.Type')">
           <RadioGroup v-model="fieldModel.type">
-            <Radio label="index">指标</Radio>
-            <Radio label="dimension">维度</Radio>
+            <Radio label="index">{{ $t('message.scripts.Metrics') }}</Radio>
+            <Radio label="dimension">{{ $t('message.scripts.Dimensions') }}</Radio>
           </RadioGroup>
         </Form-item>
         <Form-item prop="business"
-          :rules="modelRule.business" label="业务口径">
+          :rules="modelRule.business" :label="$t('message.scripts.busst')">
           <Input v-model="fieldModel.business" placeholder=""></Input>
         </Form-item>
-        <Form-item prop="calculate" :rules="modelRule.calculate" label="计算口径">
+        <Form-item prop="calculate" :rules="modelRule.calculate" :label="$t('message.scripts.calcst')">
           <Input v-model="fieldModel.calculate" placeholder=""></Input>
         </Form-item>
-        <Form-item prop="formula" label="计算公式">
+        <Form-item prop="formula" :label="$t('message.scripts.Formula')">
           <Input v-model="fieldModel.formula" type="textarea" placeholder=""></Input>
         </Form-item>
       </Form>
       <div slot="footer">
-        <Button @click="cancelEditModel">取消</Button>
-        <Button type="primary" @click="confirmEditModel">确定</Button>
+        <Button @click="cancelEditModel">{{ $t('message.scripts.Cancel') }}</Button>
+        <Button type="primary" @click="confirmEditModel">{{ $t('message.scripts.confirm') }}</Button>
       </div>
     </Modal>
   </div>
@@ -110,7 +110,7 @@ export default {
       },
       modelRule: {
         name: [
-          {required: true, message: '请输入名称', trigger: 'blur'},
+          {required: true, message: this.$t('message.scripts.plsinputname'), trigger: 'blur'},
           {
             max: 255,
             message: '输入超长，最大长度255',
@@ -118,10 +118,10 @@ export default {
           }
         ],
         type: [
-          {required: true, message: '请选择', trigger: 'blur'}
+          {required: true, message: this.$t('message.scripts.plsselect'), trigger: 'blur'}
         ],
         calculate: [
-          {required: true, message: '计算口径', trigger: 'blur'},
+          {required: true, message: this.$t('message.scripts.calcst'), trigger: 'blur'},
           {
             max: 255,
             message: '输入超长，最大长度255',
@@ -129,7 +129,7 @@ export default {
           }
         ],
         business: [
-          {required: true, message: '请输入业务口径', trigger: 'blur'},
+          {required: true, message: this.$t('message.scripts.plsinputbusiness'), trigger: 'blur'},
           {
             max: 255,
             message: '输入超长，最大长度255',
@@ -180,7 +180,7 @@ export default {
         this.batchFields = '';
         this.batchAddShow = false
       } else {
-        this.$Message.error("请输入字段")
+        this.$Message.error(this.$t('message.scripts.inputfield'))
         return false
       }
     },

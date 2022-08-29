@@ -170,7 +170,7 @@ export default {
       }), 100);
       this.editor.onContextMenu(debounce(() => {
         // 需要调换文字的右键菜单功能
-        const selectList = [{label: 'Change All Occurrences', text: '改变所有出现'}, {label: 'Format Document', text: '格式化'}, {label: 'Command Palette', text: '命令面板'}, {label: 'Cut', text: '剪切'}, {label: 'Copy', text: '复制'}];
+        const selectList = [{label: 'Change All Occurrences', text: '改变所有出现'}, {label: 'Format Document', text: '格式化'}, {label: 'Command Palette', text: '命令面板'}, {label: 'Cut', text: this.$t('message.common.Cut')}, {label: 'Copy', text: this.$t('message.common.copy')}];
         if (localStorage.getItem('locale') === 'zh-CN') {
           selectList.forEach((item) => {
             let elmentList = document.querySelectorAll(`.actions-container .action-label[aria-label="${item.label}"]`);

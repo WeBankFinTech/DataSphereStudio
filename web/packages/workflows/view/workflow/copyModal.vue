@@ -1,33 +1,33 @@
 <template>
-  <Modal title="复制工作流" v-model="visible" @on-cancel="cancelCallBack">
+  <Modal :title="$t('message.workflow.CopyWrokflow')" v-model="visible" @on-cancel="cancelCallBack">
     <Form
       ref="formRef"
       :rules="ruleValidate"
       :model="formState"
       :label-width="110"
     >
-      <FormItem label="被复制工作流" prop="name">
+      <FormItem :label="$t('message.workflow.Original')" prop="name">
         <Input v-model="formState.sourceOrchestratorName" disabled />
       </FormItem>
-      <FormItem label="复制到项目" prop="targetProjectId">
+      <FormItem :label="$t('message.workflow.CopyProj')" prop="targetProjectId">
         <Select v-model="formState.targetProjectId" clearable class="input">
           <Option v-for="item in projects" :key="item.id" :value="item.id">{{item.name}}</Option>
         </Select>
       </FormItem>
-      <FormItem label="复制后工作流名" prop="targetOrchestratorName">
+      <FormItem :label="$t('message.workflow.Copied')" prop="targetOrchestratorName">
         <Input v-model="formState.targetOrchestratorName"></Input>
       </FormItem>
-      <FormItem label="节点后缀" prop="workflowNodeSuffix">
-        <Input style="width:95%;margin-right: 6px;" v-model="formState.workflowNodeSuffix" placeholder="填写后将自动为工作流节点名添加该后缀"></Input>
-        <Tooltip min-width="300" max-width="350" content="同一项目中工作流节点重名会导致工作流发布失败，请考虑好节点后缀名再填写，若因重名问题导致发布失败，用户需手动修改对应工作流节点名称" placement="bottom">
+      <FormItem :label="$t('message.workflow.Node')" prop="workflowNodeSuffix">
+        <Input style="width:95%;margin-right: 6px;" v-model="formState.workflowNodeSuffix" :placeholder="$t('message.workflow.autosuffix')"></Input>
+        <Tooltip min-width="300" max-width="350" :content="$t('message.workflow.WorkflowSameName')"  placement="bottom">
           <SvgIcon icon-class="question" />
         </Tooltip>
       </FormItem>
     </Form>
     <Spin v-if="loading" fix></Spin>
     <template slot="footer">
-      <Button @click="handleCancel">取消</Button>
-      <Button type="primary" @click="handleOk">确定</Button>
+      <Button @click="handleCancel">{{ $t('message.workflow.Cancel') }}</Button>
+      <Button type="primary" @click="handleOk">{{ $t('message.workflow.Confirm') }}</Button>
     </template>
   </Modal>
 </template>
@@ -72,13 +72,13 @@ export default {
         targetOrchestratorName: [
           {
             required: true,
-            message: "请输入名称",
+            message: this.$t('message.workflow.PleaseInputName'),
           },
         ],
         targetProjectId: [
           {
             required: true,
-            message: "请选择项目",
+            message: this.$t('message.workflow.selcProj'),
           },
         ]
       }
@@ -97,7 +97,7 @@ export default {
         if (valid) {
           try {
             await this.copyRequest()
-            this.$Message.success('复制请求发送成功')
+            this.$Message.success(this.$t('message.workflow.Copyreq'))
             const targetProj = this.projects.find(it => it.id == this.formState.targetProjectId) || {}
             this.$emit('finish', {
               target: {

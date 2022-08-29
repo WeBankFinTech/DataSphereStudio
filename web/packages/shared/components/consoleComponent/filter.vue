@@ -56,7 +56,7 @@ export default {
       if (count > 1 || (count === 1 && !item.checked)) {
         this.$emit('on-check', item);
       } else {
-        this.$Message.warning('请至少勾选一个字段');
+        this.$Message.warning(this.$t('message.common.checkone'));
       }
     },
     getItemprops(index) {

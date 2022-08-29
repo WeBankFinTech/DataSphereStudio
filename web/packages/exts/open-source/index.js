@@ -1,6 +1,6 @@
 import ApiPublish from './scriptis/apiPublish/index.vue'
 import CopyHistory from './workflows/bottomTab/copyHistory.vue'
-
+import i18n from '@dataspherestudio/shared/common/i18n'
 /**
  * 插件绑定
  */
@@ -23,7 +23,7 @@ export default function () {
   this.bindHook('workflow_bottom_panel', function () {
     return [
       {
-        name: '复制历史',
+        name: i18n.t('message.ext.opensource.copyHistory'),
         icon: 'md-paper-plane',
         component: CopyHistory
       }

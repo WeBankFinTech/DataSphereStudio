@@ -231,13 +231,13 @@ export default {
         {
           id: 1,
           icon: "",
-          title: "开发中心",
+          title: this.$t('message.common.Development'),
           checked: false,
         },
         {
           id: 2,
           icon: "",
-          title: "生产中心",
+          title: this.$t('message.common.Production'),
           checked: false,
         },
       ],

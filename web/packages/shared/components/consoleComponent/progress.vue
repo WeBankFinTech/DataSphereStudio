@@ -23,7 +23,7 @@
         type="error"
         size="small"
         @click="clickTipButton"
-      >{{ taskInfo.solution && taskInfo.solution.solutionUrl?'查看解决方案':'上报错误'}}</Button>
+      >{{ taskInfo.solution && taskInfo.solution.solutionUrl?this.$t('message.common.viewSolution'):this.$t('message.common.reporterr')}}</Button>
     </div>
     <Row
       class="total-progress"
@@ -281,7 +281,7 @@ export default {
             errDesc: this.taskInfo.errDesc
           }
         }).then(()=>{
-          this.$Message.success('错误已上报')
+          this.$Message.success(this.$t('message.common.reported'))
         })
       }
     }

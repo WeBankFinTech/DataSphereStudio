@@ -61,7 +61,7 @@
               </div>
               <SvgIcon
                 v-if="isAdminAndSingleServe"
-                title="管理"
+                :title="$t('message.workspace.Management')"
                 class="management-button"
                 :style="{ 'font-size': '20px' }"
                 icon-class="setting"

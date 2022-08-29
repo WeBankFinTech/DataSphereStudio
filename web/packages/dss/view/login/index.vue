@@ -12,7 +12,7 @@
           <span class="login-title">{{$t('message.common.login.loginTitle', {app_name: $APP_CONF.app_name})}}</span>
         </FormItem>
         <FormItem prop="user">
-          <div class="label">用户名</div>
+          <div class="label">{{ $t('message.common.dss.Username') }}</div>
           <Input
             v-model="loginForm.user"
             type="text"
@@ -20,11 +20,11 @@
             size="large"/>
         </FormItem>
         <FormItem prop="password">
-          <div class="label">密码</div>
+          <div class="label">{{ $t('message.common.dss.Password') }}</div>
           <Input
             v-model="loginForm.password"
             type="password"
-            placeholder="请输入密码"
+            :placeholder="$t('message.common.dss.inputPassword')"
             size="large" />
           <Checkbox
             v-model="rememberUserNameAndPass"
@@ -226,12 +226,13 @@ export default {
       const hasTip = storage.get('chrome-version-tip', 'local')
       if (showversionTip && !hasTip) {
         this.$Modal.confirm({
-          title: "提示",
-          cancelText: '不再提示',
+          title: this.$t('message.common.dss.Prompt'),
+          cancelText: this.$t('message.common.dss.noPrompt'),
           onCancel: () => {
             storage.set('chrome-version-tip', true , 'local');
           },
-          content: `${chromeVersion ? '当前浏览器版本：' + chromeVersion + '，': ''}为了更好地体验推荐使用Chrome 78 版本${this.$APP_CONF.update_chrome?'，<a href="'+this.$APP_CONF.update_chrome+'">查看指引</a>':'，请联系管理员'}`
+          content: `${chromeVersion ? this.$t('message.common.dss.currentbrower') + chromeVersion + '，': ''}
+            ${this.$t('message.common.dss.Recommend')}Chrome 78 ${this.$APP_CONF.update_chrome ? `，<a href="'+this.$APP_CONF.update_chrome+'">${this.$t("message.common.dss.guide") }</a>`:`，${this.$t("message.common.dss.contactadmin")}`}`
         });
       }
     }

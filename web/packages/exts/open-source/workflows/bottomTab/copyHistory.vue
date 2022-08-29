@@ -41,19 +41,19 @@ export default {
           key: 'id'
         },
         {
-          title: '状态',
+          title: this.$t('message.ext.opensource.status'),
           key: 'status'
         },
         {
-          title: '复制人',
+          title: this.$t('message.ext.opensource.opreator'),
           key: 'userName'
         },
         {
-          title: '复制时间',
+          title: this.$t('message.ext.opensource.copytime'),
           key: 'startTime'
         },
         {
-          title: '错误信息',
+          title: this.$t('message.ext.opensource.errmsg'),
           key: 'exceptionInfo',
           width: '180',
           align: 'center',

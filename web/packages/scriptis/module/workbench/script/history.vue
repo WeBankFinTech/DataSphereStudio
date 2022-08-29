@@ -153,12 +153,12 @@ export default {
             label: this.$t('message.scripts.history.columns.control.download'),
             action: this.downloadLog,
           }, {
-            label: '查看解决方案',
+            label: this.$t('message.scripts.solution'),
             action: this.viewFAQ,
             style: { color: '#ed4014'},
             isHide: (data)=> { return window.$APP_CONF && window.$APP_CONF.error_report && data && data.solution && data.solution.solutionUrl}
           }, {
-            label: '上报错误',
+            label: this.$t('message.scripts.reporterror'),
             action: this.report,
             style: { color: '#ed4014'},
             isHide: (data)=> { return window.$APP_CONF && window.$APP_CONF.error_report && data && data.status === 'Failed' && (!data.solution || !data.solution.solutionUrl)}
@@ -280,7 +280,7 @@ export default {
             errDesc: res.task.errDesc
           }
         }).then(()=>{
-          this.$Message.success('错误已上报')
+          this.$Message.success(this.$t('message.scripts.reported'))
         })
       }
     }

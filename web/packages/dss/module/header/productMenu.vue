@@ -22,7 +22,7 @@
           @mouseenter="showRight"
         >
           <i></i>
-          全部产品
+          {{ $t('message.common.dss.allprod') }}
         </div>
         <ul class="nav-collect">
           <li

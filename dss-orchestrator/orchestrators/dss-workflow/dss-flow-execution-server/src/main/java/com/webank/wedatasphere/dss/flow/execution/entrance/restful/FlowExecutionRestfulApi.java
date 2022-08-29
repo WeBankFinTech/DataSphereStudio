@@ -21,7 +21,6 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowExecut
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob;
 import com.webank.wedatasphere.dss.flow.execution.entrance.service.WorkflowExecutionInfoService;
 import org.apache.linkis.entrance.EntranceServer;
-import org.apache.linkis.entrance.annotation.EntranceServerBeanAnnotation;
 import org.apache.linkis.protocol.utils.ZuulEntranceUtils;
 import org.apache.linkis.scheduler.queue.Job;
 import org.apache.linkis.scheduler.queue.SchedulerEventState;
@@ -30,7 +29,11 @@ import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import scala.Enumeration;
 import scala.Option;
 
@@ -46,7 +49,7 @@ public class FlowExecutionRestfulApi {
 
     private static final Logger logger = LoggerFactory.getLogger(FlowExecutionRestfulApi.class);
 
-    @EntranceServerBeanAnnotation.EntranceServerAutowiredAnnotation
+    @Autowired
     public void setEntranceServer(EntranceServer entranceServer) {
         this.entranceServer = entranceServer;
     }

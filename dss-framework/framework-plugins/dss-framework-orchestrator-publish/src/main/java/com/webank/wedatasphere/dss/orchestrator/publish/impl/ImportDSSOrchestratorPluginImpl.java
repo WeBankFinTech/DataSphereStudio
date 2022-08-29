@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
-import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -251,7 +250,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             bufferedWriter.flush();
             bufferedWriter.close();
             if (dssFlow.getRootFlow()) {
-                LOGGER.info("Modify dssFlow {} json to dssFlow {} json.", dssFlow.getName(), targetOrchestratorName);
+                LOGGER.info("Modify root dssFlow {} json to dssFlow {} json.", dssFlow.getName(), targetOrchestratorName);
                 if (!targetOrchestratorName.equals(dssFlow.getName())){
                     FileUtils.moveFile(new File(flowJsonPath), new File(flowInputPath + File.separator + targetOrchestratorName + ".json"));
                 }

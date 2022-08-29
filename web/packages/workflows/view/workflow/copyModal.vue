@@ -4,7 +4,7 @@
       ref="formRef"
       :rules="ruleValidate"
       :model="formState"
-      :label-width="100"
+      :label-width="110"
     >
       <FormItem label="被复制工作流" prop="name">
         <Input v-model="formState.sourceOrchestratorName" disabled />
@@ -14,12 +14,12 @@
           <Option v-for="item in projects" :key="item.id" :value="item.id">{{item.name}}</Option>
         </Select>
       </FormItem>
-      <FormItem label="复制后工作流" prop="targetOrchestratorName">
+      <FormItem label="复制后工作流名" prop="targetOrchestratorName">
         <Input v-model="formState.targetOrchestratorName"></Input>
       </FormItem>
       <FormItem label="节点后缀" prop="workflowNodeSuffix">
         <Input style="width:95%;margin-right: 6px;" v-model="formState.workflowNodeSuffix" placeholder="填写后将自动为工作流节点名添加该后缀"></Input>
-        <Tooltip max-width="300" content="同一项目中工作流节点重名会导致工作流发布失败，请考虑好节点后缀名再填写，若因重名问题导致发布失败，用户需手动修改对应工作流节点名称" placement="bottom">
+        <Tooltip min-width="300" max-width="350" content="同一项目中工作流节点重名会导致工作流发布失败，请考虑好节点后缀名再填写，若因重名问题导致发布失败，用户需手动修改对应工作流节点名称" placement="bottom">
           <SvgIcon icon-class="question" />
         </Tooltip>
       </FormItem>
@@ -140,7 +140,7 @@ export default {
         sourceProjectName: data.projectName
       }
       this.projects = projects.filter((item) => {
-        return item.name !== data.projectName && (item.canPublish() || item.editable)
+        return  item.canPublish() || item.editable
       })
     }
   },

@@ -70,7 +70,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiFunction;
@@ -82,7 +84,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-    private static final SimpleDateFormat SDF = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
     private OrchestratorMapper orchestratorMapper;
@@ -304,7 +306,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     orchestratorCopyInfo.getSourceOrchestratorName(), orchestratorCopyInfo.getTargetOrchestratorName(),
                     orchestratorCopyInfo.getSourceProjectName(), orchestratorCopyInfo.getTargetProjectName(), orchestratorCopyInfo.getWorkflowNodeSuffix(),
                     orchestratorCopyInfo.getMicroserverName(), orchestratorCopyInfo.getExceptionInfo(), orchestratorCopyInfo.getStatus(),
-                    orchestratorCopyInfo.getIsCopying(), SDF.format(orchestratorCopyInfo.getStartTime()), SDF.format(orchestratorCopyInfo.getEndTime()));
+                    orchestratorCopyInfo.getIsCopying(), DTF.format(LocalDateTime.ofInstant(orchestratorCopyInfo.getStartTime().toInstant(), ZoneId.systemDefault())),
+                    DTF.format(LocalDateTime.ofInstant(orchestratorCopyInfo.getEndTime().toInstant(), ZoneId.systemDefault())));
             orchestratorCopyHistoryList.add(orchestratorCopyHistory);
         }
         return new Pair<>(total, orchestratorCopyHistoryList);

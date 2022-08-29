@@ -65,7 +65,7 @@
       <we-menu-item
         v-if="currentNode.isLeaf"
         @select="openExportDialog">
-        <span>导出至工作空间</span>
+        <span>{{ $t('message.scripts.hdfs.contextMenu.exportToWorkSpace') }}</span>
       </we-menu-item>
       <we-menu-item
         v-if="!currentNode.isLeaf"
@@ -99,7 +99,7 @@
       :tree="shareTree"
       :load-data-fn="loadShareDataFn"
       :fs-type="fsType"
-      title="导出至工作空间"
+      :title="$t('message.scripts.hdfs.dialogTitle.exportToWorkSpace')"
       @import="exportToFile"
       @set-node="setNode"/>
     <we-import-to-hive

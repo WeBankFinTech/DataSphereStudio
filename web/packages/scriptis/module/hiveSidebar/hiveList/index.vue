@@ -172,7 +172,7 @@ export default {
             children: this.data
           },{
             _id: 'cs',
-            name: '上游暂存表',
+            name: this.$t('message.scripts.upstreamTable'),
             iconCls: 'md-arrow-dropright',
             dataType: 'cat',
             loaded: true,

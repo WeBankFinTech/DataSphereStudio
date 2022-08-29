@@ -39,6 +39,7 @@
   </div>
 </template>
 <script>
+import i18n from '@dataspherestudio/shared/common/i18n';
 export default {
   props: {
     title: {
@@ -46,7 +47,7 @@ export default {
       type: Object,
       default: () => {
         return {
-          name: "我是标题！",// 标题名称
+          name: i18n.t('message.apiServices.istitle'),// 标题名称
           icon: "api",// 标题icon
           iconColor: "#1296db",// icon颜色
           iconSize: "2rem"// icon大小
@@ -73,7 +74,7 @@ export default {
     desc: {
       // 描述
       type: String,
-      default: "我是描述内容！"
+      default: i18n.t('message.apiServices.isdesc')
     },
     button: {
       // 底部按钮
@@ -81,7 +82,7 @@ export default {
       default: () => {
         return {
           type: "primary",// 按钮类型
-          text: "确认",// 按钮文本
+          text: i18n.t('message.apiServices.confirm'),// 按钮文本
         }
       }
     },

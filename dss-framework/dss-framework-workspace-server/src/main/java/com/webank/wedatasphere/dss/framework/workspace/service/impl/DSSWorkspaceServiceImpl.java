@@ -196,9 +196,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                     userName, "system", userId);
-            int workspace0xId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
-                    userName, "system", userId);
+            Integer workspace0xId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
+            if (workspace0xId != null) {
+                dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+                        userName, "system", userId);
+            }
             String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()));
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
                 homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);

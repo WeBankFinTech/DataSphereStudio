@@ -21,9 +21,11 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
+import com.webank.wedatasphere.dss.common.entity.node.Node;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -183,12 +185,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Override
     public DSSFlow getFlow(Long flowID) throws NullPointerException{
-        DSSFlow DSSFlow = getFlowByID(flowID);
+        DSSFlow dssFlow = getFlowByID(flowID);
         //todo update
-        String userName = DSSFlow.getCreator();
-        Map<String, Object> query = bmlService.query(userName, DSSFlow.getResourceId(), DSSFlow.getBmlVersion());
-        DSSFlow.setFlowJson(query.get("string").toString());
-        return DSSFlow;
+        String userName = dssFlow.getCreator();
+        Map<String, Object> query = bmlService.query(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion());
+        dssFlow.setFlowJson(query.get("string").toString());
+        return dssFlow;
     }
 
     @Override
@@ -374,6 +376,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return subflowName.stream().anyMatch(s -> s.equals(name));
     }
 
+    @Override
+    public boolean checkIsExistSameFlow(String jsonFlow) {
+        List<DSSNode> workFlowNodes = workFlowParser.getWorkFlowNodes(jsonFlow);
+        long distinctSize = workFlowNodes.stream().map(Node::getName).distinct().count();
+        return distinctSize < workFlowNodes.size();
+    }
+
     private DSSFlow copyFlowAndSetSubFlowInDB(DSSFlow dssFlow,
                                               String userName, String description) {
         DSSFlow cyFlow = new DSSFlow();
@@ -445,9 +454,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             bmlService.downloadToLocalPath(userName, resource.getResourceId(), resource.getVersion(), flowResourcePath);
             //重新上传resource
             InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, flowResourcePath);
-            Map<String, Object> bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
-            resource.setResourceId(bmlReturnMap.get("resourceId").toString());
-            resource.setVersion(bmlReturnMap.get("version").toString());
+            BmlResource bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
+            resource.setResourceId(bmlReturnMap.getResourceId());
+            resource.setVersion(bmlReturnMap.getVersion());
         });
         //更新flowJson的resources
         return workFlowParser.updateFlowJsonWithKey(flowJson, "resources", resourceList);

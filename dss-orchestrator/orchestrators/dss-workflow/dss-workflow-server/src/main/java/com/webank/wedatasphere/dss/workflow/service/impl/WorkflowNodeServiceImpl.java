@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
@@ -232,12 +233,13 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     @Override
     public ExportResponseRef exportNode(String userName, CommonAppConnNode node) {
-        return tryNodeOperation(userName, node,
+        return tryNodeOperation(userName,
+                node,
                 (appConn, dssLabels) -> getDevelopmentService(appConn, dssLabels, DevelopmentIntegrationStandard::getRefExportService),
                 developmentService -> ((RefExportService) developmentService).getRefExportOperation(),
-                (developmentOperation, developmentRequestRef) ->
-                        ((RefExportOperation) developmentOperation).exportRef((RefJobContentRequestRef) developmentRequestRef)
-                , null, "export");
+                (developmentOperation, developmentRequestRef) -> ((RefExportOperation) developmentOperation).exportRef((RefJobContentRequestRef) developmentRequestRef),
+                null,
+                "export");
     }
 
     @Override

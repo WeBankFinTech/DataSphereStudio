@@ -562,7 +562,7 @@ export default {
       // 返回结构不一样
       axios
         .get(
-          `http://${window.location.host}/api/rest_j/v1/dss/framework/orchestrator/exportOrchestrator`,
+          `${location.protocol}//${window.location.host}/api/rest_j/v1/dss/framework/orchestrator/exportOrchestrator`,
           {
             params,
             responseType: "arraybuffer"

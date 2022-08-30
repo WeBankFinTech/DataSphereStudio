@@ -196,12 +196,15 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                     userName, "system", userId);
-            String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()));
+            Integer workspace0xId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
+            if (workspace0xId != null) {
+                dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+                        userName, "system", userId);
+            }
+            //若路径没有workspaceId会出现页面没有首页、管理台
+            String homepageUrl = "/home" + "?workspaceId=" + workspaceId;
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
                 homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
-            }
-            if (StringUtils.isEmpty(homepageUrl)) {
-                homepageUrl = "/home" + "?workspaceId=" + workspaceId;
             }
             dssWorkspaceHomePageVO.setHomePageUrl(homepageUrl);
             dssWorkspaceHomePageVO.setWorkspaceId(workspaceId);
@@ -226,7 +229,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setWorkspaceId(workspaceIds.get(0));
             dssWorkspaceHomePageVO.setRoleName(workspaceDBHelper.getRoleNameById(minRoleId));
         } else {
-            //排除掉默认的默认工作空间bdapWorkspace
             String homepageUrl = "/workspaceHome?workspaceId=" + workspaceIds.get(0);
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
                 homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
@@ -427,8 +429,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public String getWorkspaceName(String workspaceId) {
-        return dssWorkspaceInfoMapper.getWorkspaceNameById(Integer.parseInt(workspaceId));
+    public String getWorkspaceName(Long workspaceId) {
+        return dssWorkspaceInfoMapper.getWorkspaceNameById(workspaceId);
     }
 
     @Override
@@ -560,7 +562,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 AppConn appConn = AppConnManager.getAppConnManager().getAppConn(menuAppconn.getName());
                 List<DSSApplicationBean> instanceList = new ArrayList<>();
                 SSOUrlBuilderOperation operation;
-                if(appConn instanceof OnlySSOAppConn) {
+                if (appConn instanceof OnlySSOAppConn) {
                     operation = ((OnlySSOAppConn) appConn).getOrCreateSSOStandard().getSSOBuilderService().createSSOUrlBuilderOperation();
                     SSOHelper.setSSOUrlBuilderOperation(operation, workspace);
                     operation.setAppName(appConn.getAppDesc().getAppName());

@@ -22,19 +22,19 @@
           <Option
             value="all"
             key="all"
-          >所有项目</Option>
+          >{{ $t('message.workspace.All') }}</Option>
           <Option
             value="owner"
             key="owner"
-          >个人项目</Option>
+          >{{ $t('message.workspace.Individual') }}</Option>
           <Option
             value="share"
             key="share"
-          >共享项目</Option>
+          >{{ $t('message.workspace.Shared') }}</Option>
           <Option
             value="delete"
             key="delete"
-          >已删除项目</Option>
+          >{{ $t('message.workspace.Deleted') }}</Option>
         </Select>
         <Input
           search
@@ -114,7 +114,7 @@
       {{$t('message.common.projectDetail.confirmDeleteProject')}}{{ deleteProjectItem.name }}?
       <br />
       <br />
-      <Checkbox v-model="ifDelOtherSys">同步删除所有第三方系统的工程</Checkbox>
+      <Checkbox v-model="ifDelOtherSys">{{ $t('message.workspace.Simultaneously') }}</Checkbox>
       <br />
     </Modal>
     <Spin v-if="loading" size="large" fix />
@@ -779,7 +779,7 @@ export default {
                 this.isFlowPubulish = false
                 this.removePercent(projectId)
                 this.$Modal.error({
-                  title: `工程${typeName}${this.$t('message.workflow.fail')}`,
+                  title: `${this.$t('message.workflow.project')}${typeName}${this.$t('message.workflow.fail')}`,
                   content: `<p style="word-break: break-all;">${res.info.msg}</p>`,
                   width: 500,
                   okText: this.$root.$t('message.workflow.publish.cancel')

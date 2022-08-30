@@ -28,17 +28,49 @@ public class DSSOrchestratorVersion {
 
 
     private Long id;
+    /**
+     * 编排id
+     */
     private Long orchestratorId;
+    /**
+     * 对应的实现的id，比如workflow的id。每个版本{@link #getVersion()}对应的实现可以不一样。
+     */
     private Long appId;
+    /**
+     * 所属项目id
+     */
     private Long projectId;
+    /**
+     * 创建的来源。比如新建、回滚。 用于记录信息description用，一般不消费。
+     */
     private String source;
+    /**
+     * 编排的版本哈
+     */
     private String version;
+    /**
+     * 备注
+     */
     private String comment;
+    /**
+     * 更新时间
+     */
     private Date   updateTime;
+    /**
+     * 更新人
+     */
     private String updater;
+    /**
+     * 废弃字段。  具体实现的内容已经放到实现模块了。比如工作流在工作流模块，通过关联获取
+     */
     private String content;
+    /**
+     * 这个编排版本所对应的contextId
+     */
     private String contextId;
-    //有效标示 0:无效；1：有效，默认是有效
+    /**
+     * 有效标示 0:无效；1：有效，默认是有效
+     */
     private Integer validFlag;
 
 

@@ -25,9 +25,15 @@ public class RequestFrameworkConvertOrchestration {
 
     private String userName;
     private DSSWorkspace workspace;
+    /**
+     * 编排实现的id，比如工作流的id
+     */
     private Long orcAppId;
     private List<Long> orcIds;
     private Map<String, Object> labels;
+    /**
+     * 是否要发布工程下所有的编排
+     */
     private boolean convertAllOrcs;
     private String comment;
 

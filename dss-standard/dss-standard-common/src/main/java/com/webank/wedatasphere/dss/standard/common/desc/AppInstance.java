@@ -20,7 +20,9 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * AppConn的一个实例
+ */
 public interface AppInstance {
 
     Long getId();

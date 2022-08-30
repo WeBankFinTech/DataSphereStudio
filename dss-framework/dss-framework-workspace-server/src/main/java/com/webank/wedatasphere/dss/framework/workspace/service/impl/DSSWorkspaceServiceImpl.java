@@ -201,12 +201,10 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                         userName, "system", userId);
             }
-            String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()));
+            //若路径没有workspaceId会出现页面没有首页、管理台
+            String homepageUrl = "/home" + "?workspaceId=" + workspaceId;
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
                 homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
-            }
-            if (StringUtils.isEmpty(homepageUrl)) {
-                homepageUrl = "/home" + "?workspaceId=" + workspaceId;
             }
             dssWorkspaceHomePageVO.setHomePageUrl(homepageUrl);
             dssWorkspaceHomePageVO.setWorkspaceId(workspaceId);
@@ -231,7 +229,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setWorkspaceId(workspaceIds.get(0));
             dssWorkspaceHomePageVO.setRoleName(workspaceDBHelper.getRoleNameById(minRoleId));
         } else {
-            //排除掉默认的默认工作空间bdapWorkspace
             String homepageUrl = "/workspaceHome?workspaceId=" + workspaceIds.get(0);
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
                 homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);

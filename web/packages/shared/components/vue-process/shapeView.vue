@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="designer-shape" :class="{'shape-fold': shapeFold}">
     <div class="shape-head">
-      <div class="head-title">组件</div>
+      <div class="head-title">{{$t('message.workflow.vueProcess.comp')}}</div>
       <div class="head-btn" @click="toggleShape">
         <SvgIcon icon-class="putaway"/>
       </div>

@@ -66,7 +66,7 @@ export default {
         if (!res.task.logPath) {
           const errCode = res.task.errCode ? '\n错误码：' + res.task.errCode : '';
           const errDesc = res.task.errDesc ? '\n错误描述：' + res.task.errDesc : '';
-          const info = '未获取到日志！' + errCode + errDesc;
+          const info = this.$t('message.common.dss.nolog') + errCode + errDesc;
           this.logs = { all: info, error: '', warning: '', info: '' };
           this.fromLine = 1;
           this.isLoading = false;

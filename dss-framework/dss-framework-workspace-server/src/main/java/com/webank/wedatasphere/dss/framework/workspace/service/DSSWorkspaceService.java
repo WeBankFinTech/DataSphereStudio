@@ -57,7 +57,7 @@ public interface DSSWorkspaceService {
 
     DSSWorkspaceHomepageSettingVO getWorkspaceHomepageSettings(int workspaceId);
 
-    String getWorkspaceName(String workspaceId);
+    String getWorkspaceName(Long workspaceId);
 
     boolean checkAdmin(String userName);
 

@@ -161,11 +161,12 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         }
 
         List<ProjectResponse> projectResponseList = new ArrayList<>();
+        ProjectResponse projectResponse;
         for (QueryProjectVo projectVo : list) {
             if (projectVo.getVisible() == 0) {
                 continue;
             }
-            ProjectResponse projectResponse = new ProjectResponse();
+            projectResponse = new ProjectResponse();
             projectResponse.setApplicationArea(projectVo.getApplicationArea());
             projectResponse.setId(projectVo.getId());
             projectResponse.setBusiness(projectVo.getBusiness());
@@ -254,8 +255,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     @Override
-    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace) throws Exception  {
-        DSSProjectDO dssProjectDO = projectMapper.selectById(projectDeleteRequest.getId());
+    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) throws Exception  {
         if (dssProjectDO == null) {
             throw new DSSErrorException(600001, "工程不存在!");
         }

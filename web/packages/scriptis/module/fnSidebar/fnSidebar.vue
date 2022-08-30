@@ -156,7 +156,7 @@ export default {
       treeLoading: false,
       filterNode: () => {},
       newDialog: {
-        type: '文件夹',
+        type: this.$t('message.scripts.folder'),
         isNew: true,
         node: {},
       },

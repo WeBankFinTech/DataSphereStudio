@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.project.restful;
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
@@ -25,7 +27,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDelet
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
-import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
@@ -69,8 +71,7 @@ public class DSSFrameworkProjectRestfulApi {
         projectRequest.setUsername(username);
         LOGGER.info("user {} begin to getAllProjects, projectId:{}", username, projectRequest.getId());
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
-        Message message = Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
-        return message;
+        return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
     }
 
     /**
@@ -92,9 +93,12 @@ public class DSSFrameworkProjectRestfulApi {
         if (!releaseUsers.contains(username)) {
             releaseUsers.add(username);
         }
-//        LOGGER.info("User {} begin to create project in workspace {}, request params: {}.", username, workspace.getWorkspaceName(), projectCreateRequest);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "create project", projectCreateRequest);
-        return DSSExceptionUtils.getMessage(() -> dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace),
+        return DSSExceptionUtils.getMessage(() -> {
+                    DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
+                    AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
+                            dssProjectVo.getId(),dssProjectVo.getName(), OperateTypeEnum.CREATE,projectCreateRequest);
+                    return dssProjectVo;
+                },
                 dssProjectVo -> Message.ok("创建工程成功.").data("project", dssProjectVo),
                 String.format("用户 %s 创建工程 %s 失败. ", username, projectCreateRequest.getName()));
     }
@@ -125,7 +129,6 @@ public class DSSFrameworkProjectRestfulApi {
         if (projectModifyRequest.getDescription().length() > MAX_DESC_LENGTH) {
             return Message.error("The project description information is too long, exceeding the maximum length:" + MAX_DESC_LENGTH);
         }
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "modify project", projectModifyRequest);
         DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
         //工程不存在
         if (dbProject == null) {
@@ -145,7 +148,11 @@ public class DSSFrameworkProjectRestfulApi {
         if (!releaseUsers.contains(createUsername)) {
             releaseUsers.add(createUsername);
         }
-        return DSSExceptionUtils.getMessage(() -> dssFrameworkProjectService.modifyProject(projectModifyRequest, dbProject, username, workspace),
+        return DSSExceptionUtils.getMessage(() -> {
+                    dssFrameworkProjectService.modifyProject(projectModifyRequest, dbProject, username, workspace);
+                    AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
+                            projectModifyRequest.getId(),projectModifyRequest.getName(), OperateTypeEnum.UPDATE,projectModifyRequest);
+                    },
                 () -> Message.ok("修改工程成功."),
                 String.format("用户 %s 修改工程 %s 失败. ", username, projectModifyRequest.getName()));
     }
@@ -161,12 +168,14 @@ public class DSSFrameworkProjectRestfulApi {
     public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "delete project", projectDeleteRequest);
+
         return DSSExceptionUtils.getMessage(() -> {
                     // 检查是否具有删除项目权限
                     projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
-                    projectService.deleteProject(username, projectDeleteRequest, workspace);
-                },
+                    DSSProjectDO dssProjectDO= projectService.getProjectById(projectDeleteRequest.getId());
+                    projectService.deleteProject(username, projectDeleteRequest, workspace,dssProjectDO);
+                    AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
+                            dssProjectDO.getId(),dssProjectDO.getName(), OperateTypeEnum.DELETE,projectDeleteRequest);                },
                 () -> Message.ok("删除工程成功."),
                 String.format("用户 %s 删除工程失败. ", username));
     }
@@ -208,8 +217,7 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
         List<ProjectResponse> dssProjectVos = projectService.getDeletedProjects(projectRequest);
-        Message message = Message.ok("获取工作空间已删除的工程成功").data("projects", dssProjectVos);
-        return message;
+        return Message.ok("获取工作空间已删除的工程成功").data("projects", dssProjectVos);
     }
 
 

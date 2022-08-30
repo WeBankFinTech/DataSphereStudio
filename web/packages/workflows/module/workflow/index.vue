@@ -40,7 +40,7 @@
       @goto="versionGotoWorkflow"
     ></VersionDetail>
     <!--新增和导入 二合一弹窗-->
-    <Modal v-model="mergeModalShow" :footer-hide="true" title="添加工作流">
+    <Modal v-model="mergeModalShow" :footer-hide="true" :title="$t('message.workflow.Addworkflow')">
       <WorkflowFormNew
         v-if="mergeModalShow"
         :workflow-data="currentOrchetratorData"
@@ -213,7 +213,7 @@ export default {
           "post"
         )
         .then(() => {
-          this.$Message.success('操作成功');
+          this.$Message.success(this.$t('message.workflow.Success'));
           this.$emit('rollback', row.orchestratorId)
           this.versionDetail()
         })

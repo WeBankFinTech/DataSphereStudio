@@ -46,7 +46,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addWorkspaceRole(String roleName, int workspaceId, List<Integer> menuIds, List<Integer> componentIds, String username) {
+    public DSSWorkspaceRole addWorkspaceRole(String roleName, int workspaceId, List<Integer> menuIds, List<Integer> componentIds, String username) {
         DSSWorkspaceRole dssRole = new DSSWorkspaceRole();
         dssRole.setWorkspaceId(workspaceId);
         dssRole.setFrontName(roleName);
@@ -71,6 +71,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
             dssWorkspaceRoleMapper.updateRoleComponent(dssRole.getId(), workspaceId, allComponentIds, username, 0);
         }
         workspaceDBHelper.retrieveFromDB();
+        return dssRole;
     }
 
     @Override

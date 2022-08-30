@@ -13,7 +13,7 @@
       >
         <div class="project-add">
           <Icon :size="32" type="ios-add"></Icon>
-          <span>新建工作流</span>
+          <span>{{ $t('message.workflow.Createworkflow') }}</span>
         </div>
       </i-col>
       <i-col
@@ -37,7 +37,7 @@
               <ul class="menu-list">
                 <li class="list-item" @click.stop="deleteProject(subitem)">{{$t('message.workflow.workflowItem.delete')}}</li>
                 <li class="list-item" @click.stop="modify(currentData.id, subitem)">{{$t('message.workflow.workflowItem.config')}}</li>
-                <!-- <li class="list-item" @click.stop="Export(subitem)">导出</li> -->
+                <!-- <li class="list-item" @click.stop="Export(subitem)">{{ $t('message.workflow.Export') }}</li> -->
                 <!-- <li v-if="!isPercent(subitem.orchestratorId)" class="list-item" @click.stop="publish(subitem)">{{$t('message.workflow.workflowItem.publish')}}</li> -->
               </ul>
             </div>

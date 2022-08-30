@@ -53,10 +53,15 @@ public class DssProxyUserController {
     public Message setProxyUserCookie(@RequestBody DssProxyUser userRep, HttpServletRequest req, HttpServletResponse resp) {
 
         String username = SecurityFilter.getLoginUsername(req);
-        LOGGER.info("user {} try to add yser cookie, params:{}", username, userRep);
+        LOGGER.info("user {} try to add user cookie, params:{}", username, userRep);
         String trustCode = DS_TRUST_TOKEN.getValue();
         try {
-            if (userRep.getUserName().equals(username)) {
+            if (userRep.getUserName().equals(username) || userRep.getProxyUserName().equals(username)) {
+                //兼容linkis端直接为登陆用户名加_c后缀的场景
+                if (userRep.getProxyUserName().equals(username)) {
+                    username = userRep.getProxyUserName();
+                    userRep.setUserName(userRep.getProxyUserName());
+                }
                 if (StringUtils.isEmpty(userRep.getUserName())) {
                     DSSExceptionUtils.dealErrorException(100101, "User name is empty", DSSAdminErrorException.class);
                 } else if (StringUtils.isEmpty(userRep.getProxyUserName())) {

@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.io.input.impl;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -87,7 +88,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         String flowInputPath = inputProjectPath + File.separator + dssFlow.getName();
         String flowJsonPath = flowInputPath + File.separator + dssFlow.getName() + ".json";
         String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
-        //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
+        //如果包含subflow,需要一同导入subflow内容，并更新parentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
         String updateFlowJson = updateFlowContextIdAndVersion(userName,
                 workspace.getWorkspaceName(),
@@ -155,7 +156,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
         if (nodeJsonList.size() > 0) {
             for (String nodeJson : nodeJsonList) {
-                // TODO: 2020/3/20 暂时注视掉appconn相关
+                // TODO: 2020/3/20 暂时注释掉appconn相关
                 String updateNodeJson = nodeInputService.uploadResourceToBml(userName, nodeJson, workFlowResourceSavePath, projectName);
                 updateNodeJson = nodeInputService.uploadAppConnResource(userName, projectName,
                         dssFlow, updateNodeJson, updateContextId, appConnResourceSavePath,
@@ -260,9 +261,9 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         if (resourceList != null) {
             resourceList.forEach(resource -> {
                 InputStream resourceInputStream = readFlowResource(userName, resource, flowResourcePath);
-                Map<String, Object> bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
-                resource.setResourceId(bmlReturnMap.get("resourceId").toString());
-                resource.setVersion(bmlReturnMap.get("version").toString());
+                BmlResource bmlReturnMap = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
+                resource.setResourceId(bmlReturnMap.getResourceId());
+                resource.setVersion(bmlReturnMap.getVersion());
             });
             if (resourceList.size() == 0) {
                 return flowJson;

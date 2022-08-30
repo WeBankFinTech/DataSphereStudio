@@ -104,7 +104,7 @@
           </tr>
         </table>
         <div v-show="showTableList.length < 1" class="no-data-tip" :style="noDataStyle">
-          暂无数据
+          {{ $t('message.common.No') }}
         </div>
         <div :style="{height:`${tableOtherBottom}px`}"></div>
       </div>

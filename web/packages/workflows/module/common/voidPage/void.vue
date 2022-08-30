@@ -2,30 +2,30 @@
   <div class="void-page-wrap">
     <div class="void-page-left">
       <div class="void-page-left-title">
-        <span>开发中心</span>
+        <span>{{ $t('message.workflow.Development') }}</span>
       </div>
       <div class="void-page-left-main">
         <div class="void-page-left-main-img">
           <SvgIcon icon-class="empty" width="200px" height="200px" />
         </div>
         <div class="void-page-left-main-tip">
-          <span>无打开的工作流，可点击下方按钮添加</span>
+          <span>{{ $t('message.workflow.Noopen') }}</span>
         </div>
         <div class="void-page-left-main-button">
-          <Button @click.stop="addProject">添加项目</Button>
+          <Button @click.stop="addProject">{{ $t('message.workflow.Add') }}</Button>
           <Button
             type="primary"
             style="margin-left: 8px"
             icon="md-add"
             @click.stop="addWrokFlow"
-          >添加工作流</Button
+          >{{ $t('message.workflow.Addworkflow') }}</Button
           >
         </div>
       </div>
     </div>
     <div class="void-page-right">
       <div class="void-page-right-title" v-if="lastWorkflowList.length">
-        <span>最近</span>
+        <span>{{ $t('message.workflow.Recent') }}</span>
       </div>
       <div class="void-page-right-main">
         <div

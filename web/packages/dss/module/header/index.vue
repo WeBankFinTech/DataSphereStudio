@@ -41,7 +41,7 @@
           <Icon type="ios-arrow-down" style="margin-left: 5px"></Icon>
         </div>
         <DropdownMenu slot="list" class="proj-list">
-          <div class="proj-name">工作空间列表</div>
+          <div class="proj-name">{{ $t('message.common.dss.worklist') }}</div>
           <div class="name-bar">
             <span
               v-for="p in workspaceList"
@@ -415,7 +415,7 @@ export default {
             this.collections = this.collections.concat(app);
           })
         } else {
-          this.$Message.warning('目前只支持钉五个快捷入口')
+          this.$Message.warning(this.$t('message.common.dss.fiveshortcut'))
         }
       }
     },

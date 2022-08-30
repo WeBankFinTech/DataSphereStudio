@@ -77,7 +77,7 @@ export default {
             copyProjectName: this.copyProjectData.name,
             workspaceId: +this.$route.query.workspaceId
           }, 'post').then((res) => {
-            this.$Message.success('复制请求发送成功')
+            this.$Message.success(this.$t('message.workspace.CopySucc'))
             this.queryCopyStatus(res.projectId)
             this.copyProjectData.name = '';
           }).catch(() => {
@@ -100,7 +100,7 @@ export default {
         const name = copyProjectId + '_copy';
         this.$Notice.close(name);
         this.$Notice.info({
-          title: '提示',
+          title: this.$t('message.workspace.Prompt'),
           desc: '',
           render: (h) => {
             return h('span', {

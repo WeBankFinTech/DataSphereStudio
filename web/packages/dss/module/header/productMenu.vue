@@ -22,7 +22,7 @@
           @mouseenter="showRight"
         >
           <i></i>
-          全部产品
+          {{ $t('message.common.dss.allprod') }}
         </div>
         <ul class="nav-collect">
           <li
@@ -292,16 +292,19 @@ export default {
 }
 .luban-nav-panel {
   z-index: 2000;
-  position: fixed;
+  position: absolute;
   margin-top: 54px;
   left: 0;
   top: 0;
   bottom: 0;
-  display: flex;
   // 防止部分浏览器在translateX(-100%)仍可触发显示菜单
   visibility: hidden;
   transform: translateX(-100%);
   transition: all 0.3s ease-in-out;
+  overflow-y: auto;
+  width: 810px;
+  background: #000a17;
+  overflow-x: hidden;
   &.nav-open {
     transform: translateX(0);
     visibility: visible;
@@ -311,6 +314,8 @@ export default {
     position: relative;
     width: 250px;
     background: #000a17;
+    float: left;
+    height: 100%;
     .nav-all {
       position: relative;
       padding: 16px;
@@ -413,10 +418,9 @@ export default {
   }
   .nav-right {
     z-index: 2000;
-    position: absolute;
+    position: fixed;
     left: 250px;
     top: 0;
-    bottom: 0;
     width: 560px;
     background: #061528;
     overflow: auto;

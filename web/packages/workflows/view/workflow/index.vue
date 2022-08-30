@@ -12,7 +12,7 @@
       <div class="project-nav-tree">
         <div class="project-nav-tree-top">
           <div class="project-nav-tree-top-t">
-            <span class="project-nav-tree-top-t-txt">项目</span>
+            <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
             <div class="project-nav-tree-top-t-icon">
               <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
                 <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
@@ -30,15 +30,15 @@
                   <DropdownItem
                     name="all"
                     key="all"
-                  >所有项目</DropdownItem>
+                  >{{ $t('message.workflow.AllProj') }}</DropdownItem>
                   <DropdownItem
                     name="owner"
                     key="owner"
-                  >个人项目</DropdownItem>
+                  >{{ $t('message.workflow.Individual') }}</DropdownItem>
                   <DropdownItem
                     name="share"
                     key="share"
-                  >共享项目</DropdownItem>
+                  >{{ $t('message.workflow.ShareProj') }}</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
               <SvgIcon
@@ -166,10 +166,10 @@
       }}{{ deleteProjectItem.name }}?
       <br />
       <br />
-      <Checkbox v-model="ifDelOtherSys">同步删除所有第三方系统的工程</Checkbox>
+      <Checkbox v-model="ifDelOtherSys">{{ $t('message.workflow.Simultaneously') }}</Checkbox>
     </Modal>
     <!-- flow 基础属性 -->
-    <Modal v-model="baseprop.show" :footer-hide="true" class="prop-modal" title="基础属性">
+    <Modal v-model="baseprop.show" :footer-hide="true" class="prop-modal" :title="$t('message.workflow.Essential')">
       <div class="prop-item">
         <span class="label-prop"> 创建用户；</span> {{ baseprop.createUser }}
       </div>
@@ -183,6 +183,7 @@
         <span class="label-prop"> 最近修改时间；</span> {{ baseprop.updateTime | formatDate }}
       </div>
     </Modal>
+    <CopyModal v-model="showCopyForm" ref="copyForm" @finish="copySended" />
   </div>
 </template>
 <script>
@@ -203,6 +204,7 @@ import {
 import { setVirtualRoles } from '@dataspherestudio/shared/common/config/permissions.js';
 import Streamis from '@/workflows/module/innerIframe';
 import filters from '@dataspherestudio/shared/common/util/filters';
+import CopyModal from './copyModal.vue'
 
 export default {
   components: {
@@ -212,14 +214,15 @@ export default {
     process: Process.component,
     WorkflowTabList,
     ProjectForm,
-    Streamis: Streamis.component
+    Streamis: Streamis.component,
+    CopyModal
   },
   data() {
     return {
       tabList: [],
       current: {},
       modeOfKey: "dev",
-      modeName: "开发中心",
+      modeName: this.$t('message.workflow.Development'),
       currentMode: null,
       applicationAreaMap: [],
       orchestratorModeList: {},
@@ -278,7 +281,8 @@ export default {
           lable: this.$t('message.common.projectDetail.sortName'),
           value: 'name'
         }
-      ]
+      ],
+      showCopyForm: false
     }
   },
   filters,
@@ -310,6 +314,7 @@ export default {
   mounted() {
     // 获取所有project展示tree
     this.getAllProjects((res) => {
+      this.rawProjects = res;
       if (this.$route.query.projectID) {
         let index
         let it
@@ -536,7 +541,7 @@ export default {
     openNodeChange(v) {
       this.openNode = {...v}
     },
-    handleTreeClick({item}) {
+    async handleTreeClick({item}) {
       const node = item
       // 切换到开发模式
       this.modeOfKey =
@@ -577,7 +582,7 @@ export default {
           this.updateBread();
         }
       } else if (node && node.type === 'flow') {
-        const { canContinue } = this.hasOpenedTab({id: node.id, version: node.orchestratorVersionId})
+        const { canContinue } = await this.openCheck({id: node.id, version: node.orchestratorVersionId, name: node.name})
         if (!canContinue) {
           return
         }
@@ -888,7 +893,7 @@ export default {
      * 打开工作流查看并将工作流信息存入tab列表
      * parama 为打开工作流基本信息
      */
-    openWorkflow(params) {
+    async openWorkflow(params) {
       if (params.lastedNode) {
         const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
         this.getFlow(cur, (flows) => {
@@ -897,7 +902,7 @@ export default {
       }
 
       if (this.loading) return;
-      const {isIn, canContinue } = this.hasOpenedTab(params)
+      const {isIn, canContinue } = await this.openCheck(params)
       if (!isIn && canContinue) {
         this.currentTreeId = params.id || undefined
         // 历史版本不需要调用接口，直接使用版本里的数据
@@ -938,7 +943,7 @@ export default {
         this.onTabClick(tabId);
       }
     },
-    hasOpenedTab(params) {
+    async openCheck(params) {
       // 判断是否为相同编排的不同版本，不是则将信息新增tab列表
       const isIn = this.tabList.find(
         (item) => item.tabId === `${params.id}${params.version}`
@@ -1046,7 +1051,7 @@ export default {
           this.currentProjectData.releaseUsers.indexOf(this.getUserName()) ===
             -1)
       ) {
-        return this.$Message.warning("无运维权限");
+        return this.$Message.warning(this.$t('message.workflow.Nopermission'));
       }
       // 使用的地方很多，存在缓存全局获取
       storage.set("currentDssLabels", this.modeOfKey);
@@ -1120,8 +1125,8 @@ export default {
             <SvgIcon icon-class="more_more" />
           </div>
           <DropdownMenu slot="list">
-            <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>配置</DropdownItem>
-            <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>删除</DropdownItem>
+            <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
+            <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       )
@@ -1145,10 +1150,11 @@ export default {
             <SvgIcon icon-class="more_more" />
           </div>
           <DropdownMenu slot="list">
-            {item.editable && <DropdownItem name="config_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_flow', item)}}>配置</DropdownItem>}
-            {item.editable && <DropdownItem name="delete_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_flow', item)}}>删除</DropdownItem>}
-            <DropdownItem name="viewVersion" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'viewVersion', item)}}>查看版本</DropdownItem>
-            <DropdownItem name="baseprop" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'baseprop', item)}}>基础属性</DropdownItem>
+            {item.editable && <DropdownItem name="config_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_flow', item)}}>{this.$t('message.workflow.Configuration') }</DropdownItem>}
+            {item.editable && <DropdownItem name="delete_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_flow', item)}}>{this.$t('message.workflow.Delete') }</DropdownItem>}
+            {(item.editable || item.canPublish) && <DropdownItem name="copy_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'copy_flow', item)}}>{this.$t('message.workflow.Copy') }</DropdownItem>}
+            <DropdownItem name="viewVersion" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'viewVersion', item)}}>{this.$t('message.workflow.Show') }</DropdownItem>
+            <DropdownItem name="baseprop" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'baseprop', item)}}>{this.$t('message.workflow.Essential') }</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       )
@@ -1242,6 +1248,10 @@ export default {
         case "baseprop":
           this.onBasepropShow(node);
           break;
+        case "copy_flow":
+          this.showCopyForm = true
+          this.$refs.copyForm.init(node, this.rawProjects)
+          break;
       }
     },
     resize() {
@@ -1277,6 +1287,7 @@ export default {
             name: n.name,
             type: "project",
             canWrite: n.canWrite(),
+            canPublish: n.canPublish(),
             children: n.children || []
           };
         });
@@ -1346,6 +1357,23 @@ export default {
         }
       })
       return projs
+    },
+    /**
+     * 复制请求发送成功后更新左侧项目工作流数据
+     * 当前有打开的工作流设置成不可编辑
+     */
+    copySended({target, source}) {
+      this.getFlow({id: target.id, name: target.name}, (flows) => {
+        this.reFreshTreeData({id: target.id, name: target.name}, flows)
+        const targetFlow = flows.find(it => it.name === target.orchestratorName) || {}
+        eventbus.emit('workflow.copying', {
+          target: {
+            ...target,
+            orchestratorId: targetFlow.id
+          },
+          source
+        })
+      });
     }
   },
   beforeDestroy() {

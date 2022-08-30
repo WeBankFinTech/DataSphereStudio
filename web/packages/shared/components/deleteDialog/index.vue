@@ -11,9 +11,9 @@
     </p>
     <div class="delete-modal-content">
       <p>
-        <span>您真的确定{{$t('message.common.deleteDialog.action', {label:label})}}</span>
+        <span>确定{{$t('message.common.deleteDialog.action', {label:label})}}</span>
         <span class="delete-modal-content-name"> {{ name }} </span>
-        <span class="delete-modal-content-type">{{ type }}嘛？</span>
+        <span class="delete-modal-content-type">{{ type }}吗？</span>
       </p>
       <!-- <p>{{$t('message.common.deleteDialog.isNext')}}</p> -->
     </div>

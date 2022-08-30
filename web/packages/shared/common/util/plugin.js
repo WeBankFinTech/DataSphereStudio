@@ -31,8 +31,14 @@ hooks = {
   // workflows: 工作流开发底部TAB面板
   workflow_bottom_panel: {
     type: 'component',
-    mulit: false,
-    listener: null
+    mulit: true,
+    listener: []
+  },
+  // workflows: 工作流开发底部TAB面板
+  workflow_bottom_panel_mounted: {
+    type: 'listener',
+    mulit: true,
+    listener: []
   },
   // scriptis 结果集展示类型
   script_result_type_component: {

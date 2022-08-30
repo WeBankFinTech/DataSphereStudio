@@ -37,7 +37,7 @@ export default {
         },
         {
           id: 'changeLang',
-          name: localStorage.getItem('locale') === 'zh-CN' ? 'English' : '简体中文',
+          name: localStorage.getItem('locale') === 'zh-CN' ? 'English' : this.$t('message.workflow.Simplified'),
           icon: 'md-repeat',
         }, {
           id: 'logout',

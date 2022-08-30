@@ -16,10 +16,11 @@
 
 package com.webank.wedatasphere.dss.workflow.service
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource
+
 import java.io.{ByteArrayInputStream, InputStream}
 import java.util
 import java.util.UUID
-
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.utils.IoUtils
 import org.apache.linkis.bml.client.{BmlClient, BmlClientFactory}
@@ -55,13 +56,11 @@ class BMLService extends JavaLog {
     map += "version" -> resource.version
   }
 
-  def upload(userName: String, inputStream: InputStream, fileName: String, projectName: String): util.Map[String, Object] = {
+  def upload(userName: String, inputStream: InputStream, fileName: String, projectName: String): BmlResource = {
     val client: BmlClient = getBmlClient(userName)
     val resource: BmlUploadResponse = client.uploadShareResource(userName, projectName, fileName, inputStream)
     if (!resource.isSuccess) throw new DSSErrorException(911113, "上传失败")
-    val map = new util.HashMap[String, Object]
-    map += "resourceId" -> resource.resourceId
-    map += "version" -> resource.version
+    new BmlResource( resource.resourceId,resource.version)
   }
 
   def update(userName: String, resourceId: String, inputStream: InputStream): util.Map[String, Object] = {

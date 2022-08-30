@@ -60,13 +60,13 @@
     </Modal>
     <Modal class-name="adduser-box" :closable="false" v-model="creatershow" :title="$t('message.workspaceManagement.addUser')">
       <Form ref="addUser" :model="useradd" :rules="addrule" :label-width="80">
-        <FormItem label="用户类型">
+        <FormItem :label="$t('message.workspace.User')">
           <RadioGroup v-model="uType" @on-change="useradd.id=''">
             <Radio label="real"
-            >实名用户</Radio
+            >{{ $t('message.workspace.Real') }}</Radio
             >
             <Radio label="notreal"
-            >非实名用户</Radio
+            >{{ $t('message.workspace.Non') }}</Radio
             >
           </RadioGroup>
         </FormItem>

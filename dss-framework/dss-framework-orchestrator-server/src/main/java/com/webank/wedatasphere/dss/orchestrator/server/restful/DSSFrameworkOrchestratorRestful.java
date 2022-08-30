@@ -17,27 +17,25 @@
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -54,6 +52,8 @@ public class DSSFrameworkOrchestratorRestful {
     private OrchestratorFrameworkService orchestratorFrameworkService;
     @Autowired
     private OrchestratorService orchestratorService;
+    @Autowired
+    private HttpServletRequest httpServletRequest;
 
     @PostConstruct
     public void init() {
@@ -63,30 +63,29 @@ public class DSSFrameworkOrchestratorRestful {
     /**
      * 创建编排模式
      *
-     * @param httpServletRequest
      * @param createRequest
      * @return
      */
     @RequestMapping(path = "createOrchestrator", method = RequestMethod.POST)
-    public Message createOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorCreateRequest createRequest) throws Exception{
+    public Message createOrchestrator(@RequestBody OrchestratorCreateRequest createRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "create orchestrator", createRequest);
         //todo 先注释掉
         // orchestratorService.saveOrchestrator(createRequest,null,username);
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.createOrchestrator(username, createRequest, workspace);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(), createRequest.getOrchestratorName(), OperateTypeEnum.CREATE, createRequest);
         return Message.ok("创建工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
     }
 
     /**
      * 查询所有的编排模式
      *
-     * @param httpServletRequest
      * @param orchestratorRequest
      * @return
      */
     @RequestMapping(path = "getAllOrchestrator", method = RequestMethod.POST)
-    public Message getAllOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorRequest orchestratorRequest) {
+    public Message getAllOrchestrator(@RequestBody OrchestratorRequest orchestratorRequest) {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
             LOGGER.info("user {} begin to geyAllOrchestrator, requestBody:{}", username, orchestratorRequest);
@@ -100,41 +99,100 @@ public class DSSFrameworkOrchestratorRestful {
     /**
      * 修改编排模式
      *
-     * @param httpServletRequest
      * @param modifyRequest
      * @return
      */
     @RequestMapping(path = "modifyOrchestrator", method = RequestMethod.POST)
-    public Message modifyOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorModifyRequest modifyRequest) throws Exception{
+    public Message modifyOrchestrator(@RequestBody OrchestratorModifyRequest modifyRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "modify orchestrator", modifyRequest);
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(modifyRequest.getId())) {
+            return Message.error("当前工作流正在被复制，不允许编辑");
+        }
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.modifyOrchestrator(username, modifyRequest, workspace);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(), modifyRequest.getOrchestratorName(), OperateTypeEnum.UPDATE, modifyRequest);
         return Message.ok("修改工作流编排模式成功").data("orchestratorId", orchestratorVo.getOrchestratorId());
     }
 
     /**
      * 删除编排模式
      *
-     * @param httpServletRequest
      * @param deleteRequest
      * @return
      */
     @RequestMapping(path = "deleteOrchestrator", method = RequestMethod.POST)
-    public Message deleteOrchestrator(HttpServletRequest httpServletRequest, @RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
+    public Message deleteOrchestrator(@RequestBody OrchestratorDeleteRequest deleteRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        AuditLogUtils.printLog(username, workspace.getWorkspaceName(), "delete orchestrator", deleteRequest);
-        orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(deleteRequest.getId())) {
+            return Message.error("当前工作流正在被复制，不允许删除");
+        }
+        CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.DELETE, deleteRequest);
         return Message.ok("删除工作流编排模式成功");
     }
 
+    /**
+     * 复制编排模式
+     *
+     * @param orchestratorCopyRequest
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(path = "copyOrchestrator", method = RequestMethod.POST)
+    public Message copyOrchestrator(@RequestBody OrchestratorCopyRequest orchestratorCopyRequest) throws Exception {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(orchestratorCopyRequest.getSourceOrchestratorId())) {
+            return Message.error("当前工作流正在被复制，不允许再次复制");
+        }
+
+        String copyJobId = orchestratorFrameworkService.copyOrchestrator(username, orchestratorCopyRequest, workspace);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                orchestratorCopyRequest.getSourceOrchestratorId(), orchestratorCopyRequest.getSourceOrchestratorName(), OperateTypeEnum.COPY, orchestratorCopyRequest);
+
+        return Message.ok("复制工作流已经开始，正在后台复制中，复制状态可以从复制历史查看...").data("copyJobId", copyJobId);
+    }
+
+    /**
+     * 获取编排复制任务状态
+     *
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(path = "/{id}/copyInfo", method = RequestMethod.GET)
+    public Message getCopyJobStatus(@PathVariable("id") String copyInfoId) throws Exception {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+
+        return Message.ok("获取编排复制任务状态成功").data("orchestratorCopyInfo", orchestratorFrameworkService.getOrchestratorCopyInfoById(copyInfoId));
+    }
+
+    /**
+     * 查看编排复制历史
+     *
+     * @param orchestratorId
+     * @return
+     */
+    @RequestMapping(path = "listOrchestratorCopyHistory", method = RequestMethod.GET)
+    public Message listOrchestratorCopyHistory(@RequestParam(name = "orchestratorId") Long orchestratorId,
+                                               @RequestParam(required = false, name = "currentPage") Integer currentPage,
+                                               @RequestParam(required = false, name = "pageSize") Integer pageSize) throws Exception {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        Pair<Long, List<OrchestratorCopyHistory>> result = orchestratorFrameworkService.getOrchestratorCopyHistory(username, workspace, orchestratorId, currentPage, pageSize);
+        return Message.ok("查找工作流复制历史成功").data("copyJobHistory", result.getSecond()).data("total", result.getFirst());
+    }
+
     @RequestMapping(path = "orchestratorLevels", method = RequestMethod.GET)
-    public Message getOrchestratorLevels(HttpServletRequest httpServletRequest) {
+    public Message getOrchestratorLevels() {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         List<OrchestratorLevelEnum> levels = Arrays.asList(OrchestratorLevelEnum.values());
-        LOGGER.info("user {} try to get OrchestratorLevels, workspaceId:{}, result:{}", username, workspace.getWorkspaceId(),levels);
+        LOGGER.info("user {} try to get OrchestratorLevels, workspaceId:{}, result:{}", username, workspace.getWorkspaceId(), levels);
         return Message.ok("获取编排重要级别列表成功").data("orchestratorLevels", levels);
     }
 }

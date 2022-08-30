@@ -61,13 +61,13 @@ instance.interceptors.request.use((config) => {
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
   config.metadata = { startTime: Date.now() }
   if (/\/application\//.test(config.url)) {
-    config.url = `http://${window.location.host}` + config.url
+    config.url = `${location.protocol}//${window.location.host}` + config.url
   }
 
   // 增加token
   if (/dolphinscheduler/.test(config.url)) {
     config.headers['token'] = api.getToken()
-    config.url = `http://${window.location.host}/` + config.url
+    config.url = `${location.protocol}//${window.location.host}/` + config.url
     if (config.useForm) {
       let formData = new FormData()
       Object.keys(config.data).forEach(key => {

@@ -152,7 +152,7 @@ export default {
     transition: transform .5s;
     display: none;
     &.show{
-      transform: translate3d(0, -294px, 0)
+      transform: translate3d(0, -292px, 0)
     }
     .component {
       height: 230px;

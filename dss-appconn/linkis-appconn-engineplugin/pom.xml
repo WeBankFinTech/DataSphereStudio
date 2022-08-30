@@ -108,13 +108,6 @@
             <artifactId>linkis-io_file-client</artifactId>
             <version>${linkis.version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.linkis</groupId>
-            <artifactId>linkis-rpc</artifactId>
-            <version>${linkis.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-development-process-standard-execution</artifactId>

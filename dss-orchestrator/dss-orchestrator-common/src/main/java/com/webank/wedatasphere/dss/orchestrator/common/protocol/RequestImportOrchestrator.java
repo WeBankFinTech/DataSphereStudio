@@ -54,6 +54,27 @@ public class RequestImportOrchestrator {
         this.orchestratorName = orchestratorName;
     }
 
+    public RequestImportOrchestrator(String userName,
+                                     String projectName,
+                                     Long projectId,
+                                     String resourceId,
+                                     String bmlVersion,
+                                     String orchestratorName,
+                                     List<DSSLabel> dssLabels,
+                                     Workspace workspace,
+                                     Long copyProjectId,
+                                     String copyProjectName) {
+        this.userName = userName;
+        this.projectName = projectName;
+        this.projectId = projectId;
+        this.resourceId = resourceId;
+        this.bmlVersion = bmlVersion;
+        this.orchestratorName = orchestratorName;
+        this.dssLabels = dssLabels;
+        this.workspace = workspace;
+        this.copyProjectId = copyProjectId;
+        this.copyProjectName = copyProjectName;
+    }
 
     public String getUserName() {
         return userName;

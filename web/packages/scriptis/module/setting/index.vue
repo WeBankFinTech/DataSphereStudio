@@ -1,9 +1,9 @@
 <template>
-  <Modal title="设置" v-model="visible"
+  <Modal :title="$t('message.scripts.Settings')" v-model="visible"
     :mask-closable="closable"
     :closable="closable">
     <div style="padding:10px 0">
-      {{ pusers.length ? '请选择代理用户进入或者取消' : '请先申请实名用户允许的代理用户'}}
+      {{ pusers.length ? this.$t('message.scripts.proxytip') : this.$t('message.scripts.applyporxy')}}
     </div>
     <div v-if="pusers.length">
       <RadioGroup v-model="proxyUser">
@@ -11,7 +11,7 @@
       </RadioGroup>
     </div>
     <template slot="footer">
-      <Button type="primary" :disabled="pusers.length < 1 || !proxyUser" @click="handleOk">确定</Button>
+      <Button type="primary" :disabled="pusers.length < 1 || !proxyUser" @click="handleOk">{{ $t('message.scripts.confirm') }}</Button>
     </template>
   </Modal>
 </template>

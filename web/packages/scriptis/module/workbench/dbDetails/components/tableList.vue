@@ -3,26 +3,26 @@
     <div class="search-header">
       <!-- <Input v-model="tableOwner" class="searce-item margin-right" placeholder="请输入用户名">
       </Input> -->
-      <Input v-model="tableName" class="searce-item margin-right" placeholder="请输入表名">
+      <Input v-model="tableName" class="searce-item margin-right" :placeholder="$t('message.scripts.plstablename')">
       </Input>
       <Select v-model="orderBy" class="searce-item margin-right">
-        <Option value="1">默认排序</Option>
-        <Option value="2">表大小排序</Option>
-        <Option value='3'>创建时间排序</Option>
-        <Option value="4">访问时间排序</Option>
+        <Option value="1">{{ $t('message.scripts.defaultsort') }}</Option>
+        <Option value="2">{{ $t('message.scripts.ordersize') }}</Option>
+        <Option value='3'>{{ $t('message.scripts.ordercreatetime') }}</Option>
+        <Option value="4">{{ $t('message.scripts.orderaccesstime') }}</Option>
       </Select>
       <Select v-model="isTableOwner" class="searce-item margin-right">
-        <Option value="0">我有权限的表</Option>
-        <Option value="1">我创建的表</Option>
+        <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
+        <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
       </Select>
-      <Button class="margin-right" type="primary" @click="handleGetTables">查询</Button>
-      <Button class="margin-right" type="success" @click="copyTableName">复制表名</Button>
-      <Button class="margin-right" type="error" @click="deleteSome">批量删除</Button>
+      <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
+      <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
+      <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
     </div>
     <div class="table-data">
       <div class="field-list-header">
         <div class="field-list-item" style="width:6%;"></div>
-        <div class="field-list-item">序号</div>
+        <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
         <div
           class="field-list-item"
           v-for="(item, index) in columns"
@@ -64,11 +64,11 @@
         @on-change="pageChange"
         @on-page-size-change="pageSizeChange"
       ></Page>
-      <Modal v-model="showConfirmModal" title="请再次勾选确认删除项" width="85%">
+      <Modal v-model="showConfirmModal" :title="$t('message.scripts.checkdelconfirm')" width="85%">
         <div class="table-data" style="max-height: 470px">
           <div class="field-list-header">
             <div class="field-list-item" style="width:50px;"></div>
-            <div class="field-list-item">序号</div>
+            <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
             <div
               class="field-list-item"
               v-for="(item, index) in columns"
@@ -147,15 +147,15 @@ export default {
   data() {
     return {
       columns: [
-        { title: '表名', key: 'tableName'},
-        { title: '表别名', key: 'tableAlias'},
-        { title: '创建时间', key: 'createTime'},
-        { title: '表大小', key: 'tableSize'},
-        { title: '表属主', key: 'tableOwner'},
-        { title: '是否分区', key: 'partitioned', type: 'booleanString'},
-        { title: '压缩格式', key: 'compressedFormat'},
-        { title: '最近访问时间', key: 'viewTime'},
-        { title: '最近修改时间', key: 'modifyTime'},
+        { title: this.$t('message.scripts.tablename'), key: 'tableName'},
+        { title: this.$t('message.scripts.tbalias'), key: 'tableAlias'},
+        { title: this.$t('message.scripts.createtime'), key: 'createTime'},
+        { title: this.$t('message.scripts.tablesize'), key: 'tableSize'},
+        { title: this.$t('message.scripts.tbowner'), key: 'tableOwner'},
+        { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString'},
+        { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat'},
+        { title: this.$t('message.scripts.lastaccess'), key: 'viewTime'},
+        { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime'},
       ],
       showConfirmModal: false,
       pageData: {
@@ -236,7 +236,7 @@ export default {
       if (this.selectedItems.length) {
         this.showConfirmModal = true
       } else {
-        this.$Message.warning({ content: '请先选择删除项' });
+        this.$Message.warning({ content: this.$t('message.scripts.selectdel') });
       }
     },
     Cancel() {
@@ -265,7 +265,7 @@ export default {
         });
         this.showConfirmModal = false
       } else {
-        this.$Message.warning({ content: '请先选择删除项' });
+        this.$Message.warning({ content: this.$t('message.scripts.selectdel') });
       }
     }
   }

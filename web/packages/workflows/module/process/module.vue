@@ -61,7 +61,7 @@
               class="button"
               @click="clickswitch('select')">
               <SvgIcon class="icon" icon-class="play-2" color="#666"/>
-              <span>选中执行</span>
+              <span>{{ $t('message.workflow.SelectRun') }}</span>
             </div>
             <div
               v-if="workflowIsExecutor"
@@ -77,7 +77,7 @@
               class="button"
               @click="reRun">
               <Icon class="icon" type="ios-refresh" color="#666" size="18"/>
-              <span>失败重跑</span>
+              <span>{{ $t('message.workflow.Rerun') }}</span>
             </div>
             <div class="devider" />
             <div
@@ -371,15 +371,12 @@
       :height="consoleHeight"
       :style="getConsoleStyle"
       @close-console="closeConsole"></console>
-    <component
-      v-if="extComponents.name"
-      :is="extComponents.component"
+    <BottomTab
       :orchestratorId="orchestratorId"
       :orchestratorVersionId="orchestratorVersionId"
       :appId="flowId"
       :product="product"
       :readonly="readonly"
-      @event-from-ext="eventFromExt"
     />
   </div>
 </template>
@@ -397,14 +394,13 @@ import { NODETYPE, ext } from '@/workflows/service/nodeType';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import util from '@dataspherestudio/shared/common/util';
-import plugin from '@dataspherestudio/shared/common/util/plugin';
 import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
 import moment from 'moment';
 import { getPublishStatus } from '@/workflows/service/api.js';
 import module from './index';
-import nodeIcons from './nodeicon'
+import nodeIcons from './nodeicon';
+import BottomTab from './component/bottomTab.vue'
 
-const extComponents = plugin.emitHook('workflow_bottom_panel') || {}
 export default {
   components: {
     vueProcess,
@@ -412,7 +408,8 @@ export default {
     resource,
     nodeParameter,
     associateScript,
-    console
+    console,
+    BottomTab
   },
   mixins: [mixin],
   directives: {
@@ -548,7 +545,6 @@ export default {
       locked: false,
       newOrchestratorVersionId: this.orchestratorVersionId,
       extraToolbar: [],
-      extComponents
     };
   },
   computed: {
@@ -676,15 +672,21 @@ export default {
     this.getConsoleParams();
     document.addEventListener('keyup', this.onKeyUp)
     this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
-    // todo mixin ? 事件命名空间？
-    plugin.on('call_app_method', (fn, args) => {
-      if (typeof this[fn] === 'function') {
-        this.fn(...args)
-      }
-    })
     const refs = this.$refs
     eventbus.on('workflow.fold.left.tree', () => {
       refs.process && refs.process.layoutView()
+    });
+    eventbus.on('workflow.copying', (data) => {
+      if (data.source.orchestratorId == this.orchestratorId) {
+        this.locked = true
+        this.$Notice.close('copy_workflow_ing')
+        this.$Notice.info({
+          title: this.$t('message.workflow.Prompt'),
+          desc: '复制过程中，不允许编辑工作流',
+          duration: 0,
+          name: 'copy_workflow_ing'
+        });
+      }
     });
   },
   beforeDestroy() {
@@ -838,7 +840,7 @@ export default {
       this.originalData = this.json;
       // 更新节点之后自动保存json
       if (scriptisSave) {
-        this.autoSave('保存脚本', false);
+        this.autoSave(this.$t('message.workflow.Save'), false);
       }
     },
     getBaseInfo() {
@@ -1305,7 +1307,7 @@ export default {
                 borderColor: '#6A85A7',
               })
             })
-            this.autoSave('手动保存', false);
+            this.autoSave(this.$t('message.workflow.Manually'), false);
           },
           onCancel: () => {
           },
@@ -1318,7 +1320,7 @@ export default {
             borderColor: '#6A85A7',
           })
         })
-        this.autoSave('手动保存', false);
+        this.autoSave(this.$t('message.workflow.Manually'), false);
       }
       // });
     },
@@ -1773,7 +1775,7 @@ export default {
           return subItem;
         });
         this.originalData = this.json;
-        this.autoSave('新增节点', false);
+        this.autoSave(this.$t('message.workflow.AddNode'), false);
         return;
       }
     },
@@ -1938,7 +1940,7 @@ export default {
       });
       this.originalData = this.json;
       if (selectNodeLength > selectNodes.length) {
-        this.$Message.warning('子工作流不支持批量删除！');
+        this.$Message.warning(this.$t('message.workflow.BatchDel'));
       }
       this.autoSave('allDelete', false);
     },
@@ -2072,7 +2074,7 @@ export default {
       const selectNodeLength = selectNodes.length
       if ( runFlag === 'select') {
         if (selectNodeLength < 1 ) {
-          return this.$Message.error('请先选择需要执行的节点');
+          return this.$Message.error(this.$t('message.workflow.PleaseSelectNode'));
         }
       }
       this.dispatch('workflowIndexedDB:clearNodeCache');
@@ -2090,7 +2092,7 @@ export default {
       // 如果是生产中心的只读模式不需要保存
       let a = null;
       if (!this.myReadonly) {
-        a = await this.autoSave('执行保存', false);
+        a = await this.autoSave(this.$t('message.workflow.Saving'), false);
         if (!a || !a.flowVersion) return;
 
       }
@@ -2229,15 +2231,15 @@ export default {
         // 【0：未执行；1：运行中；2：已成功；3：已失败；4：已跳过】
         const actionStatus = {
           pendingJobs: {color: '#6A85A7', status: 0, iconType: '',
-            colorClass: '', isShowTime: false, title: '等待执行', showConsole: false},
+            colorClass: '', isShowTime: false, title: this.$t('message.workflow.Scheduled'), showConsole: false},
           runningJobs: {color: '#2E92F7', status: 1, iconType: 'status-loading',
-            colorClass: {'executor-loading': true}, isShowTime: true, title: '执行中', showConsole: true},
+            colorClass: {'executor-loading': true}, isShowTime: true, title: this.$t('message.workflow.Running'), showConsole: true},
           succeedJobs: {color: '#52C41A', status: 2,iconType: 'status-success',
-            colorClass: {'executor-success': true}, isShowTime: false, title: '执行成功', showConsole: true},
+            colorClass: {'executor-success': true}, isShowTime: false, title: this.$t('message.workflow.ExecuteSuccess'), showConsole: true},
           failedJobs: {color: '#FF4D4F', status: 3, iconType: 'status-fail',
-            colorClass: {'executor-faile': true}, isShowTime: false, title: '执行失败', showConsole: true},
+            colorClass: {'executor-faile': true}, isShowTime: false, title: this.$t('message.workflow.ExecuteFailed'), showConsole: true},
           skippedJobs: {color: '#B3C1D3', status: 4, iconType: 'status-skip',
-            colorClass: {'executor-skip': true}, isShowTime: false, title: '跳过', showConsole: false}
+            colorClass: {'executor-skip': true}, isShowTime: false, title: this.$t('message.workflow.Skip'), showConsole: false}
         };
         // 获取节点的状态，如果没有执行完成继续查询
         const  data = res;
@@ -2328,7 +2330,7 @@ export default {
       // 发布之前先保存
       let a
       try {
-        a = await this.autoSave('发布工作流', false);
+        a = await this.autoSave(this.$t('message.workflow.Publishwork'), false);
       } catch (e) {
         this.pubulishShow = false;
         this.isFlowPubulish = false;
@@ -2484,7 +2486,7 @@ export default {
 
     },
     async workflowExportOk() {
-      const a = await this.autoSave('导出', false);
+      const a = await this.autoSave(this.$t('message.workflow.Export'), false);
       if (!a) return
       this.isFlowPubulish = true;
       const params = {

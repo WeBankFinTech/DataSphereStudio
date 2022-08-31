@@ -61,6 +61,7 @@ public class OrchestratorManager {
                 }
             }
         } else {
+            //todo 加锁
             AppConn newAppConn = AppConnManager.getAppConnManager().getAppConn(dssOrchestrator.getAppConn().getAppDesc().getAppName());
             AppConn newSchedulerAppconn = AppConnManager.getAppConnManager().getAppConn(dssOrchestrator.getSchedulerAppConn().getAppDesc().getAppName());
             //若appconn已经被刷新了，需要重新执行loadOrchestrator

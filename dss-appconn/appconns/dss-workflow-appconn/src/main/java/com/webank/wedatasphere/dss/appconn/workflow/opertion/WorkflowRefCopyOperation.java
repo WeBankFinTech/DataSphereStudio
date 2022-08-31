@@ -28,6 +28,7 @@ import org.apache.linkis.rpc.Sender;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class WorkflowRefCopyOperation
@@ -45,9 +46,13 @@ public class WorkflowRefCopyOperation
         //插入version
         String version = workflowCopyRequestRef.getNewVersion();
         String description = (String) workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION);
+        Long targetProjectId = workflowCopyRequestRef.getRefProjectId();
+        Optional<Object> nodeSuffix = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get("nodeSuffix"));
+        Optional<Object> newFlowName = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NAME));
         RequestCopyWorkflow requestCopyWorkflow = new RequestCopyWorkflow(userName,
                 workflowCopyRequestRef.getWorkspace(), appId, contextIdStr,
-                projectName, version, description, workflowCopyRequestRef.getDSSLabels());
+                projectName, version, description, workflowCopyRequestRef.getDSSLabels(),
+                targetProjectId, (String) nodeSuffix.orElse(null), (String) newFlowName.orElse(null));
         ResponseCopyWorkflow responseCopyWorkflow = (ResponseCopyWorkflow) sender.ask(requestCopyWorkflow);
         Map<String, Object> refJobContent = new HashMap<>(2);
         refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCopyWorkflow.getDssFlow().getId());

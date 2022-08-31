@@ -36,8 +36,10 @@ public interface CopyRequestRef<R extends RefJobContentRequestRef<R>>
      * When the orchestrator, such as DSSWorkflow, added a new version, we hope all nodes of this workflow,
      * can also update a new version.
      * <p>
-     * 特别注意：三方节点新增节点版本时，需要将之前版本号去掉后缀，然后用节点名前缀拼接新的版本号，
-     * 比如节点名：widget_1001_v000001 在新增版本后需变为：widget_1001_v000002，而不是widget_1001_v000001_v000002
+     * 特别注意：
+     * 此版本号格式不一定是v000001的格式，在工作流复制操作时会加上前缀或者后缀（suffix_v000001的形式），三方节点最好将其当做一个普通字符串处理。
+     * 三方节点新增节点版本时，需要将之前版本号去掉后缀，然后用节点名前缀拼接新的版本号。
+     * 比如节点名：widget_1001_v000001 在新增版本号（v000002）后需变为：widget_1001_v000002，而不是widget_1001_v000001_v000002
      *
      * @return the new version of the orchestrator, such as DSSWorkflow.
      */

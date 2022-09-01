@@ -482,6 +482,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     private String addFLowNodeSuffix(String flowJson, String nodeSuffix) throws IOException {
         List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
+        if (CollectionUtils.isEmpty(nodeJsonList)) {
+            return flowJson;
+        }
         List<Map<String, Object>> nodeList = new ArrayList<>();
         for (String nodeJson : nodeJsonList) {
             Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);

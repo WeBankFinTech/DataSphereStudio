@@ -33,8 +33,8 @@ public class OrchestratorUtils {
         return "v000001";
     }
 
-    public static String generateNewTimeStampVersion() {
-        return "v" + String.valueOf(System.currentTimeMillis()).substring(3) + "000001";
+    public static String generateNewCopyVersion(String suffix) {
+        return suffix + "_v000001";
     }
 
     /**
@@ -44,13 +44,19 @@ public class OrchestratorUtils {
      * @return
      */
     public static String increaseVersion(String oldVersion) {
-        long num = Long.parseLong(oldVersion.substring(1)) + 1;
-        if (String.valueOf(num).length() <= 6) {
-            String tmp = "00000" + num;
-            return "v" + tmp.substring(tmp.length() - 6);
+        if (oldVersion.length() <= 7) {
+            return newNormalVersion(oldVersion);
         } else {
-            return "v" + num;
+            int i = oldVersion.lastIndexOf("_");
+            String newVer = newNormalVersion(oldVersion.substring(i + 1));
+            return oldVersion.substring(0, i + 1) + newVer;
         }
+    }
+
+    static String newNormalVersion(String oldVersion) {
+        long num = Long.parseLong(oldVersion.substring(1)) + 1;
+        String tmp = "00000" + num;
+        return "v" + tmp.substring(tmp.length() - 6);
     }
 
     //拼接 前后使用英文逗号结尾

@@ -52,12 +52,6 @@ public class OrchestratorCopyJob implements Runnable {
 
     private final Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
-    private ContextService contextService;
-
-    private OrchestratorMapper orchestratorMapper;
-
-    private OrchestratorManager orchestratorManager;
-
     @Override
     public void run() {
         try {
@@ -119,7 +113,7 @@ public class OrchestratorCopyJob implements Runnable {
                                     String projectName,
                                     List<DSSLabel> dssLabels, Long appId) throws DSSErrorException {
         String copyInitVersion = OrchestratorUtils.generateNewTimeStampVersion();
-        String contextId = contextService.createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), copyInitVersion, userName);
+        String contextId = orchestratorCopyEnv.getContextService().createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), copyInitVersion, userName);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
         dssOrchestratorVersion.setComment("create with orchestrator copy");
         dssOrchestratorVersion.setProjectId(orchestratorCopyVo.getTargetProjectId());
@@ -130,7 +124,7 @@ public class OrchestratorCopyJob implements Runnable {
         dssOrchestratorVersion.setValidFlag(1);
         dssOrchestratorVersion.setFormatContextId(contextId);
         LOGGER.info("Create a new ContextId {} for orchestrator copy operation with name:{},version{}.", contextId, dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion());
-        DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
+        DSSOrchestrator dssOrchestrator = orchestratorCopyEnv.getOrchestratorManager().getOrCreateOrchestrator(userName, workspace.getWorkspaceName(), dssOrchestratorInfo.getType(),
                 dssLabels);
         RefJobContentResponseRef responseRef = OrchestrationDevelopmentOperationUtils.tryOrchestrationOperation(dssOrchestratorInfo, dssOrchestrator, userName,
                 workspace, dssLabels, DevelopmentIntegrationStandard::getRefCRUDService,
@@ -149,9 +143,9 @@ public class OrchestratorCopyJob implements Runnable {
         dssOrchestratorVersion.setAppId((Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY));
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
 
-        orchestratorMapper.addOrchestrator(dssOrchestratorInfo);
+        orchestratorCopyEnv.getOrchestratorMapper().addOrchestrator(dssOrchestratorInfo);
         dssOrchestratorVersion.setOrchestratorId(dssOrchestratorInfo.getId());
-        orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
+        orchestratorCopyEnv.getOrchestratorMapper().addOrchestratorVersion(dssOrchestratorVersion);
     }
 
     private OrchestratorExportResult exportOrc() throws Exception {

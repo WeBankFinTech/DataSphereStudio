@@ -275,6 +275,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if (sourceOrchestratorInfo == null) {
             LOGGER.error("orchestrator: {} not found.", orchestratorCopyRequest.getSourceOrchestratorName());
         }
+
+        if (StringUtils.isBlank(orchestratorCopyRequest.getWorkflowNodeSuffix())){
+            orchestratorCopyRequest.setWorkflowNodeSuffix("copy");
+        }
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
                 targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
                 orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV),

@@ -274,10 +274,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSOrchestratorInfo sourceOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorCopyRequest.getSourceOrchestratorId());
         if (sourceOrchestratorInfo == null) {
             LOGGER.error("orchestrator: {} not found.", orchestratorCopyRequest.getSourceOrchestratorName());
+            DSSExceptionUtils.dealErrorException(6013, "orchestrator not found.", DSSOrchestratorErrorException.class);
         }
-
-        if (StringUtils.isBlank(orchestratorCopyRequest.getWorkflowNodeSuffix())){
+        if (StringUtils.isBlank(orchestratorCopyRequest.getWorkflowNodeSuffix())) {
             orchestratorCopyRequest.setWorkflowNodeSuffix("copy");
+        } else if (orchestratorCopyRequest.getWorkflowNodeSuffix().length() > 10) {
+            DSSExceptionUtils.dealErrorException(6014, "The node suffix length can not exceed 10. (节点后缀长度不能超过10)", DSSOrchestratorErrorException.class);
         }
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
                 targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),

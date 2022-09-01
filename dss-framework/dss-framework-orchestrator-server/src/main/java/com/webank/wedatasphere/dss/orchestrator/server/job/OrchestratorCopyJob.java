@@ -112,7 +112,7 @@ public class OrchestratorCopyJob implements Runnable {
                                     DSSOrchestratorInfo dssOrchestratorInfo,
                                     String projectName,
                                     List<DSSLabel> dssLabels, Long appId) throws DSSErrorException {
-        String copyInitVersion = OrchestratorUtils.generateNewTimeStampVersion();
+        String copyInitVersion = OrchestratorUtils.generateNewCopyVersion(orchestratorCopyVo.getWorkflowNodeSuffix());
         String contextId = orchestratorCopyEnv.getContextService().createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), copyInitVersion, userName);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
         dssOrchestratorVersion.setComment("create with orchestrator copy");
@@ -136,7 +136,7 @@ public class OrchestratorCopyJob implements Runnable {
                     Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, appId,
                             OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION, dssOrchestratorVersion.getComment());
                     refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_NAME, dssOrchestratorInfo.getName());
-                    refJobContent.put("nodeSuffix", dssOrchestratorInfo.getName());
+                    refJobContent.put("nodeSuffix", orchestratorCopyVo.getWorkflowNodeSuffix());
                     requestRef.setNewVersion(dssOrchestratorVersion.getVersion()).setRefJobContent(refJobContent);
                     return ((RefCopyOperation) developmentOperation).copyRef(requestRef);
                 }, "copy");

@@ -37,6 +37,7 @@ public interface DSSFlowService {
 
     /**
      * 通过flowID获取最新版本的dwsFlow，版本信息在latestVersion
+     *
      * @return
      */
     DSSFlow getFlow(Long flowId);
@@ -57,7 +58,8 @@ public interface DSSFlowService {
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,
-                         String description, List<DSSLabel> dssLabels) throws DSSErrorException, IOException;
+                         String description, List<DSSLabel> dssLabels,String nodeSuffix,
+                         String newFlowName, Long newProjectId) throws DSSErrorException, IOException;
 
     Long getParentFlowID(Long id);
 

@@ -140,7 +140,8 @@ export default {
         sourceProjectName: data.projectName
       }
       this.projects = projects.filter((item) => {
-        return  item.canPublish() || item.editable
+        // return  item.canPublish() || item.editable
+        return item.id == data.projectId // 一期只当前项目复制
       })
     }
   },

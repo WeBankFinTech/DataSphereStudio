@@ -80,6 +80,8 @@ public class OrchestratorCopyJob implements Runnable {
         newOrchestrator.setCreator(orchestratorCopyVo.getUsername());
         newOrchestrator.setUUID(UUID.randomUUID().toString());
         newOrchestrator.setDesc("copy from " + sourceOrchestrator.getName());
+        newOrchestrator.setUpdateTime(null);
+        newOrchestrator.setUpdateUser(null);
 
         try {
             doOrchestratorCopy(orchestratorCopyVo.getUsername(), orchestratorCopyVo.getWorkspace(), newOrchestrator,

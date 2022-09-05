@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
+import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
@@ -38,6 +39,7 @@ import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentC
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
+import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
@@ -91,6 +93,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Autowired
     private WorkFlowParser workFlowParser;
+    @Autowired
+    private NodeParser nodeParser;
     @Autowired
     private BMLService bmlService;
     @Autowired
@@ -482,6 +486,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     private String addFLowNodeSuffix(String flowJson, String nodeSuffix) throws IOException {
         List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
+        List<DSSEdge> edgeList = workFlowParser.getWorkFlowEdges(flowJson);
         if (CollectionUtils.isEmpty(nodeJsonList)) {
             return flowJson;
         }
@@ -489,8 +494,38 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         for (String nodeJson : nodeJsonList) {
             Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
             nodeJsonMap.replace("title", nodeJsonMap.get("title") + "_" + nodeSuffix);
+            List<Resource> resourceList = nodeParser.getNodeResource(nodeJson);
+            if (CollectionUtils.isNotEmpty(resourceList)) {
+                String oldKey = (String) nodeJsonMap.get("key");
+                final String newKey = UUID.randomUUID().toString();
+                //需要替换resource的fileName
+                resourceList.forEach(resource -> {
+                    resource.setFileName(resource.getFileName().replace(oldKey, newKey));
+                });
+                nodeJsonMap.put("resources", resourceList);
+                Map jobContent = (Map) nodeJsonMap.get("jobContent");
+                if (MapUtils.isNotEmpty(jobContent)) {
+                    jobContent.forEach((k, v) -> {
+                        jobContent.put(k, ((String) v).replace(oldKey, newKey));
+                    });
+                    nodeJsonMap.put("jobContent", jobContent);
+                }
+                nodeJsonMap.put("id", newKey);
+                nodeJsonMap.put("key", newKey);
+                if (CollectionUtils.isNotEmpty(edgeList)) {
+                    edgeList.forEach(e -> {
+                        if (e.getSource().equals(oldKey)) {
+                            e.setSource(newKey);
+                        }
+                        if (e.getTarget().equals(oldKey)) {
+                            e.setTarget(newKey);
+                        }
+                    });
+                }
+            }
             nodeList.add(nodeJsonMap);
         }
+        flowJson = workFlowParser.updateFlowJsonWithKey(flowJson, "edges", edgeList);
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeList);
     }
 

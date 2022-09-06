@@ -271,6 +271,7 @@ public class NodeRestfulApi {
             node.setNodeType(nodeType);
             node.setJobContent(params);
             node.setFlowId(flowId);
+            node.setName(json.get("name").toString());
             workflowNodeService.deleteNode(userName, node);
         });
 

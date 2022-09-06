@@ -93,6 +93,11 @@ export default {
       return api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}listOrchestratorCopyHistory`, {
         orchestratorId: this.orchestratorId,
       },'get').then((res) => {
+        (res.copyJobHistory || []).forEach(it => {
+          if(it) {
+            it.status = it.status ? 'Successed' : 'Failed'
+          }
+        })
         this.copyHistory = res.copyJobHistory || []
         this.page.totalSize = this.copyHistory.length
       }).catch(() => {

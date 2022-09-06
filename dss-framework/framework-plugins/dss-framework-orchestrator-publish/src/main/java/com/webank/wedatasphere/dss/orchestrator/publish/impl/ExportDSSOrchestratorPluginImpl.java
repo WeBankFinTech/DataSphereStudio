@@ -180,13 +180,12 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         //更新老版本的comment
         DSSOrchestratorVersion updateCommentVersion = new DSSOrchestratorVersion();
         updateCommentVersion.setId(oldOrcVersionId);
-        String realComment = comment != null ? comment : "release comment";
+        String realComment = StringUtils.isNotBlank(comment) ? comment : "release comment";
         updateCommentVersion.setComment(realComment);
         if(StringUtils.isNotBlank(userName)){
             updateCommentVersion.setUpdater(userName);
             dssOrchestratorVersion.setUpdater(userName);
         }
-        updateCommentVersion.setUpdateTime(new Date());
 
         //要求AppConn对应第三方应用拷贝一个新的app出来关联，如工作流，需要新建一个新的工作流进行关联。
         //1、生成上下文ContextId

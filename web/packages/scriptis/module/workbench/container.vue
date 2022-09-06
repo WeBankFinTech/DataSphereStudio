@@ -330,13 +330,7 @@ export default {
           })
           .then((args) => {
             hiveList = args
-            if (hiveList.length > 30000) {
-              that.$Notice.warning({
-                duration: 0,
-                title: this.$t('message.scripts.propmpt'),
-                desc: this.$t('message.scripts.largedatatip')
-              })
-            }
+            that.$emit('get-dbtable-length', hiveList.length)
           })
       }
 

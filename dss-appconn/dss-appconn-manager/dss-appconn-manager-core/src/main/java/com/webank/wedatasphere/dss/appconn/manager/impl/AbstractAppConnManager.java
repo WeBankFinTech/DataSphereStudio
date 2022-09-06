@@ -288,4 +288,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         }
     }
 
+    public AppConnRefreshThread getAppConnRefreshThread(){
+        return appConnRefreshThread;
+    }
+
 }

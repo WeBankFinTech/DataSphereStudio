@@ -14,23 +14,9 @@
  *
  */
 
-package com.webank.wedatasphere.dss.common.entity.node;
+package com.webank.wedatasphere.dss.appconn.manager.service;
 
-public interface DSSEdge {
+public interface AppConnRefreshListener {
 
-    String getSource();
-
-    void setSource(String source);
-
-    String getTarget();
-
-    void setTarget(String target);
-
-    String getSourceLocation();
-
-    void setSourceLocation(String sourceLocation);
-
-    String getTargetLocation();
-
-    void setTargetLocation(String targetLocation);
+    void afterRefresh(String appconnName);
 }

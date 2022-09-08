@@ -57,7 +57,25 @@ hooks = {
     type: 'component',
     mulit: true,
     listener: []
-  }
+  },
+  // 路由配置
+  app_router_config: {
+    type: 'listener',
+    mulit: true,
+    listener: []
+  },
+  // 生产中心项目菜单
+  scheduler_center_project_menu: {
+    type: 'listener',
+    mulit: true,
+    listener: []
+  },
+  // 生产中心工作流列表操作按钮
+  scheduler_center_workflow_action: {
+    type: 'listener',
+    mulit: true,
+    listener: []
+  },
   // /**
   //  * 扩展导航菜单
   //  * @param Array menu lsit

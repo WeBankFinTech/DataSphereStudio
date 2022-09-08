@@ -1,6 +1,6 @@
 {
   "name": "@dataspherestudio/shared",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "dependencies": {
     "dexie": "2.0.4",
     "dt-sql-parser": "1.2.1"

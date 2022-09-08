@@ -81,7 +81,7 @@ Vue.prototype.$API_PATH = API_PATH;
 Vue.prototype.$APP_CONF = apps.conf || {};
 
 new Vue({
-  router,
+  router: router(),
   i18n,
   render: (h) => h(App)
 }).$mount('#app')

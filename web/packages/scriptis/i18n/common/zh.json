@@ -834,6 +834,8 @@
       "createtime：": "创建时间：",
       "nodata": "暂无数据",
       "retry": "重试！",
+      "nodataclick": "暂无数据，请点击",
+      "errorclick": "后台异常，请点击",
       "folderempty": "文件夹名称不得为空！",
       "foldernameLen": "文件夹名称超过200字符！",
       "foldernamestyle": "文件夹名称只支持大写、小写字母、数字、下划线和中文!",

@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     getRunningJob() {
-      api.fetch('/jobhistory/listundone', {}, 'get').then((rst) => {
+      api.fetch('/jobhistory/listundonetasks', {}, 'get').then((rst) => {
         this.num = rst.tasks.length;
       });
     },

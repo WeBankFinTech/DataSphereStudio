@@ -41,9 +41,9 @@ function replaceKey(filePath) {
                   var attrReg = new RegExp(` (title|name|label|placeholder)="${it}"`, 'g')
                   var tagReg = new RegExp(`>(\\s*)${it}(\\s*)<`, 'g')
                   var jsReg = new RegExp(`(['"])${it}(['"])`, 'g')
-                  content = content.replace(attrReg, ` :$1="$t('message.workspace.${key}')"`)
-                  content = content.replace(tagReg, `>$1{{ $t('message.workspace.${key}') }}$2<`)
-                  content = content.replace(jsReg, `this.$t('message.workspace.${key}')`)
+                  content = content.replace(attrReg, ` :$1="$t('message.exts.bdp.${key}')"`)
+                  content = content.replace(tagReg, `>$1{{ $t('message.exts.bdp.${key}') }}$2<`)
+                  content = content.replace(jsReg, `this.$t('message.exts.bdp.${key}')`)
                 })
 
                 fs.writeFile(filedir, content, function (err) {
@@ -65,3 +65,6 @@ function replaceKey(filePath) {
 }
 
 replaceKey(json.dirPath);
+
+// 修改翻译json命名key值、修改本文件替换路径message.xxx后执行：
+// node ./script/replaceKey.js ./cn.json

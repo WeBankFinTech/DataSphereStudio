@@ -21,7 +21,7 @@
       @node-contextmenu="dispatch('work-bench-contextMenu', $event, arguments)"
       @node-check="dispatch('work-bench-check', $event, arguments)"
       @node-dblclick="dispatch('work-bench-dblclick', $event, arguments)"/>
-    <div v-if="!loading && isEmpty">暂无数据，请点击<a @click="refresh">刷新</a>{{ $t('message.scripts.retry') }}</div>
+    <div v-if="!loading && isEmpty">{{ $t('message.scripts.nodataclick') }}{{ $t('message.scripts.retry') }}<a @click="refresh">{{ $t('message.common.refresh') }}</a>{{ $t('message.scripts.retry') }}</div>
     <Spin
       v-if="loading"
       size="large"

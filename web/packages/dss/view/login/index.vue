@@ -125,7 +125,7 @@ export default {
           if (!this.rememberUserNameAndPass) {
             storage.remove('saveUserNameAndPass', 'local');
           }
-          this.loginForm.user = this.loginForm.user.toLocaleLowerCase();
+          // this.loginForm.user = this.loginForm.user.toLocaleLowerCase();
           // 需要判断是否需要给密码加密
           let password = this.loginForm.password;
           let params = {};

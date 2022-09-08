@@ -20,7 +20,7 @@
       <li v-if="toolbarShow.download" :style="{cursor: rsDownload ? 'pointer': 'not-allowed'}">
         <Poptip
           :transfer="true"
-          :width="200"
+          :width="250"
           v-model="popup.download"
           placement="right">
           <div @click.stop="openPopup('download')">

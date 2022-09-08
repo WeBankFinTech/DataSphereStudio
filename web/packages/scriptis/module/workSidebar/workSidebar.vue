@@ -26,7 +26,7 @@
       @work-bench-contextMenu="benchContextMenu"/>
     <div class="we-file-tree is-empty" :style="{height:'100%',padding:'10px'}"
       v-if="!(fileTree && fileTree.length) && treeLoading === 0">
-      <div>后台异常，请点击<a @click="refresh">刷新</a>重试。</div>
+      <div>{{ $t('message.scripts.errorclick') }}<a @click="refresh">{{ $t('message.common.refresh') }}</a>{{ $t('message.scripts.retry') }}</div>
     </div>
     <we-menu
       ref="treeContextMenu"

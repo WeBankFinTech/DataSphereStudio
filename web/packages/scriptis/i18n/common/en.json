@@ -653,7 +653,7 @@
             "title": "Code"
           },
           "failedReason": {
-            "title": "Key information"
+            "title": "Key Information"
           },
           "control": {
             "title": "Handle",
@@ -835,6 +835,8 @@
       "createtime：": "Create time：",
       "nodata": "No data",
       "retry": "Please retry！",
+      "nodataclick": "No data, please click",
+      "errorclick": "Service exception, please click",
       "folderempty": "Folder name cannot be empty！",
       "foldernameLen": "Folder name exceeds 200 characters！",
       "foldernamestyle": "Folder names only accept uppercase,lowercase,digit,underscore and Chinese",

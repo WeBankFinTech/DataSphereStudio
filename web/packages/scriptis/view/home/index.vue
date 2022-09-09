@@ -113,8 +113,8 @@ export default {
       if (hasUnsave) {
         // 提示保存，用户选择不保存则继续跳转
         this.$Modal.confirm({
-          title: "正在编辑的代码未保存，请先检查",
-          content: "点击确定去检查，点击取消不保存，继续跳转",
+          title: this.$t('message.scripts.notsaved'),
+          content: this.$t('message.scripts.confirmcheck'),
           okText: "",
           cancelText: "",
           onOk: () => {},

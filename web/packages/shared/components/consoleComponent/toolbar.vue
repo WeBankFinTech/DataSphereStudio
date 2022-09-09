@@ -17,7 +17,7 @@
           @event-from-ext="eventFromExt"
         />
       </template>
-      <li v-if="toolbarShow.download" :style="{cursor: rsDownload ? 'pointer': 'not-allowed'}">
+      <li v-if="toolbarShow.download">
         <Poptip
           :transfer="true"
           :width="250"
@@ -193,16 +193,8 @@ export default {
     }
   },
   data() {
-    // let appItem = 'linkis'
-    // if (this.$route.name === 'Workflow') {
-    //   appItem = 'workflow'
-    // } else if(this.$route.name === 'ServicesExecute') {
-    //   appItem = 'apiService'
-    // }
-    let rsDownload =  true // todo
     return {
       activeTool: 'table',
-      rsDownload,
       popup: {
         download: false,
         export: false,
@@ -229,7 +221,7 @@ export default {
       let isScriptis = this.$route.name === 'Home' || (this.$route.name === 'results' && this.$route.query.from === 'Home')
       return  {
         export: this.baseinfo.exportResEnable !== false && isScriptis && this.activeTool === 'table' && this.resultType === '2',
-        download: this.activeTool === 'table' && this.rsDownload,
+        download: this.activeTool === 'table' && this.baseinfo.downloadResEnable  !== false,
       }
     }
   },

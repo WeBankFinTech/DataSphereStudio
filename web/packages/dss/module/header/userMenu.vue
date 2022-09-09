@@ -131,7 +131,7 @@ export default {
         if (i.id == 'changeTheme') {
           return {
             id: 'changeTheme',
-            name: localStorage.getItem('theme')==='dark' ? 'light' : 'dark',
+            name: localStorage.getItem('theme')==='dark' ? this.$t(`message.common.theme.light`) : this.$t(`message.common.theme.dark`),
             icon: 'md-repeat',
           }
         } else {

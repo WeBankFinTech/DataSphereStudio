@@ -154,6 +154,7 @@
         height: 20px;
         border: 1px solid $line-color;
         @include border-color($border-color-base, $dark-border-color-base);
+        @include bg-color($light-base-color, $dark-base-color);
         outline: none;
         box-sizing: border-box;
       }

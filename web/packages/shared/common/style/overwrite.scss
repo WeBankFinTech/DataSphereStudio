@@ -73,6 +73,9 @@
       background-color: $dark-workspace-background;
     }
   }
+  .ivu-select-item-focus {
+    background: $dark-active-menu-item
+  }
   .ivu-select-input {
     color: $dark-text-color;
   }
@@ -469,7 +472,7 @@
     color: $dark-text-color !important;
   }
   .designer .node-selected {
-    background: #DEE8F4;
+    background: #dee8f49e;
     box-shadow: 1px 4px 6px 1px rgba(106, 141, 185, 0.65);
     border-radius: 4px;
   }

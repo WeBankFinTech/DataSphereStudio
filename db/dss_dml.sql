@@ -102,7 +102,7 @@ insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jum
 DELETE FROM dss_workflow_node_group;
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (1,'数据交换','Data exchange',NULL,1);
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (2,'数据开发','Data development',NULL,2);
-insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (3,'数据质量','Data Givernance',NULL,3);
+insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (3,'数据质量','Data Governance',NULL,3);
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (4,'数据可视化','Data visualization',NULL,4);
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (5,'数据输出','Data output',NULL,8);
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (6,'信号节点','Signal node',NULL,6);

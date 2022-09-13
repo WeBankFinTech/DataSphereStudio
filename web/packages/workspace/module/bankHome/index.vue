@@ -46,6 +46,7 @@ import api from '@dataspherestudio/shared/common/service/api';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import porjectComponent from '../newProject';
 import appProcess from '../appProcess/';
+import util from '@dataspherestudio/shared/common/util';
 import { GetWorkspaceData } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 export default {
   components: {
@@ -103,15 +104,15 @@ export default {
       if (item.urlType === 0) {
         this.$router.push({path: item.url, query: this.$route.query})
       } else {
-        // util.windowOpen(item.url);
-        this.$router.push({
-          path: `/commonIframe/${item.title}`,
-          query: {
-            ...this.$route.query,
-            __noreplace: 1,
-            url: item.url
-          }
-        })
+        util.windowOpen(item.url);
+        // this.$router.push({
+        //   path: `/commonIframe/${item.title}`,
+        //   query: {
+        //     ...this.$route.query,
+        //     __noreplace: 1,
+        //     url: item.url
+        //   }
+        // })
       }
     },
     // 获取常见问题

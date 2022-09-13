@@ -130,7 +130,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             throw new DSSErrorException(90037, "该工程没有可以导出的工作流,请检查工作流是否都为空");
         }
         //打包导出工程
-        return ZipHelper.zipExportProject(flowExportSaveBasePath);
+        return ZipHelper.zip(flowExportSaveBasePath);
     }
 
 

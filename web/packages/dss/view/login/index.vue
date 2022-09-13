@@ -52,6 +52,8 @@ import { config } from '@dataspherestudio/shared/common/config/db.js';
 import JSEncrypt from 'jsencrypt';
 import util from '@dataspherestudio/shared/common/util/';
 import tab from '@/scriptis/service/db/tab.js';
+import plugin from '@dataspherestudio/shared/common/util/plugin'
+
 export default {
   data() {
     return {
@@ -125,7 +127,7 @@ export default {
           if (!this.rememberUserNameAndPass) {
             storage.remove('saveUserNameAndPass', 'local');
           }
-          this.loginForm.user = this.loginForm.user.toLocaleLowerCase();
+          // this.loginForm.user = this.loginForm.user.toLocaleLowerCase();
           // 需要判断是否需要给密码加密
           let password = this.loginForm.password;
           let params = {};
@@ -178,10 +180,15 @@ export default {
                   this.$Message.success(this.$t('message.common.login.loginSuccess'));
                 })
                 this.getGlobalLimit().then(res => {
-                  storage.set('baseInfo', {
+                  const baseInfo = {
                     ...this.baseInfo,
                     ...res.globalLimits
-                  }, 'local')
+                  }
+                  storage.set('baseInfo', baseInfo, 'local')
+                  plugin.emitHook('after_login', {
+                    context: this,
+                    baseInfo
+                  })
                 })
               }
             })

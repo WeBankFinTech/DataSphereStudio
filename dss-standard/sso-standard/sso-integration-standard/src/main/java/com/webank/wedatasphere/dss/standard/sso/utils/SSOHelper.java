@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.standard.sso.utils;
 
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
+import com.webank.wedatasphere.dss.common.utils.DomainUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOBuilderService;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
@@ -107,7 +108,7 @@ public class SSOHelper {
             return getWorkspace(request);
         }
         String workspaceIdStr = String.valueOf(workspaceId);
-        String domain = getCookieDomain(request.getHeader("Referer"));
+        String domain = getCookieDomain(DomainUtils.getCookieDomain(request));
         Cookie workspaceIdCookie = new Cookie(WORKSPACE_ID_COOKIE_KEY, workspaceIdStr);
         workspaceIdCookie.setPath("/");
 //        workspaceIdCookie.setDomain(domain);

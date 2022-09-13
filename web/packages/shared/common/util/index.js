@@ -83,17 +83,7 @@ let util = {
   },
   // 打开新tab浏览器也方法
   windowOpen(url) {
-    const newTab = window.open("about:blank");
-    setTimeout(() => {
-      const reg = /^(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;
-      if (process.env.NODE_ENV === 'production') {
-        if (reg.test(url)) {
-          newTab.location.href = url;
-        }
-      } else {
-        newTab.location.href = url;
-      }
-    }, 500);
+    window.open(url, '_blank');
   },
   /**
    * 生成guid

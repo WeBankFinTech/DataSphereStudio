@@ -19,7 +19,7 @@
       </FormItem>
       <FormItem :label="$t('message.workflow.Node')" prop="workflowNodeSuffix">
         <Input style="width:95%;margin-right: 6px;" v-model="formState.workflowNodeSuffix" :placeholder="$t('message.workflow.autosuffix')"></Input>
-        <Tooltip min-width="300" max-width="350" :content="$t('message.workflow.WorkflowSameName')"  placement="bottom">
+        <Tooltip :content="$t('message.workflow.WorkflowSameName')" class="node-suffix-tips" placement="left">
           <SvgIcon icon-class="question" />
         </Tooltip>
       </FormItem>
@@ -74,6 +74,12 @@ export default {
             required: true,
             message: this.$t('message.workflow.PleaseInputName'),
           },
+          {
+            type: 'string',
+            pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+            message: this.$t('message.workflow.validNameDesc'),
+            trigger: 'blur'
+          }
         ],
         targetProjectId: [
           {
@@ -148,4 +154,11 @@ export default {
 }
 </script>
 
-<style scoped lang="less"></style>
+<style lang="scss">
+.node-suffix-tips {
+  .ivu-tooltip-inner {
+    width: 300px;
+    white-space: pre-wrap;
+  }
+}
+</style>

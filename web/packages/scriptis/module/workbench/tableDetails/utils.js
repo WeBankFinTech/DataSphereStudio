@@ -74,7 +74,7 @@ function formatValue(item, field) {
     item.modeInfo = JSON.parse(item.modeInfo)
   }
   if (field.key === 'modeInfo.type') {
-    value = item.modeInfo ? item.modeInfo.type === 'index' ? this.$t('message.scripts.Metrics'): this.$t('message.scripts.Dimensions') : ''
+    value = item.modeInfo ? item.modeInfo.type === 'index' ? i18n.t('message.scripts.Metrics'): i18n.t('message.scripts.Dimensions') : ''
   }
   if (field.key === 'modeInfo.name') {
     value = item.modeInfo ? item.modeInfo.name : ''
@@ -82,7 +82,7 @@ function formatValue(item, field) {
   let formatted = value;
   switch (field.type) {
     case 'boolean':
-      formatted = value ? this.$t('message.scripts.Yes') : this.$t('message.scripts.No');
+      formatted = value ? i18n.t('message.scripts.Yes') : i18n.t('message.scripts.No');
       break;
     case 'timestramp':
       formatted = value == '0' || !value ? 0 : moment.unix(value).format('YYYY-MM-DD HH:mm:ss');

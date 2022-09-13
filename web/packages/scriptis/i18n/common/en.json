@@ -653,7 +653,7 @@
             "title": "Code"
           },
           "failedReason": {
-            "title": "Key information"
+            "title": "Key Information"
           },
           "control": {
             "title": "Handle",
@@ -747,11 +747,8 @@
       "user": "User",
       "downloadpath": "Download path",
       "proxyuser": "Current proxy user：",
-      "notsaved": "The code being edited is not saved",
-      "check": "Please check",
-      "confirmcheck": "Click confirm to check",
-      "cancelsave": "Click cancel without saving",
-      "continue": "Continue to jump",
+      "notsaved": "The code being edited is not saved, please check",
+      "confirmcheck": "Click confirm to check, Click cancel without saving, Continue to jump",
       "folder": "Folder",
       "view": "View",
       "table": "Table",
@@ -835,6 +832,8 @@
       "createtime：": "Create time：",
       "nodata": "No data",
       "retry": "Please retry！",
+      "nodataclick": "No data, please click",
+      "errorclick": "Service exception, please click",
       "folderempty": "Folder name cannot be empty！",
       "foldernameLen": "Folder name exceeds 200 characters！",
       "foldernamestyle": "Folder names only accept uppercase,lowercase,digit,underscore and Chinese",

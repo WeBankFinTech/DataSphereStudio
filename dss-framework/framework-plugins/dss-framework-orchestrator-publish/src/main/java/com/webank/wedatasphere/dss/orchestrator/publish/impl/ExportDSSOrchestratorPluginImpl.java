@@ -61,7 +61,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import static com.webank.wedatasphere.dss.common.utils.ZipHelper.zipExportProject;
+import static com.webank.wedatasphere.dss.common.utils.ZipHelper.zip;
 
 
 @Component
@@ -137,7 +137,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             bmlService.downloadToLocalPath(userName, resourceId, version, orcExportSaveBasePath + "orc_flow.zip");
 
             //打包导出工程
-            String exportPath = zipExportProject(orcExportSaveBasePath);
+            String exportPath = zip(orcExportSaveBasePath);
 
             //3、打包新的zip包上传BML
             InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);

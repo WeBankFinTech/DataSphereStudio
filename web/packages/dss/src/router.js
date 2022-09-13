@@ -41,6 +41,7 @@ export default function() {
   });
 
   router.beforeEach((to, from, next) => {
+    plugin.emitHook('app_router_beforechange', {to, from, next})
     if (to.meta) {
     // 给路由添加参数，控制显示对应header
       if (to.meta.header) {
@@ -67,7 +68,8 @@ export default function() {
     }
   });
 
-  router.afterEach((to) => {
+  router.afterEach((to, from) => {
+    plugin.emitHook('app_router_afterchange', {to, from})
     if (to.meta) {
       document.title = to.meta.title || (apps.conf ? apps.conf.app_name || '' : '');
     }

@@ -57,7 +57,8 @@
           <workbench
             ref="workbenchContainer"
             :width="props.width"
-            v-if="props.width"/>
+            v-if="props.width"
+            @get-dbtable-length="showTip" />
         </template>
       </we-panel-item>
     </we-panel>
@@ -112,8 +113,8 @@ export default {
       if (hasUnsave) {
         // 提示保存，用户选择不保存则继续跳转
         this.$Modal.confirm({
-          title: "正在编辑的代码未保存，请先检查",
-          content: "点击确定去检查，点击取消不保存，继续跳转",
+          title: this.$t('message.scripts.notsaved'),
+          content: this.$t('message.scripts.confirmcheck'),
           okText: "",
           cancelText: "",
           onOk: () => {},
@@ -146,11 +147,23 @@ export default {
   },
   beforeDestroy() {
     // 监听窗口变化，获取浏览器宽高
+    this.$Notice.close('show-db-table-many-tip')
     window.removeEventListener('resize', this.getHeight);
   },
   methods: {
     getHeight() {
       this.resize(window.innerHeight);
+    },
+    showTip(length) {
+      if (length > 30000) {
+        this.$Notice.close('show-db-table-many-tip')
+        this.$Notice.warning({
+          duration: 0,
+          name: 'show-db-table-many-tip',
+          title: this.$t('message.scripts.propmpt'),
+          desc: this.$t('message.scripts.largedatatip')
+        })
+      }
     },
     init() {
       this.chooseLeftModule(this.leftSideNavList[0]);

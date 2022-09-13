@@ -182,7 +182,6 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return String.valueOf(idGenerator.getAndIncrement());
     }
 
-    @Transactional(rollbackFor = Exception.class)
     private void updateDBAfterConversion(Long toPublishOrcId,ResponseOperateOrchestrator response,
                                          OrchestratorConversionJob job,
                                          RequestFrameworkConvertOrchestration requestConversionOrchestration) {

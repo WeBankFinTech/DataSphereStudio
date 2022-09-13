@@ -14,16 +14,9 @@
  *
  */
 
-package com.webank.wedatasphere.dss.framework.workspace.aop;
+package com.webank.wedatasphere.dss.appconn.manager.service;
 
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.stereotype.Component;
+public interface AppConnRefreshListener {
 
-
-@Aspect
-@Component
-public class DSSUWorkspaceIdCheckerAspect {
-
-
-
+    void afterRefresh(String appconnName);
 }

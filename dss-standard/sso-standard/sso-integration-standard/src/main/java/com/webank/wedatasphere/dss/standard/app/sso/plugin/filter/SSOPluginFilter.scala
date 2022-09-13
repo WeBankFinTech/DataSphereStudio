@@ -17,9 +17,12 @@
 package com.webank.wedatasphere.dss.standard.app.sso.plugin.filter
 
 import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard
+import com.webank.wedatasphere.dss.standard.app.sso.plugin.filter.proxy.{DSSInternalProxyUserInterceptor, HttpRequestProxyUserInterceptor, HttpSessionProxyUserInterceptor}
+import com.webank.wedatasphere.dss.standard.sso.utils.ProxyUserSSOUtils
 import javax.servlet._
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import org.apache.commons.lang.StringUtils
+import org.apache.linkis.protocol.util.ImmutablePair
 
 
 abstract class SSOPluginFilter extends Filter {
@@ -47,17 +50,33 @@ abstract class SSOPluginFilter extends Filter {
       val (redirectUrl, workspaceName, wrappedReq) = if(!userInterceptor.isUserExistInSession(req)) {
         val ssoMsg = ssoPluginService.createSSOMsgParseOperation.getSSOMsg(req)
         val username = ssoMsg.getUser
+        val pair = if(ProxyUserSSOUtils.existsProxyUser(username)) {
+          ProxyUserSSOUtils.getUserAndProxyUser(username)
+        } else new ImmutablePair[String, String](username, username)
         val wrappedReq = userInterceptor match {
-          case interceptor: HttpSessionUserInterceptor =>
-            interceptor.addUserToSession(username, req)
+          case interceptor: HttpSessionProxyUserInterceptor =>
+            interceptor.addUserToSession(pair.getKey, pair.getValue, req)
             req
-          case interceptor: HttpRequestUserInterceptor => interceptor.addUserToRequest(username, req)
-          case interceptor: DSSInternalUserInterceptor => interceptor.addCookiesToRequest(dssMsg, req)
+          case interceptor: HttpRequestProxyUserInterceptor =>
+            interceptor.addUserToRequest(pair.getKey, pair.getValue, req)
+          case interceptor: DSSInternalProxyUserInterceptor =>
+            interceptor.addCookiesToRequest(dssMsg, pair.getKey, pair.getValue, req)
+          case interceptor: HttpSessionUserInterceptor =>
+            interceptor.addUserToSession(pair.getValue, req)
+            req
+          case interceptor: HttpRequestUserInterceptor =>
+            interceptor.addUserToRequest(pair.getValue, req)
+          case interceptor: DSSInternalUserInterceptor =>
+            interceptor.addCookiesToRequest(dssMsg, req)
         }
         if(wrappedReq != req) {
           wrappedReq.getCookies.foreach(resp.addCookie)
         }
-        info(s"DSS User: $username succeed to login. ")
+        if(ProxyUserSSOUtils.existsProxyUser(username)) {
+          info(s"DSS proxy user mode is opened. DSS user: ${pair.getKey} proxy to proxyUser: ${pair.getValue} login succeed.")
+        } else {
+          info(s"DSS User: $username succeed to login. ")
+        }
         (ssoMsg.getRedirectUrl, ssoMsg.getWorkspaceName, wrappedReq)
       } else {
         (dssMsg.getRedirectUrl, dssMsg.getWorkspaceName, req)

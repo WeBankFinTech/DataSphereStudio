@@ -38,6 +38,7 @@
         <module>dss-framework-project-server</module>
         <module>dss-framework-admin-service</module>
         <module>framework-plugins/dss-framework-migrate-server</module>
+        <module>dss-framework-proxy-user-service</module>
     </modules>
 
 </project>

@@ -31,4 +31,5 @@ public class DSSCommonConf {
       */
     public static final CommonVars<String> DSS_TOKEN_TICKET_KEY = CommonVars.apply("wds.dss.user.ticket.key", "linkis_user_session_ticket_id_v1");
 
+    public static final String[] SUPER_ADMIN_LIST = CommonVars.apply("wds.dss.super.admin", "").getValue().split(",");
 }

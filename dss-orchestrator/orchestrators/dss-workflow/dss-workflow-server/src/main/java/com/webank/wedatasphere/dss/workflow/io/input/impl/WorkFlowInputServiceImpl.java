@@ -87,7 +87,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         //todo 不同服务共享导入工程文件包,可采用共享存储
         String flowInputPath = inputProjectPath + File.separator + dssFlow.getName();
         String flowJsonPath = flowInputPath + File.separator + dssFlow.getName() + ".json";
-        String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
+        String flowJson = bmlService.readLocalTextFile(userName, flowJsonPath);
         //如果包含subflow,需要一同导入subflow内容，并更新parentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
         String updateFlowJson = updateFlowContextIdAndVersion(userName,

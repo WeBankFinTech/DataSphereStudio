@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.webank.wedatasphere.dss.framework.admin.xml.DssAuditMapper">
+<mapper namespace="com.webank.wedatasphere.dss.scriptis.dao.DssAuditMapper">
 
     <select id="getDownloadAuditList"
-            resultType="com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssScriptDownloadAudit">
+            resultType="com.webank.wedatasphere.dss.scriptis.pojo.entity.DssScriptDownloadAudit">
 
   SELECT
 	id,

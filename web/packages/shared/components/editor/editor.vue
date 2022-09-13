@@ -4,7 +4,7 @@
     class="we-editor"/>
 </template>
 <script>
-import monacoLoader from './monaco-loader';
+import monaco from './monaco-loader';
 import { merge, debounce } from 'lodash';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import highRiskGrammar from './highRiskGrammar';
@@ -138,7 +138,7 @@ export default {
     }
   },
   mounted() {
-    monacoLoader(this.initMonaco)
+    this.initMonaco();
     this.changeTheme(localStorage.getItem('theme'));
     eventbus.on('monaco.change', this.changeTheme);
   },
@@ -149,7 +149,7 @@ export default {
   },
   methods: {
     // 初始化
-    initMonaco(monaco) {
+    initMonaco() {
       this.editor = monaco.editor.create(this.$el, this.currentConfig);
       this.monaco = monaco;
       this.editorModel = this.editor.getModel();
@@ -181,10 +181,10 @@ export default {
     },
     changeTheme(theme) {
       if (theme == 'dark') {
-        this.monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
+        monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
       }
       if (theme == 'light') {
-        this.monaco.editor.setTheme('logview');
+        monaco.editor.setTheme('logview');
       }
     },
     changeInnerText(elList, text) {
@@ -249,7 +249,7 @@ export default {
         const SelectedRange = this.editor.getSelection();
         let range = null;
         if (SelectedRange) {
-          range = new this.monaco.Range(
+          range = new monaco.Range(
             SelectedRange.startLineNumber,
             SelectedRange.startColumn,
             SelectedRange.endLineNumber,
@@ -271,22 +271,22 @@ export default {
     },
     addCommands() {
       // 保存当前脚本
-      this.editor.addCommand(this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KEY_S, () => {
+      this.editor.addCommand(monaco.KeyMod.CtrlCmd + monaco.KeyCode.KEY_S, () => {
         this.$emit('on-save');
       });
       // 运行当前脚本
       if (this.executable) {
-        this.editor.addCommand(this.monaco.KeyCode.F3, () => {
+        this.editor.addCommand(monaco.KeyCode.F3, () => {
           this.$emit('on-run');
         });
       }
       // 调用浏览器本身的转换小写动作
-      this.editor.addCommand(this.monaco.KeyMod.CtrlCmd + this.monaco.KeyMod.Shift
-                    + this.monaco.KeyCode.KEY_U, () => {
+      this.editor.addCommand(monaco.KeyMod.CtrlCmd + monaco.KeyMod.Shift
+                    + monaco.KeyCode.KEY_U, () => {
         this.editor.trigger('toLowerCase', 'editor.action.transformToLowercase');
       });
       // 调用浏览器本身的转换大写动作
-      this.editor.addCommand(this.monaco.KeyMod.CtrlCmd + this.monaco.KeyCode.KEY_U, () => {
+      this.editor.addCommand(monaco.KeyMod.CtrlCmd + monaco.KeyCode.KEY_U, () => {
         this.editor.trigger('toUpperCase', 'editor.action.transformToUppercase');
       });
     },
@@ -296,7 +296,7 @@ export default {
       this.editor.addAction({
         id: 'editor.action.execute',
         label: this.$t('message.common.monacoMenu.YXJB'),
-        keybindings: [this.monaco.KeyCode.F3],
+        keybindings: [monaco.KeyCode.F3],
         keybindingContext: null,
         contextMenuGroupId: 'navigation',
         contextMenuOrder: 1.5,
@@ -320,7 +320,7 @@ export default {
       this.editor.addAction({
         id: 'find',
         label: this.$t('message.common.monacoMenu.CZ'),
-        keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_F],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_F],
         keybindingContext: null,
         contextMenuGroupId: 'control',
         contextMenuOrder: 1.6,
@@ -332,7 +332,7 @@ export default {
       this.editor.addAction({
         id: 'replace',
         label: this.$t('message.common.monacoMenu.TH'),
-        keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_H],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_H],
         keybindingContext: null,
         contextMenuGroupId: 'control',
         contextMenuOrder: 1.7,
@@ -344,7 +344,7 @@ export default {
       this.editor.addAction({
         id: 'commentLine',
         label: this.$t('message.common.monacoMenu.HZS'),
-        keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.US_SLASH],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.US_SLASH],
         keybindingContext: null,
         contextMenuGroupId: 'control',
         contextMenuOrder: 1.8,
@@ -374,7 +374,7 @@ export default {
       this.editor.addAction({
         id: 'gotoLine',
         label: this.$t('message.common.monacoMenu.TDZDH'),
-        keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_G],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_G],
         keybindingContext: null,
         contextMenuGroupId: 'control',
         contextMenuOrder: 1.9,
@@ -516,7 +516,7 @@ export default {
             if (validParser) {
               isParseSuccess = false;
               const warningLalbel = `编译语句时异常：在行${validParser.loc.first_line}:${validParser.loc.first_column}，输入词'${validParser.text}'附近可能存在sql语法错误`;
-              const range = new this.monaco.Range(
+              const range = new monaco.Range(
                 validParser.loc.first_line,
                 validParser.loc.first_column,
                 validParser.loc.last_line,

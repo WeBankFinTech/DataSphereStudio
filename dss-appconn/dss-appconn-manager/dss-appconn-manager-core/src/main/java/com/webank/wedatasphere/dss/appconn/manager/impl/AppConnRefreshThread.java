@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.appconn.manager.impl;
 
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
+import com.webank.wedatasphere.dss.appconn.manager.service.AppConnRefreshListener;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,7 @@ public class AppConnRefreshThread implements Runnable {
 
     private AbstractAppConnManager appConnManager;
     private volatile List<? extends AppConnInfo> appConnInfos;
+    private List<AppConnRefreshListener> refreshListeners = new ArrayList<>();
 
     public AppConnRefreshThread(AbstractAppConnManager appConnManager,
                                 List<? extends AppConnInfo> appConnInfos) {
@@ -110,10 +113,15 @@ public class AppConnRefreshThread implements Runnable {
     private void reloadAppConn(AppConnInfo appConnInfo) {
         try {
             appConnManager.reloadAppConn(appConnInfo);
+            refreshListeners.forEach(listener -> listener.afterRefresh(appConnInfo.getAppConnName()));
         } catch (Exception e) {
             // If update failed, it seems like some error happened in this AppConn.
             // this AppConn will not be refreshed any more, unless the admin changes the AppConn plugin files to optimize it.
             LOGGER.warn("Reload AppConn {} failed, ignore it", appConnInfo.getAppConnName(), e);
         }
+    }
+
+    public void registerRefreshListener(AppConnRefreshListener listener) {
+        refreshListeners.add(listener);
     }
 }

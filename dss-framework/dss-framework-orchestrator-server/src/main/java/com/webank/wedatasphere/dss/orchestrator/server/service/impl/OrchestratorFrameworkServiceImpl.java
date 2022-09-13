@@ -102,7 +102,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             .setDaemon(false)
             .build();
 
-    private final ExecutorService orchestratorCopyThreadPool = new ThreadPoolExecutor(5, 200, 0L, TimeUnit.MILLISECONDS,
+    private final ExecutorService orchestratorCopyThreadPool = new ThreadPoolExecutor(0, 200, 60L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(1024), orchestratorCopyThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 
     /**

@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.framework.admin.pojo.entity;
+package com.webank.wedatasphere.dss.scriptis.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -7,17 +7,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
-
-/**
- * @Auther: Han Tang
- * @Date: 2022/1/10-01-10-15:48
- */
-
 
 
 @TableName(value = "dss_workspace_download_audit")

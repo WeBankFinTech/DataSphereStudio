@@ -702,7 +702,7 @@ export default {
               errCode: ret.errCode,
               status: ret.status,
               taskId: ret.taskID,
-              failedReason: ret.errCode + ret.errDesc
+              failedReason: ret.errCode && ret.errDesc ? ret.errCode + ret.errDesc : ''
             })
           }
           if (!ret.errCode && ret.status == 'Failed') {

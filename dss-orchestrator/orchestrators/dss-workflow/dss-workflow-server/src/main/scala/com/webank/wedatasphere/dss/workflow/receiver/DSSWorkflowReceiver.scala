@@ -90,7 +90,10 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
         requestCopyWorkflow.getContextIdStr,
         requestCopyWorkflow.getOrcVersion,
         requestCopyWorkflow.getDescription,
-        requestCopyWorkflow.getDssLabels)
+        requestCopyWorkflow.getDssLabels,
+        requestCopyWorkflow.getNodeSuffix,
+        requestCopyWorkflow.getNewFlowName,
+        requestCopyWorkflow.getTargetProjectId)
       new ResponseCopyWorkflow(copyFlow)
 
     case requestQueryWorkFlow: RequestQueryWorkFlow =>

@@ -28,6 +28,7 @@ dss-appconn/appconns/dss-dolphinscheduler-appconn/target
 dss-appconn/dss-appconn-manager/dss-appconn-manager-client/target
 dss-appconn/dss-appconn-manager/dss-appconn-manager-core/target
 dss-appconn/dss-scheduler-appconn/target
+dss-appconn/appconns/dss-scriptis-appconn/target/
 
 # dss-apps
 dss-apps/dss-apiservice-server/target

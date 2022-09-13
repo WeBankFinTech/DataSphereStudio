@@ -1,8 +1,8 @@
 {
   "name": "@dataspherestudio/dataGovernance",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "dependencies": {
-    "@dataspherestudio/shared": "^1.1.6",
+    "@dataspherestudio/shared": "^1.1.7",
     "clipboard": "2.0.8",
     "jquery": "3.6.0"
   }

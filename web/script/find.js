@@ -56,3 +56,5 @@ function findCNText(filePath) {
 }
 
 findCNText(dirPath);
+
+//  node ./script/find.js ./packages/exts/bdp

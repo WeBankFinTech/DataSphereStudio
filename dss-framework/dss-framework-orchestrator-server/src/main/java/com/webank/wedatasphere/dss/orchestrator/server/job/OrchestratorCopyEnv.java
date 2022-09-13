@@ -1,8 +1,10 @@
 package com.webank.wedatasphere.dss.orchestrator.server.job;
 
+import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
@@ -29,6 +31,28 @@ public class OrchestratorCopyEnv {
 
     @Autowired
     private ImportDSSOrchestratorPlugin importDSSOrchestratorPlugin;
+
+    @Autowired
+    private ContextService contextService;
+
+    public ContextService getContextService() {
+        return contextService;
+    }
+
+    public void setContextService(ContextService contextService) {
+        this.contextService = contextService;
+    }
+
+    public OrchestratorManager getOrchestratorManager() {
+        return orchestratorManager;
+    }
+
+    public void setOrchestratorManager(OrchestratorManager orchestratorManager) {
+        this.orchestratorManager = orchestratorManager;
+    }
+
+    @Autowired
+    private OrchestratorManager orchestratorManager;
 
     public OrchestratorCopyJobMapper getOrchestratorCopyJobMapper() {
         return orchestratorCopyJobMapper;

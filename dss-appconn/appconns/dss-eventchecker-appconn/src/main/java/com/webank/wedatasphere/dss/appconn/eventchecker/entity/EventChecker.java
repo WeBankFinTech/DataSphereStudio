@@ -22,7 +22,9 @@ import com.webank.wedatasphere.dss.appconn.eventchecker.cs.CSEventReceiverHelper
 import com.webank.wedatasphere.dss.appconn.eventchecker.execution.EventCheckerExecutionAction;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -55,7 +57,7 @@ public class EventChecker implements Runnable{
 
 	private static Pattern pattern = Pattern.compile("[a-zA-Z_0-9@\\-]+");
 
-	private static final Logger logger = Logger.getRootLogger();
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
 	public EventChecker(Properties p, EventCheckerExecutionAction action) {
 		this.p = p;

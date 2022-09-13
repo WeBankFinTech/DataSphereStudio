@@ -63,7 +63,7 @@
         "title": "Job Status",
         "stepsInfo": {
           "Submitted": "Submitted",
-          "Inited": "waiting",
+          "Inited": "Waiting",
           "Scheduled": "Applying Resources",
           "Running": "Running",
           "Succeed": "Succeeded",
@@ -120,7 +120,7 @@
             "title": "Name"
           },
           "progress": {
-            "title": "Progress bar"
+            "title": "Progress Bar"
           },
           "taskNum": {
             "title": "Number of Tasks",
@@ -214,8 +214,8 @@
         "QDYQWFJS": "Cannot shut down an engine with starting status!",
         "WXZYQ": "No engine selected!",
         "RWGLQ": "Task Management",
-        "YQGLQ": "Engine management",
-        "DLGLQ": "Queue management",
+        "YQGLQ": "Engine Management",
+        "DLGLQ": "Queue Management",
         "SX": "Refresh",
         "JSRW": "Cancel task",
         "JSYQ": "Shut down engine",
@@ -295,14 +295,14 @@
         "engineAndTask": "Engine and task"
       },
       "toolbar": {
-        "replace": "Please choose the empty value to replace:",
+        "replace": "Select empty value to replace:",
         "emptyString": "Empty string",
         "analysis": "Visualization",
         "window": "Visualization window",
         "export": "Export",
-        "format": "Please choose the download format:",
+        "format": "Select download format:",
         "exportFormat": "Format：",
-        "coding": "Please choose the encoding:",
+        "coding": "Select encoding:",
         "model": "Please choose the model:",
         "graphAnalysis": "Graph Analysis",
         "excelAnalysis": "Excel Analysis",

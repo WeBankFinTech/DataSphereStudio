@@ -18,7 +18,8 @@
 import VueRouter from "vue-router";
 import routes from "./common-router"
 import { apps, subRoutes } from './dynamic-apps'
-import storage from '@dataspherestudio/shared/common/helper/storage';
+import storage from '@dataspherestudio/shared/common/helper/storage'
+import plugin from '@dataspherestudio/shared/common/util/plugin'
 
 // 解决重复点击路由跳转报错
 const originalPush = VueRouter.prototype.push;
@@ -28,41 +29,51 @@ VueRouter.prototype.push = function push(location) {
 
 routes.unshift(subRoutes)
 
-const router = new VueRouter({
-  routes
-});
+/**
+ * 创建router
+ */
+export default function() {
 
-router.beforeEach((to, from, next) => {
-  if (to.meta) {
+  plugin.emitHook('app_router_config', routes)
+
+  const router = new VueRouter({
+    routes
+  });
+
+  router.beforeEach((to, from, next) => {
+    plugin.emitHook('app_router_beforechange', {to, from, next})
+    if (to.meta) {
     // 给路由添加参数，控制显示对应header
-    if (to.meta.header) {
-      to.query.showHeader = to.meta.header
-    }
-    // 路由控制不需要显示 footer
-    if (to.meta.noFooter) {
-      to.query.noFooter = to.meta.noFooter;
-    }
-    if (to.meta.admin) {
+      if (to.meta.header) {
+        to.query.showHeader = to.meta.header
+      }
+      // 路由控制不需要显示 footer
+      if (to.meta.noFooter) {
+        to.query.noFooter = to.meta.noFooter;
+      }
+      if (to.meta.admin) {
       // 如果不是管理员权限，则跳转404，防止手动修改路由跳转
-      const baseInfo = storage.get("baseInfo", 'local');
-      if (baseInfo && baseInfo.isAdmin) {
+        const baseInfo = storage.get("baseInfo", 'local');
+        if (baseInfo && baseInfo.isAdmin) {
+          next();
+        } else {
+          next('/404')
+        }
+      } else if (to.meta.publicPage) {
+      // 公共页面不需要权限控制（404，500）
         next();
       } else {
-        next('/404')
+        next()
       }
-    } else if (to.meta.publicPage) {
-      // 公共页面不需要权限控制（404，500）
-      next();
-    } else {
-      next()
     }
-  }
-});
+  });
 
-router.afterEach((to) => {
-  if (to.meta) {
-    document.title = to.meta.title || (apps.conf ? apps.conf.app_name || '' : '');
-  }
-});
+  router.afterEach((to, from) => {
+    plugin.emitHook('app_router_afterchange', {to, from})
+    if (to.meta) {
+      document.title = to.meta.title || (apps.conf ? apps.conf.app_name || '' : '');
+    }
+  });
 
-export default router;
+  return router
+}

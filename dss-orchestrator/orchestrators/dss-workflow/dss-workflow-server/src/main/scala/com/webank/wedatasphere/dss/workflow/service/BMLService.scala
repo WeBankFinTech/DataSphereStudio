@@ -35,7 +35,7 @@ import scala.collection.JavaConversions._
 @Component
 class BMLService extends JavaLog {
 
-  var bmlClient: BmlClient = _
+  @volatile var bmlClient: BmlClient = _
 
   def getBmlClient(userName: String): BmlClient = {
     if (bmlClient == null) synchronized {

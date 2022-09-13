@@ -39,6 +39,11 @@ public class ZipHelper {
     private static final String RECURSIVE = "-r";
     private static final String ZIP_TYPE = ".zip";
 
+    /**
+     *  ZipHelper可以将传入的path进行打包，打包之后删除path目录
+     * @param dirPath 需要打包的project路径,绝对路径
+     * @return 打包之后的zip包全路径
+     */
     public static String zip(String dirPath) throws DSSErrorException {
         return zip(dirPath, true);
     }
@@ -46,9 +51,13 @@ public class ZipHelper {
     /**
      *  ZipHelper可以将传入的path进行打包
      * @param dirPath 需要打包的project路径,绝对路径
+     * @param deleteOriginDir 打包之后，是否要删除path目录
      * @return 打包之后的zip包全路径
      */
     public static String zip(String dirPath, boolean deleteOriginDir)throws DSSErrorException {
+        if(dirPath.endsWith(File.separator)) {
+            dirPath = dirPath.substring(0, dirPath.lastIndexOf(File.separator));
+        }
         if(!FileHelper.checkDirExists(dirPath)){
             logger.error("{} 不存在, 不能创建zip文件", dirPath);
             throw new DSSErrorException(90001,dirPath + " does not exist, can not zip");
@@ -112,7 +121,12 @@ public class ZipHelper {
         return longZipFilePath;
     }
 
-
+    /**
+     * 解压一个zip文件
+     * @param dirPath zip文件的全路径名
+     * @return 解压后的文件夹名
+     * @throws DSSErrorException 解压出现异常
+     */
 
     public static String unzip(String dirPath)throws DSSErrorException {
         File file = new File(dirPath);
@@ -181,12 +195,5 @@ public class ZipHelper {
         }
         // 目录此时为空，可以删除
         return dir.delete();
-    }
-
-    public static String zipExportProject(String projectPath) throws DSSErrorException {
-        if(projectPath.endsWith(File.separator)) {
-            projectPath = projectPath.substring(0, projectPath.lastIndexOf(File.separator));
-        }
-        return ZipHelper.zip(projectPath);
     }
 }

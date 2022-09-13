@@ -426,14 +426,15 @@ export default {
     overflow: auto;
     transform: translateX(-100%);
     transition: all 0.24s ease-in-out;
+    padding-left: 25px;
     &.nav-right-open {
       transform: translateX(0);
+      padding-bottom: 100px
     }
     .pro-box {
       margin-bottom: 20px;
       .pro-category {
         position: relative;
-        margin: 0 24px;
         padding: 16px 0;
         font-size: 16px;
         line-height: 20px;

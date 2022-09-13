@@ -103,7 +103,7 @@ export default {
       this.jobList = [];
       this.loading = true;
       try {
-        const rst = await api.fetch('/jobhistory/listundone', {}, 'get')
+        const rst = await api.fetch('/jobhistory/listundonetasks', {}, 'get')
         this.loading = false;
         (rst.tasks||[]).forEach((item) => {
           const tmpItem = Object.assign({}, item, { isActive: false, fileName: this.convertJson(item) });

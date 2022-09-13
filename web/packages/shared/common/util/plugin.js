@@ -64,6 +64,17 @@ hooks = {
     mulit: true,
     listener: []
   },
+  // 路由变化
+  app_router_beforechange: {
+    type: 'listener',
+    mulit: true,
+    listener: []
+  },
+  app_router_afterchange: {
+    type: 'listener',
+    mulit: true,
+    listener: []
+  },
   // 生产中心项目菜单
   scheduler_center_project_menu: {
     type: 'listener',
@@ -72,6 +83,12 @@ hooks = {
   },
   // 生产中心工作流列表操作按钮
   scheduler_center_workflow_action: {
+    type: 'listener',
+    mulit: true,
+    listener: []
+  },
+  // 登录成功后
+  after_login: {
     type: 'listener',
     mulit: true,
     listener: []

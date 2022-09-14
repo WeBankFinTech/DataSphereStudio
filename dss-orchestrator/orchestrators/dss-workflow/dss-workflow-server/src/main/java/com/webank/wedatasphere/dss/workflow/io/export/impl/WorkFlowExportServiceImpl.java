@@ -20,7 +20,6 @@ package com.webank.wedatasphere.dss.workflow.io.export.impl;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
-import com.webank.wedatasphere.dss.common.entity.node.DSSEdgeDefault;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -41,7 +40,6 @@ import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,11 +48,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.NODE_EXPORT_IMPORT_TIMEOUT_MINUTES;
@@ -289,7 +285,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
     @Override
     public String downloadFlowJsonFromBml(String userName, String resourceId, String version, String savePath) {
-        return bmlService.downloadAndGetFlowJson(userName, resourceId, version, savePath);
+        return bmlService.downloadAndGetText(userName, resourceId, version, savePath);
     }
 
     private String downloadFlowResourceFromBml(String userName, Resource resource, String savePath) {

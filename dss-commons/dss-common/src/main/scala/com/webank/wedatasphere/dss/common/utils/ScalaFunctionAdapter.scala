@@ -2,8 +2,6 @@ package com.webank.wedatasphere.dss.common.utils
 
 import java.util.function.{BiFunction, Consumer, Predicate, Supplier}
 
-import java.util.function
-
 import org.apache.linkis.protocol.util.ImmutablePair
 
 /**
@@ -20,7 +18,7 @@ object ScalaFunctionAdapter {
 
   def doSupplier[R](supplier: Supplier[R]): () => R = () => supplier.get()
 
-  def doFunction[P, R](function: Function[P, R]): (P) => R = p => function.apply(p)
+  def doFunction[P, R](function: java.util.function.Function[P, R]): (P) => R = p => function.apply(p)
 
   def doBiFunction[P1, P2, R](function: BiFunction[P1, P2, R]): (P1, P2) => R =
     (p1, p2) => function.apply(p1, p2)

@@ -19,7 +19,7 @@ export default function () {
     }
   })
 
-  // workflows: 工作流开发底部TAB面板包括版本比对，历史版本，执行历史
+  // workflows: 工作流开发底部TAB面板复制历史
   this.bindHook('workflow_bottom_panel', function () {
     return [
       {

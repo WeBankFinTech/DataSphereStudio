@@ -55,6 +55,7 @@ dss-framework/dss-framework-admin/target
 dss-framework/dss-framework-sql-template/target
 dss-framework/dss-framework-dbapi-server/target
 dss-framework/dss-framework-admin-service/target
+dss-framework/dss-framework-proxy-user-service/target
 
 
 # dss-orchestrator

@@ -42,7 +42,7 @@ export default {
     },
     handleOk () {
       if (this.proxyUser!== this.baseInfo.proxyUserName) {
-        api.fetch(`/dss/framework/admin/user/proxy/addUserCookie`, {
+        api.fetch(`/dss/scriptis/proxy/addUserCookie`, {
           userName: this.baseInfo.username,
           proxyUserName: this.proxyUser
         }, 'post').then(() => {
@@ -63,7 +63,7 @@ export default {
       }
     },
     getPuserData() {
-      api.fetch(`/dss/framework/admin/user/proxy/list`, {
+      api.fetch(`/dss/scriptis/proxy/list`, {
       }, 'get').then(res => {
         this.pusers = res.proxyUserList || []
       })

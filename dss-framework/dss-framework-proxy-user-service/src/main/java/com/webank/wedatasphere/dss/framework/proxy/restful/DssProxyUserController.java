@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.framework.proxy.restful;
 
 import com.webank.wedatasphere.dss.common.utils.DomainUtils;
+import com.webank.wedatasphere.dss.common.utils.ScalaFunctionUtils;
 import com.webank.wedatasphere.dss.framework.proxy.conf.ProxyUserConfiguration;
 import com.webank.wedatasphere.dss.framework.proxy.pojo.entity.DssProxyUser;
 import com.webank.wedatasphere.dss.framework.proxy.pojo.entity.DssProxyUserImpl;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import scala.Function0;
 import scala.Option;
 import scala.Tuple2;
+import scala.runtime.AbstractFunction0;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -93,12 +95,7 @@ public class DssProxyUserController {
         try {
             if ((ProxyUserConfiguration.DS_PROXY_SELF_ENABLE.getValue() && userRep.getUserName().equalsIgnoreCase(userRep.getProxyUserName())) ||
                     dssProxyUserService.isExists(userRep.getUserName(), userRep.getProxyUserName(), workspace)) {
-                ProxyUserSSOUtils.removeProxyUser(new Function0<Cookie[]>() {
-                    @Override
-                    public Cookie[] apply() {
-                        return req.getCookies();
-                    }
-                });
+                ProxyUserSSOUtils.removeProxyUser(ScalaFunctionUtils.doSupplier(req::getCookies));
             } else {
                 LOGGER.info("user {} have no permission to proxy to user {}.", userRep.getUserName(), userRep.getProxyUserName());
                 return Message.error("user " + userRep.getUserName() + " have no permission to proxy to user " + userRep.getProxyUserName());

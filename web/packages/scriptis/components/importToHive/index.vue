@@ -154,8 +154,7 @@
             <Input
               v-model="secondStep.tbName"
               :disabled="!secondStep.dbName"
-              :placeholder="$t('message.scripts.importToHive.SRSJBM')">
-            </Input>
+              :placeholder="$t('message.scripts.importToHive.SRSJBM')" />
           </FormItem>
           <Row>
             <Col span="12">
@@ -165,12 +164,12 @@
                 prop="partitionValue"
               >
                 <div style="white-space: nowrap;">
-                  <span>{{ secondStep.partition }}</span>
+                  <span style="max-width: 40%;overflow: hidden;text-overflow: ellipsis;display: inline-block;vertical-align: top;" :title="secondStep.partition">{{ secondStep.partition }}</span>
                   <span> = </span>
                   <Input
                     ref="partition"
                     v-model="secondStep.partitionValue"
-                    style="width: calc(100% - 30px);"></Input>
+                    style="width: 50%" />
                 </div>
               </FormItem>
             </Col>
@@ -199,7 +198,7 @@
                 prop="partition"
               >
                 <Input
-                  v-model="secondStep.partition"></Input>
+                  v-model="secondStep.partition" />
               </FormItem>
             </Col>
             <Col
@@ -211,7 +210,7 @@
                 <span> = </span>
                 <Input
                   v-model="secondStep.partitionValue"
-                  style="width: calc(100% - 30px);"></Input>
+                  style="width: calc(100% - 30px);" />
               </FormItem>
             </Col>
           </Row>

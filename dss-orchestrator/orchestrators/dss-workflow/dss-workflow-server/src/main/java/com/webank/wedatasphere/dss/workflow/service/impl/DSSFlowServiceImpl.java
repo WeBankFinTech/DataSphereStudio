@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.workflow.service.impl;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -51,7 +50,6 @@ import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
-import com.webank.wedatasphere.dss.workflow.entity.vo.FlowInfoVo;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
@@ -326,7 +324,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public String getFlowJson(String userName, String projectName, DSSFlow dssFlow) {
         String flowExportSaveBasePath = IoUtils.generateIOPath(userName, projectName, "");
         String savePath = flowExportSaveBasePath + File.separator + dssFlow.getName() + File.separator + dssFlow.getName() + ".json";
-        String flowJson = bmlService.downloadAndGetFlowJson(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion(), savePath);
+        String flowJson = bmlService.downloadAndGetText(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion(), savePath);
         return flowJson;
     }
 
@@ -453,7 +451,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private void updateFlowJson(String userName, String projectName, DSSFlow rootFlow,
                                 String version, Long parentFlowId, String contextIdStr,
                                 Workspace workspace, List<DSSLabel> dssLabels, String nodeSuffix) throws DSSErrorException, IOException {
-        String flowJson = bmlService.readFlowJsonFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
+        String flowJson = bmlService.readTextFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
         //copy subflow need new contextID

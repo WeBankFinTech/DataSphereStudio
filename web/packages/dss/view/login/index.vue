@@ -157,47 +157,42 @@ export default {
           Object.keys(config.stores).map((key) => {
             db.db[key].clear();
           })
-          api
-            .fetch(`/user/login`, params)
-            .then((rst) => {
-              this.loading = false;
-              // 保存用户名
-              if (this.rememberUserNameAndPass) {
-                storage.set('saveUserNameAndPass', `${this.loginForm.user}&${this.loginForm.password}`, 'local');
+          let rst
+          try {
+            rst = await api.fetch(`/user/login`, params)
+            this.loading = false;
+            // 保存用户名
+            if (this.rememberUserNameAndPass) {
+              storage.set('saveUserNameAndPass', `${this.loginForm.user}&${this.loginForm.password}`, 'local');
+            }
+
+            if (rst) {
+            // 跳转去旧版
+              if (rst.redirectLinkisUrl) {
+                location.href = rst.redirectLinkisUrl;
+                return
               }
-              if (rst) {
-                // 跳转去旧版
-                if (rst.redirectLinkisUrl) {
-                  location.href = rst.redirectLinkisUrl;
-                  return
-                }
-                this.baseInfo = { username: this.loginForm.user };
-                storage.set('baseInfo', this.baseInfo, 'local');
-                this.getIsAdmin()
-                // 登录之后需要获取当前用户的调转首页的路径
-                this.getPageHomeUrl().then((res) => {
-                  this.$router.replace({path: res});
-                  this.$Message.success(this.$t('message.common.login.loginSuccess'));
-                })
-                this.getGlobalLimit().then(res => {
-                  const baseInfo = {
-                    ...this.baseInfo,
-                    ...res.globalLimits
-                  }
-                  storage.set('baseInfo', baseInfo, 'local')
-                  plugin.emitHook('after_login', {
-                    context: this,
-                    baseInfo
-                  })
-                })
+              this.baseInfo = { username: this.loginForm.user };
+              storage.set('baseInfo', this.baseInfo, 'local');
+              this.getIsAdmin()
+              // 登录之后需要获取当前用户的调转首页的路径
+              const homePageRes = await this.getPageHomeUrl()
+              const globalRes = await this.getGlobalLimit()
+              const baseInfo = {
+                ...this.baseInfo,
+                ...globalRes.globalLimits
               }
-            })
-            .catch(() => {
-              if (this.rememberUserNameAndPass) {
-                storage.set('saveUserNameAndPass', `${this.loginForm.user}&${this.loginForm.password}`, 'local');
-              }
-              this.loading = false;
-            });
+              storage.set('baseInfo', baseInfo, 'local')
+              plugin.emitHook('after_login', {
+                context: this,
+                baseInfo
+              })
+              this.$router.replace({path: homePageRes});
+              this.$Message.success(this.$t('message.common.login.loginSuccess'));
+            }
+          } catch (error) {
+            console.error(error)
+          }
         } else {
           this.$Message.error(this.$t('message.common.login.vaildFaild'));
         }

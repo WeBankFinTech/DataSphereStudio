@@ -113,7 +113,7 @@ export default {
         endTime: endTime ? this.timeFormat(endTime) : '',
         pn: current,
       }
-      api.fetch('/dss/framework/admin/audit/script/download/query', params,'get').then((res) => {
+      api.fetch('/dss/scriptis/audit/download/query', params,'get').then((res) => {
         this.tableData = res.data.list;
         this.page.current = res.data.pageNum == 0 ? 1 : res.data.pageNum;
         this.page.totalSize = res.data.total;

@@ -7,12 +7,12 @@ import java.util.function
 import org.apache.linkis.protocol.util.ImmutablePair
 
 /**
- *
+ * java 调用scala时，传入函数到scala的适配器
  * @date 2022-09-14
  * @author enjoyyin
  * @since 0.5.0
  */
-object ScalaFunctionUtils {
+object ScalaFunctionAdapter {
 
   def doConsumer[P](consumer: Consumer[P]): (P) => Unit = p => consumer.accept(p)
 

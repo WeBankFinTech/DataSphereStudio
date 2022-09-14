@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import scala.Function0;
 import scala.Option;
 import scala.Tuple2;
 
@@ -92,7 +93,12 @@ public class DssProxyUserController {
         try {
             if ((ProxyUserConfiguration.DS_PROXY_SELF_ENABLE.getValue() && userRep.getUserName().equalsIgnoreCase(userRep.getProxyUserName())) ||
                     dssProxyUserService.isExists(userRep.getUserName(), userRep.getProxyUserName(), workspace)) {
-                ProxyUserSSOUtils.removeProxyUser(req::getCookies);
+                ProxyUserSSOUtils.removeProxyUser(new Function0<Cookie[]>() {
+                    @Override
+                    public Cookie[] apply() {
+                        return req.getCookies();
+                    }
+                });
             } else {
                 LOGGER.info("user {} have no permission to proxy to user {}.", userRep.getUserName(), userRep.getProxyUserName());
                 return Message.error("user " + userRep.getUserName() + " have no permission to proxy to user " + userRep.getProxyUserName());

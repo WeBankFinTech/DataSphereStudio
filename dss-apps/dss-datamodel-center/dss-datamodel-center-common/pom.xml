@@ -52,13 +52,17 @@
             <artifactId>linkis-computation-client</artifactId>
             <version>${linkis.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-framework-workspace-client</artifactId>
+            <version>${dss.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-data-assets-client</artifactId>
             <version>${dss.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.projectlombok</groupId>

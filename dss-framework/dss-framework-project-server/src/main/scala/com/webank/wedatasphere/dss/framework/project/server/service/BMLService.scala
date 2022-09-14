@@ -166,7 +166,7 @@ class BMLService extends Logging{
     path
   }
 
-  def downloadAndGetFlowJson(userName: String, resourceId: String, version: String, path: String): String = {
+  def downloadAndGetText(userName: String, resourceId: String, version: String, path: String): String = {
     downloadToLocalPath(userName,resourceId,version,path)
     //因为下载到指定目录后返回的resource的Stream为null,只能从文件重新读取。
     val is = IoUtils.generateInputInputStream(path)
@@ -189,16 +189,16 @@ class BMLService extends Logging{
    * @param readPath 本地文件全路径名
    * @return 文件里的文本内容
    */
-  def readLocalFlowJsonFile(userName: String,readPath: String): String ={
+  def readLocalTextFile(userName: String,readPath: String): String ={
     var inputStream:InputStream = null
-    var flowJson:String = null
+    var text:String = null
     Utils.tryFinally{
       inputStream = IoUtils.generateInputInputStream(readPath)
-      flowJson = inputstremToString(inputStream)
+      text = inputstremToString(inputStream)
     }{
       IOUtils.closeQuietly(inputStream)
     }
-    flowJson
+    text
   }
 
   private def inputstremToString(inputStream: InputStream): String = {

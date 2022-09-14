@@ -6,7 +6,8 @@ export default {
   WORKFLOW_PATH: '/dss/workflow/',
   PUBLISH_PATH: '/dss/framework/release/',
   DATASOURCE_PATH: '/dss/data/api/datasource/',
-  DATA_GOVERNANCE: '/dss/data/governance/asset/',
-  WAREHOUSE_PATH: '/dss/data/governance/classification/'
+  DATAMODEL_PATH: "/datamodel/",
+  WAREHOUSE_PATH: "/data-warehouse/",
+  DATA_GOVERNANCE: "/data-assets/asset/"
 }
 

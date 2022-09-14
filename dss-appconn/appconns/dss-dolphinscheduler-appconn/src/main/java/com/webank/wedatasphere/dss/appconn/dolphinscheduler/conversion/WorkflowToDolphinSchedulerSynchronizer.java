@@ -13,6 +13,7 @@ import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelSy
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowNode;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 
 import java.util.List;
 
@@ -47,11 +48,12 @@ public class WorkflowToDolphinSchedulerSynchronizer implements WorkflowToRelSync
         updateOperation.updateOrchestration(ref);
     }
 
+
     private void checkSchedulerProject(Workflow flow) throws ExternalOperationFailedException {
         List<WorkflowNode> nodes = flow.getWorkflowNodes();
         for (WorkflowNode node : nodes) {
             DSSNode dssNode = node.getDSSNode();
-            if (CollectionUtils.isEmpty(dssNode.getResources())) {
+            if (CollectionUtils.isEmpty(dssNode.getResources()) && MapUtils.isEmpty(dssNode.getJobContent())) {
                 throw new ExternalOperationFailedException(90021, dssNode.getName() + "节点内容不能为空");
             }
         }

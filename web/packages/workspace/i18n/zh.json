@@ -148,6 +148,7 @@
       "baseInfo": "基本信息",
       "userInfo": "用户信息",
       "authInfo": "权限信息",
+      "datasourceInfo": "数据源信息",
       "editDataSour": "编辑数据源",
       "delDataSour": "删除数据源",
       "addDataSour": "新增数据源",

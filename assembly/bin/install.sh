@@ -121,11 +121,18 @@ function replaceCommonIp() {
     DSS_DATA_API_SERVER_PORT=9208
   fi
 
-  if [ -z "$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP" ]; then
-    DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP=$LOCAL_IP
+  if [ -z "$DSS_DATA_ASSETS_SERVER_INSTALL_IP" ]; then
+    DSS_DATA_ASSETS_SERVER_INSTALL_IP=$LOCAL_IP
   fi
-  if [ -z "$DSS_DATA_GOVERNANCE_SERVER_PORT" ]; then
-    DSS_DATA_GOVERNANCE_SERVER_PORT=9209
+  if [ -z "$DSS_DATA_ASSETS_SERVER_INSTALL_IP" ]; then
+    DSS_DATA_ASSETS_SERVER_INSTALL_IP=9300
+  fi
+ if [ -z "$DSS_DATAMODEL_CENTER_SERVER_INSTALL_IP" ]; then
+    DSS_DATAMODEL_CENTER_SERVER_INSTALL_IP=9400
+  fi
+
+ if [ -z "$DSS_DATA_WAREHOUSE_SERVER_INSTALL_IP" ]; then
+    DSS_DATA_WAREHOUSE_SERVER_INSTALL_IP=9500
   fi
 
   if [ -z "$DSS_GUIDE_SERVER_INSTALL_IP" ]; then
@@ -343,13 +350,38 @@ function installDssProject() {
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
   installPackage
 
-  ###install dss-data-governance-server
-  SERVER_NAME=dss-data-governance-server
-  SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
-  SERVER_PORT=$DSS_DATA_GOVERNANCE_SERVER_PORT
-  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-data-governance/$SERVER_NAME
-  LIB_PATH=$SERVER_HOME/lib/dss-data-governance
-  LOG_PATH=$SERVER_HOME/logs/dss-data-governance/$SERVER_NAME
+  ###install dss-data-assets-server
+  SERVER_NAME=dss-data-assets-server
+  SERVER_IP=$DSS_DATA_ASSETS_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_DATA_ASSETS_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-data-assets-server/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-data-assets-server
+  LIB_PATH=$SERVER_HOME/lib/atlas-application.properties
+  LOG_PATH=$SERVER_HOME/logs/dss-data-assets-server/$SERVER_NAME
+  CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
+  CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
+  CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
+  installPackage
+
+  ###install dss-data-warehouse-server
+  SERVER_NAME=dss-data-warehouse-server
+  SERVER_IP=$DSS_DATA_WAREHOUSE_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_DATA_WAREHOUSE_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-data-warehouse-server/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-data-warehouse-server
+  LOG_PATH=$SERVER_HOME/logs/dss-data-warehouse-server/$SERVER_NAME
+  CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
+  CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
+  CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml
+  installPackage
+
+  ###install dss-datamodel-center-server
+  SERVER_NAME=dss-datamodel-center-server
+  SERVER_IP=$DSS_DATAMODEL_CENTER_SERVER_INSTALL_IP
+  SERVER_PORT=$DSS_DATAMODEL_CENTER_SERVER_PORT
+  UPLOAD_LIB_FILES=$DSS_FILE_PATH/lib/dss-datamodel-center-server/$SERVER_NAME
+  LIB_PATH=$SERVER_HOME/lib/dss-datamodel-center-server
+  LOG_PATH=$SERVER_HOME/logs/dss-datamodel-center-server/$SERVER_NAME
   CONF_SERVER_PROPERTIES=$SERVER_HOME/conf/$SERVER_NAME.properties
   CONF_DSS_PROPERTIES=$SERVER_HOME/conf/dss.properties
   CONF_APPLICATION_YML=$SERVER_HOME/conf/application-dss.yml

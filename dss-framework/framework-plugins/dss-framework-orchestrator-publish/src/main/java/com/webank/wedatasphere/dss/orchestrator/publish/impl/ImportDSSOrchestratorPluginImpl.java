@@ -234,7 +234,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             String flowInputPath = sourceProjectDir + File.separator + dssFlow.getName();
             String flowJsonPath = flowInputPath + File.separator + dssFlow.getName() + ".json";
             // 修改原有的json内容
-            String flowJson = bmlService.readLocalFlowJsonFile(userName, flowJsonPath);
+            String flowJson = bmlService.readLocalTextFile(userName, flowJsonPath);
             Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(flowJson, Map.class);
             List<DSSNodeDefault> workflowNodes = DSSCommonUtils.getWorkFlowNodes(flowJson);
             String finalNodeSuffix = nodeSuffix;

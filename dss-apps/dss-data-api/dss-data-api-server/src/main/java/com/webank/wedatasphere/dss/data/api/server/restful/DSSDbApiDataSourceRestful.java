@@ -34,7 +34,7 @@ public class DSSDbApiDataSourceRestful {
     public Message connect(HttpServletRequest httpServletRequest, @RequestParam(value = "workspaceId", required = false) Integer workspaceId,
                            @RequestParam("type") String type) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        List<DataSource> allConnections = dssDbApiDataSourceService.getAllConnections(Integer.valueOf(workspace.getWorkspaceName()), type);
+        List<DataSource> allConnections = dssDbApiDataSourceService.getAllConnections(workspaceId, type);
         return Message.ok().data("availableConns", allConnections);
 
     }
@@ -75,7 +75,7 @@ public class DSSDbApiDataSourceRestful {
                             @RequestParam("type") String type, @RequestParam("name") String name) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         DataSource dataSource = new DataSource();
-        dataSource.setWorkspaceId(Integer.valueOf(workspace.getWorkspaceName()));
+        dataSource.setWorkspaceId(workspaceId);
         dataSource.setType(type);
         dataSource.setName(name);
         List<DataSource> allDatasource = dssDbApiDataSourceService.listAllDatasources(dataSource);

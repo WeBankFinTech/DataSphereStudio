@@ -271,6 +271,7 @@
         "loginSuccess": "登录成功",
         "haveLogin": "您已经登录，请不要重复登录",
         "vaildFaild": "验证未通过！",
+        "toRegister": "没有账号? 点我注册",
         "selectProxyTip": "用户代理未选择！"
       },
       "dynamicForm": {

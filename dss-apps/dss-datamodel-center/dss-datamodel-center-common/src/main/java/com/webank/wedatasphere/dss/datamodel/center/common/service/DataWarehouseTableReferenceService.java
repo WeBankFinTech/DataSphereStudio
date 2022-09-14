@@ -1,0 +1,5 @@
+package com.webank.wedatasphere.dss.datamodel.center.common.service;
+
+
+public interface DataWarehouseTableReferenceService extends TableThemeReferenceService,TableCycleReferenceService,TableLayerReferenceService,TableModifierReferenceService{
+}

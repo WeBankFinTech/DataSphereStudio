@@ -95,7 +95,7 @@
                                @RequestParam(value = "workspaceId", required = false) String workspaceId) {
          Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
 
-         List<ApiGroupInfo> list = apiConfigService.getGroupList(workspace.getWorkspaceName());
+         List<ApiGroupInfo> list = apiConfigService.getGroupList(workspaceId);
          Message message = Message.ok().data("list", list);
          return message;
      }

@@ -45,7 +45,7 @@ public class DSSDbApiMonitorRestful {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("workspace is: {}", workspace.getWorkspaceName());
         List<Long> totals = new ArrayList<>();
-        List<ApiInfo> apiInfoList = apiManagerService.getOnlineApiInfoList(Long.valueOf(workspace.getWorkspaceName()),
+        List<ApiInfo> apiInfoList = apiManagerService.getOnlineApiInfoList(workspaceId,
                 apiName, totals, pageNow, pageSize);
         return Message.ok().data("list", apiInfoList).data("total", totals.get(0));
     }
@@ -55,7 +55,7 @@ public class DSSDbApiMonitorRestful {
     public Message getOnlineApiCnt(HttpServletRequest request, @RequestParam(value = "workspaceId", required = false) Long workspaceId) {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("workspace is: {}", workspace.getWorkspaceName());
-        return Message.ok().data("onlineApiCnt", apiMonitorService.getOnlineApiCnt(Long.valueOf(workspace.getWorkspaceName())));
+        return Message.ok().data("onlineApiCnt", apiMonitorService.getOnlineApiCnt(workspaceId));
     }
 
 
@@ -63,7 +63,7 @@ public class DSSDbApiMonitorRestful {
     public Message getOfflineApiCnt(HttpServletRequest request, @RequestParam(value = "workspaceId", required = false) Long workspaceId) {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("workspace is: {}", workspace.getWorkspaceName());
-        return Message.ok().data("offlineApiCnt", apiMonitorService.getOfflineApiCnt(Long.valueOf(workspace.getWorkspaceName())));
+        return Message.ok().data("offlineApiCnt", apiMonitorService.getOfflineApiCnt(workspaceId));
     }
 
 
@@ -99,7 +99,7 @@ public class DSSDbApiMonitorRestful {
             throws Exception {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("workspace is: {}", workspace.getWorkspaceName());
-        return Message.ok().data("list", apiMonitorService.getCallCntForPast24H(Long.valueOf(workspace.getWorkspaceName())));
+        return Message.ok().data("list", apiMonitorService.getCallCntForPast24H(workspaceId));
     }
 
     /**

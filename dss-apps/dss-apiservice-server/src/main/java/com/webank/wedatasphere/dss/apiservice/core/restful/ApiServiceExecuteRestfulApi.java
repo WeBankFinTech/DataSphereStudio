@@ -288,7 +288,7 @@ public class ApiServiceExecuteRestfulApi {
     }
 
     private Message getResponse(String user,String path, QueryRequest queryRequest, String httpMethod) {
-        Response response = ApiUtils.doAndResponse(() -> {
+        Message response = ApiUtils.doAndResponse(() -> {
             validParam(queryRequest);
             String token = queryRequest.getParams().get(ApiServiceConfiguration.API_SERVICE_TOKEN_KEY.getValue()).toString();
 
@@ -323,7 +323,7 @@ public class ApiServiceExecuteRestfulApi {
             }
             return messageVo;
         });
-        return convertMessage(response);
+        return response;
     }
 
     //convert Response to Message

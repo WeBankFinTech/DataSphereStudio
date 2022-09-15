@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.apiservice.core.exception;
 
-import com.webank.wedatasphere.dss.common.utils.MessageUtils;
 import org.apache.linkis.server.Message;
 
 import javax.validation.ConstraintViolationException;
@@ -29,11 +28,11 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class BeanValidationExceptionMapper implements ExceptionMapper<ValidationException> {
     @Override
-    public Response toResponse(ValidationException exception) {
+    public Message toResponse(ValidationException exception) {
         StringBuilder stringBuilder = new StringBuilder();
         ((ConstraintViolationException)exception)
                 .getConstraintViolations().forEach(constraintViolation -> stringBuilder.append(constraintViolation.getMessage()).append(";"));
         Message message = Message.error("Bean validation error[实例校验出错], detail:" + stringBuilder.toString());
-        return MessageUtils.messageToResponse(message);
+        return message;
     }
 }

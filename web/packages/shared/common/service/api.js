@@ -68,19 +68,21 @@ instance.interceptors.request.use((config) => {
   if (/dolphinscheduler/.test(config.url)) {
     config.headers['token'] = api.getToken()
     config.url = `http://${window.location.host}/` + config.url
-    if (config.useForm) {
-      let formData = new FormData()
-      Object.keys(config.data).forEach(key => {
-        formData.append(key, config.data[key])
-      })
-      config.data = formData
-    }
-    // fallback application/json to application/x-www-form-urlencoded
-    if (config.useFormQuery) {
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-      config.data = qs(config.data)
-    }
   }
+
+  if (config.useForm) {
+    let formData = new FormData()
+    Object.keys(config.data).forEach(key => {
+      formData.append(key, config.data[key])
+    })
+    config.data = formData
+  }
+  // fallback application/json to application/x-www-form-urlencoded
+  if (config.useFormQuery) {
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    config.data = qs(config.data)
+  }
+  
   let flag = cutReq(config);
   // 当上一次相同请求未完成时，无法进行第二次相同请求
   if (flag === true) {

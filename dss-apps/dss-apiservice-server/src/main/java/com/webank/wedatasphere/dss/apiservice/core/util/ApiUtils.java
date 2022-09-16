@@ -106,6 +106,6 @@ public class ApiUtils {
         /**
          * Operate method
          */
-        Object operateAndGetMessage() throws Exception;
+        Message operateAndGetMessage() throws Exception;
     }
 }

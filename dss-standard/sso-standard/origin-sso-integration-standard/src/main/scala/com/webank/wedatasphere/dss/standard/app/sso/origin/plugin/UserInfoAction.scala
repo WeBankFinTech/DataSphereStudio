@@ -35,6 +35,6 @@ class WorkspaceUsersAction extends POSTAction with DWSHttpAction {
 
 class ProxyUserInfoAction extends GetAction with DWSHttpAction {
 
-  override def suffixURLs: Array[String] = Array("dss", "framework", "proxy", "get")
+  override def suffixURLs: Array[String] = Array("dss", "framework", "proxy", "getProxyUser")
 
 }

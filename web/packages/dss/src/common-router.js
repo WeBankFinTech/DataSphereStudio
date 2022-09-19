@@ -15,6 +15,15 @@ export const subAppRoutes = {
     component: () =>
       import('../view/commonIframe/index.vue'),
   },
+  {
+    path: '/microApp/:appName',
+    name: 'microAppContainer',
+    meta: {
+      publicPage: true,
+    },
+    component: () =>
+      import('../view/microApp/index.vue'),
+  },
   // 新增一个redirect路由mock路由刷新效果，放在这里共享layout可保持header不会unmount，减少ajax
   {
     path: '/redirect/:path(.*)',

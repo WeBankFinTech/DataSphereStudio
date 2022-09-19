@@ -591,7 +591,7 @@ export default {
       this.isConsolePage = true;
       this.currentId = -1;
       const url =
-        location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
+        location.origin + "/dss/linkis/?noHeader=1&noFooter=1#/console";
       this.$router.push({
         path: '/commonIframe/linkis',
         query: {

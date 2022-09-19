@@ -70,9 +70,10 @@ export default {
       let url = app.homepageUri
       const openFn = (info) => {
         if (info.external) {
-          if (info.ifIframe) { // 在Iframe
+          if (info.ifIframe) {
+            // 在Iframe
             this.$router.push({
-              path: `/commonIframe/${info.name}`,
+              path: info.name === 'DmsLineage' ? '/microApp/DmsLineage' : `/commonIframe/${info.name}`,
               query: {
                 ...query,
                 url,

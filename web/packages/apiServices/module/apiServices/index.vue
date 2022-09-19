@@ -413,14 +413,11 @@ export default {
   },
   computed: {
     pageDatalist() {// 展示的数据
-      let list;
-      if(this.showAllText) {
-        list =  this.apiData.filter((item, index) => { return (this.page.pageNow - 1) * this.page.pageSize <= index && index < this.page.pageNow * this.page.pageSize });
-      } else {
+      let list = this.apiData;
+      if (!this.showAllText) {
         list =  this.apiData.filter(item => { return item.status !== 2});
-        list =  list.filter((item, index) => { return ((this.page.pageNow - 1) * this.page.pageSize <= index && index < this.page.pageNow * this.page.pageSize)});
       }
-      return list
+      return list.slice((this.page.pageNow - 1) * this.page.pageSize, this.page.pageNow * this.page.pageSize)
     }
   },
   methods: {
@@ -481,18 +478,17 @@ export default {
     // 切换分页
     change(val) {
       this.page.pageNow = val;
-      this.getApiData()
     },
     // 页容量变化
     changeSize(val) {
       this.page.pageSize = val;
       this.page.pageNow = 1;
-      this.getApiData()
     },
     goBack() {
       this.$router.go(-1)
     },
     getApiData() {
+      this.page.pageNow = 1
       api.fetch('/dss/apiservice/search', {
         name: this.searchName || undefined,
         tag: this.currentTag === 'default' ? undefined : this.currentTag,

@@ -104,7 +104,7 @@ export default {
       this.isHomePage = false;
       this.isConsolePage = true;
       const url =
-        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console'
+        location.origin + '/dss/linkis/?noHeader=1&noFooter=1#/console'
       this.$router.push({
         path: '/commonIframe/linkis',
         query: {

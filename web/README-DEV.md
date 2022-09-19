@@ -65,4 +65,5 @@ npm run build
 # 打包子应用，支持通过module组合
 npm run build --module=scriptis
 npm run build --module=apiServices,workspace --micro_module=apiServices
+npm run build --module=scheduleCenter,workflows,workspace,scriptis --micro_module=scheduleCenter
 ```

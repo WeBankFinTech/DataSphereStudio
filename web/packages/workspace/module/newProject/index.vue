@@ -131,6 +131,7 @@ import {
   GetDicSecondList,
   GetAreaMap
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
+import util from '@dataspherestudio/shared/common/util';
 import { setVirtualRoles } from '@dataspherestudio/shared/common/config/permissions.js';
 export default {
   components: {
@@ -475,8 +476,9 @@ export default {
         notPublish: subItem.notPublish,
         viewState: this.viewState
       }
+      const currentModules = util.currentModules();
       this.$router.push({
-        name: 'Workflow',
+        name: currentModules.microModule == 'scheduleCenter' ? 'ScheduleCenter' : 'Workflow',
         query
       })
       this.dispatch('workflowIndexedDB:clearProjectCache')

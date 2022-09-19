@@ -20,14 +20,11 @@ import org.apache.linkis.server.Message;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 
 @Provider
-public class BeanValidationExceptionMapper implements ExceptionMapper<ValidationException> {
-    @Override
+public class BeanValidationExceptionMapper  {
     public Message toResponse(ValidationException exception) {
         StringBuilder stringBuilder = new StringBuilder();
         ((ConstraintViolationException)exception)

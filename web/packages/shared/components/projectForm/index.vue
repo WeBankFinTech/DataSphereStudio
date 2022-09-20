@@ -426,7 +426,7 @@ export default {
 .project_form {
   height: 60vh;
   overflow-y: auto;
-  padding: 5px;
+  padding: 10px;
   max-height: 500px;
 }
 </style>

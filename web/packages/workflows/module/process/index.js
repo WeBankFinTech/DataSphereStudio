@@ -27,7 +27,7 @@ export default {
     Workbench: ['updateFlowsTab', 'updateFlowsNodeName'],
     IndexedDB: ['clearLog', 'clearResult', 'clearProgress', 'updateResult',  'getTree', 'appendTree'],
     workflowIndexedDB: [
-      'getNodeCache', 'updateNodeCache', 'removeNodeCache', 'addNodeCache', 'clearNodeCache', 'updateProjectCache', 'getProjectCache'
+      'getNodeCache', 'updateNodeCache', 'removeNodeCache', 'addNodeCache', 'clearNodeCache',
     ],
   },
   // 规范模块的动作，由外部调用或者自己执行

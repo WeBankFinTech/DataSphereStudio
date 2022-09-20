@@ -181,7 +181,7 @@ export default {
       userName: "",
       currentProject: {},
       projectList: [],
-      isSandbox: process.env.NODE_ENV === "sandbox",
+      isSandbox: this.$APP_CONF.isSandbox,
       workspaceList: [],
       currentWorkspace: {},
       menuList: [],

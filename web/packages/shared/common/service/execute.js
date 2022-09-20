@@ -40,7 +40,7 @@ function Execute(data) {
   this.status = null;
   // 仅/api/jobhistory/${id}/get接口使用
   this.taskID = null;
-  this.postType = process.env.NODE_ENV === 'sandbox' ? 'http' : (data.data.postType || 'socket');
+  this.postType = data.data.postType || 'http';
   delete data.data.postType;
   this.data = data;
   this.executionCode = null;

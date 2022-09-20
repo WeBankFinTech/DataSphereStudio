@@ -66,6 +66,7 @@
   </div>
 </template>
 <script>
+import api from '@dataspherestudio/shared/common/service/api';
 import workbenchModule from '@/scriptis/module/workbench';
 import workSidebarModule from '@/scriptis/module/workSidebar';
 import fnSidebarModule from '@/scriptis/module/fnSidebar';
@@ -133,6 +134,15 @@ export default {
       return navItemHeight * this.leftSideNavList.length + 100;
     },
   },
+  async created() {
+    let baseInfo = storage.get('baseInfo', 'local')
+    const globalRes = await this.getGlobalLimit()
+    baseInfo = {
+      ...baseInfo,
+      ...globalRes.globalLimits
+    }
+    storage.set('baseInfo', baseInfo, 'local')
+  },
   mounted() {
     this.init();
     // 监听窗口变化，获取浏览器宽高
@@ -151,6 +161,9 @@ export default {
     window.removeEventListener('resize', this.getHeight);
   },
   methods: {
+    getGlobalLimit() {
+      return api.fetch(`/dss/scriptis/globalLimits`, {}, 'get')
+    },
     getHeight() {
       this.resize(window.innerHeight);
     },

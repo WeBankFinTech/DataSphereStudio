@@ -141,12 +141,6 @@ export default {
     }
   },
   mounted() {
-    this.getCache().then(tabs => {
-      if (tabs) {
-        this.tabs = tabs;
-      }
-    });
-    this.updateProjectCacheByActive();
     this.changeTitle(false);
   },
   methods: {
@@ -173,7 +167,6 @@ export default {
     },
     choose(index) {
       this.active = index;
-      this.updateProjectCacheByActive();
     },
     remove(index) {
       // 删掉子工作流得删掉当前打开的子节点
@@ -202,7 +195,6 @@ export default {
               active = index < active ? active - 1 : active
             }
             this.choose(active);
-            this.updateProjectCacheByTab();
           },
           onCancel: () => {}
         });
@@ -217,7 +209,6 @@ export default {
           active = index < active ? active - 1 : active
         }
         this.choose(active);
-        this.updateProjectCacheByTab();
       }
     },
     check(node) {
@@ -370,7 +361,6 @@ export default {
       // 记录打开的tab的依赖关系
       this.openFileAction(node);
       this.choose(this.tabs.length - 1);
-      this.updateProjectCacheByTab();
     },
     openFileAction(node) {
       // 判断当前打开的节点的父工作过流是否已经有打开的节点s
@@ -437,8 +427,6 @@ export default {
           }
         });
       });
-      // 更新节点的编辑器的内容也更新缓存的tabs
-      this.updateProjectCacheByTab();
     },
     convertSettingParamsVariable(params) {
       const variable = isEmpty(params.variable) ? [] : util.convertObjectToArray(params.variable);
@@ -482,50 +470,6 @@ export default {
           item.title = node.title;
         }
         return item;
-      });
-    },
-    updateProjectCacheByTab() {
-      this.dispatch("workflowIndexedDB:updateProjectCache", {
-        projectID: this.$route.query.projectID,
-        key: "tabList",
-        value: {
-          tab: this.tabs,
-          ***REMOVED***",
-          sKey: "tab",
-          sValue: this.query.flowId
-        },
-        isDeep: true
-      });
-    },
-    updateProjectCacheByActive() {
-      this.dispatch("workflowIndexedDB:updateProjectCache", {
-        projectID: this.$route.query.projectID,
-        key: "tabList",
-        value: {
-          active: this.active,
-          ***REMOVED***",
-          sKey: "active",
-          sValue: this.query.flowId
-        },
-        isDeep: true
-      });
-    },
-    getCache() {
-      return new Promise(resolve => {
-        this.dispatch("workflowIndexedDB:getProjectCache", {
-          projectID: this.$route.query.projectID,
-          cb: cache => {
-            const list = (cache && cache.tabList) || [];
-            let tabs = null;
-            list.forEach(item => {
-              if (+item.flowId === +this.query.flowId) {
-                tabs = item.tab;
-                this.active = item.active || 0;
-              }
-            });
-            resolve(tabs);
-          }
-        });
       });
     },
     changeTitle(val) {

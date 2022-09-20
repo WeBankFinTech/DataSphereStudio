@@ -3,7 +3,7 @@ INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `
 VALUES (1,'sso',0,1,0,0,NULL,"com.webank.wedatasphere.dss.appconn.sso.SSOAppConn",NULL,NULL),
 (2,'scriptis',0,1,0,0,"sso",NULL,NULL,NULL),
 (3,'workflow',0,1,1,0,NULL,'com.webank.wedatasphere.dss.appconn.workflow.WorkflowAppConn','/appcom/Install/dss/dss-appconns/workflow',NULL),
-(4,'apiservice',0,1,0,0,'sso',NULL,NULL,NULL)
+(4,'apiservice',0,1,0,0,'sso',NULL,NULL,NULL),
 (5,'datamodel',0,1,0,0,'sso',NULL,NULL,NULL),
 (6,'warehouse',0,1,0,0,'sso',NULL,NULL,NULL),
 (7,'dataasset',0,1,0,0,'sso',NULL,NULL,NULL),

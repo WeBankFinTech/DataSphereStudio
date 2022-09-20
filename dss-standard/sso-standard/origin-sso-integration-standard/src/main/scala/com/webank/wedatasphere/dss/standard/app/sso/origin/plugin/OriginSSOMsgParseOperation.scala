@@ -28,8 +28,8 @@ class OriginSSOMsgParseOperation extends AbstractSSOMsgParseOperation {
   override protected def getUser(dssMsg: DSSMsg): String = {
     val dssUrl = dssMsg.getDSSUrl
     val dwsHttpClient = HttpClient.getHttpClient(dssUrl, "DSS")
-    val userInfoAction = if(ProxyUserSSOUtils.existsProxyUser(dssMsg)) new UserInfoAction
-      else new ProxyUserInfoAction
+    val userInfoAction = if(ProxyUserSSOUtils.existsProxyUser(dssMsg)) new ProxyUserInfoAction
+      else new UserInfoAction
     Utils.tryFinally {
       HttpClient.addCookies(dssMsg, userInfoAction)
       dwsHttpClient.execute(userInfoAction) match {

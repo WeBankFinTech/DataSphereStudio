@@ -22,8 +22,15 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const VirtualModulesPlugin = require('webpack-virtual-modules');
 const webpack = require("webpack");
-const { apps, exts, conf, version } = require('../../config.json')
 const child_process = require('child_process');
+
+let configFile= `../../config.json`
+if (process.env.npm_config_configfile) {
+  configFile = `../../${process.env.npm_config_configfile}`
+} else if (process.env.npm_config_micro_module) {
+  configFile = `../../config.${process.env.npm_config_micro_module}.json`
+}
+const { apps, exts, conf, version } = require(configFile)
 
 if (version) {
   process.env.VUE_APP_VERSION = version

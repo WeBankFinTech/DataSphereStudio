@@ -300,10 +300,11 @@ export default {
     // 确认新增工程 || 确认修改
     ProjectConfirm(projectData, callback) {
       projectData.workspaceId = +this.$route.query.workspaceId
+      const projectName = projectData.name
       if (
         this.checkName(
           this.cacheData[0].dwsProjectList,
-          projectData.name,
+          projectName,
           projectData.id
         )
       ) {
@@ -330,17 +331,11 @@ export default {
             this.getclassListData().then(data => {
               // 新建完工程进到工作流页
               const currentProject = data[0].dwsProjectList.filter(
-                project => project.name === projectData.name
+                project => project.name === projectName
               )[0]
-              this.$router.push({
-                name: 'Workflow',
-                query: {
-                  ...this.$route.query,
-                  projectID: currentProject.id,
-                  projectName: currentProject.name,
-                  notPublish: currentProject.notPublish
-                }
-              })
+              if (currentProject) {
+                this.gotoWorkflow({}, currentProject)
+              }
             })
           })
           .catch(() => {

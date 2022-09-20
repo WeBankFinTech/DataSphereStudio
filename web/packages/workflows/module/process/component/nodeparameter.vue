@@ -134,8 +134,6 @@ export default {
         { max: 200, message: `${this.$t('message.workflow.process.nodeParameter.CDZ200ZF')}`,  trigger: 'blur' },
       ],
       resources: [],
-      paramsIsChange: false,
-      timer: null,
       mybusinessTag: '',
       myappTag: ''
     };
@@ -177,17 +175,7 @@ export default {
         }
       })
       this.$set(this.currentNode, 'jobParams', jobParams);
-    },
-    currentNode: {
-      handler() {
-        this.paramsIsChange = true;
-        this.paramsIsChangeAction();
-      },
-      deep: true,
-    },
-    paramsIsChange(val) {
-      this.$emit('paramsChange', val);
-    },
+    }
   },
   computed: {
     // 获取当前节点参数的基本信息
@@ -358,17 +346,7 @@ export default {
       tmpArr.splice(index, 1);
       this.myappTag = tmpArr.toString()
     },
-    paramsIsChangeAction() {
-      if (this.timer) {
-        clearInterval(this.timer);
-      }
-      this.timer = setInterval(() => {
-        if (!this.paramsIsChange) {
-          clearInterval(this.timer);
-        }
-        this.paramsIsChange = false;
-      }, 1000 * 60 * 5);
-    },
+
     save() {
       this.resourcesAction();
       // 没有值降默认值回填

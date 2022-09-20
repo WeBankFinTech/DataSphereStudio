@@ -184,7 +184,6 @@
           :nodes="json && json.nodes"
           :consoleParams="consoleParams"
           @saveNode="saveNode"
-          @paramsChange="paramsChange"
         ></nodeParameter>
       </div>
     </div>
@@ -516,7 +515,6 @@ export default {
         shapeView: true, // 左侧shape列表
         control: true,
       },
-      paramsIsChange: false, // 判断参数是否有在做操作改变，是否自动保存
       addNodeShow: false, // 创建节点的弹窗显示
       cacheNode: null,
       addNodeTitle: this.$t('message.workflow.process.createSubFlow'), // 创建节点时弹窗的title
@@ -672,22 +670,8 @@ export default {
     this.getConsoleParams();
     document.addEventListener('keyup', this.onKeyUp)
     this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
-    const refs = this.$refs
-    eventbus.on('workflow.fold.left.tree', () => {
-      refs.process && refs.process.layoutView()
-    });
-    eventbus.on('workflow.copying', (data) => {
-      if (data.source.orchestratorId == this.orchestratorId) {
-        this.locked = true
-        this.$Notice.close('copy_workflow_ing')
-        this.$Notice.info({
-          title: this.$t('message.workflow.Prompt'),
-          desc: '复制过程中，不允许编辑工作流',
-          duration: 0,
-          name: 'copy_workflow_ing'
-        });
-      }
-    });
+    eventbus.on('workflow.fold.left.tree', this.foldHandler);
+    eventbus.on('workflow.copying', this.onCopying);
   },
   beforeDestroy() {
     if (this.timer) {
@@ -702,9 +686,27 @@ export default {
     if (this.updateLockTimer) {
       clearTimeout(this.updateLockTimer)
     }
+    eventbus.off('workflow.fold.left.tree', this.foldHandler);
+    eventbus.off('workflow.copying', this.onCopying);
     document.removeEventListener('keyup', this.onKeyUp)
   },
   methods: {
+    foldHandler() {
+      const refs = this.$refs
+      refs.process && refs.process.layoutView()
+    },
+    onCopying(data) {
+      if (data.source.orchestratorId == this.orchestratorId) {
+        this.locked = true
+        this.$Notice.close('copy_workflow_ing')
+        this.$Notice.info({
+          title: this.$t('message.workflow.Prompt'),
+          desc: this.$t('message.workflow.Copying'),
+          duration: 0,
+          name: 'copy_workflow_ing'
+        });
+      }
+    },
     eventFromExt(evt) {
       if (evt && evt.callFn && typeof this[evt.callFn] === 'function') {
         this[evt.callFn](...evt.params)
@@ -1751,9 +1753,6 @@ export default {
       }).catch(() => {
         cb(false);
       });
-    },
-    paramsChange(val) {
-      this.paramsIsChange = val;
     },
     addNode(node) {
       // 关闭右侧弹窗

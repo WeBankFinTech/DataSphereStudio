@@ -166,25 +166,10 @@ export default {
   methods: {
     getIndDbList() {
       this.dbList = this.work && this.work.data;
-      this.dispatch('HiveSidebar:getAllowMap', (map) => {
-        this.personalDbList = [];
-        if (!map.length) {
-          this.personalDbList = this.work.data;
-        }
-        this.work && this.work.data.forEach((item) => {
-          for (let i = 0; i < map.length; i++) {
-            if (item.name.match(map[i])) {
-              const has = this.personalDbList.find(it => it.name === item.name)
-              if (!has) {
-                this.personalDbList.push(item);
-              }
-            }
-          }
-        });
-        if (this.personalDbList.length && !this.personalDbList[0].children.length) {
-          this.getTables(this.personalDbList[0].name);
-        }
-      })
+      this.personalDbList = this.work.data;
+      if (this.personalDbList.length && !this.personalDbList[0].children.length) {
+        this.getTables(this.personalDbList[0].name);
+      }
     },
     extendHive() {
       if (!this.hiveComponent) {

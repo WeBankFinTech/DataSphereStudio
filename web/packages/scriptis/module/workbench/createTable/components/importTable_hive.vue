@@ -53,7 +53,7 @@ export default {
   },
   methods: {
     init() {
-      const personalDbName = `${this.getUserName()}_ind`;
+      const personalDbName = `${this.getUserName()}`;
       this.handleHiveChange(personalDbName);
       this.hive.dbName = this.currentAcitvedDb.name;
     },

@@ -476,13 +476,6 @@ export default {
         name: currentModules.microModule == 'scheduleCenter' ? 'ScheduleCenter' : 'Workflow',
         query
       })
-      this.dispatch('workflowIndexedDB:clearProjectCache')
-      this.dispatch('workflowIndexedDB:addProjectCache', {
-        projectID: subItem.id,
-        value: {
-          projectData: query
-        }
-      })
     },
     // 搜索对应的工程
     searchProject(event, id) {

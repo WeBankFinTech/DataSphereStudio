@@ -177,15 +177,8 @@ export default {
               this.getIsAdmin()
               // 登录之后需要获取当前用户的调转首页的路径
               const homePageRes = await this.getPageHomeUrl()
-              const globalRes = await this.getGlobalLimit()
-              const baseInfo = {
-                ...this.baseInfo,
-                ...globalRes.globalLimits
-              }
-              storage.set('baseInfo', baseInfo, 'local')
               plugin.emitHook('after_login', {
-                context: this,
-                baseInfo
+                context: this
               })
               this.$router.replace({path: homePageRes});
               this.$Message.success(this.$t('message.common.login.loginSuccess'));
@@ -201,9 +194,6 @@ export default {
     // 清楚本地缓存
     clearSession() {
       storage.clear();
-    },
-    getGlobalLimit() {
-      return api.fetch(`/dss/scriptis/globalLimits`, {}, 'get')
     },
     getIsAdmin() {
       api.fetch(`/jobhistory/governanceStationAdmin`, {}, 'get').then((rst)=> {

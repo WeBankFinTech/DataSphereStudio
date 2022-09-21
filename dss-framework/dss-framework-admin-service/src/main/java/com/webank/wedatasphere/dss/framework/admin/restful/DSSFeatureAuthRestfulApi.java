@@ -1,33 +1,20 @@
-package com.webank.wedatasphere.dss.scriptis.restful;
+package com.webank.wedatasphere.dss.framework.admin.restful;
 
-import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.utils.GlobalLimitsUtils;
-import org.apache.linkis.common.conf.BDPConfiguration;
 import org.apache.linkis.server.Message;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
-
-import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration.GLOBAL_LIMITS_PREFIX;
-import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration.GLOBAL_LIMIT_PREFIX;
-
 /**
  * @author enjoyyin
  * @date 2022-03-29
  * @since 0.5.0
  */
-@RequestMapping(path = "/dss/scriptis", produces = {"application/json"})
+@RequestMapping(path = "/dss/framework/admin", produces = {"application/json"})
 @RestController
-public class ScriptisAuthRestfulApi {
-
-    @PostConstruct
-    public void init() {
-        BDPConfiguration.set(DSSCommonConf.ALL_GLOBAL_LIMITS_PREFIX.key(), GLOBAL_LIMITS_PREFIX);
-        BDPConfiguration.set(DSSCommonConf.GLOBAL_LIMIT_PREFIX.key(), GLOBAL_LIMIT_PREFIX);
-    }
+public class DSSFeatureAuthRestfulApi {
 
     @RequestMapping(value = "/globalLimits",method = RequestMethod.GET)
     public Message globalLimits() {

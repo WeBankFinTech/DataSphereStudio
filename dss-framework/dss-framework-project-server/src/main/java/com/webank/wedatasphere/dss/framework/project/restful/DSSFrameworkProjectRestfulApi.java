@@ -36,6 +36,8 @@ import com.webank.wedatasphere.dss.framework.proxy.exception.DSSProxyUserErrorEx
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.linkis.common.exception.WarnException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -49,7 +51,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
@@ -66,7 +70,7 @@ public class DSSFrameworkProjectRestfulApi {
     @Autowired
     private List<ProjectHttpRequestHook> projectHttpRequestHooks;
 
-    private Message executeHook(Function<ProjectHttpRequestHook, Message> function) {
+    private Message executePreHook(Function<ProjectHttpRequestHook, Message> function) {
         String errorMsg = projectHttpRequestHooks.stream().map(function).filter(Objects::nonNull).map(Message::getMessage)
                 .collect(Collectors.joining(", "));
         if(StringUtils.isNotBlank(errorMsg)) {
@@ -74,6 +78,19 @@ public class DSSFrameworkProjectRestfulApi {
         } else {
             return null;
         }
+    }
+
+    private Message executeAfterHook(Consumer<ProjectHttpRequestHook> consumer, Supplier<Message> supplier) {
+        try {
+            projectHttpRequestHooks.forEach(consumer);
+        } catch (WarnException e) {
+            LOGGER.error("execute after hook failed!", e);
+            return Message.error("Execute hook failed, reason: " + e.getDesc());
+        } catch (Exception e) {
+            LOGGER.error("execute after hook failed!", e);
+            return Message.error("Execute hook failed, reason: " + ExceptionUtils.getRootCauseMessage(e));
+        }
+        return supplier.get();
     }
 
     /**
@@ -87,7 +104,7 @@ public class DSSFrameworkProjectRestfulApi {
     public Message getAllProjects(HttpServletRequest request, @RequestBody ProjectQueryRequest projectRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
-        Message message = executeHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetAllProjects(request, projectRequest));
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetAllProjects(request, projectRequest));
         if(message != null) {
             return message;
         }
@@ -110,7 +127,7 @@ public class DSSFrameworkProjectRestfulApi {
         if(projectCreateRequest.getReleaseUsers() == null) {
             projectCreateRequest.setReleaseUsers(new ArrayList<>());
         }
-        Message message = executeHook(projectHttpRequestHook -> projectHttpRequestHook.beforeCreateProject(request, projectCreateRequest));
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeCreateProject(request, projectCreateRequest));
         if(message != null) {
             return message;
         }
@@ -127,7 +144,9 @@ public class DSSFrameworkProjectRestfulApi {
                             dssProjectVo.getId(),dssProjectVo.getName(), OperateTypeEnum.CREATE,projectCreateRequest);
                     return dssProjectVo;
                 },
-                dssProjectVo -> Message.ok("创建工程成功.").data("project", dssProjectVo),
+                dssProjectVo ->
+                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterCreateProject(request, projectCreateRequest, dssProjectVo),
+                            () -> Message.ok("创建工程成功.").data("project", dssProjectVo)),
                 String.format("用户 %s 创建工程 %s 失败. ", username, projectCreateRequest.getName()));
     }
 
@@ -155,7 +174,7 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("user {} begin to modifyProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectModifyRequest);
-        Message message = executeHook(projectHttpRequestHook -> projectHttpRequestHook.beforeModifyProject(request, projectModifyRequest));
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeModifyProject(request, projectModifyRequest));
         if(message != null) {
             return message;
         }
@@ -186,7 +205,9 @@ public class DSSFrameworkProjectRestfulApi {
                     AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
                             projectModifyRequest.getId(),projectModifyRequest.getName(), OperateTypeEnum.UPDATE,projectModifyRequest);
                     },
-                () -> Message.ok("修改工程成功."),
+                () ->
+                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterModifyProject(request, projectModifyRequest),
+                            () -> Message.ok("修改工程成功.")),
                 String.format("用户 %s 修改工程 %s 失败. ", username, projectModifyRequest.getName()));
     }
 
@@ -201,7 +222,7 @@ public class DSSFrameworkProjectRestfulApi {
     public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-        Message message = executeHook(projectHttpRequestHook -> projectHttpRequestHook.beforeDeleteProject(request, projectDeleteRequest));
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeDeleteProject(request, projectDeleteRequest));
         if(message != null) {
             return message;
         }
@@ -213,7 +234,9 @@ public class DSSFrameworkProjectRestfulApi {
                     projectService.deleteProject(username, projectDeleteRequest, workspace,dssProjectDO);
                     AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
                             dssProjectDO.getId(),dssProjectDO.getName(), OperateTypeEnum.DELETE,projectDeleteRequest);                },
-                () -> Message.ok("删除工程成功."),
+                () ->
+                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterDeleteProject(request, projectDeleteRequest),
+                            () -> Message.ok("删除工程成功.")),
                 String.format("用户 %s 删除工程失败. ", username));
     }
 
@@ -253,7 +276,7 @@ public class DSSFrameworkProjectRestfulApi {
     public Message getDeletedProjects(HttpServletRequest request, @Valid @RequestBody ProjectQueryRequest projectRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
-        Message message = executeHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetDeletedProject(request, projectRequest));
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetDeletedProject(request, projectRequest));
         if(message != null) {
             return message;
         }

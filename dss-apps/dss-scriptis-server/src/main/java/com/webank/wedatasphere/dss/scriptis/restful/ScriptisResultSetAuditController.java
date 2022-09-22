@@ -20,9 +20,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/dss/scriptis/audit", produces = {"application/json"})
-public class DssAuditController {
+public class ScriptisResultSetAuditController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DssAuditController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScriptisResultSetAuditController.class);
     @Autowired
     private DssScriptDownloadService dssScriptDownloadService;
 

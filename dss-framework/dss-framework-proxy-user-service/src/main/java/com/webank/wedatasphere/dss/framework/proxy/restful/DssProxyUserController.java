@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.framework.proxy.restful;
 
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.DomainUtils;
 import com.webank.wedatasphere.dss.common.utils.ScalaFunctionAdapter;
 import com.webank.wedatasphere.dss.framework.proxy.conf.ProxyUserConfiguration;
@@ -21,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import scala.Option;
 import scala.Tuple2;
 
 import javax.servlet.http.Cookie;
@@ -44,35 +44,44 @@ public class DssProxyUserController {
 
     @RequestMapping(path = "list", method = RequestMethod.GET)
     public Message getProxyUserList(HttpServletRequest request) {
+        if(!ProxyUserConfiguration.isProxyUserEnable()) {
+            return Message.error("proxy user service is not enable, please ask admin for help.");
+        }
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = null;
         try {
             workspace = SSOHelper.getWorkspace(request);
-        } catch (AppStandardWarnException ignored) {} // ignore error
-        List<DssProxyUser> userList = dssProxyUserService.selectProxyUserList(username, workspace);
-        LOGGER.info("user {} try to get proxy list. userList: {}.", username, userList);
-        List<String> proxyUserNameList = userList.stream().map(DssProxyUser::getProxyUserName).collect(Collectors.toList());
-        if(DS_PROXY_SELF_ENABLE.getValue()) {
-            proxyUserNameList.add(username);
-        }
-        return Message.ok().data("proxyUserList", proxyUserNameList);
+        } catch (AppStandardWarnException ignored) {}
+        Workspace finalWorkspace = workspace;
+        return DSSExceptionUtils.applyMessage(() -> dssProxyUserService.selectProxyUserList(username, finalWorkspace),
+            userList -> {
+               LOGGER.info("user {} got proxy list. userList: {}.", username, userList);
+               List<String> proxyUserNameList = userList.stream().map(DssProxyUser::getProxyUserName).collect(Collectors.toList());
+               if(DS_PROXY_SELF_ENABLE.getValue()) {
+                   proxyUserNameList.add(username);
+               }
+               return Message.ok().data("proxyUserList", proxyUserNameList);
+           }, "fetch proxy user list failed.");
     }
 
     @RequestMapping(path = "getProxyUser", method = RequestMethod.GET)
     public Message getProxyUser(HttpServletRequest request) {
+        if(!ProxyUserConfiguration.isProxyUserEnable()) {
+            return Message.error("proxy user service is not enable, please ask admin for help.");
+        }
         String username = SecurityFilter.getLoginUsername(request);
         LOGGER.info("user {} try to get proxy user.", username);
-        Option<String> proxyUser = ProxyUserSSOUtils.getProxyUserUsername(request);
-        if(proxyUser.isEmpty()) {
-            return Message.error("proxy user is not exists.");
-        }
-        return Message.ok().data("userName", username).data("proxyUser", proxyUser);
+        return DSSExceptionUtils.getMessage(() -> dssProxyUserService.getProxyUser(request),
+                proxyUser -> Message.ok().data("userName", username).data("proxyUser", proxyUser), "");
     }
 
     @RequestMapping(path = "setProxyUser", method = RequestMethod.POST)
     public Message setProxyUserCookie(@RequestBody DssProxyUserImpl userRep,
                                       HttpServletRequest req,
                                       HttpServletResponse resp) {
+        if(!ProxyUserConfiguration.isProxyUserEnable()) {
+            return Message.error("proxy user service is not enable, please ask admin for help.");
+        }
         String username = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(userRep.getUserName())) {
             return Message.error("userName is null.");

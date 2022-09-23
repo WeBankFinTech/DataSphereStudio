@@ -30,9 +30,14 @@ import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResp
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
+import com.webank.wedatasphere.dss.framework.project.service.ProjectHttpRequestHook;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
+import com.webank.wedatasphere.dss.framework.proxy.exception.DSSProxyUserErrorException;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.linkis.common.exception.WarnException;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -45,6 +50,11 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
 @RestController
@@ -57,6 +67,31 @@ public class DSSFrameworkProjectRestfulApi {
     private DSSProjectService projectService;
     @Autowired
     private DSSProjectService dssProjectService;
+    @Autowired
+    private List<ProjectHttpRequestHook> projectHttpRequestHooks;
+
+    private Message executePreHook(Function<ProjectHttpRequestHook, Message> function) {
+        String errorMsg = projectHttpRequestHooks.stream().map(function).filter(Objects::nonNull).map(Message::getMessage)
+                .collect(Collectors.joining(", "));
+        if(StringUtils.isNotBlank(errorMsg)) {
+            return Message.error(errorMsg);
+        } else {
+            return null;
+        }
+    }
+
+    private Message executeAfterHook(Consumer<ProjectHttpRequestHook> consumer, Supplier<Message> supplier) {
+        try {
+            projectHttpRequestHooks.forEach(consumer);
+        } catch (WarnException e) {
+            LOGGER.error("execute after hook failed!", e);
+            return Message.error("Execute hook failed, reason: " + e.getDesc());
+        } catch (Exception e) {
+            LOGGER.error("execute after hook failed!", e);
+            return Message.error("Execute hook failed, reason: " + ExceptionUtils.getRootCauseMessage(e));
+        }
+        return supplier.get();
+    }
 
     /**
      * 获取所有工程或者单个工程
@@ -69,7 +104,11 @@ public class DSSFrameworkProjectRestfulApi {
     public Message getAllProjects(HttpServletRequest request, @RequestBody ProjectQueryRequest projectRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
-        LOGGER.info("user {} begin to getAllProjects, projectId:{}", username, projectRequest.getId());
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetAllProjects(request, projectRequest));
+        if(message != null) {
+            return message;
+        }
+        LOGGER.info("user {} begin to getAllProjects, projectId: {}.", username, projectRequest.getId());
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
         return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
     }
@@ -78,20 +117,26 @@ public class DSSFrameworkProjectRestfulApi {
      * 新建工程,通过和各个AppConn进行交互，将需要满足工程规范的所有的appconn进行创建工程
      */
     @RequestMapping(path = "createProject", method = RequestMethod.POST)
-    public Message createProject(HttpServletRequest request, @RequestBody ProjectCreateRequest projectCreateRequest) throws Exception {
+    public Message createProject(HttpServletRequest request, @RequestBody ProjectCreateRequest projectCreateRequest) throws DSSProxyUserErrorException {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
+        LOGGER.info("user {} begin to createProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectCreateRequest);
+        if(projectCreateRequest.getEditUsers() == null) {
+            projectCreateRequest.setEditUsers(new ArrayList<>());
+        }
+        if(projectCreateRequest.getReleaseUsers() == null) {
+            projectCreateRequest.setReleaseUsers(new ArrayList<>());
+        }
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeCreateProject(request, projectCreateRequest));
+        if(message != null) {
+            return message;
+        }
         //將创建人默认为发布权限和編輯权限
         if (!projectCreateRequest.getEditUsers().contains(username)) {
             projectCreateRequest.getEditUsers().add(username);
         }
-        List<String> releaseUsers = projectCreateRequest.getReleaseUsers();
-        if (releaseUsers == null) {
-            releaseUsers = new ArrayList<>();
-            projectCreateRequest.setReleaseUsers(releaseUsers);
-        }
-        if (!releaseUsers.contains(username)) {
-            releaseUsers.add(username);
+        if (!projectCreateRequest.getReleaseUsers().contains(username)) {
+            projectCreateRequest.getReleaseUsers().add(username);
         }
         return DSSExceptionUtils.getMessage(() -> {
                     DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
@@ -99,7 +144,9 @@ public class DSSFrameworkProjectRestfulApi {
                             dssProjectVo.getId(),dssProjectVo.getName(), OperateTypeEnum.CREATE,projectCreateRequest);
                     return dssProjectVo;
                 },
-                dssProjectVo -> Message.ok("创建工程成功.").data("project", dssProjectVo),
+                dssProjectVo ->
+                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterCreateProject(request, projectCreateRequest, dssProjectVo),
+                            () -> Message.ok("创建工程成功.").data("project", dssProjectVo)),
                 String.format("用户 %s 创建工程 %s 失败. ", username, projectCreateRequest.getName()));
     }
 
@@ -121,10 +168,15 @@ public class DSSFrameworkProjectRestfulApi {
      */
     @RequestMapping(path = "modifyProject", method = RequestMethod.POST)
     public Message modifyProject(HttpServletRequest request, @RequestBody ProjectModifyRequest projectModifyRequest) throws Exception {
-        String username = SecurityFilter.getLoginUsername(request);
-        Workspace workspace = SSOHelper.getWorkspace(request);
         if (projectModifyRequest.getId() == null || projectModifyRequest.getId() < 0) {
             return Message.error("project id is null, cannot modify it.");
+        }
+        String username = SecurityFilter.getLoginUsername(request);
+        Workspace workspace = SSOHelper.getWorkspace(request);
+        LOGGER.info("user {} begin to modifyProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectModifyRequest);
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeModifyProject(request, projectModifyRequest));
+        if(message != null) {
+            return message;
         }
         if (projectModifyRequest.getDescription().length() > MAX_DESC_LENGTH) {
             return Message.error("The project description information is too long, exceeding the maximum length:" + MAX_DESC_LENGTH);
@@ -153,7 +205,9 @@ public class DSSFrameworkProjectRestfulApi {
                     AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
                             projectModifyRequest.getId(),projectModifyRequest.getName(), OperateTypeEnum.UPDATE,projectModifyRequest);
                     },
-                () -> Message.ok("修改工程成功."),
+                () ->
+                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterModifyProject(request, projectModifyRequest),
+                            () -> Message.ok("修改工程成功.")),
                 String.format("用户 %s 修改工程 %s 失败. ", username, projectModifyRequest.getName()));
     }
 
@@ -165,10 +219,14 @@ public class DSSFrameworkProjectRestfulApi {
      * @return
      */
     @RequestMapping(path = "deleteProject", method = RequestMethod.POST)
-    public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) throws Exception {
+    public Message deleteProject(HttpServletRequest request, @RequestBody ProjectDeleteRequest projectDeleteRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
-
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeDeleteProject(request, projectDeleteRequest));
+        if(message != null) {
+            return message;
+        }
+        LOGGER.info("user {} begin to deleteProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectDeleteRequest);
         return DSSExceptionUtils.getMessage(() -> {
                     // 检查是否具有删除项目权限
                     projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
@@ -176,7 +234,9 @@ public class DSSFrameworkProjectRestfulApi {
                     projectService.deleteProject(username, projectDeleteRequest, workspace,dssProjectDO);
                     AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
                             dssProjectDO.getId(),dssProjectDO.getName(), OperateTypeEnum.DELETE,projectDeleteRequest);                },
-                () -> Message.ok("删除工程成功."),
+                () ->
+                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterDeleteProject(request, projectDeleteRequest),
+                            () -> Message.ok("删除工程成功.")),
                 String.format("用户 %s 删除工程失败. ", username));
     }
 
@@ -216,6 +276,10 @@ public class DSSFrameworkProjectRestfulApi {
     public Message getDeletedProjects(HttpServletRequest request, @Valid @RequestBody ProjectQueryRequest projectRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetDeletedProject(request, projectRequest));
+        if(message != null) {
+            return message;
+        }
         List<ProjectResponse> dssProjectVos = projectService.getDeletedProjects(projectRequest);
         return Message.ok("获取工作空间已删除的工程成功").data("projects", dssProjectVos);
     }

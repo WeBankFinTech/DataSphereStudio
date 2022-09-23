@@ -1,6 +1,9 @@
 import ApiPublish from './scriptis/apiPublish/index.vue'
 import CopyHistory from './workflows/bottomTab/copyHistory.vue'
+import createProxyModal from './proxyUser/index'
 import i18n from '@dataspherestudio/shared/common/i18n'
+import storage from '@dataspherestudio/shared/common/helper/storage'
+import api from '@dataspherestudio/shared/common/service/api'
 /**
  * 插件绑定
  */
@@ -17,6 +20,23 @@ export default function () {
       name: 'ApiPublish',
       component: ApiPublish
     }
+  })
+
+  // 登录后提示运维用户切换
+  this.bindHook('after_login', function () {
+    api.fetch('/dss/framework/admin/globalLimits', {}, 'get').then((res) => {
+      let baseInfo = storage.get('baseInfo', 'local')
+      baseInfo = {
+        ...baseInfo,
+        dss: {
+          ...res.globalLimits
+        }
+      }
+      storage.set('baseInfo', baseInfo, 'local')
+      if (baseInfo.dss.proxyEnable) {
+        createProxyModal()
+      }
+    })
   })
 
   // workflows: 工作流开发底部TAB面板复制历史

@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.JobTypeEnum;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener;
+import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job.JobBuilder;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.log.AzkabanAppConnLog;
 import org.apache.commons.lang.StringUtils;
@@ -127,9 +128,12 @@ public class AzkabanDssJobType extends AbstractJob {
             this.log.error("failed to get result size");
             resultSize = -1;
         }
-        for(int i =0; i < resultSize; i++){
-            this.log.info("The content of the " + (i + 1) + "th resultset is :"
-                    +  LinkisNodeExecutionImpl.getLinkisNodeExecution().getResult(this.job, i, LinkisJobExecutionConfiguration.RESULT_PRINT_SIZE.getValue(this.jobPropsMap)));
+        for (int i = 0; i < resultSize; i++) {
+            String result = LinkisNodeExecutionImpl.getLinkisNodeExecution().getResult(this.job, i, LinkisJobExecutionConfiguration.RESULT_PRINT_SIZE.getValue(this.jobPropsMap));
+            if (result.length() > LinkisJobTypeConf.LOG_MAX_RESULTSIZE.getValue()) {
+                result = result.substring(0, LinkisJobTypeConf.LOG_MAX_RESULTSIZE.getValue());
+            }
+            this.log.info("The content of the " + (i + 1) + "th resultset is :" + result);
         }
 
         info("Finished to execute job");
@@ -189,7 +193,7 @@ public class AzkabanDssJobType extends AbstractJob {
                             entry.getValue();
                     if ("azkaban.flow.start.timestamp".equals(key)){
                         this.info("run time is " + value);
-                        String runDateNow = value.substring(0, 10).replaceAll("-", "");
+                        String runDateNow = value.substring(0, 13).replaceAll("-", "").replaceAll("-","");
                         this.info("run date now is " + runDateNow);
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
                         try {
@@ -200,6 +204,33 @@ public class AzkabanDssJobType extends AbstractJob {
                             return runDate;
                         } catch (ParseException e) {
                             this.log.error("failed to parse run date " + runDateNow, e);
+                        }
+                    }
+                }
+            } catch (final Exception ex) {
+                this.log.error("failed to log job properties ", ex);
+            }
+        }
+        return null;
+    }
+
+    private String getRunTodayh(boolean stdFormat) {
+        this.info("begin to get run_today_h");
+        if (this.jobProps != null &&
+                this.jobProps.getBoolean(JOB_DUMP_PROPERTIES_IN_LOG, true)) {
+            try {
+                for (final Map.Entry<String, String> entry : this.jobPropsMap.entrySet()) {
+                    final String key = entry.getKey();
+                    final String value = key.endsWith(SENSITIVE_JOB_PROP_NAME_SUFFIX) ?
+                            SENSITIVE_JOB_PROP_VALUE_PLACEHOLDER :
+                            entry.getValue();
+                    if ("azkaban.flow.start.timestamp".equals(key)) {
+                        this.info("run time is " + value);
+                        String runTodayh = value.substring(0, 13).replaceAll("-", "").replaceAll("T", "");
+                        this.info("run today h is " + runTodayh);
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
+                        if(!stdFormat){
+                            return runTodayh;
                         }
                     }
                 }

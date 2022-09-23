@@ -185,6 +185,7 @@ export default {
             }
           } catch (error) {
             console.error(error)
+            this.loading = false
           }
         } else {
           this.$Message.error(this.$t('message.common.login.vaildFaild'));

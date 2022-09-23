@@ -43,5 +43,6 @@ public class LinkisJobTypeConf {
     public static final String MSG_SAVE_KEY = "msg.savekey";
 
     public final static CommonVars<String> SIGNAL_NODES = CommonVars.apply("wds.dss.flow.signal.nodes","linkis.appconn.eventchecker.eventreceiver");
+    public final static CommonVars<Integer> LOG_MAX_RESULTSIZE = CommonVars.apply("wds.dss.log.max.resultsize",1024);
 
 }

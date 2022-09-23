@@ -49,4 +49,7 @@ public interface DSSProjectUserMapper extends BaseMapper<DSSProjectUser> {
     Long isWorkspaceUser(@Param("workspaceId")Long workspaceId,@Param("username")String username);
 
     List<DSSProjectUser> getPrivsByProjectId(@Param("projectId") Long projectId);
+
+    @Select("SELECT admin_permission FROM dss_workspace WHERE id = #{id}")
+    Integer getWorkspaceAdminPermission(@Param("id") Long id);
 }

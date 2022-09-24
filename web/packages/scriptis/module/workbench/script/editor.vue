@@ -17,8 +17,8 @@
         <div
           v-if="
             scriptType !== 'hdfsScript' &&
-            scriptType !== 'historyScript' &&
-            !readonly
+              scriptType !== 'historyScript' &&
+              !readonly
           "
           class="workbench-body-navbar-group"
         >
@@ -72,9 +72,9 @@
             class="workbench-body-navbar-item"
             v-if="
               !script.readOnly &&
-              !isHdfs &&
-              isSupport &&
-              (script.application == 'jdbc' || script.application == 'ck')
+                !isHdfs &&
+                isSupport &&
+                (script.application == 'jdbc' || script.application == 'ck')
             "
           >
             <Select
@@ -89,7 +89,7 @@
                 v-for="item in dataSetList"
                 :value="item.dataSourceName"
                 :key="item.id"
-                >{{ item.dataSourceName }}</Option
+              >{{ item.dataSourceName }}</Option
               >
             </Select>
           </div>

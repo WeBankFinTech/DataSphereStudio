@@ -154,13 +154,13 @@
           v-if="closeModal.save"
           type="primary"
           @click="closeModal.save"
-          >{{ $t('message.scripts.container.footer.save') }}</Button
+        >{{ $t('message.scripts.container.footer.save') }}</Button
         >
         <Button
           v-if="closeModal.saveAs"
           type="primary"
           @click="closeModal.saveAs"
-          >{{ $t('message.scripts.container.footer.saveAs') }}</Button
+        >{{ $t('message.scripts.container.footer.saveAs') }}</Button
         >
       </div>
     </Modal>
@@ -1038,11 +1038,11 @@ export default {
             const scriptText =
               work.type === 'hdfsScript'
                 ? `${work.filename}-${this.$t(
-                    'message.scripts.container.removeWork.readOnly'
-                  )}`
+                  'message.scripts.container.removeWork.readOnly'
+                )}`
                 : `${work.filename}-${this.$t(
-                    'message.scripts.container.removeWork.temporary'
-                  )}`
+                  'message.scripts.container.removeWork.temporary'
+                )}`
             this.closeModal.text = scriptText
             this.closeModal.save = null
             this.closeModal.saveAs = () => {
@@ -1230,11 +1230,11 @@ export default {
       const configuration = isEmpty(params.configuration)
         ? {}
         : {
-            special: {},
-            runtime: {},
-            startup: {},
-            ...params.configuration,
-          }
+          special: {},
+          runtime: {},
+          startup: {},
+          ...params.configuration,
+        }
       return {
         ...params,
         variable,

@@ -13,7 +13,7 @@
         >
           <draggable
             class="list-group"
-            style="height:24px;margin:0"
+            style="height: 24px; margin: 0"
             tag="ul"
             v-model="worklist"
             v-bind="dragOptions"
@@ -25,7 +25,7 @@
               <template v-for="(work, index) in worklist">
                 <div
                   :key="work.id"
-                  :class="{active:work.id==current}"
+                  :class="{ active: work.id == current }"
                   class="workbench-tab-item"
                   ref="work_item"
                   v-if="work.type !== 'backgroundScript'"
@@ -82,22 +82,22 @@
             <Icon type="md-list" />
             <DropdownMenu slot="list">
               <DropdownItem name="other">{{
-                $t("message.scripts.container.closeDropDown.others")
+                $t('message.scripts.container.closeDropDown.others')
               }}</DropdownItem>
               <DropdownItem name="all">{{
-                $t("message.scripts.container.closeDropDown.all")
+                $t('message.scripts.container.closeDropDown.all')
               }}</DropdownItem>
               <DropdownItem name="left">{{
-                $t("message.scripts.container.closeDropDown.left")
+                $t('message.scripts.container.closeDropDown.left')
               }}</DropdownItem>
               <DropdownItem name="right">{{
-                $t("message.scripts.container.closeDropDown.right")
+                $t('message.scripts.container.closeDropDown.right')
               }}</DropdownItem>
               <DropdownItem name="fullScreen" divided v-if="!isTopPanelFull">{{
-                $t("message.scripts.constants.logPanelList.fullScreen")
+                $t('message.scripts.constants.logPanelList.fullScreen')
               }}</DropdownItem>
               <DropdownItem name="releaseFullScreen" v-else>{{
-                $t("message.scripts.constants.logPanelList.releaseFullScreen")
+                $t('message.scripts.constants.logPanelList.releaseFullScreen')
               }}</DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -138,29 +138,29 @@
     <Modal v-model="showCloseModal" :closable="false" width="360">
       <p slot="header" class="modal-title">
         <Icon type="md-help-circle" />
-        <span>{{ $t("message.scripts.container.closeHint") }}</span>
+        <span>{{ $t('message.scripts.container.closeHint') }}</span>
       </p>
       <div class="modal-content">
-        <p style="word-break: break-all;">{{ closeModal.text }}</p>
+        <p style="word-break: break-all">{{ closeModal.text }}</p>
       </div>
       <div slot="footer">
         <Button type="text" @click="closeModal.cancel">{{
-          $t("message.scripts.container.footer.cancel")
+          $t('message.scripts.container.footer.cancel')
         }}</Button>
         <Button type="warning" @click="closeModal.close">{{
-          $t("message.scripts.container.footer.close")
+          $t('message.scripts.container.footer.close')
         }}</Button>
         <Button
           v-if="closeModal.save"
           type="primary"
           @click="closeModal.save"
-        >{{ $t("message.scripts.container.footer.save") }}</Button
+        >{{ $t('message.scripts.container.footer.save') }}</Button
         >
         <Button
           v-if="closeModal.saveAs"
           type="primary"
           @click="closeModal.saveAs"
-        >{{ $t("message.scripts.container.footer.saveAs") }}</Button
+        >{{ $t('message.scripts.container.footer.saveAs') }}</Button
         >
       </div>
     </Modal>
@@ -168,22 +168,22 @@
   </div>
 </template>
 <script>
-import draggable from "vuedraggable"
+import draggable from 'vuedraggable'
 import api from '@dataspherestudio/shared/common/service/api'
 import storage from '@dataspherestudio/shared/common/helper/storage'
 import util from '@dataspherestudio/shared/common/util'
-import title from "./title.vue"
-import body from "./body.vue"
-import saveAs from "./script/saveAs.vue"
-import { Work } from "./modal.js"
-import { find, uniq, isEmpty, last, debounce } from "lodash"
+import title from './title.vue'
+import body from './body.vue'
+import saveAs from './script/saveAs.vue'
+import { Work } from './modal.js'
+import { find, uniq, isEmpty, last, debounce } from 'lodash'
 import elementResizeEvent from '@dataspherestudio/shared/common/helper/elementResizeEvent'
 import mixin from '@dataspherestudio/shared/common/service/mixin'
 const maxTabLen = 20
 export default {
   components: {
-    "we-body": body,
-    "we-title": title,
+    'we-body': body,
+    'we-title': title,
     saveAs,
     draggable,
   },
@@ -198,7 +198,7 @@ export default {
       type: Object,
       default: () => {
         return {
-          content: "",
+          content: '',
           params: {},
         }
       },
@@ -212,10 +212,10 @@ export default {
   data() {
     return {
       worklist: [],
-      current: "",
-      lastCurrent: "",
+      current: '',
+      lastCurrent: '',
       closeModal: {
-        text: "",
+        text: '',
         cancel: () => {},
         close: () => {},
         save: () => {},
@@ -225,7 +225,7 @@ export default {
       isControlBtnShow: false,
       tabLeft: false,
       tabRight: false,
-      tips: this.$t("message.scripts.container.tips"),
+      tips: this.$t('message.scripts.container.tips'),
       isTopPanelFull: false,
       loading: false,
     }
@@ -238,17 +238,17 @@ export default {
     dragOptions() {
       return {
         animation: 0,
-        group: "description",
+        group: 'description',
         disabled: false,
-        draggable: ".workbench-tab-item",
-        ghostClass: "ghost",
+        draggable: '.workbench-tab-item',
+        ghostClass: 'ghost',
       }
     },
   },
   watch: {
     current(val, oldVal) {
       if (oldVal) {
-        this.dispatch("Workbench:setResultCache", { id: oldVal })
+        this.dispatch('Workbench:setResultCache', { id: oldVal })
         this.revealInSidebar()
       }
     },
@@ -256,7 +256,7 @@ export default {
       this.toggleCtrlBtn(this)
       this.changeOrder()
     },
-    $route: function() {
+    $route: function () {
       this.openQueryTab()
     },
   },
@@ -269,15 +269,19 @@ export default {
   },
   methods: {
     init() {
-      this.loading = true;
-      this.dispatch('IndexedDB:getGlobalCache', {
-        id: this.getUserName(),
-      }, (cache) => {
-        this.updateCache(cache);
-      })
+      this.loading = true
+      this.dispatch(
+        'IndexedDB:getGlobalCache',
+        {
+          id: this.getUserName(),
+        },
+        (cache) => {
+          this.updateCache(cache)
+        }
+      )
       // 获取hive库和表的信息，用于在tab页中的.sql脚本进行关键字联想
       // 首次登录打开时，得重新获取数据
-      const worklist = storage.get(this.getUserName() + "tabs", "local")
+      const worklist = storage.get(this.getUserName() + 'tabs', 'local')
       if (!this.node && worklist && worklist.length > 0) {
         // getLoginTabs()内部有逻辑用于区分不同用户的缓存
         this.getLoginTabs(worklist).then(() => {
@@ -297,24 +301,26 @@ export default {
             this.scrollIntoView()
           })
         })
-        storage.remove(this.getUserName() + "tabs", "local")
+        storage.remove(this.getUserName() + 'tabs', 'local')
         return
       }
       this.getWorkListAndOpen().then(() => {
-        let work = last(this.worklist);
-        const lastActivedWork = this.worklist.find(w=>w.id === this.lastActive)
-        if(lastActivedWork) {
+        let work = last(this.worklist)
+        const lastActivedWork = this.worklist.find(
+          (w) => w.id === this.lastActive
+        )
+        if (lastActivedWork) {
           work = lastActivedWork
         }
-        if(work) {
+        if (work) {
           this.chooseWork(work)
         }
-        this.openQueryTab();
+        this.openQueryTab()
         this.$nextTick(() => {
-          this.loading = false;
-          this.scrollIntoView();
-        });
-      });
+          this.loading = false
+          this.scrollIntoView()
+        })
+      })
     },
     updateCache(cache) {
       const that = this
@@ -325,7 +331,7 @@ export default {
       const waitList = []
       const getHiveList = () => {
         return that
-          .dispatch("HiveSidebar:getAllDbsAndTables", {
+          .dispatch('HiveSidebar:getAllDbsAndTables', {
             userName,
           })
           .then((args) => {
@@ -335,13 +341,13 @@ export default {
 
       const getVariableList = () => {
         return that
-          .dispatch("GlobalValiable:getGlobalVariable")
+          .dispatch('GlobalValiable:getGlobalVariable')
           .then((args) => {
             variableList = args
           })
       }
       const getFnList = () => {
-        return that.dispatch("fnSidebar:getAllLoadedFunction").then((args) => {
+        return that.dispatch('fnSidebar:getAllLoadedFunction').then((args) => {
           fnList = args
         })
       }
@@ -349,7 +355,7 @@ export default {
         waitList.push(getHiveList(), getVariableList(), getFnList())
         Promise.all(waitList)
           .then(() => {
-            that.dispatch("IndexedDB:setGlobalCache", {
+            that.dispatch('IndexedDB:setGlobalCache', {
               key: userName,
               hiveList,
               fnList,
@@ -373,7 +379,7 @@ export default {
         }
         Promise.all(waitList)
           .then(() => {
-            that.dispatch("IndexedDB:updateGlobalCache", {
+            that.dispatch('IndexedDB:updateGlobalCache', {
               id: userName,
               hiveList: hiveList || cache.hiveList,
               fnList: fnList || cache.fnList,
@@ -400,7 +406,7 @@ export default {
           })
         }
         let asyncList = worklist.map((work) => {
-          if (work.type !== "node" && work.owner === this.getUserName()) {
+          if (work.type !== 'node' && work.owner === this.getUserName()) {
             // 登录之后,更新脚本内容, 当有filePath可从接口获取最新脚本
             return this.openFileAction(work)
           }
@@ -410,7 +416,7 @@ export default {
       }
     },
     openFileAction(work) {
-      const methodName = "Workbench:add"
+      const methodName = 'Workbench:add'
       let addParams = {
         id: work.data.id,
         filename: work.filename,
@@ -418,16 +424,16 @@ export default {
         code: work.data.data,
         type: work.type,
         saveAs: work.saveAs,
-        currentNodeKey: this.node ? this.node.key : "",
+        currentNodeKey: this.node ? this.node.key : '',
       }
       if (work.filepath) {
         return api
           .fetch(
-            "/filesystem/openFile",
+            '/filesystem/openFile',
             {
               path: work.filepath,
             },
-            "get"
+            'get'
           )
           .then((res) => {
             const params = this.convertSettingParams(res.metadata)
@@ -443,7 +449,7 @@ export default {
     getWorkListAndOpen() {
       return new Promise((resolve) => {
         if (!this.node) {
-          this.dispatch("IndexedDB:getTabs", (worklist) => {
+          this.dispatch('IndexedDB:getTabs', (worklist) => {
             let order = this.changeOrder(false)
             let lastActive = worklist.find(
               (w) => w.owner === this.getUserName() && w.actived
@@ -457,18 +463,19 @@ export default {
               })
             }
             worklist.forEach((work) => {
-              if (work.type !== "node" && work.owner === this.getUserName()) {
+              if (work.type !== 'node' && work.owner === this.getUserName()) {
                 // 登录之后,更新脚本内容, 当有filePath可从接口获取最新脚本
-                const methodName = "Workbench:add"
+                const methodName = 'Workbench:add'
                 let addParams = {
                   id: work.data.id,
+                  dataSetValue: work.dataSetValue,
                   filename: work.filename,
                   filepath: work.filepath,
                   code: work.data.data,
                   type: work.type,
                   data: work.data,
                   saveAs: work.saveAs,
-                  currentNodeKey: "",
+                  currentNodeKey: '',
                 }
                 this[methodName](addParams, () => {}, false)
               }
@@ -476,28 +483,32 @@ export default {
             resolve()
           })
         } else {
-          this.tips = ""
+          this.tips = ''
           if (this.node.key) {
-            this.dispatch("IndexedDB:getTabs", () => {
-              const methodName = "Workbench:add"
+            this.dispatch('IndexedDB:getTabs', () => {
+              const methodName = 'Workbench:add'
               const supportModes = this.getSupportModes()
               const model = this.node.modelType
-              const match = supportModes.find(
-                (s) => (s.flowType || s.scriptType || '').toLowerCase() == model
-              ) || {}
-              const name = `${this.node.name || this.node.key}${match.ext || ''}`
+              const match =
+                supportModes.find(
+                  (s) =>
+                    (s.flowType || s.scriptType || '').toLowerCase() == model
+                ) || {}
+              const name = `${this.node.name || this.node.key}${
+                match.ext || ''
+              }`
               this[methodName]({
                 id: this.node.key,
                 filename:
                   this.node.jobContent && this.node.jobContent.script
                     ? this.node.jobContent.script
                     : name,
-                filepath: "",
-                type: "node",
+                filepath: '',
+                type: 'node',
                 code: this.parameters.content,
                 params: this.parameters.params,
                 saveAs: false,
-                currentNodeKey: this.node ? this.node.key : "",
+                currentNodeKey: this.node ? this.node.key : '',
               })
               resolve()
             })
@@ -511,26 +522,26 @@ export default {
      * @param {Funcion} cb
      * @return {Notice}
      */
-    "Workbench:add"(option, cb, choose) {
+    async 'Workbench:add'(option, cb, choose) {
       option.owner = this.getUserName()
       // 先判断当前是否是节点的组件，再来判断那个节点, 由于ide使用keep-alive所以页面关闭并未注销所以还得判断没有节点时阻止
       if (
         (this.node &&
-          option.currentNodeKey !== "undefined" &&
+          option.currentNodeKey !== 'undefined' &&
           option.currentNodeKey !== this.node.key) ||
         (!this.node && option.currentNodeKey)
       )
         return
       if (!option.id || !option.filename) {
-        this.$Notice.close("developerWarning")
+        this.$Notice.close('developerWarning')
         return this.$Notice.error({
           title: this.$t(
-            "message.scripts.container.notice.developerWarning.title"
+            'message.scripts.container.notice.developerWarning.title'
           ),
           desc: this.$t(
-            "message.scripts.container.notice.developerWarning.desc"
+            'message.scripts.container.notice.developerWarning.desc'
           ),
-          name: "developerWarning",
+          name: 'developerWarning',
           duration: 3,
         })
       }
@@ -539,33 +550,65 @@ export default {
         (p) => p.rule.test(option.filename) && p.isCanBeOpen
       )
       if (!supportedMode) {
-        this.$Notice.close("unSupport")
+        this.$Notice.close('unSupport')
         return this.$Notice.warning({
-          title: this.$t("message.scripts.container.notice.unSupport.title"),
-          desc: this.$t("message.scripts.container.notice.unSupport.desc"),
-          name: "unSupport",
+          title: this.$t('message.scripts.container.notice.unSupport.title'),
+          desc: this.$t('message.scripts.container.notice.unSupport.desc'),
+          name: 'unSupport',
           duration: 3,
         })
       }
       let work = null
-      if (option.type !== "backgroundScript") {
+
+      let dataSet = []
+      api
+        .fetch(
+          'data-source-manager/info',
+          {
+            //获取数据源数据
+            pageSize: 100,
+            currentPage: 1,
+          },
+          'get'
+        )
+        .then((rst) => {
+          if (rst && rst.queryList) {
+            for (let i = 0; i < rst.queryList.length; i++) {
+              // expire 为false
+              // versionId 大于0
+              // publishedVersionId 存在此字段（未发布的数据源不含有此字段），且大于0
+              // 满足这三个条件的为有效数据源，需要在列表中被筛选
+              if (
+                rst.queryList[i].expire === false &&
+                rst.queryList[i].versionId > 0 &&
+                rst.queryList[i].publishedVersionId
+              ) {
+                dataSet.push(rst.queryList[i])
+              }
+            }
+          }
+        })
+        .catch(() => {})
+      option.dataSetList = dataSet
+
+      if (option.type !== 'backgroundScript') {
         // 如果已经在tabs中，则打开
         let repeatWork = find(this.worklist, (work) => work.id == option.id)
         if (!repeatWork) {
           if (this.worklist.length >= maxTabLen) {
-            this.$Notice.close("boyondQuota")
+            this.$Notice.close('boyondQuota')
             cb && cb(false)
             return this.$Notice.warning({
-              title: this.$t("message.scripts.boyondQuota.title"),
-              desc: this.$t("message.scripts.boyondQuota.desc"),
-              name: "boyondQuota",
+              title: this.$t('message.scripts.boyondQuota.title'),
+              desc: this.$t('message.scripts.boyondQuota.desc'),
+              name: 'boyondQuota',
               duration: 3,
             })
           }
           work = new Work(option)
           // addWay用于判断新建脚本时脚本在tab栏打开的位置
           // follow表示紧跟上一个脚本
-          if (option.addWay === "follow") {
+          if (option.addWay === 'follow') {
             const index = this.worklist.findIndex(
               (item) => item.id === this.current
             )
@@ -578,7 +621,7 @@ export default {
           cb && cb(true)
         } else {
           if (choose !== false) this.chooseWork(repeatWork)
-          if (option.action === "export_table") {
+          if (option.action === 'export_table') {
             cb && cb(true)
           } else {
             cb && cb(false)
@@ -590,14 +633,14 @@ export default {
         cb && cb(true)
       }
     },
-    "Workbench:checkExist"(option, cb) {
+    'Workbench:checkExist'(option, cb) {
       api
         .fetch(
-          "/filesystem/isExist",
+          '/filesystem/isExist',
           {
             path: option.path,
           },
-          "get"
+          'get'
         )
         .then((rst) => {
           // 如果文件已存在，则返回false
@@ -608,14 +651,14 @@ export default {
           }
         })
     },
-    "Workbench:isOpenTab"({ newLabel, oldLabel, oldDest }, cb) {
+    'Workbench:isOpenTab'({ newLabel, oldLabel, oldDest }, cb) {
       // 先判断是否有修改后缀，如果有返回false, 如果有在判断是否在tab中存在
       const newSuffix = newLabel.substr(
-        newLabel.lastIndexOf("."),
+        newLabel.lastIndexOf('.'),
         newLabel.length
       )
       const oldSuffix = oldLabel.substr(
-        oldLabel.lastIndexOf("."),
+        oldLabel.lastIndexOf('.'),
         oldLabel.length
       )
       if (oldSuffix !== newSuffix) {
@@ -629,9 +672,9 @@ export default {
         cb(false)
       }
     },
-    "Workbench:openFile"(option, cb) {
+    'Workbench:openFile'(option, cb) {
       const filename = option.filename.slice(
-        option.filename.indexOf("/") + 1,
+        option.filename.indexOf('/') + 1,
         option.filename.length
       )
       const supportedMode = find(
@@ -639,11 +682,11 @@ export default {
         (p) => p.rule.test(filename) && p.isCanBeOpen
       )
       if (!supportedMode) {
-        this.$Notice.close("unSupport")
+        this.$Notice.close('unSupport')
         return this.$Notice.warning({
-          title: this.$t("message.scripts.container.notice.unSupport.title"),
-          desc: this.$t("message.scripts.container.notice.unSupport.desc"),
-          name: "unSupport",
+          title: this.$t('message.scripts.container.notice.unSupport.title'),
+          desc: this.$t('message.scripts.container.notice.unSupport.desc'),
+          name: 'unSupport',
           duration: 3,
         })
       }
@@ -652,16 +695,16 @@ export default {
       if (findWork) {
         return this.chooseWork(findWork)
       }
-      const methodName = "Workbench:add"
+      const methodName = 'Workbench:add'
       let path = option.source ? option.source : option.path
       this.loading = true
       api
         .fetch(
-          "/filesystem/openFile",
+          '/filesystem/openFile',
           {
             path,
           },
-          "get"
+          'get'
         )
         .then((rst) => {
           const ismodifyByOldTab = option.code && !rst.fileContent[0][0]
@@ -679,7 +722,7 @@ export default {
               saveAs: option.saveAs || false,
               unsave: ismodifyByOldTab,
               ismodifyByOldTab,
-              currentNodeKey: this.node ? this.node.key : "",
+              currentNodeKey: this.node ? this.node.key : '',
             },
             () => {
               this.loading = false
@@ -698,12 +741,12 @@ export default {
       let variable = rst.metadata.variable
       let params = {
         path: option.path,
-        scriptContent: rst.fileContent[0].join(""),
+        scriptContent: rst.fileContent[0].join(''),
         params: { variable, configuration: {} },
       }
-      api.fetch("/filesystem/saveScript", params).then(() => {})
+      api.fetch('/filesystem/saveScript', params).then(() => {})
     },
-    async "Workbench:deleteDirOrFile"(path, cb) {
+    async 'Workbench:deleteDirOrFile'(path, cb) {
       const md5Path = util.md5(path)
       const findWork = find(this.worklist, (work) => {
         return work.id === md5Path
@@ -726,24 +769,24 @@ export default {
           }
         })
         if (!num) {
-          cb("none")
+          cb('none')
         } else {
           for (const work of needForClose) {
             await this.removeWork(work)
           }
-          cb("save")
+          cb('save')
         }
       } else if (findWork.unsave) {
-        cb("unsave")
+        cb('unsave')
       } else {
         this.removeWork(findWork)
-        cb("save")
+        cb('save')
       }
     },
-    "Workbench:saveAs"(work) {
+    'Workbench:saveAs'(work) {
       this.$refs.saveAs.open(work)
     },
-    "Workbench:updateTab"({ newNode, findWork, oldLabel }, cb) {
+    'Workbench:updateTab'({ newNode, findWork, oldLabel }, cb) {
       const work =
         findWork ||
         find(this.worklist, (work) => {
@@ -751,23 +794,23 @@ export default {
         })
       if (work) {
         const newKey = util.md5(newNode.path)
-        const modifyLog = this.dispatch("IndexedDB:changeLogKey", {
+        const modifyLog = this.dispatch('IndexedDB:changeLogKey', {
           oldKey: work.id,
           newKey,
         })
-        const modifyHistory = this.dispatch("IndexedDB:changeHistoryKey", {
+        const modifyHistory = this.dispatch('IndexedDB:changeHistoryKey', {
           oldKey: work.id,
           newKey,
         })
-        const modifyResult = this.dispatch("IndexedDB:changResultKey", {
+        const modifyResult = this.dispatch('IndexedDB:changResultKey', {
           oldKey: work.id,
           newKey,
         })
-        const modifyProgress = this.dispatch("IndexedDB:changProgressKey", {
+        const modifyProgress = this.dispatch('IndexedDB:changProgressKey', {
           oldKey: work.id,
           newKey,
         })
-        const modifyTab = this.dispatch("IndexedDB:changeTabKey", {
+        const modifyTab = this.dispatch('IndexedDB:changeTabKey', {
           oldKey: work.id,
           newKey,
         })
@@ -785,13 +828,13 @@ export default {
             work.unsave = false
             this.$Modal.remove()
             this.removeWork(work)
-            const methodName = "Workbench:openFile"
+            const methodName = 'Workbench:openFile'
             this[methodName](
               {
                 path: newNode.path,
                 filename: newNode.name,
                 saveAs: false,
-                code: (findWork && findWork.data.data) || "",
+                code: (findWork && findWork.data.data) || '',
                 params: (findWork && findWork.data.params) || {},
               },
               () => {
@@ -800,7 +843,7 @@ export default {
                 }
                 setTimeout(() => {
                   this.dispatch(
-                    "Workbench:save",
+                    'Workbench:save',
                     this.worklist[this.worklist.length - 1]
                   )
                 }, 500)
@@ -810,15 +853,15 @@ export default {
         })
       }
     },
-    "Workbench:updateFlowsTab"(node, data) {
+    'Workbench:updateFlowsTab'(node, data) {
       const work = find(this.worklist, (work) => {
         return work.id === node.key
       })
-      this.$set(work.data, "data", data.content)
-      this.$set(work.data, "params", this.convertSettingParams(data.params))
-      this.dispatch("Workbench:resetScriptData", work.data.id)
+      this.$set(work.data, 'data', data.content)
+      this.$set(work.data, 'params', this.convertSettingParams(data.params))
+      this.dispatch('Workbench:resetScriptData', work.data.id)
     },
-    "Workbench:updateFlowsNodeName"(node) {
+    'Workbench:updateFlowsNodeName'(node) {
       this.worklist = this.worklist.map((work) => {
         if (work.id === node.key) {
           work.nodeName = node.title
@@ -826,22 +869,22 @@ export default {
         return work
       })
     },
-    "Workbench:pasteInEditor"(value, node = {}) {
+    'Workbench:pasteInEditor'(value, node = {}) {
       // node页面和scriptis页面操作不同，由于scriptis页面有缓存，所以关闭页面并不会注销组件，所以先判断是node页面触发的还是scriptis页面触发的，然后再判断是有那个编辑器触发的
       if (!this.node && Object.keys(node).length <= 0) {
         const work = find(this.worklist, (work) => work.id === this.current)
         if (!work)
           return this.$Message.warning(
-            this.$t("message.scripts.container.warning.noSelectedScript")
+            this.$t('message.scripts.container.warning.noSelectedScript')
           )
-        this.dispatch("Workbench:insertValue", {
+        this.dispatch('Workbench:insertValue', {
           id: this.current,
           value,
         })
       } else {
         const work = find(this.worklist, (work) => work.id === node.key)
         if (work && node.key === this.current) {
-          this.dispatch("Workbench:insertValue", {
+          this.dispatch('Workbench:insertValue', {
             id: node.key,
             value,
           })
@@ -849,14 +892,14 @@ export default {
       }
     },
     // 用于获取当前打开的脚本里面有几种语言
-    "Workbench:getWorksLangList"(cb) {
+    'Workbench:getWorksLangList'(cb) {
       const workLangList = uniq(this.worklist.map((item) => item.data.lang))
       cb(workLangList)
     },
-    "Workbench:setTabPanelSize"() {
+    'Workbench:setTabPanelSize'() {
       this.isTopPanelFull = false
     },
-    "Workbench:removeWork"(work) {
+    'Workbench:removeWork'(work) {
       this.removeWork(work)
     },
     onChooseWork(work) {
@@ -883,13 +926,13 @@ export default {
             type,
             isInvert: true,
           }),
-          ""
+          ''
         )
         this.lastCurrent = this.current
         this.current = work.id
-        this.dispatch("IndexedDB:toggleTab", work.id, this.getUserName())
+        this.dispatch('IndexedDB:toggleTab', work.id, this.getUserName())
         this.panelControl(
-          this.isTopPanelFull ? "fullScreen" : "releaseFullScreen"
+          this.isTopPanelFull ? 'fullScreen' : 'releaseFullScreen'
         )
       }
       if (intoview) {
@@ -908,8 +951,8 @@ export default {
           let index = this.worklist.indexOf(work)
           if (index != -1) {
             this.worklist.splice(index, 1)
-            this.dispatch("IndexedDB:removeTab", work.id)
-            this.dispatch("IndexedDB:removeGlobalCache", {
+            this.dispatch('IndexedDB:removeTab', work.id)
+            this.dispatch('IndexedDB:removeGlobalCache', {
               id: this.getUserName(),
               tabId: work.id,
             })
@@ -947,27 +990,27 @@ export default {
                   type,
                   isInvert: true,
                 }),
-                ""
+                ''
               )
               this.dispatch(
-                "IndexedDB:toggleTab",
+                'IndexedDB:toggleTab',
                 this.current,
                 this.getUserName()
               )
             } else {
               this.isTopPanelFull = false
-              this.current = ""
-              this.dispatch("WorkSidebar:setHighLight", "")
-              this.dispatch("HdfsSidebar:setHighLight", "")
+              this.current = ''
+              this.dispatch('WorkSidebar:setHighLight', '')
+              this.dispatch('HdfsSidebar:setHighLight', '')
             }
           }
           // 清空从全局历史转过来的脚本时，切换路由到/，否则刷新界面的时候会被一直打开
           if (work.id === this.$route.query.id) {
-            this.$router.push("/")
+            this.$router.push('/')
           }
           resolve()
         }
-        if (work.unsave && work.type !== "historyScript") {
+        if (work.unsave && work.type !== 'historyScript') {
           this.chooseWork(work)
           this.showCloseModal = true
           this.closeModal.cancel = () => {
@@ -983,33 +1026,33 @@ export default {
           }
           if (!work.saveAs) {
             this.closeModal.text = `${work.filename}-${this.$t(
-              "message.scripts.container.removeWork.normal"
+              'message.scripts.container.removeWork.normal'
             )}`
             this.closeModal.save = () => {
               this.showCloseModal = false
-              this.dispatch("Workbench:save", work)
+              this.dispatch('Workbench:save', work)
               doRemove()
             }
             this.closeModal.saveAs = null
           } else {
             const scriptText =
-              work.type === "hdfsScript"
+              work.type === 'hdfsScript'
                 ? `${work.filename}-${this.$t(
-                  "message.scripts.container.removeWork.readOnly"
+                  'message.scripts.container.removeWork.readOnly'
                 )}`
                 : `${work.filename}-${this.$t(
-                  "message.scripts.container.removeWork.temporary"
+                  'message.scripts.container.removeWork.temporary'
                 )}`
             this.closeModal.text = scriptText
             this.closeModal.save = null
             this.closeModal.saveAs = () => {
-              this.dispatch("Workbench:saveAs", work)
+              this.dispatch('Workbench:saveAs', work)
             }
           }
         } else {
           doRemove()
         }
-        this.dispatch("Workbench:removeTab", this.worklist)
+        this.dispatch('Workbench:removeTab', this.worklist)
       })
     },
     /**
@@ -1019,17 +1062,17 @@ export default {
     async closeTabs(name) {
       let needCloseTabs = []
       switch (name) {
-        case "other":
+        case 'other':
           this.worklist.forEach((work) => {
             if (work.id != this.current) {
               needCloseTabs.push(work)
             }
           })
           break
-        case "all":
+        case 'all':
           needCloseTabs = this.worklist.slice(0)
           break
-        case "left":
+        case 'left':
           for (let i = 0; i < this.workListLength; i++) {
             if (this.worklist[i].id != this.current) {
               needCloseTabs.push(this.worklist[i])
@@ -1038,7 +1081,7 @@ export default {
             }
           }
           break
-        case "right":
+        case 'right':
           for (let i = this.workListLength - 1; i > 0; i--) {
             if (this.worklist[i].id != this.current) {
               needCloseTabs.push(this.worklist[i])
@@ -1057,7 +1100,7 @@ export default {
       const findWork = this.worklist.find((work) => work.id === this.current)
       // 如果是通过关闭模态框打开的，要关闭模态框
       this.closeModal.close()
-      const methodName = "Workbench:updateTab"
+      const methodName = 'Workbench:updateTab'
       this[methodName]({
         newNode: node,
         findWork,
@@ -1069,7 +1112,7 @@ export default {
     openQueryTab() {
       const isHistoryIn =
         !isEmpty(this.$route.query) && this.$route.query.taskID
-      if (this.$route.name === "Home" && isHistoryIn) {
+      if (this.$route.name === 'Home' && isHistoryIn) {
         const taskID = this.$route.query.taskID
         const filename = this.$route.query.filename
         const md5Id = util.md5(filename)
@@ -1077,12 +1120,12 @@ export default {
           id: md5Id,
           taskID,
           filename,
-          filepath: "",
+          filepath: '',
           saveAs: true,
-          type: "historyScript",
-          currentNodeKey: this.node ? this.node.key : "", //避免广播事件和ide做区分
+          type: 'historyScript',
+          currentNodeKey: this.node ? this.node.key : '', //避免广播事件和ide做区分
         }
-        const methodName = "Workbench:add"
+        const methodName = 'Workbench:add'
         this[methodName](params)
         this.$nextTick(() => {
           const findWork = find(this.worklist, (item) => {
@@ -1097,22 +1140,22 @@ export default {
     getMethodName(args) {
       let { type, isInvert } = args
       const lib = {
-        workspaceScript: "WorkSidebar:setHighLight",
-        hdfsScript: "HdfsSidebar:setHighLight",
+        workspaceScript: 'WorkSidebar:setHighLight',
+        hdfsScript: 'HdfsSidebar:setHighLight',
       }
       if (isInvert) {
-        type = type === "workspaceScript" ? "hdfsScript" : "workspaceScript"
+        type = type === 'workspaceScript' ? 'hdfsScript' : 'workspaceScript'
       }
       return lib[type]
     },
 
     tabMoving(type) {
-      const tabScroll = this.$refs["tab-list-scroll"]
+      const tabScroll = this.$refs['tab-list-scroll']
       let width = tabScroll.getBoundingClientRect().width
       let itemWidth = Math.ceil(width / this.workListLength)
-      if (type === "left") {
+      if (type === 'left') {
         tabScroll.scrollLeft += itemWidth
-      } else if (type === "right") {
+      } else if (type === 'right') {
         tabScroll.scrollLeft -= itemWidth
       }
       this.toggleCtrlBtn(this)
@@ -1124,7 +1167,7 @@ export default {
       let index = this.worklist.findIndex((w) => w.id === this.current)
       if (index < 0) return
       this.$nextTick(() => {
-        let item = this.$refs["work_item"]
+        let item = this.$refs['work_item']
         if (item && item[index]) {
           item[index].scrollIntoView()
           this.toggleCtrlBtn(this)
@@ -1136,14 +1179,14 @@ export default {
       if (set) {
         let order = []
         this.worklist.forEach((w) => order.push(w.id))
-        storage.set(key, order, "local")
+        storage.set(key, order, 'local')
       } else {
-        let order = storage.get(key, "local")
+        let order = storage.get(key, 'local')
         return order
       }
     },
     toggleCtrlBtn: debounce((that) => {
-      let tabScroll = that.$refs["tab-list-scroll"]
+      let tabScroll = that.$refs['tab-list-scroll']
       if (tabScroll) {
         let width = tabScroll.getBoundingClientRect().width
         that.isControlBtnShow = tabScroll.scrollWidth > width
@@ -1152,22 +1195,22 @@ export default {
       }
     }, 200),
     getInnerWidth() {
-      const el = document.getElementsByClassName("workbench workbench-tabs")[0]
+      const el = document.getElementsByClassName('workbench workbench-tabs')[0]
       return el.offsetWidth
     },
     panelControl(name) {
-      if (name === "fullScreen") {
+      if (name === 'fullScreen') {
         this.isTopPanelFull = true
       } else {
         this.isTopPanelFull = false
       }
-      this.dispatch("Workbench:setEditorPanelSize", {
+      this.dispatch('Workbench:setEditorPanelSize', {
         id: this.current,
         status: name,
       })
     },
     dropdownClick(name) {
-      const closeMenuList = ["fullScreen", "releaseFullScreen"]
+      const closeMenuList = ['fullScreen', 'releaseFullScreen']
       if (closeMenuList.indexOf(name) === -1) {
         this.closeTabs(name)
       } else {
@@ -1177,22 +1220,26 @@ export default {
     revealInSidebar() {
       let currentWork = this.worklist.find((item) => item.id === this.current)
       if (currentWork) {
-        this.dispatch("WorkSidebar:revealInSideBar", currentWork)
+        this.dispatch('WorkSidebar:revealInSideBar', currentWork)
       }
     },
     convertSettingParams(params) {
-      const variable = isEmpty(params.variable) ? [] : util.convertObjectToArray(params.variable);
-      const configuration = isEmpty(params.configuration) ? {} : {
-        special: {},
-        runtime: {},
-        startup: {},
-        ...params.configuration
-      };
+      const variable = isEmpty(params.variable)
+        ? []
+        : util.convertObjectToArray(params.variable)
+      const configuration = isEmpty(params.configuration)
+        ? {}
+        : {
+          special: {},
+          runtime: {},
+          startup: {},
+          ...params.configuration,
+        }
       return {
         ...params,
         variable,
         configuration,
-      };
+      }
     },
     resize() {
       this.toggleCtrlBtn(this)
@@ -1201,7 +1248,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@import "@dataspherestudio/shared/common/style/variables.scss";
+@import '@dataspherestudio/shared/common/style/variables.scss';
 .workbench {
   /deep/.ivu-tabs.ivu-tabs-card {
     border-top: $border-width-base $border-style-base #dcdee2;
@@ -1281,7 +1328,7 @@ export default {
     border-bottom: $border-width-base $border-style-base #dcdcdc;
     @include border-color($border-color-base, $dark-background-color-header);
     &.full-screen {
-      display: none
+      display: none;
     }
     .workbench-tab {
       flex: 1;

@@ -51,6 +51,7 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,6 @@ import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.DEFAULT_DEMO_WORKSPACE_NAME;
 
-//@Service
 public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceServiceImpl.class);
 
@@ -72,8 +72,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
     @Autowired
     private DSSWorkspaceMenuMapper dssWorkspaceMenuMapper;
-    @Autowired
-    private DSSWorkspaceInfoMapper dssWorkspaceInfoMapper;
     @Autowired
     private WorkspaceDBHelper workspaceDBHelper;
     @Autowired
@@ -186,21 +184,24 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 //        }
         List<Integer> workspaceIds = new ArrayList<>();
         tempWorkspaceIds.stream().
-                map(dssWorkspaceInfoMapper::getWorkspaceNameById).
+                map(dssWorkspaceMapper::getWorkspaceNameById).
                 filter(name -> !DEFAULT_DEMO_WORKSPACE_NAME.getValue().equals(name)).
-                map(dssWorkspaceInfoMapper::getWorkspaceIdByName).
+                map(dssWorkspaceMapper::getWorkspaceIdByName).
                 forEach(workspaceIds::add);
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = new DSSWorkspaceHomePageVO();
         if (workspaceIds.size() == 0) {
             Long userId = dssWorkspaceUserMapper.getUserID(userName);
-            int workspaceId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
+            int workspaceId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                     userName, "system", userId);
-            Integer workspace0xId = dssWorkspaceInfoMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
+            Integer workspace0xId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
             if (workspace0xId != null) {
                 dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                         userName, "system", userId);
             }
+            //为新用户自动加入部门关联的工作空间
+            joinWorkspaceForNewUser(userName, userId);
+
             //若路径没有workspaceId会出现页面没有首页、管理台
             String homepageUrl = "/home" + "?workspaceId=" + workspaceId;
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
@@ -403,7 +404,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public DSSWorkspaceOverviewVO getOverview(String username, int workspaceId, boolean isEnglish) {
         DSSWorkspaceOverviewVO dssWorkspaceOverviewVO = new DSSWorkspaceOverviewVO();
-        DSSWorkspace dssWorkspace = dssWorkspaceInfoMapper.getWorkspace(workspaceId);
+        DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace(workspaceId);
         dssWorkspaceOverviewVO.setTitle(dssWorkspace.getName());
         dssWorkspaceOverviewVO.setDescription(dssWorkspace.getDescription());
         return dssWorkspaceOverviewVO;
@@ -430,7 +431,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public String getWorkspaceName(Long workspaceId) {
-        return dssWorkspaceInfoMapper.getWorkspaceNameById(workspaceId);
+        return dssWorkspaceMapper.getWorkspaceNameById(workspaceId);
     }
 
     @Override
@@ -445,19 +446,18 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public List<DepartmentVO> getDepartments() {
+    public List<String> getAllDepartmentWithOffices() {
         List<String> allDepartments = staffInfoGetter.getAllDepartments();
-        List<DepartmentVO> departmentVOs = new ArrayList<>();
-        int count = 1;
-        for (String department : allDepartments) {
-            DepartmentVO departmentVO = new DepartmentVO();
-            departmentVO.setFrontName(department);
-            departmentVO.setName(department);
-            departmentVO.setId(count);
-            departmentVOs.add(departmentVO);
-            count++;
+        return allDepartments;
+    }
+
+    @Override
+    public void associateDepartments(Long workspaceId, String departments, String roles, String user) {
+        if (dssWorkspaceMapper.hasAssociateDepartments(workspaceId) > 0) {
+            dssWorkspaceMapper.updateDepartmentsForWorkspace(workspaceId, departments, roles, user);
+        } else {
+            dssWorkspaceMapper.addDepartmentsForWorkspace(workspaceId, departments, roles, user);
         }
-        return departmentVOs;
     }
 
     @Override
@@ -666,5 +666,26 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return (workspace.getName().equals(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue()) &&
                 org.apache.commons.lang3.ArrayUtils.contains(AdminConf.SUPER_ADMIN_LIST, username)) ||
                 username.equals(workspace.getCreateBy());
+    }
+
+    private void joinWorkspaceForNewUser(String userName, Long userId) {
+        String userOrgName = staffInfoGetter.getFullOrgNameByUsername(userName);
+        List<DSSWorkspaceAssociateDepartments> workspaceAssociateDepartments = dssWorkspaceMapper.getWorkspaceAssociateDepartments();
+        Set<ImmutablePair<Long, String>> needToAdd = new HashSet<>();
+        for (DSSWorkspaceAssociateDepartments item : workspaceAssociateDepartments) {
+            String departments = item.getDepartments();
+            if (StringUtils.isNotBlank(departments) && StringUtils.isNotBlank(item.getRoleIds())) {
+                Arrays.stream(departments.split(",")).forEach(org -> {
+                    if (org.equals(userOrgName)) {
+                        needToAdd.add(new ImmutablePair<>(item.getWorkspaceId(), item.getRoleIds()));
+                    }
+                });
+            }
+        }
+        needToAdd.forEach(pair -> {
+            Arrays.stream(pair.getValue().split(",")).forEach(roleId -> {
+                dssWorkspaceUserMapper.setUserRoleInWorkspace(pair.getKey().intValue(), Integer.parseInt(roleId), userName, "system", userId);
+            });
+        });
     }
 }

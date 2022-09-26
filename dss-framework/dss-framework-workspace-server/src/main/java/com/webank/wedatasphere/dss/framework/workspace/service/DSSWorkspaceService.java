@@ -27,7 +27,6 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverv
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.common.exception.ErrorException;
 
@@ -61,7 +60,9 @@ public interface DSSWorkspaceService {
 
     boolean checkAdmin(String userName);
 
-    List<DepartmentVO> getDepartments();
+    List<String> getAllDepartmentWithOffices();
+
+    void associateDepartments(Long workspaceId, String departments, String roles,String user);
 
     List<DSSWorkspaceUserVO> getWorkspaceUsersByRole(int workspaceId, String roleName, List<Long> totals,
                                                      int pageNow, int pageSize);

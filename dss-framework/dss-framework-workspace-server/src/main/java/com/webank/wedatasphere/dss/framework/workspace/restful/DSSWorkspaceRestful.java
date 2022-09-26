@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
+import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
@@ -29,7 +30,6 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorksp
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -82,24 +82,48 @@ public class DSSWorkspaceRestful {
         String stringTags = createWorkspaceRequest.getTags();
         String productName = createWorkspaceRequest.getProductName();
         int workspaceId = dssWorkspaceService.createWorkspace(workSpaceName, stringTags, userName, description, department, productName, "");
-        AuditLogUtils.printLog(userName, workspaceId,workSpaceName, TargetTypeEnum.WORKSPACE,workspaceId,workSpaceName,
-                OperateTypeEnum.CREATE,createWorkspaceRequest);
+        AuditLogUtils.printLog(userName, workspaceId, workSpaceName, TargetTypeEnum.WORKSPACE, workspaceId, workSpaceName,
+                OperateTypeEnum.CREATE, createWorkspaceRequest);
         return Message.ok().data("workspaceId", workspaceId).data("workspaceName", workSpaceName);
     }
 
-    @RequestMapping(path ="listDepartments", method = RequestMethod.GET)
-    public Message listDepartments(@RequestParam(WORKSPACE_ID_STR) String workspaceId){
-        //todo 要从um中获取
-        List<DepartmentVO> departments  = dssWorkspaceService.getDepartments();
-        return Message.ok().data("departments", departments);
+    /**
+     * 返回所有office,格式为：a-b-c
+     *
+     * @param workspaceId
+     * @return
+     */
+    @RequestMapping(path = "listAllDepartments", method = RequestMethod.GET)
+    public Message listAllDepartments(@RequestParam(value = WORKSPACE_ID_STR, required = false) String workspaceId) {
+        List<String> departments = dssWorkspaceService.getAllDepartmentWithOffices();
+        return Message.ok().data("departmentWithOffices", departments);
     }
 
-    @RequestMapping(path ="getWorkspaces", method = RequestMethod.GET)
-    public Message getWorkspaces(){
+    /**
+     * 绑定工作空间和部门-科室关系
+     *
+     * @return
+     */
+    @PostMapping(value = "associateDepartments")
+    public Message associateDepartments(@RequestBody Map<String, Object> params) throws Exception {
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        Long workspaceId = (Long) params.get("workspaceId");
+        if (!workspaceId.equals(workspace.getWorkspaceId())) {
+            DSSFrameworkErrorException.dealErrorException(30030, "Wrong workspaceId request!");
+        }
+        String departmentWithOffices = (String) params.get("departmentWithOffices");
+        String roles = (String) params.get("roles");
+        dssWorkspaceService.associateDepartments(workspaceId, departmentWithOffices, roles, userName);
+        return Message.ok();
+    }
+
+    @RequestMapping(path = "getWorkspaces", method = RequestMethod.GET)
+    public Message getWorkspaces() {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         List<DSSWorkspace> workspaces = dssWorkspaceService.getWorkspaces(username);
         List<DSSWorkspaceVO> dssWorkspaceVOS = new ArrayList<>();
-        for (DSSWorkspace workspace:workspaces ){
+        for (DSSWorkspace workspace : workspaces) {
             String name = workspace.getName();
             int id = workspace.getId();
             String labels = workspace.getLabel();
@@ -116,22 +140,23 @@ public class DSSWorkspaceRestful {
         return Message.ok().data("workspaces", dssWorkspaceVOS);
     }
 
-    @RequestMapping(path ="getWorkspaceHomePage", method = RequestMethod.GET)
-    public Message getWorkspaceHomePage(@RequestParam(required = false, name = "micro_module") String moduleName) throws Exception{
+    @RequestMapping(path = "getWorkspaceHomePage", method = RequestMethod.GET)
+    public Message getWorkspaceHomePage(@RequestParam(required = false, name = "micro_module") String moduleName) throws Exception {
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = new Workspace();
         try {
             LOGGER.info("Put gateway url and cookies into workspace.");
             SSOHelper.addWorkspaceInfo(httpServletRequest, workspace);
-        } catch (AppStandardWarnException ignored) {} // ignore it.
+        } catch (AppStandardWarnException ignored) {
+        } // ignore it.
         dssUserService.insertOrUpdateUser(username, workspace);
-        DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username,moduleName);
+        DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = dssWorkspaceService.getWorkspaceHomePage(username, moduleName);
         return Message.ok().data("workspaceHomePage", dssWorkspaceHomePageVO);
     }
 
-    @RequestMapping(path ="getOverview", method = RequestMethod.GET)
-    public Message getOverview(@RequestParam(WORKSPACE_ID_STR) int workspaceId){
+    @RequestMapping(path = "getOverview", method = RequestMethod.GET)
+    public Message getOverview(@RequestParam(WORKSPACE_ID_STR) int workspaceId) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         String language = httpServletRequest.getHeader("Content-language");
         boolean isEnglish = "en".equals(language);
@@ -139,8 +164,8 @@ public class DSSWorkspaceRestful {
         return Message.ok().data("overview", dssWorkspaceOverviewVO);
     }
 
-    @RequestMapping(path ="refreshCache", method = RequestMethod.GET)
-    public Message refreshCache(){
+    @RequestMapping(path = "refreshCache", method = RequestMethod.GET)
+    public Message refreshCache() {
         workspaceDBHelper.retrieveFromDB();
         return Message.ok("refresh ok");
     }
@@ -154,7 +179,7 @@ public class DSSWorkspaceRestful {
 
     /**
      * 获取所有工程或者单个工程
-
+     *
      * @return
      */
     @RequestMapping(path = "getWorkSpaceStr", method = RequestMethod.GET)
@@ -210,12 +235,6 @@ public class DSSWorkspaceRestful {
         return retMessage.data("roles", roles).data("workspace", workspace);
     }
 
-    @RequestMapping(path = "/workspaces/departments", method = RequestMethod.GET)
-    public Message getAllWorkspaceDepartments() {
-        List<DepartmentVO> departments = dssWorkspaceService.getDepartments();
-        return Message.ok().data("departments", departments);
-    }
-
     @RequestMapping(path = "/workspaces/exists", method = RequestMethod.GET)
     public Message getUsernameExistence(@RequestParam(required = false, name = "name") String name) {
         boolean exists = dssWorkspaceService.existWorkspaceName(name);
@@ -241,8 +260,8 @@ public class DSSWorkspaceRestful {
 
         String productName = "DSS";
         int workspaceId = dssWorkspaceService.createWorkspace(workspaceName, label, userName, description, department, productName, workspaceType);
-        AuditLogUtils.printLog(userName, workspaceId,workspaceName, TargetTypeEnum.WORKSPACE,workspaceId,workspaceName,
-                OperateTypeEnum.CREATE,json);
+        AuditLogUtils.printLog(userName, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
+                OperateTypeEnum.CREATE, json);
         return Message.ok().data("workspaceId", workspaceId);
     }
 
@@ -252,19 +271,19 @@ public class DSSWorkspaceRestful {
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        List<WorkspaceMenuVo> appconns;
+        List<WorkspaceMenuVo> menuAppconnVos;
         try {
-            appconns = dssWorkspaceService.getWorkspaceAppConns(workspace, workspaceId, username, isChinese);
+            menuAppconnVos = dssWorkspaceService.getWorkspaceAppConns(workspace, workspaceId, username, isChinese);
         } catch (DSSErrorException e) {
             LOGGER.warn("{} get appconns from workspace {} failed.", username, workspaceId, e);
             return Message.error(e);
         }
-        return Message.ok().data("menus", appconns);
+        return Message.ok().data("menus", menuAppconnVos);
     }
 
 
     @RequestMapping(path = "/workspaces/{workspaceId}/favorites", method = RequestMethod.GET)
-    public Message getWorkspaceFavorites( @PathVariable("workspaceId") Long workspaceId, @RequestParam(value = "type", required = false) String type) {
+    public Message getWorkspaceFavorites(@PathVariable("workspaceId") Long workspaceId, @RequestParam(value = "type", required = false) String type) {
         String header = httpServletRequest.getHeader("Content-language").trim();
         boolean isChinese = "zh-CN".equals(header);
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
@@ -275,7 +294,7 @@ public class DSSWorkspaceRestful {
 
     /**
      * 应用加入收藏，返回收藏后id
-
+     *
      * @param json
      * @return
      */
@@ -286,8 +305,8 @@ public class DSSWorkspaceRestful {
         String type = json.get("type") == null ? "" : json.get("type");
         String workspaceName = dssWorkspaceService.getWorkspaceName(workspaceId);
         Long favoriteId = dssWorkspaceService.addFavorite(username, workspaceId, menuApplicationId, type);
-        AuditLogUtils.printLog(username,workspaceId,workspaceName,TargetTypeEnum.WORKSPACE,workspaceId,workspaceName,
-                OperateTypeEnum.ADD_TO_FAVORITES,json);
+        AuditLogUtils.printLog(username, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
+                OperateTypeEnum.ADD_TO_FAVORITES, json);
         return Message.ok().data("favoriteId", favoriteId);
     }
 
@@ -298,8 +317,8 @@ public class DSSWorkspaceRestful {
         String type = json.get("type") == null ? "" : json.get("type");
         String workspaceName = dssWorkspaceService.getWorkspaceName(workspaceId);
         Long favoriteId = dssWorkspaceService.deleteFavorite(username, appconnId, workspaceId, type);
-        AuditLogUtils.printLog(username,workspaceId,workspaceName,TargetTypeEnum.WORKSPACE,workspaceId,workspaceName,
-                OperateTypeEnum.REM_FROM_FAVORITES,json);
+        AuditLogUtils.printLog(username, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
+                OperateTypeEnum.REM_FROM_FAVORITES, json);
         return Message.ok().data("favoriteId", favoriteId);
     }
 

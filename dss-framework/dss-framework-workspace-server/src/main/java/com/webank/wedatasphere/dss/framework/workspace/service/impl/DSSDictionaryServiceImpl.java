@@ -19,11 +19,8 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSDictionary;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSDictionaryRequestVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSDictionaryMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSDictionaryService;
-import com.webank.wedatasphere.dss.framework.workspace.util.DSSDictionaryConstant;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,37 +81,5 @@ public class DSSDictionaryServiceImpl implements DSSDictionaryService {
         retMap.put("list",dictionaries);
         retMap.put("mapList",mapList);
         return retMap;
-    }
-
-
-    /**
-     * 获取空间默认部门
-     * @return
-     */
-    @Override
-    public List<DepartmentVO> getDefaultDepartmentVOList(){
-        QueryWrapper<DSSDictionary> dictionaryQueryWrapper = new QueryWrapper<>();
-        dictionaryQueryWrapper.eq("workspace_id", 0);
-        dictionaryQueryWrapper.eq("dic_key", DSSDictionaryConstant.W_WORKSPACE_DEPARTMENT);
-        List<DSSDictionary> dictionarieList = dssDictionaryMapper.selectList(dictionaryQueryWrapper);
-        List<DepartmentVO> retList = new ArrayList<>();
-        if(CollectionUtils.isEmpty(dictionarieList)){
-            return retList;
-        }
-        String dicValue = dictionarieList.get(0).getDicValue();
-        if(StringUtils.isBlank(dicValue)){
-            return retList;
-        }
-        String[] tempStrArr = dicValue.split(";");
-        DepartmentVO departmentVO = null;
-        for(int i=0;i<tempStrArr.length;i++){
-            departmentVO = new DepartmentVO();
-            String[] tempArr = tempStrArr[i].split("-");
-            departmentVO.setId(Integer.valueOf(tempArr[0]));
-            departmentVO.setName(tempArr[1]);
-            departmentVO.setFrontName(tempArr[1]);
-            retList.add(departmentVO);
-        }
-        return retList;
     }
 }

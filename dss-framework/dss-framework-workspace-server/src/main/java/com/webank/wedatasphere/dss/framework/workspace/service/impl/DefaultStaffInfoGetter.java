@@ -41,7 +41,7 @@ public class DefaultStaffInfoGetter implements StaffInfoGetter {
 
     @Override
     public List<String> getAllDepartments() {
-        List<String> allDepartments = Arrays.asList("WeDataSphere","DataSP", "linkis");
+        List<String> allDepartments = Arrays.asList("WeDataSphere-linkisGroup");
         return allDepartments;
     }
 }

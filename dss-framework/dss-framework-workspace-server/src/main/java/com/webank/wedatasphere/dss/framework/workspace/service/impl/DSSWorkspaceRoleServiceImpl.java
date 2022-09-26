@@ -96,7 +96,10 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
 
     @Override
     public int getApiPriv(String username, Integer workspaceId, String roleName, String appName) {
-        int roleId = dssWorkspaceRoleMapper.getRoleId(roleName, -1);
+        Integer roleId = dssWorkspaceRoleMapper.getRoleId(roleName, -1);
+        if (roleId == null) {
+            return -1;
+        }
         DSSApplicationBean applicationBean = workspaceDBHelper.getAppConn(appName);
         if (applicationBean == null) {
             return -1;

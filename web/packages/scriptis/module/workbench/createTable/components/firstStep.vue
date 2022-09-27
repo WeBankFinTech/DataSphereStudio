@@ -90,7 +90,7 @@ export default {
       if (!value) {
         callback();
       } else if (!/^[\w\u4e00-\u9fa5]+$/.test(value)) {
-        callback(new Error(this.$('message.scripts.createTable.nameNotice')));
+        callback(new Error(that.$t('message.scripts.createTable.nameNotice')));
       } else {
         callback();
       }

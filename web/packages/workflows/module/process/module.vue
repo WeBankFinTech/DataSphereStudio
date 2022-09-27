@@ -2551,7 +2551,8 @@ export default {
       return storage.get(key);
     },
     onKeyUp(e) {
-      if ((e.keyCode === 46 || e.keyCode === 8 && navigator.userAgent.indexOf('Mac') !== -1) && this.tabs[this.$parent.active].key === this.activeTabKey && e.target.nodeName!='INPUT' && e.target.nodeName!='TEXTAREA') {
+      const isDel = e.altKey && e.ctrlKey && (e.keyCode === 46 || e.keyCode === 8 && navigator.userAgent.indexOf('Mac') !== -1)
+      if (isDel && this.tabs[this.$parent.active].key === this.activeTabKey && e.target.nodeName!='INPUT' && e.target.nodeName!='TEXTAREA') {
         if (this.myReadonly) return
         let selectNodes = this.$refs.process.getSelectedNodes();
         const selectNodeLength = selectNodes.length

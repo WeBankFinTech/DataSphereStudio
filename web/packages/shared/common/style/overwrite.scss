@@ -15,6 +15,9 @@
     /*scripts模块desc自定义，color继承*/
     color: $dark-text-color;
   }
+  div.ivu-notice-notice-err {
+    background: #373f50;
+  }
   .ivu-notice-title {
     color: $dark-workspace-title-color;
   }
@@ -545,10 +548,13 @@
     border-color: $dark-border-color-base;
   }
 
- .executor-pending:after {
+  .executor-pending:after {
     border-top-color: $dark-border-color-base;
   }
   .executor-pending:before {
     border-top-color: $dark-border-color-base;
+  }
+  .g-err-msg-div {
+    color: rgba(255, 255, 255, 0.85)
   }
 }

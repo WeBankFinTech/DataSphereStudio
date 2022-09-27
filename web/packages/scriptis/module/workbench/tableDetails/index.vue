@@ -155,6 +155,7 @@ export default {
     padding: 16px 10px 10px 16px;
     .table-detail-tabs {
         height: 100%;
+        @include font-color($light-text-color, $dark-text-color);
         .ivu-tabs-bar {
             margin-bottom: 10px;
         }
@@ -205,9 +206,7 @@ export default {
                 line-height: 46px;
             }
             .field-list-header {
-                // background-color: #5e9de0;
                 @include bg-color(#5e9de0, $dark-menu-base-color);
-                // color: #fff;
                 @include font-color(#fff, $dark-workspace-title-color);
                 font-weight: bold;
                 margin-top: 10px;
@@ -215,8 +214,11 @@ export default {
             }
             .field-list-body {
                 border-bottom: none;
-                // background: #fff;
                 @include bg-color($light-base-color, $dark-base-color);
+                &:not(:first-child){
+                    border-bottom: 1px solid $border-color-base;
+                    @include border-color($border-color-base, $dark-border-color-base);
+                }
             }
             .field-list-item {
                 width: 200px;

@@ -21,6 +21,9 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertO
 
 
 public interface OrchestratorPluginService {
+    /**
+     * 把编排发布到调度系统，并处理一些本地db的元数据
+     */
 
     ResponseConvertOrchestrator convertOrchestration(RequestFrameworkConvertOrchestration requestConversionOrchestration);
 

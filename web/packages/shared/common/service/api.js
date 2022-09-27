@@ -20,7 +20,10 @@
  */
 import util from '@dataspherestudio/shared/common/util';
 import axios from 'axios';
-import { Message, Notice } from 'iview';
+import {
+  Message,
+  Notice
+} from 'iview';
 import cache from './apiCache';
 import qs from './querystring'
 import storage from "./storage"
@@ -35,7 +38,7 @@ let removePending = (config) => {
     // 如果存在则执行取消操作
     if (pending[p].u === config.url + '&' + config.method + '&' + params) {
       // pending[p].f();// 执行取消操作
-      pending.splice(p, 1);// 移除记录
+      pending.splice(p, 1); // 移除记录
     }
   }
 };
@@ -53,13 +56,17 @@ const instance = axios.create({
   baseURL: process.env.VUE_APP_MN_CONFIG_PREFIX || `${location.protocol}//${window.location.host}/api/rest_j/v1/`,
   timeout: 600000,
   withCredentials: true,
-  headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+  headers: {
+    'Content-Type': 'application/json;charset=UTF-8'
+  },
 });
 
 instance.interceptors.request.use((config) => {
   // 增加国际化参数
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
-  config.metadata = { startTime: Date.now() }
+  config.metadata = {
+    startTime: Date.now()
+  }
   if (/\/application\//.test(config.url)) {
     config.url = `http://${window.location.host}` + config.url
   }
@@ -82,7 +89,7 @@ instance.interceptors.request.use((config) => {
     config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
     config.data = qs(config.data)
   }
-  
+
   let flag = cutReq(config);
   // 当上一次相同请求未完成时，无法进行第二次相同请求
   if (flag === true) {
@@ -120,7 +127,7 @@ instance.interceptors.response.use((response) => {
   if ((error.message && error.message.indexOf('timeout') >= 0) || (error.request && error.request.status !== 200)) {
     for (let p in pending) {
       if (pending[p].u === cancelConfig.url + '&' + cancelConfig.method + '&' + JSON.stringify(cancelConfig.params)) {
-        pending.splice(p, 1);// 移除记录
+        pending.splice(p, 1); // 移除记录
       }
     }
     // 优先返回后台返回的错误信息，其次是接口返回
@@ -184,7 +191,7 @@ const getData = function (data) {
 const API_ERR_MSG = '后台接口异常，请联系开发处理！'
 const success = function (response) {
   if (util.isNull(api.constructionOfResponse.codePath) || util.isNull(api.constructionOfResponse.successCode) ||
-      util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
+    util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
     console.error('【FEX】Api配置错误: 请调用setConstructionOfResponse来设置API的响应结构');
     return;
   }
@@ -355,12 +362,16 @@ const action = function (url, data, option) {
       if (error && error.response && error.response.data && error.response.data.data) {
         error.solution = error.response.data.data.solution
       }
+      const isEn = localStorage.getItem('locale') == 'en'
       const showErrMsg = function () {
-        const msg = error.message || error.msg
-        if (lastMsg !== msg  && msg) {
+        let msg = error.message || error.msg
+        if (lastMsg !== msg && msg) {
           lastMsg = msg
         } else {
           return
+        }
+        if (isEn && msg === API_ERR_MSG) {
+          msg = 'The service is abnormal, please contact the developer for processing!'
         }
         const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
         if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
@@ -369,7 +380,7 @@ const action = function (url, data, option) {
             name: noticeName,
             duration: 4,
             closable: true,
-            title: '错误提示',
+            title: isEn ? 'Error' : '错误提示',
             render: (h) => {
               return h('div', {
                 class: 'g-err-msg-div'
@@ -393,7 +404,7 @@ const action = function (url, data, option) {
                     click: () => {
                       if (error.solution && error.solution.solutionUrl) {
                         window.open(error.solution.solutionUrl, '_blank')
-                      } else if(error.response) {
+                      } else if (error.response) {
                         // 上报
                         let requestBody = error.response.config.data
                         try {
@@ -405,41 +416,48 @@ const action = function (url, data, option) {
                           requestUrl: error.response.config.url,
                           queryParams: error.response.config.params,
                           requestBody,
-                          requestHeaders: { Cookie: document.cookie, ...error.response.config.headers },
+                          requestHeaders: {
+                            Cookie: document.cookie,
+                            ...error.response.config.headers
+                          },
                           responseBody: error.response.data
-                        }).then(()=>{
-                          Message.success('错误已上报')
+                        }).then(() => {
+                          Message.success(isEn ? 'Error Reported' : '错误已上报')
                         })
                       }
                       Notice.close(noticeName)
                     }
                   }
-                }, error.solution && error.solution.solutionUrl ? '查看解决方案' : '上报错误')
+                }, error.solution && error.solution.solutionUrl ? (isEn ? 'Check Solution' : '查看解决方案') : (isEn ? 'Report Error' : '上报错误'))
               ])
             },
             onClose: () => {
               return !isHoverNotice
             }
           })
-          setTimeout(()=>{
+          setTimeout(() => {
             document.querySelectorAll('.g-err-msg-div').forEach(ele => {
               ele.parentElement.parentElement.style.textAlign = 'left'
               ele.parentElement.style.display = 'block'
               ele.parentElement.style.padding = 0
-              ele.parentElement.parentElement.style.background ="rgb(251, 233, 233)"
-              ele.parentElement.parentElement.style.border ="1px solid #eaa8a8"
-              ele.parentElement.parentElement.style.color ="#333"
-              ele.parentElement.parentElement.addEventListener('mouseover', ()=> {
+              if (ele.parentElement.parentElement.className.indexOf('ivu-notice-notice-err') < 0) {
+                ele.parentElement.parentElement.className = ele.parentElement.parentElement.className + ' ivu-notice-notice-err'
+              }
+              ele.parentElement.parentElement.addEventListener('mouseover', () => {
                 isHoverNotice = true
               }, false)
-              ele.parentElement.parentElement.addEventListener('mouseout', ()=> {
+              ele.parentElement.parentElement.addEventListener('mouseout', () => {
                 isHoverNotice = false
               }, false)
             })
           })
 
         } else {
-          Notice.error({desc: msg,  title: '错误提示', duration: 4});
+          Notice.error({
+            desc: msg,
+            title: isEn ? 'Error' : '错误提示',
+            duration: 4
+          });
         }
       }
       if (error.message === API_ERR_MSG || error.msg === API_ERR_MSG) {

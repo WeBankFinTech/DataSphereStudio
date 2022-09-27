@@ -5,6 +5,7 @@
       v-if="canAdd()"
       @click-serach="search"
       @click-creater="creater"
+      @click-autojoin="autojoinShowModal"
       :searchBar="searchBar"
       :optionType="optionType"
     ></formserch>
@@ -135,6 +136,41 @@
         }}</Button>
       </div>
     </Modal>
+    <!-- 自动加入工作空间 -->
+    <Modal class-name="adduser-box" v-model="autojoinShow" :title="$t('message.workspaceManagement.addUserJoin')">
+      <Form ref="autoJoinForm" :model="autoJoin" :rules="joinFormRule" :label-width="80">
+        <FormItem :label="$t('message.workspaceManagement.user')" prop="id">
+          <Row>
+            <Col span="12" style="width: 196px" size="small">
+              <Select
+                v-model="autoJoin.department"
+                multiple
+                filterable>
+                <Option v-for="(option, index) in departments" :value="option" :key="index">{{option}}</Option>
+              </Select>
+            </Col>
+          </Row>
+        </FormItem>
+        <FormItem :label="$t('message.workspaceManagement.role')" prop="role">
+          <CheckboxGroup v-model="autoJoin.role">
+            <Checkbox
+              v-for="item in workspaceRoles"
+              :key="item.roleId"
+              :label="item.roleId"
+              :disabled="isSuperAdmin(item)"
+            >{{item.roleFrontName}}</Checkbox>
+          </CheckboxGroup>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="text" size="large" @click="autojoinShow = false">{{
+          $t("message.workspaceManagement.cancel")
+        }}</Button>
+        <Button type="primary" size="large" @click="saveAutoRoles">{{
+          $t("message.workspaceManagement.ok")
+        }}</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -142,7 +178,7 @@ import storage from '@dataspherestudio/shared/common/helper/storage';
 import api from '@dataspherestudio/shared/common/service/api';
 import moment from 'moment';
 import formserch from "../component/formsechbar";
-import { GetWorkspaceUserManagement } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
+import { GetWorkspaceUserManagement, getAllDepartments } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 
 export default {
   components: {
@@ -192,6 +228,17 @@ export default {
         title: this.$t('message.workspaceManagement.role') + ':',
         status: [],
       },
+      autojoinShow: false,
+      autoJoin: {},
+      joinFormRule: {
+        department: [
+          { required: true, message: this.$t('message.workspaceManagement.addruleMsg'), trigger: "blur" },
+        ],
+        role: [
+          { required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagement.selectRoleMsg'), trigger: 'change' },
+        ]
+      },
+      departments: []
     };
   },
 
@@ -291,6 +338,23 @@ export default {
         current: 1
       }
       this.search();
+    },
+    autojoinShowModal() {
+      getAllDepartments().then(res => {
+        this.departments = res ? res.departmentWithOffices || [] : []
+      })
+      this.autojoinShow = true
+    },
+    saveAutoRoles() {
+      const params = {
+        departmentWithOffices: this.autoJoin.departments,
+        roles: this.autoJoin.role,
+        workspaceId: this.workspaceId
+      }
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}associateDepartments`,params,'post').then(()=>{
+        this.$Message.success('保存成功');
+        this.autojoinShow = false;
+      })
     },
     search() {
       const params = this.getParams();

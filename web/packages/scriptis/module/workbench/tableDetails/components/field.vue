@@ -34,7 +34,6 @@
           v-for="(item, index) in searchColList"
           :key="index"
           class="field-list-body"
-          :style="{'border-bottom': index === searchColList.length - 1 ? '1px solid #dcdee2' : 'none'}"
           @click="clickItem($event, item)"
         >
           <div
@@ -230,6 +229,7 @@ export default {
           width: 100%;
           display: flex;
           border: 1px solid #dcdee2;
+          @include border-color($border-color-base, $dark-border-color-base);
           height: 46px;
           line-height: 46px;
       }
@@ -242,9 +242,13 @@ export default {
       }
       .field-list-body {
           border-bottom: none;
-          background: #fff;
+          @include bg-color($light-base-color, $dark-base-color);
           .field-table-mode {
             color: $primary-color
+          }
+          &:not(:first-child){
+              border-bottom: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
           }
       }
       .field-list-item {
@@ -260,7 +264,8 @@ export default {
           min-width: 80px;
           max-width: 30%;
           &:not(:first-child){
-              border-left: 1px solid #eee;
+              border-left: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
           }
       }
   }

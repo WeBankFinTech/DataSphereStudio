@@ -1217,7 +1217,6 @@ export default {
       vertical-align: top;
       border-top: 0;
       padding: 5px 16px;
-      border-color: #dcdee2 !important;
       &.ivu-tabs-tab-active {
         border-top: 2px solid $primary-color !important;
       }

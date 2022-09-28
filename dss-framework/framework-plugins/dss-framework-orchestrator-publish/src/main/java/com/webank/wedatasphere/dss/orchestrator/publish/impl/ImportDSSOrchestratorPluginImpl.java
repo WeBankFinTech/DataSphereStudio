@@ -34,6 +34,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
+import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
@@ -95,7 +96,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         //2、导入Info信息(导入冲突处理)
         List<DSSOrchestratorInfo> dssOrchestratorInfos = metaInputService.importOrchestrator(inputPath);
         DSSOrchestratorInfo importDssOrchestratorInfo = dssOrchestratorInfos.get(0);
-
+        importDssOrchestratorInfo.setProjectId(projectId);
         //复制工程，直接使用新的UUID和复制后的工程ID
         if (requestImportOrchestrator.getCopyProjectId() != null
                 && StringUtils.isNotBlank(requestImportOrchestrator.getCopyProjectName())) {
@@ -317,7 +318,8 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setUpdater(userName);
 
         //生产导入：默认是为无效，开发环境为有效
-        dssOrchestratorVersion.setValidFlag(DSSLabelUtil.isDevEnv(dssLabels) ? 1 : 0);
+        int valid = DSSOrchestratorConf.DSS_IMPORT_VALID_IMMEDIATELY.getValue() || DSSLabelUtil.isDevEnv(dssLabels) ? 1 : 0;
+        dssOrchestratorVersion.setValidFlag(valid);
 
         String oldVersion = orchestratorMapper.getLatestVersion(importDssOrchestratorInfo.getId(), 1);
         if (StringUtils.isNotEmpty(oldVersion)) {

@@ -31,6 +31,7 @@ public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
      * 导出Orchestrator基本信息和工作流，并放到BML中。
      * 注意：导入导出接口只适合于不同环境下，先从A环境导出工作流，再导入到B环境的情况。
      * 不适合用于在同一环境下的复制。同一环境的复制操作需使用copyOperation。
+     * @param addOrcVersion 导出之后，是否要升级一个版本
      */
     OrchestratorExportResult exportOrchestrator(String userName,
                                                 Long orchestratorId,

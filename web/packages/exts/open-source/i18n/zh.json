@@ -71,7 +71,9 @@
           "publishSuccess": "发布成功"
         },
         "tagPlaceholder": "标签，按 enter 创建"
-      }
+      },
+      "operateProxyTip": "请选择代理用户进入或者取消",
+      "applyOperatePorxy": "请先申请实名用户允许的代理用户"
     },
     "ext": {
       "opensource": {

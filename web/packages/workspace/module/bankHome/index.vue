@@ -63,14 +63,6 @@ export default {
       },
       sideDataList: [], // 右侧连接列表
       workspaceId: null,
-      rules: {
-        selectApp: [
-          { required: true, message: this.$t('message.workspace.home.selectApp'), trigger: 'change' },
-        ],
-        selectType: [
-          { required: true, message: this.$t('message.workspace.home.selectType'), trigger: 'change' },
-        ],
-      },
     }
   },
   created() {

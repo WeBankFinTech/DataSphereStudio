@@ -40,12 +40,13 @@ public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConv
         workflowToRelSynchronizer.setDSSToRelConversionOperation(this);
         JsonToFlowParser parser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
         if (parser instanceof AbstractJsonToFlowParser) {
+            ((AbstractJsonToFlowParser) parser).removeAppConnWorkflowParsers();
             String packageName = WorkflowParser.class.getPackage().getName();
             List<WorkflowParser> workflowParsers = AppStandardClassUtils.getInstance(getAppConnName()).getInstances(WorkflowParser.class).stream()
                     .filter(p -> !p.getClass().getName().startsWith(packageName) &&
-                            ((AbstractJsonToFlowParser) parser).getWorkflowParsers().stream().noneMatch(l -> l.getClass().getName()
+                            ((AbstractJsonToFlowParser) parser).getDefaultWorkflowParsers().stream().noneMatch(l -> l.getClass().getName()
                                     .equals(p.getClass().getName()))).collect(Collectors.toList());
-            ((AbstractJsonToFlowParser) parser).addWorkflowParsers(workflowParsers);
+            ((AbstractJsonToFlowParser) parser).addAppConnWorkflowParsers(workflowParsers);
         }
     }
 

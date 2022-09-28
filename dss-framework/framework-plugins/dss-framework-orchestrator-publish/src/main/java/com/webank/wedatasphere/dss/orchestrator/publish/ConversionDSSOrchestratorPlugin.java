@@ -29,6 +29,7 @@ import java.util.Map;
 public interface ConversionDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
     /**
      * 编排转化（转为具体调度形式，比如转为schedulis调度工作流）
+     * 这里只是个rpc的client简单封装。
      * @param userName 发布人
      * @param project 编排所属项目
      * @param workspace 所属工作空间

@@ -6,23 +6,15 @@
       type="success"
       @click="creater"
     >{{$t('message.workspaceManagement.create')}}</Button>
-    <!-- <formserch
-      @click-serach="search"
-      @click-creater="creater"
-      :searchBar="searchBar"
-      :optionType="optionType"
-    ></formserch> -->
     <juristable v-if="tablearr && workspaceMenu" :tablearr="tablearr" :workspaceMenu="workspaceMenu" ref="menutable"></juristable>
   </div>
 </template>
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
 import storage from '@dataspherestudio/shared/common/helper/storage';
-// import formserch from "../component/formsechbar";
 import juristable from '../component/juristable'
 export default {
   components: {
-    // formserch,
     juristable
   },
   data() {

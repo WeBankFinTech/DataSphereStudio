@@ -37,8 +37,14 @@
       <Button
         type="success"
         @click="createroles"
-        style="width:80px"
+        style="margin-right:20px;width:80px"
       >{{$t('message.workspaceManagement.create')}}</Button>
+      <Button
+        type="success"
+        @click="setAutoJoin"
+        style="width: 100px"
+        :title="$t('message.workspaceManagement.autojointip')"
+      >{{$t('message.workspaceManagement.autojoin')}}</Button>
     </FormItem>
   </Form>
 </template>
@@ -62,6 +68,9 @@ export default {
     },
     createroles(){
       this.$emit("click-creater")
+    },
+    setAutoJoin() {
+      this.$emit("click-autojoin")
     }
   },
 }

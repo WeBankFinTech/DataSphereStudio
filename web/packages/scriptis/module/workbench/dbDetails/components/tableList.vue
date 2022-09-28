@@ -38,8 +38,7 @@
         <li
           v-for="(item, index) in searchColList"
           :key="index"
-          class="field-list-body"
-          :style="{'border-bottom': index === searchColList.length - 1 ? '1px solid #dcdee2' : 'none'}">
+          class="field-list-body">
           <div class="field-list-item" style="width:6%;">
             <Checkbox
               v-model="item.selected"
@@ -67,7 +66,12 @@
       <Modal v-model="showConfirmModal" :title="$t('message.scripts.checkdelconfirm')" width="85%">
         <div class="table-data" style="max-height: 470px">
           <div class="field-list-header">
-            <div class="field-list-item" style="width:50px;"></div>
+            <div class="field-list-item" style="width:50px;">
+              <Checkbox
+                v-model="selectAllConfirm"
+                @on-change="changeCheckAll"
+              />
+            </div>
             <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
             <div
               class="field-list-item"
@@ -84,11 +88,11 @@
             <li
               v-for="(item, index) in selectedItems"
               :key="index"
-              class="field-list-body"
-              :style="{'border-bottom': index === selectedItems.length - 1 ? '1px solid #dcdee2' : 'none'}">
+              class="field-list-body">
               <div class="field-list-item" style="width:50px;">
                 <Checkbox
                   v-model="item.selected"
+                  @on-change="changeCheck"
                 /></div>
               <div class="field-list-item">{{ index + 1 }}</div>
               <div
@@ -171,7 +175,8 @@ export default {
       orderBy: '1',
       loading: false,
       tablesName: [],
-      isTableOwner: '0'
+      isTableOwner: '0',
+      selectAllConfirm: false
     }
   },
   methods: {
@@ -267,11 +272,20 @@ export default {
       } else {
         this.$Message.warning({ content: this.$t('message.scripts.selectdel') });
       }
+    },
+    changeCheck() {
+      this.selectAllConfirm = this.selectedItems.every(it => it.selected)
+    },
+    changeCheckAll(v) {
+      this.selectedItems.forEach(item => {
+        item.selected = v
+      })
     }
   }
 }
 </script>
 <style lang="scss" scoped>
+@import '@dataspherestudio/shared/common/style/variables.scss';
 .search-header {
   display: flex;
   justify-content: flex-start;
@@ -291,11 +305,13 @@ export default {
   height: calc(100% - 52px);
   overflow: hidden;
   width: 100%;
+  @include font-color($light-text-color, $dark-text-color);
   .field-list-header,
   .field-list-body {
       width: 100%;
       display: flex;
       border: 1px solid #dcdee2;
+      @include border-color($border-color-base, $dark-border-color-base);
       height: 46px;
       line-height: 46px;
   }
@@ -308,7 +324,11 @@ export default {
   }
   .field-list-body {
       border-bottom: none;
-      background: #fff;
+      @include bg-color($light-base-color, $dark-base-color);
+      &:not(:first-child){
+          border-bottom: 1px solid $border-color-base;
+          @include border-color($border-color-base, $dark-border-color-base);
+      }
   }
   .field-list-item {
       width: 11%;

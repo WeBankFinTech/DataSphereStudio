@@ -18,7 +18,9 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestrationStatus;
@@ -76,9 +78,15 @@ public class PublishServiceImpl implements PublishService {
         DSSFlow dssFlow = null;
         try {
             dssFlow = dssFlowService.getFlow(workflowId);
-            if(dssFlow == null) {
+            if (dssFlow == null) {
                 DSSExceptionUtils.dealErrorException(63325, "workflow " + workflowId + " is not exists.", DSSErrorException.class);
                 return null;
+            }
+            ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+            projectInfoRequest.setProjectId(dssFlow.getProjectID());
+            DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+            if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+                DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间错误，请切换至正确的工作空间后再发布！", DSSErrorException.class);
             }
             String schedulerAppConnName = workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME);
             if(StringUtils.isBlank(schedulerAppConnName)) {

@@ -628,7 +628,7 @@ export default {
 
         this.execute.on('history', (ret) => {
           const index = findIndex(this.script.history, (o) => o.taskID == ret.taskID);
-          const findHis = find(this.script.history, (o) => o.taskID == ret.taskID);
+          const findHis = index > -1 ? this.script.history[index] : undefined
           let newItem = null;
           // 这里针对的是导入导出脚本，executionCode为object的情况
           const code = typeof (this.script.executionCode) === 'string' && this.script.executionCode ? this.script
@@ -694,7 +694,7 @@ export default {
               ...this.script.history,
             });
           }
-          // 有错误码停留进度tab，无错误码打开日志定位第一行错误
+          // 有绑定解决方案停留进度tab，否则打开日志定位第一行错误
           if (this.$refs.progressTab) {
             this.$refs.progressTab.updateErrorMsg({
               solution: ret.solution,
@@ -705,7 +705,7 @@ export default {
               failedReason: ret.errCode && ret.errDesc ? ret.errCode + ret.errDesc : ''
             })
           }
-          if (!ret.errCode && ret.status == 'Failed') {
+          if (ret.solution && ret.solution.solutionUrl && ret.status == 'Failed') {
             this.showPanelTab('log')
           }
         });
@@ -848,10 +848,6 @@ export default {
         this.execute.on('error', (type) => {
           // 执行错误的时候resolve，用于改变modal框中的loading状态
           cb && cb(type || 'error');
-          // if (this.scriptViewState.showPanel !== 'history') {
-          //   this.showPanelTab('history');
-          //   this.isLogShow = true;
-          // }
           this.dispatch('IndexedDB:appendLog', {
             tabId: this.script.id,
             rst: this.script.log,

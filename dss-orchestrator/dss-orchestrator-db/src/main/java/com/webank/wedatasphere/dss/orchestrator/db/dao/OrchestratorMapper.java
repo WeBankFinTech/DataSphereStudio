@@ -100,8 +100,8 @@ public interface OrchestratorMapper {
     @Select("select uuid from dss_orchestrator_info where project_id = #{projectId} and name = #{name}")
     String getOrcNameByParam(@Param("projectId") Long projectId, @Param("name") String name);
 
-    @Select("select id from `dss_orchestrator_info` where `project_id` = #{projectId} and `is_published` = 1")
-    List<Long> getAllOrcIdsByProjectId(@Param("projectId") Long projectId);
+    @Select("select id from `dss_orchestrator_info` where `project_id` = #{projectId} and `is_published` = #{isPublished}")
+    List<Long> getAllOrcIdsByProjectId(@Param("projectId") Long projectId, @Param("isPublished")Integer isPublished);
 
     @Select("select max(`app_id`) from `dss_orchestrator_version_info` where `orchestrator_id` = #{orchestratorId} and `version` = #{version}")
     Long getAppIdByVersion(@Param("orchestratorId") Long orchestratorId, @Param("version") String version);

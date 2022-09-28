@@ -95,6 +95,7 @@ public final class OrchestratorConversionJob implements Runnable {
             }
             //3.如果都没有报错，那么默认任务应该是成功的,那么则将所有的状态进行置为完成
             consumer.accept(response);
+            LOGGER.info("{} completed with status {}.", getId(), response.getJobStatus());
             conversionJobEntity.setResponse(response);
         } catch (final Exception t){
             LOGGER.error("Job {} convert for project {} failed.", id, conversionJobEntity.getProject().getId(), t);

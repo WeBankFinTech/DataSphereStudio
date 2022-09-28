@@ -33,6 +33,10 @@ public enum TargetTypeEnum {
      * 工作空间角色
      */
     WORKSPACE_ROLE("workspace_role"),
+    /**
+     * 数据库操作
+     */
+    DATAPIPE("datapipe")
     ;
     private String name;
 

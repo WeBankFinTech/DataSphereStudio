@@ -200,6 +200,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setContent(orchestrationContent);
         dssOrchestratorVersion.setOrchestratorId(importDssOrchestratorInfo.getId());
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
+        LOGGER.info("import orchestrator success,orcId:{},appId:{}",importDssOrchestratorInfo.getId(),orchestrationId);
 
         return dssOrchestratorVersion.getOrchestratorId();
     }

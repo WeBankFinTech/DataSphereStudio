@@ -179,6 +179,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         //submit it
         releaseThreadPool.submit(job);
         DSSOrchestratorConstant.orchestratorConversionJobMap.put(job.getId(), job);
+        LOGGER.info("publish orchestrator success. publishedOrcIds:{} ",publishedOrcIds);
         // todo insert publishJob
         return new ResponseConvertOrchestrator(job.getId(), entity.getResponse());
     }

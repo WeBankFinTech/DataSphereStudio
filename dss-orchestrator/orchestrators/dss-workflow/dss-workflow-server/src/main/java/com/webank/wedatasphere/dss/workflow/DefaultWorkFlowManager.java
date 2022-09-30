@@ -137,6 +137,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             dssFlow.setProjectID(parentFlow.getProjectID());
             dssFlow = flowService.addSubFlow(dssFlow, parentFlowId, contextIdStr, orcVersion, schedulerAppConn);
         }
+        logger.info("create workflow success. flowId:{}",dssFlow.getId());
         return dssFlow;
     }
 
@@ -162,6 +163,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         dssFlow.setDescription(description);
         dssFlow.setUses(uses);
         flowService.updateFlowBaseInfo(dssFlow);
+        logger.info("update workflow success. flowId:{}",flowId);
     }
 
     @Override
@@ -172,6 +174,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         } else {
             throw new DSSErrorException(100088, "Workflow can not be deleted unless the owner.");
         }
+        logger.info("delete workflow success. flowId:{}",flowId);
     }
 
     @Override
@@ -181,7 +184,9 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         DSSFlow dssFlow = flowService.getFlowByID(flowId);
         String exportPath = workFlowExportService.exportFlowInfo(dssProjectId, projectName, flowId, userName, workspace, dssLabels);
         InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
-        return bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
+        BmlResource bmlResource = bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
+        logger.info("export workflow success. flowId:{},bmlResource:{} .",flowId,bmlResource);
+        return bmlResource;
     }
 
     @Override
@@ -216,6 +221,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                     inputPath, null, dssFlowImportParam.getWorkspace(), dssFlowImportParam.getOrcVersion(),
                     dssFlowImportParam.getContextId(), dssLabels);
         }
+        logger.info("import workflow success.orcVersion:{},contextId:{}", dssFlowImportParam.getOrcVersion(), dssFlowImportParam.getContextId());
         return rootFlows;
     }
 
@@ -255,6 +261,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             return ResponseOperateOrchestrator.failed("由于该 Project 包含指向多个调度系统的工作流，发布过程中有一部分失败了。失败部分如下："
                     + failedResponseList.stream().map(ResponseOperateOrchestrator::getMessage).collect(Collectors.joining("; ")));
         } else {
+            logger.info("convert(publish)  workflow success");
             return responseList.get(0);
         }
     }

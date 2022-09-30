@@ -57,7 +57,7 @@ public class DssProxyUserController {
             userList -> {
                LOGGER.info("user {} got proxy list. userList: {}.", username, userList);
                List<String> proxyUserNameList = userList.stream().map(DssProxyUser::getProxyUserName).collect(Collectors.toList());
-               if(DS_PROXY_SELF_ENABLE.getValue()) {
+               if(DS_PROXY_SELF_ENABLE.getValue()&&!proxyUserNameList.contains(username)) {
                    proxyUserNameList.add(username);
                }
                return Message.ok().data("proxyUserList", proxyUserNameList);

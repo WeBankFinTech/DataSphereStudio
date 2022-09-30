@@ -136,18 +136,6 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
                     DSSCommonUtils.COMMON_GSON.toJson(resource));
         }
         resource.setFileName(zipFile.getName());
-        // Then, insert into db.
-        appConnResource.setLastModifiedTime(appConnPath.lastModified());
-        appConnResource.setSize(zipFile.length());
-        appConnResource.setResource(resource);
-        String resourceStr = AppConnServiceUtils.resourceToString(appConnResource);
-
-        AppConnBean appConnBeanReLoad = new AppConnBean();
-        appConnBeanReLoad.setId(appConnBean.getId());
-        appConnBeanReLoad.setResource(resourceStr);
-        appConnBeanReLoad.setAppConnName(appConnName);
-        appConnBeanReLoad.setClassName(appConnBean.getClassName());
-        appConnMapper.updateResourceByName(appConnBeanReLoad);
         // update index file.
         if (indexFile != null && !indexFile.delete()) {
             throw new AppConnNotExistsErrorException(20350, "Delete index file " + indexFile.getName() + " failed, please ensure the permission is all right.");
@@ -158,6 +146,17 @@ public class AppConnResourceServiceImpl implements AppConnResourceService, AppCo
         } catch (IOException e) {
             throw new AppConnNotExistsErrorException(20350, "create index file " + indexFile.getName() + " failed, please ensure the permission is all right.", e);
         }
+        // Then, insert into db.
+        appConnResource.setLastModifiedTime(appConnPath.lastModified());
+        appConnResource.setSize(zipFile.length());
+        appConnResource.setResource(resource);
+        String resourceStr = AppConnServiceUtils.resourceToString(appConnResource);
+        AppConnBean appConnBeanReLoad = new AppConnBean();
+        appConnBeanReLoad.setId(appConnBean.getId());
+        appConnBeanReLoad.setResource(resourceStr);
+        appConnBeanReLoad.setAppConnName(appConnName);
+        appConnBeanReLoad.setClassName(appConnBean.getClassName());
+        appConnMapper.updateResourceByName(appConnBeanReLoad);
         LOGGER.info("AppConn {} has updated resource to {}.", appConnName, resourceStr);
     }
 

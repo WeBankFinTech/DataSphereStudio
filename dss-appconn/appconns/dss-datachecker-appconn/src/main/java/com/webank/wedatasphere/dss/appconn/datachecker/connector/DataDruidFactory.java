@@ -24,9 +24,9 @@ import java.util.Base64;
 import java.util.Properties;
 
 public class DataDruidFactory {
-	private static DruidDataSource jobInstance;
-    private static DruidDataSource bdpInstance;
-    private static DruidDataSource msgInstance;
+	private static volatile DruidDataSource jobInstance;
+    private static volatile DruidDataSource bdpInstance;
+    private static volatile DruidDataSource msgInstance;
 
     public static DruidDataSource getJobInstance(Properties props, Logger log) {
         if (jobInstance == null ) {

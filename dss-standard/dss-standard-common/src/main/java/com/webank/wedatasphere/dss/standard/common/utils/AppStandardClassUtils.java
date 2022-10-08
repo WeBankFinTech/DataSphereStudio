@@ -72,7 +72,7 @@ public class AppStandardClassUtils extends ClassHelper {
         return INSTANCES.get(appConnName);
     }
 
-    private Reflections reflection;
+    private volatile Reflections reflection;
     private String appConnName;
 
     private AppStandardClassUtils(String appConnName) {

@@ -61,7 +61,7 @@ public class DataCheckerDao {
 
     private static DataSource jobDS;
     private static DataSource bdpDS;
-    private static DataCheckerDao instance;
+    private static volatile DataCheckerDao instance;
 
     public static DataCheckerDao getInstance() {
         if (instance == null) {

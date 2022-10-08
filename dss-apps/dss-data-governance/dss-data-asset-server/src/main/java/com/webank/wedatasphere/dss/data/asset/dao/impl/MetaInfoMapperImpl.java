@@ -44,6 +44,9 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
+            if (ps != null) {
+                ps.close();
+            }
             con.close();
         }
 
@@ -100,6 +103,9 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
+            if (ps != null) {
+                ps.close();
+            }
             con.close();
         }
         return hiveStorageInfos.subList(0,10);
@@ -131,6 +137,9 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
+            if(ps!=null){
+                ps.close();
+            }
             con.close();
         }
         return res;
@@ -167,6 +176,9 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
+            if(ps!=null){
+                ps.close();
+            }
            con.close();
         }
         return hivePartInfos;

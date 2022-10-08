@@ -75,6 +75,7 @@ DROP TABLE IF EXISTS `dss_datawarehouse_modifier`;
 CREATE TABLE `dss_datawarehouse_modifier` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `modifier_type` varchar(64) COLLATE utf8_bin NOT NULL,
+  `modifier_type_en` varchar(64) COLLATE utf8_bin DEFAULT NULL,
   `theme_domain_id` bigint(20) DEFAULT NULL,
   `layer_id` bigint(20) DEFAULT NULL,
   `theme_area` varchar(1000) COLLATE utf8_bin NOT NULL COMMENT '空：代表所有，如果是逗号分隔的字符串则代表对应的theme的names',

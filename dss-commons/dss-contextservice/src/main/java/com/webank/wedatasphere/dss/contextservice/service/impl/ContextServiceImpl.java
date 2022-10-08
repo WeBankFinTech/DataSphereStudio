@@ -49,7 +49,7 @@ public class ContextServiceImpl implements ContextService {
 
     private static final Logger logger = LoggerFactory.getLogger(ContextServiceImpl.class);
     private static ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
-    private static ContextService contextService = null;
+    private static volatile ContextService contextService = null;
 
     private ContextServiceImpl() {}
 

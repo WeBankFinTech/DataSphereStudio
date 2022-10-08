@@ -20,7 +20,7 @@ public class GlobalLimitsUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalLimitsUtils.class);
 
-    private static Map<String, Object> globalLimits;
+    private static volatile Map<String, Object> globalLimits;
     private static final Map<String, Map<String, Object>> globalLimitContents = new HashMap<>();
 
     public static Map<String, Object> getAllGlobalLimits() {

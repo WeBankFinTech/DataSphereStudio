@@ -24,7 +24,7 @@ import com.webank.wedatasphere.dss.standard.common.service.AppServiceImpl;
 
 public class SSOBuilderServiceImplImpl extends AppServiceImpl implements SSOBuilderService {
 
-    private static SSOBuilderService ssoBuilderService;
+    private static volatile SSOBuilderService ssoBuilderService;
 
     public static SSOBuilderService getSSOBuilderService() {
         if(ssoBuilderService == null) {

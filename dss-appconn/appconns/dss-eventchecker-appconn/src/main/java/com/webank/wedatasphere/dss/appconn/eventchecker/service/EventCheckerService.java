@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import java.util.Properties;
 
 public class EventCheckerService {
-    private static EventCheckerService instance;
+    private static volatile EventCheckerService instance;
 
     public static EventCheckerService getInstance() {
         if (instance == null) {

@@ -107,7 +107,7 @@ export default {
         micro_module: currentModules.microModule || 'dss'
       }, 'get').then((res) => {
         storage.set('noWorkSpace', false, 'local')
-        return res.workspaceHomePage.homePageUrl;
+        return res.workspaceHomePage;
       }).catch((e) => {
         storage.set('noWorkSpace', true, 'local');
         this.logout();
@@ -177,10 +177,15 @@ export default {
               this.getIsAdmin()
               // 登录之后需要获取当前用户的调转首页的路径
               const homePageRes = await this.getPageHomeUrl()
-              plugin.emitHook('after_login', {
-                context: this
+              const all_after_login = await plugin.emitHook('after_login', {
+                context: this,
+                homePageRes
               })
-              this.$router.replace({path: homePageRes});
+              if (all_after_login.length) {
+                // 有hook返回则hook处理
+              } else {
+                this.$router.replace({path: homePageRes.homePageUrl});
+              }
               this.$Message.success(this.$t('message.common.login.loginSuccess'));
             }
           } catch (error) {

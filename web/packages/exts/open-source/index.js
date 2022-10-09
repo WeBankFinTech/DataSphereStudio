@@ -4,6 +4,7 @@ import createProxyModal from './proxyUser/index'
 import i18n from '@dataspherestudio/shared/common/i18n'
 import storage from '@dataspherestudio/shared/common/helper/storage'
 import api from '@dataspherestudio/shared/common/service/api'
+import API_PATH from '@dataspherestudio/shared/common/config/apiPath.js'
 /**
  * 插件绑定
  */
@@ -23,8 +24,9 @@ export default function () {
   })
 
   // 登录后提示运维用户切换
-  this.bindHook('after_login', function () {
-    api.fetch('/dss/framework/admin/globalLimits', {}, 'get').then((res) => {
+  this.bindHook('after_login', async function ({homePageRes, context}) {
+    await api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${homePageRes.workspaceId}`, 'get')
+    return api.fetch('/dss/framework/admin/globalLimits', {}, 'get').then((res) => {
       let baseInfo = storage.get('baseInfo', 'local')
       baseInfo = {
         ...baseInfo,
@@ -34,7 +36,9 @@ export default function () {
       }
       storage.set('baseInfo', baseInfo, 'local')
       if (baseInfo.dss.proxyEnable) {
-        createProxyModal()
+        createProxyModal(homePageRes.homePageUrl, context)
+      } else {
+        context.$router.replace({path: homePageRes.homePageUrl});
       }
     })
   })

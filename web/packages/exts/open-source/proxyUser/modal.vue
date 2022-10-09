@@ -22,14 +22,15 @@ import tree from '@dataspherestudio/scriptis/service/db/tree.js';
 
 export default {
   props: {
-    show: Boolean
+    show: Boolean,
+    canclose: Boolean
   },
   data() {
     return {
       visible: this.show,
       proxyUser: '',
       pusers: [],
-      closable: true
+      closable: this.canclose
     }
   },
   mounted() {
@@ -58,9 +59,11 @@ export default {
           tree.remove('hiveTree');
           tree.remove('udfTree');
           tree.remove('functionTree');
-          this.baseInfo.proxyUserName = this.proxyUser
-          storage.set('baseInfo', this.baseInfo, 'local')
-          window.location.reload()
+          this.baseInfo.proxyUserName = this.proxyUser;
+          storage.set('baseInfo', this.baseInfo, 'local');
+          this.$emit('set-proxy');
+          this.visible = false;
+          // window.location.reload()
         })
       } else {
         this.toggle()

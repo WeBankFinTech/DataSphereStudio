@@ -88,7 +88,7 @@ public final class OrchestratorConversionJob implements Runnable {
             conversionJobEntity.setProject(project);
             Workspace workspace = conversionJobEntity.getWorkspace();
             ResponseOperateOrchestrator response = conversionDSSOrchestratorPlugin.convert(conversionJobEntity.getUserName(), project, workspace,
-                    conversionJobEntity.getOrchestrationIdMap(), conversionJobEntity.getLabels());
+                    conversionJobEntity.getOrchestrationIdMap(), conversionJobEntity.getLabels(),null);
             if(response.isFailed()) {
                 String msg = response.getMessage() == null ? "Unknown reason, please ask admin for help!" : response.getMessage();
                 throw new DSSErrorException(50000, msg);

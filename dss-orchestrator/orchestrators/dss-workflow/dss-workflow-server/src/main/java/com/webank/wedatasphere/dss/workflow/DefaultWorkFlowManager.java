@@ -289,7 +289,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         DSSToRelConversionRequestRef requestRef = RequestRefUtils.getRequestRef(operation);
         requestRef.setDSSProject((DSSProject) requestConversionWorkflow.getProject())
                 .setUserName(requestConversionWorkflow.getUserName())
-                .setWorkspace((Workspace) requestConversionWorkflow.getWorkspace());
+                .setWorkspace((Workspace) requestConversionWorkflow.getWorkspace())
+                .setApprovalId(requestConversionWorkflow.getApprovalId());
         if (requestRef instanceof ProjectToRelConversionRequestRef) {
             //要发布整个项目
             Map<String, Long> orchestrationMap = flowInfos.stream().filter(pair -> flows.contains(pair.getKey()))

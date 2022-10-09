@@ -67,7 +67,7 @@
       </div>
       <div
         class="nav-right"
-        :class="{ 'nav-right-open': expandRight }"
+        :class="{ 'nav-right-open': open }"
         :style="{ 'z-index': zIndex }"
       >
         <div
@@ -158,7 +158,7 @@ export default {
   data() {
     return {
       open: false, // 展开菜单
-      expandRight: false, // 展开右侧全部应用
+      expandRight: true, // 展开右侧全部应用
       favoriteList: this.favorites,
       collectionList: this.collections
     };

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import ProxyUserModal from './modal.vue'
 import i18n from '@dataspherestudio/shared/common/i18n'
 
-const createProxyModal = () => {
+const createProxyModal = (homePageRes, context) => {
   let body = document.body;
   let bindPhone = document.createElement('div')
   bindPhone.setAttribute('id', 'proxy_modal_')
@@ -15,7 +15,13 @@ const createProxyModal = () => {
         ProxyUserModal,
         {
           props: {
-            show: true
+            show: true,
+            canclose: false
+          },
+          on: {
+            'set-proxy': () => {
+              context.$router.replace({path: homePageRes});
+            }
           }
         }
       )

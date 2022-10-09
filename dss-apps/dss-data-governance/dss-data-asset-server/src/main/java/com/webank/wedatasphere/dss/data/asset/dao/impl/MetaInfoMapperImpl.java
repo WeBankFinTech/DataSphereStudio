@@ -33,20 +33,18 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             while (rs.next()){
                 num =rs.getLong(1);
             }
+            ps.close();
             String sql2 ="select SUM(PARAM_VALUE) from PARTITION_PARAMS WHERE PARAM_KEY='totalSize'";
             ps=con.prepareStatement(sql2);
             rs=ps.executeQuery();
             while (rs.next()){
                 num= num + rs.getLong(1);
             }
-
+            ps.close();
         } catch (DAOException | SQLException e){
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
-            if (ps != null) {
-                ps.close();
-            }
             con.close();
         }
 
@@ -70,6 +68,7 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
                 tableinfo.setStorage(rs.getLong(3));
                 hiveStorageInfos.add(tableinfo);
             }
+            ps.close();
             String sql2="SELECT DBS.NAME ,TBLS.TBL_NAME,SUM(CAST(PARTITION_PARAMS.PARAM_VALUE AS UNSIGNED)) AS totalSize from DBS,TBLS,PARTITIONS ,PARTITION_PARAMS where DBS.DB_ID=TBLS.DB_ID AND TBLS.TBL_ID=PARTITIONS.TBL_ID AND  PARTITIONS.PART_ID =PARTITION_PARAMS.PART_ID  AND PARTITION_PARAMS.PARAM_KEY='totalSize'  group by TBLS.TBL_NAME  order by totalSize  desc limit 10";
             ps=con.prepareStatement(sql2);
             rs=ps.executeQuery();
@@ -79,6 +78,7 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
                 tableinfo.setStorage(rs.getLong(3));
                 hiveStorageInfos.add(tableinfo);
             }
+            ps.close();
             /**
              * 特别注意LONG类型相减超出INT范围
              * System.out.println((int) (4401131805L -1796673800L))
@@ -103,9 +103,6 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
-            if (ps != null) {
-                ps.close();
-            }
             con.close();
         }
         return hiveStorageInfos.subList(0,10);
@@ -132,14 +129,12 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             while (rs.next()){
                res=rs.getInt(1);
             }
+            ps.close();
 
         } catch (DAOException | SQLException e){
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
-            if(ps!=null){
-                ps.close();
-            }
             con.close();
         }
         return res;
@@ -171,14 +166,12 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
                 part.setStore(rs.getInt(5));
                 hivePartInfos.add(part);
             }
+            ps.close();
 
         } catch (DAOException | SQLException e){
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
-            if(ps!=null){
-                ps.close();
-            }
            con.close();
         }
         return hivePartInfos;

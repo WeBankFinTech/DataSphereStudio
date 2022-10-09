@@ -246,7 +246,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                     project,
                     (Workspace) requestConversionOrchestration.getWorkspace(),
                     orchestrationIdMap,
-                    labels);
+                    labels,
+                    requestConversionOrchestration.getApproveId());
             if(response.isFailed()) {
                 String msg = response.getMessage() == null ? "Unknown reason, please ask admin for help!" : response.getMessage();
                 throw new DSSErrorException(50000, msg);

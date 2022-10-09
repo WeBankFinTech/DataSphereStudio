@@ -55,11 +55,18 @@ public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConv
     @Override
     public ResponseRef convert(K ref) {
         PreConversionRel preConversionRel = getPreConversionRel(ref);
+        //first,convert workflow
         ConvertedRel convertedRel = tryConvert(preConversionRel);
+        //then,upload the converted workflow to target schedule system
         trySync(convertedRel);
         return ResponseRef.newInternalBuilder().success();
     }
 
+    /**
+     * convert dss workflow to real schedule system workflow
+     * @param rel dss workflow
+     * @return real schedule system workflow
+     */
     protected ConvertedRel tryConvert(PreConversionRel rel) {
         ConvertedRel convertedRel = null;
         for (WorkflowToRelConverter workflowToRelConverter : workflowToRelConverters) {
@@ -72,6 +79,9 @@ public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConv
         return convertedRel;
     }
 
+    /**
+     * upload workflow to target schedule system.
+     */
     protected void trySync(ConvertedRel convertedRel) {
         workflowToRelSynchronizer.syncToRel(convertedRel);
     }

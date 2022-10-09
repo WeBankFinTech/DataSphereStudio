@@ -37,12 +37,14 @@ public class ConversionDSSOrchestratorPluginImpl extends AbstractDSSOrchestrator
                                                DSSProject project,
                                                Workspace workspace,
                                                Map<Long, Long> orchestrationIdMap,
-                                               List<DSSLabel> dssLabels) {
+                                               List<DSSLabel> dssLabels,
+                                               String approvalId) {
         //1、发布DSS编排，如DSS工作流
         RequestConvertOrchestrations requestConvertOrchestrator = new RequestConvertOrchestrations();
         requestConvertOrchestrator.setOrchestrationIdMap(orchestrationIdMap);
         requestConvertOrchestrator.setProject(project);
         requestConvertOrchestrator.setWorkspace(workspace);
+        requestConvertOrchestrator.setApprovalId(approvalId);
         requestConvertOrchestrator.setDSSLabels(dssLabels);
         requestConvertOrchestrator.setUserName(userName);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);

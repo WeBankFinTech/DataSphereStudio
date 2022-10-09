@@ -15,6 +15,7 @@
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
 import util from '@dataspherestudio/shared/common/util/index';
+import mixin from '@dataspherestudio/shared/common/service/mixin';
 
 export default {
   data() {
@@ -24,6 +25,7 @@ export default {
       isRefresh: true
     };
   },
+  mixins: [mixin],
   mounted() {
     // 创建的时候设置宽高
     this.resize(window.innerHeight);
@@ -44,7 +46,7 @@ export default {
       tail.push('app_id=facade-framework');
       tail.push('timestamp=1659924920342');
       tail.push('nonce=12345');
-      tail.push('user=lucaszhu');
+      tail.push('user=dss');
       tail.push('signature=eca1a93c2c2bb8fc55972d76d0c1267c7782f51552a5d4562a2d871a63f64168');
       return tail.join('&');
     },
@@ -84,8 +86,11 @@ export default {
         }, {
           method: 'get',
           baseURL: 'http://127.0.0.1:9090',
+          headers: {
+            proxyUser: this.getUserName(),
+          }
         });
-        this.visualSrc = util.replaceHolder(`${data.accessLocation}?baseUrl=${data.accessLocation.split('#')[0]}` || '');
+        this.visualSrc = util.replaceHolder(`${data.accessLocation}?baseUrl=${data.accessLocation.split('#')[0].replace(/\/$/, '')}` || '');
       } catch (err) {
         console.warn('-------', err);
       }

@@ -154,8 +154,9 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setProjectId(projectId);
         dssOrchestratorVersion.setSource("Orchestrator create");
         dssOrchestratorVersion.setUpdater(userName);
-        //生产导入：默认是为无效，开发环境为有效
-        dssOrchestratorVersion.setValidFlag(DSSLabelUtil.isDevEnv(dssLabels) ? 1 : 0);
+        //生产导入：默认是为无效，除非开启直接有效（在生成环境独立部署的时候，导入和发布是分开的）；开发环境为有效
+        int valid = DSSOrchestratorConf.DSS_IMPORT_VALID_IMMEDIATELY.getValue() || DSSLabelUtil.isDevEnv(dssLabels) ? 1 : 0;
+        dssOrchestratorVersion.setValidFlag(valid);
 
         String oldVersion = orchestratorMapper.getLatestVersion(importDssOrchestratorInfo.getId(), 1);
         if (StringUtils.isNotEmpty(oldVersion)) {

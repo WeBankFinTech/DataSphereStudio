@@ -256,23 +256,20 @@ public class FlowRestfulApi {
     }
 
     @RequestMapping(value = "deleteFlow", method = RequestMethod.POST)
-    public Message deleteFlow( @RequestBody DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
+    public Message deleteFlow(@RequestBody DeleteFlowRequest deleteFlowRequest) throws DSSErrorException {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         Long flowID = deleteFlowRequest.getId();
         boolean sure = deleteFlowRequest.getSure() != null && deleteFlowRequest.getSure();
         // TODO: 2019/6/13  projectVersionID的更新校验
         //state为true代表曾经发布过
-        DSSFlow dssFlow=flowService.getFlowByID(flowID);
-        if(dssFlow==null){
-            return Message.error("该工作流已不存在，无法重复删除");
-        }
-        if (dssFlow.getState() && !sure) {
+        DSSFlow dssFlow = flowService.getFlowByID(flowID);
+        if (dssFlow != null && dssFlow.getState() && !sure) {
             return Message.ok().data("warmMsg", "该工作流曾经发布过，删除将会将该工作流的所有版本都删除，是否继续？");
         }
         flowService.batchDeleteFlow(Arrays.asList(flowID));
-        AuditLogUtils.printLog( username,workspace.getWorkspaceId(), workspace.getWorkspaceName(),TargetTypeEnum.WORKFLOW,
-               flowID, dssFlow.getName(),OperateTypeEnum.DELETE,deleteFlowRequest);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.WORKFLOW,
+                flowID, dssFlow == null ? null : dssFlow.getName(), OperateTypeEnum.DELETE, deleteFlowRequest);
         return Message.ok();
     }
 

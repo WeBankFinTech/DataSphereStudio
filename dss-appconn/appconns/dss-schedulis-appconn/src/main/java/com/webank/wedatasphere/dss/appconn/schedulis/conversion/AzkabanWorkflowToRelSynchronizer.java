@@ -71,7 +71,7 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             uploadProject(projectToRelConversionRequestRef.getWorkspace(), tmpSavePath,
                     projectToRelConversionRequestRef.getDSSProject().getName(),
                     projectToRelConversionRequestRef.getUserName(),
-                    projectToRelConversionRequestRef.getUserName());
+                    projectToRelConversionRequestRef.getApprovalId());
         } catch (Exception e) {
             throw new DSSRuntimeException(90012, ExceptionUtils.getRootCauseMessage(e), e);
         }

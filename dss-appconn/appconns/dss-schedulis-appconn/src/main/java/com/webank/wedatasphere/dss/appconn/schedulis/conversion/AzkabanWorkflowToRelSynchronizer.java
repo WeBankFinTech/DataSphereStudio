@@ -30,6 +30,7 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelSynchronizer;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.httpclient.request.BinaryBody;
 import org.slf4j.Logger;
@@ -87,12 +88,15 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             binaryBodyList.add(binaryBody);
             DSSUploadAction uploadAction = new DSSUploadAction(binaryBodyList);
             uploadAction.getFormParams().put("ajax", "upload");
-            uploadAction.getFormParams().put("project", projectName);
-            uploadAction.getFormParams().put("itsmId",approvalId);
-
             uploadAction.getParameters().put("ajax", "upload");
+
+            uploadAction.getFormParams().put("project", projectName);
             uploadAction.getParameters().put("project", projectName);
-            uploadAction.getParameters().put("itsmId",approvalId);
+
+            if(StringUtils.isNotBlank(approvalId)) {
+                uploadAction.getFormParams().put("itsmId", approvalId);
+                uploadAction.getParameters().put("itsmId", approvalId);
+            }
             uploadAction.setUrl(projectUrl);
             SchedulisHttpUtils.getHttpResult(projectUrl, uploadAction,
                     dssToRelConversionOperation.getConversionService().getSSORequestService()

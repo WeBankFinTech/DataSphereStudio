@@ -42,11 +42,13 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
 
@@ -108,14 +110,27 @@ public class DSSWorkspaceRestful {
     public Message associateDepartments(@RequestBody Map<String, Object> params) throws Exception {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        Long workspaceId = (Long) params.get("workspaceId");
+        Long workspaceId = Long.valueOf((Integer) params.get("workspaceId"));
         if (!workspaceId.equals(workspace.getWorkspaceId())) {
             DSSFrameworkErrorException.dealErrorException(30030, "Wrong workspaceId request!");
         }
-        String departmentWithOffices = (String) params.get("departmentWithOffices");
-        String roles = (String) params.get("roles");
-        dssWorkspaceService.associateDepartments(workspaceId, departmentWithOffices, roles, userName);
+        ArrayList<String> departmentWithOffices = (ArrayList<String>) params.get("departmentWithOffices");
+        ArrayList<Integer> roles = (ArrayList<Integer>) params.get("roles");
+        if (CollectionUtils.isEmpty(departmentWithOffices) || CollectionUtils.isEmpty(roles)) {
+            return Message.error("参数不能为空！(params can not be null!)");
+        }
+        String roleStr = roles.stream().map(String::valueOf).collect(Collectors.joining(","));
+        dssWorkspaceService.associateDepartments(workspaceId, String.join(",", departmentWithOffices), roleStr, userName);
         return Message.ok();
+    }
+
+    @GetMapping(value = "{workspaceId}/associateDepartmentsInfo")
+    public Message getAssociateDepartments(@PathVariable("workspaceId") Long workspaceId) throws Exception {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        if (!workspaceId.equals(workspace.getWorkspaceId())) {
+            DSSFrameworkErrorException.dealErrorException(30030, "Wrong workspaceId request!");
+        }
+        return Message.ok().data("associateDepartments", dssWorkspaceService.getAssociateDepartmentsInfo(workspaceId));
     }
 
     @RequestMapping(path = "getWorkspaces", method = RequestMethod.GET)

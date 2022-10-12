@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceAssociateDepartments;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
@@ -63,6 +64,8 @@ public interface DSSWorkspaceService {
     List<String> getAllDepartmentWithOffices();
 
     void associateDepartments(Long workspaceId, String departments, String roles,String user);
+
+    DSSWorkspaceAssociateDepartments getAssociateDepartmentsInfo(Long workspaceId);
 
     List<DSSWorkspaceUserVO> getWorkspaceUsersByRole(int workspaceId, String roleName, List<Long> totals,
                                                      int pageNow, int pageSize);

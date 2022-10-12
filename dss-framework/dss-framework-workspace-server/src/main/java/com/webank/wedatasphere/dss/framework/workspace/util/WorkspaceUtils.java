@@ -24,9 +24,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 
-public class ApplicationUtils {
+public class WorkspaceUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkspaceUtils.class);
 
     private static final String REDIRECT_FORMAT = "%s?redirect=%s&dssurl=${dssurl}&cookies=${cookies}";
 
@@ -46,5 +46,7 @@ public class ApplicationUtils {
     public static void main(String[] args) throws DSSErrorException {
         System.out.println(redirectUrlFormat("http://127.0..0.1:8090/qualitis/api/v1/redirect","http://127.0..0.1:8090/#/projects/list?id={projectId}&flow=true"));
     }
+
+
 
 }

@@ -453,11 +453,16 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public void associateDepartments(Long workspaceId, String departments, String roles, String user) {
-        if (dssWorkspaceMapper.hasAssociateDepartments(workspaceId) > 0) {
+        if (dssWorkspaceMapper.getAssociateDepartmentsByWorkspaceId(workspaceId) != null) {
             dssWorkspaceMapper.updateDepartmentsForWorkspace(workspaceId, departments, roles, user);
         } else {
             dssWorkspaceMapper.addDepartmentsForWorkspace(workspaceId, departments, roles, user);
         }
+    }
+
+    @Override
+    public DSSWorkspaceAssociateDepartments getAssociateDepartmentsInfo(Long workspaceId) {
+        return dssWorkspaceMapper.getAssociateDepartmentsByWorkspaceId(workspaceId);
     }
 
     @Override

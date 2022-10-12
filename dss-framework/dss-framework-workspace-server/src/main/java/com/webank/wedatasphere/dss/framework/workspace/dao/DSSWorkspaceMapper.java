@@ -74,8 +74,8 @@ public interface DSSWorkspaceMapper {
     void updateDepartmentsForWorkspace(@Param("workspaceId") Long workspaceId, @Param("departments") String departments,
                                        @Param("roleIds") String roleIds, @Param("user") String user);
 
-    @Select("select count(1) from dss_workspace_associate_departments where workspace_id=#{workspaceId}")
-    int hasAssociateDepartments(@Param("workspaceId") Long workspaceId);
+    @Select("select * from dss_workspace_associate_departments where workspace_id=#{workspaceId}")
+    DSSWorkspaceAssociateDepartments getAssociateDepartmentsByWorkspaceId(@Param("workspaceId") Long workspaceId);
 
     @Select("select * from dss_workspace_associate_departments")
     List<DSSWorkspaceAssociateDepartments> getWorkspaceAssociateDepartments();

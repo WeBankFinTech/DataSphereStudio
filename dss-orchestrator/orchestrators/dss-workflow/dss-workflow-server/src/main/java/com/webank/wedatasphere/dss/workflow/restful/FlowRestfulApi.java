@@ -34,6 +34,8 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
@@ -68,6 +70,8 @@ public class FlowRestfulApi {
     private PublishService publishService;
     @Autowired
     private WorkFlowManager workFlowManager;
+    @Autowired
+    private LockMapper lockMapper;
     @Autowired
     private HttpServletRequest httpServletRequest;
 
@@ -247,7 +251,8 @@ public class FlowRestfulApi {
                 }
             } catch (DSSErrorException e) {
                 if (DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
-                    return Message.error(e.getDesc());
+                    DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowID);
+                    return Message.error(e.getDesc()).data("editLockInfo", flowEditLock);
                 }
                 throw e;
             }
@@ -299,6 +304,13 @@ public class FlowRestfulApi {
         Boolean isNotHaveLock = saveFlowRequest.getNotHaveLock();
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         String version;
+        //若工作流已经被其他用户抢锁，则当前用户不能再保存成功
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowID);
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
         synchronized (DSSWorkFlowConstant.saveFlowLock.intern(flowID)) {
             if (isNotHaveLock != null && isNotHaveLock.booleanValue()) {
                 version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);

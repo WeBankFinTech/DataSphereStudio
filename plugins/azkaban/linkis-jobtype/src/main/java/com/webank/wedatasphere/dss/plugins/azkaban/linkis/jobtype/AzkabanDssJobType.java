@@ -90,8 +90,12 @@ public class AzkabanDssJobType extends AbstractJob {
         info("Start to execute job");
         logJobProperties();
         String runDate = getRunDate();
-        if (StringUtils.isNotBlank(runDate)){
+        if (StringUtils.isNotBlank(runDate)) {
             this.jobPropsMap.put("run_date", runDate);
+        }
+        String runTodayH = getRunTodayh(false);
+        if (StringUtils.isNotBlank(runTodayH)) {
+            this.jobPropsMap.put("run_today_h", runDate);
         }
         this.job = JobBuilder.getAzkanbanBuilder().setJobProps(this.jobPropsMap).build();
         this.job.setLogObj(new AzkabanAppConnLog(this.log));
@@ -193,7 +197,7 @@ public class AzkabanDssJobType extends AbstractJob {
                             entry.getValue();
                     if ("azkaban.flow.start.timestamp".equals(key)){
                         this.info("run time is " + value);
-                        String runDateNow = value.substring(0, 13).replaceAll("-", "").replaceAll("-","");
+                        String runDateNow = value.substring(0, 10).replaceAll("-", "");
                         this.info("run date now is " + runDateNow);
                         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
                         try {
@@ -208,7 +212,7 @@ public class AzkabanDssJobType extends AbstractJob {
                     }
                 }
             } catch (final Exception ex) {
-                this.log.error("failed to log job properties ", ex);
+                this.log.error("failed to get run date ", ex);
             }
         }
         return null;
@@ -228,14 +232,15 @@ public class AzkabanDssJobType extends AbstractJob {
                         this.info("run time is " + value);
                         String runTodayh = value.substring(0, 13).replaceAll("-", "").replaceAll("T", "");
                         this.info("run today h is " + runTodayh);
-                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
+                        //for std
+//                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH");
                         if(!stdFormat){
                             return runTodayh;
                         }
                     }
                 }
             } catch (final Exception ex) {
-                this.log.error("failed to log job properties ", ex);
+                this.log.error("failed to get run_today_h ", ex);
             }
         }
         return null;

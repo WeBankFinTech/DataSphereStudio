@@ -11,6 +11,7 @@
       </RadioGroup>
     </div>
     <template slot="footer">
+      <Button @click="handleCancel">{{ $t('message.scripts.cancel') }}</Button>
       <Button type="primary" :disabled="pusers.length < 1 || !proxyUser" @click="handleOk">{{ $t('message.scripts.confirm') }}</Button>
     </template>
   </Modal>
@@ -68,6 +69,11 @@ export default {
       } else {
         this.toggle()
       }
+    },
+    handleCancel() {
+      api.fetch('/user/logout', {}).then(() => {
+        this.visible = false
+      });
     },
     getPuserData() {
       api.fetch(`/dss/framework/proxy/list`, {

@@ -119,7 +119,7 @@ public class MigrateServiceImpl implements MigrateService {
             dssProjectService.modifyOldProject(dssProject, dbProject);
         }
         List<DSSFlow> dssFlows = metaService.readFlow(inputPath);
-        dssFlows.stream().forEach(dssFlow -> dssFlow.setProjectID(finalProject.getId()));
+        dssFlows.stream().forEach(dssFlow -> dssFlow.setProjectId(finalProject.getId()));
 
         List<DSSFlowRelation> dssFlowRelations = metaService.readFlowRelation(inputPath);
         List<DSSFlow> rootFlows = dssFlows.stream().filter(DSSFlow::getRootFlow).collect(Collectors.toList());

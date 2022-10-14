@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.protocol.RequestDeleteWorkflow;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
@@ -43,7 +44,8 @@ public class WorkflowRefDeletionOperation
         RequestDeleteWorkflow requestDeleteWorkflow = new RequestDeleteWorkflow(userName, flowId);
         List<DSSLabel> dssLabels = requestRef.getDSSLabels();
         Sender tempSend = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
-        ResponseDeleteWorkflow responseDeleteWorkflow = (ResponseDeleteWorkflow) tempSend.ask(requestDeleteWorkflow);
+        ResponseDeleteWorkflow responseDeleteWorkflow = RpcAskUtils.processAskException(tempSend.ask(requestDeleteWorkflow),
+                ResponseDeleteWorkflow.class, RequestDeleteWorkflow.class);
         if(responseDeleteWorkflow.getJobStatus() == JobStatus.Success) {
             return ResponseRef.newInternalBuilder().success();
         } else {

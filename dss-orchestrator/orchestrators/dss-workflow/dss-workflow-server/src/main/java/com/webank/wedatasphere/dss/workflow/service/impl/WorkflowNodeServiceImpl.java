@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationResponse;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.*;
 import com.webank.wedatasphere.dss.standard.app.development.ref.*;
@@ -182,7 +183,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     private Long parseProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) {
         ProjectRelationRequest projectRelationRequest = new ProjectRelationRequest(dssProjectId, appConnName, dssLabels);
-        ProjectRelationResponse projectRelationResponse = (ProjectRelationResponse) projectSender.ask(projectRelationRequest);
+        ProjectRelationResponse projectRelationResponse = RpcAskUtils.processAskException(projectSender.ask(projectRelationRequest), ProjectRelationResponse.class, ProjectRelationRequest.class);
         return projectRelationResponse.getAppInstanceProjectId();
     }
 

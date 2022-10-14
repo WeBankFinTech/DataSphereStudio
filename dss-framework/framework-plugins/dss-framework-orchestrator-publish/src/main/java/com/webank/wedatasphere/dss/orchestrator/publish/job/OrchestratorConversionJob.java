@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish.job;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
@@ -83,8 +84,8 @@ public final class OrchestratorConversionJob implements Runnable {
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(conversionJobEntity.getProject().getId());
         try{
-            DSSProject project = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                .ask(projectInfoRequest);
+            DSSProject project = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                    .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
             conversionJobEntity.setProject(project);
             Workspace workspace = conversionJobEntity.getWorkspace();
             ResponseOperateOrchestrator response = conversionDSSOrchestratorPlugin.convert(conversionJobEntity.getUserName(), project, workspace,

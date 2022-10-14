@@ -68,7 +68,7 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
                     CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
                 return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
             }
-            if(StringUtils.startsWithIgnoreCase(proxyUser,"WTSS_")){
+            if(!StringUtils.startsWithIgnoreCase(proxyUser,"WTSS_")){
                 return Message.error("only ops proxy user can create project(只允许代理到运维用户创建工程).");
             }
             projectCreateRequest.getEditUsers().add(proxyUser);

@@ -33,6 +33,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
+import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
@@ -109,11 +110,8 @@ public class DSSWorkspaceRestful {
     @PostMapping(value = "associateDepartments")
     public Message associateDepartments(@RequestBody Map<String, Object> params) throws Exception {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
-        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         Long workspaceId = Long.valueOf((Integer) params.get("workspaceId"));
-        if (!workspaceId.equals(workspace.getWorkspaceId())) {
-            DSSFrameworkErrorException.dealErrorException(30030, "Wrong workspaceId request!");
-        }
+        WorkspaceUtils.validateWorkspace(workspaceId, httpServletRequest);
         ArrayList<String> departmentWithOffices = (ArrayList<String>) params.get("departmentWithOffices");
         ArrayList<Integer> roles = (ArrayList<Integer>) params.get("roles");
         if (CollectionUtils.isEmpty(departmentWithOffices) || CollectionUtils.isEmpty(roles)) {
@@ -126,10 +124,7 @@ public class DSSWorkspaceRestful {
 
     @GetMapping(value = "{workspaceId}/associateDepartmentsInfo")
     public Message getAssociateDepartments(@PathVariable("workspaceId") Long workspaceId) throws Exception {
-        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        if (!workspaceId.equals(workspace.getWorkspaceId())) {
-            DSSFrameworkErrorException.dealErrorException(30030, "Wrong workspaceId request!");
-        }
+        WorkspaceUtils.validateWorkspace(workspaceId, httpServletRequest);
         return Message.ok().data("associateDepartments", dssWorkspaceService.getAssociateDepartmentsInfo(workspaceId));
     }
 

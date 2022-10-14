@@ -50,8 +50,6 @@ public class OrchestratorCopyJob implements Runnable {
 
     private DSSOrchestratorCopyInfo orchestratorCopyInfo = new DSSOrchestratorCopyInfo(UUID.randomUUID().toString());
 
-    private final Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
-
     @Override
     public void run() {
         try {
@@ -148,115 +146,6 @@ public class OrchestratorCopyJob implements Runnable {
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestrator(dssOrchestratorInfo);
         dssOrchestratorVersion.setOrchestratorId(dssOrchestratorInfo.getId());
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestratorVersion(dssOrchestratorVersion);
-    }
-
-    private OrchestratorExportResult exportOrc() throws Exception {
-        Long targetProjectId = orchestratorCopyVo.getTargetProjectId();
-        String sourceProjectName = orchestratorCopyVo.getSourceProjectName();
-        String targetProjectName = orchestratorCopyVo.getTargetProjectName();
-        DSSOrchestratorInfo orchestratorInfo = orchestratorCopyVo.getOrchestrator();
-        Long sourceOrchestratorId = orchestratorInfo.getId();
-        Workspace workspace = orchestratorCopyVo.getWorkspace();
-        String username = orchestratorCopyVo.getUsername();
-        String targetOrchestratorName = orchestratorCopyVo.getTargetOrchestratorName();
-
-        LOGGER.info("Start to export orchestrator {} of project {}", orchestratorInfo.getName(), sourceProjectName);
-        //先判断工作流是否含有节点,如果没有节点直接调用接口创建即可
-        DSSOrchestratorVersion sourceOrchestratorVersion = orchestratorCopyEnv.getOrchestratorMapper().getLatestOrchestratorVersionById(sourceOrchestratorId);
-        if (isExistNodeInFlow(sourceOrchestratorVersion, username)) {
-
-            OrchestratorCreateRequest orchestratorCreateRequest = new OrchestratorCreateRequest(targetOrchestratorName,
-                    Lists.newArrayList(orchestratorInfo.getOrchestratorWay()), orchestratorInfo.getOrchestratorLevel(),
-                    Lists.newArrayList(orchestratorCopyVo.getDssLabel().toString()), orchestratorInfo.getUses(), orchestratorInfo.getDescription(),
-                    targetProjectName, workspace.getWorkspaceName());
-            orchestratorCreateRequest.setProjectId(targetProjectId);
-            orchestratorCreateRequest.setOrchestratorMode(orchestratorInfo.getOrchestratorMode());
-            orchestratorCreateRequest.setWorkspaceId(workspace.getWorkspaceId());
-            orchestratorCopyEnv.getOrchestratorFrameworkService().createOrchestrator(username, orchestratorCreateRequest, workspace);
-
-            return null;
-        }
-        //如果是含有节点的工作流
-        try {
-            return orchestratorCopyEnv.getExportDSSOrchestratorPlugin()
-                    .exportOrchestrator(username, sourceOrchestratorId, sourceOrchestratorVersion.getId(),
-                            sourceProjectName, Lists.newArrayList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV)), false, workspace);
-        } catch (Exception e) {
-            //保存错误信息
-            String errorMsg = "ExportOrcError: " + e.getMessage();
-            if (errorMsg.length() > 1000) {
-                errorMsg = errorMsg.substring(0, 999);
-            }
-
-            orchestratorCopyInfo.setIsCopying(0);
-            orchestratorCopyInfo.setEndTime(new Date());
-            orchestratorCopyInfo.setSuccessNode(Lists.newArrayList("ZERO"));
-            orchestratorCopyInfo.setStatus(0);
-            orchestratorCopyInfo.setExceptionInfo(errorMsg);
-            orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateErrorMsgById(orchestratorCopyInfo);
-            LOGGER.error("ExportOrcError: sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
-                    sourceProjectName, targetProjectName, orchestratorInfo.getName(), targetOrchestratorName, e);
-            throw new RuntimeException("Export Orc error when copying orc.", e);
-        }
-    }
-
-    /**
-     * 导入编排模式
-     *
-     * @param exportResult
-     * @throws ErrorException
-     */
-    private void importOrc(OrchestratorExportResult exportResult) throws ErrorException {
-        LOGGER.info("Begin to import orc {} for project {} and orc resource is {}", orchestratorCopyVo.getOrchestrator().getName(), orchestratorCopyVo.getSourceProjectName(), exportResult.getBmlResource());
-        List<DSSLabel> dssLabelList = Collections.singletonList(orchestratorCopyVo.getDssLabel());
-        DSSOrchestratorInfo orchestrator = orchestratorCopyVo.getOrchestrator();
-        Workspace workspace = orchestratorCopyVo.getWorkspace();
-        BmlResource bmlResource = exportResult.getBmlResource();
-
-        try {
-            LOGGER.info("CopyOrchestrator Start: sourceOrchestratorName:{}, targetOrchestratorName:{}", orchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName());
-
-            // 此处orchestraName使用targetName
-            RequestImportOrchestrator importRequest = new RequestImportOrchestrator(orchestratorCopyVo.getUsername(),
-                    orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getSourceProjectId(), bmlResource.getResourceId(),
-                    bmlResource.getVersion(), orchestratorCopyVo.getTargetOrchestratorName(), dssLabelList, workspace,
-                    orchestratorCopyVo.getTargetProjectId(), orchestratorCopyVo.getTargetProjectName());
-            Long targetOrchestratorId = orchestratorCopyEnv.getImportDSSOrchestratorPlugin().importCopyOrchestrator(importRequest, orchestratorCopyVo.getWorkflowNodeSuffix());
-
-            LOGGER.info("Copy Orchestrator Success: sourceOrchestratorName:{}, targetOrchestratorName:{}, targetOrchestratorId:{}", orchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(), targetOrchestratorId);
-        } catch (Exception e) {
-            //保存错误信息
-            String errorMsg = "ImportOrcError: " + e.getMessage();
-            if (errorMsg.length() > 1000) {
-                errorMsg = errorMsg.substring(0, 999);
-            }
-
-            orchestratorCopyInfo.setIsCopying(0);
-            orchestratorCopyInfo.setEndTime(new Date());
-            orchestratorCopyInfo.setSuccessNode(Lists.newArrayList("ZERO"));
-            orchestratorCopyInfo.setStatus(0);
-            orchestratorCopyInfo.setExceptionInfo(errorMsg);
-
-            orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateErrorMsgById(orchestratorCopyInfo);
-            LOGGER.error("ImportOrcError: sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
-                    orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), orchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(), e);
-            throw new RuntimeException("Import Orc error when copying orc.", e);
-        }
-
-        LOGGER.info("Import orchestrator {} of project {} to orchestrator {} of project {}", orchestrator.getName(), orchestratorCopyVo.getSourceProjectName(),
-                orchestratorCopyVo.getTargetOrchestratorName(), orchestratorCopyVo.getTargetProjectName());
-    }
-
-    private Boolean isExistNodeInFlow(DSSOrchestratorVersion sourceOrchestratorVersion, String username) {
-
-        Long appId = sourceOrchestratorVersion.getAppId();
-        RequestQueryWorkFlow requestQueryWorkFlow = new RequestQueryWorkFlow(username, appId);
-        ResponseQueryWorkflow responseQueryWorkflow = (ResponseQueryWorkflow) workflowSender.ask(requestQueryWorkFlow);
-        Map<String, Object> query = orchestratorCopyEnv.getBmlService().query(username, responseQueryWorkflow.getDssFlow().getResourceId(), responseQueryWorkflow.getDssFlow().getBmlVersion());
-        String flowJson = query.get("string").toString();
-        List<String> workFlowNodesJsonList = DSSCommonUtils.getWorkFlowNodesJson(flowJson);
-        return CollectionUtils.isEmpty(workFlowNodesJsonList);
-
     }
 
     public OrchestratorCopyVo getOrchestratorCopyVo() {

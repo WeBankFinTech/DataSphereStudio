@@ -83,7 +83,7 @@ public class PublishServiceImpl implements PublishService {
                 return null;
             }
             ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
-            projectInfoRequest.setProjectId(dssFlow.getProjectID());
+            projectInfoRequest.setProjectId(dssFlow.getProjectId());
             DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
             if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
                 DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间错误，请切换至正确的工作空间后再发布！", DSSErrorException.class);

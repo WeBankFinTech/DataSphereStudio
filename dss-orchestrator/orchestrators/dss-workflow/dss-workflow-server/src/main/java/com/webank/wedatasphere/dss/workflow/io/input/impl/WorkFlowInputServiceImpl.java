@@ -32,7 +32,6 @@ import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
-import com.webank.wedatasphere.dss.workflow.io.scheduler.NodeImportJob;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
@@ -198,62 +197,6 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
 
     }
 
-
-    private String inputWorkFlowNodes_for_multi_thread(String userName, String projectName, String flowJson,
-                                      DSSFlow dssFlow, String flowPath, Workspace workspace,
-                                      String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
-        List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
-        if (nodeJsonList == null) {
-            throw new DSSErrorException(90073, "工作流内没有工作流节点，导入失败 " + dssFlow.getName());
-        }
-        String updateContextId = workFlowParser.getValueWithKey(flowJson, CSCommonUtils.CONTEXT_ID_STR);
-        if (nodeJsonList.size() == 0) {
-            return flowJson;
-        }
-        List<DSSFlow> subflows = (List<DSSFlow>) dssFlow.getChildren();
-        String workFlowResourceSavePath = flowPath + File.separator + "resource" + File.separator;
-        String appConnResourceSavePath = flowPath + File.separator + "appconn-resource";
-//        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
-        List<Map<String, Object>> nodeJsonListRes = Collections.synchronizedList(new ArrayList<>());
-        CountDownLatch cdl = new CountDownLatch(nodeJsonList.size());
-        AtomicInteger failedCount = new AtomicInteger(0);
-        if (nodeJsonList.size() > 0) {
-            for (String nodeJson : nodeJsonList) {
-                NodeImportJob.ImportJobEntity jobEntity = new NodeImportJob.ImportJobEntity();
-                jobEntity.setDssFlow(dssFlow);
-                jobEntity.setNodeJson(nodeJson);
-                jobEntity.setUserName(userName);
-                jobEntity.setProjectName(projectName);
-                jobEntity.setWorkFlowResourceSavePath(workFlowResourceSavePath);
-                jobEntity.setAppConnResourceSavePath(appConnResourceSavePath);
-                jobEntity.setDssLabels(dssLabels);
-                jobEntity.setWorkspace(workspace);
-                jobEntity.setUpdateContextId(updateContextId);
-                jobEntity.setSubflows(subflows);
-                jobEntity.setOrcVersion(orcVersion);
-                NodeImportJob nodeImportJob = new NodeImportJob();
-                nodeImportJob.setNodeInputService(nodeInputService);
-                nodeImportJob.setJobEntity(jobEntity);
-                nodeImportJob.setFailedCount(failedCount);
-                nodeImportJob.setCountDownLatch(cdl);
-                nodeImportJob.setNodeJsonListRes(nodeJsonListRes);
-                nodeExportThreadPool.submit(nodeImportJob);
-            }
-        }
-        // 用户需要等待所有节点导入完成
-        boolean success = false;
-        try {
-            success = cdl.await(30, TimeUnit.MINUTES);
-        } catch (InterruptedException e) {
-            logger.error("failed to import node for workflow:{}", dssFlow.getName(), e);
-            throw new DSSErrorException(90071, "导入节点超时！");
-        }
-        if (failedCount.get() > 0) {
-            throw new DSSErrorException(90074, "有节点导入失败，请重试！");
-        }
-        return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
-    }
-
     private String uploadFlowResourceToBml(String userName, String flowJson, String flowResourcePath, String projectName) throws IOException {
 
         List<Resource> resourceList = workFlowParser.getWorkFlowResources(flowJson);
@@ -323,7 +266,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         DSSFlow cyFlow = new DSSFlow();
         BeanUtils.copyProperties(dssFlow, cyFlow, "children", "flowVersions");
         //封装flow信息
-        cyFlow.setProjectID(projectId);
+        cyFlow.setProjectId(projectId);
         cyFlow.setCreator(username);
         cyFlow.setCreateTime(new Date());
         cyFlow.setId(null);

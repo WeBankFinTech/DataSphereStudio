@@ -104,7 +104,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                   String schedulerAppConn) throws DSSErrorException, JsonProcessingException {
         DSSFlow dssFlow = new DSSFlow();
         dssFlow.setName(flowName);
-        dssFlow.setProjectID(projectId);
+        dssFlow.setProjectId(projectId);
         dssFlow.setDescription(description);
         dssFlow.setCreator(userName);
         dssFlow.setCreateTime(new Date());
@@ -134,7 +134,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             // TODO 并发问题考虑 for update，由于加了工作流编辑锁，暂时可忽略
             dssFlow.setRank(parentFlow.getRank() + 1);
             dssFlow.setHasSaved(true);
-            dssFlow.setProjectID(parentFlow.getProjectID());
+            dssFlow.setProjectId(parentFlow.getProjectId());
             dssFlow = flowService.addSubFlow(dssFlow, parentFlowId, contextIdStr, orcVersion, schedulerAppConn);
         }
         logger.info("create workflow success. flowId:{}",dssFlow.getId());

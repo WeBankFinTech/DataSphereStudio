@@ -109,7 +109,7 @@ public class NodeInputServiceImpl implements NodeInputService {
         appConnNode.setNodeType(nodeType);
         appConnNode.setJobContent(nodeContent);
         appConnNode.setFlowId(dssFlow.getId());
-        appConnNode.setProjectId(dssFlow.getProjectID());
+        appConnNode.setProjectId(dssFlow.getProjectId());
         appConnNode.setWorkspace(workspace);
         appConnNode.setContextId(flowContextId);
 

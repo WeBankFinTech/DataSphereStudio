@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
@@ -48,6 +49,6 @@ public class ConversionDSSOrchestratorPluginImpl extends AbstractDSSOrchestrator
         requestConvertOrchestrator.setDSSLabels(dssLabels);
         requestConvertOrchestrator.setUserName(userName);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
-        return (ResponseOperateOrchestrator) sender.ask(requestConvertOrchestrator);
+        return RpcAskUtils.processAskException(sender.ask(requestConvertOrchestrator), ResponseOperateOrchestrator.class, RequestConvertOrchestrations.class);
     }
 }

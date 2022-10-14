@@ -11,9 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author enjoyyin
@@ -105,7 +103,8 @@ public class AppConnRefreshThread implements Runnable {
                     || ((StringUtils.isNotEmpty(newOne.getHomepageUri()) || StringUtils.isNotEmpty(otherOne.getHomepageUri()))
                     && !StringUtils.equals(newOne.getHomepageUri(), otherOne.getHomepageUri()))
                     || ((StringUtils.isNotEmpty(newOne.getEnhanceJson()) || MapUtils.isNotEmpty(otherOne.getConfig())) &&
-                    !StringUtils.equals(newOne.getEnhanceJson(), DSSCommonUtils.COMMON_GSON.toJson(otherOne.getConfig())))))
+                    //考虑到enhanceJson中key和value之间含有空格的情况，这里需要比较map而不是map的jsonString，否则由map转换为json时不会再包含空格
+                    !otherOne.getConfig().equals(DSSCommonUtils.COMMON_GSON.fromJson(newOne.getEnhanceJson(), Map.class)))))
             );
         }
     }

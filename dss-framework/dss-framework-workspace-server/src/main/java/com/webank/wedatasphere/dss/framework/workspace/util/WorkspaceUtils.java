@@ -17,9 +17,12 @@
 package com.webank.wedatasphere.dss.framework.workspace.util;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -47,6 +50,11 @@ public class WorkspaceUtils {
         System.out.println(redirectUrlFormat("http://127.0..0.1:8090/qualitis/api/v1/redirect","http://127.0..0.1:8090/#/projects/list?id={projectId}&flow=true"));
     }
 
-
+    public static void validateWorkspace(long workspaceId, HttpServletRequest httpServletRequest) throws DSSErrorException {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        if (workspace.getWorkspaceId() != workspaceId) {
+            throw new DSSErrorException(80001, "请求参数的workspaceId和cookie中的workspaceId不一致，请切换至正确的workspace再操作。");
+        }
+    }
 
 }

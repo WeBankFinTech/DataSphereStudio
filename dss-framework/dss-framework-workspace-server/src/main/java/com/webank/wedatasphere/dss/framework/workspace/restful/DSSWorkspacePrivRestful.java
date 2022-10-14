@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateRoleComponentPrivRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateRoleMenuPrivRequest;
@@ -27,6 +28,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivV
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspacePrivService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
+import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.math3.util.Pair;
@@ -79,10 +81,11 @@ public class DSSWorkspacePrivRestful {
      * @return
      */
     @RequestMapping(path = "updateRoleMenuPriv", method = RequestMethod.POST)
-    public Message updateRoleMenuPriv(@RequestBody UpdateRoleMenuPrivRequest updateRoleMenuPrivRequest) {
+    public Message updateRoleMenuPriv(@RequestBody UpdateRoleMenuPrivRequest updateRoleMenuPrivRequest) throws Exception{
         String updater = SecurityFilter.getLoginUsername(httpServletRequest);
         int menuId = updateRoleMenuPrivRequest.getMenuId();
         int workspaceId = updateRoleMenuPrivRequest.getWorkspaceId();
+        WorkspaceUtils.validateWorkspace(workspaceId, httpServletRequest);
         Map<String, Boolean> menuPrivs = updateRoleMenuPrivRequest.getMenuPrivs();
         List<Pair<Integer, Boolean>> pairs = new ArrayList<>();
         for (String key : menuPrivs.keySet()) {
@@ -100,14 +103,15 @@ public class DSSWorkspacePrivRestful {
     }
 
     @RequestMapping(path ="updateRoleComponentPriv", method = RequestMethod.POST)
-    public Message updateRoleComponentPriv(@RequestBody UpdateRoleComponentPrivRequest updateRoleComponentPrivRequest){
+    public Message updateRoleComponentPriv(@RequestBody UpdateRoleComponentPrivRequest updateRoleComponentPrivRequest)throws DSSErrorException{
         //todo 更新工作空间中角色对于component的权限
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         int appconnId = updateRoleComponentPrivRequest.getComponentId();
         int workspaceId = updateRoleComponentPrivRequest.getWorkspaceId();
-        Map<String,Boolean> componentPrivs = updateRoleComponentPrivRequest.getComponentPrivs();
+        WorkspaceUtils.validateWorkspace(workspaceId, httpServletRequest);
+        Map<String, Boolean> componentPrivs = updateRoleComponentPrivRequest.getComponentPrivs();
         List<Pair<Integer, Boolean>> pairs = new ArrayList<>();
-        for (String key : componentPrivs.keySet()){
+        for (String key : componentPrivs.keySet()) {
             Integer roleId = dssWorkspacePrivService.getRoleId(workspaceId, key);
             if (roleId == null) {
                 roleId = workspaceDBHelper.getRoleIdByName(key);
@@ -115,10 +119,10 @@ public class DSSWorkspacePrivRestful {
             pairs.add(new Pair<Integer, Boolean>(roleId, componentPrivs.get(key)));
         }
         dssWorkspacePrivService.updateRoleComponentPriv(workspaceId, appconnId, username, pairs);
-        String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
-        AuditLogUtils.printLog(username,workspaceId, workspaceName, TargetTypeEnum.WORKSPACE,
-                workspaceId,workspaceName,OperateTypeEnum.UPDATE_ROLE_MENU, updateRoleComponentPrivRequest);
-        return Message.ok().data("updateRoleComponentPriv","更新组件权限成功");
+        String workspaceName = dssWorkspaceService.getWorkspaceName((long) workspaceId);
+        AuditLogUtils.printLog(username, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE,
+                workspaceId, workspaceName, OperateTypeEnum.UPDATE_ROLE_MENU, updateRoleComponentPrivRequest);
+        return Message.ok().data("updateRoleComponentPriv", "更新组件权限成功");
     }
 
     @RequestMapping(path ="updateRoleHomepage", method = RequestMethod.POST)

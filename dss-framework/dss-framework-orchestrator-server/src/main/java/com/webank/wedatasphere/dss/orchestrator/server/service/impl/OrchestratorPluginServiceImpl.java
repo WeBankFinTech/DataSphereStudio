@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -239,8 +240,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         projectInfoRequest.setProjectId(projectId);
         ResponseOperateOrchestrator response;
         try{
-            DSSProject project = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                    .ask(projectInfoRequest);
+            DSSProject project = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                    .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
             response = conversionDSSOrchestratorPlugin.convert(
                     requestConversionOrchestration.getUserName(),
                     project,

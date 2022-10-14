@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
@@ -53,7 +54,8 @@ public class WorkflowRefCopyOperation
                 workflowCopyRequestRef.getWorkspace(), appId, contextIdStr,
                 projectName, version, description, workflowCopyRequestRef.getDSSLabels(),
                 targetProjectId, (String) nodeSuffix.orElse(null), (String) newFlowName.orElse(null));
-        ResponseCopyWorkflow responseCopyWorkflow = (ResponseCopyWorkflow) sender.ask(requestCopyWorkflow);
+        ResponseCopyWorkflow responseCopyWorkflow = RpcAskUtils.processAskException(sender.ask(requestCopyWorkflow),
+                ResponseCopyWorkflow.class, RequestCopyWorkflow.class);
         Map<String, Object> refJobContent = new HashMap<>(2);
         refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCopyWorkflow.getDssFlow().getId());
         refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, responseCopyWorkflow.getDssFlow().getFlowJson());

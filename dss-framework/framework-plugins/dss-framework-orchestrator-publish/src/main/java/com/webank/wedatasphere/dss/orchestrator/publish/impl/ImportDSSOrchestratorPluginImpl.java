@@ -367,7 +367,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private void modifyFlowMeta(List<DSSFlow> dssFlows, String targetOrchestratorName, Long targetProjectId, String flowNodeSuffix) {
         for (DSSFlow dssFlow : dssFlows) {
             dssFlow.setCreateTime(new Date());
-            dssFlow.setProjectID(targetProjectId);
+            dssFlow.setProjectId(targetProjectId);
             if (dssFlow.getChildren() != null) {
                 modifyFlowMeta((List<DSSFlow>) dssFlow.getChildren(), null, targetProjectId, flowNodeSuffix);
             }

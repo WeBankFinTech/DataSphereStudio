@@ -177,10 +177,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Lock
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
-    public DSSFlow addSubFlow(DSSFlow DSSFlow, Long parentFlowID, String contextIDStr, String orcVersion, String schedulerAppConn) throws DSSErrorException {
+    public DSSFlow addSubFlow(DSSFlow dssFlow, Long parentFlowID, String contextIDStr, String orcVersion, String schedulerAppConn) throws DSSErrorException {
         DSSFlow parentFlow = flowMapper.selectFlowByID(parentFlowID);
-        DSSFlow.setProjectID(parentFlow.getProjectID());
-        DSSFlow subFlow = addFlow(DSSFlow, contextIDStr, orcVersion, schedulerAppConn);
+        dssFlow.setProjectId(parentFlow.getProjectId());
+        DSSFlow subFlow = addFlow(dssFlow, contextIDStr, orcVersion, schedulerAppConn);
         //数据库中插入关联信息
         flowMapper.insertFlowRelation(subFlow.getId(), parentFlowID);
         return subFlow;
@@ -425,7 +425,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             cyFlow.setName(newFlowName);
         }
         if (newProjectId != null) {
-            cyFlow.setProjectID(newProjectId);
+            cyFlow.setProjectId(newProjectId);
         }
         if (StringUtils.isNotBlank(subFlowNameSuffix) && !cyFlow.getRootFlow()) {
             cyFlow.setName(cyFlow.getName() + "_" + subFlowNameSuffix);
@@ -627,7 +627,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 oldNode.setWorkspace(workspace);
                 oldNode.setDssLabels(dssLabels);
                 oldNode.setFlowName(dssFlow.getName());
-                oldNode.setProjectId(dssFlow.getProjectID());
+                oldNode.setProjectId(dssFlow.getProjectId());
                 oldNode.setProjectName(projectName);
                 newNode.setName(oldNode.getName());
                 Map<String, Object> jobContent = workflowNodeService.copyNode(userName, newNode, oldNode, version);

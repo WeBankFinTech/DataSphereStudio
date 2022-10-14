@@ -35,6 +35,7 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
@@ -169,9 +170,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         ImmutablePair<OrchestrationService, AppInstance> orchestrationPair = getOrchestrationService(dssOrchestrator, userName, workspace, dssLabels);
         Long refProjectId, refOrchestrationId;
         if (askProjectSender) {
-            ProjectRefIdResponse projectRefIdResponse = (ProjectRefIdResponse) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                    .ask(new ProjectRefIdRequest(orchestrationPair.getValue().getId(), dssOrchestrator.getProjectId()));
-            refProjectId = projectRefIdResponse.getRefProjectId();
+            ProjectRefIdResponse projectRefIdResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                    .ask(new ProjectRefIdRequest(orchestrationPair.getValue().getId(), dssOrchestrator.getProjectId())), ProjectRefIdResponse.class, ProjectRefIdRequest.class);
+           refProjectId = projectRefIdResponse.getRefProjectId();
             refOrchestrationId = null;
         } else {
             DSSOrchestratorRefOrchestration refOrchestration = orchestratorMapper.getRefOrchestrationId(dssOrchestrator.getId());
@@ -358,8 +359,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private DSSProject validateOperation(long projectId, String username) throws DSSOrchestratorErrorException {
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
-        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                .ask(projectInfoRequest);
+        DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
         if (dssProject == null) {
             DSSExceptionUtils.dealErrorException(6003, "工程不存在", DSSOrchestratorErrorException.class);
         }
@@ -370,8 +371,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
     private boolean hasProjectEditPriv(Long projectId, String username) {
-        ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
-                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username));
+        ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username)), ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
         boolean hasEditPriv = false;
         if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
             hasEditPriv = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||

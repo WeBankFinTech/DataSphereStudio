@@ -6,10 +6,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.ResponseImportOrchestrator;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.IoUtils;
-import com.webank.wedatasphere.dss.common.utils.ZipHelper;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
@@ -229,7 +226,8 @@ public class MigrateServiceImpl implements MigrateService {
         RequestImportOrchestrator requestImportOrchestrator =
                 new RequestImportOrchestrator(username, project.getName(),
                         project.getId(), resourceId, version, dssOrchestratorInfo.getName(), dssLabels, workspace);
-        ResponseImportOrchestrator responseImportOrchestrator = (ResponseImportOrchestrator) this.orchestratorSender.ask(requestImportOrchestrator);
+        ResponseImportOrchestrator responseImportOrchestrator = RpcAskUtils.processAskException(this.orchestratorSender.ask(requestImportOrchestrator),
+                ResponseImportOrchestrator.class, RequestImportOrchestrator.class);
         return responseImportOrchestrator.orcId();
     }
 
@@ -259,8 +257,8 @@ public class MigrateServiceImpl implements MigrateService {
     @Override
     public String queryOrcUUIDByName(Long workspaceId, Long projectId, String orcName) throws DSSErrorException {
         String uuid = null;
-        ResponseOrchestratorInfos responseOrchestratorInfos = (ResponseOrchestratorInfos) orchestratorSender
-                .ask(new RequestOrchestratorInfos(null, projectId, orcName, null));
+        ResponseOrchestratorInfos responseOrchestratorInfos = RpcAskUtils.processAskException(orchestratorSender.ask(new RequestOrchestratorInfos(null, projectId, orcName, null)),
+                ResponseOrchestratorInfos.class, RequestOrchestratorInfos.class);
         if (CollectionUtils.isNotEmpty(responseOrchestratorInfos.getOrchestratorInfos())) {
             uuid = responseOrchestratorInfos.getOrchestratorInfos().get(0).getUUID();
         }

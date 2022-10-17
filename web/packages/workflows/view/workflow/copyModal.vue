@@ -102,7 +102,7 @@ export default {
       this.$refs['formRef'].validate(async (valid) => {
         if (valid) {
           try {
-            await this.copyRequest()
+            const res = await this.copyRequest()
             this.$Message.success(this.$t('message.workflow.Copyreq'))
             const targetProj = this.projects.find(it => it.id == this.formState.targetProjectId) || {}
             this.$emit('finish', {
@@ -117,7 +117,8 @@ export default {
                 name: this.formState.sourceProjectName,
                 orchestratorId: this.formState.sourceOrchestratorId,
                 orchestratorName: this.formState.sourceOrchestratorName
-              }
+              },
+              copyJobId: res && res.copyJobId
             })
             this.$emit('_changeVisible', false)
             this.$refs['formRef'].resetFields()

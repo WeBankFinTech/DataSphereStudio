@@ -229,7 +229,10 @@ export default {
         status: [],
       },
       autojoinShow: false,
-      autoJoin: {},
+      autoJoin: {
+        role: [],
+        department: []
+      },
       joinFormRule: {
         department: [
           { required: true, message: this.$t('message.workspaceManagement.addruleMsg'), trigger: "blur" },
@@ -339,15 +342,26 @@ export default {
       }
       this.search();
     },
-    autojoinShowModal() {
-      getAllDepartments().then(res => {
+    async autojoinShowModal() {
+      try {
+        const res = await getAllDepartments()
         this.departments = res ? res.departmentWithOffices || [] : []
-      })
-      this.autojoinShow = true
+        this.autojoinShow = true
+        const info = await api.fetch(`${this.$API_PATH.WORKSPACE_PATH}{$workspaceId}/associateDepartmentsInfo`, {},'get')
+        if(info) {
+          this.autoJoin = {
+            role: Array.isArray(info.roleIds) ? info.roleIds : info.roleIds.split(','),
+            department: Array.isArray(info.departments) ? info.departments : info.departments.split(',')
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      }
+
     },
     saveAutoRoles() {
       const params = {
-        departmentWithOffices: this.autoJoin.departments,
+        departmentWithOffices: this.autoJoin.department,
         roles: this.autoJoin.role,
         workspaceId: this.workspaceId
       }

@@ -17,6 +17,7 @@
       </Select>
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
+      <Button class="margin-right" type="success" @click="transfer">{{ $t('message.scripts.transfer') }}</Button>
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
     </div>
     <div class="table-data">
@@ -106,14 +107,54 @@
         </div>
         <div slot="footer">
           <Button type="text" size="large" @click="Cancel">{{
-            $t("message.workspaceManagement.cancel")
+            $t("message.common.cancel")
           }}</Button>
           <Button type="primary" size="large" @click="confirmSelect">{{
+            confirmModalType == 'delete' ? $t("message.common.ok") : $t("message.common.dss.nextstep")
+          }}</Button>
+        </div>
+      </Modal>
+      <!-- 表属主转移 -->
+      <Modal v-model="showTransferForm" :title="$t('message.scripts.transferTitle')">
+        <Form ref="transferForm" :model="formState" :rules="formRule" :label-width="120">
+          <FormItem :label="$t('message.scripts.transferForm.title')" prop="title">
+            <Input
+              v-model="formState.title"
+            ></Input>
+          </FormItem>
+          <FormItem :label="$t('message.scripts.transferForm.owner')" prop="owner">
+            <Input
+              v-model="formState.owner"
+              :placeholder="$t('message.scripts.transferForm.ownerplaceholder')"
+            ></Input>
+          </FormItem>
+          <FormItem :label="$t('message.scripts.transferForm.admin')" prop="admin">
+            <Input
+              v-model="formState.admin"
+              :placeholder="$t('message.scripts.transferForm.adminplaceholder')"
+            ></Input>
+          </FormItem>
+          <FormItem :label="$t('message.scripts.transferForm.desc')" prop="desc">
+            <Input
+              type="textarea"
+              v-model="formState.desc"
+            ></Input>
+          </FormItem>
+        </Form>
+        <div slot="footer">
+          <Button type="text" size="large" @click="showTransferForm = false">{{
+            $t("message.workspaceManagement.cancel")
+          }}</Button>
+          <Button type="text" size="large" @click="prevStep">{{
+            $t("message.common.dss.prevstep")
+          }}</Button>
+          <Button type="primary" size="large" @click="saveTransfer" :loading="saveTransing">{{
             $t("message.workspaceManagement.ok")
           }}</Button>
         </div>
       </Modal>
     </div>
+    <Spin v-if="loading" fix></Spin>
   </div>
 </template>
 <script>
@@ -176,7 +217,33 @@ export default {
       loading: false,
       tablesName: [],
       isTableOwner: '0',
-      selectAllConfirm: false
+      selectAllConfirm: false,
+      showTransferForm: false,
+      formRule: {
+        title: [{
+          required: true,
+          message: this.$t('message.scripts.transferForm.required'),
+          trigger: 'change',
+        }],
+        owner: [{
+          required: true,
+          message: this.$t('message.scripts.transferForm.required'),
+          trigger: 'change',
+        }],
+        admin: [{
+          required: true,
+          message: this.$t('message.scripts.transferForm.required'),
+          trigger: 'change',
+        }]
+      },
+      formState: {
+        title: '',
+        owner: '',
+        admin: '',
+        desc: ''
+      },
+      confirmModalType: 'delete',
+      saveTransing: false
     }
   },
   methods: {
@@ -234,14 +301,27 @@ export default {
         this.loading = false;
       })
     },
+    // 批量转移
+    transfer() {
+      // this.selectedItems.forEach(item => {
+      //   item.selected = false
+      // });
+      this.confirmModalType = 'transfer'
+      if (this.selectedItems.length) {
+        this.showConfirmModal = true
+      } else {
+        this.$Message.warning({ content: this.$t('message.scripts.checkdelconfirm') });
+      }
+    },
     deleteSome() {
+      this.confirmModalType = 'delete'
       this.selectedItems.forEach(item => {
         item.selected = false
       });
       if (this.selectedItems.length) {
         this.showConfirmModal = true
       } else {
-        this.$Message.warning({ content: this.$t('message.scripts.selectdel') });
+        this.$Message.warning({ content: this.$t('message.scripts.checkdelconfirm') });
       }
     },
     Cancel() {
@@ -249,7 +329,16 @@ export default {
     },
     confirmSelect() {
       const toDeleted = this.selectedItems.filter(item => item.selected)
-      if (toDeleted.length) {
+      if (toDeleted.length < 1) {
+        this.$Message.warning({ content: this.$t('message.scripts.selectdel') });
+        return
+      }
+      if (this.confirmModalType == 'transfer') {
+        // 批量转移
+        this.showTransferForm = true
+        this.showConfirmModal = false
+      } else {
+        // 批量删除
         const code = toDeleted.map(item => `drop ${item.isView ? 'view': 'table'} ${this.dbName}.${item.tableName};`).join('\n')
         const filename = `${this.dbName}_delete_table_${Date.now()}.hql`;
         const md5Path = utils.md5(filename);
@@ -269,9 +358,34 @@ export default {
           });
         });
         this.showConfirmModal = false
-      } else {
-        this.$Message.warning({ content: this.$t('message.scripts.selectdel') });
       }
+    },
+    saveTransfer() {
+      const tbs = this.selectedItems.map(item => item.tableName)
+      const params = {
+        approvalTitle: this.formState.title,
+        dbName: this.dbName,
+        tablesName: tbs,
+        oldOwner: this.tableOwner,
+        newOwner: this.formState.owner,
+        dataGovernanceAdmin: this.formState.admin,
+        description: this.formState.desc
+      }
+      this.$refs.transferForm.validate((valid) => {
+        if (valid) {
+          this.saveTransing = true
+          api.fetch('/dss/datapipe/datasource/transferTablesOwner', params, 'post').then(() => {
+            this.$Message.success(this.$t("message.common.saveSuccess"));
+            this.showTransferForm = false
+          }).finally(() => {
+            this.saveTransing = false
+          });
+        }
+      })
+    },
+    prevStep() {
+      this.showTransferForm = false
+      this.showConfirmModal = true
     },
     changeCheck() {
       this.selectAllConfirm = this.selectedItems.every(it => it.selected)

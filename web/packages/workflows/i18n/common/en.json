@@ -398,6 +398,7 @@
       "PleaseInputName": "Please input name",
       "selcProj": "Please choose project",
       "Copyreq": "Copy request sent successfully",
+      "CopySucceed": "Copy workflow successfully",
       "Project": "Project",
       "AllProj": "All projects",
       "Individual": "Individual projects",

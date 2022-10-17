@@ -28,14 +28,11 @@
         SELECT * FROM `dss_workflow` WHERE id = #{id}
     </select>
 
-
     <insert id="insertFlow" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
         INSERT INTO dss_workflow (<include refid = "flow_main" />)
         VALUES
-        (#{id},#{name},#{state},#{source},#{description},#{createTime},#{creator},#{isRootFlow},#{rank},#{projectID},#{hasSaved},#{uses},#{bmlVersion},#{resourceId},#{linkedAppConnNames},#{dssLabels})
+        (#{id},#{name},#{state},#{source},#{description},#{createTime},#{creator},#{isRootFlow},#{rank},#{projectId},#{hasSaved},#{uses},#{bmlVersion},#{resourceId},#{linkedAppConnNames},#{dssLabels})
     </insert>
-
-
 
     <insert id="insertFlowRelation">
         INSERT INTO dss_workflow_relation (flow_id,parent_flow_id)
@@ -59,10 +56,6 @@
         SELECT fr.flow_id FROM `dss_workflow_relation` fr WHERE fr.parent_flow_id = #{parentFlowID}
     </select>
 
-    <select id="listRootFlowIDsByProjectID" resultType="java.lang.Long">
-        SELECT fr.id FROM `dss_workflow` fr WHERE fr.project_id = #{projectID} and fr.is_root_flow = 1
-    </select>
-
     <delete id="deleteFlowBaseInfo">
         DELETE
         FROM
@@ -84,15 +77,6 @@
             `dss_workflow_relation`
         WHERE
             flow_id = #{flowID}
-    </select>
-
-    <select id="listFlowByProjectID" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
-        SELECT
-        *
-        FROM
-        `dss_workflow`
-        WHERE
-        project_id = #{projectID}
     </select>
 
 
@@ -127,7 +111,7 @@
             <if test="description != null">description=#{description},</if>
             <if test="createTime != null">create_time=#{createTime},</if>
             <if test="creator != null">creator=#{creator},</if>
-            <if test="projectID != null">project_id=#{projectID},</if>
+            <if test="projectId != null">project_id=#{projectId},</if>
             <if test="hasSaved != null">has_saved=#{hasSaved},</if>
             <if test="uses != null">uses=#{uses},</if>
             <if test="resourceId != null">resource_id=#{resourceId},</if>

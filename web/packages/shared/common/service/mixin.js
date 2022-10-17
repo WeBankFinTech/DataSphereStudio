@@ -73,7 +73,7 @@ export default {
           if (info.ifIframe) {
             // 在Iframe
             this.$router.push({
-              path: info.name === 'DmsLineage' ? '/microApp/DmsLineage' : `/commonIframe/${info.name}`,
+              path: info.name === 'DataLineage' ? '/microApp/DmsLineage' : `/commonIframe/${info.name}`,
               query: {
                 ...query,
                 url,

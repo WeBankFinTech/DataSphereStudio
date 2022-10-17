@@ -697,14 +697,7 @@ export default {
     },
     onCopying(data) {
       if (data.source.orchestratorId == this.orchestratorId) {
-        this.locked = true
-        this.$Notice.close('copy_workflow_ing')
-        this.$Notice.info({
-          title: this.$t('message.workflow.Prompt'),
-          desc: this.$t('message.workflow.Copying'),
-          duration: 0,
-          name: 'copy_workflow_ing'
-        });
+        this.locked = !!data.done
       }
     },
     eventFromExt(evt) {

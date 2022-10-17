@@ -1361,22 +1361,56 @@ export default {
     /**
      * 复制请求发送成功后更新左侧项目工作流数据
      * 当前有打开的工作流设置成不可编辑
+     * 轮询进度是否复制完成
      */
-    copySended({target, source}) {
+    copySended({target, source, copyJobId}) {
       this.getFlow({id: target.id, name: target.name}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
         const targetFlow = flows.find(it => it.name === target.orchestratorName) || {}
-        eventbus.emit('workflow.copying', {
+        const sourceTarget = {
           target: {
             ...target,
             orchestratorId: targetFlow.id
           },
-          source
-        })
+          source,
+          copyJobId
+        }
+        eventbus.emit('workflow.copying', sourceTarget)
+        this.$Notice.close('copy_workflow_ing')
+        this.$Notice.info({
+          title: this.$t('message.workflow.Prompt'),
+          desc: this.$t('message.workflow.Copying'),
+          duration: 0,
+          name: 'copy_workflow_ing'
+        });
+        // 复制状态
+        this.checkCopyStatus(sourceTarget)
       });
+    },
+    checkCopyStatus(sourceTarget) {
+      api
+        .fetch(
+          `${this.$API_PATH.ORCHESTRATOR_PATH}getAllProjects/${sourceTarget.copyJobId}/copyInfo`,
+          {
+          },
+          "get"
+        )
+        .then((res) => {
+          if (res.orchestratorCopyInfo && res.orchestratorCopyInfo.isCopying) {
+            clearTimeout(this.checkStatusTimer)
+            this.checkStatusTimer = setTimeout(()=>{
+              this.checkCopyStatus(sourceTarget)
+            },3000)
+          } else {
+            eventbus.emit('workflow.copying', {...sourceTarget, done: true})
+            this.$Notice.close('copy_workflow_ing')
+            this.$Message.success(this.$t('message.workflow.CopySucceed'))
+          }
+        });
     }
   },
   beforeDestroy() {
+    clearTimeout(this.checkStatusTimer)
     window.removeEventListener('resize', this.resize);
   }
 };

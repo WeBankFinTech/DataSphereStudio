@@ -273,7 +273,10 @@
         "admin": "Adminstrators：",
         "status": "Status：",
         "desc": "Description：",
-        "workspaceType": "Workspace Type："
+        "workspaceType": "Workspace Type：",
+        "adminviewall": "Admin user can view all projects in workspace",
+        "yes": "Yes",
+        "no": "No"
       },
       "JdbcUrlFormat": "please enter URL such as jdbc:mysql://ServerIP:Port/Database"
     },

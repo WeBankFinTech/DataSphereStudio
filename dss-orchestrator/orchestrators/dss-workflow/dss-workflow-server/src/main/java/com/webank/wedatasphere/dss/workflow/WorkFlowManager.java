@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestSubFlowContextIds;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseSubFlowContextIds;
+import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUnlockWorkflow;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
 import org.apache.linkis.common.exception.ErrorException;
 
@@ -93,6 +94,8 @@ public interface WorkFlowManager {
 
     void deleteWorkflow(String userName,
                         Long flowID) throws DSSErrorException;
+
+    ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete) throws DSSErrorException;
 
     /**
      * 导出工作流

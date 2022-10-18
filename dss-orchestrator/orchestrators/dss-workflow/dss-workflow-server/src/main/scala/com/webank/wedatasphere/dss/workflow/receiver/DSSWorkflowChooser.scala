@@ -19,8 +19,9 @@ package com.webank.wedatasphere.dss.workflow.receiver
 import com.webank.wedatasphere.dss.common.protocol.{RequestDeleteWorkflow, RequestExportWorkflow, RequestQueryWorkFlow, RequestUpdateWorkflow}
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
-import com.webank.wedatasphere.dss.workflow.common.protocol.{RequestCopyWorkflow, RequestCreateWorkflow, RequestDeleteBmlSource, RequestImportWorkflow, RequestSubFlowContextIds}
+import com.webank.wedatasphere.dss.workflow.common.protocol.{RequestCopyWorkflow, RequestCreateWorkflow, RequestDeleteBmlSource, RequestImportWorkflow, RequestSubFlowContextIds, RequestUnlockWorkflow}
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
+
 import javax.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -45,6 +46,7 @@ class DSSWorkflowChooser extends ReceiverChooser {
     case _: RequestImportWorkflow => receiver
     case _: RequestCopyWorkflow => receiver
     case _: RequestQueryWorkFlow => receiver
+    case _: RequestUnlockWorkflow => receiver
     case _: RequestConvertOrchestrations => receiver
     case _: RequestSubFlowContextIds => receiver
     case _: RequestDeleteBmlSource => receiver

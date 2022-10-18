@@ -30,6 +30,7 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.*;
@@ -90,7 +91,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Autowired
     private OrchestratorMapper orchestratorMapper;
     @Autowired
-    private OrchestratorService newOrchestratorService;
+    private OrchestratorService orchestratorService;
     @Autowired
     private OrchestratorManager orchestratorManager;
     @Autowired
@@ -118,7 +119,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     public CommonOrchestratorVo createOrchestrator(String username, OrchestratorCreateRequest orchestratorCreateRequest,
                                                    Workspace workspace) throws Exception {
         //是否存在相同的编排名称
-        newOrchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
+        orchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorCreateRequest.getProjectId(), username);
         //1.创建编排实体bean
@@ -148,7 +149,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 OrchestrationService::getOrchestrationCreationOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationCreationOperation) structureOperation)
                         .createOrchestration((DSSOrchestrationContentRequestRef) structureRequestRef), "create");
-        OrchestratorVo orchestratorVo = newOrchestratorService.createOrchestrator(username, workspace, dssProject.getName(),
+        OrchestratorVo orchestratorVo = orchestratorService.createOrchestrator(username, workspace, dssProject.getName(),
                 dssOrchestratorInfo.getProjectId(), dssOrchestratorInfo.getDesc(), dssOrchestratorInfo, dssLabels);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
         Long orchestratorVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
@@ -211,7 +212,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
         //是否存在相同的编排名称 //todo 返回orchestratorInfo而不是id
-        Long orchestratorId = newOrchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest);
+        Long orchestratorId = orchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest);
         LOGGER.info("{} begins to update a orchestrator {}.", username, orchestratorModifyRequest.getOrchestratorName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorModifyRequest.getLabels().getRoute()));
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorModifyRequest.getOrchestratorMode());
@@ -236,7 +237,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 OrchestrationService::getOrchestrationUpdateOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
                         .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
-        newOrchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
+        orchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
         //3.将工程和orchestrator的关系存储到的数据库中
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         orchestratorVo.setOrchestratorId(orchestratorId);
@@ -257,10 +258,23 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                             .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
         }
 
-        newOrchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
+        orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
-        orchestratorVo.setOrchestratorVersion(orchestratorInfo.getOrchestratorLevel());
+        orchestratorVo.setOrchestratorName(orchestratorInfo.getName());
+        orchestratorVo.setOrchestratorId(orchestratorInfo.getId());
+        return orchestratorVo;
+    }
+
+    @Override
+    public CommonOrchestratorVo unlockOrchestrator(String username, Workspace workspace, OrchestratorUnlockRequest request) throws DSSErrorException {
+        //编辑权限校验
+        DSSProject dssProject = validateOperation(request.getProjectId(), username);
+        DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(request.getId());
+        LOGGER.info("{} begins to unlock orchestrator {}.", username, orchestratorInfo.getName());
+        List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(request.getLabels().getRoute()));
+        orchestratorService.unlockOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), request.getConfirmDelete(), dssLabels);
+        CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         orchestratorVo.setOrchestratorName(orchestratorInfo.getName());
         orchestratorVo.setOrchestratorId(orchestratorInfo.getId());
         return orchestratorVo;
@@ -269,7 +283,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Override
     public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
         //校验编排名是可用
-        newOrchestratorService.isExistSameNameBeforeCreate(workspace.getWorkspaceId(), orchestratorCopyRequest.getTargetProjectId(), orchestratorCopyRequest.getTargetOrchestratorName());
+        orchestratorService.isExistSameNameBeforeCreate(workspace.getWorkspaceId(), orchestratorCopyRequest.getTargetProjectId(), orchestratorCopyRequest.getTargetOrchestratorName());
         //判断用户对项目是否有权限
         DSSProject sourceProject = validateOperation(orchestratorCopyRequest.getSourceProjectId(), username);
         DSSProject targetProject = validateOperation(orchestratorCopyRequest.getTargetProjectId(), username);

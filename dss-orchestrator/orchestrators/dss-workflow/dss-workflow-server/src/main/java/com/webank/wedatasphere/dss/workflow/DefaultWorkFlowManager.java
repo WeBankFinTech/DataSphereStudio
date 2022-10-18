@@ -44,11 +44,15 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestSubFlowContextIds;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseSubFlowContextIds;
+import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUnlockWorkflow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
@@ -89,6 +93,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     private MetaInputService metaInputService;
     @Autowired
     private WorkFlowParser workFlowParser;
+    @Autowired
+    private LockMapper lockMapper;
 
     @Override
     public DSSFlow createWorkflow(String userName,
@@ -175,6 +181,18 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             throw new DSSErrorException(100088, "Workflow can not be deleted unless the owner.");
         }
         logger.info("delete workflow success. flowId:{}",flowId);
+    }
+
+    @Override
+    public ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete) throws DSSErrorException {
+        DSSFlowEditLock editLock = lockMapper.getFlowEditLockByID(flowId);
+        if (editLock == null) {
+            return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NONEED_UNLOCK, null);
+        } else if (!Boolean.TRUE.equals(confirmDelete)) {
+            return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NEED_SECOND_CONFIRM, editLock.getUsername());
+        }
+        DSSFlowEditLockManager.deleteLock(editLock.getLockContent());
+        return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.UNLOCK_SUCCESS, null);
     }
 
     @Override

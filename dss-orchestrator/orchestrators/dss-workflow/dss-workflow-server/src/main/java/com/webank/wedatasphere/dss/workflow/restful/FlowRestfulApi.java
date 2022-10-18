@@ -97,7 +97,7 @@ public class FlowRestfulApi {
         // TODO: 2019/5/23 flowName工程名下唯一校验
         String name = addFlowRequest.getName();
         Long parentFlowID = addFlowRequest.getParentFlowID();
-        // 判断parentFlowID中是否已存在名称未name的subflow
+        // 判断parentFlowID中是否已存在名称为name的subflow
         if (flowService.checkExistSameSubflow(parentFlowID, name)){
             return Message.error("子工作流名不能重复");
         }

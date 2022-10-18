@@ -395,7 +395,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public boolean checkExistSameSubflow(Long parentFlowID, String name) {
         List<String> subflowName = flowMapper.getSubflowName(parentFlowID);
-        return subflowName.stream().anyMatch(s -> s.equals(name));
+        List<String> newSubflowName = subflowName.stream().filter(s -> !s.equals(name)).collect(Collectors.toList());
+        return newSubflowName.stream().anyMatch(s -> s.equals(name));
     }
 
     @Override

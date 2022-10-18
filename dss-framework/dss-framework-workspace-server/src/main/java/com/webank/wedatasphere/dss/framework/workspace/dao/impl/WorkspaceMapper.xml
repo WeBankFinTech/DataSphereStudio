@@ -60,7 +60,8 @@
         source,
         last_update_time,
         last_update_user,
-        workspace_type
+        workspace_type,
+        admin_permission
         FROM
         dss_workspace WHERE id = #{workspaceId}
     </select>

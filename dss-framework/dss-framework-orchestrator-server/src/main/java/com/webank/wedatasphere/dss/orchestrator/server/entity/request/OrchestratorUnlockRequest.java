@@ -23,6 +23,9 @@ public class OrchestratorUnlockRequest extends OrchestratorRequest {
     @NotNull(message = "id不能为空")
     private Long id;
 
+    /**
+     * 是否确认解锁
+     */
     private Boolean confirmDelete;
 
     public Long getId() {

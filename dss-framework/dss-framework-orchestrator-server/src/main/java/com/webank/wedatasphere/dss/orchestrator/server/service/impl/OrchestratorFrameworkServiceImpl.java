@@ -53,6 +53,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.job.OrchestratorCopyEnv;
 import com.webank.wedatasphere.dss.orchestrator.server.job.OrchestratorCopyJob;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
@@ -267,17 +268,17 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
     @Override
-    public CommonOrchestratorVo unlockOrchestrator(String username, Workspace workspace, OrchestratorUnlockRequest request) throws DSSErrorException {
+    public OrchestratorUnlockVo unlockOrchestrator(String username, Workspace workspace, OrchestratorUnlockRequest request) throws DSSErrorException {
         //编辑权限校验
         DSSProject dssProject = validateOperation(request.getProjectId(), username);
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(request.getId());
         LOGGER.info("{} begins to unlock orchestrator {}.", username, orchestratorInfo.getName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(request.getLabels().getRoute()));
-        orchestratorService.unlockOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), request.getConfirmDelete(), dssLabels);
-        CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
-        orchestratorVo.setOrchestratorName(orchestratorInfo.getName());
-        orchestratorVo.setOrchestratorId(orchestratorInfo.getId());
-        return orchestratorVo;
+        OrchestratorUnlockVo orchestratorUnlockVo = orchestratorService.unlockOrchestrator(username, workspace,
+                dssProject.getName(), orchestratorInfo.getId(), request.getConfirmDelete(), dssLabels);
+        orchestratorUnlockVo.setOrchestratorName(orchestratorInfo.getName());
+        orchestratorUnlockVo.setOrchestratorId(orchestratorInfo.getId());
+        return orchestratorUnlockVo;
     }
 
     @Override

@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLeve
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -184,10 +185,12 @@ public class DSSFrameworkOrchestratorRestful {
     public Message unlockOrchestrator(@RequestBody OrchestratorUnlockRequest unlockRequest) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.unlockOrchestrator(username, workspace, unlockRequest);
+        OrchestratorUnlockVo orchestratorVo = orchestratorFrameworkService.unlockOrchestrator(username, workspace, unlockRequest);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
                 orchestratorVo.getOrchestratorId(), orchestratorVo.getOrchestratorName(), OperateTypeEnum.DELETE, unlockRequest);
-        return Message.ok("解锁成功");
+        return Message.ok().data("status", orchestratorVo.getStatus())
+                .data("confirmMessage", orchestratorVo.getConfirmMessage())
+                .data("lockOwner", orchestratorVo.getLockOwner());
     }
 
     /**

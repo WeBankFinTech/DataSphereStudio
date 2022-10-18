@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchestr
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
@@ -77,13 +78,14 @@ public interface OrchestratorService {
      * @param confirmDelete 是否确认删除编辑锁
      * @param dssLabels
      * @throws DSSErrorException
+     * @return
      */
-    public void unlockOrchestrator(String userName,
-                                   Workspace workspace,
-                                   String projectName,
-                                   Long orchestratorInfoId,
-                                   Boolean confirmDelete,
-                                   List<DSSLabel> dssLabels) throws DSSErrorException;
+    OrchestratorUnlockVo unlockOrchestrator(String userName,
+                                                   Workspace workspace,
+                                                   String projectName,
+                                                   Long orchestratorInfoId,
+                                                   Boolean confirmDelete,
+                                                   List<DSSLabel> dssLabels) throws DSSErrorException;
 
     /**
      * 返回一个编排，包含编排的基本信息和最新版本信息

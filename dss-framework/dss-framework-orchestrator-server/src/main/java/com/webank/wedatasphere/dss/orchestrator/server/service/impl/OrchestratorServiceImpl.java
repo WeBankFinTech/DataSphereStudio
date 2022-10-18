@@ -48,6 +48,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorC
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.*;
@@ -234,12 +235,12 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    public void unlockOrchestrator(String userName,
-                                   Workspace workspace,
-                                   String projectName,
-                                   Long orchestratorInfoId,
-                                   Boolean confirmDelete,
-                                   List<DSSLabel> dssLabels) throws DSSErrorException {
+    public OrchestratorUnlockVo unlockOrchestrator(String userName,
+                                                   Workspace workspace,
+                                                   String projectName,
+                                                   Long orchestratorInfoId,
+                                                   Boolean confirmDelete,
+                                                   List<DSSLabel> dssLabels) throws DSSErrorException {
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorInfoId);
         if (null == dssOrchestratorInfo) {
             LOGGER.error("Not exists orchestration {} in project {}.", orchestratorInfoId, projectName);
@@ -257,12 +258,13 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 DSSExceptionUtils.dealErrorException(62001, String.format("解锁失败，当前工作流未被锁定：%s", dssOrchestratorInfo.getName()), DSSErrorException.class);
             case ResponseUnlockWorkflow.NEED_SECOND_CONFIRM:
                 String lockOwner = responseUnlockWorkflow.getLockOwner();
-                DSSExceptionUtils.dealErrorException(62002, String.format("当前工作流已被%s锁定编辑，强制解锁工作流会导致%s已编辑的内容无法保存，请与%s确认后再解锁工作流。",
-                        lockOwner, lockOwner, lockOwner), DSSErrorException.class);
+                String confirmMsg = String.format("当前工作流已被%s锁定编辑，强制解锁工作流会导致%s已编辑的内容无法保存，请与%s确认后再解锁工作流。", lockOwner, lockOwner, lockOwner);
+                return new OrchestratorUnlockVo(lockOwner, confirmMsg, 1);
             case ResponseUnlockWorkflow.UNLOCK_SUCCESS:
-                return;
+                return new OrchestratorUnlockVo(null, "解锁成功", 0);
             default:
                 DSSExceptionUtils.dealErrorException(62003, "unknown unlockStatus", DSSErrorException.class);
+                return null;
         }
     }
 

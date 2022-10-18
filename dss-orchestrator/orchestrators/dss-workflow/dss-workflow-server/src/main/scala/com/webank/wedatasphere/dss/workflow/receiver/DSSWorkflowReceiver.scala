@@ -55,6 +55,9 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       workflowManager.deleteWorkflow(reqDeleteFlow.userName, reqDeleteFlow.flowID)
       new ResponseDeleteWorkflow(JobStatus.Success)
 
+    case reqUnlockWorkflow: RequestUnlockWorkflow =>
+      workflowManager.unlockWorkflow(reqUnlockWorkflow.getUsername, reqUnlockWorkflow.getFlowId, reqUnlockWorkflow.getConfirmDelete)
+
     case reqExportFlow: RequestExportWorkflow =>
       val dssExportFlowResource: BmlResource = workflowManager.exportWorkflow(
         reqExportFlow.userName,

@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
 
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
@@ -69,6 +70,20 @@ public interface OrchestratorService {
                             Long orchestratorInfoId,
                             List<DSSLabel> dssLabels) throws Exception;
 
+    /**
+     * 解锁编排对应的工作流
+     *
+     * @param orchestratorInfoId 编排id
+     * @param confirmDelete 是否确认删除编辑锁
+     * @param dssLabels
+     * @throws DSSErrorException
+     */
+    public void unlockOrchestrator(String userName,
+                                   Workspace workspace,
+                                   String projectName,
+                                   Long orchestratorInfoId,
+                                   Boolean confirmDelete,
+                                   List<DSSLabel> dssLabels) throws DSSErrorException;
 
     /**
      * 返回一个编排，包含编排的基本信息和最新版本信息

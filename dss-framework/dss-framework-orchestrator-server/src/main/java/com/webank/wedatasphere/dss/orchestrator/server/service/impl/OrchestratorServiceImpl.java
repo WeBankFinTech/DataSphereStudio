@@ -60,10 +60,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestDeleteBmlSource;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseDeleteBmlSource;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseSubFlowContextIds;
+import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
@@ -234,6 +231,39 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             orchestratorMapper.deleteOrchestratorVersion(dssOrchestratorVersion.getId());
         });
         orchestratorMapper.deleteOrchestrator(orchestratorInfoId);
+    }
+
+    @Override
+    public void unlockOrchestrator(String userName,
+                                   Workspace workspace,
+                                   String projectName,
+                                   Long orchestratorInfoId,
+                                   Boolean confirmDelete,
+                                   List<DSSLabel> dssLabels) throws DSSErrorException {
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorInfoId);
+        if (null == dssOrchestratorInfo) {
+            LOGGER.error("Not exists orchestration {} in project {}.", orchestratorInfoId, projectName);
+            DSSExceptionUtils.dealErrorException(61123,
+                    String.format("Not exists orchestration %s in project %s.", orchestratorInfoId, projectName), DSSErrorException.class);
+        }
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorInfoId, VALID_FLAG);
+        LOGGER.info("user {} try to unlock the project {} 's orchestration(such as DSS workflow) {} of orchestrator {} in version {}.",
+                userName, projectName, dssOrchestratorVersion.getAppId(), dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion());
+        RequestUnlockWorkflow requestUnlockWorkflow = new RequestUnlockWorkflow(userName, dssOrchestratorVersion.getAppId(), confirmDelete);
+        ResponseUnlockWorkflow responseUnlockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getWorkflowSender(dssLabels).ask(requestUnlockWorkflow), ResponseUnlockWorkflow.class, RequestUnlockWorkflow.class);
+        switch (responseUnlockWorkflow.getUnlockStatus()) {
+            case ResponseUnlockWorkflow.NONEED_UNLOCK:
+                DSSExceptionUtils.dealErrorException(62001, String.format("解锁失败，当前工作流未被锁定：%s", dssOrchestratorInfo.getName()), DSSErrorException.class);
+            case ResponseUnlockWorkflow.NEED_SECOND_CONFIRM:
+                String lockOwner = responseUnlockWorkflow.getLockOwner();
+                DSSExceptionUtils.dealErrorException(62002, String.format("当前工作流已被%s锁定编辑，强制解锁工作流会导致%s已编辑的内容无法保存，请与%s确认后再解锁工作流。",
+                        lockOwner, lockOwner, lockOwner), DSSErrorException.class);
+            case ResponseUnlockWorkflow.UNLOCK_SUCCESS:
+                return;
+            default:
+                DSSExceptionUtils.dealErrorException(62003, "unknown unlockStatus", DSSErrorException.class);
+        }
     }
 
     @Override

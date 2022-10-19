@@ -15,6 +15,7 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.server.Message;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.slf4j.Logger;
 
 /**
  * @author enjoyyin
@@ -30,7 +32,7 @@ import java.util.function.Function;
  */
 @Component
 public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
-
+    private static final Logger LOGGER= LoggerFactory.getLogger(ProxyUserProjectHttpRequestHook.class);
     @Autowired
     private DSSProjectService dssProjectService;
     @Autowired
@@ -44,6 +46,7 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
         try {
             proxyUser = dssProxyUserService.getProxyUser(request);
         } catch (DSSProxyUserErrorException e) {
+            LOGGER.error("getProxyUser failed.",e);
             return Message.error(e.getMessage());
         }
         return function.apply(proxyUser);

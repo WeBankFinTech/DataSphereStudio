@@ -42,7 +42,7 @@ export default {
     },
     handleOk () {
       if (this.proxyUser!== this.baseInfo.proxyUserName) {
-        api.fetch(`/dss/scriptis/proxy/addUserCookie`, {
+        api.fetch(`/dss/scriptis/proxy/setProxyUser`, {
           userName: this.baseInfo.username,
           proxyUserName: this.proxyUser
         }, 'post').then(() => {

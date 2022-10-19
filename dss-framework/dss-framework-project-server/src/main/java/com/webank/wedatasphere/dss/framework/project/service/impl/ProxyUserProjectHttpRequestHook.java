@@ -20,9 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 
 /**
@@ -46,6 +49,8 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
         try {
             proxyUser = dssProxyUserService.getProxyUser(request);
         } catch (DSSProxyUserErrorException e) {
+            LOGGER.error("getProxyUser Failed,cookie is :{}", Arrays.stream(request.getCookies())
+                    .map(cookie->String.format("%s=%s",cookie.getName(),cookie.getValue())).collect(Collectors.joining(",")));
             LOGGER.error("getProxyUser failed.",e);
             return Message.error(e.getMessage());
         }

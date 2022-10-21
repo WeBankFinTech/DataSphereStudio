@@ -64,10 +64,11 @@ class ProjectReceiver(projectService: DSSProjectService,
       case projectInfoRequest: ProjectInfoRequest =>
         val dssProjectDO: DSSProjectDO = projectService.getProjectById(projectInfoRequest.getProjectId)
         val projectInfoVo: ProjectInfoVo = projectService.getProjectInfoById(projectInfoRequest.getProjectId)
-        val DSSProject = new DSSProject()
-        BeanUtils.copyProperties(dssProjectDO, DSSProject)
-        DSSProject.setWorkspaceName(projectInfoVo.getWorkspaceName)
-        DSSProject
+        val dssProject = new DSSProject()
+        BeanUtils.copyProperties(dssProjectDO, dssProject)
+        dssProject.setWorkspaceId(dssProjectDO.getWorkspaceId.intValue())
+        dssProject.setWorkspaceName(projectInfoVo.getWorkspaceName)
+        dssProject
 
       case projectUserAuthRequest: ProjectUserAuthRequest =>
         val projectId = projectUserAuthRequest.getProjectId

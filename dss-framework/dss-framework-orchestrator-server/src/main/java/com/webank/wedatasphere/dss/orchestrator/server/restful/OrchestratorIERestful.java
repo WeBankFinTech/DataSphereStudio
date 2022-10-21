@@ -67,7 +67,14 @@ public class OrchestratorIERestful {
                                   @RequestParam(required = false, name = "projectName") String projectName,
                                   @RequestParam(required = false, name = "projectID") Long projectID,
                                   @RequestParam(required = false, name = "labels") String labels,
-                                  @RequestParam(required = false, name = "file") List<MultipartFile> files) throws DSSErrorException, Exception {
+                                  @RequestParam(required = false, name = "packageFile") List<MultipartFile> packageFile,
+                                  @RequestParam(required = false, name = "packageUri") List<MultipartFile> packageUri) throws Exception {
+        List<MultipartFile> files;
+        if (packageFile != null) {
+            files = packageFile;
+        } else {
+            files = packageUri;
+        }
         if (null == files || files.size() == 0) {
             throw new DSSErrorException(100788, "Import orchestrator failed for files is empty");
         }

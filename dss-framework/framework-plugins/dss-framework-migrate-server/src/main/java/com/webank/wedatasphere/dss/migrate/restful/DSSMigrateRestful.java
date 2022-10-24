@@ -36,6 +36,7 @@ import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflo
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
+import io.protostuff.Rpc;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.common.exception.LinkisException;
@@ -371,16 +372,19 @@ public class DSSMigrateRestful {
         ResponseExportOrchestrator exportResponse = null;
         OrchestratorVo orchestratorVo;
         if (orcVersionId != null) {
-            orchestratorVo = (OrchestratorVo) orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, orcVersionId));
+            orchestratorVo = RpcAskUtils.processAskException(orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, orcVersionId)),
+                    OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         } else {
-            orchestratorVo = (OrchestratorVo) orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, null));
+            orchestratorVo = RpcAskUtils.processAskException(orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, null)),
+                    OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         }
         orcVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
         LOG.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
             RequestExportOrchestrator requestExportOrchestrator = new RequestExportOrchestrator(
                     userName, orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace);
-            exportResponse = (ResponseExportOrchestrator) orchestratorSender.ask(requestExportOrchestrator);
+            exportResponse = RpcAskUtils.processAskException(orchestratorSender.ask(requestExportOrchestrator),
+                    ResponseExportOrchestrator.class, RequestExportOrchestrator.class);
         } catch (Exception e) {
             LOG.error("export orchestrator failed for ", e);
             throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());
@@ -537,19 +541,17 @@ public class DSSMigrateRestful {
         requestOrchestratorVersion.setProjectId(projectId);
         requestOrchestratorVersion.setOrchestratorId(orcId);
         requestOrchestratorVersion.setUsername(userName);
-        ResponseOrchetratorVersion orchetratorVersion = (ResponseOrchetratorVersion) orchestratorSender.ask(requestOrchestratorVersion);
-        DSSOrchestratorVersion orchestratorLatestVersion = orchetratorVersion.getOrchestratorVersions().stream()
-                .filter((v) -> v.getValidFlag() == 1).sorted(new Comparator<DSSOrchestratorVersion>() {
-                    @Override
-                    public int compare(DSSOrchestratorVersion o1, DSSOrchestratorVersion o2) {
-                        // 注意是逆序
-                        if (o1.getVersion().compareToIgnoreCase(o2.getVersion()) < 0) {
-                            return 1;
-                        } else if (o1.getVersion().compareToIgnoreCase(o2.getVersion()) == 0) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
+        ResponseOrchetratorVersion orchestratorVersion = RpcAskUtils.processAskException(orchestratorSender.ask(requestOrchestratorVersion),
+                ResponseOrchetratorVersion.class, RequestOrchestratorVersion.class);
+        DSSOrchestratorVersion orchestratorLatestVersion = orchestratorVersion.getOrchestratorVersions().stream()
+                .filter((v) -> v.getValidFlag() == 1).sorted((o1, o2) -> {
+                    // 注意是逆序
+                    if (o1.getVersion().compareToIgnoreCase(o2.getVersion()) < 0) {
+                        return 1;
+                    } else if (o1.getVersion().compareToIgnoreCase(o2.getVersion()) == 0) {
+                        return 0;
+                    } else {
+                        return -1;
                     }
                 }).findFirst().get();
         return orchestratorLatestVersion;
@@ -557,7 +559,8 @@ public class DSSMigrateRestful {
 
     private String getLatestFlowBmlVersion(String username, long flowId) {
         RequestQueryWorkFlow requestQueryWorkFlow = new RequestQueryWorkFlow(username, flowId);
-        ResponseQueryWorkflow responseQueryWorkflow = (ResponseQueryWorkflow) workflowSender.ask(requestQueryWorkFlow);
+        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(workflowSender.ask(requestQueryWorkFlow),
+                ResponseQueryWorkflow.class, RequestQueryWorkFlow.class);
         if (null != responseQueryWorkflow && null != responseQueryWorkflow.getDssFlow()) {
             return responseQueryWorkflow.getDssFlow().getBmlVersion();
         } else {
@@ -613,7 +616,8 @@ public class DSSMigrateRestful {
         if (StringUtils.isBlank(requestOrchestratorInfos.getOrchestratorMode())) {
             requestOrchestratorInfos.setOrchestratorMode(DEFAULT_PROJECT_ORCHESTRATOR_MODE);
         }
-        ResponseOrchestratorInfos responseOrchestratorInfos = (ResponseOrchestratorInfos) orchestratorSender.ask(requestOrchestratorInfos);
+        ResponseOrchestratorInfos responseOrchestratorInfos = RpcAskUtils.processAskException(orchestratorSender.ask(requestOrchestratorInfos),
+                ResponseOrchestratorInfos.class, RequestOrchestratorInfos.class);
         int count = 0;
         if (CollectionUtils.isNotEmpty(responseOrchestratorInfos.getOrchestratorInfos())) {
             for (DSSOrchestratorInfo orchestratorInfo : responseOrchestratorInfos.getOrchestratorInfos()) {
@@ -625,7 +629,8 @@ public class DSSMigrateRestful {
                 requestOrchestratorVersion.setProjectId(orchestratorInfo.getProjectId());
                 ResponseOrchetratorVersion responseOrchetratorVersion = null;
                 try {
-                    responseOrchetratorVersion = (ResponseOrchetratorVersion) orchestratorSender.ask(requestOrchestratorVersion);
+                    responseOrchetratorVersion = RpcAskUtils.processAskException(orchestratorSender.ask(requestOrchestratorVersion),
+                            ResponseOrchetratorVersion.class, RequestOrchestratorVersion.class);
                 } catch (Exception e) {
                     DSSExceptionUtils.dealErrorException(60015, "Ask orchestrotor version failed " + BDPJettyServerHelper.gson().toJson(requestOrchestratorVersion), e,
                             DSSErrorException.class);
@@ -665,7 +670,7 @@ public class DSSMigrateRestful {
                 projectName, labels, addOrcVersion, workspace);
         ResponseExportOrchestrator exportResponse = null;
         try {
-            exportResponse = (ResponseExportOrchestrator) orchestratorSender.ask(exportRequest);
+            exportResponse = RpcAskUtils.processAskException(orchestratorSender.ask(exportRequest), ResponseExportOrchestrator.class, RequestExportOrchestrator.class);
         } catch (Exception e) {
             DSSExceptionUtils.dealErrorException(60015, "export orchestrator ref failed " + BDPJettyServerHelper.gson().toJson(exportRequest), e,
                     DSSErrorException.class);

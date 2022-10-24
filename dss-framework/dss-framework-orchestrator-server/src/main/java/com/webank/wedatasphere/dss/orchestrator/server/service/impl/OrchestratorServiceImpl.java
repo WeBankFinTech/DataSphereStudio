@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthReques
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
@@ -409,8 +410,9 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         List<OrchestratorBaseInfo> retList = new ArrayList<>(list.size());
         if (!CollectionUtils.isEmpty(list)) {
             //todo Is used in front-end?
-            ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
-                    .getProjectServerSender().ask(new ProjectUserAuthRequest(orchestratorRequest.getProjectId(), username));
+            ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                    .getProjectServerSender().ask(new ProjectUserAuthRequest(orchestratorRequest.getProjectId(), username)),
+                    ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
             boolean isReleasable = false, isEditable = false;
             if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
                 isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
@@ -464,7 +466,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 List<DSSLabel> dssLabels = Lists.newArrayList(new EnvDSSLabel(OrchestratorConf.DSS_CS_CLEAR_ENV.getValue()));
                 Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
                 List<Long> workflowIdList = historyOrcVersionList.stream().map(orcInfo -> orcInfo.getAppId()).collect(Collectors.toList());
-                ResponseSubFlowContextIds response = (ResponseSubFlowContextIds) sender.ask(new RequestSubFlowContextIds(workflowIdList));
+                ResponseSubFlowContextIds response = RpcAskUtils.processAskException(sender.ask(new RequestSubFlowContextIds(workflowIdList)),
+                        ResponseSubFlowContextIds.class, RequestSubFlowContextIds.class);
                 if (response != null) {
                     List<String> subContextIdList = response.getContextIdList();
                     if (subContextIdList != null && subContextIdList.size() > 0) {

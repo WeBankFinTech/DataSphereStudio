@@ -171,22 +171,26 @@
     <!-- flow 基础属性 -->
     <Modal v-model="baseprop.show" :footer-hide="true" class="prop-modal" :title="$t('message.workflow.Essential')">
       <div class="prop-item">
-        <span class="label-prop"> 创建用户；</span> {{ baseprop.createUser }}
+        <span class="label-prop">  {{$t('message.workflow.CreateUser') }}</span> {{ baseprop.createUser }}
       </div>
       <div class="prop-item">
-        <span class="label-prop"> 创建时间；</span> {{ baseprop.createTime | formatDate }}
+        <span class="label-prop"> {{$t('message.workflow.CreateTime') }}</span> {{ baseprop.createTime | formatDate }}
       </div>
       <div class="prop-item">
-        <span class="label-prop"> 最近修改用户；</span> {{ baseprop.updateUser }}
+        <span class="label-prop"> {{$t('message.workflow.LastModifyUser') }}</span> {{ baseprop.updateUser }}
       </div>
       <div class="prop-item">
-        <span class="label-prop"> 最近修改时间；</span> {{ baseprop.updateTime | formatDate }}
+        <span class="label-prop"> {{$t('message.workflow.LastModifyTime') }}</span> {{ baseprop.updateTime | formatDate }}
       </div>
     </Modal>
+    <!-- 复制工作流 -->
     <CopyModal v-model="showCopyForm" ref="copyForm" @finish="copySended" />
+    <!-- 导入工作流 -->
+    <ImportFlow v-model="importModal" ref="import" @finish="importSended" />
   </div>
 </template>
 <script>
+import qs from 'qs';
 import Workflow from '@/workflows/module/workflow';
 import WorkflowModal from '@/workflows/module/workflow/module/workflowModal.vue';
 import Process from '@/workflows/module/process';
@@ -205,6 +209,7 @@ import { setVirtualRoles } from '@dataspherestudio/shared/common/config/permissi
 import Streamis from '@/workflows/module/innerIframe';
 import filters from '@dataspherestudio/shared/common/util/filters';
 import CopyModal from './copyModal.vue'
+import ImportFlow from './importModal.vue'
 
 export default {
   components: {
@@ -215,7 +220,8 @@ export default {
     WorkflowTabList,
     ProjectForm,
     Streamis: Streamis.component,
-    CopyModal
+    CopyModal,
+    ImportFlow
   },
   data() {
     return {
@@ -282,7 +288,10 @@ export default {
           value: 'name'
         }
       ],
-      showCopyForm: false
+      showCopyForm: false,
+      uploadUrl: `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`,
+      uploadData: null,
+      importModal: false
     }
   },
   filters,
@@ -501,6 +510,11 @@ export default {
           resolve(flow);
         });
     },
+    importSended(target){
+      this.getFlow({id: target.id, name: target.name}, (flows) => {
+        this.reFreshTreeData({id: target.id, name: target.name}, flows)
+      })
+    },
     handleTreeModal(project) {
       this.treeModalShow = true;
       this.currentTreeProject = project;
@@ -718,6 +732,78 @@ export default {
     },
     onViewVersion(project) {
       this.$refs.workflow.versionDetail(project.id, project);
+    },
+    unlockFlow(params, confirmDelete = false) {
+      const workspaceData = storage.get("currentWorkspace");
+      api
+        .fetch(
+          `${this.$API_PATH.ORCHESTRATOR_PATH}unlockOrchestrator`,
+          {
+            id: params.orchestratorId,
+            projectId: params.projectId,
+            labels: { route: this.modeOfKey },
+            workspaceId: workspaceData.id,
+            confirmDelete
+          },
+          "post"
+        )
+        .then((rst) => {
+          if (rst.lockOwner && !confirmDelete) {
+            this.$Modal.confirm({
+              title: this.$t('message.workflow.unlockflowtitle'),
+              content: `
+                <p>${this.$t('message.workflow.unlockflow')}: ${params.name}?</p>
+                <p  style="margin-top: 10px;color:#ed4014">${this.$t('message.workflow.unlocktip', {name: rst && rst.lockOwner})}</p>
+              `,
+              okText: this.$t('message.workflow.unlock'),
+              cancelText: this.$t('message.workflow.cancel'),
+              onOk: () => {
+                this.unlockFlow(params, true)
+              },
+              onCancel: () => {}
+            })
+          }
+        })
+    },
+    exportWorkflow(node) {
+      const params = {
+        workspaceId: node.workspaceId,
+        projectId: node.projectId,
+        projectName: node.projectName,
+        orchestratorId: node.orchestratorId,
+        orcVersionId: node.orchestratorVersionId,
+        addOrcVersion: false,
+        dssLabels: this.modeOfKey,
+        outputFileName: `${node.projectName}_${node.name}`,
+        labels: {
+          route: this.modeOfKey
+        }
+      };
+      const qstring = qs.stringify(params)
+      const url = `http://${window.location.host}/api/rest_j/v1/dss/framework/orchestrator/exportOrchestrator?${qstring}`;
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      const evObj = document.createEvent("MouseEvents");
+      evObj.initMouseEvent(
+        "click",
+        true,
+        true,
+        window,
+        0,
+        0,
+        0,
+        0,
+        0,
+        false,
+        false,
+        true,
+        false,
+        0,
+        null
+      );
+      a.dispatchEvent(evObj);
+      this.$Message.success(this.$t('message.workflow.downloadrequest'))
     },
     onBasepropShow(flow) {
       this.baseprop = {
@@ -1127,6 +1213,7 @@ export default {
           <DropdownMenu slot="list">
             <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
             <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
+            <DropdownItem name="import" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'import', item)}}>{ this.$t('message.workflow.importflow') }</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       )
@@ -1153,6 +1240,8 @@ export default {
             {item.editable && <DropdownItem name="config_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_flow', item)}}>{this.$t('message.workflow.Configuration') }</DropdownItem>}
             {item.editable && <DropdownItem name="delete_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_flow', item)}}>{this.$t('message.workflow.Delete') }</DropdownItem>}
             {(item.editable || item.canPublish) && <DropdownItem name="copy_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'copy_flow', item)}}>{this.$t('message.workflow.Copy') }</DropdownItem>}
+            {(item.editable || item.canPublish) && <DropdownItem name="unlock" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'unlock', item)}}>{this.$t('message.workflow.unlock') }</DropdownItem>}
+            {(item.editable || item.canPublish) && <DropdownItem name="export" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'export', item)}}>{this.$t('message.workflow.Export') }</DropdownItem>}
             <DropdownItem name="viewVersion" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'viewVersion', item)}}>{this.$t('message.workflow.Show') }</DropdownItem>
             <DropdownItem name="baseprop" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'baseprop', item)}}>{this.$t('message.workflow.Essential') }</DropdownItem>
           </DropdownMenu>
@@ -1245,8 +1334,18 @@ export default {
         case "viewVersion":
           this.onViewVersion(node);
           break;
+        case "unlock":
+          this.unlockFlow(node);
+          break;
         case "baseprop":
           this.onBasepropShow(node);
+          break;
+        case "import":
+          this.importModal = true;
+          this.$refs.import.init(node)
+          break;
+        case "export":
+          this.exportWorkflow(node);
           break;
         case "copy_flow":
           this.showCopyForm = true

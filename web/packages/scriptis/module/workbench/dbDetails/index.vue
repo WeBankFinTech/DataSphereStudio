@@ -67,7 +67,6 @@ export default {
   },
   methods: {
     getDatalist(id) {
-      console.log(id, this.work)
       // 没有数据才请求
       if (id === 0 && Object.keys(this.dbData.baseInfo).length <= 0) {
         const params = {
@@ -84,7 +83,6 @@ export default {
     getDbBaseInfo(params = {}) {
       this.loading = true;
       api.fetch('/dss/datapipe/datasource/getSchemaBaseInfo', params, 'get').then((rst) => {
-        console.log(rst, 'rst')
         this.dbData.baseInfo = rst.schemaInfo || {};
         this.loading = false;
       }).catch(() => {

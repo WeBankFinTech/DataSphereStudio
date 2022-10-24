@@ -17,7 +17,7 @@
       </Select>
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
-      <Button class="margin-right" type="success" @click="transfer">{{ $t('message.scripts.transfer') }}</Button>
+      <Button v-if="canTransfer" class="margin-right" type="success" @click="transfer">{{ $t('message.scripts.transfer') }}</Button>
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
     </div>
     <div class="table-data">
@@ -182,6 +182,9 @@ export default {
         }
       })
       return list
+    },
+    canTransfer() {
+      return this.$APP_CONF.table_transfer && /_work$/.test(this.dbName)
     }
   },
   watch: {
@@ -303,9 +306,6 @@ export default {
     },
     // 批量转移
     transfer() {
-      // this.selectedItems.forEach(item => {
-      //   item.selected = false
-      // });
       this.confirmModalType = 'transfer'
       if (this.selectedItems.length) {
         this.showConfirmModal = true

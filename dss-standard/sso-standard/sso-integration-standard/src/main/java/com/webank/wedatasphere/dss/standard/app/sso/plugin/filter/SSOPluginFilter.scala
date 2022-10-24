@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.plugin.filter
 
+import com.webank.wedatasphere.dss.common.conf.DSSCommonConf.DSS_TOKEN_TICKET_KEY
 import com.webank.wedatasphere.dss.standard.app.sso.SSOIntegrationStandard
 import com.webank.wedatasphere.dss.standard.app.sso.plugin.filter.proxy.{DSSInternalProxyUserInterceptor, HttpRequestProxyUserInterceptor, HttpSessionProxyUserInterceptor}
 import com.webank.wedatasphere.dss.standard.sso.utils.ProxyUserSSOUtils
@@ -48,12 +49,14 @@ abstract class SSOPluginFilter extends Filter {
     val dssMsg = ssoPluginService.createSSOMsgParseOperation().getDSSMsg(req)
     val workspaceOperation = ssoPluginService.createDssMsgCacheOperation()
     if (ssoPluginService.createSSOMsgParseOperation.isDssRequest(req)) {
+      val isFirstLogin = !userInterceptor.isUserExistInSession(req) || (workspaceOperation.getDSSMsgInSession(req) != null &&
+        req.getCookies.find(_.getName == DSS_TOKEN_TICKET_KEY.getValue).map(_.getValue).exists(_ != workspaceOperation.getDSSMsgInSession(req).getCookies.get(DSS_TOKEN_TICKET_KEY.getValue)))
       // 存在一种场景：第一次登陆时没有带上代理用户（DSS登陆成功后就开始请求第三方节点），这时为了使第三方节点能够正常使用，允许完成SSO认证。
       // 这时，如果DSS绑定了代理用户，再来请求这个第三方节点时，由于已经完成认证会直接放行，所以这里加上一个判断逻辑，
       // 就是就算完成了登录认证，但是如果之前的登录认证没有包含代理用户，而本次请求的cookie中包含代理用户，则触发再次认证。
       val isSecondLoginWithProxyUser = userInterceptor.isUserExistInSession(req) && !workspaceOperation.isExistsProxyUser(req) &&
         ProxyUserSSOUtils.existsProxyUser(dssMsg)
-      val (redirectUrl, workspaceName, wrappedReq) = if(!userInterceptor.isUserExistInSession(req) || isSecondLoginWithProxyUser) {
+      val (redirectUrl, workspaceName, wrappedReq) = if(isFirstLogin || isSecondLoginWithProxyUser) {
         val ssoMsg = ssoPluginService.createSSOMsgParseOperation.getSSOMsg(req)
         val username = ssoMsg.getUser
         val pair = if(ProxyUserSSOUtils.existsProxyUser(username)) {
@@ -89,12 +92,12 @@ abstract class SSOPluginFilter extends Filter {
         (dssMsg.getRedirectUrl, dssMsg.getWorkspaceName, req)
       }
 
+      if(workspaceOperation.getDSSMsgInSession(req) == null) {
+        workspaceOperation.setDSSMsgToSession(dssMsg, req)
+      }
       if(workspaceName != workspaceOperation.getWorkspaceInSession(req)) {
         info(s"Set DSS workspace to: $workspaceName.")
         workspaceOperation.setWorkspaceToSession(req, workspaceName)
-      }
-      if(workspaceOperation.getDSSMsgInSession(req) == null) {
-        workspaceOperation.setDSSMsgToSession(dssMsg, req)
       }
       if(StringUtils.isNotBlank(redirectUrl)) resp.sendRedirect(redirectUrl)
       else filterChain.doFilter(wrappedReq, servletResponse)

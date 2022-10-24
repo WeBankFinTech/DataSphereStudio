@@ -134,20 +134,19 @@ export default {
       return navItemHeight * this.leftSideNavList.length + 100;
     },
   },
-  async created() {
-    let baseInfo = storage.get('baseInfo', 'local')
+  created() {
+  },
+  async mounted() {
+    this.init();
+    // 监听窗口变化，获取浏览器宽高
+    window.addEventListener('resize', this.getHeight);
+    let baseInfo = storage.get('baseInfo', 'local') || {}
     const globalRes = await this.getGlobalLimit()
     baseInfo = {
       ...baseInfo,
       ...globalRes.globalLimits
     }
     storage.set('baseInfo', baseInfo, 'local')
-  },
-  mounted() {
-    this.init();
-    // 监听窗口变化，获取浏览器宽高
-    window.addEventListener('resize', this.getHeight);
-    const baseInfo = storage.get("baseInfo", "local") || {}
     if (baseInfo.proxyEnable && !baseInfo.proxyUserName) {
       this.showSettingModal()
     } else if(baseInfo.proxyUserName) {

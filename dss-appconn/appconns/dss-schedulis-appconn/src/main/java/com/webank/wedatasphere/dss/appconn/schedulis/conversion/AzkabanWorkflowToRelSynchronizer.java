@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
+import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSUploadAction;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
@@ -29,6 +30,7 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelSynchronizer;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.httpclient.request.BinaryBody;
 import org.slf4j.Logger;
@@ -66,14 +68,17 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             String projectPath = azkabanConvertedRel.getStorePath();
             tmpSavePath = ZipHelper.zip(projectPath);
             //upload zip to Azkaban
-            uploadProject(azkabanConvertedRel.getDSSToRelConversionRequestRef().getWorkspace(), tmpSavePath,
-                azkabanConvertedRel.getDSSToRelConversionRequestRef().getDSSProject().getName(), azkabanConvertedRel.getDSSToRelConversionRequestRef().getUserName());
+            ProjectToRelConversionRequestRef projectToRelConversionRequestRef=azkabanConvertedRel.getDSSToRelConversionRequestRef();
+            uploadProject(projectToRelConversionRequestRef.getWorkspace(), tmpSavePath,
+                    projectToRelConversionRequestRef.getDSSProject().getName(),
+                    projectToRelConversionRequestRef.getUserName(),
+                    projectToRelConversionRequestRef.getApprovalId());
         } catch (Exception e) {
             throw new DSSRuntimeException(90012, ExceptionUtils.getRootCauseMessage(e), e);
         }
     }
 
-    private void uploadProject(Workspace workspace, String tmpSavePath, String projectName, String releaseUser) throws Exception {
+    private void uploadProject(Workspace workspace, String tmpSavePath, String projectName, String releaseUser,String approvalId) throws Exception {
 
         File file = new File(tmpSavePath);
         InputStream inputStream = new FileInputStream(file);
@@ -83,9 +88,15 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             binaryBodyList.add(binaryBody);
             DSSUploadAction uploadAction = new DSSUploadAction(binaryBodyList);
             uploadAction.getFormParams().put("ajax", "upload");
+            uploadAction.getParameters().put("ajax", "upload");
+
             uploadAction.getFormParams().put("project", projectName);
             uploadAction.getParameters().put("project", projectName);
-            uploadAction.getParameters().put("ajax", "upload");
+
+            if(StringUtils.isNotBlank(approvalId)) {
+                uploadAction.getFormParams().put("itsmId", approvalId);
+                uploadAction.getParameters().put("itsmId", approvalId);
+            }
             uploadAction.setUrl(projectUrl);
             SchedulisHttpUtils.getHttpResult(projectUrl, uploadAction,
                     dssToRelConversionOperation.getConversionService().getSSORequestService()

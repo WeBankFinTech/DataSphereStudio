@@ -290,7 +290,7 @@ export default {
           // 下载之前条用心跳接口确认是否登录
           await api.fetch('/user/heartbeat', 'get');
           // 下载记录日志
-          api.fetch('/dss/scriptis/audit/script/download/save', {
+          api.fetch('/dss/scriptis/audit/download/save', {
             creator: this.baseinfo.username,
             tenant: this.baseinfo.proxyUserName,
             path: temPath,

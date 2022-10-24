@@ -7,6 +7,7 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.RequestQueryWorkFlow;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
@@ -251,7 +252,8 @@ public class OrchestratorCopyJob implements Runnable {
 
         Long appId = sourceOrchestratorVersion.getAppId();
         RequestQueryWorkFlow requestQueryWorkFlow = new RequestQueryWorkFlow(username, appId);
-        ResponseQueryWorkflow responseQueryWorkflow = (ResponseQueryWorkflow) workflowSender.ask(requestQueryWorkFlow);
+        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(workflowSender.ask(requestQueryWorkFlow),
+                ResponseQueryWorkflow.class, RequestQueryWorkFlow.class);
         Map<String, Object> query = orchestratorCopyEnv.getBmlService().query(username, responseQueryWorkflow.getDssFlow().getResourceId(), responseQueryWorkflow.getDssFlow().getBmlVersion());
         String flowJson = query.get("string").toString();
         List<String> workFlowNodesJsonList = DSSCommonUtils.getWorkFlowNodesJson(flowJson);

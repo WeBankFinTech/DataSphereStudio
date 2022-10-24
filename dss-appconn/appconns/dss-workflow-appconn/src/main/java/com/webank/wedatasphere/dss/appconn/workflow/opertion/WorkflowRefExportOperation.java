@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
 import com.webank.wedatasphere.dss.common.protocol.RequestExportWorkflow;
 import com.webank.wedatasphere.dss.common.protocol.ResponseExportWorkflow;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
@@ -49,7 +50,8 @@ public class WorkflowRefExportOperation
                 toJson(requestRef.getWorkspace()),
                 requestRef.getDSSLabels());
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
-        ResponseExportWorkflow responseExportWorkflow = (ResponseExportWorkflow) sender.ask(requestExportWorkflow);
+        ResponseExportWorkflow responseExportWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
+                ResponseExportWorkflow.class, RequestExportWorkflow.class);
         Map<String, Object> resourceMap = new HashMap<>(2);
         resourceMap.put(ImportRequestRef.RESOURCE_ID_KEY, responseExportWorkflow.resourceId());
         resourceMap.put(ImportRequestRef.RESOURCE_VERSION_KEY, responseExportWorkflow.version());

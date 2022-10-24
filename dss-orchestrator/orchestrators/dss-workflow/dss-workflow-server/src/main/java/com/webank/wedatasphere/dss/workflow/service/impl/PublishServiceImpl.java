@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestrationStatus;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
@@ -90,7 +91,8 @@ public class PublishServiceImpl implements PublishService {
             AppInstance appInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
             requestFrameworkConvertOrchestration.setConvertAllOrcs(schedulerAppConn.getOrCreateConversionStandard().getDSSToRelConversionService(appInstance).isConvertAllOrcs());
             requestFrameworkConvertOrchestration.setLabels(dssLabel);
-            ResponseConvertOrchestrator response = (ResponseConvertOrchestrator) getOrchestratorSender().ask(requestFrameworkConvertOrchestration);
+            ResponseConvertOrchestrator response = RpcAskUtils.processAskException(getOrchestratorSender().ask(requestFrameworkConvertOrchestration),
+                    ResponseConvertOrchestrator.class, RequestFrameworkConvertOrchestration.class);
             if(response.getResponse().isFailed()) {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
             }
@@ -114,7 +116,7 @@ public class PublishServiceImpl implements PublishService {
         //通过rpc的方式去获取到最新status
         try {
             RequestFrameworkConvertOrchestrationStatus req = new RequestFrameworkConvertOrchestrationStatus(taskId);
-            response = (ResponseConvertOrchestrator) getOrchestratorSender().ask(req);
+            response = RpcAskUtils.processAskException(getOrchestratorSender().ask(req), ResponseConvertOrchestrator.class, RequestFrameworkConvertOrchestrationStatus.class);
             LOGGER.info("user {} gets status of {}, status is {}，msg is {}", username, taskId, response.getResponse().getJobStatus(), response.getResponse().getMessage());
         }catch (Exception t){
             LOGGER.error("failed to getStatus {} ", taskId, t);

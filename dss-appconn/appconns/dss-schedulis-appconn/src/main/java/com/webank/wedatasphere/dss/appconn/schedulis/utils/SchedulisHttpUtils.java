@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.utils;
 
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSGetAction;
@@ -52,7 +53,10 @@ public class SchedulisHttpUtils {
         SSOUrlBuilderOperation ssoUrlBuilderOperation = getSSORequestOperation(url, workspace);
         action.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
         HttpResult previewResult = ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, action);
-        if (previewResult.getStatusCode() == 200 || previewResult.getStatusCode() == 0) {
+        Map<String,Object> resBody=DSSCommonUtils.COMMON_GSON.fromJson(previewResult.getResponseBody(),Map.class);
+        if ((previewResult.getStatusCode() == 200 || previewResult.getStatusCode() == 0)
+                && !(resBody != null && resBody.containsKey("error"))) {
+            logger.info("request Schedulis success, responseBody is {}", DSSCommonUtils.COMMON_GSON.toJson(previewResult));
             return previewResult.getResponseBody();
         } else {
             logger.error("request Schedulis failed, responseBody is {}.", previewResult.getResponseBody());

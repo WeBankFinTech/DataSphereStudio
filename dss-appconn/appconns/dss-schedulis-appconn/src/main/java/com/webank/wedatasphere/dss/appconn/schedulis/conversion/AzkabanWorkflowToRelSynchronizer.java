@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
 import com.webank.wedatasphere.dss.appconn.schedulis.entity.AzkabanConvertedRel;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRef;
@@ -27,6 +28,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSUploadAction;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelSynchronizer;
 import org.apache.commons.io.IOUtils;
@@ -41,6 +43,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchronizer {
 
@@ -98,9 +101,13 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
                 uploadAction.getParameters().put("itsmId", approvalId);
             }
             uploadAction.setUrl(projectUrl);
+            String body=
             SchedulisHttpUtils.getHttpResult(projectUrl, uploadAction,
                     dssToRelConversionOperation.getConversionService().getSSORequestService()
                             .createSSORequestOperation(SchedulisAppConn.SCHEDULIS_APPCONN_NAME), workspace);
+            if(body!=null&&DSSCommonUtils.COMMON_GSON.fromJson(body, Map.class).get("error")!=null){
+                throw new ExternalOperationFailedException(50063, "upload project to schedulis failed." + body);
+            }
         } finally {
             IOUtils.closeQuietly(inputStream);
         }

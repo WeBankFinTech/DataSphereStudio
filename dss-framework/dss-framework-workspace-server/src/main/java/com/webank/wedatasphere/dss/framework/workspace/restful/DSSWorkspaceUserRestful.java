@@ -29,6 +29,7 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceServi
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
@@ -40,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -118,7 +120,19 @@ public class DSSWorkspaceUserRestful {
         //todo 工作空间添加用户
         String creator = SecurityFilter.getLoginUsername(httpServletRequest);
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
-        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        Workspace workspace;
+        //兼容外部系统通过接口调用场景，cookie未设置workspaceName
+        if (Arrays.stream(httpServletRequest.getCookies()).noneMatch(l -> l.getName().equals("workspaceName"))) {
+            workspace = new Workspace();
+            try {
+                workspace = SSOHelper.getWorkspace(httpServletRequest);
+            } catch (AppStandardWarnException appStandardWarnException) {
+                workspace.setWorkspaceId(updateWorkspaceUserRequest.getWorkspaceId());
+                workspace.setWorkspaceName(String.valueOf(updateWorkspaceUserRequest.getWorkspaceId()));
+            }
+        } else {
+            workspace = SSOHelper.getWorkspace(httpServletRequest);
+        }
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
         if (workspace.getWorkspaceId() != workspaceId) {
             return Message.error("cookie 中的 workspaceId 与请求添加用户的 workspace 不同！");

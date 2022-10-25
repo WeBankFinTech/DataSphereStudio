@@ -53,9 +53,7 @@ public class SchedulisHttpUtils {
         SSOUrlBuilderOperation ssoUrlBuilderOperation = getSSORequestOperation(url, workspace);
         action.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
         HttpResult previewResult = ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, action);
-        Map<String,Object> resBody=DSSCommonUtils.COMMON_GSON.fromJson(previewResult.getResponseBody(),Map.class);
-        if ((previewResult.getStatusCode() == 200 || previewResult.getStatusCode() == 0)
-                && !(resBody != null && resBody.containsKey("error"))) {
+        if (previewResult.getStatusCode() == 200 || previewResult.getStatusCode() == 0) {
             logger.info("request Schedulis success, responseBody is {}", DSSCommonUtils.COMMON_GSON.toJson(previewResult));
             return previewResult.getResponseBody();
         } else {

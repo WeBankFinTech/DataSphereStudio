@@ -20,24 +20,39 @@ import java.awt.image.BufferedImage
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
 import java.util.{Base64, UUID}
 
-import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail, PngAttachment}
+import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail, PdfAttachment, PngAttachment}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
 import org.apache.linkis.common.conf.Configuration
 import javax.imageio.ImageIO
 import org.apache.commons.codec.binary.Base64OutputStream
 import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnConfiguration._
+import org.apache.commons.io.IOUtils
+import org.apache.linkis.common.utils.Utils
 
 object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmailContent] {
 
   override protected def parseEmailContent(emailContent: PictureEmailContent,
                                            multiContentEmail: MultiContentEmail): Unit = {
     getFirstLineRecord(emailContent).foreach { imageStr =>
-      val decoder = Base64.getDecoder
-      val byteArr = decoder.decode(imageStr)
-      val inputStream = new ByteArrayInputStream(byteArr)
-      val image = ImageIO.read(inputStream)
-      val contents = generateImage(image, multiContentEmail)
-      emailContent.setContent(contents)
+      emailContent.getFileType match {
+        case "pdf" =>
+          val pdfUUID: String = UUID.randomUUID.toString
+          val pdfName = pdfUUID + ".pdf"
+          val decoder = Base64.getDecoder
+          val byteArr = decoder.decode(imageStr)
+          multiContentEmail.addAttachment(new PdfAttachment(pdfName, Base64.getEncoder.encodeToString(byteArr)))
+        case _ =>
+          var inputStream: ByteArrayInputStream = null
+          Utils.tryFinally({
+            val decoder = Base64.getDecoder
+            val byteArr = decoder.decode(imageStr)
+            inputStream = new ByteArrayInputStream(byteArr)
+            val image = ImageIO.read(inputStream)
+            val contents = generateImage(image, multiContentEmail)
+            emailContent.setContent(contents)
+          })(IOUtils.closeQuietly(inputStream))
+
+      }
     }
   }
 
@@ -62,7 +77,6 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
 
       var iHeight = image.getHeight
       var iWidth = image.getWidth
-
       if (iWidth > EMAIL_IMAGE_WIDTH.getValue) {
         iHeight = ((EMAIL_IMAGE_WIDTH.getValue.toDouble / iWidth.toDouble) * iHeight.toDouble).toInt
         iWidth = EMAIL_IMAGE_WIDTH.getValue

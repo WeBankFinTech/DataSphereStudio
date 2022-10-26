@@ -36,7 +36,9 @@ class MultiEmailContentGenerator extends AbstractEmailContentGenerator with Logg
     sb.append("<table cellspacing=0 cellpadding=0>")
     email.getEmailContents.foreach {
       case emailContent: ArrayEmailContent =>
-        emailContent.getContent.foreach(content => sb.append("<tr><td>").append(content).append("</td></tr>"))
+        if (emailContent.getContent != null) {
+          emailContent.getContent.foreach(content => sb.append("<tr><td>").append(content).append("</td></tr>"))
+        }
       case emailContent: StringEmailContent =>
         sb.append("<tr><td>").append(emailContent.getContent).append("</td></tr>")
     }

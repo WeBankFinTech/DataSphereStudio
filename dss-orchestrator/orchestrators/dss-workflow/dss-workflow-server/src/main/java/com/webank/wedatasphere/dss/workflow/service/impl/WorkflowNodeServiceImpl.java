@@ -53,13 +53,12 @@ import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.rpc.Sender;
+import org.apache.linkis.server.BDPJettyServerHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -113,7 +112,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         RefJobContentResponseRef responseRef = tryNodeOperation(userName, node, this::getRefCRUDService,
                 developmentService -> ((RefCRUDService) developmentService).getRefCreationOperation(),
                 (developmentOperation, developmentRequestRef) ->
-                    ((RefCreationOperation) developmentOperation).createRef((DSSJobContentRequestRef) developmentRequestRef)
+                        ((RefCreationOperation) developmentOperation).createRef((DSSJobContentRequestRef) developmentRequestRef)
                 , (developmentRequestRef, refJobContentResponseRef) -> {
                     if (developmentRequestRef instanceof ProjectRefRequestRef) {
                         Long projectRefId = ((ProjectRefRequestRef) developmentRequestRef).getRefProjectId();
@@ -139,7 +138,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         }
         if(node.getProjectId() == null || node.getProjectId() <= 0) {
             DSSFlow dssFlow = dssFlowService.getFlow(node.getFlowId());
-            node.setProjectId(dssFlow.getProjectID());
+            node.setProjectId(dssFlow.getProjectId());
         }
         return DevelopmentOperationUtils.tryDevelopmentOperation(() -> developmentServiceFunction.apply(appConn, node.getDssLabels()),
                 developmentOperationFunction,
@@ -160,6 +159,15 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                 },
                 refJobContentRequestRef -> {
                     refJobContentRequestRef.setRefJobContent(node.getJobContent());
+                    if ("query".equals(operation)) {
+                        try {
+                            Map runtimeParams = getRuntimeParams(node);
+                            refJobContentRequestRef.getRefJobContent().put("runtime",runtimeParams);
+                        } catch (IOException e) {
+                            throw new ExternalOperationFailedException(50205, "Get workflow runtimeParams failed." + e.getMessage(), e);
+                        }
+                    }
+
                     if (refJobContentRequestRef instanceof QueryJumpUrlRequestRef) {
                         ((QueryJumpUrlRequestRef) refJobContentRequestRef).setSSOUrlBuilderOperation(getSSOUrlBuilderOperation(appConn, node.getWorkspace()));
                     }
@@ -179,6 +187,25 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                     developmentRequestRef.setDSSLabels(node.getDssLabels()).setUserName(userName).setWorkspace(node.getWorkspace()).setName(name).setType(node.getNodeType());
                     return requestRefOperationFunction.apply(developmentOperation, (K) developmentRequestRef);
                 }, responseRefConsumer, appConn.getAppDesc().getAppName() + " try to " + operation + " workflow node " + name);
+    }
+
+    @SuppressWarnings("all")
+    private Map getRuntimeParams(CommonAppConnNode commonAppConnNode) throws IOException{
+        if (commonAppConnNode.getFlowId() == null) {
+            return new LinkedHashMap();
+        }
+        DSSFlow dssFlow = dssFlowService.getFlow(commonAppConnNode.getFlowId());
+        Map<String, Object> flowJsonObject = BDPJettyServerHelper.jacksonJson().readValue(dssFlow.getFlowJson(), Map.class);
+        final ArrayList<LinkedHashMap> nodes = (ArrayList<LinkedHashMap>) flowJsonObject.get("nodes");
+        final Optional<LinkedHashMap> first = nodes.stream().filter(map -> commonAppConnNode.getJobContent().get("title").toString().equals(map.get("title"))).findFirst();
+        if (!first.isPresent()) return new LinkedHashMap();
+        final LinkedHashMap node = first.get();
+        final LinkedHashMap params = (LinkedHashMap) node.get("params");
+        if (params == null) return new LinkedHashMap();
+        final LinkedHashMap configuration = (LinkedHashMap) params.get("configuration");
+        if (configuration == null) return new LinkedHashMap();
+        final LinkedHashMap runtime = (LinkedHashMap) configuration.get("runtime");
+        return runtime == null ? new LinkedHashMap() : runtime;
     }
 
     private Long parseProjectId(Long dssProjectId, String appConnName, List<DSSLabel> dssLabels) {

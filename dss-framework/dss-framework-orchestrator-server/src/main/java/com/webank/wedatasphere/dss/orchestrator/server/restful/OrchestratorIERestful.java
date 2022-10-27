@@ -87,7 +87,7 @@ public class OrchestratorIERestful {
                 RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
                         projectID, resultMap.getResourceId(),
                         resultMap.getVersion(), null, dssLabelList, workspace);
-                importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
+                importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest).getOrchestratorId();
             } catch (Exception e) {
                 logger.error("Import orchestrator failed for ", e);
                 throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());

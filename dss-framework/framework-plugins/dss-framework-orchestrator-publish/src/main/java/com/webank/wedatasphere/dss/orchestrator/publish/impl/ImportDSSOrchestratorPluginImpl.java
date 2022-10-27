@@ -79,7 +79,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private OrchestratorManager orchestratorManager;
 
     @Override
-    public Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception {
+    public DSSOrchestratorVersion importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception {
         String userName = requestImportOrchestrator.getUserName();
         String projectName = requestImportOrchestrator.getProjectName();
         Long projectId = requestImportOrchestrator.getProjectId();
@@ -203,7 +203,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
         LOGGER.info("import orchestrator success,orcId:{},appId:{}",importDssOrchestratorInfo.getId(),orchestrationId);
 
-        return dssOrchestratorVersion.getOrchestratorId();
+        return dssOrchestratorVersion;
     }
 
     @Override

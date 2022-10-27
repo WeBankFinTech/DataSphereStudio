@@ -138,7 +138,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
         }
         if(node.getProjectId() == null || node.getProjectId() <= 0) {
             DSSFlow dssFlow = dssFlowService.getFlow(node.getFlowId());
-            node.setProjectId(dssFlow.getProjectId());
+            node.setProjectId(dssFlow.getProjectID());
         }
         return DevelopmentOperationUtils.tryDevelopmentOperation(() -> developmentServiceFunction.apply(appConn, node.getDssLabels()),
                 developmentOperationFunction,

@@ -1,6 +1,6 @@
 package com.webank.wedatasphere.dss.common.utils;
 
-import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
+import org.apache.linkis.common.exception.LinkisRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +16,7 @@ public class RpcAskUtils {
             return responseClazz.cast(o);
         } else {
             logger.error(requestClazz.getSimpleName() + " failed for " + o);
-            throw new DSSRuntimeException(requestClazz.getSimpleName() + " failed for " + o);
+            throw (LinkisRuntimeException) o;
         }
     }
 }

@@ -86,6 +86,9 @@ public class DSSWorkspacePrivRestful {
         int menuId = updateRoleMenuPrivRequest.getMenuId();
         int workspaceId = updateRoleMenuPrivRequest.getWorkspaceId();
         WorkspaceUtils.validateWorkspace(workspaceId, httpServletRequest);
+        if (!dssWorkspaceService.checkAdminByWorkspace(updater, workspaceId)) {
+            return Message.error("无权限进行该操作");
+        }
         Map<String, Boolean> menuPrivs = updateRoleMenuPrivRequest.getMenuPrivs();
         List<Pair<Integer, Boolean>> pairs = new ArrayList<>();
         for (String key : menuPrivs.keySet()) {
@@ -109,6 +112,9 @@ public class DSSWorkspacePrivRestful {
         int appconnId = updateRoleComponentPrivRequest.getComponentId();
         int workspaceId = updateRoleComponentPrivRequest.getWorkspaceId();
         WorkspaceUtils.validateWorkspace(workspaceId, httpServletRequest);
+        if (!dssWorkspaceService.checkAdminByWorkspace(username, workspaceId)) {
+            return Message.error("无权限进行该操作");
+        }
         Map<String, Boolean> componentPrivs = updateRoleComponentPrivRequest.getComponentPrivs();
         List<Pair<Integer, Boolean>> pairs = new ArrayList<>();
         for (String key : componentPrivs.keySet()) {

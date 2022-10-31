@@ -50,7 +50,7 @@ public class DSSWorkFlowConstant {
     public static final int EDIT_LOCK_ERROR_CODE = 60056;
 
     /**
-     * 发布中的错误码
+     * 发布中的错误码，工程下有其他工作流在发布中
      */
     public static final String PUBLISHING_ERROR_CODE = "-999";
 

@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
@@ -31,8 +33,11 @@ import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorServi
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.io.IOUtils;
+import org.apache.linkis.common.io.FsPath;
+import org.apache.linkis.filesystem.service.FsService;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.apache.linkis.storage.fs.FileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +62,8 @@ public class OrchestratorIERestful {
     @Autowired
     private BMLService bmlService;
     @Autowired
+    private FsService fsService;
+    @Autowired
     OrchestratorService orchestratorService;
     @Autowired
     private DSSOrchestratorContext orchestratorContext;
@@ -66,37 +73,43 @@ public class OrchestratorIERestful {
                                   @RequestParam(required = false, name = "projectName") String projectName,
                                   @RequestParam(required = false, name = "projectID") Long projectID,
                                   @RequestParam(required = false, name = "labels") String labels,
-                                  @RequestParam(required = false, name = "packageFile") List<MultipartFile> packageFile,
-                                  @RequestParam(required = false, name = "packageUri") List<MultipartFile> packageUri) throws Exception {
-        List<MultipartFile> files;
-        if (packageFile != null) {
-            files = packageFile;
-        } else {
-            files = packageUri;
-        }
-        if (null == files || files.size() == 0) {
+                                  @RequestParam(required = false, name = "packageFile") MultipartFile packageFile,
+                                  @RequestParam(required = false, name = "packageUri") String packageUri) throws Exception {
+
+        if (null == packageFile && packageUri == null) {
             throw new DSSErrorException(100788, "Import orchestrator failed for files is empty");
         }
-        Long importOrcId = 0L;
-        for (MultipartFile p : files) {
-            InputStream inputStream = p.getInputStream();
-            String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
-            String userName = SecurityFilter.getLoginUsername(req);
-            //调用工具类生产label
-            List<DSSLabel> dssLabelList = getDSSLabelList(labels);
-            Workspace workspace = SSOHelper.getWorkspace(req);
+        String userName = SecurityFilter.getLoginUsername(req);
+        //调用工具类生产label
+        List<DSSLabel> dssLabelList = getDSSLabelList(labels);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+        InputStream inputStream;
+        String fileName;
+        if (packageFile != null) {
+            inputStream = packageFile.getInputStream();
+            fileName = new String(packageFile.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
             //3、打包新的zip包上传BML
-            Map<String, Object> resultMap = bmlService.upload(userName, inputStream,
-                    fileName, projectName);
-            try {
-                RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
-                        projectID, resultMap.get("resourceId").toString(),
-                        resultMap.get("version").toString(), null, dssLabelList, workspace);
-                importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
-            } catch (Exception e) {
-                logger.error("Import orchestrator failed for ", e);
-                throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());
+            logger.info("User {} begin to import orchestrator file", userName);
+        } else {
+            FsPath fsPath = new FsPath(packageUri);
+            FileSystem fileSystem = fsService.getFileSystem(userName, fsPath);
+            if ( !fileSystem.exists(fsPath) ) {
+                throw new DSSRuntimeException("路径上不存在文件！");
             }
+            inputStream = fileSystem.read(fsPath);
+            fileName = packageUri.substring(packageUri.lastIndexOf('/') + 1);
+        }
+
+        BmlResource resultMap = bmlService.upload(userName, inputStream, fileName, projectName);
+        Long importOrcId;
+        try {
+            RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
+                    projectID, resultMap.getResourceId(),
+                    resultMap.getVersion(), null, dssLabelList, workspace);
+            importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
+        } catch (Exception e) {
+            logger.error("Import orchestrator failed for ", e);
+            throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());
         }
         return Message.ok().data("importOrcId", importOrcId);
     }
@@ -118,7 +131,7 @@ public class OrchestratorIERestful {
         Workspace workspace = SSOHelper.getWorkspace(req);
         String userName = SecurityFilter.getLoginUsername(req);
         List<DSSLabel> dssLabelList = getDSSLabelList(labels);
-        Map<String, Object> res = null;
+        BmlResource res;
         OrchestratorVo orchestratorVo;
         if (orcVersionId != null) {
             orchestratorVo = orchestratorService.getOrchestratorVoByIdAndOrcVersionId(orchestratorId, orcVersionId);
@@ -129,15 +142,15 @@ public class OrchestratorIERestful {
         logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
             res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,
-                    orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace);
+                    orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace).getBmlResource();
         } catch (Exception e) {
             logger.error("export orchestrator failed for ", e);
             throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());
         }
         if (null != res) {
             Map<String, Object> downRes = bmlService.download(userName,
-                    res.get("resourceId").toString(),
-                    res.get("version").toString());
+                    res.getResourceId(),
+                    res.getVersion());
 
             InputStream inputStream = (InputStream) downRes.get("is");
             try {

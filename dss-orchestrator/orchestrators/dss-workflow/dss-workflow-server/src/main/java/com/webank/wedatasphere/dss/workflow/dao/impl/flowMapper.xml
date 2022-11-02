@@ -56,6 +56,10 @@
         SELECT fr.flow_id FROM `dss_workflow_relation` fr WHERE fr.parent_flow_id = #{parentFlowID}
     </select>
 
+    <select id="getSubflowInfoByParentId" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        select * from dss_workflow where id in (SELECT flow_id FROM `dss_workflow_relation` WHERE parent_flow_id = #{parentFlowID})
+    </select>
+
     <delete id="deleteFlowBaseInfo">
         DELETE
         FROM

@@ -248,10 +248,10 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             flowJsonObject.replace("nodes", targetWorkflowNodes);
             String updatedJson = DSSCommonUtils.COMMON_GSON.toJson(flowJsonObject);
             //修改json文件保存路径
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(flowJsonPath));
-            bufferedWriter.write(updatedJson);
-            bufferedWriter.flush();
-            bufferedWriter.close();
+            try(BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(flowJsonPath))) {
+                bufferedWriter.write(updatedJson);
+                bufferedWriter.flush();
+            }
             if (dssFlow.getRootFlow()) {
                 LOGGER.info("Modify root dssFlow {} json to dssFlow {} json.", dssFlow.getName(), targetOrchestratorName);
                 if (!targetOrchestratorName.equals(dssFlow.getName())){

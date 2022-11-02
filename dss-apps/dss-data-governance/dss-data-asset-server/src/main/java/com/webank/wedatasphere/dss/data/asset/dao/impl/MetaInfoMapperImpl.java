@@ -24,15 +24,15 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
 
         Connection con =dataSource.getConnection();
         long num=0;
-        PreparedStatement ps=null;
         ResultSet rs=null;
+        String sql="select SUM(PARAM_VALUE) from TABLE_PARAMS WHERE PARAM_KEY='totalSize'";
+        PreparedStatement ps=con.prepareStatement(sql);
         try {
-            String sql="select SUM(PARAM_VALUE) from TABLE_PARAMS WHERE PARAM_KEY='totalSize'";
-            ps=con.prepareStatement(sql);
             rs=ps.executeQuery();
             while (rs.next()){
                 num =rs.getLong(1);
             }
+            ps.close();
             String sql2 ="select SUM(PARAM_VALUE) from PARTITION_PARAMS WHERE PARAM_KEY='totalSize'";
             ps=con.prepareStatement(sql2);
             rs=ps.executeQuery();
@@ -44,6 +44,7 @@ public class MetaInfoMapperImpl implements MetaInfoMapper {
             throw  new DAOException(e.getMessage(),e);
         }
         finally {
+            ps.close();
             con.close();
         }
 

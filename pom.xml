@@ -55,7 +55,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>5.2.22.RELEASE</spring.version>
         <mybatis.spring.boot.version>2.1.2</mybatis.spring.boot.version>
-        <spring.boot.version>2.3.7.RELEASE</spring.boot.version>
+        <spring.boot.version>2.3.12.RELEASE</spring.boot.version>
         <spring.cloud.version>2.2.6.RELEASE</spring.cloud.version>
         <commons.math.version>3.1.1</commons.math.version>
         <commons.lang3.version>3.8.1</commons.lang3.version>

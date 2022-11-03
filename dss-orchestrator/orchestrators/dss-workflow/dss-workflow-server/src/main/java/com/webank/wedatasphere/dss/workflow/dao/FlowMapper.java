@@ -46,6 +46,8 @@ public interface FlowMapper {
 
     Long selectParentFlowIDByFlowID(Long flowID);
 
+    List<DSSFlow> getSubflowInfoByParentId(@Param("parentFlowID") Long parentFlowID);
+
     Long getParentFlowID(Long flowID);
 
     List<DSSFlowRelation> listFlowRelation(@Param("flowIDs") List<Long> flowIDs);

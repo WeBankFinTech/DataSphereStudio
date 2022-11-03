@@ -44,7 +44,7 @@ class FlowExecutionEntranceSpringConfiguration {
   }
 
   @EntranceParserBeanAnnotation
-  def generateEntranceParser(@PersistenceEngineBeanAnnotation.PersistenceEngineAutowiredAnnotation persistenceManager: PersistenceManager): EntranceParser = {
+  def generateEntranceParser(@Autowired persistenceManager: PersistenceManager): EntranceParser = {
     logger.info("begin to get FlowExecution Entrance parser")
     new FlowExecutionParser(persistenceManager)
   }

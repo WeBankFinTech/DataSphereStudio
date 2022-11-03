@@ -61,7 +61,7 @@ public class SchedulisProjectCreationOperation
             // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
             requestRef.getDSSProjectPrivilege().getReleaseUsers().forEach(releaseUser -> {
                 if (!AzkabanUserService.containsUser(releaseUser, getBaseUrl(), ssoRequestOperation, requestRef.getWorkspace())) {
-                    throw new ExternalOperationFailedException(100323, "当前设置的发布用户: " + releaseUser + ", 在 Schedulis 系统中不存在，请联系 Schedulis 管理员创建该用户！");
+                    throw new ExternalOperationFailedException(100323, "当前设置的发布用户: " + releaseUser + ", 在 Schedulis 系统中不存在，请根据'查看解决方案'中给出的指引在ITSM上提单！");
                 }
             });
         }

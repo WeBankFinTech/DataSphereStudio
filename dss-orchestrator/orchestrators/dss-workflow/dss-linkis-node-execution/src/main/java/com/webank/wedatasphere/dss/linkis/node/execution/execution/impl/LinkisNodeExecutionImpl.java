@@ -39,7 +39,7 @@ import org.apache.linkis.ujes.client.request.ResultSetAction;
 import org.apache.linkis.ujes.client.response.JobInfoResult;
 import org.apache.linkis.ujes.client.response.JobLogResult;
 import org.apache.linkis.ujes.client.response.OpenLogResult;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import scala.tools.nsc.settings.Final;
 
 import java.text.MessageFormat;
@@ -49,7 +49,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 
 
 public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExecutionListener {

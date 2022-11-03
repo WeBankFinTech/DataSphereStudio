@@ -9,7 +9,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutio
 import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf.LinkisJobTypeConf
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.job.DolphinSchedulerJobBuilder
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.linkis.common.conf.CommonVars
 import org.apache.linkis.common.utils.{Logging, Utils}
 

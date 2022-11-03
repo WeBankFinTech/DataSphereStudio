@@ -77,7 +77,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME;
+import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.*;
 
 @Service
 public class DSSFlowServiceImpl implements DSSFlowService {
@@ -246,15 +246,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         flowIDlist.forEach(this::deleteFlow);
     }
 
-    /*@Lock*/
-    @Transactional(rollbackFor = {DSSErrorException.class})
     @Override
     public String saveFlow(Long flowID,
                            String jsonFlow,
                            String comment,
                            String userName,
                            String workspaceName,
-                           String projectName) {
+                           String projectName) throws IOException{
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -268,6 +266,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         } else {
             logger.info("saveFlow is change");
         }
+        checkSubflowDependencies(userName, flowID, jsonFlow);
+
         String resourceId = dssFlow.getResourceId();
         Long parentFlowID = flowMapper.getParentFlowID(flowID);
         // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
@@ -293,6 +293,34 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         String version = bmlReturnMap.get("version").toString();
         return version;
+    }
+
+    private void checkSubflowDependencies(String user, long flowId, String flowJson) throws IOException {
+        List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
+        if (CollectionUtils.isEmpty(nodeJsonList)) {
+            return;
+        }
+        List<DSSFlow> subflowInfos = flowMapper.getSubflowInfoByParentId(flowId);
+        List<String> subflowTitleList = new ArrayList<>();
+        for (String nodeJson : nodeJsonList) {
+            Map<String, Object> nodeMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
+            String nodeType = nodeMap.get(JOBTYPE_KEY).toString();
+            if ("workflow.subflow".equals(nodeType)) {
+                String title = nodeMap.get(TITLE_KEY).toString();
+                subflowTitleList.add(title);
+            }
+        }
+        subflowInfos.forEach(subflow -> {
+            if (subflowTitleList.stream().noneMatch(t -> t.equals(subflow.getName()))) {
+                //查看子工作流有无内容
+                String subflowJson = bmlService.query(user, subflow.getResourceId(), subflow.getBmlVersion()).get("string").toString();
+                if (CollectionUtils.isEmpty(workFlowParser.getWorkFlowNodesJson(subflowJson))) {
+                    flowMapper.deleteFlowRelation(subflow.getId());
+                } else {
+                    logger.warn("子工作流内容不为空，不予删除和父工作流的依赖关系。");
+                }
+            }
+        });
     }
 
     private void updateMetrics(DSSFlow dssFlow, String flowJson) {
@@ -492,7 +520,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<Map<String, Object>> nodeList = new ArrayList<>();
         for (String nodeJson : nodeJsonList) {
             Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
-            nodeJsonMap.replace("title", nodeJsonMap.get("title") + "_" + nodeSuffix);
+            nodeJsonMap.replace(TITLE_KEY, nodeJsonMap.get(TITLE_KEY) + "_" + nodeSuffix);
             List<Resource> resourceList = nodeParser.getNodeResource(nodeJson);
             if (CollectionUtils.isNotEmpty(resourceList)) {
                 String oldKey = (String) nodeJsonMap.get("key");
@@ -597,10 +625,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
             //更新subflowID
-            String nodeType = nodeJsonMap.get("jobType").toString();
+            String nodeType = nodeJsonMap.get(JOBTYPE_KEY).toString();
             NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(nodeType);
             if ("workflow.subflow".equals(nodeType)) {
-                String subFlowName = nodeJsonMap.get("title").toString();
+                String subFlowName = nodeJsonMap.get(TITLE_KEY).toString();
                 List<DSSFlow> dssFlowList = subflows.stream().filter(subflow ->
                         subflow.getName().equals(subFlowName)
                 ).collect(Collectors.toList());
@@ -623,7 +651,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 oldNode.setJobContent((Map<String, Object>) nodeJsonMap.get("jobContent"));
                 oldNode.setContextId(updateContextId);
                 oldNode.setNodeType(nodeType);
-                oldNode.setName((String) nodeJsonMap.get("title"));
+                oldNode.setName((String) nodeJsonMap.get(TITLE_KEY));
                 oldNode.setFlowId(dssFlow.getId());
                 oldNode.setWorkspace(workspace);
                 oldNode.setDssLabels(dssLabels);

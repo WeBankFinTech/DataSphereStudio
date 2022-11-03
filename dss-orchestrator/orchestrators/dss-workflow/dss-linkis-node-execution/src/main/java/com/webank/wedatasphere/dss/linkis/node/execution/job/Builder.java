@@ -23,7 +23,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLServic
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisUjesClientUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.utils.JsonUtils;
 import org.apache.linkis.httpclient.dws.DWSHttpClient;
 import org.apache.linkis.httpclient.dws.config.DWSClientConfig;

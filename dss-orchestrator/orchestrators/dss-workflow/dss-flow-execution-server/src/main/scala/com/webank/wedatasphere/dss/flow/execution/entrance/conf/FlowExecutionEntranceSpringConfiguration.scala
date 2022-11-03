@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.engine.{FlowEntranceE
 import com.webank.wedatasphere.dss.flow.execution.entrance.entranceparser.FlowExecutionParser
 import com.webank.wedatasphere.dss.flow.execution.entrance.persistence.WorkflowPersistenceEngine
 import org.apache.linkis.entrance.EntranceParser
-import org.apache.linkis.entrance.annotation.{EntranceExecutorManagerBeanAnnotation, EntranceParserBeanAnnotation, PersistenceEngineBeanAnnotation, PersistenceManagerBeanAnnotation}
+import org.apache.linkis.entrance.annotation.{EntranceExecutorManagerBeanAnnotation, EntranceParserBeanAnnotation, PersistenceEngineBeanAnnotation}
 import org.apache.linkis.entrance.persistence.{PersistenceEngine, PersistenceManager}
 import org.apache.linkis.scheduler.executer.ExecutorManager
 import org.slf4j.LoggerFactory
@@ -44,7 +44,7 @@ class FlowExecutionEntranceSpringConfiguration {
   }
 
   @EntranceParserBeanAnnotation
-  def generateEntranceParser(@PersistenceManagerBeanAnnotation.PersistenceManagerAutowiredAnnotation persistenceManager: PersistenceManager): EntranceParser = {
+  def generateEntranceParser(@PersistenceEngineBeanAnnotation.PersistenceEngineAutowiredAnnotation persistenceManager: PersistenceManager): EntranceParser = {
     logger.info("begin to get FlowExecution Entrance parser")
     new FlowExecutionParser(persistenceManager)
   }

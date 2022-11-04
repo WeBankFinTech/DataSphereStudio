@@ -67,6 +67,16 @@
         </dependency>
 
         <dependency>
+            <artifactId>spring-aop</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-context</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-rpc</artifactId>
             <version>${linkis.version}</version>
@@ -79,6 +89,14 @@
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-starter-log4j2</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-aop</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-context</artifactId>
+                    <groupId>org.springframework</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -153,6 +171,12 @@
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-storage-script-dev-server</artifactId>
             <version>${linkis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-context-support</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.linkis</groupId>

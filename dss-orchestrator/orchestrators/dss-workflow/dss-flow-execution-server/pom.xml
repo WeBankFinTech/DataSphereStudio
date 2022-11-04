@@ -84,6 +84,16 @@
         </dependency>
 
         <dependency>
+            <artifactId>spring-tx</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-context-support</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-rpc</artifactId>
             <version>${linkis.version}</version>
@@ -100,6 +110,10 @@
                 <exclusion>
                     <groupId>org.glassfish.hk2.external</groupId>
                     <artifactId>bean-validator</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-aop</artifactId>
+                    <groupId>org.springframework</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

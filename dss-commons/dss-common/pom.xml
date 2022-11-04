@@ -124,7 +124,7 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
-            <artifactId>spring-context</artifactId>
+            <artifactId>spring-context-support</artifactId>
             <groupId>org.springframework</groupId>
             <version>${spring.version}</version>
         </dependency>

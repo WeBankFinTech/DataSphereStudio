@@ -1,0 +1,20 @@
+name: Link checker
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: "0 5 * * *"
+
+jobs:
+  CheckDeadLinks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v3
+      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'no'
+          use-verbose-mode: 'yes'
+          folder-path: '../'
+          config-file: '.github/workflows/dlc.json'

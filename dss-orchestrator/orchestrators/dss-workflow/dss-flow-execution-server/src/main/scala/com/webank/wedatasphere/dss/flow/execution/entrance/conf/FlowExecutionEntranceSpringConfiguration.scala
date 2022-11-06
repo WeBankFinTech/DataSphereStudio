@@ -20,34 +20,30 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.engine.{FlowEntranceE
 import com.webank.wedatasphere.dss.flow.execution.entrance.entranceparser.FlowExecutionParser
 import com.webank.wedatasphere.dss.flow.execution.entrance.persistence.WorkflowPersistenceEngine
 import org.apache.linkis.entrance.EntranceParser
-import org.apache.linkis.entrance.annotation.{EntranceExecutorManagerBeanAnnotation, EntranceParserBeanAnnotation, PersistenceEngineBeanAnnotation, PersistenceManagerBeanAnnotation}
 import org.apache.linkis.entrance.persistence.{PersistenceEngine, PersistenceManager}
 import org.apache.linkis.scheduler.executer.ExecutorManager
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Configuration
-
+import org.springframework.context.annotation.{Bean, Configuration}
 
 @Configuration
 class FlowExecutionEntranceSpringConfiguration {
   private val logger = LoggerFactory.getLogger(classOf[FlowExecutionEntranceSpringConfiguration])
 
-  @EntranceExecutorManagerBeanAnnotation
-  def generateExternalEntranceExecutorManager(@Autowired flowEntranceEngine:FlowEntranceEngine): ExecutorManager = {
+  @Bean
+  def executorManager(flowEntranceEngine: FlowEntranceEngine): ExecutorManager = {
     logger.info("begin to get FlowExecution Entrance EntranceExecutorManager")
     new FlowExecutionExecutorManagerImpl(flowEntranceEngine)
   }
 
-  @PersistenceEngineBeanAnnotation
-  def generatePersistenceEngine(): PersistenceEngine ={
+  @Bean
+  def persistenceEngine(): PersistenceEngine ={
     new WorkflowPersistenceEngine()
   }
 
-  @EntranceParserBeanAnnotation
-  def generateEntranceParser(@PersistenceManagerBeanAnnotation.PersistenceManagerAutowiredAnnotation persistenceManager: PersistenceManager): EntranceParser = {
+  @Bean
+  def entranceParser(persistenceManager: PersistenceManager): EntranceParser = {
     logger.info("begin to get FlowExecution Entrance parser")
     new FlowExecutionParser(persistenceManager)
   }
-
 
 }

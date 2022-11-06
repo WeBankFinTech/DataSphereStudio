@@ -46,7 +46,11 @@ public interface AppInstance {
      * 与 dss_appinstance 数据库表的 enhance_json 字段对应，允许用户在数据库表中传入一个 json 格式的参数列表，
      * 第三方应用 AppConn 的 Operation 可以直接调用该方法获取  enhance_json 里面的参数列表。<br/>
      * 当然，您也可以通过该 AppConn 的 appconn.properties 设置一些所需的参数。appconn.properties 文件存放在
-     * ${APPCONN_HOME}/${APPCONN_NAME}/conf 目录下
+     * ${APPCONN_HOME}/${APPCONN_NAME}/conf 目录下。<br/>
+     * 目前 DSS 本身需要的参数如下：
+     *   1. reqUri：(非必须) 如果第三方应用集成了 DSS 一级规范，当在 DSS 的顶部菜单栏点击跳转到第三方应用的首页时，需要用到
+     * 该属性。 reqUri 用于指定一个 RESTFul 请求的 URI，该 URI 可访问第三方系统后台的某个 RESTFUL 接口（随意的 Restful 接口），
+     * DSS 放置在第三方系统的一级规范 Jar 包会自动拦截该请求，加上用户态后自动重定向给实际的前端首页。更多请参考 DSS 一级规范。
      * @return 第三方 AppConn 参数列表
      */
     Map<String, Object> getConfig();

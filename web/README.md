@@ -30,16 +30,16 @@ Scriptis is for interactive data analysis with script development(SQL, Pyspark, 
 
 ## QuickStart
 
-Read the Quick Start [Quick Start](/docs/en_US/ch3/Scriptis_Quick_Start.md)
+Read the Quick Start [Quick Start](./docs/en_US/ch3/Scriptis_Quick_Start.md)
 
 ## Comparison with similar scheduler systems
-![Comparison](/docs/en_US/images/readme/Comparison.png)
+![Comparison](./docs/en_US/images/readme/Comparison.png)
 
 ## Community
 If you desire immediate response, please kindly raise issues to us or scan the below QR code by WeChat and QQ to join our group:
 
-![WeChatQQ](/docs/en_US/images/wechatQQ.png)
+![WeChatQQ](./docs/en_US/images/wechatQQ.png)
 
 ## License
 
-Scriptis is under the Apache 2.0 license. See the [LICENSE]((http://www.apache.org/licenses/LICENSE-2.0)) file for details
+Scriptis is under the Apache 2.0 license. See the [LICENSE](https://github.com/WeBankFinTech/DataSphereStudio/blob/master/LICENSE) file for details

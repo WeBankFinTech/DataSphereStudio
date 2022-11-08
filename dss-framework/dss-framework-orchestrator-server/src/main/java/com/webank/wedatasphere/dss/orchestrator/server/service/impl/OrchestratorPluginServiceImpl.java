@@ -236,6 +236,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 conversionDSSOrchestratorPlugin = (ConversionDSSOrchestratorPlugin) plugin;
             }
         }
+        if(conversionDSSOrchestratorPlugin==null){
+            return ResponseOperateOrchestrator.failed("can not find plugin type of ConversionDSSOrchestratorPlugin,operate failed!");
+        }
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
         ResponseOperateOrchestrator response;

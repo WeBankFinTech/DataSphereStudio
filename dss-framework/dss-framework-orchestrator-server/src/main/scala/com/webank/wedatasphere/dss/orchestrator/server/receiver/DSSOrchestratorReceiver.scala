@@ -50,8 +50,8 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
       )
 
     case requestImportOrchestrator: RequestImportOrchestrator =>
-      val importOrcId = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestrator(requestImportOrchestrator)
-      ResponseImportOrchestrator(importOrcId)
+      val dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestrator(requestImportOrchestrator)
+      ResponseImportOrchestrator(dssOrchestratorVersion.getOrchestratorId,dssOrchestratorVersion.getVersion)
 
     case addVersionAfterPublish: RequestAddVersionAfterPublish =>
       orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).addVersionAfterPublish(

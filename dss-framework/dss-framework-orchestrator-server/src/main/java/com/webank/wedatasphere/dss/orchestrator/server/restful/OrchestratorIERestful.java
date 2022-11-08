@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
@@ -101,17 +102,17 @@ public class OrchestratorIERestful {
         }
 
         BmlResource resultMap = bmlService.upload(userName, inputStream, fileName, projectName);
-        Long importOrcId;
+        DSSOrchestratorVersion dssOrchestratorVersion;
         try {
             RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
                     projectID, resultMap.getResourceId(),
                     resultMap.getVersion(), null, dssLabelList, workspace);
-            importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
+            dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
         } catch (Exception e) {
             logger.error("Import orchestrator failed for ", e);
             throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());
         }
-        return Message.ok().data("importOrcId", importOrcId);
+        return Message.ok().data("importOrcId", dssOrchestratorVersion.getOrchestratorId());
     }
 
     @RequestMapping(path ="exportOrchestrator", method = RequestMethod.GET)

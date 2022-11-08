@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -30,8 +31,8 @@ import java.util.function.Supplier;
  */
 public class AppStandardClassUtils extends ClassHelper {
 
-    private static final Map<String, AppStandardClassUtils> INSTANCES = new HashMap<>();
-    private static final Map<String, ClassLoader> CLASS_LOADER_MAP = new HashMap<>();
+    private static final Map<String, AppStandardClassUtils> INSTANCES = new ConcurrentHashMap<>();
+    private static final Map<String, ClassLoader> CLASS_LOADER_MAP = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppStandardClassUtils.class);
 

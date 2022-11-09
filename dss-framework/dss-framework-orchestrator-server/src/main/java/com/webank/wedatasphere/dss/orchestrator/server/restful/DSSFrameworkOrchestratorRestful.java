@@ -176,7 +176,8 @@ public class DSSFrameworkOrchestratorRestful {
     }
 
     /**
-     * 获取编排复制任务状态
+     * 查询锁信息和解锁操作共用此接口。
+     * confirmDelete参数为false时，返回编辑锁的owner等信息。confirmDelete为true时，执行解锁操作。
      *
      * @return
      * @throws Exception

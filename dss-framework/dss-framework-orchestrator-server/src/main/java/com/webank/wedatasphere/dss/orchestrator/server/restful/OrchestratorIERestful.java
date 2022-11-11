@@ -31,6 +31,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.impl.OrchestratorFrameworkServiceImpl;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.io.IOUtils;
@@ -68,6 +69,7 @@ public class OrchestratorIERestful {
     OrchestratorService orchestratorService;
     @Autowired
     private DSSOrchestratorContext orchestratorContext;
+
 
     @RequestMapping(path ="importOrchestratorFile", method = RequestMethod.POST)
     public Message importOrcFile(HttpServletRequest req,
@@ -140,6 +142,8 @@ public class OrchestratorIERestful {
             orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
         }
         orcVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
+        //鉴权
+        OrchestratorFrameworkServiceImpl.validateOperation(orchestratorVo.getDssOrchestratorInfo().getProjectId(), userName);
         logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
             res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,

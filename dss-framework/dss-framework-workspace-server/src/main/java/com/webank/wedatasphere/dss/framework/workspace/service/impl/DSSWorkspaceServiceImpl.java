@@ -443,7 +443,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public void associateDepartments(Long workspaceId, String departments, String roles, String user) {
+    public void associateDepartments(Long workspaceId, String departments, String roles, String user) throws DSSErrorException {
+        List<Integer> userRoles = dssWorkspaceUserMapper.getRoleInWorkspace(workspaceId.intValue(), user);
+        //管理员鉴权
+        if (userRoles.stream().noneMatch(l -> l == workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()))) {
+            throw new DSSErrorException(80000, "无权限操作");
+        }
         if (dssWorkspaceMapper.getAssociateDepartmentsByWorkspaceId(workspaceId) != null) {
             dssWorkspaceMapper.updateDepartmentsForWorkspace(workspaceId, departments, roles, user);
         } else {

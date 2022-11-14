@@ -195,6 +195,8 @@
         "GBKBTS": "Close DB/Table suggest",
         "DKKBTS": "Open DB/Table suggest",
         "DKZDHH": "Auto Break",
+        "newdbcomplition": "DB/Table suggest-Beta",
+        "dbcomplition": "DB/Table suggest-Release",
         "GBZDHH": "Close auto break",
         "GYFSYGWYF": "This is highly dangerous syntax, please be cautious!"
       },

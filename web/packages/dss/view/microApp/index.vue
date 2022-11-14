@@ -85,7 +85,7 @@ export default {
           sub_mf_name: 'data_lineage',
         }, {
           method: 'get',
-          baseURL: 'http://172.21.3.173:9090',
+          baseURL: 'http://sit.facade.bdp.weoa.com:9090',
           headers: {
             proxyUser: this.getUserName(),
           }

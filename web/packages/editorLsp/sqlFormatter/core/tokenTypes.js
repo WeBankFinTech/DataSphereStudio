@@ -15,26 +15,21 @@
  *
  */
 
-import { weMenu, weMenuItem, weSubMenu } from './menu';
-import weNavbar from './navbar';
-import weTree from './tree';
-import { wePanel, wePanelItem } from './panel';
-
-const components = {
-  weMenu,
-  weMenuItem,
-  weSubMenu,
-  weNavbar,
-  weTree,
-  wePanel,
-  wePanelItem,
-};
-const install = function(Vue) {
-  Object.keys(components).forEach((key) => {
-    Vue.component(key, components[key]);
-  });
-};
-
+/**
+ * Constants for token types
+ */
 export default {
-  install,
+  WHITESPACE: 'whitespace',
+  WORD: 'word',
+  STRING: 'string',
+  RESERVED: 'reserved',
+  RESERVED_TOPLEVEL: 'reserved-toplevel',
+  RESERVED_NEWLINE: 'reserved-newline',
+  OPERATOR: 'operator',
+  OPEN_PAREN: 'open-paren',
+  CLOSE_PAREN: 'close-paren',
+  LINE_COMMENT: 'line-comment',
+  BLOCK_COMMENT: 'block-comment',
+  NUMBER: 'number',
+  PLACEHOLDER: 'placeholder',
 };

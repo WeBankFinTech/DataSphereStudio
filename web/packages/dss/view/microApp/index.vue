@@ -85,7 +85,7 @@ export default {
           sub_mf_name: 'data_lineage',
         }, {
           method: 'get',
-          baseURL: 'http://127.0.0.1:9090',
+          baseURL: 'http://***REMOVED***:9090',
           headers: {
             proxyUser: this.getUserName(),
           }

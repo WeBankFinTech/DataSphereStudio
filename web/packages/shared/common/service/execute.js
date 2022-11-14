@@ -505,7 +505,7 @@ Execute.prototype.updateLastHistory = function(option, cb) {
  */
 function deconstructStatusIfKill(execute, ret) {
   if (ret.status !== 'Cancelled') {
-    setTimeout(() => {
+    execute.statusTimeout = setTimeout(() => {
       execute.queryStatus({ isKill: true });
     }, 5000);
   } else {
@@ -531,7 +531,7 @@ function deconstructStatus(execute, ret) {
       if (execute.postType !== 'socket') {
         // 5秒发送一次请求
         if (!execute.run) return;
-        setTimeout(() => {
+        execute.statusTimeout = setTimeout(() => {
           execute.queryStatus({ isKill: false });
           execute.queryProgress();
           execute.queryLog();

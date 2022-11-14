@@ -762,6 +762,8 @@ export default {
               },
               onCancel: () => {}
             })
+          } else {
+            this.$t('message.workflow.unlocksuccess')
           }
         })
     },
@@ -1489,21 +1491,27 @@ export default {
     checkCopyStatus(sourceTarget) {
       api
         .fetch(
-          `${this.$API_PATH.ORCHESTRATOR_PATH}getAllProjects/${sourceTarget.copyJobId}/copyInfo`,
+          `${this.$API_PATH.ORCHESTRATOR_PATH}${sourceTarget.copyJobId}/copyInfo`,
           {
           },
           "get"
         )
         .then((res) => {
-          if (res.orchestratorCopyInfo && res.orchestratorCopyInfo.isCopying) {
-            clearTimeout(this.checkStatusTimer)
-            this.checkStatusTimer = setTimeout(()=>{
-              this.checkCopyStatus(sourceTarget)
-            },3000)
-          } else {
-            eventbus.emit('workflow.copying', {...sourceTarget, done: true})
-            this.$Notice.close('copy_workflow_ing')
-            this.$Message.success(this.$t('message.workflow.CopySucceed'))
+          if (res.orchestratorCopyInfo)  {
+            if (res.orchestratorCopyInfo.isCopying) {
+              clearTimeout(this.checkStatusTimer)
+              this.checkStatusTimer = setTimeout(()=>{
+                this.checkCopyStatus(sourceTarget)
+              },3000)
+            } else {
+              eventbus.emit('workflow.copying', {...sourceTarget, done: true})
+              this.$Notice.close('copy_workflow_ing')
+              if (res.orchestratorCopyInfo.status) {
+                this.$Message.success(this.$t('message.workflow.CopySucceed'))
+              } else {
+                this.$Message.error(this.$t('message.workflow.CopyFailed'))
+              }
+            }
           }
         });
     }

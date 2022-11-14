@@ -21,7 +21,7 @@
           <div class="left_search">
             <!-- 切换显示方式按钮 -->
             <div class="left_visual" @click="changeVisual">
-              <SvgIcon color="rgba(0,0,0,0.65)" :iconClass="visualCatesIcon"/>
+              <SvgIcon :iconClass="visualCatesIcon"/>
               <span>
                 {{ visualCatesTitle }}
               </span>

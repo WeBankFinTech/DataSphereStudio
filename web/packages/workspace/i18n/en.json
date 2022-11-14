@@ -274,7 +274,7 @@
         "status": "Status：",
         "desc": "Description：",
         "workspaceType": "Workspace Type：",
-        "adminviewall": "Admin user can view all projects in workspace",
+        "adminviewall": "Admin user can view all projects in workspace: ",
         "yes": "Yes",
         "no": "No"
       },

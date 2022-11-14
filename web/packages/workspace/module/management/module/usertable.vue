@@ -347,11 +347,11 @@ export default {
         const res = await getAllDepartments()
         this.departments = res ? res.departmentWithOffices || [] : []
         this.autojoinShow = true
-        const info = await api.fetch(`${this.$API_PATH.WORKSPACE_PATH}{$workspaceId}/associateDepartmentsInfo`, {},'get')
-        if(info) {
+        const info = await api.fetch(`${this.$API_PATH.WORKSPACE_PATH}${this.workspaceId}/associateDepartmentsInfo`, {},'get')
+        if(info && info.associateDepartments) {
           this.autoJoin = {
-            role: Array.isArray(info.roleIds) ? info.roleIds : info.roleIds.split(','),
-            department: Array.isArray(info.departments) ? info.departments : info.departments.split(',')
+            role: Array.isArray(info.associateDepartments.roleIds) ? info.associateDepartments.roleIds : info.associateDepartments.roleIds.split(',').map(it => it - 0),
+            department: Array.isArray(info.associateDepartments.departments) ? info.associateDepartments.departments : info.associateDepartments.departments.split(',')
           }
         }
       } catch (error) {

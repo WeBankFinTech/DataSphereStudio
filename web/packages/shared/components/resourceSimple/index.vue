@@ -46,6 +46,13 @@
           :point-list="pointList"></point>
         <div>
           <Button
+            v-if="switcher === 'session'"
+            type="default"
+            @click="selectAll">
+            {{ isSelectedAll ? $t('message.common.resourceSimple.QXQX') : $t('message.common.resourceSimple.QX')}}
+          </Button>
+
+          <Button
             type="default"
             @click="rest">
             <Icon
@@ -106,6 +113,7 @@ export default {
       loading: false,
       isJobBtnDisabled: true,
       engineDisable: true,
+      isSelectedAll: false
     };
   },
   methods: {
@@ -149,6 +157,10 @@ export default {
     },
     rest() {
       this.open();
+    },
+    selectAll() {
+      this.$refs.engine.selectAll(this.isSelectedAll);
+      this.isSelectedAll = !this.isSelectedAll;
     },
     getPointList() {
       let list = null;

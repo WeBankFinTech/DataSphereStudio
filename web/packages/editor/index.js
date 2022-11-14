@@ -15,26 +15,18 @@
  *
  */
 
-import { weMenu, weMenuItem, weSubMenu } from './menu';
-import weNavbar from './navbar';
-import weTree from './tree';
-import { wePanel, wePanelItem } from './panel';
+import weEditor from './editor.vue';
+import weEditorCompare from './compare.vue';
 
-const components = {
-  weMenu,
-  weMenuItem,
-  weSubMenu,
-  weNavbar,
-  weTree,
-  wePanel,
-  wePanelItem,
-};
 const install = function(Vue) {
-  Object.keys(components).forEach((key) => {
-    Vue.component(key, components[key]);
-  });
+  const uselsp = localStorage.getItem('scriptis-edditor-type') === 'lsp'
+  if (!uselsp) {
+    Vue.component('WeEditor', weEditor);
+    Vue.component('WeEditorCompare', weEditorCompare);
+  }
 };
 
 export default {
   install,
 };
+

@@ -40,7 +40,7 @@ export default {
     IDE: ['saveNode'],
   },
   data: {
-    API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `http://${window.location.host}/api/rest_j/v1/`,
+    API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `${location.protocol}//${window.location.host}/api/rest_j/v1/`,
     BI_API_PATH: 'dws/vg#',
   },
   component: () =>

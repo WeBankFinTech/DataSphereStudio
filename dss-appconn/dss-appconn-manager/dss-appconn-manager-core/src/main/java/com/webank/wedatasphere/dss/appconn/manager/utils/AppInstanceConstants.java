@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.manager.utils;
 
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.conf.CommonVars;
@@ -26,12 +28,29 @@ public class AppInstanceConstants {
     static final String INDEX_FILE_PREFIX = "index_";
     static final String INDEX_FILE_SUFFIX = ".index";
 
+    static final String REQUEST_URI = "reqUri";
+
     public static final CommonVars<TimeType> APP_CONN_REFRESH_INTERVAL = CommonVars.apply("wds.dss.appconn.refresh.interval", new TimeType("5m"));
 
-    public static String getHomepageUrl(AppInstance appInstance,
+    public static String getHomepageUrl(AppInstance appInstance, SSOUrlBuilderOperation ssoUrlBuilderOperation,
                                         Long workspaceId, String workspaceName) {
-        return getHomepageUrl(appInstance.getBaseUrl(), appInstance.getHomepageUri(),
+        String homepageUrl = getHomepageUrl(appInstance.getBaseUrl(), appInstance.getHomepageUri(),
                 workspaceId, workspaceName);
+        if(MapUtils.isEmpty(appInstance.getConfig()) || ssoUrlBuilderOperation == null ||
+                !appInstance.getConfig().containsKey(REQUEST_URI)) {
+            return homepageUrl;
+        } else {
+            String reqUri = (String) appInstance.getConfig().get(REQUEST_URI);
+            String reqUrl;
+            if(appInstance.getBaseUrl().endsWith("/")) {
+                reqUrl = appInstance.getBaseUrl() + reqUri;
+            } else {
+                reqUrl = appInstance.getBaseUrl() + "/" + reqUri;
+            }
+            ssoUrlBuilderOperation.redirectTo(homepageUrl);
+            ssoUrlBuilderOperation.setReqUrl(reqUrl);
+            return ssoUrlBuilderOperation.getBuiltUrl();
+        }
     }
 
     public static String getHomepageUrl(String baseUrl, String homepageUri,

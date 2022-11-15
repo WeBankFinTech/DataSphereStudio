@@ -26,7 +26,6 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.log.LogUtils;
 import org.apache.linkis.entrance.EntranceServer;
-import org.apache.linkis.entrance.annotation.EntranceServerBeanAnnotation;
 import org.apache.linkis.entrance.execute.EntranceJob;
 import org.apache.linkis.entrance.restful.EntranceRestfulApi;
 import org.apache.linkis.entrance.utils.JobHistoryHelper;
@@ -64,7 +63,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
     @Autowired
     private TaskMapper taskMapper;
     @Override
-    @EntranceServerBeanAnnotation.EntranceServerAutowiredAnnotation
+    @Autowired
     public void setEntranceServer(EntranceServer entranceServer) {
         super.setEntranceServer(entranceServer);
         this.entranceServer = entranceServer;

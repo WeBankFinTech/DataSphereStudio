@@ -22,7 +22,7 @@ export default {
   events: ['showHive', 'getAllDbsAndTables', 'getAllowMap', 'HiveSidebar:getDatabase', 'HiveSidebar:getTables', 'HiveSidebar:getTablePartitions', 'HiveSidebar:deletedAndRefresh'],
   dispatchs: ['Workbench:add', 'Workbench:run', 'Workbench:pasteInEditor', 'HiveSidebar:getTables', 'WorkSidebar:showTree', 'HdfsSidebar:showTree', 'IndexedDB:getTree', 'IndexedDB:appendTree'],
   data: {
-    API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `http://${window.location.host}/api/rest_j/v1/`,
+    API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `${location.protocol}//${window.location.host}/api/rest_j/v1/`,
     ALLOW_MAP: ['_ind', '_share', '_work', '_qml'],
   },
   methods: {

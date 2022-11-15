@@ -65,7 +65,7 @@ export default {
       var formdata = new FormData();
       formdata.append("file", $file);
       axios({
-        url: `http://${window.location.host}/api/rest_j/v1/dss/guide/admin/guidecontent/uploadImage`,
+        url: `${location.protocol}//${window.location.host}/api/rest_j/v1/dss/guide/admin/guidecontent/uploadImage`,
         method: "post",
         data: formdata,
         headers: { "Content-Type": "multipart/form-data" },

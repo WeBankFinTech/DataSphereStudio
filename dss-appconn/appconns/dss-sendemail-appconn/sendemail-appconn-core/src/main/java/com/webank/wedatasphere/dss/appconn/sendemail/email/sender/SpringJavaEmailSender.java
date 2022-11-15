@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import java.util.Base64;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 import java.util.Map;
@@ -45,10 +46,10 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
     @Override
     public void init(Map<String, String> properties) {
         Properties prop = new Properties();
-        prop.put("mail.smtp.auth", Boolean.parseBoolean(EMAIL_SMTP_AUTH().getValue(properties)));
-        prop.put("mail.smtp.starttls.enable", Boolean.parseBoolean(EMAIL_SMTP_STARTTLS_ENABLE().getValue(properties)));
-        prop.put("mail.smtp.starttls.required", Boolean.parseBoolean(EMAIL_SMTP_STARTTLS_REQUIRED().getValue(properties)));
-        prop.put("mail.smtp.ssl.enable", Boolean.parseBoolean(EMAIL_SMTP_SSL_ENABLED().getValue(properties)));
+        prop.put("mail.smtp.auth", EMAIL_SMTP_AUTH().getValue(properties));
+        prop.put("mail.smtp.starttls.enable", EMAIL_SMTP_STARTTLS_ENABLE().getValue(properties));
+        prop.put("mail.smtp.starttls.required", EMAIL_SMTP_STARTTLS_REQUIRED().getValue(properties));
+        prop.put("mail.smtp.ssl.enable", EMAIL_SMTP_SSL_ENABLED().getValue(properties));
         prop.put("mail.smtp.timeout", EMAIL_SMTP_TIMEOUT().getValue(properties));
         javaMailSender.setJavaMailProperties(prop);
         BiConsumer<Consumer<String>, CommonVars<String>> setProp = (consumer, c) -> {
@@ -84,10 +85,10 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
-            if (StringUtils.isBlank(email.getFrom())) {
+            if (StringUtils.isBlank(javaMailSender.getUsername())) {
                 messageHelper.setFrom(DEFAULT_EMAIL_FROM().getValue());
             } else {
-                messageHelper.setFrom(email.getFrom());
+                messageHelper.setFrom(javaMailSender.getUsername());
             }
             messageHelper.setSubject(email.getSubject());
             messageHelper.setTo(email.getTo());
@@ -97,10 +98,12 @@ public class SpringJavaEmailSender extends AbstractEmailSender {
             if (StringUtils.isNotBlank(email.getBcc())) {
                 messageHelper.setBcc(email.getBcc());
             }
-            for (Attachment attachment : email.getAttachments()) {
-                messageHelper.addAttachment(attachment.getName(), new ByteArrayDataSource(attachment.getBase64Str(), attachment.getMediaType()));
-            }
             messageHelper.setText(email.getContent(), true);
+            for (Attachment attachment : email.getAttachments()) {
+                messageHelper.addInline(attachment.getName(), new ByteArrayDataSource(Base64.getMimeDecoder().decode(attachment.getBase64Str()), attachment.getMediaType()));
+                messageHelper.addAttachment(attachment.getName(), new ByteArrayDataSource(Base64.getMimeDecoder().decode(attachment.getBase64Str()), attachment.getMediaType()));
+            }
+
         } catch (Exception e) {
             logger.error("Send mail failed", e);
         }

@@ -1,4 +1,9 @@
 {
+  "ignorePatterns": [
+    {
+      "pattern": "https://github.com/WeBankFinTech/DataSphereStudio-Doc"
+    }
+  ],
   "timeout": "10s",
   "retryOn429": true,
   "retryCount": 10,
@@ -7,10 +12,6 @@
     200,
     401,
     403
-  ],
-  "exclude": [
-    "https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/en_US/Installation_and_Deployment/DSS%26Linkis_one-click_deployment_document_stand-alone_version.md",
-    "https://github.com/WeBankFinTech/DataSphereStudio-Doc/blob/main/zh_CN/%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/DSS%26Linkis%E4%B8%80%E9%94%AE%E9%83%A8%E7%BD%B2%E6%96%87%E6%A1%A3%E5%8D%95%E6%9C%BA%E7%89%88.md"
   ]
 }
 

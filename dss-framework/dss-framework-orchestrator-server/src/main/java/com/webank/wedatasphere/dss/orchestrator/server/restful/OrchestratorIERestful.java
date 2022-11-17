@@ -16,12 +16,15 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
@@ -110,6 +113,8 @@ public class OrchestratorIERestful {
                     projectID, resultMap.getResourceId(),
                     resultMap.getVersion(), null, dssLabelList, workspace);
             dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
+            AuditLogUtils.printLog(userName, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                    projectID, projectName, OperateTypeEnum.CREATE, importRequest);
         } catch (Exception e) {
             logger.error("Import orchestrator failed for ", e);
             throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());
@@ -148,6 +153,8 @@ public class OrchestratorIERestful {
         try {
             res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,
                     orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace).getBmlResource();
+            AuditLogUtils.printLog(userName, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                    orcVersionId, orchestratorVo.getDssOrchestratorInfo().getName(), OperateTypeEnum.UPDATE, orchestratorVo);
         } catch (Exception e) {
             logger.error("export orchestrator failed for ", e);
             throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());

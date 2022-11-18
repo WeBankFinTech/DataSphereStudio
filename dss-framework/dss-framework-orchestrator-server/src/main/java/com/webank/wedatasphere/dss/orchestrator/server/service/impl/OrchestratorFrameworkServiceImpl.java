@@ -371,7 +371,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
      * @return
      * @throws DSSOrchestratorErrorException
      */
-    private DSSProject validateOperation(long projectId, String username) throws DSSOrchestratorErrorException {
+    public static DSSProject validateOperation(long projectId, String username) throws DSSOrchestratorErrorException {
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
         DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
@@ -385,7 +385,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         return dssProject;
     }
 
-    private boolean hasProjectEditPriv(Long projectId, String username) {
+    private static boolean hasProjectEditPriv(Long projectId, String username) {
         ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
                 .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username)), ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
         boolean hasEditPriv = false;

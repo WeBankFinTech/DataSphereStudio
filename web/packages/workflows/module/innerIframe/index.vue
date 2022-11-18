@@ -6,13 +6,14 @@
       </div>
     </template>
     <template v-else>
-      <iframe ref="ifr" :src="openurl"   width="100%" frameborder="0"></iframe>
+      <iframe ref="ifr" :src="openurl" width="100%" frameborder="0"></iframe>
     </template>
     <Spin v-if="projectName && loading" fix>加载中，请稍后...</Spin>
   </div>
 </template>
 
 <script>
+import qs from 'qs';
 import emptyGuide from "./emptyGuide.vue"
 import storage from '@dataspherestudio/shared/common/helper/storage'
 
@@ -39,7 +40,13 @@ export default {
   },
   computed: {
     openurl() {
-      return `${this.url}?projectName=${this.projectName}`
+      if (this.url) {
+        const urlObj = new URL(this.url)
+        const search = qs.parse(urlObj.search)
+        search.projectName = this.projectName
+        return decodeURIComponent(urlObj.origin + urlObj.pathname + '?' + qs.stringify(search) + urlObj.hash )
+      }
+      return ''
     }
   },
   data() {
@@ -59,7 +66,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import "@dataspherestudio/shared/common/style/variables.scss";
+@import '@dataspherestudio/shared/common/style/variables.scss';
 
 .emptyGuideWrap {
   width: 100%;

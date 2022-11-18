@@ -565,7 +565,7 @@ export default {
         .workbench-tab-control {
             flex: 0 0 45px;
             text-align: right;
-            background-color: $body-background;
+            @include bg-color($light-base-color, $dark-base-color);
             border-left: $border-width-base $border-style-base $border-color-split;
             .ivu-icon {
               font-size: $font-size-base;
@@ -583,7 +583,7 @@ export default {
         .workbench-tab-button {
             flex: 0 0 30px;
             text-align: center;
-            background-color: $body-background;
+            @include bg-color($light-base-color, $dark-base-color);
             .ivu-icon {
                 font-size: $font-size-base;
                 margin-top: 8px;

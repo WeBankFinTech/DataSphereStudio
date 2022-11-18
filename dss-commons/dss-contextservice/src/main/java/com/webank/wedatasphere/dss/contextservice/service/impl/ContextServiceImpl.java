@@ -105,13 +105,12 @@ public class ContextServiceImpl implements ContextService {
                         if (!DSSCommonConf.DSS_IO_ENV.getValue().equalsIgnoreCase(contextID.getEnv())) {
                             updateContextId = true;
                         } else if (StringUtils.isBlank(contextID.getProject())
-                                || StringUtils.isBlank(contextID.getFlow())
-                                || StringUtils.isBlank(contextID.getVersion())) {
+                                || StringUtils.isBlank(contextID.getFlow())) {
                             updateContextId = false;
                         } else if ((null != contextID.getWorkSpace() && !contextID.getWorkSpace().equalsIgnoreCase(workspace))
                                 || !contextID.getProject().equalsIgnoreCase(project)
                                 || !contextID.getFlow().equalsIgnoreCase(flow)
-                                || !contextID.getVersion().equalsIgnoreCase(flowVersion)) {
+                                || !flowVersion.equalsIgnoreCase(contextID.getVersion())) {
                             updateContextId = true;
                         } else {
                             updateContextId = false;

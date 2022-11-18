@@ -542,7 +542,12 @@ export default {
           this.dispatch('Workbench:setTabPanelSize');
           this.scriptViewState.topPanelFull = false;
         }
-        this.showPanelTab('progress');
+        if (this.$refs.progressTab) {
+          this.$refs.progressTab.updateErrorMsg({})
+        }
+        setTimeout(()=>{
+          this.showPanelTab('progress');
+        }, 100)
         const data = this.getExecuteData(option);
         // 执行
         this.execute = new Execute(data);
@@ -705,7 +710,9 @@ export default {
               failedReason: ret.errCode && ret.errDesc ? ret.errCode + ret.errDesc : ''
             })
           }
-          if (ret.solution && ret.solution.solutionUrl && ret.status == 'Failed') {
+          if (ret.solution && ret.solution.solutionUrl) {
+            //
+          } else if (ret.status == 'Failed') {
             this.showPanelTab('log')
           }
         });
@@ -1399,7 +1406,6 @@ export default {
       left: 0 !important;
       position: fixed;
       z-index: 1050;
-      background-color: #fff;
       height: 100% !important;
     }
     .new-sidebar-spin {
@@ -1417,7 +1423,6 @@ export default {
       left: 0 !important;
       position: fixed;
       z-index: 1050;
-      background-color: #fff;
       height: 100% !important;
     }
     .workbench-tabs {

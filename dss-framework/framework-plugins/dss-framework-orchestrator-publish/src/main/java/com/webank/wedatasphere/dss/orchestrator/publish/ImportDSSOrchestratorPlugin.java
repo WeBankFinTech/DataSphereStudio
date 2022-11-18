@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -38,7 +39,7 @@ public interface ImportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
      * @throws IOException
      * @throws ExternalOperationFailedException
      */
-    Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception;
+    DSSOrchestratorVersion importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception;
 
     /**
      * 导入复制的编排

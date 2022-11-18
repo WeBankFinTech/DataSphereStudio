@@ -773,8 +773,8 @@
         "admin": "Administrator",
         "desc": "Description",
         "required": "Required",
-        "ownerplaceholder": "请准确填写表转移后属主的企业微信英文名",
-        "adminplaceholder": "请准确填写部门数据治理管理员的企业微信英文名"
+        "ownerplaceholder": "Owner's English name of the enterprise WeChat of transfer",
+        "adminplaceholder": "Department administrator’s English name of the enterprise WeChat"
       },
       "loadingwait": "Loading, please wait",
       "loading": "Loading",

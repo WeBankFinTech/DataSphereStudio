@@ -16,13 +16,17 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.restful;
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelKeyConvertor;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
@@ -30,6 +34,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.impl.OrchestratorFrameworkServiceImpl;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.io.IOUtils;
@@ -68,6 +73,7 @@ public class OrchestratorIERestful {
     @Autowired
     private DSSOrchestratorContext orchestratorContext;
 
+
     @RequestMapping(path ="importOrchestratorFile", method = RequestMethod.POST)
     public Message importOrcFile(HttpServletRequest req,
                                   @RequestParam(required = false, name = "projectName") String projectName,
@@ -101,17 +107,19 @@ public class OrchestratorIERestful {
         }
 
         BmlResource resultMap = bmlService.upload(userName, inputStream, fileName, projectName);
-        Long importOrcId;
+        DSSOrchestratorVersion dssOrchestratorVersion;
         try {
             RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,
                     projectID, resultMap.getResourceId(),
                     resultMap.getVersion(), null, dssLabelList, workspace);
-            importOrcId = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
+            dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin.class).importOrchestrator(importRequest);
+            AuditLogUtils.printLog(userName, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                    projectID, projectName, OperateTypeEnum.CREATE, importRequest);
         } catch (Exception e) {
             logger.error("Import orchestrator failed for ", e);
             throw new DSSErrorException(100789, "Import orchestrator failed for " + e.getMessage());
         }
-        return Message.ok().data("importOrcId", importOrcId);
+        return Message.ok().data("importOrcId", dssOrchestratorVersion.getOrchestratorId());
     }
 
     @RequestMapping(path ="exportOrchestrator", method = RequestMethod.GET)
@@ -139,10 +147,14 @@ public class OrchestratorIERestful {
             orchestratorVo = orchestratorService.getOrchestratorVoById(orchestratorId);
         }
         orcVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
+        //鉴权
+        OrchestratorFrameworkServiceImpl.validateOperation(orchestratorVo.getDssOrchestratorInfo().getProjectId(), userName);
         logger.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
             res = orchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class).exportOrchestrator(userName,
                     orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace).getBmlResource();
+            AuditLogUtils.printLog(userName, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                    orcVersionId, orchestratorVo.getDssOrchestratorInfo().getName(), OperateTypeEnum.UPDATE, orchestratorVo);
         } catch (Exception e) {
             logger.error("export orchestrator failed for ", e);
             throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());

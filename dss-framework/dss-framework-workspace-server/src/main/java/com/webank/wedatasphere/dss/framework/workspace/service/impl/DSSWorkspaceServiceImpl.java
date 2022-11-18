@@ -175,19 +175,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName, String moduleName) throws DSSErrorException {
-        //根据用户名 拿到用户ID
-        //根据用户id 和工作空间id 拿到 角色id
-        //根据role id 和工作空间id 拿到 重定向的 url
-        List<Integer> tempWorkspaceIds = dssWorkspaceUserMapper.getWorkspaceIds(userName);
-//        if (tempWorkspaceIds == null || tempWorkspaceIds.isEmpty()) {
-//            throw new DSSErrorException(30020, "该账号尚未加入工作空间，请联系管理员分配工作空间及用户角色");
-//        }
-        List<Integer> workspaceIds = new ArrayList<>();
-        tempWorkspaceIds.stream().
-                map(dssWorkspaceMapper::getWorkspaceNameById).
-                filter(name -> !DEFAULT_DEMO_WORKSPACE_NAME.getValue().equals(name)).
-                map(dssWorkspaceMapper::getWorkspaceIdByName).
-                forEach(workspaceIds::add);
+        List<DSSWorkspace> dssWorkspaces = dssWorkspaceMapper.getWorkspaces(userName);
+        List<Integer> workspaceIds = dssWorkspaces.stream().filter(l -> !DEFAULT_DEMO_WORKSPACE_NAME.getValue().equals(l.getName()))
+                .map(DSSWorkspace::getId).collect(Collectors.toList());
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = new DSSWorkspaceHomePageVO();
         if (workspaceIds.size() == 0) {
             Long userId = dssWorkspaceUserMapper.getUserID(userName);
@@ -199,6 +189,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
                         userName, "system", userId);
             }
+            //todo 初始化做的各项事情改为listener模式
             //为新用户自动加入部门关联的工作空间
             joinWorkspaceForNewUser(userName, userId);
 
@@ -452,7 +443,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public void associateDepartments(Long workspaceId, String departments, String roles, String user) {
+    public void associateDepartments(Long workspaceId, String departments, String roles, String user) throws DSSErrorException {
+        List<Integer> userRoles = dssWorkspaceUserMapper.getRoleInWorkspace(workspaceId.intValue(), user);
+        //管理员鉴权
+        if (userRoles.stream().noneMatch(l -> l == workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()))) {
+            throw new DSSErrorException(80000, "无权限操作");
+        }
         if (dssWorkspaceMapper.getAssociateDepartmentsByWorkspaceId(workspaceId) != null) {
             dssWorkspaceMapper.updateDepartmentsForWorkspace(workspaceId, departments, roles, user);
         } else {

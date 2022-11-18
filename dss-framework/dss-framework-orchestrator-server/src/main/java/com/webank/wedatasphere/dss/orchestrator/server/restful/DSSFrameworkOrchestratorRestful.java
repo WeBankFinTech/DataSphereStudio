@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.restful;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
@@ -169,14 +170,12 @@ public class DSSFrameworkOrchestratorRestful {
      */
     @RequestMapping(path = "/{id}/copyInfo", method = RequestMethod.GET)
     public Message getCopyJobStatus(@PathVariable("id") String copyInfoId) throws Exception {
-        String username = SecurityFilter.getLoginUsername(httpServletRequest);
-        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-
         return Message.ok("获取编排复制任务状态成功").data("orchestratorCopyInfo", orchestratorFrameworkService.getOrchestratorCopyInfoById(copyInfoId));
     }
 
     /**
-     * 获取编排复制任务状态
+     * 查询锁信息和解锁操作共用此接口。
+     * confirmDelete参数为false时，返回编辑锁的owner等信息。confirmDelete为true时，执行解锁操作。
      *
      * @return
      * @throws Exception

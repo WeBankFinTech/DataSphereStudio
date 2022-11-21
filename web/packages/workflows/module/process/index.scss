@@ -81,9 +81,12 @@
 
   }
 
-  .designer .designer-shape .shape-box {
-    margin: 2px 0;
-    padding: 0 10px 0 25px;
+  .designer .designer-shape {
+    padding-bottom: 30px;
+    .shape-box {
+      margin: 2px 0;
+      padding: 0 10px 0 25px;
+    }
   }
 
   .designer .designer-toolbar .devider {

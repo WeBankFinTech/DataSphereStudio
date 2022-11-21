@@ -81,12 +81,17 @@ public class MetaReader<T> {
         body.stream().map(DSSExceptionUtils.map(this::lineToT)).forEach(datas::add);
     }
 
-    private T lineToT(List<String> list) throws IllegalAccessException, InstantiationException, NoSuchFieldException, ParseException {
+    private T lineToT(List<String> list) throws IllegalAccessException, InstantiationException, ParseException {
         T t = tClass.newInstance();
         for (int i = 0; i < list.size(); i++) {
             String valueStr = list.get(i);
             if ("null".equalsIgnoreCase(valueStr)) continue;
-            Field declaredField = tClass.getDeclaredField(fields.get(i));
+            Field declaredField;
+            try {
+                declaredField = tClass.getDeclaredField(fields.get(i));
+            }catch ( java.lang.NoSuchFieldException e){
+                continue;
+            }
             declaredField.setAccessible(true);
             Object value = null;
             String type = declaredField.getType().getSimpleName();

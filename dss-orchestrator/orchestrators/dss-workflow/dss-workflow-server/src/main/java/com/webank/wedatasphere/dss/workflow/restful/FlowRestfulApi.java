@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.workflow.restful;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
@@ -39,9 +41,14 @@ import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
+import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.cs.client.utils.SerializeHelper;
+import org.apache.linkis.cs.common.entity.source.LinkisHAWorkFlowContextID;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -57,7 +64,6 @@ import java.io.IOException;
 import java.util.*;
 
 
-
 @RestController
 @RequestMapping(path = "/dss/workflow", produces = {"application/json"})
 public class FlowRestfulApi {
@@ -68,6 +74,8 @@ public class FlowRestfulApi {
     private DSSFlowService flowService;
     @Autowired
     private PublishService publishService;
+    @Autowired
+    private BMLService bmlService;
     @Autowired
     private WorkFlowManager workFlowManager;
     @Autowired
@@ -90,7 +98,7 @@ public class FlowRestfulApi {
      * @throws JsonProcessingException
      */
     @RequestMapping(value = "addFlow", method = RequestMethod.POST)
-    public Message addFlow( @RequestBody AddFlowRequest addFlowRequest) throws DSSErrorException, JsonProcessingException {
+    public Message addFlow( @RequestBody AddFlowRequest addFlowRequest) throws ErrorException, JsonProcessingException {
         //如果是子工作流，那么分类应该是和父类一起的？
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
@@ -104,24 +112,32 @@ public class FlowRestfulApi {
         String workspaceName = addFlowRequest.getWorkspaceName();
         String projectName = addFlowRequest.getProjectName();
         String version = addFlowRequest.getVersion();
+        //subflow中的subflow节点的version需要从父工作流获取
+        DSSFlow parentFlow = flowService.getFlow(parentFlowID);
+        JsonObject jsonObject = new Gson().fromJson(parentFlow.getFlowJson(), JsonObject.class);
+        //schedulerAppconnName从parentFlow的json中获取
+        String schedulerAppconnName = jsonObject.get(DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME).getAsString();
+        if (StringUtils.isBlank(version)) {
+            LinkisHAWorkFlowContextID contextID = (LinkisHAWorkFlowContextID) SerializeHelper
+                    .deserializeContextID(jsonObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString());
+            LOGGER.info("contextID version from parent flow is: {}", contextID.getVersion());
+            version = contextID.getVersion();
+        }
         String description = addFlowRequest.getDescription();
         String uses = addFlowRequest.getUses();
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(addFlowRequest.getLabels().getRoute()));
         String contextId = contextService.createContextID(workspaceName, projectName, name, version, userName);
-        AuditLogUtils.printLog( userName,String.valueOf(workspace.getWorkspaceId()),workspaceName, TargetTypeEnum.CONTEXTID,
-               contextId ,name, OperateTypeEnum.CREATE, addFlowRequest);
+        AuditLogUtils.printLog(userName, String.valueOf(workspace.getWorkspaceId()), workspaceName, TargetTypeEnum.CONTEXTID,
+                contextId, name, OperateTypeEnum.CREATE, addFlowRequest);
+        //projectId在后面逻辑中填充
         DSSFlow dssFlow = workFlowManager.createWorkflow(userName, null, name, contextId, description, parentFlowID,
-                uses, new ArrayList<>(), dssLabelList, null, null);
-        AuditLogUtils.printLog( userName,workspace.getWorkspaceId(),workspaceName, TargetTypeEnum.WORKFLOW,
-                dssFlow.getId() ,name, OperateTypeEnum.CREATE, addFlowRequest);
-
-        // TODO: 2019/5/16 空值校验，重复名校验
+                uses, new ArrayList<>(), dssLabelList, version, schedulerAppconnName);
+        AuditLogUtils.printLog(userName, workspace.getWorkspaceId(), workspaceName, TargetTypeEnum.WORKFLOW,
+                dssFlow.getId(), name, OperateTypeEnum.CREATE, addFlowRequest);
         LOGGER.info("User {} end to add flow, name:{}, projectName:{}", userName, name, projectName);
         return Message.ok().data("flow", dssFlow);
     }
-
-
 
     @RequestMapping(value = "publishWorkflow", method = RequestMethod.POST)
     public Message publishWorkflow(@RequestBody PublishWorkflowRequest publishWorkflowRequest) throws Exception {
@@ -287,7 +303,7 @@ public class FlowRestfulApi {
      * @throws IOException
      */
     @RequestMapping(value = "saveFlow", method = RequestMethod.POST)
-    public Message saveFlow( @RequestBody SaveFlowRequest saveFlowRequest) throws DSSErrorException, IOException {
+    public Message saveFlow( @RequestBody SaveFlowRequest saveFlowRequest) throws IOException {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
 
         Long flowID = saveFlowRequest.getId();
@@ -301,7 +317,6 @@ public class FlowRestfulApi {
             return Message.error("It exists same flow.(存在相同的节点)");
         }
 
-        Boolean isNotHaveLock = saveFlowRequest.getNotHaveLock();
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         String version;
         //若工作流已经被其他用户抢锁，则当前用户不能再保存成功
@@ -311,15 +326,7 @@ public class FlowRestfulApi {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
-        synchronized (DSSWorkFlowConstant.saveFlowLock.intern(flowID)) {
-            if (isNotHaveLock != null && isNotHaveLock.booleanValue()) {
-                version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
-                AuditLogUtils.printLog( username,workspace.getWorkspaceId(), workspaceName,TargetTypeEnum.WORKFLOW,
-                        flowID,dssFlow.getName(),OperateTypeEnum.UPDATE,saveFlowRequest);
-                return Message.ok().data("flowVersion", version).data("flowEditLock", null);
-            }
-            version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
-        }
+        version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
         AuditLogUtils.printLog( username,workspace.getWorkspaceId(), workspaceName,TargetTypeEnum.WORKFLOW,
                 flowID,dssFlow.getName(),OperateTypeEnum.UPDATE,saveFlowRequest);
         return Message.ok().data("flowVersion", version);

@@ -224,6 +224,12 @@ export default {
           return this.$t('message.common.resourceSimple.FM');
         case 'Starting':
           return this.$t('message.common.resourceSimple.QD');
+        case 'Running':
+          return this.$t('message.common.resourceSimple.QD');
+        case 'ShuttingDown':
+          return this.$t('message.common.resourceSimple.QD');
+        case 'Unlock':
+          return this.$t('message.common.resourceSimple.KX');
         default:
           return params
       }
@@ -351,6 +357,18 @@ export default {
           color: color
         }
       }
+    },
+    selectAll(isSelectedAll) {
+      const statusList = ['Error','ShuttingDown','Dead','Idle','Unlock']
+      this.ideEngineList.forEach(item =>  {
+        if (statusList.indexOf(item.engineStatus) > -1) item.isActive = !isSelectedAll
+      });
+      this.boardEngineList.forEach(item =>  {
+        if (statusList.indexOf(item.engineStatus) > -1) item.isActive = !isSelectedAll
+      });
+      this.otherEngineList.forEach(item =>  {
+        if (statusList.indexOf(item.engineStatus) > -1) item.isActive = !isSelectedAll
+      });
     },
   },
 };

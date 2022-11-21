@@ -563,7 +563,6 @@ export default {
       left: 0 !important;
       position: fixed;
       z-index: 1050;
-      background-color: #fff;
       height: 100% !important;
       width: 100% !important;
     }
@@ -580,6 +579,7 @@ export default {
         display: flex;
         border-top: $border-width-base $border-style-base #dcdcdc;
         border-bottom: $border-width-base $border-style-base #dcdcdc;
+        @include border-color($border-color-base, $dark-menu-base-color);
         .workbench-tab {
           flex: 1;
           display: flex;
@@ -611,28 +611,33 @@ export default {
             display: inline-block;
             height: 32px;
             line-height: 32px;
-            background-color: $background-color-base;
-            color: $title-color;
+            @include bg-color($background-color-base, $dark-workspace-body-bg-color);
+            @include font-color(
+              $title-color,
+              $dark-workspace-title-color
+            );
             cursor: pointer;
             min-width: 100px;
             max-width: 200px;
             overflow: hidden;
             margin-right: 2px;
             border: 1px solid #eee;
+            @include border-color($border-color-base, $dark-border-color-base);
             &.active {
               margin-top: 1px;
-              background-color: $body-background;
+              @include bg-color($light-base-color, $dark-base-color);
               color: $primary-color;
               border-radius: 4px 4px 0 0;
               border: 1px solid $border-color-base;
               border-bottom: 2px solid $primary-color;
+              @include border-color($border-color-base, $dark-border-color-base);
             }
           }
         }
         .workbench-tab-button {
           flex: 0 0 120px;
           text-align: center;
-          background-color: $body-background;
+          @include bg-color($light-base-color, $dark-base-color);
           .ivu-icon {
               font-size: $font-size-base;
               cursor: pointer;

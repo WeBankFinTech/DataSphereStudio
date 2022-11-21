@@ -15,6 +15,7 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.server.Message;
+import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -76,8 +77,11 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
                     CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
                 return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
             }
-            if(!StringUtils.startsWithIgnoreCase(proxyUser,"WTSS_")){
-                return Message.error("only ops proxy user can create project(只允许代理到运维用户创建工程).");
+            String userName= SecurityFilter.getLoginUsername(request);
+            if(userName.equals(proxyUser)
+                    &&!StringUtils.startsWithIgnoreCase(proxyUser,"WTSS_")
+                    &&!StringUtils.startsWithIgnoreCase(proxyUser,"hduser")){
+                return Message.error("only ops proxy user can create project(只允许代理用户创建工程).");
             }
             projectCreateRequest.getEditUsers().add(proxyUser);
             projectCreateRequest.getReleaseUsers().add(proxyUser);

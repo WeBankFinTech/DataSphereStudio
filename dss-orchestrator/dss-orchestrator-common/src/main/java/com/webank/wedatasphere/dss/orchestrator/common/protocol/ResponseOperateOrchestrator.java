@@ -71,12 +71,6 @@ public class ResponseOperateOrchestrator {
         return response;
     }
 
-    public static ResponseOperateOrchestrator failed() {
-        ResponseOperateOrchestrator response = new ResponseOperateOrchestrator();
-        response.setJobStatus(JobStatus.Failed);
-        return response;
-    }
-
     public static ResponseOperateOrchestrator failed(String message) {
         ResponseOperateOrchestrator response = new ResponseOperateOrchestrator();
         response.setJobStatus(JobStatus.Failed);

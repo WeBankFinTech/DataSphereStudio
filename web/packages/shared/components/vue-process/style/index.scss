@@ -634,7 +634,7 @@
    position: absolute;
    overflow: auto;
    padding: 6px 0;
-   background-color: #fff;
+   @include bg-color($light-base-color, $dark-workflow-bg-color);
    box-sizing: border-box;
    border-radius: 4px;
    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
@@ -649,7 +649,7 @@
        margin: 0;
        line-height: 25px;
        height: 25px;
-       color: $text-color;
+       @include font-color($text-color, $dark-text-color);
        font-size: 12px;
        text-align: left;
        clear: both;
@@ -659,7 +659,7 @@
        transition: background 0.2s ease-in-out;
 
        &:hover {
-         background: $hover-color;
+         @include bg-color( $hover-color, $dark-text-desc-color);
        }
      }
    }
@@ -670,7 +670,7 @@
      height: 16px;
      width: 16px;
      margin-top: -1px;
-     color: $text-color;
+     @include font-color($text-color, $dark-text-color);
    }
 
    .designer-menu-li-text {

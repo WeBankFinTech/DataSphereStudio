@@ -83,14 +83,16 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+  @import "@dataspherestudio/shared/common/style/variables.scss";
   .we-filter-view {
     width: 160px;
     position: absolute;
     bottom: 90px;
     top: 40px;
     padding-top: 10px;
-    background: #fff;
+    @include bg-color(#fff, $dark-menu-base-color);
     border: 1px solid #dcdee2;
+    @include border-color($border-color-base, #525354);
     border-left: none;
     padding: 10px;
     z-index: 2;

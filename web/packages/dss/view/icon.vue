@@ -2,7 +2,7 @@
   <div class="icon-content">
     <ul>
       <li v-for="item in list" :key="item" @click="copy(item)" class="icon-style">
-        <SvgIcon :icon-class="item"/>
+        <SvgIcon :icon-class="item" />
         <div>{{item}}</div>
       </li>
     </ul>
@@ -35,6 +35,11 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+  .icon-content {
+    width: 100%;
+    height: 100%;
+    overflow: auto
+  }
   .icon-style {
     background: #9c9c9c;
     display: inline-block;

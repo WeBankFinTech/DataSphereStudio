@@ -48,7 +48,7 @@ public class WorkflowRefCopyOperation
         String version = workflowCopyRequestRef.getNewVersion();
         String description = (String) workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION);
         Long targetProjectId = workflowCopyRequestRef.getRefProjectId();
-        Optional<Object> nodeSuffix = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get("nodeSuffix"));
+        Optional<Object> nodeSuffix = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NODE_SUFFIX));
         Optional<Object> newFlowName = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NAME));
         RequestCopyWorkflow requestCopyWorkflow = new RequestCopyWorkflow(userName,
                 workflowCopyRequestRef.getWorkspace(), appId, contextIdStr,

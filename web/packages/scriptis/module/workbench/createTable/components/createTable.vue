@@ -1,20 +1,23 @@
 <template>
   <div class="create-table">
-    <Card>
-      <p slot="title">
-        {{$t('message.scripts.createTable.baseAttr')}}
-      </p>
-      <Button
-        slot="extra"
-        type="primary"
-        size="small"
-        style="margin-right:15px"
-        @click.prevent="addFields">{{$t('message.scripts.createTable.addMore')}}</Button>
-      <Button
-        slot="extra"
-        type="primary"
-        size="small"
-        @click.prevent="addFieldsItem">{{$t('message.scripts.createTable.add')}}</Button>
+    <div class="basic-panel">
+      <div style="position: relative;height: 30px;">
+        <p class="title" style="float:left">
+          {{$t('message.scripts.createTable.baseAttr')}}
+        </p>
+        <Button
+          slot="extra"
+          type="primary"
+          size="small"
+          style="margin-right:15px; float:right"
+          @click.prevent="addFields">{{$t('message.scripts.createTable.addMore')}}</Button>
+        <Button
+          slot="extra"
+          type="primary"
+          size="small"
+          style="margin-right:15px; float:right"
+          @click.prevent="addFieldsItem">{{$t('message.scripts.createTable.add')}}</Button>
+      </div>
       <Form
         ref="fieldsForm"
         :model="target.newFieldsData">
@@ -25,9 +28,9 @@
           @on-model-click="modelEdit"
           @on-delete="delteFields"></fields-table>
       </Form>
-    </Card>
-    <Card v-if="partitionTable">
-      <p slot="title">
+    </div>
+    <div v-if="partitionTable" class="partition-panel">
+      <p class="title">
         {{$t('message.scripts.createTable.partitionAttr')}}
       </p>
       <Form
@@ -37,7 +40,7 @@
           :fields="target.newPartitionsData.fields"
           :table-columns="partitionsConfig"></fields-table>
       </Form>
-    </Card>
+    </div>
     <Modal v-model="batchAddShow" :title="$t('message.scripts.createTable.addMore')">
       <Input v-model="batchFields" type="textarea" :rows="3" placeholder="字段1,字段2,字段3.....">
       </Input>
@@ -211,6 +214,18 @@ export default {
 <style lang="scss" scoped>
 .create-table {
     height: 50%;
+    .basic-panel, .partition-panel {
+      padding: 16px 20px;
+      position: relative;
+      .title {
+        line-height: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
 }
 </style>
 

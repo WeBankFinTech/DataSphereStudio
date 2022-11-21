@@ -295,6 +295,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return version;
     }
 
+    /**
+     * 当数据库的父子工作流依赖关系和json中不一致时，该方法会删除数据库中的脏数据
+     *
+     * @param user
+     * @param flowId
+     * @param flowJson
+     * @throws IOException
+     */
     private void checkSubflowDependencies(String user, long flowId, String flowJson) throws IOException {
         List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
         if (CollectionUtils.isEmpty(nodeJsonList)) {
@@ -450,9 +458,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         //封装flow信息
         cyFlow.setCreator(userName);
         cyFlow.setCreateTime(new Date());
+        //工作流复制时用户输入的的目标工作流名
         if (StringUtils.isNotBlank(newFlowName)) {
             cyFlow.setName(newFlowName);
         }
+        //跨项目复制时，newProjectId为目标工程id
         if (newProjectId != null) {
             cyFlow.setProjectId(newProjectId);
         }

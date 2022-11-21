@@ -590,7 +590,7 @@ export default {
               arr.push({
                 text: this.$t('message.workflow.process.console'),
                 value: 'console',
-                img: require('./images/menu/xitongguanlitai.svg'),
+                icon: 'xitongguanlitai'
               })
             }
           }
@@ -600,20 +600,20 @@ export default {
                 arr.push({
                   text: this.$t('message.workflow.process.associate'),
                   value: 'associate',
-                  img: require('./images/menu/associate.svg'), // 图标资源文件，也可以通过icon配置内置字体文件支持的className
+                  icon: 'associate', // 图标资源文件，也可以通过icon配置内置字体文件支持的className
                 });
               }
               arr.push({
                 text: this.$t('message.workflow.process.relySelect'),
                 value: 'relySelect',
-                img: require('./images/menu/flow.svg'),
+                icon: 'associate',
               });
               // 通过节点类型去判断是否支持复制
               if (this.nodeCopy(node)) {
                 arr.push({
                   text: this.$t('message.workflow.copy'),
                   value: 'mycopy',
-                  img: require('./images/menu/fuzhi.svg'),
+                  icon: 'fuzhi',
                 });
               }
             }
@@ -622,12 +622,12 @@ export default {
             arr.push({
               text: this.$t('message.workflow.paste'),
               value: 'mypaste',
-              img: require('./images/menu/zhantie.svg'),
+              icon: 'zhantie',
             });
             arr.push({
               text: this.$t('message.workflow.process.allDelete'),
               value: 'allDelete',
-              img: require('./images/menu/delete.svg'),
+              icon: 'delete'
             });
           }
           return arr;
@@ -697,7 +697,7 @@ export default {
     },
     onCopying(data) {
       if (data.source.orchestratorId == this.orchestratorId) {
-        this.locked = !!data.done
+        this.locked = !data.done
       }
     },
     eventFromExt(evt) {

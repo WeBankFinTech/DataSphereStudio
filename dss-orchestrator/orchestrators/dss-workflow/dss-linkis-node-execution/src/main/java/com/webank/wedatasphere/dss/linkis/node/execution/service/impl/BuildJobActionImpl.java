@@ -187,6 +187,12 @@ public class BuildJobActionImpl implements BuildJobAction {
         return true;
     }
 
+    /**
+     * spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。
+     *
+     * @param paramMapCopy
+     * @throws LinkisJobExecutionErrorException
+     */
     private void replaceSparkConfParams(Map<String, Object> paramMapCopy) throws LinkisJobExecutionErrorException {
         Map<String, Object> startupMap = TaskUtils.getStartupMap(paramMapCopy);
         if (startupMap.containsKey("spark.conf")) {

@@ -274,7 +274,7 @@
         "status": "状态：",
         "desc": "描述：",
         "workspaceType": "工作空间类型：",
-        "adminviewall": "管理员可查看工作空间内所有项目",
+        "adminviewall": "管理员可查看工作空间内所有项目：",
         "yes": "是",
         "no": "否"
       },

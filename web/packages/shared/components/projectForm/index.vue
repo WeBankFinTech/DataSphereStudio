@@ -408,7 +408,7 @@ export default {
     showProject(params) {
       this.ProjectShow = true
       // 新增只有一项自动勾选
-      if (this.orchestratorModeList && this.orchestratorModeList.list.length === 1 && params.name) {
+      if (this.orchestratorModeList && this.orchestratorModeList.list.length === 1 && !params.name) {
         params.orchestratorModeList = [this.orchestratorModeList.list[0].dicKey]
       }
       this.projectDataCurrent = {...params}

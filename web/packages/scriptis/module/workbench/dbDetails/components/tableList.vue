@@ -184,7 +184,9 @@ export default {
       return list
     },
     canTransfer() {
-      return this.$APP_CONF.table_transfer && /_work$/.test(this.dbName)
+      return false
+      // 后端未开发完
+      // return this.$APP_CONF.table_transfer && /_work$/.test(this.dbName)
     }
   },
   watch: {
@@ -366,7 +368,6 @@ export default {
         approvalTitle: this.formState.title,
         dbName: this.dbName,
         tablesName: tbs,
-        oldOwner: this.tableOwner,
         newOwner: this.formState.owner,
         dataGovernanceAdmin: this.formState.admin,
         description: this.formState.desc
@@ -374,8 +375,8 @@ export default {
       this.$refs.transferForm.validate((valid) => {
         if (valid) {
           this.saveTransing = true
-          api.fetch('/dss/datapipe/datasource/transferTablesOwner', params, 'post').then(() => {
-            this.$Message.success(this.$t("message.common.saveSuccess"));
+          api.fetch('/dss/datapipe/datasource/transferTablesOwner', params, 'post').then((res) => {
+            this.$Message.success(res.message || this.$t("message.common.saveSuccess"));
             this.showTransferForm = false
           }).finally(() => {
             this.saveTransing = false

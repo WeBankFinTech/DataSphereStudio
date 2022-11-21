@@ -1365,7 +1365,6 @@ export default {
     .workbench-tab-button {
       flex: 0 0 30px;
       text-align: center;
-      // background-color: $body-background;
       @include bg-color($light-base-color, $dark-base-color);
       &:hover {
         @include bg-color($active-menu-item, $dark-active-menu-item);

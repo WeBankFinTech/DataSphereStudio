@@ -1,7 +1,5 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.EngineResource;
-
 /**
  * 工作空间引擎实体VO
  * Author: xlinliu
@@ -11,7 +9,7 @@ public class EngineConnItemVO {
     /**
      * 引擎实例名
      */
-    private String instanceName;
+    private String instance;
     /**
      * 引擎类型
      */
@@ -19,42 +17,31 @@ public class EngineConnItemVO {
     /**
      * 引擎状态
      */
-    private String status;
+    private String instanceStatus;
     /**
-     * yarn队列名
+     * 队列信息
      */
-    private String yarnQueue;
+    private YarnInfo yarn;
     /**
      * 已使用的本地资源
      */
-    private EngineResource usedResource;
-    /**
-     * yarn队列内存资源，单位Byte
-     */
-    private Long yarnMemoryResource;
-    /**
-     * yarn队列cpu资源，单位核
-     */
-    private Integer yarnCoreResource;
+    private DriverInfo driver;
+
     /**
      * 创建者
      */
-    private String createUser;
+    private String creator;
     /**
      * 启动时间
      */
     private String createTime;
-    /**
-     * 日志目录
-     */
-    private String logDirSuffix;
 
-    public String getInstanceName() {
-        return instanceName;
+    public String getInstance() {
+        return instance;
     }
 
-    public void setInstanceName(String instanceName) {
-        this.instanceName = instanceName;
+    public void setInstance(String instance) {
+        this.instance = instance;
     }
 
     public String getEngineType() {
@@ -65,52 +52,36 @@ public class EngineConnItemVO {
         this.engineType = engineType;
     }
 
-    public String getStatus() {
-        return status;
+    public String getInstanceStatus() {
+        return instanceStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setInstanceStatus(String instanceStatus) {
+        this.instanceStatus = instanceStatus;
     }
 
-    public String getYarnQueue() {
-        return yarnQueue;
+    public YarnInfo getYarn() {
+        return yarn;
     }
 
-    public void setYarnQueue(String yarnQueue) {
-        this.yarnQueue = yarnQueue;
+    public void setYarn(YarnInfo yarn) {
+        this.yarn = yarn;
     }
 
-    public EngineResource getUsedResource() {
-        return usedResource;
+    public DriverInfo getDriver() {
+        return driver;
     }
 
-    public void setUsedResource(EngineResource usedResource) {
-        this.usedResource = usedResource;
+    public void setDriver(DriverInfo driver) {
+        this.driver = driver;
     }
 
-    public Long getYarnMemoryResource() {
-        return yarnMemoryResource;
+    public String getCreator() {
+        return creator;
     }
 
-    public void setYarnMemoryResource(Long yarnMemoryResource) {
-        this.yarnMemoryResource = yarnMemoryResource;
-    }
-
-    public Integer getYarnCoreResource() {
-        return yarnCoreResource;
-    }
-
-    public void setYarnCoreResource(Integer yarnCoreResource) {
-        this.yarnCoreResource = yarnCoreResource;
-    }
-
-    public String getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(String createUser) {
-        this.createUser = createUser;
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     public String getCreateTime() {
@@ -121,11 +92,71 @@ public class EngineConnItemVO {
         this.createTime = createTime;
     }
 
-    public String getLogDirSuffix() {
-        return logDirSuffix;
-    }
+    public static class DriverInfo{
+          private Integer cpu;
+          private Integer instance;
+          private Long memory;
 
-    public void setLogDirSuffix(String logDirSuffix) {
-        this.logDirSuffix = logDirSuffix;
+        public Integer getCpu() {
+            return cpu;
+        }
+
+        public void setCpu(Integer cpu) {
+            this.cpu = cpu;
+        }
+
+        public Integer getInstance() {
+            return instance;
+        }
+
+        public void setInstance(Integer instance) {
+            this.instance = instance;
+        }
+
+        public Long getMemory() {
+            return memory;
+        }
+
+        public void setMemory(Long memory) {
+            this.memory = memory;
+        }
+    }
+    public static class YarnInfo{
+        private String queueName;
+        private Long queueMemory;
+        private Integer instance;
+        private Integer queueCpu;
+
+        public String getQueueName() {
+            return queueName;
+        }
+
+        public void setQueueName(String queueName) {
+            this.queueName = queueName;
+        }
+
+        public Long getQueueMemory() {
+            return queueMemory;
+        }
+
+        public void setQueueMemory(Long queueMemory) {
+            this.queueMemory = queueMemory;
+        }
+
+        public Integer getInstance() {
+            return instance;
+        }
+
+        public void setInstance(Integer instance) {
+            this.instance = instance;
+        }
+
+        public Integer getQueueCpu() {
+            return queueCpu;
+        }
+
+        public void setQueueCpu(Integer queueCpu) {
+            this.queueCpu = queueCpu;
+        }
     }
 }

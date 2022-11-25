@@ -36,8 +36,11 @@ class DolphinSchedulerJobBuilder(jobProps: JMap[String, String]) extends Builder
       val paramsMap = JsonUtils.jackson.readValue(jobParams, classOf[util.Map[String, Object]])
       linkisJob.setConfiguration(getConfiguration(paramsMap))
       linkisJob.setVariables(getVariables(paramsMap))
-      linkisJob.getVariables.put("run_date", jobProps.get(LinkisJobTypeConf.RUN_DATE))
     }
+    val runDate = new util.HashMap[String, Object]
+    runDate.put("run_date", jobProps.get(LinkisJobTypeConf.RUN_DATE))
+    linkisJob.setVariables(runDate)
+
     val source = getSource
     linkisJob.setSource(source)
     linkisJob.getRuntimeParams.put("nodeName", source.get("nodeName"))

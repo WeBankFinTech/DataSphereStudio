@@ -486,7 +486,7 @@ export default {
     versionGotoWorkflow(row) {
       this.$emit("open-workflow", {
         ...this.$route.query,
-        id: row.id,
+        id: row.orchestratorId,
         orchestratorId: row.orchestratorId,
         version: String(row.id), // 在编排列表返回的是版本id
         name:

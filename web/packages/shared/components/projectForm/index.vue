@@ -27,6 +27,18 @@
         ></Input>
       </FormItem>
       <FormItem
+        :label="$t('message.common.projectDetail.projectDesc')"
+        prop="description"
+      >
+        <Input
+          v-model="projectDataCurrent.description"
+          type="textarea"
+          :placeholder="
+            $t('message.common.projectDetail.pleaseInputProjectDesc')
+          "
+        ></Input>
+      </FormItem>
+      <FormItem
         v-if="!framework"
         :label="$t('message.common.projectDetail.product')"
         prop="product"
@@ -52,6 +64,39 @@
             :key="index"
           />
         </Select>
+      </FormItem>
+      <FormItem
+        :label="$t('message.common.projectDetail.devProcess')"
+        prop="devProcessList"
+      >
+        <CheckboxGroup v-model="projectDataCurrent.devProcessList">
+          <Checkbox
+            v-for="item in devProcess"
+            :label="item.dicValue"
+            :key="item.dicKey"
+          >
+            <SvgIcon class="icon-style" :icon-class="item.icon" />
+            <span>{{ item.dicName }}</span>
+          </Checkbox>
+        </CheckboxGroup>
+      </FormItem>
+      <FormItem
+        v-if="framework"
+        :label="$t('message.common.projectDetail.orchestratorMode')"
+        prop="orchestratorModeList"
+      >
+        <CheckboxGroup v-model="projectDataCurrent.orchestratorModeList">
+          <Checkbox
+            v-for="item in orchestratorModeList.list"
+            :label="item.dicKey"
+            :key="item.dicKey"
+          >
+            <span class="icon-bar">
+              <SvgIcon class="icon-style" :icon-class="item.icon" />
+              <span style="margin-left: 10px">{{ item.dicName }}</span>
+            </span>
+          </Checkbox>
+        </CheckboxGroup>
       </FormItem>
       <FormItem
         :label="$t('message.common.projectDetail.publishPermissions')"
@@ -112,39 +157,6 @@
         </luban-select>
       </FormItem>
       <FormItem
-        :label="$t('message.common.projectDetail.devProcess')"
-        prop="devProcessList"
-      >
-        <CheckboxGroup v-model="projectDataCurrent.devProcessList">
-          <Checkbox
-            v-for="item in devProcess"
-            :label="item.dicValue"
-            :key="item.dicKey"
-          >
-            <SvgIcon class="icon-style" :icon-class="item.icon" />
-            <span>{{ item.dicName }}</span>
-          </Checkbox>
-        </CheckboxGroup>
-      </FormItem>
-      <FormItem
-        v-if="framework"
-        :label="$t('message.common.projectDetail.orchestratorMode')"
-        prop="orchestratorModeList"
-      >
-        <CheckboxGroup v-model="projectDataCurrent.orchestratorModeList">
-          <Checkbox
-            v-for="item in orchestratorModeList.list"
-            :label="item.dicKey"
-            :key="item.dicKey"
-          >
-            <span class="icon-bar">
-              <SvgIcon class="icon-style" :icon-class="item.icon" />
-              <span style="margin-left: 10px">{{ item.dicName }}</span>
-            </span>
-          </Checkbox>
-        </CheckboxGroup>
-      </FormItem>
-      <FormItem
         :label="$t('message.common.projectDetail.business')"
         prop="business"
       >
@@ -154,18 +166,6 @@
           @add-tag="addTag"
           @delete-tag="deleteTag"
         ></we-tag>
-      </FormItem>
-      <FormItem
-        :label="$t('message.common.projectDetail.projectDesc')"
-        prop="description"
-      >
-        <Input
-          v-model="projectDataCurrent.description"
-          type="textarea"
-          :placeholder="
-            $t('message.common.projectDetail.pleaseInputProjectDesc')
-          "
-        ></Input>
       </FormItem>
     </Form>
     <div slot="footer">
@@ -390,7 +390,7 @@ export default {
     Cancel() {
       this.ProjectShow = false;
       this.$refs.projectForm.resetFields();
-      this.projectData.business = this.originBusiness;
+      this.projectDataCurrent.business = this.originBusiness;
     },
     addTag(label) {
       if (this.projectDataCurrent.business) {
@@ -403,7 +403,7 @@ export default {
       const tmpArr = this.projectDataCurrent.business.split(",");
       const index = tmpArr.findIndex((item) => item === label);
       tmpArr.splice(index, 1);
-      this.projectData.business = tmpArr.toString();
+      this.projectDataCurrent.business = tmpArr.toString();
     },
     showProject(params) {
       this.ProjectShow = true

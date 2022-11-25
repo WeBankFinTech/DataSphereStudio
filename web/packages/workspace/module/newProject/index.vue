@@ -204,6 +204,7 @@ export default {
   watch: {
     // 当切换工作空间之后，重新获取数据
     '$route.query.workspaceId'() {
+      this.viewState = 'owner'
       this.getclassListData()
     }
   },

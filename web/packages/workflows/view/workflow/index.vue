@@ -982,6 +982,7 @@ export default {
      * parama 为打开工作流基本信息
      */
     async openWorkflow(params) {
+
       if (params.lastedNode) {
         const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
         this.getFlow(cur, (flows) => {
@@ -991,6 +992,7 @@ export default {
 
       if (this.loading) return;
       const {isIn, canContinue } = await this.openCheck(params)
+      // 判断当前是否可以打开
       if (!isIn && canContinue) {
         this.currentTreeId = params.id || undefined
         // 历史版本不需要调用接口，直接使用版本里的数据
@@ -1032,7 +1034,8 @@ export default {
       }
     },
     async openCheck(params) {
-      // 判断是否为相同编排的不同版本，不是则将信息新增tab列表
+      // 判断是否为相同编排的不同版本
+      // 是否已经打开十个
       const isIn = this.tabList.find(
         (item) => item.tabId === `${params.id}${params.version}`
       );

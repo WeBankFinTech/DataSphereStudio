@@ -10,14 +10,6 @@
     }
   },
   "exts": {
-    "dss-plugin-open": {
-      "module": "exts/open-source/index.js",
-      "i18n": {
-        "en": "exts/open-source/i18n/en.json",
-        "zh-CN": "exts/open-source/i18n/zh.json"
-      },
-      "options": null
-    }
   },
   "conf": {
     "app_name": "DataSphere Studio",

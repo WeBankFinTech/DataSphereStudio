@@ -14,7 +14,19 @@
  * limitations under the License.
  *
  */
-
 import weEditor from './editor.vue';
+import weEditorCompare from './compare.vue';
 
-export default weEditor;
+
+const install = function(Vue) {
+  const uselsp = localStorage.getItem('scriptis-edditor-type') === 'lsp'
+  if (uselsp) {
+    Vue.component('WeEditor', weEditor);
+    Vue.component('WeEditorCompare', weEditorCompare);
+  }
+};
+
+export default {
+  install,
+};
+

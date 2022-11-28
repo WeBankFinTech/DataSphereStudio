@@ -152,18 +152,18 @@ export default {
             name: [
               { required: true, message: this.$t('message.scripts.createTable.inputTableName'), trigger: 'blur' },
               {
-                type: 'string',
-                pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
-                message: this.$t('message.scripts.createTable.tablePlaceholder'),
-                trigger: 'change',
-              },
-              {
                 validator(rule, value, callback) {
                   if (!value) {
                     return callback();
                   }
                   return that.handleTbInput(value, callback, that);
                 },
+              },
+              {
+                type: 'string',
+                pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
+                message: this.$t('message.scripts.createTable.tablePlaceholder'),
+                trigger: 'blur',
               },
             ],
             alias: [

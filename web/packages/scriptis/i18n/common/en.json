@@ -137,7 +137,8 @@
         "partitionValue": "Partition value",
         "partitionAlias": "Partition alias",
         "fieldsNameRequire": "Column name cannot be empty",
-        "fieldsNameRule": "Only alphanumeric characters and underscore are allowed"
+        "fieldsNameRule": "Only alphanumeric characters and underscore are allowed",
+        "dupfields": "Invalid items found, Duplicate field：<br> <span style='width: 100%;display: inline-block;text-align: left;padding-left: 23px;'>{fields}</span>"
       },
       "tableDetails": {
         "BZBSX": "Table basic attributes",

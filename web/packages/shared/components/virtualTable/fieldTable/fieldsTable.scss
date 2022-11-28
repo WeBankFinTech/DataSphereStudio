@@ -41,7 +41,7 @@
     .field-table-body {
         border-top: none;
         justify-content: space-evenly;
-        padding-top: 12px;
+        padding-top: 8px;
         height: 70px;
         &:hover {
             @include bg-color(#ebf7ff, $dark-active-menu-item);
@@ -113,4 +113,7 @@
         width: 5%;
         min-width: 50px;
     }
+    ::v-deep .ivu-form-item-error-tip {
+    padding-top: 2px;
+  }
 }

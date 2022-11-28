@@ -238,6 +238,7 @@
       "baseInfo": "基本信息",
       "userInfo": "用户信息",
       "authInfo": "权限信息",
+      "engineInfo": "引擎信息",
       "editDataSour": "编辑数据源",
       "delDataSour": "删除数据源",
       "addDataSour": "新增数据源",
@@ -279,6 +280,28 @@
         "no": "否"
       },
       "JdbcUrlFormat": "请输入URL，例：jdbc:mysql://ServerIP:Port/Database"
+    },
+    "enginelist": {
+      "engineType": "引擎类型：",
+      "queue": "队列：",
+      "user":"用户：",
+      "status":"状态：",
+      "find": "查询",
+      "stop": "批量停止",
+      "viewlog": "查看日志",
+      "cols": {
+        "engineinst": "引擎实例",
+        "taskid": "任务ID",
+        "enginetype": "引擎类型",
+        "status": "状态",
+        "queue": "队列",
+        "local": "本地资源",
+        "yarnmb": "Yarn资源（已分配MB）",
+        "yanrcores": "Yarn资源（已分配Vcores）",
+        "creator": "创建者",
+        "start": "启动时间",
+        "action": "操作"
+      }
     },
     "Project": {
       "title": "项目列表",

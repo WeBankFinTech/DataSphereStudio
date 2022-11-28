@@ -256,10 +256,11 @@ export default {
     },
     handleGetTables(isreal) {
       this.pageData.currentPage = 1;
-      this.getDbTables(isreal);
+      this.isRealTime = isreal === true
+      this.getDbTables();
     },
     // 获取库表
-    getDbTables(isreal = false) {
+    getDbTables() {
       const params = {
         dbName: this.dbName,
         tableOwner: this.tableOwner,
@@ -269,7 +270,7 @@ export default {
         pageSize: this.pageData.pageSize,
         currentPage: this.pageData.currentPage
       }
-      if (isreal) params.isRealTime = true
+      if (this.isRealTime) params.isRealTime = true
       this.loading = true;
       api.fetch('/dss/datapipe/datasource/getTableMetaDataInfo', params, 'get').then((rst) => {
         this.searchColList = rst.tableList;

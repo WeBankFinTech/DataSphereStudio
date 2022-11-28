@@ -144,23 +144,41 @@ export default {
   },
   methods: {
     addFieldsItem() {
-      this.target.newFieldsData.fields.push({
-        name: '',
-        type: 'string',
-        alias: '',
-        length: null,
-        rule: '',
-        primary: 0,
-        comment: '',
-        partitionField: 0,
-      });
+      if(!this.checkDup()){
+        this.target.newFieldsData.fields.push({
+          name: '',
+          type: 'string',
+          alias: '',
+          length: null,
+          rule: '',
+          primary: 0,
+          comment: '',
+          partitionField: 0,
+        });
+      }
     },
     delteFields(item, index) {
       if (this.target.newFieldsData.fields.length === 1) return;
       this.target.newFieldsData.fields.splice(index, 1);
     },
     addFields() {
-      this.batchAddShow = true
+      if(!this.checkDup()){
+        this.batchAddShow = true;
+      }
+    },
+    checkDup() {
+      const dupNames= {}
+      this.target.newFieldsData.fields.forEach((it) => {
+        if (it.name) {
+          dupNames[it.name] = dupNames[it.name] ? dupNames[it.name] + 1 : 1
+        }
+      })
+      const dupfield = Object.keys(dupNames).filter(it => dupNames[it] > 1)
+      if (dupfield.length) {
+        this.$Message.warning(this.$t('message.scripts.createTable.dupfields', {fields: dupfield.join('<br>')}));
+        return true
+      }
+      return false
     },
     Cancel() {
       this.batchAddShow = false;
@@ -186,6 +204,7 @@ export default {
         this.$Message.error(this.$t('message.scripts.inputfield'))
         return false
       }
+      this.checkDup();
     },
     modelEdit(item) {
       this.editModelShow = true

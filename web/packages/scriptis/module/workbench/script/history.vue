@@ -289,7 +289,7 @@ export default {
       this.changeSubscribeStatus = true;
       const taskId = params.row.taskID;
       const action = params.row.subscribed ? 'cancel' : 'add';
-      api.fetch(`/dss/scriptis/subscribe`, {action, taskId, scriptName: params.row.fileName}, 'get').then(() => {
+      api.fetch(`/dss/scriptis/task/subscribe`, {action, taskId, scriptName: params.row.fileName}, 'get').then(() => {
         this.$set(params.row, 'subscribed', params.row.subscribed ? 0 : 1);
         this.$Message.warning(this.$t('message.scripts.optsuccess'))
       }).finally(() => {

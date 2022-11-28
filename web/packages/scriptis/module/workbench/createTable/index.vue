@@ -399,7 +399,9 @@ export default {
             if (valid) {
               const dupNames= {}
               tablerefs.target.newFieldsData.fields.forEach(it => {
-                dupNames[it.name] = dupNames[it.name] ? dupNames[it.name] + 1 : 1
+                if (it.name) {
+                  dupNames[it.name] = dupNames[it.name] ? dupNames[it.name] + 1 : 1
+                }
               })
               const dupfield = Object.keys(dupNames).filter(it => dupNames[it] > 1)
               if (dupfield.length) {

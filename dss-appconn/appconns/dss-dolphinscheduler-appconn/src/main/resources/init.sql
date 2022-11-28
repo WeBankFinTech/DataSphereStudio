@@ -9,7 +9,7 @@ VALUES ('dolphinscheduler', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appco
 select @dolphinscheduler_appconnId:=id from `dss_appconn` where `appconn_name` = 'dolphinscheduler';
 
 insert into `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
-values(@dolphinscheduler_appconnId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','','dolphinscheduler');
+values(@dolphinscheduler_appconnId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','{"reqUri":"dolphinscheduler/projects/analysis/define-user-count"}','dolphinscheduler');
 
 -- 看appconn组件是要归属于哪个菜单
 select @dolphinscheduler_menuId:=id from dss_workspace_menu where name = "生产运维";

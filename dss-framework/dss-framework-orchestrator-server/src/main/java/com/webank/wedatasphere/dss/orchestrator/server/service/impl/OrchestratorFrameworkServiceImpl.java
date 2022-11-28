@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
+import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationCreationOperation;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationDeletionOperation;
@@ -41,6 +42,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelatio
 import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelationManager;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.orchestrator.loader.LinkedAppConnResolver;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
@@ -64,6 +66,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -79,7 +82,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private OrchestratorService newOrchestratorService;
     @Autowired
     private OrchestratorManager orchestratorManager;
-
+    @Autowired
+    private LinkedAppConnResolver linkedAppConnResolver;
     /**
      * 1.拿到的dss orchestrator的appconn
      * 2.然后创建
@@ -145,7 +149,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         Long refProjectId, refOrchestrationId;
         if (askProjectSender) {
             ProjectRefIdResponse projectRefIdResponse = (ProjectRefIdResponse) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                    .ask(new ProjectRefIdRequest(orchestrationPair.getValue().getId(), dssOrchestrator.getProjectId()));
+                    .ask(new ProjectRefIdRequest(Optional.ofNullable(orchestrationPair).map(ImmutablePair::getValue).map(AppInstance::getId).orElse(null), dssOrchestrator.getProjectId()));
             refProjectId = projectRefIdResponse.getRefProjectId();
             refOrchestrationId = null;
         } else {
@@ -244,11 +248,16 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             dssOrchestratorInfo.setLinkedAppConnNames(dssOrchestrator.getLinkedAppConn().stream().map(appConn -> appConn.getAppDesc().getAppName()).collect(Collectors.toList()));
         }
         SchedulerAppConn appConn = dssOrchestrator.getSchedulerAppConn();
-        if (appConn == null) {
-            throw new ExternalOperationWarnException(50322, "DSSOrchestrator " + dssOrchestrator.getName() + " has no SchedulerAppConn.");
+//        if (appConn == null) {
+//            throw new ExternalOperationWarnException(50322, "DSSOrchestrator " + dssOrchestrator.getName() + " has no SchedulerAppConn.");
+//        }
+        if (appConn != null) {
+            AppInstance appInstance = appConn.getAppDesc().getAppInstances().get(0);
+            return new ImmutablePair<>(appConn.getOrCreateStructureStandard().getOrchestrationService(appInstance), appInstance);
+        } else {
+            return new ImmutablePair<>(null, null);
         }
-        AppInstance appInstance = appConn.getAppDesc().getAppInstances().get(0);
-        return new ImmutablePair<>(appConn.getOrCreateStructureStandard().getOrchestrationService(appInstance), appInstance);
+
     }
 
     /**

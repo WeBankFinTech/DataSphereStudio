@@ -59,7 +59,7 @@ public interface DSSWorkspaceUserMapper {
             "<script>",
             "select distinct created_by as creator, username as username, create_time as joinTime,workspace_id as workspaceId " +
                     "from dss_workspace_user_role where workspace_id = #{workspaceId} ",
-            "<if test='username != null'>and username=#{username}</if> order by id desc",
+            "<if test='username != null'>and username=#{username}</if> ",
             "</script>"
     })
     List<DSSWorkspaceUser> getWorkspaceUsers(@Param("workspaceId") String workspaceId,@Param("username") String username);

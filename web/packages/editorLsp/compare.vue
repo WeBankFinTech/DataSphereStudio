@@ -13,14 +13,14 @@
 
 </template>
 <script>
-import monaco from "./monaco-loader";
+import * as monaco from 'monaco-editor';
 import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 
 const defaultToolbar = {
   mergeDefaults: true
 }
 export default {
-  name: 'MonacoEditor',
+  name: 'WeEditorCompare',
   props: {
     original: String,
     value: {

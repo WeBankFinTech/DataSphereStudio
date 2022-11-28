@@ -51,6 +51,15 @@ export const apiServicesRoutes = [
       },
       component: () =>
         import('./module/management/module/dataSourceAdministration.vue'),
+    },
+    {
+      path: 'enginelist',
+      name: 'enginelist',
+      meta: {
+        publicPage: true,
+        admin: true
+      },
+      component: () => import('./view/enginelist/index.vue'),
     }]
   },
   {

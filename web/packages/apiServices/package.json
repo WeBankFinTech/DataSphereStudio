@@ -1,7 +1,7 @@
 {
   "name": "@dataspherestudio/apiServices",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "dependencies": {
-    "@dataspherestudio/shared": "^1.1.8"
+    "@dataspherestudio/shared": "^1.1.9"
   }
 }

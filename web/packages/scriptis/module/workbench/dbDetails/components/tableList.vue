@@ -16,6 +16,7 @@
         <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
       </Select>
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
+      <Button class="margin-right" type="primary" :title="$t('message.scripts.realsearchTip')" @click="handleGetTables(true)">{{ $t('message.scripts.searchnow') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
       <Button v-if="canTransfer" class="margin-right" type="success" @click="transfer">{{ $t('message.scripts.transfer') }}</Button>
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
@@ -184,9 +185,7 @@ export default {
       return list
     },
     canTransfer() {
-      return false
-      // 后端未开发完
-      // return this.$APP_CONF.table_transfer && /_work$/.test(this.dbName)
+      return this.$APP_CONF.table_transfer && /_work$/.test(this.dbName)
     }
   },
   watch: {
@@ -255,12 +254,12 @@ export default {
     formatValue(item, field) {
       return utils.formatValue(item, field);
     },
-    handleGetTables() {
+    handleGetTables(isreal) {
       this.pageData.currentPage = 1;
-      this.getDbTables();
+      this.getDbTables(isreal);
     },
     // 获取库表
-    getDbTables() {
+    getDbTables(isreal = false) {
       const params = {
         dbName: this.dbName,
         tableOwner: this.tableOwner,
@@ -270,6 +269,7 @@ export default {
         pageSize: this.pageData.pageSize,
         currentPage: this.pageData.currentPage
       }
+      if (isreal) params.isRealTime = true
       this.loading = true;
       api.fetch('/dss/datapipe/datasource/getTableMetaDataInfo', params, 'get').then((rst) => {
         this.searchColList = rst.tableList;
@@ -332,7 +332,7 @@ export default {
     confirmSelect() {
       const toDeleted = this.selectedItems.filter(item => item.selected)
       if (toDeleted.length < 1) {
-        this.$Message.warning({ content: this.$t('message.scripts.selectdel') });
+        this.$Message.warning({ content: this.$t('message.scripts.selectfirst') });
         return
       }
       if (this.confirmModalType == 'transfer') {

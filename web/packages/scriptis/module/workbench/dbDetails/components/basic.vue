@@ -11,13 +11,13 @@
           v-for="(item, index2) in type.children"
           :key="index2"
           class="basic-card-item"
-          :class="{'comment': item.key === 'comment'}">
+          :class="{'comment': item.key === 'description'}">
           <span
             class="basic-card-item-title"
             :style="{'width': enEnv?'140px':'100px'}">{{ item.title }}: </span>
           <span
             class="basic-card-item-value"
-            :class="{'comment': item.key === 'comment'}"
+            :class="{'comment': item.key === 'description'}"
             :style="{'width': enEnv?'calc(100% - 144px)':'calc(100% - 104px)'}">{{ formatValue(item) }}</span>
         </span>
       </div>
@@ -91,7 +91,8 @@ export default {
           padding-left: 10px;
           align-items: center;
           &.comment {
-              height: 42px;
+              width: 100%;
+              height: auto;
               align-items: start;
           }
           .basic-card-item-title {
@@ -104,8 +105,7 @@ export default {
               width: calc(100% - 104px);
               overflow: hidden;
               &.comment {
-                  overflow-y: auto;
-                  height: 100%;
+                  word-break: break-all;
               }
           }
       }

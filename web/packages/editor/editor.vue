@@ -459,6 +459,19 @@ export default {
         },
       });
 
+      this.editor.addAction({
+        id: 'newdbsuggest',
+        label: this.$t('message.common.monacoMenu.newdbcomplition'),
+        keybindings: [],
+        keybindingContext: null,
+        contextMenuGroupId: 'control',
+        contextMenuOrder: 2.5,
+        run() {
+          localStorage.setItem('scriptis-edditor-type', 'lsp');
+          location.reload();
+        },
+      });
+
       if (this.language === 'hql') {
         // 控制语法检查
         this.closeParser = this.editor.createContextKey('closeParser', !this.isParserClose);

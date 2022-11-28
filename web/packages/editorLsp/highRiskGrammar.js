@@ -15,26 +15,28 @@
  *
  */
 
-import { weMenu, weMenuItem, weSubMenu } from './menu';
-import weNavbar from './navbar';
-import weTree from './tree';
-import { wePanel, wePanelItem } from './panel';
+const hql = [
+  /Truncate\s*Table/i,
+  /Drop\s*Table/i,
+  /Drop\s*Function/i,
+  /Drop\s*Database/i,
+  /ALTER\s*DATABASE/i,
+];
 
-const components = {
-  weMenu,
-  weMenuItem,
-  weSubMenu,
-  weNavbar,
-  weTree,
-  wePanel,
-  wePanelItem,
-};
-const install = function(Vue) {
-  Object.keys(components).forEach((key) => {
-    Vue.component(key, components[key]);
-  });
-};
+const python = [
+  /sys/i,
+  /os/i,
+  /sc\.stop/i,
+  /spark\.stop/i,
+];
+
+const scala = [
+  /sc\.stop/i,
+  /spark\.stop/i,
+];
 
 export default {
-  install,
+  hql,
+  python,
+  scala,
 };

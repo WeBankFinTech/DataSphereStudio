@@ -66,13 +66,12 @@ export default {
     }
   },
   created() {
-    this.workspaceId = this.$route.query.workspaceId;
+    this.$router.app.$off("getChangeCookies");
     this.init();
     this.getSideDatas();
   },
   watch: {
     $route() {
-      this.workspaceId= this.$route.query.workspaceId; //获取传来的参数
       this.init();
       this.getSideDatas();
     }
@@ -81,6 +80,7 @@ export default {
   },
   methods: {
     init() {
+      this.workspaceId= this.$route.query.workspaceId; //获取传来的参数
       sessionStorage.removeItem(`work_flow_lists_${this.workspaceId}`)
       this.$router.app.$on("getChangeCookies", () => {
         // 因为会重复注册一次，所以要触发后清除事件

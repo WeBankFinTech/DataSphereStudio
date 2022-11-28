@@ -50,6 +50,12 @@ export default {
       //   path: 'dataSourceAdministration',
       //   children: [],
       // },
+      {
+        icon: 'enginelist',
+        name: i18n.t('message.workspaceManagement.engineInfo'),
+        path: 'enginelist',
+        children: [],
+      }
     ];
     return {
       mode: '',

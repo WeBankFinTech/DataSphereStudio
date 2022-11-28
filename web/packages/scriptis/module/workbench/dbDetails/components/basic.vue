@@ -5,7 +5,7 @@
       class="basic-card"
       v-for="(type, index1) in info"
       :key="index1">
-      <p class="title" slot="title">{{ type.title }}</p>
+      <p class="title" slot="title">{{ type.title }} <span class="note">{{ $t('message.scripts.dbinfotips') }}</span></p>
       <div>
         <span
           v-for="(item, index2) in type.children"
@@ -50,6 +50,9 @@ export default {
           }, {
             key: 'tableQuantity',
             title: this.$t('message.scripts.tablenum')
+          }, {
+            key: 'description',
+            title: this.$t('message.scripts.dbdesc')
           }],
         }
       ],
@@ -70,6 +73,12 @@ export default {
 <style lang="scss" scoped>
   .title {
     color: #333;
+  }
+  .note {
+    font-weight: normal;
+    padding-left: 10px;
+    display: inline-block;
+    vertical-align: top;
   }
   .basic-card {
       margin-bottom: 10px;

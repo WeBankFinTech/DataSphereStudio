@@ -9,7 +9,7 @@ VALUES ('schedulis', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appconn.sche
 select @schedulis_appconnId:=id from `dss_appconn` where `appconn_name` = 'schedulis';
 
 insert into `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
-values(@schedulis_appconnId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','','');
+values(@schedulis_appconnId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','{"reqUri":""}','/manager');
 
 -- 看appconn组件是要归属于哪个菜单
 select @schedulis_menuId:=id from dss_workspace_menu where name = "生产运维";

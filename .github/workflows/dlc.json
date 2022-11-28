@@ -1,4 +1,9 @@
 {
+  "ignorePatterns": [
+    {
+      "pattern": "https://github.com/WeBankFinTech/DataSphereStudio-Doc"
+    }
+  ],
   "timeout": "10s",
   "retryOn429": true,
   "retryCount": 10,
@@ -9,3 +14,4 @@
     403
   ]
 }
+

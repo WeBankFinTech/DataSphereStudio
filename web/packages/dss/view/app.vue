@@ -8,7 +8,6 @@
   </div>
 </template>
 <script>
-import elementResizeEvent from '@dataspherestudio/shared/common/helper/elementResizeEvent';
 import WaterMark from '@dataspherestudio/shared/components/watermark';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import moment from 'moment'
@@ -35,6 +34,7 @@ export default {
         : null;
     },
     getMaskText() {
+      if ( !this.watermark.show ) return
       const obj = {
         username: this.getUserName(),
         time: moment(new Date()).format("YYYY-MM-DD HH:mm")
@@ -51,7 +51,6 @@ export default {
     }
   },
   beforeDestroy() {
-    elementResizeEvent.unbind(this.$el);
   },
 };
 </script>

@@ -250,6 +250,7 @@ export default {
     $route(v) {
       // 设定条件只有切换在工作空间首页时才触发
       if (v.name === "workspaceHome") {
+        this.currentId = -1;
         this.init();
         this.getWorkspacesRoles()
           .then((res) => {

@@ -15,26 +15,16 @@
  *
  */
 
-import { weMenu, weMenuItem, weSubMenu } from './menu';
-import weNavbar from './navbar';
-import weTree from './tree';
-import { wePanel, wePanelItem } from './panel';
-
-const components = {
-  weMenu,
-  weMenuItem,
-  weSubMenu,
-  weNavbar,
-  weTree,
-  wePanel,
-  wePanelItem,
-};
-const install = function(Vue) {
-  Object.keys(components).forEach((key) => {
-    Vue.component(key, components[key]);
-  });
-};
-
 export default {
-  install,
+  register(monaco) {
+    monaco.editor.defineTheme('defaultview', {
+      base: 'vs',
+      inherit: true,
+      rules: [{ background: '#FFFFFF' }],
+      colors: {
+        'editor.lineHighlightBackground': '#ffffff',
+        'editorGutter.background': '#f7f7f7',
+      },
+    });
+  },
 };

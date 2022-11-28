@@ -289,6 +289,7 @@
       "find": "查询",
       "stop": "批量停止",
       "viewlog": "查看日志",
+      "selectfirst": "请先选择",
       "cols": {
         "engineinst": "引擎实例",
         "taskid": "任务ID",

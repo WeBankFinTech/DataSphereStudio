@@ -658,7 +658,9 @@
           "control": {
             "title": "操作",
             "view": "查看",
-            "download": "日志下载"
+            "download": "日志下载",
+            "noticeopen": "开启通知",
+            "noticeclose": "关闭通知"
           }
         },
         "success": {
@@ -784,6 +786,8 @@
       "solution": "查看解决方案",
       "reporterror": "上报错误",
       "reported": "错误已上报",
+      "optlimit": "请勿频繁操作",
+      "optsuccess": "操作成功",
       "Permanent": "永久",
       "validday": "当天有效",
       "validweek": "一周有效",

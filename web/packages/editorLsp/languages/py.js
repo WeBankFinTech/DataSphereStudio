@@ -79,14 +79,15 @@ export function connectService(editor, url, cb) {
       listen({
         webSocket,
         onConnection: (connection) => {
-          if (!languageClient) {
-            languageClient = createLanguageClient(connection);
-            const disposable = languageClient.start();
-            connection.onClose(() => disposable.dispose());
-          }
-          if (cb) {
-            cb(languageClient)
-          }
+          if (languageClient) { languageClient.cleanUp() }
+          // if (!languageClient) {
+          languageClient = createLanguageClient(connection);
+          const disposable = languageClient.start();
+          connection.onClose(() => disposable.dispose());
+          // }
+          // if (cb) {
+          //   cb(languageClient)
+          // }
         },
       });
     } else {

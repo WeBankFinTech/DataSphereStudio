@@ -28,6 +28,7 @@ import axios from 'axios';
 import module from '../index';
 import api from '@dataspherestudio/shared/common/service/api';
 import util from '@dataspherestudio/shared/common/util';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 import resizeMixin from './mixin.js';
 import table from '@dataspherestudio/shared/components/virtualTable';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
@@ -96,6 +97,7 @@ export default {
     initData() {
       this.pageingData();
       this.setInitCostTime();
+      const baseinfo = storage.get('baseInfo', 'local')
       this.column = [
         {
           width: 50,
@@ -152,6 +154,22 @@ export default {
           }, {
             label: this.$t('message.scripts.history.columns.control.download'),
             action: this.downloadLog,
+          }, {
+            label: this.$t('message.scripts.history.columns.control.noticeopen'),
+            action: this.subscribe,
+            isHide: (data) => {
+              // 任务状态为：已提交/排队中/资源申请中/运行/超时/重试时
+              const status = ["Submitted","Inited","Scheduled","Running","Timeout","WaitForRetry"].indexOf(data.status) > -1
+              return baseinfo.enableTaskNotice !== false && status && !data.subscribed
+            }
+          }, {
+            label: this.$t('message.scripts.history.columns.control.noticeclose'),
+            action: this.subscribe,
+            isHide: (data) => {
+              // 任务状态为：已提交/排队中/资源申请中/运行/超时/重试时
+              const status = ["Submitted","Inited","Scheduled","Running","Timeout","WaitForRetry"].indexOf(data.status) > -1
+              return baseinfo.enableTaskNotice !== false && data.subscribed === 1 && status
+            }
           }, {
             label: this.$t('message.scripts.solution'),
             action: this.viewFAQ,
@@ -265,6 +283,20 @@ export default {
     },
     viewFAQ({ row }) {
       row.solution && window.open(row.solution.solutionUrl, '_blank')
+    },
+    subscribe(params) {
+      if (this.changeSubscribeStatus) return this.$Message.warning(this.$t('message.scripts.optlimit'))
+      this.changeSubscribeStatus = true;
+      const taskId = params.row.taskID;
+      const action = params.row.subscribed ? 'cancel' : 'add';
+      api.fetch(`/dss/scriptis/subscribe`, {action, taskId, scriptName: params.row.fileName}, 'get').then(() => {
+        this.$set(params.row, 'subscribed', params.row.subscribed ? 0 : 1);
+        this.$Message.warning(this.$t('message.scripts.optsuccess'))
+      }).finally(() => {
+        setTimeout(() => {
+          this.changeSubscribeStatus = false
+        }, 5000);
+      });
     },
     async report({row}) {
       const res = await api.fetch(`/jobhistory/${row.taskID}/get`, 'get') || { task: {}}

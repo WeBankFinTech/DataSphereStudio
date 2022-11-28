@@ -109,7 +109,9 @@ export default {
       if (this.$refs.logEditor.editor) {
         const firstError = this.logs.all.split('\n').findIndex(line => line.indexOf('ERROR') > -1)
         setTimeout(() => {
-          this.$refs.logEditor.editor.revealLine(firstError > 0 ? firstError + 1 : 1);
+          if (this.$refs.logEditor.editor) {
+            this.$refs.logEditor.editor.revealLine(firstError > 0 ? firstError + 1 : 1);
+          }
         }, 1200);
       }
     }

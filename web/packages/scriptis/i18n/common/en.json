@@ -659,7 +659,9 @@
           "control": {
             "title": "Handle",
             "view": "View",
-            "download": "Download log"
+            "download": "Download log",
+            "noticeopen": "Enable Notice",
+            "noticeclose": "Clsoe Notice"
           }
         },
         "success": {
@@ -785,6 +787,8 @@
       "solution": "Check solution",
       "reporterror": "Report error",
       "reported": "Error reported",
+      "optlimit": "Please do not operate frequently",
+      "optsuccess": "Operate success",
       "Permanent": "Permanent",
       "validday": "Valid for today only",
       "validweek": "Valid for one week",

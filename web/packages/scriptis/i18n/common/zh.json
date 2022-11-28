@@ -137,7 +137,8 @@
         "partitionValue": "分区值",
         "partitionAlias": "分区别名",
         "fieldsNameRequire": "字段名称不能为空",
-        "fieldsNameRule": "仅支持字母数字和下划线"
+        "fieldsNameRule": "支持字母数字和下划线且不为纯数字",
+        "dupfields": "验证项未通过，字段重复：<br> <span style='width: 100%;display: inline-block;text-align: left;padding-left: 23px;'>{fields}</span>"
       },
       "tableDetails": {
         "BZBSX": "表基本属性",

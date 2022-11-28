@@ -8,7 +8,9 @@
       @we-click="onClick"
       @we-contextmenu="onContextMenu"
       @we-open-node="openNodeChange"
-      @we-dblclick="handledbclick"/>
+      @we-dblclick="handledbclick"
+      @mouseover.native="toggleShow"
+    />
     <Spin
       v-if="loading||rendering"
       size="large"
@@ -16,6 +18,7 @@
   </div>
 </template>
 <script>
+import api from '@dataspherestudio/shared/common/service/api';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import VirtualTree from '@dataspherestudio/shared/components/virtualTree';
 export default {
@@ -64,6 +67,7 @@ export default {
     }
   },
   mounted() {
+    this.dbnameDesc = {}
     this.height = this.$el.clientHeight
     window.addEventListener('resize', this.resize);
   },
@@ -257,8 +261,31 @@ export default {
     resize() {
       this.height = this.$el.clientHeight
     },
+    toggleShow(e) {
+      const item = e.target.innerText
+      const overDb = e.target.className.indexOf('fi-hivedb') > -1
+      if ( overDb && !this.dbnameDesc[item] ) {
+        // mouseover 在数据库项上且未获取描述信息
+        clearTimeout(this.fetchDbInfo)
+        this.fetchDbInfo = setTimeout(() => {
+          api.fetch('/dss/datapipe/datasource/getSchemaBaseInfo',  {
+            dbName: item
+          }, 'get').then((rst) => {
+            const title = `${rst.schemaInfo.dbName}\n${rst.schemaInfo.description||''}`
+            e.target.title = `${rst.schemaInfo.dbName}\n${rst.schemaInfo.description||''}`
+            this.dbnameDesc[item] = title
+            e.target.innerText = item
+          }).catch(() => {
+          });
+        }, 800);
+      } else if (overDb) {
+        e.target.title = this.dbnameDesc[item]
+        e.target.innerText = item
+      }
+    }
   },
   beforeDestroy() {
+    clearTimeout(this.fetchDbInfo)
     window.removeEventListener('resize', this.resize);
   }
 };

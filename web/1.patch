@@ -1,0 +1,189 @@
+From 4754476e6ce560e8860f99c2a4219191e93841bf Mon Sep 17 00:00:00 2001
+From: ryanlei <ryanlei@webank.com>
+Date: Wed, 23 Nov 2022 15:03:41 +0800
+Subject: [PATCH 4/5] =?UTF-8?q?=E4=BB=BB=E5=8A=A1=E8=BF=90=E8=A1=8C?=
+ =?UTF-8?q?=E9=80=9A=E7=9F=A5?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ web/packages/editorLsp/languages/py.js        | 17 +++++++-------
+ web/packages/editorLsp/languages/sql.js       | 18 ++++++++-------
+ web/packages/scriptis/i18n/common/en.json     |  4 +++-
+ web/packages/scriptis/i18n/common/zh.json     |  4 +++-
+ .../module/workbench/script/history.vue       | 23 +++++++++++++++++++
+ .../components/consoleComponent/log.vue       |  4 +++-
+ .../shared/components/virtualTable/index.scss |  6 ++---
+ 7 files changed, 54 insertions(+), 22 deletions(-)
+
+diff --git a/web/packages/editorLsp/languages/py.js b/web/packages/editorLsp/languages/py.js
+index f5172185..9afd1b1e 100644
+--- a/web/packages/editorLsp/languages/py.js
++++ b/web/packages/editorLsp/languages/py.js
+@@ -79,14 +79,15 @@ export function connectService(editor, url, cb) {
+       listen({
+         webSocket,
+         onConnection: (connection) => {
+-          if (!languageClient) {
+-            languageClient = createLanguageClient(connection);
+-            const disposable = languageClient.start();
+-            connection.onClose(() => disposable.dispose());
+-          }
+-          if (cb) {
+-            cb(languageClient)
+-          }
++          if (languageClient) { languageClient.cleanUp() }
++          // if (!languageClient) {
++          languageClient = createLanguageClient(connection);
++          const disposable = languageClient.start();
++          connection.onClose(() => disposable.dispose());
++          // }
++          // if (cb) {
++          //   cb(languageClient)
++          // }
+         },
+       });
+     } else {
+diff --git a/web/packages/editorLsp/languages/sql.js b/web/packages/editorLsp/languages/sql.js
+index 0c6c3ec1..3a5b47c9 100644
+--- a/web/packages/editorLsp/languages/sql.js
++++ b/web/packages/editorLsp/languages/sql.js
+@@ -1347,14 +1347,16 @@ export function connectService(editor, url, cb) {
+       listen({
+         webSocket,
+         onConnection: (connection) => {
+-          if (!languageClient) {
+-            languageClient = createLanguageClient(connection);
+-            const disposable = languageClient.start();
+-            connection.onClose(() => disposable.dispose());
+-          }
+-          if (cb) {
+-            cb(languageClient)
+-          }
++          if (languageClient) { languageClient.cleanUp() }
++          // if (!languageClient) {
++          languageClient = createLanguageClient(connection);
++          const disposable = languageClient.start();
++          connection.onClose(() => disposable.dispose());
++
++          // }
++          // if (cb) {
++          //   cb(languageClient)
++          // }
+         },
+       });
+     } else {
+diff --git a/web/packages/scriptis/i18n/common/en.json b/web/packages/scriptis/i18n/common/en.json
+index f27b0c66..6df11cb7 100644
+--- a/web/packages/scriptis/i18n/common/en.json
++++ b/web/packages/scriptis/i18n/common/en.json
+@@ -659,7 +659,9 @@
+           "control": {
+             "title": "Handle",
+             "view": "View",
+-            "download": "Download log"
++            "download": "Download log",
++            "noticeopen": "Enable Notice",
++            "noticeclose": "Clsoe Notice"
+           }
+         },
+         "success": {
+diff --git a/web/packages/scriptis/i18n/common/zh.json b/web/packages/scriptis/i18n/common/zh.json
+index e970267a..b39aa8bc 100644
+--- a/web/packages/scriptis/i18n/common/zh.json
++++ b/web/packages/scriptis/i18n/common/zh.json
+@@ -658,7 +658,9 @@
+           "control": {
+             "title": "操作",
+             "view": "查看",
+-            "download": "日志下载"
++            "download": "日志下载",
++            "noticeopen": "开启通知",
++            "noticeclose": "关闭通知"
+           }
+         },
+         "success": {
+diff --git a/web/packages/scriptis/module/workbench/script/history.vue b/web/packages/scriptis/module/workbench/script/history.vue
+index b405d0a5..6a6ef4ae 100644
+--- a/web/packages/scriptis/module/workbench/script/history.vue
++++ b/web/packages/scriptis/module/workbench/script/history.vue
+@@ -152,6 +152,22 @@ export default {
+           }, {
+             label: this.$t('message.scripts.history.columns.control.download'),
+             action: this.downloadLog,
++          }, {
++            label: this.$t('message.scripts.history.columns.control.noticeopen'),
++            action: this.subscribe,
++            isHide: (data) => {
++              // 任务状态为：已提交/排队中/资源申请中/运行/超时/重试时
++              const status = ["Submitted","Inited","Scheduled","Running","Timeout","WaitForRetry"].indexOf(data.status) > -1
++              return status && !data.subscribed
++            }
++          }, {
++            label: this.$t('message.scripts.history.columns.control.noticeclose'),
++            action: this.subscribe,
++            isHide: (data) => {
++              // 任务状态为：已提交/排队中/资源申请中/运行/超时/重试时
++              const status = ["Submitted","Inited","Scheduled","Running","Timeout","WaitForRetry"].indexOf(data.status) > -1
++              return data.subscribed === 1 && status
++            }
+           }, {
+             label: this.$t('message.scripts.solution'),
+             action: this.viewFAQ,
+@@ -266,6 +282,13 @@ export default {
+     viewFAQ({ row }) {
+       row.solution && window.open(row.solution.solutionUrl, '_blank')
+     },
++    subscribe(params) {
++      const taskId = params.row.taskID;
++      const action = params.row.subscribed ? 'cancel' : 'add'
++      api.fetch(`/dss/scriptis/subscribe`, {action, taskId}, 'get').then(() => {
++        this.$set(params.row, 'subscribed', params.row.subscribed ?0 : 1);
++      });
++    },
+     async report({row}) {
+       const res = await api.fetch(`/jobhistory/${row.taskID}/get`, 'get') || { task: {}}
+       if (res.task && (res.task.errCode || res.task.errDesc)) {
+diff --git a/web/packages/shared/components/consoleComponent/log.vue b/web/packages/shared/components/consoleComponent/log.vue
+index 088a030b..b44d4829 100644
+--- a/web/packages/shared/components/consoleComponent/log.vue
++++ b/web/packages/shared/components/consoleComponent/log.vue
+@@ -109,7 +109,9 @@ export default {
+       if (this.$refs.logEditor.editor) {
+         const firstError = this.logs.all.split('\n').findIndex(line => line.indexOf('ERROR') > -1)
+         setTimeout(() => {
+-          this.$refs.logEditor.editor.revealLine(firstError > 0 ? firstError + 1 : 1);
++          if (this.$refs.logEditor.editor) {
++            this.$refs.logEditor.editor.revealLine(firstError > 0 ? firstError + 1 : 1);
++          }
+         }, 1200);
+       }
+     }
+diff --git a/web/packages/shared/components/virtualTable/index.scss b/web/packages/shared/components/virtualTable/index.scss
+index a1f959c1..a07de8af 100644
+--- a/web/packages/shared/components/virtualTable/index.scss
++++ b/web/packages/shared/components/virtualTable/index.scss
+@@ -206,8 +206,8 @@ $border-color: #e0e0e0;
+                 vertical-align: middle;
+                 .we-table-row-label {
+                     line-height: 20px;
+-                    padding-left: 18px;
+-                    padding-right: 18px;
++                    padding-left: 12px;
++                    padding-right: 12px;
+                     overflow: hidden;
+                     text-overflow: ellipsis;
+                     white-space: normal;
+@@ -226,7 +226,7 @@ $border-color: #e0e0e0;
+                         @include font-color(#515a6e, $dark-text-color);
+                         background-color: transparent;
+                         border-color: transparent;
+-                        padding: 1px 7px 2px;
++                        padding: 1px 4px 2px;
+                         font-size: 12px;
+                         border-radius: 3px;
+                         display: inline-block;
+--
+2.31.0.windows.1
+

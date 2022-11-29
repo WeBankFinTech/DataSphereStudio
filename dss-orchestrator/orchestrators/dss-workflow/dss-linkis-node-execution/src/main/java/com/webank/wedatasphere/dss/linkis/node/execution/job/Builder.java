@@ -55,7 +55,7 @@ public abstract class Builder {
         LinkisJob job = null;
         String jobType = getJobType();
         String[] jobTypeSplit = jobType.split("\\.");
-        if (jobTypeSplit.length < 3) {
+        if (jobTypeSplit.length < 2) {
             throw new LinkisJobExecutionErrorException(90100, "This is not Linkis job type, this jobtype is " + jobType);
         }
         String engineType = jobTypeSplit[1];

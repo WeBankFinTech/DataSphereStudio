@@ -254,6 +254,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         return dssWorkspaceUserVOs;
     }
+    @Override
+    public List<String> getWorkspaceUsers(String workspaceId) {
+        return
+                dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, null).stream()
+                        .map(DSSWorkspaceUser::getUsername).collect(Collectors.toList());
+    }
 
     private DSSWorkspaceUserVO changeToUserVO(DSSWorkspaceUser dssWorkspaceUser, List<Integer> roles) {
         DSSWorkspaceUserVO vo = new DSSWorkspaceUserVO();

@@ -48,6 +48,10 @@ public interface DSSWorkspaceService {
     List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
                                                String roleName, int pageNow, int pageSize, List<Long> total);
 
+    /**
+     * 获取空间内所有成员，已用户名返回
+     */
+    List<String> getWorkspaceUsers(String workspaceId);
 
     List<DSSWorkspaceRoleVO> getWorkspaceRoles(int workspaceId);
 

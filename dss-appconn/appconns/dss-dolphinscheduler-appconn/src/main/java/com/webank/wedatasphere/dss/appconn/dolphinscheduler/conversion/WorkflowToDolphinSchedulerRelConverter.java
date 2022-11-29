@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedu
 import com.webank.wedatasphere.dss.appconn.dolphinscheduler.entity.DolphinSchedulerWorkflow;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.PreConversionRel;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelConverter;
@@ -30,6 +31,12 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
     @Override
     public ConvertedRel convertToRel(PreConversionRel rel) {
         DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel = (DolphinSchedulerConvertedRel)rel;
+        List<WorkflowNode> workflowNodes = dolphinSchedulerConvertedRel.getWorkflow().getWorkflowNodes();
+        for (WorkflowNode workflowNode : workflowNodes) {
+            if ("workflow.subflow".equals(workflowNode.getNodeType())) {
+                throw new ExternalOperationFailedException(90021, workflowNode.getName() + "当前不支持将subFlow节点发布到DolphinScheduler！");
+            }
+        }
         Workflow dolphinSchedulerWorkflow = convertWorkflow(dolphinSchedulerConvertedRel);
         dolphinSchedulerConvertedRel.setWorkflow(dolphinSchedulerWorkflow);
         return dolphinSchedulerConvertedRel;
@@ -62,13 +69,16 @@ public class WorkflowToDolphinSchedulerRelConverter implements WorkflowToRelConv
                 .collect(Collectors.toMap(WorkflowNode::getName, WorkflowNode::getId));
         for (WorkflowNode workflowNode : workflow.getWorkflowNodes()) {
             DSSNode node = workflowNode.getDSSNode();
+            if (node.getLayout() == null) {
+                continue;
+            }
             DolphinSchedulerTask dolphinSchedulerTask = nodeConverter.convertNode(dolphinSchedulerConvertedRel, node);
             processDefinitionJson.addTask(dolphinSchedulerTask);
 
             DolphinSchedulerWorkflow.LocationInfo locationInfo = new DolphinSchedulerWorkflow.LocationInfo();
             locationInfo.setName(node.getName());
-            String targetarr = node.getDependencys().stream().map(nameToIdMap::get).collect(Collectors.joining(","));
-            locationInfo.setTargetarr(targetarr);
+            String targetArr = node.getDependencys().stream().map(nameToIdMap::get).collect(Collectors.joining(","));
+            locationInfo.setTargetarr(targetArr);
             locationInfo.setX((int)node.getLayout().getX());
             locationInfo.setY((int)node.getLayout().getY());
             locations.put(node.getId(), locationInfo);

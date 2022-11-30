@@ -36,7 +36,11 @@ public enum TargetTypeEnum {
     /**
      * 数据库操作
      */
-    DATAPIPE("datapipe")
+    DATAPIPE("datapipe"),
+    /**
+     * ec 引擎实例
+     */
+    EC_INSTANCE("ecinstance"),
     ;
     private String name;
 

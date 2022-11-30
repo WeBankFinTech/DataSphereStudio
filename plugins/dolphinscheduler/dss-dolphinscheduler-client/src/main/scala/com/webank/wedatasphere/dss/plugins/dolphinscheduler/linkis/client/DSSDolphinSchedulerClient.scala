@@ -4,7 +4,7 @@ import java.util
 
 import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration
 import com.webank.wedatasphere.dss.linkis.node.execution.execution.impl.LinkisNodeExecutionImpl
-import com.webank.wedatasphere.dss.linkis.node.execution.job.Job
+import com.webank.wedatasphere.dss.linkis.node.execution.job.{JobTypeEnum, LinkisJob}
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener
 import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf.LinkisJobTypeConf
@@ -68,8 +68,16 @@ object DSSDolphinSchedulerClient extends Logging {
     getAndSet("FLOW_RESOURCES", LinkisJobTypeConf.FLOW_RESOURCES)
     getAndSet("FLOW_PROPERTIES", LinkisJobTypeConf.FLOW_PROPERTIES)
     getAndSet("JOB_LABELS", LinkisJobTypeConf.JOB_LABELS)
-    val job: Job = new DolphinSchedulerJobBuilder(jobProps).build()
+    val job = new DolphinSchedulerJobBuilder(jobProps).build() match {
+      case linkisJob: LinkisJob => linkisJob
+    }
     job.setLogObj(logObj)
+    job.getJobType match {
+      case JobTypeEnum.EmptyJob =>
+        logObj.warn("This node is empty node, just do nothing and return.")
+        return
+      case _ =>
+    }
 
     val execution = LinkisNodeExecutionImpl.getLinkisNodeExecution
     execution.runJob(job)

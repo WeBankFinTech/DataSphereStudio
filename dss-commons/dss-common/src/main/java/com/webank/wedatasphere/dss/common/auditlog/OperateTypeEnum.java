@@ -19,6 +19,7 @@ public enum OperateTypeEnum {
     UPDATE_ROLE_COMPONENT("update_role_component"),
     ADD_USERS("add_users"),
     UPDATE_USERS("update_users"),
+    KILL("kill"),
 
 
     ;

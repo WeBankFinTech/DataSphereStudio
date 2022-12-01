@@ -68,6 +68,10 @@ public class DSSWorkspaceUserRestful {
                                      @RequestParam(required = false, name = "department") String department, @RequestParam(required = false, name = "userName") String username,
                                      @RequestParam(required = false, name = "roleName") String roleName) {
         //todo 获取工作空间中所有的用户以及他们的角色信息
+        if(pageNow==null&&pageSize==null){
+            pageSize=Integer.MAX_VALUE;
+            pageNow=1;
+        }
         if (pageNow == null) {
             pageNow = 1;
         }

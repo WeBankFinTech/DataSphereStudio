@@ -373,6 +373,7 @@ export default {
         dataGovernanceAdmin: this.formState.admin,
         description: this.formState.desc
       }
+      if (this.saveTransing) return
       this.$refs.transferForm.validate((valid) => {
         if (valid) {
           this.saveTransing = true

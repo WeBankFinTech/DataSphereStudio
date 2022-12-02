@@ -5,9 +5,22 @@
       v-if="watermark.show"
       :text="waterMarkText"
       ref="watermask"></water-mark>
+    <Modal v-model="update.show" width="480" :closable="false">
+      <template #header style="background:transparent">
+        <div class="ivu-modal-confirm-head-icon ivu-modal-confirm-head-icon-info"><i class="ivu-icon ivu-icon-ios-information-circle"></i></div>
+        <span style="padding-left:10px">{{ $t('message.common.updatetitle') }}</span>
+      </template>
+      <p>{{ $t('message.common.updateTip') }}</p>
+      <pre style="background-color:transparent;border:none;">{{ update.versiontext }}</pre>
+      <template #footer>
+        <Button @click="handleCancel">{{ $t('message.common.viewchange') }}</Button>
+        <Button type="primary" @click="handleOk">{{ $t('message.common.updatetitle') }}</Button>
+      </template>
+    </Modal>
   </div>
 </template>
 <script>
+import plugin from '@dataspherestudio/shared/common/util/plugin';
 import WaterMark from '@dataspherestudio/shared/components/watermark';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import moment from 'moment'
@@ -20,12 +33,22 @@ export default {
   data() {
     return {
       watermark: {},
-      waterMarkText: ''
+      waterMarkText: '',
+      update: {
+        show: false,
+        versiontext: ''
+      }
     }
   },
   mounted() {
     this.watermark = this.$APP_CONF.watermark || { template: '', show: false }
     this.getMaskText()
+    plugin.on('show_app_update_notice', (version) => {
+      this.update = {
+        show: true,
+        versiontext: version
+      }
+    })
   },
   methods: {
     getUserName() {
@@ -48,6 +71,12 @@ export default {
           this.getMaskText()
         }, this.watermark.timeupdate)
       }
+    },
+    handleOk() {
+
+    },
+    handleCancel() {
+      this.update.show = false
     }
   },
   beforeDestroy() {

@@ -552,7 +552,11 @@
       "AddTags": "Add tags",
       "Search": "Search node：",
       "Close": "Close",
-      "nodeNotFound": "Node not found"
+      "nodeNotFound": "Node not found",
+      "updatetitle": "Update",
+      "updatenow": "立即更新",
+      "viewchange": "查看更多版本特性",
+      "updateTip": "为确保您可以正常使用DSS请通过【立即更新】获取最新版本"
     },
     "workflow": {
       "downloadTolocal": "Successfully downloaded, please check from local download directory!",

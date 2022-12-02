@@ -1,5 +1,5 @@
 <template>
-  <we-panel diretion="vertical" @on-resize="resize" @on-resized="resizePanel">
+  <we-panel diretion="vertical" @on-resize="resize" @on-move-end="resizePanel">
     <we-panel-item
       ref="topPanel"
       :index="1"
@@ -404,14 +404,14 @@ export default {
   },
   methods: {
     // panel 分割线拖动调整大小
-    resizePanel() {
+    resizePanel: debounce(function() {
       if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
         this.scriptViewState.topPanelHeight = this.$refs.topPanel.$el.clientHeight
         this.scriptViewState.bottomContentHeight = this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight;
       }
-    },
+    }, 700),
     // 浏览器窗口缩放
-    resize() {
+    resize: debounce(function() {
       if (this.scriptViewState.bottomPanelFull) {
         this.scriptViewState.bottomContentHeight = this.$el.clientHeight + 30
         return
@@ -420,7 +420,7 @@ export default {
         this.scriptViewState.topPanelHeight = this.$el.clientHeight * 0.6
         this.scriptViewState.bottomContentHeight = this.$el.clientHeight * 0.4;
       }
-    },
+    }, 700),
     'Workbench:save'(work) {
       if (work.id == this.script.id) {
         this.save();
@@ -480,9 +480,7 @@ export default {
     'Workbench:removeTab'() {
       // fix http://dpms.weoa.com/#/product/100199/bug/detail/199545
       if (this.node) {
-        setTimeout(()=>{
-          this.resizePanel()
-        })
+        this.resizePanel()
       }
     },
     getCacheWork(work) {

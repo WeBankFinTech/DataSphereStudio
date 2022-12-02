@@ -8,7 +8,7 @@
     <template v-else>
       <iframe ref="ifr" :src="openurl" width="100%" frameborder="0"></iframe>
     </template>
-    <Spin v-if="projectName && loading" fix>加载中，请稍后...</Spin>
+    <Spin v-if="projectName && loading" fix>{{ $t('message.common.Loading') }}</Spin>
   </div>
 </template>
 

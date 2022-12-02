@@ -29,8 +29,8 @@ public class DSSOrchestratorRelationManager {
         int index = 1;
         while(true) {
             String key = "wds.dss.orchestrator.new." + index + "th";
-            if(BDPConfiguration.contains(key)) {
-                String relation = BDPConfiguration.get(key);
+            if(BDPConfiguration.contains(key,false)) {
+                String relation = BDPConfiguration.get(key,false);
                 OrchestratorJsonRelation jsonRelation = new OrchestratorJsonRelation(relation);
                 jsonRelation.init();
                 LOGGER.info("loaded DSSOrchestratorRelation is {}.", relation);

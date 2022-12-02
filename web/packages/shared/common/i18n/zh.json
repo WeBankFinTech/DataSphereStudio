@@ -552,7 +552,11 @@
       "AddTags": "新增标签",
       "Search": "搜索节点：",
       "Close": "关闭",
-      "nodeNotFound": "未找到对应节点"
+      "nodeNotFound": "未找到对应节点",
+      "updatetitle": "版本更新",
+      "updatenow": "立即更新",
+      "viewchange": "查看更多版本特性",
+      "updateTip": "为确保您可以正常使用DSS请通过【立即更新】获取最新版本"
     },
     "workflow": {
       "downloadTolocal": "下载成功，请到本地的download文件夹查看！",

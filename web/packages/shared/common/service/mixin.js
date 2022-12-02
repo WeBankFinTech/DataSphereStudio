@@ -72,8 +72,9 @@ export default {
         if (info.external) {
           if (info.ifIframe) {
             // 在Iframe
+            const microAppList = ['AppLineage', 'ColdData', 'DataAppAnalysis', 'DataLineage', 'GroupLineage', 'LifeCycleManage', 'Search']
             this.$router.push({
-              path: info.name === 'DataLineage' ? '/microApp/DmsLineage' : `/commonIframe/${info.name}`,
+              path: microAppList.includes(info.name) ? `/microApp/${info.name}` : `/commonIframe/${info.name}`,
               query: {
                 ...query,
                 url,

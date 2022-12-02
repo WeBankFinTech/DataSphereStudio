@@ -7,7 +7,7 @@
       :src="visualSrc"
       frameborder="0"
       width="100%"
-      sandbox="allow-same-origin allow-scripts allow-top-navigation"
+      sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts allow-top-navigation"
       :height="height">
     </iframe>
   </div>

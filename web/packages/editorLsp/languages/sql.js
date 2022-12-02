@@ -1354,9 +1354,9 @@ export function connectService(editor, url, cb) {
           connection.onClose(() => disposable.dispose());
 
           // }
-          // if (cb) {
-          //   cb(languageClient)
-          // }
+          if (cb) {
+            cb(languageClient)
+          }
         },
       });
     } else {

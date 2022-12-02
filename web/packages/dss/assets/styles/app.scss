@@ -102,6 +102,7 @@ body {
 
 .ivu-modal-header {
   //   background-color: #FAFAFA !important;
+  border-radius: 6px 6px 0 0;
   @include bg-color(#FAFAFA, $dark-base-color);
 }
 

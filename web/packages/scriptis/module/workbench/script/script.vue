@@ -633,7 +633,7 @@ export default {
 
         this.execute.on('history', (ret) => {
           const index = findIndex(this.script.history, (o) => o.taskID == ret.taskID);
-          const findHis = index > -1 ? this.script.history[index] : undefined
+          const findHis = index > -1 ? this.script.history[index] : undefined;
           let newItem = null;
           // 这里针对的是导入导出脚本，executionCode为object的情�?
           const code = typeof (this.script.executionCode) === 'string' && this.script.executionCode ? this.script
@@ -645,6 +645,7 @@ export default {
               newItem = Object.assign(findHis, ret);
             } else if (Object.prototype.hasOwnProperty.call(ret, 'logPath')) {
               newItem = {
+                subscribed: findHis.subscribed,
                 taskID: ret.taskID,
                 createDate: findHis.createDate,
                 execID: ret.execID || findHis.execID,
@@ -659,6 +660,7 @@ export default {
               };
             } else {
               newItem = {
+                subscribed: findHis.subscribed,
                 taskID: ret.taskID,
                 createDate: ret.createDate,
                 execID: ret.execID || findHis.execID,

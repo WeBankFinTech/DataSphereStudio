@@ -33,7 +33,7 @@ async function checkNeedShowUpdate() {
     ...document.getElementsByTagName('script')
   ]
     .map(it => it.src)
-    .find(it => /app\.[\da-z]{8}\.js/.test(it.src))
+    .find(it => /app\.[\da-z]{8}\.js/.test(it))
   const pageAppHash = appjs && appjs.match(/app\.([\da-z]{8})\.js/)[1]
   return Promise.resolve(pageAppHash !== serverAppHash)
 }

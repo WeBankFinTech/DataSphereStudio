@@ -158,17 +158,19 @@ export default {
             label: this.$t('message.scripts.history.columns.control.noticeopen'),
             action: this.subscribe,
             isHide: (data) => {
+              // 当前只在scriptis 任务历史，工作流暂不处理
               // 任务状态为：已提交/排队中/资源申请中/运行/超时/重试时
               const status = ["Submitted","Inited","Scheduled","Running","Timeout","WaitForRetry"].indexOf(data.status) > -1
-              return baseinfo.enableTaskNotice !== false && status && data.subscribed !== 1
+              return !this.node && baseinfo.enableTaskNotice !== false && status && data.subscribed !== 1
             }
           }, {
             label: this.$t('message.scripts.history.columns.control.noticeclose'),
             action: this.subscribe,
             isHide: (data) => {
+              // 当前只在scriptis 任务历史，工作流暂不处理
               // 任务状态为：已提交/排队中/资源申请中/运行/超时/重试时
               const status = ["Submitted","Inited","Scheduled","Running","Timeout","WaitForRetry"].indexOf(data.status) > -1
-              return baseinfo.enableTaskNotice !== false && data.subscribed === 1 && status
+              return !this.node && baseinfo.enableTaskNotice !== false && data.subscribed === 1 && status
             }
           }, {
             label: this.$t('message.scripts.solution'),
@@ -290,8 +292,11 @@ export default {
       const taskId = params.row.taskID;
       const action = params.row.subscribed ? 'cancel' : 'add';
       api.fetch(`/dss/scriptis/task/subscribe`, {action, taskId, scriptName: params.row.fileName}, 'get').then(() => {
-        this.$set(params.row, 'subscribed', params.row.subscribed ? 0 : 1);
-        this.$Message.warning(this.$t('message.scripts.optsuccess'))
+        const index = this.history.findIndex(it => it.taskID === params.row.taskID)
+        if (index > -1) {
+          this.$set(this.history, index, {...this.history[index], subscribed: params.row.subscribed ? 0 : 1})
+        }
+        this.$Message.warning(action === 'add' ? this.$t('message.scripts.optsuccess') :this.$t('message.scripts.cancelOptSuccess'))
       }).finally(() => {
         setTimeout(() => {
           this.changeSubscribeStatus = false

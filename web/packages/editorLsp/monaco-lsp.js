@@ -87,7 +87,7 @@ export function initClient({ el, value, service }, config, filePath) {
  */
 export function getLanguageClient(lang) {
   if (lang && sqlLang.indexOf(lang) > -1 ) lang = 'sql'
-  return lang ? languageClient[lang] : languageClient
+  return languageClient[lang] ||  languageClient
 }
 
 /**

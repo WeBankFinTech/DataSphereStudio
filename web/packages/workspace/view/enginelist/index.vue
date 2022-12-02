@@ -36,13 +36,16 @@
     </Form>
     <Table :columns="columns" :data="list" ref="selectionTable">
       <template slot-scope="{ row }" slot="yarnmem">
-        <span>{{ row.yarn.queueMemory }}</span>
+        <span>{{ row.yarn && row.yarn.queueMemory }}</span>
       </template>
       <template slot-scope="{ row }" slot="yarncpu">
-        <span>{{ row.yarn.queueCpu }}</span>
+        <span>{{ row.yarn && row.yarn.queueCpu }}</span>
+      </template>
+      <template slot-scope="{ row }" slot="queue">
+        <span>{{ row.yarn && row.yarn.queueName }}</span>
       </template>
       <template slot-scope="{ row }" slot="local">
-        <span>{{ row.driver.cpu }} cores, {{ row.driver.memory }} G, {{ row.driver.instance }} apps</span>
+        <span>{{ row.driver.cpu }} cores, {{ row.driver.memory }}, {{ row.driver.instance }} apps</span>
       </template>
     </Table>
     <Page
@@ -70,16 +73,15 @@ export default {
   data() {
     return {
       columns: [
-        { title: '', type: "selection" },
-        { title: this.$t('message.enginelist.cols.engineinst'), key: "ecmInstance" },
-        { title: this.$t('message.enginelist.cols.taskid'), key: "id" },
-        { title: this.$t('message.enginelist.cols.enginetype'), key: "enginetype" },
-        { title: this.$t('message.enginelist.cols.status'), key: "instanceStatus" },
-        { title: this.$t('message.enginelist.cols.queue'), key: "yarn" },
-        { title: this.$t('message.enginelist.cols.local'), key: "driver" },
-        { title: this.$t('message.enginelist.cols.yarnmb'), key: "yarn" },
-        { title: this.$t('message.enginelist.cols.yanrcores'), key: "yarn" },
-        { title: this.$t('message.enginelist.cols.creator'), key: "createUser" },
+        { title: '', type: "selection", width: '50'},
+        { title: this.$t('message.enginelist.cols.engineinst'), key: "instance" },
+        { title: this.$t('message.enginelist.cols.enginetype'), key: "engineType", width: '100'},
+        { title: this.$t('message.enginelist.cols.status'), key: "instanceStatus", width: '80'},
+        { title: this.$t('message.enginelist.cols.queue'), slot: "queue", width: '110'},
+        { title: this.$t('message.enginelist.cols.local'), slot: "local" },
+        { title: this.$t('message.enginelist.cols.yarnmb'), slot: "yarnmem" },
+        { title: this.$t('message.enginelist.cols.yanrcores'), slot: "yarncpu" },
+        { title: this.$t('message.enginelist.cols.creator'), key: "creator", width: '100'},
         { title: this.$t('message.enginelist.cols.start'), key: "createTime" }
       ],
       list: [],
@@ -164,7 +166,7 @@ export default {
         params.yarnQueue = this.searchBar.yarnQueue
       }
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listEngineConnInstances`, params, 'post').then((res) => {
-        this.list = res.ecList || [];
+        this.list = res.engineList || [];
         this.pageData.total = res.total
         this.loading = false;
       }).catch((err) => {
@@ -183,7 +185,7 @@ export default {
     },
     stopAction(selections) {
       const list = selections.map(it => {
-        return { engineInstance: it.ecmInstance }
+        return { engineInstance: it.instance }
       })
       this.stoping = true
       api.fetch('/dss/framework/workspace/killEngineConnInstances', list, 'post').then(() => {
@@ -207,5 +209,9 @@ export default {
       justify-content: space-between;
     }
   }
+}
+.pagebar {
+  text-align: center;
+  margin-top: 20px
 }
 </style>

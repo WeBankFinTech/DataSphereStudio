@@ -116,7 +116,8 @@ public class FlowRestfulApi {
         DSSFlow parentFlow = flowService.getFlow(parentFlowID);
         JsonObject jsonObject = new Gson().fromJson(parentFlow.getFlowJson(), JsonObject.class);
         //schedulerAppconnName从parentFlow的json中获取
-        String schedulerAppconnName = jsonObject.get(DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME).getAsString();
+        String schedulerAppconnName = jsonObject.get(DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME) == null
+                ? null : jsonObject.get(DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME).getAsString();
         if (StringUtils.isBlank(version)) {
             LinkisHAWorkFlowContextID contextID = (LinkisHAWorkFlowContextID) SerializeHelper
                     .deserializeContextID(jsonObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString());

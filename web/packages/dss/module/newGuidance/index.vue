@@ -264,15 +264,14 @@ export default {
   mounted() {
     if (this.$route.path === "/workspaceHome") {
       let store = localStorage.getItem("cacheGuide")
-      if(store === "null" | store === null){
-        setTimeout(() => {
+      if (store === "null" | store === null) {
+        this.timer = setTimeout(() => {
           this.currentStep += 1;
           let div = document.createElement("div");
-          div.className = "overlay";
+          div.className = "overlay ___guidance_overlay";
           let body = document.querySelector("body");
           body.appendChild(div);
         }, 1500);
-        localStorage.setItem("cacheGuide", "ok");
       }
     }
   },
@@ -345,6 +344,7 @@ export default {
       let head = document.querySelector(".layout-header");
       let foot = document.querySelector(".layout-footer");
       let user = document.querySelector(".user")
+      localStorage.setItem("cacheGuide", "ok");
       if (this.currentStep == 1) {
         head.setAttribute("style", "z-index: 1002");
         foot.setAttribute("style", "z-index: 1002");
@@ -442,6 +442,11 @@ export default {
         navM.removeEventListener("click", this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu);
       }, 300);
     },
+  },
+  beforeDestroy() {
+    clearTimeout(this.timer)
+    let overlay = document.querySelector(".___guidance_overlay");
+    if (overlay) overlay.parentNode.removeChild(overlay);
   },
 };
 </script>

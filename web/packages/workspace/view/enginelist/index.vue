@@ -146,12 +146,24 @@ export default {
     },
     getEngineList() {
       this.loading = true;
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listEngineConnInstances`, {
+      const params = {
         workspaceId: this.$route.query.workspaceId,
-        ...this.searchBar,
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
-      }, 'post').then((res) => {
+      }
+      if (this.searchBar.status) {
+        params.status = this.searchBar.status
+      }
+      if (this.searchBar.createUser) {
+        params.createUser = this.searchBar.createUser
+      }
+      if (this.searchBar.engineType) {
+        params.engineType = this.searchBar.engineType
+      }
+      if (this.searchBar.yarnQueue) {
+        params.yarnQueue = this.searchBar.yarnQueue
+      }
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listEngineConnInstances`, params, 'post').then((res) => {
         this.list = res.ecList || [];
         this.pageData.total = res.total
         this.loading = false;

@@ -85,9 +85,9 @@ export function connectService(editor, url, cb) {
           const disposable = languageClient.start();
           connection.onClose(() => disposable.dispose());
           // }
-          // if (cb) {
-          //   cb(languageClient)
-          // }
+          if (cb) {
+            cb(languageClient)
+          }
         },
       });
     } else {

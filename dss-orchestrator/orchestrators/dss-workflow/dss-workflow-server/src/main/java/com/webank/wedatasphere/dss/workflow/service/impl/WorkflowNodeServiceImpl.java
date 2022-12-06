@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.workflow.service.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
@@ -52,8 +54,14 @@ import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.cs.client.utils.SerializeHelper;
+import org.apache.linkis.cs.common.entity.source.LinkisHAWorkFlowContextID;
+import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +85,8 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
     private DSSFlowService dssFlowService;
 
     private Sender projectSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
+
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowNodeServiceImpl.class);
 
     @Override
     public List<NodeGroup> listNodeGroups() {
@@ -311,11 +321,22 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
             throw new NullPointerException("The flowId is null, please ask admin for help!");
         }
         DSSFlow dssFlow = dssFlowService.getFlow(node.getFlowId());
-        if(StringUtils.isBlank(node.getFlowName())) {
+        if (StringUtils.isBlank(node.getFlowName())) {
             node.setFlowName(dssFlow.getName());
         }
-
-        return workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSJobContentConstant.ORC_VERSION_KEY);
+        String version = workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSJobContentConstant.ORC_VERSION_KEY);
+        //兼容老的flowJson外层没有orcVersion字段的情况，需要从contextId中获取
+        if (version == null) {
+            try {
+                JsonObject jsonObject = new Gson().fromJson(dssFlow.getFlowJson(), JsonObject.class);
+                LinkisHAWorkFlowContextID contextID = (LinkisHAWorkFlowContextID) SerializeHelper
+                        .deserializeContextID(jsonObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString());
+                version = contextID.getVersion();
+            } catch (ErrorException e) {
+                logger.error("Invalid contextID, please contact with administrator: ", e);
+            }
+        }
+        return version;
     }
 
     private SSOUrlBuilderOperation getSSOUrlBuilderOperation(AppConn appConn, Workspace workspace) {

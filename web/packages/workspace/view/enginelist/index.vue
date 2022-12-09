@@ -34,7 +34,7 @@
         <Button type="warning" @click="stop">{{$t('message.enginelist.stop')}}</Button>
       </FormItem>
     </Form>
-    <Table :columns="columns" :data="list" ref="selectionTable">
+    <Table :columns="columns" :data="list" ref="selectionTable" @on-sort-change="sortFn">
       <template slot-scope="{ row }" slot="yarnmem">
         <span>{{ row.yarn && row.yarn.queueMemory }}</span>
       </template>
@@ -75,12 +75,12 @@ export default {
       columns: [
         { title: '', type: "selection", width: '50'},
         { title: this.$t('message.enginelist.cols.engineinst'), key: "instance" },
-        { title: this.$t('message.enginelist.cols.enginetype'), key: "engineType", width: '100'},
+        { title: this.$t('message.enginelist.cols.enginetype'), key: "engineType", width: '90'},
         { title: this.$t('message.enginelist.cols.status'), key: "instanceStatus", width: '80'},
         { title: this.$t('message.enginelist.cols.queue'), slot: "queue", width: '110'},
         { title: this.$t('message.enginelist.cols.local'), slot: "local" },
-        { title: this.$t('message.enginelist.cols.yarnmb'), slot: "yarnmem" },
-        { title: this.$t('message.enginelist.cols.yanrcores'), slot: "yarncpu" },
+        { title: this.$t('message.enginelist.cols.yarnmb'), slot: "yarnmem", sortable: 'custom' },
+        { title: this.$t('message.enginelist.cols.yanrcores'), slot: "yarncpu", sortable: 'custom'},
         { title: this.$t('message.enginelist.cols.creator'), key: "creator", width: '100'},
         { title: this.$t('message.enginelist.cols.start'), key: "createTime" }
       ],
@@ -165,6 +165,10 @@ export default {
       if (this.searchBar.yarnQueue) {
         params.yarnQueue = this.searchBar.yarnQueue
       }
+      if (this.sort) {
+        params.orderBy = this.sort.orderBy
+        params.sortBy = this.sort.sortBy
+      }
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listEngineConnInstances`, params, 'post').then((res) => {
         this.list = res.engineList || [];
         this.pageData.total = res.total
@@ -193,6 +197,24 @@ export default {
       }).finally(() => {
         this.stoping = false
       })
+    },
+    sortFn({ column, order}) {
+      let key = ''
+      if (column.slot === 'yarncpu') {
+        key = 'queueCpu'
+      }
+      if (column.slot === 'yarnmem') {
+        key = 'queueMemory'
+      }
+      if(order === 'normal') {
+        this.sort = null
+      } else {
+        this.sort = {
+          sortBy: key,
+          orderBy: order
+        }
+      }
+      this.getEngineList()
     }
   }
 }

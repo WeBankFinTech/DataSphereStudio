@@ -93,9 +93,8 @@ export default function () {
     if (process.env.NODE_ENV === 'production') {
       checkNeedShowUpdate().then(
         (show) => {
-          console.log('need update:', show)
           if (show) {
-            // plugin.emit('show_app_update_notice', '')
+            plugin.emit('show_app_update_notice')
           }
         }
       )

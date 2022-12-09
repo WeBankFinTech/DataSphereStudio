@@ -302,8 +302,8 @@
         "status": "状态",
         "queue": "队列",
         "local": "本地资源",
-        "yarnmb": "Yarn资源（已分配MB）",
-        "yanrcores": "Yarn资源（已分配Vcores）",
+        "yarnmb": "Yarn资源(已分配内存)",
+        "yanrcores": "Yarn资源(已分配Vcores)",
         "creator": "创建者",
         "start": "启动时间",
         "action": "操作"

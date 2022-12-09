@@ -143,10 +143,10 @@
           </FormItem>
         </Form>
         <div slot="footer">
-          <Button type="text" size="large" @click="showTransferForm = false">{{
+          <Button v-if="!saveTransing" type="text" size="large" @click="showTransferForm = false">{{
             $t("message.workspaceManagement.cancel")
           }}</Button>
-          <Button type="text" size="large" @click="prevStep">{{
+          <Button v-if="!saveTransing" type="text" size="large" @click="prevStep">{{
             $t("message.common.dss.prevstep")
           }}</Button>
           <Button type="primary" size="large" @click="saveTransfer" :loading="saveTransing">{{
@@ -185,7 +185,7 @@ export default {
       return list
     },
     canTransfer() {
-      return this.$APP_CONF.table_transfer && /_work$/.test(this.dbName)
+      return this.$APP_CONF.table_transfer && /(_bak|_work)$/.test(this.dbName)
     }
   },
   watch: {
@@ -238,6 +238,11 @@ export default {
           required: true,
           message: this.$t('message.scripts.transferForm.required'),
           trigger: 'change',
+        }],
+        desc: [{
+          message: this.$t('message.scripts.transferForm.max', {len: 500}),
+          trigger: 'change',
+          max: 500
         }]
       },
       formState: {
@@ -263,7 +268,7 @@ export default {
     getDbTables() {
       const params = {
         dbName: this.dbName,
-        tableOwner: this.tableOwner,
+        // tableOwner: this.tableOwner,
         isTableOwner: this.isTableOwner,
         tableName: this.tableName,
         orderBy: this.orderBy,
@@ -313,7 +318,7 @@ export default {
       if (this.selectedItems.length) {
         this.showConfirmModal = true
       } else {
-        this.$Message.warning({ content: this.$t('message.scripts.checkdelconfirm') });
+        this.$Message.warning({ content: this.$t('message.scripts.selectfirst') });
       }
     },
     deleteSome() {
@@ -324,7 +329,7 @@ export default {
       if (this.selectedItems.length) {
         this.showConfirmModal = true
       } else {
-        this.$Message.warning({ content: this.$t('message.scripts.checkdelconfirm') });
+        this.$Message.warning({ content: this.$t('message.scripts.selectfirst') });
       }
     },
     Cancel() {
@@ -333,7 +338,7 @@ export default {
     confirmSelect() {
       const toDeleted = this.selectedItems.filter(item => item.selected)
       if (toDeleted.length < 1) {
-        this.$Message.warning({ content: this.$t('message.scripts.selectfirst') });
+        this.$Message.warning({ content: this.$t('message.scripts.checkdelconfirm') });
         return
       }
       if (this.confirmModalType == 'transfer') {
@@ -364,7 +369,7 @@ export default {
       }
     },
     saveTransfer() {
-      const tbs = this.selectedItems.map(item => item.tableName)
+      const tbs = this.selectedItems.filter(it => it.selected).map(item => item.tableName)
       const params = {
         approvalTitle: this.formState.title,
         dbName: this.dbName,

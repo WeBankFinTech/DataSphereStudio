@@ -57,7 +57,6 @@ export const apiServicesRoutes = [
       name: 'enginelist',
       meta: {
         publicPage: true,
-        admin: true
       },
       component: () => import('./view/enginelist/index.vue'),
     }]

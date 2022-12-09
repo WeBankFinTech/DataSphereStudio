@@ -655,7 +655,7 @@ export default {
           this.treeLoading = true;
           this.compLoading = true;
           api.fetch('/udf/list', {
-            type: parent.type || parent.data.type,
+            type: parent.type || parent.data.type ||  this.currentNode.data.type,
             treeId: id,
             category: this.FNTYPE,
           }).then((rst) => {

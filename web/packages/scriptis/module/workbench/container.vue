@@ -119,17 +119,7 @@
     <template v-if="workListLength == 0 && !loading">
       <div class="bg-page">
         <img class="bg-img" src="./image/bg-img.png" />
-        <p
-          class="bg-text"
-          :class="{
-            weight: line.indexOf('？') !== -1,
-            indent: line.indexOf('？') === -1,
-          }"
-          v-for="(line, index) in tips.split('\n')"
-          :key="index"
-        >
-          {{ line }}
-        </p>
+        <div v-html="tips" style="line-height:24px"></div>
       </div>
     </template>
     <template>
@@ -1225,7 +1215,7 @@ export default {
 }
 // 工作区为空背景设置
 .bg-page {
-  width: 360px;
+  width: 560px;
   height: 100%;
   margin: 0 auto;
   display: flex;
@@ -1238,17 +1228,6 @@ export default {
     margin-bottom: 20px;
     @media screen and (max-height: 600px) {
       display: none;
-    }
-  }
-  .bg-text {
-    width: 100%;
-    text-align: left;
-    &.weight {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    &.indent {
-      text-indent: 2em;
     }
   }
 }

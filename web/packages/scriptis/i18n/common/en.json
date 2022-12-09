@@ -590,7 +590,7 @@
           "save": "Save",
           "saveAs": "Save As"
         },
-        "tips": "What is Scriptis？\nScriptis is a one-stop interactive data analysis & exploration tool built by WeDataSphere at Webank. Using Linkis as its kernel, Scriptis provides functionalities including multiple computation engines(Spark, Hive, TiSpark...), Hive database management, resource management(such as Yarn resource and server resource), application management and user resource management(such as UDF and variables). \nScriptis？\n1. Select a directory in workspace, and create a sub directory; \n2. Right-click a directory => Create script; \n3. Select script type, for example: SQL, Pyspark, HQL, etc... \n4. Edit script, click & run, wait for result sets.",
+        "tips": "<div style='font-weight:600'>Guidelines for Scriptis：</div><div style='padding-left:10px'>1. Set parameters: Set the queue and parameters on the management console<br>2. New Script: Right click to create the required script<br>3. Edit script: edit sql or command in the corresponding script file<br>4. Submit for execution: run the selected sql or command<br>5. Result query: query execution results and logs</div><div style='font-weight:600'>Go to <a>Quickly Use Scriptis</a> for more detailed instructions</div>",
         "warning": {
           "noDBInfo": "Failed to request database/table information, word association in script may not be working well! Please refresh to retry!",
           "noUDF": "Failed to request UDF and Method information, word association in script may not be working well! Please refresh to retry!",
@@ -776,6 +776,7 @@
         "admin": "Administrator",
         "desc": "Description",
         "required": "Required",
+        "max":"Maximum length({len})",
         "ownerplaceholder": "Owner's English name of the enterprise WeChat of transfer",
         "adminplaceholder": "Department administrator’s English name of the enterprise WeChat"
       },

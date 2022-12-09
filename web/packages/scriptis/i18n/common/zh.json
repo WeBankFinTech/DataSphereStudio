@@ -589,7 +589,7 @@
           "save": "保存",
           "saveAs": "另存为"
         },
-        "tips": "什么是Scriptis？\nScriptis是微众银行微数域(WeDataSphere)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。\nScriptis？\n1. 选中工作空间的目录，创建文件夹；\n2. 右键某个文件夹 =>新建脚本；\n3. 选择脚本类型，如：SQL、Pyspark、HQL等；\n4. 书写脚本，点击执行，生成结果集。",
+        "tips": "<div style='font-weight:600'>Scriptis使用指引：</div><div style='padding-left:10px'>1.设置参数:在管理台设置队列及参数<br>2.新理脚本:右键新建所需脚本<br>3.编辑脚本:在对应的脚本文件中编辑Sql或命令<br>4.提交执行:运行选中的sql或命令<br>5.结果查询:查询执行结果及日志</div><div style='font-weight:600'>前往<a>快速使用Scriptis</a>了解更详细的使用指引</div>",
         "warning": {
           "noDBInfo": "未获取到数据库表信息，脚本联想词功能可能存在异常！可刷新重试！",
           "noUDF": "未获取到UDF和方法函数信息，脚本联想词功能可能存在异常！可刷新重试！",
@@ -775,6 +775,7 @@
         "admin": "数据治理管理员",
         "desc": "描述",
         "required": "该项必填",
+        "max":"最大长度({len})",
         "ownerplaceholder": "请准确填写表转移后属主的企业微信英文名",
         "adminplaceholder": "请准确填写部门数据治理管理员的企业微信英文名"
       },

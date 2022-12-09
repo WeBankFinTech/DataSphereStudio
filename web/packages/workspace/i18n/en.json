@@ -302,8 +302,8 @@
         "status": "Status",
         "queue": "Yarn Queue",
         "local": "Local Resource",
-        "yarnmb": "Yarn Resource（MB）",
-        "yanrcores": "Yarn Resource（Vcores）",
+        "yarnmb": "Yarn Resource(Memory)",
+        "yanrcores": "Yarn Resource(Vcores)",
         "creator": "Create User",
         "start": "Start Time",
         "action": "Operation"

@@ -63,6 +63,7 @@ export default {
           this.baseInfo.proxyUserName = this.proxyUser;
           storage.set('baseInfo', this.baseInfo, 'local');
           this.$emit('set-proxy');
+          storage.remove(this.baseInfo.username + "tabs", "local");
           this.visible = false;
           // window.location.reload()
         })

@@ -150,6 +150,7 @@ export default {
 <style lang="scss" scoped>
 @import '@dataspherestudio/shared/common/style/variables.scss';
 .table-detail {
+    height: 100%;
     @include bg-color($table-thead-bg, $dark-base-color);
     padding: 16px 10px 10px 16px;
     .table-detail-tabs {

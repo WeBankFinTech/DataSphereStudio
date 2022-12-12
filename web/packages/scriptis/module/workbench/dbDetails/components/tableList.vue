@@ -173,7 +173,7 @@ export default {
   },
   computed: {
     maxSize() {
-      return Math.floor((window.innerHeight - 242) / 46) - 1;
+      return Math.floor((window.innerHeight - 255) / 46) - 1;
     },
     selectedItems() {
       const list = []
@@ -298,12 +298,14 @@ export default {
     // 复制表名
     copyTableName() {
       this.loading = true;
-      api.fetch('/dss/datapipe/datasource/getTablesName', {
+      const params = {
         dbName: this.dbName,
         orderBy: this.orderBy,
         tableName: this.tableName,
         isTableOwner: this.isTableOwner
-      }, 'get').then((rst) => {
+      }
+      if (this.isRealTime) params.isRealTime = true
+      api.fetch('/dss/datapipe/datasource/getTablesName', params, 'get').then((rst) => {
         let tablesName = rst.tablesName;
         this.loading = false;
         tablesName = tablesName.slice(0,10000).join('\r\n');
@@ -421,11 +423,9 @@ export default {
 }
 .page-bar {
   text-align: center;
-  padding: 20px 0;
+  padding: 16px 0;
 }
 .table-data, .field-list {
-  height: calc(100% - 52px);
-  overflow: hidden;
   width: 100%;
   @include font-color($light-text-color, $dark-text-color);
   .field-list-header,

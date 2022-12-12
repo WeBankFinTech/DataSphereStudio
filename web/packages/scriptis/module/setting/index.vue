@@ -56,6 +56,7 @@ export default {
           tree.remove('functionTree');
           this.baseInfo.proxyUserName = this.proxyUser
           storage.set('baseInfo', this.baseInfo, 'local')
+          storage.remove(this.baseInfo.username + "tabs", "local")
           window.location.reload()
         })
       } else {

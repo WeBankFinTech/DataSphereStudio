@@ -207,7 +207,22 @@ export default {
     scriptHelpLink() {
       const baseinfo = storage.get("baseInfo", "local") || {}
       const item = this.scriptType.find((o) => o.scriptType === this.newForm.scriptType);
-      return item ? baseinfo[item.label+'UsageGuide'] || '' : ''
+      const scriptGuideMap = {
+        ".sql": "SqlUsageGuide",
+        ".hql": "HiveUsageGuide",
+        ".psql": "PrestoSqlUsageGuide",
+        ".tsql": "TrinoSqlUsageGuide",
+        ".fql": "FlinkSqlUsageGuide",
+        ".out": "StorageUsageGuide",
+        ".scala": "ScalaUsageGuide",
+        ".jdbc": "JdbcUsageGuide",
+        ".python": "PythonUsageGuide",
+        ".py": "PythonSparkUsageGuide",
+        ".r": "RUsageGuide",
+        ".sh": "ShellUsageGuide",
+        ".ngql": "NebulaUsageGuide",
+      }
+      return item ? baseinfo[scriptGuideMap[this.ext]] || '' : ''
     }
   },
   methods: {

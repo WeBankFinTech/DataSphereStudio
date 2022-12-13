@@ -32,7 +32,7 @@
             v-if="item.inputType === 'select'"
             v-model="attrInfo[type.key][item.key]"
             :placeholder="item.placeholder"
-            @on-change="handleChange(arguments, item, index2)">
+            @on-change="handleChange($event,item)">
             <Option
               v-for="opt in item.opt"
               :key="opt.value"
@@ -332,11 +332,9 @@ export default {
       if (item.key !== 'database') {
         return;
       }
-      const index = item.opt.findIndex((el) => el.value === val[0]);
+      const index = item.opt.findIndex((el) => el.value === val);
       this.currentDb = index;
-      if (!this.dbList[index].length) {
-        this.$emit('get-tables', this.dbList[index].name);
-      }
+      this.$emit('get-tables', val);
     },
   },
 };

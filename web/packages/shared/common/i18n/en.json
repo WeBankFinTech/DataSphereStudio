@@ -269,7 +269,7 @@
       },
       "login": {
         "loginTitle": "Welcome to {app_name}！",
-        "userName": "Please enter your phone",
+        "userName": "Please enter your username",
         "remenber": "Remember me",
         "login": "Login",
         "password": "Please enter password！",
@@ -464,7 +464,7 @@
         "copied": "Successfully copied",
         "Username": "Username",
         "Password": "Password",
-        "inputPassword": "Please input the password",
+        "inputPassword": "Please enter password",
         "Prompt": "Prompt",
         "noPrompt": "Close the prompt",
         "currentbrower": "Current browser version：",

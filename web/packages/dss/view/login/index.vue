@@ -26,12 +26,12 @@
             type="password"
             :placeholder="$t('message.common.dss.inputPassword')"
             size="large" />
+        </FormItem>
+        <FormItem>
           <Checkbox
             v-model="rememberUserNameAndPass"
             class="remember-user-name"
             style="">{{$t('message.common.login.remenber')}}</Checkbox>
-        </FormItem>
-        <FormItem>
           <Button
             :loading="loading"
             type="primary"

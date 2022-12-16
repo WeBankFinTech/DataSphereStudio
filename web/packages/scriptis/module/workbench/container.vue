@@ -1191,6 +1191,13 @@ export default {
     resize() {
       this.toggleCtrlBtn(this)
     },
+    getUserName() {
+      const baseinfo = storage.get("baseInfo", "local")
+      if (baseinfo) {
+        return baseinfo.proxyEnable && baseinfo.proxyUserName ? baseinfo.proxyUserName : baseinfo.username
+      }
+      return null
+    },
   },
 }
 </script>

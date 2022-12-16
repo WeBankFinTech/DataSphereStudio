@@ -126,14 +126,14 @@ export default {
     document.addEventListener('keyup', this.esc, false);
     this.initMonaco(monaco)
     this.changeTheme(localStorage.getItem('theme'));
-    eventbus.on('monaco.change', this.changeTheme);
+    eventbus.on('theme.change', this.changeTheme);
     this.monaco = monaco;
 
   },
 
   beforeDestroy() {
     document.removeEventListener('keyup', this.esc, false);
-    eventbus.off('monaco.change', this.changeTheme);
+    eventbus.off('theme.change', this.changeTheme);
     this.editor && this.editor.dispose()
   },
 

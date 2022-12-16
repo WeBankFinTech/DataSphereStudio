@@ -33,6 +33,7 @@
 import plugin from '@dataspherestudio/shared/common/util/plugin';
 import WaterMark from '@dataspherestudio/shared/components/watermark';
 import storage from '@dataspherestudio/shared/common/helper/storage';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 import moment from 'moment';
 import { currentModules } from '@dataspherestudio/shared/common/util/currentModules.js';
 import api from '@dataspherestudio/shared/common/service/api';
@@ -54,7 +55,6 @@ export default {
     }
   },
   mounted() {
-    this.watermark = this.$APP_CONF.watermark || { template: '', show: false }
     this.getMaskText()
     plugin.on('show_app_update_notice', () => {
       let url = '/dss/framework/workspace/getReleaseNote'
@@ -72,15 +72,22 @@ export default {
           }
         }
       })
-    })
+    }),
+    eventbus.on('watermark.refresh', () => {
+      this.waterMarkText = ''
+      setTimeout(() => {
+        this.getMaskText()
+      },400)
+    });
   },
   methods: {
     getUserName() {
       return storage.get("baseInfo", "local")
         ? storage.get("baseInfo", "local").username
-        : null;
+        : '';
     },
     getMaskText() {
+      this.watermark = this.$APP_CONF.watermark || { template: '', show: false }
       if ( !this.watermark.show ) return
       const obj = {
         username: this.getUserName(),

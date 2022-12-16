@@ -140,12 +140,12 @@ export default {
   mounted() {
     this.initMonaco();
     this.changeTheme(localStorage.getItem('theme'));
-    eventbus.on('monaco.change', this.changeTheme);
+    eventbus.on('theme.change', this.changeTheme);
   },
   beforeDestroy: function() {
     // 销毁 editor，进行gc
     this.editor && this.editor.dispose();
-    eventbus.off('monaco.change', this.changeTheme);
+    eventbus.off('theme.change', this.changeTheme);
   },
   methods: {
     // 初始化

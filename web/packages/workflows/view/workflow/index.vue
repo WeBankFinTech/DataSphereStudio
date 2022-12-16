@@ -388,7 +388,7 @@ export default {
       this.treeFold = !this.treeFold;
       setTimeout(()=>{
         eventbus.emit('workflow.fold.left.tree');
-      }, 600)
+      }, 800)
     },
     // 获取开发流程基本数据
     getDevProcessData(data) {

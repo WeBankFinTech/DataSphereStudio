@@ -52,6 +52,7 @@ import { config } from '@dataspherestudio/shared/common/config/db.js';
 import JSEncrypt from 'jsencrypt';
 import util from '@dataspherestudio/shared/common/util/';
 import tab from '@/scriptis/service/db/tab.js';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 
 export default {
@@ -184,6 +185,7 @@ export default {
                 context: this,
                 homePageRes
               })
+              eventbus.emit('watermark.refresh');
               if (all_after_login.length) {
                 // 有hook返回则hook处理
               } else {

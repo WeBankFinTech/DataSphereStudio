@@ -117,11 +117,13 @@ export default {
       if(localStorage.getItem('theme')==='dark'){
         window.document.documentElement.setAttribute('data-theme', '')
         localStorage.setItem('theme', '');
-        eventbus.emit('monaco.change', 'light');
+        eventbus.emit('theme.change', 'light');
+        eventbus.emit('watermark.refresh');
       }else {
         window.document.documentElement.setAttribute('data-theme', 'dark')
         localStorage.setItem('theme', 'dark');
-        eventbus.emit('monaco.change', 'dark');
+        eventbus.emit('theme.change', 'dark');
+        eventbus.emit('watermark.refresh');
       }
       setTimeout(() => {
         document.querySelector('body').classList.remove('notransition');

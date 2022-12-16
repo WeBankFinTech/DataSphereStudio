@@ -241,11 +241,11 @@ export default {
     this.getRangeScreenData();
     this.getCallListDetail();
     window.addEventListener('resize', this.chartResize)
-    eventbus.on('monaco.change', this.changeTheme);
+    eventbus.on('theme.change', this.changeTheme);
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.chartResize)
-    eventbus.off('monaco.change', this.changeTheme);
+    eventbus.off('theme.change', this.changeTheme);
   },
   methods: {
     changeTab(tab) {

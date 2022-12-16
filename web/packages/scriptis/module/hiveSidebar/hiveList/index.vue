@@ -271,8 +271,8 @@ export default {
           api.fetch('/dss/datapipe/datasource/getSchemaBaseInfo',  {
             dbName: item
           }, 'get').then((rst) => {
-            const title = `${rst.schemaInfo.dbName}\n${rst.schemaInfo.description||''}`
-            e.target.title = `${rst.schemaInfo.dbName}\n${rst.schemaInfo.description||''}`
+            const title = `${item}\n${rst.schemaInfo.description||''}`
+            e.target.title = `${item}\n${rst.schemaInfo.description||''}`
             this.dbnameDesc[item] = title
             e.target.innerText = item
           }).catch(() => {

@@ -125,7 +125,7 @@ export default {
       // 注意：当需要停止的引擎较多时，后台需要时间处理请求，请稍等一段时间后再查询引擎状态。
       const selections = this.$refs.selectionTable.getSelection();
       if (selections.length) {
-        const hasBusy = selections.some(it => it.status === 'Busy')
+        const hasBusy = selections.some(it => it.instanceStatus === 'Busy')
         let content = ''
         content = hasBusy ? `
             <p style="margin-top: 10px;color:#ed4014">${this.$t('message.enginelist.hasBusy')}</p>

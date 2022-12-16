@@ -192,7 +192,9 @@ export default {
         return { engineInstance: it.instance }
       })
       this.stoping = true
-      api.fetch('/dss/framework/workspace/killEngineConnInstances', list, 'post').then(() => {
+      api.fetch('/dss/framework/workspace/killEngineConnInstances', {
+        instances: list
+      }, 'post').then(() => {
         this.$Message.success(this.$t('message.enginelist.stopReq'))
       }).finally(() => {
         this.stoping = false

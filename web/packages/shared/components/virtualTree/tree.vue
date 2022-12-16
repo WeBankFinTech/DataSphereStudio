@@ -142,7 +142,7 @@ export default {
     },
     getItemprops(index) {
       return {
-        key: index,
+        key: this.showData[index][this.keyText] || index,
         props: {
           item: this.showData[index],
           render: this.render

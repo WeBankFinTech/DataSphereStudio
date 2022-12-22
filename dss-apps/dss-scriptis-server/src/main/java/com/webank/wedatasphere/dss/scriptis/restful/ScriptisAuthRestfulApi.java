@@ -38,8 +38,8 @@ public class ScriptisAuthRestfulApi {
     @RequestMapping(value = "/globalLimits", method = RequestMethod.GET)
     public Message globalLimits(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
-        Map globalLimits = GlobalLimitsUtils.getAllGlobalLimits();
-        Map resMap = new HashMap(globalLimits);
+        Map<String,Object> globalLimits = GlobalLimitsUtils.getAllGlobalLimits();
+        Map<String,Object> resMap = new HashMap<>(globalLimits);
         //临时代码，兼容特定环境下不同用户需要不同的权限
         if (username.endsWith(ServerConfiguration.LINKIE_USERNAME_SUFFIX_NAME())) {
             resMap.put("resCopyEnable", true);

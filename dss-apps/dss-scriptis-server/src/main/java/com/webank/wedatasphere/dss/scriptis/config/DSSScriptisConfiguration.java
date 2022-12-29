@@ -29,8 +29,5 @@ public class DSSScriptisConfiguration {
     public final static String GLOBAL_LIMITS_PREFIX = "wds.dss.scriptis.global.limits.";
     public final static String GLOBAL_LIMIT_PREFIX = "wds.dss.scriptis.global.limit.";
 
-    public final static CommonVars<Boolean> EXPROT_RES_ENABLE = CommonVars.apply("wds.dss.scriptis.global.limits.exportResEnable", false);
-    public final static CommonVars<Boolean> DOWNLOAD_RES_ENABLE = CommonVars.apply("wds.dss.scriptis.global.limits.downloadResEnable", false);
-    public final static CommonVars<Boolean> RES_COPY_ENABLE = CommonVars.apply("wds.dss.scriptis.global.limits.resCopyEnable", false);
 
 }

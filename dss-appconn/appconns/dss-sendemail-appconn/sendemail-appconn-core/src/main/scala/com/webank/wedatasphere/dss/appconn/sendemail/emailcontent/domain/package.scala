@@ -41,9 +41,10 @@ class PictureEmailContent extends ArrayEmailContent with FsPathStoreEmailContent
 
 class HtmlEmailContent extends StringEmailContent with FsPathStoreEmailContent {
 
-  def this(filePath: FsPath) = {
+  def this(filePath: FsPath, fileType: String) = {
     this()
     setFsPath(filePath)
+    setFileType(fileType)
   }
 
 }

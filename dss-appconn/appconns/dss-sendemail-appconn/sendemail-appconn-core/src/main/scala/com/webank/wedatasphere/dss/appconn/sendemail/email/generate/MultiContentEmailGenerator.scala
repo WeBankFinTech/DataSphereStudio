@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.appconn.sendemail.email.generate
 import com.google.gson.internal.LinkedTreeMap
 import com.webank.wedatasphere.dss.appconn.sendemail.cs.EmailCSHelper
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail}
-import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
+import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.{HtmlEmailContent, PictureEmailContent}
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
@@ -60,7 +60,9 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
               val resultSet = resultSetFactory.getResultSetByPath(fsPath)
               val emailContent = resultSet.resultSetType() match {
                 case ResultSetFactory.PICTURE_TYPE => new PictureEmailContent(fsPath, fileType)
-                case ResultSetFactory.HTML_TYPE => throw new EmailSendFailedException(80003 ,"html result set is not allowed")//new HtmlEmailContent(fsPath)
+                case ResultSetFactory.HTML_TYPE =>
+                  multiContentEmail.setEmailType("html")
+                  new HtmlEmailContent (fsPath, fileType)//new HtmlEmailContent(fsPath)
                 case ResultSetFactory.TABLE_TYPE => throw new EmailSendFailedException(80003 ,"table result set is not allowed")//new TableEmailContent(fsPath)
                 case ResultSetFactory.TEXT_TYPE => throw new EmailSendFailedException(80003 ,"text result set is not allowed")//new FileEmailContent(fsPath)
               }

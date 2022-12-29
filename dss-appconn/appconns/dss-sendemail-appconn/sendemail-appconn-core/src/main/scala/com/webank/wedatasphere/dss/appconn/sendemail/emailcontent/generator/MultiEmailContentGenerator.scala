@@ -28,7 +28,11 @@ class MultiEmailContentGenerator extends AbstractEmailContentGenerator with Logg
     case multiContentEmail: MultiContentEmail =>
       formatSubjectOfOldVersion(email)
       formatSubject(multiContentEmail)
-      formatContent(multiContentEmail)
+      if (multiContentEmail.getEmailType.equals("html")) {
+        setHtmlContent(multiContentEmail)
+      } else {
+        formatContent(multiContentEmail)
+      }
   }
 
   protected def formatContent(email: MultiContentEmail): Unit = {
@@ -45,6 +49,15 @@ class MultiEmailContentGenerator extends AbstractEmailContentGenerator with Logg
     sb.append("</table>")
     sb.append("</body></html>")
     email.setContent(sb.toString)
+  }
+
+  protected def setHtmlContent(email: MultiContentEmail): Unit = {
+    email.getEmailContents.foreach {
+      case emailContent: StringEmailContent =>
+        if (emailContent.getContent != null) {
+          email.setContent(emailContent.getContent)
+        }
+    }
   }
 
 }

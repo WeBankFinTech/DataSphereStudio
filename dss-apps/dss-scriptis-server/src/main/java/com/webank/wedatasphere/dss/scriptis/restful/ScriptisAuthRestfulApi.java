@@ -2,10 +2,12 @@ package com.webank.wedatasphere.dss.scriptis.restful;
 
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.utils.GlobalLimitsUtils;
+import com.webank.wedatasphere.dss.scriptis.service.ScriptisAuthService;
 import org.apache.linkis.common.conf.BDPConfiguration;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.conf.ServerConfiguration;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +31,9 @@ import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfigurati
 @RestController
 public class ScriptisAuthRestfulApi {
 
+    @Autowired
+    private ScriptisAuthService scriptisAuthService;
+
     @PostConstruct
     public void init() {
         BDPConfiguration.set(DSSCommonConf.ALL_GLOBAL_LIMITS_PREFIX.key(), GLOBAL_LIMITS_PREFIX);
@@ -38,15 +43,8 @@ public class ScriptisAuthRestfulApi {
     @RequestMapping(value = "/globalLimits", method = RequestMethod.GET)
     public Message globalLimits(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
-        Map<String,Object> globalLimits = GlobalLimitsUtils.getAllGlobalLimits();
-        Map<String,Object> resMap = new HashMap<>(globalLimits);
-        //临时代码，兼容特定环境下不同用户需要不同的权限
-        if (username.endsWith(ServerConfiguration.LINKIE_USERNAME_SUFFIX_NAME())) {
-            resMap.put("resCopyEnable", true);
-            resMap.put("resultSetExportEnable", true);
-            resMap.put("downloadResEnable", true);
-        }
-        return Message.ok().data("globalLimits", resMap);
+        Map<String,Object> globalLimits = scriptisAuthService.getGlobalLimits(username);
+        return Message.ok().data("globalLimits", globalLimits);
     }
 
     @RequestMapping(value = "/globalLimits/{globalLimitName}",method = RequestMethod.GET)

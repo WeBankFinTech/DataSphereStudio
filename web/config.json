@@ -48,6 +48,30 @@
         "zh-CN": "dataGovernance/i18n/zh.json"
       }
     },
+    "dataAssetManage": {
+      "routes": "dataAssetManage/router",
+      "module": "dataAssetManage/module",
+      "i18n": {
+        "en": "dataAssetManage/i18n/en.json",
+        "zh-CN": "dataAssetManage/i18n/zh.json"
+      }
+    },
+    "dataModelCenter": {
+      "routes": "dataModelCenter/router",
+      "module": "dataModelCenter/module",
+      "i18n": {
+        "en": "dataModelCenter/i18n/en.json",
+        "zh-CN": "dataModelCenter/i18n/zh.json"
+      }
+    },
+    "dataWarehouseDesign": {
+      "routes": "dataWarehouseDesign/router",
+      "module": "dataWarehouseDesign/module",
+      "i18n": {
+        "en": "dataWarehouseDesign/i18n/en.json",
+        "zh-CN": "dataWarehouseDesign/i18n/zh.json"
+      }
+    },
     "dolphinScheduler": {
       "routes": "dolphinScheduler/router",
       "module": "dolphinScheduler/module",
@@ -58,14 +82,6 @@
     }
   },
   "exts": {
-    "dss-plugin-open": {
-      "module": "exts/open-source/index.js",
-      "i18n": {
-        "en": "exts/open-source/i18n/en.json",
-        "zh-CN": "exts/open-source/i18n/zh.json"
-      },
-      "options": null
-    }
   },
   "conf": {
     "app_name": "DataSphere Studio",

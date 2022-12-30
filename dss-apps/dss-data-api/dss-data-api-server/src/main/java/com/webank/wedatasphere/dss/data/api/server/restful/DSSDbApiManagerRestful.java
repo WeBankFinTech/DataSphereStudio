@@ -33,7 +33,7 @@ public class DSSDbApiManagerRestful {
         }
         Workspace workspace = SSOHelper.getWorkspace(request);
         List<Long> totals = new ArrayList<>();
-        List<ApiInfo> apiInfoList = apiManagerService.getApiInfoList(Long.valueOf(workspace.getWorkspaceName())
+        List<ApiInfo> apiInfoList = apiManagerService.getApiInfoList(workspaceId
                 , apiName, totals, pageNow, pageSize);
         return Message.ok().data("list", apiInfoList).data("total", totals.get(0));
     }

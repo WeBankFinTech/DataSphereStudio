@@ -79,8 +79,16 @@ function stopDssProject(){
 	SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
   stopApp
 
-  SERVER_NAME=dss-data-governance-server
-	SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
+  SERVER_NAME=dss-data-assets-server
+	SERVER_IP=$DSS_DATA_ASSETS_SERVER_INSTALL_IP
+  stopApp
+
+  SERVER_NAME=dss-datamodel-center-server
+	SERVER_IP=$DSS_DATAMODEL_CENTER_SERVER_INSTALL_IP
+  stopApp
+
+  SERVER_NAME=dss-data-warehouse-server
+	SERVER_IP=$DSS_DATA_WAREHOUSE_SERVER_INSTALL_IP
   stopApp
 
   SERVER_NAME=dss-guide-server

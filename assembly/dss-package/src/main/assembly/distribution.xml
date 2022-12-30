@@ -287,20 +287,40 @@
     <!--dss-data-api-server-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-data-api/dss-data-api-server/target/out/dss-data-api-server/lib/
+        ${basedir}/../../dss-apps/dss-data-api/dss-data-api-server/target/out/dss-data-api-server/lib/
       </directory>
-      <outputDirectory>lib/dss-data-api/dss-data-api-server</outputDirectory>
+      <outputDirectory>lib/dss-apps/dss-data-api-server</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
 
-    <!--dss-data-governance-server-->
+
     <fileSet>
       <directory>
-        ${basedir}/../../dss-data-governance/dss-data-governance-server/target/out/dss-data-governance-server/lib/
+        ${basedir}/../../dss-apps/dss-dataasset-management/dss-data-assets-server/target/out/dss-data-assets-server/lib/
       </directory>
-      <outputDirectory>lib/dss-data-governance/dss-data-governance-server</outputDirectory>
+      <outputDirectory>lib/dss-apps/dss-data-assets-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-apps/dss-datamodel-center/dss-datamodel-center-server/target/out/dss-datamodel-center-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-apps/dss-datamodel-center-server</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-apps/dss-datawarehouse-design/dss-data-warehouse-server/target/out/dss-data-warehouse-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-apps/dss-data-warehouse-server</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>

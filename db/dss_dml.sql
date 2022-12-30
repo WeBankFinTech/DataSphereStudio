@@ -3,16 +3,28 @@ INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `
 VALUES (1,'sso',0,1,0,0,NULL,"com.webank.wedatasphere.dss.appconn.sso.SSOAppConn",NULL,NULL),
 (2,'scriptis',0,1,0,0,"sso",NULL,NULL,NULL),
 (3,'workflow',0,1,1,0,NULL,'com.webank.wedatasphere.dss.appconn.workflow.WorkflowAppConn','/appcom/Install/dss/dss-appconns/workflow',NULL),
-(4,'apiservice',0,1,0,0,"sso",NULL,NULL,NULL);
+(4,'apiservice',0,1,0,0,'sso',NULL,NULL,NULL),
+(5,'datamodel',0,1,0,0,'sso',NULL,NULL,NULL),
+(6,'warehouse',0,1,0,0,'sso',NULL,NULL,NULL),
+(7,'dataasset',0,1,0,0,'sso',NULL,NULL,NULL),
+(8,'dataservice',0,1,0,0,'sso',NULL,NULL,NULL);
 
 DELETE FROM dss_appconn_instance;
 select @scriptis_appconn_id:= id from dss_appconn where appconn_name="scriptis";
 select @workflow_appconn_id:= id from dss_appconn where appconn_name="workflow";
 select @apiservice_appconn_id:= id from dss_appconn where appconn_name="apiservice";
+select @datamodel_appconn_id:= id from dss_appconn where appconn_name="datamodel";
+select @warehouse_appconn_id:= id from dss_appconn where appconn_name="warehouse";
+select @dataasset_appconn_id:= id from dss_appconn where appconn_name="dataasset";
+select @dataservice_appconn_id:= id from dss_appconn where appconn_name="dataservice";
 INSERT INTO `dss_appconn_instance` (`id`, `appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
 VALUES (2, @scriptis_appconn_id, 'DEV', '/home', '', ''),
 (3, @workflow_appconn_id,'DEV','/workspaceHome','',''),
-(4, @apiservice_appconn_id, 'DEV', '/apiservices', '', '');
+(4, @apiservice_appconn_id, 'DEV', '/apiservices', '', ''),
+(5,@datamodel_appconn_id,'DEV','/dataModelCenter',NULL,'tableManage/tableSearch'),
+(6,@warehouse_appconn_id,'DEV','/dataWarehouseDesign',NULL,'themeDomains'),
+(7,@dataasset_appconn_id,'DEV','/dataAssetManage',NULL,'overview'),
+(8,@dataservice_appconn_id,'DEV','/dataService','','');
 
 DELETE FROM dss_workspace;
 insert into `dss_workspace`(`id`, `name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`)
@@ -42,16 +54,10 @@ insert into `dss_workspace_dictionary`(`workspace_id`, `parent_key`, `dic_name`,
 
 DELETE FROM dss_sidebar;
 insert  into `dss_sidebar`(`id`,`workspace_id`,`name`,`name_en`,`title`,`title_en`,`type`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (2,0,'菜单','Menu','菜单','Menu',1,1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:45:50');
--- insert  into `dss_sidebar`(`id`,`workspace_id`,`name`,`name_en`,`title`,`title_en`,`type`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (3,0,'常见问题','Common problem','常见问题','Common problem',1,1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:46:18');
 
 DELETE FROM dss_sidebar_content;
 insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (3,0,2,NULL,NULL,'工作空间管理','Workspace management','/workspaceManagement/productsettings',0,'menuIcon',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:47:49');
 insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (4,0,2,NULL,NULL,'UDF管理','UDF management','dss/linkis/?noHeader=1&noFooter=1#/urm/udfManagement',1,'menuIcon',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:47:11');
--- insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (5,0,3,NULL,NULL,'资源配置说明',NULL,'http://127.0.0.1:8088/kn/d/38',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-01-12 17:16:52');
--- insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (6,0,3,NULL,NULL,'Spark使用指南','[Discussion on error code 22223]','http://127.0.0.1:8088/kn/d/40',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:48:28');
--- insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (7,0,3,NULL,NULL,'Hive语法介绍',NULL,'http://127.0.0.1:8088/kn/d/34',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-01-12 17:17:00');
--- insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (8,0,3,NULL,NULL,'工作流使用介绍',NULL,'http://127.0.0.1:8088/kn/d/42',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-01-12 17:17:01');
--- insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (9,0,3,NULL,NULL,'数据服务使用介绍','Discussion on error code 22223','http://127.0.0.1:8088/kn/d/32',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:48:19');
 
 DELETE FROM dss_workspace_menu;
 INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('1','数据交换','data exchange','数据交换','数据交换描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
@@ -61,6 +67,7 @@ INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `descrip
 INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('5','管理员功能','administrator function','管理员功能','管理员功能描述','0',NULL,NULL,NULL,NULL,NULL,NULL);
 insert into `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) values('6','数据应用','data application','数据应用','数据应用描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 insert into `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) values('7','应用开发','application development','应用开发','应用开发描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
+insert into `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) values('8','数据管理','data managee','数据管理','数据管理描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 
 DELETE FROM dss_workspace_menu_appconn;
 INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
@@ -68,8 +75,17 @@ VALUES (@scriptis_appconn_id, 2, 'Scriptis', 'Scriptis', 'Scriptis is a one-stop
 INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
 VALUES (@workflow_appconn_id, 2, 'workflow', '工作流开发', '工作流开发', '工作流开发', null, null, 1, 'Enter workflow', '进入 工作流开发', null, null, null, null, null, null, null, null, null, null);
 INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
-VALUES (@apiservice_appconn_id, 7, 'dataService', '数据服务', '/dataService', '/dataService', null, null, 1, 'Enter dataService', '进入 数据服务', null, null, null, null, null, null, null, null, null, null);
+VALUES (@apiservice_appconn_id, 7, 'SparkdataService', 'spark数据服务', '/dataService', '/dataService', null, null, 1, 'Enter dataService', '进入 spark数据服务', null, null, null, null, null, null, null, null, null, null);
 
+INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
+VALUES (@dataservice_appconn_id, 7, 'dataService', '数据服务', '/dataService', '/dataService', null, null, 1, 'Enter dataService', '进入 数据服务', null, null, null, null, null, null, null, null, null, null);
+
+INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
+VALUES (@datamodel_appconn_id, 8, 'datamodel', '数据模型管理', 'datamodel', '数据模型管理', null, null, 1, 'Enter datamodel', '进入 数据模型管理', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
+VALUES (@warehouse_appconn_id, 8, 'warehouse', '数据仓库管理', 'warehouse', '数据仓库管理', null, null, 1, 'Enter warehouse', '进入 数据仓库管理', null, null, null, null, null, null, null, null, null, null);
+INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
+VALUES (@dataasset_appconn_id, 8, 'dataasset', '数据总览', 'dataasset', '数据总览', null, null, 1, 'Enter dataasset', '进入 数据总览', null, null, null, null, null, null, null, null, null, null);
 
 DELETE FROM dss_workspace_role;
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('1','-1','admin','管理员','2020-07-13 02:43:35','通用角色管理员');
@@ -123,7 +139,6 @@ insert  into `dss_workflow_node_to_group`(`node_id`,`group_id`) values (10, @fun
 insert  into `dss_workflow_node_to_group`(`node_id`,`group_id`) values (12, @function_node_groupId);
 
 DELETE FROM dss_workflow_node_ui;
--- todo msg.topic在receiver和sender使用了重复key
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (1,'title','请填写节点名称','Please enter node name','节点名','Node name','Input',1,NULL,NULL,0,NULL,0,1,1,1,'node');
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (3,'desc','请填写节点描述','Please enter the node description','节点描述','Node description','Text',0,NULL,NULL,0,NULL,0,4,1,1,'node');
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (5,'businessTag',NULL,NULL,'业务标签','businessTag','Tag',0,NULL,NULL,0,NULL,0,2,1,1,'node');
@@ -309,7 +324,7 @@ insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_ra
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('58','Regex','(.+)@(.+)@(.+)','此格式错误，例如：ProjectName@WFName@jobName','Invalid format,example:ProjectName@WFName@jobName','blur');
 INSERT INTO `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('59','OFT','["true","false"]','请填写是否复用引擎，false：不复用，true：复用','Please fill in whether or not to reuse engine, true: reuse, false: not reuse','blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('60', 'Regex', '^[0-9.]*g{0,1}$', 'Spark内存设置如2g', 'Drive memory size, default value: 2', 'blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('61','Regex','^(.|\s){1,500}$','长度在1到5000个字符','The length is between 1 and 5000 characters','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('61','Regex','^.{1,5000}$','长度在1到5000个字符','The length is between 1 and 5000 characters','blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('62','Regex','^.{1,150}$','长度在1到150个字符','The length is between 1 and 150 characters','blur');
 
 DELETE FROM dss_workflow_node_ui_to_validate;
@@ -408,9 +423,35 @@ INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'6','1',now(),'system');
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@workflow_appconn_id,'7','1',now(),'system');
 
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@datamodel_appconn_id,'1','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@datamodel_appconn_id,'2','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@datamodel_appconn_id,'3','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@datamodel_appconn_id,'4','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@datamodel_appconn_id,'5','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@datamodel_appconn_id,'6','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@datamodel_appconn_id,'7','1',now(),'system');
+
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@warehouse_appconn_id,'1','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@warehouse_appconn_id,'2','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@warehouse_appconn_id,'3','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@warehouse_appconn_id,'4','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@warehouse_appconn_id,'5','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@warehouse_appconn_id,'6','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@warehouse_appconn_id,'7','1',now(),'system');
+
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@dataasset_appconn_id,'1','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@dataasset_appconn_id,'2','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@dataasset_appconn_id,'3','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@dataasset_appconn_id,'4','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@dataasset_appconn_id,'5','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@dataasset_appconn_id,'6','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@dataasset_appconn_id,'7','1',now(),'system');
+
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@scriptis_appconn_id,'1','1',now(),'system');
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@workflow_appconn_id,'1','1',now(),'system');
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@apiservice_appconn_id,'1','1',now(),'system');
-
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@datamodel_appconn_id,'1','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@warehouse_appconn_id,'1','1',now(),'system');
+INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@dataasset_appconn_id,'1','1',now(),'system');
 
 INSERT INTO `dss_workspace_admin_dept` (`id`, `parent_id`, `ancestors`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES('100','0','0','基础科技','0','leader01','1888888888','123@qq.com','0','0','admin',now(),'admin',now());

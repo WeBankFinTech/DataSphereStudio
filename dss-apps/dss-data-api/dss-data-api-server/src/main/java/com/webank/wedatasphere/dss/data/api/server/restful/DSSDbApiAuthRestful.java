@@ -88,7 +88,7 @@
          }
          Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
          List<Long> totals = new ArrayList<>();
-         List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(Long.valueOf(workspace.getWorkspaceName()),
+         List<ApiAuthInfo> apiAuths = apiAuthService.getApiAuthList(workspaceId,
                  caller, totals, pageNow, pageSize);
          return Message.ok().data("list", apiAuths).data("total", totals.get(0));
      }
@@ -108,7 +108,7 @@
          Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
          log.info("workspace is {}", workspace.getWorkspaceName());
 
-         List<ApiGroupInfo> apiGroupInfoList = apiAuthService.getApiGroupList(Long.valueOf(workspace.getWorkspaceName()));
+         List<ApiGroupInfo> apiGroupInfoList = apiAuthService.getApiGroupList(workspaceId);
 
          Message message = Message.ok().data("list", apiGroupInfoList);
          return message;

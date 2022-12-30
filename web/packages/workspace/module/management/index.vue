@@ -44,12 +44,12 @@ export default {
         path: 'jurisdiction',
         children: [],
       },
-      // {
-      //   icon: 'add',
-      //   name: i18n.$t('message.workspaceManagement.dataSourceAdministration'),
-      //   path: 'dataSourceAdministration',
-      //   children: [],
-      // },
+      {
+        icon: 'add',
+        name: i18n.$t('message.workspaceManagement.dataSourceAdministration'),
+        path: 'dataSourceAdministration',
+        children: [],
+      },
     ];
     return {
       mode: '',

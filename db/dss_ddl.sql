@@ -25,11 +25,7 @@ CREATE TABLE `dss_appconn_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='dss instance的实例表';
 
-/*
----------------------------------------------------------------------
--------------------  DSS Orchestrator Framework ---------------------
----------------------------------------------------------------------
-*/
+
 
 DROP TABLE IF EXISTS `dss_orchestrator_info`;
 CREATE TABLE `dss_orchestrator_info` (
@@ -82,11 +78,7 @@ CREATE TABLE `dss_orchestrator_ref_orchestration_relation` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=326 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
-/*
----------------------------------------------------------------------
--------------------  DSS Project Framework ---------------------
----------------------------------------------------------------------
-*/
+
 
 DROP TABLE IF EXISTS `dss_project`;
 CREATE TABLE `dss_project` (
@@ -141,11 +133,6 @@ CREATE TABLE `dss_appconn_project_relation` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
-/*
----------------------------------------------------------------------
----------------------  DSS Workspace Framework ----------------------
----------------------------------------------------------------------
-*/
 
 DROP TABLE IF EXISTS `dss_workspace`;
 CREATE TABLE `dss_workspace` (
@@ -308,11 +295,7 @@ CREATE TABLE `dss_workspace_download_audit`  (
 	 PRIMARY KEY (`id`)
 ) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = '文件下载审计';
 
-/*
----------------------------------------------------------------------
----------------------------  DSS Workflow ---------------------------
----------------------------------------------------------------------
-*/
+
 
 DROP TABLE IF EXISTS `dss_workflow`;
 CREATE TABLE `dss_workflow` (
@@ -589,4 +572,3 @@ CREATE TABLE `dss_proxy_user` (
   `remark` varchar(500) DEFAULT NULL COMMENT '备注',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
-

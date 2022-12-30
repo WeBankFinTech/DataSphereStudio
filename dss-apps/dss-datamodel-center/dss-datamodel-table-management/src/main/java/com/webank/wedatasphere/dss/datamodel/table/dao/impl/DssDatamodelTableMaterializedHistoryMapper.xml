@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelTableMaterializedHistoryMapper">
+  <resultMap id="BaseResultMap" type="com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTableMaterializedHistory">
+    <!--@mbg.generated-->
+    <!--@Table dss_datamodel_table_materialized_history-->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="materialized_code" jdbcType="LONGVARCHAR" property="materializedCode" />
+    <result column="reason" jdbcType="VARCHAR" property="reason" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="last_update_time" jdbcType="TIMESTAMP" property="lastUpdateTime" />
+    <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+    <result column="error_msg" jdbcType="VARCHAR" property="errorMsg" />
+    <result column="tableName" jdbcType="VARCHAR" property="tablename" />
+    <result column="database" jdbcType="VARCHAR" property="database" />
+    <result column="version" jdbcType="VARCHAR" property="version" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    id, materialized_code, reason, creator, `status`, create_time, last_update_time, 
+    task_id, error_msg, tableName, `database`, version
+  </sql>
+</mapper>

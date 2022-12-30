@@ -31,7 +31,7 @@ public class ApiConfig {
     private String method;
     @TableField("`describe`")
     private String describe;
-    @NotBlank(message = "datasource_id不能为空")
+    @NotNull(message = "datasource_id不能为空")
     @TableField(value = "datasource_id")
     private Integer datasourceId;
     private String tblName;

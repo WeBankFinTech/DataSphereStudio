@@ -206,7 +206,7 @@ public class KnowledgeGuideAdminRestful {
         final String savePath = GuideConf.TARGET_GITBOOK_PATH.getValue() + File.separator + "gitbook_books";
         final String scpCommand = "scp -r "
                 + " hadoop@" + GuideConf.HOST_IP_ADDRESS.getValue() + ":"
-                + GuideConf.HOST_GITBOOK_PATH.getValue() + " "
+                + GuideConf.HOST_GITBOOK_PATH.getValue() +  File.separator + "_book" + " "
                 + GuideConf.TARGET_GITBOOK_PATH.getValue();
         String delMkdir = "rm -rf " + savePath;
         logger.info("开始执行定时任务...");

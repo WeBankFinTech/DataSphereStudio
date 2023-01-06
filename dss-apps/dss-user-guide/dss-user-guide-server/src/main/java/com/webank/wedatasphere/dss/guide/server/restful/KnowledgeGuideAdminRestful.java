@@ -203,11 +203,12 @@ public class KnowledgeGuideAdminRestful {
     @PostConstruct
     public void syncKnowledge() {
         final String summaryPath = GuideConf.HOST_GITBOOK_PATH.getValue() + File.separator + SUMMARY;
+        final String savePath = GuideConf.TARGET_GITBOOK_PATH.getValue();
         final String scpCommand = "scp -r "
                 + " hadoop@" + GuideConf.HOST_IP_ADDRESS.getValue() + ":"
                 + GuideConf.HOST_GITBOOK_PATH.getValue() + " "
                 + GuideConf.TARGET_GITBOOK_PATH.getValue();
-        String delMkdir = "rm -rf " + GuideConf.TARGET_GITBOOK_PATH.getValue();
+        String delMkdir = "rm -rf " + savePath;
         logger.info("开始执行定时任务...");
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             try {

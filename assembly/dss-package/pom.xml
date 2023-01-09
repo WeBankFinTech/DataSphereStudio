@@ -128,6 +128,12 @@
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-storage</artifactId>
             <version>${linkis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-text</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

@@ -252,7 +252,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                            String comment,
                            String userName,
                            String workspaceName,
-                           String projectName) throws IOException{
+                           String projectName) throws IOException,DSSErrorException{
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -289,6 +289,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
         } catch (DSSErrorException e) {
             logger.error("Failed to saveContext: ", e);
+            throw e;
         }
 
         String version = bmlReturnMap.get("version").toString();

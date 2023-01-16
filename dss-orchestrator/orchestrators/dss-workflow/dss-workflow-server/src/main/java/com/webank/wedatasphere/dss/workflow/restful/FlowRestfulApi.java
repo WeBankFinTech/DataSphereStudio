@@ -304,7 +304,7 @@ public class FlowRestfulApi {
      * @throws IOException
      */
     @RequestMapping(value = "saveFlow", method = RequestMethod.POST)
-    public Message saveFlow( @RequestBody SaveFlowRequest saveFlowRequest) throws IOException,DSSErrorException {
+    public Message saveFlow( @RequestBody SaveFlowRequest saveFlowRequest) throws IOException {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
 
         Long flowID = saveFlowRequest.getId();

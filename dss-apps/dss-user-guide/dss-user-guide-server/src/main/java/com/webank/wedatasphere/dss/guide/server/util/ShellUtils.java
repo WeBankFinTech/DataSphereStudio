@@ -17,7 +17,7 @@ public class ShellUtils {
      */
     public static void callShellByExec(String shellString) {
         try {
-            logger.error("shellString:" + shellString);
+            logger.info("shellString:" + shellString);
             Process process = Runtime.getRuntime().exec(shellString);
             int exitValue = process.waitFor();
             if (0 != exitValue) {
@@ -34,7 +34,7 @@ public class ShellUtils {
      * @param shellString
      */
     public static String callShellQuery(String shellString) {
-        logger.error("shellString:" + shellString);
+        logger.info("shellString:" + shellString);
         BufferedReader reader = null;
         String result = "";
         try {

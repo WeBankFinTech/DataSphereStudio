@@ -144,7 +144,7 @@ public class ContextServiceImpl implements ContextService {
             JsonObject flowObject = new Gson().fromJson(jsonFlow, JsonObject.class);
             if (!flowObject.has(CSCommonUtils.CONTEXT_ID_STR) || !flowObject.get(CSCommonUtils.CONTEXT_ID_STR).isJsonPrimitive()) {
                 logger.error("Did not have invalid contextID, save context failed.");
-                return;
+                throw new DSSRuntimeException("does not have valid ContextID, save context failed(工作流格式错误，缺失有效的CS信息)");
             } else {
                 String contextIDStr = flowObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString();
                 // ①reset原有key 这里只清理

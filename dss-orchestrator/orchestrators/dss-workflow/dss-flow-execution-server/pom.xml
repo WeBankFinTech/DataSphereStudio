@@ -196,7 +196,12 @@
             <version>${commons.lang3.version}</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-entrance</artifactId>
+            <version>${linkis.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
 
     </dependencies>

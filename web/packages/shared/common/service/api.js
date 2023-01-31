@@ -351,7 +351,7 @@ const param = function (url, data, option) {
 
 let showApiErrorTips = true
 let lastMsg = ''
-let isHoverNotice = false
+
 const action = function (url, data, option) {
   return param(url, data, option)
     .then(success, fail)
@@ -373,6 +373,7 @@ const action = function (url, data, option) {
         if (isEn && msg === API_ERR_MSG) {
           msg = 'The service is abnormal, please contact the developer for processing!'
         }
+        let isHoverNotice = false
         const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
         if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
           const noticeName = 'err_' + Date.now()
@@ -445,9 +446,6 @@ const action = function (url, data, option) {
               }
               ele.parentElement.parentElement.addEventListener('mouseover', () => {
                 isHoverNotice = true
-              }, false)
-              ele.parentElement.parentElement.addEventListener('mouseout', () => {
-                isHoverNotice = false
               }, false)
             })
           })

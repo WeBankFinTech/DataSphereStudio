@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +40,8 @@ public class SSOHelper {
 
     private static final String WORKSPACE_ID_COOKIE_KEY = "workspaceId";
     private static final String WORKSPACE_NAME_COOKIE_KEY = "workspaceName";
+    private static final String WORKSPACE_ID_HEAD_KEY = "WORKSPACE-ID";
+    private static final String WORKSPACE_NAME_HEAD_KEY = "WORKSPACE-NAME";
     private static SSOBuilderService ssoBuilderService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSOHelper.class);
@@ -87,13 +90,18 @@ public class SSOHelper {
     public static Workspace getWorkspace(HttpServletRequest request){
         Workspace workspace = new Workspace();
         Cookie[] cookies = request.getCookies();
-        Arrays.stream(cookies).forEach(cookie -> {
-            if(WORKSPACE_NAME_COOKIE_KEY.equals(cookie.getName())) {
-                workspace.setWorkspaceName(cookie.getValue());
-            } else if(WORKSPACE_ID_COOKIE_KEY.equals(cookie.getName())) {
-                workspace.setWorkspaceId(Long.parseLong(cookie.getValue()));
+        //workspaceName和workspaceId可以通过cookie，也可以通过header指定。header优先级高于cookie
+        String workspaceName=request.getHeader(WORKSPACE_NAME_HEAD_KEY);
+        String workspaceId=request.getHeader(WORKSPACE_ID_HEAD_KEY);
+        for (Cookie cookie : cookies) {
+            if (workspaceName == null && WORKSPACE_NAME_COOKIE_KEY.equals(cookie.getName())) {
+                workspaceName = cookie.getValue();
+            } else if (workspaceId == null && WORKSPACE_ID_COOKIE_KEY.equals(cookie.getName())) {
+                workspaceId = cookie.getValue();
             }
-        });
+        }
+        workspace.setWorkspaceName(workspaceName);
+        workspace.setWorkspaceId(Optional.ofNullable(workspaceId).map(Long::parseLong).orElse(-1L));
         addWorkspaceInfo(request, workspace);
         return workspace;
     }

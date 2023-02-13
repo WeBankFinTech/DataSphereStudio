@@ -34,6 +34,7 @@ public class WorkspaceMenuAppconnVo {
 
     private Boolean ifIframe;
     private Boolean isExternal;
+    private Boolean isMicroApp;
 
     private List<DSSApplicationBean> appInstances;
 
@@ -143,5 +144,13 @@ public class WorkspaceMenuAppconnVo {
 
     public void setExternal(Boolean external) {
         isExternal = external;
+    }
+
+    public Boolean getIsMicroApp() {
+        return isMicroApp;
+    }
+
+    public void setIsMicroApp(Boolean isMicroApp) {
+        this.isMicroApp = isMicroApp;
     }
 }

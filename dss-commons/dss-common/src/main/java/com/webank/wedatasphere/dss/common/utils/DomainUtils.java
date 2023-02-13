@@ -15,6 +15,9 @@ public class DomainUtils {
 
     public static String getCookieDomain(HttpServletRequest request) {
         String referer = request.getHeader("Referer");
+        if(referer==null){
+            referer=request.getServerName();
+        }
         return getCookieDomain(referer);
     }
 

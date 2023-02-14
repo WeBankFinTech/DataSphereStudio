@@ -36,12 +36,12 @@
     </resultMap>
 
     <sql id="fields">
-        `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`,`is_micro_app`
+        `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`,`is_micro_app`,
         `reference`, `class_name`, `resource`
     </sql>
 
     <sql id="fields_query">
-        `id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`,`is_micro_app`
+        `id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`,`is_micro_app`,
         `reference`, `class_name`, `resource`
     </sql>
 

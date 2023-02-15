@@ -6,8 +6,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.data.governance.entity.ClassificationConstant;
-import com.webank.wedatasphere.dss.data.governance.response.CreateModelTypeResult;
-import com.webank.wedatasphere.dss.data.governance.response.UpdateModelTypeResult;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.context.DataModelSecurityContextHolder;
 import com.webank.wedatasphere.dss.datamodel.center.common.event.CreateModelEvent;
@@ -30,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,9 +45,9 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
     private final ModelMapper modelMapper = new ModelMapper();
 
-
     @Resource
-    private AssertsSyncService assertsSyncService;
+    private ApplicationEventPublisher publisher;
+
 
     @Resource
     private DatamodelReferencService datamodelReferencService;
@@ -74,12 +73,11 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
 
         getBaseMapper().insert(newOne);
 
-        //同步atlas
-        CreateModelTypeResult result = assertsSyncService.syncCreateModel(
-                new CreateModelEvent(this
-                        , DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
-                        , vo.getFieldIdentifier()
-                        , ClassificationConstant.DIMENSION));
+        //异步绑定资产atlas
+        publisher.publishEvent(new CreateModelEvent(this
+                , DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
+                , vo.getFieldIdentifier()
+                , ClassificationConstant.DIMENSION));
         return newOne.getId();
     }
 
@@ -134,13 +132,13 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
         updateOne.setUpdateTime(new Date());
         getBaseMapper().update(updateOne, Wrappers.<DssDatamodelDimension>lambdaUpdate().eq(DssDatamodelDimension::getId,id));
 
-        //同步atlas
-        UpdateModelTypeResult updateModelTypeResult = assertsSyncService.syncUpdateModel(
-                new UpdateModelEvent(this
-                        ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
-                        ,vo.getFieldIdentifier()
-                        ,orgFieldIdentifier
-                        ,ClassificationConstant.DIMENSION));
+
+        //异步更新绑定atlas
+        publisher.publishEvent(new UpdateModelEvent(this
+                ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
+                ,vo.getFieldIdentifier()
+                ,orgFieldIdentifier
+                ,ClassificationConstant.DIMENSION));
         return 1;
     }
 
@@ -158,8 +156,9 @@ public class DimensionServiceImpl extends ServiceImpl<DssDatamodelDimensionMappe
               throw new DSSDatamodelCenterException(ErrorCode.DIMENSION_DELETE_ERROR.getCode(), "dimension id " +id +" has referenced");
         }
         getBaseMapper().deleteById(id);
-        //同步资产
-        assertsSyncService.syncDeleteModel(new DeleteModelEvent(this
+
+        //异步删除绑定atlas
+        publisher.publishEvent(new DeleteModelEvent(this
                 ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
                 ,dssDatamodelDimension.getFieldIdentifier()
                 ,ClassificationConstant.DIMENSION));

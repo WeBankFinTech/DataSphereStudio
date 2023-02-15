@@ -53,6 +53,12 @@ public class AssetServiceImpl implements AssetService {
     @Resource
     private TableSizePartitionInfoMapper tableSizePartitionInfoMapper;
 
+    @Resource
+    private TableStorageInfoMapper tableStorageInfoMapper;
+
+    @Resource
+    private PartInfoMapper partInfoMapper;
+
     public AssetServiceImpl(AtlasService atlasService) {
         this.atlasService = atlasService;
         this.metaInfoMapper = new MetaInfoMapperImpl();
@@ -412,13 +418,7 @@ public class AssetServiceImpl implements AssetService {
     private List<PartInfo> getPartInfos(String db_name) {
         String tableName = db_name.split("\\.")[1];
         String dbName = db_name.split("\\.")[0];
-        List<PartInfo> partInfo = new ArrayList<>();
-        try {
-            partInfo = metaInfoMapper.getPartInfo(dbName, tableName);
-        } catch (DAOException e) {
-            e.printStackTrace();
-        }
-        return partInfo;
+        return partInfoMapper.query(dbName, tableName);
     }
 
     @Override
@@ -543,7 +543,6 @@ public class AssetServiceImpl implements AssetService {
                 }
                 sql.append(")");
             }
-            sql.append(")");
             return sql.toString();
         } catch (AtlasServiceException ex) {
             throw new DataGovernanceException(23000, ex.getMessage());
@@ -590,7 +589,10 @@ public class AssetServiceImpl implements AssetService {
 
     @Override
     public List<TableInfo> getTop10Table() throws DAOException {
-        return metaInfoMapper.getTop10Table();
+        List<TableInfo> tableInfoList = tableStorageInfoMapper.query();
+        // 根据存储量进行排序，并获取Top10
+        tableInfoList.sort((tb1,tb2)-> Long.compare(Long.parseLong(tb2.getStorage()), Long.parseLong(tb1.getStorage())));
+        return tableInfoList.stream().limit(10).collect(Collectors.toList());
     }
 
 

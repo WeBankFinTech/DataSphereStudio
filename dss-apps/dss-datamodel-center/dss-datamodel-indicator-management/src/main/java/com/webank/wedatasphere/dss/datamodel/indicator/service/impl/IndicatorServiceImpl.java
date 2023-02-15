@@ -8,9 +8,6 @@ import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.data.governance.entity.ClassificationConstant;
-import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient;
-import com.webank.wedatasphere.dss.data.governance.response.CreateModelTypeResult;
-import com.webank.wedatasphere.dss.data.governance.response.UpdateModelTypeResult;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.ErrorCode;
 import com.webank.wedatasphere.dss.datamodel.center.common.constant.IndicatorSourceInfoConstant;
 import com.webank.wedatasphere.dss.datamodel.center.common.context.DataModelSecurityContextHolder;
@@ -18,7 +15,6 @@ import com.webank.wedatasphere.dss.datamodel.center.common.event.CreateModelEven
 import com.webank.wedatasphere.dss.datamodel.center.common.event.DeleteModelEvent;
 import com.webank.wedatasphere.dss.datamodel.center.common.event.UpdateModelEvent;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
-import com.webank.wedatasphere.dss.datamodel.center.common.service.AssertsSyncService;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.DatamodelReferencService;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.DssDatamodelIndicatorMapper;
 import com.webank.wedatasphere.dss.datamodel.indicator.dao.IndicatorQueryMapper;
@@ -34,12 +30,13 @@ import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorContentS
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorService;
 import com.webank.wedatasphere.dss.datamodel.indicator.service.IndicatorVersionService;
 import com.webank.wedatasphere.dss.datamodel.indicator.vo.*;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
-import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,11 +68,9 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     private IndicatorQueryMapper indicatorQueryMapper;
 
 
-    @Resource
-    private LinkisDataAssetsRemoteClient linkisDataAssetsRemoteClient;
 
     @Resource
-    private AssertsSyncService assertsSyncService;
+    private ApplicationEventPublisher publisher;
 
 
     @Resource
@@ -109,12 +104,12 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
         indicatorContentService.addIndicatorContent(newOne.getId(), version, vo.getContent());
 
-        //同步atlas
-        CreateModelTypeResult result = assertsSyncService.syncCreateModel(
-                new CreateModelEvent(this
-                        , DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
-                        , vo.getFieldIdentifier()
-                        , ClassificationConstant.INDICATOR));
+
+        //异步绑定
+        publisher.publishEvent(  new CreateModelEvent(this
+                , DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
+                , vo.getFieldIdentifier()
+                , ClassificationConstant.INDICATOR));
         return newOne.getId();
     }
 
@@ -178,16 +173,12 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
 
 
 
-        //同步atlas
-        UpdateModelTypeResult updateModelTypeResult = assertsSyncService.syncUpdateModel(
-                new UpdateModelEvent(this
-                        ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
-                        ,vo.getFieldIdentifier()
-                        ,orgFieldIdentifier
-                        ,ClassificationConstant.INDICATOR)
-        );
-
-
+        //异步更新绑定
+        publisher.publishEvent(new UpdateModelEvent(this
+                ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
+                ,vo.getFieldIdentifier()
+                ,orgFieldIdentifier
+                ,ClassificationConstant.INDICATOR));
         return 1;
     }
 
@@ -218,12 +209,11 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         indicatorContentService.getBaseMapper().delete(Wrappers.<DssDatamodelIndicatorContent>lambdaQuery().eq(DssDatamodelIndicatorContent::getIndicatorId, id));
 
 
-        //同步资产
-        assertsSyncService.syncDeleteModel(new DeleteModelEvent(this
+
+        publisher.publishEvent(new DeleteModelEvent(this
                 ,DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
                 ,dssDatamodelIndicator.getFieldIdentifier()
                 ,ClassificationConstant.INDICATOR));
-
         return 1;
     }
 
@@ -231,11 +221,11 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     @Override
     public Message listIndicators(IndicatorQueryVO vo) {
         QueryWrapper<DssDatamodelIndicatorQuery> queryWrapper = new QueryWrapper<DssDatamodelIndicatorQuery>()
-                .like(StringUtils.isNotBlank(vo.getName()), "name", vo.getName())
+                .like(org.apache.commons.lang.StringUtils.isNotBlank(vo.getName()), "name", vo.getName())
                 .eq(vo.getIsAvailable() != null, "is_available", vo.getIsAvailable())
                 .eq(vo.getIndicatorType() != null, "indicator_type", vo.getIndicatorType())
-                .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), "theme_area", vo.getWarehouseThemeName())
-                .like(StringUtils.isNotBlank(vo.getOwner()), "owner", vo.getOwner());
+                .eq(org.apache.commons.lang.StringUtils.isNotBlank(vo.getWarehouseThemeName()), "theme_area", vo.getWarehouseThemeName())
+                .like(org.apache.commons.lang.StringUtils.isNotBlank(vo.getOwner()), "owner", vo.getOwner());
         PageHelper.clearPage();
         PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
         PageInfo<DssDatamodelIndicatorQuery> pageInfo = new PageInfo<>(indicatorQueryMapper.page(queryWrapper));
@@ -308,7 +298,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         String assignVersion = newVersion(orgName, orgV);
 
         //指标名称不能改变
-        if (!StringUtils.equals(orgName, vo.getName()) || !StringUtils.equals(orgNameEn, vo.getFieldIdentifier())) {
+        if (!org.apache.commons.lang.StringUtils.equals(orgName, vo.getName()) || !org.apache.commons.lang.StringUtils.equals(orgNameEn, vo.getFieldIdentifier())) {
             LOGGER.error("errorCode : {}, indicator name or fieldIdentifier must be same", ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode());
             throw new DSSDatamodelCenterException(ErrorCode.INDICATOR_VERSION_ADD_ERROR.getCode(), "indicator name or fieldIdentifier must be same");
         }
@@ -350,7 +340,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
     private String newVersion(String orgName, String orgVersion) {
         String lastVersion = indicatorVersionService.findLastVersion(orgName);
 
-        return StringUtils.isBlank(lastVersion) ?
+        return org.apache.commons.lang.StringUtils.isBlank(lastVersion) ?
                 (Integer.parseInt(orgVersion) + 1 + "") :
                 (Integer.parseInt(lastVersion) > Integer.parseInt(orgVersion)) ? (Integer.parseInt(lastVersion) + 1 + "") :
                         (Integer.parseInt(orgVersion) + 1 + "");
@@ -438,7 +428,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         int versionCount = (int) preReferences.stream().filter(e->{
             IndicatorVersionDTO rollBackDTO = gson.fromJson(e.getVersionContext(), IndicatorVersionDTO.class);
             DssDatamodelIndicator rollBackIndicator = rollBackDTO.getEssential();
-            return StringUtils.equals(rollBackIndicator.getThemeArea(),name)||StringUtils.equals(rollBackIndicator.getThemeAreaEn(),name);
+            return org.apache.commons.lang.StringUtils.equals(rollBackIndicator.getThemeArea(),name)|| org.apache.commons.lang.StringUtils.equals(rollBackIndicator.getThemeAreaEn(),name);
         }).count();
         return currentCount + versionCount + currentCountEn;
     }
@@ -451,7 +441,7 @@ public class IndicatorServiceImpl extends ServiceImpl<DssDatamodelIndicatorMappe
         int versionCount = (int) preReferences.stream().filter(e->{
             IndicatorVersionDTO rollBackDTO = gson.fromJson(e.getVersionContext(), IndicatorVersionDTO.class);
             DssDatamodelIndicator rollBackIndicator = rollBackDTO.getEssential();
-            return StringUtils.equals(rollBackIndicator.getLayerArea(),name)||StringUtils.equals(rollBackIndicator.getLayerAreaEn(),name);
+            return org.apache.commons.lang.StringUtils.equals(rollBackIndicator.getLayerArea(),name)|| org.apache.commons.lang.StringUtils.equals(rollBackIndicator.getLayerAreaEn(),name);
         }).count();
         return currentCount + versionCount + currentCountEn;
     }

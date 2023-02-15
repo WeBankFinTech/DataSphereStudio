@@ -11,23 +11,22 @@ import com.webank.wedatasphere.dss.datamodel.center.common.event.CreateLabelEven
 import com.webank.wedatasphere.dss.datamodel.center.common.event.DeleteLabelEvent;
 import com.webank.wedatasphere.dss.datamodel.center.common.event.UpdateLabelEvent;
 import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
-import com.webank.wedatasphere.dss.datamodel.center.common.service.AssertsSyncService;
 import com.webank.wedatasphere.dss.datamodel.center.common.service.DatamodelReferencService;
 import com.webank.wedatasphere.dss.datamodel.table.dao.DssDatamodelLabelMapper;
 import com.webank.wedatasphere.dss.datamodel.table.dto.LabelQueryDTO;
 import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelLabel;
-import com.webank.wedatasphere.dss.datamodel.table.entity.DssDatamodelTable;
 import com.webank.wedatasphere.dss.datamodel.table.service.LabelService;
 import com.webank.wedatasphere.dss.datamodel.table.vo.LabelAddVO;
 import com.webank.wedatasphere.dss.datamodel.table.vo.LabelEnableVO;
 import com.webank.wedatasphere.dss.datamodel.table.vo.LabelUpdateVO;
 import com.webank.wedatasphere.dss.datamodel.table.vo.LabelsQueryVO;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
-import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,8 +47,9 @@ public class LabelServiceImpl extends ServiceImpl<DssDatamodelLabelMapper, DssDa
     @Resource
     private ModelMapper modelMapper;
 
+
     @Resource
-    private AssertsSyncService assertsSyncService;
+    private ApplicationEventPublisher publisher;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -74,8 +74,9 @@ public class LabelServiceImpl extends ServiceImpl<DssDatamodelLabelMapper, DssDa
 
         getBaseMapper().insert(newOne);
 
-        //todo 同步资产创建标签
-        assertsSyncService.syncCreateLabel(new CreateLabelEvent(this
+
+        //异步绑定
+        publisher.publishEvent(new CreateLabelEvent(this
                 , DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
                 , vo.getName()));
 
@@ -109,7 +110,7 @@ public class LabelServiceImpl extends ServiceImpl<DssDatamodelLabelMapper, DssDa
         }
 
         //当更新名称时
-        if (!StringUtils.equals(vo.getName(), ori.getName())) {
+        if (!org.apache.commons.lang.StringUtils.equals(vo.getName(), ori.getName())) {
             int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelLabel>lambdaQuery().eq(DssDatamodelLabel::getName, vo.getName()));
             if (repeat > 0) {
                 LOGGER.error("errorCode : {}, label name can not repeat ", ErrorCode.DIMENSION_UPDATE_ERROR.getCode());
@@ -119,7 +120,7 @@ public class LabelServiceImpl extends ServiceImpl<DssDatamodelLabelMapper, DssDa
 
         String orgFieldIdentifier = ori.getFieldIdentifier();
         //当更新标识时
-        if (!StringUtils.equals(vo.getFieldIdentifier(), orgFieldIdentifier)) {
+        if (!org.apache.commons.lang.StringUtils.equals(vo.getFieldIdentifier(), orgFieldIdentifier)) {
             int repeat = getBaseMapper().selectCount(Wrappers.<DssDatamodelLabel>lambdaQuery().eq(DssDatamodelLabel::getFieldIdentifier, vo.getFieldIdentifier()));
             if (repeat > 0) {
                 LOGGER.error("errorCode : {}, label field identifier can not repeat", ErrorCode.DIMENSION_UPDATE_ERROR.getCode());
@@ -132,8 +133,9 @@ public class LabelServiceImpl extends ServiceImpl<DssDatamodelLabelMapper, DssDa
         updateOne.setUpdateTime(new Date());
         getBaseMapper().update(updateOne, Wrappers.<DssDatamodelLabel>lambdaUpdate().eq(DssDatamodelLabel::getId,id));
 
-        //todo 同步资产
-        assertsSyncService.syncUpdateLabel(new UpdateLabelEvent(this
+
+        //异步更新绑定
+        publisher.publishEvent(new UpdateLabelEvent(this
                 , DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
                 , vo.getName(),ori.getName()));
         return 1;
@@ -165,8 +167,9 @@ public class LabelServiceImpl extends ServiceImpl<DssDatamodelLabelMapper, DssDa
 
         getBaseMapper().deleteById(id);
 
-        //todo 同步资产
-        assertsSyncService.syncDeleteLabel(new DeleteLabelEvent(this
+
+        //异步删除绑定
+        publisher.publishEvent(new DeleteLabelEvent(this
                 , DataModelSecurityContextHolder.getContext().getDataModelAuthentication().getUser()
                 , dssDatamodelLabel.getName()));
         return 1;
@@ -177,9 +180,9 @@ public class LabelServiceImpl extends ServiceImpl<DssDatamodelLabelMapper, DssDa
         PageHelper.clearPage();
         PageHelper.startPage(vo.getPageNum(), vo.getPageSize());
         PageInfo<DssDatamodelLabel> pageInfo = new PageInfo<>(getBaseMapper().selectList(Wrappers.<DssDatamodelLabel>lambdaQuery()
-                .eq(StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelLabel::getWarehouseThemeName, vo.getWarehouseThemeName())
+                .eq(org.apache.commons.lang.StringUtils.isNotBlank(vo.getWarehouseThemeName()), DssDatamodelLabel::getWarehouseThemeName, vo.getWarehouseThemeName())
                 .eq(vo.getIsAvailable()!=null,DssDatamodelLabel::getIsAvailable,vo.getIsAvailable())
-                .eq(StringUtils.isNotBlank(vo.getOwner()),DssDatamodelLabel::getOwner,vo.getOwner())
+                .eq(org.apache.commons.lang.StringUtils.isNotBlank(vo.getOwner()),DssDatamodelLabel::getOwner,vo.getOwner())
                 .like(StringUtils.isNotBlank(vo.getName()), DssDatamodelLabel::getName, vo.getName())));
         return Message.ok()
                 .data("list",pageInfo

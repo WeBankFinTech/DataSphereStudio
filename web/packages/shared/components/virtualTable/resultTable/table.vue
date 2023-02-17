@@ -155,6 +155,5 @@ export default {
   height: 100%;
   overflow: auto;
   position: relative;
-  color: #333;
 }
 </style>

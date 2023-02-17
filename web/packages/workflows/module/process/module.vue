@@ -968,7 +968,7 @@ export default {
       return helpFn(obj) !== helpFn(this.lastObj)
     },
     initNode(arg) {
-      if(this.clickCurrentNode.id === arg.id) return; // 多出点击时，避免数据初始化
+      if(this.clickCurrentNode.id && this.clickCurrentNode.id === arg.id) return; // 多出点击时，避免数据初始化
       arg = this.bindNodeBasicInfo(arg);
       this.clickCurrentNode = JSON.parse(JSON.stringify(arg));
     },

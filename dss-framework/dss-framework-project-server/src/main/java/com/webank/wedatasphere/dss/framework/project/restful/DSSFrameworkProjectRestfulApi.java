@@ -159,6 +159,22 @@ public class DSSFrameworkProjectRestfulApi {
                 () -> Message.ok().data("repeat", false), String.format("用户 %s，创建工程名 %s 失败. ", username, name));
     }
 
+    @RequestMapping(path = "getProjectInfo", method = RequestMethod.GET)
+    public Message getProjectInfoByName(@RequestParam(name = "projectName") String projectName){
+        DSSProjectDO dbProject = dssProjectService.getProjectByName(projectName);
+        Message message;
+        if(dbProject==null){
+            String msg = String.format("project %s does not exist.", projectName);
+            message = Message.error(msg);
+        }else{
+            DSSProjectVo dssProjectVo = new DSSProjectVo();
+            dssProjectVo.setDescription(dbProject.getDescription());
+            dssProjectVo.setId(dbProject.getId());
+            dssProjectVo.setName(dbProject.getName());
+            message = Message.ok().data("project", dssProjectVo);
+        }
+        return  message;
+    }
     /**
      * 编辑工程
      *

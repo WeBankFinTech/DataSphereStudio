@@ -244,7 +244,7 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
     val toClearPath = AppConnUtils.getAppConnHomePath
     val file = new File(toClearPath)
     if (!file.exists()) {
-      error(s"you have no permission to delete this path or appconn path is not exists, path is: ${toClearPath}")
+      warn(s"the appconn path is not exists, path is: ${toClearPath}")
     }
     info(s"try to clear dss-appconns for this engine, path is: ${toClearPath}")
     Utils.tryCatch(FileUtils.deleteDirectory(file))(t => {

@@ -30,7 +30,7 @@
         <Input v-model="searchBar.yarnQueue" />
       </FormItem>
       <FormItem class="btn">
-        <Button type="primary" @click="getEngineList">{{$t('message.enginelist.find')}}</Button>
+        <Button type="primary" @click="doQuery">{{$t('message.enginelist.find')}}</Button>
         <Button type="warning" @click="stop">{{$t('message.enginelist.stop')}}</Button>
       </FormItem>
     </Form>
@@ -146,6 +146,10 @@ export default {
         this.$Message.warning({ content: this.$t('message.enginelist.selectfirst') });
       }
     },
+    doQuery() {
+      this.pageData.pageNow = 1
+      this.getEngineList()
+    },
     getEngineList() {
       this.loading = true;
       const params = {
@@ -216,6 +220,7 @@ export default {
           orderBy: order
         }
       }
+      this.pageData.pageNow = 1
       this.getEngineList()
     }
   }

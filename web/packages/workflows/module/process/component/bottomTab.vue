@@ -150,7 +150,6 @@ export default {
     @include border-color(#dee4ec, $dark-menu-base-color);
     z-index: 1;
     transition: transform .5s;
-    display: none;
     &.show{
       transform: translate3d(0, -292px, 0)
     }

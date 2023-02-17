@@ -10,6 +10,7 @@ CREATE TABLE `dss_appconn` (
   `class_name` varchar(255) DEFAULT NULL COMMENT '需要关联的某一个AppConn标识',
   `appconn_class_path` varchar(255) DEFAULT NULL COMMENT '需要关联的某一个AppConn标识',
   `resource` varchar(255) DEFAULT NULL COMMENT 'bml的资源ID',
+  `is_micro_app` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否微应用嵌入',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_appconn_name` (`appconn_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='dss appconn表';

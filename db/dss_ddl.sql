@@ -21,7 +21,7 @@ CREATE TABLE `dss_appconn_instance` (
   `appconn_id` int(20) NOT NULL COMMENT 'appconn的主键',
   `label` varchar(128) NOT NULL COMMENT '实例的标签',
   `url` varchar(128) DEFAULT NULL COMMENT '访问第三方的url',
-  `enhance_json` varchar(1024) DEFAULT NULL COMMENT 'json格式的配置',
+  `enhance_json` varchar(2048) DEFAULT NULL COMMENT 'json格式的配置',
   `homepage_uri` varchar(255) DEFAULT NULL COMMENT '主页uri，非URL',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='dss instance的实例表';

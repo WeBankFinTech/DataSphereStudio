@@ -279,8 +279,8 @@ export default {
             trigger: "submit",
           },
           {
-            message: "仅支持小写英文，数字，长度在100字符以内并必须以字母开头",
-            pattern: /^[a-z][a-z0-9]{0,99}$/g,
+            message: "只能以英文字母开头，只能包含英文字母、数字、下划线",
+            pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/g,
             trigger: "submit",
           },
         ],
@@ -583,7 +583,7 @@ export default {
           this.loading = false;
           this.$Message.success("新增版本成功");
           this.$router.push({
-            path: "/dataModelCenter/tableManage/tableSearch",
+            path: "/dataModelCenter/tableManage/tableSearch?workspaceId="+this.$route.query.workspaceId,
           });
         })
         .catch(() => {
@@ -690,12 +690,12 @@ export default {
                 onOk: async () => {
                   await this.handleTableCreate(res.id);
                   this.$router.push({
-                    path: "/dataModelCenter/tableManage/tableSearch",
+                    path: "/dataModelCenter/tableManage/tableSearch?workspaceId="+this.$route.query.workspaceId,
                   });
                 },
                 onCancel: () => {
                   this.$router.push({
-                    path: "/dataModelCenter/tableManage/tableSearch",
+                    path: "/dataModelCenter/tableManage/tableSearch?workspaceId="+this.$route.query.workspaceId,
                   });
                 },
               });
@@ -706,7 +706,7 @@ export default {
             updateTable(this.config.id, this.handleGetFormatData()).then(() => {
               this.$Message.success("更新成功");
               this.$router.push({
-                path: "/dataModelCenter/tableManage/tableSearch",
+                path: "/dataModelCenter/tableManage/tableSearch?workspaceId="+this.$route.query.workspaceId,
               });
             });
           }

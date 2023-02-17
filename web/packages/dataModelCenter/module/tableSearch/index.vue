@@ -562,9 +562,10 @@ export default {
      * @description 去往创建表
      */
     handleToCreateAction() {
+      const workspaceId = this.$route.query.workspaceId;
       this.$router.push({
         path: `/datamodelcenter/tableManage/tableEditor`,
-        query: { mode: "create" },
+        query: { mode: "create", workspaceId: workspaceId },
       });
     },
     /**

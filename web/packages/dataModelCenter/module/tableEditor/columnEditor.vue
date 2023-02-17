@@ -293,9 +293,9 @@ export default {
       let checkPartitionField = false;
       for (let i = 0; i < this.columnData.length; i++) {
         let item = this.columnData[i];
-        if (!Boolean(/^[a-z][a-z0-9]{0,99}$/g.test(item.name))) {
+        if (!Boolean(/^[a-zA-Z][a-zA-Z0-9_]*$/g.test(item.name))) {
           this.$Message.warning(
-            "字段名仅支持小写英文，数字，长度在100字符以内并必须以字母开头"
+            "只能以英文字母开头，只能包含英文字母、数字、下划线"
           );
           return false;
         }

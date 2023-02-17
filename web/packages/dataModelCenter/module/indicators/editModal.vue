@@ -473,6 +473,20 @@ export default {
     },
   },
   data() {
+    const _themeArea = (rule, value, callback) => {
+      if (value) {
+        callback();
+      } else {
+        callback(new Error('请选择主题域'))
+      }
+    };
+    const _layerArea = (rule, value, callback) => {
+      if (value) {
+        callback();
+      } else {
+        callback(new Error('请选择分层'))
+      }
+    };
     return {
       // 是否加载中
       loading: false,
@@ -520,6 +534,18 @@ export default {
             pattern: /^[0-9_\u4e00-\u9fa5]+$/g,
             trigger: "submit",
           },
+        ],
+        _themeArea: [
+          { validator: _themeArea,
+            required: true,
+            trigger: 'change,blur'
+          }
+        ],
+        _layerArea: [
+          { validator: _layerArea,
+            required: true,
+            trigger: 'change,blur'
+          }
         ],
         fieldIdentifier: [
           {

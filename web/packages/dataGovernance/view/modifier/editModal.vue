@@ -160,6 +160,20 @@ export default {
     },
   },
   data() {
+    const themeDomainId = (rule, value, callback) => {
+      if (value) {
+        callback();
+      } else {
+        callback(new Error('请选择主题域'))
+      }
+    };
+    const layerId = (rule, value, callback) => {
+      if (value) {
+        callback();
+      } else {
+        callback(new Error('请选择分层'))
+      }
+    };
     return {
       tokenListColumns,
       // 是否加载中
@@ -169,7 +183,20 @@ export default {
       // 分层
       layeredList: [],
       // 验证规则
-      ruleValidate: {},
+      ruleValidate: {
+        themeDomainId: [
+          { validator: themeDomainId,
+            required: true,
+            trigger: 'change,blur'
+          }
+        ],
+        layerId: [
+          { validator: layerId,
+            required: true,
+            trigger: 'change,blur'
+          }
+        ]
+      },
       // 表单数据
       formState: {
         typeName: '',

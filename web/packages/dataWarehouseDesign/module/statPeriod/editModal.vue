@@ -24,34 +24,28 @@
         </Input>
       </FormItem>
       <h3 style="margin-bottom: 12px"><b>作用范围</b></h3>
-      <Row :gutter="12">
-        <Col span="12">
-          <FormItem prop="themeDomainId">
-            <Select v-model="formState.themeDomainId" placeholder="主题域">
-              <Option
-                v-for="item in themeList"
-                :value="item.id"
-                :key="item.name"
-              >
-                {{ item.name }}
-              </Option>
-            </Select>
-          </FormItem>
-        </Col>
-        <Col span="12">
-          <FormItem prop="layerId">
-            <Select v-model="formState.layerId" placeholder="分层">
-              <Option
-                v-for="item in layerList"
-                :value="item.id"
-                :key="item.name"
-              >
-                {{ item.name }}
-              </Option>
-            </Select>
-          </FormItem>
-        </Col>
-      </Row>
+      <FormItem prop="themeDomainId" label="主题域">
+        <Select v-model="formState.themeDomainId" placeholder="主题域" >
+          <Option
+            v-for="item in themeList"
+            :value="item.id"
+            :key="item.name"
+          >
+            {{ item.name }}
+          </Option>
+        </Select>
+      </FormItem>
+      <FormItem prop="layerId" label="分层">
+        <Select v-model="formState.layerId" placeholder="分层">
+          <Option
+            v-for="item in layerList"
+            :value="item.id"
+            :key="item.name"
+          >
+            {{ item.name }}
+          </Option>
+        </Select>
+      </FormItem>
       <h3 style="margin-bottom: 12px"><b>计算公式</b></h3>
       <Row :gutter="12">
         <Col span="12">
@@ -165,6 +159,20 @@ export default {
     },
   },
   data() {
+    const themeDomainId = (rule, value, callback) => {
+      if (value) {
+        callback();
+      } else {
+        callback(new Error('请选择主题域'))
+      }
+    };
+    const layerId = (rule, value, callback) => {
+      callback();
+      if (value) {
+      } else {
+        callback(new Error('请选择分层'))
+      }
+    };
     return {
       // 验证规则
       ruleValidate: {
@@ -179,6 +187,18 @@ export default {
             pattern: /^[0-9_\u4e00-\u9fa5]+$/g,
             trigger: "submit",
           },
+        ],
+        themeDomainId: [
+          { validator: themeDomainId,
+            required: true,
+            trigger: 'change,blur'
+          }
+        ],
+        layerId: [
+          { validator: layerId,
+            required: true,
+            trigger: 'change,blur'
+          }
         ],
         enName: [
           {
@@ -205,7 +225,7 @@ export default {
             message: "此项必填",
             trigger: "submit",
           },
-        ],
+        ]
       },
       // 是否加载中
       loading: false,

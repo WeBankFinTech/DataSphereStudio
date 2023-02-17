@@ -34,7 +34,7 @@
         >
         </Input>
       </FormItem>
-      <FormItem label="主题域" prop="warehouseThemeName">
+      <FormItem label="主题域" prop="_warehouseTheme">
         <Select
           v-model="formState._warehouseTheme"
           placeholder="请选择主题域和主题"
@@ -135,6 +135,13 @@ export default {
     },
   },
   data() {
+    const _warehouseTheme = (rule, value, callback) => {
+      if (value) {
+        callback();
+      } else {
+        callback(new Error('请选择主题域'))
+      }
+    };
     return {
       // 表单数据
       formState: {
@@ -160,6 +167,12 @@ export default {
             pattern: /^[0-9_\u4e00-\u9fa5]+$/g,
             trigger: "submit",
           },
+        ],
+        _warehouseTheme: [
+          { validator: _warehouseTheme,
+            required: true,
+            trigger: 'change,blur'
+          }
         ],
         fieldIdentifier: [
           {

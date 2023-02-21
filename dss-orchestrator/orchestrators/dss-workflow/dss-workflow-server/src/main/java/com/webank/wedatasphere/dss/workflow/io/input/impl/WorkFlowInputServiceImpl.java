@@ -106,7 +106,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         updateFlowJson = updateFlowContextIdAndVersion(userName,
                 workspace.getWorkspaceName(),
                 projectName,
-                flowJson,
+                updateFlowJson,
                 dssFlow,
                 parentFlowId,
                 contextId,

@@ -16,6 +16,9 @@
 
 package com.webank.wedatasphere.dss.workflow.io.input.impl;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -34,6 +37,7 @@ import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.workflow.service.BMLService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
@@ -45,13 +49,13 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool.nodeExportThreadPool;
 
 @Service
 public class WorkFlowInputServiceImpl implements WorkFlowInputService {
@@ -87,9 +91,19 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         String flowInputPath = inputProjectPath + File.separator + dssFlow.getName();
         String flowJsonPath = flowInputPath + File.separator + dssFlow.getName() + ".json";
         String flowJson = bmlService.readLocalTextFile(userName, flowJsonPath);
-        //如果包含subflow,需要一同导入subflow内容，并更新parentflow的json内容
+        //生成新的节点key。
+        Set<String> nodeKeys=findFlowNodeKeys(flowJson);
+        Map<String, String> oldNewNodeKeyMap = nodeKeys.stream().collect(Collectors.toMap(Function.identity(), v -> UUID.randomUUID().toString()));
+        String updateFlowJson=flowJson;
+        for (Map.Entry<String, String> entry : oldNewNodeKeyMap.entrySet()) {
+            String oldKey=entry.getKey();
+            String newKey = entry.getValue();
+            updateFlowJson = updateFlowJson.replaceAll(oldKey, newKey);
+        }
+        //对于第三方节点，resource名也要更新，否则在寻找resource的时候会找不到。
+        renameAppConnResource(flowInputPath,oldNewNodeKeyMap);
         // TODO: 2020/7/31 优化update方法里面的saveContent
-        String updateFlowJson = updateFlowContextIdAndVersion(userName,
+        updateFlowJson = updateFlowContextIdAndVersion(userName,
                 workspace.getWorkspaceName(),
                 projectName,
                 flowJson,
@@ -99,6 +113,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 orcVersion);
         updateFlowJson = inputWorkFlowNodes(userName, projectName, updateFlowJson, dssFlow,
                 flowInputPath, workspace, orcVersion, dssLabels);
+        //如果包含subflow,需要一同导入subflow内容，并更新parentflow的json内容
         List<? extends DSSFlow> subFlows = dssFlow.getChildren();
         if (subFlows != null) {
             for (DSSFlow subFlow : subFlows) {
@@ -117,7 +132,41 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
 
     }
 
+    /**
+     * 找到所有的
+     * @param flowJson
+     * @return
+     */
+    private Set<String> findFlowNodeKeys(String flowJson){
+        Set<String> nodeKeys = new HashSet<>();
+        JsonArray jsonElements;
+        if(StringUtils.isBlank(flowJson)||(jsonElements=new JsonParser().parse(flowJson).getAsJsonObject().getAsJsonArray("nodes"))
+                ==null){
+            return  nodeKeys;
+        }
+        for (JsonElement node : jsonElements) {
+            String nodeKey= node.getAsJsonObject().get("key").getAsString();
+            nodeKeys.add(nodeKey);
+        }
+        return nodeKeys;
+    }
 
+    /**
+     * 修改解压包中appconn资源的文件名
+     */
+    private void renameAppConnResource(String flowInputPath, Map<String,String> oldNewName){
+        String appConnResourceSavePath = flowInputPath + File.separator + "appconn-resource";
+        oldNewName.forEach((oldKey,newKey)->{
+            Path oldNodeResourcePath =Paths.get( appConnResourceSavePath ,oldKey , ".appconnre");
+            Path newNodeResourcePath =Paths.get( appConnResourceSavePath ,newKey , ".appconnre");
+            try {
+                Files.move(oldNodeResourcePath,newNodeResourcePath);
+            } catch (IOException e) {
+                logger.error("move appconn resource file failed,path:{}",oldNodeResourcePath);
+                //do nothing
+            }
+        });
+    }
     private String updateFlowContextIdAndVersion(String userName,
                                                  String workspaceName,
                                                  String projectName,

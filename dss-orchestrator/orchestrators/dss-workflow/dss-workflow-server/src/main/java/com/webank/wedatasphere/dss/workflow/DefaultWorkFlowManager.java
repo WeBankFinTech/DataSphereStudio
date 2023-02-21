@@ -276,7 +276,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                 });
         List<ResponseOperateOrchestrator> failedResponseList = responseList.stream().filter(ResponseOperateOrchestrator::isFailed).collect(Collectors.toList());
         if (!failedResponseList.isEmpty()) {
-            return ResponseOperateOrchestrator.failed("由于该 Project 包含指向多个调度系统的工作流，发布过程中有一部分失败了。失败部分如下："
+            return ResponseOperateOrchestrator.failed("发布失败，失败原因如下："
                     + failedResponseList.stream().map(ResponseOperateOrchestrator::getMessage).collect(Collectors.joining("; ")));
         } else {
             logger.info("convert(publish)  workflow success");

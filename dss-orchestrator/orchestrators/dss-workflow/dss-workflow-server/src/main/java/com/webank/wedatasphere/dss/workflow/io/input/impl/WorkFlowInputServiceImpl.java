@@ -157,8 +157,8 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
     private void renameAppConnResource(String flowInputPath, Map<String,String> oldNewName){
         String appConnResourceSavePath = flowInputPath + File.separator + "appconn-resource";
         oldNewName.forEach((oldKey,newKey)->{
-            Path oldNodeResourcePath =Paths.get( appConnResourceSavePath ,oldKey , ".appconnre");
-            Path newNodeResourcePath =Paths.get( appConnResourceSavePath ,newKey , ".appconnre");
+            Path oldNodeResourcePath =Paths.get( appConnResourceSavePath ,oldKey + ".appconnre");
+            Path newNodeResourcePath =Paths.get( appConnResourceSavePath ,newKey + ".appconnre");
             try {
                 Files.move(oldNodeResourcePath,newNodeResourcePath);
             } catch (IOException e) {

@@ -69,6 +69,7 @@
       :action-type="actionType"
       :project-data="currentProjectData"
       :classify-list="cacheData"
+      :workspace-users="workspaceUsers"
       :applicationAreaMap="applicationAreaMap"
       :orchestratorModeList="orchestratorModeList"
       :framework="true"
@@ -128,6 +129,7 @@ import storage from '@dataspherestudio/shared/common/helper/storage'
 import api from '@dataspherestudio/shared/common/service/api'
 import projectContentItem from './module/projectItem.vue'
 import {
+  GetWorkspaceUserList,
   GetDicSecondList,
   GetAreaMap
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
@@ -181,7 +183,12 @@ export default {
       applicationAreaMap: [],
       orchestratorModeList: {},
       ifDelOtherSys: false,
-      viewState: 'owner'
+      viewState: 'owner',
+      workspaceUsers: {
+        accessUsers: [],
+        releaseUsers: [],
+        editUsers: []
+      }
     }
   },
   computed: {
@@ -223,6 +230,11 @@ export default {
     this.$nextTick(() => {
       this.precentList = storage.get('precentList') || []
     })
+    GetWorkspaceUserList({ workspaceId: +this.$route.query.workspaceId }).then(
+      (res) => {
+        this.workspaceUsers = res.users;
+      }
+    );
   },
   methods: {
     changeCatType() {

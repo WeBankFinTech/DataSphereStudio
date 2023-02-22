@@ -11,7 +11,7 @@
       :visualShow="visualShow"
       :dispatch="dispatch"
       :getResultUrl="getResultUrl"
-      :comData="comData"
+      :work="work"
       :result-type="resultType"
       @on-filter="handleFilterView"
       @change-view-type="changeViewType" />
@@ -165,9 +165,6 @@ export default {
     getResultUrl: {
       type: String,
       defalut: `filesystem`
-    },
-    comData: {
-      type: Object
     }
   },
   mixins: [mixin],

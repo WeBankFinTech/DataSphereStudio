@@ -37,7 +37,7 @@
           </template>
         </i-col>
       </Row>
-      <results ref="currentConsole" getResultUrl="dss/apiservice"  :comData="apiData" :dispatch="dispatch" :height="height" @executRun="executRun"></results>
+      <results ref="currentConsole" getResultUrl="dss/apiservice" :work="apiData" :dispatch="dispatch" :height="height" @executRun="executRun"></results>
     </div>
     <Modal :title="$t('message.apiServices.apiTestInfo.params')" v-model="conditionShow" @on-ok="confirmSelect">
       <CheckboxGroup v-model="selectCondition">

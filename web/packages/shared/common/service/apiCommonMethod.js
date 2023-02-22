@@ -9,7 +9,7 @@ const GetDicSecondList = (params) => {
   })
 }
 // 获取工作空间用户管理相关数据
-const GetWorkspaceUserManagement = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}getWorkspaceUsers`, params, 'get')
+const GetWorkspaceUserManagement = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}getWorkspaceUsers`, params, {method: 'get', cacheOptions: {time: 3000}})
 
 // 获取工作空间用户的列表
 const GetWorkspaceUserList = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}getAllWorkspaceUsers`, params, 'get')

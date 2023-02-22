@@ -808,7 +808,7 @@ export default {
         delete destination.isOverwrite;
         delete destination.fieldDelimiter;
       }
-      const tabName = `export__${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
+      const tabName = `export__${this.currentAcitved.dbName}.${this.currentAcitved.name}_${Date.now()}`;
       const code = `val destination = """${JSON.stringify(destination)}"""\nval dataInfo = """${JSON.stringify(dataInfo)}"""\norg.apache.linkis.engineplugin.spark.imexport.ExportData.exportData(spark,dataInfo,destination)`;
       const md5Path = util.md5(tabName);
       this.dispatch('Workbench:add', {

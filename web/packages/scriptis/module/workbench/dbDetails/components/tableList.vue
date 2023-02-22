@@ -202,6 +202,7 @@ export default {
         { title: this.$t('message.scripts.tablesize'), key: 'tableSize'},
         { title: this.$t('message.scripts.tbowner'), key: 'tableOwner'},
         { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString'},
+        { title: this.$t('message.scripts.iscompress'), key: 'compressed', type: 'boolean'},
         { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat'},
         { title: this.$t('message.scripts.lastaccess'), key: 'viewTime'},
         { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime'},

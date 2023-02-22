@@ -32,6 +32,9 @@ export default {
       type: Object,
     },
     enEnv: Boolean,
+    metaData: {
+      type: Object
+    }
   },
   data() {
     return {
@@ -50,6 +53,10 @@ export default {
           }, {
             key: 'partitionTable',
             title: this.$t('message.scripts.tableDetails.FQM'),
+            type: 'boolean',
+          }, {
+            key: 'compressTable',
+            title: this.$t('message.scripts.tableDetails.compressTable'),
             type: 'boolean',
           }, {
             key: 'creator',
@@ -111,6 +118,12 @@ export default {
   },
   methods: {
     formatValue(item) {
+      if (item.key == 'compressTable') {
+        if (this.metaData && this.metaData.compressed !== undefined) {
+          return utils.formatValue({compressTable: this.metaData.compressed}, item);
+        }
+        return ''
+      }
       return utils.formatValue(this.tableBaseInfo, item);
     },
   },

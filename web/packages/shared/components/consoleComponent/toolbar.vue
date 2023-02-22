@@ -20,7 +20,7 @@
       <li v-if="toolbarShow.download">
         <Poptip
           :transfer="true"
-          :width="250"
+          :width="380"
           v-model="popup.download"
           placement="right">
           <div @click.stop="openPopup('download')">
@@ -29,10 +29,10 @@
           </div>
           <div slot="content">
             <div>
-              <Row>
+              <Row class="row-item">
                 {{ $t('message.common.toolbar.format') }}
               </Row>
-              <Row>
+              <Row class="row-item">
                 <RadioGroup v-model="download.format">
                   <Col span="10">
                     <Radio label="1">CSV</Radio>
@@ -47,10 +47,10 @@
               </Row>
             </div>
             <div>
-              <Row>
+              <Row class="row-item">
                 {{ $t('message.common.toolbar.coding') }}
               </Row>
-              <Row>
+              <Row class="row-item">
                 <RadioGroup v-model="download.coding">
                   <Col span="10">
                     <Radio label="1">UTF-8</Radio>
@@ -64,10 +64,10 @@
               </Row>
             </div>
             <div>
-              <Row>
+              <Row class="row-item">
                 {{$t('message.common.toolbar.replace')}}
               </Row>
-              <Row>
+              <Row class="row-item">
                 <RadioGroup v-model="download.nullValue">
                   <Col span="10">
                     <Radio label="1">NULL</Radio>
@@ -80,18 +80,37 @@
                 </RadioGroup>
               </Row>
             </div>
+            <div v-if="download.format == 1">
+              <Row class="row-item">
+                {{$t('message.common.toolbar.selectsplit')}}
+              </Row>
+              <Row class="row-item">
+                <RadioGroup
+                  v-model="download.splitChar"
+                >
+                  <Radio
+                    v-for="item in splitList"
+                    :label="item.value"
+                    :name="item.value"
+                    :key="item.value"
+                  >
+                    {{ item.label }}
+                  </Radio>
+                </RadioGroup>
+              </Row>
+            </div>
             <div v-if="isAll">
-              <Row>
+              <Row class="row-item">
                 {{$t('message.common.toolbar.downloadMode')}}
               </Row>
-              <Row>
+              <Row class="row-item">
                 <Checkbox v-model="allDownload">{{$t('message.common.toolbar.all')}}</Checkbox>
               </Row>
             </div>
-            <Row v-if="download.format == 2">
+            <Row class="row-item" v-if="download.format == 2">
               <Checkbox v-model="autoFormat">{{$t('message.common.toolbar.autoformat')}}</Checkbox>
             </Row>
-            <Row class="confirm">
+            <Row class="confirm row-item">
               <Col span="10">
                 <Button @click="cancelPopup('download')">{{$t('message.common.cancel')}}</Button>
               </Col>
@@ -184,7 +203,7 @@ export default {
       type: String,
       defalut: `filesystem`
     },
-    comData: {
+    work: {
       type: Object
     },
     resultType: {
@@ -205,12 +224,20 @@ export default {
         format: '1',
         coding: '1',
         nullValue: '1',
+        splitChar: '1',
       },
       isIconLabelShow: true,
       iconSize: 14,
       allDownload: false, // 是否下载全部结果集
       autoFormat: false,
-      extComponents
+      extComponents,
+      splitList: [
+        { label: this.$t('message.scripts.hiveTableExport.DH'), value: '1' },
+        { label: this.$t('message.scripts.hiveTableExport.FH'), value: '2' },
+        { label: this.$t('message.scripts.hiveTableExport.ZBF'), value: '3' },
+        { label: this.$t('message.scripts.hiveTableExport.KG'), value: '4' },
+        { label: this.$t('message.scripts.hiveTableExport.SX'), value: '5' },
+      ]
     };
   },
   computed: {
@@ -236,6 +263,7 @@ export default {
           format: '1',
           coding: '1',
           nullValue: '1',
+          splitChar: '1'
         }
       }
       if (type === 'export') {
@@ -281,7 +309,11 @@ export default {
           let querys = 'path=' + temPath + '&charset=' + charset + '&outputFileType=' + splitor + '&nullValue=' + nullValue + '&outputFileName=' + filename + '&autoFormat=' + this.autoFormat;
           // 如果是api执行页获取结果集，需要带上taskId
           if(this.getResultUrl !== 'filesystem') {
-            querys += `&taskId=${this.comData.taskID}`
+            querys += `&taskId=${this.work.taskID}`
+          }
+          const splitChar = [',',';','\t',' ','|'][this.download.splitChar - 1] || ','
+          if(this.download.format == 1) {
+            querys += `&csvSeparator=${encodeURIComponent(splitChar)}`
           }
           let url = `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` + querys
 
@@ -370,5 +402,10 @@ export default {
       }
     }
   }
+</style>
+<style>
+.ivu-poptip-body-content .row-item {
+  margin-top: 5px;
+}
 </style>
 

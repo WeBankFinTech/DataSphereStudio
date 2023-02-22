@@ -79,10 +79,7 @@ export default {
   },
   methods: {
     release (obj) {
-      this.$emit('event-from-ext', {
-        callFn: 'release',
-        params: [obj]
-      })
+      this.$emit('release', obj)
     },
     clickItem(item) {
       if (this.curTab.name !== item.name) {

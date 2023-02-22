@@ -10,6 +10,7 @@ CREATE TABLE `dss_appconn` (
   `class_name` varchar(255) DEFAULT NULL COMMENT '需要关联的某一个AppConn标识',
   `appconn_class_path` varchar(255) DEFAULT NULL COMMENT '需要关联的某一个AppConn标识',
   `resource` varchar(255) DEFAULT NULL COMMENT 'bml的资源ID',
+  `is_micro_app` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否微应用嵌入',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_appconn_name` (`appconn_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='dss appconn表';
@@ -20,7 +21,7 @@ CREATE TABLE `dss_appconn_instance` (
   `appconn_id` int(20) NOT NULL COMMENT 'appconn的主键',
   `label` varchar(128) NOT NULL COMMENT '实例的标签',
   `url` varchar(128) DEFAULT NULL COMMENT '访问第三方的url',
-  `enhance_json` varchar(1024) DEFAULT NULL COMMENT 'json格式的配置',
+  `enhance_json` varchar(2048) DEFAULT NULL COMMENT 'json格式的配置',
   `homepage_uri` varchar(255) DEFAULT NULL COMMENT '主页uri，非URL',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='dss instance的实例表';

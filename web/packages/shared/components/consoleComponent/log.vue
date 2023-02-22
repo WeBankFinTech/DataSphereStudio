@@ -106,7 +106,7 @@ export default {
       }
     },
     logs() {
-      if (this.$refs.logEditor.editor) {
+      if (this.$refs.logEditor.editor && this.logs.all) {
         const firstError = this.logs.all.split('\n').findIndex(line => line.indexOf('ERROR') > -1)
         setTimeout(() => {
           if (this.$refs.logEditor.editor) {

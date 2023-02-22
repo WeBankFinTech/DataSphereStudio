@@ -1014,6 +1014,7 @@ export default {
       let tempParams = JSON.parse(JSON.stringify(params));
       delete tempParams.metadata.configuration.runtime.contextID;
       delete tempParams.metadata.configuration.runtime.nodeName;
+      delete tempParams.metadata.configuration.startup;
       return api.fetch('/filesystem/saveScriptToBML', tempParams, 'post')
         .then((res) => {
           this.$Message.success(this.$t('message.scripts.saveSuccess'));

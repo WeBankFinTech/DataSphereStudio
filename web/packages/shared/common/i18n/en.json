@@ -222,6 +222,7 @@
         "DLGLQ": "Queue Management",
         "QX": "Select All",
         "QXQX": "Deselect All",
+        "viewMore": "View More",
         "SX": "Refresh",
         "JSRW": "Cancel task",
         "JSYQ": "Shut down engine",
@@ -317,6 +318,7 @@
         "resultGroup": "Result Group",
         "all": "all",
         "downloadMode": "Download Mode :",
+        "selectsplit": "Please Select Separator :",
         "autoformat": "Format",
         "deepAnalysis": "Deep Analysis",
         "success": {

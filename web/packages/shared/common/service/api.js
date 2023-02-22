@@ -373,10 +373,11 @@ const action = function (url, data, option) {
         if (isEn && msg === API_ERR_MSG) {
           msg = 'The service is abnormal, please contact the developer for processing!'
         }
-        let isHoverNotice = false
+        let isHoverNotice = {}
         const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
         if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
           const noticeName = 'err_' + Date.now()
+          isHoverNotice[noticeName] = false
           Notice.error({
             name: noticeName,
             duration: 4,
@@ -384,7 +385,10 @@ const action = function (url, data, option) {
             title: isEn ? 'Error' : '错误提示',
             render: (h) => {
               return h('div', {
-                class: 'g-err-msg-div'
+                class: 'g-err-msg-div',
+                attrs: {
+                  'data-erritem': noticeName
+                }
               }, [
                 h('div', {
                   style: {
@@ -433,11 +437,12 @@ const action = function (url, data, option) {
               ])
             },
             onClose: () => {
-              return !isHoverNotice
+              return !isHoverNotice[noticeName]
             }
           })
           setTimeout(() => {
             document.querySelectorAll('.g-err-msg-div').forEach(ele => {
+              const erritem =ele.dataset.erritem
               ele.parentElement.parentElement.style.textAlign = 'left'
               ele.parentElement.style.display = 'block'
               ele.parentElement.style.padding = 0
@@ -445,11 +450,10 @@ const action = function (url, data, option) {
                 ele.parentElement.parentElement.className = ele.parentElement.parentElement.className + ' ivu-notice-notice-err'
               }
               ele.parentElement.parentElement.addEventListener('mouseover', () => {
-                isHoverNotice = true
+                isHoverNotice[erritem] = true
               }, false)
             })
-          })
-
+          }, 150)
         } else {
           Notice.error({
             desc: msg,

@@ -109,7 +109,7 @@
           :placeholder="$t('message.common.projectDetail.userAllowedPublish')"
         >
           <Option
-            v-for="(item, index) in releaseUsers"
+            v-for="(item, index) in workspaceUsers.releaseUsers"
             :label="item"
             :value="item"
             :key="index"
@@ -128,7 +128,7 @@
           :placeholder="$t('message.common.projectDetail.usersAllowedToEdit')"
         >
           <Option
-            v-for="(item, index) in editUsersMap"
+            v-for="(item, index) in workspaceUsers.editUsers"
             :disabled="item == projectDataCurrent.createBy"
             :label="item"
             :value="item"
@@ -148,7 +148,7 @@
           :placeholder="$t('message.common.projectDetail.usersAllowedToView')"
         >
           <Option
-            v-for="(item, index) in accessUsersMap"
+            v-for="(item, index) in workspaceUsers.accessUsers"
             :disabled="item == projectDataCurrent.createBy"
             :label="item"
             :value="item"
@@ -188,7 +188,6 @@ import tag from "@dataspherestudio/shared/components/tag/index.vue";
 import lubanSelect from "@dataspherestudio/shared/components/select/index.vue";
 import _ from "lodash";
 import {
-  GetWorkspaceUserList,
   GetDicList,
   CheckProjectNameRepeat
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
@@ -206,6 +205,16 @@ export default {
       type: String,
       default: "",
     },
+    workspaceUsers: {
+      type: Object,
+      default: () => {
+        return {
+          accessUsers: [],
+          releaseUsers: [],
+          editUsers: []
+        }
+      },
+    },
     applicationAreaMap: {
       type: Array,
       default: () => [],
@@ -221,12 +230,8 @@ export default {
   },
   data() {
     return {
-      test: [],
       ProjectShow: false,
       originBusiness: "",
-      editUsersMap: [],
-      accessUsersMap: [],
-      releaseUsers: [],
       devProcess: [
         {
           id: 1,
@@ -324,27 +329,10 @@ export default {
             type: "array",
           },
         ],
-        // releaseUsers: [
-        //   {
-        //     required: true,
-        //     message: this.$t(
-        //       "message.common.projectDetail.userAllowedPublish"
-        //     ),
-        //     trigger: "change",
-        //     type: "array",
-        //   },
-        // ],
       };
     },
   },
   mounted() {
-    GetWorkspaceUserList({ workspaceId: +this.$route.query.workspaceId }).then(
-      (res) => {
-        this.accessUsersMap = res.users.accessUsers;
-        this.editUsersMap = res.users.editUsers;
-        this.releaseUsers = res.users.releaseUsers;
-      }
-    );
     this.getData();
   },
   watch: {

@@ -3,7 +3,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.entity.vo;
 
 public class OrchestratorCopyHistory {
 
-    private Long id;
+    private String id;
 
     private String userName;
 
@@ -49,7 +49,7 @@ public class OrchestratorCopyHistory {
     public OrchestratorCopyHistory() {
     }
 
-    public OrchestratorCopyHistory(Long id, String username, String workspaceName, String sourceOrchestratorName, String targetOrchestratorName, String sourceProjectName, String targetProjectName, String workflowNodeSuffix, String microserverName, String exceptionInfo, Integer status, Integer isCopying, String startTime, String endTime) {
+    public OrchestratorCopyHistory(String id, String username, String workspaceName, String sourceOrchestratorName, String targetOrchestratorName, String sourceProjectName, String targetProjectName, String workflowNodeSuffix, String microserverName, String exceptionInfo, Integer status, Integer isCopying, String startTime, String endTime) {
         this.id = id;
         this.userName = username;
         this.workspaceName = workspaceName;
@@ -66,11 +66,11 @@ public class OrchestratorCopyHistory {
         this.endTime = endTime;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

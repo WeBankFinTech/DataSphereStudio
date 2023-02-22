@@ -118,7 +118,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         dssFlow.setSource("create by user");
         dssFlow.setUses(uses);
 
-        dssFlow.setLinkedAppConnNames(String.join(",", linkedAppConnNames));
+        dssFlow.setLinkedAppConnNames(linkedAppConnNames == null ? "" : String.join(",", linkedAppConnNames));
         Map<String, String> dssLabelList = new HashMap<>(1);
         if (null != dssLabels) {
             dssLabels.stream().map(DSSLabel::getValue).forEach(a -> {

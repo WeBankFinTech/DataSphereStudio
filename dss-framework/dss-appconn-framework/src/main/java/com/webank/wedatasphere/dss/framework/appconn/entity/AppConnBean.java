@@ -33,6 +33,7 @@ public class AppConnBean implements AppConnInfo, Serializable {
     private String level;
     private Boolean ifIframe;
     private Boolean isExternal;
+    private Boolean isMicroApp;
 
     // todo:目前通过这两个字段在classpath下加载类。
     // 未来这两个字段的作用是在bml和默认应用的。
@@ -91,6 +92,14 @@ public class AppConnBean implements AppConnInfo, Serializable {
 
     public void setExternal(Boolean external) {
         isExternal = external;
+    }
+
+    public Boolean getIsMicroApp() {
+        return isMicroApp;
+    }
+
+    public void setIsMicroApp(Boolean isMicroApp) {
+        this.isMicroApp = isMicroApp;
     }
 
     @Override

@@ -326,7 +326,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         List < OrchestratorCopyHistory > orchestratorCopyHistoryList = new ArrayList<>();
         OrchestratorCopyHistory orchestratorCopyHistory;
         for (DSSOrchestratorCopyInfo orchestratorCopyInfo: orchestratorCopyInfoList) {
-            orchestratorCopyHistory = new OrchestratorCopyHistory(orchestratorId, orchestratorCopyInfo.getUsername(), workspace.getWorkspaceName(),
+            orchestratorCopyHistory = new OrchestratorCopyHistory(orchestratorCopyInfo.getId(), orchestratorCopyInfo.getUsername(), workspace.getWorkspaceName(),
                     orchestratorCopyInfo.getSourceOrchestratorName(), orchestratorCopyInfo.getTargetOrchestratorName(),
                     orchestratorCopyInfo.getSourceProjectName(), orchestratorCopyInfo.getTargetProjectName(), orchestratorCopyInfo.getWorkflowNodeSuffix(),
                     orchestratorCopyInfo.getMicroserverName(), orchestratorCopyInfo.getExceptionInfo(), orchestratorCopyInfo.getStatus(),

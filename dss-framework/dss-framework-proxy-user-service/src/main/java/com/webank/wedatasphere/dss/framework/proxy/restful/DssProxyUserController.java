@@ -48,7 +48,7 @@ public class DssProxyUserController {
             return Message.error("proxy user service is not enable, please ask admin for help.");
         }
         String username = SecurityFilter.getLoginUsername(request);
-        Workspace workspace = null;
+        Workspace workspace = new Workspace();
         try {
             workspace = SSOHelper.getWorkspace(request);
         } catch (AppStandardWarnException ignored) {}
@@ -95,7 +95,7 @@ public class DssProxyUserController {
         if (userRep.getProxyUserName().equals(username)) {
             userRep.setUserName(userRep.getProxyUserName());
         }
-        Workspace workspace = null;
+        Workspace workspace = new Workspace();
         try {
             workspace = SSOHelper.getWorkspace(req);
         } catch (AppStandardWarnException ignored) {} // ignore error

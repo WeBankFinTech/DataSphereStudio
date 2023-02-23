@@ -51,7 +51,12 @@
             @click="selectAll">
             {{ isSelectedAll ? $t('message.common.resourceSimple.QXQX') : $t('message.common.resourceSimple.QX')}}
           </Button>
-
+          <Button
+            v-if="switcher === 'queue'"
+            type="default"
+            @click="viewMore">
+            {{ $t('message.common.resourceSimple.viewMore') }}
+          </Button>
           <Button
             type="default"
             @click="rest">
@@ -161,6 +166,9 @@ export default {
     selectAll() {
       this.$refs.engine.selectAll(this.isSelectedAll);
       this.isSelectedAll = !this.isSelectedAll;
+    },
+    viewMore() {
+      window.open("/dss/visualishub/#/portal/portallist/operational_data", '_blank');
     },
     getPointList() {
       let list = null;

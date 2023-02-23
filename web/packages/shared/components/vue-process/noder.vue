@@ -17,7 +17,7 @@
       <canvas ref="canvas" class="node-box-bg" />
       <div
         :title="title"
-        :style="{'line-height': height * state.baseOptions.pageSize + 'px' }"
+        :style="{'line-height': height * state.baseOptions.pageSize + 'px', left: width * 0.3 > 25 ? '25px' :  width * 0.3 + 'px' }"
         class="node-box-content">
         {{ title }}
       </div>
@@ -149,8 +149,8 @@ export default {
           ...styelObj,
           'background-image': `url(${this.image})`,
           'background-repeat': 'no-repeat',
-          'background-position': '10% center',
-          'background-size': '12%'
+          'background-position': '5px center',
+          'background-size': '11%'
         }
       }
       return {
@@ -492,7 +492,7 @@ export default {
           x = x - this.width;
         }
       } else {
-        // 
+        //
       }
       let endNode = Object.assign({}, beginNode, {
         key: getKey(),

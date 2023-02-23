@@ -51,7 +51,7 @@ public class ProjectInfoWorkflowToRelConverter implements WorkflowToRelConverter
         String repeatNodes = nodeNames.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream().filter(entry -> entry.getValue() > 1).map(Map.Entry::getKey).collect(Collectors.joining(", "));
         if (StringUtils.isNotEmpty(repeatNodes)) {
-            throw new DSSRuntimeException(80001, "项目中不同工作流里存在重名节点，请修改节点名避免重名。重名节点：" + repeatNodes);
+            throw new DSSRuntimeException(80001, "重复的节点名称。项目中不同工作流(或子工作流）里存在重名节点，请修改节点名避免重名。重名节点：" + repeatNodes);
         }
         AzkabanConvertedRel azkabanConvertedRel = new AzkabanConvertedRel(projectPreConversionRel);
         //1. Assign a value to the storepath of azkabanschedulerproject.

@@ -1519,6 +1519,18 @@ export default {
         });
     }
   },
+  beforeRouteLeave(to, from, next) {
+    // 用户退出，后端语言服务子进程无法关闭，要求前端发送关闭
+    window.__connected_sql_langserver = false;
+    window.__connected_py_langserver = false;
+    if (window.__webSocket_sql_langserver) {
+      window.__webSocket_sql_langserver.close();
+    }
+    if (window.__webSocket_py_langserver) {
+      window.__webSocket_sql_langserver.close();
+    }
+    next();
+  },
   beforeDestroy() {
     clearTimeout(this.checkStatusTimer)
     window.removeEventListener('resize', this.resize);

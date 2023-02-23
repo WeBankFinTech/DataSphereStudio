@@ -71,10 +71,8 @@ export default {
       const openFn = (info) => {
         if (info.external) {
           if (info.ifIframe) {
-            // 在Iframe
-            const microAppList = ['AppLineage', 'ColdData', 'DataAppAnalysis', 'DataLineage', 'GroupLineage', 'LifeCycleManage', 'Search']
             this.$router.push({
-              path: microAppList.includes(info.name) ? `/microApp/${info.name}` : `/commonIframe/${info.name}`,
+              path: info.isMicroApp ? `/microApp/${info.name}` : `/commonIframe/${info.name}`, //isMicroApp判断是否微应用
               query: {
                 ...query,
                 url,

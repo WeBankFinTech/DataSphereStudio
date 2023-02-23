@@ -376,6 +376,7 @@
       :appId="flowId"
       :product="product"
       :readonly="readonly"
+      @release="release"
     />
   </div>
 </template>
@@ -1710,6 +1711,7 @@ export default {
           metadata: rst.metadata,
           projectName: this.$route.query.projectName || ''
         };
+        delete params.metadata.configuration.startup;
         api.fetch('/filesystem/saveScriptToBML', params, 'post')
           .then((res) => {
             this.$Message.success(this.$t('message.workflow.process.associaSuccess'));
@@ -2560,7 +2562,7 @@ export default {
     },
     async checkLastPublish(cb) {
       const publishTaskId = this.getTaskId()
-      if (publishTaskId) {
+      if (publishTaskId && this.orchestratorId == this.$route.query.flowId) {
         const res = await getPublishStatus(publishTaskId, this.getCurrentDsslabels())
         if (res.status === 'running') {
           this.isFlowPubulish = true

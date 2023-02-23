@@ -13,6 +13,7 @@
         <basic
           v-if="item === $t('message.scripts.tableDetails.BZBSX')"
           :table-info="work.data"
+          :meta-data="metadata"
           :en-env="isEnEnv"></basic>
         <field
           v-if="item === $t('message.scripts.tableDetails.BZDXX') && table"
@@ -89,13 +90,37 @@ export default {
         database: this.work.data.dbName,
         tableName: this.work.data.name,
       };
-      if(id === 1){
-        this.getTableFieldsInfo(params)
-      } else if(id === 2){
-        if (!this.statisticInfo) {
-          this.getTableStatisticInfo(params)
-        }
+      switch (id) {
+        case 1:
+          this.getTableFieldsInfo(params)
+          break;
+        case 2:
+          if (!this.statisticInfo) {
+            this.getTableStatisticInfo(params)
+          }
+          break;
+        case 0:
+          this.getTableComperssInfo(params)
+          break;
+        default:
+          break;
       }
+    },
+    getTableComperssInfo(data) {
+      const params = {
+        dbName: data.database,
+        isTableOwner: '0',
+        orderBy: '1',
+        tableName: data.tableName,
+        isRealTime: true,
+        exactTableName: true,
+        pageSize: 1,
+        currentPage: 1
+      }
+      api.fetch('/dss/datapipe/datasource/getTableMetaDataInfo', params, 'get').then((rst) => {
+        this.metadata = rst.tableList[0] || {}
+      }).catch(() => {
+      });
     },
     getTableFieldsInfo(params) {
       this.loading = true;
@@ -132,6 +157,7 @@ export default {
   },
   data() {
     return {
+      metadata: {},
       tabList: [this.$t('message.scripts.tableDetails.BZBSX'), this.$t('message.scripts.tableDetails.BZDXX'), this.$t('message.scripts.tableDetails.BTJXX')],
       table: null,
       statisticInfo: null,
@@ -145,6 +171,11 @@ export default {
       partitionSort: 'desc' // asc 分区的排序顺序
     };
   },
+  mounted() {
+    if (!this.metadata.tableName) {
+      this.getDatalist(0)
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

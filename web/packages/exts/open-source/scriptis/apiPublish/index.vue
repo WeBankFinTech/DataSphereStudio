@@ -613,8 +613,6 @@ export default {
     }
   },
   created() {
-    this.getApplyUserList();
-    this.getApiList();
   },
   computed: {
     isSupport() {
@@ -683,7 +681,10 @@ export default {
     getApiList() {
       api.fetch('/dss/apiservice/getUserServices', {
         workspaceId: this.$route.query.workspaceId
-      }, 'get').then((res) => {
+      }, {
+        method: 'get',
+        cacheOptions: {time: 3000}
+      }).then((res) => {
         // 只有是正常的数据服务才能被选择0-禁用，1-正常，2-删除
         if (res.query_list) {
           this.apiList = res.query_list.filter((item) => item.status === 1);
@@ -789,7 +790,8 @@ export default {
     },
     publishApiPanel(name) {
       if (this.script.params.variable.some((item) => !item.value)) return this.$Message.warning(this.$t('message.ext.opensource.cnanotnull'))
-      // let _this = this;
+      this.getApplyUserList();
+      this.getApiList();
       this.clear()
       if ('addApi' === name) {
         this.addApiModalShow = true

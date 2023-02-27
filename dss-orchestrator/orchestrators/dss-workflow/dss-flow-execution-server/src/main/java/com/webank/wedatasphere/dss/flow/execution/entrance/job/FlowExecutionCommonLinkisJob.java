@@ -16,17 +16,9 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.job;
 
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration;
-import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.AbstractCommonLinkisJob;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.CommonLinkisJob;
-import com.webank.wedatasphere.dss.linkis.node.execution.job.JobTypeEnum;
-import com.webank.wedatasphere.dss.linkis.node.execution.log.LinkisJobExecutionLog;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.linkis.ujes.client.response.JobExecuteResult;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 
 public class FlowExecutionCommonLinkisJob extends AbstractCommonLinkisJob {
@@ -40,8 +32,16 @@ public class FlowExecutionCommonLinkisJob extends AbstractCommonLinkisJob {
 
     @Override
     public String getUser() {
-        return getSubmitUser();
-        //return getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
+        String labels = getJobProps().getOrDefault(DSSCommonUtils.DSS_LABELS_KEY, DSSCommonUtils.ENV_LABEL_VALUE_DEV);
+        String submitUser = getSubmitUser();
+        if(DSSCommonUtils.ENV_LABEL_VALUE_DEV.equals(labels)) {
+            return submitUser;
+        } else {
+            String proxyUser = getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
+            getLogObj().info(String.format("try to submit the node by proxyUser %s(submitUser: %s), since the node label is %s.",
+                    proxyUser, submitUser, labels));
+            return proxyUser;
+        }
     }
 
     @Override

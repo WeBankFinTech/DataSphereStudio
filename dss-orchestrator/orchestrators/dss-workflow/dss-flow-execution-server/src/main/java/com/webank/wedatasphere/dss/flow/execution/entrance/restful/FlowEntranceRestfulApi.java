@@ -81,7 +81,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
     public Message execute(HttpServletRequest req, @RequestBody Map<String, Object> json) {
         Message message = null;
 //        try{
-        logger.info("Begin to get an execID, the request params is:{}", json);
+        logger.info("Begin to execute workflow, the request params is: {}.", json);
         DSSWorkspace workspace = SSOHelper.getWorkspace(req);
         String umUser = SecurityFilter.getLoginUsername(req);
         json.put(TaskConstant.UMUSER, umUser);
@@ -122,13 +122,13 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         pushLog("************************************SCRIPT CODE************************************", job);
         pushLog(task.getExecutionCode(), job);
         pushLog("************************************SCRIPT CODE************************************", job);
-        pushLog(LogUtils.generateInfo("Your job is accepted,  jobID is " + execID + " and taskID is " + taskID + ". Please wait it to be scheduled"), job);
+        pushLog(LogUtils.generateInfo("Your job is accepted,  jobID is " + execID + ", taskID is " + taskID + ", and labels is " + label + ". Please wait it to be scheduled"), job);
         execID = ZuulEntranceUtils.generateExecID(execID, Sender.getThisServiceInstance().getApplicationName(), new String[]{Sender.getThisInstance()});
         message = Message.ok();
         message.setMethod("/api/entrance/execute");
         message.data("execID", execID);
         message.data("taskID", taskID);
-        logger.info("End to get an an execID: {}, taskID: {}", execID, taskID);
+        logger.info("End to get an an execID: {}, taskID: {}, labels: {}.", execID, taskID, label);
         return message;
     }
 

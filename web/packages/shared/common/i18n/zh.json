@@ -296,8 +296,8 @@
         "waring": "警告",
         "action": "要{label}",
         "isNext": "是否继续？",
-        "over": "结束{type}",
-        "overThe": "结束该",
+        "confirm": "确认",
+        "overThe": "结束",
         "engine": "引擎",
         "task": "任务",
         "engineAndTask": "引擎和任务"

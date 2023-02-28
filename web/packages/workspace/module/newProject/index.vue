@@ -212,16 +212,11 @@ export default {
     // 当切换工作空间之后，重新获取数据
     '$route.query.workspaceId'() {
       this.viewState = 'owner'
-      this.getclassListData()
+      this.initWorkspaceData()
     }
   },
   created() {
-    // 获取所有分类和工程
-    this.getclassListData()
-    // 获取编排的数据
-    GetDicSecondList(this.$route.query.workspaceId).then((res) => {
-      this.orchestratorModeList = res.list;
-    });
+    this.initWorkspaceData()
   },
   mounted() {
     GetAreaMap().then(res => {
@@ -230,13 +225,22 @@ export default {
     this.$nextTick(() => {
       this.precentList = storage.get('precentList') || []
     })
-    GetWorkspaceUserList({ workspaceId: +this.$route.query.workspaceId }).then(
-      (res) => {
-        this.workspaceUsers = res.users;
-      }
-    );
+
   },
   methods: {
+    initWorkspaceData() {
+      GetWorkspaceUserList({ workspaceId: +this.$route.query.workspaceId }).then(
+        (res) => {
+          this.workspaceUsers = res.users;
+        }
+      );
+      // 获取所有分类和工程
+      this.getclassListData()
+      // 获取编排的数据
+      GetDicSecondList(this.$route.query.workspaceId).then((res) => {
+        this.orchestratorModeList = res.list;
+      });
+    },
     changeCatType() {
       if (this.viewState === 'delete') {
         this.viewDeleted()

@@ -1389,6 +1389,7 @@ export default {
           return {
             id: n.id,
             name: n.name,
+            description: n.description,
             type: "project",
             canWrite: n.canWrite(),
             canPublish: n.canPublish(),

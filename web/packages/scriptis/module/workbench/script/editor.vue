@@ -76,7 +76,7 @@
         :id="script.id"
         :read-only="script.readOnly"
         :script-type="scriptType"
-        :file-path="work.filepath || work.filename"
+        :file-path="work.filepath || script.id + work.filename"
         :application="script.application"
         type="code"
         @on-operator="heartBeat"

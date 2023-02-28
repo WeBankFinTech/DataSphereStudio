@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.job;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.AbstractCommonLinkisJob;
+import org.apache.commons.lang3.StringUtils;
 
 
 public class FlowExecutionCommonLinkisJob extends AbstractCommonLinkisJob {
@@ -38,9 +39,11 @@ public class FlowExecutionCommonLinkisJob extends AbstractCommonLinkisJob {
             return submitUser;
         } else {
             String proxyUser = getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());
-            getLogObj().info(String.format("try to submit the node by proxyUser %s(submitUser: %s), since the node label is %s.",
-                    proxyUser, submitUser, labels));
-            return proxyUser;
+            if(StringUtils.isNotEmpty(proxyUser)){
+                return proxyUser;
+            }else {
+                return submitUser;
+            }
         }
     }
 

@@ -1711,7 +1711,7 @@ export default {
           metadata: rst.metadata,
           projectName: this.$route.query.projectName || ''
         };
-        delete params.metadata.configuration.startup;
+        if (params.metadata && params.metadata.configuration) delete params.metadata.configuration.startup;
         api.fetch('/filesystem/saveScriptToBML', params, 'post')
           .then((res) => {
             this.$Message.success(this.$t('message.workflow.process.associaSuccess'));
@@ -2545,8 +2545,13 @@ export default {
       const key = this.getTaskKey();
       return storage.get(key);
     },
+    removeTaskId() {
+      const key = this.getTaskKey();
+      storage.remove(key);
+    },
     onKeyUp(e) {
-      const isDel = e.altKey && e.ctrlKey && (e.keyCode === 46 || e.keyCode === 8 && navigator.userAgent.indexOf('Mac') !== -1)
+      const isDel = e.keyCode === 46 || e.keyCode === 8 && navigator.userAgent.indexOf('Mac') !== -1
+      if (e.altKey && e.ctrlKey) { return }
       if (isDel && this.tabs[this.$parent.active].key === this.activeTabKey && e.target.nodeName!='INPUT' && e.target.nodeName!='TEXTAREA') {
         if (this.myReadonly) return
         let selectNodes = this.$refs.process.getSelectedNodes();
@@ -2563,8 +2568,13 @@ export default {
     async checkLastPublish(cb) {
       const publishTaskId = this.getTaskId()
       if (publishTaskId && this.orchestratorId == this.$route.query.flowId) {
-        const res = await getPublishStatus(publishTaskId, this.getCurrentDsslabels())
-        if (res.status === 'running') {
+        let res
+        try {
+          res = await getPublishStatus(publishTaskId, this.getCurrentDsslabels())
+        } catch (error) {
+          this.removeTaskId()
+        }
+        if (res && res.status === 'running') {
           this.isFlowPubulish = true
           this.checkResult(publishTaskId, 0, 'publish')
           // 打开发布历史panel

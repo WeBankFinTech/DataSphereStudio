@@ -295,8 +295,8 @@
         "waring": "Warning",
         "action": "Need {label}",
         "isNext": "Continue or not?",
-        "over": "Stop {type}",
-        "overThe": "Stop this",
+        "confirm": "Confirm",
+        "overThe": "Stop",
         "engine": "Engine",
         "task": "Task",
         "engineAndTask": "Engine and task"

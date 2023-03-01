@@ -30,7 +30,7 @@ if (process.env.npm_config_configfile) {
 } else if (process.env.npm_config_micro_module) {
   configFile = `../../config.${process.env.npm_config_micro_module}.json`
 }
-const { apps = {}, exts = {}, conf = {}, version, components } = require(configFile)
+const { apps = {}, exts = {}, conf = {}, version, components = {} } = require(configFile)
 
 if (version) {
   process.env.VUE_APP_VERSION = version

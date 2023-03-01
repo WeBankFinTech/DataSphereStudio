@@ -56,10 +56,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -130,13 +127,19 @@ public class NodeRestfulApi {
         Function<NodeUi, String> descriptionSupplier = internationalization(req, NodeUi::getDescriptionEn, NodeUi::getDescription);
         Function<NodeUi, String> labelNameSupplier = internationalization(req, NodeUi::getLableNameEn, NodeUi::getLableName);
         ArrayList<NodeUiVO> nodeUiVOS = new ArrayList<>();
+        Set<String> keySet = new HashSet<>(nodeInfo.getNodeUis().size());
         for (NodeUi nodeUi : nodeInfo.getNodeUis()) {
+            //避免重复的ui key，因为第三方组件可能会重复配置。
+            if(keySet.contains(nodeUi.getKey())){
+                continue;
+            }
             NodeUiVO nodeUiVO = new NodeUiVO();
             BeanUtils.copyProperties(nodeUi, nodeUiVO);
             nodeUiVO.setDesc(descriptionSupplier.apply(nodeUi));
             nodeUiVO.setLableName(labelNameSupplier.apply(nodeUi));
             nodeUiVO.setNodeUiValidateVOS(nodeUi.getNodeUiValidates().stream().map(v -> transfer(v, req)).sorted(NodeUiValidateVO::compareTo).collect(Collectors.toList()));
             nodeUiVOS.add(nodeUiVO);
+            keySet.add(nodeUi.getKey());
         }
         nodeUiVOS.sort(NodeUiVO::compareTo);
         nodeInfoVO.setNodeUiVOS(nodeUiVOS);

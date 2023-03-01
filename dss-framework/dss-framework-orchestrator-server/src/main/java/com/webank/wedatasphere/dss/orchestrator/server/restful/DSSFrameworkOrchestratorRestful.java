@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import scala.tools.nsc.typechecker.Implicits;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -199,11 +200,14 @@ public class DSSFrameworkOrchestratorRestful {
      * @return
      */
     @RequestMapping(path = "listOrchestratorCopyHistory", method = RequestMethod.GET)
-    public Message listOrchestratorCopyHistory(@RequestParam(name = "orchestratorId") Long orchestratorId,
+    public Message listOrchestratorCopyHistory(@RequestParam(required = false, name = "orchestratorId") Long orchestratorId,
                                                @RequestParam(required = false, name = "currentPage") Integer currentPage,
                                                @RequestParam(required = false, name = "pageSize") Integer pageSize) throws Exception {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        if (orchestratorId == null) {
+            return Message.error("请到父工作流查看复制历史信息！");
+        }
         Pair<Long, List<OrchestratorCopyHistory>> result = orchestratorFrameworkService.getOrchestratorCopyHistory(username, workspace, orchestratorId, currentPage, pageSize);
         return Message.ok("查找工作流复制历史成功").data("copyJobHistory", result.getSecond()).data("total", result.getFirst());
     }

@@ -87,7 +87,7 @@ public class PublishServiceImpl implements PublishService {
             projectInfoRequest.setProjectId(dssFlow.getProjectId());
             DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
             if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
-                DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请切换至正确的工作空间后再发布！", DSSErrorException.class);
+                DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
             }
             String schedulerAppConnName = workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME);
             if(StringUtils.isBlank(schedulerAppConnName)) {

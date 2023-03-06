@@ -164,7 +164,7 @@ export default {
         const pointNum = label.split('.').length - 1;
         const reg = /^[\w\u4e00-\u9fa5]{1,200}\.[A-Za-z]+$/;
         const unReg = /[^\w\u4e00-\u9fa5]+/g;
-        const extReg = /\.(hql|sql)$/i;
+        const extAllowChange = ['.sql','.hql'];
         if (!reg.test(label)) {
           if (len === 0) {
             msg = this.$t('message.scripts.scriptNameEmpty');
@@ -173,7 +173,7 @@ export default {
           } else if (!isHaveSuffix) {
             msg = this.$t('message.scripts.scriptSuffix');
           } else if (pointNum > 1) {
-            msg = '存在非法字符"."！';
+            msg = this.$t('message.scripts.illegal', {str: '"."'});
           } else if (prefix.length >= 200) {
             msg = this.$t('message.scripts.Scriptprefix200 ');
           } else {
@@ -198,10 +198,10 @@ export default {
               0,
               unRegString.length - 2
             );
-            msg = `存在非法字符"${unRegString}"`;
+            msg = this.$t('message.scripts.illegal', {str: `"${unRegString}"`});
           }
-        } else if (newSuffix !== oldSuffix && !extReg.test(label)) {
-          msg = `该脚本类型(后缀名)不得修改！`;
+        } else if (newSuffix !== oldSuffix && extAllowChange.indexOf(newSuffix) < 0 || extAllowChange.indexOf(oldSuffix) < 0 ) {
+          msg = this.$t('message.scripts.cannotmodify');
         }
       }
       return msg;

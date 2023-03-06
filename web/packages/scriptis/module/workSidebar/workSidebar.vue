@@ -487,7 +487,7 @@ export default {
             oldDest: args.node.path,
           }, (isOpenTab) => {
             if (isOpenTab) {
-              return this.$Message.error(`存在已打开脚本不支持修改`);
+              return this.$Message.error(this.$t('message.scripts.hasopen'));
             } else {
               api.fetch('/filesystem/rename', {
                 oldDest: args.node.path,

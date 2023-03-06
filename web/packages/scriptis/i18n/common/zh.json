@@ -866,7 +866,7 @@
       "scriptSuffix": "后缀名不得为空！",
       "illegal": "存在非法字符{str}！",
       "Scriptprefix200 ": "脚本前缀名称超过200字符！",
-      "cannotmodify": "该脚本类型(后缀名)不得修改！",
+      "cannotmodify": "仅支持hql，sql互相修改",
       "cancelfullscreen": "取消全屏",
       "fullscreen": "全屏展示",
       "fieldnamestyle": "字段名只支持大小写字母、数字和下划线",

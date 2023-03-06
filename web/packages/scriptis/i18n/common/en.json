@@ -867,7 +867,7 @@
       "scriptSuffix": "Script suffix name cannot be empty！",
       "illegal": "There are illegal characters {str}！",
       "Scriptprefix200 ": "Script prefix name exceeds 200 characters！",
-      "cannotmodify": "The script type (suffix name) cannot be modified！",
+      "cannotmodify": "Only hql and sql files mutual modification！",
       "cancelfullscreen": "Cancel full screen",
       "fullscreen": "Full screen",
       "fieldnamestyle": "Filed names only accept uppercase, lowercase, digit and underscore",

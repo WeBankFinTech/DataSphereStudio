@@ -45,4 +45,6 @@ public class LinkisJobTypeConf {
     public final static CommonVars<String> SIGNAL_NODES = CommonVars.apply("wds.dss.flow.signal.nodes","linkis.appconn.eventchecker.eventreceiver");
     public final static CommonVars<Integer> LOG_MAX_RESULTSIZE = CommonVars.apply("wds.dss.log.max.resultsize",1024);
 
+    public final static CommonVars<String> CONTEXT_ENV_DEV = CommonVars.apply("wds.dss.flow.env.dev","BDAP_DEV");
+    public final static CommonVars<String> CONTEXT_ENV_PROD = CommonVars.apply("wds.dss.flow.env.prod","BDAP_PROD");
 }

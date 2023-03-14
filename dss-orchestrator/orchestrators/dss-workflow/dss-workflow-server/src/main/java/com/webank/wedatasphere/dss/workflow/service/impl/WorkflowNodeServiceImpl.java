@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectRelationResponse;
@@ -139,7 +140,17 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                                                                                         BiConsumer<K, V> responseRefConsumer,
                                                                                         String operation) {
         NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+        if(nodeInfo==null){
+            String msg = String.format("%s note type not exist,please check appconn install successfully", node.getNodeType());
+            logger.error(msg);
+            throw new DSSRuntimeException(msg);
+        }
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn(nodeInfo.getAppConnName());
+        if(appConn==null){
+            String msg = String.format("%s appconn not exist,please check appconn install successfully", node.getNodeType());
+            logger.error(msg);
+            throw new DSSRuntimeException(msg);
+        }
         String name;
         if (StringUtils.isBlank(node.getName())) {
             name = node.getJobContent().get(DSSWorkFlowConstant.TITLE_KEY).toString();

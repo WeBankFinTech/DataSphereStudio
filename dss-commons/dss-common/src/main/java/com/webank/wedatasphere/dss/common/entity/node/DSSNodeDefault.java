@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.common.entity.node;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,8 @@ public class DSSNodeDefault implements DSSNode {
     private String desc;
     private String createTime;
     private String userProxy;
+    private String modifyUser;
+    private Date modifyTime;
     /**
      * dependencys 是该Node的依赖节点
      */
@@ -143,6 +146,16 @@ public class DSSNodeDefault implements DSSNode {
     @Override
     public List<String> getDependencys() {
         return dependencys;
+    }
+
+    @Override
+    public String getModifyUser() {
+        return modifyUser;
+    }
+
+    @Override
+    public Date getModifyTime() {
+        return modifyTime;
     }
 
     @Override

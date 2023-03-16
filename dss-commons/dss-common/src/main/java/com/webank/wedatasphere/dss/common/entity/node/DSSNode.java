@@ -45,5 +45,5 @@ public interface DSSNode extends Node {
     void setUserProxy(String userProxy);
 
     String getModifyUser();
-    Date getModifyTime();
+    Long getModifyTime();
 }

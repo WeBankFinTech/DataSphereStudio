@@ -36,7 +36,7 @@ public class DSSNodeDefault implements DSSNode {
     private String createTime;
     private String userProxy;
     private String modifyUser;
-    private Date modifyTime;
+    private Long modifyTime;
     /**
      * dependencys 是该Node的依赖节点
      */
@@ -154,7 +154,7 @@ public class DSSNodeDefault implements DSSNode {
     }
 
     @Override
-    public Date getModifyTime() {
+    public Long getModifyTime() {
         return modifyTime;
     }
 

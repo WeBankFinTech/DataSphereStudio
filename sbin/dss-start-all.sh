@@ -107,6 +107,10 @@ function startDssProject(){
 #  fi
 #  echo "------------------------the project service is registered to eureka successfully------------------------------------------------"
 
+	SERVER_NAME=dss-apps-server
+	SERVER_IP=$DSS_APPS_SERVER_INSTALL_IP
+	startApp
+
 	SERVER_NAME=dss-apiservice-server
 	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
 	startApp

@@ -46,4 +46,5 @@ public interface DSSNode extends Node {
 
     String getModifyUser();
     Long getModifyTime();
+    String getDesc();
 }

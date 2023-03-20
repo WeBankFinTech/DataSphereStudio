@@ -59,7 +59,7 @@ if [ ! -r "$DSS_COMMONS_LIB" ] ; then
 fi
 
 ## server lib
-export SERVER_LIB=$DSS_HOME/lib/dss-apps/$SERVER_SUFFIX
+export SERVER_LIB=$DSS_HOME/lib/$SERVER_SUFFIX
 
 
 if [ ! -r "$SERVER_LIB" ] ; then

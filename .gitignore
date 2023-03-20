@@ -33,6 +33,7 @@ dss-appconn/appconns/dss-scriptis-appconn/target/
 # dss-apps
 dss-apps/dss-apiservice-server/target
 dss-apps/dss-scriptis-server/target
+dss-apps/dss-apps-server/target
 
 #dss-guide
 dss-apps/dss-user-guide/dss-user-guide-server/src/main/resources/

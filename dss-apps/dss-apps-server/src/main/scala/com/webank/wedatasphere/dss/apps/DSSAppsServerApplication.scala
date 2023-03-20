@@ -17,6 +17,7 @@
  */
 
 package com.webank.wedatasphere.dss.apps
+
 import com.webank.wedatasphere.dss.common.utils.DSSMainHelper
 import org.apache.linkis.DataWorkCloudApplication
 import org.apache.linkis.common.utils.{Logging, Utils}

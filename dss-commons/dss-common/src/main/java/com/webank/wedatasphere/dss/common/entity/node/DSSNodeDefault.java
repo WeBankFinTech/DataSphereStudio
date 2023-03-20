@@ -159,6 +159,11 @@ public class DSSNodeDefault implements DSSNode {
     }
 
     @Override
+    public String getDesc() {
+        return desc;
+    }
+
+    @Override
     public String toString() {
         return "dwsNode{" +
                 "layout=" + layout +

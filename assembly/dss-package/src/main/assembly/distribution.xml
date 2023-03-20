@@ -100,6 +100,16 @@
         <include>**/*</include>
       </includes>
     </fileSet>
+    <!--dss-apps-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-apps/target/out/dss-apps-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-apps-server/</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
 
 <!--    &lt;!&ndash;dss-workflow-server&ndash;&gt;-->
 <!--    <fileSet>-->

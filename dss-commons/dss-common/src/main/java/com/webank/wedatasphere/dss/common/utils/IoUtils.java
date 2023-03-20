@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.common.utils;
 
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
-import com.webank.wedatasphere.dss.common.entity.IOEnv;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -138,14 +137,14 @@ public class IoUtils {
      * @throws IOException
      */
     public static void generateIOEnv(String basePath) throws IOException {
-        generateIOProperties("env",getDSSServerEnv().name(),basePath);
+        generateIOProperties("env",getDSSServerEnv(),basePath);
     }
 
     /**
      * 获取当前服务器的环境
      */
-    public static IOEnv getDSSServerEnv(){
+    public static String getDSSServerEnv(){
         //dssserverEnv 是当前dss服务启动的env环境
-        return IOEnv.valueOf(DSSCommonConf.DSS_IO_ENV.getValue());
+        return DSSCommonConf.DSS_IO_ENV.getValue();
     }
 }

@@ -37,6 +37,7 @@ import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
@@ -100,6 +101,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Autowired
     private OrchestratorCopyEnv orchestratorCopyEnv;
 
+    private static final int MAX_DESC_LENGTH = 250;
+    private static final int MAX_NAME_LENGTH = 255;
+
     private final ThreadFactory orchestratorCopyThreadFactory = new ThreadFactoryBuilder()
             .setNameFormat("dss-orchestrator—copy-thread-%d")
             .setDaemon(false)
@@ -119,6 +123,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @SuppressWarnings("ConstantConditions")
     public CommonOrchestratorVo createOrchestrator(String username, OrchestratorCreateRequest orchestratorCreateRequest,
                                                    Workspace workspace) throws Exception {
+        //检查desc字段长度
+        if(orchestratorCreateRequest.getDescription().length() > MAX_DESC_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "描述过长，请限制在" + MAX_DESC_LENGTH + "以内");
+        }
+        if(orchestratorCreateRequest.getOrchestratorName().length() > MAX_NAME_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
+        }
         //是否存在相同的编排名称
         orchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
         //判断工程是否存在,并且取出工程名称和空间名称
@@ -209,6 +220,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public CommonOrchestratorVo modifyOrchestrator(String username, OrchestratorModifyRequest orchestratorModifyRequest, Workspace workspace) throws Exception {
+        //检查desc字段长度
+        if(orchestratorModifyRequest.getDescription().length() > MAX_DESC_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "描述字段过长，请限制在" + MAX_DESC_LENGTH + "以内");
+        }
+        if(orchestratorModifyRequest.getOrchestratorName().length() > MAX_NAME_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
+        }
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
@@ -283,6 +301,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
+        if(orchestratorCopyRequest.getTargetOrchestratorName().length() > MAX_NAME_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
+        }
         //校验编排名是可用
         orchestratorService.isExistSameNameBeforeCreate(workspace.getWorkspaceId(), orchestratorCopyRequest.getTargetProjectId(), orchestratorCopyRequest.getTargetOrchestratorName());
         //判断用户对项目是否有权限

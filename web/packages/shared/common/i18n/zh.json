@@ -374,6 +374,7 @@
         "comingSoon": "尚未开源，敬请期待！"
       },
       "projectDetail": {
+        "editing": "编辑中",
         "WDGZL": "我的工作流",
         "overTime": "超时",
         "workflowRunFail": "工作流执行失败！",

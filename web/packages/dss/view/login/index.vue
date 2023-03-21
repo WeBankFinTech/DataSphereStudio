@@ -88,8 +88,6 @@ export default {
     this.getPublicKey()
   },
   mounted() {
-    window.__connected_sql_langserver = false;
-    window.__connected_py_langserver = false;
     storage.set('close_db_table_suggest', false);
     const workspaceId = this.getCurrentWorkspaceId()
     sessionStorage.removeItem(`work_flow_lists_${workspaceId}`)

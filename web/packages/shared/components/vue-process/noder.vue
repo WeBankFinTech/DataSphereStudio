@@ -382,7 +382,7 @@ export default {
         if (this.state.disabled) return;
         let keys = [];
         if (this.state.choosing.type == 'node') {
-          keys = e.ctrlKey || this.state.choosing.key.length > 1 ? this.state.choosing.key : []
+          keys = e.ctrlKey || this.state.choosing.key.length > 1 ? [...this.state.choosing.key] : []
         }
         if (keys.indexOf(this.k) < 0) {
           keys.push(this.k);
@@ -398,12 +398,12 @@ export default {
             nodes.push(node)
           }
         })
-        if (this.designer) {
-          commit(this.$store, 'UPDATE_CHOOSING', {
-            type: 'node',
-            key: keys
-          });
-        }
+        // if (this.designer) {
+        //   commit(this.$store, 'UPDATE_CHOOSING', {
+        //     type: 'node',
+        //     key: keys
+        //   });
+        // }
         this.setDraging({
           type: 'node',
           data: {
@@ -441,6 +441,8 @@ export default {
         }
         if (keys.indexOf(this.k) < 0) {
           keys.push(this.k);
+        } else {
+          keys = keys.filter(it => it != this.k)
         }
         if (this.designer) {
           commit(this.$store, 'UPDATE_CHOOSING', {

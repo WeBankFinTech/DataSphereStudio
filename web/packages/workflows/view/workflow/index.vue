@@ -151,6 +151,7 @@
       :applicationAreaMap="applicationAreaMap"
       :classify-list="cacheData"
       :framework="true"
+      :workspace-users="workspaceUsers"
       :orchestratorModeList="orchestratorModeList"
       @getDevProcessData="getDevProcessData"
       @confirm="ProjectConfirm"
@@ -202,6 +203,7 @@ import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
 import api from '@dataspherestudio/shared/common/service/api';
 import { DEVPROCESS, ORCHESTRATORMODES } from '@dataspherestudio/shared/common/config/const.js';
 import {
+  GetWorkspaceUserList,
   GetDicSecondList,
   GetAreaMap,
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
@@ -291,7 +293,12 @@ export default {
       showCopyForm: false,
       uploadUrl: `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`,
       uploadData: null,
-      importModal: false
+      importModal: false,
+      workspaceUsers: {
+        accessUsers: [],
+        releaseUsers: [],
+        editUsers: []
+      }
     }
   },
   filters,
@@ -317,6 +324,11 @@ export default {
   },
   created() {
     storage.set("currentDssLabels", this.modeOfKey);
+    GetWorkspaceUserList({ workspaceId: +this.$route.query.workspaceId }).then(
+      (res) => {
+        this.workspaceUsers = res.users;
+      }
+    );
     this.getAreaMap();
     this.getDicSecondList();
   },
@@ -353,9 +365,6 @@ export default {
     window.addEventListener('resize', this.resize);
   },
   computed: {
-    currentWorkdapceData() {
-      return storage.get("currentWorkspace");
-    },
     formatProjectNameList() {
       let res = [];
       if( this.projectsTree.length > 0 ) {
@@ -1522,13 +1531,22 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     // 用户退出，后端语言服务子进程无法关闭，要求前端发送关闭
-    window.__connected_sql_langserver = false;
-    window.__connected_py_langserver = false;
-    if (window.__webSocket_sql_langserver) {
-      window.__webSocket_sql_langserver.close();
-    }
-    if (window.__webSocket_py_langserver) {
-      window.__webSocket_sql_langserver.close();
+    try {
+      if (window.languageClient) {
+        window.languageClient.__connected_sql_langserver = false;
+        window.languageClient.__connected_py_langserver = false;
+        if (window.languageClient.__webSocket_sql_langserver) {
+          window.languageClient.sql.sendNotification('textDocument/changePage')
+
+          window.languageClient.__webSocket_sql_langserver.close();
+        }
+        if (window.languageClient.__webSocket_py_langserver) {
+          window.languageClient.python.sendNotification('textDocument/changePage')
+          window.languageClient.__webSocket_sql_langserver.close();
+        }
+      }
+    } catch (e) {
+      //
     }
     next();
   },

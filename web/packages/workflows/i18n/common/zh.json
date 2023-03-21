@@ -54,6 +54,7 @@
       "historicalVersion": "历史版本",
       "exportWorkflow": "工作流导出",
       "ok": "确认",
+      "showVersionDiff": "版本比对",
       "requesting": "接口正在请求中...",
       "cancel": "取消",
       "newCreate": "新建",

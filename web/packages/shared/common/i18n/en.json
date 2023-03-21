@@ -374,6 +374,7 @@
         "GJZ": "Open source co-construction is in progress, so stay tuned!"
       },
       "projectDetail": {
+        "editing": "Editing",
         "WDGZL": "My personal workflow",
         "overTime": "Over Time",
         "workflowRunFail": "Workflow run fail",

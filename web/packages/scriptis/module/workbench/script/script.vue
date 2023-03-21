@@ -242,6 +242,11 @@ export default {
       if (this.node) {
         this.resizePanel()
       }
+    },
+    'work.unsave': function(v) {
+      if (this.node && v) {
+        this.$set(this.node, 'isChange', true)
+      }
     }
   },
   async created() {

@@ -49,6 +49,7 @@ export default function () {
       {
         name: i18n.t('message.ext.opensource.copyHistory'),
         icon: 'md-paper-plane',
+        key: 'copyhistory',
         component: CopyHistory
       }
     ]

@@ -8,7 +8,7 @@
         <span class="navbar-item-name">{{ isFullscreen ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}</span>
       </div>
     </div>
-    <div ref="editor" class="el-editor" :style="{height: editorHeight}" />
+    <div ref="editor" class="el-editor" />
   </div>
 
 </template>
@@ -41,15 +41,6 @@ export default {
       type: [Boolean, Object],
       default: () => defaultToolbar
     },
-    height: {
-      type: Number,
-      default: 120
-    },
-    //fix--esc退出全屏&modal退出事件冲突
-    disableEsc: {
-      type: Boolean,
-      default: false
-    },
     readOnly: {
       type: Boolean,
       default: false
@@ -63,7 +54,6 @@ export default {
   data(){
     return {
       isFullscreen: false,
-      editorHeight: this.height + 'px'
     }
   },
 
@@ -103,13 +93,6 @@ export default {
     theme(newVal) {
       if (this.editor) {
         this.monaco.editor.setTheme(newVal)
-      }
-    },
-
-    height(newVal) {
-      if(typeof newVal === 'number') {
-        this.editorHeight = newVal + 'px'
-        this.layout();
       }
     },
 
@@ -182,9 +165,6 @@ export default {
         const value = editor.getValue();
         this.$emit('change', value, event);
       })
-      if (this.height) {
-        this.$refs.editor.style.height = this.height + 'px';
-      }
       this.layout();
       this.$emit('editorDidMount', this.editor)
     },
@@ -202,7 +182,11 @@ export default {
     },
 
     fullAction() {
-      this.isFullscreen = !this.isFullscreen
+      if (this.isFullscreen) {
+        this.exitFullScreen()
+      } else  {
+        this.fullScreen()
+      }
     },
 
     layout() {
@@ -219,17 +203,15 @@ export default {
     },
 
     exitFullScreen() {
-      this.editorHeight = this.height + 'px';
       this.isFullscreen = false;
       this.layout();
-      this.$emit('esc-key-event', false)
+      this.$emit('full-screen-change', false)
     },
 
     fullScreen() {
-      this.editorHeight = '100%';
       this.isFullscreen = true;
       this.layout();
-      this.$emit('esc-key-event', true)
+      this.$emit('full-screen-change', true)
     },
 
     changeTheme(theme) {
@@ -248,6 +230,7 @@ export default {
     .wrap {
         position: relative;
         border: 1px solid #eee;
+        margin-bottom: 20px;
     }
     .toolbar {
         height: 30px;
@@ -261,6 +244,8 @@ export default {
     }
     .el-editor {
         width: 100%;
+        height: calc(100% - 32px);
+        min-height: 380px;
     }
     .workbench-body-navbar-item {
         margin: 0 16px;
@@ -274,7 +259,7 @@ export default {
         border: 0;
         right: 0;
         width: 100%;
-        height: 99%;
+        height: 100%;
         background: #fff;
         z-index: 9999;
     }

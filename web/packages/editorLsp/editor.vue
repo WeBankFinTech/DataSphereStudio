@@ -145,7 +145,11 @@ export default {
       service: this.$APP_CONF && this.$APP_CONF.lsp_service || {}
     }, {
       ...this.currentConfig
-    }, this.filePath)
+    }, this.filePath, (data) => {
+      if (data.errMsg) {
+        this.$Message.error(data.errMsg)
+      }
+    })
     this.editor = editor
     this.monaco = monaco
     this.editorModel = this.editor.getModel();

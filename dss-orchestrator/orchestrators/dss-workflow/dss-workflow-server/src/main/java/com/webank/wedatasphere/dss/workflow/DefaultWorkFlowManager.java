@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -70,6 +71,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.DEFAULT_SCHEDULER_APP_CONN;
 
@@ -215,8 +218,19 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                         List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
 
         //todo download workflow bml file contains flowInfo and flowRelationInfo
-        String inputZipPath = IoUtils.generateIOPath(userName, dssFlowImportParam.getProjectName(), dssFlowImportParam.getProjectName() + ".zip");
+        String projectName = dssFlowImportParam.getProjectName();
+        String inputZipPath = IoUtils.generateIOPath(userName, projectName, projectName + ".zip");
         bmlService.downloadToLocalPath(userName, resourceId, bmlVersion, inputZipPath);
+        try{
+            String  originProjectName=readImportZipProjectName(inputZipPath);
+            if(!projectName.equals(originProjectName)){
+                String msg=String.format("target project name must be same with origin project name.origin project name:%s,target project name:%s(导入的目标工程名必须与导出时源工程名保持一致。源工程名：%s，目标工程名：%s)"
+                        ,originProjectName,projectName,originProjectName,projectName);
+                throw new DSSRuntimeException(msg);
+            }
+        }catch (IOException e){
+            throw new DSSRuntimeException("upload file format error(导入包格式错误)");
+        }
         String inputPath = ZipHelper.unzip(inputZipPath);
         //导入工作流数据库信息
         List<DSSFlow> dssFlows = metaInputService.inputFlow(inputPath);
@@ -235,7 +249,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         for (DSSFlow rootFlow : rootFlows) {
             workFlowInputService.inputWorkFlow(dssFlowImportParam.getUserName(),
                     rootFlow,
-                    dssFlowImportParam.getProjectName(),
+                    projectName,
                     inputPath, null, dssFlowImportParam.getWorkspace(), dssFlowImportParam.getOrcVersion(),
                     dssFlowImportParam.getContextId(), dssLabels);
         }
@@ -338,5 +352,15 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             return ResponseOperateOrchestrator.failed("Workflow(s) " + convertFlowStr + " publish to " + schedulerAppConnName +
                     "failed! Reason: " + ExceptionUtils.getRootCauseMessage(e));
         }
+    }
+
+    private String readImportZipProjectName(String zipFilePath) throws IOException {
+        try(ZipFile zipFile =new ZipFile(zipFilePath)){
+            Enumeration<? extends ZipEntry> entries =zipFile.entries();
+            if(entries.hasMoreElements()){
+                return entries.nextElement().getName();
+            }
+        }
+        throw new IOException();
     }
 }

@@ -1217,7 +1217,7 @@ export default {
               commit(this.$store, 'UPDATE_NODE', {
                 key: dragNode.key,
                 obj: Object.assign(node, {
-                  lastUpdateTime: Date.now(),
+                  modifyTime: Date.now(),
                   y: this.state.snapLineX.top - node.height / 2
                 })
               });
@@ -1236,7 +1236,7 @@ export default {
               commit(this.$store, 'UPDATE_NODE', {
                 key: dragNode.key,
                 obj: Object.assign(node, {
-                  lastUpdateTime: Date.now(),
+                  modifyTime: Date.now(),
                   x: this.state.snapLineY.left - node.width / 2
                 })
               });
@@ -1535,9 +1535,10 @@ export default {
             width,
             height } = getComputedStyle(nodeRef.$el);
           let nodePos = { left, top, width, height };
-          if (this.isInBoxSelect(nodePos, this.boxSelectLayerStyle)) {
+          if (node.selected) {
+            chooseNodes.push(node.key)
+          } else if (this.isInBoxSelect(nodePos, this.boxSelectLayerStyle)) {
             chooseNodes.push(node.key);
-            node.selected = true;
           }
         })
         setTimeout(() => {
@@ -1567,7 +1568,7 @@ export default {
     clickoutsideNode(e) {
       if (this.state.disabled) return;
       // 这里改成当只有点击大背景板时才取消选择
-      if (this.state.choosing.type == 'node' && e.target === this.$refs.canvas) {
+      if (!e.ctrlKey && !e.shiftKey && this.state.choosing.type == 'node' && e.target === this.$refs.canvas) {
         commit(this.$store, 'UPDATE_CHOOSING', {
           type: 'node',
           key: []

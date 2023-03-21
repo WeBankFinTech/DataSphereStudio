@@ -625,6 +625,7 @@
         },
         "warning": {
           "running": "Script execution in progress, please hold on!",
+          "unchange": "No changes for save！",
           "invalidArgs": "Please check the correctness of the input of configuration parameters!",
           "emptyCode": "Cannot execute empty script!"
         }

@@ -54,6 +54,7 @@
       "synchronousPublishing": "Synchronous Publishing",
       "exportWorkflow": "Export Workflow",
       "ok": "OK",
+      "showVersionDiff": "Compare",
       "requesting": "Interface is requesting...",
       "cancel": "Cancel",
       "newCreate": "ADD",

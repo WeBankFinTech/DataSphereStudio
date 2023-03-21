@@ -102,8 +102,29 @@ export default {
   },
   //组建内的守卫
   beforeRouteLeave(to, from, next) {
+    let hasUnsave = false;
+    const close = () => {
+      if (window.languageClient) {
+        // 用户退出，后端语言服务子进程无法关闭，要求前端发送关闭
+        try {
+          window.languageClient.__connected_sql_langserver = false;
+          window.languageClient.__connected_py_langserver = false;
+          if (window.languageClient.__webSocket_sql_langserver) {
+            window.languageClient.sql.sendNotification('textDocument/changePage')
+            window.languageClient.__webSocket_sql_langserver.close();
+          }
+          if (window.languageClient.__webSocket_py_langserver) {
+            window.languageClient.python.sendNotification('textDocument/changePage')
+            window.languageClient.__webSocket_sql_langserver.close();
+          }
+
+        } catch (error) {
+          //
+        }
+
+      }
+    }
     if (this.$refs.workbenchContainer) {
-      let hasUnsave = false;
       if (this.$refs.workbenchContainer.worklist) {
         // 检查是否有未保存的非临时脚本
         hasUnsave = this.$refs.workbenchContainer.worklist.some(
@@ -120,12 +141,17 @@ export default {
           cancelText: "",
           onOk: () => {},
           onCancel: () => {
+            close();
             next(); //如果用户点击取消 则直接跳转到用户点击的路由页面
           },
         });
       } else {
+        close();
         next();
       }
+    } else {
+      close();
+      next();
     }
   },
   computed: {

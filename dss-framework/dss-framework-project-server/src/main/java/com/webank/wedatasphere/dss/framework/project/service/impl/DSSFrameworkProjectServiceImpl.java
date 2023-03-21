@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyStructureAppConn;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
@@ -41,6 +42,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.utils.StructureOperati
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.exception.WarnException;
@@ -60,8 +62,9 @@ import static com.webank.wedatasphere.dss.framework.project.utils.ProjectOperati
 
 public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSFrameworkProjectServiceImpl.class);
-    public static final int MAX_PROJECT_NAME_SIZE = 150;
-    public static final int MAX_PROJECT_DESC_SIZE = 2048;
+    public static final int MAX_PROJECT_NAME_SIZE = 128;
+    public static final int MAX_PROJECT_DESC_SIZE = ProjectConf.MAX_DESC_LENGTH.getValue();
+    private static final int MAX_PROJECT_BUSSINESS_SIZE = 200;
     @Autowired
     private DSSProjectService dssProjectService;
     @Autowired
@@ -90,6 +93,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             DSSExceptionUtils.dealErrorException(60021,"project name is too long. the length must be less than " + MAX_PROJECT_NAME_SIZE, DSSProjectErrorException.class);
         } else if(projectCreateRequest.getDescription().length() > MAX_PROJECT_DESC_SIZE) {
             DSSExceptionUtils.dealErrorException(60021,"project description is too long. the length must be less than " + MAX_PROJECT_DESC_SIZE, DSSProjectErrorException.class);
+        } else if(StringUtils.isNotEmpty(projectCreateRequest.getBusiness()) && projectCreateRequest.getBusiness().length() > MAX_PROJECT_BUSSINESS_SIZE){
+            DSSExceptionUtils.dealErrorException(60021,"project bussiness is too long. the length must be less than " + MAX_PROJECT_BUSSINESS_SIZE, DSSProjectErrorException.class);
         }
 
         this.checkProjectName(projectCreateRequest.getName(), workspace, username);

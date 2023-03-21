@@ -204,10 +204,14 @@ export default {
       });
     },
     async save() {
-      let valid = await this.validateRepeat();
-      if (!valid) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
-      this.$refs.editor.save();
-      this.$emit('on-save');
+      if (this.work && this.work.unsave) {
+        let valid = await this.validateRepeat();
+        if (!valid) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
+        this.$refs.editor.save();
+        this.$emit('on-save');
+      } else {
+        this.$Message.warning(this.$t('message.scripts.editorDetail.warning.unchange'));
+      }
     },
     config() {
       this.showConfig = !this.showConfig;

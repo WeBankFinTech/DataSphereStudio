@@ -42,6 +42,7 @@ dss-apps/dss-user-guide/dss-user-guide-server/target
 # dss-commons
 dss-commons/dss-common/target
 dss-commons/dss-contextservice/target
+dss-commons/dss-bmlservice/target
 
 # dss-framework
 dss-framework/dss-appconn-framework/target

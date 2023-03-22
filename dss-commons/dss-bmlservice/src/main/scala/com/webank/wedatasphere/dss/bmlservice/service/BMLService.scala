@@ -14,29 +14,31 @@
  *
  */
 
-package com.webank.wedatasphere.dss.workflow.service
+package com.webank.wedatasphere.dss.bmlservice.service
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException
+import com.webank.wedatasphere.dss.common.utils.IoUtils
+import org.apache.commons.io.IOUtils
+import org.apache.linkis.common.utils.{JavaLog, Utils}
+import org.springframework.stereotype.Component
+import org.apache.linkis.bml.client.{BmlClient, BmlClientFactory}
+import org.apache.linkis.bml.protocol.{BmlDownloadResponse, BmlUpdateResponse, BmlUploadResponse}
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.util
 import java.util.UUID
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException
-import com.webank.wedatasphere.dss.common.utils.IoUtils
-import org.apache.linkis.bml.client.{BmlClient, BmlClientFactory}
-import org.apache.linkis.bml.protocol.{BmlDownloadResponse, BmlUpdateResponse, BmlUploadResponse}
-import org.apache.linkis.common.utils.{JavaLog, Utils}
-import org.apache.commons.io.IOUtils
-import org.springframework.stereotype.Component
-
 import scala.collection.JavaConversions._
 
-
-@Component
 class BMLService extends JavaLog {
 
   @volatile var bmlClient: BmlClient = _
 
+  /**
+   * 单例，获取bml client
+   * @param userName
+   * @return
+   */
   def getBmlClient(userName: String): BmlClient = {
     if (bmlClient == null) synchronized {
       if (bmlClient == null) {
@@ -46,6 +48,13 @@ class BMLService extends JavaLog {
     bmlClient
   }
 
+  /**
+   * 上传一段文本
+   * @param content 要上传的文本内容
+   * @param fileName 指定生成的文件名
+   * @param projectName 指定项目名
+   * @return 返回BmlResource
+   */
   def upload(userName: String, content: String, fileName: String, projectName: String): util.Map[String, Object] = {
     val inputStream = new ByteArrayInputStream(content.getBytes("utf-8"))
     val client: BmlClient = getBmlClient(userName)
@@ -56,13 +65,27 @@ class BMLService extends JavaLog {
     map += "version" -> resource.version
   }
 
+  /**
+   * 上传二进制流
+   *
+   * @param inputStream 要上传的二进制流
+   * @param fileName    指定生成的文件名
+   * @param projectName 指定项目名
+   * @return 上传后的结果BmlResource
+   */
   def upload(userName: String, inputStream: InputStream, fileName: String, projectName: String): BmlResource = {
     val client: BmlClient = getBmlClient(userName)
     val resource: BmlUploadResponse = client.uploadShareResource(userName, projectName, fileName, inputStream)
     if (!resource.isSuccess) throw new DSSErrorException(911113, "上传失败")
-    new BmlResource( resource.resourceId,resource.version)
+    new BmlResource(resource.resourceId, resource.version)
   }
 
+  /**
+   * 将特定资源更新为指定二进制流
+   * @param resourceId 要更新的资源
+   * @param inputStream 二进制流
+   * @return 更新后的结果BmlResource
+   */
   def update(userName: String, resourceId: String, inputStream: InputStream): util.Map[String, Object] = {
     val client: BmlClient = getBmlClient(userName)
     val resource: BmlUpdateResponse = client.updateShareResource(userName, resourceId, "", inputStream)
@@ -72,6 +95,13 @@ class BMLService extends JavaLog {
     map += "version" -> resource.version
   }
 
+  /**
+   * 将特定资源更新为指定文本
+   *
+   * @param resourceId  要更新的资源
+   * @param inputStream 文本内容
+   * @return 更新后的结果BmlResource
+   */
   def update(userName: String, resourceId: String, content: String): util.Map[String, Object] = {
     val inputStream = new ByteArrayInputStream(content.getBytes("utf-8"))
     val client: BmlClient = getBmlClient(userName)
@@ -82,6 +112,9 @@ class BMLService extends JavaLog {
     map += "version" -> resource.version
   }
 
+  /**
+   * 读取一个resource并转为文本返回。
+   */
   def query(userName: String, resourceId: String, version: String): util.Map[String, Object] = {
     val client: BmlClient = getBmlClient(userName)
     var resource: BmlDownloadResponse = null
@@ -96,6 +129,10 @@ class BMLService extends JavaLog {
     map += "string" -> inputstremToString(resource.inputStream)
   }
 
+  /**
+   * 下载一个资源
+   * @return 资源的路径和输入流
+   */
   def download(userName: String, resourceId: String, version: String): util.Map[String, Object] = {
     val client: BmlClient = getBmlClient(userName)
     var resource: BmlDownloadResponse = null
@@ -110,6 +147,10 @@ class BMLService extends JavaLog {
     map += "is" -> resource.inputStream
   }
 
+  /**
+   * 把资源下载到指定的本地文件，返
+   * @param path 本地文件全路径名
+   */
   def downloadToLocalPath(userName: String, resourceId: String, version: String, path: String): String = {
     val result = download(userName, resourceId, version)
     val is = result.get("is").asInstanceOf[InputStream]
@@ -128,10 +169,22 @@ class BMLService extends JavaLog {
     Utils.tryFinally(inputstremToString(is))(IOUtils.closeQuietly(is))
   }
 
+  /**
+   * 读取本地文件，返回二进制输入流
+   *
+   * @param userName 用户名
+   * @param readPath 本地文件全路径名
+   * @return 二进制输入流
+   */
   def readLocalResourceFile(userName: String, readPath: String): InputStream = {
     IoUtils.generateInputInputStream(readPath)
   }
 
+  /**
+   * 读取本地指定文件名的一段文本
+   * @param readPath 本地文件全路径名
+   * @return 文件里的文本内容
+   */
   def readLocalTextFile(userName: String, readPath: String): String = {
     var inputStream: InputStream = null
     var text: String = null
@@ -162,14 +215,20 @@ class BMLService extends JavaLog {
   }
 
 
-
   private def inputstremToString(inputStream: InputStream): String = {
     scala.io.Source.fromInputStream(inputStream).mkString
   }
 
 
-  def createBmlProject(username: String, projectName: String, editUsers: util.List[String],
-                       accessUsers: util.List[String]): Unit = {
+  /**
+   * 创建BML工程
+   * @param username 用户名
+   * @param projectName 工程名
+   * @param editUsers 编辑者
+   * @param accessUsers 访问者
+   */
+  def createBmlProject(username:String, projectName:String, editUsers:util.List[String],
+                       accessUsers:util.List[String] ): Unit ={
     val client = getBmlClient(username)
     val response = client.createBmlProject(username, projectName, accessUsers, editUsers)
     if (response.isSuccess) {
@@ -189,7 +248,13 @@ class BMLService extends JavaLog {
     }
   }
 
-
+  /**
+   * 修改BML工程中的编辑者、访问者等权限
+   * @param projectName 工程名
+   * @param username 操作用户名
+   * @param editUsers 新的编辑者名单
+   * @param accessUsers 新的访问者名单
+   */
   def updateProjectPriv(projectName: String, username: String, editUsers: util.List[String],
                         accessUsers: util.List[String]): Unit = {
     val client = getBmlClient(username)
@@ -209,6 +274,20 @@ class BMLService extends JavaLog {
     } else {
       logger.error(s"delete $username bml resource file failed, resourceId: $resourceId")
     }
+  }
+
+}
+
+object BMLService {
+  @volatile var bmlService: BMLService = _
+
+  def getInstance(): BMLService = {
+    if (bmlService == null) synchronized {
+      if (bmlService == null) {
+        bmlService = new BMLService()
+      }
+    }
+    bmlService
   }
 
 }

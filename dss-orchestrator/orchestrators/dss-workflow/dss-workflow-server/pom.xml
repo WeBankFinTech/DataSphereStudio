@@ -100,6 +100,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-bmlservice</artifactId>
+            <version>${dss.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>

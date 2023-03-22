@@ -369,7 +369,11 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         try(ZipFile zipFile =new ZipFile(zipFilePath)){
             Enumeration<? extends ZipEntry> entries =zipFile.entries();
             if(entries.hasMoreElements()){
-                return entries.nextElement().getName();
+                String name=entries.nextElement().getName();
+                if(name.endsWith("\\")||name.endsWith("/")){
+                    name = name.substring(0, name.length() - 1);
+                }
+                return name;
             }
         }
         throw new IOException();

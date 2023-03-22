@@ -20,6 +20,7 @@ public enum OperateTypeEnum {
     ADD_USERS("add_users"),
     UPDATE_USERS("update_users"),
     KILL("kill"),
+    SEND_EMAIL("send_email"),
 
 
     ;

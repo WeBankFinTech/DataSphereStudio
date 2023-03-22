@@ -32,6 +32,7 @@
     <modules>
         <module>dss-common</module>
         <module>dss-contextservice</module>
+        <module>dss-bmlservice</module>
         <module>dss-sender-service</module>
     </modules>
 

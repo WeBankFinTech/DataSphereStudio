@@ -111,36 +111,8 @@ function startDssProject(){
 	SERVER_IP=$DSS_APPS_SERVER_INSTALL_IP
 	startApp
 
-	SERVER_NAME=dss-apiservice-server
-	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
-	startApp
-
-	SERVER_NAME=dss-scriptis-server
-  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
-  startApp
-
-	SERVER_NAME=dss-flow-execution-server
-	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
-	startApp
-
-	SERVER_NAME=dss-data-api-server
-	SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
-	startApp
-
-  SERVER_NAME=dss-data-governance-server
-	SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
-  startApp
-
-  SERVER_NAME=dss-guide-server
-	SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
-  startApp
-
   SERVER_NAME=dss-framework-orchestrator-server
 	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
-	startApp
-
-	SERVER_NAME=dss-workflow-server
-	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
 	startApp
 
 }
@@ -154,31 +126,10 @@ function checkDssService(){
 	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
 	checkServer
 
-	SERVER_NAME=dss-apiservice-server
-	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
-	checkServer
-
-	SERVER_NAME=dss-scriptis-server
-  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
-  checkServer
-
-	SERVER_NAME=dss-workflow-server
-	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
-	checkServer
-
-	SERVER_NAME=dss-flow-execution-server
-	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
-	checkServer
-
 	SERVER_NAME=dss-data-api-server
   SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
   checkServer
-
-  SERVER_NAME=dss-guide-server
-  SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
-  checkServer
 }
-
 
 
 startDssProject

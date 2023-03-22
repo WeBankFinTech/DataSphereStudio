@@ -103,35 +103,13 @@
     <!--dss-apps-server-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-apps/target/out/dss-apps-server/lib/
+        ${basedir}/../../dss-apps/dss-apps-server/target/out/dss-apps-server/lib/
       </directory>
       <outputDirectory>lib/dss-apps-server/</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
-
-<!--    &lt;!&ndash;dss-workflow-server&ndash;&gt;-->
-<!--    <fileSet>-->
-<!--      <directory>-->
-<!--        ${basedir}/../../dss-orchestrator/orchestrators/dss-workflow/dss-workflow-server/target/out/dss-workflow-server/lib/-->
-<!--      </directory>-->
-<!--      <outputDirectory>lib/dss-orchestrator/dss-workflow-server/</outputDirectory>-->
-<!--      <includes>-->
-<!--        <include>**/*</include>-->
-<!--      </includes>-->
-<!--    </fileSet>-->
-
-<!--    &lt;!&ndash;dss-flow-execution-server&ndash;&gt;-->
-<!--    <fileSet>-->
-<!--      <directory>-->
-<!--        ${basedir}/../../dss-orchestrator/orchestrators/dss-workflow/dss-flow-execution-server/target/out/dss-flow-execution-server/lib/-->
-<!--      </directory>-->
-<!--      <outputDirectory>lib/dss-orchestrator/dss-flow-execution-server/</outputDirectory>-->
-<!--      <includes>-->
-<!--        <include>**/*</include>-->
-<!--      </includes>-->
-<!--    </fileSet>-->
 
     <!--dss-datachecker-appconn-->
     <fileSet>

@@ -29,6 +29,12 @@
     <artifactId>dss-flow-execution-server</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-workflow-server</artifactId>
+            <version>${dss.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.linkis</groupId>

@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.conf;
 
+import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -28,8 +29,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class OrchestratorSpringConf {
 
     @Bean(name = "contextService")
-    public ContextService createContextService(){
+    public ContextService createContextService() {
         return ContextServiceImpl.getInstance();
+    }
+
+    @Bean(name = "bmlService")
+    public BMLService createBmlService() {
+        return BMLService.getInstance();
     }
 
     @Bean
@@ -37,8 +43,6 @@ public class OrchestratorSpringConf {
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(3);
         return executor;
     }
-
-
 
 
 }

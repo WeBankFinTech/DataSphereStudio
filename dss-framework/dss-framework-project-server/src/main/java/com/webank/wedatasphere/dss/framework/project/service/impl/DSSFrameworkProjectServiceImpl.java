@@ -62,7 +62,7 @@ import static com.webank.wedatasphere.dss.framework.project.utils.ProjectOperati
 
 public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSFrameworkProjectServiceImpl.class);
-    public static final int MAX_PROJECT_NAME_SIZE = 128;
+    public static final int MAX_PROJECT_NAME_SIZE = 64;
     public static final int MAX_PROJECT_DESC_SIZE = ProjectConf.MAX_DESC_LENGTH.getValue();
     private static final int MAX_PROJECT_BUSSINESS_SIZE = 200;
     @Autowired

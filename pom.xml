@@ -39,7 +39,7 @@
     </modules>
 
     <properties>
-        <dss.version>1.1.0.10-SNAPSHOT</dss.version>
+        <dss.version>1.1.0.12-SNAPSHOT</dss.version>
         <linkis.version>1.1.8-webank</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>

@@ -48,7 +48,6 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
     @Autowired
     private DSSProjectUserMapper projectUserMapper;
     @Autowired
-    @Qualifier("projectServerBMLService")
     private BMLService bmlService;
     @Autowired
     private DSSProjectMapper dssProjectMapper;

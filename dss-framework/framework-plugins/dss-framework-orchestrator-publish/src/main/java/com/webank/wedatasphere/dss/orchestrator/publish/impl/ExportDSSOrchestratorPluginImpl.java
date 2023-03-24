@@ -48,6 +48,7 @@ import com.webank.wedatasphere.dss.standard.app.development.standard.Development
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +75,7 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     @Autowired
     private OrchestratorMapper orchestratorMapper;
     @Autowired
+    @Qualifier("orcMetaExportService")
     private MetaExportService metaExportService;
     @Autowired
     private ContextService contextService;

@@ -29,7 +29,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrc
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
-import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
+import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
@@ -50,6 +50,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -66,8 +67,10 @@ import static com.webank.wedatasphere.dss.orchestrator.publish.impl.ExportDSSOrc
 public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlugin implements ImportDSSOrchestratorPlugin {
 
     @Autowired
+    @Qualifier("orcMetaInputService")
     private MetaInputService metaInputService;
     @Autowired
+    @Qualifier("orcMetaExportService")
     private MetaExportService metaExportService;
     @Autowired
     private OrchestratorMapper orchestratorMapper;

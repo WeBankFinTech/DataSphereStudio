@@ -16,41 +16,31 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
-import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.common.protocol.JobStatus;
-import com.webank.wedatasphere.dss.common.protocol.RequestDeleteWorkflow;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.appconn.workflow.utils.Utils;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.OnlyDevelopmentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseDeleteWorkflow;
-import org.apache.linkis.rpc.Sender;
-
-import java.util.List;
 
 
 public class WorkflowRefDeletionOperation
-    extends AbstractDevelopmentOperation<OnlyDevelopmentRequestRef.RefJobContentRequestRefImpl, ResponseRef>
+        extends AbstractDevelopmentOperation<OnlyDevelopmentRequestRef.RefJobContentRequestRefImpl, ResponseRef>
         implements RefDeletionOperation<OnlyDevelopmentRequestRef.RefJobContentRequestRefImpl> {
 
     @Override
     public ResponseRef deleteRef(OnlyDevelopmentRequestRef.RefJobContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
         String userName = requestRef.getUserName();
         Long flowId = (Long) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);
-        RequestDeleteWorkflow requestDeleteWorkflow = new RequestDeleteWorkflow(userName, flowId);
-        List<DSSLabel> dssLabels = requestRef.getDSSLabels();
-        Sender tempSend = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
-        ResponseDeleteWorkflow responseDeleteWorkflow = RpcAskUtils.processAskException(tempSend.ask(requestDeleteWorkflow),
-                ResponseDeleteWorkflow.class, RequestDeleteWorkflow.class);
-        if(responseDeleteWorkflow.getJobStatus() == JobStatus.Success) {
-            return ResponseRef.newInternalBuilder().success();
-        } else {
-            return ResponseRef.newInternalBuilder().error("Unknown error, please ask admin for help.");
+        try {
+            Utils.getDefaultWorkflowManager().deleteWorkflow(userName, flowId);
+        } catch (DSSErrorException e) {
+            throw new DSSRuntimeException(16003, "调用workflowManager删除workflow出现异常！", e);
         }
+        return ResponseRef.newInternalBuilder().success();
     }
 
 }

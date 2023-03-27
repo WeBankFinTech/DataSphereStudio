@@ -119,5 +119,6 @@ export default {
   text-overflow: ellipsis;
   overflow: hidden;
   border-radius: unset;
+  white-space: nowrap;
 }
 </style>

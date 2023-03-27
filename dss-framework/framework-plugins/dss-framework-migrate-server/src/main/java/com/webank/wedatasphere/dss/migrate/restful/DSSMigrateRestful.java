@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.migrate.restful;
 
 import com.google.common.collect.Lists;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -14,7 +15,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
+import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
@@ -89,7 +90,6 @@ public class DSSMigrateRestful {
 
     // todo only dev开发中心
     private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
-    private Sender workflowSender = Sender.getSender(MigrateConf.WORKFLOW_SERVER_NAME);
 
 
     @PostMapping("/importOldDSSProject")
@@ -280,9 +280,9 @@ public class DSSMigrateRestful {
             InputStream inputStream = new FileInputStream(orcZipPath);
             long importOrcId = 0L;
             try {
-                Map<String, Object> uploadMap = bmlService.upload(userName, inputStream, "default_orc.zip", projectVo.getName());
-                String resourceId = uploadMap.get("resourceId").toString();
-                String version = uploadMap.get("version").toString();
+                BmlResource bmlResource = bmlService.upload(userName, inputStream, "default_orc.zip", projectVo.getName());
+                String resourceId = bmlResource.getResourceId();
+                String version = bmlResource.getVersion();
                 //不能走release的importservice接口 因为dev标签没有import操作
                 importOrcId = migrateService.importOrcToOrchestrator(resourceId, version, projectVo, userName, "dev", workspace, orchestratorInfo);
             } finally {
@@ -559,7 +559,7 @@ public class DSSMigrateRestful {
 
     private String getLatestFlowBmlVersion(String username, long flowId) {
         RequestQueryWorkFlow requestQueryWorkFlow = new RequestQueryWorkFlow(username, flowId);
-        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(workflowSender.ask(requestQueryWorkFlow),
+        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(orchestratorSender.ask(requestQueryWorkFlow),
                 ResponseQueryWorkflow.class, RequestQueryWorkFlow.class);
         if (null != responseQueryWorkflow && null != responseQueryWorkflow.getDssFlow()) {
             return responseQueryWorkflow.getDssFlow().getBmlVersion();

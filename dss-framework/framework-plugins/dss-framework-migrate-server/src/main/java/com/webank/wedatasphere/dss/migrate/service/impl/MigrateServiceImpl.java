@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.migrate.service.impl;
 
 import com.google.common.collect.Lists;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -10,7 +11,7 @@ import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
-import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
+import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.migrate.conf.MigrateConf;
@@ -77,9 +78,9 @@ public class MigrateServiceImpl implements MigrateService {
         DSSProjectDO dssProject = metaService.readProject(inputPath);
         DSSProjectVo finalProject;
         DSSProjectDO dbProject = dssProjectService.getProjectByName(dssProject.getName());
-        if(!dssProject.getUsername().equalsIgnoreCase(userName)){
+        if (!dssProject.getUsername().equalsIgnoreCase(userName)) {
             LOG.error("fatal error, project owner is {} ，but export user is {}", dssProject.getUsername(), userName);
-            throw new MigrateErrorException(40013, "project has been exported by others,not owner "+dssProject.getUsername());
+            throw new MigrateErrorException(40013, "project has been exported by others,not owner " + dssProject.getUsername());
         }
         if (dbProject == null) {
             //判断如果没有该工程，则开始调用接口来进行工程创建
@@ -170,9 +171,9 @@ public class MigrateServiceImpl implements MigrateService {
             String orcZipPath = ZipHelper.zip(orcPath);
             InputStream inputStream = new FileInputStream(orcZipPath);
             try {
-                Map<String, Object> uploadMap = bmlService.upload(userName, inputStream, "default_orc.zip", finalProject.getName());
-                String resourceId = uploadMap.get("resourceId").toString();
-                String version = uploadMap.get("version").toString();
+                BmlResource bmlResource = bmlService.upload(userName, inputStream, "default_orc.zip", finalProject.getName());
+                String resourceId = bmlResource.getResourceId();
+                String version = bmlResource.getVersion();
                 //不能走release的importservice接口 因为dev标签没有import操作
                 importOrcToOrchestrator(resourceId, version, finalProject, userName, "dev", workspace, orchestratorInfo);
             } finally {

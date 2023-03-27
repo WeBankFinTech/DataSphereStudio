@@ -37,7 +37,7 @@ import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.WorkFlowExportService;
-import com.webank.wedatasphere.dss.workflow.service.BMLService;
+import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;

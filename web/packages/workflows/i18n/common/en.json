@@ -251,6 +251,7 @@
         "readonlyNoCopy": "This node is on read-only status, copy is not supported!",
         "noPaste": "This node is on read-only status, paste is not supported!",
         "firstCopy": "Please copy a node first!",
+        "namelength": "Node name length exceeds 150！",
         "noDelete": "This node is on read-only status, delete is not supported!",
         "createdSuccess": "Successfully created!",
         "arguments": {
@@ -273,7 +274,6 @@
           "inputeNodeName": "Please enter the node name",
           "nodeType": "Node Type",
           "nodeDesc": "Node Description:",
-          "inputeNodeDesc": "Please enter the node description",
           "SXXX": "Attribute information:",
           "XZRMBXXJZ": "Please choose the sending mechanism of RMB message",
           "XZSJLY": "Please choose the data source",

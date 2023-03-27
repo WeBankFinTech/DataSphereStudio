@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>1.1.0.11-SNAPSHOT</version>
+    <version>1.1.0.12-SNAPSHOT</version>
 
     <modules>
         <module>dss-commons</module>
@@ -31,9 +31,7 @@
         <module>dss-orchestrator</module>
         <module>dss-appconn</module>
         <module>dss-framework</module>
-        <module>dss-apps/dss-apiservice-server</module>
-        <module>dss-apps/dss-scriptis-server</module>
-        <module>dss-apps/dss-user-guide</module>
+        <module>dss-apps</module>
         <module>plugins/azkaban/linkis-jobtype</module>
         <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>
@@ -41,7 +39,7 @@
     </modules>
 
     <properties>
-        <dss.version>1.1.0.11-SNAPSHOT</dss.version>
+        <dss.version>1.1.0.12-SNAPSHOT</dss.version>
         <linkis.version>1.1.8-webank</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>

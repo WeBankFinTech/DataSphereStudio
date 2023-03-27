@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.0.11-SNAPSHOT</version>
+        <version>1.1.0.12-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -32,6 +32,7 @@
     <modules>
         <module>dss-common</module>
         <module>dss-contextservice</module>
+        <module>dss-bmlservice</module>
         <module>dss-sender-service</module>
     </modules>
 

@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.0.11-SNAPSHOT</version>
+        <version>1.1.0.12-SNAPSHOT</version>
         <relativePath>../../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -29,6 +29,12 @@
     <artifactId>dss-flow-execution-server</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-workflow-server</artifactId>
+            <version>${dss.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.linkis</groupId>
@@ -226,35 +232,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-            </plugin>
-           <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.3</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/main/assembly/distribution.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <skipAssembly>false</skipAssembly>
-                    <finalName>out</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <attach>false</attach>
-                    <descriptors>
-                        <descriptor>src/main/assembly/distribution.xml</descriptor>
-                    </descriptors>
-                </configuration>
             </plugin>
         </plugins>
         <resources>

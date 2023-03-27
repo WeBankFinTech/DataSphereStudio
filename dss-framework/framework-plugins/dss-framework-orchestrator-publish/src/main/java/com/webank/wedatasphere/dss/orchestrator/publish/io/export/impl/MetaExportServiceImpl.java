@@ -30,7 +30,7 @@ import java.io.*;
 import java.util.List;
 
 
-@Service
+@Service("orcMetaExportService")
 public class MetaExportServiceImpl implements MetaExportService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());

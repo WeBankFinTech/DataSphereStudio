@@ -16,30 +16,29 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCreationOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestCreateWorkflow;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseCreateWorkflow;
-import org.apache.linkis.rpc.Sender;
+import com.webank.wedatasphere.dss.workflow.DefaultWorkFlowManager;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import org.apache.linkis.DataWorkCloudApplication;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class WorkflowRefCreationOperation
-    extends AbstractDevelopmentOperation<ThirdlyRequestRef.DSSJobContentWithContextRequestRef, RefJobContentResponseRef>
+        extends AbstractDevelopmentOperation<ThirdlyRequestRef.DSSJobContentWithContextRequestRef, RefJobContentResponseRef>
         implements RefCreationOperation<ThirdlyRequestRef.DSSJobContentWithContextRequestRef> {
 
-    private Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
+    private final DefaultWorkFlowManager defaultWorkFlowManager = DataWorkCloudApplication.getApplicationContext().getBean(DefaultWorkFlowManager.class);
 
     @Override
     public RefJobContentResponseRef createRef(ThirdlyRequestRef.DSSJobContentWithContextRequestRef requestRef) throws ExternalOperationFailedException {
@@ -53,16 +52,18 @@ public class WorkflowRefCreationOperation
         String orcVersion = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATOR_VERSION_KEY);
         String schedulerAppConnName = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATION_SCHEDULER_APP_CONN);
         long parentFlowId = -1L;
-        List<String> linkedAppConnNames = dssOrchestratorInfo.getLinkedAppConnNames() != null ?
-                dssOrchestratorInfo.getLinkedAppConnNames() : new ArrayList<>();
-        String uses = dssOrchestratorInfo.getUses() != null ?
-                dssOrchestratorInfo.getUses() : "uses";
-        RequestCreateWorkflow requestCreateWorkflow = new RequestCreateWorkflow(userName, dssOrchestratorInfo.getProjectId(), workflowName,
-                contextId, description, parentFlowId, uses, linkedAppConnNames, dssLabels, orcVersion, schedulerAppConnName);
-        ResponseCreateWorkflow responseCreateWorkflow = RpcAskUtils.processAskException(sender.ask(requestCreateWorkflow),
-                ResponseCreateWorkflow.class, RequestCreateWorkflow.class);
-        Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCreateWorkflow.getDssFlow().getId(),
-            OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, responseCreateWorkflow.getDssFlow().getFlowJson());
+        List<String> linkedAppConnNames = dssOrchestratorInfo.getLinkedAppConnNames() != null ? dssOrchestratorInfo.getLinkedAppConnNames() : new ArrayList<>();
+        String uses = dssOrchestratorInfo.getUses() != null ? dssOrchestratorInfo.getUses() : "uses";
+        logger.info("try to call workflowManager to create workflow: " + workflowName);
+        DSSFlow dssFlow;
+        try {
+            dssFlow = defaultWorkFlowManager.createWorkflow(userName, dssOrchestratorInfo.getProjectId(), workflowName, contextId, description,
+                    parentFlowId, uses, linkedAppConnNames, dssLabels, orcVersion, schedulerAppConnName);
+        } catch (Exception e) {
+            throw new DSSRuntimeException(16002, "调用workflowManager创建workflow出现异常！", e);
+        }
+        Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssFlow.getId(),
+                OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, dssFlow.getFlowJson());
         return RefJobContentResponseRef.newBuilder().setRefJobContent(refJobContent).success();
     }
 }

@@ -624,6 +624,7 @@
         },
         "warning": {
           "running": "脚本运行中，请稍候！",
+          "unchange": "未做修改，无需保存！",
           "invalidArgs": "请检查配置参数输入是否正确！",
           "emptyCode": "无法执行空代码！"
         }

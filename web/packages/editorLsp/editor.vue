@@ -145,7 +145,19 @@ export default {
       service: this.$APP_CONF && this.$APP_CONF.lsp_service || {}
     }, {
       ...this.currentConfig
-    }, this.filePath)
+    }, this.filePath, (data) => {
+      if (data.errMsg) {
+        if (data.errMsg == 'connect-failded') {
+          if (localStorage.getItem('locale') === 'zh-CN') {
+            this.$Message.error('语言服务连接失败')
+          } else {
+            this.$Message.error('Language server connection failed')
+          }
+        } else {
+          this.$Message.error(data.errMsg)
+        }
+      }
+    })
     this.editor = editor
     this.monaco = monaco
     this.editorModel = this.editor.getModel();

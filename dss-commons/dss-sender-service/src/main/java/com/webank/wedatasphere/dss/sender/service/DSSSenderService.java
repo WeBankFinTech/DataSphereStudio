@@ -28,12 +28,6 @@ public interface DSSSenderService {
 
     Sender getScheduleOrcSender();
 
-    Sender getWorkflowSender(List<DSSLabel> dssLabels);
-
-    Sender getWorkflowSender();
-
-    Sender getSchedulerWorkflowSender();
-
     Sender getProjectServerSender();
 
 }

@@ -54,6 +54,7 @@
       "historicalVersion": "历史版本",
       "exportWorkflow": "工作流导出",
       "ok": "确认",
+      "showVersionDiff": "版本比对",
       "requesting": "接口正在请求中...",
       "cancel": "取消",
       "newCreate": "新建",
@@ -250,6 +251,7 @@
         "readonlyNoCopy": "节点只读状态，节点不支持复制！",
         "noPaste": "节点只读状态，节点不支持粘贴！",
         "firstCopy": "请先复制节点！",
+        "namelength": "节点名称长度超过150！",
         "noDelete": "节点只读状态，节点不支持删除！",
         "createdSuccess": "创建成功！",
         "arguments": {
@@ -272,7 +274,6 @@
           "inputeNodeName": "请填写节点名",
           "nodeType": "节点类型",
           "nodeDesc": "节点描述:",
-          "inputeNodeDesc": "请填写节点描述",
           "SXXX": "属性信息：",
           "XZRMBXXJZ": "请选择RMB消息发送机制",
           "XZSJLY": "请选择数据来源",

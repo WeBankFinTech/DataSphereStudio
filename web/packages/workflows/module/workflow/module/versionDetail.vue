@@ -86,7 +86,14 @@ export default {
           title: this.$t("message.common.projectDetail.version"),
           key: "version",
           width: 130,
-          align: "center"
+          align: "center",
+          render: (h, scope) => {
+            return h(
+              "span",
+              {},
+              scope.index === 0 && this.versionPage.pageNow === 1 ? this.$t("message.common.projectDetail.editing") : scope.row.version
+            );
+          }
         },
         {
           title: this.$t("message.common.projectDetail.updator"),

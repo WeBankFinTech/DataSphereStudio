@@ -1291,6 +1291,9 @@ const langDefinition = {
 
 let installed = false
 let languageClient
+const maxRetries = 10
+window.languageClient = window.languageClient || {}
+
 /**
  * 创建websocket
  * @param {*} url
@@ -1301,7 +1304,7 @@ function createWebSocket(url) {
     minReconnectionDelay: 1000,
     reconnectionDelayGrowFactor: 1.3,
     connectionTimeout: 10000,
-    maxRetries: 10,
+    maxRetries,
     debug: false,
   };
   return new ReconnectingWebSocket(url, [], socketOptions);
@@ -1341,9 +1344,17 @@ export function connectService(editor, url, cb) {
       installed = true;
       MonacoServices.install(editor);
     }
-    if (window.__connected_sql_langserver !== true) {
-      window.__connected_sql_langserver = true;
+    if (window.languageClient.__connected_sql_langserver !== true) {
+      window.languageClient.__connected_sql_langserver = true;
       const webSocket = createWebSocket(url);
+      webSocket.addEventListener('error', () => {
+        if (webSocket._retryCount >= maxRetries) {
+          cb({
+            errMsg: 'connect-failded'
+          })
+        }
+      });
+      window.languageClient.__webSocket_sql_langserver = webSocket;
       listen({
         webSocket,
         onConnection: (connection) => {
@@ -1355,13 +1366,17 @@ export function connectService(editor, url, cb) {
 
           // }
           if (cb) {
-            cb(languageClient)
+            cb({
+              client: languageClient
+            })
           }
         },
       });
     } else {
       if (cb) {
-        cb(languageClient)
+        cb({
+          client: languageClient
+        })
       }
     }
   }

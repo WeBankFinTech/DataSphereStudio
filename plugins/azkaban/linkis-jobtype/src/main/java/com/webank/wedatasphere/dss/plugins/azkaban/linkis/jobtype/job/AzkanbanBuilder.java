@@ -88,7 +88,12 @@ public class AzkanbanBuilder extends Builder {
 
     @Override
     protected String getContextID(Job job) {
-        return jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID);
+        String contextID = jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID);
+        //将部分老的工作流的BDAP_DEV标签替换为BDAP_PROD
+        if (null != contextID) {
+            contextID = contextID.replace(LinkisJobTypeConf.CONTEXT_ENV_DEV.getValue(), LinkisJobTypeConf.CONTEXT_ENV_PROD.getValue());
+        }
+        return contextID;
     }
 
     @Override

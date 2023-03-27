@@ -71,6 +71,7 @@ export default {
             releaseNote: res.releaseNote
           }
         }
+        this.updateVersion = res.version
       })
     }),
     eventbus.on('watermark.refresh', () => {
@@ -107,7 +108,7 @@ export default {
       location.reload()
     },
     handleCancel() {
-      window.open('_book/动态与公告/DSS功能发布记录（2023年）.html', '_blank')
+      if (this.updateVersion) window.open(`_book/动态与公告/v${this.updateVersion}.html`, '_blank')
     },
     goItem(item) {
       // url类型: 0-内部系统（直接跳转），1-外部系统（新tab打开）

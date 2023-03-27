@@ -42,6 +42,8 @@ public class SchedulisProjectCreationOperation
 
     private String managerUrl;
 
+    public static final int WTSS_MAX_PROJECT_NAME_SIZE = 64;
+
     @Override
     protected String getAppConnName() {
         return SchedulisAppConn.SCHEDULIS_APPCONN_NAME;
@@ -57,6 +59,9 @@ public class SchedulisProjectCreationOperation
     @Override
     public ProjectResponseRef createProject(DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
         logger.info("begin to create project in schedulis, project name is {}.", requestRef.getDSSProject().getName());
+        if (requestRef.getDSSProject().getName().length() > WTSS_MAX_PROJECT_NAME_SIZE) {
+            throw new ExternalOperationFailedException(60021, "project name is too long, it must be less then " + WTSS_MAX_PROJECT_NAME_SIZE + " in schedulis! ");
+        }
         if (CollectionUtils.isNotEmpty(requestRef.getDSSProjectPrivilege().getReleaseUsers())) {
             // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
             requestRef.getDSSProjectPrivilege().getReleaseUsers().forEach(releaseUser -> {

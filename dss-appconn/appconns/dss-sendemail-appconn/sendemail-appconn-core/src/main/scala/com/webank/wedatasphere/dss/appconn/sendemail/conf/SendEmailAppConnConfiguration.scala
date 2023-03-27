@@ -25,6 +25,7 @@ object SendEmailAppConnConfiguration {
 
   val EMAIL_HOOK_CLASSES = CommonVars("wds.dss.appconn.email.hook.classes",
     "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailItsmCheckHook," +
+      "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailCheckHook," +
       "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailVisualisContentLimitHook," +
       "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailTableauCheckHook," +
       "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailMetaBaseCheckHook")

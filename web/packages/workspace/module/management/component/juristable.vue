@@ -1,22 +1,36 @@
 <template>
-  <div>
+  <div class="juristable">
     <div v-for="item in tablearr" :key="item.title">
       <h4 class="menu-permission-title" style="margin:20px 0px 10px;">{{item.title}}</h4>
       <div style="overflow: auto;">
-        <Table :style="width(item.columns)" border highlight-row  :columns="item.columns" :data="item.datalist">
-          <template style="color:#4ACA6D" slot-scope="{ row, index }" slot="action">
-            <Button v-if="isAdmin()" type="warning" size="small" @click="modify(row,index)">{{$t('message.workspaceManagement.editor')}}</Button>
+        <history-table
+          :columns="item.columns"
+          :data="item.datalist"
+          :height="40*(item.datalist.length+1) + 10"
+          :no-data-text="$t('message.scripts.emptyText')"
+          size="small"
+          border
+          stripe>
+          <template style="color:#4ACA6D" slot-scope="scope" slot="action">
+            <Button v-if="isAdmin()" type="warning" size="small" @click="modify(scope.data.row,scope.data.index)">{{$t('message.workspaceManagement.editor')}}</Button>
           </template>
-        </Table>
+        </history-table>
       </div>
     </div>
     <div  v-if="homepagedata && homepagedata.datalist.length" class="hoempage-table">
       <h4 style="margin:10px 0px;" class="menu-permission-title">{{$t('message.workspaceManagement.homeSetting')}}</h4>
-      <Table width="1100" border highlight-row :columns="homepagedata.column" :data="homepagedata.datalist">
-        <template style="color:#4ACA6D;"  slot="action">
+      <history-table
+        :columns="homepagedata.column"
+        :data="homepagedata.datalist"
+        :height="40*(homepagedata.datalist.length + 1) + 10"
+        :no-data-text="$t('message.scripts.emptyText')"
+        size="small"
+        border
+        stripe>
+        <template style="color:#4ACA6D;" slot="action">
           <Button type="warning" size="small" disabled>{{$t('message.workspaceManagement.editor')}}</Button>
         </template>
-      </Table>
+      </history-table>
     </div>
     <Modal
       v-model="creatershow"
@@ -64,7 +78,11 @@
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
 import storage from '@dataspherestudio/shared/common/helper/storage';
+import table from '@dataspherestudio/shared/components/virtualTable';
 export default {
+  components: {
+    historyTable: table.historyTable,
+  },
   props: {
     workspaceMenu: Object,
     tablearr: Array
@@ -229,6 +247,11 @@ export default {
     align-items: center;
     label{
       width: 100px
+    }
+  }
+   div.juristable {
+    ::v-deep .we-table tbody td.we-table-row-cell {
+      height: 38px;
     }
   }
 </style>

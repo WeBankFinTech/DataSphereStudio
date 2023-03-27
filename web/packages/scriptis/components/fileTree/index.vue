@@ -200,7 +200,7 @@ export default {
             );
             msg = this.$t('message.scripts.illegal', {str: `"${unRegString}"`});
           }
-        } else if (newSuffix !== oldSuffix && extAllowChange.indexOf(newSuffix) < 0 || extAllowChange.indexOf(oldSuffix) < 0 ) {
+        } else if (newSuffix !== oldSuffix && (extAllowChange.indexOf(newSuffix) < 0 || extAllowChange.indexOf(oldSuffix) < 0)) {
           msg = this.$t('message.scripts.cannotmodify');
         }
       }

@@ -276,7 +276,7 @@ export default {
             params: node.params,
             resources: node.resources,
             createTime: node.createTime || Date.now(),
-            modifyTime: node.createTime || Date.now()
+            modifyTime: node.modifyTime || Date.now()
           }
           // 把跟流程无关的数据原样返回
           for (let p in node) {

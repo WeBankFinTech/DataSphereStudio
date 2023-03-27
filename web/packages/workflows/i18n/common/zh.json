@@ -251,6 +251,7 @@
         "readonlyNoCopy": "节点只读状态，节点不支持复制！",
         "noPaste": "节点只读状态，节点不支持粘贴！",
         "firstCopy": "请先复制节点！",
+        "namelength": "节点名称长度超过150！",
         "noDelete": "节点只读状态，节点不支持删除！",
         "createdSuccess": "创建成功！",
         "arguments": {

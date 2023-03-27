@@ -29,18 +29,14 @@ export default {
       copyProjectData: {
         id: '',
         name: '',
-        version: '',
       },
-      // copyFormValid: {
-      //     name: [
-      //         { required: true, message: '请输入名称', trigger: 'blur' },
-      //         { message: '名称长度不能大于64', max: 64 },
-      //         { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '必须以字母开头，且只支持字母、数字、下划线！', trigger: 'blur' },
-      //     ],
-      //     version: [
-      //         { required: true, message: '请选择版本号', trigger: 'blur' },
-      //     ],
-      // },
+      copyFormValid: {
+        name: [
+          { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
+          { message: `${this.$t('message.workflow.nameLength')}64`, max: 64 },
+          { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
+        ],
+      },
     };
   },
   created() {
@@ -53,19 +49,6 @@ export default {
     }
   },
   computed: {
-    copyFormValid() {
-      return {
-        name: [
-          { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}64`, max: 64 },
-          { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
-        ],
-        version: [
-          { required: true, message: this.$t('message.common.projectDetail.selectVersion'), trigger: 'blur' },
-        ],
-
-      }
-    },
   },
   methods: {
     ProjectCopy() {

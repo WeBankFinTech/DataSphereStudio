@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -69,7 +70,11 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.DEFAULT_SCHEDULER_APP_CONN;
 
@@ -95,6 +100,13 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     private WorkFlowParser workFlowParser;
     @Autowired
     private LockMapper lockMapper;
+
+    //匹配wtss返回的错误信息
+    private static final Pattern ERROR_PATTERN = Pattern.compile("(?<=Error uploading project properties)[\\s\\S]+.job");
+
+    private static final String SCHEDULIS = "schedulis";
+
+    private static final int SCHEDULIS_MAX_SIZE = 250;
 
     @Override
     public DSSFlow createWorkflow(String userName,
@@ -215,8 +227,19 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                         List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
 
         //todo download workflow bml file contains flowInfo and flowRelationInfo
-        String inputZipPath = IoUtils.generateIOPath(userName, dssFlowImportParam.getProjectName(), dssFlowImportParam.getProjectName() + ".zip");
+        String projectName = dssFlowImportParam.getProjectName();
+        String inputZipPath = IoUtils.generateIOPath(userName, projectName, projectName + ".zip");
         bmlService.downloadToLocalPath(userName, resourceId, bmlVersion, inputZipPath);
+        try{
+            String  originProjectName=readImportZipProjectName(inputZipPath);
+            if(!projectName.equals(originProjectName)){
+                String msg=String.format("target project name must be same with origin project name.origin project name:%s,target project name:%s(导入的目标工程名必须与导出时源工程名保持一致。源工程名：%s，目标工程名：%s)"
+                        ,originProjectName,projectName,originProjectName,projectName);
+                throw new DSSRuntimeException(msg);
+            }
+        }catch (IOException e){
+            throw new DSSRuntimeException("upload file format error(导入包格式错误)");
+        }
         String inputPath = ZipHelper.unzip(inputZipPath);
         //导入工作流数据库信息
         List<DSSFlow> dssFlows = metaInputService.inputFlow(inputPath);
@@ -235,7 +258,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         for (DSSFlow rootFlow : rootFlows) {
             workFlowInputService.inputWorkFlow(dssFlowImportParam.getUserName(),
                     rootFlow,
-                    dssFlowImportParam.getProjectName(),
+                    projectName,
                     inputPath, null, dssFlowImportParam.getWorkspace(), dssFlowImportParam.getOrcVersion(),
                     dssFlowImportParam.getContextId(), dssLabels);
         }
@@ -326,17 +349,41 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             //把（多个）工作流转化成第三方调度系统，即发布到第三方调度系统做调度。
             ResponseRef responseRef = operation.convert(requestRef);
             if (responseRef.isFailed()) {
+                String errorMsg = dealSchedulisErrorMsg(responseRef.getErrorMsg(),schedulerAppConnName);
                 logger.error("user {} convert workflow(s) {} to {} failed, Reason: {}.", requestConversionWorkflow.getUserName(),
-                        convertFlowStr, schedulerAppConnName, responseRef.getErrorMsg());
+                        convertFlowStr, schedulerAppConnName, errorMsg);
                 return ResponseOperateOrchestrator.failed("workflow(s) " + convertFlowStr + " publish to " + schedulerAppConnName + "failed! Reason: "
-                        + responseRef.getErrorMsg());
+                        + errorMsg);
             }
             return ResponseOperateOrchestrator.success();
         } catch (Exception e) {
+            String errorMsg = dealSchedulisErrorMsg(ExceptionUtils.getRootCauseMessage(e),schedulerAppConnName);
             logger.error("user {} convert workflow(s) {} to {} failed.", requestConversionWorkflow.getUserName(),
                     convertFlowStr, schedulerAppConnName, e);
             return ResponseOperateOrchestrator.failed("Workflow(s) " + convertFlowStr + " publish to " + schedulerAppConnName +
-                    "failed! Reason: " + ExceptionUtils.getRootCauseMessage(e));
+                    "failed! Reason: " + errorMsg);
         }
+    }
+
+    private String readImportZipProjectName(String zipFilePath) throws IOException {
+        try(ZipFile zipFile =new ZipFile(zipFilePath)){
+            Enumeration<? extends ZipEntry> entries =zipFile.entries();
+            if(entries.hasMoreElements()){
+                String name=entries.nextElement().getName();
+                if(name.endsWith("\\")||name.endsWith("/")){
+                    name = name.substring(0, name.length() - 1);
+                }
+                return name;
+            }
+        }
+        throw new IOException();
+    }
+
+    private String dealSchedulisErrorMsg(String errorMsg, String schedulerAppConnName){
+        Matcher matcher = ERROR_PATTERN.matcher(errorMsg);
+        if(matcher.find() && StringUtils.equals(SCHEDULIS,schedulerAppConnName) &&  matcher.group().length() >= SCHEDULIS_MAX_SIZE){
+            errorMsg = "wokflow name " + matcher.group().split("/")[1] + " is to long, please abide the rules of schedulis: projectName + workflowName*3 + 12 <= 250 ";
+        }
+        return errorMsg;
     }
 }

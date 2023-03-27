@@ -334,6 +334,8 @@
       </Form>
       <div slot="footer">
         <Button
+          @click="showDiff">{{$t('message.workflow.showVersionDiff')}}</Button>
+        <Button
           type="primary"
           :loading="saveingComment"
           :disabled="saveingComment"
@@ -371,6 +373,7 @@
       :style="getConsoleStyle"
       @close-console="closeConsole"></console>
     <BottomTab
+      ref="bottomTab"
       :orchestratorId="orchestratorId"
       :orchestratorVersionId="orchestratorVersionId"
       :appId="flowId"
@@ -824,6 +827,8 @@ export default {
           item.jobContent = node.jobContent;
           item.resources = node.resources;
           item.params = node.params;
+          item.modifyUser = this.getUserName();
+          item.modifyTime = Date.now();
         }
         return item;
       })
@@ -938,7 +943,7 @@ export default {
     },
     checkChange(obj) {
       // 剔除单击节点选中导致的change
-      // createTime,lastUpdateTime 流程图产生的数据
+      // createTime 流程图产生的数据
       // params 动态添加的，手动保存会更新jsonchange标志位
       const helpFn = function(obj = {}) {
         const temp = { nodes: [], edges: [] }
@@ -946,7 +951,7 @@ export default {
           obj.nodes.forEach(item => {
             const nodeItem = {}
             Object.keys(item).forEach(k => {
-              if(['selected','createTime','lastUpdateTime', 'params'].indexOf(k) < 0) {
+              if(['selected','createTime', 'updateTime', 'params'].indexOf(k) < 0) {
                 nodeItem[k] = item[k]
               }
             })
@@ -957,7 +962,7 @@ export default {
           obj.edges.forEach(item => {
             const link = {}
             Object.keys(item).forEach(k => {
-              if(['selected','createTime','lastUpdateTime', 'params'].indexOf(k) < 0) {
+              if(['selected','createTime', 'updateTime', 'params'].indexOf(k) < 0) {
                 link[k] = item[k]
               }
             })
@@ -1078,6 +1083,8 @@ export default {
           item.bindViewKey = node.bindViewKey || "";
           item.appTag = node.appTag;
           item.businessTag = node.businessTag;
+          item.modifyUser = this.getUserName();
+          item.modifyTime = Date.now();
         }
         return item;
       });
@@ -1765,6 +1772,8 @@ export default {
         this.json.nodes = this.json.nodes.map((subItem) => {
           if (subItem.key === this.clickCurrentNode.key) {
             subItem.title = this.clickCurrentNode.title;
+            subItem.modifyUser = this.getUserName();
+            subItem.modifyTime = Date.now();
           }
           return subItem;
         });
@@ -1842,17 +1851,20 @@ export default {
       if (!this.cacheNode) {
         return this.$Message.warning(this.$t('message.workflow.process.firstCopy'));
       }
+      let tmpTitle = this.cacheNode.title+'_copy'
+      const hasNodeTitle = this.json.nodes.filter(it => it.title.indexOf(tmpTitle) > -1)
+      if (hasNodeTitle.length) {
+        tmpTitle = tmpTitle + hasNodeTitle.length
+      }
+      if (tmpTitle.length > 150) {
+        return this.$Message.warning(this.$t('message.workflow.process.namelength'));
+      }
       // 获取屏幕的缩放值
       let pageSize = this.$refs.process.getState().baseOptions.pageSize;
       const key = '' + new Date().getTime() + Math.ceil(Math.random() * 100);
       this.cacheNode.key = key;
       this.cacheNode.id = key;
       this.cacheNode.selected = true;
-      let tmpTitle = this.cacheNode.title+'_copy'
-      const hasNodeTitle = this.json.nodes.filter(it => it.title.indexOf(tmpTitle) > -1)
-      if (hasNodeTitle.length) {
-        tmpTitle = tmpTitle + hasNodeTitle.length
-      }
       this.cacheNode.title = tmpTitle
       this.cacheNode.createTime = Date.now()
       this.cacheNode.layout = {
@@ -2315,6 +2327,10 @@ export default {
       this.pubulishShow = true;
       this.saveingComment = false;
       this.pubulishFlowComment = ''
+    },
+    showDiff() {
+      this.pubulishShow = false;
+      this.$refs.bottomTab.showPanel('version');
     },
     async workflowPublish() {
       if (this.saveingComment) {

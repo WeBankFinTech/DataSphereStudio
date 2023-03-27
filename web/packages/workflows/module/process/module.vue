@@ -1083,6 +1083,8 @@ export default {
           item.bindViewKey = node.bindViewKey || "";
           item.appTag = node.appTag;
           item.businessTag = node.businessTag;
+          item.modifyUser = this.getUserName();
+          item.modifyTime = Date.now();
         }
         return item;
       });
@@ -1770,6 +1772,8 @@ export default {
         this.json.nodes = this.json.nodes.map((subItem) => {
           if (subItem.key === this.clickCurrentNode.key) {
             subItem.title = this.clickCurrentNode.title;
+            subItem.modifyUser = this.getUserName();
+            subItem.modifyTime = Date.now();
           }
           return subItem;
         });
@@ -1847,17 +1851,20 @@ export default {
       if (!this.cacheNode) {
         return this.$Message.warning(this.$t('message.workflow.process.firstCopy'));
       }
+      let tmpTitle = this.cacheNode.title+'_copy'
+      const hasNodeTitle = this.json.nodes.filter(it => it.title.indexOf(tmpTitle) > -1)
+      if (hasNodeTitle.length) {
+        tmpTitle = tmpTitle + hasNodeTitle.length
+      }
+      if (tmpTitle.length > 150) {
+        return this.$Message.warning(this.$t('message.workflow.process.namelength'));
+      }
       // 获取屏幕的缩放值
       let pageSize = this.$refs.process.getState().baseOptions.pageSize;
       const key = '' + new Date().getTime() + Math.ceil(Math.random() * 100);
       this.cacheNode.key = key;
       this.cacheNode.id = key;
       this.cacheNode.selected = true;
-      let tmpTitle = this.cacheNode.title+'_copy'
-      const hasNodeTitle = this.json.nodes.filter(it => it.title.indexOf(tmpTitle) > -1)
-      if (hasNodeTitle.length) {
-        tmpTitle = tmpTitle + hasNodeTitle.length
-      }
       this.cacheNode.title = tmpTitle
       this.cacheNode.createTime = Date.now()
       this.cacheNode.layout = {

@@ -16,7 +16,6 @@
         @on-page-size-change="changeSize" />
     </div>
   </div>
-  </div>
 </template>
 <script>
 import api from '@dataspherestudio/shared/common/service/api';

@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModif
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
+import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.ProjectHttpRequestHook;
@@ -61,6 +62,7 @@ import java.util.stream.Collectors;
 public class DSSFrameworkProjectRestfulApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSFrameworkProjectRestfulApi.class);
     private static final int MAX_DESC_LENGTH = ProjectConf.MAX_DESC_LENGTH.getValue();
+    private static final int MAX_BUSSINESS_SIZE = 200;
     @Autowired
     DSSFrameworkProjectService dssFrameworkProjectService;
     @Autowired
@@ -196,6 +198,9 @@ public class DSSFrameworkProjectRestfulApi {
         }
         if (projectModifyRequest.getDescription().length() > MAX_DESC_LENGTH) {
             return Message.error("The project description information is too long, exceeding the maximum length:" + MAX_DESC_LENGTH);
+        }
+        if(org.apache.commons.lang.StringUtils.isNotEmpty(projectModifyRequest.getBusiness()) && projectModifyRequest.getBusiness().length() > MAX_BUSSINESS_SIZE){
+            return Message.error("The project bussiness is too long, exceeding the maximum length:" + MAX_BUSSINESS_SIZE);
         }
         DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
         //工程不存在

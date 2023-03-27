@@ -41,6 +41,14 @@
                 :column="th"
                 :index="index"
                 :render="renderComponent({type: th.renderType, cell: td, key: th.key, params: th.renderParams})"></table-expand>
+              <table-expand
+                v-else-if="th.render"
+                :row="td"
+                :column="th"
+                :index="index"
+                :render="th.render">
+              </table-expand>
+              <slot v-else-if="th.slot" :name="th.slot" :data="{row: td,  index}"></slot>
               <span
                 v-else
                 :class="th.className">{{ td[th.key] }}</span>

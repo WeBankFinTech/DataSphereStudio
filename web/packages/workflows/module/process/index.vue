@@ -68,6 +68,7 @@
             @saveBaseInfo="saveBaseInfo"
             @updateWorkflowList="$emit('updateWorkflowList')"
             @release="release"
+            @opem="$emit('open')"
             @close="$emit('close')"
           ></Process>
           <Ide
@@ -86,6 +87,7 @@
             :key="item.title"
             :parametes="item.data"
             :node="item.node"
+            :query="query"
             @save="saveNode"
           ></commonIframe>
         </template>

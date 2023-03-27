@@ -147,7 +147,15 @@ export default {
       ...this.currentConfig
     }, this.filePath, (data) => {
       if (data.errMsg) {
-        this.$Message.error(data.errMsg)
+        if (data.errMsg == 'connect-failded') {
+          if (localStorage.getItem('locale') === 'zh-CN') {
+            this.$Message.error('语言服务连接失败')
+          } else {
+            this.$Message.error('Language server connection failed')
+          }
+        } else {
+          this.$Message.error(data.errMsg)
+        }
       }
     })
     this.editor = editor

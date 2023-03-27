@@ -380,7 +380,7 @@ const action = function (url, data, option) {
           isHoverNotice[noticeName] = false
           Notice.error({
             name: noticeName,
-            duration: 4,
+            duration: 6,
             closable: true,
             title: isEn ? 'Error' : '错误提示',
             render: (h) => {

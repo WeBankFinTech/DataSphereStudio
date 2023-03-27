@@ -16,54 +16,56 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
-import com.webank.wedatasphere.dss.common.protocol.JobStatus;
-import com.webank.wedatasphere.dss.common.utils.MapUtils;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.appconn.workflow.utils.Utils;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestImportWorkflow;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseImportWorkflow;
-import org.apache.linkis.rpc.Sender;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
+import org.apache.commons.collections.CollectionUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class WorkflowRefImportOperation
-    extends AbstractDevelopmentOperation<ThirdlyRequestRef.ImportWitContextRequestRefImpl, RefJobContentResponseRef>
+        extends AbstractDevelopmentOperation<ThirdlyRequestRef.ImportWitContextRequestRefImpl, RefJobContentResponseRef>
         implements RefImportOperation<ThirdlyRequestRef.ImportWitContextRequestRefImpl> {
 
     @Override
     public RefJobContentResponseRef importRef(ThirdlyRequestRef.ImportWitContextRequestRefImpl requestRef) throws ExternalOperationFailedException {
-        RequestImportWorkflow requestImportWorkflow = new RequestImportWorkflow(requestRef.getUserName(),
-                (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_ID_KEY),
-                (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY),
-                requestRef.getRefProjectId(), requestRef.getProjectName(),
-                requestRef.getNewVersion(),
-                requestRef.getWorkspace(),
-                requestRef.getContextId(), requestRef.getDSSLabels());
+        DSSFlowImportParam dssFlowImportParam = new DSSFlowImportParam();
+        dssFlowImportParam.setProjectID(requestRef.getRefProjectId());
+        dssFlowImportParam.setProjectName(requestRef.getProjectName());
+        dssFlowImportParam.setUserName(requestRef.getUserName());
+        dssFlowImportParam.setOrcVersion(requestRef.getNewVersion());
+        dssFlowImportParam.setWorkspace(requestRef.getWorkspace());
+        dssFlowImportParam.setContextId(requestRef.getContextId());
 
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
-        ResponseImportWorkflow responseImportWorkflow = RpcAskUtils.processAskException(sender.ask(requestImportWorkflow),
-                ResponseImportWorkflow.class, RequestImportWorkflow.class);
-        if(responseImportWorkflow.getStatus() == JobStatus.Success) {
-            if(MapUtils.isEmpty(responseImportWorkflow.getWorkflows())) {
-                return RefJobContentResponseRef.newBuilder()
-                        .error("Empty workflow returned from workflow server, please ask admin for help!");
-            }
-            Map<String, Object> refMap = new HashMap<>(2);
-            responseImportWorkflow.getWorkflows().forEach((key, value) -> {
-                refMap.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, key);
-                refMap.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, value);
-            });
-            return RefJobContentResponseRef.newBuilder().setRefJobContent(refMap).success();
-        } else {
-            return RefJobContentResponseRef.newBuilder().error("Unknown reason, please ask admin for help.");
+        List<DSSFlow> responseFlowInfos;
+        try {
+            responseFlowInfos = Utils.getDefaultWorkflowManager().importWorkflow(requestRef.getUserName(),
+                    (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_ID_KEY),
+                    (String) requestRef.getResourceMap().get(ImportRequestRef.RESOURCE_VERSION_KEY),
+                    dssFlowImportParam, requestRef.getDSSLabels());
+        } catch (Exception e) {
+            throw new DSSRuntimeException(16005, "调用workflowManager导入workflow出现异常！", e);
         }
+
+        if (CollectionUtils.isEmpty(responseFlowInfos)) {
+            return RefJobContentResponseRef.newBuilder()
+                    .error("Empty workflow returned from workflow server, please ask admin for help!");
+        }
+        Map<String, Object> refMap = new HashMap<>(2);
+        responseFlowInfos.forEach(flow -> {
+            refMap.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, flow.getId());
+            refMap.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, flow.getFlowJson());
+        });
+        return RefJobContentResponseRef.newBuilder().setRefJobContent(refMap).success();
     }
 }

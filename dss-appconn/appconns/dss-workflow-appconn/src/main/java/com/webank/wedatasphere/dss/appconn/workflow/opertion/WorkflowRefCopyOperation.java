@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
+import com.webank.wedatasphere.dss.appconn.workflow.utils.Utils;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
@@ -35,8 +36,6 @@ public class WorkflowRefCopyOperation
         extends AbstractDevelopmentOperation<ThirdlyRequestRef.CopyWitContextRequestRefImpl, RefJobContentResponseRef>
         implements RefCopyOperation<ThirdlyRequestRef.CopyWitContextRequestRefImpl> {
 
-    private final DefaultWorkFlowManager defaultWorkFlowManager = DataWorkCloudApplication.getApplicationContext().getBean(DefaultWorkFlowManager.class);
-
     @Override
     public RefJobContentResponseRef copyRef(ThirdlyRequestRef.CopyWitContextRequestRefImpl workflowCopyRequestRef) {
         Long appId = (Long) workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);
@@ -51,7 +50,7 @@ public class WorkflowRefCopyOperation
         Optional<Object> newFlowName = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NAME));
         DSSFlow dssFlow;
         try {
-            dssFlow = defaultWorkFlowManager.copyRootFlowWithSubFlows(userName, appId, workflowCopyRequestRef.getWorkspace(),
+            dssFlow = Utils.getDefaultWorkflowManager().copyRootFlowWithSubFlows(userName, appId, workflowCopyRequestRef.getWorkspace(),
                     projectName, contextIdStr, version, description, workflowCopyRequestRef.getDSSLabels(),
                     (String) nodeSuffix.orElse(null), (String) newFlowName.orElse(null), targetProjectId);
         } catch (Exception e) {

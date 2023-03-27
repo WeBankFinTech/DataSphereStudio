@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
-import com.webank.wedatasphere.dss.orchestrator.core.service.BMLService;
+import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;

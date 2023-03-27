@@ -18,7 +18,8 @@ const findLang = find(languagesList, (lang) => {
 });
 
 const sqlLang = ['sql', 'hql']
-const languageClient = {}
+window.languageClient = window.languageClient || {}
+
 if (!findLang) {
   // 注册theme
   defaultView.register(monaco);
@@ -37,7 +38,7 @@ if (!findLang) {
 /**
  * 初始化编辑器
  */
-export function initClient({ el, value, service }, config, filePath) {
+export function initClient({ el, value, service }, config, filePath, cb) {
   const options = { ...config }
   let model
   if (filePath) {
@@ -59,23 +60,35 @@ export function initClient({ el, value, service }, config, filePath) {
     protocol: location.protocol == 'https:' ? 'wss:' : 'ws:',
     host: location.host
   }
+  /**
+   *
+   * @param {*} type
+   */
+  function callBack (type) {
+    return ({client, errMsg})=> {
+      if (client) {
+        window.languageClient[type] = client
+      }
+      if (errMsg) {
+        if (cb) {
+          cb({errMsg})
+        }
+      }
+    }
+  }
   // sql
   if (sqlLang.indexOf(config.language) > -1 && service.sql) {
     const wsurl = service.sql.replace(/\$\{([^}]*)}/g, function (a, b) {
       return locationObj[b]
     })
-    sqlLanguage.connectService(editor, wsurl, (client)=> {
-      languageClient.sql = client
-    })
+    sqlLanguage.connectService(editor, wsurl, callBack('sql'))
   }
   // python
   if (config.language === 'python' && service.py) {
     const wsurl = service.py.replace(/\$\{([^}]*)}/g, function (a, b) {
       return locationObj[b]
     })
-    pyLanguage.connectService(editor, wsurl, (client)=> {
-      languageClient.python = client
-    })
+    pyLanguage.connectService(editor, wsurl, callBack('python'))
   }
 
   return { monaco, editor }
@@ -87,7 +100,7 @@ export function initClient({ el, value, service }, config, filePath) {
  */
 export function getLanguageClient(lang) {
   if (lang && sqlLang.indexOf(lang) > -1 ) lang = 'sql'
-  return languageClient[lang] ||  languageClient
+  return window.languageClient[lang]
 }
 
 /**

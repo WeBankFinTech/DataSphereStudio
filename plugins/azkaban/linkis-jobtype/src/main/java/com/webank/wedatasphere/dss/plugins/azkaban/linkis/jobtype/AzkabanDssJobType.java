@@ -27,7 +27,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.conf.LinkisJobTypeConf;
 import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.job.JobBuilder;
-import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.log.AzkabanAppConnLog;
+import com.webank.wedatasphere.dss.plugins.azkaban.linkis.jobtype.log.AzkabanJobLog;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
@@ -98,9 +98,9 @@ public class AzkabanDssJobType extends AbstractJob {
             this.jobPropsMap.put("run_today_h", runTodayH);
         }
         this.job = JobBuilder.getAzkanbanBuilder().setJobProps(this.jobPropsMap).build();
-        this.job.setLogObj(new AzkabanAppConnLog(this.log));
+        this.job.setLogObj(new AzkabanJobLog(this));
         if(JobTypeEnum.EmptyJob == ((LinkisJob)this.job).getJobType()){
-            this.log.warn("This node is empty type");
+            warn("This node is empty type");
             return;
         }
        // info("runtimeMap is " + job.getRuntimeParams());
@@ -111,16 +111,16 @@ public class AzkabanDssJobType extends AbstractJob {
         try {
             LinkisNodeExecutionImpl.getLinkisNodeExecution().waitForComplete(this.job);
         } catch (Exception e) {
-            this.log.warn("Failed to execute job", e);
+            warn("Failed to execute job", e);
             //String reason = LinkisNodeExecutionImpl.getLinkisNodeExecution().getLog(this.job);
             //this.log.error("Reason for failure: " + reason);
             throw e;
         }
         try {
             String endLog = LinkisNodeExecutionImpl.getLinkisNodeExecution().getLog(this.job);
-            this.log.info(endLog);
+            info(endLog);
         } catch (Throwable e){
-            this.log.info("Failed to get log", e);
+            info("Failed to get log", e);
         }
 
         LinkisExecutionListener listener = (LinkisExecutionListener)LinkisNodeExecutionImpl.getLinkisNodeExecution();
@@ -129,7 +129,7 @@ public class AzkabanDssJobType extends AbstractJob {
         try{
             resultSize = LinkisNodeExecutionImpl.getLinkisNodeExecution().getResultSize(this.job);
         }catch(final Throwable t){
-            this.log.error("failed to get result size");
+            error("failed to get result size");
             resultSize = -1;
         }
         for (int i = 0; i < resultSize; i++) {
@@ -137,7 +137,7 @@ public class AzkabanDssJobType extends AbstractJob {
             if (result.length() > LinkisJobTypeConf.LOG_MAX_RESULTSIZE.getValue()) {
                 result = result.substring(0, LinkisJobTypeConf.LOG_MAX_RESULTSIZE.getValue());
             }
-            this.log.info("The content of the " + (i + 1) + "th resultset is :" + result);
+            info("The content of the " + (i + 1) + "th resultset is :" + result);
         }
 
         info("Finished to execute job");

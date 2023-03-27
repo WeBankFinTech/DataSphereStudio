@@ -274,7 +274,6 @@
           "inputeNodeName": "请填写节点名",
           "nodeType": "节点类型",
           "nodeDesc": "节点描述:",
-          "inputeNodeDesc": "请填写节点描述",
           "SXXX": "属性信息：",
           "XZRMBXXJZ": "请选择RMB消息发送机制",
           "XZSJLY": "请选择数据来源",

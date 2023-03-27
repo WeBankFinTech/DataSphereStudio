@@ -274,7 +274,6 @@
           "inputeNodeName": "Please enter the node name",
           "nodeType": "Node Type",
           "nodeDesc": "Node Description:",
-          "inputeNodeDesc": "Please enter the node description",
           "SXXX": "Attribute information:",
           "XZRMBXXJZ": "Please choose the sending mechanism of RMB message",
           "XZSJLY": "Please choose the data source",

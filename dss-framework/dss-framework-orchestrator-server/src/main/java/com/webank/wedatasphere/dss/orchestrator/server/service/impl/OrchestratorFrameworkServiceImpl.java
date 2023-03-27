@@ -102,7 +102,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private OrchestratorCopyEnv orchestratorCopyEnv;
 
     private static final int MAX_DESC_LENGTH = 250;
-    private static final int MAX_NAME_LENGTH = 255;
+    private static final int MAX_NAME_LENGTH = 128;
 
     private final ThreadFactory orchestratorCopyThreadFactory = new ThreadFactoryBuilder()
             .setNameFormat("dss-orchestrator—copy-thread-%d")

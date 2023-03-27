@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
+import com.webank.wedatasphere.dss.appconn.workflow.utils.Utils;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
@@ -38,8 +39,6 @@ public class WorkflowRefCreationOperation
         extends AbstractDevelopmentOperation<ThirdlyRequestRef.DSSJobContentWithContextRequestRef, RefJobContentResponseRef>
         implements RefCreationOperation<ThirdlyRequestRef.DSSJobContentWithContextRequestRef> {
 
-    private final DefaultWorkFlowManager defaultWorkFlowManager = DataWorkCloudApplication.getApplicationContext().getBean(DefaultWorkFlowManager.class);
-
     @Override
     public RefJobContentResponseRef createRef(ThirdlyRequestRef.DSSJobContentWithContextRequestRef requestRef) throws ExternalOperationFailedException {
         //发送RPC请求
@@ -57,7 +56,7 @@ public class WorkflowRefCreationOperation
         logger.info("try to call workflowManager to create workflow: " + workflowName);
         DSSFlow dssFlow;
         try {
-            dssFlow = defaultWorkFlowManager.createWorkflow(userName, dssOrchestratorInfo.getProjectId(), workflowName, contextId, description,
+            dssFlow = Utils.getDefaultWorkflowManager().createWorkflow(userName, dssOrchestratorInfo.getProjectId(), workflowName, contextId, description,
                     parentFlowId, uses, linkedAppConnNames, dssLabels, orcVersion, schedulerAppConnName);
         } catch (Exception e) {
             throw new DSSRuntimeException(16002, "调用workflowManager创建workflow出现异常！", e);

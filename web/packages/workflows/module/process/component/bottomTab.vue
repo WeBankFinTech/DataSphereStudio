@@ -8,7 +8,7 @@
       <component v-show="!showLog" class="component" :is="curTab.component"
         :orchestratorId="orchestratorId"
         :orchestratorVersionId="orchestratorVersionId"
-        :appId="appId"
+        :appId="flowId"
         @event-from-ext="eventFromExt"
         @release="release"/>
       <Log
@@ -44,7 +44,7 @@ const extComponents = plugin.emitHook('workflow_bottom_panel') || {}
 
 export default {
   props: {
-    appId: {
+    flowId: {
       type: Number
     },
     orchestratorId: {
@@ -107,6 +107,15 @@ export default {
     closePanel() {
       this.showContent = false
       this.curTab = {}
+    },
+    showPanel(key) {
+      const item = this.tabs.find(it => it.key === key)
+      if (this.curTab.key !== item.key) {
+        this.minSize =false
+        this.showContent = true
+        this.showLog = false
+        this.curTab = item
+      }
     },
     eventFromExt(evt) {
       if (evt && evt.callFn && typeof this[evt.callFn] === 'function') {

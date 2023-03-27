@@ -90,7 +90,6 @@ public class DSSMigrateRestful {
 
     // todo only dev开发中心
     private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
-    private Sender workflowSender = Sender.getSender(MigrateConf.WORKFLOW_SERVER_NAME);
 
 
     @PostMapping("/importOldDSSProject")
@@ -560,7 +559,7 @@ public class DSSMigrateRestful {
 
     private String getLatestFlowBmlVersion(String username, long flowId) {
         RequestQueryWorkFlow requestQueryWorkFlow = new RequestQueryWorkFlow(username, flowId);
-        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(workflowSender.ask(requestQueryWorkFlow),
+        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(orchestratorSender.ask(requestQueryWorkFlow),
                 ResponseQueryWorkflow.class, RequestQueryWorkFlow.class);
         if (null != responseQueryWorkflow && null != responseQueryWorkflow.getDssFlow()) {
             return responseQueryWorkflow.getDssFlow().getBmlVersion();

@@ -3,38 +3,22 @@ package com.webank.wedatasphere.dss.orchestrator.server.job;
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.protocol.RequestQueryWorkFlow;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
-import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
-import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
-import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
-import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
-import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyVo;
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.service.RefCRUDService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflow;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.linkis.common.exception.ErrorException;
-import org.apache.linkis.rpc.Sender;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -51,7 +35,6 @@ public class OrchestratorCopyJob implements Runnable {
 
     private DSSOrchestratorCopyInfo orchestratorCopyInfo = new DSSOrchestratorCopyInfo(UUID.randomUUID().toString());
 
-    private final Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
     @Override
     public void run() {

@@ -280,7 +280,7 @@ export default {
             message: this.$t("message.workflow.enterName"),
             trigger: "blur",
           },
-          { message: `${this.$t("message.workflow.nameLength")}150`, max: 150 },
+          { message: `${this.$t("message.workflow.nameLength")}64`, max: 64 },
           {
             type: "string",
             pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,

@@ -135,6 +135,7 @@ import {
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 import util from '@dataspherestudio/shared/common/util';
 import { setVirtualRoles } from '@dataspherestudio/shared/common/config/permissions.js';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 export default {
   components: {
     projectContentItem,
@@ -212,11 +213,9 @@ export default {
     // 当切换工作空间之后，重新获取数据
     '$route.query.workspaceId'() {
       this.viewState = 'owner'
-      this.initWorkspaceData()
     }
   },
   created() {
-    this.initWorkspaceData()
   },
   mounted() {
     GetAreaMap().then(res => {
@@ -225,7 +224,7 @@ export default {
     this.$nextTick(() => {
       this.precentList = storage.get('precentList') || []
     })
-
+    eventbus.on('workspace.change', this.initWorkspaceData);
   },
   methods: {
     initWorkspaceData() {
@@ -813,6 +812,9 @@ export default {
         this.precentList = precentList
       }
     }
+  },
+  beforeDestroy() {
+    eventbus.off('workspace.change', this.initWorkspaceData);
   }
 }
 </script>

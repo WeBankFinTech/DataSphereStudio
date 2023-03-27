@@ -33,7 +33,7 @@ import java.io.InputStream;
 import java.util.List;
 
 
-@Service
+@Service("orcMetaInputService")
 public class MetaInputServiceImpl implements MetaInputService {
 
     // TODO: 2020/3/13 防止表结构发生改变的version 字段的添加

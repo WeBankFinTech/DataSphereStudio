@@ -74,6 +74,7 @@ export default {
             required: true,
             message: this.$t('message.workflow.PleaseInputName'),
           },
+          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
           {
             type: 'string',
             pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,

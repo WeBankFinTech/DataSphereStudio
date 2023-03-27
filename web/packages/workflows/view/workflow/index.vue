@@ -130,6 +130,7 @@
             @updateWorkflowList="updateWorkflowList"
             @isChange="isChange(index, arguments)"
             @close="onTabRemove(item.tabId)"
+            @open="reopen(item)"
             @release="(p)=>{openItemAction({...p, name: `${item.name}(${$t('message.workflow.historicalVersion')})`})}"
           ></process>
           <template v-else>
@@ -985,6 +986,9 @@ export default {
               this.$refs.projectForm.originBusiness;
           });
       }
+    },
+    reopen(it) {
+      this.openWorkflow(it.query)
     },
     /**
      * 打开工作流查看并将工作流信息存入tab列表

@@ -68,7 +68,7 @@
             @saveBaseInfo="saveBaseInfo"
             @updateWorkflowList="$emit('updateWorkflowList')"
             @release="release"
-            @opem="$emit('open')"
+            @open="$emit('open')"
             @close="$emit('close')"
           ></Process>
           <Ide

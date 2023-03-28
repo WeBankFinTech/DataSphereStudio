@@ -32,7 +32,7 @@
     <modules>
         <module>dss-apiservice-server</module>
         <module>dss-scriptis-server</module>
-        <module>dss-user-guide/dss-user-guide-server</module>
+        <module>dss-user-guide</module>
         <module>dss-apps-server</module>
     </modules>
 

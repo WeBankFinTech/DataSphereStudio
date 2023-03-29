@@ -1311,8 +1311,12 @@ export default {
       if (rst.dirFileTrees) {
         // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
         this.script.resultSet = 0
-        this.script.resultList = rst.dirFileTrees.children.sort((a, b) => parseInt(a.name, 10) - parseInt(b.name,
-          10));
+        const slice = (name) => {
+          return Number(name.slice(1, name.lastIndexOf('.')));
+        }
+        this.script.resultList = rst.dirFileTrees.children.sort((a, b) => {
+          return slice(a.name) - slice(b.name);
+        });
         if (this.script.resultList.length) {
           const currentResultPath = rst.dirFileTrees.children[0].path;
           const url2 = `/filesystem/openFile`;

@@ -316,9 +316,6 @@ export default {
             querys += `&csvSeparator=${encodeURIComponent(splitChar)}`
           }
           let url = `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` + querys
-
-          window.console.log(url, 'DOWNLOD-URL')
-
           // 下载之前条用心跳接口确认是否登录
           await api.fetch('/user/heartbeat', 'get');
           // 下载记录日志

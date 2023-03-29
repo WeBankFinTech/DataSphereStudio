@@ -1160,6 +1160,7 @@ export default {
         comment: comment,
         type: this.type,
         updateTime,
+        updateUser: this.getUserName(),
         props: this.props,
         resources: this.resources,
         scheduleParams: this.scheduleParams,

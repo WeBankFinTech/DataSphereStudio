@@ -30,6 +30,7 @@ object SendEmailAppConnConfiguration {
       "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailTableauCheckHook," +
       "com.webank.wedatasphere.dss.appconn.sendemail.hook.SendEmailMetaBaseCheckHook")
 
+  val EMAIL_IMAGE_MAXSIZE = CommonVars("wds.dss.appconn.email.image.maxsize", 2000*10000)
   val EMAIL_IMAGE_HEIGHT = CommonVars("wds.dss.appconn.email.image.height", 500)
   val EMAIL_IMAGE_WIDTH = CommonVars("wds.dss.appconn.email.image.width", 1920)
   val DEFAULT_EMAIL_FROM = CommonVars("wds.dss.appconn.email.from.default", "")

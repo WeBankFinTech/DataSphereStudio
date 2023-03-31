@@ -17,15 +17,18 @@
 package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser
 
 import java.awt.image.BufferedImage
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
-import java.util.{Base64, UUID}
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
+import java.util
+import java.util.{Base64, Iterator, UUID}
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail, PdfAttachment, PngAttachment}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
 import org.apache.linkis.common.conf.Configuration
-import javax.imageio.ImageIO
+import javax.imageio.{ImageIO, ImageReader}
 import org.apache.commons.codec.binary.Base64OutputStream
 import com.webank.wedatasphere.dss.appconn.sendemail.conf.SendEmailAppConnConfiguration._
+import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
+import javax.imageio.stream.ImageInputStream
 import org.apache.commons.io.IOUtils
 import org.apache.linkis.common.utils.Utils
 
@@ -46,6 +49,7 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
           Utils.tryFinally({
             val decoder = Base64.getDecoder
             val byteArr = decoder.decode(imageStr)
+            checkImageSize(byteArr)
             inputStream = new ByteArrayInputStream(byteArr)
             val image = ImageIO.read(inputStream)
             val contents = generateImage(image, multiContentEmail)
@@ -54,6 +58,29 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
 
       }
     }
+  }
+
+  protected def checkImageSize(byteArr: Array[Byte]): Unit = {
+    var reader: ImageReader = null
+    val inputStream: InputStream = new ByteArrayInputStream(byteArr)
+    var imageInputStream: ImageInputStream = null
+    Utils.tryFinally({
+      imageInputStream = ImageIO.createImageInputStream(inputStream)
+      val imageReaders: util.Iterator[ImageReader] = ImageIO.getImageReaders(imageInputStream)
+      if (!imageReaders.hasNext) throw new EmailSendFailedException(80002,"Unsupported image format!")
+      reader = imageReaders.next
+      reader.setInput(imageInputStream)
+      val height = reader.getHeight(0)
+      val width = reader.getWidth(0)
+      if ((height * width) > EMAIL_IMAGE_MAXSIZE.getValue) {
+        throw new EmailSendFailedException(80002, "too large picture size :" + (height * width) + ", expect max picture size is :" + EMAIL_IMAGE_MAXSIZE.getValue)
+      }
+    })({
+      if (reader != null) reader.dispose()
+      IOUtils.closeQuietly(imageInputStream)
+      IOUtils.closeQuietly(inputStream)
+    })
+
   }
 
   protected def generateImage(bufferedImage: BufferedImage, email: AbstractEmail): Array[String] = {

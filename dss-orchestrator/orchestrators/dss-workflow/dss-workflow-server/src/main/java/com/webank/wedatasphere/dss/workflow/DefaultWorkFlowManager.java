@@ -101,13 +101,6 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     @Autowired
     private LockMapper lockMapper;
 
-    //匹配wtss返回的错误信息
-    private static final Pattern ERROR_PATTERN = Pattern.compile("(?<=Error uploading project properties)[\\s\\S]+.job");
-
-    private static final String SCHEDULIS = "schedulis";
-
-    private static final int SCHEDULIS_MAX_SIZE = 250;
-
     @Override
     public DSSFlow createWorkflow(String userName,
                                   Long projectId,
@@ -349,19 +342,17 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             //把（多个）工作流转化成第三方调度系统，即发布到第三方调度系统做调度。
             ResponseRef responseRef = operation.convert(requestRef);
             if (responseRef.isFailed()) {
-                String errorMsg = dealSchedulisErrorMsg(responseRef.getErrorMsg(),schedulerAppConnName);
                 logger.error("user {} convert workflow(s) {} to {} failed, Reason: {}.", requestConversionWorkflow.getUserName(),
-                        convertFlowStr, schedulerAppConnName, errorMsg);
+                        convertFlowStr, schedulerAppConnName, responseRef.getErrorMsg());
                 return ResponseOperateOrchestrator.failed("workflow(s) " + convertFlowStr + " publish to " + schedulerAppConnName + "failed! Reason: "
-                        + errorMsg);
+                        + responseRef.getErrorMsg());
             }
             return ResponseOperateOrchestrator.success();
         } catch (Exception e) {
-            String errorMsg = dealSchedulisErrorMsg(ExceptionUtils.getRootCauseMessage(e),schedulerAppConnName);
             logger.error("user {} convert workflow(s) {} to {} failed.", requestConversionWorkflow.getUserName(),
                     convertFlowStr, schedulerAppConnName, e);
             return ResponseOperateOrchestrator.failed("Workflow(s) " + convertFlowStr + " publish to " + schedulerAppConnName +
-                    "failed! Reason: " + errorMsg);
+                    "failed! Reason: " + ExceptionUtils.getRootCauseMessage(e));
         }
     }
 
@@ -379,11 +370,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         throw new IOException();
     }
 
-    private String dealSchedulisErrorMsg(String errorMsg, String schedulerAppConnName){
-        Matcher matcher = ERROR_PATTERN.matcher(errorMsg);
-        if(matcher.find() && StringUtils.equals(SCHEDULIS,schedulerAppConnName) &&  matcher.group().length() >= SCHEDULIS_MAX_SIZE){
-            errorMsg = "wokflow name " + matcher.group().split("/")[1] + " is to long, please abide the rules of schedulis: projectName + workflowName*3 + 12 <= 250 ";
-        }
-        return errorMsg;
-    }
 }
+
+
+

@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DSSOrchestratorConstant {
-    public static final String PUBLISH_FLOW_REPORT_FORMATE = "工作流名:%s,版本号:%s，工作流内容为空,请自行修改或者删除";
 
     public static Map<String, OrchestratorConversionJob> orchestratorConversionJobMap = new ConcurrentHashMap<>();
 

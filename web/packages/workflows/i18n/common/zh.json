@@ -297,7 +297,6 @@
           "filter": "过滤条件",
           "executeUser": "执行用户",
           "QTXZQJSON": "请填写正确的json格式！",
-          "JDMCBNYGZL": "节点名称不能以工作流名加下划线",
           "CZBNSRZW": "此值不能输入中文",
           "QTXYLSJMC": "请填写依赖数据名称",
           "CD500ZF": "长度在1到500个字符",

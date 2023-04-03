@@ -407,7 +407,7 @@ export default {
         this.setDraging({
           type: 'node',
           data: {
-            key: this.key,
+            key: this.k,
             beginX: parseInt(this.x),
             beginY: parseInt(this.y),
             beginPageX: e.pageX,

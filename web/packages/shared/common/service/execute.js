@@ -372,10 +372,10 @@ Execute.prototype.getResultList = function() {
       .then((rst) => {
         // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
         if(rst.dirFileTrees && rst.dirFileTrees.children) {
+          const slice = (name) => {
+            return Number(name.slice(1, name.lastIndexOf('.')));
+          }
           this.resultList = rst.dirFileTrees.children.sort((a, b) => {
-            const slice = (name) => {
-              return Number(name.slice(1, name.lastIndexOf('.')));
-            }
             return slice(a.name) - slice(b.name);
           });
         }
@@ -564,6 +564,7 @@ function deconstructStatus(execute, ret) {
  * @param {*} execute
  */
 function whenSuccess(execute) {
+  console.log(execute.runType)
   if (execute.runType !== 'pipeline') {
     // stateEnd是需要获取结果集的，获取结果集的同时会更新历史
     execute.trigger('stateEnd');

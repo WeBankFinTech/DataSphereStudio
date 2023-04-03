@@ -82,7 +82,7 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
                     projectToRelConversionRequestRef.getUserName(),
                     projectToRelConversionRequestRef.getApprovalId());
         } catch (Exception e) {
-            throw new DSSRuntimeException(90012, dealSchedulisErrorMsg(ExceptionUtils.getRootCauseMessage(e)), e);
+            throw new DSSRuntimeException(90012, ExceptionUtils.getRootCauseMessage(e), e);
         }
     }
 
@@ -113,6 +113,8 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             if(body!=null&&DSSCommonUtils.COMMON_GSON.fromJson(body, Map.class).get("error")!=null){
                 throw new ExternalOperationFailedException(50063, "upload project to schedulis failed." + body);
             }
+        } catch (Exception e){
+            throw new DSSRuntimeException(90012, dealSchedulisErrorMsg(ExceptionUtils.getRootCauseMessage(e)));
         } finally {
             IOUtils.closeQuietly(inputStream);
         }

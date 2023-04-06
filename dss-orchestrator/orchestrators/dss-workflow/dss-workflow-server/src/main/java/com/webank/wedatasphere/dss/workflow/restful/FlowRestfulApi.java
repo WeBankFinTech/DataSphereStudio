@@ -26,7 +26,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
@@ -41,7 +40,7 @@ import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.commons.lang.StringUtils;
@@ -54,6 +53,7 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -75,6 +75,7 @@ public class FlowRestfulApi {
     @Autowired
     private PublishService publishService;
     @Autowired
+    @Qualifier("workflowBmlService")
     private BMLService bmlService;
     @Autowired
     private WorkFlowManager workFlowManager;

@@ -30,7 +30,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVer
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -46,6 +46,7 @@ import org.apache.linkis.storage.fs.FileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,6 +66,7 @@ import java.util.Map;
 public class OrchestratorIERestful {
     private static final Logger logger = LoggerFactory.getLogger(OrchestratorIERestful.class);
     @Autowired
+    @Qualifier("orchestratorBmlService")
     private BMLService bmlService;
     @Autowired
     private FsService fsService;

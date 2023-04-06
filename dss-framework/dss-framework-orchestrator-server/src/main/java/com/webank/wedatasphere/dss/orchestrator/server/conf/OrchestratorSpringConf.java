@@ -44,5 +44,10 @@ public class OrchestratorSpringConf {
         return executor;
     }
 
+    @Bean
+    public String getCron() {
+        return OrchestratorConf.DSS_CS_CLEAR_CRON.getValue();
+    }
+
 
 }

@@ -54,6 +54,9 @@ object EmailCSHelper extends Logging{
       contextKey.setContextScope(ContextScope.PUBLIC)
       contextKey.setContextType(ContextType.DATA)
       contextKey.setKey(CSCommonUtils.NODE_PREFIX + nodeName + CSCommonUtils.JOB_ID)
+            info(s"contextIDStr is ${contextIDStr}.")
+            info(s"contextKey is ${contextKey}.")
+            info(s"SerializeHelper.serializeContextKey is ${SerializeHelper.serializeContextKey(contextKey)}.")
       LinkisJobDataServiceImpl.getInstance().getLinkisJobData(contextIDStr, SerializeHelper.serializeContextKey(contextKey))
     }.map(_.getJobID).toArray
     if (null == jobIds || jobIds.length < 1){

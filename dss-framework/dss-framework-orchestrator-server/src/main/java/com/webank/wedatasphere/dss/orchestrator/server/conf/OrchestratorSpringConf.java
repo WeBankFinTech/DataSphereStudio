@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.conf;
 
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -33,7 +33,7 @@ public class OrchestratorSpringConf {
         return ContextServiceImpl.getInstance();
     }
 
-    @Bean(name = "bmlService")
+    @Bean(name = "orchestratorBmlService")
     public BMLService createBmlService() {
         return BMLService.getInstance();
     }

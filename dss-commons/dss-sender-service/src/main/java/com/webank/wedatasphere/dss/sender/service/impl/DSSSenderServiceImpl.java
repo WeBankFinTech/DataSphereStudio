@@ -26,6 +26,8 @@ public class DSSSenderServiceImpl implements DSSSenderService {
 
     private final Sender orcSender = Sender.getSender(DSSSenderServiceConf.ORCHESTRATOR_SERVER_DEV_NAME.getValue());
 
+    private final Sender workflowSender = Sender.getSender(DSSSenderServiceConf.DSS_WORKFLOW_APPLICATION_NAME_DEV.getValue());
+
     private final Sender projectSender = Sender.getSender(DSSSenderServiceConf.PROJECT_SERVER_NAME.getValue());
     @Override
     public Sender getOrcSender() {
@@ -42,6 +44,20 @@ public class DSSSenderServiceImpl implements DSSSenderService {
         return orcSender;
     }
 
+    @Override
+    public Sender getWorkflowSender(List<DSSLabel> dssLabels) {
+        return workflowSender;
+    }
+
+    @Override
+    public Sender getWorkflowSender() {
+        return workflowSender;
+    }
+
+    @Override
+    public Sender getSchedulerWorkflowSender() {
+        return workflowSender;
+    }
 
     @Override
     public Sender getProjectServerSender() {

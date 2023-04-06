@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.conf;
 
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.service.impl.DSSFrameworkProjectServiceImpl;
@@ -41,7 +41,7 @@ public class ProjectSpringConf {
         return new DSSFrameworkProjectServiceImpl();
     }
 
-    @Bean(name = "bmlService")
+    @Bean(name = "projectBmlService")
     public BMLService createBmlService() {
         return BMLService.getInstance();
     }

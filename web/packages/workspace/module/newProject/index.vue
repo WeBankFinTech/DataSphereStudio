@@ -467,7 +467,7 @@ export default {
         editUsers: [],
         accessUsers: [],
         releaseUsers: [],
-        devProcessList: ['dev', 'prod']
+        devProcessList: []
       }
     },
     // 修改工程

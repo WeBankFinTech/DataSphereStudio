@@ -216,42 +216,6 @@
           @click="handleSave">{{$t('message.workflow.process.confirmSave')}}</Button>
       </div>
     </Modal>
-    <Modal
-      v-model="importModal">
-      <div
-        class="process-module-title"
-        slot="header">
-        {{$t('message.workflow.process.importJson')}}
-      </div>
-      <Upload
-        ref="uploadJson"
-        type="drag"
-        multiple
-        :before-upload="handleUpload"
-        :format="[json]"
-        :max-size="2001000"
-        action="">
-        <div style="padding: 20px 0">
-          <Icon
-            type="ios-cloud-upload"
-            size="52"
-            style="color: #3399ff"></Icon>
-          <p>{{$t('message.workflow.process.uplaodJson')}}</p>
-        </div>
-      </Upload>
-      <div v-show="importModel.names.length">
-        <div
-          v-for="filename in importModel.names"
-          :key="filename">
-          {{ filename }}
-        </div>
-      </div>
-      <div slot="footer">
-        <Button
-          type="primary"
-          @click="importJSON">{{$t('message.workflow.process.confirmImport')}}</Button>
-      </div>
-    </Modal>
     <Spin
       v-if="loading"
       size="large"
@@ -270,6 +234,7 @@
     <associate-script
       ref="associateScript"
       @click="associateScript"/>
+    <!-- 创建节点弹窗 -->
     <Modal
       :title="addNodeTitle"
       v-model="addNodeShow"
@@ -341,7 +306,8 @@
           :disabled="saveingComment"
           @click="workflowPublish">{{$t('message.workflow.ok')}}</Button>
       </div>
-    </Modal>
+    </Modal>】
+    <!-- 导出弹窗 -->
     <Modal
       v-model="workflowExportShow"
       :title="$t('message.workflow.exportWorkflow')"
@@ -362,7 +328,7 @@
         </FormItem>
       </Form>
     </Modal>
-
+    <!-- 运行控制台 -->
     <console
       v-if="openningNode"
       ref="currentConsole"
@@ -376,7 +342,7 @@
       ref="bottomTab"
       :orchestratorId="orchestratorId"
       :orchestratorVersionId="orchestratorVersionId"
-      :appId="flowId"
+      :flowId="flowId"
       :product="product"
       :readonly="readonly"
       @release="release"
@@ -500,13 +466,6 @@ export default {
       // 控制参数模态框是否显示
       isParamModalShow: false,
       isResourceShow: false,
-      // 是否显示导入JSON视图
-      importModal: false,
-      importModel: {
-        names: [],
-        files: [],
-        jsons: [],
-      },
       // 是否有改变
       jsonChange: false,
       loading: false,
@@ -541,11 +500,9 @@ export default {
       exporTChangeVersion: false,
       changeNum: 0,
       consoleParams: [],
-      appId: null,
       consoleHeight: 250,
       needReRun: false,
       locked: false,
-      newOrchestratorVersionId: this.orchestratorVersionId,
       extraToolbar: [],
     };
   },
@@ -637,9 +594,6 @@ export default {
           return arr;
         }
       }
-    },
-    newFlowId() {
-      return this.appId || this.flowId
     }
   },
   created() {
@@ -656,7 +610,7 @@ export default {
   mounted() {
     this.workflowExecutorCache = storage.get('workflowExecutorCache', 'local') || [];
     // 查找缓存中是否有当前工作流
-    const currentExecutorFlow = this.workflowExecutorCache.filter((item) => item.flowId === this.newFlowId)
+    const currentExecutorFlow = this.workflowExecutorCache.filter((item) => item.flowId === this.flowId)
     if (currentExecutorFlow.length > 0) {
       this.workflowIsExecutor = true;
       this.queryWorkflowExecutor(currentExecutorFlow[0].execID, currentExecutorFlow[0].taskID)
@@ -744,8 +698,8 @@ export default {
     paramsValid(param) {
       // 自定义函数的方法先写这里
       const validatorTitle = (rule, value, callback) => {
-        if (value === `${this.name}_`) {
-          callback(new Error(this.$t('message.workflow.process.nodeParameter.JDMCBNYGZL')));
+        if (value === `${this.name}`) {
+          callback(new Error(rule.message));
         } else {
           callback();
         }
@@ -770,7 +724,7 @@ export default {
             })
           } else if (item.validateType === 'Function') {
             temRule.push({
-              validator: validatorTitle,
+              validator: ['validatorTitle'].includes(item.validateRange) ? validatorTitle : () => {},
               trigger: 'blur'
             })
           }
@@ -869,7 +823,7 @@ export default {
     },
     getOriginJson() {
       return api.fetch(`/dss/workflow/get`, {
-        flowId: this.newFlowId,
+        flowId: this.flowId,
         labels: this.getCurrentDsslabels()
       },'get').then((res) => {
         let json = this.convertJson(res.flow);
@@ -1043,7 +997,7 @@ export default {
           await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}addFlow`, {
             name: node.title,
             description: node.desc,
-            parentFlowID: Number(this.newFlowId),
+            parentFlowID: Number(this.flowId),
             workspaceName: this.getCurrentWorkspaceName(),
             projectName: this.$route.query.projectName,
             version: this.version,
@@ -1098,188 +1052,8 @@ export default {
       this.$emit('saveParam', arg);
     },
     /**
-         * 显示导入JSON视图
-         */
-    showImportJsonView() {
-      this.importModel.files = [];
-      this.importModel.jsons = [];
-      this.importModel.names = [];
-      this.$refs.uploadJson.clearFiles();
-      this.importModal = true;
-    },
-    handleUpload(file) {
-      if (file.name.indexOf('.json') === -1) {
-        this.$Message.warning(this.$t('message.workflow.process.uploadJson'));
-        return false;
-      }
-      const sizeResult = file.size >= 1024 * 1024;
-      if (sizeResult) return this.$Message.warning(this.$t('message.workflow.process.JsonLimit'));
-      if (this.importModel.names.indexOf(file.name) < 0) {
-        this.importModel.names.push(file.name);
-        this.importModel.files.push(file);
-      }
-
-      return false;
-    },
-    readFileJson(file) {
-      return new Promise((resolve) => {
-        let reader = new FileReader();
-        // Closure to capture the file information.
-        reader.onload = (e) => {
-          this.importModel.json = e.target.result;
-          resolve({ name: file.name, json: e.target.result });
-        };
-        // Read in the image file as a data URL.
-        reader.readAsText(file);
-      });
-    },
-    importJSON() {
-      if (this.importModel.files.length < 1) {
-        return this.$Message.warning(this.$t('message.workflow.process.jsonFormat'));
-      }
-      let fp = this.importModel.files.map((f) => this.readFileJson(f));
-      Promise.all(fp).then((res) => {
-        let valid = true;
-        res.forEach((fileItem) => {
-          // 检查数据结构
-          let json = {};
-          try {
-            json = JSON.parse(fileItem.json);
-          } catch (error) {
-            valid = false;
-            return this.$Message.warning(`${this.$t('message.workflow.process.jsonFormat')}：${error.message}`);
-          }
-
-          for (let i = 0; i < json.edges.length; i++) {
-            let edge = json.edges[i];
-            if (!edge.source || !edge.target || !edge.sourceLocation || !edge.targetLocation) {
-              return this.$Message.warning(this.$t('message.workflow.process.jsonEdgeNotice'));
-            }
-          }
-
-          for (let i = 0; i < json.nodes.length; i++) {
-            let node = json.nodes[i];
-            if (!node.layout || !node.jobType || !node.id) {
-              valid = false;
-              return this.$Message.warning(this.$t('message.workflow.process.jsonNodeNotice'));
-            } else if (node.layout) {
-              let layout = node.layout;
-              if (layout.x === undefined || layout.y === undefined || layout.width === undefined || layout.height === undefined) {
-                valid = false;
-                return this.$Message.warning(this.$t('message.workflow.process.jsonLayoutNotice'));
-              }
-            }
-          }
-
-          // 需要把 id -> key, jobType -> type，id即为名称
-          json.nodes.forEach((node) => {
-            node.key = node.id;
-            node.createTime = +new Date();
-            node.name = +new Date() + '' + Math.ceil(Math.random() * 1000); // 保存时使用时间戳作为文件名
-            node.type = node.jobType;
-            node.title = node.id;
-            if (node.jobContent && node.jobContent.code) {
-              node.resources = [];
-            }
-            node = this.bindNodeBasicInfo(node);
-            delete node.id;
-            delete node.jobType;
-          });
-          let validTypes = [];
-          this.shapes.forEach((it) => {
-            if (it.children) {
-              validTypes = validTypes.concat(it.children.map((child) => child.type).filter((t) => t));
-            }
-          });
-          validTypes = Array.from(new Set(validTypes));
-
-          if (json.edges && !Array.isArray(json.edges)) {
-            valid = false;
-            return this.$Message.warning(this.$t('message.workflow.process.jsonEdgesNoArray'));
-          }
-          if (json.nodes && !Array.isArray(json.nodes)) {
-            valid = false;
-            return this.$Message.warning(this.$t('message.workflow.process.jsonNodesNoArray'));
-          }
-          let invalidNodes = json.nodes.filter((node) => {
-            return validTypes.indexOf(node.type) < 0;
-          });
-
-          if (invalidNodes.length === json.nodes.length || json.nodes.length < 1) {
-            valid = false;
-            return this.$Message.warning(`${this.$t('message.workflow.process.jsonNoType')}（${validTypes.join('、')}）`);
-          } else {
-            invalidNodes.forEach((node) => console.warn(`${this.$t('message.workflow.process.nosupprotType')}${node.type}`, node));
-          }
-          if (valid) {
-            this.importModel.jsons.push(json);
-          }
-        });
-        if (valid) {
-          this.mergeJson();
-        }
-      });
-    },
-    mergeJson() {
-      this.importModel.jsons.forEach((json) => {
-        this.changeJsonData(json);
-      });
-      this.importModal = false;
-    },
-    changeJsonData(json) {
-      // importReplace 多次导入是覆盖还是追加
-      if (this.importReplace) {
-        this.originalData = json;
-      } else if (this.json) {
-        // 过滤掉重复节点，重复边
-        if (Array.isArray(this.json.nodes) && Array.isArray(json.nodes)) {
-          json.nodes = json.nodes.filter((node) => {
-            return !this.json.nodes.some((on) => {
-              return on.key === node.key;
-            });
-          });
-          json.nodes = this.json.nodes.concat(json.nodes).map((item) => {
-            if (item.type === NODETYPE.CONNECTOR) {
-              item.title = item.key = item.key + '_' + this.rank;
-            }
-            return item;
-          });
-        }
-        if (Array.isArray(this.json.edges) && Array.isArray(json.edges)) {
-          json.edges = json.edges.filter((node) => {
-            return !this.json.edges.some((on) => {
-              return on.source === node.source && on.target === node.target;
-            });
-          });
-          json.edges = this.json.edges.concat(json.edges).map((item) => { // 修改空节点名称，避免全局工程下节点同名，不是很严谨，但能减少使用人员去修改重名
-            if (/^CONNECTOR_/.test(item.source)) {
-              item.source = item.source + '_' + this.rank;
-            }
-            if (/^CONNECTOR_/.test(item.target)) {
-              item.target = item.target + '_' + this.rank;
-            }
-            return item;
-          });
-        }
-        this.json = this.originalData = json;
-      } else {
-        this.json = this.originalData = json;
-      }
-    },
-    /**
-         * 显示保存视图
-         */
-    showSaveView() {
-      if (this.workflowIsExecutor) return;
-      // 检查JSON
-      if (!this.validateJSON()) {
-        return;
-      }
-      this.saveModal = true;
-    },
-    /**
-         * 保存工作流
-         */
+     * 保存工作流
+     */
     handleSave: debounce(function () {
       this.save()
     }, 1500),
@@ -1325,7 +1099,6 @@ export default {
         })
         this.autoSave(this.$t('message.workflow.Manually'), false);
       }
-      // });
     },
     autoSave(comment, f) {
       // 检查JSON
@@ -1381,12 +1154,13 @@ export default {
       return this.saveRequest(json, comment, f);
     },
     // 保存请求
-    saveRequest(json, comment, f, cb) {
+    saveRequest(json, comment, f) {
       const updateTime = Date.now();
       const paramsJson = JSON.parse(JSON.stringify(Object.assign(json, {
         comment: comment,
         type: this.type,
         updateTime,
+        updateUser: this.getUserName(),
         props: this.props,
         resources: this.resources,
         scheduleParams: this.scheduleParams,
@@ -1406,7 +1180,7 @@ export default {
         return node;
       });
       return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}saveFlow`, {
-        id: Number(this.newFlowId),
+        id: Number(this.flowId),
         json: JSON.stringify(paramsJson),
         projectName: this.$route.query.projectName,
         workspaceName: this.getCurrentWorkspaceName(),
@@ -1433,17 +1207,11 @@ export default {
           });
         }
         this.jsonChange = false;
-        if (cb) {
-          cb();
-        }
         // 保存成功后去更新tab的工作流数据
         this.$emit('updateWorkflowList');
         return res;
       }).catch(() => {
         this.loading = false;
-        if (cb) {
-          cb();
-        }
       });
     },
     /**
@@ -1464,7 +1232,7 @@ export default {
       let data = storage.get("flowEditLock") || {}
       const key = this.getUserName()
       const updateList = (data[key] || []).filter(it => it.projectId != this.$route.query.projectID)
-      updateList.push({ flowId: this.newFlowId, lock: flowEditLock, projectId: this.$route.query.projectID })
+      updateList.push({ flowId: this.flowId, lock: flowEditLock, projectId: this.$route.query.projectID })
       storage.set("flowEditLock", {
         [key]: updateList
       });
@@ -1472,7 +1240,7 @@ export default {
     getFlowEditLock() {
       const data = storage.get("flowEditLock") || {}
       const key = this.getUserName()
-      const item = (data[key] || []).find(it => it.flowId == this.newFlowId && it.projectId == this.$route.query.projectID)
+      const item = (data[key] || []).find(it => it.flowId == this.flowId && it.projectId == this.$route.query.projectID)
       return item && item.lock
     },
     updateLock() {
@@ -1984,7 +1752,7 @@ export default {
         cb();
         const newCreateParams = this.getCreatePrams(node);
         const createParams = {
-          flowID: this.newFlowId,
+          flowID: this.flowId,
           projectID: +this.$route.query.projectID,
           nodeType: node.type,
           nodeID: node.key,
@@ -2025,7 +1793,7 @@ export default {
         })
       } else {
         const params = {
-          flowID: this.newFlowId,
+          flowID: this.flowId,
           nodeType: node.type,
           projectID: +this.$route.query.projectID,
           params: {
@@ -2106,7 +1874,7 @@ export default {
       const parmas = {
         executeApplicationName: "flowexecution",
         executionCode: JSON.stringify({
-          flowId: this.newFlowId,
+          flowId: this.flowId,
           version: !this.myReadonly ? a.flowVersion : this.flowVersion
         }),
         runType: "json",
@@ -2132,7 +1900,7 @@ export default {
         // 每次执行之后缓存工作流，关闭重新打开再接着获取状态
 
         this.workflowExecutorCache.push({
-          flowId: this.newFlowId,
+          flowId: this.flowId,
           execID: res.execID,
           taskID: res.taskID
         })
@@ -2152,7 +1920,7 @@ export default {
       clearTimeout(this.executorStatusTimer);
       // 清掉当前工作流执行的缓存
       this.workflowExecutorCache = this.workflowExecutorCache.filter((item) => {
-        item.flowId !== this.newFlowId;
+        item.flowId !== this.flowId;
       });
       if (this.task_killing) {
         return this.$Message.error('请求已发出，请勿重复点击');
@@ -2213,7 +1981,7 @@ export default {
           }
           // 清掉当前工作流执行的缓存
           this.workflowExecutorCache = this.workflowExecutorCache.filter((item) => {
-            return item.flowId !== this.newFlowId;
+            return item.flowId !== this.flowId;
           });
         }
       }).catch(() => {
@@ -2353,9 +2121,9 @@ export default {
       }      // 调用发布接口
       const params = {
         orchestratorId: this.orchestratorId,
-        orchestratorVersionId: this.newOrchestratorVersionId,
+        orchestratorVersionId: this.orchestratorVersionId,
         dssLabel: this.getCurrentDsslabels(),
-        workflowId: Number(this.newFlowId),
+        workflowId: Number(this.flowId),
         labels: {route: this.getCurrentDsslabels()},
         comment: this.pubulishFlowComment
       }
@@ -2417,7 +2185,7 @@ export default {
               }
               this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
-              this.refreshOpen(this.getBaseInfo)
+              this.refreshOpen()
             } else if (res.status === 'failed') {
               clearTimeout(this.timer);
               this.isFlowPubulish = false;
@@ -2428,7 +2196,7 @@ export default {
                 okText: this.$root.$t('message.workflow.publish.cancel'),
               });
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
-              this.refreshOpen(this.getBaseInfo)
+              this.refreshOpen()
             }
           } else {
             clearTimeout(this.timer);
@@ -2439,48 +2207,13 @@ export default {
           eventbus.emit('get_publish_status', res)
         }).catch(()=> {
           this.isFlowPubulish = false;
-          this.refreshOpen(this.getBaseInfo)
+          this.refreshOpen()
         });
       }, 2000);
     },
-    refreshOpen(cb) {
-      // 再次获取appId
-      this.loading = true;
-      const workspaceData = storage.get("currentWorkspace");
-      api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}openOrchestrator`, {
-        orchestratorId: this.orchestratorId,
-        labels: {route: this.getCurrentDsslabels()},
-        workspaceName: workspaceData.name
-      }, 'post').then((openOrchestrator) => {
-        this.loading = false;
-        if (openOrchestrator) {
-          const previd = `${this.orchestratorId}${this.newOrchestratorVersionId}`
-          const resVersion =  openOrchestrator.OrchestratorVo.dssOrchestratorVersion
-          // 发布成功后id变化，更新缓存，防止刷新页面重复打开工作流
-          let workspaceId = this.$route.query.workspaceId;
-          let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
-          workFlowLists.forEach(it => {
-            if (it.tabId == previd) {
-              it.version = resVersion.id
-              it.tabId = `${this.orchestratorId}${resVersion.id}`
-              it.query = {
-                ...it.query,
-                orchestratorVersionId: resVersion.id,
-                appId: resVersion.appId,
-                version: resVersion.id
-              }
-            }
-          });
-          sessionStorage.setItem(`work_flow_lists_${workspaceId}`, JSON.stringify(workFlowLists))
-          this.appId = resVersion.appId;
-          this.newOrchestratorVersionId = resVersion.id;
-          if(cb) {
-            cb();
-          }
-        }
-      }).catch(() => {
-        this.loading = false;
-      });
+    refreshOpen() {
+      this.$emit('close')
+      this.$emit('open')
     },
     dateFormatter(date) {
       return moment(date).format('YYYY-MM-DD HH:mm:ss');
@@ -2500,7 +2233,7 @@ export default {
       if (!a) return
       this.isFlowPubulish = true;
       const params = {
-        rootFlowID: Number(this.newFlowId),
+        rootFlowID: Number(this.flowId),
         // projectVersionID: +this.projectVersionID,
         IOType: 'FLOW',
         comment: this.exportDesc,

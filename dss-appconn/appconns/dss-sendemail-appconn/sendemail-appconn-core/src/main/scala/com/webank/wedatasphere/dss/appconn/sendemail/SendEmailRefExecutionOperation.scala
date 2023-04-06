@@ -53,9 +53,7 @@ class SendEmailRefExecutionOperation
     val email = Utils.tryCatch {
       sendEmailAppConnHooks.foreach(_.preGenerate(requestRef))
       val email = emailGenerator.generateEmail(requestRef)
-      emailContentParsers.foreach{
-        p => Utils.tryQuietly(p.parse(email))
-      }
+      emailContentParsers.foreach(_.parse(email))
       emailContentGenerators.foreach{
         g => Utils.tryQuietly(g.generate(email))
       }

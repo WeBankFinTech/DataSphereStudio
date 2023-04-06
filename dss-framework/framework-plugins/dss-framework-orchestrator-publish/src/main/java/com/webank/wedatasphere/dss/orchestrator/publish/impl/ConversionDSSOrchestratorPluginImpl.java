@@ -18,14 +18,13 @@ package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.workflow.DefaultWorkFlowManager;
-import org.apache.linkis.DataWorkCloudApplication;
 import org.apache.linkis.rpc.Sender;
 
 import java.util.List;
@@ -49,8 +48,7 @@ public class ConversionDSSOrchestratorPluginImpl extends AbstractDSSOrchestrator
         requestConvertOrchestrator.setApprovalId(approvalId);
         requestConvertOrchestrator.setDSSLabels(dssLabels);
         requestConvertOrchestrator.setUserName(userName);
-        DefaultWorkFlowManager workFlowManager = DataWorkCloudApplication.getApplicationContext().getBean(DefaultWorkFlowManager.class);
-        return workFlowManager.convertWorkflow(requestConvertOrchestrator);
-
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
+        return RpcAskUtils.processAskException(sender.ask(requestConvertOrchestrator), ResponseOperateOrchestrator.class, RequestConvertOrchestrations.class);
     }
 }

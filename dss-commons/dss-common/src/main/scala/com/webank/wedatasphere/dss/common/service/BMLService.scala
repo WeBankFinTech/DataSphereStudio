@@ -14,16 +14,15 @@
  *
  */
 
-package com.webank.wedatasphere.dss.bmlservice.service
+package com.webank.wedatasphere.dss.common.service
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.utils.IoUtils
 import org.apache.commons.io.IOUtils
-import org.apache.linkis.common.utils.{JavaLog, Utils}
-import org.springframework.stereotype.Component
 import org.apache.linkis.bml.client.{BmlClient, BmlClientFactory}
 import org.apache.linkis.bml.protocol.{BmlDownloadResponse, BmlUpdateResponse, BmlUploadResponse}
+import org.apache.linkis.common.utils.{JavaLog, Utils}
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.util

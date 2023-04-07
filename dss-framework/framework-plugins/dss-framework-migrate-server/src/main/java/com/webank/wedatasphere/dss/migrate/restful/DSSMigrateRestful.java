@@ -15,7 +15,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
@@ -37,7 +37,6 @@ import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseQueryWorkflo
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
-import io.protostuff.Rpc;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.common.exception.LinkisException;
@@ -51,6 +50,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -84,12 +84,14 @@ public class DSSMigrateRestful {
     @Autowired
     private DSSFrameworkProjectService dssFrameworkProjectService;
     @Autowired
+    @Qualifier("projectBmlService")
     BMLService bmlService;
     @Autowired
     private MetaService metaService;
 
     // todo only dev开发中心
     private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
+    private Sender workflowSender = Sender.getSender(MigrateConf.WORKFLOW_SERVER_NAME);
 
 
     @PostMapping("/importOldDSSProject")
@@ -559,7 +561,7 @@ public class DSSMigrateRestful {
 
     private String getLatestFlowBmlVersion(String username, long flowId) {
         RequestQueryWorkFlow requestQueryWorkFlow = new RequestQueryWorkFlow(username, flowId);
-        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(orchestratorSender.ask(requestQueryWorkFlow),
+        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(workflowSender.ask(requestQueryWorkFlow),
                 ResponseQueryWorkflow.class, RequestQueryWorkFlow.class);
         if (null != responseQueryWorkflow && null != responseQueryWorkflow.getDssFlow()) {
             return responseQueryWorkflow.getDssFlow().getBmlVersion();

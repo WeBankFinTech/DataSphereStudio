@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -46,9 +48,11 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator) {
+        //获取用户创建时间
+        DSSWorkspaceUser workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(String.valueOf(workspaceId), userName, null).stream().findFirst().get();
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
         roles.forEach(role ->{
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, role, userName, creator, 0L);
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId, role, workspaceUsers.getJoinTime(), userName, workspaceUsers.getCreator(), 0L, creator);
         });
     }
 

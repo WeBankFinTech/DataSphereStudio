@@ -149,7 +149,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         //保存 - 保存用户角色关系 dss_workspace_user_role
         for (Integer roleId : roleIds) {
-            dssWorkspaceUserMapper.setUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, userName, creator, userId == null ? null : Long.parseLong(userId));
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), creator);
         }
     }
 
@@ -234,30 +234,21 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
                                                       String roleName, int pageNow, int pageSize, List<Long> total) {
-        int roleId = -1;
-        if (StringUtils.isNotEmpty(roleName)) {
-            roleId = workspaceDBHelper.getRoleIdByName(roleName);
-        }
+        int roleId = workspaceDBHelper.getRoleIdByName(roleName);
         PageHelper.startPage(pageNow, pageSize);
-        List<DSSWorkspaceUser> workspaceUsers = new ArrayList<>();
-        try {
-            workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, username);
-        } finally {
-            //PageHelper.clearPage();
-        }
+        List<DSSWorkspaceUser> workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, username, String.valueOf(roleId));
         PageInfo<DSSWorkspaceUser> pageInfo = new PageInfo<>(workspaceUsers);
         total.add(pageInfo.getTotal());
-        List<DSSWorkspaceUserVO> dssWorkspaceUserVOs = new ArrayList<>();
-        for (DSSWorkspaceUser workspaceUser : workspaceUsers) {
-            List<Integer> roles = dssWorkspaceUserMapper.getRoleInWorkspace(Integer.parseInt(workspaceId), workspaceUser.getUsername());
-            dssWorkspaceUserVOs.add(changeToUserVO(workspaceUser, roles));
-        }
-        return dssWorkspaceUserVOs;
+        return workspaceUsers.stream().map(
+                        workspaceUser -> changeToUserVO(workspaceUser,
+                                Arrays.stream(workspaceUser.getRoleIds().split(",")).map(Integer::valueOf).collect(Collectors.toList())))
+                .collect(Collectors.toList());
     }
+
     @Override
     public List<String> getWorkspaceUsers(String workspaceId) {
         return
-                dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, null).stream()
+                dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, null, null).stream()
                         .map(DSSWorkspaceUser::getUsername).collect(Collectors.toList());
     }
 

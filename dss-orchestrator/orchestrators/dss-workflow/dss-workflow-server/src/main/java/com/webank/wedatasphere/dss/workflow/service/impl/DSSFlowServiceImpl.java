@@ -54,7 +54,7 @@ import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.collections.CollectionUtils;
@@ -69,6 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,6 +97,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Autowired
     private NodeParser nodeParser;
     @Autowired
+    @Qualifier("workflowBmlService")
     private BMLService bmlService;
     @Autowired
     private NodeExportService nodeExportService;

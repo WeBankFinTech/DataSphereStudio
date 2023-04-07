@@ -22,7 +22,17 @@ public class DSSSenderServiceConf {
     public static final CommonVars<String> ORCHESTRATOR_SERVER_DEV_NAME =
             CommonVars.apply("wds.dss.orc.server.dev.name", "DSS-Framework-Orchestrator-Server-Dev");
 
+    public static final CommonVars<String> DSS_WORKFLOW_APPLICATION_NAME_DEV =
+            CommonVars.apply("wds.dss.workflow.name.dev", "dss-workflow-server-dev");
+
     public static final CommonVars<String> PROJECT_SERVER_NAME =
             CommonVars.apply("wds.dss.project.sever.name", "dss-framework-project-server");
+
+    public static final CommonVars<String> DSS_SERVER_NAME =
+            CommonVars.apply("wds.dss.sever.name.dev", "dss-server-dev");
+
+    //以服务合并后方式启动服务需要开启该参数，回退到老方式启动则需要关闭该参数
+    public static final CommonVars<Boolean> USE_DSS_SENDER =
+            CommonVars.apply("wds.dss.server.use.dssSender", true);
 
 }

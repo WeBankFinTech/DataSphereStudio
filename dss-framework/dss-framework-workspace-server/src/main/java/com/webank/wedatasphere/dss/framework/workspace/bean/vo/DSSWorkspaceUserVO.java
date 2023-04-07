@@ -30,11 +30,27 @@ public class DSSWorkspaceUserVO extends AbstractDSSVO{
     private String office;
     private String creator;
     private Date joinTime;
+    private Date updateTime;
+    private String updateUser;
 
     public DSSWorkspaceUserVO() {
     }
 
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
 
     public int getId() {
         return id;

@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
+import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -35,6 +36,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf;
@@ -49,10 +51,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.common.utils.ByteTimeUtils;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.manager.label.builder.factory.LabelBuilderFactoryContext;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -163,6 +165,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         job.setId(generateId());
         LOGGER.info("user {} try to submit a conversion job {}, the orchestrationIdMap is {}, the orcIdList is {}.", requestConversionOrchestration.getUserName(),
                 job.getId(), orchestrationIdMap, publishedOrcIds);
+
         ConversionJobEntity entity = new ConversionJobEntity();
         entity.setResponse(ResponseOperateOrchestrator.inited());
         entity.setCreateTime(new Date());
@@ -177,11 +180,20 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         job.setConversionJobEntity(entity);
         job.setConversionDSSOrchestratorPlugins(dssOrchestratorContext.getOrchestratorPlugins());
         job.afterConversion(response -> this.updateDBAfterConversion(toPublishOrcId, response, job.getConversionJobEntity(), requestConversionOrchestration));
+
+        OrchestratorPublishJob orchestratorPublishJob = new OrchestratorPublishJob();
+        orchestratorPublishJob.setJobId(job.getId());
+        orchestratorPublishJob.setStatus(JobStatus.Inited.getIndex());
+        orchestratorPublishJob.setInstanceName(Sender.getThisInstance());
+        orchestratorPublishJob.setCreatedTime(new Date(System.currentTimeMillis()));
+        orchestratorPublishJob.setUpdatedTime(new Date(System.currentTimeMillis()));
+        orchestratorPublishJob.setConversionJobJson(job.toString());
+
+        orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
         //submit it
         releaseThreadPool.submit(job);
         DSSOrchestratorConstant.orchestratorConversionJobMap.put(job.getId(), job);
         LOGGER.info("publish orchestrator success. publishedOrcIds:{} ",publishedOrcIds);
-        // todo insert publishJob
         return new ResponseConvertOrchestrator(job.getId(), entity.getResponse());
     }
 
@@ -276,12 +288,21 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Override
     public ResponseConvertOrchestrator getConvertOrchestrationStatus(String id) {
+        String jobId;
+        ResponseOperateOrchestrator responseOperateOrchestrator = new ResponseOperateOrchestrator();
         OrchestratorConversionJob job = DSSOrchestratorConstant.orchestratorConversionJobMap.get(id);
-        // todo 找不到从db加载
-        if(job.getConversionJobEntity().getResponse().isCompleted()) {
-            DSSOrchestratorConstant.orchestratorConversionJobMap.remove(job.getId());
+        if (job != null) {
+            jobId = job.getId();
+            responseOperateOrchestrator.setJobStatus(job.getConversionJobEntity().getResponse().getJobStatus());
+            if (job.getConversionJobEntity().getResponse().isCompleted()) {
+                DSSOrchestratorConstant.orchestratorConversionJobMap.remove(job.getId());
+            }
+        } else {
+            OrchestratorPublishJob publishJob = orchestratorJobMapper.getPublishJobByJobId(id);
+            jobId = publishJob.getJobId();
+            responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByIndex(publishJob.getStatus()));
         }
-        return new ResponseConvertOrchestrator(job.getId(), job.getConversionJobEntity().getResponse());
+        return new ResponseConvertOrchestrator(jobId, responseOperateOrchestrator);
     }
 
     private String generateId() {

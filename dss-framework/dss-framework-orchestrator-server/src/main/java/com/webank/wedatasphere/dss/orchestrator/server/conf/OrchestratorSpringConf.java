@@ -45,9 +45,22 @@ public class OrchestratorSpringConf {
     }
 
     @Bean
-    public String getCron() {
+    public String getBatchClearCsTaskCron() {
         return OrchestratorConf.DSS_CS_CLEAR_CRON.getValue();
     }
 
+    @Bean
+    public String getCheckOrchestratorConversionJobTaskCron() {
+
+        Integer value = OrchestratorConf.DSS_ORCHESTRATOR_CONVERT_PERIOD.getValue();
+
+        if (value < 60) {
+            return "0/" + value + " * * * * ?";
+        } else if (value < 3600) {
+            return "0 0/" + value / 60 + " * * * ?";
+        } else {
+            return "0 0 0/1 * * ?";
+        }
+    }
 
 }

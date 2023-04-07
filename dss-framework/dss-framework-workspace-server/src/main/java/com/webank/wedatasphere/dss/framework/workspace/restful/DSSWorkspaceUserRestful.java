@@ -79,20 +79,11 @@ public class DSSWorkspaceUserRestful {
             //默认改成20
             pageSize = 20;
         }
-        if (StringUtils.isNotEmpty(roleName)) {
-            //如果roleName不是空的话，就按照roleName来吧
-            List<Long> totals = new ArrayList<>();
-            List<DSSWorkspaceUserVO> workspaceUsers =
-                    dssWorkspaceService.getWorkspaceUsersByRole(Integer.parseInt(workspaceId), roleName, totals, pageNow, pageSize);
-            List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
-            return Message.ok().data("roles", dssRoles).data("workspaceUsers", workspaceUsers).data("total", totals.get(0));
-        } else {
-            List<Long> totals = new ArrayList<>();
-            List<DSSWorkspaceUserVO> workspaceUsers =
-                    dssWorkspaceService.getWorkspaceUsers(workspaceId, department, username, roleName, pageNow, pageSize, totals);
-            List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
-            return Message.ok().data("roles", dssRoles).data("workspaceUsers", workspaceUsers).data("total", totals.get(0));
-        }
+        List<Long> totals = new ArrayList<>();
+        List<DSSWorkspaceUserVO> workspaceUsers =
+                dssWorkspaceService.getWorkspaceUsers(workspaceId, department, username, roleName, pageNow, pageSize, totals);
+        List<DSSWorkspaceRoleVO> dssRoles = workspaceDBHelper.getRoleVOs(Integer.parseInt(workspaceId));
+        return Message.ok().data("roles", dssRoles).data("workspaceUsers", workspaceUsers).data("total", totals.get(0));
     }
 
     @RequestMapping(path = "getAllWorkspaceUsers", method = RequestMethod.GET)

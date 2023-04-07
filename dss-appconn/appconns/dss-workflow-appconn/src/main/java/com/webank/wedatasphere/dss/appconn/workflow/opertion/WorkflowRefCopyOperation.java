@@ -16,16 +16,16 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
-import com.webank.wedatasphere.dss.appconn.workflow.utils.Utils;
-import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.impl.ThirdlyRequestRef;
-import com.webank.wedatasphere.dss.workflow.DefaultWorkFlowManager;
-import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-import org.apache.linkis.DataWorkCloudApplication;
+import com.webank.wedatasphere.dss.workflow.common.protocol.RequestCopyWorkflow;
+import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseCopyWorkflow;
+import org.apache.linkis.rpc.Sender;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +35,8 @@ import java.util.Optional;
 public class WorkflowRefCopyOperation
         extends AbstractDevelopmentOperation<ThirdlyRequestRef.CopyWitContextRequestRefImpl, RefJobContentResponseRef>
         implements RefCopyOperation<ThirdlyRequestRef.CopyWitContextRequestRefImpl> {
+
+    private final Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
     @Override
     public RefJobContentResponseRef copyRef(ThirdlyRequestRef.CopyWitContextRequestRefImpl workflowCopyRequestRef) {
@@ -48,17 +50,15 @@ public class WorkflowRefCopyOperation
         Long targetProjectId = workflowCopyRequestRef.getRefProjectId();
         Optional<Object> nodeSuffix = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NODE_SUFFIX));
         Optional<Object> newFlowName = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NAME));
-        DSSFlow dssFlow;
-        try {
-            dssFlow = Utils.getDefaultWorkflowManager().copyRootFlowWithSubFlows(userName, appId, workflowCopyRequestRef.getWorkspace(),
-                    projectName, contextIdStr, version, description, workflowCopyRequestRef.getDSSLabels(),
-                    (String) nodeSuffix.orElse(null), (String) newFlowName.orElse(null), targetProjectId);
-        } catch (Exception e) {
-            throw new DSSRuntimeException(16001, "调用workflowManager复制workflow出现异常！", e);
-        }
+        RequestCopyWorkflow requestCopyWorkflow = new RequestCopyWorkflow(userName,
+                workflowCopyRequestRef.getWorkspace(), appId, contextIdStr,
+                projectName, version, description, workflowCopyRequestRef.getDSSLabels(),
+                targetProjectId, (String) nodeSuffix.orElse(null), (String) newFlowName.orElse(null));
+        ResponseCopyWorkflow responseCopyWorkflow = RpcAskUtils.processAskException(sender.ask(requestCopyWorkflow),
+                ResponseCopyWorkflow.class, RequestCopyWorkflow.class);
         Map<String, Object> refJobContent = new HashMap<>(2);
-        refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, dssFlow.getId());
-        refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, dssFlow.getFlowJson());
+        refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCopyWorkflow.getDssFlow().getId());
+        refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, responseCopyWorkflow.getDssFlow().getFlowJson());
         return RefJobContentResponseRef.newBuilder().setRefJobContent(refJobContent).success();
     }
 }

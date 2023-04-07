@@ -111,6 +111,18 @@
       </includes>
     </fileSet>
 
+    <!--dss-server-->
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-server/target/out/dss-server/lib/
+      </directory>
+      <outputDirectory>lib/dss-server/</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+
     <!--dss-datachecker-appconn-->
     <fileSet>
       <directory>

@@ -29,7 +29,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrc
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestratorPlugin;
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
@@ -75,6 +75,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     @Autowired
     private OrchestratorMapper orchestratorMapper;
     @Autowired
+    @Qualifier("orchestratorBmlService")
     private BMLService bmlService;
     @Autowired
     private ContextService contextService;

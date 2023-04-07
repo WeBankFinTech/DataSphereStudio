@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
@@ -9,6 +9,7 @@ import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlu
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -21,6 +22,7 @@ public class OrchestratorCopyEnv {
     private OrchestratorMapper orchestratorMapper;
 
     @Autowired
+    @Qualifier("orchestratorBmlService")
     private BMLService bmlService;
 
     @Autowired

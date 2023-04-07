@@ -16,7 +16,7 @@ public class BatchClearCsTask {
     @Autowired
     private OrchestratorService  orchestratorService;
 
-    @Scheduled(cron = "#{@getCron}")
+    @Scheduled(cron = "#{@getBatchClearCsTaskCron}")
     public void batchClearCsTask(){
         orchestratorService.batchClearContextId();
 

@@ -30,14 +30,37 @@ public enum JobStatus {
     private String status;
     private int index;
 
-    private JobStatus(String status, int index){
+    JobStatus(String status, int index){
         this.status = status;
         this.index = index;
     }
 
-    public static boolean isSuccess(String status){
-        return Success.status.equals(status);
+    public static JobStatus getJobStatusByIndex(Integer index) {
+        if (JobStatus.Inited.getIndex() == index) {
+            return JobStatus.Inited;
+        } else if (JobStatus.Running.getIndex() == index) {
+            return JobStatus.Running;
+        } else if (JobStatus.Success.getIndex() == index) {
+            return JobStatus.Success;
+        } else {
+            return JobStatus.Failed;
+        }
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
 }

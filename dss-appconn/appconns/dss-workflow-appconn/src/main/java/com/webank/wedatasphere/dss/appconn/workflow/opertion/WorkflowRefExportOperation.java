@@ -16,9 +16,6 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
-import com.webank.wedatasphere.dss.appconn.workflow.utils.Utils;
-import com.webank.wedatasphere.dss.common.entity.BmlResource;
-import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.protocol.RequestExportWorkflow;
 import com.webank.wedatasphere.dss.common.protocol.ResponseExportWorkflow;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
@@ -46,16 +43,18 @@ public class WorkflowRefExportOperation
         long flowId = (long) requestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);
         Long projectId = requestRef.getRefProjectId();
         String projectName = requestRef.getProjectName();
-        BmlResource bmlResource;
-        try {
-            bmlResource = Utils.getDefaultWorkflowManager().exportWorkflow(userName, flowId, projectId, projectName,
-                    requestRef.getWorkspace(), requestRef.getDSSLabels());
-        } catch (Exception e) {
-            throw new DSSRuntimeException(16004, "调用workflowManager导出workflow出现异常！", e);
-        }
+        RequestExportWorkflow requestExportWorkflow = new RequestExportWorkflow(userName,
+                flowId,
+                projectId,
+                projectName,
+                toJson(requestRef.getWorkspace()),
+                requestRef.getDSSLabels());
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
+        ResponseExportWorkflow responseExportWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
+                ResponseExportWorkflow.class, RequestExportWorkflow.class);
         Map<String, Object> resourceMap = new HashMap<>(2);
-        resourceMap.put(ImportRequestRef.RESOURCE_ID_KEY, bmlResource.getResourceId());
-        resourceMap.put(ImportRequestRef.RESOURCE_VERSION_KEY, bmlResource.getVersion());
+        resourceMap.put(ImportRequestRef.RESOURCE_ID_KEY, responseExportWorkflow.resourceId());
+        resourceMap.put(ImportRequestRef.RESOURCE_VERSION_KEY, responseExportWorkflow.version());
         return ExportResponseRef.newBuilder().setResourceMap(resourceMap).success();
     }
 

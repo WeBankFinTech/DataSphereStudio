@@ -11,7 +11,7 @@ import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.migrate.conf.MigrateConf;
@@ -32,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -56,6 +57,7 @@ public class MigrateServiceImpl implements MigrateService {
     DSSFrameworkProjectService dssFrameworkProjectService;
 
     @Autowired
+    @Qualifier("projectBmlService")
     BMLService bmlService;
 
     private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);

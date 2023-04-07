@@ -27,7 +27,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.bmlservice.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectUserUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -48,6 +48,7 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
     @Autowired
     private DSSProjectUserMapper projectUserMapper;
     @Autowired
+    @Qualifier("projectBmlService")
     private BMLService bmlService;
     @Autowired
     private DSSProjectMapper dssProjectMapper;

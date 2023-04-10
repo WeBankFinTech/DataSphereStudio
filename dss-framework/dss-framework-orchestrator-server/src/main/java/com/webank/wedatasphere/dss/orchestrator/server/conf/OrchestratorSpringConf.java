@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.conf;
 
 import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.common.utils.AssembleCronUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -51,16 +52,8 @@ public class OrchestratorSpringConf {
 
     @Bean
     public String getCheckOrchestratorConversionJobTaskCron() {
-
-        Integer value = OrchestratorConf.DSS_ORCHESTRATOR_CONVERT_PERIOD.getValue();
-
-        if (value < 60) {
-            return "0/" + value + " * * * * ?";
-        } else if (value < 3600) {
-            return "0 0/" + value / 60 + " * * * ?";
-        } else {
-            return "0 0 0/1 * * ?";
-        }
+        Integer value = OrchestratorConf.DSS_CONVERT_ORCHESTRATOR_PERIOD.getValue();
+        return AssembleCronUtils.getCron(value);
     }
 
 }

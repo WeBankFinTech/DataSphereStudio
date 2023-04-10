@@ -37,4 +37,6 @@ public class DSSCommonConf {
 
     public static final CommonVars<String> GLOBAL_LIMIT_PREFIX = CommonVars.apply("wds.dss.global.limit.prefix", "wds.dss.global.limit.");
 
+    public static final CommonVars<Integer> DSS_INSTANCE_NUMBERS = CommonVars.apply("wds.dss.instance.numbers", 2);
+
 }

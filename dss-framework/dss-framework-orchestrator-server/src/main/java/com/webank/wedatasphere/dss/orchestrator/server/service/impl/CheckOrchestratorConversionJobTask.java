@@ -28,7 +28,7 @@ public class CheckOrchestratorConversionJobTask {
 
     List<OrchestratorPublishJob> failedJobs;
 
-    @Scheduled(cron = "#{@getCheckOrchestratorConversionJobTaskCron}")
+    @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkOrchestratorConversionJob() {
 
         ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.DSS_SERVER_NAME.getValue());

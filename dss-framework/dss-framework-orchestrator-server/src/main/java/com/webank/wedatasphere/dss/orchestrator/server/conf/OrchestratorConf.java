@@ -27,6 +27,6 @@ public class OrchestratorConf {
     /**
      * check orchestrator convert job period, The value can only be between 0 and 59 inclusive, or a multiple of 60 and its unit is 's'.
      */
-    public static final CommonVars<Integer> DSS_ORCHESTRATOR_CONVERT_PERIOD = CommonVars.apply("wds.dss.server.scheduling.orchestrator.convert.period", 60);
+    public static final CommonVars<Integer> DSS_CONVERT_ORCHESTRATOR_PERIOD = CommonVars.apply("wds.dss.check.convert.orchestrator.period", 60);
 
 }

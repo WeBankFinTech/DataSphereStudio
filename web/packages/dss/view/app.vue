@@ -71,7 +71,7 @@ export default {
             releaseNote: res.releaseNote
           }
         }
-        this.updateVersion = res.version
+        this.releaseNoteUrl = res.releaseNoteUrl
       })
     }),
     eventbus.on('watermark.refresh', () => {
@@ -108,7 +108,7 @@ export default {
       location.reload()
     },
     handleCancel() {
-      if (this.updateVersion) window.open(`_book/动态与公告/v${this.updateVersion}.html`, '_blank')
+      if (this.releaseNoteUrl) window.open(this.releaseNoteUrl, '_blank')
     },
     goItem(item) {
       // url类型: 0-内部系统（直接跳转），1-外部系统（新tab打开）

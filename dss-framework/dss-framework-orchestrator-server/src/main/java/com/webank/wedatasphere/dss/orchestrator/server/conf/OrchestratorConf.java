@@ -24,9 +24,5 @@ public class OrchestratorConf {
     public static final CommonVars<Integer> DSS_PUBLISH_MAX_VERSION = CommonVars.apply("wds.dss.publish.max.remain.version", 30);
     public static final CommonVars<String> DSS_CS_CLEAR_ENV = CommonVars.apply("wds.dss.server.cs.clear.env", "DEV");
     public static final  CommonVars<String> DSS_CS_CLEAR_CRON = CommonVars.apply("wds.dss.server.scheduling.clear.cs.cron", "");
-    /**
-     * check orchestrator convert job period, The value can only be between 0 and 59 inclusive, or a multiple of 60 and its unit is 's'.
-     */
-    public static final CommonVars<Integer> DSS_CONVERT_ORCHESTRATOR_PERIOD = CommonVars.apply("wds.dss.check.convert.orchestrator.period", 60);
 
 }

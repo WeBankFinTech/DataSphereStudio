@@ -585,7 +585,7 @@ export default {
       }
     },
     async handleTbInput(val, cb) {
-      const activeTB = find(this.activeDB.children, (o) => o.value === val);
+      const activeTB = find(this.activeDB.children, (o) => o.value.toLowerCase() === val.toLowerCase());
       if (!activeTB) {
         this.resetPartition();
         return cb();

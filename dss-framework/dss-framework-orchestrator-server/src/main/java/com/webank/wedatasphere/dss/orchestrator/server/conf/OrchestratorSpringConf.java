@@ -50,10 +50,4 @@ public class OrchestratorSpringConf {
         return OrchestratorConf.DSS_CS_CLEAR_CRON.getValue();
     }
 
-    @Bean
-    public String getCheckOrchestratorConversionJobTaskCron() {
-        Integer value = OrchestratorConf.DSS_CONVERT_ORCHESTRATOR_PERIOD.getValue();
-        return AssembleCronUtils.getCron(value);
-    }
-
 }

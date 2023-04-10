@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
+import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
@@ -29,10 +30,9 @@ public class CheckOrchestratorConversionJobTask {
 
     @Scheduled(cron = "#{@getCheckOrchestratorConversionJobTaskCron}")
     public void checkOrchestratorConversionJob() {
-        //TODO 修改PROJECT_SERVER_NAME到对应的值
-        ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.PROJECT_SERVER_NAME.getValue());
-        //TODO 节点数也要从配置文件中拿
-        if (allActionInstances.length == 2){
+
+        ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.DSS_SERVER_NAME.getValue());
+        if (allActionInstances.length == DSSCommonConf.DSS_INSTANCE_NUMBERS.getValue()){
          return;
         }
 

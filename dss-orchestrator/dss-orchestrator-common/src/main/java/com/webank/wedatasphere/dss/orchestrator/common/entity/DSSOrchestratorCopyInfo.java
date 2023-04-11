@@ -33,9 +33,11 @@ public class DSSOrchestratorCopyInfo {
     private String exceptionInfo;
 
     /**
-     * 复制任务最终状态，1成功，0失败
+     * 复制任务最终状态,0失败，1成功
      */
     private Integer status;
+
+    private String instanceName;
 
     /**
      * 当前编排是否在被复制，1有，0没有
@@ -67,7 +69,7 @@ public class DSSOrchestratorCopyInfo {
     public DSSOrchestratorCopyInfo(String id, String username, String type, Long workspaceId, Long sourceOrchestratorId,
                                    String sourceOrchestratorName, String targetOrchestratorName,
                                    String sourceProjectName, String targetProjectName, String workflowNodeSuffix,
-                                   String microserverName, Integer isCopying, Date startTime, Date endTime) {
+                                   String microserverName, Integer isCopying, Date startTime, Date endTime, String instanceName) {
         this.id = id;
         this.username = username;
         this.type = type;
@@ -82,6 +84,7 @@ public class DSSOrchestratorCopyInfo {
         this.isCopying = isCopying;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.instanceName = instanceName;
     }
 
     public String getId() {
@@ -188,6 +191,14 @@ public class DSSOrchestratorCopyInfo {
         this.status = status;
     }
 
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
+    }
+
     public Integer getIsCopying() {
         return isCopying;
     }
@@ -223,11 +234,11 @@ public class DSSOrchestratorCopyInfo {
     @Override
     public String toString() {
         return "DSSOrchestratorCopyInfo{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", username='" + username + '\'' +
                 ", type='" + type + '\'' +
-                ", workspaceId='" + workspaceId + '\'' +
-                ", sourceOrchestratorId='" + sourceOrchestratorId + '\'' +
+                ", workspaceId=" + workspaceId +
+                ", sourceOrchestratorId=" + sourceOrchestratorId +
                 ", sourceOrchestratorName='" + sourceOrchestratorName + '\'' +
                 ", targetOrchestratorName='" + targetOrchestratorName + '\'' +
                 ", sourceProjectName='" + sourceProjectName + '\'' +
@@ -235,7 +246,8 @@ public class DSSOrchestratorCopyInfo {
                 ", workflowNodeSuffix='" + workflowNodeSuffix + '\'' +
                 ", microserverName='" + microserverName + '\'' +
                 ", exceptionInfo='" + exceptionInfo + '\'' +
-                ", status=" + status +
+                ", status='" + status + '\'' +
+                ", instanceName='" + instanceName + '\'' +
                 ", isCopying=" + isCopying +
                 ", successNode=" + successNode +
                 ", startTime=" + startTime +

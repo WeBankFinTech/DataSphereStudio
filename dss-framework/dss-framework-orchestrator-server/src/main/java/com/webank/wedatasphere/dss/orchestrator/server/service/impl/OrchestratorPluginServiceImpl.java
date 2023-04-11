@@ -183,10 +183,10 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
         OrchestratorPublishJob orchestratorPublishJob = new OrchestratorPublishJob();
         orchestratorPublishJob.setJobId(job.getId());
-        orchestratorPublishJob.setStatus(JobStatus.Inited.getIndex());
+        orchestratorPublishJob.setStatus(JobStatus.Inited.getStatus());
         orchestratorPublishJob.setInstanceName(Sender.getThisInstance());
-        orchestratorPublishJob.setCreatedTime(new Date(System.currentTimeMillis()));
-        orchestratorPublishJob.setUpdatedTime(new Date(System.currentTimeMillis()));
+        orchestratorPublishJob.setCreateTime(new Date(System.currentTimeMillis()));
+        orchestratorPublishJob.setUpdateTime(new Date(System.currentTimeMillis()));
         orchestratorPublishJob.setConversionJobJson(job.toString());
 
         orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
@@ -300,7 +300,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         } else {
             OrchestratorPublishJob publishJob = orchestratorJobMapper.getPublishJobByJobId(id);
             jobId = publishJob.getJobId();
-            responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByIndex(publishJob.getStatus()));
+            responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByStatus(publishJob.getStatus()));
         }
         return new ResponseConvertOrchestrator(jobId, responseOperateOrchestrator);
     }

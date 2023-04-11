@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.common.protocol;
 
+import java.util.Objects;
+
 public enum JobStatus {
 
     /**
@@ -35,12 +37,12 @@ public enum JobStatus {
         this.index = index;
     }
 
-    public static JobStatus getJobStatusByIndex(Integer index) {
-        if (JobStatus.Inited.getIndex() == index) {
+    public static JobStatus getJobStatusByStatus(String status) {
+        if (JobStatus.Inited.getStatus().equals(status)) {
             return JobStatus.Inited;
-        } else if (JobStatus.Running.getIndex() == index) {
+        } else if (JobStatus.Running.getStatus().equals(status)) {
             return JobStatus.Running;
-        } else if (JobStatus.Success.getIndex() == index) {
+        } else if (JobStatus.Success.getStatus().equals(status)) {
             return JobStatus.Success;
         } else {
             return JobStatus.Failed;

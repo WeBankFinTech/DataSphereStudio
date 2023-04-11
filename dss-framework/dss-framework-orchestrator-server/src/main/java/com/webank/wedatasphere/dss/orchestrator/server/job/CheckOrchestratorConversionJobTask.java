@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
+package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;

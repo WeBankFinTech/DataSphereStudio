@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
+package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import org.springframework.beans.factory.annotation.Autowired;

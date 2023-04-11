@@ -21,6 +21,7 @@ public class OrchestratorCopyVo implements Serializable {
     private final DSSLabel dssLabel;
     private final Workspace workspace;
     private final Long copyTaskId;
+    private final String instanceName;
 
     private OrchestratorCopyVo(Builder builder) {
         this.username = builder.username;
@@ -34,6 +35,7 @@ public class OrchestratorCopyVo implements Serializable {
         this.dssLabel = builder.dssLabel;
         this.workspace = builder.workspace;
         this.copyTaskId = builder.copyTaskId;
+        this.instanceName = builder.instanceName;
     }
 
 
@@ -50,10 +52,11 @@ public class OrchestratorCopyVo implements Serializable {
         private final DSSLabel dssLabel;
         private final Workspace workspace;
         private Long copyTaskId;
+        private final String instanceName;
 
         public Builder(String username, Long sourceProjectId, String sourceProjectName, Long targetProjectId,
                        String targetProjectName, DSSOrchestratorInfo orchestrator, String targetOrchestratorName,
-                       String workflowNodeSuffix, DSSLabel dssLabel, Workspace workspace) {
+                       String workflowNodeSuffix, DSSLabel dssLabel, Workspace workspace, String instanceName) {
             this.username = username;
             this.sourceProjectId = sourceProjectId;
             this.sourceProjectName = sourceProjectName;
@@ -64,6 +67,7 @@ public class OrchestratorCopyVo implements Serializable {
             this.workflowNodeSuffix = workflowNodeSuffix;
             this.dssLabel = dssLabel;
             this.workspace = workspace;
+            this.instanceName = instanceName;
         }
 
         public Builder setCopyTaskId(Long copyTaskId){
@@ -120,5 +124,8 @@ public class OrchestratorCopyVo implements Serializable {
         return copyTaskId;
     }
 
+    public String getInstanceName() {
+        return instanceName;
+    }
 }
 

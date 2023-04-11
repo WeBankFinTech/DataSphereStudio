@@ -1,9 +1,8 @@
-package com.webank.wedatasphere.dss.flow.execution.entrance.job;
+package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
-import com.webank.wedatasphere.dss.common.protocol.JobStatus;
-import com.webank.wedatasphere.dss.flow.execution.entrance.dao.TaskMapper;
-import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
+import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import org.apache.linkis.common.ServiceInstance;
 import org.apache.linkis.rpc.Sender;
@@ -17,40 +16,43 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Description monitor workflow execute job if active
+ * Description monitor orchestrator copy job if active
  */
 @Component
 @EnableScheduling
-public class CheckWorkflowExecuteTask {
+public class CheckOrchestratorCopyJobTask {
 
     @Autowired
-    private TaskMapper taskMapper;
+    private OrchestratorCopyJobMapper orchestratorCopyJobMapper;
 
-    List<WorkflowQueryTask> failedJobs;
+    List<DSSOrchestratorCopyInfo> failedJobs;
 
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
-    public void checkWorkflowExecuteTask() {
+    public void checkOrchestratorCopyJobTask() {
 
         ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.DSS_SERVER_NAME.getValue());
         if (allActionInstances.length == DSSCommonConf.DSS_INSTANCE_NUMBERS.getValue()){
             return;
         }
 
-        List<WorkflowQueryTask> maybeFailedJobs = taskMapper.search(null, null, Arrays.asList(JobStatus.Inited.getStatus(), JobStatus.Running.getStatus()), null, null, null, null, null);
+        List<DSSOrchestratorCopyInfo> maybeFailedJobs = orchestratorCopyJobMapper.getRunningJob();
 
         List<String> activeInstance = Arrays.stream(allActionInstances).map(ServiceInstance::getInstance).collect(Collectors.toList());
 
-        for (WorkflowQueryTask maybeFailedJob : maybeFailedJobs) {
-            if (!activeInstance.contains(maybeFailedJob.getInstance())) {
-                maybeFailedJob.setStatus(JobStatus.Failed.getStatus());
+        for (DSSOrchestratorCopyInfo maybeFailedJob : maybeFailedJobs) {
+            if (!activeInstance.contains(maybeFailedJob.getInstanceName())) {
+                maybeFailedJob.setStatus(0);
+                maybeFailedJob.setIsCopying(0);
+                maybeFailedJob.setExceptionInfo("Execute instance error, maybe the instance is hang up.");
                 failedJobs.add(maybeFailedJob);
             }
         }
 
-        // update execute job status to failed
-        taskMapper.batchUpdateTasks(failedJobs);
+        // update copy job status to failed
+        orchestratorCopyJobMapper.batchUpdateCopyJob(failedJobs);
 
         // send alter
 
     }
+
 }

@@ -56,6 +56,12 @@
         WHERE id = #{id}
     </update>
 
+    <update id="batchUpdateCopyJob">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE `dss_workflow_task` set status = #{item.status}, is_copying = #{item.isCopying}, exception_info = #{item.exceptionInfo} WHERE id = #{item.id}
+        </foreach>
+    </update>
+
     <select id="getOrchestratorCopyInfoList" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
         SELECT * FROM `dss_orchestrator_copy_info` WHERE source_orchestrator_id = #{orchestratorId} order by start_time desc
     </select>
@@ -66,6 +72,10 @@
 
     <select id="getOrchestratorCopyStatus" resultType="java.lang.String">
         SELECT id FROM `dss_orchestrator_copy_info` WHERE source_orchestrator_id = #{sourceOrchestratorId} AND is_copying = 1;
+    </select>
+
+    <select id="getRunningJob" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        SELECT * FROM `dss_orchestrator_copy_info` WHERE is_copying = 1;
     </select>
 
 </mapper>

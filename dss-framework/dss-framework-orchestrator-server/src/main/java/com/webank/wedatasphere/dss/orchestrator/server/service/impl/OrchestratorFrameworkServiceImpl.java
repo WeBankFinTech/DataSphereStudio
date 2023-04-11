@@ -70,6 +70,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.protocol.util.ImmutablePair;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -323,7 +324,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
                 targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
                 orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV),
-                workspace).setCopyTaskId(null).build();
+                workspace, Sender.getThisInstance()).setCopyTaskId(null).build();
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);
         orchestratorCopyJob.setOrchestratorCopyEnv(orchestratorCopyEnv);

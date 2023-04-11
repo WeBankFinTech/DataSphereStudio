@@ -19,22 +19,22 @@ public class CommonUpdateConvertJobStatus {
     public void updateConvertJobStatus(OrchestratorConversionJob orchestratorConversionJob) {
         LOGGER.info("Update convert orchestrator job status to {}", orchestratorConversionJob
                 .getConversionJobEntity().getOrchestratorPublishJob().getStatus());
-        orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob().setCreatedTime(new Date(System.currentTimeMillis()));
+        orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob().setCreateTime(new Date(System.currentTimeMillis()));
         orchestratorJobMapper.updatePublishJob(orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob());
     }
 
     public void toRunningStatus(OrchestratorConversionJob orchestratorConversionJob) {
-        orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob().setStatus(JobStatus.Running.getIndex());
+        orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob().setStatus(JobStatus.Running.getStatus());
         updateConvertJobStatus(orchestratorConversionJob);
     }
 
     public void toSuccessStatus(OrchestratorConversionJob orchestratorConversionJob) {
-        orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob().setStatus(JobStatus.Success.getIndex());
+        orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob().setStatus(JobStatus.Success.getStatus());
         updateConvertJobStatus(orchestratorConversionJob);
     }
 
     public void toFailedStatus(OrchestratorConversionJob orchestratorConversionJob) {
-        orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob().setStatus(JobStatus.Failed.getIndex());
+        orchestratorConversionJob.getConversionJobEntity().getOrchestratorPublishJob().setStatus(JobStatus.Failed.getStatus());
         updateConvertJobStatus(orchestratorConversionJob);
     }
 

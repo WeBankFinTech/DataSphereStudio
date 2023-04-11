@@ -52,7 +52,8 @@ public class SchedulisHttpUtils {
         SSOUrlBuilderOperation ssoUrlBuilderOperation = getSSORequestOperation(url, workspace);
         action.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
         HttpResult previewResult = ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, action);
-        if (previewResult.getStatusCode() == 200 || previewResult.getStatusCode() == 0) {
+        if (StringUtils.isNotBlank(previewResult.getResponseBody())
+                && (previewResult.getStatusCode() == 200 || previewResult.getStatusCode() == 0)  ) {
             return previewResult.getResponseBody();
         } else {
             logger.error("request Schedulis failed, responseBody is {}.", previewResult.getResponseBody());

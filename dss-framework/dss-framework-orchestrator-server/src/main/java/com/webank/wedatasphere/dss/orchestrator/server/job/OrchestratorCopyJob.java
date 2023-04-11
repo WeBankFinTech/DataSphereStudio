@@ -51,7 +51,7 @@ public class OrchestratorCopyJob implements Runnable {
         orchestratorCopyInfo = new DSSOrchestratorCopyInfo(orchestratorCopyInfo.getId(), orchestratorCopyVo.getUsername(), sourceOrchestrator.getType(), orchestratorCopyVo.getWorkspace().getWorkspaceId(),
                 sourceOrchestrator.getId(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(),
                 orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), orchestratorCopyVo.getWorkflowNodeSuffix(),
-                "Orchestrator server", 1, new Date(), new Date());
+                "Orchestrator server", 1, new Date(), new Date(), orchestratorCopyVo.getInstanceName());
         orchestratorCopyEnv.getOrchestratorCopyJobMapper().insertOrchestratorCopyInfo(orchestratorCopyInfo);
         DSSOrchestratorVersion latestOrcVersion = orchestratorCopyEnv.getOrchestratorMapper().getLatestOrchestratorVersionById(sourceOrchestrator.getId());
         Long appId = latestOrcVersion.getAppId();
@@ -84,7 +84,7 @@ public class OrchestratorCopyJob implements Runnable {
             orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateErrorMsgById(orchestratorCopyInfo);
             LOGGER.error("copy orc error: sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
                     orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(), e);
-            throw new RuntimeException("error happend when copying orc.", e);
+            throw new RuntimeException("error happened when copying orc.", e);
         }
         orchestratorCopyInfo.setIsCopying(0);
         orchestratorCopyInfo.setEndTime(new Date());

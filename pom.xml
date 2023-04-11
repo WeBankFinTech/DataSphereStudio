@@ -35,7 +35,6 @@
         <module>dss-apps/dss-scriptis-server</module>
         <module>dss-apps/dss-user-guide</module>
         <module>plugins/azkaban/linkis-jobtype</module>
-        <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>
         <module>plugins/dolphinscheduler</module>
     </modules>

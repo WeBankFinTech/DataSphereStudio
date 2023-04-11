@@ -112,6 +112,12 @@
         WHERE id =#{taskID}
     </update>
 
+    <update id="batchUpdateTasks" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE `dss_workflow_task` set status = #{item.status} WHERE id = #{item.id}
+        </foreach>
+    </update>
+
     <select id="selectTaskStatusForUpdate" resultType="java.lang.String">
         SELECT
         bdt.`status`

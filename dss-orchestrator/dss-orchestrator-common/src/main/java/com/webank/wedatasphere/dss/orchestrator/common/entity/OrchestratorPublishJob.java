@@ -10,7 +10,7 @@ public class OrchestratorPublishJob {
     private Date createTime;
     private Date updateTime;
     private String instanceName;
-    private Integer status;
+    private String status;
 
     public String getInstanceName() {
         return instanceName;
@@ -20,11 +20,11 @@ public class OrchestratorPublishJob {
         this.instanceName = instanceName;
     }
 
-    public Integer getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -54,21 +54,19 @@ public class OrchestratorPublishJob {
 		return this;
     }
 
-    public Date getCreatedTime() {
+    public Date getCreateTime() {
         return createTime;
     }
 
-    public OrchestratorPublishJob setCreatedTime(Date createdTime) {
-        this.createTime = createdTime;
-		return this;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public Date getUpdatedTime() {
+    public Date getUpdateTime() {
         return updateTime;
     }
 
-    public OrchestratorPublishJob setUpdatedTime(Date updatedTime) {
-        this.updateTime = updatedTime;
-        return this;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }

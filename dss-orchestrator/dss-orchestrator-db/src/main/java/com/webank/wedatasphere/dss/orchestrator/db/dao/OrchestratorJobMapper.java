@@ -12,7 +12,7 @@ public interface OrchestratorJobMapper {
 
     OrchestratorPublishJob getPublishJobByJobId(String jobId);
 
-    List<OrchestratorPublishJob> getPublishJobByJobStatuses(List<Integer> statuses);
+    List<OrchestratorPublishJob> getPublishJobByJobStatuses(List<String> statuses);
 
     long insertPublishJob(OrchestratorPublishJob job);
 

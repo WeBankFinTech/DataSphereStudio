@@ -38,7 +38,7 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
                                            multiContentEmail: MultiContentEmail): Unit = {
     getFirstLineRecord(emailContent).foreach { imageStr =>
       emailContent.getFileType match {
-        case "checkdata" =>
+        case "checkData" =>
           //对于邮件校验数据不进行处理
         case "pdf" =>
           val pdfUUID: String = UUID.randomUUID.toString

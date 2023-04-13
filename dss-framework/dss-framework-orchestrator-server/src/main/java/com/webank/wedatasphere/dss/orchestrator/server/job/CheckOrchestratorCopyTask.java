@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @EnableScheduling
-public class CheckOrchestratorCopyJobTask {
+public class CheckOrchestratorCopyTask {
 
     @Autowired
     private OrchestratorCopyJobMapper orchestratorCopyJobMapper;

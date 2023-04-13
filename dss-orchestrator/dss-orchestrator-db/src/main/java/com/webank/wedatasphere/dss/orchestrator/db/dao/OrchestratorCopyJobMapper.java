@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.orchestrator.db.dao;
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface OrchestratorCopyJobMapper {
 
     void updateErrorMsgById(DSSOrchestratorCopyInfo dssOrchestratorCopyInfo);
 
-    void batchUpdateCopyJob(List<DSSOrchestratorCopyInfo> dssOrchestratorCopyInfos);
+    void batchUpdateCopyJob(@Param("list") List<DSSOrchestratorCopyInfo> dssOrchestratorCopyInfos);
 
     DSSOrchestratorCopyInfo getOrchestratorCopyInfoById(String id);
 

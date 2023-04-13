@@ -24,10 +24,6 @@
         id, job_id, conversion_job_json, create_time, update_time, instance_name, status
     </sql>
 
-    <select id="getPublishJobById" resultMap="orchestrator_job_info_result_map">
-        SELECT * FROM `dss_orchestrator_job_info` WHERE id = #{id}
-    </select>
-
     <select id="getPublishJobByJobId" resultMap="orchestrator_job_info_result_map">
         SELECT * FROM `dss_orchestrator_job_info` WHERE job_id = #{jobId}
     </select>
@@ -61,16 +57,9 @@
 
     <update id="batchUpdatePublishJob" parameterType="java.util.List">
         <foreach collection="list" item="item" separator=";">
-        UPDATE dss_orchestrator_job_info set status = #{item.status} WHERE id = #{item.id}
+            UPDATE dss_orchestrator_job_info set status = #{item.status} WHERE id = #{item.id}
         </foreach>
     </update>
-
-    <delete id="deletePublishJob">
-        DELETE
-        FROM
-        dss_orchestrator_job_info
-        WHERE id = #{id}
-    </delete>
 
     <resultMap id="orchestrator_job_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">
         <result column="id" property="id" jdbcType="BIGINT"/>

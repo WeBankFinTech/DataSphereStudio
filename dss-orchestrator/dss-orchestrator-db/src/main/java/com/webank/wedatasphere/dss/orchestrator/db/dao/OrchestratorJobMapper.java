@@ -2,24 +2,21 @@ package com.webank.wedatasphere.dss.orchestrator.db.dao;
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 @Mapper
 public interface OrchestratorJobMapper {
 
-    OrchestratorPublishJob getPublishJobById(long id);
+    OrchestratorPublishJob getPublishJobByJobId(@Param("jobId") String jobId);
 
-    OrchestratorPublishJob getPublishJobByJobId(String jobId);
-
-    List<OrchestratorPublishJob> getPublishJobByJobStatuses(List<String> statuses);
+    List<OrchestratorPublishJob> getPublishJobByJobStatuses(@Param("statuses") List<String> statuses);
 
     long insertPublishJob(OrchestratorPublishJob job);
 
     void updatePublishJob(OrchestratorPublishJob job);
 
-    void deletePublishJob(OrchestratorPublishJob job);
-
-    void batchUpdatePublishJob(List<OrchestratorPublishJob> jobs);
+    void batchUpdatePublishJob(@Param("list") List<OrchestratorPublishJob> jobs);
 
 }

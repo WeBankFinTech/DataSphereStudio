@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
@@ -179,6 +180,11 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 for (DSSNode node : nodes) {
                     nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
                     NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+                    if(nodeInfo==null){
+                        String msg = String.format("%s note type not exist,please check appconn install successfully", node.getNodeType());
+                        logger.error(msg);
+                        throw new DSSRuntimeException(msg);
+                    }
                     if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
                         logger.info("node.getJobContent() is :{}", node.getJobContent());
                         nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);
@@ -245,6 +251,11 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                                 try {
                                     nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
                                     NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
+                                    if(nodeInfo==null){
+                                        String msg = String.format("%s note type not exist,please check appconn install successfully", node.getNodeType());
+                                        logger.error(msg);
+                                        throw new DSSRuntimeException(msg);
+                                    }
                                     if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
                                         logger.info("node.getJobContent() is :{}", node.getJobContent());
                                         nodeExportService.downloadAppConnResourceToLocal(userName, projectId, projectName, node, appConnResourceSavePath, workspace, dssLabels);

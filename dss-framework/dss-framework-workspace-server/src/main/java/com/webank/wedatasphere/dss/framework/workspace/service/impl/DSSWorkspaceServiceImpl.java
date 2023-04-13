@@ -234,9 +234,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
                                                       String roleName, int pageNow, int pageSize, List<Long> total) {
-        int roleId = workspaceDBHelper.getRoleIdByName(roleName);
+        String roleId = StringUtils.isBlank(roleName) ? null : String.valueOf(workspaceDBHelper.getRoleIdByName(roleName));
         PageHelper.startPage(pageNow, pageSize);
-        List<DSSWorkspaceUser> workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, username, String.valueOf(roleId));
+        List<DSSWorkspaceUser> workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, username, roleId);
         PageInfo<DSSWorkspaceUser> pageInfo = new PageInfo<>(workspaceUsers);
         total.add(pageInfo.getTotal());
         return workspaceUsers.stream().map(

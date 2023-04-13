@@ -44,6 +44,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchronizer {
 
@@ -51,6 +53,9 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
 
     private String projectUrl;
     private DSSToRelConversionOperation dssToRelConversionOperation;
+    //匹配wtss返回的错误信息
+    private static final Pattern ERROR_PATTERN = Pattern.compile("(?<=Error uploading project properties)[\\s\\S]+.job");
+    private static final int SCHEDULIS_MAX_SIZE = 250;
 
     public void init() {
         String baseUrl = dssToRelConversionOperation.getConversionService().getAppInstance().getBaseUrl();
@@ -108,8 +113,18 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             if(body!=null&&DSSCommonUtils.COMMON_GSON.fromJson(body, Map.class).get("error")!=null){
                 throw new ExternalOperationFailedException(50063, "upload project to schedulis failed." + body);
             }
+        } catch (Exception e){
+            throw new DSSRuntimeException(90012, dealSchedulisErrorMsg(ExceptionUtils.getRootCauseMessage(e)));
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
+    }
+
+    private String dealSchedulisErrorMsg(String errorMsg){
+        Matcher matcher = ERROR_PATTERN.matcher(errorMsg);
+        if(matcher.find() &&  matcher.group().length() >= SCHEDULIS_MAX_SIZE){
+            errorMsg = "wokflow name " + matcher.group().split("/")[1] + " is to long, please abide the rules of schedulis: projectName + workflowName*3 + 12 <= 250 ";
+        }
+        return errorMsg;
     }
 }

@@ -656,6 +656,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                 }
 //            } else if (nodeJsonMap.get("jobContent") != null && !((Map) nodeJsonMap.get("jobContent")).containsKey("script")) {
+            }else if(nodeInfo==null){
+                String msg = String.format("%s note type not exist,please check appconn install successfully", nodeType);
+                logger.error(msg);
+                throw new DSSRuntimeException(msg);
             } else if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
                 logger.info("nodeJsonMap.jobContent is:{}", nodeJsonMap.get("jobContent"));
                 CommonAppConnNode newNode = new CommonAppConnNode();

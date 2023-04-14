@@ -47,7 +47,7 @@ public class CheckOrchestratorConversionJobTask {
 
         List<OrchestratorPublishJob> maybeFailedJobs = orchestratorJobMapper.getPublishJobByJobStatuses
                 (Arrays.asList(JobStatus.Inited.getStatus(), JobStatus.Running.getStatus()));
-        LOGGER.info("These tasks maybe are failed. " + maybeFailedJobs.toString());
+        LOGGER.info("These tasks are maybe failed. " + maybeFailedJobs.toString());
         List<String> activeInstance = Arrays.stream(allActionInstances).map(ServiceInstance::getInstance).collect(Collectors.toList());
         LOGGER.info("Active instances are " + activeInstance);
         if (maybeFailedJobs.size() > 0) {

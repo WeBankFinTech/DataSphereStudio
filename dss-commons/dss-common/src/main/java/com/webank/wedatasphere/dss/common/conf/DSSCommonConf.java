@@ -46,4 +46,5 @@ public class DSSCommonConf {
     public static final CommonVars<Integer> DSS_CHECK_SERVER_ACTIVE_PERIOD = CommonVars.apply("wds.dss.check.server.active.period", 60);
 
     public static final CommonVars<String> ALTER_CLASS = CommonVars.apply("wds.dss.alter.class", "com.webank.wedatasphere.dss.common.server.alter.ImsAlterServiceImpl");
+    public static final CommonVars<String> ALTER_RECEIVER = CommonVars.apply("wds.dss.alter.receiver", "burdezhang,mouhonghao");
 }

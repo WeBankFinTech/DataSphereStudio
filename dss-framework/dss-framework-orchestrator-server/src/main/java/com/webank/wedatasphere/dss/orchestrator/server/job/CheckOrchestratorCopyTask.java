@@ -1,7 +1,6 @@
 package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
-import com.webank.wedatasphere.dss.flow.execution.entrance.job.CheckWorkflowExecuteTask;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
@@ -41,7 +40,7 @@ public class CheckOrchestratorCopyTask {
         }
 
         List<DSSOrchestratorCopyInfo> maybeFailedJobs = orchestratorCopyJobMapper.getRunningJob();
-        LOGGER.info("These tasks maybe are failed. " + maybeFailedJobs.toString());
+        LOGGER.info("These tasks are maybe failed. " + maybeFailedJobs.toString());
         List<String> activeInstance = Arrays.stream(allActionInstances).map(ServiceInstance::getInstance).collect(Collectors.toList());
         LOGGER.info("Active instances are " + activeInstance);
         if (maybeFailedJobs.size() > 0) {

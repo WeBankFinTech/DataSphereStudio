@@ -2,7 +2,6 @@ package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.webank.wedatasphere.dss.common.alter.ExecuteAlter;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
-import com.webank.wedatasphere.dss.common.entity.Alter;
 import com.webank.wedatasphere.dss.common.entity.CustomAlter;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;

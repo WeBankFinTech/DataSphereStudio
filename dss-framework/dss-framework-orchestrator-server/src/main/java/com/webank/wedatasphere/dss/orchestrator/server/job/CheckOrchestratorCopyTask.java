@@ -4,7 +4,6 @@ import com.webank.wedatasphere.dss.common.alter.ExecuteAlter;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.entity.CustomAlter;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import org.apache.linkis.common.ServiceInstance;

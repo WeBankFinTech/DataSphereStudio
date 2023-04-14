@@ -36,11 +36,14 @@ public class DSSCommonConf {
     public static final CommonVars<String> ALL_GLOBAL_LIMITS_PREFIX = CommonVars.apply("wds.dss.global.limits.prefix", "wds.dss.global.limits.");
 
     public static final CommonVars<String> GLOBAL_LIMIT_PREFIX = CommonVars.apply("wds.dss.global.limit.prefix", "wds.dss.global.limit.");
-
+    /**
+     * deploy DSS instance numbers
+     */
     public static final CommonVars<Integer> DSS_INSTANCE_NUMBERS = CommonVars.apply("wds.dss.instance.numbers", 2);
-
     /**
      * check dss server is active period, The value can only be between 0 and 59 inclusive, or a multiple of 60 and its unit is 's'.
      */
     public static final CommonVars<Integer> DSS_CHECK_SERVER_ACTIVE_PERIOD = CommonVars.apply("wds.dss.check.server.active.period", 60);
+
+    public static final CommonVars<String> ALTER_CLASS = CommonVars.apply("wds.dss.alter.class", "com.webank.wedatasphere.dss.common.server.alter.ImsAlterServiceImpl");
 }

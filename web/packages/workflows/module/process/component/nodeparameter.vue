@@ -404,3 +404,10 @@ export default {
 };
 
 </script>
+<style>
+.node-parameter-bar label.ivu-form-item-label {
+  text-align: left;
+  line-height: 14px;
+  padding-bottom: 6px;
+}
+</style>

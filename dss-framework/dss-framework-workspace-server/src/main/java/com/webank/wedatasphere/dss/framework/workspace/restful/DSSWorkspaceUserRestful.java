@@ -138,7 +138,7 @@ public class DSSWorkspaceUserRestful {
         if (count != null && count > 0) {
             return Message.error("用户已经存在该工作空间，不需要重复添加！");
         }
-        if (!dssWorkspaceService.isAdminUser((long) workspaceId, creator)) {
+        if (!dssWorkspaceService.checkPrivilege(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
         dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);

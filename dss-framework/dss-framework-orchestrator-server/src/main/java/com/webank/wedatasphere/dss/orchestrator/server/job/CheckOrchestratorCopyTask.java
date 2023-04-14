@@ -1,7 +1,10 @@
 package com.webank.wedatasphere.dss.orchestrator.server.job;
 
+import com.webank.wedatasphere.dss.common.alter.ExecuteAlter;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
+import com.webank.wedatasphere.dss.common.entity.CustomAlter;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import org.apache.linkis.common.ServiceInstance;
@@ -28,7 +31,12 @@ public class CheckOrchestratorCopyTask {
     @Autowired
     private OrchestratorCopyJobMapper orchestratorCopyJobMapper;
 
+    @Autowired
+    private ExecuteAlter executeAlter;
+
     List<DSSOrchestratorCopyInfo> failedJobs;
+
+    CustomAlter customAlter = new CustomAlter();
 
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkOrchestratorCopyJobTask() {
@@ -57,11 +65,14 @@ public class CheckOrchestratorCopyTask {
         // update copy job status to failed
         if (failedJobs.size() > 0) {
             orchestratorCopyJobMapper.batchUpdateCopyJob(failedJobs);
+            List<String> exceptionInstances = failedJobs.stream().map(DSSOrchestratorCopyInfo::getInstanceName).distinct().collect(Collectors.toList());
+            List<String> exceptionId = failedJobs.stream().map(DSSOrchestratorCopyInfo::getId).collect(Collectors.toList());
             failedJobs.clear();
+            // send alter
+            customAlter.setAlterTitle("DSS exception of instance: " + exceptionInstances);
+            customAlter.setAlterInfo("以下id的工作流拷贝失败，请到表dss_orchestrator_copy_info查看失败的工作流信息：" + exceptionId);
+            customAlter.setAlterLevel("1");
+            customAlter.setAlterReceiver(DSSCommonConf.ALTER_RECEIVER.getValue());
         }
-
-        // send alter
-
     }
-
 }

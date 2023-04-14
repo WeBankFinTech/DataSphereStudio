@@ -58,7 +58,7 @@
 
     <update id="batchUpdateCopyJob">
         <foreach collection="list" item="item" separator=";">
-            UPDATE `dss_workflow_task` set status = #{item.status}, is_copying = #{item.isCopying}, exception_info = #{item.exceptionInfo} WHERE id = #{item.id}
+            UPDATE `dss_orchestrator_copy_info` set status = #{item.status}, is_copying = #{item.isCopying}, exception_info = #{item.exceptionInfo} WHERE id = #{item.id}
         </foreach>
     </update>
 

@@ -272,6 +272,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         vo.setRoles(roles);
         vo.setCreator(dssWorkspaceUser.getCreator());
         vo.setJoinTime(dssWorkspaceUser.getJoinTime());
+        vo.setUpdateTime(dssWorkspaceUser.getUpdateTime());
+        vo.setUpdateUser(dssWorkspaceUser.getUpdateUser());
         return vo;
     }
 

@@ -153,10 +153,10 @@ public class DSSWorkspaceUserRestful {
         List<Integer> roles = updateWorkspaceUserRequest.getRoles();
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
         String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
-        if (!dssWorkspaceService.isAdminUser(Long.valueOf(workspaceId), creator)) {
+        String userName = updateWorkspaceUserRequest.getUserName();
+        if (!dssWorkspaceService.checkPrivilege(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
-        String userName = updateWorkspaceUserRequest.getUserName();
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
         AuditLogUtils.printLog(userName,workspaceId, workspaceName, TargetTypeEnum.WORKSPACE,workspaceId,
                 workspaceName, OperateTypeEnum.UPDATE_USERS,updateWorkspaceUserRequest);

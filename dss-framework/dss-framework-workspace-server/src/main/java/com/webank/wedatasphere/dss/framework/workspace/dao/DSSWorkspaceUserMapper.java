@@ -37,7 +37,7 @@ public interface DSSWorkspaceUserMapper {
                                 @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId);
 
     @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by,user_id, update_user, update_time)" +
-            "values(#{workspaceId}, #{username}, #{roleId}, #{createTime}, #{createdBy}, #{userId}), #{updateUser}, now()")
+            "values(#{workspaceId}, #{username}, #{roleId}, #{createTime}, #{createdBy}, #{userId}, #{updateUser}, now())")
     void insertUserRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId, @Param("createTime") Date createTime,
                                    @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId, @Param("updateUser") String updateUser);
 

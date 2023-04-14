@@ -6,5 +6,5 @@ public interface ExceptionAlterSender {
     /**
      * send alter to user when server exception,
      */
-    void sendAlter(Alter alter);
+    void sendAlter(String alterType, Alter alter);
 }

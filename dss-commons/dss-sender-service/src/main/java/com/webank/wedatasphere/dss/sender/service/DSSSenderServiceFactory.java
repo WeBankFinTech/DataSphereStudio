@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.sender.service;
 
+import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import com.webank.wedatasphere.dss.sender.service.impl.DSSSenderServiceImpl;
 import com.webank.wedatasphere.dss.sender.service.impl.DSSServerSenderServiceImpl;
@@ -29,9 +30,9 @@ public class DSSSenderServiceFactory {
 
     static {
         if (DSSSenderServiceConf.USE_DSS_SENDER.getValue()) {
-            service = new DSSServerSenderServiceImpl();
+            service = ClassUtils.getInstanceOrDefault(DSSServerSenderServiceImpl.class, new DSSServerSenderServiceImpl());
         } else {
-            service = new DSSSenderServiceImpl();
+            service = ClassUtils.getInstanceOrDefault(DSSSenderServiceImpl.class, new DSSSenderServiceImpl());
         }
         LOGGER.info("Use {} to instance a available DSSSenderService.", service.getClass().getName());
     }

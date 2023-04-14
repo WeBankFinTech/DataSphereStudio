@@ -72,6 +72,7 @@ public class CheckWorkflowExecuteTask {
             customAlter.setAlterInfo("以下taskId的工作流执行失败，请到表dss_workflow_task查看失败的工作流信息：" + exceptionId);
             customAlter.setAlterLevel("1");
             customAlter.setAlterReceiver(DSSCommonConf.ALTER_RECEIVER.getValue());
+            executeAlter.sendAlter(customAlter);
         }
     }
 }

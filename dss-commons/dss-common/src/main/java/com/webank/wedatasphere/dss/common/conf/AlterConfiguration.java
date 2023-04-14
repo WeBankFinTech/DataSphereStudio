@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.common.conf;
 
+import com.webank.wedatasphere.dss.common.alter.CustomAlterServiceImpl;
 import com.webank.wedatasphere.dss.common.alter.ExceptionAlterSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ public class AlterConfiguration {
             return (ExceptionAlterSender) AlterConfiguration.class.getClassLoader().loadClass(alterClassName).newInstance();
         } catch (Exception e) {
             logger.warn("Use CustomAlter {}", alterClassName, e);
-            return null;
+            return new CustomAlterServiceImpl();
         }
 
     }

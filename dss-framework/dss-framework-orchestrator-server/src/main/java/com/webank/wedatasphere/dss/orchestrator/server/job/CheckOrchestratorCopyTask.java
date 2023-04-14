@@ -73,6 +73,7 @@ public class CheckOrchestratorCopyTask {
             customAlter.setAlterInfo("以下id的工作流拷贝失败，请到表dss_orchestrator_copy_info查看失败的工作流信息：" + exceptionId);
             customAlter.setAlterLevel("1");
             customAlter.setAlterReceiver(DSSCommonConf.ALTER_RECEIVER.getValue());
+            executeAlter.sendAlter(customAlter);
         }
     }
 }

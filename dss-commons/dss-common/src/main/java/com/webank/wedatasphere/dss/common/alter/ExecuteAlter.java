@@ -5,10 +5,10 @@ import com.webank.wedatasphere.dss.common.entity.Alter;
 
 public class ExecuteAlter {
 
-    public void sendAlter(String alterType, Alter alter) throws Exception {
+    public void sendAlter(Alter alter) {
         ExceptionAlterSender alterSender = AlterConfiguration.getAlter();
         AlterContext alterContext = new AlterContext(alterSender);
-        alterContext.executeStrategy(alterType, alter);
+        alterContext.executeStrategy(alter);
     }
 
 }

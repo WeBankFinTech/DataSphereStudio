@@ -2,6 +2,8 @@ package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.webank.wedatasphere.dss.common.alter.ExecuteAlter;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
+import com.webank.wedatasphere.dss.common.entity.Alter;
+import com.webank.wedatasphere.dss.common.entity.CustomAlter;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
@@ -35,6 +37,8 @@ public class CheckOrchestratorConversionJobTask {
 
     List<OrchestratorPublishJob> failedJobs;
 
+    CustomAlter customAlter = new CustomAlter();
+
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkOrchestratorConversionJob() {
 
@@ -58,17 +62,18 @@ public class CheckOrchestratorConversionJobTask {
             }
         }
 
-        // update publish job status to failed
         if (failedJobs.size() > 0) {
+            // update publish job status to failed
             orchestratorJobMapper.batchUpdatePublishJob(failedJobs);
+            List<String> exceptionInstances = failedJobs.stream().map(OrchestratorPublishJob::getInstanceName).distinct().collect(Collectors.toList());
+            List<Long> exceptionId = failedJobs.stream().map(OrchestratorPublishJob::getId).collect(Collectors.toList());
             failedJobs.clear();
+            // send alter
+            customAlter.setAlterTitle("DSS exception of instance: " + exceptionInstances);
+            customAlter.setAlterInfo("以下id的工作流发布失败，请到表dss_orchestrator_job_info查看失败的工作流信息：" + exceptionId);
+            customAlter.setAlterLevel("1");
+            customAlter.setAlterReceiver(DSSCommonConf.ALTER_RECEIVER.getValue());
+            executeAlter.sendAlter(customAlter);
         }
-
-        // send alter
-//        executeAlter.sendAlter();
-
     }
-
-
-
 }

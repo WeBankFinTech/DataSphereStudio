@@ -5,7 +5,7 @@ import com.webank.wedatasphere.dss.common.entity.Alter;
 public class CustomAlterServiceImpl implements ExceptionAlterSender {
 
     @Override
-    public void sendAlter(Alter alter) {
+    public void sendAlter(String alterType, Alter alter) {
 
     }
 }

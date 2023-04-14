@@ -2,6 +2,9 @@ package com.webank.wedatasphere.dss.common.entity;
 
 public abstract class Alter {
 
+    /**
+     * 告警标题，少于100个字符，必填项
+     */
     private String alterTitle;
 
     private String alterInfo;

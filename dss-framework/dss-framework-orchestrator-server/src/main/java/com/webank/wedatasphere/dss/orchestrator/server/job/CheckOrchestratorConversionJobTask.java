@@ -3,7 +3,6 @@ package com.webank.wedatasphere.dss.orchestrator.server.job;
 import com.webank.wedatasphere.dss.common.alter.ExecuteAlter;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
-import com.webank.wedatasphere.dss.flow.execution.entrance.job.CheckWorkflowExecuteTask;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;

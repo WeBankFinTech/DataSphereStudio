@@ -10,7 +10,7 @@ public class AlterContext {
         this.exceptionAlterSender = exceptionAlterSender;
     }
 
-    public void executeStrategy(String alterType, Alter alter) throws Exception {
-        exceptionAlterSender.sendAlter(alterType, alter);
+    public void executeStrategy(Alter alter) {
+        exceptionAlterSender.sendAlter(alter);
     }
 }

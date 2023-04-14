@@ -6,7 +6,6 @@ import com.webank.wedatasphere.dss.common.entity.CustomAlter;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.flow.execution.entrance.dao.TaskMapper;
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import org.apache.linkis.common.ServiceInstance;
 import org.apache.linkis.rpc.Sender;

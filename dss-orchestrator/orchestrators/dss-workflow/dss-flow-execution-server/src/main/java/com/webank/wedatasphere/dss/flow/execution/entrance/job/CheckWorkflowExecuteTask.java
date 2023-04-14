@@ -1,9 +1,12 @@
 package com.webank.wedatasphere.dss.flow.execution.entrance.job;
 
+import com.webank.wedatasphere.dss.common.alter.ExecuteAlter;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
+import com.webank.wedatasphere.dss.common.entity.CustomAlter;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.flow.execution.entrance.dao.TaskMapper;
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import org.apache.linkis.common.ServiceInstance;
 import org.apache.linkis.rpc.Sender;
@@ -29,7 +32,12 @@ public class CheckWorkflowExecuteTask {
     @Autowired
     private TaskMapper taskMapper;
 
+    @Autowired
+    private ExecuteAlter executeAlter;
+
     List<WorkflowQueryTask> failedJobs;
+
+    CustomAlter customAlter = new CustomAlter();
 
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkWorkflowExecuteTask() {
@@ -56,10 +64,14 @@ public class CheckWorkflowExecuteTask {
         // update execute job status to failed
         if (failedJobs.size() > 0) {
             taskMapper.batchUpdateTasks(failedJobs);
+            List<String> exceptionInstances = failedJobs.stream().map(WorkflowQueryTask::getInstance).distinct().collect(Collectors.toList());
+            List<Long> exceptionId = failedJobs.stream().map(WorkflowQueryTask::getTaskID).collect(Collectors.toList());
             failedJobs.clear();
+            // send alter
+            customAlter.setAlterTitle("DSS exception of instance: " + exceptionInstances);
+            customAlter.setAlterInfo("以下taskId的工作流执行失败，请到表dss_workflow_task查看失败的工作流信息：" + exceptionId);
+            customAlter.setAlterLevel("1");
+            customAlter.setAlterReceiver(DSSCommonConf.ALTER_RECEIVER.getValue());
         }
-
-        // send alter
-
     }
 }

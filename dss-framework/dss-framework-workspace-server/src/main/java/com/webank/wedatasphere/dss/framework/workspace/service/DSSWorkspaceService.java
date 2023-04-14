@@ -63,6 +63,8 @@ public interface DSSWorkspaceService {
 
     String getWorkspaceName(Long workspaceId);
 
+    boolean checkPrivilege(int workspaceId, String loginUser, String username, List<Integer> roles);
+
     boolean checkAdmin(String userName);
 
     List<String> getAllDepartmentWithOffices();

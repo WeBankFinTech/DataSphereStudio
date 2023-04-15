@@ -9,6 +9,14 @@ public abstract class Alter {
 
     private String alterInfo;
 
+    public Alter() {
+    }
+
+    public Alter(String alterTitle, String alterInfo) {
+        this.alterTitle = alterTitle;
+        this.alterInfo = alterInfo;
+    }
+
     public String getAlterTitle() {
         return alterTitle;
     }

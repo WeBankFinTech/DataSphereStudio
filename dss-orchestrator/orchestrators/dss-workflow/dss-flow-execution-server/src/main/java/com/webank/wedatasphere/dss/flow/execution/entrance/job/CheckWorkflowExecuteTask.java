@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,10 +35,6 @@ public class CheckWorkflowExecuteTask {
     @Autowired
     private ExecuteAlter executeAlter;
 
-    List<WorkflowQueryTask> failedJobs;
-
-    CustomAlter customAlter = new CustomAlter();
-
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkWorkflowExecuteTask() {
 
@@ -51,6 +48,7 @@ public class CheckWorkflowExecuteTask {
         LOGGER.info("These tasks maybe are failed. " + maybeFailedJobs.toString());
         List<String> activeInstance = Arrays.stream(allActionInstances).map(ServiceInstance::getInstance).collect(Collectors.toList());
         LOGGER.info("Active instances are " + activeInstance);
+        List<WorkflowQueryTask> failedJobs = new ArrayList<>();
         if (maybeFailedJobs.size() > 0) {
             for (WorkflowQueryTask maybeFailedJob : maybeFailedJobs) {
                 if (!activeInstance.contains(maybeFailedJob.getInstance())) {
@@ -67,10 +65,9 @@ public class CheckWorkflowExecuteTask {
             List<Long> exceptionId = failedJobs.stream().map(WorkflowQueryTask::getTaskID).collect(Collectors.toList());
             failedJobs.clear();
             // send alter
-            customAlter.setAlterTitle("DSS exception of instance: " + exceptionInstances);
-            customAlter.setAlterInfo("以下taskId的工作流执行失败，请到表dss_workflow_task查看失败的工作流信息：" + exceptionId);
-            customAlter.setAlterLevel("1");
-            customAlter.setAlterReceiver(DSSCommonConf.ALTER_RECEIVER.getValue());
+            CustomAlter customAlter = new CustomAlter("DSS exception of instance: " + exceptionInstances,
+                    "以下taskId的工作流执行失败，请到表dss_workflow_task查看失败的工作流信息：" + exceptionId,
+                    "1", DSSCommonConf.ALTER_RECEIVER.getValue());
             executeAlter.sendAlter(customAlter);
         }
     }

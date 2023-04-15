@@ -6,6 +6,15 @@ public class CustomAlter extends Alter{
 
     private String alterReceiver;
 
+    public CustomAlter() {
+    }
+
+    public CustomAlter(String alterTitle, String alterInfo, String alterLevel, String alterReceiver) {
+        super(alterTitle, alterInfo);
+        this.alterLevel = alterLevel;
+        this.alterReceiver = alterReceiver;
+    }
+
     public String getAlterLevel() {
         return alterLevel;
     }

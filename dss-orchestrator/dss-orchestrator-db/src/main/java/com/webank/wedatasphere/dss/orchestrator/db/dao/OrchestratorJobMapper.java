@@ -17,6 +17,6 @@ public interface OrchestratorJobMapper {
 
     void updatePublishJob(OrchestratorPublishJob job);
 
-    void batchUpdatePublishJob(@Param("list") List<OrchestratorPublishJob> jobs);
+    void batchUpdatePublishJob(@Param("failedJobs") List<OrchestratorPublishJob> failedJobs);
 
 }

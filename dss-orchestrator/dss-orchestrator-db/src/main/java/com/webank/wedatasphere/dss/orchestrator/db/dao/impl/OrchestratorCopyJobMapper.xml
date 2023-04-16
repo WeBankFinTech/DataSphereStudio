@@ -56,9 +56,30 @@
         WHERE id = #{id}
     </update>
 
-    <update id="batchUpdateCopyJob">
-        <foreach collection="list" item="item" separator=";">
-            UPDATE `dss_orchestrator_copy_info` set status = #{item.status}, is_copying = #{item.isCopying}, exception_info = #{item.exceptionInfo} WHERE id = #{item.id}
+    <update id="batchUpdateCopyJob" parameterType="java.util.List">
+        UPDATE dss_orchestrator_copy_info set status =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.id} then #{item.status}
+        </foreach>
+        is_copying =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.id} then #{item.isCopying}
+        </foreach>
+        exception_info =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.id} then #{item.exceptionInfo}
+        </foreach>
+        end_time =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end">
+            when id = #{item.id} then #{item.endTime}
+        </foreach>
+        WHERE id in
+        <foreach collection="failedJobs" item="item" index="index" separator="," open="(" close=")">
+            #{item.id}
         </foreach>
     </update>
 

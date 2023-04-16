@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,8 @@ public class CheckWorkflowExecuteTask {
             for (WorkflowQueryTask maybeFailedJob : maybeFailedJobs) {
                 if (!activeInstance.contains(maybeFailedJob.getInstance())) {
                     maybeFailedJob.setStatus(JobStatus.Failed.getStatus());
+                    maybeFailedJob.setUpdatedTime(new Date());
+                    maybeFailedJob.setErrDesc("系统打盹，请稍后重试！");
                     failedJobs.add(maybeFailedJob);
                 }
             }

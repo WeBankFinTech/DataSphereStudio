@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,7 @@ public class CheckOrchestratorCopyTask {
                     maybeFailedJob.setStatus(0);
                     maybeFailedJob.setIsCopying(0);
                     maybeFailedJob.setExceptionInfo("系统打盹，请稍后重试！");
+                    maybeFailedJob.setEndTime(new Date());
                     failedJobs.add(maybeFailedJob);
                 }
             }

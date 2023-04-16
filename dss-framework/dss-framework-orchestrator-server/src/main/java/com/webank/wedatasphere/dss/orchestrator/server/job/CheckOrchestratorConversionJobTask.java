@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,7 @@ public class CheckOrchestratorConversionJobTask {
             for (OrchestratorPublishJob maybeFailedJob : maybeFailedJobs) {
                 if (!activeInstance.contains(maybeFailedJob.getInstanceName())) {
                     maybeFailedJob.setStatus(JobStatus.Failed.getStatus());
+                    maybeFailedJob.setUpdateTime(new Date());
                     failedJobs.add(maybeFailedJob);
                 }
             }

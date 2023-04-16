@@ -116,21 +116,21 @@
         UPDATE dss_workflow_task set status =
         <foreach collection="failedJobs" item="item" index="index"
                  separator=" " open="case" close="end,">
-            when id = #{item.id} then #{item.status}
+            when id = #{item.taskID} then #{item.status}
         </foreach>
         err_desc =
         <foreach collection="failedJobs" item="item" index="index"
                  separator=" " open="case" close="end,">
-            when id = #{item.id} then #{item.errDesc}
+            when id = #{item.taskID} then #{item.errDesc}
         </foreach>
         updated_time =
         <foreach collection="failedJobs" item="item" index="index"
                  separator=" " open="case" close="end">
-            when id = #{item.id} then #{item.updatedTime}
+            when id = #{item.taskID} then #{item.updatedTime}
         </foreach>
         WHERE id in
         <foreach collection="failedJobs" item="item" index="index" separator="," open="(" close=")">
-            #{item.id}
+            #{item.taskID}
         </foreach>
     </update>
 

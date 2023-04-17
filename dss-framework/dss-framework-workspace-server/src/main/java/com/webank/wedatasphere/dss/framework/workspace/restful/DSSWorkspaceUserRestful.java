@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
@@ -195,5 +196,19 @@ public class DSSWorkspaceUserRestful {
         List<Integer> userWorkspaceIds = dssWorkspaceUserService.getUserWorkspaceIds(queryUserName);
         String userWorkspaceIdStr = userWorkspaceIds.stream().map(x -> x.toString()).collect(Collectors.joining(","));
         return Message.ok().data("userWorkspaceIds", userWorkspaceIdStr);
+    }
+
+    @RequestMapping(path = "getUserRole", method = RequestMethod.GET)
+    public Message getWorkspaceUserRole(@RequestParam(name = "userName") String username) {
+        List<Map<String,Object>> userRoles = dssWorkspaceUserService.getUserRoleByUserName(username);
+        return Message.ok().data("userName", username).data("roleInfo", userRoles);
+    }
+
+    @RequestMapping(path = "clearUser", method = RequestMethod.DELETE)
+    public Message clearUser(@RequestParam(name = "userName") String username) {
+        dssWorkspaceUserService.clearUserByUserName(username);
+        AuditLogUtils.printLog(username,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
+                null, OperateTypeEnum.DELETE,null);
+        return Message.ok();
     }
 }

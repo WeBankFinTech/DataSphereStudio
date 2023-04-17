@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -30,8 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -44,6 +44,9 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     @Autowired
     private StaffInfoGetter staffInfoGetter;
+
+    @Autowired
+    private WorkspaceDBHelper workspaceDBHelper;
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
@@ -113,5 +116,29 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Override
     public Long getCountByUsername(String username,int workspaceId){
         return dssWorkspaceUserMapper.getCountByUsername(username,workspaceId);
+    }
+
+    @Override
+    public List<Map<String,Object>> getUserRoleByUserName(String userName) {
+        List<DSSWorkspaceUser> workspaceRoles = dssWorkspaceUserMapper.getWorkspaceRoleByUsername(userName);
+        List<Map<String,Object>> list = new ArrayList<>();
+        workspaceRoles.forEach(workspaceRole -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("workspaceId", workspaceRole.getWorkspaceId());
+            map.put("roleId", workspaceRole.getRoleIds());
+            map.put("roleName", workspaceDBHelper.getRoleFrontName(Integer.parseInt(workspaceRole.getRoleIds())));
+            list.add(map);
+        });
+        return list;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void clearUserByUserName(String userName) {
+        if(staffInfoGetter.getAllUsers().stream().anyMatch(staffInfo -> staffInfo.getEnglishName().equals(userName))) {
+            dssWorkspaceUserMapper.deleteUserByUserName(userName);
+            dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
+            dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
+        }
     }
 }

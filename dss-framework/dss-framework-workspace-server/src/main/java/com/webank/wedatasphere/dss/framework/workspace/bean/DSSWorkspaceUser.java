@@ -101,6 +101,8 @@ public class DSSWorkspaceUser {
         this.joinTime = joinTime;
     }
 
+
+
     @Override
     public String toString() {
         return "DSSWorkspaceUser{" +
@@ -109,6 +111,7 @@ public class DSSWorkspaceUser {
                 ", workspaceId=" + workspaceId +
                 ", creator='" + creator + '\'' +
                 ", joinTime=" + joinTime +
+                ", roleIds=" + roleIds +
                 '}';
     }
 }

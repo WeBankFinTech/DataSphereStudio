@@ -83,4 +83,16 @@ public interface DSSWorkspaceUserMapper {
     @Select("select count(1) from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
     Long getCountByUsername(@Param("username") String username, @Param("workspaceId") int workspaceId);
 
+    @Select("select distinct workspace_id, role_id " +
+            "from dss_workspace_user_role where username = #{username} ")
+    List<DSSWorkspaceUser> getWorkspaceRoleByUsername(@Param("username") String username);
+
+    @Delete("delete from dss_workspace_user_role where username = #{username} ")
+    void deleteUserRolesByUserName(@Param("username") String username);
+
+    @Delete("delete from dss_user where username = #{username} ")
+    void deleteUserByUserName(@Param("username") String username);
+
+    @Delete("delete from dss_proxy_user where username = #{username} ")
+    void deleteProxyUserByUserName(@Param("username") String username);
 }

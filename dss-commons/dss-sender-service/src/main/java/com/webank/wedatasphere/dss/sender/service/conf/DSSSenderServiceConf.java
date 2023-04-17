@@ -29,7 +29,7 @@ public class DSSSenderServiceConf {
             CommonVars.apply("wds.dss.project.sever.name", "dss-framework-project-server");
 
     public static final CommonVars<String> DSS_SERVER_NAME =
-            CommonVars.apply("wds.dss.sever.name.dev", "dss-server-dev");
+            CommonVars.apply("spring.spring.application.name", "dss-server-dev");
 
     //以服务合并后方式启动服务需要开启该参数，回退到老方式启动则需要关闭该参数
     public static final CommonVars<Boolean> USE_DSS_SENDER =

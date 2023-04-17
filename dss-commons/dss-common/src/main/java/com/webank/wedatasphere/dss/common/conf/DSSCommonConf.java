@@ -36,6 +36,8 @@ public class DSSCommonConf {
     public static final CommonVars<String> ALL_GLOBAL_LIMITS_PREFIX = CommonVars.apply("wds.dss.global.limits.prefix", "wds.dss.global.limits.");
 
     public static final CommonVars<String> GLOBAL_LIMIT_PREFIX = CommonVars.apply("wds.dss.global.limit.prefix", "wds.dss.global.limit.");
+
+    public static final CommonVars<Boolean> DSS_SERVER_IS_MERGE = CommonVars.apply("wds.dss.server.is.merge", true);
     /**
      * deploy DSS instance numbers
      */

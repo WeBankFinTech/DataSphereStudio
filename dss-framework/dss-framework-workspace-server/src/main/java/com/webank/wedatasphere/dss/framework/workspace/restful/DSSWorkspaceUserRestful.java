@@ -139,7 +139,7 @@ public class DSSWorkspaceUserRestful {
         if (count != null && count > 0) {
             return Message.error("用户已经存在该工作空间，不需要重复添加！");
         }
-        if (!dssWorkspaceService.checkPrivilege(workspaceId, creator, userName, roles)) {
+        if (!dssWorkspaceService.checkRolesOperation(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
         dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);
@@ -155,7 +155,7 @@ public class DSSWorkspaceUserRestful {
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
         String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
         String userName = updateWorkspaceUserRequest.getUserName();
-        if (!dssWorkspaceService.checkPrivilege(workspaceId, creator, userName, roles)) {
+        if (!dssWorkspaceService.checkRolesOperation(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
@@ -171,7 +171,7 @@ public class DSSWorkspaceUserRestful {
         int workspaceId = deleteWorkspaceUserRequest.getWorkspaceId();
         String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
         String creator = SecurityFilter.getLoginUsername(httpServletRequest);
-        if (!dssWorkspaceService.checkAdmin(creator) || !dssWorkspaceService.checkAdminByWorkspace(creator, workspaceId)) {
+        if (!dssWorkspaceService.checkRolesOperation(workspaceId, creator, userName, new ArrayList<>())) {
             return Message.error("无权限进行该操作");
         }
         dssWorkspaceUserService.deleteWorkspaceUser(userName, workspaceId);

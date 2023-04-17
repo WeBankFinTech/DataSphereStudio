@@ -71,7 +71,7 @@ public class PublishServiceImpl implements PublishService {
         LOGGER.info("User {} begins to convert workflow {}.", convertUser, workflowId);
         //1 获取对应的orcId 和 orcVersionId
         //2.进行提交
-        RequestFrameworkConvertOrchestration requestFrameworkConvertOrchestration = new RequestFrameworkConvertOrchestration();
+        RequestFrameworkConvertOrchestration requestFrameworkConvertOrchestration = getRequestFrameworkConvertOrchestration();
         requestFrameworkConvertOrchestration.setComment(comment);
         requestFrameworkConvertOrchestration.setOrcAppId(workflowId);
         requestFrameworkConvertOrchestration.setUserName(convertUser);
@@ -113,6 +113,15 @@ public class PublishServiceImpl implements PublishService {
             DSSExceptionUtils.dealErrorException(63325, "Failed to submit publish " + str, t, DSSErrorException.class);
         }
         return null;
+    }
+
+    /**
+     * 可覆写该方法自定义实现发布对象内容
+     *
+     * @return
+     */
+    protected RequestFrameworkConvertOrchestration getRequestFrameworkConvertOrchestration() {
+        return new RequestFrameworkConvertOrchestration();
     }
 
     @Override

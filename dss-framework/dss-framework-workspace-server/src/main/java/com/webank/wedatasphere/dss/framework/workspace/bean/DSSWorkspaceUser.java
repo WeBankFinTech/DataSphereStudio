@@ -31,7 +31,35 @@ public class DSSWorkspaceUser {
 
     private Date joinTime;
 
-    private int roleId;
+    private String roleIds;
+
+    private Date updateTime;
+
+    private String updateUser;
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getUpdateUser() {
+        return updateUser;
+    }
+
+    public void setUpdateUser(String updateUser) {
+        this.updateUser = updateUser;
+    }
+
+    public String getRoleIds() {
+        return roleIds;
+    }
+
+    public void setRoleIds(String roleIds) {
+        this.roleIds = roleIds;
+    }
 
     public Long getId() {
         return id;
@@ -73,13 +101,7 @@ public class DSSWorkspaceUser {
         this.joinTime = joinTime;
     }
 
-    public int getRoleId() {
-        return roleId;
-    }
 
-    public void setRoleId(int roleId) {
-        this.roleId = roleId;
-    }
 
     @Override
     public String toString() {
@@ -89,7 +111,7 @@ public class DSSWorkspaceUser {
                 ", workspaceId=" + workspaceId +
                 ", creator='" + creator + '\'' +
                 ", joinTime=" + joinTime +
-                ", roleId=" + roleId +
+                ", roleIds=" + roleIds +
                 '}';
     }
 }

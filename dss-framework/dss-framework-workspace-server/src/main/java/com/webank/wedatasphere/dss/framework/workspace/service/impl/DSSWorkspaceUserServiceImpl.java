@@ -125,8 +125,8 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         workspaceRoles.forEach(workspaceRole -> {
             Map<String, Object> map = new HashMap<>();
             map.put("workspaceId", workspaceRole.getWorkspaceId());
-            map.put("roleId", workspaceRole.getRoleId());
-            map.put("roleName", workspaceDBHelper.getRoleFrontName(workspaceRole.getRoleId()));
+            map.put("roleId", workspaceRole.getRoleIds());
+            map.put("roleName", workspaceDBHelper.getRoleFrontName(Integer.parseInt(workspaceRole.getRoleIds())));
             list.add(map);
         });
         return list;

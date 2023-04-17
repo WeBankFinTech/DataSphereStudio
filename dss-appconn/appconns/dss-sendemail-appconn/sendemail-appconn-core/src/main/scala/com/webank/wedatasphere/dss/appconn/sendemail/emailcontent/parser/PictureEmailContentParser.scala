@@ -51,7 +51,9 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
           Utils.tryFinally({
             val decoder = Base64.getDecoder
             val byteArr = decoder.decode(imageStr)
-            checkImageSize(byteArr)
+            if (CHECK_EMAIL_IMAGE_SWITCH.getValue) {
+              checkImageSize(byteArr)
+            }
             inputStream = new ByteArrayInputStream(byteArr)
             val image = ImageIO.read(inputStream)
             val contents = generateImage(image, multiContentEmail)

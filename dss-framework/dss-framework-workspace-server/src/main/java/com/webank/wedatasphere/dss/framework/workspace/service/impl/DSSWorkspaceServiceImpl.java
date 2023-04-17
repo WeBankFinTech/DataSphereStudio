@@ -668,16 +668,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 username.equals(workspace.getCreateBy());
     }
 
-    /**
-     * 权限校验
-     * @param workspaceId  工作空间id
-     * @param loginUser  当前登录用户
-     * @param username  将要修改的用户
-     * @param roles  将要修改的角色
-     * @return
-     */
     @Override
-    public boolean checkPrivilege(int workspaceId, String loginUser, String username, List<Integer> roles){
+    public boolean checkRolesOperation(int workspaceId, String loginUser, String username, List<Integer> roles){
         // 获取工作空间创建者
         String createBy = dssWorkspaceMapper.getWorkspace(workspaceId).getCreateBy();
         return StringUtils.equals(loginUser, createBy) ?

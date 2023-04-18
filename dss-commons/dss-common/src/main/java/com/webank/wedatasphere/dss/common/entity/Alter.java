@@ -9,12 +9,18 @@ public abstract class Alter {
 
     private String alterInfo;
 
+    private String alterLevel;
+
+    private String alterReceiver;
+
     public Alter() {
     }
 
-    public Alter(String alterTitle, String alterInfo) {
+    public Alter(String alterTitle, String alterInfo, String alterLevel, String alterReceiver) {
         this.alterTitle = alterTitle;
         this.alterInfo = alterInfo;
+        this.alterLevel = alterLevel;
+        this.alterReceiver = alterReceiver;
     }
 
     public String getAlterTitle() {
@@ -31,5 +37,21 @@ public abstract class Alter {
 
     public void setAlterInfo(String alterInfo) {
         this.alterInfo = alterInfo;
+    }
+
+    public String getAlterLevel() {
+        return alterLevel;
+    }
+
+    public void setAlterLevel(String alterLevel) {
+        this.alterLevel = alterLevel;
+    }
+
+    public String getAlterReceiver() {
+        return alterReceiver;
+    }
+
+    public void setAlterReceiver(String alterReceiver) {
+        this.alterReceiver = alterReceiver;
     }
 }

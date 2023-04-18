@@ -23,7 +23,9 @@ INSERT INTO `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, 
     `job_id` bigint(20) DEFAULT NULL COMMENT 'job ID',
     `conversion_job_json` text,
     `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+    `instance_name` varchar(128) DEFAULT NULL COMMENT '执行任务的实例',
+    `status` varchar(128) DEFAULT NULL COMMENT '转换任务状态',
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='dss_orchestrator_job_info表';
 

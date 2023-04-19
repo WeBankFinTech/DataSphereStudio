@@ -208,7 +208,6 @@ export default {
       }
     },
     gotoWorkspace(workspace) {
-      storage.set("curWorkspace", workspace, "local");
       const workspaceId = workspace.workspaceId || workspace.id;
       const currentModules = util.currentModules();
       if (currentModules.microModule === "apiServices") {

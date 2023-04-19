@@ -5,9 +5,9 @@ import moment from 'moment'
  *  @param (Number)
  *  @return (String)
  */
-function formatDate (value) {
+function formatDate (value, format = 'YYYY-MM-DD HH:mm') {
   if (!value) return ''
-  return moment(value).format("YYYY-MM-DD HH:mm")
+  return moment(value).format(format)
 }
 
 export default {

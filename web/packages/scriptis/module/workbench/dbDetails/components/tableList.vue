@@ -23,7 +23,11 @@
     </div>
     <div class="table-data">
       <div class="field-list-header">
-        <div class="field-list-item" style="width:6%;"></div>
+        <div class="field-list-item" style="width:6%;">
+          <Checkbox
+            v-model="selectAll"
+            @on-change="changeCheckAll"
+          /></div>
         <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
         <div
           class="field-list-item"
@@ -44,6 +48,7 @@
           <div class="field-list-item" style="width:6%;">
             <Checkbox
               v-model="item.selected"
+              @on-change="changeCheckList"
               :disabled="item.tableOwner !== getUserName()"
             /></div>
           <div class="field-list-item">{{ index + 1 }}</div>
@@ -71,7 +76,7 @@
             <div class="field-list-item" style="width:50px;">
               <Checkbox
                 v-model="selectAllConfirm"
-                @on-change="changeCheckAll"
+                @on-change="changeCheckAllConfirm"
               />
             </div>
             <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
@@ -223,6 +228,7 @@ export default {
       tablesName: [],
       isTableOwner: '0',
       selectAllConfirm: false,
+      selectAll: false,
       showTransferForm: false,
       formRule: {
         title: [{
@@ -288,10 +294,12 @@ export default {
       });
     },
     pageChange(number) {
+      this.selectAll = false;
       this.pageData.currentPage = number;
       this.getDbTables();
     },
     pageSizeChange(size) {
+      this.selectAll = false;
       this.pageData.pageSize = size;
       this.pageData.currentPage = 1;
       this.getDbTables();
@@ -401,10 +409,24 @@ export default {
     changeCheck() {
       this.selectAllConfirm = this.selectedItems.every(it => it.selected)
     },
-    changeCheckAll(v) {
+    changeCheckAllConfirm(v) {
       this.selectedItems.forEach(item => {
         item.selected = v
       })
+    },
+    changeCheckAll(v) {
+      const u = this.getUserName()
+      this.searchColList = this.searchColList.map(item => {
+        item.selected = v && item.tableOwner === u
+        return item
+      })
+    },
+    changeCheckList() {
+      const u = this.getUserName()
+      this.selectAll = this.searchColList.filter(item => {
+        return item.tableOwner === u
+      }).every(it => it.selected)
+      this.searchColList = [...this.searchColList]
     }
   }
 }

@@ -82,28 +82,60 @@ export default {
         clearTimeout(this.queryTimer)
         const name = copyProjectId + '_copy';
         this.$Notice.close(name);
-        this.$Notice.info({
-          title: this.$t('message.workspace.Prompt'),
-          desc: '',
-          render: (h) => {
-            return h('span', {
-              style: {
-                'word-break': 'break-all',
-                'line-height': '20px',
+        if (res.status === 2) {
+          this.$Notice.success({
+            title: this.$t('message.workspace.Prompt'),
+            desc: '',
+            render: (h) => {
+              return h('span', {
+                style: {
+                  'word-break': 'break-all',
+                  'line-height': '20px',
+                },
               },
+              this.$t('message.workspace.CopyDone')
+              );
             },
-            `复制中(${res.surplusCount}/${res.sumCount})，请稍候...`
-            );
-          },
-          name
-        });
-        if (res.surplusCount < 1) {
-          this.dispatch('Project:loading', false);
-          this.dispatch('Project:getData');
+          })
+        } else if(res.status === 3) {
+          this.$Notice.error({
+            title: this.$t('message.workspace.Prompt'),
+            desc: '',
+            render: (h) => {
+              return h('span', {
+                style: {
+                  'word-break': 'break-all',
+                  'line-height': '20px',
+                },
+              },
+              res.errorMsg
+              );
+            },
+          })
         } else {
-          this.queryTimer = setTimeout(() => {
-            this.queryCopyStatus(copyProjectId)
-          }, 1500);
+          this.$Notice.info({
+            title: this.$t('message.workspace.Prompt'),
+            desc: '',
+            render: (h) => {
+              return h('span', {
+                style: {
+                  'word-break': 'break-all',
+                  'line-height': '20px',
+                },
+              },
+              this.$t('message.workspace.Copying', {data: `(${res.surplusCount}/${res.sumCount})`})
+              );
+            },
+            name
+          });
+          if (res.surplusCount < 1) {
+            this.dispatch('Project:loading', false);
+            this.dispatch('Project:getData');
+          } else {
+            this.queryTimer = setTimeout(() => {
+              this.queryCopyStatus(copyProjectId)
+            }, 1500);
+          }
         }
       } catch (e) {
         //

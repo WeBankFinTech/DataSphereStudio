@@ -1,14 +1,43 @@
 <template>
   <div class="user-serchbar-box">
     <h4 style="margin-bottom: 20px;" class="user-table-title">{{$t('message.workspaceManagement.userManagement')}}</h4>
-    <formserch
-      v-if="canAdd()"
-      @click-serach="search"
-      @click-creater="creater"
-      @click-autojoin="autojoinShowModal"
-      :searchBar="searchBar"
-      :optionType="optionType"
-    ></formserch>
+    <Form v-if="canAdd()" label-position="left" :label-width="40" class="user-serchbar" ref="searchBar" :model="searchBar" inline>
+      <FormItem prop="searchText" :label="$t('message.workspaceManagement.name') + ':'" class="user-serchbar-dep">
+        <Input
+          style="width:250px"
+          v-model="searchBar.searchText"
+          :placeholder="searchBar.title">
+        </Input>
+      </FormItem>
+      <FormItem v-if="optionType.status" prop="status" :label="optionType.title" class="user-serchbar-role">
+        <Select v-model="searchBar.status" style="min-width:120px;">
+          <Option
+            v-for="(item) in optionType.status"
+            :label="item.label"
+            :value="item.value"
+            :key="item.value"
+          />
+        </Select>
+      </FormItem>
+      <FormItem class='float-right'>
+        <Button
+          type="primary"
+          @click="search"
+          style="margin-right:20px;width:80px"
+        >{{$t('message.workspaceManagement.find')}}</Button>
+        <Button
+          type="success"
+          @click="creater"
+          style="margin-right:20px;width:80px"
+        >{{$t('message.workspaceManagement.create')}}</Button>
+        <Button
+          type="success"
+          @click="autojoinShowModal"
+          style="width: 100px"
+          :title="$t('message.workspaceManagement.autojointip')"
+        >{{$t('message.workspaceManagement.autojoin')}}</Button>
+      </FormItem>
+    </Form>
     <Table
       border
       highlight-row
@@ -95,7 +124,7 @@
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
-              :disabled="isSuperAdmin(item)"
+              :disabled="cantModifyAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
@@ -122,7 +151,7 @@
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
-              :disabled="isSuperAdmin(item)"
+              :disabled="cantModifyAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
@@ -157,7 +186,7 @@
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
-              :disabled="isSuperAdmin(item)"
+              :disabled="cantModifyAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
@@ -177,13 +206,13 @@
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import api from '@dataspherestudio/shared/common/service/api';
 import moment from 'moment';
-import formserch from "../component/formsechbar";
+import mixin from '@dataspherestudio/shared/common/service/mixin';
 import { GetWorkspaceUserManagement, getAllDepartments } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 
 export default {
   components: {
-    formserch
   },
+  mixins: [mixin],
   data() {
     return {
       delshow: false,
@@ -246,49 +275,51 @@ export default {
   },
 
   created(){
-    this.workspaceId =parseInt(this.$route.query.workspaceId);
+    this.workspaceId = parseInt(this.$route.query.workspaceId);
+    this.workspaceInfo = this.getCurrentWorkspace();
   },
   mounted() {
+    // 工作空间创建者一定是工作空间管理员；
+    // 工作空间管理员可以修改空间内（除工作空间管理员）任何成员的信息；
+    // 工作空间创建者可以修改自己的权限（不能取消自身管理员角色）以及任何用户的权限；
+    // 只有工作空间创建者有权限授权或取消用户的管理员角色。
+    // 工作空间管理员对其他管理员，在操作界面下，无任何按钮。
+    // 工作空间创建者进入工作空间管理后，对自己的操作中，删除选项可以隐去。
     this.init()
     this.getUserList()
   },
   methods: {
-    isSuperAdmin(item){
-      const isAdmin = this.getIsAdmin();
-      return item.roleId===1 && !isAdmin;
+    cantModifyAdmin(item) {
+      const username = this.getUserName();
+      return item.roleId === 1 && (username !== this.workspaceInfo.createBy || this.row.name === this.workspaceInfo.createBy);
     },
     canAdd(){
-      //管理员可以add
-      const isAdmin = this.getIsAdmin();
       const workspaceRoles = storage.get(`workspaceRoles`) || [];
-      if (isAdmin || workspaceRoles.indexOf('admin') > -1) {
+      if (workspaceRoles.indexOf('admin') > -1) {
         return true;
       } else {
         return false;
       }
     },
-    canDelete(row = {}){
-      //创建者和超级管理员可以删除
-      const isAdmin = this.getIsAdmin();
+    canDelete(row = {}) {
       const username = this.getUserName();
-      if (row.creator === username || isAdmin) {
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      const isWorkspaceCreator = username === this.workspaceInfo.createBy;
+      const isAdmin = row.roles.indexOf(1) > -1;
+      if (workspaceRoles.indexOf('admin') > -1 && !isWorkspaceCreator && !isAdmin || isWorkspaceCreator && row.name !== this.workspaceInfo.createBy) {
         return true;
       } else {
         return false;
       }
     },
-    canEdit(row = {}){
-      //创建者,超级管理员isAdmin,空间管理员可以edit(非isAdmin的空间管理员帐号不能修改其他空间管理员)
-      const isAdmin = this.getIsAdmin();
+    canEdit(row = {}) {
       const username = this.getUserName();
-      if (row.creator === username || isAdmin) {
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      const isWorkspaceCreator = username === this.workspaceInfo.createBy;
+      const isAdmin = row.roles.indexOf(1) > -1;
+      if (workspaceRoles.indexOf('admin') > -1 && row.name !== this.workspaceInfo.createBy && !isAdmin || isWorkspaceCreator) {
         return true;
       } else {
-        // 非isAdmin的空间管理员帐号不能修改其他空间管理员
-        const workspaceRoles = storage.get(`workspaceRoles`) || [];
-        if (workspaceRoles.indexOf('admin') > -1 && row.roles.indexOf(1) == -1) {
-          return true;
-        }
         return false;
       }
     },
@@ -388,6 +419,8 @@ export default {
         { title: this.$t('message.workspaceManagement.department'), slot: "department", align: "center" },
         { title: this.$t('message.workspaceManagement.creator'), key: "creator", align: "center" },
         { title: this.$t('message.workspaceManagement.joinTime'), key: "joinTime", align: "center" },
+        { title: this.$t('message.workspaceManagement.updateUser'), key: "updateUser", align: "center" },
+        { title: this.$t('message.workspaceManagement.updateTime'), key: "updateTime", align: "center" },
         { title: this.$t('message.workspaceManagement.action'), slot: "action", width: 150, align: "center" }
       ];
       return column;
@@ -430,13 +463,6 @@ export default {
       this.row = row;
     },
     del() {
-      const curUserName = this.getUserName();
-      if(this.row.creator === this.row.name){
-        return this.$Message.warning(this.$t("message.workspaceManagement.notsupported"));
-      }
-      if(curUserName === this.row.name){
-        return this.$Message.error(this.$t('message.workspaceManagement.notDeleteMsg'));
-      }
       this.delshow = false;
       const params = {
         workspaceId: this.workspaceId,
@@ -448,8 +474,6 @@ export default {
       });
     },
     edit(row) {
-      // 如果是当前用户修改自己的权限，提示用户不能修改
-      if (row.name === row.creator) return this.$Message.warning(this.$t("message.workspaceManagement.notsupported"));
       this.edituser = {
         role: [...row.roles]
       }
@@ -535,6 +559,7 @@ export default {
     renderFormatTime(data){
       data.forEach(item => {
         item.joinTime = moment.unix(item.joinTime / 1000).format('YYYY-MM-DD HH:mm:ss')
+        item.updateTime = item.updateTime ? moment.unix(item.updateTime / 1000).format('YYYY-MM-DD HH:mm:ss') : ''
       });
       return data;
     },

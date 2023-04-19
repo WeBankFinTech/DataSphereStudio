@@ -15,13 +15,8 @@
       @node-baseInfo="saveNodeBaseInfo"
       @node-param="saveNodeParam"
       @node-delete="nodeDelete"
-      @ctx-menu-associate="checkAssociated"
       @add="addNode"
-      @ctx-menu-relySelect="relySelect"
-      @ctx-menu-mycopy="copyNode"
-      @ctx-menu-mypaste="pasteNode"
-      @ctx-menu-allDelete="allDelete"
-      @ctx-menu-console="openConsole"
+      @on-ctx-menu="onContextMenu"
       @link-delete="linkDelete"
       @link-add="linkAdd">
       <template >
@@ -567,7 +562,25 @@ export default {
               arr.push({
                 text: this.$t('message.workflow.process.relySelect'),
                 value: 'relySelect',
-                icon: 'associate',
+                icon: 'depselect',
+                children: [{
+                  text: this.$t('message.workflow.process.upstreamLevelOne'),
+                  value: 'relySelectUpOne',
+                  icon: 'depselect',
+                }, {
+                  text: this.$t('message.workflow.process.downstreamLevelOne'),
+                  value: 'relySelectDownOne',
+                  icon: 'depselect',
+                }, {
+                  text: this.$t('message.workflow.process.upAllLevel'),
+                  value: 'relySelectUp',
+                  icon: 'depselect',
+                }, {
+                  text: this.$t('message.workflow.process.downAllLevel'),
+                  value: 'relySelectDown',
+                  icon: 'depselect',
+                }
+                ]
               });
               // 通过节点类型去判断是否支持复制
               if (this.nodeCopy(node)) {
@@ -1443,6 +1456,37 @@ export default {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonly'));
       this.saveNodeBaseInfo(node);
     },
+    onContextMenu(menu, data) {
+      switch(menu) {
+        case 'associate':
+          this.checkAssociated(data);
+          break;
+        case 'console':
+          this.openConsole(data);
+          break;
+        case 'mycopy':
+          this.copyNode(data);
+          break;
+        case 'mypaste':
+          this.pasteNode(data);
+          break;
+        case 'allDelete':
+          this.allDelete();
+          break;
+        case 'relySelectUpOne':
+          this.relySelect(data, 'up-one');
+          break;
+        case 'relySelectDownOne':
+          this.relySelect(data, 'down-one');
+          break;
+        case 'relySelectUp':
+          this.relySelect(data, 'up');
+          break;
+        case 'relySelectDown':
+          this.relySelect(data, 'down');
+          break;
+      }
+    },
     checkAssociated(node) {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonlyNoAssociated'));
       if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.PYTHON].indexOf(node.type) === -1) {
@@ -1579,29 +1623,53 @@ export default {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonlyNoCeated'));
       this.saveNodeBaseInfo(this.clickCurrentNode);
     },
-    relySelect(node) {
+    relySelect(node, dir) {
       /**
        * 1.获取当前节点的key
        * 2.查找以当前key为source的节点
        * 3.遍历查找出来的节点数组，接着递归
        *  */
       let stepArray = [];
-      const stepArrayAction = (nodeKey) => {
+      const stepArrayAction = (nodeKey, level = 0) => {
+        level++;
         this.json.edges.forEach((item) => {
-          if (item.source === nodeKey) {
+          if ( dir === 'down' && item.source === nodeKey) {
+            stepArray.push({...item, level});
+            stepArrayAction(item.target, level);
+          } else if(dir === 'up' && item.target === nodeKey) {
+            stepArray.push({...item, level});
             stepArray.push(item);
-            stepArrayAction(item.target);
+            stepArrayAction(item.source, level);
+          } else if(dir === 'down-one' && item.source === nodeKey) {
+            stepArray.push({...item, level});
+          } else if(dir === 'up-one' && item.target === nodeKey) {
+            stepArray.push({...item, level});
           }
         });
       };
       stepArrayAction(node.key);
       this.json.nodes = this.json.nodes.map((subItem) => {
-        if (stepArray.some((item) => item.target === subItem.key) || subItem.key === node.key) {
+        let runState
+        const inDeps = stepArray.find((item) => (item.target === subItem.key && dir.includes('down')) || (item.source === subItem.key && dir.includes('up')))
+        if (inDeps || subItem.key === node.key) {
           subItem.selected = true;
+          if (inDeps) {
+            runState = {
+              outerText: inDeps.level,
+              outerStyle: {
+                position: 'absolute',
+                top: '12px',
+                right: '-30px',
+                width: '30px',
+                textAlign: 'center',
+                color: 'rgb(237, 64, 20)',
+              }
+            }
+          }
         } else {
           subItem.selected = false;
         }
-        return subItem;
+        return {...subItem, runState};
       });
       this.originalData = this.json;
     },

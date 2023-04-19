@@ -42,7 +42,7 @@
         class="node-anchor"
         @mousedown.stop="clickAnchor(arrow, $event)" />
     </template>
-
+    <div v-if="runState.outerText && selected" :style="runState.outerStyle" >{{ runState.outerText }}</div>
   </div>
 </template>
 <script>
@@ -344,21 +344,30 @@ export default {
       if (userMenu && Array.isArray(userMenu)) {
         arr = arr.concat(userMenu);
       }
+      /**
+       * 处理图标
+       */
+      function iconHelper (arr = []) {
+        return arr.map((it) => {
+          let menuItem = {
+            text: it.text,
+            value: it.value,
+          }
+          if (it.img) {
+            menuItem.img = it.img;
+          } else if (it.icon) {
+            menuItem.icon = it.icon;
+          }
+          if (it.children) {
+            menuItem.children = iconHelper(it.children)
+          }
+          return menuItem
+        });
+      }
       if (typeof beforeShowMenu === 'function') {
         arr = beforeShowMenu(this.selfNode, arr, 'node');
         if (Array.isArray(arr)) {
-          arr = arr.map((it) => {
-            let menuItem = {
-              text: it.text,
-              value: it.value
-            }
-            if (it.img) {
-              menuItem.img = it.img;
-            } else if (it.icon) {
-              menuItem.icon = it.icon;
-            }
-            return menuItem
-          });
+          arr = iconHelper(arr)
         } else {
           console.warn('ctxMenuOptions.beforeShowMenu' + this.$t('message.workflow.process.returnRule'))
         }
@@ -370,7 +379,7 @@ export default {
         top: e.clientY,
         choose: (data) => {
           // if (this.state.disabled) return;
-          this.designer.$emit(`ctx-menu-${data.value}`, this.selfNode, 'node')
+          this.designer.$emit(`on-ctx-menu`, data.value, this.selfNode, 'node')
           this.$emit('operat-node', data.value, this.k);
         }
       })

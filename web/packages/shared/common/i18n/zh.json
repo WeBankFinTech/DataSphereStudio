@@ -1,6 +1,11 @@
 {
   "message": {
     "common": {
+      "apierrmsg": "后台接口异常，请联系开发处理！",
+      "errsubmit": "上报错误",
+      "errsubmited": "错误已上报",
+      "errsolution": "查看解决方案",
+      "errTitle": "错误提示",
       "log": "日志",
       "diagnosis": "智能诊断",
       "watermaskText": "由DataWorkShop生成，仅供内部参考，严禁对外分享",

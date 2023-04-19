@@ -366,6 +366,7 @@ CREATE TABLE `dss_workflow_task` (
   `log_path` varchar(200) DEFAULT NULL COMMENT 'File path of the log files',
   `result_location` varchar(200) DEFAULT NULL COMMENT 'File path of the result',
   `status` varchar(50) DEFAULT NULL COMMENT 'Script execution status, must be one of the following: Inited, WaitForRetry, Scheduled, Running, Succeed, Failed, Cancelled, Timeout',
+  `instance_name` varchar(128) DEFAULT NULL COMMENT 'Execute task instance',
   `created_time` datetime DEFAULT NULL COMMENT 'Creation time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Update time',
   `run_type` varchar(50) DEFAULT NULL COMMENT 'Further refinement of execution_application_time, e.g, specifying whether to run pySpark or SparkR',

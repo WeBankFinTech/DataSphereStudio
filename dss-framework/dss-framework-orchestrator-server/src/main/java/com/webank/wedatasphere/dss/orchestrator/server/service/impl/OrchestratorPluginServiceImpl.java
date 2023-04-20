@@ -58,7 +58,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class OrchestratorPluginServiceImpl implements OrchestratorPluginService {
@@ -191,7 +190,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         orchestratorPublishJob.setCreateTime(new Date(System.currentTimeMillis()));
         orchestratorPublishJob.setUpdateTime(new Date(System.currentTimeMillis()));
         orchestratorPublishJob.setConversionJobJson(job.toString());
-
+        job.setOrchestratorPublishJob(orchestratorPublishJob);
         orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
         //submit it
         releaseThreadPool.submit(job);

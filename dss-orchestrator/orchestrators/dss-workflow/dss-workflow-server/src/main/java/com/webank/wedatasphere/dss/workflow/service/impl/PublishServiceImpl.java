@@ -116,7 +116,7 @@ public class PublishServiceImpl implements PublishService {
     }
 
     /**
-     * 可覆写该方法自定义实现发布对象内容
+     * 可覆写该方法自定义实现发布对象
      *
      * @return
      */
@@ -132,7 +132,8 @@ public class PublishServiceImpl implements PublishService {
         ResponseConvertOrchestrator response =new ResponseConvertOrchestrator();
         //通过rpc的方式去获取到最新status
         try {
-            RequestFrameworkConvertOrchestrationStatus req = new RequestFrameworkConvertOrchestrationStatus(taskId);
+            RequestFrameworkConvertOrchestrationStatus req = getRequestFrameworkConvertOrchestrationStatus();
+            req.setId(taskId);
             response = RpcAskUtils.processAskException(getOrchestratorSender().ask(req), ResponseConvertOrchestrator.class, RequestFrameworkConvertOrchestrationStatus.class);
             LOGGER.info("user {} gets status of {}, status is {}，msg is {}", username, taskId, response.getResponse().getJobStatus(), response.getResponse().getMessage());
         }catch (Exception t){
@@ -142,4 +143,12 @@ public class PublishServiceImpl implements PublishService {
         return response;
     }
 
+    /**
+     * 可覆写该方法自定义实现发布状态
+     *
+     * @return
+     */
+    protected RequestFrameworkConvertOrchestrationStatus getRequestFrameworkConvertOrchestrationStatus(){
+        return new RequestFrameworkConvertOrchestrationStatus();
+    }
 }

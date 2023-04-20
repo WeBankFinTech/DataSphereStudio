@@ -40,6 +40,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublis
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf;
+import com.webank.wedatasphere.dss.orchestrator.publish.job.CommonUpdateConvertJobStatus;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
@@ -57,7 +58,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class OrchestratorPluginServiceImpl implements OrchestratorPluginService {
@@ -72,6 +72,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Autowired
     private DSSOrchestratorContext dssOrchestratorContext;
+
+    @Autowired
+    private CommonUpdateConvertJobStatus commonUpdateConvertJobStatus;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
 
@@ -176,6 +179,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         dssProject.setId(projectId);
         entity.setProject(dssProject);
         job.setConversionJobEntity(entity);
+        job.setCommonUpdateConvertJobStatus(commonUpdateConvertJobStatus);
         job.setConversionDSSOrchestratorPlugins(dssOrchestratorContext.getOrchestratorPlugins());
         job.afterConversion(response -> this.updateDBAfterConversion(toPublishOrcId, response, job.getConversionJobEntity(), requestConversionOrchestration));
 
@@ -186,7 +190,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         orchestratorPublishJob.setCreateTime(new Date(System.currentTimeMillis()));
         orchestratorPublishJob.setUpdateTime(new Date(System.currentTimeMillis()));
         orchestratorPublishJob.setConversionJobJson(job.toString());
-
+        job.setOrchestratorPublishJob(orchestratorPublishJob);
         orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
         //submit it
         releaseThreadPool.submit(job);

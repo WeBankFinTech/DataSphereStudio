@@ -204,11 +204,11 @@ public class DSSWorkspaceUserRestful {
         return Message.ok().data("userName", username).data("roleInfo", userRoles);
     }
 
-    @RequestMapping(path = "clearUser", method = RequestMethod.DELETE)
-    public Message clearUser(@RequestParam(name = "userName") String username) {
-        dssWorkspaceUserService.clearUserByUserName(username);
-        AuditLogUtils.printLog(username,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
+    @RequestMapping(path = "/clearUser/{userName}", method = RequestMethod.POST)
+    public Message clearUser(@PathVariable("userName") String userName) {
+        dssWorkspaceUserService.clearUserByUserName(userName);
+        AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
                 null, OperateTypeEnum.DELETE,null);
-        return Message.ok();
+        return Message.ok("删除成功");
     }
 }

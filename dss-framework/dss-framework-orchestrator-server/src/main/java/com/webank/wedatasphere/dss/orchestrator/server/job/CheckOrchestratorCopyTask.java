@@ -38,7 +38,7 @@ public class CheckOrchestratorCopyTask {
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkOrchestratorCopyJobTask() {
 
-        ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.DSS_SERVER_NAME.getValue());
+        ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue());
         if (allActionInstances.length == DSSCommonConf.DSS_INSTANCE_NUMBERS.getValue()){
             LOGGER.info("All instances are active!");
             return;

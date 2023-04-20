@@ -11,7 +11,7 @@ public class PageInfo<T> {
     List<T> data;
     long total;
 
-    public PageInfo(List<T> data, Integer total) {
+    public PageInfo(List<T> data, Long total) {
         this.data = data;
         this.total = total;
     }

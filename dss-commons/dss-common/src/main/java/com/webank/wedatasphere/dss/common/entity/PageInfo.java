@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class PageInfo<T> {
     List<T> data;
-    Integer total;
+    long total;
 
     public PageInfo(List<T> data, Integer total) {
         this.data = data;
@@ -24,11 +24,11 @@ public class PageInfo<T> {
         this.data = data;
     }
 
-    public Integer getTotal() {
+    public long getTotal() {
         return total;
     }
 
-    public void setTotal(Integer total) {
+    public void setTotal(long total) {
         this.total = total;
     }
 }

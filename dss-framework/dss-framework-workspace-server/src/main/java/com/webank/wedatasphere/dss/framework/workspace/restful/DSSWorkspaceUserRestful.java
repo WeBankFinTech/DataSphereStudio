@@ -204,8 +204,8 @@ public class DSSWorkspaceUserRestful {
         return Message.ok().data("userName", username).data("roleInfo", userRoles);
     }
 
-    @RequestMapping(path = "/clearUser/{userName}", method = RequestMethod.POST)
-    public Message clearUser(@PathVariable("userName") String userName) {
+    @RequestMapping(path = "/clearUser", method = RequestMethod.GET)
+    public Message clearUser(@RequestParam("userName") String userName) {
         dssWorkspaceUserService.clearUserByUserName(userName);
         AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
                 null, OperateTypeEnum.DELETE,null);

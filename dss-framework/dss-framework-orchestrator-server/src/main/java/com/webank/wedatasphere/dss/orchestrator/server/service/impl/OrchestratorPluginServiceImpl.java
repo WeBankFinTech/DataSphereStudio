@@ -40,6 +40,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublis
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf;
+import com.webank.wedatasphere.dss.orchestrator.publish.job.CommonUpdateConvertJobStatus;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
@@ -72,6 +73,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Autowired
     private DSSOrchestratorContext dssOrchestratorContext;
+
+    @Autowired
+    private CommonUpdateConvertJobStatus commonUpdateConvertJobStatus;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
 
@@ -176,6 +180,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         dssProject.setId(projectId);
         entity.setProject(dssProject);
         job.setConversionJobEntity(entity);
+        job.setCommonUpdateConvertJobStatus(commonUpdateConvertJobStatus);
         job.setConversionDSSOrchestratorPlugins(dssOrchestratorContext.getOrchestratorPlugins());
         job.afterConversion(response -> this.updateDBAfterConversion(toPublishOrcId, response, job.getConversionJobEntity(), requestConversionOrchestration));
 

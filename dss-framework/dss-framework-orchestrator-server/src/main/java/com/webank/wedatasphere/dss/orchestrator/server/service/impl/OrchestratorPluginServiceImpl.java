@@ -42,7 +42,6 @@ import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlu
 import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
-import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -192,7 +191,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
         //submit it
         releaseThreadPool.submit(job);
-        DSSOrchestratorConstant.orchestratorConversionJobMap.put(job.getId(), job);
+
         LOGGER.info("publish orchestrator success. publishedOrcIds:{} ",publishedOrcIds);
         return new ResponseConvertOrchestrator(job.getId(), entity.getResponse());
     }
@@ -290,18 +289,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     public ResponseConvertOrchestrator getConvertOrchestrationStatus(String id) {
         String jobId;
         ResponseOperateOrchestrator responseOperateOrchestrator = new ResponseOperateOrchestrator();
-        OrchestratorConversionJob job = DSSOrchestratorConstant.orchestratorConversionJobMap.get(id);
-        if (job != null) {
-            jobId = job.getId();
-            responseOperateOrchestrator.setJobStatus(job.getConversionJobEntity().getResponse().getJobStatus());
-            if (job.getConversionJobEntity().getResponse().isCompleted()) {
-                DSSOrchestratorConstant.orchestratorConversionJobMap.remove(job.getId());
-            }
-        } else {
-            OrchestratorPublishJob publishJob = orchestratorJobMapper.getPublishJobByJobId(id);
-            jobId = publishJob.getJobId();
-            responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByStatus(publishJob.getStatus()));
-        }
+        OrchestratorPublishJob publishJob = orchestratorJobMapper.getPublishJobByJobId(id);
+        jobId = publishJob.getJobId();
+        responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByStatus(publishJob.getStatus()));
         return new ResponseConvertOrchestrator(jobId, responseOperateOrchestrator);
     }
 

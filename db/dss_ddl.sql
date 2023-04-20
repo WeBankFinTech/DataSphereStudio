@@ -582,6 +582,8 @@ CREATE TABLE `dss_workspace_user_role` (
   `create_time` datetime DEFAULT NULL,
   `created_by` varchar(255) DEFAULT NULL,
   `user_id` bigint(20) DEFAULT NULL,
+  `update_user` varchar(32) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
 

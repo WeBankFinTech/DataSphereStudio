@@ -74,7 +74,6 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     private DSSOrchestratorContext dssOrchestratorContext;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
-    private AtomicInteger idGenerator = new AtomicInteger();
 
     @Override
     public ResponseConvertOrchestrator convertOrchestration(RequestFrameworkConvertOrchestration requestConversionOrchestration) {
@@ -161,7 +160,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             return new ResponseConvertOrchestrator("no-necessary-id", ResponseOperateOrchestrator.failed("No suitable workflow(s) found, publish is ignored."));
         }
         OrchestratorConversionJob job = new OrchestratorConversionJob();
-        job.setId(generateId());
+        job.setId(String.valueOf(UUID.randomUUID()));
         LOGGER.info("user {} try to submit a conversion job {}, the orchestrationIdMap is {}, the orcIdList is {}.", requestConversionOrchestration.getUserName(),
                 job.getId(), orchestrationIdMap, publishedOrcIds);
 
@@ -293,10 +292,6 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         jobId = publishJob.getJobId();
         responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByStatus(publishJob.getStatus()));
         return new ResponseConvertOrchestrator(jobId, responseOperateOrchestrator);
-    }
-
-    private String generateId() {
-        return String.valueOf(idGenerator.getAndIncrement());
     }
 
     private void updateDBAfterConversion(Long toPublishOrcId,ResponseOperateOrchestrator response,

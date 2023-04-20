@@ -45,11 +45,7 @@
     <update id="updatePublishJob" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">
         UPDATE dss_orchestrator_job_info
         <trim prefix="set" suffixOverrides=",">
-            <if test="jobId != null">job_id =#{jobId},</if>
-            <if test="conversionJobJson != null">conversion_job_json =#{conversionJobJson},</if>
-            <if test="createTime != null">create_time =#{createTime},</if>
             <if test="updateTime != null">update_time =#{updateTime},</if>
-            <if test="instanceName != null">instance_name = #{instanceName},</if>
             <if test="status != null">status = #{status},</if>
         </trim>
         WHERE id = #{id}

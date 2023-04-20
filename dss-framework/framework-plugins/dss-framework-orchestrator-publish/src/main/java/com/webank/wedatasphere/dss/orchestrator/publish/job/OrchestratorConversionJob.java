@@ -49,9 +49,6 @@ public final class OrchestratorConversionJob implements Runnable {
     private Consumer<ResponseOperateOrchestrator> consumer;
     private CommonUpdateConvertJobStatus commonUpdateConvertJobStatus;
 
-    @Autowired
-    private OrchestratorJobMapper orchestratorJobMapper;
-
     public String getId() {
         return id;
     }
@@ -76,6 +73,14 @@ public final class OrchestratorConversionJob implements Runnable {
         this.consumer = consumer;
     }
 
+    public CommonUpdateConvertJobStatus getCommonUpdateConvertJobStatus() {
+        return commonUpdateConvertJobStatus;
+    }
+
+    public void setCommonUpdateConvertJobStatus(CommonUpdateConvertJobStatus commonUpdateConvertJobStatus) {
+        this.commonUpdateConvertJobStatus = commonUpdateConvertJobStatus;
+    }
+
     @Override
     public void run() {
         //1.从编排中心导出一次工作流,进行一次版本升级
@@ -83,7 +88,7 @@ public final class OrchestratorConversionJob implements Runnable {
         LOGGER.info("Job {} begin to convert project {} for user {} to scheduler, the orchestrationIds is {}.", id,
             conversionJobEntity.getProject().getId(), conversionJobEntity.getUserName(), conversionJobEntity.getOrchestrationIdMap().keySet());
         conversionJobEntity.setResponse(ResponseOperateOrchestrator.running());
-        commonUpdateConvertJobStatus.toRunningStatus(this);
+        this.commonUpdateConvertJobStatus.toRunningStatus(this);
         ConversionDSSOrchestratorPlugin conversionDSSOrchestratorPlugin = null;
         for (DSSOrchestratorPlugin plugin: conversionDSSOrchestratorPlugins) {
             if(plugin instanceof ConversionDSSOrchestratorPlugin) {
@@ -107,13 +112,13 @@ public final class OrchestratorConversionJob implements Runnable {
             consumer.accept(response);
             LOGGER.info("{} completed with status {}.", getId(), response.getJobStatus());
             conversionJobEntity.setResponse(response);
-            commonUpdateConvertJobStatus.toSuccessStatus(this);
+            this.commonUpdateConvertJobStatus.toSuccessStatus(this);
         } catch (final Exception t){
             LOGGER.error("Job {} convert for project {} failed.", id, conversionJobEntity.getProject().getId(), t);
             ResponseOperateOrchestrator response = ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(t));
             conversionJobEntity.setResponse(response);
             consumer.accept(response);
-            commonUpdateConvertJobStatus.toFailedStatus(this);
+            this.commonUpdateConvertJobStatus.toFailedStatus(this);
         }
         LOGGER.info("Job {} convert project {} for user {} to Orchestrator {}, costs {}.", id, conversionJobEntity.getProject().getId(),
             conversionJobEntity.getUserName(), conversionJobEntity.getResponse().getJobStatus(), ByteTimeUtils.msDurationToString(conversionJobEntity.getUpdateTime().getTime() - conversionJobEntity.getCreateTime().getTime()));

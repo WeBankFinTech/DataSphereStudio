@@ -18,13 +18,11 @@ package com.webank.wedatasphere.dss.orchestrator.publish.job;
 
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
-import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -32,7 +30,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.utils.ByteTimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -48,6 +45,16 @@ public final class OrchestratorConversionJob implements Runnable {
     private List<DSSOrchestratorPlugin> conversionDSSOrchestratorPlugins;
     private Consumer<ResponseOperateOrchestrator> consumer;
     private CommonUpdateConvertJobStatus commonUpdateConvertJobStatus;
+
+    private OrchestratorPublishJob orchestratorPublishJob;
+
+    public OrchestratorPublishJob getOrchestratorPublishJob() {
+        return orchestratorPublishJob;
+    }
+
+    public void setOrchestratorPublishJob(OrchestratorPublishJob orchestratorPublishJob) {
+        this.orchestratorPublishJob = orchestratorPublishJob;
+    }
 
     public String getId() {
         return id;
@@ -88,7 +95,7 @@ public final class OrchestratorConversionJob implements Runnable {
         LOGGER.info("Job {} begin to convert project {} for user {} to scheduler, the orchestrationIds is {}.", id,
             conversionJobEntity.getProject().getId(), conversionJobEntity.getUserName(), conversionJobEntity.getOrchestrationIdMap().keySet());
         conversionJobEntity.setResponse(ResponseOperateOrchestrator.running());
-        this.commonUpdateConvertJobStatus.toRunningStatus(this);
+        this.commonUpdateConvertJobStatus.toRunningStatus(this.orchestratorPublishJob);
         ConversionDSSOrchestratorPlugin conversionDSSOrchestratorPlugin = null;
         for (DSSOrchestratorPlugin plugin: conversionDSSOrchestratorPlugins) {
             if(plugin instanceof ConversionDSSOrchestratorPlugin) {
@@ -112,13 +119,13 @@ public final class OrchestratorConversionJob implements Runnable {
             consumer.accept(response);
             LOGGER.info("{} completed with status {}.", getId(), response.getJobStatus());
             conversionJobEntity.setResponse(response);
-            this.commonUpdateConvertJobStatus.toSuccessStatus(this);
+            this.commonUpdateConvertJobStatus.toSuccessStatus(this.orchestratorPublishJob);
         } catch (final Exception t){
             LOGGER.error("Job {} convert for project {} failed.", id, conversionJobEntity.getProject().getId(), t);
             ResponseOperateOrchestrator response = ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(t));
             conversionJobEntity.setResponse(response);
             consumer.accept(response);
-            this.commonUpdateConvertJobStatus.toFailedStatus(this);
+            this.commonUpdateConvertJobStatus.toFailedStatus(this.orchestratorPublishJob);
         }
         LOGGER.info("Job {} convert project {} for user {} to Orchestrator {}, costs {}.", id, conversionJobEntity.getProject().getId(),
             conversionJobEntity.getUserName(), conversionJobEntity.getResponse().getJobStatus(), ByteTimeUtils.msDurationToString(conversionJobEntity.getUpdateTime().getTime() - conversionJobEntity.getCreateTime().getTime()));

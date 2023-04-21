@@ -1,34 +1,96 @@
 <template>
   <div style="height: 100%;  padding: 10px 15px;">
     <div class="title">{{ $t('message.enginelist.ruleset')}}</div>
-    <Form class="table-searchbar" ref="searchBar" :model="searchBar" inline label-position="left">
-      <FormItem prop="name" :label="$t('message.enginelist.rulename')" :label-width="80">
+    <Form
+      class="table-searchbar"
+      ref="searchBar"
+      :model="searchBar"
+      inline
+      label-position="left"
+    >
+      <FormItem
+        prop="name"
+        :label="$t('message.enginelist.rulename')"
+        :label-width="80"
+      >
         <Input v-model="searchBar.name" />
       </FormItem>
-      <FormItem prop="yarnQueue" :label="$t('message.enginelist.queue')" :label-width="50">
-        <Input v-model="searchBar.yarnQueue" />
+      <FormItem
+        prop="yarnQueue"
+        :label="$t('message.enginelist.queue')"
+        :label-width="50"
+      >
+        <Select
+          style="width:150px"
+          v-model="searchBar.yarnQueue"
+          filterable
+        >
+          <Option
+            v-for="(item) in queues"
+            :label="item"
+            :title="item"
+            :value="item"
+            :key="item"
+          />
+        </Select>
       </FormItem>
-      <FormItem prop="status" :label="$t('message.enginelist.status')" :label-width="50">
-        <Select v-model="searchBar.status" multiple style="min-width:120px;">
-          <Option v-for="(item) in statusList" :label="item.label" :value="item.value" :key="item.value" />
+      <FormItem
+        prop="status"
+        :label="$t('message.enginelist.status')"
+        :label-width="50"
+      >
+        <Select
+          v-model="searchBar.status"
+          multiple
+          style="min-width:120px;"
+        >
+          <Option
+            v-for="(item) in statusList"
+            :label="item.label"
+            :value="item.value"
+            :key="item.value"
+          />
         </Select>
       </FormItem>
       <FormItem class="btn">
-        <Button type="primary" @click="doQuery">{{$t('message.enginelist.find')}}</Button>
-        <Button type="success" @click="add">{{$t('message.enginelist.add')}}</Button>
+        <Button
+          type="primary"
+          @click="doQuery"
+        >{{$t('message.enginelist.find')}}</Button>
+        <Button
+          type="success"
+          @click="add"
+        >{{$t('message.enginelist.add')}}</Button>
       </FormItem>
     </Form>
     <div class="card-list-wrapper">
-      <div class="card-item" v-for="item in showList" :key="item.name">
+      <div
+        class="card-item"
+        v-for="item in showList"
+        :key="item.name"
+      >
         <div class="row-title">
           <div> {{item.name}}
-            <span class="status" :class="{enable:item.status}" >
+            <span
+              class="status"
+              :class="{enable:item.status}"
+            >
               [{{item.status ? $t('message.enginelist.enable') : $t('message.enginelist.disable')}}]
-            </span></div>
+            </span>
+          </div>
           <div>
-            <span class="btn-text" @click="edit(item)">{{$t('message.enginelist.edit')}}</span>
-            <span class="btn-text" @click="enable(item)">{{ item.enable ? $t('message.enginelist.disable') : $t('message.enginelist.enable')}}</span>
-            <span class="btn-text del" @click="deleteItem(item)">{{$t('message.enginelist.delete')}}</span>
+            <span
+              class="btn-text"
+              @click="edit(item)"
+            >{{$t('message.enginelist.edit')}}</span>
+            <span
+              class="btn-text"
+              @click="enable(item)"
+            >{{ item.enable ? $t('message.enginelist.disable') : $t('message.enginelist.enable')}}</span>
+            <span
+              class="btn-text del"
+              @click="deleteItem(item)"
+            >{{$t('message.enginelist.delete')}}</span>
           </div>
         </div>
         <div class="row-item">
@@ -69,7 +131,10 @@
           {{ $t('message.enginelist.ruleform.createTime')}}：{{ item.createTime | formatDate('YYYY-MM-DD HH:mm:ss') }}
         </div>
       </div>
-      <div v-if="showList.length<1" class="no-data">{{ $t('message.common.No') }}</div>
+      <div
+        v-if="showList.length<1"
+        class="no-data"
+      >{{ $t('message.common.No') }}</div>
     </div>
     <Page
       v-if="pageData.total > 10"
@@ -82,6 +147,7 @@
     />
     <Modal
       v-model="showModal"
+      :width="600"
       :title="isEdit ? $t('message.enginelist.ruleform.edittitle') : $t('message.enginelist.ruleform.addtitle')"
     >
       <Form
@@ -90,10 +156,12 @@
         class="engine_kill_rule_form"
         :label-width="80"
         :model="formData"
-        :rules="formValid">
+        :rules="formValid"
+      >
         <FormItem
           :label="$t('message.enginelist.rulename')"
-          prop="name">
+          prop="name"
+        >
           <Input
             v-model="formData.name"
             :placeholder="$t('message.enginelist.ruleform.enterName')"
@@ -101,7 +169,8 @@
         </FormItem>
         <FormItem
           :label="$t('message.enginelist.ruleform.description')"
-          prop="description">
+          prop="description"
+        >
           <Input
             v-model="formData.description"
             type="textarea"
@@ -109,103 +178,157 @@
         </FormItem>
         <FormItem
           :label="$t('message.enginelist.ruleform.queue')"
-          prop="queue">
+          prop="queue"
+        >
           <Select
             v-model="formData.queue"
-            :placeholder="$t('message.enginelist.ruleform.selectqueue')">
+            style="width:150px"
+            filterable
+            :disabled="isEdit"
+            :placeholder="$t('message.enginelist.ruleform.selectqueue')"
+          >
             <Option
               v-for="(item) in queues"
               :label="item"
               :value="item"
-              :key="item"/>
+              :title="item"
+              :key="item"
+            />
           </Select>
         </FormItem>
         <!-- 触发条件 -->
         <FormItem
-          :label="$t('message.enginelist.ruleform.trigger')"
-          prop="triggerConditionConf">
-          <span style="margin-right:10px">{{$t('message.enginelist.ruleform.relation')}}</span>
-          <RadioGroup v-model="formData.triggerConditionConf.relation">
-            <Radio label="and">{{$t('message.enginelist.ruleform.and')}}</Radio>
-            <Radio label="or">{{$t('message.enginelist.ruleform.or')}}</Radio>
-          </RadioGroup>
-          <div v-for="(ruleIt,idx) in formData.triggerConditionConf.conditions" :key="idx" style="display:flex;margin:5px 0;">
-            <Select
-              v-model="formData.triggerConditionConf.conditions[idx].field"
-              :placeholder="$t('message.enginelist.ruleform.selectqueue')">
-              <Option
-                v-for="(item, index) in types"
-                :label="item.label"
-                :value="item.value"
-                :key="index"/>
-            </Select>
-            <span style="margin:0 20px">>=</span>
-            <InputNumber style="width:120px; margin-right:5px" placeholder="1-100" type="number"
-              :max="100" :min="1" v-model="formData.triggerConditionConf.conditions[idx].value" /> %
-            <div class="delete-icon" @click="delRuleItem('triggerConditionConf', idx)"><SvgIcon icon-class="delete"/></div>
-          </div>
-          <div v-if="ruleItemValid.triggerConditionConf" class="item-error-tip">{{ruleItemValid.triggerConditionConf}}</div>
-          <div v-if="formData.triggerConditionConf.conditions.length < 2" class="addBtn" @click="addTrigger">
-            {{$t('message.enginelist.ruleform.addruleit')}}
-          </div>
+          :label="$t('message.enginelist.ruleform.conditionSet')"
+          prop="triggerConditionConf"
+        >
+          <Checkbox v-model="conditionRule.cpu">{{$t('message.enginelist.cpu')}}</Checkbox>
+          <Checkbox v-model="conditionRule.memory">{{$t('message.enginelist.memory')}}</Checkbox>
         </FormItem>
-        <!-- 终止条件 -->
-        <FormItem
-          :label="$t('message.enginelist.ruleform.stop')"
-          prop="terminateConditionConf">
-          <span style="margin-right:10px">{{$t('message.enginelist.ruleform.relation')}}</span>
-          <RadioGroup v-model="formData.terminateConditionConf.relation">
-            <Radio label="and">{{$t('message.enginelist.ruleform.and')}}</Radio>
-            <Radio label="or">{{$t('message.enginelist.ruleform.or')}}</Radio>
-          </RadioGroup>
-          <div v-for="(ruleIt,idx) in formData.terminateConditionConf.conditions" :key="idx" style="display:flex;margin:5px 0;">
-            <Select
-              v-model="formData.terminateConditionConf.conditions[idx].field"
-              :placeholder="$t('message.enginelist.ruleform.selectqueue')">
-              <Option
-                v-for="(item, index) in types"
-                :label="item.label"
-                :value="item.value"
-                :key="index"/>
-            </Select>
-            <span style="margin:0 20px"><=</span>
-            <InputNumber style="width:120px; margin-right:5px" placeholder="1-100" type="number"
-              :max="100" :min="1" v-model="formData.terminateConditionConf.conditions[idx].value" /> %
-            <div class="delete-icon" @click="delRuleItem('terminateConditionConf', idx)"><SvgIcon icon-class="delete"/></div>
-          </div>
-          <div v-if="ruleItemValid.terminateConditionConf" class="item-error-tip">{{ruleItemValid.terminateConditionConf}}</div>
-          <div v-if="formData.terminateConditionConf.conditions.length < 2" class="addBtn" @click="addStop">
-            {{$t('message.enginelist.ruleform.addruleit')}}
-          </div>
-        </FormItem>
+        <Row class="condition-row">
+          <Col span="12">
+            <div>{{ $t('message.enginelist.ruleform.trigger') }}</div>
+            <div
+              v-if="conditionRule.cpu"
+              class="rule-field"
+            >
+              <span> {{$t('message.enginelist.cpu')}} </span>
+              <InputNumber
+                style="width:70px; margin-right:5px;margin-left:10px"
+                placeholder="1-100"
+                type="number"
+                @on-blur="validInput"
+                :max="100"
+                :min="1"
+                v-model="formData.triggerConditionConf.conditions[0].value"
+              /> %
+            </div>
+            <div
+              v-if="conditionRule.memory"
+              class="rule-field"
+            >
+              <span> {{$t('message.enginelist.memory')}} </span>
+              <InputNumber
+                style="width:70px; margin-right:5px;margin-left:10px"
+                placeholder="1-100"
+                type="number"
+                @on-blur="validInput"
+                :max="100"
+                :min="1"
+                v-model="formData.triggerConditionConf.conditions[1].value"
+              /> %
+            </div>
+            <span
+              v-if="conditionRule.cpu && conditionRule.memory"
+              style="margin-right:10px"
+            >{{$t('message.enginelist.ruleform.relation')}}</span>
+            <RadioGroup
+              v-if="conditionRule.cpu && conditionRule.memory"
+              v-model="formData.triggerConditionConf.relation"
+            >
+              <Radio label="and">{{$t('message.enginelist.ruleform.and')}}</Radio>
+              <Radio label="or">{{$t('message.enginelist.ruleform.or')}}</Radio>
+            </RadioGroup>
+          </Col>
+          <Col span="12">
+            <div>{{ $t('message.enginelist.ruleform.stop') }}</div>
+            <div
+              v-if="conditionRule.cpu"
+              class="rule-field"
+            >
+              <span> {{$t('message.enginelist.cpu')}} </span>
+              <InputNumber
+                style="width:70px; margin-right:5px;margin-left:10px"
+                placeholder="1-100"
+                type="number"
+                @on-blur="validInput"
+                :max="100"
+                :min="1"
+                v-model="formData.terminateConditionConf.conditions[0].value"
+              /> %
+            </div>
+            <div
+              v-if="conditionRule.memory"
+              class="rule-field"
+            >
+              <span> {{$t('message.enginelist.memory')}} </span>
+              <InputNumber
+                style="width:70px; margin-right:5px;margin-left:10px"
+                @on-blur="validInput"
+                placeholder="1-100"
+                type="number"
+                :max="100"
+                :min="1"
+                v-model="formData.terminateConditionConf.conditions[1].value"
+              /> %
+            </div>
+            <span
+              v-if="conditionRule.cpu && conditionRule.memory"
+              style="margin-right:10px"
+            >{{$t('message.enginelist.ruleform.relation')}}</span>
+            <RadioGroup
+              v-if="conditionRule.cpu && conditionRule.memory"
+              v-model="formData.terminateConditionConf.relation"
+            >
+              <Radio label="and">{{$t('message.enginelist.ruleform.and')}}</Radio>
+              <Radio label="or">{{$t('message.enginelist.ruleform.or')}}</Radio>
+            </RadioGroup>
+          </Col>
+        </Row>
+        <div
+          v-if="ruleItemValid"
+          class="item-error-tip"
+        >{{ruleItemValid}}</div>
         <FormItem
           :label="$t('message.enginelist.ruleform.alertset')"
-          prop="imsConf.enable">
+          prop="imsConf.enable"
+        >
           <Checkbox v-model="formData.imsConf.enable">{{$t('message.enginelist.ruleform.alertoption')}}</Checkbox>
         </FormItem>
         <FormItem
           v-show="formData.imsConf.enable"
           :label="$t('message.enginelist.ruleform.level')"
-          prop="imsConf.level">
-          <Select
-            v-model="formData.imsConf.level">
+          prop="imsConf.level"
+        >
+          <Select v-model="formData.imsConf.level">
             <Option
               v-for="(item) in levels"
               :label="item"
               :value="item"
-              :key="item"/>
+              :key="item"
+            />
           </Select>
         </FormItem>
         <FormItem
           v-show="formData.imsConf.enable"
           :label="$t('message.enginelist.ruleform.duration')"
-          prop="imsConf.duration">
-          <Select
-            v-model="formData.imsConf.duration">
+          prop="imsConf.duration"
+        >
+          <Select v-model="formData.imsConf.duration">
             <Option
               v-for="(item) in durations"
               :value="item.value"
-              :key="item.value">
+              :key="item.value"
+            >
               {{ item.label }}
             </Option>
           </Select>
@@ -213,15 +336,18 @@
         <FormItem
           v-show="formData.imsConf.enable"
           :label="$t('message.enginelist.ruleform.alertuser')"
-          prop="imsConf.receiver">
+          prop="imsConf.receiver"
+        >
           <Select
             v-model="formData.imsConf.receiver"
             multiple
-            :placeholder="$t('message.enginelist.ruleform.selectalertuser')">
+            :placeholder="$t('message.enginelist.ruleform.selectalertuser')"
+          >
             <Option
               v-for="(item) in userlist"
               :value="item.name"
-              :key="item.name">
+              :key="item.name"
+            >
               {{ item.name }}
             </Option>
           </Select>
@@ -229,7 +355,10 @@
       </Form>
       <template slot="footer">
         <Button @click="handleCancel">{{$t('message.common.cancel')}}</Button>
-        <Button type="primary" @click="saveRule">{{$t('message.common.ok')}}</Button>
+        <Button
+          type="primary"
+          @click="saveRule"
+        >{{$t('message.common.ok')}}</Button>
       </template>
     </Modal>
   </div>
@@ -261,12 +390,20 @@ export default {
             field: 'cpu',
             operation: '>=',
             value: null
+          }, {
+            field: 'memory',
+            operation: '<=',
+            value: null
           }]
         },
         terminateConditionConf: {
           relation: "or",
           conditions: [{
             field: 'cpu',
+            operation: '<=',
+            value: null
+          }, {
+            field: 'memory',
             operation: '<=',
             value: null
           }]
@@ -280,12 +417,12 @@ export default {
         }
       },
       queues: [],
-      levels: ['MINOR','WARNING'],
+      levels: ['MINOR', 'WARNING'],
       durations: [
-        {value: '1', label: "1min"},
-        {value: '5', label: "5min"},
-        {value: '10', label: "10min"},
-        {value: '30', label: "30min"}
+        { value: '1', label: "1min" },
+        { value: '5', label: "5min" },
+        { value: '10', label: "10min" },
+        { value: '30', label: "30min" }
       ],
       userlist: [],
       statusList: [{
@@ -295,18 +432,12 @@ export default {
         label: this.$t('message.enginelist.disable'),
         value: '0'
       }],
-      types: [{
-        label: this.$t('message.enginelist.cpu'),
-        value: 'cpu'
-      }, {
-        label: this.$t('message.enginelist.memory'),
-        value: 'memory'
-      }],
-      isEdit: false,
-      ruleItemValid: {
-        triggerConditionConf: '',
-        terminateConditionConf: ''
+      conditionRule: {
+        cpu: true,
+        memory: false
       },
+      isEdit: false,
+      ruleItemValid: '',
       pageData: {
         total: 0,
         pageNow: 1,
@@ -317,39 +448,34 @@ export default {
   computed: {
     formValid() {
       let validateTrigger = (rule, value, callback) => {
-        let valid = true;
-        let repeat = false;
-        if (value.conditions) {
-          if (value.conditions[0]) {
-            if (!value.conditions[0].field || value.conditions[0].value > 100 || value.conditions[0].value < 1 || value.conditions[0].value % 1 !== 0) {
-              valid = false
-            }
+        let valid = this.conditionRule.cpu || this.conditionRule.memory;
+        if (!valid) {
+          this.ruleItemValid = this.$t("message.enginelist.ruleform.selectRuleType")
+          callback()
+          return
+        }
+        if (value.conditions[0] && this.conditionRule.cpu) {
+          if (!value.conditions[0].field || value.conditions[0].value > 100 || value.conditions[0].value < 1 || value.conditions[0].value % 1 !== 0) {
+            valid = false
           }
-          if (value.conditions[1]) {
-            if(!value.conditions[1].field || value.conditions[1].value > 100 || value.conditions[1].value < 1 || value.conditions[1].value % 1 !== 0){
-              valid = false
-            }
+        }
+        if (value.conditions[1] && this.conditionRule.memory) {
+          if (!value.conditions[1].field || value.conditions[1].value > 100 || value.conditions[1].value < 1 || value.conditions[1].value % 1 !== 0) {
+            valid = false
           }
-          if (value.conditions.length > 1 && value.conditions[0].field == value.conditions[1].field) {
-            repeat = true
-          }
-        } else {
+        }
+        let triggerConf = this.formData.triggerConditionConf.conditions
+        let terminateConf = this.formData.terminateConditionConf.conditions
+        if (this.conditionRule.cpu && (triggerConf[0].value <= terminateConf[0].value || !terminateConf[0].value)) {
           valid = false
         }
-        let triggerStop = this.formData.terminateConditionConf.conditions.length === this.formData.triggerConditionConf.conditions.length
-        this.formData.triggerConditionConf.conditions.forEach(item => {
-          const sItm = this.formData.terminateConditionConf.conditions.find(it => it.field === item.field)
-          if (!sItm || sItm.value >= item.value) {
-            triggerStop = false
-          }
-        });
-        if (repeat) {
-          this.ruleItemValid[rule.field] = this.$t("message.enginelist.ruleform.repeat")
-        } else {
-          this.ruleItemValid[rule.field] = valid ? triggerStop ? '' : this.$t("message.enginelist.ruleform.ruleIttype") : this.$t("message.enginelist.ruleform.ruleItvalue")
+        if (this.conditionRule.memory && (triggerConf[1].value <= terminateConf[1].value || !terminateConf[1].value)) {
+          valid = false
         }
+        this.ruleItemValid = valid ? '' : this.$t("message.enginelist.ruleform.ruleItvalue")
         callback()
       }
+
       return {
         name: [
           {
@@ -398,12 +524,7 @@ export default {
         ],
         triggerConditionConf: [
           {
-            validator: validateTrigger,
-            trigger: "blur",
-          },
-        ],
-        terminateConditionConf: [
-          {
+            required: true,
             validator: validateTrigger,
             trigger: "blur",
           },
@@ -418,22 +539,30 @@ export default {
     'formData.triggerConditionConf.conditions': {
       handler() {
         this.$refs.ruleForm.validateField('triggerConditionConf')
-        this.$refs.ruleForm.validateField('terminateConditionConf')
       },
       deep: true
     },
     'formData.terminateConditionConf.conditions': {
       handler() {
         this.$refs.ruleForm.validateField('triggerConditionConf')
-        this.$refs.ruleForm.validateField('terminateConditionConf')
       },
       deep: true
+    },
+    'conditionRule.cpu'() {
+      this.formData.triggerConditionConf.conditions[0].value = null
+      this.formData.terminateConditionConf.conditions[0].value = null
+      this.$refs.ruleForm.validateField('triggerConditionConf')
+    },
+    'conditionRule.memory'() {
+      this.formData.triggerConditionConf.conditions[1].value = null
+      this.formData.terminateConditionConf.conditions[1].value = null
+      this.$refs.ruleForm.validateField('triggerConditionConf')
     }
   },
   filters,
   mounted() {
-    // this.doQuery()
-    // this.getQueueList()
+    this.doQuery()
+    this.getQueueList()
   },
   methods: {
     doQuery() {
@@ -452,7 +581,7 @@ export default {
             resItem = resItem && this.searchBar.yarnQueue.trim() === item.queue
           }
           if (this.searchBar.name.trim()) {
-            resItem = resItem && item.name.indexOf(this.searchBar.name.trim()) > -1
+            resItem = resItem && new RegExp(this.searchBar.name.trim(), 'i').test(item.name)
           }
           return resItem
         })
@@ -467,12 +596,83 @@ export default {
       })
     },
     add() {
+      // this.isEdit = false
       // this.getUserList()
+      // this.formData = {
+      //   strategyId: '',
+      //   name: '',
+      //   description: '',
+      //   triggerConditionConf: {
+      //     relation: "or",
+      //     conditions: [{
+      //       field: 'cpu',
+      //       operation: '>=',
+      //       value: null
+      //     }, {
+      //       field: 'memory',
+      //       operation: '<=',
+      //       value: null
+      //     }]
+      //   },
+      //   terminateConditionConf: {
+      //     relation: "or",
+      //     conditions: [{
+      //       field: 'cpu',
+      //       operation: '<=',
+      //       value: null
+      //     },{
+      //       field: 'memory',
+      //       operation: '<=',
+      //       value: null
+      //     }]
+      //   },
+      //   queue: '',
+      //   imsConf: {
+      //     enable: false,
+      //     duration: null,
+      //     level: null,
+      //     receiver: null
+      //   }
+      // }
+      // this.conditionRule = {
+      //   cpu: true,
+      //   memory: false
+      // }
       // this.showModal = true
+      // this.$nextTick(() => {
+      //   this.$refs.ruleForm.resetFields();
+      // })
+      // setTimeout(() => {
+      //   this.ruleItemValid = ''
+      // }, 50);
     },
     saveRule() {
       let url = `${this.$API_PATH.WORKSPACE_PATH}saveEcReleaseStrategy`
-      const params = { ...this.formData }
+      const params = {
+        strategyId: this.formData.strategyId,
+        name: this.formData.name,
+        description: this.formData.description,
+        triggerConditionConf: {
+          relation: this.formData.triggerConditionConf.relation,
+          conditions: [...this.formData.triggerConditionConf.conditions]
+        },
+        terminateConditionConf: {
+          relation: this.formData.terminateConditionConf.relation,
+          conditions: [...this.formData.terminateConditionConf.conditions]
+        },
+        queue: this.formData.queue,
+        imsConf: {
+          ...this.formData.imsConf
+        }
+      }
+      if (!this.conditionRule.cpu) {
+        params.triggerConditionConf.conditions.shift()
+        params.terminateConditionConf.conditions.shift()
+      }
+      if (!this.conditionRule.memory) {
+        params.triggerConditionConf.conditions.pop()
+        params.terminateConditionConf.conditions.pop()
+      }
       if (!this.isEdit) {
         delete params.strategyId
       }
@@ -483,7 +683,7 @@ export default {
           api.fetch(url, params, 'put').then(() => {
             this.doQuery();
             this.$Message.success(this.$t("message.common.Success"))
-          }).finally(()=>{
+          }).finally(() => {
             this.loading = false
           })
         }
@@ -502,30 +702,13 @@ export default {
         })
       }
     },
-    addTrigger() {
-      this.formData.triggerConditionConf.conditions.push({
-        field: '',
-        operation: '>=',
-        value: null
-      })
-    },
-    addStop() {
-      this.formData.terminateConditionConf.conditions.push({
-        field: '',
-        operation: '<=',
-        value: null
-      })
-    },
-    delRuleItem(type, index) {
-      this.formData[type].conditions.splice(index,1);
-    },
     deleteItem(item) {
       if (item.status) {
         return this.$t("message.enginelist.disableReq")
       }
       this.confirmAction({
         title: this.$t("message.enginelist.delRule"),
-        content: this.$t("message.enginelist.confirmDel", {data: item.name}),
+        content: this.$t("message.enginelist.confirmDel", { data: item.name }),
         ok: () => {
           api.fetch(`${this.$API_PATH.WORKSPACE_PATH}ecReleaseStrategy/${item.strategyId}`, {
           }, 'delete').then(() => {
@@ -536,18 +719,67 @@ export default {
       })
     },
     edit(item) {
+      item = JSON.parse(JSON.stringify(item))
       this.getUserList()
       if (item.status) {
         return this.$t("message.enginelist.disableReq")
       }
       this.isEdit = true;
+      this.ruleItemValid = ''
+      const data = {
+        strategyId: item.strategyId,
+        name: item.name,
+        description: item.description,
+        triggerConditionConf: {
+          relation: item.triggerConditionConf.relation,
+          conditions: [...item.triggerConditionConf.conditions]
+        },
+        terminateConditionConf: {
+          relation: item.terminateConditionConf.relation,
+          conditions: [...item.terminateConditionConf.conditions]
+        },
+        queue: item.queue,
+        imsConf: {
+          ...item.imsConf
+        }
+      }
+      const hasCpu = data.terminateConditionConf.conditions.find(it => it.field === 'cpu')
+      const hasMem = data.terminateConditionConf.conditions.find(it => it.field === 'memory')
+      if (!hasCpu) {
+        data.triggerConditionConf.conditions.unshift({
+          field: 'cpu',
+          operation: '>=',
+          value: null
+        })
+        data.terminateConditionConf.conditions.unshift({
+          field: 'cpu',
+          operation: '>=',
+          value: null
+        })
+      }
+      if (!hasMem) {
+        data.triggerConditionConf.conditions.push({
+          field: 'memory',
+          operation: '<=',
+          value: null
+        })
+        data.terminateConditionConf.conditions.push({
+          field: 'memory',
+          operation: '<=',
+          value: null
+        })
+      }
+      this.conditionRule.cpu = hasCpu != undefined;
+      this.conditionRule.memory = hasMem != undefined;
       this.showModal = true;
-      this.formData = {...item}
+      this.$nextTick(() => {
+        this.formData = data;
+      })
     },
     enable(item) {
       this.confirmAction({
         title: !item.status ? this.$t("message.enginelist.enableRule") : this.$t("message.enginelist.disableRule"),
-        content: !item.status ? this.$t("message.enginelist.confirmEnable" , {data: item.name}) : this.$t("message.enginelist.confirmDisable", {data: item.name}),
+        content: !item.status ? this.$t("message.enginelist.confirmEnable", { data: item.name }) : this.$t("message.enginelist.confirmDisable", { data: item.name }),
         ok: () => {
           if (this.loading) return
           this.loading = true
@@ -557,7 +789,7 @@ export default {
           }, 'post').then(() => {
             this.doQuery();
             this.$Message.success(this.$t("message.common.Success"))
-          }).finally(()=>{
+          }).finally(() => {
             this.loading = false
           })
         }
@@ -575,7 +807,7 @@ export default {
     formatConditions(conditions) {
       let string = '';
       conditions.forEach(item => {
-        string += `${item.field == 'cpu' ? this.$t('message.enginelist.cpu') : this.$t('message.enginelist.memory') } ${item.operation} ${item.value}`;
+        string += `${item.field == 'cpu' ? this.$t('message.enginelist.cpu') : this.$t('message.enginelist.memory')} ${item.operation} ${item.value}`;
       })
       return string;
     },
@@ -585,6 +817,9 @@ export default {
     handlePageChange(page) {
       this.pageData.pageNow = page;
     },
+    validInput() {
+      this.$refs.ruleForm.validateField('triggerConditionConf')
+    }
   }
 }
 </script>
@@ -606,10 +841,11 @@ export default {
   font-weight: 600;
   padding: 10px 0;
 }
-.delete-icon{
-  margin: 0 20px
+.delete-icon {
+  margin: 0 20px;
 }
-.addBtn,.delete-icon {
+.addBtn,
+.delete-icon {
   display: inline-block;
   color: $primary-color;
 }
@@ -650,6 +886,7 @@ export default {
 .item-error-tip {
   color: $error-color;
   line-height: 16px;
+  margin-left: 80px;
 }
 .engine_kill_rule_form {
   max-height: 475px;
@@ -660,7 +897,18 @@ export default {
 }
 .pagebar {
   text-align: center;
-  margin-top: 20px
+  margin-top: 20px;
+}
+.condition-row {
+  margin-left: 80px;
+  background: #eee;
+  padding: 20px;
+  margin-bottom: 10px;
+}
+.rule-field {
+  display: flex;
+  margin: 8px 0;
+  align-items: center;
 }
 .no-data {
   text-align: center;

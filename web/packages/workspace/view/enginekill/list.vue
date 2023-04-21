@@ -1,16 +1,32 @@
 <template>
   <div style="height: 100%;  padding: 10px 15px;">
-    <Table :columns="columns" :data="list" ref="selectionTable">
-      <template slot-scope="{ row }" slot="yarnmem">
+    <Table
+      :columns="columns"
+      :data="list"
+      ref="selectionTable"
+    >
+      <template
+        slot-scope="{ row }"
+        slot="yarnmem"
+      >
         <span>{{ row.yarn && row.yarn.queueMemory }}</span>
       </template>
-      <template slot-scope="{ row }" slot="yarncpu">
+      <template
+        slot-scope="{ row }"
+        slot="yarncpu"
+      >
         <span>{{ row.yarn && row.yarn.queueCpu }}</span>
       </template>
-      <template slot-scope="{ row }" slot="queue">
+      <template
+        slot-scope="{ row }"
+        slot="queue"
+      >
         <span>{{ row.yarn && row.yarn.queueName }}</span>
       </template>
-      <template slot-scope="{ row }" slot="local">
+      <template
+        slot-scope="{ row }"
+        slot="local"
+      >
         <span>{{ row.driver.cpu }} cores, {{ row.driver.memory }}, {{ row.driver.instance }} apps</span>
       </template>
     </Table>
@@ -26,7 +42,11 @@
       @on-change="handlePageChange"
       @on-page-size-change="handlePageSizeChange"
     />
-    <Spin v-show="loading" size="large" fix />
+    <Spin
+      v-show="loading"
+      size="large"
+      fix
+    />
   </div>
 </template>
 
@@ -45,8 +65,9 @@ export default {
         { title: this.$t('message.enginelist.cols.yarnmb'), slot: "yarnmem" },
         { title: this.$t('message.enginelist.cols.yanrcores'), slot: "yarncpu" },
         { title: this.$t('message.enginelist.cols.freeTime'), key: "unlockDuration" },
-        { title: this.$t('message.enginelist.cols.creator'), key: "creator" },
+        { title: this.$t('message.enginelist.cols.creator'), key: "owner" },
         { title: this.$t('message.enginelist.cols.start'), key: "createTime" },
+        { title: this.$t('message.enginelist.cols.killer'), key: "killer" },
         { title: this.$t('message.enginelist.cols.requestTime'), key: "killTime" },
 
       ],
@@ -95,6 +116,6 @@ export default {
 <style lang="scss" scoped>
 .pagebar {
   text-align: center;
-  margin-top: 20px
+  margin-top: 20px;
 }
 </style>

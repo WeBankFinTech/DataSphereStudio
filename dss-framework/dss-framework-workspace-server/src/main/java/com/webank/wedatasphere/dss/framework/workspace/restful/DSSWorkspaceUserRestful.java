@@ -206,9 +206,10 @@ public class DSSWorkspaceUserRestful {
 
     @RequestMapping(path = "/clearUser", method = RequestMethod.GET)
     public Message clearUser(@RequestParam("userName") String userName) {
-        dssWorkspaceUserService.clearUserByUserName(userName);
+        boolean clearResult = dssWorkspaceUserService.clearUserByUserName(userName);
         AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
                 null, OperateTypeEnum.DELETE,null);
-        return Message.ok("删除成功");
+        return clearResult ? Message.ok("清理成功") : Message.error("userName不是实名用户，不会清理此用户");
+
     }
 }

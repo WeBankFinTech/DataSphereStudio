@@ -26,7 +26,6 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnQualityChecker;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.server.Message;
@@ -43,7 +42,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf.APPCONN_UPLOAD_THREAD_NUM;
 
@@ -94,6 +92,12 @@ public class AppConnManagerRestfulApi {
             LOGGER.info("All AppConn plugins has scanned.");
             uploadThreadPool.shutdown();
         } else {
+            LOGGER.info("Not appConn manager, start to download all appConn.");
+            AppConnManager.getAppConnManager().listAppConns().forEach(appConn -> {
+                LOGGER.info("Try to download AppConn {}.", appConn.getAppDesc().getAppName());
+                AppConnManager.getAppConnManager().reloadAppConn(appConn.getAppDesc().getAppName());
+            });
+            LOGGER.info("Download appConn end.");
             LOGGER.info("Not appConn manager, will not scan plugins.");
         }
     }

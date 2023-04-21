@@ -18,7 +18,6 @@ package com.webank.wedatasphere.dss.orchestrator.publish.job;
 
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
@@ -50,16 +49,6 @@ public class ConversionJobEntity {
     private Date updateTime;
 
     private ResponseOperateOrchestrator response;
-
-    private OrchestratorPublishJob orchestratorPublishJob;
-
-    public OrchestratorPublishJob getOrchestratorPublishJob() {
-        return orchestratorPublishJob;
-    }
-
-    public void setOrchestratorPublishJob(OrchestratorPublishJob orchestratorPublishJob) {
-        this.orchestratorPublishJob = orchestratorPublishJob;
-    }
 
     public DSSProject getProject() {
         return project;

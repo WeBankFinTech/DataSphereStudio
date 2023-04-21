@@ -51,12 +51,8 @@ echo "<-------------------------------->"
 }
 
 function stopDssProject(){
- 	SERVER_NAME=dss-framework-project-server
-	SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
-	stopApp
-
-	SERVER_NAME=dss-framework-orchestrator-server
-	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
+ 	SERVER_NAME=dss-server
+	SERVER_IP=$DSS_SERVER_INSTALL_IP
 	stopApp
 
   SERVER_NAME=dss-apps-server

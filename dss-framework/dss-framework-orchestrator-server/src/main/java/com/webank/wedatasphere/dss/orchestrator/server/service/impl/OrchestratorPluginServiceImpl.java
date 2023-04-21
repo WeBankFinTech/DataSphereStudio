@@ -292,6 +292,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     public ResponseConvertOrchestrator getConvertOrchestrationStatus(String id) {
         String jobId;
         ResponseOperateOrchestrator responseOperateOrchestrator = new ResponseOperateOrchestrator();
+        LOGGER.info("Convert to orchestrator id: {}", id);
         OrchestratorPublishJob publishJob = orchestratorJobMapper.getPublishJobByJobId(id);
         jobId = publishJob.getJobId();
         responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByStatus(publishJob.getStatus()));

@@ -1378,21 +1378,27 @@ export default {
         }
       }
       let { beforeShowMenu, beforePaste } = this.designer.myMenuOptions;
+      const iconHelper = function (arr) {
+        return arr.map((it) => {
+          let menuItem = {
+            text: it.text,
+            value: it.value,
+          }
+          if (it.img) {
+            menuItem.img = it.img;
+          } else if (it.icon) {
+            menuItem.icon = it.icon;
+          }
+          if (it.children) {
+            menuItem.children = iconHelper(it.children)
+          }
+          return menuItem
+        });
+      }
       if (typeof beforeShowMenu === 'function') {
         arr = beforeShowMenu(null, arr, 'view');
         if (Array.isArray(arr)) {
-          arr = arr.map((it) => {
-            let menuItem = {
-              text: it.text,
-              value: it.value
-            }
-            if (it.img) {
-              menuItem.img = it.img;
-            } else if (it.icon) {
-              menuItem.icon = it.icon;
-            }
-            return menuItem
-          });
+          arr = iconHelper(arr)
         } else {
           console.warn('ctxMenuOptions.beforeShowMenu返回值必须是一个数组')
         }
@@ -1423,7 +1429,7 @@ export default {
               });
             }
           }
-          this.designer.$emit(`ctx-menu-${data.value}`, e, 'view')
+          this.designer.$emit(`on-ctx-menu`, data.value, e, 'view')
         }
       })
     },
@@ -1457,7 +1463,7 @@ export default {
         choose: (data) => {
           if (this.state.disabled) return;
           this.operatLiner(data.value, k);
-          this.designer.$emit(`ctx-menu-${data.value}`, k, 'link')
+          this.designer.$emit('on-ctx-menu', data.value, k, 'link')
         }
       })
     },

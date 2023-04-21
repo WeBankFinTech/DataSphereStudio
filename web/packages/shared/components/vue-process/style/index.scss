@@ -632,7 +632,7 @@
 
  .designer-menu {
    position: absolute;
-   overflow: auto;
+   overflow: visible;
    padding: 6px 0;
    @include bg-color($light-base-color, $dark-workflow-bg-color);
    box-sizing: border-box;
@@ -660,8 +660,21 @@
 
        &:hover {
          @include bg-color( $hover-color, $dark-text-desc-color);
+         .sub-menu-ul{
+           display: block;
+         }
        }
      }
+   }
+   .sub-menu-ul {
+    position: absolute;
+    transform: translateX(100%);
+    top: 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 0;
+    display: none;
+    @include bg-color($light-base-color, $dark-workflow-bg-color);
    }
 
    .designer-menu-li-icon {

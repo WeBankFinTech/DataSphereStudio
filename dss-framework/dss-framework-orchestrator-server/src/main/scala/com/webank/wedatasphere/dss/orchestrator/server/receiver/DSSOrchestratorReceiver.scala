@@ -25,12 +25,15 @@ import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExpor
 import com.webank.wedatasphere.dss.orchestrator.publish.{ExportDSSOrchestratorPlugin, ImportDSSOrchestratorPlugin}
 import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
 import org.apache.linkis.rpc.{Receiver, Sender}
+import org.slf4j.{Logger, LoggerFactory}
 
 import java.util
 import scala.concurrent.duration.Duration
 
 
 class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestratorPluginService: OrchestratorPluginService, orchestratorContext: DSSOrchestratorContext) extends Receiver {
+
+  private val LOGGER = LoggerFactory.getLogger(classOf[DSSOrchestratorReceiver])
 
   override def receive(message: Any, sender: Sender): Unit = {}
 
@@ -69,6 +72,7 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
 
     case requestConversionOrchestration: RequestFrameworkConvertOrchestration =>
       //发布调度，请注意
+      LOGGER.info("received requestConversionOrchestration, the class is: {}", requestConversionOrchestration)
       orchestratorPluginService.convertOrchestration(requestConversionOrchestration)
     case requestConversionOrchestrationStatus: RequestFrameworkConvertOrchestrationStatus =>
       orchestratorPluginService.getConvertOrchestrationStatus(requestConversionOrchestrationStatus.getId)

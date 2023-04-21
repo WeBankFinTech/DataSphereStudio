@@ -406,6 +406,21 @@ export default {
         }
         this.clearDraging();
       }
+      if (!e.shiftKey && !e.ctrlKey) {
+        let hasOuter = false
+        const nodes = this.state.nodes.map(item => {
+          if (item.runState && item.runState.outerText) {
+            hasOuter = true
+          }
+          return {
+            ...item,
+            runState: item.runState && item.runState.outerText ? undefined : item.runState
+          }
+        });
+        if (hasOuter) {
+          commit(this.$store, 'UPDATE_ALLNODES', nodes)
+        }
+      }
     },
     closeBaseInfo() {
       // 清除这个修改中的节点

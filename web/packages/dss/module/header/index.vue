@@ -502,7 +502,6 @@ export default {
     // 切换工作空间
     changeWorkspace(workspace) {
       if (workspace.id === this.currentWorkspace.id) return;
-      storage.set("curWorkspace", workspace, "local");
       if (
         this.$route.path.indexOf("/dataService") !== -1 ||
         this.$route.path.indexOf("/dataManagement") !== -1

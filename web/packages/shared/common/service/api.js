@@ -27,6 +27,7 @@ import {
 import cache from './apiCache';
 import qs from './querystring'
 import storage from "./storage"
+import i18n from '../i18n'
 
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
@@ -188,7 +189,7 @@ const getData = function (data) {
   });
   return res;
 };
-const API_ERR_MSG = '后台接口异常，请联系开发处理！'
+const API_ERR_MSG = 'API_ERR_MSG'
 const success = function (response) {
   if (util.isNull(api.constructionOfResponse.codePath) || util.isNull(api.constructionOfResponse.successCode) ||
     util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
@@ -351,7 +352,105 @@ const param = function (url, data, option) {
 
 let showApiErrorTips = true
 let lastMsg = ''
-
+const showErrMsg = function (error) {
+  let msg = error.message || error.msg
+  if (lastMsg !== msg && msg) {
+    lastMsg = msg
+  } else {
+    return
+  }
+  if (msg === API_ERR_MSG) {
+    msg = i18n.t('message.common.apierrmsg')
+  }
+  let isHoverNotice = {}
+  const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
+  if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
+    const noticeName = 'err_' + Date.now()
+    isHoverNotice[noticeName] = false
+    Notice.error({
+      name: noticeName,
+      duration: 6,
+      closable: true,
+      title: i18n.t('message.common.errTitle'), //isEn ? 'Error' : '错误提示',
+      render: (h) => {
+        return h('div', {
+          class: 'g-err-msg-div',
+          attrs: {
+            'data-erritem': noticeName
+          }
+        }, [
+          h('div', {
+            style: {
+              'word-break': 'break-all',
+              'margin-bottom': '10px',
+              'text-align': 'left',
+              'line-height': '18px'
+            }
+          }, msg),
+          h('button', {
+            class: 'ivu-btn ivu-btn-default ivu-btn-small',
+            style: {
+              background: '#ec6565',
+              color: '#fff',
+              display: error.solution !== undefined ? 'inline-block' : 'none'
+            },
+            on: {
+              click: () => {
+                if (error.solution && error.solution.solutionUrl) {
+                  window.open(error.solution.solutionUrl, '_blank')
+                } else if (error.response) {
+                  // 上报
+                  let requestBody = error.response.config.data
+                  try {
+                    requestBody = typeof error.response.config.data === 'string' ? JSON.parse(error.response.config.data) : error.response.config.data
+                  } catch (e) {
+                    //
+                  }
+                  action('/dss/guide/solution/reportProblem', {
+                    requestUrl: error.response.config.url,
+                    queryParams: error.response.config.params,
+                    requestBody,
+                    requestHeaders: {
+                      Cookie: document.cookie,
+                      ...error.response.config.headers
+                    },
+                    responseBody: error.response.data
+                  }).then(() => {
+                    Message.success(i18n.t('message.common.errsubmited'))
+                  })
+                }
+                Notice.close(noticeName)
+              }
+            }
+          }, error.solution && error.solution.solutionUrl ? i18n.t('message.common.errsolution') : i18n.t('message.common.errsubmit'))
+        ])
+      },
+      onClose: () => {
+        return !isHoverNotice[noticeName]
+      }
+    })
+    setTimeout(() => {
+      document.querySelectorAll('.g-err-msg-div').forEach(ele => {
+        const erritem =ele.dataset.erritem
+        ele.parentElement.parentElement.style.textAlign = 'left'
+        ele.parentElement.style.display = 'block'
+        ele.parentElement.style.padding = 0
+        if (ele.parentElement.parentElement.className.indexOf('ivu-notice-notice-err') < 0) {
+          ele.parentElement.parentElement.className = ele.parentElement.parentElement.className + ' ivu-notice-notice-err'
+        }
+        ele.parentElement.parentElement.addEventListener('mouseover', () => {
+          isHoverNotice[erritem] = true
+        }, false)
+      })
+    }, 150)
+  } else {
+    Notice.error({
+      desc: msg,
+      title: i18n.t('message.common.errTitle') ,
+      duration: 4
+    });
+  }
+}
 const action = function (url, data, option) {
   return param(url, data, option)
     .then(success, fail)
@@ -362,116 +461,16 @@ const action = function (url, data, option) {
       if (error && error.response && error.response.data && error.response.data.data) {
         error.solution = error.response.data.data.solution
       }
-      const isEn = localStorage.getItem('locale') == 'en'
-      const showErrMsg = function () {
-        let msg = error.message || error.msg
-        if (lastMsg !== msg && msg) {
-          lastMsg = msg
-        } else {
-          return
-        }
-        if (isEn && msg === API_ERR_MSG) {
-          msg = 'The service is abnormal, please contact the developer for processing!'
-        }
-        let isHoverNotice = {}
-        const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
-        if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
-          const noticeName = 'err_' + Date.now()
-          isHoverNotice[noticeName] = false
-          Notice.error({
-            name: noticeName,
-            duration: 6,
-            closable: true,
-            title: isEn ? 'Error' : '错误提示',
-            render: (h) => {
-              return h('div', {
-                class: 'g-err-msg-div',
-                attrs: {
-                  'data-erritem': noticeName
-                }
-              }, [
-                h('div', {
-                  style: {
-                    'word-break': 'break-all',
-                    'margin-bottom': '10px',
-                    'text-align': 'left',
-                    'line-height': '18px'
-                  }
-                }, msg),
-                h('button', {
-                  class: 'ivu-btn ivu-btn-default ivu-btn-small',
-                  style: {
-                    background: '#ec6565',
-                    color: '#fff',
-                    display: error.solution !== undefined ? 'inline-block' : 'none'
-                  },
-                  on: {
-                    click: () => {
-                      if (error.solution && error.solution.solutionUrl) {
-                        window.open(error.solution.solutionUrl, '_blank')
-                      } else if (error.response) {
-                        // 上报
-                        let requestBody = error.response.config.data
-                        try {
-                          requestBody = typeof error.response.config.data === 'string' ? JSON.parse(error.response.config.data) : error.response.config.data
-                        } catch (e) {
-                          //
-                        }
-                        action('/dss/guide/solution/reportProblem', {
-                          requestUrl: error.response.config.url,
-                          queryParams: error.response.config.params,
-                          requestBody,
-                          requestHeaders: {
-                            Cookie: document.cookie,
-                            ...error.response.config.headers
-                          },
-                          responseBody: error.response.data
-                        }).then(() => {
-                          Message.success(isEn ? 'Error Reported' : '错误已上报')
-                        })
-                      }
-                      Notice.close(noticeName)
-                    }
-                  }
-                }, error.solution && error.solution.solutionUrl ? (isEn ? 'Check Solution' : '查看解决方案') : (isEn ? 'Report Error' : '上报错误'))
-              ])
-            },
-            onClose: () => {
-              return !isHoverNotice[noticeName]
-            }
-          })
-          setTimeout(() => {
-            document.querySelectorAll('.g-err-msg-div').forEach(ele => {
-              const erritem =ele.dataset.erritem
-              ele.parentElement.parentElement.style.textAlign = 'left'
-              ele.parentElement.style.display = 'block'
-              ele.parentElement.style.padding = 0
-              if (ele.parentElement.parentElement.className.indexOf('ivu-notice-notice-err') < 0) {
-                ele.parentElement.parentElement.className = ele.parentElement.parentElement.className + ' ivu-notice-notice-err'
-              }
-              ele.parentElement.parentElement.addEventListener('mouseover', () => {
-                isHoverNotice[erritem] = true
-              }, false)
-            })
-          }, 150)
-        } else {
-          Notice.error({
-            desc: msg,
-            title: isEn ? 'Error' : '错误提示',
-            duration: 4
-          });
-        }
-      }
       if (error.message === API_ERR_MSG || error.msg === API_ERR_MSG) {
         if (showApiErrorTips) {
           showApiErrorTips = false
           setTimeout(() => {
             showApiErrorTips = true
           }, 3000)
-          showErrMsg()
+          showErrMsg(error)
         }
       } else {
-        showErrMsg()
+        showErrMsg(error)
       }
       setTimeout(() => {
         lastMsg = ''

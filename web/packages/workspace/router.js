@@ -59,6 +59,22 @@ export const apiServicesRoutes = [
         publicPage: true,
       },
       component: () => import('./view/enginelist/index.vue'),
+    },
+    {
+      path: 'enginekill',
+      name: 'enginekill',
+      meta: {
+        publicPage: true,
+      },
+      component: () => import('./view/enginekill/index.vue'),
+    },
+    {
+      path: 'enginekillList',
+      name: 'enginekillList',
+      meta: {
+        publicPage: true,
+      },
+      component: () => import('./view/enginekill/list.vue'),
     }]
   },
   {

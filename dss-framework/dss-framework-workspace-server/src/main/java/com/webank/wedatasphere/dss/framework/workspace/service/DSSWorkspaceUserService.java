@@ -43,5 +43,5 @@ public interface DSSWorkspaceUserService {
 
     List<Map<String,Object>> getUserRoleByUserName(String userName);
 
-    void clearUserByUserName(String userName);
+    boolean clearUserByUserName(String userName);
 }

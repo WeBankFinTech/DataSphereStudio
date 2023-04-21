@@ -30,7 +30,6 @@ public class DssFrameworkAdminDeptController {
         dept.setParentId(parentId);
         dept.setDeptName(deptName);
         List<DssAdminDept> list = dssAdminDeptService.selectDeptList(dept);
-        LOGGER.info("get dept list finish, list:{}", list);
         return Message.ok().data("deptList", list).message("成功");
     }
 

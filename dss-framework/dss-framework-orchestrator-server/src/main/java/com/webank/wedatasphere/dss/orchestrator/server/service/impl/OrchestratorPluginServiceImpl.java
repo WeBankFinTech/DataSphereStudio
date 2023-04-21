@@ -40,9 +40,9 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublis
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf;
+import com.webank.wedatasphere.dss.orchestrator.publish.job.CommonUpdateConvertJobStatus;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
-import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -58,7 +58,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class OrchestratorPluginServiceImpl implements OrchestratorPluginService {
@@ -74,8 +73,10 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     @Autowired
     private DSSOrchestratorContext dssOrchestratorContext;
 
+    @Autowired
+    private CommonUpdateConvertJobStatus commonUpdateConvertJobStatus;
+
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
-    private AtomicInteger idGenerator = new AtomicInteger();
 
     @Override
     public ResponseConvertOrchestrator convertOrchestration(RequestFrameworkConvertOrchestration requestConversionOrchestration) {
@@ -162,7 +163,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             return new ResponseConvertOrchestrator("no-necessary-id", ResponseOperateOrchestrator.failed("No suitable workflow(s) found, publish is ignored."));
         }
         OrchestratorConversionJob job = new OrchestratorConversionJob();
-        job.setId(generateId());
+        job.setId(String.valueOf(UUID.randomUUID()));
         LOGGER.info("user {} try to submit a conversion job {}, the orchestrationIdMap is {}, the orcIdList is {}.", requestConversionOrchestration.getUserName(),
                 job.getId(), orchestrationIdMap, publishedOrcIds);
 
@@ -178,6 +179,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         dssProject.setId(projectId);
         entity.setProject(dssProject);
         job.setConversionJobEntity(entity);
+        job.setCommonUpdateConvertJobStatus(commonUpdateConvertJobStatus);
         job.setConversionDSSOrchestratorPlugins(dssOrchestratorContext.getOrchestratorPlugins());
         job.afterConversion(response -> this.updateDBAfterConversion(toPublishOrcId, response, job.getConversionJobEntity(), requestConversionOrchestration));
 
@@ -188,11 +190,11 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         orchestratorPublishJob.setCreateTime(new Date(System.currentTimeMillis()));
         orchestratorPublishJob.setUpdateTime(new Date(System.currentTimeMillis()));
         orchestratorPublishJob.setConversionJobJson(job.toString());
-
+        job.setOrchestratorPublishJob(orchestratorPublishJob);
         orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
         //submit it
         releaseThreadPool.submit(job);
-        DSSOrchestratorConstant.orchestratorConversionJobMap.put(job.getId(), job);
+
         LOGGER.info("publish orchestrator success. publishedOrcIds:{} ",publishedOrcIds);
         return new ResponseConvertOrchestrator(job.getId(), entity.getResponse());
     }
@@ -290,23 +292,10 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     public ResponseConvertOrchestrator getConvertOrchestrationStatus(String id) {
         String jobId;
         ResponseOperateOrchestrator responseOperateOrchestrator = new ResponseOperateOrchestrator();
-        OrchestratorConversionJob job = DSSOrchestratorConstant.orchestratorConversionJobMap.get(id);
-        if (job != null) {
-            jobId = job.getId();
-            responseOperateOrchestrator.setJobStatus(job.getConversionJobEntity().getResponse().getJobStatus());
-            if (job.getConversionJobEntity().getResponse().isCompleted()) {
-                DSSOrchestratorConstant.orchestratorConversionJobMap.remove(job.getId());
-            }
-        } else {
-            OrchestratorPublishJob publishJob = orchestratorJobMapper.getPublishJobByJobId(id);
-            jobId = publishJob.getJobId();
-            responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByStatus(publishJob.getStatus()));
-        }
+        OrchestratorPublishJob publishJob = orchestratorJobMapper.getPublishJobByJobId(id);
+        jobId = publishJob.getJobId();
+        responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByStatus(publishJob.getStatus()));
         return new ResponseConvertOrchestrator(jobId, responseOperateOrchestrator);
-    }
-
-    private String generateId() {
-        return String.valueOf(idGenerator.getAndIncrement());
     }
 
     private void updateDBAfterConversion(Long toPublishOrcId,ResponseOperateOrchestrator response,

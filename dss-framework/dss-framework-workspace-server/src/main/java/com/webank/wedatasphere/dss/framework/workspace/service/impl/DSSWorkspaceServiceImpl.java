@@ -674,7 +674,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         String createBy = dssWorkspaceMapper.getWorkspace(workspaceId).getCreateBy();
         return StringUtils.equals(loginUser, createBy) ?
                 (!StringUtils.equals(createBy, username) || roles.contains(1)) :
-                (isAdminUser((long) workspaceId, loginUser) && (!isAdminUser((long) workspaceId, username) && !roles.contains(1)));
+                (isAdminUser((long) workspaceId, loginUser) && ((!isAdminUser((long) workspaceId, username) && !roles.contains(1))
+                        || (StringUtils.equals(loginUser, username) && roles.contains(1))));
     }
 
     private void joinWorkspaceForNewUser(String userName, Long userId) {

@@ -134,11 +134,14 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void clearUserByUserName(String userName) {
+    public boolean clearUserByUserName(String userName) {
         if(staffInfoGetter.getAllUsers().stream().anyMatch(staffInfo -> staffInfo.getEnglishName().equals(userName))) {
             dssWorkspaceUserMapper.deleteUserByUserName(userName);
             dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
             dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
+            return true;
+        }else{
+            return false;
         }
     }
 }

@@ -12,5 +12,10 @@ public class DSSCommonSpringConf {
         Integer value = DSSCommonConf.DSS_CHECK_SERVER_ACTIVE_PERIOD.getValue();
         return AssembleCronUtils.getCron(value);
     }
+    @Bean
+    public String getECInstanceReleaseCron(){
+        Integer value=DSSCommonConf.DSS_EC_KILL_PERIOD.getValue();
+        return AssembleCronUtils.getCron(value);
+    }
 
 }

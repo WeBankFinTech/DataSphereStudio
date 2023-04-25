@@ -45,7 +45,10 @@ public class DSSCommonConf {
      * check dss server is active period, The value can only be between 0 and 59 inclusive, or a multiple of 60 and its unit is 's'.
      */
     public static final CommonVars<Integer> DSS_CHECK_SERVER_ACTIVE_PERIOD = CommonVars.apply("wds.dss.check.server.active.period", 60);
-
+    /**
+     * The value can only be between 0 and 59 inclusive, or a multiple of 60 and its unit is 'second'.
+     */
+    public static final CommonVars<Integer> DSS_EC_KILL_PERIOD = CommonVars.apply("wds.dss.ec.kill.period", 60);
     public static final CommonVars<String> ALTER_CLASS = CommonVars.apply("wds.dss.alter.class", "com.webank.wedatasphere.dss.common.server.alter.ImsAlterServiceImpl");
     public static final CommonVars<String> ALTER_RECEIVER = CommonVars.apply("wds.dss.alter.receiver", "burdezhang,mouhonghao");
 }

@@ -34,8 +34,9 @@ public class CommonUpdateConvertJobStatus {
         updateConvertJobStatus(orchestratorPublishJob);
     }
 
-    public void toFailedStatus(OrchestratorPublishJob orchestratorPublishJob) {
+    public void toFailedStatus(OrchestratorPublishJob orchestratorPublishJob, String errorMsg) {
         orchestratorPublishJob.setStatus(JobStatus.Failed.getStatus());
+        orchestratorPublishJob.setErrorMsg(errorMsg);
         updateConvertJobStatus(orchestratorPublishJob);
     }
 

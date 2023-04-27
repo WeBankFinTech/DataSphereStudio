@@ -26,6 +26,7 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnQualityChecker;
 import com.webank.wedatasphere.dss.framework.appconn.service.AppConnResourceUploadService;
+import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.server.Message;
@@ -62,6 +63,11 @@ public class AppConnManagerRestfulApi {
 
     @PostConstruct
     public void init() throws InterruptedException {
+        //仅dss-server-dev和原dss-framework-project-server服务需要初始化加载appconn
+        if (!DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue().equalsIgnoreCase(DSSSenderServiceConf.PROJECT_SERVER_NAME.getValue())
+                && !DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue().equalsIgnoreCase(DSSSenderServiceConf.DSS_SERVER_NAME.getValue())) {
+            return;
+        }
         if (AppConnConf.IS_APPCONN_MANAGER.getValue()) {
             LOGGER.info("First, try to load all AppConn...");
             AppConnManager.getAppConnManager().listAppConns().forEach(appConn -> {

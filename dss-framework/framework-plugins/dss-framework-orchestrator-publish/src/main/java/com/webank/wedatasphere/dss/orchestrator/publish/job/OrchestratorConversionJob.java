@@ -125,7 +125,7 @@ public final class OrchestratorConversionJob implements Runnable {
             ResponseOperateOrchestrator response = ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(t));
             conversionJobEntity.setResponse(response);
             consumer.accept(response);
-            this.commonUpdateConvertJobStatus.toFailedStatus(this.orchestratorPublishJob);
+            this.commonUpdateConvertJobStatus.toFailedStatus(this.orchestratorPublishJob, response.getMessage());
         }
         LOGGER.info("Job {} convert project {} for user {} to Orchestrator {}, costs {}.", id, conversionJobEntity.getProject().getId(),
             conversionJobEntity.getUserName(), conversionJobEntity.getResponse().getJobStatus(), ByteTimeUtils.msDurationToString(conversionJobEntity.getUpdateTime().getTime() - conversionJobEntity.getCreateTime().getTime()));

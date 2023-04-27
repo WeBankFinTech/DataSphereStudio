@@ -21,7 +21,7 @@
 <mapper namespace="com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper">
 
     <sql id="orchestrator_job">
-        id, job_id, conversion_job_json, create_time, update_time, instance_name, status
+        id, job_id, conversion_job_json, create_time, update_time, instance_name, status, error_msg
     </sql>
 
     <select id="getPublishJobByJobId" resultMap="orchestrator_job_info_result_map">
@@ -39,7 +39,7 @@
             parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">
         INSERT INTO dss_orchestrator_job_info (<include refid="orchestrator_job"/>)
         VALUES
-        (#{id},#{jobId},#{conversionJobJson},#{createTime},#{updateTime},#{instanceName},#{status})
+        (#{id},#{jobId},#{conversionJobJson},#{createTime},#{updateTime},#{instanceName},#{status},#{errorMsg})
     </insert>
 
     <update id="updatePublishJob" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">
@@ -47,6 +47,7 @@
         <trim prefix="set" suffixOverrides=",">
             <if test="updateTime != null">update_time =#{updateTime},</if>
             <if test="status != null">status = #{status},</if>
+            <if test="errorMsg != null">error_msg = #{errorMsg},</if>
         </trim>
         WHERE id = #{id}
     </update>
@@ -76,6 +77,7 @@
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="instance_name" property="instanceName" jdbcType="LONGNVARCHAR"/>
         <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="error_msg" property="errorMsg" jdbcType="LONGNVARCHAR"/>
     </resultMap>
 
 

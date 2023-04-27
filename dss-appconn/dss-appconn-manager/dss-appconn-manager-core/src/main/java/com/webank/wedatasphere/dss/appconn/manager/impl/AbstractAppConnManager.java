@@ -70,7 +70,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         synchronized (AbstractAppConnManager.class) {
             if (appConnManager == null) {
                 appConnManager = AppConnManagerCoreConfiguration.APPCONN_IS_CLIENT_MODE.getValue() ?
-                        ClassUtils.getInstanceOrWarn(AppConnManagerImpl.class) : ClassUtils.getInstanceOrDefault(AppConnManager.class, new AppConnManagerImpl());
+                        ClassUtils.getInstanceOrWarn(AppConnManagerImpl.class) : ClassUtils.getInstanceOrDefault(AppConnManager.class,
+                        c -> c.getPackage().getName().contains("com.webank.wedatasphere.dss.framework.appconn"), new AppConnManagerImpl());
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
             }

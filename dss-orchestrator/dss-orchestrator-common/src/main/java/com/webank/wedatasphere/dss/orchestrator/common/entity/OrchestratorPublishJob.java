@@ -11,6 +11,7 @@ public class OrchestratorPublishJob {
     private Date updateTime;
     private String instanceName;
     private String status;
+    private String errorMsg;
 
     public String getInstanceName() {
         return instanceName;
@@ -68,5 +69,13 @@ public class OrchestratorPublishJob {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 }

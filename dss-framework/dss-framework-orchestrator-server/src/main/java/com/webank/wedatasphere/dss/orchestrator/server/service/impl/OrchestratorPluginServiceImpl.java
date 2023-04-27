@@ -296,6 +296,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         OrchestratorPublishJob publishJob = orchestratorJobMapper.getPublishJobByJobId(id);
         jobId = publishJob.getJobId();
         responseOperateOrchestrator.setJobStatus(JobStatus.getJobStatusByStatus(publishJob.getStatus()));
+        if (publishJob.getErrorMsg() != null) {
+            responseOperateOrchestrator.setMessage(publishJob.getErrorMsg());
+        }
         return new ResponseConvertOrchestrator(jobId, responseOperateOrchestrator);
     }
 

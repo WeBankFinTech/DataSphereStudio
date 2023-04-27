@@ -11,7 +11,7 @@ public class DSSWorkspaceRoleCheckConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DSSWorkspaceRoleCheckService getRoleCheckBean(){
+    public DSSWorkspaceRoleCheckService createDSSWorkspaceRoleCheckService(){
         return new DSSWorkspaceRoleCheckServiceImpl();
     }
 

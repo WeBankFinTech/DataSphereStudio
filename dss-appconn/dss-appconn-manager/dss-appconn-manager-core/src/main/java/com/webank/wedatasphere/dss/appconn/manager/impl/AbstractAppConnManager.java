@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.loader.loader.AppConnLoader;
 import com.webank.wedatasphere.dss.appconn.loader.loader.AppConnLoaderFactory;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerCoreConfiguration;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
@@ -68,7 +69,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         }
         synchronized (AbstractAppConnManager.class) {
             if (appConnManager == null) {
-                appConnManager = ClassUtils.getInstanceOrDefault(AppConnManager.class, new AppConnManagerImpl());
+                appConnManager = AppConnManagerCoreConfiguration.APPCONN_IS_CLIENT_MODE.getValue() ?
+                        ClassUtils.getInstanceOrWarn(AppConnManagerImpl.class) : ClassUtils.getInstanceOrDefault(AppConnManager.class, new AppConnManagerImpl());
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
             }
@@ -277,9 +279,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
 
     void deleteAppConn(AppConnInfo appConnInfo) {
         lazyLoadAppConns();
-        if(this.appConns.containsKey(appConnInfo.getAppConnName())) {
+        if (this.appConns.containsKey(appConnInfo.getAppConnName())) {
             synchronized (this.appConns) {
-                if(this.appConns.containsKey(appConnInfo.getAppConnName())) {
+                if (this.appConns.containsKey(appConnInfo.getAppConnName())) {
                     this.appConns.remove(appConnInfo.getAppConnName());
                     appConnList = Collections.unmodifiableList(new ArrayList<>(appConns.values()));
                     LOGGER.info("Deleted AppConn {}.", appConnInfo.getAppConnName());
@@ -288,7 +290,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         }
     }
 
-    public AppConnRefreshThread getAppConnRefreshThread(){
+    public AppConnRefreshThread getAppConnRefreshThread() {
         return appConnRefreshThread;
     }
 

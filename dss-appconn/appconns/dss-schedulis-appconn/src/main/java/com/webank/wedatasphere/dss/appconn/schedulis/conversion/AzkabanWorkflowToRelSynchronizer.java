@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectTo
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSUploadAction;
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
@@ -42,6 +43,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -59,7 +61,7 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
 
     public void init() {
         String baseUrl = dssToRelConversionOperation.getConversionService().getAppInstance().getBaseUrl();
-        this.projectUrl = baseUrl.endsWith("/") ? baseUrl + "manager": baseUrl + "/manager";
+        this.projectUrl = baseUrl.endsWith("/") ? baseUrl + "manager" : baseUrl + "/manager";
     }
 
     @Override
@@ -72,11 +74,16 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
     public void syncToRel(ConvertedRel convertedRel) {
         String tmpSavePath;
         AzkabanConvertedRel azkabanConvertedRel = (AzkabanConvertedRel) convertedRel;
+        ProjectToRelConversionRequestRef projectToRelConversionRequestRef = azkabanConvertedRel.getDSSToRelConversionRequestRef();
         try {
+            String projectName = projectToRelConversionRequestRef.getDSSProject().getName();
+            //前置检查，若项目在schedulis不存在，直接返回
+            if (!searchProjectExists(projectToRelConversionRequestRef.getDSSProject().getName(), projectToRelConversionRequestRef.getWorkspace())) {
+                throw new DSSRuntimeException(90012, "the project: " + projectName + " is not exists in schedulis.(项目在schedulis不存在，请检查是否在schedulis中已被删除)");
+            }
             String projectPath = azkabanConvertedRel.getStorePath();
             tmpSavePath = ZipHelper.zip(projectPath);
             //upload zip to Azkaban
-            ProjectToRelConversionRequestRef projectToRelConversionRequestRef=azkabanConvertedRel.getDSSToRelConversionRequestRef();
             uploadProject(projectToRelConversionRequestRef.getWorkspace(), tmpSavePath,
                     projectToRelConversionRequestRef.getDSSProject().getName(),
                     projectToRelConversionRequestRef.getUserName(),
@@ -86,13 +93,38 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
         }
     }
 
-    private void uploadProject(Workspace workspace, String tmpSavePath, String projectName, String releaseUser,String approvalId) throws Exception {
+    private boolean searchProjectExists(String projectName, Workspace workspace) {
+        LOGGER.info("begin to search Schedulis project before upload, projectName is {}.", projectName);
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("project", projectName);
+        params.put("ajax", "fetchprojectflows");
+        try {
+            String responseBody = SchedulisHttpUtils.getHttpGetResult(projectUrl, params,
+                    dssToRelConversionOperation.getConversionService().getSSORequestService().createSSORequestOperation(SchedulisAppConn.SCHEDULIS_APPCONN_NAME),
+                    workspace);
+            LOGGER.info("responseBody from Schedulis is: {}.", responseBody);
+            Map map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
+            String errorInfo = (String) map.get("error");
+            if (errorInfo != null && (errorInfo.contains("Project " + projectName + " doesn't exist")
+                    //schedulis已删除但未永久删除的项目返回这个
+                    || errorInfo.contains("Permission denied. Need READ access"))) {
+                return false;
+            } else if (errorInfo != null) {
+                throw new ExternalOperationFailedException(90012, errorInfo);
+            }
+            return true;
+        } catch (Exception e) {
+            throw new ExternalOperationFailedException(90117, "Failed to search Schedulis project name!", e);
+        }
+    }
+
+    private void uploadProject(Workspace workspace, String tmpSavePath, String projectName, String releaseUser, String approvalId) throws Exception {
 
         File file = new File(tmpSavePath);
         InputStream inputStream = new FileInputStream(file);
         try {
-            BinaryBody binaryBody = BinaryBody.apply("file",inputStream,file.getName(),"application/zip");
-            List<BinaryBody> binaryBodyList =new ArrayList<>();
+            BinaryBody binaryBody = BinaryBody.apply("file", inputStream, file.getName(), "application/zip");
+            List<BinaryBody> binaryBodyList = new ArrayList<>();
             binaryBodyList.add(binaryBody);
             DSSUploadAction uploadAction = new DSSUploadAction(binaryBodyList);
             uploadAction.getFormParams().put("ajax", "upload");
@@ -101,28 +133,28 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             uploadAction.getFormParams().put("project", projectName);
             uploadAction.getParameters().put("project", projectName);
 
-            if(StringUtils.isNotBlank(approvalId)) {
+            if (StringUtils.isNotBlank(approvalId)) {
                 uploadAction.getFormParams().put("itsmId", approvalId);
                 uploadAction.getParameters().put("itsmId", approvalId);
             }
             uploadAction.setUrl(projectUrl);
-            String body=
-            SchedulisHttpUtils.getHttpResult(projectUrl, uploadAction,
-                    dssToRelConversionOperation.getConversionService().getSSORequestService()
-                            .createSSORequestOperation(SchedulisAppConn.SCHEDULIS_APPCONN_NAME), workspace);
-            if(body!=null&&DSSCommonUtils.COMMON_GSON.fromJson(body, Map.class).get("error")!=null){
+            String body =
+                    SchedulisHttpUtils.getHttpResult(projectUrl, uploadAction,
+                            dssToRelConversionOperation.getConversionService().getSSORequestService()
+                                    .createSSORequestOperation(SchedulisAppConn.SCHEDULIS_APPCONN_NAME), workspace);
+            if (body != null && DSSCommonUtils.COMMON_GSON.fromJson(body, Map.class).get("error") != null) {
                 throw new ExternalOperationFailedException(50063, "upload project to schedulis failed." + body);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new DSSRuntimeException(90012, dealSchedulisErrorMsg(ExceptionUtils.getRootCauseMessage(e)));
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
     }
 
-    private String dealSchedulisErrorMsg(String errorMsg){
+    private String dealSchedulisErrorMsg(String errorMsg) {
         Matcher matcher = ERROR_PATTERN.matcher(errorMsg);
-        if(matcher.find() &&  matcher.group().length() >= SCHEDULIS_MAX_SIZE){
+        if (matcher.find() && matcher.group().length() >= SCHEDULIS_MAX_SIZE) {
             errorMsg = "wokflow name " + matcher.group().split("/")[1] + " is to long, please abide the rules of schedulis: projectName + workflowName*3 + 12 <= 250 ";
         }
         return errorMsg;

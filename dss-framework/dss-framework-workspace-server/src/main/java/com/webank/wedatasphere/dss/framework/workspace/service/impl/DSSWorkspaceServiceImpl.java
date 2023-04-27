@@ -120,7 +120,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         Long userId = dssWorkspaceUserMapper.getUserID(userName);
         dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(),
-                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()), userName, userName, userId);
+                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()), userName, userName, userId, userName);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
         dssComponentRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceComponentPrivs(dssWorkspace.getId(), userName));
@@ -183,11 +183,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             Long userId = dssWorkspaceUserMapper.getUserID(userName);
             int workspaceId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
             dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
-                    userName, "system", userId);
+                    userName, "system", userId, "system");
             Integer workspace0xId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
             if (workspace0xId != null) {
                 dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
-                        userName, "system", userId);
+                        userName, "system", userId, "system");
             }
             //todo 初始化做的各项事情改为listener模式
             //为新用户自动加入部门关联的工作空间
@@ -684,7 +684,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         needToAdd.forEach(pair -> {
             Arrays.stream(pair.getValue().split(",")).forEach(roleId -> {
-                dssWorkspaceUserMapper.setUserRoleInWorkspace(pair.getKey().intValue(), Integer.parseInt(roleId), userName, "system", userId);
+                dssWorkspaceUserMapper.setUserRoleInWorkspace(pair.getKey().intValue(), Integer.parseInt(roleId), userName, "system", userId, "system");
             });
         });
     }

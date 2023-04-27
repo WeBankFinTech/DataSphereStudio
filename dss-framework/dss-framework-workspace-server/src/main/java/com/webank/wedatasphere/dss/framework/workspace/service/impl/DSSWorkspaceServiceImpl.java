@@ -668,16 +668,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 username.equals(workspace.getCreateBy());
     }
 
-    @Override
-    public boolean checkRolesOperation(int workspaceId, String loginUser, String username, List<Integer> roles){
-        // 获取工作空间创建者
-        String createBy = dssWorkspaceMapper.getWorkspace(workspaceId).getCreateBy();
-        return StringUtils.equals(loginUser, createBy) ?
-                (!StringUtils.equals(createBy, username) || roles.contains(1)) :
-                (isAdminUser((long) workspaceId, loginUser) && ((!isAdminUser((long) workspaceId, username) && !roles.contains(1))
-                        || (StringUtils.equals(loginUser, username) && roles.contains(1))));
-    }
-
     private void joinWorkspaceForNewUser(String userName, Long userId) {
         String userOrgName = staffInfoGetter.getFullOrgNameByUsername(userName);
         List<DSSWorkspaceAssociateDepartments> workspaceAssociateDepartments = dssWorkspaceMapper.getWorkspaceAssociateDepartments();

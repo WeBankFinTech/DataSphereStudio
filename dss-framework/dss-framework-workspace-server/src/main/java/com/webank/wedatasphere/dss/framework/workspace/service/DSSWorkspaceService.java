@@ -64,16 +64,6 @@ public interface DSSWorkspaceService {
     String getWorkspaceName(Long workspaceId);
 
     /**
-     * 权限管理界面判断登录人是否拥有用户操作权限
-     * @param workspaceId  工作空间id
-     * @param loginUser  当前登录用户
-     * @param username  将要修改的用户
-     * @param roles  将要修改的角色
-     * @return
-     */
-    boolean checkRolesOperation(int workspaceId, String loginUser, String username, List<Integer> roles);
-
-    /**
      * 工作空间管理员权限判断(is_admin=1的用户才拥有工作空间操作权限)
      * @param userName
      * @return

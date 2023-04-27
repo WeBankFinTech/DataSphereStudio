@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleV
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUsersVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleCheckService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -62,6 +63,8 @@ public class DSSWorkspaceUserRestful {
     private DSSWorkspaceUserService dssWorkspaceUserService;
     @Autowired
     private HttpServletRequest httpServletRequest;
+    @Autowired
+    private DSSWorkspaceRoleCheckService roleCheckService;
 
     @RequestMapping(path = "getWorkspaceUsers", method = RequestMethod.GET)
     public Message getWorkspaceUsers( @RequestParam(WORKSPACE_ID_STR) String workspaceId,
@@ -139,7 +142,7 @@ public class DSSWorkspaceUserRestful {
         if (count != null && count > 0) {
             return Message.error("用户已经存在该工作空间，不需要重复添加！");
         }
-        if (!dssWorkspaceService.checkRolesOperation(workspaceId, creator, userName, roles)) {
+        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
         dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);
@@ -155,7 +158,7 @@ public class DSSWorkspaceUserRestful {
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
         String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
         String userName = updateWorkspaceUserRequest.getUserName();
-        if (!dssWorkspaceService.checkRolesOperation(workspaceId, creator, userName, roles)) {
+        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
         dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
@@ -171,7 +174,7 @@ public class DSSWorkspaceUserRestful {
         int workspaceId = deleteWorkspaceUserRequest.getWorkspaceId();
         String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
         String creator = SecurityFilter.getLoginUsername(httpServletRequest);
-        if (!dssWorkspaceService.checkRolesOperation(workspaceId, creator, userName, new ArrayList<>())) {
+        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, new ArrayList<>())) {
             return Message.error("无权限进行该操作");
         }
         dssWorkspaceUserService.deleteWorkspaceUser(userName, workspaceId);

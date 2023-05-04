@@ -13,10 +13,10 @@ public abstract class Alter {
 
     private String alterReceiver;
 
-    public Alter() {
+    protected Alter() {
     }
 
-    public Alter(String alterTitle, String alterInfo, String alterLevel, String alterReceiver) {
+    protected Alter(String alterTitle, String alterInfo, String alterLevel, String alterReceiver) {
         this.alterTitle = alterTitle;
         this.alterInfo = alterInfo;
         this.alterLevel = alterLevel;

@@ -103,7 +103,7 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
                     dssToRelConversionOperation.getConversionService().getSSORequestService().createSSORequestOperation(SchedulisAppConn.SCHEDULIS_APPCONN_NAME),
                     workspace);
             LOGGER.info("responseBody from Schedulis is: {}.", responseBody);
-            Map map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
+            Map<String, Object> map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
             String errorInfo = (String) map.get("error");
             if (errorInfo != null && (errorInfo.contains("Project " + projectName + " doesn't exist")
                     //schedulis已删除但未永久删除的项目返回这个

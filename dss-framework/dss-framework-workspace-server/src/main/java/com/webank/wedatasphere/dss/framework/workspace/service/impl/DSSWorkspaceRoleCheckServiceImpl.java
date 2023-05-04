@@ -5,11 +5,8 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleC
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 
-@Service
 public class DSSWorkspaceRoleCheckServiceImpl implements DSSWorkspaceRoleCheckService {
 
     @Autowired

@@ -6,6 +6,6 @@ public class CustomAlterServiceImpl implements ExceptionAlterSender {
 
     @Override
     public void sendAlter(Alter alter) {
-
+        // Users can customize their own alarm methods
     }
 }

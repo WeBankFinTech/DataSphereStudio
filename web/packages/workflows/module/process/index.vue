@@ -103,7 +103,7 @@ import Process from "./module.vue";
 import Ide from '@/workflows/module/ide';
 import commonModule from '@/workflows/module/common';
 import { NODETYPE } from '@/workflows/service/nodeType';
-import defaultNodeIcon from './images/newIcon/flow.svg';
+import defaultNodeIcon from './images/flow.svg';
 export default {
   components: {
     Process,

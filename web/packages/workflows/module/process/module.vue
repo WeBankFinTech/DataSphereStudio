@@ -1638,7 +1638,6 @@ export default {
             stepArrayAction(item.target, level);
           } else if(dir === 'up' && item.target === nodeKey) {
             stepArray.push({...item, level});
-            stepArray.push(item);
             stepArrayAction(item.source, level);
           } else if(dir === 'down-one' && item.source === nodeKey) {
             stepArray.push({...item, level});
@@ -1650,22 +1649,21 @@ export default {
       stepArrayAction(node.key);
       this.json.nodes = this.json.nodes.map((subItem) => {
         let runState
-        const inDeps = stepArray.find((item) => (item.target === subItem.key && dir.includes('down')) || (item.source === subItem.key && dir.includes('up')))
-        if (inDeps || subItem.key === node.key) {
+        const inDeps = stepArray.filter((item) => (item.target === subItem.key && dir.includes('down')) || (item.source === subItem.key && dir.includes('up')))
+        if (subItem.key === node.key) subItem.selected = true;
+        if (inDeps.length ) {
           subItem.selected = true;
-          if (inDeps) {
-            runState = {
-              outerText: inDeps.level,
-              outerStyle: {
-                position: 'absolute',
-                top: '12px',
-                right: '-30px',
-                width: '30px',
-                textAlign: 'center',
-                color: 'rgb(237, 64, 20)',
-              }
-            }
-          }
+          // runState = {
+          //   outerText: Math.max(...inDeps.map(it => it.level)),
+          //   outerStyle: {
+          //     position: 'absolute',
+          //     top: '12px',
+          //     right: '-30px',
+          //     width: '30px',
+          //     textAlign: 'center',
+          //     color: 'rgb(237, 64, 20)',
+          //   }
+          // }
         } else {
           subItem.selected = false;
         }

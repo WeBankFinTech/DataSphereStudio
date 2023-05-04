@@ -13,7 +13,7 @@
         :label="$t('message.enginelist.rulename')"
         :label-width="80"
       >
-        <Input v-model="searchBar.name" />
+        <Input v-model="searchBar.name" @on-enter="doQuery" />
       </FormItem>
       <FormItem
         prop="yarnQueue"
@@ -24,6 +24,8 @@
           style="width:150px"
           v-model="searchBar.yarnQueue"
           filterable
+          clearable
+          @on-change="doQuery"
         >
           <Option
             v-for="(item) in queues"
@@ -41,8 +43,9 @@
       >
         <Select
           v-model="searchBar.status"
-          multiple
           style="min-width:120px;"
+          clearable
+          @on-change="doQuery"
         >
           <Option
             v-for="(item) in statusList"
@@ -86,7 +89,7 @@
             <span
               class="btn-text"
               @click="enable(item)"
-            >{{ item.enable ? $t('message.enginelist.disable') : $t('message.enginelist.enable')}}</span>
+            >{{ item.status ? $t('message.enginelist.disable') : $t('message.enginelist.enable')}}</span>
             <span
               class="btn-text del"
               @click="deleteItem(item)"
@@ -100,7 +103,7 @@
           <div class="row-item inline-block">
             {{ $t('message.enginelist.ruleform.trigger')}}：{{ formatConditions(item.triggerConditionConf.conditions) }}
           </div>
-          <div class="row-item inline-block">
+          <div class="row-item inline-block" v-if="item.triggerConditionConf.conditions.length > 1">
             {{ $t('message.enginelist.ruleform.relation')}}：
             {{ item.triggerConditionConf.relation == 'and' ? $t('message.enginelist.ruleform.and') : $t('message.enginelist.ruleform.or') }}
           </div>
@@ -109,23 +112,23 @@
           <div class="row-item inline-block">
             {{ $t('message.enginelist.ruleform.stop')}}：{{ formatConditions(item.terminateConditionConf.conditions) }}
           </div>
-          <div class="row-item inline-block">
-            {{ $t('message.enginelist.ruleform.relation')}}：{{ item.triggerConditionConf.relation == 'and' ? $t('message.enginelist.ruleform.and') : $t('message.enginelist.ruleform.or') }}
+          <div class="row-item inline-block" v-if="item.terminateConditionConf.conditions.length > 1">
+            {{ $t('message.enginelist.ruleform.relation')}}：{{ item.terminateConditionConf.relation == 'and' ? $t('message.enginelist.ruleform.and') : $t('message.enginelist.ruleform.or') }}
           </div>
         </div>
         <div class="row-item inline-block">
-          {{ $t('message.enginelist.ruleform.alertuser')}}：{{ item.imsConf.receiver && item.imsConf.receiver.join('') }}
+          {{ $t('message.enginelist.ruleform.alertuser')}}：{{ item.imsConf.receiver && item.imsConf.receiver.join(';') }}
         </div>
         <div>
           <div class="row-item inline-block">
             {{ $t('message.enginelist.ruleform.modifyUser')}}：{{ item.modifier }}
           </div>
           <div class="row-item inline-block">
-            {{ $t('message.enginelist.ruleform.modifyTime')}}：{{ item.modifiyTime | formatDate('YYYY-MM-DD HH:mm:ss') }}
+            {{ $t('message.enginelist.ruleform.modifyTime')}}：{{ item.modifyTime | formatDate('YYYY-MM-DD HH:mm:ss') }}
           </div>
         </div>
         <div class="row-item inline-block">
-          {{ $t('message.enginelist.ruleform.createUser')}}：{{ item.ceator }}
+          {{ $t('message.enginelist.ruleform.createUser')}}：{{ item.creator }}
         </div>
         <div class="row-item inline-block">
           {{ $t('message.enginelist.ruleform.createTime')}}：{{ item.createTime | formatDate('YYYY-MM-DD HH:mm:ss') }}
@@ -211,7 +214,7 @@
               v-if="conditionRule.cpu"
               class="rule-field"
             >
-              <span> {{$t('message.enginelist.cpu')}} </span>
+              <span> {{$t('message.enginelist.cpu')}} >= </span>
               <InputNumber
                 style="width:70px; margin-right:5px;margin-left:10px"
                 placeholder="1-100"
@@ -226,7 +229,7 @@
               v-if="conditionRule.memory"
               class="rule-field"
             >
-              <span> {{$t('message.enginelist.memory')}} </span>
+              <span> {{$t('message.enginelist.memory')}} >= </span>
               <InputNumber
                 style="width:70px; margin-right:5px;margin-left:10px"
                 placeholder="1-100"
@@ -255,7 +258,7 @@
               v-if="conditionRule.cpu"
               class="rule-field"
             >
-              <span> {{$t('message.enginelist.cpu')}} </span>
+              <span> {{$t('message.enginelist.cpu')}} <= </span>
               <InputNumber
                 style="width:70px; margin-right:5px;margin-left:10px"
                 placeholder="1-100"
@@ -270,7 +273,7 @@
               v-if="conditionRule.memory"
               class="rule-field"
             >
-              <span> {{$t('message.enginelist.memory')}} </span>
+              <span> {{$t('message.enginelist.memory')}} <= </span>
               <InputNumber
                 style="width:70px; margin-right:5px;margin-left:10px"
                 @on-blur="validInput"
@@ -305,7 +308,7 @@
           <Checkbox v-model="formData.imsConf.enable">{{$t('message.enginelist.ruleform.alertoption')}}</Checkbox>
         </FormItem>
         <FormItem
-          v-show="formData.imsConf.enable"
+          v-if="formData.imsConf.enable"
           :label="$t('message.enginelist.ruleform.level')"
           prop="imsConf.level"
         >
@@ -319,7 +322,7 @@
           </Select>
         </FormItem>
         <FormItem
-          v-show="formData.imsConf.enable"
+          v-if="formData.imsConf.enable"
           :label="$t('message.enginelist.ruleform.duration')"
           prop="imsConf.duration"
         >
@@ -334,13 +337,14 @@
           </Select>
         </FormItem>
         <FormItem
-          v-show="formData.imsConf.enable"
+          v-if="formData.imsConf.enable"
           :label="$t('message.enginelist.ruleform.alertuser')"
           prop="imsConf.receiver"
         >
           <Select
             v-model="formData.imsConf.receiver"
             multiple
+            filterable
             :placeholder="$t('message.enginelist.ruleform.selectalertuser')"
           >
             <Option
@@ -392,7 +396,7 @@ export default {
             value: null
           }, {
             field: 'memory',
-            operation: '<=',
+            operation: '>=',
             value: null
           }]
         },
@@ -577,10 +581,10 @@ export default {
           if (this.searchBar.status) {
             resItem = item.status == this.searchBar.status
           }
-          if (this.searchBar.yarnQueue.trim()) {
+          if (this.searchBar.yarnQueue && this.searchBar.yarnQueue.trim()) {
             resItem = resItem && this.searchBar.yarnQueue.trim() === item.queue
           }
-          if (this.searchBar.name.trim()) {
+          if (this.searchBar.name && this.searchBar.name.trim()) {
             resItem = resItem && new RegExp(this.searchBar.name.trim(), 'i').test(item.name)
           }
           return resItem
@@ -596,55 +600,54 @@ export default {
       })
     },
     add() {
-      // this.isEdit = false
-      // this.getUserList()
-      // this.formData = {
-      //   strategyId: '',
-      //   name: '',
-      //   description: '',
-      //   triggerConditionConf: {
-      //     relation: "or",
-      //     conditions: [{
-      //       field: 'cpu',
-      //       operation: '>=',
-      //       value: null
-      //     }, {
-      //       field: 'memory',
-      //       operation: '<=',
-      //       value: null
-      //     }]
-      //   },
-      //   terminateConditionConf: {
-      //     relation: "or",
-      //     conditions: [{
-      //       field: 'cpu',
-      //       operation: '<=',
-      //       value: null
-      //     },{
-      //       field: 'memory',
-      //       operation: '<=',
-      //       value: null
-      //     }]
-      //   },
-      //   queue: '',
-      //   imsConf: {
-      //     enable: false,
-      //     duration: null,
-      //     level: null,
-      //     receiver: null
-      //   }
-      // }
-      // this.conditionRule = {
-      //   cpu: true,
-      //   memory: false
-      // }
-      // this.showModal = true
-      // this.$nextTick(() => {
-      //   this.$refs.ruleForm.resetFields();
-      // })
-      // setTimeout(() => {
-      //   this.ruleItemValid = ''
-      // }, 50);
+      this.isEdit = false
+      this.getUserList()
+      this.getQueueList()
+      this.formData = {
+        strategyId: '',
+        name: '',
+        description: '',
+        triggerConditionConf: {
+          relation: "or",
+          conditions: [{
+            field: 'cpu',
+            operation: '>=',
+            value: null
+          }, {
+            field: 'memory',
+            operation: '>=',
+            value: null
+          }]
+        },
+        terminateConditionConf: {
+          relation: "or",
+          conditions: [{
+            field: 'cpu',
+            operation: '<=',
+            value: null
+          },{
+            field: 'memory',
+            operation: '<=',
+            value: null
+          }]
+        },
+        queue: '',
+        imsConf: {
+          enable: false,
+          duration: null,
+          level: null,
+          receiver: null
+        }
+      }
+      this.conditionRule = {
+        cpu: true,
+        memory: false
+      }
+      this.showModal = true
+      this.$refs.ruleForm.resetFields();
+      setTimeout(() => {
+        this.ruleItemValid = ''
+      }, 20);
     },
     saveRule() {
       let url = `${this.$API_PATH.WORKSPACE_PATH}saveEcReleaseStrategy`
@@ -677,14 +680,15 @@ export default {
         delete params.strategyId
       }
       this.$refs.ruleForm.validate(valid => {
-        if (valid) {
+        if (valid && !this.ruleItemValid) {
           if (this.loading) return
           this.loading = true
           api.fetch(url, params, 'put').then(() => {
             this.doQuery();
-            this.$Message.success(this.$t("message.common.Success"))
+            this.showModal = false;
+            this.$Message.success(this.$t("message.common.saveSuccess"))
           }).finally(() => {
-            this.loading = false
+            this.loading = false;
           })
         }
       })
@@ -704,14 +708,14 @@ export default {
     },
     deleteItem(item) {
       if (item.status) {
-        return this.$t("message.enginelist.disableReq")
+        return this.$Message.warning(this.$t("message.enginelist.disableReq"))
       }
       this.confirmAction({
         title: this.$t("message.enginelist.delRule"),
         content: this.$t("message.enginelist.confirmDel", { data: item.name }),
         ok: () => {
           api.fetch(`${this.$API_PATH.WORKSPACE_PATH}ecReleaseStrategy/${item.strategyId}`, {
-          }, 'delete').then(() => {
+          }, 'post').then(() => {
             this.doQuery();
             this.$Message.success(this.$t("message.enginelist.deletesuccess"))
           })
@@ -722,7 +726,7 @@ export default {
       item = JSON.parse(JSON.stringify(item))
       this.getUserList()
       if (item.status) {
-        return this.$t("message.enginelist.disableReq")
+        return this.$Message.warning(this.$t("message.enginelist.disableReq"))
       }
       this.isEdit = true;
       this.ruleItemValid = ''
@@ -753,14 +757,14 @@ export default {
         })
         data.terminateConditionConf.conditions.unshift({
           field: 'cpu',
-          operation: '>=',
+          operation: '<=',
           value: null
         })
       }
       if (!hasMem) {
         data.triggerConditionConf.conditions.push({
           field: 'memory',
-          operation: '<=',
+          operation: '>=',
           value: null
         })
         data.terminateConditionConf.conditions.push({
@@ -772,6 +776,9 @@ export default {
       this.conditionRule.cpu = hasCpu != undefined;
       this.conditionRule.memory = hasMem != undefined;
       this.showModal = true;
+      if (data.imsConf && data.imsConf.enable) {
+        data.imsConf.duration = data.imsConf.duration + ''
+      }
       this.$nextTick(() => {
         this.formData = data;
       })
@@ -785,10 +792,10 @@ export default {
           this.loading = true
           api.fetch(`${this.$API_PATH.WORKSPACE_PATH}changeEcReleaseStrategyStatus`, {
             strategyId: item.strategyId,
-            action: item.status ? 'turnDown' : 'turnOn '
+            action: item.status ? 'turnDown' : 'turnOn'
           }, 'post').then(() => {
             this.doQuery();
-            this.$Message.success(this.$t("message.common.Success"))
+            item.status ? this.$Message.success(this.$t("message.enginelist.disableSucc")) : this.$Message.success(this.$t("message.enginelist.enableSucc"))
           }).finally(() => {
             this.loading = false
           })
@@ -807,7 +814,7 @@ export default {
     formatConditions(conditions) {
       let string = '';
       conditions.forEach(item => {
-        string += `${item.field == 'cpu' ? this.$t('message.enginelist.cpu') : this.$t('message.enginelist.memory')} ${item.operation} ${item.value}`;
+        string += `${item.field == 'cpu' ? this.$t('message.enginelist.cpu') : this.$t('message.enginelist.memory')} ${item.operation} ${item.value} %`;
       })
       return string;
     },
@@ -871,8 +878,8 @@ export default {
 }
 .card-item {
   padding: 15px;
-  box-shadow: 0 0 3px 2px #eee;
-  border: 1px solid #eee;
+  @include border-color(#eee, #37383a);
+  @include guide-box-shadow(#eee, #37383a);
   margin-bottom: 20px;
 }
 .row-item {
@@ -901,7 +908,7 @@ export default {
 }
 .condition-row {
   margin-left: 80px;
-  background: #eee;
+  @include bg-color(#eee, #000a17);
   padding: 20px;
   margin-bottom: 10px;
 }

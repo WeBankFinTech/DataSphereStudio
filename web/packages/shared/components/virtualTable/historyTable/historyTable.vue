@@ -232,7 +232,13 @@ export default {
             },
             on: {
               click: () => {
-                item.action({ row: cell });
+                if (!this.isDisabled) {
+                  item.action({ row: cell });
+                  this.isDisabled = true
+                }
+                setTimeout(()=>{
+                  this.isDisabled = false
+                },1500)
               },
             },
           }, item.label));

@@ -1,13 +1,15 @@
 <template>
   <div
     class="login"
-    @keyup.enter.stop.prevent="handleSubmit('loginForm')">
-    <i class="login-bg"/>
+    @keyup.enter.stop.prevent="handleSubmit('loginForm')"
+  >
+    <i class="login-bg" />
     <div class="login-main">
       <Form
         ref="loginForm"
         :model="loginForm"
-        :rules="ruleInline">
+        :rules="ruleInline"
+      >
         <FormItem>
           <span class="login-title">{{$t('message.common.login.loginTitle', {app_name: $APP_CONF.app_name})}}</span>
         </FormItem>
@@ -17,7 +19,8 @@
             v-model="loginForm.user"
             type="text"
             :placeholder="$t('message.common.login.userName')"
-            size="large"/>
+            size="large"
+          />
         </FormItem>
         <FormItem prop="password">
           <div class="label">{{ $t('message.common.dss.Password') }}</div>
@@ -25,19 +28,22 @@
             v-model="loginForm.password"
             type="password"
             :placeholder="$t('message.common.dss.inputPassword')"
-            size="large" />
+            size="large"
+          />
         </FormItem>
         <FormItem>
           <Checkbox
             v-model="rememberUserNameAndPass"
             class="remember-user-name"
-            style="">{{$t('message.common.login.remenber')}}</Checkbox>
+            style=""
+          >{{$t('message.common.login.remenber')}}</Checkbox>
           <Button
             :loading="loading"
             type="primary"
             long
             size="large"
-            @click="handleSubmit('loginForm')">{{$t('message.common.login.login')}}</Button>
+            @click="handleSubmit('loginForm')"
+          >{{$t('message.common.login.login')}}</Button>
         </FormItem>
       </Form>
     </div>
@@ -113,7 +119,7 @@ export default {
       }).catch((e) => {
         storage.set('noWorkSpace', true, 'local');
         this.logout();
-        throw  e;
+        throw e;
       });
     },
     // 获取公钥接口
@@ -169,7 +175,7 @@ export default {
             }
 
             if (rst) {
-            // 跳转去旧版
+              // 跳转去旧版
               if (rst.redirectLinkisUrl) {
                 location.href = rst.redirectLinkisUrl;
                 return
@@ -187,7 +193,7 @@ export default {
               if (all_after_login.length) {
                 // 有hook返回则hook处理
               } else {
-                this.$router.replace({path: homePageRes.homePageUrl});
+                this.$router.replace({ path: homePageRes.homePageUrl });
               }
               this.$Message.success(this.$t('message.common.login.loginSuccess'));
             }
@@ -205,7 +211,7 @@ export default {
       storage.clear();
     },
     getIsAdmin() {
-      api.fetch(`/jobhistory/governanceStationAdmin`, {}, 'get').then((rst)=> {
+      api.fetch(`/jobhistory/governanceStationAdmin`, {}, 'get').then((rst) => {
         this.baseInfo = { username: this.loginForm.user, isAdmin: rst.admin }
         storage.set('baseInfo', this.baseInfo, 'local');
       })
@@ -213,8 +219,8 @@ export default {
     checkChromeVersion() {
       let arr = navigator.userAgent.split(' ');
       let chromeVersion = '';
-      for(let i=0;i < arr.length;i++){
-        if(/chrome/i.test(arr[i]))
+      for (let i = 0; i < arr.length; i++) {
+        if (/chrome/i.test(arr[i]))
           chromeVersion = arr[i]
       }
       let showversionTip = false
@@ -226,14 +232,16 @@ export default {
       }
       const hasTip = storage.get('chrome-version-tip', 'local')
       if (showversionTip && !hasTip) {
+        const link = `，<a href="${this.$APP_CONF.update_chrome}">${this.$t("message.common.dss.guide")}</a>`
+        const contact = `，${this.$t("message.common.dss.contactadmin")}`
         this.$Modal.confirm({
           title: this.$t('message.common.dss.Prompt'),
           cancelText: this.$t('message.common.dss.noPrompt'),
           onCancel: () => {
-            storage.set('chrome-version-tip', true , 'local');
+            storage.set('chrome-version-tip', true, 'local');
           },
-          content: `${chromeVersion ? this.$t('message.common.dss.currentbrower') + chromeVersion + '，': ''}
-            ${this.$t('message.common.dss.Recommend')}Chrome 78 ${this.$APP_CONF.update_chrome ? `，<a href="'+this.$APP_CONF.update_chrome+'">${this.$t("message.common.dss.guide") }</a>`:`，${this.$t("message.common.dss.contactadmin")}`}`
+          content: `${chromeVersion ? this.$t('message.common.dss.currentbrower') + chromeVersion + '，' : ''}
+            ${this.$t('message.common.dss.Recommend')}Chrome 78 ${this.$APP_CONF.update_chrome ? link : contact}`
         });
       }
     }

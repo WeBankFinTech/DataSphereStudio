@@ -24,7 +24,7 @@ class CsvAttachment(name: String, b64: String) extends Attachment {
 
   override def getBase64Str: String = b64
 
-  override def getFile: File = null //TODO write b64 to file
+  override def getFile: File = null
 
   override def getMediaType: String = "text/csv"
 

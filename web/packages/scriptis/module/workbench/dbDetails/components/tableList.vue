@@ -267,6 +267,7 @@ export default {
       return utils.formatValue(item, field);
     },
     handleGetTables(isreal) {
+      this.selectAll = false;
       this.pageData.currentPage = 1;
       this.isRealTime = isreal === true
       this.getDbTables();
@@ -327,6 +328,7 @@ export default {
     transfer() {
       this.confirmModalType = 'transfer'
       if (this.selectedItems.length) {
+        this.selectAllConfirm = false
         this.showConfirmModal = true
       } else {
         this.$Message.warning({ content: this.$t('message.scripts.selectfirst') });
@@ -338,6 +340,7 @@ export default {
         item.selected = false
       });
       if (this.selectedItems.length) {
+        this.selectAllConfirm = false
         this.showConfirmModal = true
       } else {
         this.$Message.warning({ content: this.$t('message.scripts.selectfirst') });

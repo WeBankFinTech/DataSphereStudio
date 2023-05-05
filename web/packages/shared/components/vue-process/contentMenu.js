@@ -20,7 +20,7 @@ import contentMenu from './contentMenu.vue';
 
 /**
  * 右键菜单
- * @param {*} option 
+ * @param {*} option
  */
 export default function ContentMenu(option) {
   if (option.autoClose === undefined) {

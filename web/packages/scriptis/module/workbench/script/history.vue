@@ -200,11 +200,6 @@ export default {
       const supportModes = this.getSupportModes();
       const match = supportModes.find((s) => s.rule.test(params.row.fileName));
       const ext = match ? match.ext : '.hql';
-      if (!params.row.logPath) {
-        await api.fetch(`/jobhistory/${params.row.taskID}/get`, 'get').then((rst) => {
-          params.row.logPath = rst.task.logPath;
-        });
-      }
       const name = `history_item_${params.row.taskID}${ext}`;
       const md5Id = util.md5(name);
       this.dispatch('Workbench:add', {

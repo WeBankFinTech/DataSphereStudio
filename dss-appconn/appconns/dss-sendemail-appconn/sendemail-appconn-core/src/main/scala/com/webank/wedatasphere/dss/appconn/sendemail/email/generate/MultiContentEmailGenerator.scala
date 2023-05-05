@@ -62,9 +62,9 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
                 case ResultSetFactory.PICTURE_TYPE => new PictureEmailContent(fsPath, fileType)
                 case ResultSetFactory.HTML_TYPE =>
                   multiContentEmail.setEmailType("html")
-                  new HtmlEmailContent (fsPath, fileType)//new HtmlEmailContent(fsPath)
-                case ResultSetFactory.TABLE_TYPE => throw new EmailSendFailedException(80003 ,"table result set is not allowed")//new TableEmailContent(fsPath)
-                case ResultSetFactory.TEXT_TYPE => throw new EmailSendFailedException(80003 ,"text result set is not allowed")//new FileEmailContent(fsPath)
+                  new HtmlEmailContent (fsPath, fileType)
+                case ResultSetFactory.TABLE_TYPE => throw new EmailSendFailedException(80003 ,"table result set is not allowed")
+                case ResultSetFactory.TEXT_TYPE => throw new EmailSendFailedException(80003 ,"text result set is not allowed")
               }
               multiContentEmail.addEmailContent(emailContent)
             }
@@ -73,13 +73,9 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
               multiContentEmail.setEmailType(emailType)
             }
           }
-        case "file" => throw new EmailSendFailedException(80003 ,"file content is not allowed") //addContentEmail(c => new FileEmailContent(new FsPath(c)))
-        case "text" => throw new EmailSendFailedException(80003 ,"text content is not allowed")//addContentEmail(new TextEmailContent(_))
-        case "link" => throw new EmailSendFailedException(80003 ,"link content is not allowed")//addContentEmail(new UrlEmailContent(_))
+        case "file" => throw new EmailSendFailedException(80003 ,"file content is not allowed")
+        case "text" => throw new EmailSendFailedException(80003 ,"text content is not allowed")
+        case "link" => throw new EmailSendFailedException(80003 ,"link content is not allowed")
       }
   }
-
-
-
-
 }

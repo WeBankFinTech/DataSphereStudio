@@ -83,7 +83,7 @@ export default {
         const name = copyProjectId + '_copy';
         this.$Notice.close(name);
         if (res.status === 2) {
-          this.$Notice.success({
+          this.$Notice.info({
             title: this.$t('message.workspace.Prompt'),
             desc: '',
             render: (h) => {
@@ -93,7 +93,7 @@ export default {
                   'line-height': '20px',
                 },
               },
-              this.$t('message.workspace.CopyDone')
+              res.errorMsg ? res.errorMsg : this.$t('message.workspace.CopyDone')
               );
             },
           })

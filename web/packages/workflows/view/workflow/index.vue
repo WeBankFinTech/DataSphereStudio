@@ -1070,6 +1070,10 @@ export default {
       this.tabList = this.tabList.filter(item => {
         return item.query.orchestratorId != params.orchestratorId
       })
+      let workspaceId = this.$route.query.workspaceId
+      let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
+      workFlowLists = workFlowLists.filter(it => it.query.orchestratorId != params.orchestratorId)
+      sessionStorage.setItem(`work_flow_lists_${workspaceId}`, JSON.stringify(workFlowLists))
       const cur = this.projectsTree.filter(item => item.id == params.projectId)[0];
       this.getFlow(cur, (flows) => {
         this.reFreshTreeData(cur, flows)
@@ -1130,7 +1134,7 @@ export default {
         workFlowLists = workFlowLists.filter(it=>it.tabId !== tabId);
         sessionStorage.setItem(`work_flow_lists_${workspaceId}`, JSON.stringify(workFlowLists))
       };
-      if (this.tabList[index].isChange) {
+      if (this.tabList[index] && this.tabList[index].isChange) {
         this.$Modal.confirm({
           title: this.$t("message.workflow.process.index.GBTS"),
           content: this.$t("message.workflow.process.index.WBCSFGB"),

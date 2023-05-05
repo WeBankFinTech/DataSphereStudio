@@ -189,7 +189,11 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         orchestratorPublishJob.setInstanceName(Sender.getThisInstance());
         orchestratorPublishJob.setCreateTime(new Date(System.currentTimeMillis()));
         orchestratorPublishJob.setUpdateTime(new Date(System.currentTimeMillis()));
-        orchestratorPublishJob.setConversionJobJson(job.toString());
+        if (DSSCommonUtils.COMMON_GSON.toJson(job).length() > 1024) {
+            orchestratorPublishJob.setConversionJobJson(DSSCommonUtils.COMMON_GSON.toJson(job).substring(0, 1024));
+        } else {
+            orchestratorPublishJob.setConversionJobJson(DSSCommonUtils.COMMON_GSON.toJson(job));
+        }
         job.setOrchestratorPublishJob(orchestratorPublishJob);
         orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
         //submit it

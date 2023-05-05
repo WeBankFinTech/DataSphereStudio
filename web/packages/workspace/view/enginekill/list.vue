@@ -29,6 +29,12 @@
       >
         <span>{{ row.driver.cpu }} cores, {{ row.driver.memory }}, {{ row.driver.instance }} apps</span>
       </template>
+      <template
+        slot-scope="{ row }"
+        slot="killTime"
+      >
+        <span>{{ row.killTime | formatDate('YYYY-MM-DD HH:mm:ss') }}</span>
+      </template>
     </Table>
     <Page
       v-if="pageData.total"
@@ -52,6 +58,8 @@
 
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
+import filters from '@dataspherestudio/shared/common/util/filters';
+
 export default {
   components: {
   },
@@ -64,11 +72,11 @@ export default {
         { title: this.$t('message.enginelist.cols.local'), slot: "local", width: '120' },
         { title: this.$t('message.enginelist.cols.yarnmb'), slot: "yarnmem" },
         { title: this.$t('message.enginelist.cols.yanrcores'), slot: "yarncpu" },
-        { title: this.$t('message.enginelist.cols.freeTime'), key: "unlockDuration" },
-        { title: this.$t('message.enginelist.cols.creator'), key: "owner" },
+        { title: this.$t('message.enginelist.cols.freeTime'), key: "unlockDuration", width: '90' },
+        { title: this.$t('message.enginelist.cols.creator'), key: "owner" , width: '100' },
         { title: this.$t('message.enginelist.cols.start'), key: "createTime" },
-        { title: this.$t('message.enginelist.cols.killer'), key: "killer" },
-        { title: this.$t('message.enginelist.cols.requestTime'), key: "killTime" },
+        { title: this.$t('message.enginelist.cols.killer'), key: "killer" , width: '100' },
+        { title: this.$t('message.enginelist.cols.requestTime'), key: "killTime",  slot: "killTime" },
 
       ],
       list: [],
@@ -81,6 +89,7 @@ export default {
       },
     }
   },
+  filters,
   mounted() {
     this.getEngineList()
   },
@@ -100,8 +109,8 @@ export default {
         pageNow: this.pageData.pageNow,
         pageSize: this.pageData.pageSize,
       }
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listEcKillHistory`, params, 'post').then((res) => {
-        this.list = res.engineList || [];
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listEcKillHistory`, params, 'get').then((res) => {
+        this.list = res.engineList || []
         this.pageData.total = res.total
         this.loading = false;
       }).catch((err) => {

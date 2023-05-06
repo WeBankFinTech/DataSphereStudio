@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.appconn.restful;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerCoreConf;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
@@ -63,12 +64,8 @@ public class AppConnManagerRestfulApi {
 
     @PostConstruct
     public void init() throws InterruptedException {
-        //仅dss-server-dev和原dss-framework-project-server服务需要初始化加载appconn
-        if (!DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue().equalsIgnoreCase(DSSSenderServiceConf.PROJECT_SERVER_NAME.getValue())
-                && !DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue().equalsIgnoreCase(DSSSenderServiceConf.DSS_SERVER_NAME.getValue())) {
-            return;
-        }
-        if (AppConnConf.IS_APPCONN_MANAGER.getValue()) {
+        //仅dss-server-dev的其中一个服务需要作为appconn-manager节点上传appconn包，其他服务都是client端
+        if (AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue()) {
             LOGGER.info("First, try to load all AppConn...");
             AppConnManager.getAppConnManager().listAppConns().forEach(appConn -> {
                 LOGGER.info("Try to check the quality of AppConn {}.", appConn.getAppDesc().getAppName());

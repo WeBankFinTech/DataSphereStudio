@@ -17,30 +17,25 @@
 package com.webank.wedatasphere.dss.appconn.manager.impl;
 
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
+import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoServiceImpl;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnResourceService;
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
-import com.webank.wedatasphere.dss.common.utils.ClassUtils;
+import com.webank.wedatasphere.dss.appconn.manager.service.AppConnResourceServiceImpl;
 
 
+/**
+ * 此AppConnManager实现类只在appconn-manager-client端使用
+ */
 public class AppConnManagerImpl extends AbstractAppConnManager {
 
     @Override
     protected AppConnInfoService createAppConnInfoService() {
-        try {
-            return ClassUtils.getInstance(AppConnInfoService.class);
-        } catch (DSSErrorException e) {
-            throw new DSSRuntimeException(25000, "Cannot find a useful AppConnInfoService.", e);
-        }
+        //返回client端的实现类
+        return new AppConnInfoServiceImpl();
     }
 
     @Override
     protected AppConnResourceService createAppConnResourceService() {
-        try {
-            return ClassUtils.getInstance(AppConnResourceService.class);
-        } catch (DSSErrorException e) {
-            throw new DSSRuntimeException(25000, "Cannot find a useful AppConnResourceService.", e);
-        }
+        return new AppConnResourceServiceImpl();
     }
 
 }

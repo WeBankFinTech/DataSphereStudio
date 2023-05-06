@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.loader.loader.AppConnLoader;
 import com.webank.wedatasphere.dss.appconn.loader.loader.AppConnLoaderFactory;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
-import com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerCoreConfiguration;
+import com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerCoreConf;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
@@ -69,9 +69,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         }
         synchronized (AbstractAppConnManager.class) {
             if (appConnManager == null) {
-                appConnManager = AppConnManagerCoreConfiguration.APPCONN_IS_CLIENT_MODE.getValue() ?
-                        ClassUtils.getInstanceOrWarn(AppConnManagerImpl.class) : ClassUtils.getInstanceOrDefault(AppConnManager.class,
-                        c -> c.getPackage().getName().contains("com.webank.wedatasphere.dss.framework.appconn"), new AppConnManagerImpl());
+                appConnManager = AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue() ?
+                        ClassUtils.getInstanceOrDefault(AppConnManager.class, new AppConnManagerImpl()) : new AppConnManagerImpl();
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
             }

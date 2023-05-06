@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.appconn.manager.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
-public class AppConnManagerCoreConfiguration {
-
-    public final static CommonVars<Boolean> APPCONN_IS_CLIENT_MODE = CommonVars.apply("wds.dss.appconn.core.is.clientmode", false);
+public class AppConnManagerCoreConf {
+    // 默认值为false，只有dev的其中一个服务需要开启该配置作为manager节点
+    public static final CommonVars<Boolean> IS_APPCONN_MANAGER = CommonVars.apply("wds.dss.appconn.framework.ismanager", false);
 }

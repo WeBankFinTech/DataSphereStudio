@@ -6,6 +6,7 @@ import org.apache.linkis.common.utils.{Logging, Utils}
 import java.io.{File, FileInputStream, IOException, InputStream}
 import java.util
 import java.util.Properties
+import java.util.stream.Collectors
 import scala.collection.JavaConverters._
 
 object DSSConfiguration extends Logging {
@@ -46,10 +47,14 @@ object DSSConfiguration extends Logging {
         )
       }
     }
-    setConfig(MAPPER_LOCATIONS, String.join(",", mapperLocationList))
-    setConfig(TYPE_ALIASES_PACKAGE, String.join(",", typeAliasesPackageList))
-    setConfig(BASE_PACKAGE, String.join(",", basePackageList))
-    setConfig(RESTFUL_SCAN_PACKAGES, String.join(",", restfulScanPackagesList))
+    setConfig(MAPPER_LOCATIONS, distinctStr(String.join(",", mapperLocationList)))
+    setConfig(TYPE_ALIASES_PACKAGE, distinctStr(String.join(",", typeAliasesPackageList)))
+    setConfig(BASE_PACKAGE, distinctStr(String.join(",", basePackageList)))
+    setConfig(RESTFUL_SCAN_PACKAGES, distinctStr(String.join(",", restfulScanPackagesList)))
+  }
+
+  private def distinctStr(str: String): String = {
+    String.join(",", util.Arrays.stream(str.split(',')).collect(Collectors.toSet()))
   }
 
   private def initConfig(config: Properties, filePath: String): Unit = {
@@ -67,6 +72,7 @@ object DSSConfiguration extends Logging {
   }
 
   def setConfig(key: String, value: String): Unit = {
+    logger.info(s"try to set a config, key:$key, value:$value")
     BDPConfiguration.set(key, value)
   }
 

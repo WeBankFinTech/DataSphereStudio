@@ -19,4 +19,5 @@ public interface OrchestratorJobMapper {
 
     void batchUpdatePublishJob(@Param("failedJobs") List<OrchestratorPublishJob> failedJobs);
 
+    void updatePublishJobByInstance(@Param("thisInstance") String thisInstance);
 }

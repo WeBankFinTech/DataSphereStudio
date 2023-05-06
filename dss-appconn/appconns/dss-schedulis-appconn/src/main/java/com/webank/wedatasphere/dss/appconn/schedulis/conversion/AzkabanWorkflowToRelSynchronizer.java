@@ -26,9 +26,9 @@ import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSS
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.ProjectToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSUploadAction;
-import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestService;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectSearchOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectResponseRef;
-import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.workflow.conversion.entity.ConvertedRel;
 import com.webank.wedatasphere.dss.workflow.conversion.operation.WorkflowToRelSynchronizer;
@@ -78,9 +78,20 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
         try {
             String projectName = projectToRelConversionRequestRef.getDSSProject().getName();
             //前置检查，若项目在schedulis不存在，直接返回
-            if (!searchProjectExists(projectToRelConversionRequestRef.getDSSProject().getName(), projectToRelConversionRequestRef.getWorkspace())) {
+            SchedulisAppConn schedulisAppConn = (SchedulisAppConn) dssToRelConversionOperation.getConversionService().getAppStandard().getAppConn();
+            ProjectSearchOperation projectSearchOperation = schedulisAppConn.getOrCreateStructureStandard()
+                    .getProjectService(dssToRelConversionOperation.getConversionService().getAppInstance()).getProjectSearchOperation();
+            ProjectResponseRef responseRef = projectSearchOperation.searchProject(new RefProjectContentRequestRef.RefProjectContentRequestRefImpl()
+                    .setProjectName(projectName).setWorkspace(projectToRelConversionRequestRef.getWorkspace()));
+            if (responseRef.isFailed()) {
+                //接口调用返回其他错误，如网络错误
+                throw new ExternalOperationFailedException(90012, responseRef.getErrorMsg());
+            }
+            if (responseRef.isSucceed() && responseRef.getRefProjectId() == null) {
+                //项目在schedulis不存在
                 throw new DSSRuntimeException(90012, "the project: " + projectName + " is not exists in schedulis.(项目在schedulis不存在，请检查是否在schedulis中已被删除)");
             }
+            //项目存在，则继续执行如下步骤
             String projectPath = azkabanConvertedRel.getStorePath();
             tmpSavePath = ZipHelper.zip(projectPath);
             //upload zip to Azkaban

@@ -60,13 +60,22 @@
         </foreach>
         update_time =
         <foreach collection="failedJobs" item="item" index="index"
-                 separator=" " open="case" close="end">
+                 separator=" " open="case" close="end,">
             when id = #{item.id} then #{item.updateTime}
+        </foreach>
+        error_msg =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end">
+            when id = #{item.id} then #{item.errorMsg}
         </foreach>
         WHERE id in
         <foreach collection="failedJobs" item="item" index="index" separator="," open="(" close=")">
             #{item.id}
         </foreach>
+    </update>
+
+    <update id="updatePublishJobByInstance">
+        UPDATE dss_orchestrator_job_info SET status = 'Failed' WHERE instance_name = #{thisInstance} AND status IN ('Running', 'Inited')
     </update>
 
     <resultMap id="orchestrator_job_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">

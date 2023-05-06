@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,15 +37,17 @@ public class CheckOrchestratorConversionJobTask {
     @Autowired
     private ExecuteAlter executeAlter;
 
+    @PostConstruct
+    public void checkSelfExecuteTasks() {
+        LOGGER.info("CheckOrchestratorConversionJobTask: Start checking for tasks that are still running after instance exceptions");
+        String thisInstance = Sender.getThisInstance();
+        orchestratorJobMapper.updatePublishJobByInstance(thisInstance);
+    }
+
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkOrchestratorConversionJob() {
 
         ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue());
-        if (allActionInstances.length == DSSCommonConf.DSS_INSTANCE_NUMBERS.getValue()){
-            LOGGER.info("All instances are active!");
-            return;
-        }
-
         List<OrchestratorPublishJob> maybeFailedJobs = orchestratorJobMapper.getPublishJobByJobStatuses
                 (Arrays.asList(JobStatus.Inited.getStatus(), JobStatus.Running.getStatus()));
         LOGGER.info("These tasks are maybe failed. " + maybeFailedJobs.toString());
@@ -56,6 +59,7 @@ public class CheckOrchestratorConversionJobTask {
                 if (!activeInstance.contains(maybeFailedJob.getInstanceName())) {
                     maybeFailedJob.setStatus(JobStatus.Failed.getStatus());
                     maybeFailedJob.setUpdateTime(new Date());
+                    maybeFailedJob.setErrorMsg("执行发布的实例异常，请重新发布！");
                     failedJobs.add(maybeFailedJob);
                 }
             }

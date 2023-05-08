@@ -89,7 +89,7 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             }
             if (responseRef.isSucceed() && responseRef.getRefProjectId() == null) {
                 //项目在schedulis不存在
-                throw new DSSRuntimeException(90012, "the project: " + projectName + " is not exists in schedulis.(项目在schedulis不存在，请检查是否在schedulis中已被删除)");
+                throw new DSSRuntimeException(90012, "the project: " + projectName + " is not exists in schedulis.(工作流对应项目在schedulis已被删除，请在schedulis中重新创建同名项目)");
             }
             //项目存在，则继续执行如下步骤
             String projectPath = azkabanConvertedRel.getStorePath();
@@ -101,31 +101,6 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
                     projectToRelConversionRequestRef.getApprovalId());
         } catch (Exception e) {
             throw new DSSRuntimeException(90012, ExceptionUtils.getRootCauseMessage(e), e);
-        }
-    }
-
-    private boolean searchProjectExists(String projectName, Workspace workspace) {
-        LOGGER.info("begin to search Schedulis project before upload, projectName is {}.", projectName);
-        Map<String, Object> params = new HashMap<>(2);
-        params.put("project", projectName);
-        params.put("ajax", "fetchprojectflows");
-        try {
-            String responseBody = SchedulisHttpUtils.getHttpGetResult(projectUrl, params,
-                    dssToRelConversionOperation.getConversionService().getSSORequestService().createSSORequestOperation(SchedulisAppConn.SCHEDULIS_APPCONN_NAME),
-                    workspace);
-            LOGGER.info("responseBody from Schedulis is: {}.", responseBody);
-            Map<String, Object> map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
-            String errorInfo = (String) map.get("error");
-            if (errorInfo != null && (errorInfo.contains("Project " + projectName + " doesn't exist")
-                    //schedulis已删除但未永久删除的项目返回这个
-                    || errorInfo.contains("Permission denied. Need READ access"))) {
-                return false;
-            } else if (errorInfo != null) {
-                throw new ExternalOperationFailedException(90012, errorInfo);
-            }
-            return true;
-        } catch (Exception e) {
-            throw new ExternalOperationFailedException(90117, "Failed to search Schedulis project name!", e);
         }
     }
 

@@ -69,8 +69,11 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         }
         synchronized (AbstractAppConnManager.class) {
             if (appConnManager == null) {
-                appConnManager = AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue() ?
-                        ClassUtils.getInstanceOrDefault(AppConnManager.class, new AppConnManagerImpl()) : new AppConnManagerImpl();
+                //appconn-manager-core包无法引入manager-client包，会有maven循环依赖，这里通过反射获取client的实现类
+                //ismanager=false时，获取client端的AppConnManager实现类，ismanager=true时，获取appconn-framework端的AppConnManager实现类。
+                appConnManager = !AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue() ? ClassUtils.getInstanceOrWarn(AppConnManagerImpl.class) :
+                        //通过包名过滤
+                        ClassUtils.getInstanceOrDefault(AppConnManager.class, c -> c.getPackage().getName().contains("com.webank.wedatasphere.dss.framework.appconn"), new AppConnManagerImpl());
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
             }

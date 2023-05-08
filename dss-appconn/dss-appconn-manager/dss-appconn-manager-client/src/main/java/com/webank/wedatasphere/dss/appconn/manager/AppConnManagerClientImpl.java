@@ -14,34 +14,22 @@
  *
  */
 
-package com.webank.wedatasphere.dss.appconn.manager.impl;
+package com.webank.wedatasphere.dss.appconn.manager;
 
+import com.webank.wedatasphere.dss.appconn.manager.impl.AppConnManagerImpl;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
+import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoServiceImpl;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnResourceService;
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
-import com.webank.wedatasphere.dss.common.utils.ClassUtils;
+import com.webank.wedatasphere.dss.appconn.manager.service.AppConnResourceServiceImpl;
 
-
-public class AppConnManagerImpl extends AbstractAppConnManager {
-
+public class AppConnManagerClientImpl extends AppConnManagerImpl {
     @Override
     protected AppConnInfoService createAppConnInfoService() {
-        try {
-            //由于maven不能循环依赖，这里不能返回client端的实现类
-            return ClassUtils.getInstance(AppConnInfoService.class);
-        } catch (DSSErrorException e) {
-            throw new DSSRuntimeException(25000, "Cannot find a useful AppConnInfoService.", e);
-        }
+        return new AppConnInfoServiceImpl();
     }
 
     @Override
     protected AppConnResourceService createAppConnResourceService() {
-        try {
-            return ClassUtils.getInstance(AppConnResourceService.class);
-        } catch (DSSErrorException e) {
-            throw new DSSRuntimeException(25000, "Cannot find a useful AppConnResourceService.", e);
-        }
+        return new AppConnResourceServiceImpl();
     }
-
 }

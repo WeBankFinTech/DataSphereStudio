@@ -35,6 +35,7 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,8 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
 @RestController
 public class DSSWorkspaceUserRestful {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceUserRestful.class);
+
+    private static final String HPMS_TOKEN_STARTWITH = "HPMS-";
 
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
@@ -203,12 +206,20 @@ public class DSSWorkspaceUserRestful {
 
     @RequestMapping(path = "getUserRole", method = RequestMethod.GET)
     public Message getWorkspaceUserRole(@RequestParam(name = "userName") String username) {
+        String token = ModuleUserUtils.getToken(httpServletRequest);
+        if(token.toUpperCase().startsWith(HPMS_TOKEN_STARTWITH)){
+            return Message.error("Token:" + token + " has no permission to get user info.");
+        }
         List<Map<String,Object>> userRoles = dssWorkspaceUserService.getUserRoleByUserName(username);
         return Message.ok().data("userName", username).data("roleInfo", userRoles);
     }
 
     @RequestMapping(path = "/clearUser", method = RequestMethod.GET)
     public Message clearUser(@RequestParam("userName") String userName) {
+        String token = ModuleUserUtils.getToken(httpServletRequest);
+        if(token.toUpperCase().startsWith(HPMS_TOKEN_STARTWITH)){
+            return Message.error("Token:" + token + " has no permission to clear user.");
+        }
         boolean clearResult = dssWorkspaceUserService.clearUserByUserName(userName);
         AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
                 null, OperateTypeEnum.DELETE,null);

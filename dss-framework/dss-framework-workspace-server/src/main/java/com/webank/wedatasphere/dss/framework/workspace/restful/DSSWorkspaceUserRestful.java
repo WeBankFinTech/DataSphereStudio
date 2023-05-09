@@ -207,7 +207,7 @@ public class DSSWorkspaceUserRestful {
     @RequestMapping(path = "getUserRole", method = RequestMethod.GET)
     public Message getWorkspaceUserRole(@RequestParam(name = "userName") String username) {
         String token = ModuleUserUtils.getToken(httpServletRequest);
-        if(token.toUpperCase().startsWith(HPMS_TOKEN_STARTWITH)){
+        if(!token.toUpperCase().startsWith(HPMS_TOKEN_STARTWITH)){
             return Message.error("Token:" + token + " has no permission to get user info.");
         }
         List<Map<String,Object>> userRoles = dssWorkspaceUserService.getUserRoleByUserName(username);
@@ -217,7 +217,7 @@ public class DSSWorkspaceUserRestful {
     @RequestMapping(path = "/clearUser", method = RequestMethod.GET)
     public Message clearUser(@RequestParam("userName") String userName) {
         String token = ModuleUserUtils.getToken(httpServletRequest);
-        if(token.toUpperCase().startsWith(HPMS_TOKEN_STARTWITH)){
+        if(!token.toUpperCase().startsWith(HPMS_TOKEN_STARTWITH)){
             return Message.error("Token:" + token + " has no permission to clear user.");
         }
         boolean clearResult = dssWorkspaceUserService.clearUserByUserName(userName);

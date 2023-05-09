@@ -75,7 +75,7 @@
     </update>
 
     <update id="updatePublishJobByInstance">
-        UPDATE dss_orchestrator_job_info SET status = 'Failed' WHERE instance_name = #{thisInstance} AND status IN ('Running', 'Inited')
+        UPDATE dss_orchestrator_job_info SET status = 'Failed', error_msg = '执行发布的实例异常，请重新发布！' WHERE instance_name = #{thisInstance} AND status IN ('Running', 'Inited')
     </update>
 
     <resultMap id="orchestrator_job_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">

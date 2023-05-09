@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerCoreConf;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfo;
 import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.service.AppConnInfoService;
+import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.framework.appconn.conf.AppConnConf;
@@ -95,13 +96,8 @@ public class AppConnManagerRestfulApi {
             LOGGER.info("All AppConn plugins has scanned.");
             uploadThreadPool.shutdown();
         } else {
-            LOGGER.info("Not appConn manager, start to download all appConn.");
-            AppConnManager.getAppConnManager().listAppConns().forEach(appConn -> {
-                LOGGER.info("Try to download AppConn {}.", appConn.getAppDesc().getAppName());
-                AppConnManager.getAppConnManager().reloadAppConn(appConn.getAppDesc().getAppName());
-            });
-            LOGGER.info("Download appConn end.");
             LOGGER.info("Not appConn manager, will not scan plugins.");
+            AppConnManagerUtils.autoLoadAppConnManager();
         }
     }
 

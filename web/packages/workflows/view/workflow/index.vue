@@ -336,7 +336,6 @@ export default {
   mounted() {
     // 获取所有project展示tree
     this.getAllProjects((res) => {
-      this.rawProjects = res;
       if (this.$route.query.projectID) {
         let index
         let it
@@ -351,7 +350,9 @@ export default {
           res.projects.unshift(it)
         }
       }
-      this.setVirtualRolesForProj(res)
+      this.rawProjects = res;
+      const projs = this.changeCatType(this.$route.query.viewState)
+      this.setVirtualRolesForProj({projects: projs})
       this.updateBread();
       this.tryOpenWorkFlow();
     });

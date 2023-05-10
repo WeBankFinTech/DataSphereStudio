@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -35,15 +36,17 @@ public class CheckOrchestratorCopyTask {
     @Autowired
     private ExecuteAlter executeAlter;
 
+    @PostConstruct
+    public void checkSelfExecuteTasks() {
+        LOGGER.info("CheckOrchestratorCopyTask: Start checking for tasks that are still running after instance exceptions");
+        String thisInstance = Sender.getThisInstance();
+        orchestratorCopyJobMapper.updateOrchestratorCopyJobByInstance(thisInstance);
+    }
+
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkOrchestratorCopyJobTask() {
 
         ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue());
-        if (allActionInstances.length == DSSCommonConf.DSS_INSTANCE_NUMBERS.getValue()){
-            LOGGER.info("All instances are active!");
-            return;
-        }
-
         List<DSSOrchestratorCopyInfo> maybeFailedJobs = orchestratorCopyJobMapper.getRunningJob();
         LOGGER.info("These tasks are maybe failed. " + maybeFailedJobs.toString());
         List<String> activeInstance = Arrays.stream(allActionInstances).map(ServiceInstance::getInstance).collect(Collectors.toList());
@@ -54,7 +57,7 @@ public class CheckOrchestratorCopyTask {
                 if (!activeInstance.contains(maybeFailedJob.getInstanceName())) {
                     maybeFailedJob.setStatus(0);
                     maybeFailedJob.setIsCopying(0);
-                    maybeFailedJob.setExceptionInfo("系统打盹，请稍后重试！");
+                    maybeFailedJob.setExceptionInfo("执行复制的实例异常，请稍后重试！");
                     maybeFailedJob.setEndTime(new Date());
                     failedJobs.add(maybeFailedJob);
                 }
@@ -63,13 +66,14 @@ public class CheckOrchestratorCopyTask {
 
         // update copy job status to failed
         if (failedJobs.size() > 0) {
+            LOGGER.warn("以下工作流复制任务因执行实例异常导致失败！{}", failedJobs);
             orchestratorCopyJobMapper.batchUpdateCopyJob(failedJobs);
             List<String> exceptionInstances = failedJobs.stream().map(DSSOrchestratorCopyInfo::getInstanceName).distinct().collect(Collectors.toList());
             List<String> exceptionId = failedJobs.stream().map(DSSOrchestratorCopyInfo::getId).collect(Collectors.toList());
             failedJobs.clear();
             // send alter
             CustomAlter customAlter = new CustomAlter("DSS exception of instance: " + exceptionInstances,
-                    "以下id的工作流拷贝失败，请到表dss_orchestrator_copy_info查看失败的工作流信息：" + exceptionId,
+                    "以下Id的工作流拷贝失败，请到表dss_orchestrator_copy_info查看失败的工作流信息：" + exceptionId,
                     "1", DSSCommonConf.ALTER_RECEIVER.getValue());
             executeAlter.sendAlter(customAlter);
         }

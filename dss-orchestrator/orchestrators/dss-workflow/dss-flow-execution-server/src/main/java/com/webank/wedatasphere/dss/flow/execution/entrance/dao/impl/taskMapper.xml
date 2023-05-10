@@ -134,10 +134,6 @@
         </foreach>
     </update>
 
-    <update id="updateWorkflowExecuteJobByInstance">
-        UPDATE dss_workflow_task SET status = 'Failed', err_desc = '执行工作流的实例异常，请稍后重试！', updated_time = now() WHERE instance_name = #{thisInstance} AND status IN ('Running', 'Inited')
-    </update>
-
     <select id="selectTaskStatusForUpdate" resultType="java.lang.String">
         SELECT
         bdt.`status`

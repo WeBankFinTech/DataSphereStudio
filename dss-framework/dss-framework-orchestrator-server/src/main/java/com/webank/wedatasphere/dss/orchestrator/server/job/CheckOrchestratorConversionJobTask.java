@@ -4,6 +4,7 @@ import com.webank.wedatasphere.dss.common.alter.ExecuteAlter;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.entity.CustomAlter;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
@@ -17,10 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +39,16 @@ public class CheckOrchestratorConversionJobTask {
     public void checkSelfExecuteTasks() {
         LOGGER.info("CheckOrchestratorConversionJobTask: Start checking for tasks that are still running after instance exceptions");
         String thisInstance = Sender.getThisInstance();
-        orchestratorJobMapper.updatePublishJobByInstance(thisInstance);
+        List<OrchestratorPublishJob> maybeFailedJobs = orchestratorJobMapper.getPublishJobByJobStatuses
+                (Arrays.asList(JobStatus.Inited.getStatus(), JobStatus.Running.getStatus()));
+        List<OrchestratorPublishJob> failedJobs = maybeFailedJobs.stream().filter(t -> Objects.equals(t.getInstanceName(), thisInstance))
+                .peek(t -> {
+                    t.setErrorMsg("执行发布的实例异常，请重新发布！");
+                    t.setStatus(JobStatus.Failed.getStatus());
+                    t.setUpdateTime(new Date());
+                }).collect(Collectors.toList());
+        LOGGER.warn("实例启动阶段，以下工作流发布任务因为该实例异常导致发布失败！{}", DSSCommonUtils.COMMON_GSON.toJson(failedJobs));
+        orchestratorJobMapper.batchUpdatePublishJob(failedJobs);
     }
 
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
@@ -50,24 +57,22 @@ public class CheckOrchestratorConversionJobTask {
         ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue());
         List<OrchestratorPublishJob> maybeFailedJobs = orchestratorJobMapper.getPublishJobByJobStatuses
                 (Arrays.asList(JobStatus.Inited.getStatus(), JobStatus.Running.getStatus()));
-        LOGGER.info("These tasks are maybe failed. " + maybeFailedJobs.toString());
+        LOGGER.info("These tasks are maybe failed. " + DSSCommonUtils.COMMON_GSON.toJson(maybeFailedJobs));
         List<String> activeInstance = Arrays.stream(allActionInstances).map(ServiceInstance::getInstance).collect(Collectors.toList());
         LOGGER.info("Active instances are " + activeInstance);
         List<OrchestratorPublishJob> failedJobs = new ArrayList<>();
         if (maybeFailedJobs.size() > 0) {
-            for (OrchestratorPublishJob maybeFailedJob : maybeFailedJobs) {
-                if (!activeInstance.contains(maybeFailedJob.getInstanceName())) {
-                    maybeFailedJob.setStatus(JobStatus.Failed.getStatus());
-                    maybeFailedJob.setUpdateTime(new Date());
-                    maybeFailedJob.setErrorMsg("执行发布的实例异常，请重新发布！");
-                    failedJobs.add(maybeFailedJob);
-                }
-            }
+            failedJobs = maybeFailedJobs.stream().filter(t -> !activeInstance.contains(t.getInstanceName()))
+                    .peek(t -> {
+                        t.setStatus(JobStatus.Failed.getStatus());
+                        t.setUpdateTime(new Date());
+                        t.setErrorMsg("执行发布的实例异常，请重新发布！");
+                    }).collect(Collectors.toList());
         }
 
         if (failedJobs.size() > 0) {
             // update publish job status to failed
-            LOGGER.warn("以下工作流发布任务因为执行实例异常导致发布失败！{}", failedJobs);
+            LOGGER.warn("以下工作流发布任务因为执行实例异常导致发布失败！{}", DSSCommonUtils.COMMON_GSON.toJson(failedJobs));
             orchestratorJobMapper.batchUpdatePublishJob(failedJobs);
             List<String> exceptionInstances = failedJobs.stream().map(OrchestratorPublishJob::getInstanceName).distinct().collect(Collectors.toList());
             List<Long> exceptionId = failedJobs.stream().map(OrchestratorPublishJob::getId).collect(Collectors.toList());

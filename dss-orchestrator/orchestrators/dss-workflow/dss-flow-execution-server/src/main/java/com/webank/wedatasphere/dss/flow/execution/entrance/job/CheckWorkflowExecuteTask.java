@@ -46,8 +46,10 @@ public class CheckWorkflowExecuteTask {
                     t.setUpdatedTime(new Date());
                     t.setErrDesc("执行工作流的实例异常，请稍后重试！");
                 }).collect(Collectors.toList());
-        LOGGER.warn("实例服务启动阶段，以下工作流执行任务因该实例异常导致失败！{}", failedJobs);
-        taskMapper.batchUpdateTasks(failedJobs);
+        if (failedJobs.size()> 0){
+            LOGGER.warn("实例服务启动阶段，以下工作流执行任务因该实例异常导致失败！{}", failedJobs);
+            taskMapper.batchUpdateTasks(failedJobs);
+        }
     }
 
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")

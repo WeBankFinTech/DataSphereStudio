@@ -4,7 +4,7 @@
       v-if="!$route.query.noHeader"
       @clear-session="clearSession"
       ref="layoutHeader"></layout-header>
-    <notice api-path="/api/rest_j/v1/dss/scriptis/getNotice" />
+    <notice api-path="/dss/scriptis/getNotice" />
     <router-view/>
     <layout-footer ref="layoutFooter" v-if="!$route.query.noFooter"/>
   </div>

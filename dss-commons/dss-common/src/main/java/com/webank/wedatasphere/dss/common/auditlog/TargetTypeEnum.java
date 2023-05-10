@@ -40,7 +40,13 @@ public enum TargetTypeEnum {
     /**
      * ec 引擎实例
      */
-    EC_INSTANCE("ecinstance"),
+    EC_INSTANCE("ec_instance"),
+
+    /**
+     * ec 自动释放规则
+     */
+    EC_KILL_STRATEGY("ec_kill_strategy"),
+
     ;
     private String name;
 

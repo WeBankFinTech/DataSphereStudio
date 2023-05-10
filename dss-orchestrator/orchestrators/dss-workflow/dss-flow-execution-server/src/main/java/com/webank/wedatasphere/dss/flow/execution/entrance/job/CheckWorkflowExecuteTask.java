@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,15 +37,17 @@ public class CheckWorkflowExecuteTask {
     @Autowired
     private ExecuteAlter executeAlter;
 
+    @PostConstruct
+    public void checkSelfExecuteTasks() {
+        LOGGER.info("CheckWorkflowExecuteTask: Start checking for tasks that are still running after instance exceptions");
+        String thisInstance = Sender.getThisInstance();
+        taskMapper.updateWorkflowExecuteJobByInstance(thisInstance);
+    }
+
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
     public void checkWorkflowExecuteTask() {
 
         ServiceInstance[] allActionInstances = Sender.getInstances(DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue());
-        if (allActionInstances.length == DSSCommonConf.DSS_INSTANCE_NUMBERS.getValue()){
-            LOGGER.info("All instances are active!");
-            return;
-        }
-
         List<WorkflowQueryTask> maybeFailedJobs = taskMapper.search(null, null, Arrays.asList(JobStatus.Inited.getStatus(), JobStatus.Running.getStatus()), null, null, null, null, null);
         LOGGER.info("These tasks maybe are failed. " + maybeFailedJobs.toString());
         List<String> activeInstance = Arrays.stream(allActionInstances).map(ServiceInstance::getInstance).collect(Collectors.toList());
@@ -55,7 +58,7 @@ public class CheckWorkflowExecuteTask {
                 if (!activeInstance.contains(maybeFailedJob.getInstance())) {
                     maybeFailedJob.setStatus(JobStatus.Failed.getStatus());
                     maybeFailedJob.setUpdatedTime(new Date());
-                    maybeFailedJob.setErrDesc("系统打盹，请稍后重试！");
+                    maybeFailedJob.setErrDesc("执行工作流的实例异常，请稍后重试！");
                     failedJobs.add(maybeFailedJob);
                 }
             }
@@ -63,6 +66,7 @@ public class CheckWorkflowExecuteTask {
 
         // update execute job status to failed
         if (failedJobs.size() > 0) {
+            LOGGER.warn("以下工作流执行任务因执行实例异常导致失败！{}", failedJobs);
             taskMapper.batchUpdateTasks(failedJobs);
             List<String> exceptionInstances = failedJobs.stream().map(WorkflowQueryTask::getInstance).distinct().collect(Collectors.toList());
             List<Long> exceptionId = failedJobs.stream().map(WorkflowQueryTask::getTaskID).collect(Collectors.toList());

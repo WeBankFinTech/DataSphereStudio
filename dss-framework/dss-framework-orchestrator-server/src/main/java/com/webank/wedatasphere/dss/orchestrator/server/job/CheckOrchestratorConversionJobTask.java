@@ -67,13 +67,14 @@ public class CheckOrchestratorConversionJobTask {
 
         if (failedJobs.size() > 0) {
             // update publish job status to failed
+            LOGGER.warn("以下工作流发布任务因为执行实例异常导致发布失败！{}", failedJobs);
             orchestratorJobMapper.batchUpdatePublishJob(failedJobs);
             List<String> exceptionInstances = failedJobs.stream().map(OrchestratorPublishJob::getInstanceName).distinct().collect(Collectors.toList());
             List<Long> exceptionId = failedJobs.stream().map(OrchestratorPublishJob::getId).collect(Collectors.toList());
             failedJobs.clear();
             // send alter
             CustomAlter customAlter = new CustomAlter("DSS exception of instance: " + exceptionInstances,
-                    "以下id的工作流发布失败，请到表dss_orchestrator_job_info查看失败的工作流信息：" + exceptionId,
+                    "以下Id工作流发布失败，请到表dss_orchestrator_job_info查看失败的工作流信息：" + exceptionId,
                     "1", DSSCommonConf.ALTER_RECEIVER.getValue());
             executeAlter.sendAlter(customAlter);
         }

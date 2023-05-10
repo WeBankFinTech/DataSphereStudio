@@ -38,4 +38,5 @@ public interface TaskMapper {
 
     String selectTaskStatusForUpdate(Long taskID);
 
+    void updateWorkflowExecuteJobByInstance(@Param("thisInstance") String thisInstance);
 }

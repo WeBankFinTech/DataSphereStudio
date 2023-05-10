@@ -47,8 +47,10 @@ public class CheckOrchestratorConversionJobTask {
                     t.setStatus(JobStatus.Failed.getStatus());
                     t.setUpdateTime(new Date());
                 }).collect(Collectors.toList());
-        LOGGER.warn("实例启动阶段，以下工作流发布任务因为该实例异常导致发布失败！{}", DSSCommonUtils.COMMON_GSON.toJson(failedJobs));
-        orchestratorJobMapper.batchUpdatePublishJob(failedJobs);
+        if (failedJobs.size() > 0){
+            LOGGER.warn("实例启动阶段，以下工作流发布任务因为该实例异常导致发布失败！{}", DSSCommonUtils.COMMON_GSON.toJson(failedJobs));
+            orchestratorJobMapper.batchUpdatePublishJob(failedJobs);
+        }
     }
 
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")

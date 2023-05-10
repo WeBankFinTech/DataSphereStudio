@@ -48,8 +48,10 @@ public class CheckOrchestratorCopyTask {
                     t.setEndTime(new Date());
                     t.setIsCopying(0);
                 }).collect(Collectors.toList());
-        LOGGER.warn("实例启动阶段，以下工作流复制任务因该实例异常导致失败！{}", DSSCommonUtils.COMMON_GSON.toJson(failedJobs));
-        orchestratorCopyJobMapper.batchUpdateCopyJob(failedJobs);
+        if (failedJobs.size() > 0){
+            LOGGER.warn("实例启动阶段，以下工作流复制任务因该实例异常导致失败！{}", DSSCommonUtils.COMMON_GSON.toJson(failedJobs));
+            orchestratorCopyJobMapper.batchUpdateCopyJob(failedJobs);
+        }
     }
 
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")

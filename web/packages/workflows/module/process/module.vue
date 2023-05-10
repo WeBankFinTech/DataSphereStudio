@@ -988,7 +988,6 @@ export default {
       this.dispatch('Workbench:updateFlowsNodeName', arg);
       // 当保存子流程节点的基础信息时，如果子流程节点没有 embeddedFlowId:"flow_id" 则先创建子流程节点
       let node = arg;
-      // let flage = false; // 避免创建子工作流有两个提示
       if (node.type == NODETYPE.FLOW) {
         if (this.rank >= 4) {
           return this.$Message.warning(this.$t('message.workflow.process.rankLimit'));
@@ -1005,9 +1004,8 @@ export default {
         }
 
         if (!node.jobContent.embeddedFlowId) {
-          // flage = true;
           // 调用接口创建
-          await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}addFlow`, {
+          const result = await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}addFlow`, {
             name: node.title,
             description: node.desc,
             parentFlowID: Number(this.flowId),
@@ -1022,7 +1020,11 @@ export default {
               desc: this.$t('message.workflow.process.createSubSuccess'),
             });
             node.jobContent.embeddedFlowId = res.flow.id;
+            return true
           });
+          if (result !== true) {
+            return
+          }
         } else {
           await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}updateFlowBaseInfo`, {
             id: node.jobContent.embeddedFlowId,
@@ -1057,7 +1059,7 @@ export default {
       });
       this.originalData = this.json;
       this.jsonChange = true;
-      // if (!flage) return this.$Message.success(this.$t('message.workflow.process.saveParamsNotice'));
+      this.addNodeShow = false;
       // 保存工作流
       this.autoSave('paramsSave', false);
     },
@@ -1619,7 +1621,6 @@ export default {
     },
     // addFlowOk函数里可以复用的操作
     addFlowOkFunction() {
-      this.addNodeShow = false;
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonlyNoCeated'));
       this.saveNodeBaseInfo(this.clickCurrentNode);
     },

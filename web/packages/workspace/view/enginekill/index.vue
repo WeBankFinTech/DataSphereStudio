@@ -117,7 +117,7 @@
           </div>
         </div>
         <div class="row-item inline-block">
-          {{ $t('message.enginelist.ruleform.alertuser')}}：{{ item.imsConf.receiver && item.imsConf.receiver.join(';') }}
+          {{ $t('message.enginelist.ruleform.alertuser')}}：{{ item.imsConf.enable && item.imsConf.receiver && item.imsConf.receiver.join(';') }}
         </div>
         <div>
           <div class="row-item inline-block">
@@ -458,18 +458,28 @@ export default {
           callback()
           return
         }
-        if (value.conditions[0] && this.conditionRule.cpu) {
-          if (!value.conditions[0].field || value.conditions[0].value > 100 || value.conditions[0].value < 1 || value.conditions[0].value % 1 !== 0) {
-            valid = false
-          }
-        }
-        if (value.conditions[1] && this.conditionRule.memory) {
-          if (!value.conditions[1].field || value.conditions[1].value > 100 || value.conditions[1].value < 1 || value.conditions[1].value % 1 !== 0) {
-            valid = false
-          }
-        }
         let triggerConf = this.formData.triggerConditionConf.conditions
         let terminateConf = this.formData.terminateConditionConf.conditions
+        if (triggerConf[0] && this.conditionRule.cpu) {
+          if (!triggerConf[0].field || triggerConf[0].value > 100 || triggerConf[0].value < 1 || triggerConf[0].value % 1 !== 0) {
+            valid = false
+          }
+        }
+        if (triggerConf[1] && this.conditionRule.memory) {
+          if (!triggerConf[1].field || triggerConf[1].value > 100 || triggerConf[1].value < 1 || triggerConf[1].value % 1 !== 0) {
+            valid = false
+          }
+        }
+        if (terminateConf[0] && this.conditionRule.cpu) {
+          if (!terminateConf[0].field || terminateConf[0].value > 100 || terminateConf[0].value < 1 || terminateConf[0].value % 1 !== 0) {
+            valid = false
+          }
+        }
+        if (terminateConf[1] && this.conditionRule.memory) {
+          if (!terminateConf[1].field || terminateConf[1].value > 100 || terminateConf[1].value < 1 || terminateConf[1].value % 1 !== 0) {
+            valid = false
+          }
+        }
         if (this.conditionRule.cpu && (triggerConf[0].value <= terminateConf[0].value || !terminateConf[0].value)) {
           valid = false
         }
@@ -541,12 +551,6 @@ export default {
   },
   watch: {
     'formData.triggerConditionConf.conditions': {
-      handler() {
-        this.$refs.ruleForm.validateField('triggerConditionConf')
-      },
-      deep: true
-    },
-    'formData.terminateConditionConf.conditions': {
       handler() {
         this.$refs.ruleForm.validateField('triggerConditionConf')
       },
@@ -683,6 +687,11 @@ export default {
         if (valid && !this.ruleItemValid) {
           if (this.loading) return
           this.loading = true
+          if (!params.imsConf.enable) {
+            params.imsConf.duration = null
+            params.imsConf.level = null
+            params.imsConf.receiver = null
+          }
           api.fetch(url, params, 'put').then(() => {
             this.doQuery();
             this.showModal = false;
@@ -814,7 +823,7 @@ export default {
     formatConditions(conditions) {
       let string = '';
       conditions.forEach(item => {
-        string += `${item.field == 'cpu' ? this.$t('message.enginelist.cpu') : this.$t('message.enginelist.memory')} ${item.operation} ${item.value} %`;
+        string += `${item.field == 'cpu' ? this.$t('message.enginelist.cpu') : this.$t('message.enginelist.memory')} ${item.operation} ${item.value}% `;
       })
       return string;
     },

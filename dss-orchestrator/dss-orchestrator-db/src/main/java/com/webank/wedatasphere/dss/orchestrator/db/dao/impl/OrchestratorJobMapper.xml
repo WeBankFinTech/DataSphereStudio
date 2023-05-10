@@ -74,10 +74,6 @@
         </foreach>
     </update>
 
-    <update id="updatePublishJobByInstance">
-        UPDATE dss_orchestrator_job_info SET status = 'Failed', error_msg = '执行发布的实例异常，请重新发布！', update_time = now() WHERE instance_name = #{thisInstance} AND status IN ('Running', 'Inited')
-    </update>
-
     <resultMap id="orchestrator_job_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">
         <result column="id" property="id" jdbcType="BIGINT"/>
         <result column="job_id" property="jobId" jdbcType="LONGVARCHAR"/>

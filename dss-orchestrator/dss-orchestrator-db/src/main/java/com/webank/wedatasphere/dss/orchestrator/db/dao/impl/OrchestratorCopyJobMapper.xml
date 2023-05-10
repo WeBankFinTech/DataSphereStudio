@@ -83,6 +83,10 @@
         </foreach>
     </update>
 
+    <update id="updateOrchestratorCopyJobByInstance">
+        UPDATE dss_orchestrator_copy_info SET status = 0, exception_info = '执行复制的实例异常，请稍后重试！', end_time = now() WHERE instance_name = #{thisInstance} AND is_copying = 1
+    </update>
+
     <select id="getOrchestratorCopyInfoList" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
         SELECT * FROM `dss_orchestrator_copy_info` WHERE source_orchestrator_id = #{orchestratorId} order by start_time desc
     </select>

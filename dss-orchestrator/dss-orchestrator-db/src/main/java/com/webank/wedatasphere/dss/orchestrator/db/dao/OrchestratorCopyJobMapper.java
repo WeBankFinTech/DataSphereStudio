@@ -27,5 +27,4 @@ public interface OrchestratorCopyJobMapper {
 
     List<DSSOrchestratorCopyInfo> getRunningJob();
 
-    void updateOrchestratorCopyJobByInstance(@Param("thisInstance") String thisInstance);
 }

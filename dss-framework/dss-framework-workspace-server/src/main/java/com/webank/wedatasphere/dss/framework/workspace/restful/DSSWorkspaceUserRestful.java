@@ -33,6 +33,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.linkis.server.utils.ModuleUserUtils;
@@ -56,7 +57,7 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
 public class DSSWorkspaceUserRestful {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceUserRestful.class);
 
-    private static final String HPMS_TOKEN_STARTWITH = "HPMS-";
+    private static final String HPMS_USER_TOKEN = CommonVars.apply("wds.dss.workspace.hpms.user.token", "HPMS-AUTH").getValue();;
 
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
@@ -207,7 +208,7 @@ public class DSSWorkspaceUserRestful {
     @RequestMapping(path = "getUserRole", method = RequestMethod.GET)
     public Message getWorkspaceUserRole(@RequestParam(name = "userName") String username) {
         String token = ModuleUserUtils.getToken(httpServletRequest);
-        if(!token.toUpperCase().startsWith(HPMS_TOKEN_STARTWITH)){
+        if(!token.equals(HPMS_USER_TOKEN)){
             return Message.error("Token:" + token + " has no permission to get user info.");
         }
         List<Map<String,Object>> userRoles = dssWorkspaceUserService.getUserRoleByUserName(username);
@@ -217,7 +218,7 @@ public class DSSWorkspaceUserRestful {
     @RequestMapping(path = "/clearUser", method = RequestMethod.GET)
     public Message clearUser(@RequestParam("userName") String userName) {
         String token = ModuleUserUtils.getToken(httpServletRequest);
-        if(!token.toUpperCase().startsWith(HPMS_TOKEN_STARTWITH)){
+        if(!token.equals(HPMS_USER_TOKEN)){
             return Message.error("Token:" + token + " has no permission to clear user.");
         }
         boolean clearResult = dssWorkspaceUserService.clearUserByUserName(userName);

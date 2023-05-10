@@ -6,6 +6,7 @@ import com.webank.wedatasphere.dss.common.entity.CustomAlter;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.flow.execution.entrance.dao.TaskMapper;
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import org.apache.linkis.common.ServiceInstance;
 import org.apache.linkis.rpc.Sender;
@@ -17,10 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +39,15 @@ public class CheckWorkflowExecuteTask {
     public void checkSelfExecuteTasks() {
         LOGGER.info("CheckWorkflowExecuteTask: Start checking for tasks that are still running after instance exceptions");
         String thisInstance = Sender.getThisInstance();
-        taskMapper.updateWorkflowExecuteJobByInstance(thisInstance);
+        List<WorkflowQueryTask> maybeFailedJobs = taskMapper.search(null, null, Arrays.asList(JobStatus.Inited.getStatus(), JobStatus.Running.getStatus()), null, null, null, null, null);
+        List<WorkflowQueryTask> failedJobs = maybeFailedJobs.stream().filter(t -> Objects.equals(t.getInstance(), thisInstance))
+                .peek(t -> {
+                    t.setStatus(JobStatus.Failed.getStatus());
+                    t.setUpdatedTime(new Date());
+                    t.setErrDesc("执行工作流的实例异常，请稍后重试！");
+                }).collect(Collectors.toList());
+        LOGGER.warn("实例服务启动阶段，以下工作流执行任务因该实例异常导致失败！{}", failedJobs);
+        taskMapper.batchUpdateTasks(failedJobs);
     }
 
     @Scheduled(cron = "#{@getCheckInstanceIsActiveCron}")
@@ -54,14 +60,12 @@ public class CheckWorkflowExecuteTask {
         LOGGER.info("Active instances are " + activeInstance);
         List<WorkflowQueryTask> failedJobs = new ArrayList<>();
         if (maybeFailedJobs.size() > 0) {
-            for (WorkflowQueryTask maybeFailedJob : maybeFailedJobs) {
-                if (!activeInstance.contains(maybeFailedJob.getInstance())) {
-                    maybeFailedJob.setStatus(JobStatus.Failed.getStatus());
-                    maybeFailedJob.setUpdatedTime(new Date());
-                    maybeFailedJob.setErrDesc("执行工作流的实例异常，请稍后重试！");
-                    failedJobs.add(maybeFailedJob);
-                }
-            }
+            failedJobs = maybeFailedJobs.stream().filter(t -> !activeInstance.contains(t.getInstance()))
+                    .peek(t -> {
+                        t.setStatus(JobStatus.Failed.getStatus());
+                        t.setUpdatedTime(new Date());
+                        t.setErrDesc("执行工作流的实例异常，请稍后重试！");
+                    }).collect(Collectors.toList());
         }
 
         // update execute job status to failed

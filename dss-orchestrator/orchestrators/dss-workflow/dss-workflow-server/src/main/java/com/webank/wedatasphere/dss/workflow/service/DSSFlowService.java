@@ -67,5 +67,9 @@ public interface DSSFlowService {
 
     boolean checkExistSameSubflow(Long parentFlowID, String name);
 
+    boolean checkExistSameFlow(Long parentFlowID, String name, String existName);
+
     boolean checkIsExistSameFlow(String jsonFlow);
+
+    List<String> checkIsSave(Long parentFlowID, String jsonFlow);
 }

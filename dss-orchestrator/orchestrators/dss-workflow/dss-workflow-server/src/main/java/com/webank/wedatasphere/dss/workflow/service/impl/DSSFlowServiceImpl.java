@@ -449,8 +449,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public List<String> checkIsSave(Long parentFlowID, String jsonFlow) {
-        List<String> subflowName = flowMapper.getSubflowName(parentFlowID);
+    public List<String> checkIsSave(Long flowID, String jsonFlow) {
+        List<String> subflowName = flowMapper.getSubflowName(flowID);
         List<DSSNode> workFlowNodes = workFlowParser.getWorkFlowNodes(jsonFlow);
         return workFlowNodes.stream().filter(t -> Objects.equals("workflow.subflow", t.getNodeType()))
                 .map(DSSNode::getName)

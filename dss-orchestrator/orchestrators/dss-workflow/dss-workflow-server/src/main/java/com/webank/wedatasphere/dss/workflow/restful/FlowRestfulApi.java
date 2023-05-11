@@ -219,7 +219,8 @@ public class FlowRestfulApi {
         String description = updateFlowBaseInfoRequest.getDescription();
         String uses = updateFlowBaseInfoRequest.getUses();
         Long parentFlowID = flowService.getParentFlowID(flowID);
-        if (flowService.checkExistSameSubflow(parentFlowID, name)){
+        DSSFlow flowByID = flowService.getFlowByID(flowID);
+        if (flowService.checkExistSameFlow(parentFlowID, name, flowByID.getName())){
             return Message.error("子工作流名不能重复");
         }
         // TODO: 2019/6/13  projectVersionID的更新校验
@@ -317,6 +318,14 @@ public class FlowRestfulApi {
         // 判断工作流中是否存在命名相同的节点
         if (flowService.checkIsExistSameFlow(jsonFlow)) {
             return Message.error("It exists same flow.(存在相同的节点)");
+        }
+        // 判断工作流中是否有子工作流未被保存
+        Long parentFlowID = flowService.getParentFlowID(flowID);
+        if (parentFlowID != null) {
+            List<String> unSaveNodes = flowService.checkIsSave(parentFlowID, jsonFlow);
+            if (unSaveNodes != null) {
+                return Message.error("工作流中存在子工作流未被保存，请先保存子工作流：" + unSaveNodes);
+            }
         }
 
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);

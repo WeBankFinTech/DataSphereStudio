@@ -14,7 +14,6 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
-import com.webank.wedatasphere.dss.migrate.conf.MigrateConf;
 import com.webank.wedatasphere.dss.migrate.exception.MigrateErrorException;
 import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;

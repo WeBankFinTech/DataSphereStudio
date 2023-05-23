@@ -65,6 +65,12 @@
             <artifactId>dss-flow-execution-server</artifactId>
             <version>${dss.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-framework-migrate-server</artifactId>
+            <version>${dss.version}</version>
+        </dependency>
+
 
     </dependencies>
 

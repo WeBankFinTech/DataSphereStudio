@@ -135,7 +135,7 @@ public class DataCheckerDao {
                     .parallelStream()
                     .map(proObjectMap -> {
                         log.info("Begin to Check dataObject:" + proObjectMap.entrySet().toString());
-                        boolean checkRes = getDataCheckResult(proObjectMap, jobConn, bdpConn, dopsConn, props, log,qualitisUtil);
+                        boolean checkRes = getDataCheckResult(proObjectMap, jobConn, bdpConn, dopsConn, props, log,action,qualitisUtil);
                         if (null != action.getExecutionRequestRefContext()) {
                             if (checkRes) {
                                 action.getExecutionRequestRefContext().appendLog("Database table partition info : " + proObjectMap.get(DataChecker.DATA_OBJECT) + " has arrived");
@@ -149,9 +149,9 @@ public class DataCheckerDao {
                     }).collect(Collectors.toList());
             boolean flag = allCheckRes.stream().allMatch(res -> res.equals(true));
             if (flag) {
-                log.info("=============================Data Check End==========================================");
+                log.info("=============================Data Check End,check result:true==========================================");
                 if (null != action.getExecutionRequestRefContext()) {
-                    action.getExecutionRequestRefContext().appendLog("=============================Data Check End==========================================");
+                    action.getExecutionRequestRefContext().appendLog("=============================Data Check End,check result:true==========================================");
                 }
                 return true;
             }
@@ -160,9 +160,9 @@ public class DataCheckerDao {
             throw new RuntimeException("get DataChecker result failed", e);
         }
 
-        log.info("=============================Data Check End==========================================");
+        log.info("=============================Data Check End,check result:false==========================================");
         if (null != action.getExecutionRequestRefContext()) {
-            action.getExecutionRequestRefContext().appendLog("=============================Data Check End==========================================");
+            action.getExecutionRequestRefContext().appendLog("=============================Data Check End,,check result:false==========================================");
         }
         return false;
     }
@@ -176,6 +176,7 @@ public class DataCheckerDao {
                                        Connection dopsConn,
                                        Properties props,
                                        Logger log,
+                                       RefExecutionAction action,
                                        QualitisUtil qualitisUtil ) {
         String dataObjectStr = proObjectMap.get(DataChecker.DATA_OBJECT) == null ? "" : proObjectMap.get(DataChecker.DATA_OBJECT);
         if (StringUtils.isNotBlank(dataObjectStr)) {
@@ -206,19 +207,35 @@ public class DataCheckerDao {
         Predicate<Map<String, String>> isCheckMask = (hasDataSource.and(isBdpDataSource)).or(hasNotDataSource.and(isOdsDB));
         boolean normalCheck;
         if (isCheckMetadata.test(proObjectMap)) {
+            if (null != action.getExecutionRequestRefContext()){
+                action.getExecutionRequestRefContext().appendLog("start to check hive meta");
+            }
+            log.info("start to check hive meta");
             proObjectMap.put(DataChecker.SOURCE_TYPE, HIVE_SOURCE_TYPE);
             normalCheck= getJobTotalCount(dataObject, jobConn, log) > 0;
+            if (null != action.getExecutionRequestRefContext()){
+                action.getExecutionRequestRefContext().appendLog("check hive meta end,check result:"+normalCheck);
+            }
+            log.info("check hive meta end,check result:"+normalCheck);
 
         } else {
             if (isCheckMask.test(proObjectMap)) {
+                if (null != action.getExecutionRequestRefContext()){
+                    action.getExecutionRequestRefContext().appendLog("start to check maskis");
+                }
+                log.info("start to check maskis");
                 proObjectMap.put(DataChecker.SOURCE_TYPE, MASK_SOURCE_TYPE);
                 normalCheck= (getBdpTotalCount(dataObject, bdpConn, log, props) > 0 || "success".equals(fetchMaskCode(dataObject, log, props).get("maskStatus")));
+                if (null != action.getExecutionRequestRefContext()){
+                    action.getExecutionRequestRefContext().appendLog("check maskis end,check result:"+normalCheck);
+                }
+                log.info("check maskis end,check result:"+normalCheck);
             }else {
                 normalCheck = false;
             }
         }
         return normalCheck
-                && checkQualitisData( objectNum,dataObject, log, props, dopsConn,qualitisUtil);
+                && checkQualitisData( objectNum,dataObject, log, action, props, dopsConn,qualitisUtil);
 
     }
 
@@ -439,13 +456,24 @@ public class DataCheckerDao {
     /**
      * 从qualitis去check数据
      */
-    private boolean checkQualitisData(String objectNum,CheckDataObject dataObject, Logger log, Properties props,Connection conn, QualitisUtil qualitisUtil) {
+    private boolean checkQualitisData(String objectNum,CheckDataObject dataObject, Logger log, RefExecutionAction action,Properties props,Connection conn, QualitisUtil qualitisUtil) {
         boolean systemCheck = Boolean.valueOf(props.getProperty(DataChecker.QUALITIS_SWITCH));
         String userCheckDefault=props.getProperty(DataChecker.QUALITIS_CHECK_DEFAULT);
-        boolean userCheck = Boolean.valueOf(props.getProperty(DataChecker.QUALITIS_CHECK, userCheckDefault));
+        String userCheckStr = StringUtils.isBlank(props.getProperty(DataChecker.QUALITIS_CHECK)) ?
+                userCheckDefault :
+                props.getProperty(DataChecker.QUALITIS_CHECK);
+        boolean userCheck = Boolean.valueOf(userCheckStr);
+        log.info("systemCheck:{},userCheckDefault:{},userCheck:{}",systemCheck,userCheckDefault,userCheck);
         if (systemCheck && userCheck ) {
-
+            if (null != action.getExecutionRequestRefContext()){
+                action.getExecutionRequestRefContext().appendLog("start to check dops");
+            }
+            log.info("start to check dops");
             int dopsState=checkDops(dataObject,conn,log);
+            if (null != action.getExecutionRequestRefContext()){
+                action.getExecutionRequestRefContext().appendLog("check dops end,check result:"+dopsState);
+            }
+            log.info("check dops end,check result:"+dopsState);
             if(dopsState==0){
                 //没找到记录，直接通过校验
                 return true;
@@ -454,6 +482,9 @@ public class DataCheckerDao {
                 return false;
             }
             // 其他情况，继续走qualitis校验
+            if (null != action.getExecutionRequestRefContext()){
+                action.getExecutionRequestRefContext().appendLog("Data Check Qualitis Start");
+            }
             log.info(
                     "=============================Data Check Qualitis Start==========================================");
             try {
@@ -466,7 +497,7 @@ public class DataCheckerDao {
                 String applicationId = qualitisUtil
                         .createAndSubmitRule(dataObject,projectName,ruleName,user);
                 if (StringUtils.isEmpty(applicationId)) {
-                    return false;
+                    throw new SQLException("applicationId is empty");
                 }
                 long startTime = System.currentTimeMillis();
                 while (System.currentTimeMillis() - startTime < Integer
@@ -485,16 +516,30 @@ public class DataCheckerDao {
                             }
                             break;
                         case 4:
+                            if (null != action.getExecutionRequestRefContext()){
+                                action.getExecutionRequestRefContext().appendLog("check qualitis end,check result:true");
+                            }
+                            log.info("check qualitis end,check result:true");
                             return true;
                         default:
+                            if (null != action.getExecutionRequestRefContext()){
+                                action.getExecutionRequestRefContext().appendLog("check qualitis end,check result:false");
+                            }
+                            log.info("check qualitis end,check result:false");
                             return false;
                     }
 
                 }
+                if (null != action.getExecutionRequestRefContext()){
+                    action.getExecutionRequestRefContext().appendLog("Data Check Qualitis time out,check result set to false");
+                }
                 log.info(
-                        "=============================Data Check Qualitis time out==========================================");
+                        "=============================Data Check Qualitis time out,check result set to false==========================================");
                 return false;
             } catch (Exception e) {
+                if (null != action.getExecutionRequestRefContext()){
+                    action.getExecutionRequestRefContext().appendLog("check qualitis failed,check result set to false.cause by:"+e.getMessage());
+                }
                 log.error("get datachecker result from qualitis failed", e);
                 return false;
             }

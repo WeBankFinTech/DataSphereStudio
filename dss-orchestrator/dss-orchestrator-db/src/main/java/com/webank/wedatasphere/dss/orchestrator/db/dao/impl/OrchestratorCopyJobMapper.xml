@@ -22,14 +22,14 @@
 
     <sql id="orchestrator_copy_info">
         `id`,`username`,`type`,`source_orchestrator_id`,`source_orchestrator_name`,`target_orchestrator_name`,`source_project_name`,
-        `target_project_name`,`workspace_id`,`workflow_node_suffix`,`microserver_name`,`exception_info`,`status`,`is_copying`,`success_node`,`start_time`,`end_time`
+        `target_project_name`,`workspace_id`,`workflow_node_suffix`,`microserver_name`,`exception_info`,`status`,`is_copying`,`success_node`,`start_time`,`end_time`,`instance_name`
     </sql>
 
     <insert id="insertOrchestratorCopyInfo">
         INSERT INTO `dss_orchestrator_copy_info` (<include refid="orchestrator_copy_info"/>)
         VALUES
         (#{id}, #{username}, #{type}, #{sourceOrchestratorId}, #{sourceOrchestratorName}, #{targetOrchestratorName}, #{sourceProjectName},
-        #{targetProjectName}, #{workspaceId}, #{workflowNodeSuffix}, #{microserverName}, #{exceptionInfo}, #{status}, #{isCopying}, #{successNode}, #{startTime}, #{endTime})
+        #{targetProjectName}, #{workspaceId}, #{workflowNodeSuffix}, #{microserverName}, #{exceptionInfo}, #{status}, #{isCopying}, #{successNode}, #{startTime}, #{endTime}, #{instanceName})
     </insert>
 
     <update id="updateCopyStatus" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">

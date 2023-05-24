@@ -642,10 +642,13 @@ export default {
       return new Promise((resolve) => {
         if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.data'));
         let id = this.currentNode.data && this.currentNode.data.id;
-        let parent = this.currentNode.parent
+        let parent
         // 编辑或删除时要去刷新上一级目录
         if (this.currentNode.isLeaf || type === 'edit' || type === 'delete') {
+          parent = this.currentNode.parent
           id = this.currentNode.parent.data.id;
+        } else {
+          parent = this.currentNode
         }
         if (type === 'new') {
           parent = this.currentNode

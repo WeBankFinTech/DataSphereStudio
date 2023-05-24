@@ -301,7 +301,7 @@
           :disabled="saveingComment"
           @click="workflowPublish">{{$t('message.workflow.ok')}}</Button>
       </div>
-    </Modal>】
+    </Modal>
     <!-- 导出弹窗 -->
     <Modal
       v-model="workflowExportShow"

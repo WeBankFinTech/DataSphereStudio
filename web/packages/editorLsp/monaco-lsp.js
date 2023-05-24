@@ -50,6 +50,8 @@ export function initClient({ el, value, service }, config, filePath, cb) {
         sqlLang.indexOf(config.language) > -1 ? 'sql' : config.language,
         uri
       )
+    } else {
+      model.setValue(value)
     }
   }
   if (model) {

@@ -408,7 +408,7 @@ export default {
       this.init();
       this.ProjectShow = true;
       this.actionType = "modify";
-      this.currentOrchetratorData = project;
+      this.currentOrchetratorData = { ...project };
       this.currentOrchetratorData.taxonomyID = classifyId;
     },
     ProjectShowAction(val) {

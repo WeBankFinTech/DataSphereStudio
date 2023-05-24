@@ -39,7 +39,7 @@ public interface DSSWorkspaceService {
 
     int createWorkspace(String workspaceName, String tags, String userName, String description, String department, String productName,String workspaceType) throws ErrorException;
 
-    void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creater, String userId, Integer isReal);
+    void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creater, String userId);
 
     List<DSSWorkspace> getWorkspaces(String userName);
 

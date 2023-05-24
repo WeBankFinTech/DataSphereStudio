@@ -86,6 +86,7 @@ export default {
           this.$Notice.info({
             title: this.$t('message.workspace.Prompt'),
             desc: '',
+            duration: res.errorMsg ? 0 : 3,
             render: (h) => {
               return h('span', {
                 style: {
@@ -101,6 +102,7 @@ export default {
           this.$Notice.error({
             title: this.$t('message.workspace.Prompt'),
             desc: '',
+            duration: 0,
             render: (h) => {
               return h('span', {
                 style: {

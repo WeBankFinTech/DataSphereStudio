@@ -12,6 +12,6 @@ public interface DSSWorkspaceRoleCheckService {
      * @param roles  将要修改的角色
      * @return
      */
-    boolean checkRolesOperation(int workspaceId, String loginUser, String username, List<Integer> roles);
+    boolean checkRolesOperation(int workspaceId, String loginUser, String username, List<Integer> roles, Integer isReal);
 
 }

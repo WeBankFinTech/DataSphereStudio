@@ -35,6 +35,8 @@
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
+import { setVirtualRoles } from '@dataspherestudio/shared/common/config/permissions.js';
+
 export default {
   model: {
     prop: '_visible',
@@ -148,6 +150,7 @@ export default {
         sourceProjectName: data.projectName
       }
       this.projects = projects.filter((item) => {
+        setVirtualRoles(item, this.getUserName());
         return  item.canPublish() || item.editable
       })
     }

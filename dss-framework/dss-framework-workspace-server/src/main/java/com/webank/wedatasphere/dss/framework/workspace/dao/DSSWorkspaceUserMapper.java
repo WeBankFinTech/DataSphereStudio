@@ -37,10 +37,10 @@ public interface DSSWorkspaceUserMapper {
                                 @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId,
                                 @Param("updateUser") String updateUser);
 
-    @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by, user_id, is_real, update_user, update_time)" +
+    @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by, user_id, update_user, update_time)" +
             "values(#{workspaceId}, #{username}, #{roleId}, #{createTime}, #{createdBy}, #{userId}, #{updateUser}, now())")
     void insertUserRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId, @Param("createTime") Date createTime,
-                                   @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId, @Param("isReal") Integer isReal,@Param("updateUser") String updateUser);
+                                   @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId,@Param("updateUser") String updateUser);
 
     @Select("select role_id from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
     List<Integer> getRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("username") String username);

@@ -32,10 +32,18 @@ public class DSSWorkspaceUserVO extends AbstractDSSVO{
     private Date joinTime;
     private Date updateTime;
     private String updateUser;
+    private Integer isReal;
 
     public DSSWorkspaceUserVO() {
     }
 
+    public Integer getIsReal() {
+        return isReal;
+    }
+
+    public void setIsReal(Integer isReal) {
+        this.isReal = isReal;
+    }
     public Date getUpdateTime() {
         return updateTime;
     }

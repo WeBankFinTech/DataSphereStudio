@@ -50,12 +50,12 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator) {
+    public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, Integer isReal, String creator) {
         //获取用户创建时间
         DSSWorkspaceUser workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(String.valueOf(workspaceId), userName, null).stream().findFirst().get();
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
         roles.forEach(role ->{
-            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId, role, workspaceUsers.getJoinTime(), userName, workspaceUsers.getCreator(), 0L, creator);
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId, role, workspaceUsers.getJoinTime(), userName, workspaceUsers.getCreator(), 0L, isReal, creator);
         });
     }
 

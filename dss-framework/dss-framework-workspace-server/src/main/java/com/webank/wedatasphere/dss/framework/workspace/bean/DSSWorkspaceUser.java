@@ -33,9 +33,19 @@ public class DSSWorkspaceUser {
 
     private String roleIds;
 
+    private Integer isReal;
+
     private Date updateTime;
 
     private String updateUser;
+
+    public Integer getIsReal() {
+        return isReal;
+    }
+
+    public void setIsReal(Integer isReal) {
+        this.isReal = isReal;
+    }
 
     public Date getUpdateTime() {
         return updateTime;
@@ -112,6 +122,7 @@ public class DSSWorkspaceUser {
                 ", creator='" + creator + '\'' +
                 ", joinTime=" + joinTime +
                 ", roleIds=" + roleIds +
+                ", isReal=" + isReal +
                 '}';
     }
 }

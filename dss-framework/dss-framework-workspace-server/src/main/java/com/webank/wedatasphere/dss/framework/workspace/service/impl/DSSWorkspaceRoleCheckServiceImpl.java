@@ -17,7 +17,7 @@ public class DSSWorkspaceRoleCheckServiceImpl implements DSSWorkspaceRoleCheckSe
     DSSWorkspaceService dssWorkspaceService;
 
     @Override
-    public boolean checkRolesOperation(int workspaceId, String loginUser, String username, List<Integer> roles, Integer isReal) {
+    public boolean checkRolesOperation(int workspaceId, String loginUser, String username, List<Integer> roles) {
         // 获取工作空间创建者
         String createBy = dssWorkspaceMapper.getWorkspace(workspaceId).getCreateBy();
         return StringUtils.equals(loginUser, createBy) ?

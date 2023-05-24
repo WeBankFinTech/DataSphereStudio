@@ -10,19 +10,6 @@ public class UpdateWorkspaceUserRequest implements Serializable {
     private List<Integer> roles;
     private String userId;
 
-    /**
-     * 0表示实名用户，1表示非实名用户
-     */
-    private Integer isReal;
-
-    public Integer getIsReal() {
-        return isReal;
-    }
-
-    public void setIsReal(Integer isReal) {
-        this.isReal = isReal;
-    }
-
     public String getUserName() {
         return userName;
     }
@@ -64,7 +51,6 @@ public class UpdateWorkspaceUserRequest implements Serializable {
                 ", userName='" + userName + '\'' +
                 ", roles=" + roles +
                 ", userId='" + userId + '\'' +
-                ", isReal='" + isReal + '\'' +
                 '}';
     }
 }

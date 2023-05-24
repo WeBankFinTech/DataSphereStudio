@@ -142,15 +142,14 @@ public class DSSWorkspaceUserRestful {
         }
         String userName = updateWorkspaceUserRequest.getUserName();
         String userId = updateWorkspaceUserRequest.getUserId();
-        Integer isReal = updateWorkspaceUserRequest.getIsReal();
         Long count = dssWorkspaceUserService.getCountByUsername(userName, workspaceId);
         if (count != null && count > 0) {
             return Message.error("用户已经存在该工作空间，不需要重复添加！");
         }
-        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, roles, isReal)) {
+        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
-        dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId, isReal);
+        dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);
         AuditLogUtils.printLog(userName,workspaceId, workspace.getWorkspaceName(), TargetTypeEnum.WORKSPACE,workspaceId,
                 workspace.getWorkspaceName(), OperateTypeEnum.ADD_USERS,updateWorkspaceUserRequest);
         return Message.ok();
@@ -163,11 +162,10 @@ public class DSSWorkspaceUserRestful {
         int workspaceId = updateWorkspaceUserRequest.getWorkspaceId();
         String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
         String userName = updateWorkspaceUserRequest.getUserName();
-        Integer isReal = updateWorkspaceUserRequest.getIsReal();
-        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, roles, isReal)) {
+        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
-        dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, isReal, creator);
+        dssWorkspaceUserService.updateWorkspaceUser(roles, workspaceId, userName, creator);
         AuditLogUtils.printLog(userName,workspaceId, workspaceName, TargetTypeEnum.WORKSPACE,workspaceId,
                 workspaceName, OperateTypeEnum.UPDATE_USERS,updateWorkspaceUserRequest);
         return Message.ok();
@@ -180,7 +178,7 @@ public class DSSWorkspaceUserRestful {
         int workspaceId = deleteWorkspaceUserRequest.getWorkspaceId();
         String workspaceName= dssWorkspaceService.getWorkspaceName((long)workspaceId);
         String creator = SecurityFilter.getLoginUsername(httpServletRequest);
-        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, new ArrayList<>(), null)) {
+        if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, new ArrayList<>())) {
             return Message.error("无权限进行该操作");
         }
         dssWorkspaceUserService.deleteWorkspaceUser(userName, workspaceId);

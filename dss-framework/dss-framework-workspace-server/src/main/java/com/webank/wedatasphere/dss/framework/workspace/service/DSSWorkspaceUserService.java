@@ -25,7 +25,7 @@ import java.util.Map;
 
 public interface DSSWorkspaceUserService {
 
-    void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, Integer isReal, String creator);
+    void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator);
 
     void deleteWorkspaceUser(String userName, int workspaceId);
 

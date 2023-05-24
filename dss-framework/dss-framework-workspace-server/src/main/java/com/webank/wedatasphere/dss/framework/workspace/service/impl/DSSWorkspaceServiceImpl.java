@@ -133,14 +133,14 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 .stream()
                 .map(DSSWorkspaceRoleVO::getRoleId)
                 .collect(Collectors.toList());
-        dssWorkspaceUserService.updateWorkspaceUser(roleIds, workspaceId, userName, 0,userName);
+        dssWorkspaceUserService.updateWorkspaceUser(roleIds, workspaceId, userName, userName);
     }
 
 
     //把用户及角色添加到工作空间
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creator, String userId, Integer isReal) {
+    public void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creator, String userId) {
         //根据用户名 从用户表拿到用户id
 //        Long userId = dssUserService.getUserID(userName);
         if (userId == null) {
@@ -149,7 +149,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         //保存 - 保存用户角色关系 dss_workspace_user_role
         for (Integer roleId : roleIds) {
-            dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), isReal, creator);
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), creator);
         }
     }
 
@@ -272,7 +272,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         vo.setRoles(roles);
         vo.setCreator(dssWorkspaceUser.getCreator());
         vo.setJoinTime(dssWorkspaceUser.getJoinTime());
-        vo.setIsReal(dssWorkspaceUser.getIsReal());
         vo.setUpdateTime(dssWorkspaceUser.getUpdateTime());
         vo.setUpdateUser(dssWorkspaceUser.getUpdateUser());
         return vo;

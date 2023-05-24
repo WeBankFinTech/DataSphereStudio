@@ -20,7 +20,6 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProject
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
-import com.webank.wedatasphere.dss.migrate.conf.MigrateConf;
 import com.webank.wedatasphere.dss.migrate.exception.MigrateErrorException;
 import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;
@@ -28,6 +27,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInf
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
@@ -89,9 +89,8 @@ public class DSSMigrateRestful {
     @Autowired
     private MetaService metaService;
 
-    // todo only dev开发中心
-    private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
-    private Sender workflowSender = Sender.getSender(MigrateConf.WORKFLOW_SERVER_NAME);
+    private Sender orchestratorSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+    private Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
 
     @PostMapping("/importOldDSSProject")

@@ -14,13 +14,13 @@ import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
-import com.webank.wedatasphere.dss.migrate.conf.MigrateConf;
 import com.webank.wedatasphere.dss.migrate.exception.MigrateErrorException;
 import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
@@ -60,7 +60,7 @@ public class MigrateServiceImpl implements MigrateService {
     @Qualifier("projectBmlService")
     BMLService bmlService;
 
-    private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
+    private Sender orchestratorSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
 
     @Override
     public void migrate(String userName, String inputZipPath, Workspace workspace) throws Exception {

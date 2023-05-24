@@ -440,6 +440,25 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
+    public boolean checkExistSameFlow(Long parentFlowID, String name, String existName) {
+        List<String> subflowName = flowMapper.getSubflowName(parentFlowID);
+        if (name.equals(existName)) {
+            return false;
+        }
+        return subflowName.stream().anyMatch(s -> s.equals(name));
+    }
+
+    @Override
+    public List<String> checkIsSave(Long flowID, String jsonFlow) {
+        List<String> subflowName = flowMapper.getSubflowName(flowID);
+        List<DSSNode> workFlowNodes = workFlowParser.getWorkFlowNodes(jsonFlow);
+        return workFlowNodes.stream().filter(t -> Objects.equals("workflow.subflow", t.getNodeType()))
+                .map(DSSNode::getName)
+                .filter(name -> !subflowName.contains(name))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public boolean checkIsExistSameFlow(String jsonFlow) {
         List<DSSNode> workFlowNodes = workFlowParser.getWorkFlowNodes(jsonFlow);
         long distinctSize = workFlowNodes.stream().map(Node::getName).distinct().count();

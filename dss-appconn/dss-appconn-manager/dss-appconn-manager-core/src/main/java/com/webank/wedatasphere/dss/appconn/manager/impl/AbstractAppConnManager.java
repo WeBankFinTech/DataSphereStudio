@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.appconn.manager.impl;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
+import com.webank.wedatasphere.dss.appconn.core.exception.AppConnErrorException;
+import com.webank.wedatasphere.dss.appconn.core.exception.AppConnWarnException;
 import com.webank.wedatasphere.dss.appconn.loader.loader.AppConnLoader;
 import com.webank.wedatasphere.dss.appconn.loader.loader.AppConnLoaderFactory;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
@@ -222,6 +224,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     @Override
     public List<AppConn> listAppConns() {
         lazyLoadAppConns();
+        if(appConnList==null){
+            throw new AppConnWarnException(25344,"appconn list has not been loaded,please try again later.");
+        }
         return appConnList;
     }
 

@@ -57,7 +57,7 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
 public class DSSWorkspaceUserRestful {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceUserRestful.class);
 
-    private static final String HPMS_USER_TOKEN = CommonVars.apply("wds.dss.workspace.hpms.user.token", "HPMS-AUTH").getValue();;
+    private static final String HPMS_USER_TOKEN = CommonVars.apply("wds.dss.workspace.hpms.user.token", "HPMS-KhFGSQkdaaCPBYfE").getValue();
 
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;

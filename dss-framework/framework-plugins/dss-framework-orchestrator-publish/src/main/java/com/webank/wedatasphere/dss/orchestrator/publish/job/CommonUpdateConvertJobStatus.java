@@ -36,8 +36,11 @@ public class CommonUpdateConvertJobStatus {
 
     public void toFailedStatus(OrchestratorPublishJob orchestratorPublishJob, String errorMsg) {
         orchestratorPublishJob.setStatus(JobStatus.Failed.getStatus());
-        orchestratorPublishJob.setErrorMsg(errorMsg);
+        if (errorMsg.length() > 2048) {
+            orchestratorPublishJob.setErrorMsg(errorMsg.substring(0, 2048));
+        } else {
+            orchestratorPublishJob.setErrorMsg(errorMsg);
+        }
         updateConvertJobStatus(orchestratorPublishJob);
     }
-
 }

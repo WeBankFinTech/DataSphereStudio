@@ -41,18 +41,16 @@ public class OrchestratorPublishJob {
         return jobId;
     }
 
-    public OrchestratorPublishJob setJobId(String jobId) {
+    public void setJobId(String jobId) {
         this.jobId = jobId;
-		return this;
     }
 
     public String getConversionJobJson() {
         return conversionJobJson;
     }
 
-    public OrchestratorPublishJob setConversionJobJson(String conversionJobJson) {
+    public void setConversionJobJson(String conversionJobJson) {
         this.conversionJobJson = conversionJobJson;
-		return this;
     }
 
     public Date getCreateTime() {

@@ -69,6 +69,7 @@
         "applicant": "Applicant：",
         "status": "Status",
         "find": "Find",
+        "approve": "Submit Approval",
         "path": "API Path：",
         "submitter": "Submitter",
         "scriptsPath": "Scripts Path："
@@ -93,6 +94,8 @@
         "reason": "Reason",
         "ip_whitelist": "Ip Whitelist",
         "apply_time": "Apply Time",
+        "applySource": "Apply Source",
+        "proxyExecuteUser": "Execute User",
         "caller": "Caller",
         "access": "Access",
         "version": "Version",
@@ -133,6 +136,8 @@
       "disable": "Stop",
       "normal": "Normal",
       "expired": "Expired",
+      "submited": "已提单",
+      "unsubmit": "未提单",
       "all": "All",
       "updateApiModal": {
         "modalTitle": "Update API",

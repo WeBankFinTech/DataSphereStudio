@@ -30,7 +30,5 @@ public interface AdminConf {
 
     String[] SUPER_ADMIN_LIST = DSSCommonConf.SUPER_ADMIN_LIST;
 
-    String HPMS_USER_TOKEN = CommonVars.apply("wds.dss.workspace.hpms.user.token", "HPMS-KhFGSQkdaaCPBYfE").getValue();
-
 
 }

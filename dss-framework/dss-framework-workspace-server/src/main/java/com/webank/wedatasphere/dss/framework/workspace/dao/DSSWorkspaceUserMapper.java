@@ -84,8 +84,8 @@ public interface DSSWorkspaceUserMapper {
     @Select("select count(1) from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
     Long getCountByUsername(@Param("username") String username, @Param("workspaceId") int workspaceId);
 
-    @Select("select distinct workspace_id, role_id as roleIds " +
-            "from dss_workspace_user_role where username = #{username} ")
+    @Select("SELECT DISTINCT dwur.workspace_id, dwur.role_id AS roleIds, dw.name AS workspaceName " +
+            "FROM dss_workspace_user_role dwur,dss_workspace dw  WHERE dwur.workspace_id =dw.id AND username = #{username} ")
     List<DSSWorkspaceUser> getWorkspaceRoleByUsername(@Param("username") String username);
 
     @Delete("delete from dss_workspace_user_role where username = #{username} ")
@@ -96,4 +96,20 @@ public interface DSSWorkspaceUserMapper {
 
     @Delete("delete from dss_proxy_user where username = #{username} ")
     void deleteProxyUserByUserName(@Param("username") String username);
+
+    @Delete({
+            "<script>",
+            "DELETE FROM dss_workspace_user_role " +
+            "WHERE username = #{username}" ,
+            "<if test='workspaceIds != null and workspaceIds.length>0' >" ,
+                "AND workspace_id in ",
+                "<foreach collection='workspaceIds' open='(' close=')' separator=',' item='workspaceId'> #{workspaceId} </foreach>" ,
+            "</if>" ,
+            "<if test='roleIds != null and roleIds.length>0' >" ,
+                "AND role_id in ",
+                "<foreach collection='roleIds' open='(' close=')' separator=',' item='roleId'> #{roleId} </foreach>" ,
+            "</if>" ,
+            "</script>"
+    })
+    void deleteUserRoles(@Param("username") String username, @Param("workspaceIds") Integer[] workspaceIds, @Param("roleIds") Integer[] roleIds);
 }

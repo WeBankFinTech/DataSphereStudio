@@ -24,6 +24,11 @@ public class ScriptisProxyUserServiceImpl implements DssProxyUserService, Script
     }
 
     @Override
+    public void revokeProxyUser(String userName, String[] proxyUserNames) {
+        dssProxyUserMapper.deleteProxyUser(userName, proxyUserNames);
+    }
+
+    @Override
     public int insertProxyUser(ScriptisProxyUser dssProxyUser) {
         return dssProxyUserMapper.insertUser(dssProxyUser);
     }

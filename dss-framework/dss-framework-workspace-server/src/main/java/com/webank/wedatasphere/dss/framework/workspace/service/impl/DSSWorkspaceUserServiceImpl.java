@@ -127,6 +127,7 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
             map.put("workspaceId", workspaceRole.getWorkspaceId());
             map.put("roleId", workspaceRole.getRoleIds());
             map.put("roleName", workspaceDBHelper.getRoleFrontName(Integer.parseInt(workspaceRole.getRoleIds())));
+            map.put("workspaceName", workspaceRole.getWorkspaceName());
             list.add(map);
         });
         return list;
@@ -134,14 +135,15 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean clearUserByUserName(String userName) {
-        if(staffInfoGetter.getAllUsers().stream().anyMatch(staffInfo -> staffInfo.getEnglishName().equals(userName))) {
-            dssWorkspaceUserMapper.deleteUserByUserName(userName);
-            dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
-            dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
-            return true;
-        }else{
-            return false;
-        }
+    public void clearUserByUserName(String userName) {
+        dssWorkspaceUserMapper.deleteUserByUserName(userName);
+        dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
+        dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds) {
+        dssWorkspaceUserMapper.deleteUserRoles(userName, workspaceIds, roleIds);
     }
 }

@@ -1,5 +1,8 @@
 package com.webank.wedatasphere.dss.framework.proxy.restful;
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.DomainUtils;
 import com.webank.wedatasphere.dss.common.utils.ScalaFunctionAdapter;
@@ -16,20 +19,21 @@ import org.apache.linkis.server.Message;
 import org.apache.linkis.server.conf.ServerConfiguration;
 import org.apache.linkis.server.security.ProxyUserSSOUtils;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import scala.Tuple2;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.webank.wedatasphere.dss.framework.common.conf.TokenConf.HPMS_USER_TOKEN;
 import static com.webank.wedatasphere.dss.framework.proxy.conf.ProxyUserConfiguration.DS_PROXY_SELF_ENABLE;
 import static com.webank.wedatasphere.dss.framework.proxy.conf.ProxyUserConfiguration.DS_TRUST_TOKEN;
 
@@ -123,4 +127,28 @@ public class DssProxyUserController {
         return Message.ok("Success to add proxy user into cookie.");
     }
 
+    @GetMapping("/getProxyUserName")
+    public Message getProxyUserName(@RequestParam("userName")String userName){
+        List<DssProxyUser> dssProxyUsers = dssProxyUserService.selectProxyUserList(userName, null);
+        List<String> proxyUsernames = dssProxyUsers.stream().map(DssProxyUser::getProxyUserName).collect(Collectors.toList());
+        return Message.ok().data("userNames", proxyUsernames);
+    }
+
+    @PostMapping("/revokeProxyUser")
+    public Message revokeProxyUser(HttpServletRequest httpServletRequest,
+                                   @RequestParam("userName")String userName,
+                                   @RequestParam(required = false, name = "proxyUserNames" )String[] proxyUserNames){
+        String token = ModuleUserUtils.getToken(httpServletRequest);
+        if (StringUtils.isNotBlank(token)) {
+            if(!token.equals(HPMS_USER_TOKEN)){
+                return Message.error("Token:" + token + " has no permission to revoke proxyUser.");
+            }
+        }else {
+            return Message.error("User:" + userName + " has no permission to revoke proxyUser.");
+        }
+        dssProxyUserService.revokeProxyUser(userName,proxyUserNames);
+        AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
+                "deleteProxyUser", OperateTypeEnum.DELETE,"userName:" + userName + " ,proxyUserNames:" + Arrays.toString(proxyUserNames));
+        return Message.ok();
+    }
 }

@@ -18,6 +18,16 @@
         order by u.create_time desc
     </select>
 
+    <delete id="deleteProxyUser">
+        DELETE FROM dss_proxy_user WHERE username = #{userName}
+        <if test="proxyUserNames != null and proxyUserNames.length>0">
+            AND proxy_user_name IN
+            <foreach collection='proxyUserNames' open='(' close=')' separator=',' item='proxyUserName'>
+                #{proxyUserName}
+            </foreach>
+        </if>
+    </delete>
+
     <insert id="insertUser" parameterType="com.webank.wedatasphere.dss.scriptis.pojo.entity.ScriptisProxyUser" useGeneratedKeys="true" keyProperty="id">
         insert into dss_proxy_user(
         <if test="id != null and id != 0">id,</if>

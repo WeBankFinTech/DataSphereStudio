@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.webank.wedatasphere.dss.framework.admin.conf.AdminConf.HPMS_USER_TOKEN;
+import static com.webank.wedatasphere.dss.framework.common.conf.TokenConf.HPMS_USER_TOKEN;
 
 @RequestMapping(path = "/dss/framework/admin/user", produces = {"application/json"})
 @RestController
@@ -138,7 +138,7 @@ public class DssFrameworkAdminUserController extends BaseController {
         return Message.ok().data("修改用户成功。", dssAdminUserService.updateUser(user, getWorkspace(req)));
     }
 
-    @GetMapping("/getAllUsername")
+    @GetMapping("/getAllUserName")
     public Message getAllUsername(){
         return Message.ok().data("userNames", dssAdminUserService.getAllUsername());
     }

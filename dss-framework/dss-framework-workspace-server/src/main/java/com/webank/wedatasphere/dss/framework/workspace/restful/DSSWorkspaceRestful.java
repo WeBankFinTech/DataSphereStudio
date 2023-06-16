@@ -22,7 +22,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
-import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
@@ -154,6 +153,9 @@ public class DSSWorkspaceRestful {
     public Message getWorkspaceHomePage(@RequestParam(required = false, name = "micro_module") String moduleName) throws Exception {
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        if (username != null && username.toLowerCase().startsWith("hduser")) {
+            LOGGER.error("Do not allow hduser* accounts to log in DSS system.");
+        }
         Workspace workspace = new Workspace();
         try {
             LOGGER.info("Put gateway url and cookies into workspace.");

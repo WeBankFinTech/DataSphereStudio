@@ -47,6 +47,11 @@ public enum TargetTypeEnum {
      */
     EC_KILL_STRATEGY("ec_kill_strategy"),
 
+    /**
+     * 用户部门
+     */
+    USER_DEPT("user_dept")
+
     ;
     private String name;
 

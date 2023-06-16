@@ -160,6 +160,16 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
         return dssUserMapper.updateUser(user);
     }
 
+    @Override
+    public List<String> getAllUsername() {
+        return dssUserMapper.getAllUsername();
+    }
+
+    @Override
+    public void deleteUser(String userName) {
+        dssUserMapper.deleteUser(userName);
+    }
+
     private <T extends SSOUserOperation> void tryUserOperation(BiPredicate<SSOUserService, DSSUserContentRequestRef.User> filter,
                                                                Function<SSOUserService, T> operationFunction,
                                                                BiFunction<T, DSSUserContentRequestRef, ResponseRef> operationConsumer,

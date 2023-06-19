@@ -71,6 +71,25 @@
           "publishSuccess": "发布成功"
         },
         "tagPlaceholder": "标签，按 enter 创建"
+      },
+      "operateProxyTip": "请选择代理用户进入或者取消",
+      "applyOperatePorxy": "请先申请实名用户允许的代理用户"
+    },
+    "ext": {
+      "opensource": {
+        "selectservice": "请选择服务",
+        "defalut": "默认值",
+        "detail": "详细说明",
+        "longer1024": "不能超过1024个字符！",
+        "rowlimit": "行数过多请分批查询！",
+        "outlimit": "超出限制请修改！",
+        "cnanotnull": "参数值不能为空",
+        "entercreate": "标签，按 enter 创建",
+        "status": "状态",
+        "opreator": "复制人",
+        "copytime": "复制时间",
+        "copyHistory": "复制历史",
+        "errmsg": "错误信息"
       }
     }
   }

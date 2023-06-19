@@ -161,7 +161,7 @@ public class DSSFlowEditLockManager {
             unLockEvents.offer(unLockEvent);
             return lockContent;
         } catch (DuplicateKeyException e) {
-            LOGGER.warn("acquire lock failed", e);
+            LOGGER.warn("acquire lock failed", e.getMessage());
             DSSFlowEditLock personalFlowEditLock = lockMapper.getPersonalFlowEditLock(flowID, null);
             String userName = Optional.ofNullable(personalFlowEditLock).map(DSSFlowEditLock::getUsername).orElse(null);
             throw new DSSErrorException(DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE, "用户" + userName + "已锁定编辑");

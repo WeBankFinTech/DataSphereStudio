@@ -21,13 +21,16 @@ import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaWriter;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.io.*;
+import java.util.List;
 
 
-@Service
+@Service("orcMetaExportService")
 public class MetaExportServiceImpl implements MetaExportService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -44,6 +47,30 @@ public class MetaExportServiceImpl implements MetaExportService {
         ) {
             exportOrchestratorBaseInfo(dssOrchestratorInfo, outputStream);
         }
+    }
+
+    @Override
+    public void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException {
+
+        try (
+                OutputStream outputStream = generateOutputStream(savePath)
+        ) {
+            exportFlowBaseInfo(allDSSFlows, outputStream);
+            exportFlowRelation(allFlowRelations, outputStream);
+        }
+
+    }
+
+    private void exportFlowBaseInfo(List<DSSFlow> DSSFlows, OutputStream outputStream) throws IOException {
+
+        MetaWriter.of("dss_flow", DSSFlow.class).data(DSSFlows).write(outputStream);
+
+    }
+
+    private void exportFlowRelation(List<DSSFlowRelation> flowRelations, OutputStream outputStream) throws IOException {
+
+        MetaWriter.of("dss_workflow_relation", DSSFlowRelation.class).data(flowRelations).write(outputStream);
+
     }
 
 

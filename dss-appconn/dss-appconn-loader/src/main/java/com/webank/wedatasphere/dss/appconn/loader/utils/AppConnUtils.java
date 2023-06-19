@@ -99,16 +99,17 @@ public class AppConnUtils {
      */
     private static List<String> getClassNameFrom(String jarName) throws IOException {
         List<String> fileList = new ArrayList<>();
-        JarFile jarFile = new JarFile(new File(jarName));
-        Enumeration<JarEntry> en = jarFile.entries();
-        while (en.hasMoreElements()) {
-            String name1 = en.nextElement().getName();
-            if (!name1.endsWith(".class")) {
-                continue;
+        try (JarFile jarFile = new JarFile(new File(jarName))) {
+            Enumeration<JarEntry> en = jarFile.entries();
+            while (en.hasMoreElements()) {
+                String name1 = en.nextElement().getName();
+                if (!name1.endsWith(".class")) {
+                    continue;
+                }
+                String name2 = name1.substring(0, name1.lastIndexOf(".class"));
+                String name3 = name2.replaceAll("/", ".");
+                fileList.add(name3);
             }
-            String name2 = name1.substring(0, name1.lastIndexOf(".class"));
-            String name3 = name2.replaceAll("/", ".");
-            fileList.add(name3);
         }
         return fileList;
     }

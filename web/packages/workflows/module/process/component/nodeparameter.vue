@@ -1,38 +1,47 @@
 <template>
   <div>
     <Form label-position="top" ref="baseInfoForm" :model="currentNode" class="node-parameter-bar">
-      <FormItem :label="$t('message.workflow.process.nodeParameter.nodeName')" prop="title" :rules="titleRules">
-        <Input v-model="currentNode.title" :placeholder="$t('message.workflow.process.nodeParameter.inputeNodeName')" />
-      </FormItem>
-      <FormItem
-        :label="$t('message.workflow.process.nodeParameter.businessLabel')"
-        prop="mybusinessTag">
-        <we-tag
-          :new-label="$t('message.workflow.process.nodeParameter.addLabel')"
-          :tag-list="mybusinessTag"
-          @add-tag="businessAddTag"
-          @delete-tag="businessDeleteTag"></we-tag>
-      </FormItem>
-      <FormItem
-        :label="$t('message.workflow.process.nodeParameter.applyLabel')"
-        prop="myappTag">
-        <we-tag
-          :new-label="$t('message.workflow.process.nodeParameter.addLabel')"
-          :tag-list="myappTag"
-          @add-tag="appAddTag"
-          @delete-tag="appdDeleteTag"></we-tag>
-      </FormItem>
-      <FormItem :label="$t('message.workflow.process.nodeParameter.nodeDesc')" prop="desc" :rules="descRules">
-        <Input v-model="currentNode.desc" type="textarea"
-          :placeholder="$t('message.workflow.process.nodeParameter.inputeNodeDesc')" />
-      </FormItem>
+      <template v-for="item in curNodeBaseParamsList">
+        <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="item.key">
+          <Input v-model="currentNode[item.key]" :type="filterFormType(item.uiType)" :rows="6"
+            :placeholder="item.desc" :disabled="item.uiType === 'Disable'"
+          />
+        </FormItem>
+        <FormItem
+          v-if="item.uiType === 'Tag'"
+          :label="item.lableName"
+          :key="poinToLink(item.key)"
+          :prop="item.key">
+          <we-tag
+            :new-label="$t('message.workflow.process.nodeParameter.addLabel')"
+            :tag-list="currentNode[item.key]"
+            @add-tag="addTag(item.key,$event)"
+            @delete-tag="deleteTag(item.key,$event)"></we-tag>
+        </FormItem>
+        <FormItem v-if="item.uiType === 'Select' || item.uiType === 'MultiSelect'" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="item.key">
+          <Select
+            v-model="currentNode[item.key]"
+            :placeholder="item.desc"
+            :multiple="item.uiType === 'MultiSelect'">
+            <Option v-for="subItem in JSON.parse(item.value)" :value="subItem" :key="subItem">{{subItem}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem v-if="item.uiType === 'MultiBinding'" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="item.key">
+          <Select
+            v-model="currentNode[item.key]"
+            :placeholder="item.desc"
+            multiple>
+            <Option v-for="(subItem,index) in conditionBindList(item)" :value="subItem.key" :key="index">{{ subItem.name }}</Option>
+          </Select>
+        </FormItem>
+      </template>
     </Form>
-    <div v-if="currentNodeParamsBaseinfoList.length > 0" class="node-module-param-modal-header">
+    <div v-if="curNodeParamsList.length > 0" class="node-module-param-modal-header">
       <h5>{{$t('message.workflow.process.nodeParameter.SXXX')}}</h5>
     </div>
-    <Form v-if="currentNodeParamsBaseinfoList.length > 0 && currentNode.jobParams" label-position="top"
+    <Form v-if="curNodeParamsList.length > 0 && currentNode.jobParams" label-position="top"
       ref="parameterForm"  class="node-parameter-bar" :model="currentNode">
-      <template v-for="item in currentNodeParamsBaseinfoList">
+      <template v-for="item in curNodeParamsList">
         <template v-if="item.position === 'runtime' || item.position === 'startup'">
           <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
             <Input v-model="currentNode.jobParams[poinToLink(item.key)]" :type="filterFormType(item.uiType)" :rows="6"
@@ -113,31 +122,11 @@ export default {
     }
   },
   data() {
-    let validatorName = (rule, value, callback) => {
-      if (value === `${this.name}_`) {
-        callback(new Error(this.$t('message.workflow.process.nodeParameter.JDMCBNYGZL')));
-      } else {
-        callback();
-      }
-    };
     return {
       test: [],
       currentNode: {
       },
-      titleRules: [
-        { required: true, message: this.$t('message.workflow.process.nodeParameter.TXJDMC'), trigger: 'blur' },
-        { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.process.nodeParameter.BXYZMKTXHX'), trigger: 'change' },
-        { validator: validatorName, trigger: 'blur' },
-        { min: 1, max: 128, message: this.$t('message.workflow.process.nodeParameter.CDZ128ZF'), trigger: 'change' },
-      ],
-      descRules: [
-        { max: 200, message: `${this.$t('message.workflow.process.nodeParameter.CDZ200ZF')}`,  trigger: 'blur' },
-      ],
-      resources: [],
-      paramsIsChange: false,
-      timer: null,
-      mybusinessTag: '',
-      myappTag: ''
+      resources: []
     };
   },
   watch: {
@@ -153,11 +142,9 @@ export default {
           }
         })
       }
-      this.mybusinessTag = val.businessTag
-      this.myappTag = val.appTag;
       // 在节点没有保存参数时，需要设置默认值的值,先判断保存的值应该存在哪里starup或者runtime或者是node下
       let jobParams = {};
-      this.currentNodeParamsBaseinfoList.map((item) => {
+      this.curNodeParamsList.map((item) => {
         // 多选框是数组值
         const defaultValue = ['MultiBinding'].includes(item.uiType) ? JSON.parse(item.defaultValue) : this.consoleParamsDefault(item.defaultValue, item.key, this.consoleParams);
         if ((item.position === 'runtime' || item.position === 'startup') && this.currentNode.params) {
@@ -177,22 +164,18 @@ export default {
         }
       })
       this.$set(this.currentNode, 'jobParams', jobParams);
-    },
-    currentNode: {
-      handler() {
-        this.paramsIsChange = true;
-        this.paramsIsChangeAction();
-      },
-      deep: true,
-    },
-    paramsIsChange(val) {
-      this.$emit('paramsChange', val);
-    },
+    }
   },
   computed: {
     // 获取当前节点参数的基本信息
-    currentNodeParamsBaseinfoList() {
+    curNodeParamsList() {
       return this.currentNode.nodeUiVOS ? this.currentNode.nodeUiVOS.filter((item) => !item.baseInfo && item.nodeMenuType) : [];
+    },
+    curNodeBaseParamsList() {
+      return this.currentNode.nodeUiVOS ? this.currentNode.nodeUiVOS.filter((item) => {
+        const fields = ['appTag','businessTag','title','desc'].indexOf(item.key) > -1
+        return item.baseInfo && fields// && !item.hidden
+      }) : [];
     }
   },
   methods: {
@@ -228,8 +211,8 @@ export default {
       // 自定义函数的方法先写这里
       // eslint-disable-next-line no-unused-vars
       const validatorTitle = (rule, value, callback) => {
-        if (value === `${this.name}_`) {
-          callback(new Error(this.$t('message.workflow.process.nodeParameter.JDMCBNYGZL')));
+        if (value === `${this.name}`) {
+          callback(new Error(rule.message));
         } else {
           callback();
         }
@@ -283,6 +266,7 @@ export default {
             temRule.push({
               // 只有和上面定义的函数名相同才让执行
               validator: ['validatorTitle', 'validateJson'].includes(item.validateRange) ? eval(item.validateRange) : () => {},
+              message: item.message,
               trigger: item.trigger || 'blur'
             })
           } else if (item.validateType === 'NumInterval') {
@@ -332,56 +316,31 @@ export default {
       }
       return temArry;
     },
-    businessAddTag(label) {
-      if (this.mybusinessTag) {
-        this.mybusinessTag += `,${label}`;
+    addTag(key, label) {
+      if (this.currentNode[key]) {
+        this.$set(this.currentNode, key, this.currentNode[key] + `,${label}`);
       } else {
-        this.mybusinessTag = label;
+        this.$set(this.currentNode, key, label);
       }
     },
-    businessDeleteTag(label) {
-      const tmpArr = this.mybusinessTag.split(',');
+    deleteTag(key, label) {
+      const tmpArr = this.currentNode[key].split(',');
       const index = tmpArr.findIndex((item) => item === label);
       tmpArr.splice(index, 1);
-      this.mybusinessTag = tmpArr.toString();
+      this.$set(this.currentNode, key, tmpArr.toString());
     },
-    appAddTag(label) {
-      if (this.myappTag) {
-        this.myappTag += `,${label}`;
-      } else {
-        this.myappTag = label;
-      }
-    },
-    appdDeleteTag(label) {
-      const tmpArr = this.myappTag.split(',');
-      const index = tmpArr.findIndex((item) => item === label);
-      tmpArr.splice(index, 1);
-      this.myappTag = tmpArr.toString()
-    },
-    paramsIsChangeAction() {
-      if (this.timer) {
-        clearInterval(this.timer);
-      }
-      this.timer = setInterval(() => {
-        if (!this.paramsIsChange) {
-          clearInterval(this.timer);
-        }
-        this.paramsIsChange = false;
-      }, 1000 * 60 * 5);
-    },
+
     save() {
       this.resourcesAction();
       // 没有值降默认值回填
       if(this.currentNode.jobParams && this.currentNode.params.configuration) {
-        this.currentNodeParamsBaseinfoList.map((item) => {
+        this.curNodeParamsList.map((item) => {
           if ((item.position === 'runtime' || item.position === 'startup') && this.currentNode.params) {
             const value = this.currentNode.jobParams[this.poinToLink(item.key)] ? this.currentNode.jobParams[this.poinToLink(item.key)] : item.defaultValue;
             this.currentNode.params.configuration[item.position][item.key] = value;
           }
         })
       }
-      this.currentNode.businessTag = this.mybusinessTag;
-      this.currentNode.appTag = this.myappTag;
       this.validFrom();
     },
     validFrom() {
@@ -445,3 +404,10 @@ export default {
 };
 
 </script>
+<style>
+.node-parameter-bar label.ivu-form-item-label {
+  text-align: left;
+  line-height: 14px;
+  padding-bottom: 6px;
+}
+</style>

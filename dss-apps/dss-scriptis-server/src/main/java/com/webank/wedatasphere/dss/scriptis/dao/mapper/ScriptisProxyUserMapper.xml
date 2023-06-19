@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.scriptis.dao.ScriptisProxyUserMapper">
+
+    <resultMap type="com.webank.wedatasphere.dss.scriptis.pojo.entity.ScriptisProxyUser" id="DssProxyUserResult">
+        <result property="id" column="id"/>
+        <result property="userName" column="username"/>
+        <result property="proxyUserName" column="proxy_user_name"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+   <select id="selectProxyUserList" parameterType="String" resultMap="DssProxyUserResult">
+        select u.id, u.username, u.proxy_user_name, u.create_time, u.update_time,u.remark
+        from dss_proxy_user u
+        where u.username = #{userName}
+        order by u.create_time desc
+    </select>
+
+    <insert id="insertUser" parameterType="com.webank.wedatasphere.dss.scriptis.pojo.entity.ScriptisProxyUser" useGeneratedKeys="true" keyProperty="id">
+        insert into dss_proxy_user(
+        <if test="id != null and id != 0">id,</if>
+        <if test="userName != null and userName != ''">username,</if>
+        <if test="proxyUserName != null and proxyUserName != ''">proxy_user_name,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="remark != null and remark != ''">remark,</if>
+        create_time
+        )values(
+        <if test="id != null and id != ''">#{id},</if>
+        <if test="userName != null and userName != ''">#{userName},</if>
+        <if test="proxyUserName != null and proxyUserName != ''">#{proxyUserName},</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        <if test="remark != null and remark != ''">#{remark},</if>
+        sysdate()
+        )
+    </insert>
+
+
+</mapper>

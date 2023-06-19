@@ -4,7 +4,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.webank.wedatasphere.dss.data.common.conf.AtlasConf;
 
 public class DataSourceUtil {
-    private static DruidDataSource druidDataSource =null;
+    private static volatile DruidDataSource druidDataSource =null;
 
     private DataSourceUtil(){}
 

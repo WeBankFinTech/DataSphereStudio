@@ -33,6 +33,10 @@ public class OrchestratorUtils {
         return "v000001";
     }
 
+    public static String generateNewCopyVersion(String suffix) {
+        return suffix + "_v000001";
+    }
+
     /**
      * 注意： flow版本更新需要同步更新ContextID
      *
@@ -40,7 +44,17 @@ public class OrchestratorUtils {
      * @return
      */
     public static String increaseVersion(String oldVersion) {
-        int num = Integer.parseInt(oldVersion.substring(1)) + 1;
+        if (oldVersion.length() <= 7) {
+            return newNormalVersion(oldVersion);
+        } else {
+            int i = oldVersion.lastIndexOf("_");
+            String newVer = newNormalVersion(oldVersion.substring(i + 1));
+            return oldVersion.substring(0, i + 1) + newVer;
+        }
+    }
+
+    static String newNormalVersion(String oldVersion) {
+        long num = Long.parseLong(oldVersion.substring(1)) + 1;
         String tmp = "00000" + num;
         return "v" + tmp.substring(tmp.length() - 6);
     }
@@ -53,10 +67,10 @@ public class OrchestratorUtils {
         return strList.stream().map(String::trim).filter((s) -> StringUtils.isNotBlank(s)).distinct().collect(Collectors.joining(MODE_SPLIT, MODE_SPLIT, MODE_SPLIT));
     }
 
-    public static List<String> convertList(String str){
-        if(StringUtils.isEmpty(str)){
+    public static List<String> convertList(String str) {
+        if (StringUtils.isEmpty(str)) {
             return new ArrayList<>();
         }
-        return Arrays.stream(str.split(MODE_SPLIT)).map(String::trim).filter((s)-> StringUtils.isNotBlank(s)).distinct().collect(Collectors.toList());
+        return Arrays.stream(str.split(MODE_SPLIT)).map(String::trim).filter((s) -> StringUtils.isNotBlank(s)).distinct().collect(Collectors.toList());
     }
 }

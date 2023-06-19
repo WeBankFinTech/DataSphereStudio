@@ -8,7 +8,7 @@
       <span>{{$t('message.workflow.process.associateBar.XZGLJB')}}</span>
       <span @click="fullScreenModal" class="full-btn">
         <Icon :type="isFullScreen?'md-contract':'md-expand'" />
-        {{isFullScreen?'取消全屏':'全屏展示'}}
+        {{isFullScreen?this.$t('message.workflow.CancelFullScreen'):this.$t('message.workflow.Full')}}
       </span>
     </div>
     <div>

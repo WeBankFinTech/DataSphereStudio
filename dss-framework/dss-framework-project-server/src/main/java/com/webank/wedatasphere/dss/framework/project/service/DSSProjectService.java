@@ -66,7 +66,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     Long getAppConnProjectId(Long appInstanceId, Long dssProjectId);
 
-    void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace)  throws Exception;
+    void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO)  throws Exception;
 
     List<String> getProjectAbilities(String username);
 

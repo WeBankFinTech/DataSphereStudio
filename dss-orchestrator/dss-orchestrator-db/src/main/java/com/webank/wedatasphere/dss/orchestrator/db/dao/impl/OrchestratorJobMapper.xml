@@ -21,48 +21,68 @@
 <mapper namespace="com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper">
 
     <sql id="orchestrator_job">
-        id, job_id, conversion_job_json, created_time, updated_time
+        id, job_id, conversion_job_json, create_time, update_time, instance_name, status, error_msg
     </sql>
-
-    <select id="getPublishJobById" resultMap="orchestrator_job_info_result_map">
-        SELECT * FROM `dss_orchestrator_job_info` WHERE id = #{id}
-    </select>
 
     <select id="getPublishJobByJobId" resultMap="orchestrator_job_info_result_map">
         SELECT * FROM `dss_orchestrator_job_info` WHERE job_id = #{jobId}
     </select>
 
+    <select id="getPublishJobByJobStatuses" resultMap="orchestrator_job_info_result_map">
+        SELECT * FROM `dss_orchestrator_job_info` WHERE status in
+        <foreach item="item" index="index" collection="statuses" open="(" separator="," close=" )">
+            #{item}
+        </foreach>
+    </select>
+
     <insert id="insertPublishJob" useGeneratedKeys="true" keyProperty="id"
-            parameterType="com.webank.wedatasphere.dss.orchestrator.db.entity.OrchestratorPublishJob">
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">
         INSERT INTO dss_orchestrator_job_info (<include refid="orchestrator_job"/>)
         VALUES
-        (#{id},#{jobId},#{conversionJobJson},#{createdTime})
+        (#{id},#{jobId},#{conversionJobJson},#{createTime},#{updateTime},#{instanceName},#{status},#{errorMsg})
     </insert>
 
-    <update id="updatePublishJob" parameterType="com.webank.wedatasphere.dss.orchestrator.db.entity.OrchestratorPublishJob">
+    <update id="updatePublishJob" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">
         UPDATE dss_orchestrator_job_info
         <trim prefix="set" suffixOverrides=",">
-            <if test="jobId != null">job_id =#{jobId},</if>
-            <if test="conversionJobJson != null">conversion_job_json =#{conversionJobJson},</if>
-            <if test="createdTime != null">created_time =#{createdTime},</if>
-            <if test="updatedTime != null">updated_time =#{updatedTime},</if>
+            <if test="updateTime != null">update_time =#{updateTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="errorMsg != null">error_msg = #{errorMsg},</if>
         </trim>
         WHERE id = #{id}
     </update>
 
-    <delete id="deletePublishJob">
-        DELETE
-        FROM
-        dss_orchestrator_job_info
-        WHERE id = #{id}
-    </delete>
+    <update id="batchUpdatePublishJob" parameterType="java.util.List">
+        UPDATE dss_orchestrator_job_info set status =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.id} then #{item.status}
+        </foreach>
+        update_time =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.id} then #{item.updateTime}
+        </foreach>
+        error_msg =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end">
+            when id = #{item.id} then #{item.errorMsg}
+        </foreach>
+        WHERE id in
+        <foreach collection="failedJobs" item="item" index="index" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
 
-    <resultMap id="orchestrator_job_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.db.entity.OrchestratorPublishJob">
+    <resultMap id="orchestrator_job_info_result_map" type="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob">
         <result column="id" property="id" jdbcType="BIGINT"/>
         <result column="job_id" property="jobId" jdbcType="LONGVARCHAR"/>
         <result column="conversion_job_json" property="conversionJobJson" jdbcType="LONGVARCHAR"/>
-        <result column="created_time" property="createdTime" jdbcType="TIMESTAMP"/>
-        <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="instance_name" property="instanceName" jdbcType="LONGNVARCHAR"/>
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="error_msg" property="errorMsg" jdbcType="LONGNVARCHAR"/>
     </resultMap>
 
 

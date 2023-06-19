@@ -9,7 +9,7 @@
   padding: 0 20px;
   @include bg-color($background-color-header, $dark-background-color-header);
   color: $dark-color;
-  z-index: 10;
+  z-index: 1010;
   user-select: none;
   clear: both;
   display: flex;
@@ -58,8 +58,8 @@
     .menu-item {
       position: $relative;
       float: left;
-      margin: 0 10px;
-      padding: 0 10px;
+      margin: 0 8px;
+      padding: 0 4px;
       font-size: $font-size-base;
       text-align: center;
       text-indent: 0;

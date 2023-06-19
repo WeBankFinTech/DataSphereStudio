@@ -22,6 +22,8 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInf
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaReader;
 
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -31,7 +33,7 @@ import java.io.InputStream;
 import java.util.List;
 
 
-@Service
+@Service("orcMetaInputService")
 public class MetaInputServiceImpl implements MetaInputService {
 
     // TODO: 2020/3/13 防止表结构发生改变的version 字段的添加
@@ -45,6 +47,19 @@ public class MetaInputServiceImpl implements MetaInputService {
         }
     }
 
+    @Override
+    public List<DSSFlow> inputFlow(String basePath) throws IOException {
+        try (InputStream inputStream = generateInputstream(basePath)) {
+            return MetaReader.of("dss_flow", DSSFlow.class).read(inputStream);
+        }
+    }
+
+    @Override
+    public List<DSSFlowRelation> inputFlowRelation(String basePath) throws IOException {
+        try (InputStream inputStream = generateInputstream(basePath)) {
+            return MetaReader.of("dss_workflow_relation", DSSFlowRelation.class).read(inputStream);
+        }
+    }
 
     /**
      * 获取inputStream

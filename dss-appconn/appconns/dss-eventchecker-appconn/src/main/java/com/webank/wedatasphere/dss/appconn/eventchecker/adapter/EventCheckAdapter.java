@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.adapter;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.util.Properties;
 

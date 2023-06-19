@@ -25,9 +25,11 @@ import scala.collection.mutable
  */
 class HttpSSOIntegrationStandard extends SSOIntegrationStandard {
 
-  private val ssoPluginService: SSOPluginService = new OriginSSOPluginServiceImpl
+  private val ssoPluginService: SSOPluginService = createSSOPluginService()
   private val ssoRequestService: SSORequestService = createSSORequestService()
   private val ssoUserServices = new mutable.ArrayBuffer[SSOUserService]()
+
+  protected def createSSOPluginService(): SSOPluginService = new OriginSSOPluginServiceImpl
 
   protected def createSSORequestService(): SSORequestService = new HttpSSORequestServiceImpl
 
@@ -39,6 +41,7 @@ class HttpSSOIntegrationStandard extends SSOIntegrationStandard {
     ssoUserServices.find(_.getAppInstance == appInstance).getOrElse(ssoUserServices synchronized {
       ssoUserServices.find(_.getAppInstance == appInstance).getOrElse {
         val service = new SSOUserServiceImpl
+        service.setSSORequestService(getSSORequestService)
         service.setAppInstance(appInstance)
         ssoUserServices += service
         service

@@ -67,7 +67,7 @@
         "visibleRole": "Visible Role：",
         "test": "Test：",
         "applicant": "Applicant：",
-        "status": "Status：",
+        "status": "Status",
         "find": "Find",
         "path": "API Path：",
         "submitter": "Submitter",
@@ -256,7 +256,17 @@
       "notice": {
         "publishSuccess": "Publish Success"
       },
-      "tagPlaceholder": "tag，click enter add"
+      "tagPlaceholder": "tag，click enter add",
+      "istitle": "This is the title",
+      "isdesc": "This is the description",
+      "cancel": "Cancel",
+      "tuned": "Stay tuned！",
+      "manage": "Management",
+      "disableenable": "Disable/Enable",
+      "more1024": "Cannot exceed 1024 characters！",
+      "moreline": "Too many rows, please query in batches！",
+      "outlimit": "Exceed the limit, please modify！",
+      "uninittask": "Nothing has been returned yet,Please try again later or contact administrator！"
     }
   }
 }

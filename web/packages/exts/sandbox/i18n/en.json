@@ -1,0 +1,88 @@
+{
+  "message": {
+    "workspace": {
+      "topNotice": {
+        "title": "Tips",
+        "content": "Dear Sandbox users: The sand environment is an open environment for testing, deploying all the components of the WeDataSphere open source version. Currently, only demos are allowed to run due to security restrictions, and users cannot add or modify test data. Please take care of the use of the sandbox environment."
+      }
+    },
+    "register": {
+      "codeInfo": "Scan the code or email to get the invitation code. See the introduction on the right for details",
+      "invitationJoin": {
+        "welcome": "Scan the Qr Code below to join our DaraSphere Studio User Community!",
+        "community": "Datasphere stdio community group to stay up-to-date",
+        "join": "Scan the QR Code below to get in touch with our team members for invitation code and to join our community.",
+        "contact": "Contact team members for invitation code, scan code to add swarm robot",
+        "send": "Or send email to",
+        "tag": "for personalized assistance. Remember to include your company name, your position, and number of code needed.",
+        "thank": " If you need more than 5 codes, plaase state your reason."
+      },
+      "registerTitle": "DataSphere Studio Trial Application",
+      "org": "Organization",
+      "invit": "Invitation Code",
+      "invitation": "Please enter your invitation code",
+      "organization": "Please enter your organization name",
+      "nam": "Name",
+      "name": "Please enter your name",
+      "pho": "Phone",
+      "phone": "Please enter your phone",
+      "ver": "Verification Code",
+      "veriCode": "Please enter your verification code",
+      "contact": "Contact Information",
+      "contactType": "Mailbox and wechat",
+      "application": "Immediate application",
+      "discover": {
+        "how": "How did you hear about us?",
+        "GitHub": "GitHub",
+        "OsChina": "OsChina/Gitee",
+        "search": "Search Engines",
+        "csdn": "CSDN",
+        "meeting": "Community",
+        "decomend": "Friend's/Colleague's recommendation"
+      },
+      "des": "Requirement description",
+      "desc": "Please enter your business requirements, the maximum length is 160 characters",
+      "agree": {
+        "agr": "I agree to the",
+        "service": "Terms",
+        "and": "and",
+        "privacy": "Conditions"
+      },
+      "errTip": {
+        "org": "Maximum length is 120 characters",
+        "phone": "Please input the correct mobile number",
+        "discovery": "Please select how you found DSS",
+        "desc": "Maximum length is 160 characters",
+        "contact": "Please enter your contact information",
+        "code": "Please enter the correct verification code",
+        "vericode": "Please enter the verification code",
+        "trim": "The input cannot have spaces",
+        "invitation": "The input format of verification code is incorrect",
+        "format": "The input format is incorrect, please re-enter"
+      },
+      "tips": "Tip",
+      "success": "Successfully registered!",
+      "pass": "Your password is :",
+      "pa": "the last six digits of your mobile number",
+      "userNameTitle": "Your user name is :",
+      "userName": "cell-phone number",
+      "error": "Registration failed, please register again",
+      "watch": {
+        "welcome": "Follow our other open-source projects:",
+        "note": "follow ",
+        "and": "and ",
+        "star": "STAR ",
+        "project": "the following open source projects:",
+        "data": " DataSphereStudio - One-stop data application development management portal ",
+        "links": " Linkis - Computational middleware with multi engine",
+        "qualitis": "Qualitis - Heterogeneous data source & data quality management platform",
+        "Script": "Scriptis - Data development explores IDE tools",
+        "Visualis": "Visualis - BI tool for data visualization",
+        "Streamis": "Streamis - One-stop development management system for streaming application",
+        "Schedulis": "Schedulis - Workflow task scheduling system",
+        "Prophecis": "Prophecis - One-stop machine learning platform",
+        "Exchangis": "Exchangis - Data exchange platform"
+      }
+    }
+  }
+}

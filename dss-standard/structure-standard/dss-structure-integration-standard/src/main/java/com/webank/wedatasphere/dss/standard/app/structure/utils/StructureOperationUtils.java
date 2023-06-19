@@ -9,7 +9,11 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProject
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
+import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.linkis.common.exception.WarnException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +50,21 @@ public class StructureOperationUtils {
         if(structureRequestRefConsumer != null) {
             structureRequestRefConsumer.accept(requestRef);
         }
-        V responseRef = responseRefConsumer.apply(operation, requestRef);
+        V responseRef;
+        try {
+            responseRef = responseRefConsumer.apply(operation, requestRef);
+        } catch (WarnException e) {
+            String error;
+            if(StringUtils.isBlank(e.getDesc())) {
+                error = String.format("%s failed, no detail error returned by this AppConn, please ask admin for help.", errorMsg);
+            } else {
+                error = String.format("%s failed. Caused by: %s.", errorMsg, e.getDesc());
+            }
+            throw new ExternalOperationFailedException(50009, error, e);
+        } catch (RuntimeException e) {
+            String error = String.format("%s failed. Caused by: %s.", errorMsg, ExceptionUtils.getRootCauseMessage(e));
+            throw new ExternalOperationFailedException(50009, error, e);
+        }
         if(responseRef.isFailed()) {
             LOGGER.error("{} failed. Caused by: {}.", errorMsg, responseRef.getErrorMsg());
             DSSExceptionUtils.dealWarnException(61123,

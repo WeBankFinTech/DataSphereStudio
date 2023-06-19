@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <Spin
-      v-if="loading"
-      size="large"
-      fix/>
+  <Spin
+    v-if="loading"
+    size="large"
+    fix/>
+  <div v-else >
     <div class="job-manager">
       <div
         class="job-manager-empty"
@@ -103,14 +103,9 @@ export default {
       this.jobList = [];
       this.loading = true;
       try {
-        const rst = await api.fetch('/jobhistory/list', {
-          pageSize: 100,
-          status: 'Running,Inited,Scheduled',
-        }, 'get')
+        const rst = await api.fetch('/jobhistory/listundonetasks', {}, 'get')
         this.loading = false;
-        this.dispatch('Footer:updateRunningJob', rst.tasks.length);
-
-        rst.tasks.forEach((item) => {
+        (rst.tasks||[]).forEach((item) => {
           const tmpItem = Object.assign({}, item, { isActive: false, fileName: this.convertJson(item) });
           this.jobList.push(tmpItem);
           if (this.jobTypeList.indexOf(item.requestApplicationName) < 0) {
@@ -118,7 +113,6 @@ export default {
           }
         });
         this.jobList = orderBy(this.jobList, ['status', 'fileName']);
-        this.$emit('update-job', rst.tasks.length);
       } catch (err) {
         this.loading = false;
         console.error(err)

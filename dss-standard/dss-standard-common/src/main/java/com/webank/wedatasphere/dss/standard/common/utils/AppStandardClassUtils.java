@@ -17,22 +17,36 @@
 package com.webank.wedatasphere.dss.standard.common.utils;
 
 import com.webank.wedatasphere.dss.common.utils.ClassUtils.ClassHelper;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
  * This class is defined for AppConn jar, if some classes in AppConn want to load a class in AppConn jar.
  */
 public class AppStandardClassUtils extends ClassHelper {
 
-    private static final Map<String, AppStandardClassUtils> INSTANCES = new HashMap<>();
-    private static final Map<String, ClassLoader> CLASS_LOADER_MAP = new HashMap<>();
+    private static final Map<String, AppStandardClassUtils> INSTANCES = new ConcurrentHashMap<>();
+    private static final Map<String, ClassLoader> CLASS_LOADER_MAP = new ConcurrentHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppStandardClassUtils.class);
+
+    public static ClassLoader refreshClassloader(String appConnName, Supplier<ClassLoader> createClassLoader) {
+        if(CLASS_LOADER_MAP.containsKey(appConnName)) {
+            synchronized (AppStandardClassUtils.class) {
+                if(CLASS_LOADER_MAP.containsKey(appConnName)) {
+                    CLASS_LOADER_MAP.remove(appConnName);
+                    INSTANCES.remove(appConnName);
+                }
+            }
+        }
+        return getClassLoader(appConnName, createClassLoader);
+    }
 
     public static ClassLoader getClassLoader(String appConnName, Supplier<ClassLoader> createClassLoader) {
         if(!CLASS_LOADER_MAP.containsKey(appConnName)) {
@@ -46,6 +60,7 @@ public class AppStandardClassUtils extends ClassHelper {
         return CLASS_LOADER_MAP.get(appConnName);
     }
 
+
     public static AppStandardClassUtils getInstance(String appConnName) {
         if(!INSTANCES.containsKey(appConnName)) {
             synchronized (AppStandardClassUtils.class) {
@@ -58,7 +73,7 @@ public class AppStandardClassUtils extends ClassHelper {
         return INSTANCES.get(appConnName);
     }
 
-    private Reflections reflection;
+    private volatile Reflections reflection;
     private String appConnName;
 
     private AppStandardClassUtils(String appConnName) {

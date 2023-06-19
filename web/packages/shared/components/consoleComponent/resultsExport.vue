@@ -8,7 +8,7 @@
       <span>{{ $t('message.common.resultsExport.header') }}</span>
       <span @click="fullScreenModal" class="full-btn">
         <Icon :type="isFullScreen?'md-contract':'md-expand'" />
-        {{isFullScreen?'取消全屏':'全屏展示'}}
+        {{isFullScreen?this.$t('message.common.cancelFullScreen'):this.$t('message.common.fullScreen')}}
       </span>
     </div>
     <div class="results-export-content">

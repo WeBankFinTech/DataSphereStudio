@@ -28,6 +28,7 @@ public class AppConnManagerImpl extends AbstractAppConnManager {
     @Override
     protected AppConnInfoService createAppConnInfoService() {
         try {
+            //由于maven不能循环依赖，这里不能返回client端的实现类
             return ClassUtils.getInstance(AppConnInfoService.class);
         } catch (DSSErrorException e) {
             throw new DSSRuntimeException(25000, "Cannot find a useful AppConnInfoService.", e);

@@ -11,7 +11,7 @@
       :visualShow="visualShow"
       :dispatch="dispatch"
       :getResultUrl="getResultUrl"
-      :comData="comData"
+      :work="work"
       :result-type="resultType"
       @on-filter="handleFilterView"
       @change-view-type="changeViewType" />
@@ -73,7 +73,7 @@
           @on-sort-change="sortChange"/>
       </template>
       <div v-if="result.hugeData" :style="{height: resultHeight+'px', padding: '15px'}">
-        因为您的结果集较大，为了更好的体验，<a :href="`/#/results?workspaceId=${$route.query.workspaceId}&resultPath=${resultPath}&fileName=${script.fileName||script.ti}&from=${$route.name}&taskID=${taskID}`" target="_blank">点击查看结果集</a>
+        {{ $t('message.common.resulttip') }}<a :href="`/#/results?workspaceId=${$route.query.workspaceId}&resultPath=${resultPath}&fileName=${script.fileName||script.ti}&from=${$route.name}&taskID=${taskID}`" target="_blank">{{ $t('message.common.viewSet') }}</a>
       </div>
     </div>
     <!-- resultType: 2 visual|dataWrangler -->
@@ -125,7 +125,7 @@
           show-sizer
           @on-change="change"
           @on-page-size-change="changeSize" />
-        <span v-if="tableData.total>=5000">前端只展示5000条数据</span>
+        <span v-if="tableData.total>=5000">{{ $t('message.common.only500') }}</span>
       </div>
     </div>
   </div>
@@ -165,9 +165,6 @@ export default {
     getResultUrl: {
       type: String,
       defalut: `filesystem`
-    },
-    comData: {
-      type: Object
     }
   },
   mixins: [mixin],
@@ -354,8 +351,10 @@ export default {
         }
         // 如果为整数型大小
         if (['int', 'float', 'double', 'long', 'short', 'bigint', 'decimal'].includes(valueType.toLowerCase())) {
-
           return strA - strB;
+        }
+        if (['timestamp'].includes(valueType.toLowerCase()) && typeof strA === 'string') {
+          return strA.localeCompare(strB)
         }
         const charAry = strA.split('');
         for (const i in charAry) {

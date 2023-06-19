@@ -25,13 +25,14 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
-import com.webank.wedatasphere.dss.workflow.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.Closeable;
@@ -47,6 +48,7 @@ public class NodeExportServiceImpl implements NodeExportService {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
+    @Qualifier("workflowBmlService")
     private BMLService bmlService;
     @Autowired
     private NodeInfoMapper nodeInfoMapper;

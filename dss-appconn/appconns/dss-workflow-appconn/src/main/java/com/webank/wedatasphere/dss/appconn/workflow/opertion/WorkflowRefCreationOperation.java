@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 public class WorkflowRefCreationOperation
-    extends AbstractDevelopmentOperation<ThirdlyRequestRef.DSSJobContentWithContextRequestRef, RefJobContentResponseRef>
+        extends AbstractDevelopmentOperation<ThirdlyRequestRef.DSSJobContentWithContextRequestRef, RefJobContentResponseRef>
         implements RefCreationOperation<ThirdlyRequestRef.DSSJobContentWithContextRequestRef> {
 
     private Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
@@ -58,10 +59,10 @@ public class WorkflowRefCreationOperation
                 dssOrchestratorInfo.getUses() : "uses";
         RequestCreateWorkflow requestCreateWorkflow = new RequestCreateWorkflow(userName, dssOrchestratorInfo.getProjectId(), workflowName,
                 contextId, description, parentFlowId, uses, linkedAppConnNames, dssLabels, orcVersion, schedulerAppConnName);
-
-        ResponseCreateWorkflow responseCreateWorkflow = (ResponseCreateWorkflow) sender.ask(requestCreateWorkflow);
+        ResponseCreateWorkflow responseCreateWorkflow = RpcAskUtils.processAskException(sender.ask(requestCreateWorkflow),
+                ResponseCreateWorkflow.class, RequestCreateWorkflow.class);
         Map<String, Object> refJobContent = MapUtils.newCommonMap(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCreateWorkflow.getDssFlow().getId(),
-            OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, responseCreateWorkflow.getDssFlow().getFlowJson());
+                OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, responseCreateWorkflow.getDssFlow().getFlowJson());
         return RefJobContentResponseRef.newBuilder().setRefJobContent(refJobContent).success();
     }
 }

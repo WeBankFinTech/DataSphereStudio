@@ -43,6 +43,7 @@ public class DSSWorkFlowConstant {
     public static final String SCHEDULER_APP_CONN_NAME = "schedulerAppConnName";
     public static final String REF_PROJECT_ID_KEY = "refProjectId";
     public static final String TITLE_KEY = "title";
+    public static final String JOBTYPE_KEY = "jobType";
 
     /**
      * 用户已锁定编辑错误码
@@ -50,7 +51,7 @@ public class DSSWorkFlowConstant {
     public static final int EDIT_LOCK_ERROR_CODE = 60056;
 
     /**
-     * 发布中的错误码
+     * 发布中的错误码，工程下有其他工作流在发布中
      */
     public static final String PUBLISHING_ERROR_CODE = "-999";
 

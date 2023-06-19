@@ -46,6 +46,7 @@ import api from '@dataspherestudio/shared/common/service/api';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import porjectComponent from '../newProject';
 import appProcess from '../appProcess/';
+import util from '@dataspherestudio/shared/common/util';
 import { GetWorkspaceData } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 export default {
   components: {
@@ -62,24 +63,15 @@ export default {
       },
       sideDataList: [], // 右侧连接列表
       workspaceId: null,
-      rules: {
-        selectApp: [
-          { required: true, message: this.$t('message.workspace.home.selectApp'), trigger: 'change' },
-        ],
-        selectType: [
-          { required: true, message: this.$t('message.workspace.home.selectType'), trigger: 'change' },
-        ],
-      },
     }
   },
   created() {
-    this.workspaceId = this.$route.query.workspaceId;
+    this.$router.app.$off("getChangeCookies");
     this.init();
     this.getSideDatas();
   },
   watch: {
     $route() {
-      this.workspaceId= this.$route.query.workspaceId; //获取传来的参数
       this.init();
       this.getSideDatas();
     }
@@ -88,6 +80,7 @@ export default {
   },
   methods: {
     init() {
+      this.workspaceId= this.$route.query.workspaceId; //获取传来的参数
       sessionStorage.removeItem(`work_flow_lists_${this.workspaceId}`)
       this.$router.app.$on("getChangeCookies", () => {
         // 因为会重复注册一次，所以要触发后清除事件
@@ -103,15 +96,15 @@ export default {
       if (item.urlType === 0) {
         this.$router.push({path: item.url, query: this.$route.query})
       } else {
-        // util.windowOpen(item.url);
-        this.$router.push({
-          path: `/commonIframe/${item.title}`,
-          query: {
-            ...this.$route.query,
-            __noreplace: 1,
-            url: item.url
-          }
-        })
+        util.windowOpen(item.url);
+        // this.$router.push({
+        //   path: `/commonIframe/${item.title}`,
+        //   query: {
+        //     ...this.$route.query,
+        //     __noreplace: 1,
+        //     url: item.url
+        //   }
+        // })
       }
     },
     // 获取常见问题

@@ -35,38 +35,6 @@
    }
  }
 
- .no-data-bgc {
-   font-size: $font-size-base;
-   position: absolute;
-   top: 0;
-   bottom: 40px;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-
-   .no-data-img {
-     width: 200px;
-     margin-top: 150px;
-   }
-
-   .bg-text {
-     width: 60%;
-     text-align: left;
-     display: block;
-     line-height: 40px;
-
-     &.weight {
-       margin-top: 10px;
-       font-weight: bold;
-     }
-
-     &.indent {
-       text-indent: 2em;
-     }
-   }
- }
-
  .icon-blod {
    margin-right: 2px;
  }

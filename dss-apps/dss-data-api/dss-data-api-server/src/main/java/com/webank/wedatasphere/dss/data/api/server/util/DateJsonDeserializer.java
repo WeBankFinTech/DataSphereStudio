@@ -11,7 +11,8 @@ import java.util.Date;
 
 public class DateJsonDeserializer extends JsonDeserializer<Date>
 {
-    public static final SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static final ThreadLocal<SimpleDateFormat> format
+            = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     @Override
     public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
@@ -19,7 +20,7 @@ public class DateJsonDeserializer extends JsonDeserializer<Date>
     {
         try
         {
-            return format.parse(jsonParser.getText());
+            return format.get().parse(jsonParser.getText());
         }
         catch(Exception e)
         {

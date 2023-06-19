@@ -35,3 +35,12 @@ class WorkspaceUsersResult extends DWSResult {
   @BeanProperty var users: java.util.List[String] = _
 
 }
+
+@DWSHttpMessageResult("/api/rest_j/v\\d+/dss/framework/proxy/getProxyUser")
+class ProxyUserInfoResult extends DWSResult {
+
+  @BeanProperty var userName: String = _
+
+  @BeanProperty var proxyUser: String = _
+
+}

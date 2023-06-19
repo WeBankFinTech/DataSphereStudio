@@ -8,7 +8,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource
 import com.webank.wedatasphere.dss.linkis.node.execution.job.{Builder, CommonLinkisJob, Job, LinkisJob}
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils
 import com.webank.wedatasphere.dss.plugins.dolphinscheduler.linkis.client.conf.LinkisJobTypeConf
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.linkis.common.utils.JsonUtils
 
 import scala.collection.JavaConverters._

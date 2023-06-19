@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.service;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ExportResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;

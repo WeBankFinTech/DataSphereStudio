@@ -124,7 +124,6 @@ export default {
       return {
         name: [
           { required: true, message: this.$t('message.workspace.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workspace.nameLength')}150`, max: 150 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workspace.validNameDesc'), trigger: 'blur' },
           { validator: this.checkNameExist, message: this.$t('message.workspace.validNameExist'), trigger: 'blur' },
         ],
@@ -166,7 +165,7 @@ export default {
     checkNameExist(rule, value, callback) {
       CheckWorkspaceNameExist({ name: value }).then((res) => {
         if (res.workspaceNameExists) {
-          callback(new Error('不可重复'));
+          callback(new Error(this.$t('message.workspace.Not')));
         } else {
           callback();
         }

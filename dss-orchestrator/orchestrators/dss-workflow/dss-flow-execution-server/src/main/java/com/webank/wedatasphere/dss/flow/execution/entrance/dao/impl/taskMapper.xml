@@ -112,6 +112,28 @@
         WHERE id =#{taskID}
     </update>
 
+    <update id="batchUpdateTasks" parameterType="java.util.List">
+        UPDATE dss_workflow_task set status =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.taskID} then #{item.status}
+        </foreach>
+        err_desc =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.taskID} then #{item.errDesc}
+        </foreach>
+        updated_time =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end">
+            when id = #{item.taskID} then #{item.updatedTime}
+        </foreach>
+        WHERE id in
+        <foreach collection="failedJobs" item="item" index="index" separator="," open="(" close=")">
+            #{item.taskID}
+        </foreach>
+    </update>
+
     <select id="selectTaskStatusForUpdate" resultType="java.lang.String">
         SELECT
         bdt.`status`

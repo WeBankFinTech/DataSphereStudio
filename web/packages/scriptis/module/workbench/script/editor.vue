@@ -76,6 +76,7 @@
         :id="script.id"
         :read-only="script.readOnly"
         :script-type="scriptType"
+        :file-path="work.filepath || script.id + work.filename"
         :application="script.application"
         type="code"
         @on-operator="heartBeat"
@@ -136,9 +137,6 @@ export default {
     };
   },
   computed: {
-    listenResource() {
-      return this.script.running;
-    },
     isHdfs() {
       return this.work.filepath.indexOf('hdfs') === 0;
     },
@@ -147,17 +145,6 @@ export default {
     }
   },
   watch: {
-    listenResource(val) {
-      if (!val) {
-        api.fetch('/jobhistory/list', {
-          pageSize: 100,
-          status: 'Running,Inited,Scheduled',
-        }, 'get').then((rst) => {
-          this.dispatch('Footer:updateRunningJob', rst.tasks.length);
-        }).catch(() => {
-        });
-      }
-    },
     'work.unsave'(val) {
       if (!val) {
         this.$refs.setting.origin = JSON.stringify(this.script.params);
@@ -187,14 +174,10 @@ export default {
       this.$refs.editor.redo();
     },
     async run() {
-      // if (!this.isParseSuccess) return this.$Message.warning('代码中有语法错误，请检查后再试！');
       if (this.script.running) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.running'));
       let selectCode = this.$refs.editor.getValueInRange() || this.script.data;
       let validRepeat = await this.validateRepeat();
       this.$refs.editor.deltaDecorations(selectCode, () => {
-        // if (!flag) {
-        //     return this.$Message.warning('代码中有语法错误，请检查后再试！');
-        // }
         if (!validRepeat) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
         if (this.loading) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
         if (!selectCode) {
@@ -221,10 +204,14 @@ export default {
       });
     },
     async save() {
-      let valid = await this.validateRepeat();
-      if (!valid) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
-      this.$refs.editor.save();
-      this.$emit('on-save');
+      if (this.work && this.work.unsave) {
+        let valid = await this.validateRepeat();
+        if (!valid) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
+        this.$refs.editor.save();
+        this.$emit('on-save');
+      } else {
+        this.$Message.warning(this.$t('message.scripts.editorDetail.warning.unchange'));
+      }
     },
     config() {
       this.showConfig = !this.showConfig;

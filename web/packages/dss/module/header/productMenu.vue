@@ -22,7 +22,7 @@
           @mouseenter="showRight"
         >
           <i></i>
-          全部产品
+          {{ $t('message.common.dss.allprod') }}
         </div>
         <ul class="nav-collect">
           <li
@@ -67,7 +67,7 @@
       </div>
       <div
         class="nav-right"
-        :class="{ 'nav-right-open': expandRight }"
+        :class="{ 'nav-right-open': open }"
         :style="{ 'z-index': zIndex }"
       >
         <div
@@ -158,7 +158,7 @@ export default {
   data() {
     return {
       open: false, // 展开菜单
-      expandRight: false, // 展开右侧全部应用
+      expandRight: true, // 展开右侧全部应用
       favoriteList: this.favorites,
       collectionList: this.collections
     };
@@ -292,16 +292,19 @@ export default {
 }
 .luban-nav-panel {
   z-index: 2000;
-  position: fixed;
+  position: absolute;
   margin-top: 54px;
   left: 0;
   top: 0;
   bottom: 0;
-  display: flex;
   // 防止部分浏览器在translateX(-100%)仍可触发显示菜单
   visibility: hidden;
   transform: translateX(-100%);
   transition: all 0.3s ease-in-out;
+  overflow-y: auto;
+  width: 810px;
+  background: #000a17;
+  overflow-x: hidden;
   &.nav-open {
     transform: translateX(0);
     visibility: visible;
@@ -311,6 +314,8 @@ export default {
     position: relative;
     width: 250px;
     background: #000a17;
+    float: left;
+    height: 100%;
     .nav-all {
       position: relative;
       padding: 16px;
@@ -413,23 +418,23 @@ export default {
   }
   .nav-right {
     z-index: 2000;
-    position: absolute;
+    position: fixed;
     left: 250px;
     top: 0;
-    bottom: 0;
     width: 560px;
     background: #061528;
     overflow: auto;
     transform: translateX(-100%);
     transition: all 0.24s ease-in-out;
+    padding-left: 25px;
     &.nav-right-open {
       transform: translateX(0);
+      padding-bottom: 100px
     }
     .pro-box {
       margin-bottom: 20px;
       .pro-category {
         position: relative;
-        margin: 0 24px;
         padding: 16px 0;
         font-size: 16px;
         line-height: 20px;

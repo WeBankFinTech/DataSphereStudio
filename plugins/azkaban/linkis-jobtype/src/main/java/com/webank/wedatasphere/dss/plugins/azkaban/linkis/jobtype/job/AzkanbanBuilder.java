@@ -38,7 +38,7 @@ public class AzkanbanBuilder extends Builder {
     private static final Logger LOGGER = LoggerFactory.getLogger(AzkanbanBuilder.class);
 
     private static final String RUN_DATE_KEY = "run_date";
-    private static final String RUN_DATE_HOUR_KEY = "run_date_h";
+    private static final String RUN_DATE_HOUR_KEY = "run_today_h";
     private Map<String, String> jobProps;
 
     public AzkanbanBuilder setJobProps(Map<String, String> jobProps) {
@@ -88,7 +88,12 @@ public class AzkanbanBuilder extends Builder {
 
     @Override
     protected String getContextID(Job job) {
-        return jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID);
+        String contextID = jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID);
+        //将部分老的工作流的BDAP_DEV标签替换为BDAP_PROD
+        if (null != contextID) {
+            contextID = contextID.replace(LinkisJobTypeConf.CONTEXT_ENV_DEV.getValue(), LinkisJobTypeConf.CONTEXT_ENV_PROD.getValue());
+        }
+        return contextID;
     }
 
     @Override

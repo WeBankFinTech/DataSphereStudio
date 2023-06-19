@@ -19,11 +19,12 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
 
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 
@@ -59,7 +60,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
                     result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId);
                 }
             }else{
-                log.error("executeType error {} " + executeType.toString());
+                log.error("executeType error {} " + Arrays.toString(executeType));
                 return result;
             }
         }catch (Exception e){
@@ -113,7 +114,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
         String waitForTime = wait_for_time;
         String formatWaitForTime = DateFormatUtils.format(new Date(),"yyyy-MM-dd " + waitForTime + ":00");
         DateFormat fmt =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date targetWaitTime = null;
+        Date targetWaitTime = new Date();
         try {
             targetWaitTime = fmt.parse(formatWaitForTime);
         } catch (ParseException e) {

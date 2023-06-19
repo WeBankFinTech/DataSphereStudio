@@ -276,7 +276,6 @@ export default {
 
   .list-view-item {
     height: 100%;
-    color: #666;
     box-sizing: border-box;
     flex-shrink: 0;
     text-align: center;

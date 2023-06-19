@@ -16,10 +16,6 @@
 
 package com.webank.wedatasphere.dss.standard.app.sso.plugin
 
-import java.lang
-import java.lang.reflect.Type
-
-import com.google.gson.{GsonBuilder, JsonElement, JsonPrimitive, JsonSerializationContext, JsonSerializer}
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation
 import com.webank.wedatasphere.dss.standard.app.sso.builder.DssMsgBuilderOperation.DSSMsg
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.DSSMsgImpl
@@ -60,6 +56,10 @@ class DssMsgCacheOperationImpl private() extends DssMsgCacheOperation {
     }
     request.getSession.setAttribute(DssMsgCacheOperationImpl.DSS_MSG_KEY, newDSSMsg)
   }
+
+  override def setExistsProxyUser(req: HttpServletRequest): Unit = req.getSession.setAttribute("existsDSSProxyUser", true)
+
+  override def isExistsProxyUser(req: HttpServletRequest): Boolean = req.getSession.getAttribute("existsDSSProxyUser") != null
 }
 object DssMsgCacheOperationImpl {
   private val DSS_MSG_KEY = "dss_msg_key"

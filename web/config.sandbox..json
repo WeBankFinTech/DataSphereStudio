@@ -1,0 +1,98 @@
+{
+  "apps": {
+    "workspace": {
+      "routes": "workspace/router",
+      "module": "workspace/module",
+      "i18n": {
+        "en": "workspace/i18n/en.json",
+        "zh-CN": "workspace/i18n/zh.json"
+      }
+    },
+    "scriptis": {
+      "routes": "scriptis/router",
+      "module": "scriptis/module",
+      "i18n": {
+        "en": "scriptis/i18n/common/en.json",
+        "zh-CN": "scriptis/i18n/common/zh.json"
+      }
+    },
+    "workflows": {
+      "routes": "workflows/router",
+      "module": "workflows/module",
+      "i18n": {
+        "en": "workflows/i18n/common/en.json",
+        "zh-CN": "workflows/i18n/common/zh.json"
+      }
+    },
+    "apiServices": {
+      "routes": "apiServices/router",
+      "module": "apiServices/module",
+      "i18n": {
+        "en": "apiServices/i18n/en.json",
+        "zh-CN": "apiServices/i18n/zh.json"
+      }
+    },
+    "dataService": {
+      "routes": "dataService/router",
+      "module": "dataService/module",
+      "i18n": {
+        "en": "dataService/i18n/en.json",
+        "zh-CN": "dataService/i18n/zh.json"
+      }
+    },
+    "scheduleCenter": {
+      "routes": "scheduleCenter/router",
+      "module": "scheduleCenter/module",
+      "i18n": {
+        "en": "scheduleCenter/i18n/en.json",
+        "zh-CN": "scheduleCenter/i18n/zh.json"
+      }
+    },
+    "dolphinScheduler": {
+      "routes": "dolphinScheduler/router",
+      "module": "dolphinScheduler/module",
+      "i18n": {
+        "en": "dolphinScheduler/i18n/en.json",
+        "zh-CN": "dolphinScheduler/i18n/zh.json"
+      }
+    }
+  },
+  "exts": {
+    "dss-plugin-open": {
+      "module": "exts/open-source/index.js",
+      "i18n": {
+        "en": "exts/open-source/i18n/en.json",
+        "zh-CN": "exts/open-source/i18n/zh.json"
+      },
+      "options": null
+    },
+    "dss-plugin-sandbox": {
+      "module": "exts/sandbox/index.js",
+      "i18n": {
+        "en": "exts/sandbox/i18n/en.json",
+        "zh-CN": "exts/sandbox/i18n/zh.json"
+      },
+      "options": null
+    }
+  },
+  "components": {
+    "WeEditorLsp": "editorLsp/index.js",
+    "WeEditor": "editor/index.js"
+  },
+  "conf": {
+    "app_name": "DataSphere Studio",
+    "app_logo": "dss/assets/images/dssLogo.png",
+    "user_guide": "",
+    "isSandbox": true,
+    "faq_link": "/_book/",
+    "copy_project_enable": true,
+    "error_report": true,
+    "watermark": {
+      "show": true,
+      "template": "${username} ${time}",
+      "timeupdate": 60000
+    },
+    "update_chrome": "/_book/知识库/DSS常见问题/其他/DSS使用推荐的浏览器版本.html"
+  },
+  "version": "1.1.7"
+}

@@ -52,6 +52,7 @@ public class DSSDictionaryRestful {
      */
     @RequestMapping(path ="getDicList", method = RequestMethod.POST)
     public Message getDevFlowList(HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
+        LOGGER.info("begin to getDicList for dickey:{}, parantKey:{} ", dictionaryRequestVO.getDicKey(), dictionaryRequestVO.getParentKey());
         try{
             if(dictionaryRequestVO.getWorkspaceId()==null){
                 return Message.error("workspaceId(空间id)不能为空");
@@ -73,6 +74,7 @@ public class DSSDictionaryRestful {
 
     @RequestMapping(path ="getDicSecondList", method = RequestMethod.POST)
     public Message getDicSecondList(HttpServletRequest request, @RequestBody DSSDictionaryRequestVO dictionaryRequestVO){
+        LOGGER.info("begin to getDicSecondList for dickey:{}, parantKey:{} ", dictionaryRequestVO.getDicKey(), dictionaryRequestVO.getParentKey());
         try{
             if(dictionaryRequestVO.getWorkspaceId()==null){
                 return Message.error("workspaceId(空间id)不能为空");

@@ -59,6 +59,7 @@ public class FlowExecutionRestfulApi {
 
     @RequestMapping(value = "/{id}/execution",method = RequestMethod.GET)
     public Message execution(@PathVariable("id") String id,@RequestParam("labels") String labels) {
+        logger.info("Begin to get job execution info, id:{}", id);
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job = entranceServer.getJob(realId);
@@ -118,6 +119,7 @@ public class FlowExecutionRestfulApi {
             logger.error("Failed to get job execution info:", e);
             message = Message.error("Failed to get job execution info:" + e.getMessage());
         }
+        logger.info("End to get job execution info, id:{}", id);
         return message;
     }
 

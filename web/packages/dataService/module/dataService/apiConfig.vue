@@ -58,7 +58,6 @@ export default {
   },
   computed: {
     choosedData() {
-      console.log(12333)
       return this.tabDatas.find((item) => item.isActive)
     },
   },

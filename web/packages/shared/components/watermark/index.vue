@@ -47,7 +47,8 @@ export default {
       singleCtx.clearRect(0, 0, w, h);
       singleCtx.font = '12px 宋体';
       singleCtx.rotate(-10 * Math.PI / 180);
-      singleCtx.fillStyle = 'rgba(0,0,0,0.2)';
+      const isDark = window.document.documentElement.getAttribute('data-theme') === 'dark'
+      singleCtx.fillStyle = isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.2)';
       if (typeof text === 'function') {
         text = text()
       }

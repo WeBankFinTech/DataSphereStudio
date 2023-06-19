@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.standard.app.development.ref;
 
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
+
 import java.util.Map;
 
 public interface ImportRequestRef<R extends RefJobContentRequestRef<R>>

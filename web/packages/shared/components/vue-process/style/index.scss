@@ -22,17 +22,17 @@
  $sub-text-color : #999;
  $dark-color : #333;
  $toool-button-color: rgba(0,0,0,0.65);
- 
+
  // Border color
  $border-color-base :#DEE4EC; // outside
  $border-color-split : #e3e8ee; // inside
- 
- 
+
+
  // Background color
  $background-color-base : #F8F9FC;
  $hover-color : #f3f3f3;
  $tooltip-color : #fff;
- 
+
  // Shadow
  $shadow-color : rgba(0, 0, 0, .2);
  $shadow-1-up : 0 -1px 6px $shadow-color;
@@ -41,9 +41,9 @@
  $shadow-1-right : 1px 0 6px $shadow-color;
  $shadow-2 : 0 2px 8px $shadow-color;
  $box-shadow-base : $shadow-1-down;
- 
+
  $mask-color: rgba(55, 55, 55, .6);
- 
+
  ::-webkit-scrollbar-thumb {
    @include bg-color(#cdcdcd, #474E5D);
  }
@@ -57,17 +57,17 @@
    font-size: 12px;
    @include font-color($text-color, $dark-workflow-font-color);
    @include bg-color(#fff, $dark-workflow-bg-color);
- 
+
    * {
      box-sizing: border-box;
      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
    }
- 
+
    *:before,
    *:after {
      box-sizing: border-box;
    }
- 
+
    input,
    textarea,
    .designer-button {
@@ -82,11 +82,11 @@
      @include font-color($text-color, $dark-workflow-font-color);
      @include bg-color($tooltip-color, $dark-workflow-bg-color);
    }
- 
+
    .designer-button {
      padding: 0 12px;
    }
- 
+
    .designer-toolbar {
      position: absolute;
      left: 0;
@@ -97,7 +97,7 @@
      @include bg-color($background-color-base, $dark-workflow-bg-color);
      border-bottom: 1px solid $border-color-base;
      @include border-color($border-color-base, $dark-base-color);
- 
+
      .icon {
        display: inline-block;
        vertical-align: text-top;
@@ -106,11 +106,11 @@
        @include font-color($dark-color, rgba(255,255,255,0.65));
        text-align: center;
      }
- 
+
      .text {
        vertical-align: text-top;
      }
- 
+
      .button {
        float: left;
        margin: 6px 0px 6px 0;
@@ -138,11 +138,11 @@
          font-size: 14px;
        }
      }
- 
+
      .long-button {
        min-width: 60px;
      }
- 
+
      .devider {
        float: left;
        border-left: 1px solid $border-color-split;
@@ -150,9 +150,9 @@
        margin: 8px 15px;
      }
    }
- 
+
    &.show-toolbar {
- 
+
      .designer-shape,
      .designer-viewport,
      .right-draw,
@@ -160,7 +160,7 @@
        top: 36px;
      }
    }
- 
+
    .designer-shape {
      position: absolute;
      left: 0;
@@ -173,7 +173,7 @@
      border-right: 1px solid $border-color-base;
      @include border-color($border-color-base, $dark-base-color);
      transition: all .3s;
- 
+
      .shape-head {
        display: flex;
        padding: 0 10px 0 20px;
@@ -199,28 +199,28 @@
          }
        }
      }
- 
+
      .shape-search {
        display: block;
        width: 80%;
        margin: 10px auto;
      }
- 
+
      .shape-container {
        margin-top: 1px;
        // border-bottom: 1px solid $border-color-split;
        @include border-color($border-color-split, $dark-workflow-bg-color);
- 
+
        &.top {
          border-top: 1px solid $border-color-split;
          @include border-color($border-color-split, $dark-workflow-bg-color);
        }
- 
+
        .icon {
          height: 14px;
          width: 14px;
        }
- 
+
        .shape-title {
          position: relative;
          margin: 0px;
@@ -239,13 +239,8 @@
            font-size: 16px;
          }
        }
- 
-       .shape-content {
-         // padding-bottom: 10px;
-         // padding-left: 10px;
-       }
      }
- 
+
      .shape-box {
        display: flex;
        align-items: center;
@@ -265,7 +260,7 @@
        text-overflow: ellipsis;
        overflow: hidden;
      }
- 
+
      .shape-box-img {
        display: inline-block;
        width: 22px;
@@ -273,7 +268,7 @@
        user-select: none;
        pointer-events: none;
      }
- 
+
      .shape-box-draging {
        position: absolute;
        text-align: center;
@@ -303,7 +298,7 @@
        @include font-color(#000, #fff);
      }
    }
- 
+
    .designer-viewport {
      position: absolute;
      left: 180px;
@@ -317,13 +312,13 @@
    .designer-viewport-fold {
      left: 0;
    }
- 
+
    .snap-line {
      position: absolute;
      z-index: 4;
      background: #6eb1eb;
    }
- 
+
    .node-box {
      position: absolute;
      left: 0;
@@ -331,13 +326,13 @@
      z-index: 2;
      @include bg-color(#fff, $dark-workflow-bg-color);
      cursor: move;
- 
+
      &:hover {
        .node-anchor {
          display: block;
        }
      }
- 
+
      .node-anchor {
        display: none;
        position: absolute;
@@ -348,35 +343,35 @@
        @include bg-color($light-base-color, $dark-base-color);
        cursor: crosshair;
      }
- 
+
      .node-box-bg {
        user-select: none;
        pointer-events: none;
      }
- 
+
      .node-box-content {
        position: absolute;
-       left: 30%;
+       left: 25px;
        top: 0;
        bottom: 0;
-       right: 16%;
+       right: 5px;
        z-index: 0;
        overflow: hidden;
        text-overflow: ellipsis;
        white-space: nowrap;
      }
    }
- 
+
    .linker-box {
      position: absolute;
      z-index: 1;
      display: none;
    }
- 
+
    .drag-linker-box {
      cursor: crosshair;
    }
- 
+
    .right-draw {
      position: absolute;
      top: 0;
@@ -390,13 +385,13 @@
      z-index: 1100;
      color: $text-color;
      background: #fff;
- 
+
      .icon {
        width: 14px;
        height: 14px;
        cursor: pointer;
      }
- 
+
      .right-draw-title {
        padding: 0 20px;
        height: 36px;
@@ -405,7 +400,7 @@
        border-bottom: 1px solid $border-color-split;
        font-size: 12px;
        font-weight: 500;
- 
+
        .icon {
          width: 16px;
          height: 16px;
@@ -414,15 +409,15 @@
          margin-top: 6px;
        }
      }
- 
+
      .right-draw-content {
        padding: 0 20px;
      }
- 
+
      .row {
        margin: 16px 0;
        font-size: 0;
- 
+
        .row-name {
          padding-right: 20px;
          display: inline-block;
@@ -431,7 +426,7 @@
          text-align: right;
          font-size: 12px;
        }
- 
+
        .half {
          display: inline-block;
          width: 50%;
@@ -439,38 +434,38 @@
          font-size: 12px;
          text-align: center;
        }
- 
+
        .row-input {
          vertical-align: middle;
          width: 200px;
        }
- 
+
        .row-button {
          cursor: pointer;
- 
+
          &:hover {
            background: $hover-color;
          }
        }
- 
+
        textarea {
          min-height: 52px;
        }
      }
    }
- 
+
    .baseinfo {
      .row-button {
        margin-left: 100px;
      }
    }
- 
+
    .paraminfo {
      .row-button {
        margin-left: 155px;
      }
    }
- 
+
    .designer-control {
      position: absolute;
      top: 0;
@@ -478,7 +473,7 @@
      right: 14px;
      width: 36px;
      z-index: 1000;
- 
+
      .designer-control-header {
        @include bg-color(#5c5c5c, #474E5D);
        height: 8px;
@@ -488,7 +483,7 @@
        border-bottom: 1px solid #000;
        @include border-color(#5c5c5c, #474E5D);
      }
- 
+
      .designer-control-buttons {
        @include bg-color(#fff, #2A303C);
        padding: 10px 0px 10px;
@@ -498,7 +493,7 @@
        @include border-color(#d7dde4, #2A303C);
        overflow: hidden;
      }
- 
+
      .designer-control-button {
        position: relative;
        margin: 5px 5px 5px 5px;
@@ -508,7 +503,7 @@
        font-size: 18px;
        cursor: pointer;
      }
- 
+
      .designer-control-dialog {
        position: absolute;
        top: 50px;
@@ -518,13 +513,13 @@
        @include bg-color(#fff, $dark-base-color);
        border: 2px solid rgba(0, 0, 0, 0.5);
        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
- 
+
        .line-type {
          width: 100%;
          height: 40px;
          display: flex;
          justify-content: center;
- 
+
          input,
          label {
            margin: 0 3px;
@@ -532,18 +527,18 @@
            cursor: pointer;
          }
        }
- 
+
        .node-width-container {
          width: 100%;
          height: 40px;
          text-align: center;
        }
- 
+
        .operations {
          width: 100%;
          height: 40px;
          text-align: center;
- 
+
          .format,
          .cancel {
            margin-left: 5px;
@@ -553,18 +548,18 @@
            line-height: 24px;
            border: 1px solid #d7dde4;
            cursor: pointer;
- 
+
            &:hover {
              border: 1px solid black;
            }
          }
        }
      }
- 
+
      .designer-control-dialog.reset {
        top: 120px;
        height: 90px;
- 
+
        .hint {
          margin-top: 5px;
          width: 100%;
@@ -616,7 +611,7 @@
        }
      }
    }
- 
+
    .box-select-layer {
      position: absolute;
      left: 0;
@@ -634,27 +629,27 @@
      border-radius: 4px;
    }
  }
- 
+
  .designer-menu {
    position: absolute;
-   overflow: auto;
+   overflow: visible;
    padding: 6px 0;
-   background-color: #fff;
+   @include bg-color($light-base-color, $dark-workflow-bg-color);
    box-sizing: border-box;
    border-radius: 4px;
    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
    z-index: 900;
- 
+
    .designer-menu-ul {
      min-width: 100px;
- 
+
      .designer-menu-li {
        position: relative;
        padding: 0 10px;
        margin: 0;
        line-height: 25px;
        height: 25px;
-       color: $text-color;
+       @include font-color($text-color, $dark-text-color);
        font-size: 12px;
        text-align: left;
        clear: both;
@@ -662,24 +657,35 @@
        list-style: none;
        cursor: pointer;
        transition: background 0.2s ease-in-out;
- 
+
        &:hover {
-         background: $hover-color;
+         @include bg-color( $hover-color, $dark-text-desc-color);
+         .sub-menu-ul{
+           display: block;
+         }
        }
      }
    }
- 
+   .sub-menu-ul {
+    position: absolute;
+    transform: translateX(100%);
+    top: 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 0;
+    display: none;
+    @include bg-color($light-base-color, $dark-workflow-bg-color);
+   }
+
    .designer-menu-li-icon {
      display: inline-block;
      vertical-align: middle;
      height: 16px;
      width: 16px;
      margin-top: -1px;
-     color: $text-color;
+     @include font-color($text-color, $dark-text-color);
    }
-   .menu-img {
-     margin-left: 5px;
-   }
+
    .designer-menu-li-text {
      margin-left: 10px;
      vertical-align: middle;
@@ -704,7 +710,7 @@
    position: absolute;
    pointer-events: none;
  }
- 
+
  .executor-pending:after {
    border-top-color: #fff;
    border-width: 7px;
@@ -717,15 +723,10 @@
  }
  .executor-icon {
    position: absolute;
-   right: 10px;
+   right: 4px;
    top: 10px;
  }
- .executor-success {
- }
- .executor-faile {
- }
- .executor-skip {
- }
+
  .executor-loading {
    animation: loading 2s linear 0s infinite ;
  }
@@ -736,4 +737,3 @@
        transform: rotateZ(360deg);
      }
  }
- 

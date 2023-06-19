@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.utils;
 
 import com.webank.wedatasphere.dss.appconn.eventchecker.exception.UndefinedPropertyException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

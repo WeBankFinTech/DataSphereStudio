@@ -10,7 +10,7 @@
     <!-- 产品文档 -->
     <div
       class="management-platform-container-list"
-      v-if="header === '产品文档'"
+      v-if="header === this.$t('message.workspace.Documents2')"
     >
       <!-- tabs -->
 
@@ -29,7 +29,7 @@
     <!-- 组件接入 -->
     <div
       class="management-platform-container-list"
-      v-if="header === '组件接入'"
+      v-if="header === this.$t('message.workspace.ComponentAccess')"
     >
       <!-- tabs -->
 
@@ -46,7 +46,7 @@
     </div>
     <div
       class="management-platform-container-list"
-      :class="{ consoleStyle: header == '控制台' }"
+      :class="{ consoleStyle: header == this.$t('message.workspace.Console') }"
       v-else
     >
       <!-- 面包屑  管理台和组件接入模块拥有 -->

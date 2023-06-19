@@ -67,6 +67,10 @@
       "options": null
     }
   },
+  "components": {
+    "WeEditorLsp": "editorLsp/index.js",
+    "WeEditor": "editor/index.js"
+  },
   "conf": {
     "app_name": "DataSphere Studio",
     "app_logo": "dss/assets/images/dssLogo.png",
@@ -77,7 +81,11 @@
       "show": false,
       "template": "${username} ${time}",
       "timeupdate": 60000
+    },
+    "lsp_service": {
+      "sql": "${protocol}//${host}/server",
+      "py": "${protocol}//${host}/python"
     }
   },
-  "version": "1.1.1"
+  "version": "1.1.12"
 }

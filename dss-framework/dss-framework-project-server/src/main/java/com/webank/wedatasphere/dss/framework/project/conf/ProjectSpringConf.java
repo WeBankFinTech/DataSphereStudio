@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.conf;
 
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.service.impl.DSSFrameworkProjectServiceImpl;
@@ -38,5 +39,10 @@ public class ProjectSpringConf {
     @ConditionalOnMissingBean
     public DSSFrameworkProjectService createDSSFrameworkProjectServiceImpl() {
         return new DSSFrameworkProjectServiceImpl();
+    }
+
+    @Bean(name = "projectBmlService")
+    public BMLService createBmlService() {
+        return BMLService.getInstance();
     }
 }

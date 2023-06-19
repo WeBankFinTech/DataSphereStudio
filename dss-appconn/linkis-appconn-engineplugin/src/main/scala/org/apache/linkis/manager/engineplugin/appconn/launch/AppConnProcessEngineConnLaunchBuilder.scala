@@ -36,4 +36,7 @@ class AppConnProcessEngineConnLaunchBuilder extends JavaProcessEngineConnLaunchB
     super.getBmlResources
   }
 
+  override def enablePublicModule: Boolean = true
+
+
 }

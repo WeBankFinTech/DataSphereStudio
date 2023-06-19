@@ -259,7 +259,7 @@ export default {
       // 如果为true则表示为编辑状态
       if(flag) {
         // 修改成功则改变按钮状态
-        if(this.apiData.comment.length > 1024) return this.$Message.error({ content: '不能超过1024个字符！' });
+        if(this.apiData.comment.length > 1024) return this.$Message.error({ content: this.$t('message.apiServices.more1024') });
         api.fetch(`/dss/apiservice/apiCommentUpdate`, {
           id: this.apiData.id,
           comment: this.apiData.comment

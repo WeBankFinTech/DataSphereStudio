@@ -1,28 +1,26 @@
 package com.webank.wedatasphere.dss.migrate.service.impl;
 
 import com.google.common.collect.Lists;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.ResponseImportOrchestrator;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.IoUtils;
-import com.webank.wedatasphere.dss.common.utils.ZipHelper;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
-import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
-import com.webank.wedatasphere.dss.migrate.conf.MigrateConf;
 import com.webank.wedatasphere.dss.migrate.exception.MigrateErrorException;
 import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
@@ -34,6 +32,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -58,9 +57,10 @@ public class MigrateServiceImpl implements MigrateService {
     DSSFrameworkProjectService dssFrameworkProjectService;
 
     @Autowired
+    @Qualifier("projectBmlService")
     BMLService bmlService;
 
-    private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
+    private Sender orchestratorSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
 
     @Override
     public void migrate(String userName, String inputZipPath, Workspace workspace) throws Exception {
@@ -80,9 +80,9 @@ public class MigrateServiceImpl implements MigrateService {
         DSSProjectDO dssProject = metaService.readProject(inputPath);
         DSSProjectVo finalProject;
         DSSProjectDO dbProject = dssProjectService.getProjectByName(dssProject.getName());
-        if(!dssProject.getUsername().equalsIgnoreCase(userName)){
+        if (!dssProject.getUsername().equalsIgnoreCase(userName)) {
             LOG.error("fatal error, project owner is {} ，but export user is {}", dssProject.getUsername(), userName);
-            throw new MigrateErrorException(40013, "project has been exported by others,not owner "+dssProject.getUsername());
+            throw new MigrateErrorException(40013, "project has been exported by others,not owner " + dssProject.getUsername());
         }
         if (dbProject == null) {
             //判断如果没有该工程，则开始调用接口来进行工程创建
@@ -119,7 +119,7 @@ public class MigrateServiceImpl implements MigrateService {
             dssProjectService.modifyOldProject(dssProject, dbProject);
         }
         List<DSSFlow> dssFlows = metaService.readFlow(inputPath);
-        dssFlows.stream().forEach(dssFlow -> dssFlow.setProjectID(finalProject.getId()));
+        dssFlows.stream().forEach(dssFlow -> dssFlow.setProjectId(finalProject.getId()));
 
         List<DSSFlowRelation> dssFlowRelations = metaService.readFlowRelation(inputPath);
         List<DSSFlow> rootFlows = dssFlows.stream().filter(DSSFlow::getRootFlow).collect(Collectors.toList());
@@ -173,9 +173,9 @@ public class MigrateServiceImpl implements MigrateService {
             String orcZipPath = ZipHelper.zip(orcPath);
             InputStream inputStream = new FileInputStream(orcZipPath);
             try {
-                Map<String, Object> uploadMap = bmlService.upload(userName, inputStream, "default_orc.zip", finalProject.getName());
-                String resourceId = uploadMap.get("resourceId").toString();
-                String version = uploadMap.get("version").toString();
+                BmlResource bmlResource = bmlService.upload(userName, inputStream, "default_orc.zip", finalProject.getName());
+                String resourceId = bmlResource.getResourceId();
+                String version = bmlResource.getVersion();
                 //不能走release的importservice接口 因为dev标签没有import操作
                 importOrcToOrchestrator(resourceId, version, finalProject, userName, "dev", workspace, orchestratorInfo);
             } finally {
@@ -229,7 +229,8 @@ public class MigrateServiceImpl implements MigrateService {
         RequestImportOrchestrator requestImportOrchestrator =
                 new RequestImportOrchestrator(username, project.getName(),
                         project.getId(), resourceId, version, dssOrchestratorInfo.getName(), dssLabels, workspace);
-        ResponseImportOrchestrator responseImportOrchestrator = (ResponseImportOrchestrator) this.orchestratorSender.ask(requestImportOrchestrator);
+        ResponseImportOrchestrator responseImportOrchestrator = RpcAskUtils.processAskException(this.orchestratorSender.ask(requestImportOrchestrator),
+                ResponseImportOrchestrator.class, RequestImportOrchestrator.class);
         return responseImportOrchestrator.orcId();
     }
 
@@ -259,8 +260,8 @@ public class MigrateServiceImpl implements MigrateService {
     @Override
     public String queryOrcUUIDByName(Long workspaceId, Long projectId, String orcName) throws DSSErrorException {
         String uuid = null;
-        ResponseOrchestratorInfos responseOrchestratorInfos = (ResponseOrchestratorInfos) orchestratorSender
-                .ask(new RequestOrchestratorInfos(null, projectId, orcName, null));
+        ResponseOrchestratorInfos responseOrchestratorInfos = RpcAskUtils.processAskException(orchestratorSender.ask(new RequestOrchestratorInfos(null, projectId, orcName, null)),
+                ResponseOrchestratorInfos.class, RequestOrchestratorInfos.class);
         if (CollectionUtils.isNotEmpty(responseOrchestratorInfos.getOrchestratorInfos())) {
             uuid = responseOrchestratorInfos.getOrchestratorInfos().get(0).getUUID();
         }

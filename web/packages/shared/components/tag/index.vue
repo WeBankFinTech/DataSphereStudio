@@ -29,12 +29,14 @@
   </div>
 </template>
 <script>
+import i18n from '@dataspherestudio/shared/common/i18n';
+
 export default {
   props: {
     tagList: String,
     newLabel: {
       type: String,
-      default: '新增标签',
+      default: i18n.t('message.common.AddTags'),
     },
   },
   data() {

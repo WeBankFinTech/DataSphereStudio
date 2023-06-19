@@ -10,6 +10,7 @@ CREATE TABLE `dss_appconn` (
   `class_name` varchar(255) DEFAULT NULL COMMENT '需要关联的某一个AppConn标识',
   `appconn_class_path` varchar(255) DEFAULT NULL COMMENT '需要关联的某一个AppConn标识',
   `resource` varchar(255) DEFAULT NULL COMMENT 'bml的资源ID',
+  `is_micro_app` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否微应用嵌入',
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_appconn_name` (`appconn_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='dss appconn表';
@@ -20,7 +21,7 @@ CREATE TABLE `dss_appconn_instance` (
   `appconn_id` int(20) NOT NULL COMMENT 'appconn的主键',
   `label` varchar(128) NOT NULL COMMENT '实例的标签',
   `url` varchar(128) DEFAULT NULL COMMENT '访问第三方的url',
-  `enhance_json` varchar(1024) DEFAULT NULL COMMENT 'json格式的配置',
+  `enhance_json` varchar(2048) DEFAULT NULL COMMENT 'json格式的配置',
   `homepage_uri` varchar(255) DEFAULT NULL COMMENT '主页uri，非URL',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COMMENT='dss instance的实例表';
@@ -327,11 +328,12 @@ CREATE TABLE `dss_workflow` (
   `rank` int(10) DEFAULT NULL,
   `project_id` bigint(20) DEFAULT NULL,
   `has_saved` tinyint(1) DEFAULT NULL,
-  `uses` varchar(255) DEFAULT NULL,
+  `uses` varchar(500) DEFAULT NULL,
   `bml_version` varchar(255) DEFAULT NULL,
   `resource_id` varchar(255) DEFAULT NULL,
   `linked_appconn_names` varchar(255) DEFAULT NULL,
   `dss_labels` varchar(255) DEFAULT NULL,
+  `metrics` varchar(1024) NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=455 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
@@ -370,6 +372,7 @@ CREATE TABLE `dss_workflow_task` (
   `log_path` varchar(200) DEFAULT NULL COMMENT 'File path of the log files',
   `result_location` varchar(200) DEFAULT NULL COMMENT 'File path of the result',
   `status` varchar(50) DEFAULT NULL COMMENT 'Script execution status, must be one of the following: Inited, WaitForRetry, Scheduled, Running, Succeed, Failed, Cancelled, Timeout',
+  `instance_name` varchar(128) DEFAULT NULL COMMENT 'Execute task instance',
   `created_time` datetime DEFAULT NULL COMMENT 'Creation time',
   `updated_time` datetime DEFAULT NULL COMMENT 'Update time',
   `run_type` varchar(50) DEFAULT NULL COMMENT 'Further refinement of execution_application_time, e.g, specifying whether to run pySpark or SparkR',
@@ -574,6 +577,8 @@ CREATE TABLE `dss_workspace_user_role` (
   `create_time` datetime DEFAULT NULL,
   `created_by` varchar(255) DEFAULT NULL,
   `user_id` bigint(20) DEFAULT NULL,
+  `update_user` varchar(32) DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 comment '空间用户角色关系表';
 

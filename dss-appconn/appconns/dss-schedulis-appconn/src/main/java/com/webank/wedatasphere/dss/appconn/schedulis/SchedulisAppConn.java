@@ -25,6 +25,7 @@ public class SchedulisAppConn extends AbstractSchedulerAppConn {
 
     public static final String SCHEDULIS_APPCONN_NAME = "Schedulis";
 
+    @Override
     public ConversionIntegrationStandard getOrCreateConversionStandard() {
         return super.getOrCreateConversionStandard();
     }

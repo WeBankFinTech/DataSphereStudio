@@ -2,7 +2,7 @@
   <div class="we-side-bar">
     <we-navbar
       ref="navbar"
-      placeholder="支持db.table模式"
+      placeholder="db.table"
       :nav-list="navList"
       :add-title="$t('message.scripts.createdTitle')"
       @on-add="openAddTab"
@@ -36,7 +36,7 @@
           {{ $t('message.scripts.database.contextMenu.db.pasteName') }}
         </we-menu-item>
         <we-menu-item v-if="!$APP_CONF.hide_view_db_detail" @select="describeDb">
-          查看库信息
+          {{ $t('message.scripts.database.contextMenu.db.dbinfo') }}
         </we-menu-item>
         <we-menu-item class="ctx-divider"/>
         <we-menu-item @select="reflesh">
@@ -570,7 +570,7 @@ export default {
       util.executeCopy(this.currentAcitved.fullColumn);
     },
     openDeleteDialog() {
-      const type = this.currentAcitved.isView ? '视图' : '表';
+      const type = this.currentAcitved.isView ? this.$t('message.scripts.view') : this.$t('message.scripts.table');
       this.$refs.deleteDialog.open({
         type,
         name: this.currentAcitved.name,
@@ -796,7 +796,7 @@ export default {
         pathType: two.type,
         hasHeader: one.isHasHeader,
         isCsv: one.exportType === 'csv',
-        isOverwrite: one.isOverwrite !== '追加',
+        isOverwrite: one.isOverwrite !== this.$t('message.scripts.append'),
         fieldDelimiter: separator,
         sheetName: two.sheetName || one.tbName,
         encoding: one.exportType === 'csv' ? one.chartset : '',
@@ -808,7 +808,7 @@ export default {
         delete destination.isOverwrite;
         delete destination.fieldDelimiter;
       }
-      const tabName = `export__${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
+      const tabName = `export__${this.currentAcitved.dbName}.${this.currentAcitved.name}_${Date.now()}`;
       const code = `val destination = """${JSON.stringify(destination)}"""\nval dataInfo = """${JSON.stringify(dataInfo)}"""\norg.apache.linkis.engineplugin.spark.imexport.ExportData.exportData(spark,dataInfo,destination)`;
       const md5Path = util.md5(tabName);
       this.dispatch('Workbench:add', {

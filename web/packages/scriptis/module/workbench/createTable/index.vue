@@ -8,18 +8,18 @@
       @next-step="nextStep"
       @get-tables="getTables"
       :loading="loading"
-      v-if="current === 1"/>
+      v-show="current === 1"/>
     <second-step
+      v-show="current === 2"
       ref="secondStep"
       :db-list="dbList"
       :loading="loading"
       :attr-info="attrInfo"
-      v-if="current === 2"
       @get-fields="getFields"
       @get-tables="getTables"/>
     <div
       class="create-table-view-button-group"
-      v-if="current===2">
+      v-show="current===2">
       <Button
         @click="prev">{{$t('message.scripts.createTable.FHSYB')}}</Button>
       <Button
@@ -394,9 +394,21 @@ export default {
     getValidate() {
       return new Promise((resolve) => {
         if (this.attrInfo.source.source === 'new') {
-          this.$refs.secondStep.$refs.createTable.$refs.fieldsForm.validate((valid) => {
+          const tablerefs = this.$refs.secondStep.$refs.createTable
+          tablerefs.$refs.fieldsForm.validate((valid) => {
             if (valid) {
-              resolve();
+              const dupNames= {}
+              tablerefs.target.newFieldsData.fields.forEach(it => {
+                if (it.name) {
+                  dupNames[it.name] = dupNames[it.name] ? dupNames[it.name] + 1 : 1
+                }
+              })
+              const dupfield = Object.keys(dupNames).filter(it => dupNames[it] > 1)
+              if (dupfield.length) {
+                this.$Message.warning(this.$t('message.scripts.createTable.dupfields', {fields: dupfield.join('<br>')}));
+              } else {
+                resolve();
+              }
             } else {
               this.$Message.warning(this.$t('message.scripts.failedNotice'));
             }

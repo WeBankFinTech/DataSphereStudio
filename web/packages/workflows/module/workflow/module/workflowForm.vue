@@ -152,7 +152,7 @@ export default {
       return {
         orchestratorName: [
           { required: true, message: this.$t('message.workflow.enterName'), trigger: 'blur' },
-          { message: `${this.$t('message.workflow.nameLength')}150`, max: 150 },
+          { message: `${this.$t('message.workflow.nameLength')}128`, max: 128 },
           { type: 'string', pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: this.$t('message.workflow.validNameDesc'), trigger: 'blur' },
         ],
         description: [
@@ -213,8 +213,13 @@ export default {
       this.$refs.projectForm.validate((valid) => {
         if (valid) {
           this.submiting = true;
-          this.$emit('confirm', this.modeValueTypeChange(this.workflowDataCurrent));
-          this.ProjectShow = false;
+          this.$emit('confirm', {
+            data: this.modeValueTypeChange(this.workflowDataCurrent),
+            cb: (close) => {
+              this.submiting = false;
+              if (close) this.ProjectShow = false;
+            }
+          });
         } else {
           this.$Message.warning(this.$t('message.workflow.failedNotice'));
         }

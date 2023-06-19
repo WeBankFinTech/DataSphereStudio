@@ -22,8 +22,6 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.Sidebar;
 import com.webank.wedatasphere.dss.framework.workspace.bean.SidebarContent;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SidebarContentVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.SidebarVO;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceInfoMapper;
-import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceRoleMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.SidebarContentMapper;
 import com.webank.wedatasphere.dss.framework.workspace.dao.SidebarMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSSideInfoService;
@@ -50,8 +48,6 @@ public class DSSSideInfoServiceImpl implements DSSSideInfoService {
     private SidebarMapper sidebarMapper;
     @Autowired
     private SidebarContentMapper sidebarContentMapper;
-    @Autowired
-    private DSSWorkspaceInfoMapper dssWorkspaceInfoMapper;
     @Autowired
     private DSSWorkspaceService workspaceService;
 

@@ -40,10 +40,10 @@ class Node extends Basic {
      */
   async getNodeCache({nodeId, key}) {
     let caches = await this.get(nodeId);
-    if (key) {
+    if (key && caches[0]) {
       return caches[0][key];
     }
-    return caches[0];
+    return caches && caches[0];
   }
 
   /**

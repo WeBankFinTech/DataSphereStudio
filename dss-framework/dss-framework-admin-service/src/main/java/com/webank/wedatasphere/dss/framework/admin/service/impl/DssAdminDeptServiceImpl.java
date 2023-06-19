@@ -1,13 +1,13 @@
 package com.webank.wedatasphere.dss.framework.admin.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.framework.admin.common.constant.UserConstants;
-import com.webank.wedatasphere.dss.framework.admin.common.exception.AdminException;
 import com.webank.wedatasphere.dss.framework.admin.common.utils.StringUtils;
+import com.webank.wedatasphere.dss.framework.admin.exception.DSSAdminWarnException;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminDept;
-import com.webank.wedatasphere.dss.framework.admin.xml.DssAdminDeptMapper;
 import com.webank.wedatasphere.dss.framework.admin.pojo.entity.TreeSelect;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminDeptService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.webank.wedatasphere.dss.framework.admin.xml.DssAdminDeptMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -48,7 +48,7 @@ public class DssAdminDeptServiceImpl extends ServiceImpl<DssAdminDeptMapper, Dss
         DssAdminDept info = dssAdminDeptMapper.selectDeptById(dept.getParentId());
         // 如果父节点不为正常状态,则不允许新增子节点
         if (!UserConstants.DEPT_NORMAL.equals(info.getStatus())) {
-            throw new AdminException("部门停用，不允许新增");
+            throw new DSSAdminWarnException("部门停用，不允许新增");
         }
         dept.setAncestors(info.getAncestors() + "," + dept.getParentId());
         return dssAdminDeptMapper.insertDept(dept);

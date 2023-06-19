@@ -54,7 +54,7 @@ public class CommonAppConnLoader implements AppConnLoader {
         }
         LOGGER.info("The libPath url of AppConn {} is {}.", appConnName, libPathUrl);
         List<URL> jars = AppConnUtils.getJarsUrlsOfPath(libPathUrl);
-        ClassLoader classLoader = AppStandardClassUtils.getClassLoader(appConnName, () -> new AppConnClassLoader(jars.toArray(new URL[1]), currentClassLoader));
+        ClassLoader classLoader = AppStandardClassUtils.refreshClassloader(appConnName, () -> new AppConnClassLoader(jars.toArray(new URL[1]), currentClassLoader));
         Thread.currentThread().setContextClassLoader(classLoader);
         String fullClassName;
         if (StringUtils.isEmpty(spi)) {

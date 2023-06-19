@@ -15,6 +15,9 @@
     /*scripts模块desc自定义，color继承*/
     color: $dark-text-color;
   }
+  div.ivu-notice-notice-err {
+    background: #373f50;
+  }
   .ivu-notice-title {
     color: $dark-workspace-title-color;
   }
@@ -72,6 +75,9 @@
     .ivu-select-dropdown-list {
       background-color: $dark-workspace-background;
     }
+  }
+  .ivu-select-item-focus {
+    background: $dark-active-menu-item
   }
   .ivu-select-input {
     color: $dark-text-color;
@@ -468,8 +474,8 @@
   .progress-label {
     color: $dark-text-color !important;
   }
-  .designer .node-selected {
-    background: #DEE8F4;
+  .designer div.node-selected {
+    background: rgba(222, 232, 244, 0.62);
     box-shadow: 1px 4px 6px 1px rgba(106, 141, 185, 0.65);
     border-radius: 4px;
   }
@@ -542,10 +548,16 @@
     border-color: $dark-border-color-base;
   }
 
- .executor-pending:after {
+  .executor-pending:after {
     border-top-color: $dark-border-color-base;
   }
   .executor-pending:before {
     border-top-color: $dark-border-color-base;
+  }
+  .g-err-msg-div {
+    color: rgba(255, 255, 255, 0.85)
+  }
+  .scriptis_usage_guide .steps {
+    color: #333;
   }
 }

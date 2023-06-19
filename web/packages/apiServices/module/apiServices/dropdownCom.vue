@@ -8,14 +8,15 @@
   </Dropdown>
 </template>
 <script>
+import i18n from '@dataspherestudio/shared/common/i18n';
 export default {
   props: {
     dropdownList: {
       type: Array,
       default: () => {
         return [
-          {id: 1, title: '管理'},
-          {id: 2, title: '禁用/启用'},
+          {id: 1, title: i18n.t('message.apiServices.manage')},
+          {id: 2, title: i18n.t('message.apiServices.disableenable')},
           // {id: 3, title: '更新'},
         ]
       }

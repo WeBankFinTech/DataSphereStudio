@@ -11,7 +11,7 @@
     </template>
     <div class="library-search-empty" v-else>
       <SvgIcon icon-class="empty" width="160px" height="160px" />
-      <div class="empty-tips">没有找到您期望的内容</div>
+      <div class="empty-tips">{{ $t('message.common.dss.notfound') }}</div>
     </div>
   </div>
 </template>

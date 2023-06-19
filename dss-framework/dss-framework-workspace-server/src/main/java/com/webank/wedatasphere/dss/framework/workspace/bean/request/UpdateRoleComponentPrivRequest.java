@@ -33,4 +33,13 @@ public class UpdateRoleComponentPrivRequest implements Serializable {
     public void setComponentPrivs(Map<String, Boolean> componentPrivs) {
         this.componentPrivs = componentPrivs;
     }
+
+    @Override
+    public String toString() {
+        return "UpdateRoleComponentPrivRequest{" +
+                "componentId=" + componentId +
+                ", workspaceId=" + workspaceId +
+                ", componentPrivs=" + componentPrivs +
+                '}';
+    }
 }

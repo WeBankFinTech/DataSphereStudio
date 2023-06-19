@@ -17,7 +17,6 @@
 
 import { weMenu, weMenuItem, weSubMenu } from './menu';
 import weNavbar from './navbar';
-import weEditor from './editor';
 import weTree from './tree';
 import { wePanel, wePanelItem } from './panel';
 
@@ -26,7 +25,6 @@ const components = {
   weMenuItem,
   weSubMenu,
   weNavbar,
-  weEditor,
   weTree,
   wePanel,
   wePanelItem,

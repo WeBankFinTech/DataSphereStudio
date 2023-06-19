@@ -11,11 +11,11 @@
         :key="index"
         style="height:100%;">
         <basic
-          v-if="item === '库基本信息'"
+          v-if="item === $t('message.scripts.dbinfs')"
           :db-info="dbData.baseInfo"
           :en-env="isEnEnv"></basic>
         <tableList
-          v-if="item === '库表信息'"
+          v-if="item === $t('message.scripts.tableifs')"
           ref="tableList"
           :db-name="work.data.name"
           @table-listChange="tableListChange"
@@ -28,7 +28,7 @@
       class="current-spin"
       fix>
       <Icon type="ios-loading" size="18" class="spin-icon-load"></Icon>
-      <div>数据加载中，请耐心等候</div>
+      <div>{{ $t('message.scripts.loadingwait') }}</div>
     </Spin>
   </div>
 </template>
@@ -54,7 +54,7 @@ export default {
   },
   data() {
     return {
-      tabList: ['库基本信息', '库表信息'],
+      tabList: [this.$t('message.scripts.dbinfs'), this.$t('message.scripts.tableifs')],
       dbData: {
         baseInfo: {},
         tablesList: []
@@ -67,7 +67,6 @@ export default {
   },
   methods: {
     getDatalist(id) {
-      console.log(id, this.work)
       // 没有数据才请求
       if (id === 0 && Object.keys(this.dbData.baseInfo).length <= 0) {
         const params = {
@@ -84,7 +83,6 @@ export default {
     getDbBaseInfo(params = {}) {
       this.loading = true;
       api.fetch('/dss/datapipe/datasource/getSchemaBaseInfo', params, 'get').then((rst) => {
-        console.log(rst, 'rst')
         this.dbData.baseInfo = rst.schemaInfo || {};
         this.loading = false;
       }).catch(() => {
@@ -107,7 +105,6 @@ export default {
     @include bg-color($table-thead-bg, $dark-base-color);
     padding: 16px 10px 10px 16px;
     .table-detail-tabs {
-        height: 100%;
         .ivu-tabs-bar {
             margin-bottom: 10px;
         }

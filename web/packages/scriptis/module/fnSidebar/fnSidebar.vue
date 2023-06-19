@@ -156,7 +156,7 @@ export default {
       treeLoading: false,
       filterNode: () => {},
       newDialog: {
-        type: '文件夹',
+        type: this.$t('message.scripts.folder'),
         isNew: true,
         node: {},
       },
@@ -642,10 +642,13 @@ export default {
       return new Promise((resolve) => {
         if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.data'));
         let id = this.currentNode.data && this.currentNode.data.id;
-        let parent = this.currentNode.parent
+        let parent
         // 编辑或删除时要去刷新上一级目录
         if (this.currentNode.isLeaf || type === 'edit' || type === 'delete') {
+          parent = this.currentNode.parent
           id = this.currentNode.parent.data.id;
+        } else {
+          parent = this.currentNode
         }
         if (type === 'new') {
           parent = this.currentNode
@@ -655,7 +658,7 @@ export default {
           this.treeLoading = true;
           this.compLoading = true;
           api.fetch('/udf/list', {
-            type: parent.type || parent.data.type,
+            type: parent.type || parent.data.type ||  this.currentNode.data.type,
             treeId: id,
             category: this.FNTYPE,
           }).then((rst) => {

@@ -128,7 +128,7 @@ export default {
         const name = this.work.filepath || this.work.filename;
         this.$Notice.close(name);
         this.$Notice.info({
-          title: '运行提示',
+          title: this.$t('message.scripts.running'),
           desc: '',
           render: (h) => {
             return h('span', {
@@ -319,7 +319,7 @@ export default {
         const name = this.work.filepath || this.work.filename;
         this.$Notice.close(name);
         this.$Notice.success({
-          title: '执行结果提示',
+          title: this.$t('message.scripts.resultpropt'),
           desc: '',
           render: (h) => {
             return h('span', {
@@ -345,7 +345,7 @@ export default {
         const label = autoJoin ? `脚本${this.work.filename} ${msg}` : msg;
         this.$Notice.close(name);
         this.$Notice[type]({
-          title: '执行结果提示',
+          title: this.$t('message.scripts.resultpropt'),
           name,
           desc: '',
           duration: 5,

@@ -16,8 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.receiver
 
-import java.util
-
+import com.webank.wedatasphere.dss.common.entity.BmlResource
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
@@ -56,15 +55,18 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       workflowManager.deleteWorkflow(reqDeleteFlow.userName, reqDeleteFlow.flowID)
       new ResponseDeleteWorkflow(JobStatus.Success)
 
+    case reqUnlockWorkflow: RequestUnlockWorkflow =>
+      workflowManager.unlockWorkflow(reqUnlockWorkflow.getUsername, reqUnlockWorkflow.getFlowId, reqUnlockWorkflow.getConfirmDelete)
+
     case reqExportFlow: RequestExportWorkflow =>
-      val dssExportFlowResource: util.Map[String, AnyRef] = workflowManager.exportWorkflow(
+      val dssExportFlowResource: BmlResource = workflowManager.exportWorkflow(
         reqExportFlow.userName,
         reqExportFlow.flowID,
         reqExportFlow.projectId,
         reqExportFlow.projectName,
         DSSCommonUtils.COMMON_GSON.fromJson(reqExportFlow.workspaceStr, classOf[Workspace]),
         reqExportFlow.dssLabelList)
-      ResponseExportWorkflow(dssExportFlowResource.get("resourceId").toString, dssExportFlowResource.get("version").toString,
+      ResponseExportWorkflow(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
         reqExportFlow.flowID)
 
     case requestImportWorkflow: RequestImportWorkflow =>
@@ -91,7 +93,10 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
         requestCopyWorkflow.getContextIdStr,
         requestCopyWorkflow.getOrcVersion,
         requestCopyWorkflow.getDescription,
-        requestCopyWorkflow.getDssLabels)
+        requestCopyWorkflow.getDssLabels,
+        requestCopyWorkflow.getNodeSuffix,
+        requestCopyWorkflow.getNewFlowName,
+        requestCopyWorkflow.getTargetProjectId)
       new ResponseCopyWorkflow(copyFlow)
 
     case requestQueryWorkFlow: RequestQueryWorkFlow =>
@@ -101,6 +106,8 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
 
     case requestConvertOrchestrator: RequestConvertOrchestrations =>
       workflowManager.convertWorkflow(requestConvertOrchestrator)
+    case requestWorkflowIdList : RequestSubFlowContextIds =>
+      workflowManager.getSubFlowContextIdsByFlowIds(requestWorkflowIdList)
 
     case _ => throw new DSSErrorException(90000, "Not support protocol " + message)
   }

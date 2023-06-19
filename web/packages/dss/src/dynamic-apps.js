@@ -45,7 +45,6 @@ if (apps.appsI18n) {
     merge(i18nConfig, item)
   });
 }
-
 export {
   subRoutes,
   i18nConfig,

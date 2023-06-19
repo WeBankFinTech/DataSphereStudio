@@ -23,6 +23,5 @@ export default {
   component: {
     iframe: () => import('./iframe/index.vue'),
     publish: () => import('./projectPublishForm.vue'),
-    workflowContentItem: () => import('./workflowContentItem')
   },
 };

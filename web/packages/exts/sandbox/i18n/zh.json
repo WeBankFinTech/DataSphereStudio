@@ -1,0 +1,90 @@
+{
+  "message": {
+    "workspace": {
+      "topNotice": {
+        "title": "温馨提示",
+        "content": "沙箱环境属于开放体验环境，已部署WeDataSphere开源新版组件全部内容，但受安全限制仅开放指定DEMO的运行功能，且不能增改数据，敬请爱护使用。"
+      }
+    },
+    "register": {
+      "codeInfo": "扫码或邮件获取邀请码，详见右边介绍",
+      "invitationJoin": {
+        "welcome": "欢迎扫码加入",
+        "community": "DataSphere Studio社区群了解最新动态",
+        "join": "请加入DataShpere Studio社区用户群，",
+        "contact": "联系团队成员获取邀请码，扫码添加加群机器人",
+        "send": "或发送邮件",
+        "tag": "邮件注明公司、职位及数量，如果申请的邀请码数量",
+        "thank": "超过5个请备注原因。DataSphere Studio团队感谢您的参与！"
+      },
+      "inviation": "",
+      "remarks": "备注",
+      "registerTitle": "DataSphere Studio 试用申请",
+      "invit": "邀请码",
+      "invitation": "请输入您的邀请码",
+      "org": "组织",
+      "organization": "请输入您的组织名",
+      "nam": "姓名",
+      "name": "请输入您的姓名",
+      "pho": "手机",
+      "phone": "请填写联系人手机号码",
+      "ver": "验证码",
+      "veriCode": "请输入验证码",
+      "contact": "联系方式",
+      "contactType": "邮箱或者微信号",
+      "discover": {
+        "how": "如何发现DSS的",
+        "GitHub": "GitHub",
+        "OsChina": "OsChina/Gitee",
+        "search": "搜索引擎",
+        "csdn": "CSDN",
+        "meeting": "相关活动吸引",
+        "decomend": "朋友推荐"
+      },
+      "des": "需求描述",
+      "desc": "请输入您的业务需求，最大长度为160个字符",
+      "agree": {
+        "agr": "同意并遵守",
+        "service": "《服务条款》",
+        "and": "和",
+        "privacy": "《隐私条款》"
+      },
+      "application": "立即申请",
+      "errTip": {
+        "org": "最大长度为120个字符",
+        "phone": "请输入正确的手机号",
+        "discovery": "请选择您是如何发现DSS的",
+        "desc": "最大长度为160个字符",
+        "contact": "请输入您的联系方式",
+        "code": "请输入正确的验证码",
+        "vericode": "请输入验证码",
+        "trim": "输入的内容不能有空格",
+        "invitation": "邀请码格式不正确",
+        "format": "输入的格式有误，请重新输入"
+      },
+      "tips": "提示",
+      "success": "注册成功!",
+      "pass": "您的密码是：",
+      "pa": "手机号后六位",
+      "userNameTitle": "您的用户名是：",
+      "userName": "手机号",
+      "error": "注册失败，请重新注册",
+      "watch": {
+        "welcome": "关于我们的其他开源项目：",
+        "note": "关注",
+        "and": "和",
+        "star": "STAR",
+        "project": "以下已开源项目: ",
+        "data": "DataSphereStudio——一站式数据应用开发管理门户",
+        "links": "Linkis——多引擎计算中间件",
+        "qualitis": "Qualitis——异构数据源数据质量管理平台",
+        "Script": "Scriptis——数据开发探索IDE工具",
+        "Visualis": "Visualis——数据可视化BI工具",
+        "Streamis": "Streamis一站式流式应用开发管理系统",
+        "Schedulis": "Schedulis——工作流任务调度系统",
+        "Prophecis": "Prophecis——一站式机器学习平台",
+        "Exchangis": "Exchangis——数据交换平台"
+      }
+    }
+  }
+}

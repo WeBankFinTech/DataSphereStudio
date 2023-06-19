@@ -102,7 +102,8 @@ public class WorkflowImpl implements Workflow {
 
     public void setFlowProperties(List<Map<String, Object>> flowProperties) {
         try{
-            if(CollectionUtils.isNotEmpty(flowProperties)){
+            //1.1.11版本的前端修复了updateUser为空的bug，这里user.to.proxy只是为了兼容bug修复前的老工作流。
+            if(this.getUpdateUser()==null&&CollectionUtils.isNotEmpty(flowProperties)){
                 flowProperties.forEach(a->{
                     String key = "user.to.proxy";
                     if(a.containsKey(key)){

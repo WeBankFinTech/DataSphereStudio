@@ -25,6 +25,7 @@ import org.apache.linkis.common.utils.Logging
 abstract class OriginSSOPluginFilter extends SSOPluginFilter with Logging{
 
   private val factory = new OriginSSOIntegrationStandardFactory
+  factory.init()
 
   override def info(str: String): Unit = logger.info(str)
 

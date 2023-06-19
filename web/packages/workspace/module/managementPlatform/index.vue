@@ -28,13 +28,13 @@
         <span class="management-platform-sidebar-tree-header">
           {{ defaultMenu.title }}
         </span>
-        <guide-menu v-if="defaultMenu.title == '产品文档'" />
-        <library-menu v-else-if="defaultMenu.title == '知识库'" />
+        <guide-menu v-if="defaultMenu.title == $t('message.workspace.Documents2')" />
+        <library-menu v-else-if="defaultMenu.title == $t('message.workspace.Knowledge')" />
         <Tree
           v-else
           class="management-platform-sidebar-tree-container"
           :nodes="defaultMenu.nodes"
-          :currentTreeId="this.currentTreeId"
+          :currentTreeId="currentTreeId"
           @on-item-click="handleTreeClick"
           @on-add-click="handleTreeComponent"
         />
@@ -63,6 +63,7 @@ import lubanTree from '@dataspherestudio/shared/components/lubanTree';
 import TabList from "./component/tabList/index.vue";
 import GuideMenu from "./component/guide/menu.vue";
 import LibraryMenu from "./component/library/menu.vue";
+import i18n from '@dataspherestudio/shared/common/i18n';
 import {
   GetMenu,
   QueryAllData,
@@ -72,17 +73,17 @@ import {
 import { formatComponentDataForPost } from "./util/fomat";
 const menu = [
   {
-    title: "部门和用户管理",
+    title: i18n.t('message.workspace.DepAndUser'),
     icon: "departUser",
     nodes: [
       {
-        name: "部门管理",
+        name: i18n.t('message.workspace.Department'),
         type: "permissions",
         id: 1024,
         pathName: "departManagement",
       },
       {
-        name: "用户管理",
+        name: i18n.t('message.workspace.UserManage'),
         type: "permissions",
         id: 1023,
         pathName: "personManagement",
@@ -90,24 +91,24 @@ const menu = [
     ],
   },
   // {
-  //   title: "组件接入",
+  //   title: i18n.t('message.workspace.ComponentAccess'),
   //   icon: "componentImport",
   //   nodes: [],
   // },
   {
-    title: "产品文档",
+    title: i18n.t('message.workspace.Documents2'),
     icon: "guide",
     nodes: [],
   },
   {
-    title: "知识库",
+    title: i18n.t('message.workspace.Knowledge'),
     icon: "question",
     nodes: [],
   }
 ];
 const tempComponent = {
   onestopMenuId: 1,
-  titleCn: "新增组件",
+  titleCn: i18n.t('message.workspace.AddComp'),
   titleEn: "",
   url: "",
   homepageUrl: "",
@@ -118,7 +119,7 @@ const tempComponent = {
   descCn: "",
   descEn: "",
   // access_button_en: 'not null',
-  // access_button_cn: '不能为空'
+  // access_button_cn: this.$t('message.workspace.Cannotempty')
 };
 export default {
   components: {
@@ -136,7 +137,7 @@ export default {
       lastPathName: "",
       defaultMenu: menu[0],
       header: menu[0].title || "",
-      currentHeader: "部门和用户管理",
+      currentHeader: this.$t('message.workspace.DepAndUser'),
       breadcrumbName: "",
 
       tabList: [],
@@ -168,11 +169,11 @@ export default {
       } else {
         this.defaultMenu = this.menu.find((item) => item.title === title);
         this.sidebarFold = false;
-        if (this.defaultMenu.title == "产品文档") {
+        if (this.defaultMenu.title == this.$t('message.workspace.Documents2')) {
           this.$router.push("guide");
-        } else if (this.defaultMenu.title == "知识库") {
+        } else if (this.defaultMenu.title == this.$t('message.workspace.Knowledge')) {
           this.$router.push("library");
-        } else if (this.defaultMenu.title == "组件接入") {
+        } else if (this.defaultMenu.title == this.$t('message.workspace.ComponentAccess')) {
           this.$router.push("accessComponents");
         }
       }
@@ -219,13 +220,13 @@ export default {
         this.current = componentData;
         this.tabList.push(componentData);
         this.addedFlag = true;
-        this.header = "组件接入";
+        this.header = this.$t('message.workspace.ComponentAccess');
         return this.$router.push({ name: "accessComponents" });
       } else {
         const component_data = this.tabList.filter((tab) => tab.isAdded)[0];
         component_data.onestopMenuId = node.id;
         this.current = JSON.parse(JSON.stringify(component_data));
-        this.header = "组件接入";
+        this.header = this.$t('message.workspace.ComponentAccess');
       }
     },
 
@@ -299,10 +300,10 @@ export default {
         console.log(updateData)
         UpdateDataFromId(componentItem.id, updateData)
           .then(() => {
-            _this.$Message.success("更新成功");
+            _this.$Message.success(this.$t('message.workspace.UpdateSucc'));
           })
           .catch(() => {
-            _this.$Message.fail("更新失败");
+            _this.$Message.fail(this.$t('message.workspace.Update'));
           });
       }
       //新增
@@ -310,10 +311,10 @@ export default {
         const postData = formatComponentDataForPost(componentItem);
         CreateData(postData)
           .then(() => {
-            _this.$Message.success("新增成功");
+            _this.$Message.success(this.$t('message.workspace.AddSucc'));
           })
           .catch(() => {
-            _this.$Message.fail("新增失败");
+            _this.$Message.fail(this.$t('message.workspace.AddFail'));
           });
       }
     },

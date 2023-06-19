@@ -151,8 +151,14 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     public List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest) {
         //根据dss_project、dss_project_user查询出所在空间登录用户相关的工程
         List<QueryProjectVo> list;
+        //判断工作空间是否设置了管理员能否查看该工作空间下所有项目的权限
+        Integer workspaceAdminPermission = projectUserMapper.getWorkspaceAdminPermission(projectRequest.getWorkspaceId());
         if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())) {
-            list = projectMapper.getListForAdmin(projectRequest);
+            if (workspaceAdminPermission == 1){
+                list = projectMapper.getListForAdmin(projectRequest);
+            } else {
+                list = projectMapper.getListByParam(projectRequest);
+            }
         } else {
             list = projectMapper.getListByParam(projectRequest);
         }
@@ -161,11 +167,12 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         }
 
         List<ProjectResponse> projectResponseList = new ArrayList<>();
+        ProjectResponse projectResponse;
         for (QueryProjectVo projectVo : list) {
             if (projectVo.getVisible() == 0) {
                 continue;
             }
-            ProjectResponse projectResponse = new ProjectResponse();
+            projectResponse = new ProjectResponse();
             projectResponse.setApplicationArea(projectVo.getApplicationArea());
             projectResponse.setId(projectVo.getId());
             projectResponse.setBusiness(projectVo.getBusiness());
@@ -254,8 +261,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     @Override
-    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace) throws Exception  {
-        DSSProjectDO dssProjectDO = projectMapper.selectById(projectDeleteRequest.getId());
+    public void deleteProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) throws Exception  {
         if (dssProjectDO == null) {
             throw new DSSErrorException(600001, "工程不存在!");
         }

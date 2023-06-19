@@ -20,10 +20,14 @@
  */
 import util from '@dataspherestudio/shared/common/util';
 import axios from 'axios';
-import { Message, Notice } from 'iview';
+import {
+  Message,
+  Notice
+} from 'iview';
 import cache from './apiCache';
 import qs from './querystring'
 import storage from "./storage"
+import i18n from '../i18n'
 
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
@@ -35,7 +39,7 @@ let removePending = (config) => {
     // 如果存在则执行取消操作
     if (pending[p].u === config.url + '&' + config.method + '&' + params) {
       // pending[p].f();// 执行取消操作
-      pending.splice(p, 1);// 移除记录
+      pending.splice(p, 1); // 移除记录
     }
   }
 };
@@ -53,34 +57,40 @@ const instance = axios.create({
   baseURL: process.env.VUE_APP_MN_CONFIG_PREFIX || `${location.protocol}//${window.location.host}/api/rest_j/v1/`,
   timeout: 600000,
   withCredentials: true,
-  headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+  headers: {
+    'Content-Type': 'application/json;charset=UTF-8'
+  },
 });
 
 instance.interceptors.request.use((config) => {
   // 增加国际化参数
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
-  config.metadata = { startTime: Date.now() }
+  config.metadata = {
+    startTime: Date.now()
+  }
   if (/\/application\//.test(config.url)) {
-    config.url = `${location.protocol}//${window.location.host}` + config.url
+    config.url = `http://${window.location.host}` + config.url
   }
 
   // 增加token
   if (/dolphinscheduler/.test(config.url)) {
     config.headers['token'] = api.getToken()
-    config.url = `${location.protocol}//${window.location.host}/` + config.url
-    if (config.useForm) {
-      let formData = new FormData()
-      Object.keys(config.data).forEach(key => {
-        formData.append(key, config.data[key])
-      })
-      config.data = formData
-    }
-    // fallback application/json to application/x-www-form-urlencoded
-    if (config.useFormQuery) {
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-      config.data = qs(config.data)
-    }
+    config.url = `http://${window.location.host}/` + config.url
   }
+
+  if (config.useForm) {
+    let formData = new FormData()
+    Object.keys(config.data).forEach(key => {
+      formData.append(key, config.data[key])
+    })
+    config.data = formData
+  }
+  // fallback application/json to application/x-www-form-urlencoded
+  if (config.useFormQuery) {
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+    config.data = qs(config.data)
+  }
+
   let flag = cutReq(config);
   // 当上一次相同请求未完成时，无法进行第二次相同请求
   if (flag === true) {
@@ -118,7 +128,7 @@ instance.interceptors.response.use((response) => {
   if ((error.message && error.message.indexOf('timeout') >= 0) || (error.request && error.request.status !== 200)) {
     for (let p in pending) {
       if (pending[p].u === cancelConfig.url + '&' + cancelConfig.method + '&' + JSON.stringify(cancelConfig.params)) {
-        pending.splice(p, 1);// 移除记录
+        pending.splice(p, 1); // 移除记录
       }
     }
     // 优先返回后台返回的错误信息，其次是接口返回
@@ -179,10 +189,10 @@ const getData = function (data) {
   });
   return res;
 };
-const API_ERR_MSG = '后台接口异常，请联系开发处理！'
+const API_ERR_MSG = 'API_ERR_MSG'
 const success = function (response) {
   if (util.isNull(api.constructionOfResponse.codePath) || util.isNull(api.constructionOfResponse.successCode) ||
-      util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
+    util.isNull(api.constructionOfResponse.messagePath) || util.isNull(api.constructionOfResponse.resultPath)) {
     console.error('【FEX】Api配置错误: 请调用setConstructionOfResponse来设置API的响应结构');
     return;
   }
@@ -193,7 +203,12 @@ const success = function (response) {
       throw new Error('token失效，请重新进入之前页面!');
     }
     if (util.isString(response.data) && response.data) {
-      data = JSON.parse(response.data);
+      try {
+        data = JSON.parse(response.data);
+      } catch (e) {
+        console.log(e, response.data)
+        throw new Error(API_ERR_MSG);
+      }
     } else if (util.isObject(response.data)) {
       // 兼容ds blob流下载
       if (response.status === 200 && !response.data.data && !response.data.msg && response.data.code != api.constructionOfResponse.successCode) {
@@ -268,7 +283,12 @@ const fail = function (error) {
     if (response && response.data) {
       let data;
       if (util.isString(response.data) && response.data) {
-        data = JSON.parse(response.data);
+        try {
+          data = JSON.parse(response.data);
+        } catch (e) {
+          //
+        }
+
       } else if (util.isObject(response.data)) {
         data = response.data;
       }
@@ -332,7 +352,105 @@ const param = function (url, data, option) {
 
 let showApiErrorTips = true
 let lastMsg = ''
-let isHoverNotice = false
+const showErrMsg = function (error) {
+  let msg = error.message || error.msg
+  if (lastMsg !== msg && msg) {
+    lastMsg = msg
+  } else {
+    return
+  }
+  if (msg === API_ERR_MSG) {
+    msg = i18n.t('message.common.apierrmsg')
+  }
+  let isHoverNotice = {}
+  const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
+  if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
+    const noticeName = 'err_' + Date.now()
+    isHoverNotice[noticeName] = false
+    Notice.error({
+      name: noticeName,
+      duration: 6,
+      closable: true,
+      title: i18n.t('message.common.errTitle'), //isEn ? 'Error' : '错误提示',
+      render: (h) => {
+        return h('div', {
+          class: 'g-err-msg-div',
+          attrs: {
+            'data-erritem': noticeName
+          }
+        }, [
+          h('div', {
+            style: {
+              'word-break': 'break-all',
+              'margin-bottom': '10px',
+              'text-align': 'left',
+              'line-height': '18px'
+            }
+          }, msg),
+          h('button', {
+            class: 'ivu-btn ivu-btn-default ivu-btn-small',
+            style: {
+              background: '#ec6565',
+              color: '#fff',
+              display: error.solution !== undefined ? 'inline-block' : 'none'
+            },
+            on: {
+              click: () => {
+                if (error.solution && error.solution.solutionUrl) {
+                  window.open(error.solution.solutionUrl, '_blank')
+                } else if (error.response) {
+                  // 上报
+                  let requestBody = error.response.config.data
+                  try {
+                    requestBody = typeof error.response.config.data === 'string' ? JSON.parse(error.response.config.data) : error.response.config.data
+                  } catch (e) {
+                    //
+                  }
+                  action('/dss/guide/solution/reportProblem', {
+                    requestUrl: error.response.config.url,
+                    queryParams: error.response.config.params,
+                    requestBody,
+                    requestHeaders: {
+                      Cookie: document.cookie,
+                      ...error.response.config.headers
+                    },
+                    responseBody: error.response.data
+                  }).then(() => {
+                    Message.success(i18n.t('message.common.errsubmited'))
+                  })
+                }
+                Notice.close(noticeName)
+              }
+            }
+          }, error.solution && error.solution.solutionUrl ? i18n.t('message.common.errsolution') : i18n.t('message.common.errsubmit'))
+        ])
+      },
+      onClose: () => {
+        return !isHoverNotice[noticeName]
+      }
+    })
+    setTimeout(() => {
+      document.querySelectorAll('.g-err-msg-div').forEach(ele => {
+        const erritem =ele.dataset.erritem
+        ele.parentElement.parentElement.style.textAlign = 'left'
+        ele.parentElement.style.display = 'block'
+        ele.parentElement.style.padding = 0
+        if (ele.parentElement.parentElement.className.indexOf('ivu-notice-notice-err') < 0) {
+          ele.parentElement.parentElement.className = ele.parentElement.parentElement.className + ' ivu-notice-notice-err'
+        }
+        ele.parentElement.parentElement.addEventListener('mouseover', () => {
+          isHoverNotice[erritem] = true
+        }, false)
+      })
+    }, 150)
+  } else {
+    Notice.error({
+      desc: msg,
+      title: i18n.t('message.common.errTitle') ,
+      duration: 4
+    });
+  }
+}
 const action = function (url, data, option) {
   return param(url, data, option)
     .then(success, fail)
@@ -340,86 +458,8 @@ const action = function (url, data, option) {
       return response;
     })
     .catch(function (error) {
-      const showErrMsg = function () {
-        const msg = error.message || error.msg
-        if (lastMsg !== msg  && msg) {
-          lastMsg = msg
-        } else {
-          return
-        }
-        const checkPath = !error.response || error.response.config.url.indexOf('dss/guide/solution/reportProblem') < 0
-        if (window.$APP_CONF && window.$APP_CONF.error_report && checkPath) {
-          const noticeName = 'err_' + Date.now()
-          Notice.error({
-            name: noticeName,
-            duration: 4,
-            closable: true,
-            title: '错误提示',
-            render: (h) => {
-              return h('div', {
-                class: 'g-err-msg-div'
-              }, [
-                h('div', {
-                  style: {
-                    'word-break': 'break-all',
-                    'margin-bottom': '10px',
-                    'text-align': 'left',
-                    'line-height': '18px'
-                  }
-                }, msg),
-                h('button', {
-                  class: 'ivu-btn ivu-btn-default ivu-btn-small',
-                  style: {
-                    background: '#ec6565',
-                    color: '#fff',
-                    display: error.solution !== undefined ? 'inline-block' : 'none'
-                  },
-                  on: {
-                    click: () => {
-                      if (error.solution && error.solution.solutionUrl) {
-                        window.open(error.solution.solutionUrl, '_blank')
-                      } else if(error.response) {
-                        // 上报
-                        action('/dss/guide/solution/reportProblem', {
-                          requestUrl: error.response.config.url,
-                          queryParams: error.response.config.params,
-                          requestBody: typeof error.response.config.data === 'string' ? JSON.parse(error.response.config.data) : error.response.config.data,
-                          requestHeaders: { Cookie: document.cookie, ...error.response.config.headers },
-                          responseBody: error.response.data
-                        }).then(()=>{
-                          Message.success('错误已上报')
-                        })
-                      }
-                      Notice.close(noticeName)
-                    }
-                  }
-                }, error.solution && error.solution.solutionUrl ? '查看解决方案' : '上报错误')
-              ])
-            },
-            onClose: () => {
-              return !isHoverNotice
-            }
-          })
-          setTimeout(()=>{
-            document.querySelectorAll('.g-err-msg-div').forEach(ele => {
-              ele.parentElement.parentElement.style.textAlign = 'left'
-              ele.parentElement.style.display = 'block'
-              ele.parentElement.style.padding = 0
-              ele.parentElement.parentElement.style.background ="rgb(251, 233, 233)"
-              ele.parentElement.parentElement.style.border ="1px solid #eaa8a8"
-              ele.parentElement.parentElement.style.color ="#333"
-              ele.parentElement.parentElement.addEventListener('mouseover', ()=> {
-                isHoverNotice = true
-              }, false)
-              ele.parentElement.parentElement.addEventListener('mouseout', ()=> {
-                isHoverNotice = false
-              }, false)
-            })
-          })
-
-        } else {
-          Notice.error({desc: msg,  title: '错误提示', duration: 4});
-        }
+      if (error && error.response && error.response.data && error.response.data.data) {
+        error.solution = error.response.data.data.solution
       }
       if (error.message === API_ERR_MSG || error.msg === API_ERR_MSG) {
         if (showApiErrorTips) {
@@ -427,10 +467,10 @@ const action = function (url, data, option) {
           setTimeout(() => {
             showApiErrorTips = true
           }, 3000)
-          showErrMsg()
+          showErrMsg(error)
         }
       } else {
-        showErrMsg()
+        showErrMsg(error)
       }
       setTimeout(() => {
         lastMsg = ''

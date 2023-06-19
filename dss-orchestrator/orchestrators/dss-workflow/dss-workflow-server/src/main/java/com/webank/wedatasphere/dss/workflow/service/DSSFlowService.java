@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
+import org.apache.linkis.common.exception.ErrorException;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,12 +37,14 @@ public interface DSSFlowService {
 
     /**
      * 通过flowID获取最新版本的dwsFlow，版本信息在latestVersion
+     *
      * @return
      */
     DSSFlow getFlow(Long flowId);
 
-    void updateFlowBaseInfo(DSSFlow dssFlow) throws DSSErrorException;
+    List<String> getSubFlowContextIdsByFlowIds(List<Long> flowIdList) throws ErrorException;
 
+    void updateFlowBaseInfo(DSSFlow dssFlow) throws DSSErrorException;
 
     void batchDeleteFlow(List<Long> flowIdlist);
 
@@ -51,13 +54,22 @@ public interface DSSFlowService {
                     String userName,
                     String workspaceName,
                     String projectName
-    ) throws DSSErrorException;
+    ) throws IOException;
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,
-                         String description, List<DSSLabel> dssLabels) throws DSSErrorException, IOException;
+                         String description, List<DSSLabel> dssLabels,String nodeSuffix,
+                         String newFlowName, Long newProjectId) throws DSSErrorException, IOException;
 
     Long getParentFlowID(Long id);
 
     List<ExtraToolBarsVO> getExtraToolBars(long workspaceId, long projectId);
+
+    boolean checkExistSameSubflow(Long parentFlowID, String name);
+
+    boolean checkExistSameFlow(Long parentFlowID, String name, String existName);
+
+    boolean checkIsExistSameFlow(String jsonFlow);
+
+    List<String> checkIsSave(Long parentFlowID, String jsonFlow);
 }

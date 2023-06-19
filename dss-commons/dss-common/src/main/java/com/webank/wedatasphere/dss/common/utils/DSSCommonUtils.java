@@ -17,13 +17,16 @@
 package com.webank.wedatasphere.dss.common.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.*;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.utils.JsonUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DSSCommonUtils {
 
@@ -74,6 +77,27 @@ public class DSSCommonUtils {
             return Long.parseLong(val.toString());
         }
         throw new DSSRuntimeException(90322, "parse the return of externalSystem failed, the value is null.");
+    }
+
+    public static List<DSSNodeDefault> getWorkFlowNodes(String workFlowJson) {
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
+        JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
+        List<DSSNodeDefault> dwsNodes = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
+        }.getType());
+        return dwsNodes;
+    }
+
+    public static List<String> getWorkFlowNodesJson(String workFlowJson) {
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
+        JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
+        if (nodeJsonArray == null) {
+            return null;
+        }
+        List<Object> nodeJsonList = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray.toString(), new TypeToken<List<Object>>() {
+        }.getType());
+        return nodeJsonList.stream().map(DSSCommonUtils.COMMON_GSON::toJson).collect(Collectors.toList());
     }
 
 }

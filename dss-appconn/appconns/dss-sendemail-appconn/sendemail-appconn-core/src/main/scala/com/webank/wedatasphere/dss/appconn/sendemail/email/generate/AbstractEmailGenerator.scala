@@ -18,10 +18,9 @@ package com.webank.wedatasphere.dss.appconn.sendemail.email.generate
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.AbstractEmail
 import com.webank.wedatasphere.dss.appconn.sendemail.email.{Email, EmailGenerator}
-import com.webank.wedatasphere.dss.common.utils.VariableUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
-import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.{Logging, VariableUtils}
 
 trait AbstractEmailGenerator extends EmailGenerator with Logging{
 

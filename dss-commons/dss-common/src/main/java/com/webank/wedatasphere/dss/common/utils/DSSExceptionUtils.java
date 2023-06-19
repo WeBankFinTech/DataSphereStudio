@@ -16,18 +16,18 @@
 
 package com.webank.wedatasphere.dss.common.utils;
 
-import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
-import com.webank.wedatasphere.dss.common.exception.ThrowingConsumer;
-import com.webank.wedatasphere.dss.common.exception.ThrowingFunction;
+import com.webank.wedatasphere.dss.common.exception.*;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.common.exception.WarnException;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class DSSExceptionUtils {
 
@@ -119,6 +119,47 @@ public class DSSExceptionUtils {
             warnException.initCause(throwable);
         }
         throw warnException;
+    }
+
+    public static <T> Message getMessage(ThrowingSupplier<T, Exception> supplier, Function<T, Message> function, String errorMsg) {
+        T result;
+        try {
+            result = supplier.get();
+        } catch (ErrorException e) {
+            LOGGER.error(errorMsg, e);
+            return Message.error(errorMsg + e.getDesc());
+        } catch (WarnException e) {
+            LOGGER.error(errorMsg, e);
+            return Message.error(errorMsg + e.getDesc());
+        } catch (Exception e) {
+            LOGGER.error(errorMsg, e);
+            return Message.error(errorMsg + " 原因：" + ExceptionUtils.getRootCauseMessage(e));
+        }
+        return function.apply(result);
+    }
+
+    public static Message getMessage(ThrowingApply<Exception> apply, Supplier<Message> supplier, String errorMsg) {
+        try {
+            apply.apply();
+        } catch (ErrorException e) {
+            LOGGER.error(errorMsg, e);
+            return Message.error(errorMsg + e.getDesc());
+        } catch (WarnException e) {
+            LOGGER.error(errorMsg, e);
+            return Message.error(errorMsg + e.getDesc());
+        } catch (Exception e) {
+            LOGGER.error(errorMsg, e);
+            return Message.error(errorMsg + " 原因：" + ExceptionUtils.getRootCauseMessage(e));
+        }
+        return supplier.get();
+    }
+
+    public static <T> Message applyMessage(Supplier<T> supplier, Function<T, Message> function, String errorMsg) {
+        return getMessage(supplier::get, function, errorMsg);
+    }
+
+    public static <T> Message applyMessage(Apply apply, Supplier<Message> supplier, String errorMsg) {
+        return getMessage(apply::apply, supplier, errorMsg);
     }
 
 }

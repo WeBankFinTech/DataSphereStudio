@@ -261,7 +261,7 @@ export default {
         this.state.nodes.forEach(node => {
           let innerKeys = ['layout', 'type', 'title', 'desc', 'image', 'ready', 'viewOffsetX', 'viewOffsetY',
             'width', 'height', 'borderWidth',
-            'radiusWidth', 'anchorSize', 'borderColor', 'key', 'x', 'y', 'createTime', 'lastUpdateTime'];
+            'radiusWidth', 'anchorSize', 'borderColor', 'key', 'x', 'y', 'createTime', 'modifyTime'];
           let obj = {
             key: node.key,
             title: node.title,
@@ -275,8 +275,8 @@ export default {
             },
             params: node.params,
             resources: node.resources,
-            createTime: node.createTime,
-            lastUpdateTime: node.lastUpdateTime
+            createTime: node.createTime || Date.now(),
+            modifyTime: node.modifyTime || Date.now()
           }
           // 把跟流程无关的数据原样返回
           for (let p in node) {
@@ -405,6 +405,21 @@ export default {
           this._new_node = null;
         }
         this.clearDraging();
+      }
+      if (!e.shiftKey && !e.ctrlKey) {
+        let hasOuter = false
+        const nodes = this.state.nodes.map(item => {
+          if (item.runState && item.runState.outerText) {
+            hasOuter = true
+          }
+          return {
+            ...item,
+            runState: item.runState && item.runState.outerText ? undefined : item.runState
+          }
+        });
+        if (hasOuter) {
+          commit(this.$store, 'UPDATE_ALLNODES', nodes)
+        }
       }
     },
     closeBaseInfo() {

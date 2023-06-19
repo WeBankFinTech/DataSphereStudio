@@ -3,8 +3,8 @@
     v-model="ProjectShow"
     :title="
       actionType === 'add'
-        ? $t('message.workflow.projectDetail.createProject')
-        : $t('message.workflow.projectDetail.editorProject')
+        ? $t('message.common.projectDetail.createProject')
+        : $t('message.common.projectDetail.editorProject')
     "
     :closable="false"
   >
@@ -14,10 +14,10 @@
       ref="projectForm"
       :model="projectDataCurrent"
       :rules="formValid"
-      v-if="ProjectShow"
+      class="project_form"
     >
       <FormItem
-        :label="$t('message.workflow.projectDetail.projectName')"
+        :label="$t('message.common.projectDetail.projectName')"
         prop="name"
       >
         <Input
@@ -27,8 +27,20 @@
         ></Input>
       </FormItem>
       <FormItem
+        :label="$t('message.common.projectDetail.projectDesc')"
+        prop="description"
+      >
+        <Input
+          v-model="projectDataCurrent.description"
+          type="textarea"
+          :placeholder="
+            $t('message.common.projectDetail.pleaseInputProjectDesc')
+          "
+        ></Input>
+      </FormItem>
+      <FormItem
         v-if="!framework"
-        :label="$t('message.workflow.projectDetail.product')"
+        :label="$t('message.common.projectDetail.product')"
         prop="product"
       >
         <Input
@@ -38,12 +50,12 @@
         </Input>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.appArea')"
+        :label="$t('message.common.projectDetail.appArea')"
         prop="applicationArea"
       >
         <Select
           v-model="projectDataCurrent.applicationArea"
-          :placeholder="$t('message.workflow.projectDetail.selectAppArea')"
+          :placeholder="$t('message.common.projectDetail.selectAppArea')"
         >
           <Option
             v-for="(item, index) in applicationAreaMap"
@@ -54,65 +66,7 @@
         </Select>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.publishPermissions')"
-        prop="releaseUsers"
-      >
-        <luban-select
-          v-model="projectDataCurrent.releaseUsers"
-          multiple
-          filterable
-          :placeholder="$t('message.workflow.projectDetail.userAllowedPublish')"
-        >
-          <Option
-            v-for="(item, index) in releaseUsers"
-            :label="item"
-            :value="item"
-            :key="index"
-          />
-        </luban-select>
-      </FormItem>
-      <FormItem
-        :label="$t('message.workflow.projectDetail.editPermissions')"
-        prop="editUsers"
-      >
-        <luban-select
-          v-model="projectDataCurrent.editUsers"
-          :disabled-tags="[projectDataCurrent.createBy]"
-          multiple
-          filterable
-          :placeholder="$t('message.workflow.projectDetail.usersAllowedToEdit')"
-        >
-          <Option
-            v-for="(item, index) in editUsersMap"
-            :disabled="item == projectDataCurrent.createBy"
-            :label="item"
-            :value="item"
-            :key="index"
-          />
-        </luban-select>
-      </FormItem>
-      <FormItem
-        :label="$t('message.workflow.projectDetail.viewPermissions')"
-        prop="accessUsers"
-      >
-        <luban-select
-          v-model="projectDataCurrent.accessUsers"
-          :disabled-tags="[projectDataCurrent.createBy]"
-          multiple
-          filterable
-          :placeholder="$t('message.workflow.projectDetail.usersAllowedToView')"
-        >
-          <Option
-            v-for="(item, index) in accessUsersMap"
-            :disabled="item == projectDataCurrent.createBy"
-            :label="item"
-            :value="item"
-            :key="index"
-          />
-        </luban-select>
-      </FormItem>
-      <FormItem
-        :label="$t('message.workflow.projectDetail.devProcess')"
+        :label="$t('message.common.projectDetail.devProcess')"
         prop="devProcessList"
       >
         <CheckboxGroup v-model="projectDataCurrent.devProcessList">
@@ -128,7 +82,7 @@
       </FormItem>
       <FormItem
         v-if="framework"
-        :label="$t('message.workflow.projectDetail.orchestratorMode')"
+        :label="$t('message.common.projectDetail.orchestratorMode')"
         prop="orchestratorModeList"
       >
         <CheckboxGroup v-model="projectDataCurrent.orchestratorModeList">
@@ -145,27 +99,73 @@
         </CheckboxGroup>
       </FormItem>
       <FormItem
-        :label="$t('message.workflow.projectDetail.business')"
+        :label="$t('message.common.projectDetail.publishPermissions')"
+        prop="releaseUsers"
+      >
+        <luban-select
+          v-model="projectDataCurrent.releaseUsers"
+          multiple
+          filterable
+          :placeholder="$t('message.common.projectDetail.userAllowedPublish')"
+        >
+          <Option
+            v-for="(item, index) in workspaceUsers.releaseUsers"
+            :label="item"
+            :value="item"
+            :key="index"
+          />
+        </luban-select>
+      </FormItem>
+      <FormItem
+        :label="$t('message.common.projectDetail.editPermissions')"
+        prop="editUsers"
+      >
+        <luban-select
+          v-model="projectDataCurrent.editUsers"
+          :disabled-tags="[projectDataCurrent.createBy]"
+          multiple
+          filterable
+          :placeholder="$t('message.common.projectDetail.usersAllowedToEdit')"
+        >
+          <Option
+            v-for="(item, index) in workspaceUsers.editUsers"
+            :disabled="item == projectDataCurrent.createBy"
+            :label="item"
+            :value="item"
+            :key="index"
+          />
+        </luban-select>
+      </FormItem>
+      <FormItem
+        :label="$t('message.common.projectDetail.viewPermissions')"
+        prop="accessUsers"
+      >
+        <luban-select
+          v-model="projectDataCurrent.accessUsers"
+          :disabled-tags="[projectDataCurrent.createBy]"
+          multiple
+          filterable
+          :placeholder="$t('message.common.projectDetail.usersAllowedToView')"
+        >
+          <Option
+            v-for="(item, index) in workspaceUsers.accessUsers"
+            :disabled="item == projectDataCurrent.createBy"
+            :label="item"
+            :value="item"
+            :key="index"
+          />
+        </luban-select>
+      </FormItem>
+      <FormItem
+        :label="$t('message.common.projectDetail.business')"
         prop="business"
       >
         <we-tag
-          :new-label="$t('message.workflow.projectDetail.addBusiness')"
+          :new-label="$t('message.common.projectDetail.addBusiness')"
           :tag-list="projectDataCurrent.business"
           @add-tag="addTag"
           @delete-tag="deleteTag"
         ></we-tag>
-      </FormItem>
-      <FormItem
-        :label="$t('message.workflow.projectDetail.projectDesc')"
-        prop="description"
-      >
-        <Input
-          v-model="projectDataCurrent.description"
-          type="textarea"
-          :placeholder="
-            $t('message.workflow.projectDetail.pleaseInputProjectDesc')
-          "
-        ></Input>
       </FormItem>
     </Form>
     <div slot="footer">
@@ -184,13 +184,12 @@
   </Modal>
 </template>
 <script>
-import storage from '@dataspherestudio/shared/common/helper/storage';
 import tag from "@dataspherestudio/shared/components/tag/index.vue";
 import lubanSelect from "@dataspherestudio/shared/components/select/index.vue";
 import _ from "lodash";
 import {
-  GetWorkspaceUserList,
   GetDicList,
+  CheckProjectNameRepeat
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 export default {
   components: {
@@ -205,6 +204,16 @@ export default {
     actionType: {
       type: String,
       default: "",
+    },
+    workspaceUsers: {
+      type: Object,
+      default: () => {
+        return {
+          accessUsers: [],
+          releaseUsers: [],
+          editUsers: []
+        }
+      },
     },
     applicationAreaMap: {
       type: Array,
@@ -221,23 +230,19 @@ export default {
   },
   data() {
     return {
-      test: [],
       ProjectShow: false,
       originBusiness: "",
-      editUsersMap: [],
-      accessUsersMap: [],
-      releaseUsers: [],
       devProcess: [
         {
           id: 1,
           icon: "",
-          title: "开发中心",
+          title: this.$t('message.common.Development'),
           checked: false,
         },
         {
           id: 2,
           icon: "",
-          title: "生产中心",
+          title: this.$t('message.common.Production'),
           checked: false,
         },
       ],
@@ -249,21 +254,20 @@ export default {
   },
   computed: {
     formValid() {
-      let validateName = (rule, value, callback) => {
-        let currentWorkspaceName = storage.get("currentWorkspace")
-          ? storage.get("currentWorkspace").name
-          : null;
-        let username = storage.get("baseInfo", "local")
-          ? storage.get("baseInfo", "local").username
-          : null;
-        if (
-          (currentWorkspaceName &&
-            username &&
-            value.match(currentWorkspaceName)) ||
-          value.match(username)
-        ) {
+      let validateName = async (rule, value, callback) => {
+        // 校验是否重名
+        let repeat = false
+        try {
+          if (this.actionType === 'add') {
+            const res = await CheckProjectNameRepeat(value)
+            repeat = res.repeat
+          }
+        } catch (error) {
+          //
+        }
+        if (repeat && this.actionType === 'add') {
           callback(
-            new Error(this.$t("message.workflow.projectDetail.validateName"))
+            new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
           );
         } else {
           callback();
@@ -276,7 +280,7 @@ export default {
             message: this.$t("message.workflow.enterName"),
             trigger: "blur",
           },
-          { message: `${this.$t("message.workflow.nameLength")}150`, max: 150 },
+          { message: `${this.$t("message.workflow.nameLength")}64`, max: 64 },
           {
             type: "string",
             pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/,
@@ -289,7 +293,7 @@ export default {
           {
             required: true,
             message: this.$t(
-              "message.workflow.projectDetail.pleaseInputProjectDesc"
+              "message.common.projectDetail.pleaseInputProjectDesc"
             ),
             trigger: "blur",
           },
@@ -297,14 +301,14 @@ export default {
         product: [
           {
             required: true,
-            message: this.$t("message.workflow.projectDetail.selectProduct"),
+            message: this.$t("message.common.projectDetail.selectProduct"),
             trigger: "change",
           },
         ],
         applicationArea: [
           {
             required: true,
-            message: this.$t("message.workflow.projectDetail.selectAppArea"),
+            message: this.$t("message.common.projectDetail.selectAppArea"),
             trigger: "change",
             type: "number",
           },
@@ -312,7 +316,7 @@ export default {
         devProcessList: [
           {
             required: true,
-            message: this.$t("message.workflow.projectDetail.pleaseSelect"),
+            message: this.$t("message.common.projectDetail.pleaseSelect"),
             trigger: "blur",
             type: "array",
           },
@@ -320,32 +324,15 @@ export default {
         orchestratorModeList: [
           {
             required: true,
-            message: this.$t("message.workflow.projectDetail.pleaseSelect"),
+            message: this.$t("message.common.projectDetail.pleaseSelect"),
             trigger: "blur",
             type: "array",
           },
         ],
-        // releaseUsers: [
-        //   {
-        //     required: true,
-        //     message: this.$t(
-        //       "message.workflow.projectDetail.userAllowedPublish"
-        //     ),
-        //     trigger: "change",
-        //     type: "array",
-        //   },
-        // ],
       };
     },
   },
   mounted() {
-    GetWorkspaceUserList({ workspaceId: +this.$route.query.workspaceId }).then(
-      (res) => {
-        this.accessUsersMap = res.users.accessUsers;
-        this.editUsersMap = res.users.editUsers;
-        this.releaseUsers = res.users.releaseUsers;
-      }
-    );
     this.getData();
   },
   watch: {
@@ -375,9 +362,13 @@ export default {
         if (valid) {
           this.submiting = true;
           this.$emit("confirm", this.projectDataCurrent, (success) => {
-            if (success) this.ProjectShow = false;
+            if (success) {
+              this.$refs.projectForm.resetFields();
+              this.ProjectShow = false;
+            }
             this.submiting = false;
           });
+
         } else {
           this.submiting = false;
           this.$Message.warning(this.$t("message.workflow.failedNotice"));
@@ -386,7 +377,8 @@ export default {
     },
     Cancel() {
       this.ProjectShow = false;
-      this.projectData.business = this.originBusiness;
+      this.$refs.projectForm.resetFields();
+      this.projectDataCurrent.business = this.originBusiness;
     },
     addTag(label) {
       if (this.projectDataCurrent.business) {
@@ -399,12 +391,12 @@ export default {
       const tmpArr = this.projectDataCurrent.business.split(",");
       const index = tmpArr.findIndex((item) => item === label);
       tmpArr.splice(index, 1);
-      this.projectData.business = tmpArr.toString();
+      this.projectDataCurrent.business = tmpArr.toString();
     },
     showProject(params) {
       this.ProjectShow = true
       // 新增只有一项自动勾选
-      if (this.orchestratorModeList && this.orchestratorModeList.list.length === 1 && params.name) {
+      if (this.orchestratorModeList && this.orchestratorModeList.list.length === 1 && !params.name) {
         params.orchestratorModeList = [this.orchestratorModeList.list[0].dicKey]
       }
       this.projectDataCurrent = {...params}
@@ -418,5 +410,11 @@ export default {
   margin-left: 10px;
   font-size: 16px;
   color: black;
+}
+.project_form {
+  height: 60vh;
+  overflow-y: auto;
+  padding: 10px;
+  max-height: 500px;
 }
 </style>

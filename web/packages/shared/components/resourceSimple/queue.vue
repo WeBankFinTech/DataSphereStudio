@@ -1,9 +1,9 @@
 <template>
-  <div class="queue-manager">
-    <Spin
-      v-if="loading"
-      size="large"
-      fix/>
+  <Spin
+    v-if="loading"
+    size="large"
+    fix/>
+  <div v-else class="queue-manager">
     <div
       class="queue-manager-select-warpper"
       v-if="queueList.length">

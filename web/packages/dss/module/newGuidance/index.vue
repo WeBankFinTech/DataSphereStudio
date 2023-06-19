@@ -4,13 +4,13 @@
       <div id="mask1">
         <div class="description">
           <p>
-            DataSphere Studio（简称 DSS）是微众银行自研的数据应用开发管理集成框架，以工作流式的图形化拖拽开发体验，将满足从数据交换、脱敏清洗、分析探索、质量检测、数据建模、可视化展现、邮件发送到定时调度等，数据应用开发全流程场景需求。
+            {{ $t('message.common.dss.dss') }}
           </p>
           <br />
-          <p>下面，让我们一起来熟悉一下DataSphereStudio的操作界面吧！</p>
+          <p>{{ $t('message.common.dss.nextoper') }}</p>
         </div>
         <div id="confirm1">
-          <div class="next" @click="next()">我知道了</div>
+          <div class="next" @click="next()">{{ $t('message.common.dss.isee') }}</div>
           <img
             class="luBanLogo"
             src="~@/dss/assets/images/luBanLogo.png"
@@ -21,10 +21,10 @@
     </div>
     <div v-else-if="currentStep === 2" key="2">
       <div id="mask2">
-        <div class="description">这是{{$APP_CONF.app_name}}的主页面，即工作空间首页。</div>
+        <div class="description">{{$t('message.common.dss.isworkspacehome', {name:$APP_CONF.app_name})}}</div>
         <div id="confirm2">
-          <div class="skip" @click="skip()">跳过</div>
-          <div class="next" @click="next()">下一步</div>
+          <div class="skip" @click="skip()">{{ $t('message.common.dss.skip') }}</div>
+          <div class="next" @click="next()">{{ $t('message.common.dss.nextstep') }}</div>
           <img
             class="luBanLogo"
             src="~@/dss/assets/images/luBanLogo.png"
@@ -49,27 +49,27 @@
         </div>
         <div class="item3">
           <div class="desc1">
-            点击<span>自定义功能菜单</span>，可支持自定义配置全局功能菜单。
+            {{ $t('message.common.dss.click') }}<span>{{ $t('message.common.dss.customemenu') }}</span>{{$t('message.common.dss.globalfunmenu')}}
           </div>
           <div class="desc2">
-            点击<span>{{ $APP_CONF.app_name }}</span>，可返回工作空间首页。
+            {{ $t('message.common.dss.click') }}<span>{{ $APP_CONF.app_name }}</span>{{$t('message.common.dss.returnhome')}}
           </div>
           <div class="desc3">
-            鼠标悬浮显示所有<span>工作空间</span>，点击可切换。
+            {{ $t('message.common.dss.showall') }}<span>{{ $t('message.common.dss.Workspace') }}</span>{{$t('message.common.dss.switch')}}
           </div>
-          <div class="desc4">点击<span>首页</span>，可返回工作空间首页。</div>
+          <div class="desc4">{{ $t('message.common.dss.click') }}<span>{{ $t('message.common.dss.homepage2') }}</span>{{$t('message.common.dss.returnhome')}}</div>
           <div class="desc5">
-            点击<span>账户</span>，可切换账号、清理缓存、更换界面皮肤等。
+            {{ $t('message.common.dss.click') }}<span>{{ $t('message.common.dss.Account') }}</span>{{$t('message.common.dss.switchandclear')}}
           </div>
         </div>
       </div>
       <div class="footerSuspension">
         <div class="item1">
           <div class="desc1">
-            点击<span>帮助中心</span>，可弹出帮助文档，包含当页介绍，操作步骤及常见问题。
+            {{ $t('message.common.dss.click') }}<span>{{ $t('message.common.dss.helpcenter') }}</span>{{$t('message.common.dss.documentpage')}}
           </div>
           <div class="desc2">
-            点击<span>资源管理器</span>，可显示任务，引擎及资源使用情况。
+            {{ $t('message.common.dss.click') }}<span>{{ $t('message.common.dss.resource') }}</span>{{$t('message.common.dss.engineuse')}}
           </div>
         </div>
         <div class="item2">
@@ -99,11 +99,11 @@
         <div class="arrow">
           <img src="~@/dss/assets/images/3-1.svg" alt="" />
         </div>
-        <div class="desc">这是<span>自定义功能菜单</span>，请试着点击它。</div>
+        <div class="desc">{{ $t('message.common.dss.this') }} <span>{{ $t('message.common.dss.customemenu') }}</span>{{ $t('message.common.dss.tryclick') }}</div>
         <div id="confirm3">
-          <div class="skip" @click="skip()">跳过</div>
-          <div class="prev" @click="prev()">上一步</div>
-          <div class="next" @click="next()">下一步</div>
+          <div class="skip" @click="skip()">{{ $t('message.common.dss.skip') }}</div>
+          <div class="prev" @click="prev()">{{ $t('message.common.dss.prevstep') }}</div>
+          <div class="next" @click="next()">{{ $t('message.common.dss.nextstep') }}</div>
           <img
             class="luBanLogo"
             src="~@/dss/assets/images/luBanLogo.png"
@@ -131,12 +131,12 @@
             <img src="~@/dss/assets/images/4-1.svg" alt="" />
           </div>
           <div class="desc">
-            这是<span>自定义功能菜单</span>，点击全部产品内，具体功能旁★号，可以收藏该功能至菜单。点击自定义菜单功能旁叉号，可以删除该收藏。
+            {{ $t('message.common.dss.this') }}<span>{{ $t('message.common.dss.customemenu') }}</span>{{ $t('message.common.dss.savetomenu') }}
           </div>
           <div id="confirm4">
-            <div class="skip" @click="skip()">跳过</div>
-            <div class="prev" @click="prev()">上一步</div>
-            <div class="next" @click="next()">下一步</div>
+            <div class="skip" @click="skip()">{{ $t('message.common.dss.skip') }}</div>
+            <div class="prev" @click="prev()">{{ $t('message.common.dss.prevstep') }}</div>
+            <div class="next" @click="next()">{{ $t('message.common.dss.nextstep') }}</div>
             <img
               class="luBanLogo"
               src="~@/dss/assets/images/luBanLogo.png"
@@ -152,11 +152,11 @@
         <div class="arrow">
           <img src="~@/dss/assets/images/5-1.svg" alt="" />
         </div>
-        <div class="desc">这是<span>账户设置</span>，请试着点击它。</div>
+        <div class="desc">{{ $t('message.common.dss.this') }}<span>{{ $t('message.common.dss.Account') }}</span>{{ $t('message.common.dss.tryclick') }}</div>
         <div id="confirm5">
-          <div class="skip" @click="skip()">跳过</div>
-          <div class="prev" @click="prev()">上一步</div>
-          <div class="next" @click="next()">下一步</div>
+          <div class="skip" @click="skip()">{{ $t('message.common.dss.skip') }}</div>
+          <div class="prev" @click="prev()">{{ $t('message.common.dss.prevstep') }}</div>
+          <div class="next" @click="next()">{{ $t('message.common.dss.nextstep') }}</div>
           <img
             class="luBanLogo"
             src="~@/dss/assets/images/luBanLogo.png"
@@ -183,12 +183,12 @@
           <img src="~@/dss/assets/images/6-1.svg" alt="" />
         </div>
         <div class="desc">
-          这是<span>账户设置</span>，可切换账号，设置语言，更换界面皮肤等清理缓存，可以清理当前用户运行的任务缓存结果。
+          {{ $t('message.common.dss.this') }}<span>{{ $t('message.common.dss.Account') }}</span>，{{ $t('message.common.dss.switchaccount') }}
         </div>
         <div id="confirm6">
-          <div class="skip" @click="skip()">跳过</div>
-          <div class="prev" @click="prev()">上一步</div>
-          <div class="next" @click="next()">下一步</div>
+          <div class="skip" @click="skip()">{{ $t('message.common.dss.skip') }}</div>
+          <div class="prev" @click="prev()">{{ $t('message.common.dss.prevstep') }}</div>
+          <div class="next" @click="next()">{{ $t('message.common.dss.nextstep') }}</div>
           <img
             class="luBanLogo"
             src="~@/dss/assets/images/luBanLogo.png"
@@ -211,11 +211,11 @@
       ></div>
       <div id="mask7">
         <div class="item1">
-          <div class="desc">这是<span>帮助文档</span>，请试着点击他。</div>
+          <div class="desc">{{ $t('message.common.dss.this') }}<span>{{ $t('message.common.dss.dochelp') }}</span>{{ $t('message.common.dss.tryclick') }}</div>
           <div id="confirm7">
-            <div class="skip" @click="skip()">跳过</div>
-            <div class="prev" @click="prev()">上一步</div>
-            <div class="next" @click="next()">下一步</div>
+            <div class="skip" @click="skip()">{{ $t('message.common.dss.skip') }}</div>
+            <div class="prev" @click="prev()">{{ $t('message.common.dss.prevstep') }}</div>
+            <div class="next" @click="next()">{{ $t('message.common.dss.nextstep') }}</div>
             <img
               class="luBanLogo"
               src="~@/dss/assets/images/luBanLogo.png"
@@ -233,15 +233,15 @@
       <div id="mask9">
         <div class="description">
           <p>
-            以上就是{{$APP_CONF.app_name}}的新手介绍了，在后续的使用中，<span>有任何问题，可以随时打开帮助文档</span>，查看当页的使用帮助，希望你在使用的过程中一切顺利。
+            {{$t('message.common.dss.endintro', {app:$APP_CONF.app_name})}}<span>{{ $t('message.common.dss.anyquestion') }}</span>{{$t('message.common.dss.vish')}}
           </p>
           <br />
           <p>
-            如果你发现了任何bug或者有需要向我们反馈的问题，欢迎你进入用户反馈中心，留下你的宝贵意见。
+            {{ $t('message.common.dss.bugreport') }}
           </p>
         </div>
         <div id="confirm1">
-          <div class="next" @click="next()">我知道了</div>
+          <div class="next" @click="next()">{{ $t('message.common.dss.isee') }}</div>
           <img
             class="luBanLogo"
             src="~@/dss/assets/images/luBanLogo.png"
@@ -264,15 +264,14 @@ export default {
   mounted() {
     if (this.$route.path === "/workspaceHome") {
       let store = localStorage.getItem("cacheGuide")
-      if(store === "null" | store === null){
-        setTimeout(() => {
+      if (store === "null" | store === null) {
+        this.timer = setTimeout(() => {
           this.currentStep += 1;
           let div = document.createElement("div");
-          div.className = "overlay";
+          div.className = "overlay ___guidance_overlay";
           let body = document.querySelector("body");
           body.appendChild(div);
         }, 1500);
-        localStorage.setItem("cacheGuide", "ok");
       }
     }
   },
@@ -345,6 +344,7 @@ export default {
       let head = document.querySelector(".layout-header");
       let foot = document.querySelector(".layout-footer");
       let user = document.querySelector(".user")
+      localStorage.setItem("cacheGuide", "ok");
       if (this.currentStep == 1) {
         head.setAttribute("style", "z-index: 1002");
         foot.setAttribute("style", "z-index: 1002");
@@ -442,6 +442,11 @@ export default {
         navM.removeEventListener("click", this.$parent.$refs.layoutHeader.$refs.vueLubanMenu.hideMenu);
       }, 300);
     },
+  },
+  beforeDestroy() {
+    clearTimeout(this.timer)
+    let overlay = document.querySelector(".___guidance_overlay");
+    if (overlay) overlay.parentNode.removeChild(overlay);
   },
 };
 </script>

@@ -21,6 +21,8 @@ package com.webank.wedatasphere.dss.orchestrator.publish.io.input;
 
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,5 +32,9 @@ public interface MetaInputService {
 
 
     List<DSSOrchestratorInfo> importOrchestrator(String basePath) throws IOException;
+
+    List<DSSFlow> inputFlow(String basePath) throws IOException;
+
+    List<DSSFlowRelation> inputFlowRelation(String basePath) throws IOException;
 
 }

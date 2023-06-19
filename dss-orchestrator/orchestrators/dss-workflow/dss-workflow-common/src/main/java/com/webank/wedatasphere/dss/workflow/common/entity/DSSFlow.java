@@ -31,7 +31,7 @@ public class DSSFlow implements Flow {
     private String creator;
     private Boolean isRootFlow;
     private Integer rank;
-    private Long projectID;
+    private Long projectId;
     private String linkedAppConnNames;
     private String dssLabels;
     private String flowEditLock;//工作流编辑锁
@@ -46,6 +46,16 @@ public class DSSFlow implements Flow {
     private String resourceId;
 
     private String bmlVersion;
+
+    private String metrics;
+
+    public String getMetrics() {
+        return metrics;
+    }
+
+    public void setMetrics(String metrics) {
+        this.metrics = metrics;
+    }
 
     public String getFlowJson() {
         return flowJson;
@@ -180,12 +190,12 @@ public class DSSFlow implements Flow {
         this.creator = creator;
     }
 
-    public Long getProjectID() {
-        return projectID;
+    public Long getProjectId() {
+        return projectId;
     }
 
-    public void setProjectID(Long projectID) {
-        this.projectID = projectID;
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     public Boolean getHasSaved() {
@@ -240,7 +250,7 @@ public class DSSFlow implements Flow {
                 ", creator='" + creator + '\'' +
                 ", isRootFlow=" + isRootFlow +
                 ", rank=" + rank +
-                ", projectID=" + projectID +
+                ", projectId=" + projectId +
                 ", linkedAppConnNames='" + linkedAppConnNames + '\'' +
                 ", dssLabels='" + dssLabels + '\'' +
                 ", flowEditLock='" + flowEditLock + '\'' +

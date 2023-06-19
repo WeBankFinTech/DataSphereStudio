@@ -1,10 +1,10 @@
 <template>
-  <!--新增和导入 二合一弹窗-->
+  <!--新增弹窗-->
   <Modal
     v-model="mergeModalShow"
     @on-cancel="ProjectMergeCancel"
     :footer-hide="true"
-    title="添加工作流"
+    :title="$t('message.workflow.Addworkflow')"
   >
     <WorkflowFormNew
       v-if="mergeModalShow"
@@ -15,26 +15,6 @@
       @cancel="ProjectMergeCancel"
       @confirm="ProjectMergeConfirm">
     </WorkflowFormNew>
-    <!-- <Tab-pane label="导入工作流" name="upload">
-        <Upload
-          ref="uploadJson"
-          type="drag"
-          :data="uploadData"
-          :before-upload="handleUpload"
-          :on-success="handleSuccess"
-          :on-error="handleError"
-          :format="['zip']"
-          :max-size="2001000"
-          :action="uploadUrl">
-          <div class="upload-box">
-            <Icon
-              type="ios-cloud-upload"
-              size="52"
-              style="color: #3399ff"></Icon>
-            <p>{{ $t('message.orchestratorModes.clickOrDragFile') }}</p>
-          </div>
-        </Upload>
-      </Tab-pane> -->
   </Modal>
 </template>
 <script>
@@ -72,10 +52,8 @@ export default {
   },
   data() {
     return {
-      mergeModalShow: this.treeModalShow, // 二合一弹窗展示
-      currentOrchetratorData: null,
-      uploadUrl: `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`,
-      uploadData: null
+      mergeModalShow: this.treeModalShow, // 弹窗展示
+      currentOrchetratorData: null
     };
   },
   watch: {
@@ -109,6 +87,11 @@ export default {
         }
         this.init()
       })
+        .catch(() => {
+          if (cb) {
+            cb()
+          }
+        });
     },
     init() {
       this.currentOrchetratorData = {

@@ -83,25 +83,32 @@ export default {
     columns() {
       return [
         {
-          title: this.$t("message.workflow.projectDetail.version"),
+          title: this.$t("message.common.projectDetail.version"),
           key: "version",
           width: 130,
-          align: "center"
+          align: "center",
+          render: (h, scope) => {
+            return h(
+              "span",
+              {},
+              scope.index === 0 && this.versionPage.pageNow === 1 ? this.$t("message.common.projectDetail.editing") : scope.row.version
+            );
+          }
         },
         {
-          title: this.$t("message.workflow.projectDetail.updator"),
+          title: this.$t("message.common.projectDetail.updator"),
           key: "updater",
           width: 130,
           align: "center"
         },
         {
-          title: this.$t("message.workflow.projectDetail.comment"),
+          title: this.$t("message.common.projectDetail.comment"),
           key: "comment",
           width: 200,
           align: "center"
         },
         {
-          title: this.$t("message.workflow.projectDetail.uptateTime"),
+          title: this.$t("message.common.projectDetail.uptateTime"),
           key: "updateTime",
           width: 186,
           align: "center",
@@ -114,7 +121,7 @@ export default {
           }
         },
         {
-          title: this.$t("message.workflow.projectDetail.action"),
+          title: this.$t("message.common.projectDetail.action"),
           slot: "action",
           align: "center",
           width: 130
@@ -130,8 +137,8 @@ export default {
     },
     rollback(row) {
       this.$Modal.confirm({
-        title: this.$t('message.workflow.projectDetail.rollBack'),
-        content: this.$t('message.workflow.projectDetail.newVersion', { version: row.version }),
+        title: this.$t('message.common.projectDetail.rollBack'),
+        content: this.$t('message.common.projectDetail.newVersion', { version: row.version }),
         onOk: () => {
           this.loading = true;
           this.$emit('rollback', row);

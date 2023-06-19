@@ -1217,7 +1217,7 @@ export default {
               commit(this.$store, 'UPDATE_NODE', {
                 key: dragNode.key,
                 obj: Object.assign(node, {
-                  lastUpdateTime: Date.now(),
+                  modifyTime: Date.now(),
                   y: this.state.snapLineX.top - node.height / 2
                 })
               });
@@ -1236,7 +1236,7 @@ export default {
               commit(this.$store, 'UPDATE_NODE', {
                 key: dragNode.key,
                 obj: Object.assign(node, {
-                  lastUpdateTime: Date.now(),
+                  modifyTime: Date.now(),
                   x: this.state.snapLineY.left - node.width / 2
                 })
               });
@@ -1378,21 +1378,27 @@ export default {
         }
       }
       let { beforeShowMenu, beforePaste } = this.designer.myMenuOptions;
+      const iconHelper = function (arr) {
+        return arr.map((it) => {
+          let menuItem = {
+            text: it.text,
+            value: it.value,
+          }
+          if (it.img) {
+            menuItem.img = it.img;
+          } else if (it.icon) {
+            menuItem.icon = it.icon;
+          }
+          if (it.children) {
+            menuItem.children = iconHelper(it.children)
+          }
+          return menuItem
+        });
+      }
       if (typeof beforeShowMenu === 'function') {
         arr = beforeShowMenu(null, arr, 'view');
         if (Array.isArray(arr)) {
-          arr = arr.map((it) => {
-            let menuItem = {
-              text: it.text,
-              value: it.value
-            }
-            if (it.img) {
-              menuItem.img = it.img;
-            } else if (it.icon) {
-              menuItem.icon = it.icon;
-            }
-            return menuItem
-          });
+          arr = iconHelper(arr)
         } else {
           console.warn('ctxMenuOptions.beforeShowMenu返回值必须是一个数组')
         }
@@ -1423,7 +1429,7 @@ export default {
               });
             }
           }
-          this.designer.$emit(`ctx-menu-${data.value}`, e, 'view')
+          this.designer.$emit(`on-ctx-menu`, data.value, e, 'view')
         }
       })
     },
@@ -1457,7 +1463,7 @@ export default {
         choose: (data) => {
           if (this.state.disabled) return;
           this.operatLiner(data.value, k);
-          this.designer.$emit(`ctx-menu-${data.value}`, k, 'link')
+          this.designer.$emit('on-ctx-menu', data.value, k, 'link')
         }
       })
     },
@@ -1535,9 +1541,10 @@ export default {
             width,
             height } = getComputedStyle(nodeRef.$el);
           let nodePos = { left, top, width, height };
-          if (this.isInBoxSelect(nodePos, this.boxSelectLayerStyle)) {
+          if (node.selected) {
+            chooseNodes.push(node.key)
+          } else if (this.isInBoxSelect(nodePos, this.boxSelectLayerStyle)) {
             chooseNodes.push(node.key);
-            node.selected = true;
           }
         })
         setTimeout(() => {
@@ -1567,7 +1574,7 @@ export default {
     clickoutsideNode(e) {
       if (this.state.disabled) return;
       // 这里改成当只有点击大背景板时才取消选择
-      if (this.state.choosing.type == 'node' && e.target === this.$refs.canvas) {
+      if (!e.ctrlKey && !e.shiftKey && this.state.choosing.type == 'node' && e.target === this.$refs.canvas) {
         commit(this.$store, 'UPDATE_CHOOSING', {
           type: 'node',
           key: []

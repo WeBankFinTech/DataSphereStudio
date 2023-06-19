@@ -130,9 +130,6 @@ export default {
   mounted() {
   },
   computed: {
-    currentWorkdapceData() {
-      return storage.get("currentWorkspace");
-    }
   },
   methods: {
     handleTreeToggle() {

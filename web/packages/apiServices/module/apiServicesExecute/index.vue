@@ -14,9 +14,9 @@
       <Row class="content-top">
         <i-col span="10">
           <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
-          <Form ref="searchFrom" class="search-from" :label-width="80" :model="conditionResult">
+          <Form ref="searchFrom" class="search-from" :label-width="100" :model="conditionResult">
             <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="[{
-              required: false,
+              required: item.required,
               message: $t('message.apiServices.placeholder.emter'),
               trigger: 'blur'
             }]">
@@ -37,7 +37,7 @@
           </template>
         </i-col>
       </Row>
-      <results ref="currentConsole" getResultUrl="dss/apiservice"  :comData="apiData" :dispatch="dispatch" :height="height" @executRun="executRun"></results>
+      <results ref="currentConsole" getResultUrl="dss/apiservice" :work="apiData" :dispatch="dispatch" :height="height" @executRun="executRun"></results>
     </div>
     <Modal :title="$t('message.apiServices.apiTestInfo.params')" v-model="conditionShow" @on-ok="confirmSelect">
       <CheckboxGroup v-model="selectCondition">
@@ -87,10 +87,10 @@ export default {
     verificationValue (row) {
       let flag;
       if(row.defaultValue.length > 1024 && Number(row.type) !== 4) {
-        this.$Message.error({ content: '默认字符不能超过1024个字符！' });
+        this.$Message.error({ content: this.$t('message.apiServices.more1024') });
         flag = true;
       } else if(row.type == 4 && row.defaultValue.split('\n').length > 5000) {
-        this.$Message.error({ content: '行数过多请分批查询！' });
+        this.$Message.error({ content: this.$t('message.apiServices.moreline') });
         flag = true;
       } else {
         flag = false
@@ -159,10 +159,10 @@ export default {
       this.showConditionList = this.conditionList.filter((item) => this.selectCondition.includes(item.id));
     },
     search() {
-      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: '超出限制请修改！' });
+      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: this.$t('message.apiServices.outlimit') });
       // 后续的执行逻辑
       if (this.excuteLoading) { // 停止执行
-        if(!(this.apiData && this.apiData.execID)) return this.$Message.error({ content: '任务暂时未生成返回，请稍后再试或联系管理员！' });
+        if(!(this.apiData && this.apiData.execID)) return this.$Message.error({ content: this.$t('message.apiServices.uninittask') });
         api.fetch(`/entrance/${this.apiData.execID}/kill`, {taskID: this.apiData.taskID}, 'get').then(() => {
           // kill成功后，去查kill后的状态
           this.$refs.currentConsole.killExecute(true);
@@ -292,6 +292,7 @@ export default {
       padding-right: 20px;
       position: relative;
       line-height: 1.2;
+      display: flex;
     }
     .label-class {
       overflow: hidden;

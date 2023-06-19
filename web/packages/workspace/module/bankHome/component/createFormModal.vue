@@ -125,7 +125,7 @@ export default {
     checkNameExist(rule, value, callback) {
       CheckWorkspaceNameExist({ name: value }).then((res) => {
         if (res.workspaceNameExists) {
-          callback(new Error('不可重复'));
+          callback(new Error(this.$t('message.workspace.Not')));
         } else {
           callback();
         }

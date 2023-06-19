@@ -20,23 +20,25 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
+import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import java.util.List;
-import java.util.Map;
 
 
 public interface ExportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
 
     /**
-     * 导出Orchestrator基本信息和工作流基本信息
+     * 导出Orchestrator基本信息和工作流，并放到BML中。
+     * 注意：导入导出接口只适合于不同环境下，先从A环境导出工作流，再导入到B环境的情况。
+     * 不适合用于在同一环境下的复制。同一环境的复制操作需使用copyOperation。
+     * @param addOrcVersion 导出之后，是否要升级一个版本
      */
-    Map<String,Object> exportOrchestrator(String userName,
-                                          Long orchestratorId,
-                                          Long orcVersionId,
-                                          String projectName,
-                                          List<DSSLabel> dssLabels,
-                                          boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
-
+    OrchestratorExportResult exportOrchestrator(String userName,
+                                                Long orchestratorId,
+                                                Long orcVersionId,
+                                                String projectName,
+                                                List<DSSLabel> dssLabels,
+                                                boolean addOrcVersion, Workspace workspace) throws DSSErrorException;
     Long orchestratorVersionIncrease(Long orcId,
                                      String userName,
                                      String comment,

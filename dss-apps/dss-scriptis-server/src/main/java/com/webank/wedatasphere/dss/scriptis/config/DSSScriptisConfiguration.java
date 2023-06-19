@@ -29,4 +29,5 @@ public class DSSScriptisConfiguration {
     public final static String GLOBAL_LIMITS_PREFIX = "wds.dss.scriptis.global.limits.";
     public final static String GLOBAL_LIMIT_PREFIX = "wds.dss.scriptis.global.limit.";
 
+
 }

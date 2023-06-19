@@ -18,9 +18,9 @@ package org.apache.linkis.manager.engineplugin.appconn.executor
 
 import java.util
 import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
-
 import com.webank.wedatasphere.dss.appconn.core.AppConn
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyDevelopmentAppConn
+import com.webank.wedatasphere.dss.appconn.loader.utils.AppConnUtils
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager
 import com.webank.wedatasphere.dss.common.label.{DSSLabel, EnvDSSLabel, LabelKeyConvertor}
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
@@ -30,6 +30,7 @@ import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncE
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef
+import org.apache.commons.io.FileUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.linkis.common.utils.{OverloadUtils, Utils}
 import org.apache.linkis.engineconn.computation.executor.async.AsyncConcurrentComputationExecutor
@@ -46,6 +47,7 @@ import org.apache.linkis.protocol.engine.JobProgressInfo
 import org.apache.linkis.scheduler.executer.{AsynReturnExecuteResponse, ErrorExecuteResponse, ExecuteResponse, SuccessExecuteResponse}
 import org.apache.linkis.server.BDPJettyServerHelper
 
+import java.io.File
 import scala.collection.JavaConverters._
 
 class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
@@ -69,7 +71,7 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
   def setUser(user: String): Unit = this.user = user
 
   override def executeLine(engineExecutorContext: EngineExecutionContext, code: String): ExecuteResponse = {
-    info(s"The execution code is: $code, runtime properties is: ${BDPJettyServerHelper.gson.toJson(engineExecutorContext.getProperties)}.")
+    info(s"The execution code is: $code, jobId is: ${engineExecutorContext.getJobId}, runtime properties is: ${BDPJettyServerHelper.gson.toJson(engineExecutorContext.getProperties)}.")
 
     val source = engineExecutorContext.getProperties.get(GovernanceConstant.TASK_SOURCE_MAP_KEY) match {
       case map: util.Map[String, Object] => map
@@ -85,7 +87,7 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
     val appConnName = getAppConnName(getValue(engineExecutorContext.getProperties, NODE_TYPE))
     val appConn = AppConnManager.getAppConnManager.getAppConn(appConnName)
     if (appConn == null) {
-      error(s"Cannot find AppConn $appConnName.")
+      error(s"Cannot find AppConn $appConnName. jobId is: ${engineExecutorContext.getJobId}")
       throw AppConnExecuteFailedException(510001, "Cannot Find appConnName: " + appConnName)
     }
     val labels = engineExecutorContext.getProperties.get("labels").toString
@@ -101,6 +103,7 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
           case map: util.Map[String, Object] => map
           case _ => new util.HashMap[String, Object]()
         }
+        info(s"try to execute appconn job for jobId: ${engineExecutorContext.getJobId}")
         val responseRef = Utils.tryCatch {
           AppConnExecutionUtils.tryToOperation(refExecutionService, getValue(engineExecutorContext.getProperties, CONTEXT_ID_KEY),
             getValue(source, PROJECT_NAME_STR), new ExecutionRequestRefContextImpl(engineExecutorContext, user, submitUser),
@@ -235,6 +238,19 @@ class AppConnEngineConnExecutor(override val outputPrintLimit: Int, val id: Int)
       warn(s"AppConn Kill job: $taskID failed for task is not exist.")
     }
     super.killTask(taskID)
+  }
+
+  override def tryShutdown(): Boolean = {
+    val toClearPath = AppConnUtils.getAppConnHomePath
+    val file = new File(toClearPath)
+    if (!file.exists()) {
+      warn(s"the appconn path is not exists, path is: ${toClearPath}")
+    }
+    info(s"try to clear dss-appconns for this engine, path is: ${toClearPath}")
+    Utils.tryCatch(FileUtils.deleteDirectory(file))(t => {
+      error(s"you have no permission to delete this path: ${toClearPath}, error: $t")
+    })
+    super.tryShutdown()
   }
 }
 

@@ -38,6 +38,7 @@ import org.apache.linkis.scheduler.queue.SchedulerEventState;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,8 +114,8 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         params.put("workspace", workspace);
         String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
-        String execID = entranceServer.execute(json);
-        Job job = entranceServer.getJob(execID).get();
+        Job job = entranceServer.execute(json);
+        String  execID = job.getId();
         JobRequest task = ((EntranceJob) job).getJobRequest();
         Long taskID = task.getId();
         pushLog(LogUtils.generateInfo("You have submitted a new job, script code (after variable substitution) is"), job);
@@ -133,11 +134,12 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
 
     @Override
     @RequestMapping(value = "/{id}/status",method = RequestMethod.GET)
-    public Message status(@PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
+    public Message status(HttpServletRequest req, @PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
         logger.info("Begin to get status for execId:{}", id);
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job;
+        ModuleUserUtils.getOperationUser(req, "status realId: " + realId);
         try {
             job = entranceServer.getJob(realId);
         } catch (Exception e) {

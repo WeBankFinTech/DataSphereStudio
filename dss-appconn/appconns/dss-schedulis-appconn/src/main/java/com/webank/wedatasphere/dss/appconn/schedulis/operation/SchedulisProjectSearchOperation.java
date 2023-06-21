@@ -31,9 +31,11 @@ public class SchedulisProjectSearchOperation
             logger.info("responseBody from Schedulis is: {}.", responseBody);
             Map<String,Object> map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, new TypeToken<Map<String,Object>>(){}.getType());
             String errorInfo = (String) map.get("error");
+            boolean projectActive = (boolean)map.get("projectActive");
+
             if (errorInfo != null){
                 if (errorInfo.contains("Project " + requestRef.getProjectName() + " doesn't exist")){
-                    errorInfo += "（工作流对应项目 "+requestRef.getProjectName()+" 在schedulis不存在或已被删除，请在schedulis中重新创建同名项目）";
+                    errorInfo += "（工作流对应项目 "+requestRef.getProjectName()+" 在schedulis不存在，请在schedulis中创建同名项目）";
                     return ProjectResponseRef.newExternalBuilder().setErrorMsg(errorInfo).success();
                 } else if (errorInfo.contains("Permission denied. Need READ access")) {
                     errorInfo += "（在schedulis中已存在相同项目名称 "+requestRef.getProjectName()+" ，但用户 "+requestRef.getUserName()+" 没有权限操作项目）";
@@ -42,6 +44,9 @@ public class SchedulisProjectSearchOperation
                     //接口调用返回其他错误，如网络错误
                     return ProjectResponseRef.newExternalBuilder().error(errorInfo);
                 }
+            } else if (!projectActive) { //项目是删除状态
+                errorInfo += "（工作流对应项目 "+requestRef.getProjectName()+" 在schedulis已被删除，请在schedulis中重新创建同名项目）";
+                return ProjectResponseRef.newExternalBuilder().setErrorMsg(errorInfo).success();
             }
             return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(map.get("projectId"))).success();
         } catch (Exception e) {

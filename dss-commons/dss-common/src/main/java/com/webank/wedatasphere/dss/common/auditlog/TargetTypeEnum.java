@@ -46,6 +46,19 @@ public enum TargetTypeEnum {
      * ec 自动释放规则
      */
     EC_KILL_STRATEGY("ec_kill_strategy"),
+    /**
+     * 参数模板
+     */
+    EC_CONF_TEMPLATE("ec_conf_template"),
+    /**
+     * 参数模板应用规则
+     */
+    EC_CONF_TEMPLATE_APPLY_RULE("ec_conf_template_apply_rule"),
+
+    /**
+     * 用户部门
+     */
+    USER_DEPT("user_dept")
 
     ;
     private String name;

@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -84,12 +83,7 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             ProjectResponseRef responseRef = projectSearchOperation.searchProject(new RefProjectContentRequestRef.RefProjectContentRequestRefImpl()
                     .setProjectName(projectName).setWorkspace(projectToRelConversionRequestRef.getWorkspace()));
             if (responseRef.isFailed()) {
-                //接口调用返回其他错误，如网络错误
                 throw new ExternalOperationFailedException(90012, responseRef.getErrorMsg());
-            }
-            if (responseRef.isSucceed() && responseRef.getRefProjectId() == null) {
-                //项目在schedulis不存在
-                throw new DSSRuntimeException(90012, "the project: " + projectName + " is not exists in schedulis.(工作流对应项目在schedulis已被删除，请在schedulis中重新创建同名项目)");
             }
             //项目存在，则继续执行如下步骤
             String projectPath = azkabanConvertedRel.getStorePath();

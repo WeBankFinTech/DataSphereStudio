@@ -36,6 +36,6 @@ public interface DssProxyUserService {
         return proxyUser.get();
     }
 
-    void revokeProxyUser(String userName, String[] proxyUserNames);
+
 
 }

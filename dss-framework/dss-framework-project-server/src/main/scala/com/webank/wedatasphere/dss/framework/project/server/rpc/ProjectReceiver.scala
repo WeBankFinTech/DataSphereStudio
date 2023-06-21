@@ -58,7 +58,7 @@ class ProjectReceiver(projectService: DSSProjectService,
         new ResponseUserWorkspace(userWorkspaceIds)
 
       case requestUserListFromWorkspace: RequestUserListFromWorkspace =>
-        val userList = requestUserListFromWorkspace.getUserWorkspaceIds.flatMap(id => dssWorkspaceUserService.getAllWorkspaceUsers(id)).distinct
+        val userList = requestUserListFromWorkspace.getUserWorkspaceIds.flatMap(id => dssWorkspaceUserService.getAllWorkspaceUsers(id.asInstanceOf[Long])).distinct
         new ResponseWorkspaceUserList(userList)
 
       case projectInfoRequest: ProjectInfoRequest =>

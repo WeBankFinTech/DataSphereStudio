@@ -71,6 +71,7 @@
         "path": "API路径：",
         "submitter": "提交人",
         "find": "查询",
+        "approve": "批量提交审批",
         "scriptsPath": "脚本路径："
       },
       "buttonText": {
@@ -102,6 +103,8 @@
         "reason": "申请原因",
         "ip_whitelist": "白名单IP",
         "apply_time": "申请起始时间",
+        "applySource": "审批单号",
+        "executeUser": "代理执行用户",
         "caller": "调用方",
         "access": "限流情况",
         "version": "版本号",
@@ -133,6 +136,8 @@
       "disable": "已禁用",
       "normal": "正常",
       "expired": "已过期",
+      "submited": "已提单",
+      "unsubmit": "未提单",
       "all": "全部",
       "updateApiModal": {
         "modalTitle": "数据服务API更新",

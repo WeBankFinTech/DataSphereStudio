@@ -16,6 +16,9 @@
       <FormItem :label-width="80" :label="$t('message.apiServices.label.applicant')" style="width: 300px">
         <Input v-model="formItem.user" :placeholder="$t('message.apiServices.placeholder.emter')"></Input>
       </FormItem>
+      <FormItem :label-width="80" :label="$t('message.apiServices.apiTable.version')" style="width: 300px">
+        <Input v-model="formItem.version" :placeholder="$t('message.apiServices.placeholder.emter')"></Input>
+      </FormItem>
       <FormItem :label-width="80" :label="$t('message.apiServices.label.status')"  style="width: 300px">
         <Select v-model="formItem.status">
           <Option value="">{{$t('message.apiServices.all')}}</Option>
@@ -70,6 +73,7 @@ export default {
       formItem: {
         applyTime: "",
         user: "",
+        version: "",
         status: ""
       },
       page: {
@@ -123,8 +127,18 @@ export default {
           align: "center"
         },
         {
+          title: this.$t('message.apiServices.apiTable.version'),
+          key: "version",
+          align: "center"
+        },
+        {
           title: this.$t('message.apiServices.apiTable.status'),
           slot: "status",
+          align: "center"
+        },
+        {
+          title: this.$t('message.apiServices.apiTable.applySource'),
+          key: "applySource",
           align: "center"
         },
         {
@@ -175,12 +189,14 @@ export default {
         apiId: this.$route.query.id,
         user: this.formItem.user || undefined,
         status: this.formItem.status || undefined,
+        version: this.formItem.version || undefined,
         startDate: this.formItem.applyTime[0] ? this.formItem.applyTime[0].getTime() : undefined,
         endDate: this.formItem.applyTime[1] ? this.formItem.applyTime[1].getTime() : undefined,
         currentPage: this.page.pageNow,
         pageSize: this.page.pageSize,
       }, 'get').then((res) => {
         this.tokenData = res.queryList;
+        console.log('this.tokenData: ', this.tokenData);
         this.page.totalSize = res.total;
         // 每次数据查询之后需比较当前页，是否超出可选范围
         const num = Math.ceil(this.page.totalSize / this.page.pageSize);

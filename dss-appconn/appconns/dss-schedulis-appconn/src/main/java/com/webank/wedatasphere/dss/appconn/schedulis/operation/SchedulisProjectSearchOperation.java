@@ -33,11 +33,11 @@ public class SchedulisProjectSearchOperation
             String errorInfo = (String) map.get("error");
             if (errorInfo != null){
                 if (errorInfo.contains("Project " + requestRef.getProjectName() + " doesn't exist")){
-                    errorInfo += "（工作流对应项目【"+requestRef.getProjectName()+"】在schedulis不存在或已被删除，请在schedulis中重新创建同名项目）";
-                    return ProjectResponseRef.newExternalBuilder().error(errorInfo);
+                    errorInfo += "（工作流对应项目 "+requestRef.getProjectName()+" 在schedulis不存在或已被删除，请在schedulis中重新创建同名项目）";
+                    return ProjectResponseRef.newExternalBuilder().setErrorMsg(errorInfo).success();
                 } else if (errorInfo.contains("Permission denied. Need READ access")) {
-                    errorInfo += "（用户【"+requestRef.getUserName()+"】在schedulis中没有权限操作项目【"+requestRef.getProjectName()+"】）";
-                    return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(map.get("projectId"))).error(errorInfo);
+                    errorInfo += "（在schedulis中已存在相同项目名称 "+requestRef.getProjectName()+" ，但用户 "+requestRef.getUserName()+" 没有权限操作项目）";
+                    return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(map.get("projectId"))).setErrorMsg(errorInfo).success();
                 } else {
                     //接口调用返回其他错误，如网络错误
                     return ProjectResponseRef.newExternalBuilder().error(errorInfo);

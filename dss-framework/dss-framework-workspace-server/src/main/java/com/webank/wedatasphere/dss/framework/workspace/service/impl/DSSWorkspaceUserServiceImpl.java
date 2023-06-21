@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.webank.wedatasphere.dss.common.entity.PageInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
@@ -93,8 +95,16 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<String> getAllWorkspaceUsers(int workspaceId) {
+    public List<String> getAllWorkspaceUsers(long workspaceId) {
         return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
+    }
+
+    @Override
+    public PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize) {
+        PageHelper.startPage(pageNow,pageSize);
+        List<String> dos= dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
+        com.github.pagehelper.PageInfo<String> doPage = new com.github.pagehelper.PageInfo<>(dos);
+        return new PageInfo<>(doPage.getList(), doPage.getTotal());
     }
 
     @Override
@@ -116,6 +126,11 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Override
     public Long getCountByUsername(String username,int workspaceId){
         return dssWorkspaceUserMapper.getCountByUsername(username,workspaceId);
+    }
+
+    @Override
+    public Long getUserCount(long workspaceId) {
+        return dssWorkspaceUserMapper.getUserCountByWorkspaceId(workspaceId);
     }
 
     @Override

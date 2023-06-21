@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.appconn.schedulis.operation;
 
+import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.appconn.schedulis.SchedulisAppConn;
 import com.webank.wedatasphere.dss.appconn.schedulis.utils.SchedulisHttpUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -28,14 +29,19 @@ public class SchedulisProjectSearchOperation
         try {
             String responseBody = SchedulisHttpUtils.getHttpGetResult(queryUrl, params, ssoRequestOperation, requestRef.getWorkspace());
             logger.info("responseBody from Schedulis is: {}.", responseBody);
-            Map map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, Map.class);
+            Map<String,Object> map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, new TypeToken<Map<String,Object>>(){}.getType());
             String errorInfo = (String) map.get("error");
-            if (errorInfo != null && (errorInfo.contains("Project " + requestRef.getProjectName() + " doesn't exist")
-                    //schedulis已删除但未永久删除的项目返回这个
-                    || errorInfo.contains("Permission denied. Need READ access"))) {
-                return ProjectResponseRef.newExternalBuilder().success();
-            } else if (errorInfo != null) {
-                return ProjectResponseRef.newExternalBuilder().error(errorInfo);
+            if (errorInfo != null){
+                if (errorInfo.contains("Project " + requestRef.getProjectName() + " doesn't exist")){
+                    errorInfo += "（工作流对应项目【"+requestRef.getProjectName()+"】在schedulis不存在或已被删除，请在schedulis中重新创建同名项目）";
+                    return ProjectResponseRef.newExternalBuilder().error(errorInfo);
+                } else if (errorInfo.contains("Permission denied. Need READ access")) {
+                    errorInfo += "（用户【"+requestRef.getUserName()+"】在schedulis中没有权限操作项目【"+requestRef.getProjectName()+"】）";
+                    return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(map.get("projectId"))).error(errorInfo);
+                } else {
+                    //接口调用返回其他错误，如网络错误
+                    return ProjectResponseRef.newExternalBuilder().error(errorInfo);
+                }
             }
             return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(map.get("projectId"))).success();
         } catch (Exception e) {

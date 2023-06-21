@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.RevokeUserRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
@@ -33,7 +34,6 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.StringUtils;
-import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.linkis.server.utils.ModuleUserUtils;
@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.webank.wedatasphere.dss.framework.common.conf.TokenConf.HPMS_USER_TOKEN;
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
 
 
@@ -56,8 +57,6 @@ import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceC
 @RestController
 public class DSSWorkspaceUserRestful {
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceUserRestful.class);
-
-    private static final String HPMS_USER_TOKEN = CommonVars.apply("wds.dss.workspace.hpms.user.token", "HPMS-KhFGSQkdaaCPBYfE").getValue();
 
     @Autowired
     private DSSWorkspaceService dssWorkspaceService;
@@ -229,10 +228,30 @@ public class DSSWorkspaceUserRestful {
         }else {
             return Message.error("User:" + userName + " has no permission to clear user.");
         }
-        boolean clearResult = dssWorkspaceUserService.clearUserByUserName(userName);
+        dssWorkspaceUserService.clearUserByUserName(userName);
         AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
-                null, OperateTypeEnum.DELETE,null);
-        return clearResult ? Message.ok("清理成功") : Message.error("userName不是实名用户，不会清理此用户");
+                "clearUser", OperateTypeEnum.DELETE,null);
+        return Message.ok("清理成功");
+
+    }
+
+    @PostMapping(path = "/revokeUserRole")
+    public Message revokeUserRole(@RequestBody RevokeUserRole revokeUserRole) {
+        String userName = revokeUserRole.getUserName();
+        Integer[] workspaceIds = revokeUserRole.getWorkspaceIds();
+        Integer[] roleIds = revokeUserRole.getRoleIds();
+        String token = ModuleUserUtils.getToken(httpServletRequest);
+        if (StringUtils.isNotBlank(token)) {
+            if(!token.equals(HPMS_USER_TOKEN)){
+                return Message.error("Token:" + token + " has no permission to revoke userRole.");
+            }
+        }else {
+            return Message.error("User:" + userName + " has no permission to clear user.");
+        }
+        dssWorkspaceUserService.revokeUserRoles(userName, workspaceIds, roleIds);
+        AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
+                "revokeUserRole", OperateTypeEnum.DELETE,revokeUserRole);
+        return Message.ok("回收成功");
 
     }
 }

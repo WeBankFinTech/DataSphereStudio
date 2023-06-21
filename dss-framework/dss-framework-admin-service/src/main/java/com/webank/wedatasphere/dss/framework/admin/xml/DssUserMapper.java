@@ -1,9 +1,8 @@
 package com.webank.wedatasphere.dss.framework.admin.xml;
 
-import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.webank.wedatasphere.dss.framework.admin.pojo.entity.DssAdminUser;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -72,6 +71,7 @@ public interface DssUserMapper extends BaseMapper<DssAdminUser> {
     DssAdminUser checkEmailUnique(String email);
 
 
+    List<String> getAllUsername();
 
-
+    void deleteUser(String userName);
 }

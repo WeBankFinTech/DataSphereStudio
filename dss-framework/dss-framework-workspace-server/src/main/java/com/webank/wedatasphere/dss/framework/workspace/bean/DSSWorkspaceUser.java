@@ -27,6 +27,8 @@ public class DSSWorkspaceUser {
 
     private int workspaceId;
 
+    private String workspaceName;
+
     private String creator;
 
     private Date joinTime;
@@ -83,6 +85,14 @@ public class DSSWorkspaceUser {
 
     public void setWorkspaceId(int workspaceId) {
         this.workspaceId = workspaceId;
+    }
+
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
     }
 
     public String getCreator() {

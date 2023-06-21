@@ -230,7 +230,7 @@ export default {
       return path
     },
     taskID() {
-      return this.work.taskID || (this.work.data && this.work.data.history && this.work.data.history[0] && this.work.data.history[0].taskID)
+      return this.work ? this.work.taskID || (this.work.data && this.work.data.history && this.work.data.history[0] && this.work.data.history[0].taskID) : ''
     }
   },
   watch: {

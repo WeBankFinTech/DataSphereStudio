@@ -134,21 +134,4 @@ public class DssProxyUserController {
         return Message.ok().data("userNames", proxyUsernames);
     }
 
-    @PostMapping("/revokeProxyUser")
-    public Message revokeProxyUser(HttpServletRequest httpServletRequest,
-                                   @RequestParam("userName")String userName,
-                                   @RequestParam(required = false, name = "proxyUserNames" )String[] proxyUserNames){
-        String token = ModuleUserUtils.getToken(httpServletRequest);
-        if (StringUtils.isNotBlank(token)) {
-            if(!token.equals(HPMS_USER_TOKEN)){
-                return Message.error("Token:" + token + " has no permission to revoke proxyUser.");
-            }
-        }else {
-            return Message.error("User:" + userName + " has no permission to revoke proxyUser.");
-        }
-        dssProxyUserService.revokeProxyUser(userName,proxyUserNames);
-        AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
-                "deleteProxyUser", OperateTypeEnum.DELETE,"userName:" + userName + " ,proxyUserNames:" + Arrays.toString(proxyUserNames));
-        return Message.ok();
-    }
 }

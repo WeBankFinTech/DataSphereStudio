@@ -57,7 +57,7 @@ public interface DSSWorkspaceUserMapper {
     String getHomepageUrl(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId);
 
     @Select("select distinct username from dss_workspace_user_role where workspace_id = #{workspaceId}")
-    List<String> getAllWorkspaceUsers(@Param("workspaceId") int workspaceId);
+    List<String> getAllWorkspaceUsers(@Param("workspaceId") long workspaceId);
 
     @Select("select is_admin from dss_user where username = #{userName}")
     Integer isAdmin(@Param("userName") String userName);
@@ -83,6 +83,9 @@ public interface DSSWorkspaceUserMapper {
 
     @Select("select count(1) from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
     Long getCountByUsername(@Param("username") String username, @Param("workspaceId") int workspaceId);
+
+    @Select("select count( distinct username) from dss_workspace_user_role where workspace_id = #{workspaceId}")
+    Long getUserCountByWorkspaceId(@Param("workspaceId") long workspaceId);
 
     @Select("SELECT DISTINCT dwur.workspace_id, dwur.role_id AS roleIds, dw.name AS workspaceName " +
             "FROM dss_workspace_user_role dwur,dss_workspace dw  WHERE dwur.workspace_id =dw.id AND username = #{username} ")

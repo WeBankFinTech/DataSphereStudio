@@ -34,6 +34,7 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDescImpl;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstanceImpl;
 import org.apache.commons.lang.StringUtils;
@@ -73,7 +74,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             if (appConnManager == null) {
                 //appconn-manager-core包无法引入manager-client包，会有maven循环依赖，这里通过反射获取client的实现类
                 //ismanager=false时，获取client端的AppConnManager实现类，ismanager=true时，获取appconn-framework端的AppConnManager实现类。
-                if (Objects.equals(AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue(), AppConnManagerCoreConf.hostname)) {
+                if (Objects.equals(AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue(), AppConnManagerCoreConf.hostname)
+                        && "dss-server-dev".equals(DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue())) {
                     //通过包名过滤
                     appConnManager = ClassUtils.getInstanceOrDefault(AppConnManager.class, c -> c.getPackage().getName().contains("com.webank.wedatasphere.dss.framework.appconn"), new AppConnManagerImpl());
                 } else {

@@ -16,29 +16,25 @@
 
 package com.webank.wedatasphere.dss.appconn.schedulis.entity;
 
-import java.util.List;
-
 public class AzkabanUserEntity {
-    private String userId;
-    private String fullName;
+    private String id;
+    private String text;
     private String username;
 
-    private List<String> permission;
-
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getText() {
+        return text;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setText(String text) {
+        this.text = text;
     }
 
     public String getUsername() {
@@ -47,13 +43,5 @@ public class AzkabanUserEntity {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public List<String> getPermission() {
-        return permission;
-    }
-
-    public void setPermission(List<String> permission) {
-        this.permission = permission;
     }
 }

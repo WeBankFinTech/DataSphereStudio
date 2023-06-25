@@ -34,7 +34,10 @@ public class SchedulisProjectSearchOperation
             String errorInfo = (String) map.get("error");
             Boolean projectActive = (Boolean)map.get("projectActive");
 
-            if (errorInfo != null){
+            if (BooleanUtils.isFalse(projectActive)) { //项目是删除状态
+                errorInfo += "（项目名称 "+requestRef.getProjectName()+" 在schedulis已被删除，请在schedulis中重新创建同名项目）";
+                return ProjectResponseRef.newExternalBuilder().setErrorMsg(errorInfo).success();
+            } else if (errorInfo != null){
                 if (errorInfo.contains("Project " + requestRef.getProjectName() + " doesn't exist")){
                     errorInfo += "（项目名称 "+requestRef.getProjectName()+" 在schedulis不存在，请在schedulis中创建同名项目）";
                     return ProjectResponseRef.newExternalBuilder().setErrorMsg(errorInfo).success();
@@ -45,9 +48,6 @@ public class SchedulisProjectSearchOperation
                     //接口调用返回其他错误，如网络错误
                     return ProjectResponseRef.newExternalBuilder().error(errorInfo);
                 }
-            } else if (BooleanUtils.isFalse(projectActive)) { //项目是删除状态
-                errorInfo += "（项目名称 "+requestRef.getProjectName()+" 在schedulis已被删除，请在schedulis中重新创建同名项目）";
-                return ProjectResponseRef.newExternalBuilder().setErrorMsg(errorInfo).success();
             }
             return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(map.get("projectId"))).success();
         } catch (Exception e) {

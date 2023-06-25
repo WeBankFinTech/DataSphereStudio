@@ -46,8 +46,8 @@ public class AzkabanUserService {
         try {
             String response = SchedulisHttpUtils.getHttpGetResult(finalUrl, params, ssoRequestOperation, workspace);
             Map<String, Object> map = DSSCommonUtils.COMMON_GSON.fromJson(response, Map.class);
-            if (map.get("systemUserPageList") instanceof List) {
-                newEntityList = ((List<Object>) map.get("systemUserPageList")).stream().map(e -> {
+            if (map.get("systemUserList") instanceof List) {
+                newEntityList = ((List<Object>) map.get("systemUserList")).stream().map(e -> {
                             AzkabanUserEntity userEntity;
                             try {
                                 userEntity = DSSCommonUtils.COMMON_GSON.fromJson(e.toString(), AzkabanUserEntity.class);

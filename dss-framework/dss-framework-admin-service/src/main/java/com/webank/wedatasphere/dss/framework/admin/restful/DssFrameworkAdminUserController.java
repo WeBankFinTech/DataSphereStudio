@@ -143,8 +143,8 @@ public class DssFrameworkAdminUserController extends BaseController {
         return Message.ok().data("userNames", dssAdminUserService.getAllUsername());
     }
 
-    @PostMapping("/deleteUser")
-    public Message deleteUser(HttpServletRequest httpServletRequest, @RequestParam("userName")String userName){
+    @PostMapping("/deleteUser/{userName}")
+    public Message deleteUser(HttpServletRequest httpServletRequest, @PathVariable String userName){
         String token = ModuleUserUtils.getToken(httpServletRequest);
         if (StringUtils.isNotBlank(token)) {
             if(!token.equals(HPMS_USER_TOKEN)){

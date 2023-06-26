@@ -42,7 +42,7 @@ public class SchedulisProjectSearchOperation
                     errorInfo += "（项目名称 "+requestRef.getProjectName()+" 在schedulis不存在，请在schedulis中创建同名项目）";
                     return ProjectResponseRef.newExternalBuilder().setErrorMsg(errorInfo).success();
                 } else if (errorInfo.contains("Permission denied. Need READ access")) {
-                    errorInfo += "（在schedulis中已存在相同项目名称 "+requestRef.getProjectName()+" ，但用户 "+requestRef.getUserName()+" 没有权限操作项目）";
+                    errorInfo += "（在schedulis中已存在相同项目名称 "+requestRef.getProjectName()+" ，但当前登录用户没有权限操作该项目）";
                     return ProjectResponseRef.newExternalBuilder().setRefProjectId(DSSCommonUtils.parseToLong(map.get("projectId"))).setErrorMsg(errorInfo).success();
                 } else {
                     //接口调用返回其他错误，如网络错误

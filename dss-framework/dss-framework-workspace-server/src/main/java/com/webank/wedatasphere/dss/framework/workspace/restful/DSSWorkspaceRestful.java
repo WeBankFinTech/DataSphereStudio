@@ -154,7 +154,7 @@ public class DSSWorkspaceRestful {
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         if (username != null && username.toLowerCase().startsWith("hduser")) {
-            LOGGER.error("Do not allow hduser* accounts to log in DSS system.");
+            return Message.error("Do not allow hduser* accounts to log in DSS system.");
         }
         Workspace workspace = new Workspace();
         try {

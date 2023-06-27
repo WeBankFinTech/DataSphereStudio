@@ -1037,7 +1037,6 @@ export default {
       } else {
         // iframe节点
         await this.saveCommonIframe(node, () => {
-          // flage = true;
         });
       }
       // 为了表单校验，基础信息弹窗保存的节点已不再是响应式，需重新赋值给json

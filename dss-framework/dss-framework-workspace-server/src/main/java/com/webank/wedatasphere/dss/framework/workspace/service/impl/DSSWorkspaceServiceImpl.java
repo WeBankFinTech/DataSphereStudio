@@ -119,8 +119,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             throw exception1;
         }
         Long userId = dssWorkspaceUserMapper.getUserID(userName);
-        dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(),
-                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()), userName, userName, userId, userName);
+        dssWorkspaceUserMapper.insertUserRoleInWorkspace(dssWorkspace.getId(),
+                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()),new Date(), userName, userName, userId, userName);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
         dssComponentRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceComponentPrivs(dssWorkspace.getId(), userName));
@@ -136,22 +136,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspaceUserService.updateWorkspaceUser(roleIds, workspaceId, userName, userName);
     }
 
-
-    //把用户及角色添加到工作空间
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creator, String userId) {
-        //根据用户名 从用户表拿到用户id
-//        Long userId = dssUserService.getUserID(userName);
-        if (userId == null) {
-            //保存 - dss_user
-            dssUserService.insertOrUpdateUser(userName, workspace);
-        }
-        //保存 - 保存用户角色关系 dss_workspace_user_role
-        for (Integer roleId : roleIds) {
-            dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), creator);
-        }
-    }
 
     //获取所有的工作空间
     @Override
@@ -182,11 +166,13 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         if (workspaceIds.size() == 0) {
             Long userId = dssWorkspaceUserMapper.getUserID(userName);
             int workspaceId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+            Integer analyserRole = workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName());
+
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId,analyserRole ,new Date(),
                     userName, "system", userId, "system");
             Integer workspace0xId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
             if (workspace0xId != null) {
-                dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+                dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspace0xId, analyserRole ,new Date(),
                         userName, "system", userId, "system");
             }
             //todo 初始化做的各项事情改为listener模式
@@ -684,7 +670,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         needToAdd.forEach(pair -> {
             Arrays.stream(pair.getValue().split(",")).forEach(roleId -> {
-                dssWorkspaceUserMapper.setUserRoleInWorkspace(pair.getKey().intValue(), Integer.parseInt(roleId), userName, "system", userId, "system");
+                dssWorkspaceUserMapper.insertUserRoleInWorkspace(pair.getKey().intValue(), Integer.parseInt(roleId),new Date(), userName, "system", userId, "system");
             });
         });
     }

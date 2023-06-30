@@ -10,11 +10,11 @@ public interface DSSWorkspaceAddUserHook {
     /**
      * 加入工作空间前执行
      */
-    void beforeAdd(String userName, Workspace workspace);
+    void beforeAdd(String userName, long workspaceId);
 
     /**
      * 加入工作空间后执行
      */
 
-    void afterAdd(String userName, Workspace workspace);
+    void afterAdd(String userName, long workspaceId);
 }

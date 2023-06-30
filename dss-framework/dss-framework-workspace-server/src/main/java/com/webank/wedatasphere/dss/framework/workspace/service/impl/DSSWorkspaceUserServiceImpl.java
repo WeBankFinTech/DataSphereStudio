@@ -18,10 +18,12 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.webank.wedatasphere.dss.common.entity.PageInfo;
+import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceAddUserHook;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -40,6 +42,7 @@ import java.util.stream.Collectors;
 @Service
 public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceUserServiceImpl.class);
     @Autowired
     private DSSWorkspaceUserMapper dssWorkspaceUserMapper;
@@ -49,10 +52,24 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     @Autowired
     private WorkspaceDBHelper workspaceDBHelper;
+    @Autowired
+    private DssAdminUserService dssUserService;
+    @Autowired
+    private DSSWorkspaceAddUserHook dssWorkspaceAddUserHook;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addWorkspaceUser(List<Integer> roleIds, long workspaceId, String userName, String creator, String userId) {
+
+        //保存 - 保存用户角色关系 dss_workspace_user_role
+        for (Integer roleId : roleIds) {
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspaceId, roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), creator);
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator) {
+    public void updateWorkspaceUser(List<Integer> roles, long workspaceId, String userName, String creator) {
         //获取用户创建时间
         DSSWorkspaceUser workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(String.valueOf(workspaceId), userName, null).stream().findFirst().get();
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);

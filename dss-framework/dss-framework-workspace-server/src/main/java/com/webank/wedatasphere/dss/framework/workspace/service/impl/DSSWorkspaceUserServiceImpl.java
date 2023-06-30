@@ -65,6 +65,7 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         for (Integer roleId : roleIds) {
             dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspaceId, roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), creator);
         }
+        dssWorkspaceAddUserHook.afterAdd(userName,workspaceId);
     }
 
     @Override

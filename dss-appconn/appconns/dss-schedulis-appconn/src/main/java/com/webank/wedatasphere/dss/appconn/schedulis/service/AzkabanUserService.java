@@ -37,7 +37,7 @@ public class AzkabanUserService {
         LOGGER.info("try to update all releaseUsers from Schedulis url {}.", baseUrl);
         Map<String, Object> params = new HashMap<>(3);
         params.put("page", "1");
-        params.put("pageSize", "500");
+        params.put("pageSize", "100");
         params.put("serach", releaseUser);
         params.put("ajax", "loadSystemUserSelectData");
         String finalUrl = !baseUrl.endsWith("/") ? (baseUrl + "/" + "system") : baseUrl + "system";

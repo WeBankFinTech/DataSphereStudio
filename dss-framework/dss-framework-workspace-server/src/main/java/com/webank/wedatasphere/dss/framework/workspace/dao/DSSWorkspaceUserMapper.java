@@ -30,16 +30,9 @@ public interface DSSWorkspaceUserMapper {
     Long getUserID(String userName);
 
     String getUserName(Long userID);
-
-    @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by,user_id, update_user, update_time)" +
-            "values(#{workspaceId}, #{username}, #{roleId}, now(), #{createdBy}, #{userId}, #{updateUser}, now())")
-    void setUserRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId,
-                                @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId,
-                                @Param("updateUser") String updateUser);
-
     @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by, user_id, update_user, update_time)" +
             "values(#{workspaceId}, #{username}, #{roleId}, #{createTime}, #{createdBy}, #{userId}, #{updateUser}, now())")
-    void insertUserRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId, @Param("createTime") Date createTime,
+    void insertUserRoleInWorkspace(@Param("workspaceId") long workspaceId, @Param("roleId") int roleId, @Param("createTime") Date createTime,
                                    @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId,@Param("updateUser") String updateUser);
 
     @Select("select role_id from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
@@ -47,7 +40,7 @@ public interface DSSWorkspaceUserMapper {
 
 
     @Delete("delete from dss_workspace_user_role where username = #{username} and workspace_id = #{workspaceId}")
-    void removeAllRolesForUser(@Param("username") String username, @Param("workspaceId") int workspaceId);
+    void removeAllRolesForUser(@Param("username") String username, @Param("workspaceId") long workspaceId);
 
 
     @Select("select distinct workspace_id from dss_workspace_user_role where username = #{username}")

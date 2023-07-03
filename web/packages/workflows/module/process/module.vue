@@ -17,6 +17,7 @@
       @node-delete="nodeDelete"
       @add="addNode"
       @on-ctx-menu="onContextMenu"
+      @search-node-path="showSearchPath"
       @link-delete="linkDelete"
       @link-add="linkAdd">
       <template >
@@ -342,6 +343,7 @@
       :readonly="readonly"
       @release="release"
     />
+    <NodePath :data="json" :show="showNodePathPanel" @close="showNodePathPanel = false" @open-params="click" @open-node="dblclick"/>
   </div>
 </template>
 <script>
@@ -363,7 +365,8 @@ import moment from 'moment';
 import { getPublishStatus } from '@/workflows/service/api.js';
 import module from './index';
 import nodeIcons from './nodeicon';
-import BottomTab from './component/bottomTab.vue'
+import BottomTab from './component/bottomTab.vue';
+import NodePath from './component/nodePath.vue';
 
 export default {
   components: {
@@ -373,7 +376,8 @@ export default {
     nodeParameter,
     associateScript,
     console,
-    BottomTab
+    BottomTab,
+    NodePath
   },
   mixins: [mixin],
   directives: {
@@ -499,6 +503,7 @@ export default {
       needReRun: false,
       locked: false,
       extraToolbar: [],
+      showNodePathPanel: false
     };
   },
   computed: {
@@ -2398,6 +2403,9 @@ export default {
           }
         }
       }
+    },
+    showSearchPath() {
+      this.showNodePathPanel = true
     }
   }
 }

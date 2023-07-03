@@ -21,6 +21,9 @@
       <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.search')" @click="clickToolItem('search')">
         <Icon name="search" />
       </div>
+      <div class="designer-control-button" :title="$t('message.workflow.vueProcess.narrow')" @click="clickNodePath">
+        <SvgIcon icon-class="nodepath" />
+      </div>
     </div>
     <div v-show="formatDialogVisible" class="designer-control-dialog">
       <div class="line-type">
@@ -152,6 +155,9 @@ export default {
           this.pageSizeList[index - 1].value
         );
       }
+    },
+    clickNodePath() {
+      this.designer.$emit('search-node-path')
     },
     toggleFullScreen() {
       commit(this.$store, 'UPDATE_FULL_SCREEN', !this.state.fullScreen);

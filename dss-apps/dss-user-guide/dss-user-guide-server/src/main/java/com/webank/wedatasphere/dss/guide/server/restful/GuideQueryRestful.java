@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/dss/guide/query", produces = {"application/json"})
+@RequestMapping(path = "/dss/guide/queryguide", produces = {"application/json"})
 @AllArgsConstructor
 public class GuideQueryRestful {
     private static final Logger logger = LoggerFactory.getLogger(GuideQueryRestful.class);

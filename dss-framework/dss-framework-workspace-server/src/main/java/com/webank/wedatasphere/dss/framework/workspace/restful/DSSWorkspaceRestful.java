@@ -18,11 +18,12 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.entity.NoticeContent;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.service.NoticeService;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
-import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
@@ -72,6 +73,9 @@ public class DSSWorkspaceRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private HttpServletResponse httpServletResponse;
+
+    @Autowired
+    private NoticeService noticeService;
 
     @RequestMapping(path = "createWorkspace", method = RequestMethod.POST)
     public Message createWorkspace(@RequestBody CreateWorkspaceRequest createWorkspaceRequest) throws ErrorException {
@@ -332,6 +336,11 @@ public class DSSWorkspaceRestful {
         return Message.ok().data("favoriteId", favoriteId);
     }
 
+    @GetMapping("getNotice")
+    public Message getNotice(){
+        List<NoticeContent> noticeContent= noticeService.getNoticeContent();
+        return Message.ok("公告获取成功").data("notices", noticeContent);
+    }
 
 }
 

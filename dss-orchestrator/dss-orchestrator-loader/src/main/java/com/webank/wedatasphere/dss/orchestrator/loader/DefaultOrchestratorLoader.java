@@ -66,7 +66,7 @@ public class DefaultOrchestratorLoader implements OrchestratorLoader {
         if (appConnList.stream().anyMatch(t -> t instanceof SchedulerAppConn)) {
             List<SchedulerAppConn> schedulerAppConns = AppConnManager.getAppConnManager().listAppConns(SchedulerAppConn.class);
             SchedulerAppConn schedulerAppConn;
-            if(StringUtils.isBlank(relation.getBindingSchedulerAppConnName())) {
+            if (StringUtils.isBlank(relation.getBindingSchedulerAppConnName())) {
                 schedulerAppConn = schedulerAppConns.get(0);
             } else {
                 schedulerAppConn = schedulerAppConns.stream().filter(appConn1 -> appConn1.getAppDesc().getAppName().equals(relation.getBindingSchedulerAppConnName()))

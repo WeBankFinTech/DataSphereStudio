@@ -185,7 +185,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         Long refProjectId, refOrchestrationId;
         if (askProjectSender) {
             ProjectRefIdResponse projectRefIdResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                    .ask(new ProjectRefIdRequest(orchestrationPair.getValue().getId(), dssOrchestrator.getProjectId())), ProjectRefIdResponse.class, ProjectRefIdRequest.class);
+                    .ask(new ProjectRefIdRequest(Optional.ofNullable(orchestrationPair).map(ImmutablePair::getValue).map(AppInstance::getId).orElse(null), dssOrchestrator.getProjectId())), ProjectRefIdResponse.class, ProjectRefIdRequest.class);
            refProjectId = projectRefIdResponse.getRefProjectId();
             refOrchestrationId = null;
         } else {
@@ -378,11 +378,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             dssOrchestratorInfo.setLinkedAppConnNames(dssOrchestrator.getLinkedAppConn().stream().map(appConn -> appConn.getAppDesc().getAppName()).collect(Collectors.toList()));
         }
         SchedulerAppConn appConn = dssOrchestrator.getSchedulerAppConn();
-        if (appConn == null) {
-            throw new ExternalOperationWarnException(50322, "DSSOrchestrator " + dssOrchestrator.getName() + " has no SchedulerAppConn.");
+        if (appConn != null) {
+            AppInstance appInstance = appConn.getAppDesc().getAppInstances().get(0);
+            return new ImmutablePair<>(appConn.getOrCreateStructureStandard().getOrchestrationService(appInstance), appInstance);
+        } else {
+            return new ImmutablePair<>(null, null);
         }
-        AppInstance appInstance = appConn.getAppDesc().getAppInstances().get(0);
-        return new ImmutablePair<>(appConn.getOrCreateStructureStandard().getOrchestrationService(appInstance), appInstance);
     }
 
     /**

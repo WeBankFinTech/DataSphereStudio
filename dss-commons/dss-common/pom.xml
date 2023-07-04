@@ -149,7 +149,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
-            <!--                <scope>test</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-mybatis</artifactId>
+            <version>${linkis.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

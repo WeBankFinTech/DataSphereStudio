@@ -70,7 +70,11 @@
             <artifactId>dss-framework-migrate-server</artifactId>
             <version>${dss.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-scriptis-server</artifactId>
+            <version>${dss.version}</version>
+        </dependency>
 
     </dependencies>
 

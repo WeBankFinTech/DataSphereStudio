@@ -69,12 +69,12 @@
         <dependency>
             <artifactId>spring-aop</artifactId>
             <groupId>org.springframework</groupId>
-            <version>${spring.version}</version>
+            <version>${spring-framework.version}</version>
         </dependency>
         <dependency>
             <artifactId>spring-context</artifactId>
             <groupId>org.springframework</groupId>
-            <version>${spring.version}</version>
+            <version>${spring-framework.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.linkis</groupId>

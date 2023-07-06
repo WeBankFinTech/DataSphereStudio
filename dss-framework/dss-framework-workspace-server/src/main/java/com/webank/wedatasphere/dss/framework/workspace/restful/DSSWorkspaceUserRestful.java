@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.RevokeUserRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
@@ -62,6 +63,8 @@ public class DSSWorkspaceUserRestful {
     private DSSWorkspaceService dssWorkspaceService;
     @Autowired
     private WorkspaceDBHelper workspaceDBHelper;
+    @Autowired
+    private DssAdminUserService dssUserService;
     @Autowired
     private DSSWorkspaceUserService dssWorkspaceUserService;
     @Autowired
@@ -148,7 +151,8 @@ public class DSSWorkspaceUserRestful {
         if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
-        dssWorkspaceService.addWorkspaceUser(roles, workspace, userName, creator, userId);
+        dssUserService.insertOrUpdateUser(userName, workspace);
+        dssWorkspaceUserService.addWorkspaceUser(roles, workspace.getWorkspaceId(), userName, creator, userId);
         AuditLogUtils.printLog(userName,workspaceId, workspace.getWorkspaceName(), TargetTypeEnum.WORKSPACE,workspaceId,
                 workspace.getWorkspaceName(), OperateTypeEnum.ADD_USERS,updateWorkspaceUserRequest);
         return Message.ok();

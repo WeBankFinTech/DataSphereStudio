@@ -85,6 +85,9 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             if (responseRef.isFailed()) {
                 throw new ExternalOperationFailedException(90012, responseRef.getErrorMsg());
             }
+            if (responseRef.isSucceed() && StringUtils.isNotBlank(responseRef.getErrorMsg() )) {
+                throw new DSSRuntimeException(90012, responseRef.getErrorMsg());
+            }
             //项目存在，则继续执行如下步骤
             String projectPath = azkabanConvertedRel.getStorePath();
             tmpSavePath = ZipHelper.zip(projectPath);

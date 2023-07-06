@@ -7,6 +7,13 @@
         "en": "demo/i18n/en.json",
         "zh-CN": "demo/i18n/zh.json"
       }
+    },
+    "sparketl": {
+      "routes": "sparketl/router/index",
+      "i18n": {
+        "en": "sparketl/utils/i18n/zh.json",
+        "zh-CN": "sparketl/utils/i18n/zh.json"
+      }
     }
   },
   "exts": {

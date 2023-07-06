@@ -68,7 +68,6 @@
     }
   },
   "components": {
-    "WeEditorLsp": "editorLsp/index.js",
     "WeEditor": "editor/index.js"
   },
   "conf": {
@@ -82,10 +81,7 @@
       "template": "${username} ${time}",
       "timeupdate": 60000
     },
-    "lsp_service": {
-      "sql": "${protocol}//${host}/server",
-      "py": "${protocol}//${host}/python"
-    }
+    "env": "opensource"
   },
   "version": "1.1.12"
 }

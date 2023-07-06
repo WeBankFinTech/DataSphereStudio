@@ -256,7 +256,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         switch (responseUnlockWorkflow.getUnlockStatus()) {
             case ResponseUnlockWorkflow.NONEED_UNLOCK:
                 //DSSExceptionUtils.dealErrorException(62001, String.format("解锁失败，当前工作流未被锁定：%s", dssOrchestratorInfo.getName()), DSSErrorException.class);
-                return new OrchestratorUnlockVo(null, null, 1);
+                return new OrchestratorUnlockVo(null, null, 0);
             case ResponseUnlockWorkflow.NEED_SECOND_CONFIRM:
                 String lockOwner = responseUnlockWorkflow.getLockOwner();
                 String confirmMsg = String.format("当前工作流已被%s锁定编辑，强制解锁工作流会导致%s已编辑的内容无法保存，请与%s确认后再解锁工作流。", lockOwner, lockOwner, lockOwner);

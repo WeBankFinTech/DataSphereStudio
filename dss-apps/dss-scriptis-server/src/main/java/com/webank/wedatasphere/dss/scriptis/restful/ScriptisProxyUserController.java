@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.proxy.restful.DssProxyUserController;
+import com.webank.wedatasphere.dss.scriptis.pojo.entity.ProxyUserRevokeRequest;
 import com.webank.wedatasphere.dss.scriptis.pojo.entity.ScriptisProxyUser;
 import com.webank.wedatasphere.dss.scriptis.service.ScriptisProxyUserService;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -14,6 +15,7 @@ import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,8 +53,9 @@ public class ScriptisProxyUserController extends DssProxyUserController {
     }
     @PostMapping("/revokeProxyUser")
     public Message revokeProxyUser(HttpServletRequest httpServletRequest,
-                                   @RequestParam("userName")String userName,
-                                   @RequestParam(required = false, name = "proxyUserNames" )String[] proxyUserNames){
+                                   @Validated @RequestBody ProxyUserRevokeRequest proxyUserRevokeRequest){
+        String userName = proxyUserRevokeRequest.getUserName();
+        String[] proxyUserNames = proxyUserRevokeRequest.getProxyUserNames();
         String token = ModuleUserUtils.getToken(httpServletRequest);
         if (StringUtils.isNotBlank(token)) {
             if(!token.equals(HPMS_USER_TOKEN)){

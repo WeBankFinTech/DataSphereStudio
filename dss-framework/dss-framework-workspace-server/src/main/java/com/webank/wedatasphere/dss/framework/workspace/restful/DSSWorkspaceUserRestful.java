@@ -41,13 +41,13 @@ import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.common.conf.TokenConf.HPMS_USER_TOKEN;
@@ -218,7 +218,7 @@ public class DSSWorkspaceUserRestful {
         }else {
             return Message.error("User:" + username + " has no permission to get user info.");
         }
-        List<Map<String,Object>> userRoles = dssWorkspaceUserService.getUserRoleByUserName(username);
+        List<DSSWorkspaceRoleVO> userRoles = dssWorkspaceUserService.getUserRoleByUserName(username);
         return Message.ok().data("userName", username).data("roleInfo", userRoles);
     }
 
@@ -240,7 +240,7 @@ public class DSSWorkspaceUserRestful {
     }
 
     @PostMapping(path = "/revokeUserRole")
-    public Message revokeUserRole(@RequestBody RevokeUserRole revokeUserRole) {
+    public Message revokeUserRole(@Validated @RequestBody RevokeUserRole revokeUserRole) {
         String userName = revokeUserRole.getUserName();
         Integer[] workspaceIds = revokeUserRole.getWorkspaceIds();
         Integer[] roleIds = revokeUserRole.getRoleIds();

@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.common.entity.PageInfo;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceAddUserHook;
@@ -35,7 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -152,18 +154,10 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<Map<String,Object>> getUserRoleByUserName(String userName) {
-        List<DSSWorkspaceUser> workspaceRoles = dssWorkspaceUserMapper.getWorkspaceRoleByUsername(userName);
-        List<Map<String,Object>> list = new ArrayList<>();
-        workspaceRoles.forEach(workspaceRole -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("workspaceId", workspaceRole.getWorkspaceId());
-            map.put("roleId", workspaceRole.getRoleIds());
-            map.put("roleName", workspaceDBHelper.getRoleFrontName(Integer.parseInt(workspaceRole.getRoleIds())));
-            map.put("workspaceName", workspaceRole.getWorkspaceName());
-            list.add(map);
-        });
-        return list;
+    public List<DSSWorkspaceRoleVO> getUserRoleByUserName(String userName) {
+        List<DSSWorkspaceRoleVO> workspaceUserRoles = dssWorkspaceUserMapper.getWorkspaceRoleByUsername(userName);
+        workspaceUserRoles.forEach(workspaceUserRole -> workspaceUserRole.setRoleName(workspaceDBHelper.getRoleFrontName(workspaceUserRole.getRoleId())));
+        return workspaceUserRoles;
     }
 
     @Override

@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.Date;
@@ -80,9 +81,9 @@ public interface DSSWorkspaceUserMapper {
     @Select("select count( distinct username) from dss_workspace_user_role where workspace_id = #{workspaceId}")
     Long getUserCountByWorkspaceId(@Param("workspaceId") long workspaceId);
 
-    @Select("SELECT DISTINCT dwur.workspace_id, dwur.role_id AS roleIds, dw.name AS workspaceName " +
+    @Select("SELECT DISTINCT dwur.workspace_id, dwur.role_id, dw.name AS workspaceName " +
             "FROM dss_workspace_user_role dwur,dss_workspace dw  WHERE dwur.workspace_id =dw.id AND username = #{username} ")
-    List<DSSWorkspaceUser> getWorkspaceRoleByUsername(@Param("username") String username);
+    List<DSSWorkspaceRoleVO> getWorkspaceRoleByUsername(@Param("username") String username);
 
     @Delete("delete from dss_workspace_user_role where username = #{username} ")
     void deleteUserRolesByUserName(@Param("username") String username);

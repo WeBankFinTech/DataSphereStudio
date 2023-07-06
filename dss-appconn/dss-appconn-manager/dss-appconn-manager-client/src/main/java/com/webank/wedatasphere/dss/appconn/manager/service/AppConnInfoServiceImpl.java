@@ -25,6 +25,8 @@ import com.webank.wedatasphere.dss.appconn.manager.entity.AppInstanceInfo;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppConnInfoResult;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppConnInfosResult;
 import com.webank.wedatasphere.dss.appconn.manager.result.GetAppInstancesResult;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.common.conf.Configuration;
 import org.apache.linkis.httpclient.config.ClientConfig;
 import org.apache.linkis.httpclient.dws.DWSHttpClient;
@@ -56,7 +58,10 @@ public class AppConnInfoServiceImpl implements AppConnInfoService {
         action.setAppConnName(appConnName);
         action.setUser(LINKIS_ADMIN_USER.getValue());
         GetAppConnInfoResult result = (GetAppConnInfoResult) client.execute(action);
-        return result.getAppConnInfo();
+        if (CollectionUtils.isEmpty(result.getAppConnInfo())) {
+            throw new DSSRuntimeException("Cannot get any info about AppConn " + appConnName);
+        }
+        return result.getAppConnInfo().get(0);
     }
 
     @Override

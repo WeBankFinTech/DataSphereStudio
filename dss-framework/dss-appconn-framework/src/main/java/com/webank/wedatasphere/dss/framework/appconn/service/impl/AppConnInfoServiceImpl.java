@@ -54,7 +54,11 @@ public class AppConnInfoServiceImpl implements AppConnInfoService {
 
     @Override
     public AppConnInfo getAppConnInfo(String appConnName) {
-        return appConnMapper.getAppConnBeanByName(appConnName);
+        AppConnBean appConnBean = appConnMapper.getAppConnBeanByName(appConnName);
+        if (StringUtils.isNotBlank(appConnBean.getResource())) {
+            appConnBean.setAppConnResource(AppConnServiceUtils.stringToResource(appConnBean.getResource()).getResource());
+        }
+        return appConnBean;
     }
 
     @Override

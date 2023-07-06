@@ -20,6 +20,17 @@ function isSuccess(){
   fi
 }
 
+function refresh() {
+  while true; do
+    response=$(curl -H "Token-Code:BML-AUTH" -H "Token-User:hadoop" -X GET http://${GATEWAY_INSTALL_IP}:${GATEWAY_PORT}/api/rest_j/v1/dss/framework/project/appconn/${APPCONN_NAME}/load)
+    if [[ $response == *"succeed"* ]]; then
+      break
+    else
+      sleep 1
+    fi
+  done
+}
+
 if [ -z $1 ];then
   if [ -z $APPCONN_NAME ]; then
     APPCONN_NAME=''
@@ -39,19 +50,20 @@ if [ -z $1 ];then
     sh $SOURCE_ROOT/sbin/dss-start-all.sh
   else
     echo "You chose to wait for 5 minutes."
-    echo "Now try to call dss-framework-project to reload the plugin of $APPCONN_NAME AppConn."
-    curl -H "Token-Code:BML-AUTH" -H "Token-User:hadoop" -X GET http://${GATEWAY_INSTALL_IP}:${GATEWAY_PORT}/api/rest_j/v1/dss/framework/project/appconn/${APPCONN_NAME}/load
-    isSuccess "reload the plugin of $APPCONN_NAME AppConn in dss-framework-project."
+    echo "Now try to call dss-server to reload the plugin of $APPCONN_NAME AppConn. Please wait!"
+    refresh
+    isSuccess "reload the plugin of $APPCONN_NAME AppConn in dss-server."
     echo "Now please wait for 5 minutes, then all of the DSS micro-services will refresh the ${APPCONN_NAME} AppConn plugin."
     echo ""
     exit 0
   fi
 else
   APPCONN_NAME=$1
-  echo "Now try to call dss-framework-project to reload the plugin of $APPCONN_NAME AppConn."
-  curl -H "Token-Code:BML-AUTH" -H "Token-User:hadoop" -X GET http://${GATEWAY_INSTALL_IP}:${GATEWAY_PORT}/api/rest_j/v1/dss/framework/project/appconn/${APPCONN_NAME}/load
-  isSuccess "reload the plugin of $APPCONN_NAME AppConn in dss-framework-project."
+  echo "Now try to call dss-server to reload the plugin of $APPCONN_NAME AppConn. Please wait!"
+  refresh
+  isSuccess "reload the plugin of $APPCONN_NAME AppConn in dss-server."
   echo "Now please wait for 5 minutes, then all of the DSS micro-services will refresh the ${APPCONN_NAME} AppConn plugin."
   echo ""
   exit 0
 fi
+

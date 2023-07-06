@@ -1416,7 +1416,7 @@ export default {
       left: 0 !important;
       position: fixed;
       z-index: 1050;
-      height: 100% !important;
+      height: calc(100% - 54px) !important;
     }
     .new-sidebar-spin {
       @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
@@ -1433,7 +1433,7 @@ export default {
       left: 0 !important;
       position: fixed;
       z-index: 1050;
-      height: 100% !important;
+      height: calc(100% - 54px) !important;
     }
     .workbench-tabs {
       position: $relative;

@@ -36,18 +36,19 @@ public class AzkabanUserService {
     private static List<AzkabanUserEntity> requestUserId(String releaseUser, String baseUrl, SSORequestOperation ssoRequestOperation, Workspace workspace) {
         LOGGER.info("try to update all releaseUsers from Schedulis url {}.", baseUrl);
         Map<String, Object> params = new HashMap<>(3);
-        params.put("searchterm", releaseUser);
-        params.put("start", 0);
-        params.put("pageSize", 500);
-        params.put("ajax", "findSystemUserPage");
+        params.put("page", "1");
+        params.put("pageSize", "100");
+        params.put("serach", releaseUser);
+        params.put("ajax", "loadSystemUserSelectData");
         String finalUrl = !baseUrl.endsWith("/") ? (baseUrl + "/" + "system") : baseUrl + "system";
         //systemUserTotalCount  page
         List<AzkabanUserEntity> newEntityList = new ArrayList<>();
         try {
             String response = SchedulisHttpUtils.getHttpGetResult(finalUrl, params, ssoRequestOperation, workspace);
+            LOGGER.info("call schedulist method {}, response {}", finalUrl, response);
             Map<String, Object> map = DSSCommonUtils.COMMON_GSON.fromJson(response, Map.class);
-            if (map.get("systemUserPageList") instanceof List) {
-                newEntityList = ((List<Object>) map.get("systemUserPageList")).stream().map(e -> {
+            if (map.get("systemUserList") instanceof List) {
+                newEntityList = ((List<Object>) map.get("systemUserList")).stream().map(e -> {
                             AzkabanUserEntity userEntity;
                             try {
                                 userEntity = DSSCommonUtils.COMMON_GSON.fromJson(e.toString(), AzkabanUserEntity.class);
@@ -74,7 +75,7 @@ public class AzkabanUserService {
     public static String getUserId(String user, String baseUrl,
                                    SSORequestOperation ssoRequestOperation, Workspace workspace) {
         String userId = requestUserId(user, baseUrl, ssoRequestOperation, workspace)
-                .stream().filter(userEntity -> userEntity.getUsername().equals(user)).findAny().orElse(new AzkabanUserEntity()).getUserId();
+                .stream().filter(userEntity -> userEntity.getUsername().equals(user)).findAny().orElse(new AzkabanUserEntity()).getId();
         if (StringUtils.isBlank(userId)) {
             throw new ExternalOperationFailedException(10823, "Not exists user in Schedulis " + user);
         }

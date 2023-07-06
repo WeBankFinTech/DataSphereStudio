@@ -65,15 +65,19 @@ public class DevelopmentOperationUtils {
         }
         K requestRef = RequestRefUtils.getRequestRef(operation);
         if(jobContentRequestRefConsumer != null && requestRef instanceof DSSJobContentRequestRef) {
+            LOGGER.info("requestRef is DSSJobContentRequestRef");
             jobContentRequestRefConsumer.accept((DSSJobContentRequestRef) requestRef);
         }
         if(refJobContentRequestRefConsumer != null && requestRef instanceof RefJobContentRequestRef) {
+            LOGGER.info("requestRef is RefJobContentRequestRef");
             refJobContentRequestRefConsumer.accept((RefJobContentRequestRef) requestRef);
         }
         if(contextRequestRefConsumer != null && requestRef instanceof DSSContextRequestRef) {
+            LOGGER.info("requestRef is DSSContextRequestRef");
             contextRequestRefConsumer.accept((DSSContextRequestRef) requestRef);
         }
         if(projectRefRequestRefConsumer != null && requestRef instanceof ProjectRefRequestRef) {
+            LOGGER.info("requestRef is ProjectRefRequestRef");
             projectRefRequestRefConsumer.accept((ProjectRefRequestRef) requestRef);
         }
         V responseRef;

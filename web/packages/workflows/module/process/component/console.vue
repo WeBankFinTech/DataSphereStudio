@@ -563,7 +563,7 @@ export default {
       left: 0 !important;
       position: fixed;
       z-index: 1050;
-      height: 100% !important;
+      height: calc(100% - 54px) !important;
       width: 100% !important;
     }
     .workbench-tabs {

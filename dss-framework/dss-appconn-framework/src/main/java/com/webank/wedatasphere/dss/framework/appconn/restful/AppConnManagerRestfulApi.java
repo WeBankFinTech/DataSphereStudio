@@ -16,7 +16,6 @@
 
 package com.webank.wedatasphere.dss.framework.appconn.restful;
 
-import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerCoreConf;
@@ -114,9 +113,8 @@ public class AppConnManagerRestfulApi {
     @RequestMapping(path = "{appConnName}/get", method = RequestMethod.GET)
     public Message get(@PathVariable("appConnName") String appConnName) {
         LOGGER.info("try to get appconn info:{}.", appConnName);
-        AppConnInfo appConnInfoOne = appConnInfoService.getAppConnInfo(appConnName);
+        AppConnInfo appConnInfo = appConnInfoService.getAppConnInfo(appConnName);
         Message message = Message.ok("Get AppConnInfo succeed.");
-        List<? extends AppConnInfo> appConnInfo = Lists.newArrayList(appConnInfoOne);
         message.data("appConnInfo", appConnInfo);
         return message;
     }

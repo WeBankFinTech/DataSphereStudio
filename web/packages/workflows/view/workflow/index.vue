@@ -129,7 +129,7 @@
             :query="item.query"
             @updateWorkflowList="updateWorkflowList"
             @isChange="isChange(index, arguments)"
-            @close="onTabRemove(item.tabId)"
+            @close="onTabRemove(item.tabId, false)"
             @open="reopen(item)"
             @release="(p)=>{openItemAction({...p, name: `${item.name}(${$t('message.workflow.historicalVersion')})`})}"
           ></process>
@@ -1104,7 +1104,7 @@ export default {
         this.tabList.push(this.current);
       }
     },
-    onTabRemove(tabId) {
+    onTabRemove(tabId, del) {
       let index = "";
       const removeData = this.tabList.filter((item, i) => {
         if (item.tabId === tabId) {
@@ -1129,7 +1129,7 @@ export default {
           }
         }
         this.tabList.splice(index, 1);
-        this.deleteEditLock(removeData.query.appId);
+        if (del !== false) this.deleteEditLock(removeData.query.appId);
         let workspaceId = this.$route.query.workspaceId;
         let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
         workFlowLists = workFlowLists.filter(it=>it.tabId !== tabId);

@@ -405,7 +405,7 @@ CREATE TABLE `dss_workflow_execute_info` (
 DROP TABLE IF EXISTS `dss_workflow_node`;
 CREATE TABLE `dss_workflow_node` (
    `id` int(11) NOT NULL AUTO_INCREMENT,
-   `name` varchar(16) DEFAULT NULL,
+   `name` varchar(24) DEFAULT NULL,
    `appconn_name` varchar(64) DEFAULT '-1' COMMENT 'appconn的名称，与dss_appconn这表的appconn_name名称对应',
    `node_type` varchar(255) DEFAULT NULL,
    `jump_type` int(11) DEFAULT NULL,

@@ -193,7 +193,10 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                         ((QueryJumpUrlRequestRef) refJobContentRequestRef).setSSOUrlBuilderOperation(getSSOUrlBuilderOperation(appConn, node.getWorkspace()));
                     }
                 },
-                dssContextRequestRef -> dssContextRequestRef.setContextId(node.getContextId()),
+                dssContextRequestRef -> {
+                    logger.info("execute dssContextRequestRef setters. contextId:{}", node.getContextId());
+                    dssContextRequestRef.setContextId(node.getContextId());
+                },
                 projectRefRequestRef -> {
                     Long refProjectId;
                     //todo 第一次导入时用的是dev的refProjectId
@@ -202,9 +205,11 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 //                    } else {
                     refProjectId = parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), node.getDssLabels());
 //                    }
+                    logger.info("execute projectRefRequestRef setters. DSSProjectId:{},RefProjectId:{},projectName:{}", node.getProjectId(),refProjectId,node.getProjectName());
                     projectRefRequestRef.setDSSProjectId(node.getProjectId()).setRefProjectId(refProjectId).setProjectName(node.getProjectName());
                 },
                 (developmentOperation, developmentRequestRef) -> {
+                    logger.info("execute developmentRequestRef setters. lablel:{},username:{},workspace:{},name:{},noteType:{}", node.getDssLabels(), userName, node.getWorkspace(), name, node.getNodeType());
                     developmentRequestRef.setDSSLabels(node.getDssLabels()).setUserName(userName).setWorkspace(node.getWorkspace()).setName(name).setType(node.getNodeType());
                     return requestRefOperationFunction.apply(developmentOperation, (K) developmentRequestRef);
                 }, responseRefConsumer, appConn.getAppDesc().getAppName() + " try to " + operation + " workflow node " + name);
@@ -243,6 +248,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     @Override
     public Map<String, Object> updateNode(String userName, CommonAppConnNode node) throws ExternalOperationFailedException {
+        logger.info("update node. node name:{}", node.getName());
         tryNodeOperation(userName, node, this::getRefCRUDService, developmentService -> ((RefCRUDService) developmentService).getRefUpdateOperation(),
                 (developmentOperation, developmentRequestRef) -> ((RefUpdateOperation) developmentOperation).updateRef((UpdateRequestRef) developmentRequestRef), null, "update");
         return node.getJobContent();

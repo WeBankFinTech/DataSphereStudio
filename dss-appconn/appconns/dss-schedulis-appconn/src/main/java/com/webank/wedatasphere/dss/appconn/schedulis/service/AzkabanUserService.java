@@ -45,6 +45,7 @@ public class AzkabanUserService {
         List<AzkabanUserEntity> newEntityList = new ArrayList<>();
         try {
             String response = SchedulisHttpUtils.getHttpGetResult(finalUrl, params, ssoRequestOperation, workspace);
+            LOGGER.info("call schedulist method {}, response {}", finalUrl, response);
             Map<String, Object> map = DSSCommonUtils.COMMON_GSON.fromJson(response, Map.class);
             if (map.get("systemUserList") instanceof List) {
                 newEntityList = ((List<Object>) map.get("systemUserList")).stream().map(e -> {

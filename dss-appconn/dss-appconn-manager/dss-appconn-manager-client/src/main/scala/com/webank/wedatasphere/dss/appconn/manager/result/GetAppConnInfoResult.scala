@@ -17,26 +17,22 @@
 package com.webank.wedatasphere.dss.appconn.manager.result
 
 import java.util
-import com.webank.wedatasphere.dss.appconn.manager.entity.{AppConnInfo, AppConnInfoImpl}
+
+import com.webank.wedatasphere.dss.appconn.manager.entity.AppConnInfoImpl
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import org.apache.linkis.httpclient.dws.annotation.DWSHttpMessageResult
 import org.apache.linkis.httpclient.dws.response.DWSResult
 
-import scala.collection.convert.wrapAsScala._
-import scala.collection.convert.wrapAsJava._
-
 @DWSHttpMessageResult("/api/rest_j/v\\d+/dss/framework/project/appconn/[a-zA-Z0-9]+/get")
 class GetAppConnInfoResult extends DWSResult {
 
-  private var appConnInfo: util.List[AppConnInfo] = _
+  private var appConnInfo: AppConnInfoImpl = _
 
-  def setAppConnInfo(appConnInfo: util.List[util.Map[String, Object]]): Unit = {
-    this.appConnInfo = appConnInfo.map{ map =>
-      val json = DSSCommonUtils.COMMON_GSON.toJson(map)
-      DSSCommonUtils.COMMON_GSON.fromJson(json, classOf[AppConnInfoImpl]).asInstanceOf[AppConnInfo]
-    }
+  def setAppConnInfo(appConnInfo: util.Map[String, Object]): Unit = {
+    val json = DSSCommonUtils.COMMON_GSON.toJson(appConnInfo)
+    this.appConnInfo = DSSCommonUtils.COMMON_GSON.fromJson(json, classOf[AppConnInfoImpl])
   }
 
-  def getAppConnInfo: util.List[AppConnInfo] = appConnInfo
+  def getAppConnInfo: AppConnInfoImpl = appConnInfo
 
 }

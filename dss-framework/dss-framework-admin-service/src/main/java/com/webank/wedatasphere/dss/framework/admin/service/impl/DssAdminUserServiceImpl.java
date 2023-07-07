@@ -108,6 +108,21 @@ public class DssAdminUserServiceImpl extends ServiceImpl<DssUserMapper, DssAdmin
         }
     }
 
+    @Override
+    public void insertIfNotExist(String username, Workspace workspace) {
+        DssAdminUser dssUser = dssUserMapper.selectUserByName(username);
+        if (dssUser == null) {
+            logger.info("new user {} access to DSS, now try to add it.", username);
+            dssUser = new DssAdminUser();
+            dssUser.setUserName(username);
+            dssUser.setName(username);
+            dssUser.setIsFirstLogin(1);
+            dssUser.setIsAdmin(ArrayUtils.contains(SUPER_ADMIN_LIST, username) ? 1 : 0);
+            dssUser.setLoginNum(1);
+            insertUser(dssUser, workspace);
+        }
+    }
+
     /**
      * 新增保存用户信息
      *

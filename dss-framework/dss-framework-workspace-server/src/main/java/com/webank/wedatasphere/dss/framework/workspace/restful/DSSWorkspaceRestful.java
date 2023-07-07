@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
-import com.webank.wedatasphere.dss.common.entity.NoticeContent;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.common.service.NoticeService;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
@@ -34,6 +32,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverv
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
+import com.webank.wedatasphere.dss.framework.workspace.service.NoticeService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;

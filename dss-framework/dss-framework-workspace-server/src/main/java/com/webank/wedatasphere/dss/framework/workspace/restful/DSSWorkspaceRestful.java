@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.NoticeContent;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorkspaceRequest;

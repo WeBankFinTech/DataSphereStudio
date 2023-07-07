@@ -151,7 +151,7 @@ public class DSSWorkspaceUserRestful {
         if (!roleCheckService.checkRolesOperation(workspaceId, creator, userName, roles)) {
             return Message.error("无权限进行该操作");
         }
-        dssUserService.insertOrUpdateUser(userName, workspace);
+        dssUserService.insertIfNotExist(userName, workspace);
         dssWorkspaceUserService.addWorkspaceUser(roles, workspace.getWorkspaceId(), userName, creator, userId);
         AuditLogUtils.printLog(userName,workspaceId, workspace.getWorkspaceName(), TargetTypeEnum.WORKSPACE,workspaceId,
                 workspace.getWorkspaceName(), OperateTypeEnum.ADD_USERS,updateWorkspaceUserRequest);

@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.common.entity;
+package com.webank.wedatasphere.dss.framework.workspace.bean;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 

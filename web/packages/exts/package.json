@@ -1,7 +1,7 @@
 {
   "name": "@dataspherestudio/exts",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "dependencies": {
-    "@dataspherestudio/shared": "^1.1.12"
+    "@dataspherestudio/shared": "^1.1.13"
   }
 }

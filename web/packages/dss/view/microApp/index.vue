@@ -68,9 +68,10 @@ export default {
       console.log(process.env.VUE_APP_MICRO_PREFIX)
       try {
         // 查询绑定信息
+        const sub_mf_name = this.humpToLine(this.$route.params.appName);
         const data = await api.fetch(`/mfgov/fesdk/bindQuery/v1?${this.generateUrlTail()}`, {
           main_mf_name: 'dss',
-          sub_mf_name: this.humpToLine(this.$route.params.appName),
+          sub_mf_name,
         }, {
           method: 'get',
           baseURL: process.env.VUE_APP_MICRO_PREFIX,
@@ -78,7 +79,11 @@ export default {
             proxyUser: this.getUserName(),
           }
         });
-        this.visualSrc = util.replaceHolder(`${data.accessLocation}?baseUrl=${data.accessLocation.split('#')[0].replace(/\/$/, '')}` || '');
+        let queryStr = `baseUrl=${data.accessLocation.split('#')[0].replace(/\/$/, '')}`;
+        if(sub_mf_name.toLowerCase() === 'search') {
+          queryStr += '&dmsSearch=true'
+        }
+        this.visualSrc = util.replaceHolder(`${data.accessLocation}?${queryStr}` || '');
       } catch (err) {
         console.warn('-------', err);
       }

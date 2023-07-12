@@ -343,7 +343,7 @@
       :readonly="readonly"
       @release="release"
     />
-    <NodePath :data="json" :show="showNodePathPanel" @close="showNodePathPanel = false" @open-params="click" @open-node="dblclick"/>
+    <NodePath :data="json" :show="showNodePathPanel" @close="showNodePathPanel = false" @open-params="click" @open-node="dblclick" />
   </div>
 </template>
 <script>
@@ -1041,8 +1041,7 @@ export default {
         }
       } else {
         // iframe节点
-        await this.saveCommonIframe(node, () => {
-        });
+        await this.saveCommonIframe(node);
       }
       // 为了表单校验，基础信息弹窗保存的节点已不再是响应式，需重新赋值给json
 
@@ -1816,11 +1815,9 @@ export default {
         this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth;
       }
     },
-    saveCommonIframe(node, cb) {
-      if (!(node.supportJump && node.shouldCreationBeforeNode)) return;
-      this.loading = true;
-      if (!node.jobContent) {
-        cb();
+    saveCommonIframe(node) {
+      // 创建
+      if (node.supportJump && node.shouldCreationBeforeNode && !node.jobContent) {
         const newCreateParams = this.getCreatePrams(node);
         const createParams = {
           flowID: this.flowId,
@@ -1835,6 +1832,7 @@ export default {
             route: this.getCurrentDsslabels()
           }
         }
+        this.loading = true;
         return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}createAppConnNode`, createParams).then((res) => {
           // 由于vsbi的错误信息返回的这里，所以得判断是否成功给予提示
           let commomData = {};
@@ -1862,7 +1860,9 @@ export default {
           });
           this.originalData = this.json;
         })
-      } else {
+      }
+      // 更新
+      if (node.jumpType == 1 && node.jobContent) {
         const params = {
           flowID: this.flowId,
           nodeType: node.type,
@@ -1876,6 +1876,7 @@ export default {
             route: this.getCurrentDsslabels()
           }
         }
+        this.loading = true;
         return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}updateAppConnNode`, params, 'post').then(() => {
           this.$Message.success(this.$t('message.workflow.updataSuccess'))
         }).catch(() => {})

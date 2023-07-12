@@ -15,6 +15,12 @@
 <script>
 import util from '@dataspherestudio/shared/common/util/index';
 export default {
+  props: {
+    url: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       height: 0,
@@ -58,8 +64,11 @@ export default {
       this.height = height;
     },
     getUrl() {
-      const {url,__noreplace} = this.$route.query;
-      if(__noreplace) {
+      let {url,__noreplace} = this.$route.query;
+      if (this.url && !url) {
+        return this.visualSrc = this.url
+      }
+      if (__noreplace) {
         this.visualSrc = url
       } else {
         this.visualSrc = util.replaceHolder(url, {
@@ -79,5 +88,6 @@ export default {
 <style>
 .iframeClass{
     height: 100%;
+    display: block;
 }
 </style>

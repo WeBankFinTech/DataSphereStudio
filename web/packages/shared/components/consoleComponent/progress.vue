@@ -139,7 +139,17 @@ export default {
       return this.script.status
     },
     percent() {
-      return Number((this.script.progress.current * 100).toFixed(2));
+      const numMulti = function (num1, num2) {
+        var baseNum = 0;
+        try { baseNum += num1.toString().split(".")[1].length; } catch (e) {
+          //
+        }
+        try { baseNum += num2.toString().split(".")[1].length; } catch (e) {
+          //
+        }
+        return Number(num1.toString().replace(".", "")) * Number(num2.toString().replace(".", "")) / Math.pow(10, baseNum);
+      };
+      return numMulti(this.script.progress.current , 100);
     },
     waitingSize() {
       return this.script.progress.waitingSize
@@ -148,7 +158,7 @@ export default {
       return this.script.progress.progressInfo
     },
     costTime() {
-      return this.script.progress.costTime || `0 second`
+      return this.script.progress.costTime || ``
     },
     isWaittingSizeShow() {
       // 当waitingSize等于null时，waitingSize >= 0为true；

@@ -21,7 +21,7 @@
               hide-info
             />
             <span
-              style="cursor: pointer;"
+              style="cursor: pointer;max-width: max-content;"
               class="we-steps-label"
               :class="getClasses(child)"
             >{{ child.label }}({{percent}}%)</span>
@@ -69,7 +69,7 @@
             size="26"
             v-if="index !== renderList.length - 1 && child.isFinish"/>
         </div>
-        <div v-if="percent === 100" style="padding-left: 10px">
+        <div v-if="costTime" style="padding-left: 10px">
           <span>{{$t('message.common.process')}}</span>
           <span class="progress-costtime">{{ costTime }}</span>
         </div>
@@ -91,7 +91,7 @@ export default {
     },
     costTime: {
       type: String,
-      default: '0 second'
+      default: ''
     }
   },
   data() {

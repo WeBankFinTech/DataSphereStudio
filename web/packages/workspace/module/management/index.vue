@@ -86,7 +86,13 @@ export default {
             children: [],
           }
         ],
-      }
+      },
+      {
+        icon: 'resTemplateManage',
+        name: i18n.t('message.workspaceManagement.resTemplateManage'),
+        path: 'resTemplate',
+        children: [],
+      },
     ];
     return {
       mode: '',

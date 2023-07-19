@@ -287,7 +287,7 @@
     <!--dss-data-api-server-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-data-api/dss-data-api-server/target/out/dss-data-api-server/lib/
+        ${basedir}/../../dss-apps/dss-data-api/dss-data-api-server/target/out/dss-data-api-server/lib/
       </directory>
       <outputDirectory>lib/dss-data-api/dss-data-api-server</outputDirectory>
       <includes>
@@ -298,7 +298,7 @@
     <!--dss-data-governance-server-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-data-governance/dss-data-governance-server/target/out/dss-data-governance-server/lib/
+        ${basedir}/../../dss-apps/dss-data-governance/dss-data-governance-server/target/out/dss-data-governance-server/lib/
       </directory>
       <outputDirectory>lib/dss-data-governance/dss-data-governance-server</outputDirectory>
       <includes>

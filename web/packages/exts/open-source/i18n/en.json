@@ -71,6 +71,25 @@
           "publishSuccess": "Publish Success"
         },
         "tagPlaceholder": "tag，click enter add"
+      },
+      "operateProxyTip": "Before entering, please select a proxy user or cancel",
+      "applyOperatePorxy": "Please apply for a proxy user first"
+    },
+    "ext": {
+      "opensource": {
+        "selectservice": "Please select service",
+        "defalut": "Default value",
+        "detail": "Detailed description",
+        "longer1024": "No longer than 1024 characters！",
+        "rowlimit": "Too many rows, please query in batches！",
+        "outlimit": "Exceed the limit, please modify！！",
+        "cnanotnull": "Parameter cannot be null!",
+        "entercreate": "Tags, press enter to create",
+        "status": "Status",
+        "opreator": "Operator",
+        "copytime": "copy time",
+        "copyHistory": "Copy History",
+        "errmsg": "Error message"
       }
     }
   }

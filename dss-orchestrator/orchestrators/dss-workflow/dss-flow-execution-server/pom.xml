@@ -21,13 +21,19 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
+        <relativePath>../../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dss-flow-execution-server</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-jobhistory</artifactId>
+            <version>${linkis.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-entrance</artifactId>
@@ -55,6 +61,37 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-scheduler</artifactId>
+            <version>${linkis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>linkis-common</artifactId>
+                    <groupId>org.apache.linkis</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-tx</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-text</artifactId>
+                    <groupId>org.apache.commons</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>json4s-jackson_2.11</artifactId>
+                    <groupId>org.json4s</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>linkis-label-common</artifactId>
+                    <groupId>org.apache.linkis</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-beanutils</artifactId>
+                    <groupId>commons-beanutils</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
@@ -77,6 +114,16 @@
         </dependency>
 
         <dependency>
+            <artifactId>spring-tx</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring-framework.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-context-support</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring-framework.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-rpc</artifactId>
             <version>${linkis.version}</version>
@@ -93,6 +140,10 @@
                 <exclusion>
                     <groupId>org.glassfish.hk2.external</groupId>
                     <artifactId>bean-validator</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-aop</artifactId>
+                    <groupId>org.springframework</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -144,8 +195,6 @@
             <version>${commons.lang3.version}</version>
             <scope>provided</scope>
         </dependency>
-
-
 
     </dependencies>
 

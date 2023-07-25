@@ -20,30 +20,34 @@ import com.webank.wedatasphere.dss.flow.execution.entrance.engine.{FlowEntranceE
 import com.webank.wedatasphere.dss.flow.execution.entrance.entranceparser.FlowExecutionParser
 import com.webank.wedatasphere.dss.flow.execution.entrance.persistence.WorkflowPersistenceEngine
 import org.apache.linkis.entrance.EntranceParser
+import org.apache.linkis.entrance.annotation.{EntranceExecutorManagerBeanAnnotation, EntranceParserBeanAnnotation, PersistenceEngineBeanAnnotation}
 import org.apache.linkis.entrance.persistence.{PersistenceEngine, PersistenceManager}
 import org.apache.linkis.scheduler.executer.ExecutorManager
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.{Bean, Configuration}
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Configuration
+
 
 @Configuration
 class FlowExecutionEntranceSpringConfiguration {
   private val logger = LoggerFactory.getLogger(classOf[FlowExecutionEntranceSpringConfiguration])
 
-  @Bean
-  def executorManager(flowEntranceEngine: FlowEntranceEngine): ExecutorManager = {
+  @EntranceExecutorManagerBeanAnnotation
+  def generateExternalEntranceExecutorManager(@Autowired flowEntranceEngine:FlowEntranceEngine): ExecutorManager = {
     logger.info("begin to get FlowExecution Entrance EntranceExecutorManager")
     new FlowExecutionExecutorManagerImpl(flowEntranceEngine)
   }
 
-  @Bean
-  def persistenceEngine(): PersistenceEngine ={
+  @PersistenceEngineBeanAnnotation
+  def generatePersistenceEngine(): PersistenceEngine ={
     new WorkflowPersistenceEngine()
   }
 
-  @Bean
-  def entranceParser(persistenceManager: PersistenceManager): EntranceParser = {
+  @EntranceParserBeanAnnotation
+  def generateEntranceParser(@Autowired persistenceManager: PersistenceManager): EntranceParser = {
     logger.info("begin to get FlowExecution Entrance parser")
     new FlowExecutionParser(persistenceManager)
   }
+
 
 }

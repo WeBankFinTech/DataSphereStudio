@@ -195,9 +195,12 @@ const convertList = {
   export function formatValue(item, field) {
     const value = item[field.key];
     let formatted = value;
+    const isZh = localStorage.getItem('locale') === 'zh-CN'
+    const yes = isZh ? '是' : 'Yes'
+    const no = isZh ? '否' : 'No'
     switch (field.type) {
       case 'boolean':
-        formatted = value ? '是' : '否';
+        formatted = value ? yes : no;
         break;
       case 'timestramp':
         formatted = value == '0' || !value ? 0 : moment.unix(value).format('YYYY-MM-DD HH:mm:ss');
@@ -209,7 +212,7 @@ const convertList = {
         formatted = convertList[field.key][item[field.key]].label;
         break;
       case 'booleanString':
-        formatted = value === 'Y' ? '是' : '否';
+        formatted = value === 'Y' ? yes : no;
         break;
     }
     return formatted;

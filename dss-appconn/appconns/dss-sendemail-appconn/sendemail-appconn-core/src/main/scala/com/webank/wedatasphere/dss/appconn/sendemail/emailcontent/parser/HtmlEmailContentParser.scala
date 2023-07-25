@@ -16,12 +16,40 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser
 
-import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.MultiContentEmail
+import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{CsvAttachment, MultiContentEmail, PngAttachment}
+import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.HtmlItem
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.HtmlEmailContent
+import org.apache.linkis.server.JSONUtils
+
+import java.nio.charset.StandardCharsets
+import java.util.Base64
+import scala.sys.error
 
 object HtmlEmailContentParser extends AbstractEmailContentParser[HtmlEmailContent] {
   override protected def parseEmailContent(emailContent: HtmlEmailContent,
                                            multiContentEmail: MultiContentEmail): Unit = {
-    getFirstLineRecord(emailContent).foreach(emailContent.setContent)
+    getFirstLineRecord(emailContent).foreach(htmlStr =>
+      emailContent.getFileType match {
+        case "html" =>
+          val htmlItems: Array[HtmlItem] = JSONUtils.gson.fromJson(htmlStr, classOf[Array[HtmlItem]])
+          htmlItems.foreach {
+            case htmlItem: HtmlItem =>
+              if (htmlItem.getFileType.equals("attachment") && htmlItem.getContentType.equals("csv")) {
+                val csvName = htmlItem.getFileName
+                val csvContent = htmlItem.getContent
+                val csvContentBytes = csvContent.getBytes
+                val csvBase64BaseContent = new String(Base64.getEncoder.encode(csvContentBytes), StandardCharsets.UTF_8)
+                multiContentEmail.addAttachment(new CsvAttachment(csvName, csvBase64BaseContent))
+              } else if (htmlItem.getContentType.equals("image") && htmlItem.getFileType.equals("inline")) {
+                multiContentEmail.addAttachment(new PngAttachment(htmlItem.getContentId, htmlItem.getContent))
+              } else if (htmlItem.getContentType.equals("html")) {
+                emailContent.setContent(htmlItem.getContent)
+              } else {
+                error("unknow content type: " + emailContent.getFileType)
+              }
+          }
+        case _ =>
+      }
+    )
   }
 }

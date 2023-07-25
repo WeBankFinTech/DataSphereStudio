@@ -13,8 +13,7 @@ SERVER_IP=""
 SERVER_HOME=""
 
 local_host="`hostname --fqdn`"
-LOCAL_IP=$(hostname -I)
-LOCAL_IP=${LOCAL_IP// /}
+LOCAL_IP=$(hostname -I | awk '{print $1}')
 
 #To be compatible with MacOS and Linux
 txt=""
@@ -228,19 +227,12 @@ fi
 ##Install dss projects
 function installDssProject() {
   echo "step2:update config"
-#  if [ "$DSS_INSTALL_HOME" != "" ]
-#  then
-#	   rm -rf $DSS_INSTALL_HOME
-#  fi
-  #echo ""
-  #echo "-----------------DSS install start--------------------"
   SERVER_HOME=$DSS_INSTALL_HOME
   if [ "$SERVER_HOME" == "" ]
   then
     export SERVER_HOME=${workDir}/DSSInstall
   fi
   if [ -d $SERVER_HOME ] && [ "$SERVER_HOME" != "$workDir" ]; then
-    rm -r $SERVER_HOME-bak
     echo "mv  $SERVER_HOME  $SERVER_HOME-bak"
     mv  $SERVER_HOME  $SERVER_HOME-bak
   fi

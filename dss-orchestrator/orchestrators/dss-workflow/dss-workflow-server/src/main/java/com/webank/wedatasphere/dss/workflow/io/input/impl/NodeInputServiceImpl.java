@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.workflow.io.input.impl;
 
 
+import com.google.common.collect.ImmutableMap;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -30,26 +32,25 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
-import com.webank.wedatasphere.dss.workflow.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 
 @Service
 public class NodeInputServiceImpl implements NodeInputService {
     @Autowired
+    @Qualifier("workflowBmlService")
     private BMLService bmlService;
 
     @Autowired
@@ -70,10 +71,10 @@ public class NodeInputServiceImpl implements NodeInputService {
             resources.forEach(resource -> {
                 if (resource.getVersion() != null && resource.getFileName() != null && resource.getResourceId() != null) {
                     InputStream resourceInputStream = readResource(userName, resource, inputResourcePath);
-                    Map<String, Object> bmlReturnMap = bmlService.upload(userName,
+                    BmlResource bmlReturnMap = bmlService.upload(userName,
                             resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
-                    resource.setResourceId(bmlReturnMap.get("resourceId").toString());
-                    resource.setVersion(bmlReturnMap.get("version").toString());
+                    resource.setResourceId(bmlReturnMap.getResourceId());
+                    resource.setVersion(bmlReturnMap.getVersion());
                 } else {
                     logger.warn("Illegal resource information");
                     logger.warn("username:{},fileName:{},version:{},resourceId:{}", userName, resource.getFileName(), resource.getVersion(), resource.getResourceId());
@@ -110,7 +111,7 @@ public class NodeInputServiceImpl implements NodeInputService {
         appConnNode.setNodeType(nodeType);
         appConnNode.setJobContent(nodeContent);
         appConnNode.setFlowId(dssFlow.getId());
-        appConnNode.setProjectId(dssFlow.getProjectID());
+        appConnNode.setProjectId(dssFlow.getProjectId());
         appConnNode.setWorkspace(workspace);
         appConnNode.setContextId(flowContextId);
 
@@ -119,8 +120,14 @@ public class NodeInputServiceImpl implements NodeInputService {
         File file = new File(nodeResourcePath);
         if (file.exists()) {
             InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, nodeResourcePath);
-            Supplier<Map<String, Object>> bmlResourceMap = () -> bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
-                    projectName);
+            Supplier<Map<String, Object>> bmlResourceMap = () -> {
+                BmlResource resource = bmlService.upload(userName, resourceInputStream, UUID.randomUUID().toString() + ".json",
+                        projectName);
+                return ImmutableMap.of(
+                        "resourceId", resource.getResourceId(),
+                        "version", resource.getVersion()
+                );
+            };
             Supplier<Map<String, Object>> streamResourceMap = () -> MapUtils.newCommonMap(ImportRequestRef.INPUT_STREAM_KEY, resourceInputStream);
             try {
                 nodeExportContent = nodeService.importNode(userName, appConnNode, bmlResourceMap, streamResourceMap, orcVersion);
@@ -142,7 +149,7 @@ public class NodeInputServiceImpl implements NodeInputService {
                 return BDPJettyServerHelper.jacksonJson().writeValueAsString(nodeJsonMap);
             }
         } else {
-            logger.error("appConn node resource file does not exists. nodeId: {}" + nodeId);
+            logger.warn("appConn node resource file does not exists. nodeId: {}" + nodeId);
         }
 
         return nodeJson;

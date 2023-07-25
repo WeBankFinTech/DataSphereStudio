@@ -3,8 +3,8 @@
   * 判断当前是否独立应用和环境列表
   * @return {Object}
   */
-const apps = require('dynamic-modules')
-export function currentModules () {
+ export function currentModules () {
+  const apps = require('dynamic-modules')
   let obj = {
     linkisOnly: false,
     scriptisOnly: false,

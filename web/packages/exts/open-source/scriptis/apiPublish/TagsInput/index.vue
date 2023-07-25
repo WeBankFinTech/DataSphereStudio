@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import i18n from '@dataspherestudio/shared/common/i18n';
 export default {
   props: {
     source: {
@@ -16,7 +17,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: '标签，按 enter 创建'
+      default: i18n.t('message.ext.opensource.entercreate')
     }
   },
   watch: {

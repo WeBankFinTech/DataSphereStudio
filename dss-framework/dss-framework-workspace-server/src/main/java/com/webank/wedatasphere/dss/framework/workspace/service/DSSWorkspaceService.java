@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceAssociateDepartments;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceDepartmentVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
@@ -27,7 +28,6 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverv
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspacePrivVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentVO;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.common.exception.ErrorException;
 
@@ -48,6 +48,10 @@ public interface DSSWorkspaceService {
     List<DSSWorkspaceUserVO> getWorkspaceUsers(String workspaceId, String department, String username,
                                                String roleName, int pageNow, int pageSize, List<Long> total);
 
+    /**
+     * 获取空间内所有成员，已用户名返回
+     */
+    List<String> getWorkspaceUsers(String workspaceId);
 
     List<DSSWorkspaceRoleVO> getWorkspaceRoles(int workspaceId);
 
@@ -57,11 +61,28 @@ public interface DSSWorkspaceService {
 
     DSSWorkspaceHomepageSettingVO getWorkspaceHomepageSettings(int workspaceId);
 
-    String getWorkspaceName(String workspaceId);
+    String getWorkspaceName(Long workspaceId);
 
+    /**
+     * 工作空间管理员权限判断(is_admin=1的用户才拥有工作空间操作权限)
+     * @param userName
+     * @return
+     */
     boolean checkAdmin(String userName);
 
-    List<DepartmentVO> getDepartments();
+    /**
+     * 判断是否拥有该工作空间管理员权限
+     * @param workspaceId
+     * @param username
+     * @return
+     */
+    public boolean isAdminUser(Long workspaceId, String username);
+
+    List<String> getAllDepartmentWithOffices();
+
+    void associateDepartments(Long workspaceId, String departments, String roles,String user) throws DSSErrorException;
+
+    DSSWorkspaceAssociateDepartments getAssociateDepartmentsInfo(Long workspaceId);
 
     List<DSSWorkspaceUserVO> getWorkspaceUsersByRole(int workspaceId, String roleName, List<Long> totals,
                                                      int pageNow, int pageSize);
@@ -83,12 +104,9 @@ public interface DSSWorkspaceService {
 
     Long addFavorite(String username, Long workspaceId, Long menuApplicationId,String type);
 
-    Long deleteFavorite(String username, Long applicationId, Long workspaceId,String type);
+    Long deleteFavorite(String username, Long appconnId, Long workspaceId,String type);
 
 
     boolean checkAdminByWorkspace(String username, int workspaceId);
-
-    //是否为超级管理员
-    public boolean isAdminUser(Long workspaceId, String username);
 
 }

@@ -18,7 +18,7 @@ export default Object.freeze([{
   logo: 'fi-spark',
   color: '#FF9900',
   isCanBeNew: true,
-  label: 'Sql',
+  label: 'Spark Sql',
   isCanBeOpen: true,
   flowType: 'sql'
 },
@@ -34,7 +34,7 @@ export default Object.freeze([{
   logo: 'fi-hive',
   color: '#F4CF38',
   isCanBeNew: true,
-  label: 'Hive',
+  label: 'Hive Sql',
   isCanBeOpen: true,
   flowType: 'hql'
 },
@@ -50,9 +50,25 @@ export default Object.freeze([{
   logo: 'fi-presto-sql',
   color: '#3a3837',
   isCanBeNew: true, // 是否能新建
-  label: 'Psql',
+  label: 'Presto Sql',
   isCanBeOpen: true, // 是否能双击打开
   flowType: 'psql'
+},
+{
+  rule: /\.(tsql)$/i, // 后缀
+  lang: 'hql', // 脚本语言
+  executable: true, // 是否可执行
+  application: 'trino',
+  runType: 'tsql',
+  ext: '.tsql',
+  scriptType: 'tsql', // 脚本类型
+  abbr: 'tsql',
+  logo: 'fi-trino-sql',
+  color: '#3a3837',
+  isCanBeNew: true, // 是否能新建
+  label: 'Trino Sql',
+  isCanBeOpen: true, // 是否能双击打开
+  flowType: 'tsql'
 },
 {
   rule: /\.(fql)$/i,
@@ -66,7 +82,7 @@ export default Object.freeze([{
   logo: 'fi-flink-sql',
   color: '#FF9900',
   isCanBeNew: true,
-  label: 'Flink',
+  label: 'Flink Sql',
   isCanBeOpen: true,
   flowType: 'fql'
 },
@@ -97,7 +113,7 @@ export default Object.freeze([{
   logo: 'fi-scala',
   color: '#ED4014',
   isCanBeNew: true,
-  label: 'Scala',
+  label: 'Spark Scala',
   isCanBeOpen: true,
   flowType: 'scala'
 },

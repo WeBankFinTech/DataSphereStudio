@@ -64,7 +64,7 @@ export default {
           this.clearCache();
           break;
         case 'logout':
-          this.getRunningJob();
+          this.logout();
           break;
         case 'changeLang':
           this.changeLang();
@@ -93,9 +93,6 @@ export default {
         },
       });
     },
-    getRunningJob() {
-      this.logout();
-    },
     logout() {
       api.fetch('/user/logout', {}).then(() => {
         this.$emit('clear-session');
@@ -120,11 +117,13 @@ export default {
       if(localStorage.getItem('theme')==='dark'){
         window.document.documentElement.setAttribute('data-theme', '')
         localStorage.setItem('theme', '');
-        eventbus.emit('monaco.change', 'light');
+        eventbus.emit('theme.change', 'light');
+        eventbus.emit('watermark.refresh');
       }else {
         window.document.documentElement.setAttribute('data-theme', 'dark')
         localStorage.setItem('theme', 'dark');
-        eventbus.emit('monaco.change', 'dark');
+        eventbus.emit('theme.change', 'dark');
+        eventbus.emit('watermark.refresh');
       }
       setTimeout(() => {
         document.querySelector('body').classList.remove('notransition');
@@ -134,7 +133,7 @@ export default {
         if (i.id == 'changeTheme') {
           return {
             id: 'changeTheme',
-            name: localStorage.getItem('theme')==='dark' ? 'light' : 'dark',
+            name: localStorage.getItem('theme')==='dark' ? this.$t(`message.common.theme.light`) : this.$t(`message.common.theme.dark`),
             icon: 'md-repeat',
           }
         } else {

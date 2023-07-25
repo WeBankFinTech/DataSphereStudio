@@ -22,7 +22,8 @@
     <parent>
         <artifactId>dss-commons</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>dss-common</artifactId>
 
@@ -43,10 +44,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -122,8 +119,29 @@
         </dependency>
 
         <dependency>
+            <artifactId>spring-aop</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring-framework.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-context-support</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring-framework.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>spring-webmvc</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>${spring-framework.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-module</artifactId>
+            <version>${linkis.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-bml-client</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -131,7 +149,12 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
-            <!--                <scope>test</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-mybatis</artifactId>
+            <version>${linkis.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

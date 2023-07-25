@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -44,6 +44,26 @@
                     <artifactId>json4s-jackson_2.11</artifactId>
                     <groupId>org.json4s</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.webank.wedatasphere.dss</groupId>
+                    <artifactId>dss-origin-sso-integration-standard</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-origin-sso-integration-standard</artifactId>
+            <version>1.1.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.linkis</groupId>
+                    <artifactId>linkis-gateway-httpclient-support</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -61,15 +81,15 @@
         </dependency>
 
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.2.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jetbrains</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

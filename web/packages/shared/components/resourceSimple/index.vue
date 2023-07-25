@@ -25,7 +25,6 @@
         ref="job"
         v-if="switcher === 'job'"
         :dispatch="dispatch"
-        @update-job="updateJob"
         @close-modal="close"
         @change-loading="changeLoading"
         @change-job-disabled="changeJobDisabled"/>
@@ -33,6 +32,7 @@
         ref="engine"
         v-else-if="switcher === 'session'"
         @disabled="engineDisabledChange"
+        @update-job="updateJob"
         @change-loading="changeLoading"/>
       <queue
         ref="queue"
@@ -45,6 +45,18 @@
           v-if="pointList.length"
           :point-list="pointList"></point>
         <div>
+          <Button
+            v-if="switcher === 'session'"
+            type="default"
+            @click="selectAll">
+            {{ isSelectedAll ? $t('message.common.resourceSimple.QXQX') : $t('message.common.resourceSimple.QX')}}
+          </Button>
+          <Button
+            v-if="switcher === 'queue'"
+            type="default"
+            @click="viewMore">
+            {{ $t('message.common.resourceSimple.viewMore') }}
+          </Button>
           <Button
             type="default"
             @click="rest">
@@ -106,6 +118,7 @@ export default {
       loading: false,
       isJobBtnDisabled: true,
       engineDisable: true,
+      isSelectedAll: false
     };
   },
   methods: {
@@ -149,6 +162,13 @@ export default {
     },
     rest() {
       this.open();
+    },
+    selectAll() {
+      this.$refs.engine.selectAll(this.isSelectedAll);
+      this.isSelectedAll = !this.isSelectedAll;
+    },
+    viewMore() {
+      window.open("/dss/visualishub/#/portal/portallist/operational_data", '_blank');
     },
     getPointList() {
       let list = null;

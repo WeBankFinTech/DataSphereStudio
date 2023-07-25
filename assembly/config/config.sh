@@ -7,7 +7,7 @@ SERVER_HEAP_SIZE="512M"
 ### The install home path of DSS，Must provided
 DSS_INSTALL_HOME=/appcom/Install/DSSInstall
 
-DSS_VERSION=1.1.0
+DSS_VERSION=1.1.2
 
 DSS_FILE_NAME="dss-$DSS_VERSION"
 
@@ -33,35 +33,13 @@ GATEWAY_PORT=9001
 
 ### DSS_SERVER
 ### This service is used to provide dss-server capability.
+### dss-server
+DSS_SERVER_INSTALL_IP=127.0.0.1
+DSS_SERVER_PORT=9043
 
-### project-server
-DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP=127.0.0.1
-DSS_FRAMEWORK_PROJECT_SERVER_PORT=9002
-### orchestrator-server
-DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP=127.0.0.1
-DSS_FRAMEWORK_ORCHESTRATOR_SERVER_PORT=9003
-### apiservice-server
-DSS_APISERVICE_SERVER_INSTALL_IP=127.0.0.1
-DSS_APISERVICE_SERVER_PORT=9004
-### dss-workflow-server
-DSS_WORKFLOW_SERVER_INSTALL_IP=127.0.0.1
-DSS_WORKFLOW_SERVER_PORT=9005
-### dss-flow-execution-server
-DSS_FLOW_EXECUTION_SERVER_INSTALL_IP=127.0.0.1
-DSS_FLOW_EXECUTION_SERVER_PORT=9006
-###dss-scriptis-server
-DSS_SCRIPTIS_SERVER_INSTALL_IP=127.0.0.1
-DSS_SCRIPTIS_SERVER_PORT=9008
-
-###dss-data-api-server
-DSS_DATA_API_SERVER_INSTALL_IP=127.0.0.1
-DSS_DATA_API_SERVER_PORT=9208
-###dss-data-governance-server
-DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP=127.0.0.1
-DSS_DATA_GOVERNANCE_SERVER_PORT=9209
-###dss-guide-server
-DSS_GUIDE_SERVER_INSTALL_IP=127.0.0.1
-DSS_GUIDE_SERVER_PORT=9210
+### dss-apps-server
+DSS_APPS_SERVER_INSTALL_IP=127.0.0.1
+DSS_APPS_SERVER_PORT=9044
 
 ############## ############## dss_appconn_instance configuration   start   ############## ##############
 ####eventchecker表的地址，一般就是dss数据库

@@ -5,13 +5,20 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dss-framework-migrate-server</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-sender-service</artifactId>
+            <version>${dss.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-framework-project-server</artifactId>

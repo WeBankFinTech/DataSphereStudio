@@ -163,6 +163,8 @@ insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`l
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (41,'executeUser','请填写执行用户','Please enter execute user','执行用户','executeUser','Input',1,NULL,NULL,0,NULL,0,1,1,0,'runtime');
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (42,'Filter','请填写过滤条件','Please enter filter','过滤条件','Filter','Input',1,NULL,NULL,0,NULL,0,1,1,0,'runtime');
 INSERT  INTO `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (45,'ReuseEngine','请选择是否复用引擎','Please choose to reuse engin or not','是否复用引擎','reuse-engine-or-not','Select',1,'[\"true\",\"false\"]','true',0,NULL,0,1,1,0,'startup');
+INSERT  INTO `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) VALUES (46, 'spark.conf', 'spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。', 'input spark params config, eg: spark.sql.shuffle.partitions=10. Use semi-colon to split multi-params', 'spark.conf', 'spark.conf', 'Text', 0, NULL, "", 0, NULL, 0, 1, 1, 0, 'startup');
+
 
 DELETE FROM dss_workflow_node_to_ui;
 select @workflow_node_sql:=id from dss_workflow_node where name='sql';
@@ -206,6 +208,14 @@ select @node_ui_job_desc:=id from dss_workflow_node_ui where `key`='job.desc';
 select @node_ui_upStreams:=id from dss_workflow_node_ui where `key`='upStreams';
 select @node_ui_executeUser:=id from dss_workflow_node_ui where `key`='executeUser';
 select @node_ui_ReuseEngine:=id from dss_workflow_node_ui where `key`='ReuseEngine';
+select @sparkConfUiId:=id from dss_workflow_node_ui where `key`="spark.conf";
+select @sqlNodeId:=id from dss_workflow_node where node_type="linkis.spark.sql";
+select @pysparkNodeId:=id from dss_workflow_node where node_type="linkis.spark.py";
+select @scalaNodeId:=id from dss_workflow_node where node_type="linkis.spark.scala";
+
+insert into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values(@sqlNodeId, @sparkConfUiId);
+insert into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values(@pysparkNodeId, @sparkConfUiId);
+insert into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values(@scalaNodeId, @sparkConfUiId);
 
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_desc);
@@ -309,7 +319,7 @@ insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_ra
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('58','Regex','(.+)@(.+)@(.+)','此格式错误，例如：ProjectName@WFName@jobName','Invalid format,example:ProjectName@WFName@jobName','blur');
 INSERT INTO `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('59','OFT','["true","false"]','请填写是否复用引擎，false：不复用，true：复用','Please fill in whether or not to reuse engine, true: reuse, false: not reuse','blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('60', 'Regex', '^[0-9.]*g{0,1}$', 'Spark内存设置如2g', 'Drive memory size, default value: 2', 'blur');
-insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('61','Regex','^(.|\s){1,500}$','长度在1到5000个字符','The length is between 1 and 5000 characters','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('61','Regex','^(.|\s){1,5000}$','长度在1到5000个字符','The length is between 1 and 5000 characters','blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('62','Regex','^.{1,150}$','长度在1到150个字符','The length is between 1 and 150 characters','blur');
 
 DELETE FROM dss_workflow_node_ui_to_validate;
@@ -389,7 +399,34 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_spark_driver_memory,60);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_spark_executor_memory,60);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_job_desc,61);
+insert into dss_workflow_node_ui_to_validate(`ui_id`,`validate_id`) values(@sparkConfUiId, 41);
+-- 去除节点描述的中文限制
+delete nutv from dss_workflow_node_ui_to_validate nutv , dss_workflow_node_ui nu , dss_workflow_node_ui_validate nuv
+             where   nu.id = nutv.ui_id
+             AND nutv.validate_id = nuv.id and nu.lable_name ='节点描述' and nuv.error_msg='此值不能输入中文';
+-- 调整执行器内存大小限制为1-28
+update
+    dss_workflow_node_ui_to_validate nutv , dss_workflow_node_ui nu , dss_workflow_node_ui_validate nuv
+set
+    nuv.validate_type='Regex',
+    nuv.validate_range='^([1-9]|1[0-9]|2[0-8])(g|G){0,1}$',
+    nuv.error_msg='设置范围为[1,28],设置超出限制',
+    nuv.error_msg_en='must be between 1 and 28',
+    nuv.trigger='blur'
+where   nu.id = nutv.ui_id
+  AND nutv.validate_id = nuv.id AND nu.key='spark.executor.memory' ;
 
+-- fix 驱动器内存大小设置不能带g
+update
+    dss_workflow_node_ui_to_validate nutv , dss_workflow_node_ui nu , dss_workflow_node_ui_validate nuv
+set
+    nuv.validate_type='Regex',
+    nuv.validate_range='^([1-9]|1[0-5])(g|G){0,1}$',
+    nuv.error_msg='设置范围为[1,15],设置超出限制',
+    nuv.error_msg_en='must be between 1 and 15',
+    nuv.trigger='blur'
+where   nu.id = nutv.ui_id
+  AND nutv.validate_id = nuv.id AND nu.key='spark.driver.memory' ;
 
 DELETE FROM dss_workspace_appconn_role;
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'1','1',now(),'system');
@@ -411,6 +448,5 @@ INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@scriptis_appconn_id,'1','1',now(),'system');
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@workflow_appconn_id,'1','1',now(),'system');
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('224',@apiservice_appconn_id,'1','1',now(),'system');
-
 
 INSERT INTO `dss_workspace_admin_dept` (`id`, `parent_id`, `ancestors`, `dept_name`, `order_num`, `leader`, `phone`, `email`, `status`, `del_flag`, `create_by`, `create_time`, `update_by`, `update_time`) VALUES('100','0','0','基础科技','0','leader01','1888888888','123@qq.com','0','0','admin',now(),'admin',now());

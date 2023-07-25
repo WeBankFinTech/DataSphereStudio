@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.plugin.filter.UserIntercepto
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.conf.ProjectCooperateConfiguration
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.filter.ProjectRequestType.{Access, Delete, Edit, Execute}
 import com.webank.wedatasphere.dss.standard.app.structure.project.plugin.{ProjectAuth, ProjectCooperationPlugin}
+import com.webank.wedatasphere.dss.standard.sso.utils.ProxyUserSSOUtils
 import org.apache.linkis.common.conf.Configuration
 import org.apache.linkis.common.utils.{Logging, Utils}
 import org.apache.linkis.httpclient.exception.HttpClientResultException
@@ -93,8 +94,14 @@ abstract class ProjectCooperationFilter extends Filter with Logging {
       return
     }
     val projectRequestType = projectAuthInterceptor.getProjectRequestType(req)
-    debug(s"RequestURI: $uri, ProjectRequestType: $projectRequestType, ProjectAuth: $projectAuth.")
-    val user = userInterceptor.getUser(req)
+    var user = userInterceptor.getUser(req)
+    info(s"RequestURI: $uri, ProjectRequestType: $projectRequestType, ProjectAuth: $projectAuth, user: $user.")
+    if(ProxyUserSSOUtils.existsProxyUser(user)) {
+      // 这里使用代理用户的权限来表示实际的工程权限
+      val pair = ProxyUserSSOUtils.getUserAndProxyUser(user)
+      info(s"use proxy user ${pair.getValue} to decide if user ${pair.getKey} can $projectRequestType cooperation project ${projectAuth.getProjectName}.")
+      user = pair.getValue
+    }
     val passed = projectRequestType match {
       case Edit => projectAuth.getEditUsers.contains(user)
       case Access => projectAuth.getAccessUsers.contains(user)
@@ -106,7 +113,7 @@ abstract class ProjectCooperationFilter extends Filter with Logging {
       filterChain.doFilter(req, resp)
     } else {
       val msg = projectAuthInterceptor.getForbiddenMsg(projectAuth, projectRequestType, req)
-      info(s"Cooperation Project request $uri has been failed with auth validation.")
+      info(s"Cooperation Project request $uri has been failed with auth validation for user $user.")
       resp.getOutputStream.write(msg.getBytes(Configuration.BDP_ENCODING.getValue))
       resp.setStatus(403)
       resp.getOutputStream.flush()

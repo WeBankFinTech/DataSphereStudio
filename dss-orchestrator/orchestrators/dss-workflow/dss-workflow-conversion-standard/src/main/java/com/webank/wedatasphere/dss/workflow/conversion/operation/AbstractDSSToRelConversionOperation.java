@@ -40,12 +40,13 @@ public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConv
         workflowToRelSynchronizer.setDSSToRelConversionOperation(this);
         JsonToFlowParser parser = WorkflowFactory.INSTANCE.getJsonToFlowParser();
         if (parser instanceof AbstractJsonToFlowParser) {
+            ((AbstractJsonToFlowParser) parser).removeAppConnWorkflowParsers();
             String packageName = WorkflowParser.class.getPackage().getName();
             List<WorkflowParser> workflowParsers = AppStandardClassUtils.getInstance(getAppConnName()).getInstances(WorkflowParser.class).stream()
                     .filter(p -> !p.getClass().getName().startsWith(packageName) &&
-                            ((AbstractJsonToFlowParser) parser).getWorkflowParsers().stream().noneMatch(l -> l.getClass().getName()
+                            ((AbstractJsonToFlowParser) parser).getDefaultWorkflowParsers().stream().noneMatch(l -> l.getClass().getName()
                                     .equals(p.getClass().getName()))).collect(Collectors.toList());
-            ((AbstractJsonToFlowParser) parser).addWorkflowParsers(workflowParsers);
+            ((AbstractJsonToFlowParser) parser).addAppConnWorkflowParsers(workflowParsers);
         }
     }
 
@@ -54,11 +55,18 @@ public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConv
     @Override
     public ResponseRef convert(K ref) {
         PreConversionRel preConversionRel = getPreConversionRel(ref);
+        //first,convert workflow
         ConvertedRel convertedRel = tryConvert(preConversionRel);
+        //then,upload the converted workflow to target schedule system
         trySync(convertedRel);
         return ResponseRef.newInternalBuilder().success();
     }
 
+    /**
+     * convert dss workflow to real schedule system workflow
+     * @param rel dss workflow
+     * @return real schedule system workflow
+     */
     protected ConvertedRel tryConvert(PreConversionRel rel) {
         ConvertedRel convertedRel = null;
         for (WorkflowToRelConverter workflowToRelConverter : workflowToRelConverters) {
@@ -71,6 +79,9 @@ public abstract class AbstractDSSToRelConversionOperation<K extends DSSToRelConv
         return convertedRel;
     }
 
+    /**
+     * upload workflow to target schedule system.
+     */
     protected void trySync(ConvertedRel convertedRel) {
         workflowToRelSynchronizer.syncToRel(convertedRel);
     }

@@ -1,6 +1,6 @@
 <template>
   <div class="layout-footer" @mousemove="onMouseMove" :style="{'pointer-events': `${isMouseDown ? 'initial' : 'none'}`}">
-    <div ref="footerChannel" class="tool-btns" @mousedown.prevent.stop="onMouseDown">
+    <div ref="footerChannel" class="tool-btns" :class="{min:min}" @mousedown.prevent.stop="onMouseDown">
       <template v-if="!min">
         <div class="footer-btn footer-doc" @click="toggleGuide">
           <SvgIcon icon-class="question" />
@@ -58,10 +58,7 @@ export default {
   },
   methods: {
     getRunningJob() {
-      api.fetch('/jobhistory/list', {
-        pageSize: 100,
-        status: 'Running,Inited,Scheduled',
-      }, 'get').then((rst) => {
+      api.fetch('/jobhistory/listundonetasks', {}, 'get').then((rst) => {
         this.num = rst.tasks.length;
       });
     },

@@ -19,12 +19,18 @@ package com.webank.wedatasphere.dss.appconn.sendemail.email.generate
 import com.google.gson.internal.LinkedTreeMap
 import com.webank.wedatasphere.dss.appconn.sendemail.cs.EmailCSHelper
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail}
-import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
+import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.{HtmlEmailContent, PictureEmailContent}
 import com.webank.wedatasphere.dss.appconn.sendemail.exception.EmailSendFailedException
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
 import org.apache.commons.lang3.StringUtils
+import org.apache.linkis.common.log.LogUtils
+import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.server.JSONUtils
+import org.apache.linkis.storage.LineMetaData
 import org.apache.linkis.storage.resultset.ResultSetFactory
+
+import java.util
 
 class MultiContentEmailGenerator extends AbstractEmailGenerator {
 
@@ -39,12 +45,26 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
           val resultSetFactory = ResultSetFactory.getInstance
           EmailCSHelper.getJobIds(refContext).foreach { jobId =>
             refContext.fetchLinkisJobResultSetPaths(jobId).foreach { fsPath =>
+              var fileType = "";
+              val reader = refContext.getResultSetReader(fsPath)
+              val meta = reader.getMetaData.cloneMeta()
+              Utils.tryFinally(meta match {
+                case metadata: LineMetaData =>
+                  val data = JSONUtils.gson.fromJson(metadata.getMetaData, classOf[util.Map[String, String]])
+                  // 如果是pdf附件存字段pdf到multiContentEmail
+                  if (data.get("type") != null && data.get("format") != null) {
+                    fileType = data.get("format").toString
+                  }
+                case _ =>
+              })(Utils.tryQuietly(reader.close()))
               val resultSet = resultSetFactory.getResultSetByPath(fsPath)
               val emailContent = resultSet.resultSetType() match {
-                case ResultSetFactory.PICTURE_TYPE => new PictureEmailContent(fsPath)
-                case ResultSetFactory.HTML_TYPE => throw new EmailSendFailedException(80003 ,"html result set is not allowed")//new HtmlEmailContent(fsPath)
-                case ResultSetFactory.TABLE_TYPE => throw new EmailSendFailedException(80003 ,"table result set is not allowed")//new TableEmailContent(fsPath)
-                case ResultSetFactory.TEXT_TYPE => throw new EmailSendFailedException(80003 ,"text result set is not allowed")//new FileEmailContent(fsPath)
+                case ResultSetFactory.PICTURE_TYPE => new PictureEmailContent(fsPath, fileType)
+                case ResultSetFactory.HTML_TYPE =>
+                  multiContentEmail.setEmailType("html")
+                  new HtmlEmailContent (fsPath, fileType)
+                case ResultSetFactory.TABLE_TYPE => throw new EmailSendFailedException(80003 ,"table result set is not allowed")
+                case ResultSetFactory.TEXT_TYPE => throw new EmailSendFailedException(80003 ,"text result set is not allowed")
               }
               multiContentEmail.addEmailContent(emailContent)
             }
@@ -53,13 +73,9 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
               multiContentEmail.setEmailType(emailType)
             }
           }
-        case "file" => throw new EmailSendFailedException(80003 ,"file content is not allowed") //addContentEmail(c => new FileEmailContent(new FsPath(c)))
-        case "text" => throw new EmailSendFailedException(80003 ,"text content is not allowed")//addContentEmail(new TextEmailContent(_))
-        case "link" => throw new EmailSendFailedException(80003 ,"link content is not allowed")//addContentEmail(new UrlEmailContent(_))
+        case "file" => throw new EmailSendFailedException(80003 ,"file content is not allowed")
+        case "text" => throw new EmailSendFailedException(80003 ,"text content is not allowed")
+        case "link" => throw new EmailSendFailedException(80003 ,"link content is not allowed")
       }
   }
-
-
-
-
 }

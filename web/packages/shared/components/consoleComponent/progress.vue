@@ -8,29 +8,23 @@
       :execute="execute"
       :progress="script.progress"
       @open-panel="openPanel"></we-toolbar>
+    <!-- 进度步骤条 -->
     <steps
       :step-list="steps"
+      :percent="percent"
+      :costTime="costTime"
       v-if="steps.length"></steps>
-    <Row
-      class="total-progress"
-      v-if="isStatusOk">
-      <Col
-        span="2"
-        class="title">
-        {{ $t('message.common.progress.title') + '：' }}
-      </Col>
-      <Col span="12">
-        <Progress
-          :percent="percent"
-          status="active"/>
-      </Col>
-      <Col
-        span="10"
-        v-if="percent === 100">
-        <span>{{$t('message.common.process')}}</span>
-        <span class="progress-costtime">{{ costTime }}</span>
-      </Col>
-    </Row>
+    <!-- 错误信息 -->
+    <div v-if="taskInfo.failedReason || taskInfo.solution" class="alert-tips" :class="errTipColor">
+      <Icon :type="taskInfo.status == 'Failed'?'ios-close-circle-outline':'ios-alert-outline'" size="14" />
+      <span style="padding-left: 10px; flex:1">{{taskInfo.failedReason}} </span>
+      <Button
+        v-if="taskInfo.solution !== undefined"
+        type="error"
+        size="small"
+        @click="clickTipButton"
+      >{{ taskInfo.solution && taskInfo.solution.solutionUrl?this.$t('message.common.viewSolution'):this.$t('message.common.reporterr')}}</Button>
+    </div>
     <Row
       class="total-progress"
       v-if="isWaittingSizeShow">
@@ -42,6 +36,7 @@
         <span>{{ $t('message.common.progress.watingList', { num: waitingSize }) }}</span>
       </Col>
     </Row>
+    <!-- 子任务进度 -->
     <Table
       class="progress-table"
       v-if="isStatusOk"
@@ -55,6 +50,7 @@
 <script>
 import steps from './steps.vue';
 import weToolbar from './toolbar_progress.vue';
+import api from '@dataspherestudio/shared/common/service/api';
 /**
  * 脚本执行进度tab面板
  * ! 1. 与工作流节点执行console.vue 共用
@@ -132,6 +128,7 @@ export default {
           },
         },
       ],
+      taskInfo: {}
     };
   },
   computed: {
@@ -162,6 +159,27 @@ export default {
     },
     height() {
       return this.scriptViewState.bottomContentHeight - 34 //减去tab高度
+    },
+    errTipColor() {
+      return {
+        'warn-color': this.taskInfo.status != 'Failed',
+        'error-color': this.taskInfo.status == 'Failed'
+      }
+    }
+  },
+  mounted() {
+    if (this.steps.length && this.taskInfo.errCode === undefined && this.script.history) {
+      const ret  = this.script.history[0]
+      if (ret) {
+        this.taskInfo = {
+          solution: ret.solution,
+          errDesc: ret.errDesc,
+          errCode: ret.errCode,
+          status: ret.status,
+          taskId: ret.taskID,
+          failedReason: ret.failedReason
+        }
+      }
     }
   },
   methods: {
@@ -244,6 +262,28 @@ export default {
     },
     openPanel(type) {
       this.$emit('open-panel', type);
+    },
+    updateErrorMsg(data) {
+      this.taskInfo = data
+    },
+    clickTipButton() {
+      if (this.taskInfo.solution && this.taskInfo.solution.solutionUrl) {
+        window.open(this.taskInfo.solution.solutionUrl, '_blank')
+      } else if(this.taskInfo.errCode || this.taskInfo.errDesc) {
+        api.fetch('/dss/guide/solution/reportProblem', {
+          requestUrl: `/jobhistory/${this.taskInfo.taskID}/get`,
+          queryParams: {},
+          requestBody: {},
+          requestHeaders: {},
+          responseBody: {
+            taskID: this.taskInfo.taskID,
+            errCode: this.taskInfo.errCode,
+            errDesc: this.taskInfo.errDesc
+          }
+        }).then(()=>{
+          this.$Message.success(this.$t('message.common.reported'))
+        })
+      }
     }
   },
 };
@@ -260,17 +300,6 @@ export default {
         @include font-color($light-base-color, $dark-base-color);
         @include bg-color($primary-color, $dark-primary-color);
       }
-    }
-    .total-progress {
-      padding: 6px 0;
-      color: $title-color;
-      @include font-color($workspace-title-color, $dark-workspace-title-color);
-      .title {
-        text-align: center;
-      }
-    }
-    .progress-costtime {
-      color: $success-color;
     }
     .progress-wrap {
         position: $relative;
@@ -320,8 +349,22 @@ export default {
             text-align: center;
         }
     }
-    .progress-costtime {
-        color: $success-color;
+
+    .alert-tips {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      margin: 0 20px 15px 20px;
+      padding: 5px;
+      border-radius: 4px;
+    }
+    .error-color {
+      color: $error-color;
+      background-color: #f1c7c763;
+    }
+    .warn-color {
+      color: $warning-color;
+      background-color: #f79f531f;
     }
   }
 </style>

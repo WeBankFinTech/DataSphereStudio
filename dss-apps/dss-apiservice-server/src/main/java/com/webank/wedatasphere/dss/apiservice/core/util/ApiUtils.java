@@ -55,27 +55,27 @@ public class ApiUtils {
     /**
      * @param tryOperation operate function
      */
-    public static Response doAndResponse(Operation tryOperation) {
-        Object msg = null;
+    public static Message doAndResponse(Operation tryOperation) {
+        Message msg = null;
         try {
             msg = tryOperation.operateAndGetMessage();
-            return Response.ok(msg).build();
+            return msg;
         } catch (ConstraintViolationException e) {
             LOG.error("api error ", e);
             return new BeanValidationExceptionMapper().toResponse(e);
         } catch (WarnException e) {
             LOG.error("api error ", e);
-            return Response.ok(setMsg("系统异常")).build();
+            return Message.error("系统异常");
         } catch (AssertException e) {
             LOG.error("api error ", e);
-            return Response.ok(setMsg(e.getMessage())).build();
+            return Message.error(e.getMessage());
         }catch (ApiServiceRuntimeException e){
             LOG.error("api error ", e);
-            return Response.ok(setMsg(e.getMessage())).build();
+            return Message.error(e.getMessage());
         }
         catch (Exception e) {
             LOG.error("api error ", e);
-            return Response.ok(setMsg(String.valueOf(e.getCause()))).build();
+            return Message.error(String.valueOf(e.getCause()));
         }
     }
 
@@ -106,6 +106,6 @@ public class ApiUtils {
         /**
          * Operate method
          */
-        Object operateAndGetMessage() throws Exception;
+        Message operateAndGetMessage() throws Exception;
     }
 }

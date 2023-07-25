@@ -161,27 +161,13 @@ status()
 }
 
 function setServerName(){
-  if [[ $PROJECT_NAME == *"project"* ]]; then
-		SERVER_NAME=dss-framework-project-server
-	elif [[ $PROJECT_NAME == *"orchestrator"* ]]; then
-		SERVER_NAME=dss-framework-orchestrator-server
-  elif [[ $PROJECT_NAME == *"apiservice"* ]]; then
-		SERVER_NAME=dss-apiservice-server
-	elif [[ $PROJECT_NAME == *"scriptis"* ]]; then
-		SERVER_NAME=dss-scriptis-server
-	elif [[ $PROJECT_NAME == *"workflow"* ]]; then
-		SERVER_NAME=dss-workflow-server
-	elif [[ $PROJECT_NAME == *"execution"* ]]; then
-		SERVER_NAME=dss-flow-execution-server
-	elif [[ $PROJECT_NAME == *"data-api"* ]]; then
-		SERVER_NAME=dss-data-api-server
-	elif [[ $PROJECT_NAME == *"governance"* ]]; then
-		SERVER_NAME=dss-data-governance-server
-	elif [[ $PROJECT_NAME == *"guide"* ]]; then
-		SERVER_NAME=dss-guide-server
+	if [[ $PROJECT_NAME == *"dss-server"* ]]; then
+		SERVER_NAME=dss-server
+	elif [[ $PROJECT_NAME == *"apps"* ]]; then
+		SERVER_NAME=dss-apps-server
   else
-		echo "please input： sh dss-daemon.sh [start,restart,stop] [server name]; for example : sh dss-daemon.sh restart project "
-		echo "server name :  project、orchestrator、apiservice、scriptis、workflow、execution、data-api、governance、guide"
+		echo "please input： sh dss-daemon.sh [start,restart,stop] [server name]; for example : sh dss-daemon.sh restart dss-server "
+		echo "server name :  dss-server、apps-server"
 		exit 1
 	fi
 }

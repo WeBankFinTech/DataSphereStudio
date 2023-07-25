@@ -22,44 +22,49 @@ import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowImpl;
-import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.parser.WorkflowParser;
+import org.springframework.beans.BeanUtils;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.BeanUtils;
 
 
 public abstract class AbstractJsonToFlowParser implements JsonToFlowParser {
 
     private List<WorkflowParser> workflowParsers;
+    private List<WorkflowParser> allWorkflowParsers;
 
-    public List<WorkflowParser> getWorkflowParsers() {
+    public List<WorkflowParser> getDefaultWorkflowParsers() {
         return workflowParsers;
     }
 
-    public synchronized void addWorkflowParsers(List<WorkflowParser> workflowParsers) {
+    public synchronized void addAppConnWorkflowParsers(List<WorkflowParser> workflowParsers) {
         if(workflowParsers == null || workflowParsers.isEmpty()) {
             return;
         }
         workflowParsers.forEach(WorkflowParser::init);
-        if(this.workflowParsers == null) {
-            this.workflowParsers  = new ArrayList<>();
+        allWorkflowParsers.addAll(workflowParsers);
+        allWorkflowParsers = allWorkflowParsers.stream().sorted(Comparator.comparingInt(WorkflowParser::getOrder))
+                .collect(Collectors.toList());
+    }
+
+    public synchronized void removeAppConnWorkflowParsers() {
+        if(allWorkflowParsers == null) {
+            return;
         }
-        this.workflowParsers.addAll(workflowParsers);
-        this.workflowParsers = this.workflowParsers.stream().sorted(Comparator.comparingInt(WorkflowParser::getOrder)).collect(Collectors.toList());
+        allWorkflowParsers.clear();
+        allWorkflowParsers.addAll(workflowParsers);
     }
 
     @Override
     public void init() {
-        if(workflowParsers == null) {
-            workflowParsers = ClassUtils.getInstances(WorkflowParser.class);
-        } else {
-            workflowParsers.addAll(ClassUtils.getInstances(WorkflowParser.class));
-        }
-        workflowParsers = workflowParsers.stream().sorted(Comparator.comparingInt(WorkflowParser::getOrder)).collect(Collectors.toList());
+        workflowParsers = ClassUtils.getInstances(WorkflowParser.class);
+        workflowParsers = workflowParsers.stream().sorted(Comparator.comparingInt(WorkflowParser::getOrder))
+                .collect(Collectors.toList());
         workflowParsers.forEach(WorkflowParser::init);
+        allWorkflowParsers = new ArrayList<>(workflowParsers);
     }
 
     @Override
@@ -68,7 +73,7 @@ public abstract class AbstractJsonToFlowParser implements JsonToFlowParser {
         BeanUtils.copyProperties(dssFlow, workflow, "children");
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(dssFlow.getFlowJson()).getAsJsonObject();
-        for(WorkflowParser workflowParser : workflowParsers) {
+        for(WorkflowParser workflowParser : allWorkflowParsers) {
             workflow = workflowParser.parse(jsonObject, workflow);
         }
         if(dssFlow.getChildren() != null) {
@@ -86,19 +91,14 @@ public abstract class AbstractJsonToFlowParser implements JsonToFlowParser {
         return workflow;
     }
 
-    public void syncJsonField(Workflow workflow,JsonObject jsonObject){
-        try{
-            if(!jsonObject.has("updateTime")){
-                return;
-            }
-            if(workflow instanceof WorkflowImpl) {
-                ((WorkflowImpl) workflow).setUpdateTime(jsonObject.get("updateTime").getAsLong());
-            }else if(workflow instanceof WorkflowWithContextImpl) {
-                ((WorkflowWithContextImpl) workflow).setUpdateTime(jsonObject.get("updateTime").getAsLong());
-            }
-        }catch (Exception e){
-            e.fillInStackTrace();
+    private void syncJsonField(Workflow workflow,JsonObject jsonObject){
+        if(!jsonObject.has("updateTime")){
+            return;
+        }
+        if(workflow instanceof WorkflowImpl) {
+            ((WorkflowImpl) workflow).setUpdateTime(jsonObject.get("updateTime").getAsLong());
         }
     }
+
     protected abstract Workflow createWorkflow();
 }

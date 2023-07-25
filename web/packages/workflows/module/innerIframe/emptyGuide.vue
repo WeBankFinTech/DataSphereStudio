@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="title">流式计算中心操作步骤</div>
+    <div class="title">{{ $t('message.workflow.Streaming') }}</div>
     <div class="stepWrap">
       <div>
         <div v-for="(value, index) in steps" :key="index" class="leftWrap">
@@ -25,8 +25,8 @@ export default {
         `Flink SQL 脚本开发调试&nbsp;&nbsp;&nbsp;&nbsp;前往<a href="#/home?workspaceId=${this.$route.query.workspaceId}">即席查询</a>`,
         `离线创建jar包并配置&nbsp;&nbsp;&nbsp;&nbsp;样例<a href='./streamis/flinkJar.zip' download="flinkJar.zip">下载</a>&nbsp;&nbsp;配置说明下载<a href='./streamis/Streamis流式应用ZIP包上传格式.txt' download="Streamis流式应用ZIP包上传格式.txt">下载</a>`,
         "导入jar包至实时计算中心",
-        "配置资源及生产环境",
-        "配置Flink参数并运行"
+        this.$t('message.workflow.confitEnv'),
+        this.$t('message.workflow.Configure')
       ]
     };
   },

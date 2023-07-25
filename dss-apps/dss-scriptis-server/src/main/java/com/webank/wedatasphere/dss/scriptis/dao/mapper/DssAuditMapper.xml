@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.webank.wedatasphere.dss.scriptis.dao.DssAuditMapper">
+
+    <select id="getDownloadAuditList"
+            resultType="com.webank.wedatasphere.dss.scriptis.pojo.entity.DssScriptDownloadAudit">
+
+  SELECT
+	id,
+	creator,
+	tenant,
+	path,
+	`sql`,
+	create_time
+  FROM
+		dss_workspace_download_audit
+
+		<where>
+			<if test="creator != null and creator != ''">
+				creator like  CONCAT('%',#{creator},'%')
+			</if>
+			<if test="startTime != null and startTime != ''">
+				AND create_time >= #{startTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+				AND create_time <![CDATA[ <= ]]> #{endTime}
+			</if>
+		</where>
+    </select>
+
+</mapper>

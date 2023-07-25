@@ -57,7 +57,8 @@
           <workbench
             ref="workbenchContainer"
             :width="props.width"
-            v-if="props.width"/>
+            v-if="props.width"
+            @get-dbtable-length="showTip" />
         </template>
       </we-panel-item>
     </we-panel>
@@ -65,6 +66,7 @@
   </div>
 </template>
 <script>
+import api from '@dataspherestudio/shared/common/service/api';
 import workbenchModule from '@/scriptis/module/workbench';
 import workSidebarModule from '@/scriptis/module/workSidebar';
 import fnSidebarModule from '@/scriptis/module/fnSidebar';
@@ -100,8 +102,29 @@ export default {
   },
   //组建内的守卫
   beforeRouteLeave(to, from, next) {
+    let hasUnsave = false;
+    const close = () => {
+      if (window.languageClient) {
+        // 用户退出，后端语言服务子进程无法关闭，要求前端发送关闭
+        try {
+          window.languageClient.__connected_sql_langserver = false;
+          window.languageClient.__connected_py_langserver = false;
+          if (window.languageClient.__webSocket_sql_langserver) {
+            window.languageClient.sql.sendNotification('textDocument/changePage')
+            window.languageClient.__webSocket_sql_langserver.close();
+          }
+          if (window.languageClient.__webSocket_py_langserver) {
+            window.languageClient.python.sendNotification('textDocument/changePage')
+            window.languageClient.__webSocket_sql_langserver.close();
+          }
+
+        } catch (error) {
+          //
+        }
+
+      }
+    }
     if (this.$refs.workbenchContainer) {
-      let hasUnsave = false;
       if (this.$refs.workbenchContainer.worklist) {
         // 检查是否有未保存的非临时脚本
         hasUnsave = this.$refs.workbenchContainer.worklist.some(
@@ -112,18 +135,23 @@ export default {
       if (hasUnsave) {
         // 提示保存，用户选择不保存则继续跳转
         this.$Modal.confirm({
-          title: "正在编辑的代码未保存，请先检查",
-          content: "点击确定去检查，点击取消不保存，继续跳转",
+          title: this.$t('message.scripts.notsaved'),
+          content: this.$t('message.scripts.confirmcheck'),
           okText: "",
           cancelText: "",
           onOk: () => {},
           onCancel: () => {
+            close();
             next(); //如果用户点击取消 则直接跳转到用户点击的路由页面
           },
         });
       } else {
+        close();
         next();
       }
+    } else {
+      close();
+      next();
     }
   },
   computed: {
@@ -132,11 +160,19 @@ export default {
       return navItemHeight * this.leftSideNavList.length + 100;
     },
   },
-  mounted() {
+  created() {
+  },
+  async mounted() {
     this.init();
     // 监听窗口变化，获取浏览器宽高
     window.addEventListener('resize', this.getHeight);
-    const baseInfo = storage.get("baseInfo", "local") || {}
+    let baseInfo = storage.get('baseInfo', 'local') || {}
+    const globalRes = await this.getGlobalLimit()
+    baseInfo = {
+      ...baseInfo,
+      ...globalRes.globalLimits
+    }
+    storage.set('baseInfo', baseInfo, 'local')
     if (baseInfo.proxyEnable && !baseInfo.proxyUserName) {
       this.showSettingModal()
     } else if(baseInfo.proxyUserName) {
@@ -146,11 +182,26 @@ export default {
   },
   beforeDestroy() {
     // 监听窗口变化，获取浏览器宽高
+    this.$Notice.close('show-db-table-many-tip')
     window.removeEventListener('resize', this.getHeight);
   },
   methods: {
+    getGlobalLimit() {
+      return api.fetch(`/dss/scriptis/globalLimits`, {}, 'get')
+    },
     getHeight() {
       this.resize(window.innerHeight);
+    },
+    showTip(length) {
+      if (length > 30000) {
+        this.$Notice.close('show-db-table-many-tip')
+        this.$Notice.warning({
+          duration: 0,
+          name: 'show-db-table-many-tip',
+          title: this.$t('message.scripts.propmpt'),
+          desc: this.$t('message.scripts.largedatatip')
+        })
+      }
     },
     init() {
       this.chooseLeftModule(this.leftSideNavList[0]);

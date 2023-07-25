@@ -40,7 +40,7 @@ function Execute(data) {
   this.status = null;
   // 仅/api/jobhistory/${id}/get接口使用
   this.taskID = null;
-  this.postType = process.env.NODE_ENV === 'sandbox' ? 'http' : (data.data.postType || 'socket');
+  this.postType = data.data.postType || 'http';
   delete data.data.postType;
   this.data = data;
   this.executionCode = null;
@@ -372,10 +372,10 @@ Execute.prototype.getResultList = function() {
       .then((rst) => {
         // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
         if(rst.dirFileTrees && rst.dirFileTrees.children) {
+          const slice = (name) => {
+            return Number(name.slice(1, name.lastIndexOf('.')));
+          }
           this.resultList = rst.dirFileTrees.children.sort((a, b) => {
-            const slice = (name) => {
-              return Number(name.slice(1, name.lastIndexOf('.')));
-            }
             return slice(a.name) - slice(b.name);
           });
         }
@@ -477,6 +477,8 @@ Execute.prototype.updateLastHistory = function(option, cb) {
         taskID: task.taskID,
         execID: '',
         solution: res.solution,
+        errCode: task.errCode,
+        errDesc: task.errDesc,
         createDate: task.createdTime,
         runningTime: task.costTime,
         // 这里改成使用execute的status是因为数据库中在大结果集的情况下可能会发生状态不翻转的情况，但websocket推送的状态是对的
@@ -503,7 +505,7 @@ Execute.prototype.updateLastHistory = function(option, cb) {
  */
 function deconstructStatusIfKill(execute, ret) {
   if (ret.status !== 'Cancelled') {
-    setTimeout(() => {
+    execute.statusTimeout = setTimeout(() => {
       execute.queryStatus({ isKill: true });
     }, 5000);
   } else {
@@ -529,7 +531,7 @@ function deconstructStatus(execute, ret) {
       if (execute.postType !== 'socket') {
         // 5秒发送一次请求
         if (!execute.run) return;
-        setTimeout(() => {
+        execute.statusTimeout = setTimeout(() => {
           execute.queryStatus({ isKill: false });
           execute.queryProgress();
           execute.queryLog();
@@ -562,6 +564,7 @@ function deconstructStatus(execute, ret) {
  * @param {*} execute
  */
 function whenSuccess(execute) {
+  console.log(execute.runType)
   if (execute.runType !== 'pipeline') {
     // stateEnd是需要获取结果集的，获取结果集的同时会更新历史
     execute.trigger('stateEnd');

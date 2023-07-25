@@ -1,5 +1,5 @@
 <template>
-  <we-panel diretion="vertical" @on-resize="resize" @on-resized="resizePanel">
+  <we-panel diretion="vertical" @on-resize="resize" @on-move-end="resizePanel">
     <we-panel-item
       ref="topPanel"
       :index="1"
@@ -77,10 +77,15 @@
               />
             </template>
           </div>
+          <span class="workbench-tab-full-btn" @click="configLogPanel">
+            <Icon :type="scriptViewState.bottomPanelFull?'md-contract':'md-expand'" />
+            {{ scriptViewState.bottomPanelFull ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}
+          </span>
         </div>
         <div class="workbench-container">
           <we-progress
             v-if="bottomTab.show_progress"
+            ref="progressTab"
             :script="script"
             :script-view-state="scriptViewState"
             :execute="execute"
@@ -275,6 +280,11 @@ export default {
         this.resizePanel()
       }
     },
+    'work.unsave': function(v) {
+      if (this.node && v) {
+        this.$set(this.node, 'isChange', true)
+      }
+    }
   },
   async created() {
     this.userName = this.getUserName()
@@ -447,29 +457,23 @@ export default {
   },
   methods: {
     // panel 分割线拖动调整大小
-    resizePanel() {
-      if (
-        this.$el &&
-        this.$refs.topPanel &&
-        this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0
-      ) {
-        this.scriptViewState.topPanelHeight =
-          this.$refs.topPanel.$el.clientHeight
-        this.scriptViewState.bottomContentHeight =
-          this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight
+    resizePanel: debounce(function() {
+      if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
+        this.scriptViewState.topPanelHeight = this.$refs.topPanel.$el.clientHeight
+        this.scriptViewState.bottomContentHeight = this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight;
       }
-    },
+    }, 700),
     // 浏览器窗口缩放
-    resize() {
-      if (
-        this.$el &&
-        this.$refs.topPanel &&
-        this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0
-      ) {
+    resize: debounce(function() {
+      if (this.scriptViewState.bottomPanelFull) {
+        this.scriptViewState.bottomContentHeight = this.$el.clientHeight + 30
+        return
+      }
+      if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
         this.scriptViewState.topPanelHeight = this.$el.clientHeight * 0.6
         this.scriptViewState.bottomContentHeight = this.$el.clientHeight * 0.4
       }
-    },
+    }, 700),
     'Workbench:save'(work) {
       if (work.id == this.script.id) {
         this.save()
@@ -527,11 +531,8 @@ export default {
       }
     },
     'Workbench:removeTab'() {
-      // fix http://***REMOVED***/#/product/100199/bug/detail/199545
       if (this.node) {
-        setTimeout(() => {
-          this.resizePanel()
-        })
+        this.resizePanel()
       }
     },
     getCacheWork(work) {
@@ -608,8 +609,13 @@ export default {
           this.dispatch('Workbench:setTabPanelSize')
           this.scriptViewState.topPanelFull = false
         }
-        this.showPanelTab('progress')
-        const data = this.getExecuteData(option)
+        if (this.$refs.progressTab) {
+          this.$refs.progressTab.updateErrorMsg({})
+        }
+        setTimeout(()=>{
+          this.showPanelTab('progress');
+        }, 100)
+        const data = this.getExecuteData(option);
         // 执行
         this.execute = new Execute(data)
         this.isLogShow = false
@@ -671,12 +677,9 @@ export default {
             this.script.executionCode = this.script.data = code
           }
           // 加入用户名来区分不同账户下的tab
-          this.dispatch('IndexedDB:recordTab', {
-            ...this.work,
-            userName: this.userName,
-          })
-          cb && cb('start')
-        })
+          this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
+          cb && cb('start');
+        });
         this.execute.on('updateResource', (num) => {
           this.dispatch('Footer:updateRunningJob', num)
         })
@@ -704,15 +707,9 @@ export default {
         })
 
         this.execute.on('history', (ret) => {
-          const index = findIndex(
-            this.script.history,
-            (o) => o.taskID == ret.taskID
-          )
-          const findHis = find(
-            this.script.history,
-            (o) => o.taskID == ret.taskID
-          )
-          let newItem = null
+          const index = findIndex(this.script.history, (o) => o.taskID == ret.taskID);
+          const findHis = index > -1 ? this.script.history[index] : undefined;
+          let newItem = null;
           // 这里针对的是导入导出脚本，executionCode为object的情况
           const code =
             typeof this.script.executionCode === 'string' &&
@@ -726,6 +723,7 @@ export default {
               newItem = Object.assign(findHis, ret)
             } else if (Object.prototype.hasOwnProperty.call(ret, 'logPath')) {
               newItem = {
+                subscribed: findHis.subscribed,
                 taskID: ret.taskID,
                 createDate: findHis.createDate,
                 execID: ret.execID || findHis.execID,
@@ -734,10 +732,13 @@ export default {
                 data: code,
                 status: ret.status,
                 fileName: this.script.fileName,
-                failedReason: ret.failedReason,
-              }
+                errDesc: ret.errDesc,
+                errCode: ret.errCode,
+                failedReason: ret.failedReason
+              };
             } else {
               newItem = {
+                subscribed: findHis.subscribed,
                 taskID: ret.taskID,
                 createDate: ret.createDate,
                 execID: ret.execID || findHis.execID,
@@ -745,8 +746,10 @@ export default {
                 data: code,
                 status: ret.status,
                 fileName: this.script.fileName,
-                failedReason: ret.failedReason,
-              }
+                errDesc: ret.errDesc,
+                errCode: ret.errCode,
+                failedReason: ret.failedReason
+              };
             }
           } else {
             newItem = {
@@ -758,7 +761,9 @@ export default {
               status: ret.status,
               fileName: this.script.fileName,
               failedReason: ret.failedReason,
-            }
+              errDesc: ret.errDesc,
+              errCode: ret.errCode,
+            };
           }
           newItem.solution = ret.solution
           if (index === -1) {
@@ -774,7 +779,23 @@ export default {
               ...this.script.history,
             })
           }
-        })
+          // 有绑定解决方案停留进度tab，否则打开日志定位第一行错误
+          if (this.$refs.progressTab) {
+            this.$refs.progressTab.updateErrorMsg({
+              solution: ret.solution,
+              errDesc: ret.errDesc,
+              errCode: ret.errCode,
+              status: ret.status,
+              taskId: ret.taskID,
+              failedReason: ret.errCode && ret.errDesc ? ret.errCode + ret.errDesc : ''
+            })
+          }
+          if (ret.solution && ret.solution.solutionUrl) {
+            //
+          } else if (ret.status == 'Failed') {
+            this.showPanelTab('log')
+          }
+        });
         this.execute.on('result', (ret) => {
           this.showPanelTab('result')
           const storeResult = {
@@ -927,11 +948,7 @@ export default {
         })
         this.execute.on('error', (type) => {
           // 执行错误的时候resolve，用于改变modal框中的loading状态
-          cb && cb(type || 'error')
-          if (this.scriptViewState.showPanel !== 'history') {
-            this.showPanelTab('history')
-            this.isLogShow = true
-          }
+          cb && cb(type || 'error');
           this.dispatch('IndexedDB:appendLog', {
             tabId: this.script.id,
             rst: this.script.log,
@@ -991,56 +1008,17 @@ export default {
             desc: '',
             duration: 5,
             render: (h) => {
-              return h(
-                'div',
-                {
-                  style: {
-                    position: 'relative',
-                    'padding-bottom': '15px',
-                  },
+              return h('div', {
+                style: {
+                  position: 'relative',
+                  'padding-bottom': '15px'
+                }
+              }, [h('span', {
+                style: {
+                  'word-break': 'break-all',
+                  'line-height': '20px',
                 },
-                [
-                  h(
-                    'span',
-                    {
-                      style: {
-                        'word-break': 'break-all',
-                        'line-height': '20px',
-                      },
-                    },
-                    label
-                  ),
-                  h(
-                    'span',
-                    {
-                      style: {
-                        color: 'red',
-                        position: 'absolute',
-                        right: '10px',
-                        bottom: '0px',
-                        display: 'none',
-                        cursor: 'pointer',
-                      },
-                      on: {
-                        click: () => {
-                          if (type === 'error') {
-                            // 先根据执行的最新的任务记录获取错误码后查询是否有贴
-                            const failedReason =
-                              this.work.data.history[0].failedReason
-                            const errorCode = parseInt(failedReason) || ''
-                            const errorDesc = failedReason.substring(
-                              errorCode.toString().length,
-                              failedReason.length
-                            )
-                            this.checkErrorCode(errorCode, errorDesc)
-                          }
-                        },
-                      },
-                    },
-                    '发布提问'
-                  ),
-                ]
-              )
+              }, label)])
             },
           })
         })
@@ -1052,42 +1030,6 @@ export default {
           })
         })
       }
-    },
-    checkErrorCode(errorCode, errorDesc) {
-      api
-        .fetch(
-          '/kn/isErrorDuplicate',
-          {
-            errorCode,
-          },
-          'get'
-        )
-        .then((res) => {
-          if (res.isDuplicate) {
-            // 如果有就打开新浏览器跳转
-          } else {
-            // 没有就发帖
-            this.postMessage(errorCode, errorDesc)
-          }
-        })
-    },
-    // 发帖
-    postMessage(errorCode, errorDesc) {
-      api
-        .fetch(
-          '/kn/posting',
-          {
-            title: `errorDesc问题讨论`,
-            content: {
-              errorCode,
-              errorDesc,
-            },
-          },
-          'post'
-        )
-        .then((res) => {
-          window.console.log(res, '发帖成功')
-        })
     },
     resetData() {
       // upgrade only one time
@@ -1181,11 +1123,11 @@ export default {
       delete this.node.params.configuration.runtime.contextID
       delete this.node.params.configuration.runtime.nodeName
       // 除了执行，其他的都不需要contextID
-      let tempParams = JSON.parse(JSON.stringify(params))
-      delete tempParams.metadata.configuration.runtime.contextID
-      delete tempParams.metadata.configuration.runtime.nodeName
-      return api
-        .fetch('/filesystem/saveScriptToBML', tempParams, 'post')
+      let tempParams = JSON.parse(JSON.stringify(params));
+      delete tempParams.metadata.configuration.runtime.contextID;
+      delete tempParams.metadata.configuration.runtime.nodeName;
+      delete tempParams.metadata.configuration.startup;
+      return api.fetch('/filesystem/saveScriptToBML', tempParams, 'post')
         .then((res) => {
           this.$Message.success(this.$t('message.scripts.saveSuccess'))
           this.node.isChange = false
@@ -1344,10 +1286,18 @@ export default {
       }
       this.debounceLocalLogShow()
     },
-    configLogPanel(name) {
+    configLogPanel() {
+      let bottomContentHeight
+      if (this.scriptViewState.bottomPanelFull) {
+        bottomContentHeight = this._last_bottom_panel_height
+      } else {
+        this._last_bottom_panel_height = this.scriptViewState.bottomContentHeight
+        bottomContentHeight = this.$el.clientHeight + 30
+      }
       this.scriptViewState = {
         ...this.scriptViewState,
-        bottomPanelFull: name == 'fullScreen',
+        bottomContentHeight,
+        bottomPanelFull: !this.scriptViewState.bottomPanelFull
       }
     },
     changeResultSet(data, cb) {
@@ -1529,9 +1479,12 @@ export default {
       if (rst.dirFileTrees) {
         // 后台的结果集顺序是根据结果集名称按字符串排序的，展示时会出现结果集对应不上的问题，所以加上排序
         this.script.resultSet = 0
-        this.script.resultList = rst.dirFileTrees.children.sort(
-          (a, b) => parseInt(a.name, 10) - parseInt(b.name, 10)
-        )
+        const slice = (name) => {
+          return Number(name.slice(1, name.lastIndexOf('.')));
+        }
+        this.script.resultList = rst.dirFileTrees.children.sort((a, b) => {
+          return slice(a.name) - slice(b.name);
+        });
         if (this.script.resultList.length) {
           const currentResultPath = rst.dirFileTrees.children[0].path
           const url2 = `/filesystem/openFile`
@@ -1623,106 +1576,125 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-@import '@dataspherestudio/shared/common/style/variables.scss';
-.editor-panel {
-  position: relative;
-  .script-line {
-    position: absolute;
-    width: 100%;
-    height: 6px;
-    left: 0;
-    bottom: -2px;
-    z-index: 3;
-    border-bottom: 1px solid #dcdee2;
-    @include border-color($border-color-base, $dark-base-color);
+  @import '@dataspherestudio/shared/common/style/variables.scss';
+  .editor-panel {
+    position: relative;
+    .script-line {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      left: 0;
+      bottom: -2px;
+      z-index: 3;
+      border-bottom: 1px solid #dcdee2;
+      @include border-color($border-color-base, $dark-base-color);
+      @include bg-color($light-base-color, $dark-base-color);
+      cursor: ns-resize;
+    }
+    &.full-screen {
+      top: 54px !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      position: fixed;
+      z-index: 1050;
+      height: 100% !important;
+    }
+    .new-sidebar-spin {
+      @include bg-color(rgba(255, 255, 255, .1), rgba(0, 0, 0, 0.5));
+    }
+  }
+  .log-panel {
+    border-top: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-border-color-base);
     @include bg-color($light-base-color, $dark-base-color);
-    cursor: ns-resize;
-  }
-  &.full-screen {
-    top: 54px !important;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    position: fixed;
-    z-index: 100;
-    background-color: #fff;
-    height: 100% !important;
-  }
-  .new-sidebar-spin {
-    @include bg-color(rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.5));
-  }
-}
-.log-panel {
-  border-top: $border-width-base $border-style-base $border-color-base;
-  @include border-color($border-color-base, $dark-border-color-base);
-  @include bg-color($light-base-color, $dark-base-color);
-  .workbench-tabs {
-    position: $relative;
-    height: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-    z-index: 3;
-    .workbench-tab-wrapper {
-      display: flex;
-      border-top: $border-width-base $border-style-base #dcdcdc;
-      border-bottom: $border-width-base $border-style-base #dcdcdc;
-      @include border-color($border-color-base, $dark-menu-base-color);
-      .workbench-tab {
-        flex: 1;
+    &.full-screen {
+      top: 54px !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      position: fixed;
+      z-index: 1050;
+      height: 100% !important;
+    }
+    .workbench-tabs {
+      position: $relative;
+      height: 100%;
+      overflow: hidden;
+      box-sizing: border-box;
+      z-index: 3;
+      .workbench-tab-wrapper {
         display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        align-items: center;
-        height: 32px;
-        @include bg-color($light-base-color, $dark-base-color);
-        width: calc(100% - 45px);
-        overflow: hidden;
-        &.work-list-tab {
-          overflow-x: auto;
-          overflow-y: hidden;
-          &::-webkit-scrollbar {
-            width: 0;
-            height: 0;
-            background-color: transparent;
-          }
-          .list-group > span {
-            white-space: nowrap;
-            display: block;
-            height: 0;
-          }
-        }
-        .workbench-tab-item {
-          text-align: center;
-          border-top: none;
-          display: inline-block;
+        border-top: $border-width-base $border-style-base #dcdcdc;
+        border-bottom: $border-width-base $border-style-base #dcdcdc;
+        @include border-color($border-color-base, $dark-menu-base-color);
+        .workbench-tab {
+          flex: 1;
+
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          justify-content: flex-start;
+          align-items: center;
           height: 32px;
-          line-height: 32px;
-          @include bg-color($light-base-color, $dark-submenu-color);
-          @include font-color(
-            $workspace-title-color,
-            $dark-workspace-title-color
-          );
-          cursor: pointer;
-          min-width: 100px;
-          max-width: 200px;
+          @include bg-color($light-base-color, $dark-base-color);
+          width: calc(100% - 45px);
           overflow: hidden;
-          margin-right: 2px;
-          border: 1px solid #eee;
-          @include border-color($border-color-base, $dark-border-color-base);
-          &.active {
-            margin-top: 1px;
-            @include bg-color($light-base-color, $dark-base-color);
-            @include font-color($primary-color, $dark-primary-color);
-            border-radius: 4px 4px 0 0;
-            border-left: 1px solid $border-color-base;
-            border-right: 1px solid $border-color-base;
-            border-top: 1px solid $border-color-base;
+          &.work-list-tab {
+            overflow-x: auto;
+            overflow-y: hidden;
+            &::-webkit-scrollbar {
+              width: 0;
+              height: 0;
+              background-color: transparent;
+            }
+            .list-group > span {
+              white-space: nowrap;
+              display: block;
+              height: 0;
+            }
+          }
+          .workbench-tab-item {
+            text-align: center;
+            border-top: none;
+            display: inline-block;
+            height: 32px;
+            line-height: 32px;
+            @include bg-color($light-base-color, $dark-submenu-color);
+            @include font-color(
+              $workspace-title-color,
+              $dark-workspace-title-color
+            );
+            cursor: pointer;
+            min-width: 100px;
+            max-width: 200px;
+            overflow: hidden;
+            margin-right: 2px;
+            border: 1px solid #eee;
             @include border-color($border-color-base, $dark-border-color-base);
+            &.active {
+              margin-top: 1px;
+              @include bg-color($light-base-color, $dark-base-color);
+              @include font-color($primary-color, $dark-primary-color);
+              border-radius: 4px 4px 0 0;
+              border-left: 1px solid $border-color-base;
+              border-right: 1px solid $border-color-base;
+              border-top: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
+            }
+          }
+          .workbench-tab-full-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-right: 8px;
+            cursor: pointer;
+            &:hover {
+              @include font-color($primary-color, $dark-primary-color);
+            }
           }
         }
       }
     }
-  }
-}
+ }
 </style>

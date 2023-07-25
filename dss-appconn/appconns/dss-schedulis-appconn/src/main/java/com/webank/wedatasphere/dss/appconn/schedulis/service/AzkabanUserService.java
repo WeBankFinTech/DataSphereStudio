@@ -26,10 +26,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -64,9 +61,17 @@ public class AzkabanUserService {
                     }
                 }
                 List<AzkabanUserEntity> entityList = schedulisUserMap.get(baseUrl);
-                List<AzkabanUserEntity> newEntityList = ((List<Object>) map.get("systemUserList")).stream().map(e ->
-                        DSSCommonUtils.COMMON_GSON.fromJson(e.toString(), AzkabanUserEntity.class)
-                ).collect(Collectors.toList());
+                List<AzkabanUserEntity> newEntityList = ((List<Object>) map.get("systemUserList")).stream().map(e -> {
+                            AzkabanUserEntity userEntity;
+                            try {
+                                userEntity = DSSCommonUtils.COMMON_GSON.fromJson(e.toString(), AzkabanUserEntity.class);
+                            } catch (Exception ex) {
+                                LOGGER.warn("AzkabanUserEntity: {} parsed from json failed!", e.toString());
+                                userEntity = null;
+                            }
+                            return userEntity;
+                        }
+                ).filter(Objects::nonNull).collect(Collectors.toList());
                 synchronized (entityList) {
                     entityList.clear();
                     entityList.addAll(newEntityList);
@@ -79,7 +84,7 @@ public class AzkabanUserService {
     }
 
     public static boolean containsUser(String releaseUser, String baseUrl,
-                                              SSORequestOperation ssoRequestOperation, Workspace workspace) {
+                                       SSORequestOperation ssoRequestOperation, Workspace workspace) {
         Supplier<Boolean> supplier = () -> schedulisUserMap.containsKey(baseUrl) &&
                 schedulisUserMap.get(baseUrl).stream().anyMatch(entity -> entity.getUsername().equals(releaseUser));
         if (!supplier.get()) {
@@ -89,8 +94,8 @@ public class AzkabanUserService {
     }
 
     public static String getUserId(String user, String baseUrl,
-                                    SSORequestOperation ssoRequestOperation, Workspace workspace) {
-        if(containsUser(user, baseUrl, ssoRequestOperation, workspace)) {
+                                   SSORequestOperation ssoRequestOperation, Workspace workspace) {
+        if (containsUser(user, baseUrl, ssoRequestOperation, workspace)) {
             return schedulisUserMap.get(baseUrl).stream().filter(entity -> entity.getUsername().equals(user)).findAny().get().getId();
         } else {
             throw new ExternalOperationFailedException(10823, "Not exists user in Schedulis " + user);

@@ -17,7 +17,7 @@
       <canvas ref="canvas" class="node-box-bg" />
       <div
         :title="title"
-        :style="{'line-height': height * state.baseOptions.pageSize + 'px' }"
+        :style="{'line-height': height * state.baseOptions.pageSize + 'px', left: width * 0.3 > 25 ? '25px' :  width * 0.3 + 'px' }"
         class="node-box-content">
         {{ title }}
       </div>
@@ -42,7 +42,7 @@
         class="node-anchor"
         @mousedown.stop="clickAnchor(arrow, $event)" />
     </template>
-
+    <div v-if="runState.outerText && selected" :style="runState.outerStyle" >{{ runState.outerText }}</div>
   </div>
 </template>
 <script>
@@ -149,8 +149,8 @@ export default {
           ...styelObj,
           'background-image': `url(${this.image})`,
           'background-repeat': 'no-repeat',
-          'background-position': '10% center',
-          'background-size': '12%'
+          'background-position': '5px center',
+          'background-size': '11%'
         }
       }
       return {
@@ -344,21 +344,30 @@ export default {
       if (userMenu && Array.isArray(userMenu)) {
         arr = arr.concat(userMenu);
       }
+      /**
+       * 处理图标
+       */
+      function iconHelper (arr = []) {
+        return arr.map((it) => {
+          let menuItem = {
+            text: it.text,
+            value: it.value,
+          }
+          if (it.img) {
+            menuItem.img = it.img;
+          } else if (it.icon) {
+            menuItem.icon = it.icon;
+          }
+          if (it.children) {
+            menuItem.children = iconHelper(it.children)
+          }
+          return menuItem
+        });
+      }
       if (typeof beforeShowMenu === 'function') {
         arr = beforeShowMenu(this.selfNode, arr, 'node');
         if (Array.isArray(arr)) {
-          arr = arr.map((it) => {
-            let menuItem = {
-              text: it.text,
-              value: it.value
-            }
-            if (it.img) {
-              menuItem.img = it.img;
-            } else if (it.icon) {
-              menuItem.icon = it.icon;
-            }
-            return menuItem
-          });
+          arr = iconHelper(arr)
         } else {
           console.warn('ctxMenuOptions.beforeShowMenu' + this.$t('message.workflow.process.returnRule'))
         }
@@ -370,7 +379,7 @@ export default {
         top: e.clientY,
         choose: (data) => {
           // if (this.state.disabled) return;
-          this.designer.$emit(`ctx-menu-${data.value}`, this.selfNode, 'node')
+          this.designer.$emit(`on-ctx-menu`, data.value, this.selfNode, 'node')
           this.$emit('operat-node', data.value, this.k);
         }
       })
@@ -382,7 +391,7 @@ export default {
         if (this.state.disabled) return;
         let keys = [];
         if (this.state.choosing.type == 'node') {
-          keys = e.ctrlKey || this.state.choosing.key.length > 1 ? this.state.choosing.key : []
+          keys = e.ctrlKey || this.state.choosing.key.length > 1 ? [...this.state.choosing.key] : []
         }
         if (keys.indexOf(this.k) < 0) {
           keys.push(this.k);
@@ -398,16 +407,16 @@ export default {
             nodes.push(node)
           }
         })
-        if (this.designer) {
-          commit(this.$store, 'UPDATE_CHOOSING', {
-            type: 'node',
-            key: keys
-          });
-        }
+        // if (this.designer) {
+        //   commit(this.$store, 'UPDATE_CHOOSING', {
+        //     type: 'node',
+        //     key: keys
+        //   });
+        // }
         this.setDraging({
           type: 'node',
           data: {
-            key: this.key,
+            key: this.k,
             beginX: parseInt(this.x),
             beginY: parseInt(this.y),
             beginPageX: e.pageX,
@@ -441,6 +450,8 @@ export default {
         }
         if (keys.indexOf(this.k) < 0) {
           keys.push(this.k);
+        } else {
+          keys = keys.filter(it => it != this.k)
         }
         if (this.designer) {
           commit(this.$store, 'UPDATE_CHOOSING', {
@@ -492,7 +503,7 @@ export default {
           x = x - this.width;
         }
       } else {
-        // 
+        //
       }
       let endNode = Object.assign({}, beginNode, {
         key: getKey(),

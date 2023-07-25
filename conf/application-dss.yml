@@ -1,13 +1,11 @@
-
 eureka:
   client:
+    registry-fetch-interval-seconds: 8
     serviceUrl:
       defaultZone: http://127.0.0.1:20303/eureka/
-  #instance:
-    #prefer-ip-address: true
-    #instance-id: ${spring.cloud.client.ip-address}:${server.port}
-    #metadata-map:
-      #test: wedatasphere
+  instance:
+    lease-renewal-interval-in-seconds: 4
+    lease-expiration-duration-in-seconds: 12
 
 management:
   endpoints:
@@ -17,7 +15,13 @@ management:
 logging:
   config: classpath:log4j2.xml
 
-#mybatis:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+ribbon:
+  ReadTimeout: 300000
+  ConnectTimeout: 300000
 
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 90000
+        readTimeout: 90000

@@ -1,9 +1,9 @@
 <template>
-  <div class="engine-box">
-    <Spin
-      v-if="loading"
-      size="large"
-      fix/>
+  <Spin
+    v-if="loading"
+    size="large"
+    fix/>
+  <div v-else class="engine-box">
     <div
       class="engine-content"
       v-if="ideEngineList.length > 0">
@@ -132,10 +132,7 @@
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
 export default {
-  name: 'Job',
-  filters: {
-
-  },
+  name: 'Engine',
   data() {
     return {
       btnSize: 'small',
@@ -227,6 +224,12 @@ export default {
           return this.$t('message.common.resourceSimple.FM');
         case 'Starting':
           return this.$t('message.common.resourceSimple.QD');
+        case 'Running':
+          return this.$t('message.common.resourceSimple.QD');
+        case 'ShuttingDown':
+          return this.$t('message.common.resourceSimple.QD');
+        case 'Unlock':
+          return this.$t('message.common.resourceSimple.KX');
         default:
           return params
       }
@@ -280,6 +283,7 @@ export default {
             this.otherEngineList.push(item);
           }
         });
+        this.$emit('update-job', res.engines.length);
         // 根据状态改变数据
         this.getClassListAction(this.ideSelectData, this.ideEngineList, this.ideClassList);
         this.getClassListAction(this.boardSelectData, this.boardEngineList, this.boardClassList);
@@ -353,6 +357,18 @@ export default {
           color: color
         }
       }
+    },
+    selectAll(isSelectedAll) {
+      const statusList = ['Error','ShuttingDown','Dead','Idle','Unlock']
+      this.ideEngineList.forEach(item =>  {
+        if (statusList.indexOf(item.engineStatus) > -1) item.isActive = !isSelectedAll
+      });
+      this.boardEngineList.forEach(item =>  {
+        if (statusList.indexOf(item.engineStatus) > -1) item.isActive = !isSelectedAll
+      });
+      this.otherEngineList.forEach(item =>  {
+        if (statusList.indexOf(item.engineStatus) > -1) item.isActive = !isSelectedAll
+      });
     },
   },
 };

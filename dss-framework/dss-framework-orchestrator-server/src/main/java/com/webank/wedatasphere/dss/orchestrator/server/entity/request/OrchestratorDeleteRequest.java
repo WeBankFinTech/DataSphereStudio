@@ -43,4 +43,12 @@ public class OrchestratorDeleteRequest extends OrchestratorRequest {
     public void setDeleteSchedulerWorkflow(Boolean deleteSchedulerWorkflow) {
         this.deleteSchedulerWorkflow = deleteSchedulerWorkflow;
     }
+
+    @Override
+    public String toString() {
+        return "OrchestratorDeleteRequest{" +
+                "id=" + id +
+                ", deleteSchedulerWorkflow=" + deleteSchedulerWorkflow +
+                '}';
+    }
 }

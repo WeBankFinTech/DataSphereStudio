@@ -17,6 +17,10 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.AddWorkspaceRoleRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
@@ -45,7 +49,7 @@ public class DSSWorkspaceRoleRestful {
     private DSSWorkspaceRoleService dssWorkspaceRoleService;
 
     @RequestMapping(path = "getWorkspaceRoles", method = RequestMethod.GET)
-    public Message getWorkspaceRoles(HttpServletRequest request, @RequestParam(WORKSPACE_ID_STR) int workspaceId) {
+    public Message getWorkspaceRoles(@RequestParam(WORKSPACE_ID_STR) int workspaceId) {
         //todo 获取工作空间中所有的角色
         List<DSSWorkspaceRoleVO> workspaceRoles = dssWorkspaceService.getWorkspaceRoles(workspaceId);
         return Message.ok().data("workspaceRoles", workspaceRoles);
@@ -61,74 +65,17 @@ public class DSSWorkspaceRoleRestful {
         if (!dssWorkspaceService.checkAdmin(username) || !dssWorkspaceService.checkAdminByWorkspace(username, workspaceId)) {
             return Message.error("无权限进行该操作");
         }
-        dssWorkspaceRoleService.addWorkspaceRole(roleName, workspaceId, menuIds, componentIds, username);
+        DSSWorkspaceRole dssRole = dssWorkspaceRoleService.addWorkspaceRole(roleName, workspaceId, menuIds, componentIds, username);
+        String workspaceName = dssWorkspaceService.getWorkspaceName((long) workspaceId);
+        AuditLogUtils.printLog(username, workspaceId,workspaceName, TargetTypeEnum.WORKSPACE_ROLE,dssRole.getId(),roleName,
+                OperateTypeEnum.CREATE, addWorkspaceRoleRequest);
         return Message.ok("创建角色成功");
     }
 
     @RequestMapping(path = "deleteWorkspaceRole", method = RequestMethod.POST)
-    public Message deleteWorkspaceRole(HttpServletRequest request) {
+    public Message deleteWorkspaceRole() {
 
         return null;
     }
-
-//    @RequestMapping(path = "getWorkspaceBaseInfo", method = RequestMethod.GET)
-//    @Deprecated
-//    public Message getWorkspaceInfo(HttpServletRequest request,
-//                                    HttpServletResponse response,
-//                                    @RequestParam(WORKSPACE_ID_STR) Integer workspaceId) {
-//        String username = SecurityFilter.getLoginUsername(request);
-//        //如果workspaceId为null的话,那么就找到这个用户工作空间
-//        if (workspaceId == null || workspaceId <= 0) {
-//            workspaceId = dssWorkspaceRoleService.getWorkspaceIdByUser(username);
-//        }
-//        DSSWorkspace workspace;
-//        try {
-//            workspace = dssWorkspaceService.getWorkspacesById(workspaceId.longValue(), username);
-//        } catch (DSSErrorException e) {
-//            return Message.error(ExceptionUtils.getRootCauseMessage(e));
-//        }
-//        //将workspaceId作为cookie写入
-//        SSOHelper.setAndGetWorkspace(request, response, workspaceId, workspace.getName());
-//        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, workspaceId);
-//        if (roles == null || roles.isEmpty()) {
-//            LOGGER.error("username {}, in workspace {} roles are null or empty", username, workspaceId);
-//            return Message.error("can not get roles information");
-//        }
-//        //判断如果是没有权限的，那么就直接干掉
-//        if (roles.contains("apiUser")) {
-//            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId, "apiUser", "apiService");
-//            if (priv <= 0) {
-//                roles.remove("apiUser");
-//            }
-//        }
-//        Message retMessage = Message.ok();
-//        //工作空间中，加上用户在顶部的菜单
-//        if (roles.contains("analyser")) {
-//            retMessage.data("topName", "Scriptis");
-//            retMessage.data("topUrl", "/home");
-//        } else if (roles.contains("developer")) {
-//            retMessage.data("topName", "Scriptis");
-//            retMessage.data("topUrl", "/home");
-//        } else if (roles.contains("apiUser") && roles.size() == 1) {
-//            retMessage.data("topName", "Scriptis");
-//            retMessage.data("topUrl", "/home");
-//        } else {
-//            retMessage.data("topName", "Scriptis");
-//            retMessage.data("topUrl", "/home");
-//        }
-//        //如果其他的角色也是有这个api权限的，那么就加上这个apiUser
-//        boolean flag = false;
-//        for (String role : roles) {
-//            int priv = dssWorkspaceRoleService.getApiPriv(username, workspaceId, role, "apiService");
-//            if (priv >= 1) {
-//                flag = true;
-//                break;
-//            }
-//        }
-//        if (flag && !roles.contains("apiUser")) {
-//            roles.add("apiUser");
-//        }
-//        return retMessage.data("roles", roles).data("workspaceId", workspaceId);
-//    }
 
 }

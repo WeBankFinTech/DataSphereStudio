@@ -16,11 +16,16 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import org.apache.commons.math3.util.Pair;
+
+import java.util.List;
 
 
 public interface OrchestratorFrameworkService {
@@ -31,4 +36,13 @@ public interface OrchestratorFrameworkService {
 
     CommonOrchestratorVo deleteOrchestrator(String username, OrchestratorDeleteRequest orchestratorDeleteRequest, Workspace workspace) throws Exception;
 
+    OrchestratorUnlockVo unlockOrchestrator(String username, Workspace workspace, OrchestratorUnlockRequest request) throws DSSErrorException;
+
+    String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception;
+
+    Pair<Long, List<OrchestratorCopyHistory>> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception;
+
+    Boolean getOrchestratorCopyStatus(Long sourceOrchestratorId);
+
+    DSSOrchestratorCopyInfo getOrchestratorCopyInfoById(String copyInfoId);
 }

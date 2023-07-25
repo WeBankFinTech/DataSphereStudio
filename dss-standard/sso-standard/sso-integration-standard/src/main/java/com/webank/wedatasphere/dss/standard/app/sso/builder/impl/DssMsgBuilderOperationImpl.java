@@ -76,7 +76,7 @@ public class DssMsgBuilderOperationImpl implements DssMsgBuilderOperation {
                 cookies.put(key, value);
             });
         }
-        LOGGER.info("Set cookies from dssMsg: "+cookies.toString());
+//        LOGGER.info("Set cookies from dssMsg: "+cookies.toString());
         dssMsg.setCookies(cookies);
         return dssMsg;
     }

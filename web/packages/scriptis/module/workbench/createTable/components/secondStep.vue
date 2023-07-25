@@ -120,7 +120,6 @@ export default {
 .create-table-second-step {
     .data-source {
         display: block;
-        background: #fff;
         border-radius: 4px;
         font-size: 14px;
         position: relative;
@@ -128,11 +127,6 @@ export default {
         transition: all .2s ease-in-out;
         padding: 14px 16px;
         line-height: 1;
-        &:hover {
-            -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
-            box-shadow: 0 1px 6px rgba(0, 0, 0, .2);
-            border-color: #eee;
-        }
         .data-source-item-wrap {
             display: inline-block;
             .data-source-title {
@@ -140,7 +134,6 @@ export default {
                 height: 20px;
                 line-height: 20px;
                 font-size: 14px;
-                color: #17233d;
                 font-weight: 700;
             }
             .data-source-type {

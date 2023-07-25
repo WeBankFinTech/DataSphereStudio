@@ -65,4 +65,13 @@ public class Resource implements Serializable {
     public int hashCode() {
         return Objects.hash(resourceId, version);
     }
+
+    @Override
+    public String toString() {
+        return "Resource{" +
+                "fileName='" + fileName + '\'' +
+                ", resourceId='" + resourceId + '\'' +
+                ", version='" + version + '\'' +
+                '}';
+    }
 }

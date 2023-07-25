@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 public class LinkisJobSubmit {
 
-    private static UJESClient ujesClient;
+    private static volatile UJESClient ujesClient;
 
     public static UJESClient getClient() {
         if(ujesClient == null) {

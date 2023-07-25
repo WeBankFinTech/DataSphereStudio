@@ -1,6 +1,7 @@
 <template>
   <div class="iframeClass">
     <iframe
+      ref="ifr"
       class="iframeClass"
       v-if="isRefresh"
       id="iframe"
@@ -8,6 +9,7 @@
       frameborder="0"
       width="100%"
       :height="height"/>
+    <Spin v-if="loading" fix>{{ $t('message.common.Loading') }}</Spin>
   </div>
 </template>
 <script>
@@ -17,7 +19,8 @@ export default {
     return {
       height: 0,
       visualSrc: '',
-      isRefresh: true
+      isRefresh: true,
+      loading: true
     };
   },
   watch: {
@@ -35,6 +38,12 @@ export default {
     }
   },
   mounted() {
+    const ifr = this.$refs.ifr;
+    if (ifr) {
+      ifr.onload = () => {
+        this.loading = false
+      }
+    }
     this.getUrl();
     // 创建的时候设置宽高
     this.resize(window.innerHeight);

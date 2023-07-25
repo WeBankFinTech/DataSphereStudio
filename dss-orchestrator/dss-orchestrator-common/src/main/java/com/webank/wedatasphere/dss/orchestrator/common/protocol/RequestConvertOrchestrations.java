@@ -32,6 +32,7 @@ public class RequestConvertOrchestrations {
     private Project project;
     private DSSWorkspace workspace;
     private List<DSSLabel> dssLabels;
+    private String approvalId;
 
     public Map<Long, Long> getOrchestrationIdMap() {
         return orchestrationIdMap;
@@ -71,5 +72,13 @@ public class RequestConvertOrchestrations {
 
     public void setDSSLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
+    }
+
+    public String getApprovalId() {
+        return approvalId;
+    }
+
+    public void setApprovalId(String approvalId) {
+        this.approvalId = approvalId;
     }
 }

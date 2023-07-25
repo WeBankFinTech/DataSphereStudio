@@ -35,6 +35,18 @@ public interface DSSToRelConversionRequestRef<R extends DSSToRelConversionReques
         setParameter("dssProject", dssProject);
         return (R) this;
     }
+    /**
+     * some schedule system need approval id
+     * @return
+     */
+    default String getApprovalId() {
+        return (String) getParameter("approvalId");
+    }
+
+    default R setApprovalId(String approvalId) {
+        setParameter("approvalId", approvalId);
+        return (R) this;
+    }
 
     class ProjectToRelConversionRequestRefImpl extends DSSToRelConversionRequestRefImpl<ProjectToRelConversionRequestRefImpl>
         implements ProjectToRelConversionRequestRef<ProjectToRelConversionRequestRefImpl> {}

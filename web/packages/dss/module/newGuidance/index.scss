@@ -17,7 +17,7 @@
         position: relative;
 
         p {
-            text-align: justify;
+            text-align: left;
             span {
                 color: rgb(9, 140, 234);
                 font-weight: 550;
@@ -93,7 +93,7 @@
         padding    : 16px;
 
         p {
-            text-align: justify;
+            text-align: left;
 
             span {
                 color: rgb(9, 140, 234);
@@ -158,7 +158,7 @@
     left    : 0;
     width   : 100%;
     z-index : 1003;
-
+    text-align: left;
     .item1 {
         .dashed {
             display   : inline-block;
@@ -183,7 +183,7 @@
 
         .block4 {
             width      : 80px;
-            margin-left: 35px;
+            margin-left: 22px;
         }
 
         .block5 {
@@ -222,7 +222,7 @@
 
         font-size  : 14px;
         color      : #ffffff;
-        text-align : justify;
+        text-align : left;
         min-width  : 1050px;
 
         span {
@@ -270,13 +270,14 @@
     right   : 0;
     z-index : 1003;
     width: 383px;
-    height: 250px;
+    height: 278px;
+    text-align: left;
 
     .item1 {
 
         font-size  : 14px;
         color      : #ffffff;
-        text-align : justify;
+        text-align : left;
         display    : inline-block;
 
         span {
@@ -285,13 +286,13 @@
         }
 
         div {
-            height: 60px;
+            height: 110px;
             width : 180px;
         }
 
         .desc2 {
             width        : 200px;
-            margin-top   : 65px;
+            margin-top   : 40px;
         }
     }
 

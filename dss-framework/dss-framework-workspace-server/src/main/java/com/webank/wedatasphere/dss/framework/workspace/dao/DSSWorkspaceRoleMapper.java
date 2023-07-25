@@ -99,7 +99,7 @@ public interface DSSWorkspaceRoleMapper {
     Integer getDefaultWorkspaceId(@Param("defaultWorkspaceName") String defaultWorkspaceName);
 
     @Select("select id from dss_workspace_role where workspace_id = #{workspaceId} and name = #{apiUser}")
-    int getRoleId(@Param("apiUser") String apiUser, @Param("workspaceId") int workspaceId);
+    Integer getRoleId(@Param("apiUser") String apiUser, @Param("workspaceId") int workspaceId);
 
     @Select("Select count(*) from dss_workspace_appconn_role where workspace_id = #{workspaceId} and role_id = #{roleId} and appconn_id = #{componentId}")
     int getCount(@Param("workspaceId") Integer workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId);

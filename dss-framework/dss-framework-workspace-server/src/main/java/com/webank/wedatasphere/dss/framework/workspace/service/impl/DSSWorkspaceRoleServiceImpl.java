@@ -46,7 +46,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addWorkspaceRole(String roleName, int workspaceId, List<Integer> menuIds, List<Integer> componentIds, String username) {
+    public DSSWorkspaceRole addWorkspaceRole(String roleName, int workspaceId, List<Integer> menuIds, List<Integer> componentIds, String username) {
         DSSWorkspaceRole dssRole = new DSSWorkspaceRole();
         dssRole.setWorkspaceId(workspaceId);
         dssRole.setFrontName(roleName);
@@ -71,6 +71,7 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
             dssWorkspaceRoleMapper.updateRoleComponent(dssRole.getId(), workspaceId, allComponentIds, username, 0);
         }
         workspaceDBHelper.retrieveFromDB();
+        return dssRole;
     }
 
     @Override
@@ -95,7 +96,10 @@ public class DSSWorkspaceRoleServiceImpl implements DSSWorkspaceRoleService {
 
     @Override
     public int getApiPriv(String username, Integer workspaceId, String roleName, String appName) {
-        int roleId = dssWorkspaceRoleMapper.getRoleId(roleName, -1);
+        Integer roleId = dssWorkspaceRoleMapper.getRoleId(roleName, -1);
+        if (roleId == null) {
+            return -1;
+        }
         DSSApplicationBean applicationBean = workspaceDBHelper.getAppConn(appName);
         if (applicationBean == null) {
             return -1;

@@ -22,24 +22,24 @@
           <Option
             value="all"
             key="all"
-          >所有项目</Option>
+          >{{ $t('message.workspace.All') }}</Option>
           <Option
             value="owner"
             key="owner"
-          >个人项目</Option>
+          >{{ $t('message.workspace.Individual') }}</Option>
           <Option
             value="share"
             key="share"
-          >共享项目</Option>
+          >{{ $t('message.workspace.Shared') }}</Option>
           <Option
             value="delete"
             key="delete"
-          >已删除项目</Option>
+          >{{ $t('message.workspace.Deleted') }}</Option>
         </Select>
         <Input
           search
           class="search-input"
-          :placeholder="$t('message.workflow.projectDetail.SRMCSS')"
+          :placeholder="$t('message.common.projectDetail.SRMCSS')"
           @on-change="searchProject($event, 1)"
         />
       </div>
@@ -69,6 +69,7 @@
       :action-type="actionType"
       :project-data="currentProjectData"
       :classify-list="cacheData"
+      :workspace-users="workspaceUsers"
       :applicationAreaMap="applicationAreaMap"
       :orchestratorModeList="orchestratorModeList"
       :framework="true"
@@ -108,13 +109,13 @@
     </Modal>
     <Modal
       v-model="deleteProjectShow"
-      :title="$t('message.workflow.projectDetail.deleteProject')"
+      :title="$t('message.common.projectDetail.deleteProject')"
       @on-ok="deleteProjectConfirm"
     >
-      {{$t('message.workflow.projectDetail.confirmDeleteProject')}}{{ deleteProjectItem.name }}?
+      {{$t('message.common.projectDetail.confirmDeleteProject')}}{{ deleteProjectItem.name }}?
       <br />
       <br />
-      <Checkbox v-model="ifDelOtherSys">同步删除所有第三方系统的工程</Checkbox>
+      <Checkbox v-model="ifDelOtherSys">{{ $t('message.workspace.Simultaneously') }}</Checkbox>
       <br />
     </Modal>
     <Spin v-if="loading" size="large" fix />
@@ -128,10 +129,13 @@ import storage from '@dataspherestudio/shared/common/helper/storage'
 import api from '@dataspherestudio/shared/common/service/api'
 import projectContentItem from './module/projectItem.vue'
 import {
+  GetWorkspaceUserList,
   GetDicSecondList,
   GetAreaMap
 } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
+import util from '@dataspherestudio/shared/common/util';
 import { setVirtualRoles } from '@dataspherestudio/shared/common/config/permissions.js';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 export default {
   components: {
     projectContentItem,
@@ -160,7 +164,7 @@ export default {
       dataList: [
         {
           id: 1,
-          name: this.$t('message.workflow.projectDetail.WCYDXM'),
+          name: this.$t('message.common.projectDetail.WCYDXM'),
           dwsProjectList: []
         }
       ],
@@ -180,39 +184,38 @@ export default {
       applicationAreaMap: [],
       orchestratorModeList: {},
       ifDelOtherSys: false,
-      viewState: 'all'
+      viewState: 'owner',
+      workspaceUsers: {
+        accessUsers: [],
+        releaseUsers: [],
+        editUsers: []
+      }
     }
   },
   computed: {
     sortTypeList() {
       return [
         {
-          lable: this.$t('message.workflow.projectDetail.sortUpdateTime'),
+          lable: this.$t('message.common.projectDetail.sortUpdateTime'),
           value: 'updateTime'
         },
         {
-          lable: this.$t('message.workflow.projectDetail.sortName'),
+          lable: this.$t('message.common.projectDetail.sortName'),
           value: 'name'
         }
       ]
     },
     tips() {
-      return this.$t('message.workflow.projectDetail.tips', {app_name: this.$APP_CONF.app_name})
+      return this.$t('message.common.projectDetail.tips', {app_name: this.$APP_CONF.app_name})
     }
   },
   watch: {
     // 当切换工作空间之后，重新获取数据
     '$route.query.workspaceId'() {
-      this.getclassListData()
+      this.viewState = 'owner'
     }
   },
   created() {
-    // 获取所有分类和工程
-    this.getclassListData()
-    // 获取编排的数据
-    GetDicSecondList(this.$route.query.workspaceId).then((res) => {
-      this.orchestratorModeList = res.list;
-    });
   },
   mounted() {
     GetAreaMap().then(res => {
@@ -221,8 +224,22 @@ export default {
     this.$nextTick(() => {
       this.precentList = storage.get('precentList') || []
     })
+    eventbus.on('workspace.change', this.initWorkspaceData);
   },
   methods: {
+    initWorkspaceData() {
+      GetWorkspaceUserList({ workspaceId: +this.$route.query.workspaceId }).then(
+        (res) => {
+          this.workspaceUsers = res.users;
+        }
+      );
+      // 获取所有分类和工程
+      this.getclassListData()
+      // 获取编排的数据
+      GetDicSecondList(this.$route.query.workspaceId).then((res) => {
+        this.orchestratorModeList = res.list;
+      });
+    },
     changeCatType() {
       if (this.viewState === 'delete') {
         this.viewDeleted()
@@ -240,7 +257,7 @@ export default {
         this.cacheData = this.dataList
         this.dataList.forEach(item => {
           this.sortType[item.id] = this.$t(
-            'message.workflow.projectDetail.updteTime'
+            'message.common.projectDetail.updteTime'
           )
         })
         this.sortTypeChange()
@@ -278,7 +295,7 @@ export default {
           this.cacheData = this.dataList
           this.dataList.forEach(item => {
             this.sortType[item.id] = this.$t(
-              'message.workflow.projectDetail.updteTime'
+              'message.common.projectDetail.updteTime'
             )
           })
           this.sortTypeChange()
@@ -299,16 +316,17 @@ export default {
     // 确认新增工程 || 确认修改
     ProjectConfirm(projectData, callback) {
       projectData.workspaceId = +this.$route.query.workspaceId
+      const projectName = projectData.name
       if (
         this.checkName(
           this.cacheData[0].dwsProjectList,
-          projectData.name,
+          projectName,
           projectData.id
         )
       ) {
         typeof callback == "function" && callback();
         return this.$Message.warning(
-          this.$t('message.workflow.projectDetail.nameUnrepeatable')
+          this.$t('message.common.projectDetail.nameUnrepeatable')
         )
       }
       this.loading = true
@@ -323,23 +341,17 @@ export default {
             typeof callback == "function" && callback(true);
             this.$Message.success(
               `${this.$t(
-                'message.workflow.projectDetail.createProject'
+                'message.common.projectDetail.createProject'
               )}${this.$t('message.workflow.success')}`
             )
             this.getclassListData().then(data => {
               // 新建完工程进到工作流页
               const currentProject = data[0].dwsProjectList.filter(
-                project => project.name === projectData.name
+                project => project.name === projectName
               )[0]
-              this.$router.push({
-                name: 'Workflow',
-                query: {
-                  ...this.$route.query,
-                  projectID: currentProject.id,
-                  projectName: currentProject.name,
-                  notPublish: currentProject.notPublish
-                }
-              })
+              if (currentProject) {
+                this.gotoWorkflow({}, currentProject)
+              }
             })
           })
           .catch(() => {
@@ -370,7 +382,7 @@ export default {
           .then(() => {
             typeof callback == "function" && callback(true);
             this.$Message.success(
-              this.$t('message.workflow.projectDetail.eidtorProjectSuccess', {
+              this.$t('message.common.projectDetail.eidtorProjectSuccess', {
                 name: projectParams.name
               })
             )
@@ -405,7 +417,7 @@ export default {
           this.loading = false
           if (res.warmMsg) {
             this.$Modal.confirm({
-              title: this.$t('message.workflow.projectDetail.deleteTitle'),
+              title: this.$t('message.common.projectDetail.deleteTitle'),
               content: res.warmMsg,
               onOk: () => {
                 params.sure = true
@@ -419,7 +431,7 @@ export default {
                   .then(() => {
                     this.$Message.success(
                       `${this.$t(
-                        'message.workflow.projectDetail.deleteProject'
+                        'message.common.projectDetail.deleteProject'
                       )}${this.deleteProjectItem.name}${this.$t(
                         'message.workflow.success'
                       )}`
@@ -455,7 +467,7 @@ export default {
         editUsers: [],
         accessUsers: [],
         releaseUsers: [],
-        devProcessList: ['dev', 'prod']
+        devProcessList: []
       }
     },
     // 修改工程
@@ -475,16 +487,10 @@ export default {
         notPublish: subItem.notPublish,
         viewState: this.viewState
       }
+      const currentModules = util.currentModules();
       this.$router.push({
-        name: 'Workflow',
+        name: currentModules.microModule == 'scheduleCenter' ? 'ScheduleCenter' : 'Workflow',
         query
-      })
-      this.dispatch('workflowIndexedDB:clearProjectCache')
-      this.dispatch('workflowIndexedDB:addProjectCache', {
-        projectID: subItem.id,
-        value: {
-          projectData: query
-        }
       })
     },
     // 搜索对应的工程
@@ -541,7 +547,7 @@ export default {
       this.init()
       this.currentForm = 'copyForm'
       this.currentProjectData = project
-      this.commonTitle = this.$t('message.workflow.projectDetail.projectCopy')
+      this.commonTitle = this.$t('message.common.projectDetail.projectCopy')
       this.projectModelShow = true
     },
     projectExport(classifyId, project) {
@@ -563,7 +569,7 @@ export default {
             )
           )
             return this.$Message.warning(
-              this.$t('message.workflow.projectDetail.nameUnrepeatable')
+              this.$t('message.common.projectDetail.nameUnrepeatable')
             )
         }
         this.$refs.publish.ProjectCopy(copyCheckName)
@@ -621,10 +627,10 @@ export default {
         return -1
       })
       return list.sort(a => {
-        if (a.name === this.$t('message.workflow.projectDetail.WDGZL')) {
+        if (a.name === this.$t('message.common.projectDetail.WDGZL')) {
           return -1
         }
-        if (a.name === this.$t('message.workflow.projectDetail.WCYDXM')) {
+        if (a.name === this.$t('message.common.projectDetail.WCYDXM')) {
           return -1
         }
       })
@@ -654,8 +660,8 @@ export default {
     sortTypeChange(name = 'updateTime', id) {
       this.sortType[id] =
         name === 'updateTime'
-          ? this.$t('message.workflow.projectDetail.updteTime')
-          : this.$t('message.workflow.projectDetail.name')
+          ? this.$t('message.common.projectDetail.updteTime')
+          : this.$t('message.common.projectDetail.name')
       this.dataList = this.dataList.map(item => {
         if (!id || id === item.id) {
           item.dwsProjectList = item.dwsProjectList.sort((a, b) => {
@@ -779,7 +785,7 @@ export default {
                 this.isFlowPubulish = false
                 this.removePercent(projectId)
                 this.$Modal.error({
-                  title: `工程${typeName}${this.$t('message.workflow.fail')}`,
+                  title: `${this.$t('message.workflow.project')}${typeName}${this.$t('message.workflow.fail')}`,
                   content: `<p style="word-break: break-all;">${res.info.msg}</p>`,
                   width: 500,
                   okText: this.$root.$t('message.workflow.publish.cancel')
@@ -806,6 +812,9 @@ export default {
         this.precentList = precentList
       }
     }
+  },
+  beforeDestroy() {
+    eventbus.off('workspace.change', this.initWorkspaceData);
   }
 }
 </script>

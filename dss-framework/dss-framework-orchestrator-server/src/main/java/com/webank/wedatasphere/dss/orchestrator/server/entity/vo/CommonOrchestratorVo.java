@@ -27,6 +27,8 @@ public class CommonOrchestratorVo {
 
     private String orchestratorVersion;
 
+    private String orchestratorName;
+
     private String type = WORK_FLOW;
 
     public Long getOrchestratorId() {
@@ -43,6 +45,14 @@ public class CommonOrchestratorVo {
 
     public void setOrchestratorVersion(String orchestratorVersion) {
         this.orchestratorVersion = orchestratorVersion;
+    }
+
+    public String getOrchestratorName() {
+        return orchestratorName;
+    }
+
+    public void setOrchestratorName(String orchestratorName) {
+        this.orchestratorName = orchestratorName;
     }
 
     public String getType() {

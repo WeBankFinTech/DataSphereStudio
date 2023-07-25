@@ -43,7 +43,7 @@
           :script="script"
           :dispatch="dispatch"
           :getResultUrl="getResultUrl"
-          :comData="comData"
+          :work="work"
           :script-view-state="scriptViewState"
           @on-set-change="changeResultSet"/>
         <log
@@ -77,7 +77,7 @@ export default {
     stop: {
       type: Boolean,
     },
-    comData: {
+    work: {
       type: Object
     },
     height: {
@@ -146,8 +146,8 @@ export default {
     },
     createScript() {
       this.script = new Script({
-        id: this.comData.id,
-        title: this.comData.name,
+        id: this.work.id,
+        title: this.work.name,
         scriptViewState: this.scriptViewState,
       });
     },
@@ -155,11 +155,11 @@ export default {
       const data = {
         getResultUrl: this.getResultUrl,
         method: '/api/rest_j/v1/entrance/execute',
-        websocketTag: this.comData.id,
+        websocketTag: this.work.id,
         data: {
           executeApplicationName: null,
           executionCode: null,
-          runType: this.comData.runType,
+          runType: this.work.runType,
           params: null,
           postType: 'http',
           source: {
@@ -174,20 +174,20 @@ export default {
       }
     },
     queryState() {
-      if (this.comData.execID) {
+      if (this.work.execID) {
         const option = {
-          taskID: this.comData.taskID,
-          execID: this.comData.execID,
+          taskID: this.work.taskID,
+          execID: this.work.execID,
           isRestore: true,
-          id: this.comData.id,
-          nodeId: this.comData.key || undefined,
+          id: this.work.id,
+          nodeId: this.work.key || undefined,
         }
         this.execute.halfExecute(option);
         this.monitoringData();
       }
     },
     monitoringData() {
-      if (this.execute.taskID !== this.comData.taskID) {
+      if (this.execute.taskID !== this.work.taskID) {
         return;
       }
       this.execute.on('log', (logs) => {
@@ -383,7 +383,7 @@ export default {
         }
         // 如果是api执行需要带上taskId
         if (this.getResultUrl !== 'filesystem') {
-          params.taskId = this.comData.taskID
+          params.taskId = this.work.taskID
         }
         api.fetch(url, {
           ...params
@@ -451,7 +451,7 @@ export default {
       })
     },
     getLogs() {
-      api.fetch(`/entrance/${this.comData.execID}/log`, {
+      api.fetch(`/entrance/${this.work.execID}/log`, {
         fromLine: this.fromLine,
         size: -1,
       }, 'get')
@@ -565,7 +565,7 @@ export default {
         .workbench-tab-control {
             flex: 0 0 45px;
             text-align: right;
-            background-color: $body-background;
+            @include bg-color($light-base-color, $dark-base-color);
             border-left: $border-width-base $border-style-base $border-color-split;
             .ivu-icon {
               font-size: $font-size-base;
@@ -583,7 +583,7 @@ export default {
         .workbench-tab-button {
             flex: 0 0 30px;
             text-align: center;
-            background-color: $body-background;
+            @include bg-color($light-base-color, $dark-base-color);
             .ivu-icon {
                 font-size: $font-size-base;
                 margin-top: 8px;

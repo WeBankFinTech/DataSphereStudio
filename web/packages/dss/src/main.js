@@ -37,7 +37,24 @@ import 'iview/dist/styles/iview.css'
 import '@dataspherestudio/shared/common/style/theme/default.less'
 
 // Icon
-import '@dataspherestudio/shared/components/svgIcon/index.js'
+import SvgIcon from '@dataspherestudio/shared/components/svgIcon/index.vue'// svg component
+
+
+// register globally
+Vue.component('SvgIcon', SvgIcon)
+
+if (apps.vuecomps) {
+  Object.keys(apps.vuecomps).forEach(it => {
+    if (apps.vuecomps[it].default && apps.vuecomps[it].default.install) {
+      Vue.use(apps.vuecomps[it].default)
+    } else {
+      Vue.component(it, apps.vuecomps[it].default)
+    }
+  })
+}
+
+import('@dataspherestudio/shared/components/svgIcon/index.js')
+
 import '../module/index.js'
 
 // 扩展模块
@@ -77,7 +94,7 @@ Vue.prototype.$API_PATH = API_PATH;
 Vue.prototype.$APP_CONF = apps.conf || {};
 
 new Vue({
-  router,
+  router: router(),
   i18n,
   render: (h) => h(App)
 }).$mount('#app')

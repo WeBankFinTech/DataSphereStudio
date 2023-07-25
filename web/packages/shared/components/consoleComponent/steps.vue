@@ -13,7 +13,20 @@
           class="we-steps-child"
           v-for="(child, index) in renderList"
           :key="index">
-          <span class="we-steps-child-wrapper">
+          <span class="we-steps-child-wrapper" v-if="child.value==='Running'">
+            <Progress
+              style="width: 150px"
+              :percent="percent"
+              status="active"
+              hide-info
+            />
+            <span
+              style="cursor: pointer;"
+              class="we-steps-label"
+              :class="getClasses(child)"
+            >{{ child.label }}({{percent}}%)</span>
+          </span>
+          <span v-else class="we-steps-child-wrapper">
             <span
               class="we-steps-circle"
               :class="getClasses(child)"
@@ -39,21 +52,26 @@
                 <p
                   v-for="(p, index1) in hoverList"
                   :key="index1"
-                  :style="{'color': p.includes('失败') ? 'red' : '#67c23a'}"
+                  :style="{'color': p.includes(this.$t('message.common.Failed')) ? 'red' : '#67c23a'}"
                   style="line-height: 24px;">{{ p }}</p>
               </div>
             </Tooltip>
             <span
+              v-else
               style="cursor: pointer;"
               class="we-steps-label"
               :class="getClasses(child)"
-              v-else>{{ child.label }}</span>
+            >{{ child.label }}</span>
           </span>
           <Icon
             :color="getArrowColor(child, index)"
             type="md-arrow-round-forward"
             size="26"
             v-if="index !== renderList.length - 1 && child.isFinish"/>
+        </div>
+        <div v-if="percent === 100" style="padding-left: 10px">
+          <span>{{$t('message.common.process')}}</span>
+          <span class="progress-costtime">{{ costTime }}</span>
         </div>
       </Col>
     </Row>
@@ -67,6 +85,14 @@ export default {
       type: Array,
       default: () => [],
     },
+    percent: {
+      type: Number,
+      default: 0
+    },
+    costTime: {
+      type: String,
+      default: '0 second'
+    }
   },
   data() {
     return {
@@ -236,7 +262,7 @@ export default {
 .we-steps {
   .we-steps-row-first {
     width: 100%;
-    padding: 20px 0 10px;
+    padding: 15px 0;
     display: flex;
     align-items: center;
     .we-steps-title {
@@ -305,6 +331,9 @@ export default {
         }
       }
     }
+  }
+  .progress-costtime {
+    color: $success-color;
   }
 }
 </style>

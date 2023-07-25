@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface DSSWorkspaceUserService {
@@ -39,4 +40,8 @@ public interface DSSWorkspaceUserService {
     List<String> getWorkspaceReleaseUsers(int workspaceId);
 
     Long getCountByUsername(String username,int workspaceId);
+
+    List<Map<String,Object>> getUserRoleByUserName(String userName);
+
+    boolean clearUserByUserName(String userName);
 }

@@ -17,23 +17,22 @@
           @event-from-ext="eventFromExt"
         />
       </template>
-      <li v-if="toolbarShow.download" :style="{cursor: rsDownload ? 'pointer': 'not-allowed'}">
+      <li v-if="toolbarShow.download">
         <Poptip
           :transfer="true"
-          :width="200"
+          :width="380"
           v-model="popup.download"
-          placement="right"
-          popper-class="we-poptip">
+          placement="right">
           <div @click.stop="openPopup('download')">
             <SvgIcon :style="{ 'font-size': '20px' }" icon-class="downLoad" color="#515a6e" />
             <span v-if="isIconLabelShow" :title="$t('message.common.download')" class="v-toolbar-icon">{{ $t('message.common.download') }}</span>
           </div>
           <div slot="content">
             <div>
-              <Row>
+              <Row class="row-item">
                 {{ $t('message.common.toolbar.format') }}
               </Row>
-              <Row>
+              <Row class="row-item">
                 <RadioGroup v-model="download.format">
                   <Col span="10">
                     <Radio label="1">CSV</Radio>
@@ -48,10 +47,10 @@
               </Row>
             </div>
             <div>
-              <Row>
+              <Row class="row-item">
                 {{ $t('message.common.toolbar.coding') }}
               </Row>
-              <Row>
+              <Row class="row-item">
                 <RadioGroup v-model="download.coding">
                   <Col span="10">
                     <Radio label="1">UTF-8</Radio>
@@ -65,10 +64,10 @@
               </Row>
             </div>
             <div>
-              <Row>
+              <Row class="row-item">
                 {{$t('message.common.toolbar.replace')}}
               </Row>
-              <Row>
+              <Row class="row-item">
                 <RadioGroup v-model="download.nullValue">
                   <Col span="10">
                     <Radio label="1">NULL</Radio>
@@ -81,18 +80,37 @@
                 </RadioGroup>
               </Row>
             </div>
+            <div v-if="download.format == 1">
+              <Row class="row-item">
+                {{$t('message.common.toolbar.selectsplit')}}
+              </Row>
+              <Row class="row-item">
+                <RadioGroup
+                  v-model="download.splitChar"
+                >
+                  <Radio
+                    v-for="item in splitList"
+                    :label="item.value"
+                    :name="item.value"
+                    :key="item.value"
+                  >
+                    {{ item.label }}
+                  </Radio>
+                </RadioGroup>
+              </Row>
+            </div>
             <div v-if="isAll">
-              <Row>
+              <Row class="row-item">
                 {{$t('message.common.toolbar.downloadMode')}}
               </Row>
-              <Row>
+              <Row class="row-item">
                 <Checkbox v-model="allDownload">{{$t('message.common.toolbar.all')}}</Checkbox>
               </Row>
             </div>
-            <Row v-if="download.format == 2">
+            <Row class="row-item" v-if="download.format == 2">
               <Checkbox v-model="autoFormat">{{$t('message.common.toolbar.autoformat')}}</Checkbox>
             </Row>
-            <Row class="confirm">
+            <Row class="confirm row-item">
               <Col span="10">
                 <Button @click="cancelPopup('download')">{{$t('message.common.cancel')}}</Button>
               </Col>
@@ -185,7 +203,7 @@ export default {
       type: String,
       defalut: `filesystem`
     },
-    comData: {
+    work: {
       type: Object
     },
     resultType: {
@@ -194,16 +212,8 @@ export default {
     }
   },
   data() {
-    // let appItem = 'linkis'
-    // if (this.$route.name === 'Workflow') {
-    //   appItem = 'workflow'
-    // } else if(this.$route.name === 'ServicesExecute') {
-    //   appItem = 'apiService'
-    // }
-    let rsDownload =  true // todo
     return {
       activeTool: 'table',
-      rsDownload,
       popup: {
         download: false,
         export: false,
@@ -214,12 +224,20 @@ export default {
         format: '1',
         coding: '1',
         nullValue: '1',
+        splitChar: '1',
       },
       isIconLabelShow: true,
       iconSize: 14,
       allDownload: false, // 是否下载全部结果集
       autoFormat: false,
-      extComponents
+      extComponents,
+      splitList: [
+        { label: this.$t('message.scripts.hiveTableExport.DH'), value: '1' },
+        { label: this.$t('message.scripts.hiveTableExport.FH'), value: '2' },
+        { label: this.$t('message.scripts.hiveTableExport.ZBF'), value: '3' },
+        { label: this.$t('message.scripts.hiveTableExport.KG'), value: '4' },
+        { label: this.$t('message.scripts.hiveTableExport.SX'), value: '5' },
+      ]
     };
   },
   computed: {
@@ -230,7 +248,7 @@ export default {
       let isScriptis = this.$route.name === 'Home' || (this.$route.name === 'results' && this.$route.query.from === 'Home')
       return  {
         export: this.baseinfo.exportResEnable !== false && isScriptis && this.activeTool === 'table' && this.resultType === '2',
-        download: this.activeTool === 'table' && this.rsDownload,
+        download: this.activeTool === 'table' && this.baseinfo.downloadResEnable  !== false,
       }
     }
   },
@@ -245,6 +263,7 @@ export default {
           format: '1',
           coding: '1',
           nullValue: '1',
+          splitChar: '1'
         }
       }
       if (type === 'export') {
@@ -266,8 +285,8 @@ export default {
     },
     downloadConfirm() {
       this.$Modal.confirm({
-        title: '提示',
-        content: '当前进行数据下载，可能涉及敏感数据，请保障数据的安全',
+        title: this.$t('message.common.Prompt'),
+        content: this.$t('message.common.safetips'),
         onOk: async () => {
           const splitor = this.download.format === '1' ? 'csv' : 'xlsx';
           const charset = this.download.coding === '1' ? 'utf-8' : 'gbk';
@@ -290,16 +309,17 @@ export default {
           let querys = 'path=' + temPath + '&charset=' + charset + '&outputFileType=' + splitor + '&nullValue=' + nullValue + '&outputFileName=' + filename + '&autoFormat=' + this.autoFormat;
           // 如果是api执行页获取结果集，需要带上taskId
           if(this.getResultUrl !== 'filesystem') {
-            querys += `&taskId=${this.comData.taskID}`
+            querys += `&taskId=${this.work.taskID}`
+          }
+          const splitChar = [',',';','\t',' ','|'][this.download.splitChar - 1] || ','
+          if(this.download.format == 1) {
+            querys += `&csvSeparator=${encodeURIComponent(splitChar)}`
           }
           let url = `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` + querys
-
-          window.console.log(url, 'DOWNLOD-URL')
-
           // 下载之前条用心跳接口确认是否登录
           await api.fetch('/user/heartbeat', 'get');
           // 下载记录日志
-          api.fetch('/dss/framework/admin/audit/script/download/save', {
+          api.fetch('/dss/scriptis/audit/download/save', {
             creator: this.baseinfo.username,
             tenant: this.baseinfo.proxyUserName,
             path: temPath,
@@ -357,17 +377,6 @@ export default {
     left: 40px;
     margin-left: -$toolbarWidth;
     @include bg-color($light-base-color, $dark-menu-base-color);
-    .we-poptip {
-      padding: 12px;
-      line-height: 28px;
-      .confirm {
-        margin-top: 10px;
-      }
-      .title {
-        margin: 10px 0;
-        text-align: center;
-      }
-    }
     .we-toolbar {
       width: 100%;
       height: 100%;
@@ -390,5 +399,10 @@ export default {
       }
     }
   }
+</style>
+<style>
+.ivu-poptip-body-content .row-item {
+  margin-top: 5px;
+}
 </style>
 

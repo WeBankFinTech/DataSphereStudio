@@ -30,6 +30,8 @@ public interface TaskMapper {
 
     void updateTask(WorkflowQueryTask queryTask);
 
+    void batchUpdateTasks(@Param("failedJobs") List<WorkflowQueryTask> failedJobs);
+
     List<WorkflowQueryTask> search(@Param("taskID") Long taskID, @Param("umUser") String username, @Param("status") List<String> status,
                            @Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("executeApplicationName") String executeApplicationName,
                            @Param("instance") String instance, @Param("execId") String execId);

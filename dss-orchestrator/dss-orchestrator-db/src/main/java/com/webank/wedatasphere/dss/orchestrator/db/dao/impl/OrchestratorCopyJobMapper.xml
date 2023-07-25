@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper">
+
+    <sql id="orchestrator_copy_info">
+        `id`,`username`,`type`,`source_orchestrator_id`,`source_orchestrator_name`,`target_orchestrator_name`,`source_project_name`,
+        `target_project_name`,`workspace_id`,`workflow_node_suffix`,`microserver_name`,`exception_info`,`status`,`is_copying`,`success_node`,`start_time`,`end_time`,`instance_name`
+    </sql>
+
+    <insert id="insertOrchestratorCopyInfo">
+        INSERT INTO `dss_orchestrator_copy_info` (<include refid="orchestrator_copy_info"/>)
+        VALUES
+        (#{id}, #{username}, #{type}, #{sourceOrchestratorId}, #{sourceOrchestratorName}, #{targetOrchestratorName}, #{sourceProjectName},
+        #{targetProjectName}, #{workspaceId}, #{workflowNodeSuffix}, #{microserverName}, #{exceptionInfo}, #{status}, #{isCopying}, #{successNode}, #{startTime}, #{endTime}, #{instanceName})
+    </insert>
+
+    <update id="updateCopyStatus" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        UPDATE dss_orchestrator_copy_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="isCopying != null">`is_copying`=#{isCopying},</if>
+            <if test="endTime != null">`end_time`=#{endTime},</if>
+            <if test="successNode != null">`success_node`=#{successNode},</if>
+            <if test="status != null">`status`=#{status}</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+
+    <update id="updateErrorMsgById" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        UPDATE dss_orchestrator_copy_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="isCopying != null">`is_copying`=#{isCopying},</if>
+            <if test="endTime != null">`end_time`=#{endTime},</if>
+            <if test="successNode != null">`success_node`=#{successNode},</if>
+            <if test="status != null">`status`=#{status},</if>
+            <if test="exceptionInfo != null">`exception_info`=#{exceptionInfo}</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <update id="batchUpdateCopyJob" parameterType="java.util.List">
+        UPDATE dss_orchestrator_copy_info set status =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.id} then #{item.status}
+        </foreach>
+        is_copying =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.id} then #{item.isCopying}
+        </foreach>
+        exception_info =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end,">
+            when id = #{item.id} then #{item.exceptionInfo}
+        </foreach>
+        end_time =
+        <foreach collection="failedJobs" item="item" index="index"
+                 separator=" " open="case" close="end">
+            when id = #{item.id} then #{item.endTime}
+        </foreach>
+        WHERE id in
+        <foreach collection="failedJobs" item="item" index="index" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <select id="getOrchestratorCopyInfoList" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        SELECT * FROM `dss_orchestrator_copy_info` WHERE source_orchestrator_id = #{orchestratorId} order by start_time desc
+    </select>
+
+    <select id="getOrchestratorCopyInfoById" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        SELECT * FROM `dss_orchestrator_copy_info` WHERE id = #{id}
+    </select>
+
+    <select id="getOrchestratorCopyStatus" resultType="java.lang.String">
+        SELECT id FROM `dss_orchestrator_copy_info` WHERE source_orchestrator_id = #{sourceOrchestratorId} AND is_copying = 1;
+    </select>
+
+    <select id="getRunningJob" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo">
+        SELECT * FROM `dss_orchestrator_copy_info` WHERE is_copying = 1;
+    </select>
+
+</mapper>

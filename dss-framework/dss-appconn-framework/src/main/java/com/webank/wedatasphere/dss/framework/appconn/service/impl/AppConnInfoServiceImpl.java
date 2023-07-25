@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AppConnInfoServiceImpl implements AppConnInfoService {
@@ -39,9 +40,10 @@ public class AppConnInfoServiceImpl implements AppConnInfoService {
 
     @Override
     public List<? extends AppConnInfo> getAppConnInfos() {
-        List<AppConnBean> appConnBeans = appConnMapper.getAllAppConnBeans();
-        appConnBeans.stream().filter(appConnBean -> !AppConnConf.DISABLED_APP_CONNS.contains(appConnBean.getAppConnName()))
-                .forEach(appConnBean -> {
+        List<AppConnBean> appConnBeans = appConnMapper.getAllAppConnBeans().stream()
+                .filter(appConnBean -> !AppConnConf.DISABLED_APP_CONNS.contains(appConnBean.getAppConnName()))
+                .collect(Collectors.toList());
+        appConnBeans.forEach(appConnBean -> {
             String resource = appConnBean.getResource();
             if(StringUtils.isNotBlank(resource)) {
                 appConnBean.setAppConnResource(AppConnServiceUtils.stringToResource(resource).getResource());

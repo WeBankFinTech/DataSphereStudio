@@ -1,7 +1,7 @@
 <template>
   <div class="access-component-wrap">
     <div class="head-menu">
-      <Tooltip content="查看全部节点" placement="top">
+      <Tooltip :content="$t('message.workspace.ListallNode')" placement="top">
         <div class="btn-op" @click="handleChangeMode('all')">
           <SvgIcon icon-class="guide-all" />
         </div>
@@ -50,23 +50,23 @@
           <Input
             type="text"
             v-model="groupForm.path"
-            placeholder="请输入文档path，path以/开头"
+            :placeholder="$t('message.workspace.docpathinput')"
             style="width: 300px"
           ></Input>
         </FormItem>
-        <FormItem label="文档名称" prop="title">
+        <FormItem :label="$t('message.workspace.DocumentName')" prop="title">
           <Input
             type="text"
             v-model="groupForm.title"
-            placeholder="请输入文档名称"
+            :placeholder="$t('message.workspace.inputdocName')"
             style="width: 300px"
           ></Input>
         </FormItem>
-        <FormItem label="文档描述" prop="description">
+        <FormItem :label="$t('message.workspace.Document')" prop="description">
           <Input
             type="textarea"
             v-model="groupForm.description"
-            placeholder="请输入描述"
+            :placeholder="$t('message.workspace.Pleaseinputdesc')"
             style="width: 300px"
           >
           </Input>
@@ -79,7 +79,7 @@
         :rules="contentRule"
         v-show="modalType !== 'group'"
       >
-        <FormItem label="所属路径" prop="path">
+        <FormItem :label="$t('message.workspace.Path')" prop="path">
           <Input
             type="text"
             v-model="contentForm.path"
@@ -88,22 +88,22 @@
           >
           </Input>
         </FormItem>
-        <FormItem label="节点类型" prop="type">
+        <FormItem :label="$t('message.workspace.NodeType')" prop="type">
           <RadioGroup v-model="contentForm.type">
-            <Radio label="1" :disabled="!!contentForm.id">步骤</Radio>
-            <Radio label="2" :disabled="!!contentForm.id">问题</Radio>
+            <Radio label="1" :disabled="!!contentForm.id">{{ $t('message.workspace.Step') }}</Radio>
+            <Radio label="2" :disabled="!!contentForm.id">{{ $t('message.workspace.Problem') }}</Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="内容标题" prop="title">
+        <FormItem :label="$t('message.workspace.Content')" prop="title">
           <Input
             type="text"
             v-model="contentForm.title"
-            placeholder="请输入标题"
+            :placeholder="$t('message.workspace.inputTitle')"
             style="width: 300px"
           >
           </Input>
         </FormItem>
-        <FormItem label="标题别名" prop="titleAlias">
+        <FormItem :label="$t('message.workspace.Titlealias')" prop="titleAlias">
           <Input
             type="text"
             v-model="contentForm.titleAlias"
@@ -113,7 +113,7 @@
           >
           </Input>
         </FormItem>
-        <FormItem label="标题前缀" prop="seq" v-if="contentForm.type == 1">
+        <FormItem :label="$t('message.workspace.Title')" prop="seq" v-if="contentForm.type == 1">
           <Input
             type="text"
             v-model="contentForm.seq"
@@ -126,14 +126,14 @@
       </Form>
       <slot name="footer">
         <div class="modalFooter">
-          <Button @click="handleModalCancel()" size="large">取消</Button>
+          <Button @click="handleModalCancel()" size="large">{{ $t('message.workspace.Cancel') }}</Button>
           <Button
             type="primary"
             size="large"
             :loading="submitLoading"
             @click="handleModalOk()"
             style="margin-left: 10px"
-          >确认</Button
+          >{{ $t('message.workspace.Confirm') }}</Button
           >
         </div>
       </slot>
@@ -160,7 +160,7 @@ export default {
       const result = value && value.trim();
       const reg = /^\/[\w_\/]*$/;
       if (!reg.test(result)) {
-        callback(new Error("path以/开头，支持英文、数字、下划线（_）和斜线（/）"));
+        callback(new Error("以/开头，支持英文、数字、下划线（_）和斜线（/）"));
       } else {
         const path_not_change = this.nodes.find(
           (item) => item.path.trim() === result && item.id == this.groupForm.id
@@ -171,7 +171,7 @@ export default {
         } else {
           // 修改path，检查不能和其他group重复
           if (this.nodes.some((item) => item.path.trim() === result)) {
-            callback(new Error("该path已经存在"));
+            callback(new Error(this.$t('message.workspace.alreadyexist')));
             return;
           } else {
             callback();
@@ -206,9 +206,9 @@ export default {
       },
       contentRule: {
         type: [
-          { required: true, message: "请选择节点类型", trigger: "change" },
+          { required: true, message: this.$t('message.workspace.chooseNodeType'), trigger: "change" },
         ],
-        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
+        title: [{ required: true, message: this.$t('message.workspace.inputTitle'), trigger: "blur" }],
       },
     };
   },
@@ -287,7 +287,7 @@ export default {
     },
     handleDeleteClick(node) {
       this.$Modal.confirm({
-        title: "确认删除吗",
+        title: this.$t('message.workspace.ConfirmDel'),
         content: "",
         onOk: () => {
           if (node.type) {
@@ -297,7 +297,7 @@ export default {
           } else {
             const group = this.nodes.find((i) => i.id == node.id);
             if (group && group.children && group.children.length) {
-              this.$Message.info("该页面group还有所属内容，不能删除");
+              this.$Message.info(this.$t('message.workspace.Therecontents'));
             } else {
               DeleteGuideGroup(node.id).then(() => {
                 this.refreshTree();
@@ -312,7 +312,7 @@ export default {
       const type = node.type ? "content" : "group";
       this.showModal({
         type: type,
-        op: "修改",
+        op: this.$t('message.workspace.Edit'),
       });
       // 修改操作时，不要直接把node赋值，会同时影响tree的数据
       if (type == "group") {
@@ -336,7 +336,7 @@ export default {
     handleAddClick(node) {
       this.showModal({
         type: "content",
-        op: "新增",
+        op: this.$t('message.workspace.Add'),
       });
       this.contentForm = {
         path: node.path,
@@ -350,7 +350,7 @@ export default {
     handleAddGroup() {
       this.showModal({
         type: "group",
-        op: "新增",
+        op: this.$t('message.workspace.Add'),
       });
     },
     showModal(payload) {

@@ -59,7 +59,7 @@ export default {
       sysVersion: process.env.VUE_APP_VERSION,
       isUserMenuShow: false,
       userName: '',
-      isSandbox: process.env.NODE_ENV === 'sandbox',
+      isSandbox: this.$APP_CONF.isSandbox,
       isHomePage: true,
       isConsolePage: false
     }
@@ -104,7 +104,7 @@ export default {
       this.isHomePage = false;
       this.isConsolePage = true;
       const url =
-        location.origin + '/dss/linkis?noHeader=1&noFooter=1#/console'
+        location.origin + '/dss/linkis/?noHeader=1&noFooter=1#/console'
       this.$router.push({
         path: '/commonIframe/linkis',
         query: {

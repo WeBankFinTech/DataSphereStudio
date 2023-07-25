@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.common.entity.node;
 
 import com.webank.wedatasphere.dss.common.entity.Resource;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -42,4 +43,8 @@ public interface DSSNode extends Node {
     String getUserProxy();
 
     void setUserProxy(String userProxy);
+
+    String getModifyUser();
+    Long getModifyTime();
+    String getDesc();
 }

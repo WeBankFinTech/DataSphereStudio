@@ -30,7 +30,7 @@
         <Icon
           type="ios-loading"
           size="12"
-          style="opacity: 0.65; color: #000"
+          style="opacity: 0.85;"
           class="we-icon-loading"/>
       </Spin>
     </span>

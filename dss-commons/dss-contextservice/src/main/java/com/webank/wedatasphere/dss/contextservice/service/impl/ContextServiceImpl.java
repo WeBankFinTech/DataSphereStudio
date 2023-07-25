@@ -49,7 +49,7 @@ public class ContextServiceImpl implements ContextService {
 
     private static final Logger logger = LoggerFactory.getLogger(ContextServiceImpl.class);
     private static ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
-    private static ContextService contextService = null;
+    private static volatile ContextService contextService = null;
 
     private ContextServiceImpl() {}
 
@@ -105,13 +105,12 @@ public class ContextServiceImpl implements ContextService {
                         if (!DSSCommonConf.DSS_IO_ENV.getValue().equalsIgnoreCase(contextID.getEnv())) {
                             updateContextId = true;
                         } else if (StringUtils.isBlank(contextID.getProject())
-                                || StringUtils.isBlank(contextID.getFlow())
-                                || StringUtils.isBlank(contextID.getVersion())) {
+                                || StringUtils.isBlank(contextID.getFlow())) {
                             updateContextId = false;
                         } else if ((null != contextID.getWorkSpace() && !contextID.getWorkSpace().equalsIgnoreCase(workspace))
                                 || !contextID.getProject().equalsIgnoreCase(project)
                                 || !contextID.getFlow().equalsIgnoreCase(flow)
-                                || !contextID.getVersion().equalsIgnoreCase(flowVersion)) {
+                                || !flowVersion.equalsIgnoreCase(contextID.getVersion())) {
                             updateContextId = true;
                         } else {
                             updateContextId = false;
@@ -145,7 +144,7 @@ public class ContextServiceImpl implements ContextService {
             JsonObject flowObject = new Gson().fromJson(jsonFlow, JsonObject.class);
             if (!flowObject.has(CSCommonUtils.CONTEXT_ID_STR) || !flowObject.get(CSCommonUtils.CONTEXT_ID_STR).isJsonPrimitive()) {
                 logger.error("Did not have invalid contextID, save context failed.");
-                return;
+                throw new DSSRuntimeException("does not have valid ContextID, save context failed(工作流格式错误，缺失有效的CS信息)");
             } else {
                 String contextIDStr = flowObject.get(CSCommonUtils.CONTEXT_ID_STR).getAsString();
                 // ①reset原有key 这里只清理
@@ -179,9 +178,9 @@ public class ContextServiceImpl implements ContextService {
                             saveContextResource(contextIDStr, nodeRes, contextClient,
                                     CSCommonUtils.NODE_PREFIX, json.get(DSSCommonUtils.NODE_NAME_NAME).getAsString());
                         }
-                        if (json.has(DSSCommonUtils.NODE_PROP_NAME)) {
-                            JsonObject nodePropObj = json.get(DSSCommonUtils.NODE_PROP_NAME).getAsJsonObject();
-                        }
+//                        if (json.has(DSSCommonUtils.NODE_PROP_NAME)) {
+//                            JsonObject nodePropObj = json.get(DSSCommonUtils.NODE_PROP_NAME).getAsJsonObject();
+//                        }
                     }
                 }
                 // 保存info信息

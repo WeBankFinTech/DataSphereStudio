@@ -42,6 +42,7 @@ public class DSSSideInfoRestful {
     @RequestMapping(path ="getSideInfos", method = RequestMethod.GET)
     public Message getSideInfos(HttpServletRequest request, @RequestParam(required = false, name = "workspaceID") Long workspaceId){
         String username = SecurityFilter.getLoginUsername(request);
+        LOGGER.info("Begin to getSideInfos for user:{}", username);
         try{
             boolean isEnglish = "en".equals(request.getHeader("Content-language"));
             return Message.ok("获取侧边栏成功").data("presentations", dssSideInfoService.getSidebarVOList(username, workspaceId,isEnglish));

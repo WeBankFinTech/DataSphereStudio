@@ -18,6 +18,7 @@
 
 package com.webank.wedatasphere.dss.framework.admin.conf;
 
+import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import org.apache.linkis.common.conf.CommonVars;
 
 public interface AdminConf {
@@ -26,12 +27,7 @@ public interface AdminConf {
     CommonVars<String> LDAP_ADMIN_PASS = CommonVars.apply("wds.dss.ldap.admin.password", "");
     CommonVars<String> LDAP_URL = CommonVars.apply("wds.dss.ldap.url", "");
     CommonVars<String> LDAP_BASE_DN = CommonVars.apply("wds.dss.ldap.base.dn", "");
-    CommonVars<String> EXCHANGE_URL = CommonVars.apply("wds.dss.exchange.url", "");
-    CommonVars<String> EXCHANGE_ADMIN_COOKIE = CommonVars.apply("wds.dss.exchange.cookie", "");
-    CommonVars<String> DS_TRUST_TOKEN = CommonVars.apply("wds.dss.trust.token", "");
-    CommonVars<Boolean> DS_PROXY_SELF_ENABLE = CommonVars.apply("wds.dss.proxy.self.enable", true);
-    CommonVars<String> DSS_PROXY_ADMIN_NAME = CommonVars.apply("wds.dss.proxy.admin.name", "adminUser");
 
-    String[] SUPER_ADMIN_LIST = CommonVars.apply("wds.dss.super.admin", "").getValue().split(",");
+    String[] SUPER_ADMIN_LIST = DSSCommonConf.SUPER_ADMIN_LIST;
 
 }

@@ -5,7 +5,7 @@
       <span>{{ modalTitle }}</span>
       <span @click="fullScreenModal" class="full-btn">
         <Icon :type="isFullScreen?'md-contract':'md-expand'" />
-        {{isFullScreen?'取消全屏':'全屏展示'}}
+        {{isFullScreen?this.$t('message.scripts.cancelfullscreen'):this.$t('message.scripts.fullscreen')}}
       </span>
     </div>
     <div>
@@ -36,7 +36,7 @@
             :placeholder="$t('message.scripts.newDialog.placeholder')"
             style="width: 360px;"></Input>
           <span>{{ ext }}</span>
-          <a target="_blank" v-if="scriptHelpLink" style="float:right" :href="scriptHelpLink">脚本使用说明</a>
+          <a target="_blank" v-if="scriptHelpLink" style="float:right" :href="scriptHelpLink">{{ $t('message.scripts.scriptUsage') }}</a>
         </FormItem>
         <FormItem
           v-else
@@ -101,6 +101,7 @@
 <script>
 import directoryDialog from '@dataspherestudio/shared/components/directoryDialog/index.vue';
 import storage from '@dataspherestudio/shared/common/helper/storage';
+import i18n from '@dataspherestudio/shared/common/i18n';
 export default {
   name: 'NewDialog',
   components: {
@@ -145,7 +146,7 @@ export default {
     },
     type: {
       type: String,
-      default: '文件夹',
+      default: i18n.t('message.scripts.folder'),
     },
     node: {
       type: Object,
@@ -206,7 +207,22 @@ export default {
     scriptHelpLink() {
       const baseinfo = storage.get("baseInfo", "local") || {}
       const item = this.scriptType.find((o) => o.scriptType === this.newForm.scriptType);
-      return item ? baseinfo[item.label+'UsageGuide'] || '' : ''
+      const scriptGuideMap = {
+        ".sql": "SqlUsageGuide",
+        ".hql": "HiveUsageGuide",
+        ".psql": "PrestoSqlUsageGuide",
+        ".tsql": "TrinoSqlUsageGuide",
+        ".fql": "FlinkSqlUsageGuide",
+        ".out": "StorageUsageGuide",
+        ".scala": "ScalaUsageGuide",
+        ".jdbc": "JdbcUsageGuide",
+        ".python": "PythonUsageGuide",
+        ".py": "PythonSparkUsageGuide",
+        ".r": "RUsageGuide",
+        ".sh": "ShellUsageGuide",
+        ".ngql": "NebulaUsageGuide",
+      }
+      return item ? baseinfo[scriptGuideMap[this.ext]] || '' : ''
     }
   },
   methods: {

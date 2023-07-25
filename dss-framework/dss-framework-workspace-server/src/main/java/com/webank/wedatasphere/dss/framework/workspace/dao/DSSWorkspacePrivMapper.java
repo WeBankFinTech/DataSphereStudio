@@ -40,19 +40,19 @@ public interface DSSWorkspacePrivMapper {
                                 @Param("username") String username);
 
     @Update("update dss_workspace_appconn_role set priv = #{priv} , update_time = now()" +
-            "where workspace_id = #{workspaceId} and appconn_id = #{componentId} and role_id = #{roleId}")
-    void updateRoleComponentPriv(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId,
+            "where workspace_id = #{workspaceId} and appconn_id = #{appconnId} and role_id = #{roleId}")
+    void updateRoleComponentPriv(@Param("workspaceId") int workspaceId, @Param("appconnId") int appconnId,
                                  @Param("roleId") int roleId, @Param("priv") int priv);
 
     @Select("select id from dss_workspace_role where workspace_id = #{workspaceId} and name = #{key}")
     Integer getRoleId(@Param("workspaceId") int workspaceId, @Param("key") String key);
 
-    @Select("select count(*) from dss_workspace_appconn_role where workspace_id = #{workspaceId} and appconn_id = #{componentId} and role_id = #{roleId}")
-    int queryCntOfRCP(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId);
+    @Select("select count(*) from dss_workspace_appconn_role where workspace_id = #{workspaceId} and appconn_id = #{appconnId} and role_id = #{roleId}")
+    int queryCntOfRCP(@Param("workspaceId") int workspaceId, @Param("appconnId") int appconnId, @Param("roleId") int roleId);
 
     @Select("insert into dss_workspace_appconn_role (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) " +
-            "values(#{workspaceId}, #{componentId}, #{roleId}, #{priv}, now(), #{username})")
-    void insertRolComponentPriv(@Param("workspaceId") int workspaceId, @Param("componentId") int componentId, @Param("roleId") int roleId,
+            "values(#{workspaceId}, #{appconnId}, #{roleId}, #{priv}, now(), #{username})")
+    void insertRolComponentPriv(@Param("workspaceId") int workspaceId, @Param("appconnId") int appconnId, @Param("roleId") int roleId,
                                 @Param("priv") int priv,
                                 @Param("username") String username);
 }

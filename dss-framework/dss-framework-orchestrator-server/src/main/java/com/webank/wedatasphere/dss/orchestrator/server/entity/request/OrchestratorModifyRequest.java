@@ -30,12 +30,6 @@ public class OrchestratorModifyRequest extends OrchestratorRequest {
     private String orchestratorName;
 
     /**
-     * 编排模式，如工作流，组合编排等
-     */
-    @NotNull(message = "编排模式不能为空")
-    private String orchestratorMode;
-
-    /**
      * 编排方式
      */
     @NotNull(message = "编排方式不能为空")
@@ -67,14 +61,6 @@ public class OrchestratorModifyRequest extends OrchestratorRequest {
 
     public void setOrchestratorName(String orchestratorName) {
         this.orchestratorName = orchestratorName;
-    }
-
-    public String getOrchestratorMode() {
-        return orchestratorMode;
-    }
-
-    public void setOrchestratorMode(String orchestratorMode) {
-        this.orchestratorMode = orchestratorMode;
     }
 
     public List<String> getOrchestratorWays() {
@@ -116,7 +102,7 @@ public class OrchestratorModifyRequest extends OrchestratorRequest {
                 ", workspaceId=" + getWorkspaceId() +
                 ", projectId=" + getProjectId() +
                 ", orchestratorName='" + orchestratorName + '\'' +
-                ", orchestratorMode='" + orchestratorMode + '\'' +
+                ", orchestratorMode='" + getOrchestratorMode() + '\'' +
                 ", orchestratorWays=" + orchestratorWays +
                 ", uses='" + uses + '\'' +
                 ", description='" + description + '\'' +

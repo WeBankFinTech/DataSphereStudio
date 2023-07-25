@@ -16,15 +16,19 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
+import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
@@ -40,9 +44,12 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
+import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
+import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.*;
@@ -56,7 +63,11 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppDesc;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
+import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.linkis.cs.client.ContextClient;
+import org.apache.linkis.cs.client.builder.ContextClientFactory;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -64,10 +75,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class OrchestratorServiceImpl implements OrchestratorService {
@@ -223,6 +236,40 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             orchestratorMapper.deleteOrchestratorVersion(dssOrchestratorVersion.getId());
         });
         orchestratorMapper.deleteOrchestrator(orchestratorInfoId);
+    }
+
+    @Override
+    public OrchestratorUnlockVo unlockOrchestrator(String userName,
+                                                   Workspace workspace,
+                                                   String projectName,
+                                                   Long orchestratorInfoId,
+                                                   Boolean confirmDelete,
+                                                   List<DSSLabel> dssLabels) throws DSSErrorException {
+        DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorInfoId);
+        if (null == dssOrchestratorInfo) {
+            LOGGER.error("Not exists orchestration {} in project {}.", orchestratorInfoId, projectName);
+            DSSExceptionUtils.dealErrorException(61123,
+                    String.format("Not exists orchestration %s in project %s.", orchestratorInfoId, projectName), DSSErrorException.class);
+        }
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorInfoId, VALID_FLAG);
+        LOGGER.info("user {} try to unlock the project {} 's orchestration(such as DSS workflow) {} of orchestrator {} in version {}.",
+                userName, projectName, dssOrchestratorVersion.getAppId(), dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion());
+        RequestUnlockWorkflow requestUnlockWorkflow = new RequestUnlockWorkflow(userName, dssOrchestratorVersion.getAppId(), confirmDelete);
+        ResponseUnlockWorkflow responseUnlockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getWorkflowSender(dssLabels).ask(requestUnlockWorkflow), ResponseUnlockWorkflow.class, RequestUnlockWorkflow.class);
+        switch (responseUnlockWorkflow.getUnlockStatus()) {
+            case ResponseUnlockWorkflow.NONEED_UNLOCK:
+                DSSExceptionUtils.dealErrorException(62001, String.format("解锁失败，当前工作流未被锁定：%s", dssOrchestratorInfo.getName()), DSSErrorException.class);
+            case ResponseUnlockWorkflow.NEED_SECOND_CONFIRM:
+                String lockOwner = responseUnlockWorkflow.getLockOwner();
+                String confirmMsg = String.format("当前工作流已被%s锁定编辑，强制解锁工作流会导致%s已编辑的内容无法保存，请与%s确认后再解锁工作流。", lockOwner, lockOwner, lockOwner);
+                return new OrchestratorUnlockVo(lockOwner, confirmMsg, 1);
+            case ResponseUnlockWorkflow.UNLOCK_SUCCESS:
+                return new OrchestratorUnlockVo(null, "解锁成功", 0);
+            default:
+                DSSExceptionUtils.dealErrorException(62003, "unknown unlockStatus", DSSErrorException.class);
+                return null;
+        }
     }
 
     @Override
@@ -399,8 +446,9 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         List<OrchestratorBaseInfo> retList = new ArrayList<>(list.size());
         if (!CollectionUtils.isEmpty(list)) {
             //todo Is used in front-end?
-            ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
-                    .getProjectServerSender().ask(new ProjectUserAuthRequest(orchestratorRequest.getProjectId(), username));
+            ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                            .getProjectServerSender().ask(new ProjectUserAuthRequest(orchestratorRequest.getProjectId(), username)),
+                    ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
             boolean isReleasable = false, isEditable = false;
             if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
                 isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
@@ -433,6 +481,63 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             put("orchestrator_mode", requestOrchestratorInfos.getOrchestratorMode());
         }});
         return new ResponseOrchestratorInfos(orchestratorInfos);
+    }
+
+    @Override
+    public void batchClearContextId() {
+        LOGGER.info("--------------------{} start clear old contextId------------------------", LocalDateTime.now());
+        try {
+            // 1、先去查询dss_orchestrator_version_info表，筛选出发布过n次及以上的编排，并获取老的发布记录。
+            //为了不影响正常使用，需要频繁下载工作流bml文件，每次只拿50条工作流进行清理
+            List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
+            while (historyOrcVersionList.size()>0) {
+                LOGGER.info("Clear historyOrcVersionList size is "+ historyOrcVersionList.size());
+                if (historyOrcVersionList == null || historyOrcVersionList.isEmpty()) {
+                    LOGGER.info("--------------------{} end clear old contextId------------------------", LocalDateTime.now());
+                    return;
+                }
+                List<String> contextIdList = historyOrcVersionList.stream().map(DSSOrchestratorVersion::getContextId).collect(Collectors.toList());
+
+                // 2、根据appIds去查询子工作流contextId,必须保证标签绝对正确，否则可能清理了错误的工作流上下文ID
+                List<DSSLabel> dssLabels = Lists.newArrayList(new EnvDSSLabel(OrchestratorConf.DSS_CS_CLEAR_ENV.getValue()));
+                Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
+                List<Long> workflowIdList = historyOrcVersionList.stream().map(orcInfo -> orcInfo.getAppId()).collect(Collectors.toList());
+                ResponseSubFlowContextIds response = RpcAskUtils.processAskException(sender.ask(new RequestSubFlowContextIds(workflowIdList)),
+                        ResponseSubFlowContextIds.class, RequestSubFlowContextIds.class);
+                if (response != null) {
+                    List<String> subContextIdList = response.getContextIdList();
+                    if (subContextIdList != null && subContextIdList.size() > 0) {
+                        contextIdList.addAll(response.getContextIdList());
+                    }
+                }
+                LOGGER.info("Clear contextIdList size is "+ contextIdList.size());
+                // 3、调用linkis接口批量删除contextId
+                ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
+                // 每次处理1000条数据
+                if (contextIdList.size() < DSSOrchestratorConstant.MAX_CLEAR_SIZE) {
+                    LOGGER.info("clear old contextId, contextIds：{}", contextIdList.toString());
+                    contextClient.batchClearContextByHAID(contextIdList);
+                } else {
+                    int len = DSSOrchestratorConstant.MAX_CLEAR_SIZE;
+                    int size = contextIdList.size();
+                    int count = (size + len - 1) / len;
+                    for (int i = 0; i < count; i++) {
+                        List<String> subList = contextIdList.subList(i * len, (Math.min((i + 1) * len, size)));
+                        LOGGER.info("clear old contextId by batch, {} batch, contextIds：{}", i + 1, subList.toString());
+                        contextClient.batchClearContextByHAID(subList);
+                        Thread.sleep(2000);
+                    }
+                }
+                LOGGER.info("--------------------{} end clear old contextId------------------------", LocalDateTime.now());
+
+                orchestratorMapper.batchUpdateOrcInfo(historyOrcVersionList);
+                Thread.sleep(5000);
+                historyOrcVersionList=orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
+            }
+
+        } catch (Exception e) {
+            LOGGER.warn("execute linkis batch clear csId failed", e);
+        }
     }
 
 }

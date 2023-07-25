@@ -18,7 +18,7 @@
       <div v-show="state.isFormatted  && !state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.returnFormat')" @click="clickToolItem('format')">
         <Icon name="ziyuanxhdpi" />
       </div>
-      <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.searchNode')" @click="clickToolItem('search')">
+      <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.search')" @click="clickToolItem('search')">
         <Icon name="search" />
       </div>
     </div>
@@ -62,13 +62,13 @@
       </div>
     </div>
     <div v-show="searchPanel" class="designer-control-dialog search">
-      <div class="search-head"> 搜索节点：
+      <div class="search-head"> {{ $t('message.common.Search') }}
         <input id="searchText" v-model="searchText" type="text" name="searchText">
-        <span class="close" @click="searchPanel = false">关闭</span>
+        <span class="close" @click="searchPanel = false">{{ $t('message.common.Close') }}</span>
       </div>
       <div class="node-list-container" @click="selectItem">
         <div class="node-item" v-for="node in nodes" :data-key="node.key" :key="node.key" :title="node.title">{{node.title}}</div>
-        <div v-if="nodes.length < 1 " class="no-data">未找到对应节点</div>
+        <div v-if="nodes.length < 1 " class="no-data">{{ $t('message.common.nodeNotFound') }}</div>
       </div>
     </div>
     <div>

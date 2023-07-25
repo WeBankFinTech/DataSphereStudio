@@ -21,4 +21,8 @@ import org.apache.linkis.common.conf.CommonVars;
 
 public class OrchestratorConf {
     public static final CommonVars<String> DSS_UPLOAD_PATH = CommonVars.apply("wds.dss.file.upload.dir", "/appcom/tmp/uploads");
+    public static final CommonVars<Integer> DSS_PUBLISH_MAX_VERSION = CommonVars.apply("wds.dss.publish.max.remain.version", 30);
+    public static final CommonVars<String> DSS_CS_CLEAR_ENV = CommonVars.apply("wds.dss.server.cs.clear.env", "DEV");
+    public static final  CommonVars<String> DSS_CS_CLEAR_CRON = CommonVars.apply("wds.dss.server.scheduling.clear.cs.cron", "");
+
 }

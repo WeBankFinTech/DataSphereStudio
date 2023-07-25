@@ -17,6 +17,19 @@
 
 import i18n from '@dataspherestudio/shared/common/i18n'
 
+const validateName = (rule, value, callback) => {
+  if (value) {
+    const valid = /^[a-zA-Z0-9_]+$/.test(value) && !/^[0-9]+$/.test(value)
+    if (valid) {
+      callback();
+    } else {
+      callback(new Error(i18n.t('message.scripts.createTable.fieldsNameRule')))
+    }
+  } else {
+    callback(new Error(i18n.t('message.scripts.createTable.fieldsNameRequire')));
+  }
+};
+
 const CREATE_TABLE_FIELDS_CONFIG = [
   {
     key: 'name',
@@ -28,11 +41,8 @@ const CREATE_TABLE_FIELDS_CONFIG = [
     rules: [
       {
         required: true,
-        message: i18n.t('message.scripts.createTable.fieldsNameRequire'),
-      }, {
-        pattern: /^[a-zA-Z0-9_]+$/,
-        message: i18n.t('message.scripts.createTable.fieldsNameRule'),
-      },
+        validator: validateName
+      }
     ],
     width: '150px',
   },

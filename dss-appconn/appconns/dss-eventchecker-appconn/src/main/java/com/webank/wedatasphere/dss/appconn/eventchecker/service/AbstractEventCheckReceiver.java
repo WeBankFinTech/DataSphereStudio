@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

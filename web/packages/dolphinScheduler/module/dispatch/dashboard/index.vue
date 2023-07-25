@@ -589,7 +589,7 @@ export default {
           align: 'center',
         },
         {
-          title: this.$t('message.workflow.projectDetail.status'),
+          title: this.$t('message.common.projectDetail.status'),
           key: 'state',
           align: 'center',
           width: 80,

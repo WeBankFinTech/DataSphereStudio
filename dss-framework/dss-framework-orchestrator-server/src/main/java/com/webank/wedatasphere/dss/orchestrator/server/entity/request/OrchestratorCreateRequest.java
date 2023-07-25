@@ -28,12 +28,6 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
     private String orchestratorName;
 
     /**
-     * 编排模式，如工作流，组合编排等
-     */
-    @NotNull(message = "编排模式类型不能为空")
-    private String orchestratorMode;
-
-    /**
      * 编排方式
      */
     @NotNull(message = "编排方式不能为空")
@@ -58,6 +52,20 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
 
     private String workspaceName;
 
+    public OrchestratorCreateRequest() {
+    }
+
+    public OrchestratorCreateRequest(String orchestratorName, List<String> orchestratorWays, String orchestratorLevel, List<String> dssLabels, String uses, String description, String projectName, String workspaceName) {
+        this.orchestratorName = orchestratorName;
+        this.orchestratorWays = orchestratorWays;
+        this.orchestratorLevel = orchestratorLevel;
+        this.dssLabels = dssLabels;
+        this.uses = uses;
+        this.description = description;
+        this.projectName = projectName;
+        this.workspaceName = workspaceName;
+    }
+
     public List<String> getDssLabels() {
         return dssLabels;
     }
@@ -72,16 +80,6 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
 
     public void setOrchestratorName(String orchestratorName) {
         this.orchestratorName = orchestratorName;
-    }
-
-    @Override
-    public String getOrchestratorMode() {
-        return orchestratorMode;
-    }
-
-    @Override
-    public void setOrchestratorMode(String orchestratorMode) {
-        this.orchestratorMode = orchestratorMode;
     }
 
     public List<String> getOrchestratorWays() {
@@ -138,7 +136,7 @@ public class OrchestratorCreateRequest extends OrchestratorRequest {
                 "workspaceId=" + getWorkspaceId() +
                 ", projectId=" + getProjectId() +
                 ", arrangeName='" + orchestratorName + '\'' +
-                ", arrangeMode='" + orchestratorMode + '\'' +
+                ", arrangeMode='" + getOrchestratorMode() + '\'' +
                 ", arrangeWays=" + orchestratorWays +
                 ", uses='" + uses + '\'' +
                 ", description='" + description + '\'' +

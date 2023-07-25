@@ -32,4 +32,13 @@ public class OpenOrchestratorRequest {
     public void setLabels(LabelRouteVO labels) {
         this.labels = labels;
     }
+
+    @Override
+    public String toString() {
+        return "OpenOrchestratorRequest{" +
+                "workspaceName='" + workspaceName + '\'' +
+                ", orchestratorId=" + orchestratorId +
+                ", labels=" + labels +
+                '}';
+    }
 }

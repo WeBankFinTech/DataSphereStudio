@@ -6,12 +6,14 @@
       </div>
     </template>
     <template v-else>
-      <iframe :src="`${url}?projectName=${this.projectName}`" width="100%" frameborder="0"></iframe>
+      <iframe ref="ifr" :src="openurl" width="100%" frameborder="0"></iframe>
     </template>
+    <Spin v-if="projectName && loading" fix>{{ $t('message.common.Loading') }}</Spin>
   </div>
 </template>
 
 <script>
+import qs from 'qs';
 import emptyGuide from "./emptyGuide.vue"
 import storage from '@dataspherestudio/shared/common/helper/storage'
 
@@ -28,11 +30,29 @@ export default {
         if (appItem) applicationItem = appItem
       }
     })
+    const ifr = this.$refs.ifr;
+    if (ifr) {
+      ifr.onload = () => {
+        this.loading = false
+      }
+    }
     this.url = applicationItem.appInstances && applicationItem.appInstances[0] && applicationItem.appInstances[0].homepageUri;
+  },
+  computed: {
+    openurl() {
+      if (this.url) {
+        const urlObj = new URL(this.url)
+        const search = qs.parse(urlObj.search)
+        search.projectName = this.projectName
+        return decodeURIComponent(urlObj.origin + urlObj.pathname + '?' + qs.stringify(search) + urlObj.hash )
+      }
+      return ''
+    }
   },
   data() {
     return {
       url: '',
+      loading: true
     }
   },
   props: {
@@ -46,7 +66,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import "@dataspherestudio/shared/common/style/variables.scss";
+@import '@dataspherestudio/shared/common/style/variables.scss';
 
 .emptyGuideWrap {
   width: 100%;

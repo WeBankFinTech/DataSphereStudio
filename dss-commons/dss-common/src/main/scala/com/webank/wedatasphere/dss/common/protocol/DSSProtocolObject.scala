@@ -25,7 +25,7 @@ case class ResponseExportOrchestrator(resourceId: String,
                                       version: String,
                                       orcVersionId: Long)
 
-case class ResponseImportOrchestrator(orcId: Long)
+case class ResponseImportOrchestrator(orcId: Long,version:String)
 
 case class RequestUpdateWorkflow(userName: String,
                                  flowID: Long,

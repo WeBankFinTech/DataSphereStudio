@@ -24,10 +24,17 @@ import org.apache.linkis.httpclient.request.POSTAction
 class UserInfoAction extends GetAction with DWSHttpAction {
   override def suffixURLs: Array[String] = Array("user", "userInfo")
 }
+
 class WorkspaceUsersAction extends POSTAction with DWSHttpAction {
   override def getRequestPayload: String = ""
 
   override def suffixURLs: Array[String] = Array("dss", "getUsersOfWorkspace")
 
   def setWorkspace(workspace: String): Unit = addRequestPayload("workspaceName", workspace)
+}
+
+class ProxyUserInfoAction extends GetAction with DWSHttpAction {
+
+  override def suffixURLs: Array[String] = Array("dss", "framework", "proxy", "getProxyUser")
+
 }

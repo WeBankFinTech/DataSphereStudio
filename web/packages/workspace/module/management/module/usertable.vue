@@ -1,13 +1,67 @@
 <template>
   <div class="user-serchbar-box">
-    <h4 style="margin-bottom: 20px;" class="user-table-title">{{$t('message.workspaceManagement.userManagement')}}</h4>
-    <formserch
+    <h4
+      style="margin-bottom: 20px;"
+      class="user-table-title"
+    >{{$t('message.workspaceManagement.userManagement')}}</h4>
+    <Form
       v-if="canAdd()"
-      @click-serach="search"
-      @click-creater="creater"
-      :searchBar="searchBar"
-      :optionType="optionType"
-    ></formserch>
+      label-position="left"
+      :label-width="40"
+      class="user-serchbar"
+      ref="searchBar"
+      :model="searchBar"
+      inline
+    >
+      <FormItem
+        prop="searchText"
+        :label="$t('message.workspaceManagement.name') + ':'"
+        class="user-serchbar-dep"
+      >
+        <Input
+          style="width:250px"
+          v-model="searchBar.searchText"
+          :placeholder="searchBar.title"
+        >
+        </Input>
+      </FormItem>
+      <FormItem
+        v-if="optionType.status"
+        prop="status"
+        :label="optionType.title"
+        class="user-serchbar-role"
+      >
+        <Select
+          v-model="searchBar.status"
+          style="min-width:120px;"
+        >
+          <Option
+            v-for="(item) in optionType.status"
+            :label="item.label"
+            :value="item.value"
+            :key="item.value"
+          />
+        </Select>
+      </FormItem>
+      <FormItem class='float-right'>
+        <Button
+          type="primary"
+          @click="search"
+          style="margin-right:20px;width:80px"
+        >{{$t('message.workspaceManagement.find')}}</Button>
+        <Button
+          type="success"
+          @click="creater"
+          style="margin-right:20px;width:80px"
+        >{{$t('message.workspaceManagement.create')}}</Button>
+        <Button
+          type="success"
+          @click="autojoinShowModal"
+          style="width: 100px"
+          :title="$t('message.workspaceManagement.autojointip')"
+        >{{$t('message.workspaceManagement.autojoin')}}</Button>
+      </FormItem>
+    </Form>
     <Table
       border
       highlight-row
@@ -15,22 +69,35 @@
       :columns="data.columns"
       :data="data.datalist"
     >
-      <template slot-scope="{ row }" slot="role">
+      <template
+        slot-scope="{ row }"
+        slot="role"
+      >
         <span>{{ rolelist(row) }}</span>
       </template>
-      <template slot-scope="{ row }" slot="department">
+      <template
+        slot-scope="{ row }"
+        slot="department"
+      >
         <span>{{row.office + '-' + row.department}}</span>
       </template>
-      <template slot-scope="{ row, index }" slot="action">
-        <Button v-if="canDelete(row)" type="error" size="small" @click="remove(row, index)">{{$t('message.workspaceManagement.delete')}}</Button>
+      <template
+        slot-scope="{ row, index }"
+        slot="action"
+      >
+        <Button
+          v-if="canDelete(row)"
+          type="error"
+          size="small"
+          @click="remove(row, index)"
+        >{{$t('message.workspaceManagement.delete')}}</Button>
         <Button
           v-if="canEdit(row)"
           type="primary"
           size="small"
           style="margin-left: 10px"
           @click="edit(row, index)"
-        >{{$t('message.workspaceManagement.editor')}}</Button
-        >
+        >{{$t('message.workspaceManagement.editor')}}</Button>
       </template>
     </Table>
     <div class="user-table-page">
@@ -44,8 +111,15 @@
         @on-change="changePage"
       />
     </div>
-    <Modal v-model="delshow" width="360" class-name="delete-modal">
-      <p slot="header" class="delete-modal-header">
+    <Modal
+      v-model="delshow"
+      width="360"
+      class-name="delete-modal"
+    >
+      <p
+        slot="header"
+        class="delete-modal-header"
+      >
         <Icon type="ios-information-circle" />
         <span>{{ $t("message.workspaceManagement.waring") }}</span>
       </p>
@@ -55,82 +129,210 @@
         </div>
       </div>
       <div slot="footer">
-        <Button type="error" size="large" long @click="del">{{$t('message.workspaceManagement.comfirmDelete')}}</Button>
+        <Button
+          type="error"
+          size="large"
+          long
+          @click="del"
+        >{{$t('message.workspaceManagement.comfirmDelete')}}</Button>
       </div>
     </Modal>
-    <Modal class-name="adduser-box" :closable="false" v-model="creatershow" :title="$t('message.workspaceManagement.addUser')">
-      <Form ref="addUser" :model="useradd" :rules="addrule" :label-width="80">
-        <FormItem label="用户类型">
-          <RadioGroup v-model="uType" @on-change="useradd.id=''">
-            <Radio label="real"
-            >实名用户</Radio
-            >
-            <Radio label="notreal"
-            >非实名用户</Radio
-            >
+    <Modal
+      class-name="adduser-box"
+      :closable="false"
+      v-model="creatershow"
+      :title="$t('message.workspaceManagement.addUser')"
+    >
+      <Form
+        ref="addUser"
+        :model="useradd"
+        :rules="addrule"
+        :label-width="80"
+      >
+        <FormItem :label="$t('message.workspace.User')">
+          <RadioGroup
+            v-model="uType"
+            @on-change="useradd.id=''"
+          >
+            <Radio label="real">{{ $t('message.workspace.Real') }}</Radio>
+            <Radio label="notreal">{{ $t('message.workspace.Non') }}</Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem v-if="uType==='real'" :label="$t('message.workspaceManagement.user')" prop="id">
+        <FormItem
+          v-if="uType==='real'"
+          :label="$t('message.workspaceManagement.user')"
+          prop="id"
+        >
           <Row>
-            <Col span="12" style="width: 196px" size="small">
+            <Col
+              span="12"
+              style="width: 196px"
+              size="small"
+            >
               <Select
                 v-model="useradd.id"
                 filterable
                 remote
                 :remote-method="remoteMethod1"
                 @on-open-change="queryWhenOpen"
-                :loading="loading1">
-                <Option v-for="(option, index) in options" :value="option.id" :key="index" :disabled="option.disabled">{{option.username}}</Option>
+                :loading="loading1"
+              >
+                <Option
+                  v-for="(option, index) in options"
+                  :value="option.id"
+                  :key="index"
+                  :disabled="option.disabled"
+                >{{option.username}}</Option>
               </Select>
             </Col>
           </Row>
         </FormItem>
-        <FormItem v-if="uType === 'notreal'" :label="$t('message.workspaceManagement.user')" prop="id">
-          <Input v-model="useradd.id"  style="width: 196px" />
+        <FormItem
+          v-if="uType === 'notreal'"
+          :label="$t('message.workspaceManagement.user')"
+          prop="id"
+        >
+          <Input
+            v-model="useradd.id"
+            style="width: 196px"
+          />
         </FormItem>
-        <FormItem :label="$t('message.workspaceManagement.role')" prop="role">
+        <FormItem
+          :label="$t('message.workspaceManagement.role')"
+          prop="role"
+        >
           <CheckboxGroup v-model="useradd.role">
             <Checkbox
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
-              :disabled="isSuperAdmin(item)"
+              :disabled="cantModifyAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button type="text" size="large" @click="Cancel">{{
+        <Button
+          type="text"
+          size="large"
+          @click="Cancel"
+        >{{
           $t("message.workspaceManagement.cancel")
         }}</Button>
-        <Button type="primary" size="large" @click="Ok('addUser')">{{
+        <Button
+          type="primary"
+          size="large"
+          @click="Ok('addUser')"
+        >{{
           $t("message.workspaceManagement.ok")
         }}</Button>
       </div>
     </Modal>
-    <Modal :closable="false" v-model="editusershow" :title="$t('message.workspaceManagement.editUser')">
+    <Modal
+      :closable="false"
+      v-model="editusershow"
+      :title="$t('message.workspaceManagement.editUser')"
+    >
       <Form
         ref="editUser"
         :model="edituser"
         :rules="editrule"
         :label-width="80"
       >
-        <FormItem :label="$t('message.workspaceManagement.role')" prop="role">
+        <FormItem
+          :label="$t('message.workspaceManagement.role')"
+          prop="role"
+        >
           <CheckboxGroup v-model="edituser.role">
             <Checkbox
               v-for="item in workspaceRoles"
               :key="item.roleId"
               :label="item.roleId"
-              :disabled="isSuperAdmin(item)"
+              :disabled="cantModifyAdmin(item)"
             >{{item.roleFrontName}}</Checkbox>
           </CheckboxGroup>
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button type="text" size="large" @click="Cancel">{{
+        <Button
+          type="text"
+          size="large"
+          @click="Cancel"
+        >{{
           $t("message.workspaceManagement.cancel")
         }}</Button>
-        <Button type="primary" size="large" @click="Ok('editUser')">{{
+        <Button
+          type="primary"
+          size="large"
+          @click="Ok('editUser')"
+        >{{
+          $t("message.workspaceManagement.ok")
+        }}</Button>
+      </div>
+    </Modal>
+    <!-- 自动加入工作空间 -->
+    <Modal
+      class-name="adduser-box"
+      v-model="autojoinShow"
+      :title="$t('message.workspaceManagement.addUserJoin')"
+    >
+      <Form
+        ref="autoJoinForm"
+        :model="autoJoin"
+        :rules="joinFormRule"
+        :label-width="80"
+      >
+        <FormItem
+          :label="$t('message.workspaceManagement.user')"
+          prop="id"
+        >
+          <Row>
+            <Col
+              span="12"
+              style="width: 196px"
+              size="small"
+            >
+              <Select
+                v-model="autoJoin.department"
+                multiple
+                filterable
+              >
+                <Option
+                  v-for="(option, index) in departments"
+                  :value="option"
+                  :key="index"
+                >{{option}}</Option>
+              </Select>
+            </Col>
+          </Row>
+        </FormItem>
+        <FormItem
+          :label="$t('message.workspaceManagement.role')"
+          prop="role"
+        >
+          <CheckboxGroup v-model="autoJoin.role">
+            <Checkbox
+              v-for="item in workspaceRoles"
+              :key="item.roleId"
+              :label="item.roleId"
+              :disabled="cantModifyAdmin(item)"
+            >{{item.roleFrontName}}</Checkbox>
+          </CheckboxGroup>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button
+          type="text"
+          size="large"
+          @click="autojoinShow = false"
+        >{{
+          $t("message.workspaceManagement.cancel")
+        }}</Button>
+        <Button
+          type="primary"
+          size="large"
+          @click="saveAutoRoles"
+        >{{
           $t("message.workspaceManagement.ok")
         }}</Button>
       </div>
@@ -141,13 +343,13 @@
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import api from '@dataspherestudio/shared/common/service/api';
 import moment from 'moment';
-import formserch from "../component/formsechbar";
-import { GetWorkspaceUserManagement } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
+import mixin from '@dataspherestudio/shared/common/service/mixin';
+import { GetWorkspaceUserManagement, getAllDepartments } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 
 export default {
   components: {
-    formserch
   },
+  mixins: [mixin],
   data() {
     return {
       delshow: false,
@@ -192,53 +394,69 @@ export default {
         title: this.$t('message.workspaceManagement.role') + ':',
         status: [],
       },
+      autojoinShow: false,
+      autoJoin: {
+        role: [],
+        department: []
+      },
+      joinFormRule: {
+        department: [
+          { required: true, message: this.$t('message.workspaceManagement.addruleMsg'), trigger: "blur" },
+        ],
+        role: [
+          { required: true, type: 'array', min: 1, message: this.$t('message.workspaceManagement.selectRoleMsg'), trigger: 'change' },
+        ]
+      },
+      departments: []
     };
   },
 
-  created(){
-    this.workspaceId =parseInt(this.$route.query.workspaceId);
+  created() {
+    this.workspaceId = parseInt(this.$route.query.workspaceId);
+    this.workspaceInfo = this.getCurrentWorkspace();
   },
   mounted() {
+    // 工作空间创建者一定是工作空间管理员；
+    // 工作空间管理员可以修改空间内（除工作空间管理员）任何成员的信息；
+    // 工作空间创建者可以修改自己的权限（不能取消自身管理员角色）以及任何用户的权限；
+    // 只有工作空间创建者有权限授权或取消用户的管理员角色。
+    // 工作空间管理员对其他管理员，在操作界面下，无任何按钮。
+    // 工作空间创建者进入工作空间管理后，对自己的操作中，删除选项可以隐去。
     this.init()
     this.getUserList()
   },
   methods: {
-    isSuperAdmin(item){
-      const isAdmin = this.getIsAdmin();
-      return item.roleId===1 && !isAdmin;
+    cantModifyAdmin(item) {
+      const username = this.getUserName();
+      return item.roleId === 1 && (username !== this.workspaceInfo.createBy || this.row.name === this.workspaceInfo.createBy || this.autojoinShow);
     },
-    canAdd(){
-      //管理员可以add
-      const isAdmin = this.getIsAdmin();
+    canAdd() {
       const workspaceRoles = storage.get(`workspaceRoles`) || [];
-      if (isAdmin || workspaceRoles.indexOf('admin') > -1) {
+      if (workspaceRoles.indexOf('admin') > -1) {
         return true;
       } else {
         return false;
       }
     },
-    canDelete(row = {}){
-      //创建者和超级管理员可以删除
-      const isAdmin = this.getIsAdmin();
+    canDelete(row = {}) {
       const username = this.getUserName();
-      if (row.creator === username || isAdmin) {
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      const isWorkspaceCreator = username === this.workspaceInfo.createBy;
+      const isAdmin = row.roles.indexOf(1) > -1;
+      if (workspaceRoles.indexOf('admin') > -1 && !isWorkspaceCreator && !isAdmin || isWorkspaceCreator && row.name !== this.workspaceInfo.createBy) {
         return true;
       } else {
         return false;
       }
     },
-    canEdit(row = {}){
-      //创建者,超级管理员isAdmin,空间管理员可以edit(非isAdmin的空间管理员帐号不能修改其他空间管理员)
-      const isAdmin = this.getIsAdmin();
+    canEdit(row = {}) {
       const username = this.getUserName();
-      if (row.creator === username || isAdmin) {
+      const workspaceRoles = storage.get(`workspaceRoles`) || [];
+      const isWorkspaceCreator = username === this.workspaceInfo.createBy;
+      const isAdmin = row.roles.indexOf(1) > -1;
+      if (workspaceRoles.indexOf('admin') > -1 && row.name !== this.workspaceInfo.createBy && !isAdmin || isWorkspaceCreator || row.name === username) {
         return true;
       } else {
-        // 非isAdmin的空间管理员帐号不能修改其他空间管理员
-        const workspaceRoles = storage.get(`workspaceRoles`) || [];
-        if (workspaceRoles.indexOf('admin') > -1 && row.roles.indexOf(1) == -1) {
-          return true;
-        }
         return false;
       }
     },
@@ -256,7 +474,7 @@ export default {
         this.loading1 = false
         return
       }
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listAllUsers`, 'get').then((res)=>{
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}listAllUsers`, 'get').then((res) => {
         this.loading1 = false
         let list = res.users
         this.data.datalist.forEach(item => {
@@ -279,10 +497,10 @@ export default {
       }
     },
     init() {
-      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceRoles`,{
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getWorkspaceRoles`, {
         workspaceId: this.workspaceId,
-      },'get').then((rst)=>{
-        this.workspaceRoles =  rst.workspaceRoles;
+      }, 'get').then((rst) => {
+        this.workspaceRoles = rst.workspaceRoles;
         this.optionType.status = this.statuslist(rst.workspaceRoles)
       })
       this.pageSetting = {
@@ -292,9 +510,37 @@ export default {
       }
       this.search();
     },
+    async autojoinShowModal() {
+      try {
+        const res = await getAllDepartments()
+        this.departments = res ? res.departmentWithOffices || [] : []
+        this.autojoinShow = true
+        const info = await api.fetch(`${this.$API_PATH.WORKSPACE_PATH}${this.workspaceId}/associateDepartmentsInfo`, {}, 'get')
+        if (info && info.associateDepartments) {
+          this.autoJoin = {
+            role: Array.isArray(info.associateDepartments.roleIds) ? info.associateDepartments.roleIds : info.associateDepartments.roleIds.split(',').map(it => it - 0),
+            department: Array.isArray(info.associateDepartments.departments) ? info.associateDepartments.departments : info.associateDepartments.departments.split(',')
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      }
+
+    },
+    saveAutoRoles() {
+      const params = {
+        departmentWithOffices: this.autoJoin.department,
+        roles: this.autoJoin.role,
+        workspaceId: this.workspaceId
+      }
+      api.fetch(`${this.$API_PATH.WORKSPACE_PATH}associateDepartments`, params, 'post').then(() => {
+        this.$Message.success('保存成功');
+        this.autojoinShow = false;
+      })
+    },
     search() {
       const params = this.getParams();
-      this.data.columns  = this.getColumns();
+      this.data.columns = this.getColumns();
       GetWorkspaceUserManagement(params).then((rst) => {
         this.pageSetting.total = rst.total;
         this.data.datalistAll = this.renderFormatTime(rst.workspaceUsers);
@@ -303,42 +549,35 @@ export default {
 
       });
     },
-    getColumns(){
+    getColumns() {
       const column = [
         { title: this.$t('message.workspaceManagement.name'), key: "name", align: "center" },
-        { title: this.$t('message.workspaceManagement.role'), slot: "role", align: "center",width: 250 },
+        { title: this.$t('message.workspaceManagement.role'), slot: "role", align: "center", width: 250 },
         { title: this.$t('message.workspaceManagement.department'), slot: "department", align: "center" },
         { title: this.$t('message.workspaceManagement.creator'), key: "creator", align: "center" },
         { title: this.$t('message.workspaceManagement.joinTime'), key: "joinTime", align: "center" },
+        { title: this.$t('message.workspaceManagement.updateUser'), key: "updateUser", align: "center" },
+        { title: this.$t('message.workspaceManagement.updateTime'), key: "updateTime", align: "center" },
         { title: this.$t('message.workspaceManagement.action'), slot: "action", width: 150, align: "center" }
       ];
       return column;
     },
-    getParams(page){
-      const params =  {
+    getParams(page) {
+      const params = {
         workspaceId: this.workspaceId,
-        userName: this.searchBar.searchText,
-        roleName: this.searchBar.status,
-        department: this.searchBar.engine,
+        // department: this.searchBar.engine,
         pageNow: page || this.pageSetting.current,
         pageSize: 10
       }
-      if(this.searchBar.searchText){
-        delete params.roleName;
-        delete params.status;
-      }else{
-        let {engine,status} = this.searchBar;
-        if(status===0){
-          delete params.roleName;
-        }
-        if(engine===0){
-          delete params.department;
-        }
-        delete params.userName;
+      if (this.searchBar.status) {
+        params.roleName = this.searchBar.status
+      }
+      if (this.searchBar.searchText) {
+        params.userName = this.searchBar.searchText
       }
       return params
     },
-    changePage(page){
+    changePage(page) {
       const params = this.getParams(page);
       this.column = this.getColumns();
       GetWorkspaceUserManagement(params).then((rst) => {
@@ -352,13 +591,6 @@ export default {
       this.row = row;
     },
     del() {
-      const curUserName = this.getUserName();
-      if(this.row.creator === this.row.name){
-        return this.$Message.warning(this.$t("message.workspaceManagement.notsupported"));
-      }
-      if(curUserName === this.row.name){
-        return this.$Message.error(this.$t('message.workspaceManagement.notDeleteMsg'));
-      }
       this.delshow = false;
       const params = {
         workspaceId: this.workspaceId,
@@ -370,8 +602,6 @@ export default {
       });
     },
     edit(row) {
-      // 如果是当前用户修改自己的权限，提示用户不能修改
-      if (row.name === row.creator) return this.$Message.warning(this.$t("message.workspaceManagement.notsupported"));
       this.edituser = {
         role: [...row.roles]
       }
@@ -379,6 +609,7 @@ export default {
       this.editusershow = true;
     },
     creater() {
+      this.row = {}
       this.useradd = {
         id: "",
         name: "",
@@ -389,10 +620,10 @@ export default {
     Ok(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
-          if(name === 'addUser') {
+          if (name === 'addUser') {
             this.useradd.id ? this.createuser() : this.$Message.error(this.$t("message.workspaceManagement.addruleMsg"));
           }
-          if(name === 'editUser') {
+          if (name === 'editUser') {
             this.editrole()
           }
         } else {
@@ -405,7 +636,7 @@ export default {
       this.editusershow = false;
       this.options = [];
     },
-    createuser(){
+    createuser() {
       let id = this.useradd.id
       let userName
       for (let i = 0; i < this.options.length; i++) {
@@ -430,12 +661,11 @@ export default {
         this.$Message.success(this.$t('message.workspaceManagement.addSuccess'))
         this.options = []
       }).catch(() => {
-        this.$Message.warning(this.$t('message.workspaceManagement.addFail'))
         this.options = []
       })
       this.creatershow = false;
     },
-    editrole(){
+    editrole() {
       let name = this.row.name
       const params = {
         roles: this.edituser.role,
@@ -450,18 +680,18 @@ export default {
         }
         this.$Message.success(this.$t('message.workspaceManagement.updataSuccess'));
       }).catch(() => {
-        this.$Message.warning('');
       });
       this.editusershow = false;
     },
-    renderFormatTime(data){
+    renderFormatTime(data) {
       data.forEach(item => {
         item.joinTime = moment.unix(item.joinTime / 1000).format('YYYY-MM-DD HH:mm:ss')
+        item.updateTime = item.updateTime ? moment.unix(item.updateTime / 1000).format('YYYY-MM-DD HH:mm:ss') : ''
       });
       return data;
     },
-    rolelist(data){
-      let  str  = '';
+    rolelist(data) {
+      let str = '';
       data.roles.forEach(element => {
         this.workspaceRoles.forEach(item => {
           if (item.roleId === element) {
@@ -470,34 +700,34 @@ export default {
         })
       });
       str = str.substring(0, str.lastIndexOf('-'));
-      return  str
+      return str
     },
-    statuslist(data){
+    statuslist(data) {
       if (!data) return
       let arr = []
       let obj = {}
-      data.forEach(item=>{
-        obj={
+      data.forEach(item => {
+        obj = {
           label: item.roleFrontName,
           value: item.roleName
         }
         arr.push(obj)
       })
-      arr.unshift({label: this.$t('message.workspaceManagement.all'), value: 0})
+      arr.unshift({ label: this.$t('message.workspaceManagement.all'), value: 0 })
       return arr
     },
-    departmentlist(data){
+    departmentlist(data) {
       if (!data) return
       let arr = []
       let obj = {}
-      data.forEach(item=>{
-        obj={
+      data.forEach(item => {
+        obj = {
           label: item.name,
           value: item.frontName
         }
         arr.push(obj)
       })
-      arr.unshift({label: this.$t('message.workspaceManagement.all'), value: 0})
+      arr.unshift({ label: this.$t('message.workspaceManagement.all'), value: 0 })
       return arr
     }
   }

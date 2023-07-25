@@ -55,6 +55,8 @@
   </div>
 </template>
 <script>
+import i18n from '@dataspherestudio/shared/common/i18n';
+
 export default {
   props: {
     labelWidth: {
@@ -85,12 +87,12 @@ export default {
     submitText: {
       // 确认文本
       type: String,
-      default: "确认",
+      default: i18n.t('message.apiServices.confirm'),
     },
     cancelText: {
       // 取消文本
       type: String,
-      default: "取消",
+      default: i18n.t('message.apiServices.cancel'),
     },
     "label-width": {
       type: Number
@@ -105,7 +107,7 @@ export default {
     },
     title: {
       type: String,
-      default: "我是标题"
+      default: i18n.t('message.apiServices.istitle')
     }
   },
   mounted() {

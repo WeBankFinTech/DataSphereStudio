@@ -8,6 +8,17 @@
         <span class="designer-menu-li-text">
           {{ item.text }}
         </span>
+        <span v-if="item.children"> > </span>
+        <ul class="designer-menu-ul sub-menu-ul" v-if="item.children">
+          <li v-for="(itemChild, indexChild) in item.children" :key="indexChild" class="designer-menu-li" @click="choose(itemChild, indexChild)">
+            <Icon v-if="itemChild.icon" :name="itemChild.icon" class="designer-menu-li-icon" />
+            <img v-else-if="itemChild.img" :src="itemChild.img" class="designer-menu-li-icon menu-img">
+            <span v-else class="designer-menu-li-icon" />
+            <span class="designer-menu-li-text">
+              {{ itemChild.text }}
+            </span>
+          </li>
+        </ul>
       </li>
     </ul>
   </div>

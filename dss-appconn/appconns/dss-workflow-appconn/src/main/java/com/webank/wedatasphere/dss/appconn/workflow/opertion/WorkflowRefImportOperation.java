@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
@@ -34,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WorkflowRefImportOperation
-    extends AbstractDevelopmentOperation<ThirdlyRequestRef.ImportWitContextRequestRefImpl, RefJobContentResponseRef>
+        extends AbstractDevelopmentOperation<ThirdlyRequestRef.ImportWitContextRequestRefImpl, RefJobContentResponseRef>
         implements RefImportOperation<ThirdlyRequestRef.ImportWitContextRequestRefImpl> {
 
     @Override
@@ -48,7 +49,8 @@ public class WorkflowRefImportOperation
                 requestRef.getContextId(), requestRef.getDSSLabels());
 
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
-        ResponseImportWorkflow responseImportWorkflow = (ResponseImportWorkflow) sender.ask(requestImportWorkflow);
+        ResponseImportWorkflow responseImportWorkflow = RpcAskUtils.processAskException(sender.ask(requestImportWorkflow),
+                ResponseImportWorkflow.class, RequestImportWorkflow.class);
         if(responseImportWorkflow.getStatus() == JobStatus.Success) {
             if(MapUtils.isEmpty(responseImportWorkflow.getWorkflows())) {
                 return RefJobContentResponseRef.newBuilder()

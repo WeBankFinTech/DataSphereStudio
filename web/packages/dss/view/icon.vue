@@ -2,7 +2,7 @@
   <div class="icon-content">
     <ul>
       <li v-for="item in list" :key="item" @click="copy(item)" class="icon-style">
-        <SvgIcon :icon-class="item"/>
+        <SvgIcon :icon-class="item" />
         <div>{{item}}</div>
       </li>
     </ul>
@@ -28,13 +28,18 @@ export default {
       document.body.appendChild(inputEl);
       inputEl.select(); // 选择对象;
       document.execCommand("Copy"); // 执行浏览器复制命令
-      this.$Message.info('复制成功');
+      this.$Message.info(this.$t('message.common.dss.copied'));
       inputEl.remove();
     },
   }
 };
 </script>
 <style lang="scss" scoped>
+  .icon-content {
+    width: 100%;
+    height: 100%;
+    overflow: auto
+  }
   .icon-style {
     background: #9c9c9c;
     display: inline-block;

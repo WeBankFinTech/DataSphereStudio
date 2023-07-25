@@ -22,19 +22,23 @@ import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExec
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
-import org.apache.commons.lang.SerializationUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.manager.label.constant.LabelKeyConstant;
 import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
 import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator;
+import org.apache.linkis.protocol.constants.TaskConstant;
 import org.apache.linkis.protocol.utils.TaskUtils;
 import org.apache.linkis.ujes.client.request.JobExecuteAction;
 import org.apache.linkis.ujes.client.request.JobSubmitAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecutionConfiguration.*;
 
@@ -140,6 +144,8 @@ public class BuildJobActionImpl implements BuildJobAction {
             labels.put("executeOnce", "");
         }
         Map<String, Object> paramMapCopy = (HashMap<String, Object>) SerializationUtils.clone(new HashMap<String, Object>(job.getParams()));
+        replaceSparkConfParams(paramMapCopy);
+
         JobSubmitAction.Builder builder = JobSubmitAction.builder()
                 .addExecuteCode(code)
                 .setUser(job.getUser())
@@ -179,6 +185,32 @@ public class BuildJobActionImpl implements BuildJobAction {
             }
         }
         return true;
+    }
+
+    /**
+     * spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。
+     *
+     * @param paramMapCopy
+     * @throws LinkisJobExecutionErrorException
+     */
+    private void replaceSparkConfParams(Map<String, Object> paramMapCopy) throws LinkisJobExecutionErrorException {
+        Map<String, Object> startupMap = TaskUtils.getStartupMap(paramMapCopy);
+        if (startupMap.containsKey("spark.conf")) {
+            String sparkConfVal = (String) startupMap.get("spark.conf");
+            List<String> kvList = Arrays.stream(sparkConfVal.split(";")).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+            for (String l : kvList) {
+                String[] kv = l.split("=");
+                if (kv.length != 2) {
+                    throw new LinkisJobExecutionErrorException(90103, "wrong spark.conf params. please recheck!");
+                } else {
+                    startupMap.put(kv[0], kv[1]);
+                }
+            }
+            startupMap.remove("spark.conf");
+            Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
+            configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
+            paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);
+        }
     }
 
     //TODO

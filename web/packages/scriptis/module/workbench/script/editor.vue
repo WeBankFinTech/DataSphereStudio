@@ -126,6 +126,7 @@
         :id="script.id"
         :read-only="script.readOnly"
         :script-type="scriptType"
+        :file-path="work.filepath || script.id + work.filename"
         :application="script.application"
         type="code"
         @on-operator="heartBeat"
@@ -281,7 +282,6 @@ export default {
       this.$refs.editor.redo()
     },
     async run() {
-      // if (!this.isParseSuccess) return this.$Message.warning('代码中有语法错误，请检查后再试！');
       if (this.script.running)
         return this.$Message.warning(
           this.$t('message.scripts.editorDetail.warning.running')
@@ -289,9 +289,6 @@ export default {
       let selectCode = this.$refs.editor.getValueInRange() || this.script.data
       let validRepeat = await this.validateRepeat()
       this.$refs.editor.deltaDecorations(selectCode, () => {
-        // if (!flag) {
-        //     return this.$Message.warning('代码中有语法错误，请检查后再试！');
-        // }
         if (!validRepeat)
           return this.$Message.warning(
             this.$t('message.scripts.editorDetail.warning.invalidArgs')
@@ -334,16 +331,19 @@ export default {
       })
     },
     async save() {
-      // debugger
-      let valid = await this.validateRepeat()
-      if (!valid)
-        return this.$Message.warning(
-          this.$t('message.scripts.editorDetail.warning.invalidArgs')
-        )
-      this.$refs.editor.save()
-      this.$emit('on-save', '', this.dataSetValue)
-      this.oldDataSetValue = this.dataSetValue
-      this.scriptUnsave = this.work.unsave
+      if (this.work && this.work.unsave) {
+        let valid = await this.validateRepeat()
+        if (!valid)
+          return this.$Message.warning(
+            this.$t('message.scripts.editorDetail.warning.invalidArgs')
+          )
+        this.$refs.editor.save()
+        this.$emit('on-save', '', this.dataSetValue)
+        this.oldDataSetValue = this.dataSetValue
+        this.scriptUnsave = this.work.unsave
+      } else {
+        this.$Message.warning(this.$t('message.scripts.editorDetail.warning.unchange'));
+      }
     },
     config() {
       this.showConfig = !this.showConfig

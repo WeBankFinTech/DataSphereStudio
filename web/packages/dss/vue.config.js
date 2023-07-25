@@ -22,8 +22,15 @@ const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const VirtualModulesPlugin = require('webpack-virtual-modules');
 const webpack = require("webpack");
-const { apps, exts, conf, version } = require('../../config.json')
 const child_process = require('child_process');
+
+let configFile= `../../config.json`
+if (process.env.npm_config_configfile) {
+  configFile = `../../${process.env.npm_config_configfile}`
+} else if (process.env.npm_config_micro_module) {
+  configFile = `../../config.${process.env.npm_config_micro_module}.json`
+}
+const { apps = {}, exts = {}, conf = {}, version, components = {} } = require(configFile)
 
 if (version) {
   process.env.VUE_APP_VERSION = version
@@ -87,6 +94,13 @@ Object.keys(exts).forEach((item, index) => {
   }
 })
 
+//vue components
+let vuecomps = []
+Object.keys(components).forEach(item => {
+  vuecomps.push(`${item}: require('@/${components[item]}')`)
+})
+
+// config
 Object.keys(conf).forEach(item=> {
   if(['app_logo'].includes(item)) {
     confs.push(`${item}: require('@/${conf[item]}')`)
@@ -115,6 +129,7 @@ const virtualModules = new VirtualModulesPlugin({
     modules: ${JSON.stringify(modules)},
     exts: {${extsMoule.join(',')}},
     appsRoutes: {${appsRoutes.join(',')}},
+    vuecomps: {${vuecomps.join(',')}},
     appsI18n: [${appsI18n.join(',')}],
     requireComponent: [${requireComponent.join(',')}],
     requireComponentVue: [${requireComponentVue.join(',')}],
@@ -218,6 +233,7 @@ module.exports = {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '../'),
+        'vscode': require.resolve('monaco-languageclient/lib/vscode-compatibility')
       }
     },
     plugins

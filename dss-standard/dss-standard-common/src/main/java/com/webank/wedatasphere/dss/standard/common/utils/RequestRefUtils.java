@@ -12,7 +12,12 @@ import java.util.stream.Stream;
  * @since 0.5.0
  */
 public class RequestRefUtils {
-
+    /**
+     * 获取operation的RequestRef具体实现类的一个实例
+     * @param operation operation
+     * @return 一个具体的RequestRef实例
+     * @param <T> RequestRef的具体实现类
+     */
     public static <T> T getRequestRef(Object operation) {
         ParameterizedType parameterizedType = (ParameterizedType) operation.getClass().getGenericSuperclass();
         return newInstance(operation, parameterizedType);

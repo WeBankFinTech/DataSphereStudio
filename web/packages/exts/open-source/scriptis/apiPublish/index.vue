@@ -462,7 +462,7 @@ export default {
           }
         },
         {
-          title: '默认值',
+          title: this.$t('message.ext.opensource.defalut'),
           width: '180',
           slot: 'defaultValue',
         },
@@ -493,7 +493,7 @@ export default {
           }
         },
         {
-          title: '详细说明',// TODO 国际化待合并后修改
+          title: this.$t('message.ext.opensource.detail'),// TODO 国际化待合并后修改
           key: 'details',
           width: '200',
           render: (h, params) => {
@@ -613,8 +613,6 @@ export default {
     }
   },
   created() {
-    this.getApplyUserList();
-    this.getApiList();
   },
   computed: {
     isSupport() {
@@ -657,10 +655,10 @@ export default {
     verificationValue (row) {
       let flag;
       if(row.defaultValue.length > 1024) {
-        this.$Message.error({ content: '默认字符不能超过1024个字符！' });
+        this.$Message.error({ content: this.$t('message.ext.opensource.longer1024') });
         flag = true;
       } else if(row.paramType === 4 && row.defaultValue.split('\n').length > 1000) {
-        this.$Message.error({ content: '行数过多请分批查询！' });
+        this.$Message.error({ content: this.$t('message.ext.opensource.rowlimit') });
         flag = true;
       } else {
         flag = false
@@ -683,7 +681,10 @@ export default {
     getApiList() {
       api.fetch('/dss/apiservice/getUserServices', {
         workspaceId: this.$route.query.workspaceId
-      }, 'get').then((res) => {
+      }, {
+        method: 'get',
+        cacheOptions: {time: 3000}
+      }).then((res) => {
         // 只有是正常的数据服务才能被选择0-禁用，1-正常，2-删除
         if (res.query_list) {
           this.apiList = res.query_list.filter((item) => item.status === 1);
@@ -691,7 +692,7 @@ export default {
       })
     },
     updateNextStep() {
-      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: '超出限制请修改！' });
+      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: this.$t('message.ext.opensource.outlimit') });
       this.$refs['updateApi'].validate((valid) => {
         if (valid) {
           this.step += 1;
@@ -788,8 +789,9 @@ export default {
       })
     },
     publishApiPanel(name) {
-      if (this.script.params.variable.some((item) => !item.value)) return this.$Message.warning('参数值不能为空')
-      // let _this = this;
+      if (this.script.params.variable.some((item) => !item.value)) return this.$Message.warning(this.$t('message.ext.opensource.cnanotnull'))
+      this.getApplyUserList();
+      this.getApiList();
       this.clear()
       if ('addApi' === name) {
         this.addApiModalShow = true
@@ -871,7 +873,7 @@ export default {
           }
         });
       } else {
-        if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: '超出限制请修改！' });
+        if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: this.$t('message.ext.opensource.outlimit') });
         this.step = 3
         this.addApiModalWidth = 450;
       }

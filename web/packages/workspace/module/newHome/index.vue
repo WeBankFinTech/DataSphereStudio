@@ -21,7 +21,7 @@
           <div class="left_search">
             <!-- 切换显示方式按钮 -->
             <div class="left_visual" @click="changeVisual">
-              <SvgIcon color="rgba(0,0,0,0.65)" :iconClass="visualCatesIcon"/>
+              <SvgIcon :iconClass="visualCatesIcon"/>
               <span>
                 {{ visualCatesTitle }}
               </span>
@@ -61,7 +61,7 @@
               </div>
               <SvgIcon
                 v-if="isAdminAndSingleServe"
-                title="管理"
+                :title="$t('message.workspace.Management')"
                 class="management-button"
                 :style="{ 'font-size': '20px' }"
                 icon-class="setting"
@@ -208,7 +208,6 @@ export default {
       }
     },
     gotoWorkspace(workspace) {
-      storage.set("curWorkspace", workspace, "local");
       const workspaceId = workspace.workspaceId || workspace.id;
       const currentModules = util.currentModules();
       if (currentModules.microModule === "apiServices") {

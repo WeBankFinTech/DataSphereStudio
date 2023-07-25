@@ -41,4 +41,14 @@ public class AddWorkspaceRoleRequest implements Serializable {
     public void setComponentIds(List<Integer> componentIds) {
         this.componentIds = componentIds;
     }
+
+    @Override
+    public String toString() {
+        return "AddWorkspaceRoleRequest{" +
+                "workspaceId=" + workspaceId +
+                ", roleName='" + roleName + '\'' +
+                ", menuIds=" + menuIds +
+                ", componentIds=" + componentIds +
+                '}';
+    }
 }

@@ -16,11 +16,13 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -43,12 +45,17 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Autowired
     private StaffInfoGetter staffInfoGetter;
 
+    @Autowired
+    private WorkspaceDBHelper workspaceDBHelper;
+
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator) {
+        //获取用户创建时间
+        DSSWorkspaceUser workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(String.valueOf(workspaceId), userName, null).stream().findFirst().get();
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
         roles.forEach(role ->{
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, role, userName, creator, 0L);
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId, role, workspaceUsers.getJoinTime(), userName, workspaceUsers.getCreator(), 0L, creator);
         });
     }
 
@@ -109,5 +116,32 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Override
     public Long getCountByUsername(String username,int workspaceId){
         return dssWorkspaceUserMapper.getCountByUsername(username,workspaceId);
+    }
+
+    @Override
+    public List<Map<String,Object>> getUserRoleByUserName(String userName) {
+        List<DSSWorkspaceUser> workspaceRoles = dssWorkspaceUserMapper.getWorkspaceRoleByUsername(userName);
+        List<Map<String,Object>> list = new ArrayList<>();
+        workspaceRoles.forEach(workspaceRole -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("workspaceId", workspaceRole.getWorkspaceId());
+            map.put("roleId", workspaceRole.getRoleIds());
+            map.put("roleName", workspaceDBHelper.getRoleFrontName(Integer.parseInt(workspaceRole.getRoleIds())));
+            list.add(map);
+        });
+        return list;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean clearUserByUserName(String userName) {
+        if(staffInfoGetter.getAllUsers().stream().anyMatch(staffInfo -> staffInfo.getEnglishName().equals(userName))) {
+            dssWorkspaceUserMapper.deleteUserByUserName(userName);
+            dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
+            dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
+            return true;
+        }else{
+            return false;
+        }
     }
 }

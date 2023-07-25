@@ -78,6 +78,7 @@ module.exports = {
         'vue/multiline-html-element-content-newline': 0,
         'vue/attributes-order': 0,
         'vue/html-self-closing': 0,
+        "vue/valid-v-model": 0,
         'no-useless-constructor': 0,
         'no-mixed-operators': 0,
         'no-new-func': 0,

@@ -157,4 +157,22 @@ public class ProjectCreateRequest {
     public void setOrchestratorModeList(List<String> orchestratorModeList) {
         this.orchestratorModeList = orchestratorModeList;
     }
+
+    @Override
+    public String toString() {
+        return "ProjectCreateRequest{" +
+                "name='" + name + '\'' +
+                ", applicationArea=" + applicationArea +
+                ", business='" + business + '\'' +
+                ", product='" + product + '\'' +
+                ", releaseUsers=" + releaseUsers +
+                ", editUsers=" + editUsers +
+                ", accessUsers=" + accessUsers +
+                ", description='" + description + '\'' +
+                ", workspaceId=" + workspaceId +
+                ", workspaceName='" + workspaceName + '\'' +
+                ", devProcessList=" + devProcessList +
+                ", orchestratorModeList=" + orchestratorModeList +
+                '}';
+    }
 }

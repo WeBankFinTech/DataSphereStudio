@@ -15,6 +15,7 @@
  */
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.job.parser
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel
 import com.webank.wedatasphere.dss.common.protocol.{ProxyUserCheckRequest, RequestQueryWorkFlow, ResponseProxyUserCheck}
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
@@ -31,6 +32,8 @@ import org.apache.linkis.rpc.Sender
 import org.apache.commons.lang3.StringUtils
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
+
+import java.util.Collections
 
 
 @Order(1)
@@ -52,12 +55,12 @@ class FlowJobFlowParser extends FlowEntranceJobParser with Logging {
     }
   }
 
-  private def getDSSScheduleFlowById(userName: String , flowId:Long, label:String): Workflow = {
+  private def getDSSScheduleFlowById(userName: String, flowId: Long, label: String): Workflow = {
     val req = RequestQueryWorkFlow(userName, flowId)
-    val sendWorkflowName = FlowExecutionEntranceConfiguration.WORKFLOW_APPLICATION_NAME.getValue + label.toUpperCase
-    logger.info("Send query workflow json to "+ sendWorkflowName)
-    val response: ResponseQueryWorkflow= Sender.getSender(sendWorkflowName)
-                                               .ask(req).asInstanceOf[ResponseQueryWorkflow]
+    val sender: Sender = DSSSenderServiceFactory.getOrCreateServiceInstance()
+      .getWorkflowSender(Collections.singletonList(new EnvDSSLabel(label)))
+    logger.info(s"Send query workflow json to sender: $sender")
+    val response: ResponseQueryWorkflow = sender.ask(req).asInstanceOf[ResponseQueryWorkflow]
     WorkflowFactory.INSTANCE.getJsonToFlowParser.parse(response.getDssFlow)
   }
 

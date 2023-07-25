@@ -30,4 +30,7 @@ public interface OrchestratorRefConstant {
     String ORCHESTRATION_USES = "orchestrationUses";
     String ORCHESTRATION_SCHEDULER_APP_CONN = "schedulerAppConnName";
 
+    //workflow node suffix input by the user during workflow replication.
+    String ORCHESTRATION_NODE_SUFFIX = "nodeSuffix";
+
 }

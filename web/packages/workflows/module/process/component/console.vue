@@ -1,7 +1,9 @@
 <template>
   <div
     ref="bottomPanel"
-    class="log-panel">
+    class="log-panel"
+    :class="{'full-screen': scriptViewState.bottomPanelFull}"
+  >
     <div class="workbench-tabs">
       <div class="workbench-tab-wrapper">
         <div class="workbench-tab">
@@ -28,6 +30,10 @@
         </div>
         <div
           class="workbench-tab-button">
+          <span class="workbench-tab-full-btn" @click="toggleFull">
+            <Icon :type="scriptViewState.bottomPanelFull?'md-contract':'md-expand'" />
+            {{ scriptViewState.bottomPanelFull ? $t('message.scripts.constants.logPanelList.releaseFullScreen') : $t('message.scripts.constants.logPanelList.fullScreen') }}
+          </span>
           <Icon
             type="ios-close"
             size="20"
@@ -93,7 +99,8 @@ export default {
       scriptViewState: {
         showPanel: 'progress',
         cacheLogScroll: 0,
-        bottomContentHeight: this.height || '250'
+        bottomContentHeight: this.height || '250',
+        bottomPanelFull: false
       },
       isBottomPanelFull: false,
       isLogShow: false,
@@ -358,7 +365,7 @@ export default {
     showPanelTab(type) {
       this.scriptViewState.showPanel = type;
       this.script.showPanel = type;
-      this.updateNodeCache('showPanel');
+      this.updateNodeCache(type);
       if (type === 'log') {
         this.localLogShow();
       }
@@ -475,10 +482,10 @@ export default {
             }
           } else {
             this.createScript();
+            this.$nextTick(() => {
+              this.createExecute(needQuery);
+            })
           }
-          this.$nextTick(() => {
-            this.createExecute(needQuery);
-          })
         }
       })
     },
@@ -524,7 +531,21 @@ export default {
         }
       });
       return tmpLogs;
-    }
+    },
+    toggleFull() {
+      let bottomContentHeight
+      if (this.scriptViewState.bottomPanelFull) {
+        bottomContentHeight = this._last_bottom_panel_height
+      } else {
+        this._last_bottom_panel_height = this.scriptViewState.bottomContentHeight
+        bottomContentHeight = this.$parent.$el.clientHeight + 50
+      }
+      this.scriptViewState = {
+        ...this.scriptViewState,
+        bottomContentHeight,
+        bottomPanelFull: !this.scriptViewState.bottomPanelFull
+      }
+    },
   }
 }
 </script>
@@ -535,6 +556,16 @@ export default {
     border-top: $border-width-base $border-style-base $border-color-base;
     @include border-color($border-color-base, $dark-border-color-base);
     @include bg-color($light-base-color, $dark-base-color);
+    &.full-screen {
+      top: 54px !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      position: fixed;
+      z-index: 1050;
+      height: 100% !important;
+      width: 100% !important;
+    }
     .workbench-tabs {
       position: $relative;
       height: 100%;
@@ -548,6 +579,7 @@ export default {
         display: flex;
         border-top: $border-width-base $border-style-base #dcdcdc;
         border-bottom: $border-width-base $border-style-base #dcdcdc;
+        @include border-color($border-color-base, $dark-menu-base-color);
         .workbench-tab {
           flex: 1;
           display: flex;
@@ -579,31 +611,35 @@ export default {
             display: inline-block;
             height: 32px;
             line-height: 32px;
-            background-color: $background-color-base;
-            color: $title-color;
+            @include bg-color($background-color-base, $dark-workspace-body-bg-color);
+            @include font-color(
+              $title-color,
+              $dark-workspace-title-color
+            );
             cursor: pointer;
             min-width: 100px;
             max-width: 200px;
             overflow: hidden;
             margin-right: 2px;
             border: 1px solid #eee;
+            @include border-color($border-color-base, $dark-border-color-base);
             &.active {
               margin-top: 1px;
-              background-color: $body-background;
+              @include bg-color($light-base-color, $dark-base-color);
               color: $primary-color;
               border-radius: 4px 4px 0 0;
               border: 1px solid $border-color-base;
               border-bottom: 2px solid $primary-color;
+              @include border-color($border-color-base, $dark-border-color-base);
             }
           }
         }
         .workbench-tab-button {
-          flex: 0 0 30px;
+          flex: 0 0 120px;
           text-align: center;
-          background-color: $body-background;
+          @include bg-color($light-base-color, $dark-base-color);
           .ivu-icon {
               font-size: $font-size-base;
-              margin-top: 8px;
               cursor: pointer;
           }
         }
@@ -621,6 +657,17 @@ export default {
                 width: 100%;
             }
         }
+      }
+    }
+    .workbench-tab-full-btn {
+      display: inline-block;
+      line-height: 32px;
+      align-items: center;
+      padding-right: 8px;
+      height: 32px;
+      cursor: pointer;
+      &:hover {
+        @include font-color($primary-color, $dark-primary-color);
       }
     }
   }

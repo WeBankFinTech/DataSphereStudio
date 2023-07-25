@@ -67,6 +67,9 @@
       "options": null
     }
   },
+  "components": {
+    "WeEditor": "editor/index.js"
+  },
   "conf": {
     "app_name": "DataSphere Studio",
     "app_logo": "dss/assets/images/dssLogo.png",
@@ -77,7 +80,8 @@
       "show": false,
       "template": "${username} ${time}",
       "timeupdate": 60000
-    }
+    },
+    "env": "opensource"
   },
-  "version": "1.1.1"
+  "version": "1.1.12"
 }

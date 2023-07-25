@@ -26,6 +26,11 @@ public interface ConversionOperation<K extends ConversionRequestRef, V extends R
 
     void setConversionService(ConversionService conversionService);
 
+    /**
+     * 将DSS工作流转为具体的第三方调度系统工作流，即发布到第三方调度系统
+     * @param ref
+     * @return
+     */
     V convert(K ref);
 
 }

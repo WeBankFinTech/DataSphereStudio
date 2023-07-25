@@ -119,17 +119,7 @@
     <template v-if="workListLength == 0 && !loading">
       <div class="bg-page">
         <img class="bg-img" src="./image/bg-img.png" />
-        <p
-          class="bg-text"
-          :class="{
-            weight: line.indexOf('？') !== -1,
-            indent: line.indexOf('？') === -1,
-          }"
-          v-for="(line, index) in tips.split('\n')"
-          :key="index"
-        >
-          {{ line }}
-        </p>
+        <div v-html="tips" style="line-height:24px"></div>
       </div>
     </template>
     <template>
@@ -336,6 +326,7 @@ export default {
           })
           .then((args) => {
             hiveList = args
+            that.$emit('get-dbtable-length', hiveList.length)
           })
       }
 
@@ -651,23 +642,11 @@ export default {
           }
         })
     },
-    'Workbench:isOpenTab'({ newLabel, oldLabel, oldDest }, cb) {
-      // 先判断是否有修改后缀，如果有返回false, 如果有在判断是否在tab中存在
-      const newSuffix = newLabel.substr(
-        newLabel.lastIndexOf('.'),
-        newLabel.length
-      )
-      const oldSuffix = oldLabel.substr(
-        oldLabel.lastIndexOf('.'),
-        oldLabel.length
-      )
-      if (oldSuffix !== newSuffix) {
-        const work = this.worklist.find((work) => work.filepath === oldDest)
-        if (work) {
-          cb(true)
-        } else {
-          cb(false)
-        }
+    "Workbench:isOpenTab"({ oldDest }, cb) {
+      // 重命名文件、目录，是否存在已打开
+      const work = this.worklist.find((work) => work.filepath.indexOf(oldDest) > -1)
+      if (work) {
+        cb(true)
       } else {
         cb(false)
       }
@@ -1244,6 +1223,13 @@ export default {
     resize() {
       this.toggleCtrlBtn(this)
     },
+    getUserName() {
+      const baseinfo = storage.get("baseInfo", "local")
+      if (baseinfo) {
+        return baseinfo.proxyEnable && baseinfo.proxyUserName ? baseinfo.proxyUserName : baseinfo.username
+      }
+      return null
+    },
   },
 }
 </script>
@@ -1260,7 +1246,6 @@ export default {
       vertical-align: top;
       border-top: 0;
       padding: 5px 16px;
-      border-color: #dcdee2 !important;
       &.ivu-tabs-tab-active {
         border-top: 2px solid $primary-color !important;
       }
@@ -1269,7 +1254,7 @@ export default {
 }
 // 工作区为空背景设置
 .bg-page {
-  width: 360px;
+  width: 560px;
   height: 100%;
   margin: 0 auto;
   display: flex;
@@ -1282,17 +1267,6 @@ export default {
     margin-bottom: 20px;
     @media screen and (max-height: 600px) {
       display: none;
-    }
-  }
-  .bg-text {
-    width: 100%;
-    text-align: left;
-    &.weight {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    &.indent {
-      text-indent: 2em;
     }
   }
 }
@@ -1409,7 +1383,6 @@ export default {
     .workbench-tab-button {
       flex: 0 0 30px;
       text-align: center;
-      // background-color: $body-background;
       @include bg-color($light-base-color, $dark-base-color);
       &:hover {
         @include bg-color($active-menu-item, $dark-active-menu-item);

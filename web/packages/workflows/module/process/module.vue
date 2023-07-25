@@ -294,6 +294,7 @@
       </Form>
       <div slot="footer">
         <Button
+          v-if="$APP_CONF && $APP_CONF.env === 'webank'"
           @click="showDiff">{{$t('message.workflow.showVersionDiff')}}</Button>
         <Button
           type="primary"

@@ -458,19 +458,21 @@ export default {
           vm.editor.updateOptions({wordWrap: 'on'});
         },
       });
-
-      this.editor.addAction({
-        id: 'newdbsuggest',
-        label: this.$t('message.common.monacoMenu.newdbcomplition'),
-        keybindings: [],
-        keybindingContext: null,
-        contextMenuGroupId: 'control',
-        contextMenuOrder: 2.5,
-        run() {
-          localStorage.setItem('scriptis-edditor-type', 'lsp');
-          location.reload();
-        },
-      });
+      
+      if (this.$APP_CONF && this.$APP_CONF.lsp_service) {
+        this.editor.addAction({
+          id: 'newdbsuggest',
+          label: this.$t('message.common.monacoMenu.newdbcomplition'),
+          keybindings: [],
+          keybindingContext: null,
+          contextMenuGroupId: 'control',
+          contextMenuOrder: 2.5,
+          run() {
+            localStorage.setItem('scriptis-edditor-type', 'lsp');
+            location.reload();
+          },
+        });
+      }
 
       if (this.language === 'hql') {
         // 控制语法检查

@@ -62,7 +62,9 @@ export default {
       //   path: 'dataSourceAdministration',
       //   children: [],
       // },
-      {
+    ];
+    if (this.$APP_CONF && this.$APP_CONF.env === 'webank') {
+      manageMenus.push({
         icon: 'engineinfo',
         name: i18n.t('message.workspaceManagement.engineInfo'),
         path: 'engineinfo',
@@ -86,8 +88,8 @@ export default {
             children: [],
           }
         ],
-      }
-    ];
+      })
+    }
     return {
       mode: '',
       activeName: '',

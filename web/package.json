@@ -3,8 +3,8 @@
     "version": "1.1.6",
     "private": true,
     "scripts": {
-        "serve": "cd packages/dss && npm run serve",
-        "build": "cd packages/dss && npm run build",
+        "serve": "patch-package && cd packages/dss && npm run serve",
+        "build": "patch-package && cd packages/dss && npm run build",
         "serve-sandbox": "patch-package && npm run serve --configfile=config.sandbox.json",
         "build-sandbox": "patch-package && npm run build --configfile=config.sandbox.json",
         "serve-scriptis": "patch-package && npm run serve --module=scriptis --micro_module=scriptis",

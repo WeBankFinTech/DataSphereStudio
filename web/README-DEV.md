@@ -31,7 +31,6 @@
 新增功能模块先确定涉及应用，按照上面目录结构维护代码同时建议遵守以下约束：
 
 - 子应用可以配置自己的layout需要在应用router模块导出配置subAppRoutes
-- 子应用支持使用自己的header，需要在config.json里配置模块路径
 - 各应用需要使用iView作为UI库，并提供路由，国际化等配置写入config.json
 - 各应用间不要相互直接依赖，确有依赖通过lerna管理
 - 可复用组件，资源需要合理放置，packages/shared 共享组件方法，修改需要注意影响
@@ -43,9 +42,12 @@
 
 ### 如何新增一个子应用，如何扩展
 
-1. config.json 新增应用配置
+1. config.json apps里新增应用配置（apps里配置的字应用模块会一起合并打包）
 2. packages 下新建应用目录或者插件目录进行应用开发
 
+参考packages/demo：
+npm run serve --configfile=config.demo.json
+http://localhost:8080/#/demoHome
 
 ### 前端开发、构建打包
 

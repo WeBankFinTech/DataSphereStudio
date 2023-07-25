@@ -152,18 +152,6 @@ ALTER TABLE `dss_workflow_task` ADD `instance_name` varchar(128) DEFAULT NULL CO
 ALTER TABLE `dss_workspace_user_role` add `update_user` varchar(32) DEFAULT NULL COMMENT '更新人';
 ALTER TABLE `dss_workspace_user_role` add `update_time` datetime DEFAULT NULL COMMENT '更新时间';
 
--- webank内部表，待开源相关功能使用
-CREATE TABLE IF NOT EXISTS `dss_streamis_proxy_user`
-(
-    `id`              int(11)  NOT NULL AUTO_INCREMENT,
-    `user_name`       varchar(64)       DEFAULT NULL COMMENT  '实名用户名',
-    `proxy_user_name` varchar(64)       DEFAULT NULL COMMENT  '代理用户名',
-    `create_by`       varchar(64)       DEFAULT NULL COMMENT '创建者',
-    `create_time`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT='流式应用代理用户表';
-
--- webank内部表，待开源相关功能使用
 CREATE TABLE IF NOT EXISTS `dss_workspace_associate_departments` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `workspace_id` bigint(20) DEFAULT NULL,
@@ -175,6 +163,17 @@ CREATE TABLE IF NOT EXISTS `dss_workspace_associate_departments` (
   `update_by` varchar(128) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='空间自动加入用户绑定的部门科室信息';
+
+-- webank内部表，待开源相关功能使用
+CREATE TABLE IF NOT EXISTS `dss_streamis_proxy_user`
+(
+    `id`              int(11)  NOT NULL AUTO_INCREMENT,
+    `user_name`       varchar(64)       DEFAULT NULL COMMENT  '实名用户名',
+    `proxy_user_name` varchar(64)       DEFAULT NULL COMMENT  '代理用户名',
+    `create_by`       varchar(64)       DEFAULT NULL COMMENT '创建者',
+    `create_time`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT='流式应用代理用户表';
 
 -- 版本发布时的releaseNote信息。webank内部表，待开源相关功能使用
 CREATE TABLE IF NOT EXISTS `dss_release_note_content`

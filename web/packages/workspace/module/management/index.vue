@@ -63,7 +63,7 @@ export default {
       //   children: [],
       // },
     ];
-    if (this.$APP_CONF && this.$APP_CONF.env === 'webank') {
+    if (this.$APP_CONF && this.$APP_CONF.has_engineinfo !== false) {
       manageMenus.push({
         icon: 'engineinfo',
         name: i18n.t('message.workspaceManagement.engineInfo'),

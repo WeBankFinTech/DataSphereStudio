@@ -28,7 +28,6 @@ import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
@@ -59,12 +58,9 @@ public class DataCheckerDao {
                     "AND (UNIX_TIMESTAMP() - UNIX_TIMESTAMP(STR_TO_DATE(modify_time, '%Y-%m-%d %H:%i:%s'))) <= ? AND status = '1';";
 
     private static final String SQL_DOPS_CHECK_TABLE =
-            "SELECT * FROM dops_clean_task_list WHERE db_name = ? AND tb_name = ? AND part_name is null AND task_state NOT IN (10,13) order by order_id desc limit 1";
+            "SELECT * FROM dops_clean_task_list WHERE task_state = 10 AND db_name = ? AND tb_name = ? ";
     private static final String SQL_DOPS_CHECK_PARTITION =
-            "SELECT * FROM dops_clean_task_list WHERE db_name = ? AND tb_name = ? AND part_name = ?     AND task_state NOT IN  (10,13) order by order_id desc limit 1";
-
-    private static final String SQL_DOPS_CHECK_ALL_PARTITION =
-            "SELECT * FROM dops_clean_task_list WHERE db_name = ? AND tb_name = ? AND part_name is not null  AND task_state != 13 order by order_id desc limit 1";
+            "SELECT * FROM dops_clean_task_list WHERE task_state = 10 AND db_name = ? AND tb_name = ? AND part_name = ?";
     private static final String HIVE_SOURCE_TYPE = "hivedb";
     private static final String MASK_SOURCE_TYPE = "maskdb";
 
@@ -181,7 +177,6 @@ public class DataCheckerDao {
         if (StringUtils.isNotBlank(dataObjectStr)) {
             dataObjectStr = dataObjectStr.replace(" ", "").trim();
         }
-        String objectNum = proObjectMap.get(DataChecker.DATA_OBJECT_NUM);
         CheckDataObject dataObject;
         try {
             dataObject = parseDataObject(dataObjectStr);
@@ -218,7 +213,8 @@ public class DataCheckerDao {
             }
         }
         return normalCheck
-                && checkQualitisData( objectNum,dataObject, log, props, dopsConn,qualitisUtil);
+                && getDopsTotalCount(dataObject, dopsConn, log) > 0
+                && checkQualitisData(dataObject, log, props, qualitisUtil);
 
     }
 
@@ -253,7 +249,6 @@ public class DataCheckerDao {
                     proMap.put(DataChecker.SOURCE_TYPE, String.valueOf(p.get(stKey)));
                 }
                 proMap.put(DataChecker.DATA_OBJECT, String.valueOf(p.get(doKey)));
-                proMap.put(DataChecker.DATA_OBJECT_NUM, keyNum);
             } else {
                 String stKey = DataChecker.SOURCE_TYPE;
                 String doKey = DataChecker.DATA_OBJECT;
@@ -261,7 +256,6 @@ public class DataCheckerDao {
                     proMap.put(DataChecker.SOURCE_TYPE, String.valueOf(p.get(stKey)));
                 }
                 proMap.put(DataChecker.DATA_OBJECT, String.valueOf(p.get(doKey)));
-                proMap.put(DataChecker.DATA_OBJECT_NUM, "0");
             }
         }
 
@@ -324,17 +318,6 @@ public class DataCheckerDao {
         }
     }
 
-    /**
-     * 构造查询dops库的查询，分区表全表校验场景
-     */
-    private PreparedStatement getDopsStatementCheckAllPartition(Connection conn, CheckDataObject dataObject) throws SQLException {
-            PreparedStatement pstmt = conn.prepareCall(SQL_DOPS_CHECK_ALL_PARTITION);
-            pstmt.setString(1, dataObject.getDbName());
-            pstmt.setString(2, dataObject.getTableName());
-            return pstmt;
-
-    }
-
 
     /**
      * 反序列化检查对象
@@ -343,7 +326,7 @@ public class DataCheckerDao {
      */
     private CheckDataObject parseDataObject(String dataObjectStr)throws SQLException{
         CheckDataObject dataObject;
-        if(!dataObjectStr.contains(".")){
+        if(!dataObjectStr.contains("\\.")){
             throw new SQLException("Error for  DataObject format!"+dataObjectStr);
         }
         String dbName = dataObjectStr.split("\\.")[0];
@@ -368,12 +351,10 @@ public class DataCheckerDao {
      */
     private long getJobTotalCount(CheckDataObject dataObject, Connection conn, Logger log) {
         log.info("-------------------------------------- search hive/spark/mr data ");
-        log.info("-------------------------------------- dataObject: " + dataObject);
+        log.info("-------------------------------------- : " + dataObject);
         try (PreparedStatement pstmt = getJobStatement(conn, dataObject)) {
             ResultSet rs = pstmt.executeQuery();
-            long ret = rs.last() ? rs.getRow() : 0;
-            log.info("-------------------------------------- hive/spark/mr data result:"+ret);
-            return ret;
+            return rs.last() ? rs.getRow() : 0;
         } catch (SQLException e) {
             log.error("fetch data from Hive MetaStore error", e);
             return 0;
@@ -386,12 +367,10 @@ public class DataCheckerDao {
     private long getBdpTotalCount(CheckDataObject dataObject, Connection conn, Logger log, Properties props) {
         String timeScape = props.getOrDefault(DataChecker.TIME_SCAPE, "NULL").toString();
         log.info("-------------------------------------- search bdp data ");
-        log.info("-------------------------------------- dataObject: " + dataObject.toString());
+        log.info("-------------------------------------- : " + dataObject.toString());
         try (PreparedStatement pstmt = getBdpStatement(conn, dataObject, timeScape)) {
             ResultSet rs = pstmt.executeQuery();
-            long ret=rs.last() ? rs.getRow() : 0;
-            log.info("-------------------------------------- bdp data result:"+ret);
-            return ret;
+            return rs.last() ? rs.getRow() : 0;
         } catch (SQLException e) {
             log.error("fetch data from bdp error", e);
             return 0;
@@ -399,71 +378,34 @@ public class DataCheckerDao {
     }
 
     /**
-     * - 返回0表示未找到任何记录 ；
-     * - 返回1表示非分区表的全表校验场景找到了记录；
-     * - 返回2表示分区表的分区校验场景找到了记录；
-     * - 返回3表示分区表的全表校验场景找到了记录；
-     * - 返回4表示查询出错了
+     * 查询dops库
      */
-    private int checkDops(CheckDataObject dataObject, Connection conn, Logger log){
+    private long getDopsTotalCount(CheckDataObject dataObject, Connection conn, Logger log) {
+
         log.info("-------------------------------------- search dops data ");
-        log.info("-------------------------------------- dataObject: " + dataObject.toString());
+        log.info("-------------------------------------- : " + dataObject.toString());
         try (PreparedStatement pstmt = getDopsStatement(conn, dataObject)) {
             ResultSet rs = pstmt.executeQuery();
-            long count = rs.last() ? rs.getRow() : 0;
-            log.info("-------------------------------------- dops data check table or partition,count:"+count);
-            if(count>0){
-                return CheckDataObject.Type.PARTITION == dataObject.getType() ? 2 : 1;
-            }
+            return rs.last() ? rs.getRow() : 0;
         } catch (SQLException e) {
-            log.error("fetch data from dops error while check table or partition", e);
+            log.error("fetch data from dops error", e);
             //如果查询出错，还是认为dops处理过这个表/分区
-            return 4;
+            return 1;
         }
-
-        try(PreparedStatement pstmt = getDopsStatementCheckAllPartition(conn, dataObject)){
-            ResultSet rs = pstmt.executeQuery();
-            long count = rs.last() ? rs.getRow() : 0;
-            log.info("-------------------------------------- dops data check all partition result count:"+count);
-            if(count>0){
-                return 3;
-            }
-        }catch (SQLException e) {
-            log.error("fetch data from dops error while check all partition", e);
-            //如果查询出错，还是认为dops处理过这个表/分区
-            return 4;
-        }
-        return 0;
     }
 
     /**
      * 从qualitis去check数据
      */
-    private boolean checkQualitisData(String objectNum,CheckDataObject dataObject, Logger log, Properties props,Connection conn, QualitisUtil qualitisUtil) {
+    private boolean checkQualitisData(CheckDataObject dataObject, Logger log, Properties props, QualitisUtil qualitisUtil) {
         boolean systemCheck = Boolean.valueOf(props.getProperty("job.eventchecker.qualitis.switch"));
         boolean userCheck = Boolean.valueOf(props.getProperty(DataChecker.QUALITIS_CHECK, "true"));
         if (systemCheck && userCheck ) {
-
-            int dopsState=checkDops(dataObject,conn,log);
-            if(dopsState==0){
-                //没找到记录，直接通过校验
-                return true;
-            } else if (dopsState == 3 || dopsState == 4) {
-                //找记录失败、或者是找到了分区表的全表校验记录，直接校验不通过。
-                return false;
-            }
-            // 其他情况，继续走qualitis校验
             log.info(
                     "=============================Data Check Qualitis Start==========================================");
             try {
-                String projectName = props.getProperty(DataChecker.CONTEXTID_PROJECT_NAME);
-                String user = props.getProperty(DataChecker.CONTEXTID_USER);
-                String flowName = props.getProperty(DataChecker.CONTEXTID_FLOW_NAME);
-                String nodeName=props.getProperty(DataChecker.NAME_NAME);
-
-                String ruleName = getMD5Str(projectName + flowName + nodeName + objectNum);
                 String applicationId = qualitisUtil
-                        .createAndSubmitRule(dataObject,projectName,ruleName,user);
+                        .createAndSubmitRule(dataObject);
                 if (StringUtils.isEmpty(applicationId)) {
                     return false;
                 }
@@ -478,7 +420,7 @@ public class DataCheckerDao {
                         case 12:
                             try {
                                 Thread
-                                        .sleep(Double.valueOf(props.getProperty("qualitis.getStatus.interval")).longValue());
+                                        .sleep(Integer.valueOf(props.getProperty("qualitis.getStatus.interval")));
                             } catch (InterruptedException e) {
                                 log.error("get datachecker result from qualitis InterruptedException", e);
                             }
@@ -501,9 +443,6 @@ public class DataCheckerDao {
         } else {
             return true;
         }
-    }
-    public static String getMD5Str(String str){
-        return DigestUtils.md5Hex(str);
     }
 
     private Map<String, String> fetchMaskCode(CheckDataObject dataObject, Logger log, Properties props) {

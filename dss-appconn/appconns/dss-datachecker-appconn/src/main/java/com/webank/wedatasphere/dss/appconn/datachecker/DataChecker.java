@@ -28,24 +28,18 @@ import java.util.Properties;
 public class DataChecker {
     public final static String SOURCE_TYPE = "source.type";
     public final static String DATA_OBJECT = "check.object";
-    /**
-     * 检查对象在节点中的序号
-     */
-    public final static String DATA_OBJECT_NUM = "check.sn.object.num";
     public final static String WAIT_TIME = "max.check.hours";
     public final static String QUERY_FREQUENCY = "query.frequency";
     public final static String TIME_SCAPE = "time.scape";
     public final static String MASK_URL = "bdp.mask.url";
     public final static String MASK_APP_ID = "bdp.mask.app.id";
     public final static String MASK_APP_TOKEN = "bdp.mask.app.token";
-    public final static String CONTEXTID_USER = "contextId.user";
-    public final static String CONTEXTID_PROJECT_NAME = "contextId.projectName";
-    public final static String CONTEXTID_FLOW_NAME = "contextId.flowName";
-    public final static String NAME_NAME = "nodeName";
-
+    public static final String JOB_ID = "azkaban.job.id";
     public final static String QUALITIS_CHECK = "qualitis.check";
 
-
+    public final static String DB_NAME = "dbName";
+    public final static String TABLE_NAME = "tableName";
+    public final static String PARTITION_NAME = "partitionName";
 
     private Properties p;
     private static final Logger logger = LoggerFactory.getLogger(DataChecker.class);;

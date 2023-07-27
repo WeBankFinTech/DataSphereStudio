@@ -43,6 +43,10 @@
                     <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
                     <groupId>org.springframework.cloud</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>netty-all</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -54,6 +58,12 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-framework-orchestrator-server</artifactId>
             <version>${dss.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>netty-all</artifactId>
+                    <groupId>io.netty</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>

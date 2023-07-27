@@ -42,11 +42,8 @@ class DataCheckerRefExecutionOperation
     val nodeAction = new DataCheckerExecutionAction()
     nodeAction.setId(UUID.randomUUID().toString)
     import scala.collection.JavaConversions.mapAsScalaMap
-    // appconn里的配置
     val InstanceConfig = this.service.getAppInstance.getConfig
-    // 节点上的配置
     val runTimeParams = requestRef.getExecutionRequestRefContext.getRuntimeMap
-    // 自定义变量
     val variableParams: mutable.Map[String, Object]= requestRef.getRefJobContent.get("variable"). asInstanceOf[java.util.Map[String,Object]]
     val inputParams = runTimeParams ++ variableParams
     val properties = new Properties()
@@ -95,7 +92,6 @@ class DataCheckerRefExecutionOperation
         }
       }
     }
-    logger.info("datachecker properties :{}", properties)
     Utils.tryCatch({
       val dc = new DataChecker(properties, nodeAction)
       dc.run()

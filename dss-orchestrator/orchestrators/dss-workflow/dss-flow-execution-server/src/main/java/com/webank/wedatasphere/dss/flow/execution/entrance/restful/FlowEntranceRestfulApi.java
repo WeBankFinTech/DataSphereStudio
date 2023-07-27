@@ -114,6 +114,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         params.put("workspace", workspace);
         String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
+        logger.info("submit to entranceServer content:{}",json);
         String execID = entranceServer.execute(json);
         Job job = entranceServer.getJob(execID).get();
         JobRequest task = ((EntranceJob) job).getJobRequest();

@@ -97,7 +97,7 @@ public class DataChecker {
         }
         if(success) {
             dataCheckerAction.setState(RefExecutionState.Success);
-        } else if (dataCheckerAction.getState() != RefExecutionState.Failed) {
+        }else {
             dataCheckerAction.setState(RefExecutionState.Running);
         }
     }

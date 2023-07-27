@@ -19,13 +19,11 @@ package com.webank.wedatasphere.dss.appconn.datachecker.connector;
 import com.alibaba.druid.pool.DruidDataSource;
 
 import com.webank.wedatasphere.dss.appconn.datachecker.DataChecker;
-import com.webank.wedatasphere.dss.appconn.datachecker.DataCheckerExecutionAction;
 import com.webank.wedatasphere.dss.appconn.datachecker.common.CheckDataObject;
 import com.webank.wedatasphere.dss.appconn.datachecker.common.MaskCheckNotExistException;
 import com.webank.wedatasphere.dss.appconn.datachecker.utils.HttpUtils;
 import com.webank.wedatasphere.dss.appconn.datachecker.utils.QualitisUtil;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -87,7 +85,7 @@ public class DataCheckerDao {
         return instance;
     }
 
-    public boolean validateTableStatusFunction(Properties props, Logger log, DataCheckerExecutionAction action) {
+    public boolean validateTableStatusFunction(Properties props, Logger log, RefExecutionAction action) {
         if (jobDS == null) {
             jobDS = DataDruidFactory.getJobInstance(props, log);
             if (jobDS == null) {
@@ -178,7 +176,7 @@ public class DataCheckerDao {
                                        Connection dopsConn,
                                        Properties props,
                                        Logger log,
-                                       DataCheckerExecutionAction action,
+                                       RefExecutionAction action,
                                        QualitisUtil qualitisUtil ) {
         String dataObjectStr = proObjectMap.get(DataChecker.DATA_OBJECT) == null ? "" : proObjectMap.get(DataChecker.DATA_OBJECT);
         if (StringUtils.isNotBlank(dataObjectStr)) {
@@ -236,16 +234,9 @@ public class DataCheckerDao {
                 normalCheck = false;
             }
         }
-        if(!normalCheck){
-            return false;
-        }
+        return normalCheck
+                && checkQualitisData( objectNum,dataObject, log, action, props, dopsConn,qualitisUtil);
 
-        boolean qualitisCheck = checkQualitisData(objectNum, dataObject, log, action, props, dopsConn, qualitisUtil);
-        if(!qualitisCheck){
-            //如果是qualitis校验失败，则直接终止任务
-            action.setState(RefExecutionState.Failed);
-        }
-        return qualitisCheck;
     }
 
 

@@ -5,7 +5,6 @@ import com.webank.wedatasphere.dss.appconn.datachecker.DataChecker;
 import com.webank.wedatasphere.dss.appconn.datachecker.common.CheckDataObject;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import okhttp3.*;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -36,7 +35,7 @@ public class QualitisUtil {
   String baseUrl = "";
   String appId = "";
   String appToken = "";
-  long getStatusTimeout;
+  int getStatusTimeout;
   private Properties properties;
 
 
@@ -46,8 +45,8 @@ public class QualitisUtil {
     this.baseUrl = this.properties.getProperty("qualitis.baseUrl");
     this.appId = this.properties.getProperty("qualitis.appId");
     this.appToken = this.properties.getProperty("qualitis.appToken");
-    this.getStatusTimeout =Double
-        .valueOf(this.properties.getProperty("qualitis.getStatus.timeout", "60000")).longValue();
+    this.getStatusTimeout = Integer
+        .valueOf(this.properties.getProperty("qualitis.getStatus.timeout", "60000"));
   }
 
   /**
@@ -112,7 +111,7 @@ public class QualitisUtil {
     return applicationId;
   }
 
-  public String createAndSubmitRule(CheckDataObject dataObject,String projectName,String ruleName,String user) throws IOException {
+  public String createAndSubmitRule(CheckDataObject dataObject) throws IOException {
     logger.info("");
     String applicationId = "";
     String url = "";
@@ -125,8 +124,9 @@ public class QualitisUtil {
 
     // JSON 请求参数
     Map<String, Object> param = new HashMap<>();
-    param.put("create_user", user);
-    param.put("execution_user",user);
+    param.put("create_user", properties.getProperty("user.to.proxy"));
+    param.put("execution_user", properties.getProperty("user.to.proxy"));
+    // expectFileAmountCount(\"HDP-GZPC-BDAP-UAT.dqm_test.test_dqm_left:ds=${run_date}\", null, false).addRuleMetricWithCheck(\"BDP-DQM_custom-metric_filetest_Year\", false, false, false).fixValueNotEqual(0)
     // 集群名
     String clusterName = properties.getProperty("cluster.name");
     // 子系统名 WTSS-BDPWFM/WTSS-BDAPWFM
@@ -136,20 +136,21 @@ public class QualitisUtil {
         .append(dataObject.getType()== CheckDataObject.Type.PARTITION? ":" + dataObject.getPartitionName() : "")
         .append("\", null, false).addRuleMetricWithCheck(\"")
         .append(String.format(properties.getProperty("qualitis.rule.metric"),
-                ruleName))
+            properties.getProperty(DataChecker.JOB_ID).replace("_", "-")))
         .append("\", false, false, false).fixValueNotEqual(0)");
     logger.info("template_function:{}",sb);
     param.put("template_function", sb.toString());
-    param.put("project_name", projectName);
-    param.put("rule_name", ruleName);
+    param.put("project_name", properties.getProperty("azkaban.flow.projectname"));
+    param.put("rule_name", properties.getProperty("azkaban.flow.projectname") + properties
+        .getProperty(DataChecker.JOB_ID) + dataObject);
 
     String json = DSSCommonUtils.COMMON_GSON.toJson(param);
-    logger.info("start to call qualitis,url:{} ,Request Json:{} ", url, json );
+    logger.info("Request Json: " + json);
     MediaType applicationJson = MediaType.parse("application/json;charset=utf-8");
     RequestBody requestBody = RequestBody.create(json, applicationJson);
 
     OkHttpClient okHttpClient = new OkHttpClient.Builder()
-        .callTimeout(Double.valueOf(properties.getProperty("qualitis.submitTask.timeout")).longValue(), TimeUnit.MILLISECONDS)
+        .callTimeout(Integer.valueOf(properties.getProperty("qualitis.submitTask.timeout")), TimeUnit.MILLISECONDS)
         .connectTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(20, TimeUnit.SECONDS)
         .readTimeout(20, TimeUnit.SECONDS)
@@ -163,7 +164,7 @@ public class QualitisUtil {
     Call call = okHttpClient.newCall(request);
     Response response = call.execute();
     String resultJson = response.body().string();
-    logger.info("call qualitis end,Response Json:{} " , resultJson);
+    logger.info("Response Json: " + resultJson);
     if (StringUtils.isNotEmpty(resultJson)) {
       Map<String, Object> resultMap = DSSCommonUtils.COMMON_GSON.fromJson(resultJson,Map.class);
       String code = (String) resultMap.get("code");
@@ -224,6 +225,7 @@ public class QualitisUtil {
       logger.info("Response Json: " + resultJson);
       if (StringUtils.isNotEmpty(resultJson)) {
         Map<String, Object> resultMap = DSSCommonUtils.COMMON_GSON.fromJson(resultJson,Map.class);
+        logger.info(String.valueOf(resultMap));
         String code = (String) resultMap.get("code");
         if ("200".equals(code)) {
           status = ((Map<String, Object>) (resultMap.get("data"))).get(
@@ -254,6 +256,7 @@ public class QualitisUtil {
       throws NoSuchAlgorithmException {
     return Sha256Utils.getSHA256L32(Sha256Utils.getSHA256L32(appId + nonce + timestamp) + appToken);
   }
+
 
   public static void main(String[] args) throws Exception {
 
@@ -295,6 +298,7 @@ public class QualitisUtil {
     properties.setProperty("subsystem.name", "WTSS-BDPWFM");
     properties.setProperty("azkaban.flow.flowid", "test");
     properties.setProperty("azkaban.flow.projectname", "test");
+    properties.setProperty(DataChecker.JOB_ID,"4134314");
     properties.setProperty("qualitis.rule.metric","WTSS-BDPWFM_general-metric_%s_Daily");
 
     String dBName = "dqm_test";
@@ -302,8 +306,8 @@ public class QualitisUtil {
     String partitionName = "ds=2023-05-08";
 
     QualitisUtil qualitisUtil = new QualitisUtil(properties);
-    String applicationId = qualitisUtil.createAndSubmitRule(new CheckDataObject(dBName, tableName, partitionName), "test", "4134314","hadoop");
-    String applicationId1 = qualitisUtil.createAndSubmitRule(new CheckDataObject(dBName, tableName, partitionName), "test", "4134314","hadoop");
+    String applicationId = qualitisUtil.createAndSubmitRule(new CheckDataObject(dBName,tableName,partitionName));
+    String applicationId1 = qualitisUtil.createAndSubmitRule(new CheckDataObject(dBName,tableName,partitionName));
     System.out.println(applicationId);
     System.out.println(applicationId1);
 

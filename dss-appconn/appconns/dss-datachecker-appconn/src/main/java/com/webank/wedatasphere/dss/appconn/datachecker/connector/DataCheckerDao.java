@@ -440,9 +440,6 @@ public class DataCheckerDao {
             log.info("-------------------------------------- dops data check table or partition,count:"+count);
             if(count>0){
                 return CheckDataObject.Type.PARTITION == dataObject.getType() ? 2 : 1;
-            }else if(CheckDataObject.Type.PARTITION == dataObject.getType()){
-                //分区校验没找到记录，直接返回0。
-                return 0;
             }
         } catch (SQLException e) {
             log.error("fetch data from dops error while check table or partition", e);

@@ -81,7 +81,7 @@ public class DataChecker {
             begineCheck(dataCheckerAction);
         }catch (Exception ex){
             dataCheckerAction.setState(RefExecutionState.Failed);
-            throw ex;
+            throw new  RuntimeException("get DataChecker result failed", ex);
         }
 
     }
@@ -93,7 +93,7 @@ public class DataChecker {
         }catch (Exception ex){
             dataCheckerAction.setState(RefExecutionState.Failed);
             logger.error("datacheck error",ex);
-            throw  ex;
+            throw new  RuntimeException("get DataChecker result failed", ex);
         }
         if(success) {
             dataCheckerAction.setState(RefExecutionState.Success);

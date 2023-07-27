@@ -440,9 +440,8 @@ public class DataCheckerDao {
      * 从qualitis去check数据
      */
     private boolean checkQualitisData(String objectNum,CheckDataObject dataObject, Logger log, Properties props,Connection conn, QualitisUtil qualitisUtil) {
-        boolean systemCheck = Boolean.valueOf(props.getProperty(DataChecker.QUALITIS_SWITCH));
-        String userCheckDefault=props.getProperty(DataChecker.QUALITIS_CHECK_DEFAULT);
-        boolean userCheck = Boolean.valueOf(props.getProperty(DataChecker.QUALITIS_CHECK, userCheckDefault));
+        boolean systemCheck = Boolean.valueOf(props.getProperty("job.eventchecker.qualitis.switch"));
+        boolean userCheck = Boolean.valueOf(props.getProperty(DataChecker.QUALITIS_CHECK, "true"));
         if (systemCheck && userCheck ) {
 
             int dopsState=checkDops(dataObject,conn,log);

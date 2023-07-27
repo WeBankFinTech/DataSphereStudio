@@ -247,13 +247,15 @@ public class DataCheckerDao {
             }
             partitionName = partitionName.replace("\'", "").replace("\"", "");
             tableName = tableName.split("\\{")[0];
-            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_PARTITION);
+            PreparedStatement pstmt = conn.prepareStatement(SQL_SOURCE_TYPE_JOB_PARTITION, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_PARTITION);
             pstmt.setString(1, dbName);
             pstmt.setString(2, tableName);
             pstmt.setString(3, partitionName);
             return pstmt;
         } else if (dataObjectArray.length == 2) {
-            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_TABLE);
+            PreparedStatement pstmt = conn.prepareStatement(SQL_SOURCE_TYPE_JOB_TABLE, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_TABLE);
             pstmt.setString(1, dbName);
             pstmt.setString(2, tableName);
             return pstmt;
@@ -278,9 +280,11 @@ public class DataCheckerDao {
         }
         PreparedStatement pstmt = null;
         if (timeScape.equals("NULL")) {
-            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
+            pstmt = conn.prepareStatement(SQL_SOURCE_TYPE_BDP, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
         } else {
-            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
+            pstmt = conn.prepareStatement(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
             pstmt.setInt(4, Integer.valueOf(timeScape) * 3600);
         }
         pstmt.setString(1, dbName);

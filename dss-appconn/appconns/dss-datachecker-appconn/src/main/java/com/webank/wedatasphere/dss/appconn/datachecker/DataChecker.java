@@ -86,7 +86,7 @@ public class DataChecker {
 
     }
 
-    public void begineCheck(DataCheckerExecutionAction action){
+    public void begineCheck(RefExecutionAction action){
         boolean success=false;
         try {
             success= wbDao.validateTableStatusFunction(p, logger,action);

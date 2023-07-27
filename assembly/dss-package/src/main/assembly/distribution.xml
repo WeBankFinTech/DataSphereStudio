@@ -212,6 +212,16 @@
 
     <fileSet>
       <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-sparketl-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
         ${basedir}/../../dss-appconn/linkis-appconn-engineplugin/target/
       </directory>
       <outputDirectory>dss-appconns</outputDirectory>

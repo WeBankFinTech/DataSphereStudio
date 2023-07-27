@@ -44,8 +44,6 @@ public class DataChecker {
     public final static String NAME_NAME = "nodeName";
 
     public final static String QUALITIS_CHECK = "qualitis.check";
-    public final static String QUALITIS_SWITCH = "job.eventchecker.qualitis.switch";
-    public final static String QUALITIS_CHECK_DEFAULT = "qualitis.check.default";
 
 
 

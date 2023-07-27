@@ -243,7 +243,7 @@ public class DataCheckerDao {
         boolean qualitisCheck = checkQualitisData(objectNum, dataObject, log, action, props, dopsConn, qualitisUtil);
         if(!qualitisCheck){
             //如果是qualitis校验失败，则直接终止任务
-            throw new RuntimeException("does not pass qualitis check(qualitis校验未通过)");
+            action.setState(RefExecutionState.Failed);
         }
         return qualitisCheck;
     }

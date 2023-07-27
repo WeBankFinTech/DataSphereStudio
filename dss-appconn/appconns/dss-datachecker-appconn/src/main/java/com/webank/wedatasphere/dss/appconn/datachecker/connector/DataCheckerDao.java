@@ -102,8 +102,7 @@ public class DataCheckerDao {
                 return false;
             }
         }
-        boolean systemCheck = Boolean.valueOf(props.getProperty(DataChecker.QUALITIS_SWITCH));
-        if (systemCheck && dopsDS == null) {
+        if (dopsDS == null) {
             dopsDS = DataDruidFactory.getDopsInstance(props, log);//通过alibaba的druid数据库连接池获取JOB数据库连接
             if (dopsDS == null) {
                 log.error("Error getting Druid DataSource instance");
@@ -133,7 +132,7 @@ public class DataCheckerDao {
         QualitisUtil qualitisUtil = new QualitisUtil(props);
         try (Connection jobConn = jobDS.getConnection();
              Connection bdpConn = bdpDS.getConnection();
-             Connection dopsConn = dopsDS != null ? dopsDS.getConnection() : null) {
+             Connection dopsConn=dopsDS.getConnection()) {
             List<Boolean> allCheckRes = dataObjectList
                     .parallelStream()
                     .map(proObjectMap -> {

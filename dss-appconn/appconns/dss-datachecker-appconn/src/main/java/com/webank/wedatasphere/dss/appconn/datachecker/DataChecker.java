@@ -34,12 +34,6 @@ public class DataChecker {
     public final static String MASK_URL = "bdp.mask.url";
     public final static String MASK_APP_ID = "bdp.mask.app.id";
     public final static String MASK_APP_TOKEN = "bdp.mask.app.token";
-    public static final String JOB_ID = "azkaban.job.id";
-    public final static String QUALITIS_CHECK = "qualitis.check";
-
-    public final static String DB_NAME = "dbName";
-    public final static String TABLE_NAME = "tableName";
-    public final static String PARTITION_NAME = "partitionName";
 
     private Properties p;
     private static final Logger logger = LoggerFactory.getLogger(DataChecker.class);;

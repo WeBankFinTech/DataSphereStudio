@@ -20,7 +20,9 @@ import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
+import com.webank.wedatasphere.dss.workflow.service.SaveFlowHook;
 import com.webank.wedatasphere.dss.workflow.service.impl.PublishServiceImpl;
+import com.webank.wedatasphere.dss.workflow.service.impl.SaveFlowHookImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +45,12 @@ public class WorkflowServerSpringConfiguration {
     @Bean(name = "workflowBmlService")
     public BMLService createBmlService() {
         return BMLService.getInstance();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SaveFlowHook createSaveFlowHook(){
+        return new SaveFlowHookImpl();
     }
 
 }

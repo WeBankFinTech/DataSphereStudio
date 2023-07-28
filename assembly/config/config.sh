@@ -5,24 +5,25 @@ deployUser=hadoop
 SERVER_HEAP_SIZE="512M"
 
 ### The install home path of DSS，Must provided
-DSS_INSTALL_HOME=/appcom/Install/DSSInstall
+LINKIS_DSS_HOME=/data/Install/dss_install
 
 DSS_VERSION=1.1.2
 
 DSS_FILE_NAME="dss-$DSS_VERSION"
 
-###  Linkis EUREKA  information.  # Microservices Service Registration Discovery Center
+###  Linkis EUREKA information.  # Microservices Service Registration Discovery Center
 EUREKA_INSTALL_IP=127.0.0.1
 EUREKA_PORT=20303
 ### If EUREKA  has safety verification, please fill in username and password
 #EUREKA_USERNAME=
 #EUREKA_PASSWORD=
 
-### Linkis Gateway  information
+### Linkis Gateway information
 GATEWAY_INSTALL_IP=127.0.0.1
 GATEWAY_PORT=9001
 
-################### The install Configuration of all Micro-Services #####################
+
+################### The install Configuration of all Micro-Services start #####################
 #
 #    NOTICE:
 #       1. If you just wanna try, the following micro-service configuration can be set without any settings.
@@ -40,8 +41,10 @@ DSS_SERVER_PORT=9043
 ### dss-apps-server
 DSS_APPS_SERVER_INSTALL_IP=127.0.0.1
 DSS_APPS_SERVER_PORT=9044
+################### The install Configuration of all Micro-Services end #####################
 
-############## ############## dss_appconn_instance configuration   start   ############## ##############
+
+############## ############## dss_appconn_instance configuration start ############## ##############
 ####eventchecker表的地址，一般就是dss数据库
 EVENTCHECKER_JDBC_URL="jdbc:mysql://$MYSQL_HOST:$MYSQL_PORT/$MYSQL_DB?characterEncoding=UTF-8"
 EVENTCHECKER_JDBC_USERNAME=$MYSQL_USER
@@ -56,10 +59,11 @@ DATACHECKER_BDP_JDBC_URL="jdbc:mysql://127.0.0.1:3306/uat2_metastore?characterEn
 DATACHECKER_BDP_JDBC_USERNAME=hadoop
 DATACHECKER_BDP_JDBC_PASSWORD=hadoop
 
+### 邮件节点配置
 EMAIL_HOST=smtp.163.com
 EMAIL_PORT=25
 EMAIL_USERNAME=xxx@163.com
 EMAIL_PASSWORD=xxxxx
 EMAIL_PROTOCOL=smtp
-############## ############## dss_appconn_instance configuration   end   ############## ##############
+############## ############## dss_appconn_instance configuration end ############## ##############
 

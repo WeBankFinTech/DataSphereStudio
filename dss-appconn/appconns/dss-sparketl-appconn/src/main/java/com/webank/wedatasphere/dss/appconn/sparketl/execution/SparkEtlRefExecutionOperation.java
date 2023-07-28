@@ -63,11 +63,6 @@ public class SparkEtlRefExecutionOperation extends LongTermRefExecutionOperation
     private static final String FILTER = "filter";
 
     @Override
-    protected String getAppConnName() {
-        return SparkEtlAppConn.SPARKETL_APPCONN_NAME;
-    }
-
-    @Override
     public boolean kill(RefExecutionAction action) {
         String applicationId = ((SparkEtlRefExecutionAction) action).getApplicationId();
         String executtionUser = ((SparkEtlRefExecutionAction) action).getExecutionUser();

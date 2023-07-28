@@ -106,7 +106,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private WorkflowNodeService workflowNodeService;
 
     @Autowired
-                                private SaveFlowHook saveFlowHook;
+    private SaveFlowHook saveFlowHook;
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 

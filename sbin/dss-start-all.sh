@@ -43,7 +43,7 @@ source $DSS_CONF_DIR/config.sh
 function startApp(){
 echo "<-------------------------------->"
 echo "Begin to start $SERVER_NAME"
-SERVER_START_CMD="sh $DSS_INSTALL_HOME/sbin/dss-daemon.sh restart $SERVER_NAME"
+SERVER_START_CMD="sh $DSS_HOME/sbin/dss-daemon.sh restart $SERVER_NAME"
 if test -z "$SERVER_IP"
 then
   SERVER_IP=$local_host

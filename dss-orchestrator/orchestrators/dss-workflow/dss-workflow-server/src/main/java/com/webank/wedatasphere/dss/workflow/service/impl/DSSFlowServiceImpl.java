@@ -56,6 +56,7 @@ import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import com.webank.wedatasphere.dss.workflow.service.SaveFlowHook;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -103,6 +104,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private NodeExportService nodeExportService;
     @Autowired
     private WorkflowNodeService workflowNodeService;
+
+    @Autowired
+                                private SaveFlowHook saveFlowHook;
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
@@ -277,7 +281,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
         jsonFlow = contextService.checkAndCreateContextID(jsonFlow, dssFlow.getBmlVersion(),
                 workspaceName, projectName, dssFlow.getName(), userName, false);
-
+        saveFlowHook.beforeSave(jsonFlow,dssFlow,parentFlowID);
         Map<String, Object> bmlReturnMap = bmlService.update(userName, resourceId, jsonFlow);
 
         dssFlow.setId(flowID);
@@ -295,7 +299,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             logger.error("Failed to saveContext: ", e);
             throw new DSSRuntimeException(e.getErrCode(),"保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
         }
-
+        saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
         return version;
     }

@@ -58,8 +58,17 @@ public enum TargetTypeEnum {
     /**
      * 用户部门
      */
-    USER_DEPT("user_dept")
+    USER_DEPT("user_dept"),
 
+    /**
+     * 工作流默认模板
+     */
+    DSS_WORKFLOW_DEFAULT_TEMPLATE("dss_workflow_default_template"),
+
+    /**
+     * 工作流引用默认模板
+     */
+     DSS_EC_CONFIG_TEMPLATE_WORKFLOW("dss_ec_config_template_workflow"),
     ;
     private String name;
 

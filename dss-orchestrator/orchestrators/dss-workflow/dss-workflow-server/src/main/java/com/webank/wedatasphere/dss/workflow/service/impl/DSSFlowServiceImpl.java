@@ -433,7 +433,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels, nodeSuffix);
-        return flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
+        DSSFlow copyFlow= flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
+        copyFlow.setParamConfTemplates(rootFlowWithSubFlows.getParamConfTemplates());
+        return copyFlow;
     }
 
 
@@ -535,14 +537,25 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow,
                 version, workspace, dssLabels);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
+        Set<String> templateIds = new HashSet<>();
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
                 updateFlowJson(userName, projectName, subflow, version, rootFlow.getId(),
                         contextIdStr, workspace, dssLabels, nodeSuffix);
+                templateIds.addAll(subflow.getParamConfTemplates());
             }
         }
 
         DSSFlow updateDssFlow = uploadFlowJsonToBml(userName, projectName, rootFlow, updateFlowJson);
+        List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(updateFlowJson);
+        List<String> templateIdsInRoot = nodes.stream()
+                .filter(e ->e.getParams()!=null&& e.getParams().containsKey("startup"))
+                .map(e -> (Map<String, Object>) e.getParams().get("startup"))
+                .filter(e -> e.containsKey("ec.conf.templateId"))
+                .map(e -> (String) e.get("ec.conf.templateId"))
+                .collect(Collectors.toList());
+        templateIds.addAll(templateIdsInRoot);
+        rootFlow.setParamConfTemplates(new ArrayList<>(templateIds));
         //todo add dssflow to database
         flowMapper.updateFlowInputInfo(updateDssFlow);
         contextService.checkAndSaveContext(updateFlowJson, String.valueOf(parentFlowId));

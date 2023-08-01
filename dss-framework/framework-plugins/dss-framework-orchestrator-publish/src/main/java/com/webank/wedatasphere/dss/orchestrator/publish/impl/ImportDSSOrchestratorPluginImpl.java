@@ -204,6 +204,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setAppId(orchestrationId);
         dssOrchestratorVersion.setContent(orchestrationContent);
         dssOrchestratorVersion.setOrchestratorId(importDssOrchestratorInfo.getId());
+
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
         LOGGER.info("import orchestrator success,orcId:{},appId:{}",importDssOrchestratorInfo.getId(),orchestrationId);
 
@@ -363,6 +364,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setUpdateTime(new Date());
         dssOrchestratorVersion.setAppId(orchestrationId);
         dssOrchestratorVersion.setContent(orchestrationContent);
+
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
 
         return dssOrchestratorVersion.getOrchestratorId();

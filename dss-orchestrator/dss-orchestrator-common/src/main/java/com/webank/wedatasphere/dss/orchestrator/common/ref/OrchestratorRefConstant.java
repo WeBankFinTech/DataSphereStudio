@@ -25,6 +25,7 @@ public interface OrchestratorRefConstant {
     /*************************************************************/
     String ORCHESTRATION_ID_KEY = "orchestrationId";
     String ORCHESTRATION_CONTENT_KEY = "orchestrationContent";
+    String ORCHESTRATION_PARAMCONF_TEMPLATEIDS_KEY = "orchestrationParamConfTemplateIds";
     String ORCHESTRATION_NAME = "orchestrationName";
     String ORCHESTRATION_DESCRIPTION = "orchestrationDescription";
     String ORCHESTRATION_USES = "orchestrationUses";

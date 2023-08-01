@@ -41,6 +41,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.orchestrator.db.hook.AddOrchestratorVersionHook;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
 import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
@@ -90,6 +91,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     private OrchestratorMapper orchestratorMapper;
     @Autowired
     private ContextService contextService;
+    @Autowired
+    AddOrchestratorVersionHook addOrchestratorVersionHook;
 
     private static final int VALID_FLAG = 1;
 
@@ -345,7 +348,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         //1.新建一个版本
         //2.然后将version的版本内容进行去workflow进行cp
         //3.然后把生产的内容进行update到数据库
-        String latestVersion = orchestratorMapper.getLatestVersion(orchestratorId, 1);
+        DSSOrchestratorVersion oldOrcVersion=orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
+        String latestVersion = oldOrcVersion.getVersion();
         List<DSSLabel> labels = new ArrayList<>();
         labels.add(dssLabel);
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
@@ -381,9 +385,12 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 }, "copy");
         dssOrchestratorVersion.setAppId((Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY));
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
+        List<String> paramConfTemplateIds=(List<String>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_PARAMCONF_TEMPLATEIDS_KEY);
         dssOrchestratorVersion.setFormatContextId(contextId);
         //update appConn node contextId
+        addOrchestratorVersionHook.beforeAdd(oldOrcVersion, Collections.emptyMap());
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
+        addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_PARAMCONF_TEMPLATEIDS_KEY,paramConfTemplateIds));
 //        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
         return dssOrchestratorVersion.getVersion();
     }

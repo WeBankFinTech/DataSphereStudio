@@ -48,6 +48,18 @@ public class DSSFlow implements Flow {
     private String bmlVersion;
 
     private String metrics;
+    /**
+     * 工作流内（包括子工作流）参数模板
+     */
+    private List<String> paramConfTemplates;
+
+    public List<String> getParamConfTemplates() {
+        return paramConfTemplates;
+    }
+
+    public void setParamConfTemplates(List<String> paramConfTemplates) {
+        this.paramConfTemplates = paramConfTemplates;
+    }
 
     public String getMetrics() {
         return metrics;

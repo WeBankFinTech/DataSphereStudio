@@ -22,7 +22,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -385,12 +384,12 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 }, "copy");
         dssOrchestratorVersion.setAppId((Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY));
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
-        List<String> paramConfTemplateIds=(List<String>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_PARAMCONF_TEMPLATEIDS_KEY);
+        List<String[]> paramConfTemplateIds=(List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
         dssOrchestratorVersion.setFormatContextId(contextId);
         //update appConn node contextId
         addOrchestratorVersionHook.beforeAdd(oldOrcVersion, Collections.emptyMap());
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
-        addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_PARAMCONF_TEMPLATEIDS_KEY,paramConfTemplateIds));
+        addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
 //        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
         return dssOrchestratorVersion.getVersion();
     }

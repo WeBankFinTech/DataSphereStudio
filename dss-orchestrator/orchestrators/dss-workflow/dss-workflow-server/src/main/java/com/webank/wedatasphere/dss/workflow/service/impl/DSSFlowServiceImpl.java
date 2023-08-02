@@ -547,14 +547,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         DSSFlow updateDssFlow = uploadFlowJsonToBml(userName, projectName, rootFlow, updateFlowJson);
-        List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(updateFlowJson);
-        List<String[]> templateIdsInRoot = nodes.stream()
-                .filter(e ->e.getParams()!=null&& e.getParams().containsKey("configuration")
-                        &&((Map<String,Object>)e.getParams().get("configuration")).containsKey("startup"))
-                .map(e -> (Map<String,Object>) ((Map<String,Object>)e.getParams().get("configuration")).get("startup"))
-                .filter(e -> e.containsKey("ec.conf.templateId"))
-                .map(e -> (String) e.get("ec.conf.templateId"))
-                .distinct()
+        List<String> tempIds = workFlowParser.getParamConfTemplate(updateFlowJson);
+        List<String[]> templateIdsInRoot = tempIds.stream()
                 .map(e->new String[]{updateDssFlow.getId().toString(),e})
                 .collect(Collectors.toList());
         templateIds.addAll(templateIdsInRoot);

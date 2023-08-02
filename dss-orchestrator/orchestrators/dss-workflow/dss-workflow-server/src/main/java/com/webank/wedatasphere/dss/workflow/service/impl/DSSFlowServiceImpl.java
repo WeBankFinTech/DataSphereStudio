@@ -552,7 +552,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 .map(e->new String[]{updateDssFlow.getId().toString(),e})
                 .collect(Collectors.toList());
         templateIds.addAll(templateIdsInRoot);
-        rootFlow.setFlowIdParamConfTemplateIdTuples(new ArrayList<>(templateIds));
+        rootFlow.setFlowIdParamConfTemplateIdTuples(templateIds);
         //todo add dssflow to database
         flowMapper.updateFlowInputInfo(updateDssFlow);
         contextService.checkAndSaveContext(updateFlowJson, String.valueOf(parentFlowId));

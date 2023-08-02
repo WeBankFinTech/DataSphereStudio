@@ -117,17 +117,24 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 flowInputPath, workspace, orcVersion, dssLabels);
         //如果包含subflow,需要一同导入subflow内容，并更新parentflow的json内容
         List<? extends DSSFlow> subFlows = dssFlow.getChildren();
+        List<String[]> templateIds = new ArrayList<>();
         if (subFlows != null) {
             for (DSSFlow subFlow : subFlows) {
                 inputWorkFlow(userName, subFlow, projectName, inputProjectPath, dssFlow.getId(),
                         workspace, orcVersion, contextId, dssLabels);
+                templateIds.addAll(subFlow.getFlowIdParamConfTemplateIdTuples());
             }
         }
 
         updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson, flowInputPath, projectName);
 
         DSSFlow updateDssFlow = uploadFlowJsonToBml(userName, projectName, dssFlow, updateFlowJson);
-        //todo add dssflow to database
+        List<String> tempIds = workFlowParser.getParamConfTemplate(updateFlowJson);
+        List<String[]> templateIdsInRoot = tempIds.stream()
+                .map(e->new String[]{updateDssFlow.getId().toString(),e})
+                .collect(Collectors.toList());
+        templateIds.addAll(templateIdsInRoot);
+        updateDssFlow.setFlowIdParamConfTemplateIdTuples(templateIds);
         contextService.checkAndSaveContext(updateFlowJson, String.valueOf(parentFlowId));
         flowMapper.updateFlowInputInfo(updateDssFlow);
 

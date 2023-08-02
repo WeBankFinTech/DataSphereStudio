@@ -81,9 +81,7 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
         requestImportWorkflow.getResourceId,
         requestImportWorkflow.getBmlVersion,
         dssFlowImportParam, requestImportWorkflow.getDssLabels)
-      import scala.collection.JavaConversions._
-      val dssFlowIds = dssFlows.map(dssFlow => (dssFlow.getId, dssFlow.getFlowJson)).toMap
-      new ResponseImportWorkflow(JobStatus.Success, dssFlowIds)
+      new ResponseImportWorkflow(JobStatus.Success, dssFlows)
 
     case requestCopyWorkflow: RequestCopyWorkflow =>
       val copyFlow: DSSFlow = workflowManager.copyRootFlowWithSubFlows(requestCopyWorkflow.getUserName,

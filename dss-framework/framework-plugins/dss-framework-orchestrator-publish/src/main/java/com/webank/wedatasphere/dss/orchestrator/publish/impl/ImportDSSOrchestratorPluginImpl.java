@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
-import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
@@ -32,6 +31,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestra
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.orchestrator.db.hook.AddOrchestratorVersionHook;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf;
@@ -44,21 +44,16 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRes
 import com.webank.wedatasphere.dss.standard.app.development.service.RefImportService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.linkis.server.BDPJettyServerHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.orchestrator.publish.impl.ExportDSSOrchestratorPluginImpl.DEFAULT_ORC_NAME;
 
@@ -81,6 +76,9 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private ContextService contextService;
     @Autowired
     private OrchestratorManager orchestratorManager;
+
+    @Autowired
+    private AddOrchestratorVersionHook addOrchestratorVersionHook;
 
     @Override
     public DSSOrchestratorVersion importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception {
@@ -162,9 +160,9 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         int valid = DSSOrchestratorConf.DSS_IMPORT_VALID_IMMEDIATELY.getValue() || DSSLabelUtil.isDevEnv(dssLabels) ? 1 : 0;
         dssOrchestratorVersion.setValidFlag(valid);
 
-        String oldVersion = orchestratorMapper.getLatestVersion(importDssOrchestratorInfo.getId(), 1);
-        if (StringUtils.isNotEmpty(oldVersion)) {
-            dssOrchestratorVersion.setVersion(OrchestratorUtils.increaseVersion(oldVersion));
+        DSSOrchestratorVersion oldVersion  = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(importDssOrchestratorInfo.getId(), 1);
+        if (oldVersion!=null) {
+            dssOrchestratorVersion.setVersion(OrchestratorUtils.increaseVersion(oldVersion.getVersion()));
         } else {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.generateNewVersion());
         }
@@ -192,7 +190,9 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 }, "import");
         long orchestrationId = (Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);
         String orchestrationContent = (String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY);
+        List<String[]> paramConfTemplateIds = (List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
         if(null != existFlag){
+            addOrchestratorVersionHook.beforeAdd(oldVersion,Collections.emptyMap());
             //如果Orchestrator已经导入过，目前只更新版本信息，并更新基础信息name,其它信息不修改。
             orchestratorMapper.updateOrchestrator(importDssOrchestratorInfo);
         }else{
@@ -206,6 +206,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setOrchestratorId(importDssOrchestratorInfo.getId());
 
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
+        addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
         LOGGER.info("import orchestrator success,orcId:{},appId:{}",importDssOrchestratorInfo.getId(),orchestrationId);
 
         return dssOrchestratorVersion;

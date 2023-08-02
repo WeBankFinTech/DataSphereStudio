@@ -434,7 +434,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels, nodeSuffix);
         DSSFlow copyFlow= flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
-        copyFlow.setParamConfTemplates(rootFlowWithSubFlows.getParamConfTemplates());
+        copyFlow.setFlowIdParamConfTemplateIdTuples(rootFlowWithSubFlows.getFlowIdParamConfTemplateIdTuples());
         return copyFlow;
     }
 
@@ -537,25 +537,28 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow,
                 version, workspace, dssLabels);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
-        Set<String> templateIds = new HashSet<>();
+        List<String[]> templateIds = new ArrayList<>();
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
                 updateFlowJson(userName, projectName, subflow, version, rootFlow.getId(),
                         contextIdStr, workspace, dssLabels, nodeSuffix);
-                templateIds.addAll(subflow.getParamConfTemplates());
+                templateIds.addAll(subflow.getFlowIdParamConfTemplateIdTuples());
             }
         }
 
         DSSFlow updateDssFlow = uploadFlowJsonToBml(userName, projectName, rootFlow, updateFlowJson);
         List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(updateFlowJson);
-        List<String> templateIdsInRoot = nodes.stream()
-                .filter(e ->e.getParams()!=null&& e.getParams().containsKey("startup"))
-                .map(e -> (Map<String, Object>) e.getParams().get("startup"))
+        List<String[]> templateIdsInRoot = nodes.stream()
+                .filter(e ->e.getParams()!=null&& e.getParams().containsKey("configuration")
+                        &&((Map<String,Object>)e.getParams().get("configuration")).containsKey("startup"))
+                .map(e -> (Map<String,Object>) ((Map<String,Object>)e.getParams().get("configuration")).get("startup"))
                 .filter(e -> e.containsKey("ec.conf.templateId"))
                 .map(e -> (String) e.get("ec.conf.templateId"))
+                .distinct()
+                .map(e->new String[]{updateDssFlow.getId().toString(),e})
                 .collect(Collectors.toList());
         templateIds.addAll(templateIdsInRoot);
-        rootFlow.setParamConfTemplates(new ArrayList<>(templateIds));
+        rootFlow.setFlowIdParamConfTemplateIdTuples(new ArrayList<>(templateIds));
         //todo add dssflow to database
         flowMapper.updateFlowInputInfo(updateDssFlow);
         contextService.checkAndSaveContext(updateFlowJson, String.valueOf(parentFlowId));

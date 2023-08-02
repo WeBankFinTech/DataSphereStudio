@@ -128,11 +128,11 @@ public class OrchestratorCopyJob implements Runnable {
                 }, "copy");
         dssOrchestratorVersion.setAppId((Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY));
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
-        List<String> paramConfTemplateIds=(List<String>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_PARAMCONF_TEMPLATEIDS_KEY);
+        List<String[]> paramConfTemplateIds=(List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestrator(dssOrchestratorInfo);
         dssOrchestratorVersion.setOrchestratorId(dssOrchestratorInfo.getId());
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestratorVersion(dssOrchestratorVersion);
-        orchestratorCopyEnv.getAddOrchestratorVersionHook().afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_PARAMCONF_TEMPLATEIDS_KEY,paramConfTemplateIds));
+        orchestratorCopyEnv.getAddOrchestratorVersionHook().afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
     }
 
 

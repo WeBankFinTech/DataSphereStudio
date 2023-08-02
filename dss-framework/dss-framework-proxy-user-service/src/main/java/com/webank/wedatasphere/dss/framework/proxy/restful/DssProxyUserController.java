@@ -46,7 +46,7 @@ public class DssProxyUserController {
     @Autowired
     protected DssProxyUserService dssProxyUserService;
 
-    @RequestMapping(path = "list", method = RequestMethod.GET)
+    @RequestMapping(path = {"list","listProxyUsers"}, method = RequestMethod.GET)
     public Message getProxyUserList(HttpServletRequest request) {
         if(!ProxyUserConfiguration.isProxyUserEnable()) {
             return Message.error("proxy user service is not enable, please ask admin for help.");

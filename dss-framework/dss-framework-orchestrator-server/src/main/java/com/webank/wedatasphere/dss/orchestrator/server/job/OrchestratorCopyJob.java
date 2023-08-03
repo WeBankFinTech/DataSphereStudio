@@ -82,8 +82,8 @@ public class OrchestratorCopyJob implements Runnable {
             orchestratorCopyInfo.setStatus(0);
             orchestratorCopyInfo.setExceptionInfo(errorMsg);
             orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateErrorMsgById(orchestratorCopyInfo);
-            LOGGER.error("copy orc error: sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
-                    orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(), e);
+            LOGGER.error("copy orc error. copyID:{}, sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
+                    orchestratorCopyInfo.getId(), orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(), e);
             throw new RuntimeException("error happened when copying orc.", e);
         }
         orchestratorCopyInfo.setIsCopying(0);

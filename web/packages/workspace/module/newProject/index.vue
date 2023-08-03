@@ -39,6 +39,7 @@
         <Input
           search
           class="search-input"
+          v-model="searchTxt"
           :placeholder="$t('message.common.projectDetail.SRMCSS')"
           @on-change="searchProject($event, 1)"
         />
@@ -185,6 +186,7 @@ export default {
       orchestratorModeList: {},
       ifDelOtherSys: false,
       viewState: 'owner',
+      searchTxt: '',
       workspaceUsers: {
         accessUsers: [],
         releaseUsers: [],
@@ -241,6 +243,7 @@ export default {
       });
     },
     changeCatType() {
+      this.searchTxt = ''
       if (this.viewState === 'delete') {
         this.viewDeleted()
       } else {

@@ -35,6 +35,15 @@ export const apiServicesRoutes = [
         import('./module/management/module/usertable.vue'),
     },
     {
+      path: 'resTemplate',
+      name: 'resTemplate',
+      meta: {
+        publicPage: true
+      },
+      component: () =>
+        import('./module/management/module/resTemplate.vue'),
+    },
+    {
       path: 'jurisdiction',
       name: 'jurisdiction',
       meta: {

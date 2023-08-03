@@ -1,8 +1,8 @@
 {
   "name": "@dataspherestudio/workflows",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "dependencies": {
-    "@dataspherestudio/scriptis": "^1.1.13",
-    "@dataspherestudio/shared": "^1.1.13"
+    "@dataspherestudio/scriptis": "^1.1.14",
+    "@dataspherestudio/shared": "^1.1.14"
   }
 }

@@ -28,7 +28,7 @@
           </span>
           <div class="navbar-head-search">
             <div class="icon-prefix">
-              <SvgIcon icon-class="search-icon" />
+              <SvgIcon icon-class="search" />
             </div>
             <Input v-model="keyword" clearable @on-enter="changeToLibrarySearch" />
           </div>

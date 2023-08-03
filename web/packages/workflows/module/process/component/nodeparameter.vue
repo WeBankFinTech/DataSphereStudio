@@ -40,36 +40,55 @@
       <h5>{{$t('message.workflow.process.nodeParameter.SXXX')}}</h5>
     </div>
     <Form v-if="curNodeParamsList.length > 0 && currentNode.jobParams" label-position="top"
-      ref="parameterForm"  class="node-parameter-bar" :model="currentNode">
-      <template v-for="item in curNodeParamsList">
-        <template v-if="item.position === 'runtime' || item.position === 'startup'">
-          <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
-            <Input v-model="currentNode.jobParams[poinToLink(item.key)]" :type="filterFormType(item.uiType)" :rows="6"
-              :placeholder="item.desc" :disabled="item.uiType === 'Disable'"
-            />
-          </FormItem>
-          <FormItem v-if="item.uiType === 'Select' || item.uiType === 'MultiSelect'" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
-            <Select
-              v-model="currentNode.jobParams[poinToLink(item.key)]"
-              :placeholder="item.desc"
-              :multiple="item.uiType === 'MultiSelect'">
-              <Option v-for="subItem in JSON.parse(item.value)" :value="subItem" :key="subItem">{{subItem}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem v-if="item.uiType === 'MultiBinding'" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
-            <Select
-              v-model="currentNode.jobParams[poinToLink(item.key)]"
-              :placeholder="item.desc"
-              multiple>
-              <Option v-for="(subItem,index) in conditionBindList(item)" :value="subItem.key" :key="index">{{ subItem.name }}</Option>
-            </Select>
-          </FormItem>
-        </template>
-        <template v-if="item.uiType === 'Upload'">
-          <FormItem :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName">
-            <resource :resources="resources" :is-ripetition="true" :node-type="nodeData.type" :readonly="readonly"
-              @update-resources="updateResources"></resource>
-          </FormItem>
+      ref="parameterForm"  class="node-parameter-bar" :model="currentNode" :rules="ruleValidate">
+      <FormItem label="是否引用参数模板">
+        <Select
+          v-model="isRefTemplate" @on-change="handleRefTemplateChange">
+          <Option value="1">是</Option>
+          <Option value="0">否</Option>
+        </Select>
+      </FormItem>
+      <!-- <template v-if="isRefTemplate === '1'">
+        <FormItem label="参数模板名称">
+          <Input v-model="currentNode.jobParams['ec.conf.templateName']" placeholder="请选择参数模板名称" readonly @on-focus="openTemplateDrawer"></Input>
+        </FormItem>
+      </template> -->
+      <template v-if="isRefTemplate === '1'">
+        <FormItem label="参数模板名称" prop="ecConfTemplateName">
+          <Input v-model="currentNode.ecConfTemplateName" placeholder="请选择参数模板名称" readonly @on-focus="openTemplateDrawer"></Input>
+        </FormItem>
+      </template>
+      <template>
+        <template v-for="item in curNodeParamsList">
+          <template v-if="item.position === 'runtime' || item.position === 'startup'">
+            <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
+              <Input v-model="currentNode.jobParams[poinToLink(item.key)]" :type="filterFormType(item.uiType)" :rows="6"
+                :placeholder="item.desc" :disabled="item.uiType === 'Disable'"
+              />
+            </FormItem>
+            <FormItem v-if="item.uiType === 'Select' || item.uiType === 'MultiSelect'" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
+              <Select
+                v-model="currentNode.jobParams[poinToLink(item.key)]"
+                :placeholder="item.desc"
+                :multiple="item.uiType === 'MultiSelect'">
+                <Option v-for="subItem in JSON.parse(item.value)" :value="subItem" :key="subItem">{{subItem}}</Option>
+              </Select>
+            </FormItem>
+            <FormItem v-if="item.uiType === 'MultiBinding'" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
+              <Select
+                v-model="currentNode.jobParams[poinToLink(item.key)]"
+                :placeholder="item.desc"
+                multiple>
+                <Option v-for="(subItem,index) in conditionBindList(item)" :value="subItem.key" :key="index">{{ subItem.name }}</Option>
+              </Select>
+            </FormItem>
+          </template>
+          <template v-if="item.uiType === 'Upload'">
+            <FormItem :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName">
+              <resource :resources="resources" :is-ripetition="true" :node-type="nodeData.type" :readonly="readonly"
+                @update-resources="updateResources"></resource>
+            </FormItem>
+          </template>
         </template>
       </template>
     </Form>
@@ -78,17 +97,25 @@
         :disabled="isNodeMap">{{$t('message.workflow.process.nodeParameter.BC')}}
       </Button>
     </div>
+    <templateSelectDrawer ref="templateSelectDrawer" v-show="isTemplateDrawerShow" @isShow="handleTemplateShow" 
+      :nodeInfo="nodeData" :templateList="templateList" @submit="handleTemplateSelect"
+      :defaultTemplateId="currentNode.ecConfTemplateId"></templateSelectDrawer>
   </div>
 </template>
 <script>
 import resource from './resource.vue';
 import weTag from '@dataspherestudio/shared/components/tag/index.vue'
 import { isEmpty } from 'lodash';
-
+import templateSelectDrawer from './templateSelectDrawer.vue'
+import { useData } from './useData.js';
+const {
+  getTemplateDatas,
+} = useData();
 export default {
   name: 'NodeParams',
   components: {
     resource,
+    templateSelectDrawer,
     'we-tag': weTag
   },
   props: {
@@ -126,7 +153,15 @@ export default {
       test: [],
       currentNode: {
       },
-      resources: []
+      resources: [],
+      isTemplateDrawerShow: false,
+      templateList: [],
+      isRefTemplate: '0',
+      ruleValidate: {
+        ecConfTemplateName: [
+          { required: true, message: '请选择参数模板', trigger: 'change' }
+        ],
+      }
     };
   },
   watch: {
@@ -163,6 +198,7 @@ export default {
           }
         }
       })
+      this.isRefTemplate = this.currentNode.ecConfTemplateId ? '1':'0'
       this.$set(this.currentNode, 'jobParams', jobParams);
     }
   },
@@ -179,6 +215,48 @@ export default {
     }
   },
   methods: {
+    // 是否选择模板从false切到true时，查询是否有默认模板，有则填入默认值
+    async handleRefTemplateChange(v) {
+      if(v ==='1' && !this.currentNode.ecConfTemplateName) {
+        await this.getTemplateDataByProject()
+        this.templateList.forEach((v) => {
+          if(v.workflowDefault) {
+            this.$set(this.currentNode, 'ecConfTemplateName', v.templateName);
+            this.$set(this.currentNode, 'ecConfTemplateId', v.templateId);
+          }
+        })
+      }
+    },
+    // 选择参数模板
+    handleTemplateSelect(templateObj) {
+      this.$set(this.currentNode, 'ecConfTemplateName', templateObj.templateName);
+      this.$set(this.currentNode, 'ecConfTemplateId', templateObj.templateId);
+    },
+    // 打开选择参数模板的抽屉
+    async openTemplateDrawer() {
+      await this.getTemplateDataByProject()
+      this.isTemplateDrawerShow = true
+      this.$refs.templateSelectDrawer.initRadioData()
+    },
+    // 关闭选择参数模板的抽屉
+    handleTemplateShow() {
+      this.isTemplateDrawerShow = false
+    },
+    // 获取当前节点对应的模板信息
+    async getTemplateDataByProject() {
+      const params = {
+        projectId: this.$route.query.projectID,
+        orchestratorId: this.$route.query.flowId,
+        jobType: this.nodeData.type,
+      }
+      const res = await getTemplateDatas(params);
+      this.templateList = [];
+      res.forEach(e=> {
+        e.child.forEach(d => {
+          this.templateList.push(Object.assign(d))
+        })
+      });
+    },
     // 控制台设置的参数赋值
     consoleParamsDefault(originDefalut, key, rst) {
       let value = originDefalut;
@@ -340,6 +418,14 @@ export default {
             this.currentNode.params.configuration[item.position][item.key] = value;
           }
         })
+      }
+      // 未选择模板时删除对应模板数据
+      if (this.isRefTemplate === '0') {
+        delete this.currentNode.ecConfTemplateId
+        delete this.currentNode.ecConfTemplateName
+      } else {
+        this.currentNode.jobParams['ec.conf.templateId'] = this.currentNode.ecConfTemplateId 
+        this.currentNode.params.configuration['startup']['ec.conf.templateId'] = this.currentNode.ecConfTemplateId 
       }
       this.validFrom();
     },

@@ -101,8 +101,7 @@
      .icon {
        display: inline-block;
        vertical-align: text-top;
-       width: 18px;
-       height: 18px;
+
        @include font-color($dark-color, rgba(255,255,255,0.65));
        text-align: center;
      }

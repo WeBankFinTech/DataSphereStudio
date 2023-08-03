@@ -336,6 +336,16 @@ export default {
                 name: data.orchestratorName
               })
             );
+            const templateData = {
+              projectId: data.projectId,
+              orchestratorId: data.id,
+              templateIds: data.templateIds,
+            }
+            api.fetch(
+              `${this.$API_PATH.ORCHESTRATOR_PATH}saveTemplateRef`,
+              templateData,
+              "put"
+            )
             this.getParams();
             this.getFlowData(this.params);
             if (cb) {

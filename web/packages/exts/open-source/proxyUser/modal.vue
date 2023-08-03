@@ -77,7 +77,7 @@ export default {
       });
     },
     getPuserData() {
-      api.fetch(`/dss/framework/proxy/list`, {
+      api.fetch(`/dss/framework/proxy/listProxyUsers`, {
       }, 'get').then(res => {
         this.pusers = res.proxyUserList || []
       })

@@ -108,7 +108,8 @@
   border: $border-width-base $border-style-base $border-color-base;
   border-top: 0;
   box-shadow: -6px 0 6px -6px $shadow-color;
-  z-index: 1008;
+  // z-index: 1008;
+  z-index: 999;
   @include bg-color(#fff, $dark-base-color);
   @include border-color($border-color-base, $dark-background-color-header);
   overflow-y: auto;

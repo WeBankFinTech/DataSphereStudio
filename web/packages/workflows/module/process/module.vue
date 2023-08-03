@@ -47,7 +47,7 @@
               :title="$t('message.workflow.process.run')"
               class="button"
               @click="clickswitch">
-              <SvgIcon class="icon" icon-class="play-2" color="#666"/>
+              <SvgIcon class="icon" icon-class="stop" color="#666"/>
               <span>{{$t('message.workflow.process.run')}}</span>
             </div>
             <div class="devider" v-if="!workflowIsExecutor" />
@@ -56,7 +56,7 @@
               :title="$t('message.workflow.process.run')"
               class="button"
               @click="clickswitch('select')">
-              <SvgIcon class="icon" icon-class="play-2" color="#666"/>
+              <SvgIcon class="icon" icon-class="stop" color="#666"/>
               <span>{{ $t('message.workflow.SelectRun') }}</span>
             </div>
             <div
@@ -121,7 +121,7 @@
             :title="$t('message.workflow.process.run')"
             class="button"
             @click="clickswitch">
-            <SvgIcon class="icon" icon-class="play-2" />
+            <SvgIcon class="icon" icon-class="stop" />
             <span>{{$t('message.workflow.process.run')}}</span>
           </div>
           <div
@@ -1049,6 +1049,8 @@ export default {
         if (item.key === node.key) {
           item.title = node.title;
           item.desc = node.desc;
+          item.ecConfTemplateName = node.ecConfTemplateName;
+          item.ecConfTemplateId = node.ecConfTemplateId;
           item.jobContent = node.jobContent;
           item.resources = node.resources || [];
           item.params = node.params; // 节点参数现在存在这里，和jobparams一样

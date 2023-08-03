@@ -404,8 +404,7 @@
         "success": "Successfully published orchestrator {name}",
         "failed": "Failed to publish with error",
         "cancel": "Cancel",
-        "timeout": "Timeout on publishing orchestrator {name}!",
-        "publishNotice": "Publishing will close the opened orchestrator, please save it!"
+        "timeout": "Timeout on publishing orchestrator {name}!"
       },
       "CopyWrokflow": "Copy workflow",
       "Original": "Original workflow",

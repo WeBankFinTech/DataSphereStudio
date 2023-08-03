@@ -58,6 +58,7 @@
           @on-current-change="onRowClick"
           @on-head-dblclick="copyLabel"
           @on-sort-change="sortChange"
+          @on-tdcontext-munu="handleTdContextmenu"
           class="result-normal-table">
         </wb-table>
       </template>
@@ -70,7 +71,8 @@
           :size="tableData.size"
           @dbl-click="copyLabel"
           @on-click="onWeTableRowClick"
-          @on-sort-change="sortChange"/>
+          @on-sort-change="sortChange"
+          @on-tdcontext-munu="handleTdContextmenu"/>
       </template>
       <div v-if="result.hugeData" :style="{height: resultHeight+'px', padding: '15px'}">
         {{ $t('message.common.resulttip') }}<a :href="`/#/results?workspaceId=${$route.query.workspaceId}&resultPath=${resultPath}&fileName=${script.fileName||script.ti}&from=${$route.name}&taskID=${taskID}`" target="_blank">{{ $t('message.common.viewSet') }}</a>
@@ -335,6 +337,26 @@ export default {
       this.pageingData();
       if (cb) {
         cb()
+      }
+    },
+    handleTdContextmenu({content}) {
+      if (content.split(/\n/).length > 1) {
+        this.$Modal.info({
+          title: this.$t("message.common.detail"),
+          closable: true,
+          width: 600,
+          render: (h) => {
+            return h('div', {
+              style: {
+                'word-break': 'break-all',
+                'line-height': '20px',
+                'white-space': 'pre-line',
+                'max-height': '500px',
+                'overflow': 'auto',
+              },
+            }, content)
+          }
+        })
       }
     },
     arraySortByName(list, valueType, key) {

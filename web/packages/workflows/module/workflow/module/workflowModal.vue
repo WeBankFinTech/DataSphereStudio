@@ -77,8 +77,20 @@ export default {
     ProjectMergeConfirm({data, cb}) {
       data.dssLabels = [this.getCurrentDsslabels()];
       data.labels = { route: this.getCurrentDsslabels() };
-      api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}createOrchestrator`, data, 'post').then(() => {
+      const curTemplateIds = data.templateIds;
+      delete data.templateIds
+      api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}createOrchestrator`, data, 'post').then((res) => {
         this.$Message.success(this.$t('message.workflow.createdSuccess'));
+        const templateData = {
+          projectId: data.projectId,
+          orchestratorId: res.orchestratorId,
+          templateIds: curTemplateIds,
+        }
+        api.fetch(
+          `${this.$API_PATH.ORCHESTRATOR_PATH}saveTemplateRef`,
+          templateData,
+          "put"
+        )
         this.$emit('on-tree-modal-confirm', {
           id: data.projectId
         })

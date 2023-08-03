@@ -13,8 +13,7 @@ SERVER_IP=""
 SERVER_HOME=""
 
 local_host="`hostname --fqdn`"
-LOCAL_IP=$(hostname -I)
-LOCAL_IP=${LOCAL_IP// /}
+LOCAL_IP=$(hostname -I | sed 's/^\([0-9.]\+\) .*/\1/')
 
 #To be compatible with MacOS and Linux
 txt=""

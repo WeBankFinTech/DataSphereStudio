@@ -162,6 +162,7 @@
       "Console": "控制台"
     },
     "workspaceManagement": {
+      "resTemplateManage": "资源模板管理",
       "waring": "警告",
       "ok": "确认",
       "cancel": "取消",
@@ -370,7 +371,9 @@
       "AppDevProcess": "应用开发流程",
       "createProject": "创建项目",
       "config": "配置",
-      "deleteSuccess": "{name}删除成功"
+      "deleteSuccess": "{name}删除成功",
+      "paramsTemplate": "可用参数模板",
+      "defaultTemplate": "默认参数模板"
     },
     "permissions": {
       "departManagement": "部门管理",

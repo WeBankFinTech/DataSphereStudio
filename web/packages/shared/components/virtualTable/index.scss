@@ -128,9 +128,8 @@ $border-color: #e0e0e0;
 }
 
 .we-column-item {
-    height: 67px;
     border-bottom: 1px solid $border-color;
-    padding: 6px;
+    padding: 4px;
     word-break: break-all;
     &.odd {
         background: rgb(250, 250, 250)
@@ -146,10 +145,12 @@ $border-color: #e0e0e0;
         background: #ebf7ff;
     }
     .we-column-item-content {
-        height: 100%;
+        height: 40px;
         display: flex;
+        overflow: hidden;
+        white-space: pre-line;
+        align-items: center;
         justify-content: center;
-        overflow-y: auto;
     }
 }
 

@@ -405,8 +405,7 @@
         "success": "工作流{name}发布成功",
         "failed": "工作流发布错误",
         "cancel": "关闭",
-        "timeout": "工作流{name}发布超时！",
-        "publishNotice": "发布将会关闭已打开的工作流，请注意保存！"
+        "timeout": "工作流{name}发布超时！"
       },
       "CopyWrokflow": "复制工作流",
       "Original": "被复制工作流",

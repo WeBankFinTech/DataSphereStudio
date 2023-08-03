@@ -13,7 +13,7 @@
             <span class="title-text">{{$t('message.scheduler.viewLog')}}</span>
             <div class="full-screen">
               <a href="javascript:" @click="_downloadLog" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.downloadLog')">
-                <SvgIcon icon-class="download2" />
+                <SvgIcon icon-class="download" />
               </a>
               <a href="javascript:" class="refresh-log" :class="loading ? 'active' :''" @click="!loading && _refreshLog()" data-container="body" data-toggle="tooltip" :title="$t('message.scheduler.refreshLog')">
                 <SvgIcon icon-class="refresh" />

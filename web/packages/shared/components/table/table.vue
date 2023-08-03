@@ -52,6 +52,7 @@
         id="bottomDiv"
         class="table-bottom"
         @scroll.stop="handleScroll"
+        @contextmenu.prevent.stop="handleContextMenu"
       >
         <div :style="{height:`${dataTop}px`}"></div>
         <table
@@ -68,8 +69,8 @@
             @click="rowClick(items,indexs+dataTop/tdHeight)"
             @dblclick="rowDblclick(items,indexs+dataTop/tdHeight)"
             :key="indexs"
-            :style="{'line-height':`${tdHeight}px`}"
             :class="selectIndex==indexs?'trselect':'trhover'"
+            :style="{height:`${tdHeight}px`}"
           >
             <td
               class="bottom-td"
@@ -87,10 +88,13 @@
                 class="bottom-td"
                 :class="{'null-text': items[item.key] === 'NULL'}"
                 :key="index"
-                :style="{width: item.width?`${item.width}px`:'auto', height:`${tdHeight}px`}"
-                :title="item.logic==undefined?items[item.key]:item.logic(items)"
+                :style="{width: item.width?`${item.width}px`:'auto'}"
               >
-                {{item.logic==undefined?items[item.key]:item.logic(items)}}
+                <p class="content"
+                  :data-row="indexs"
+                  :data-col="item.key"
+                  :title="item.logic==undefined?items[item.key]:item.logic(items)"
+                  :style="{height:`${tdHeight}px`}">{{item.logic==undefined?items[item.key]:item.logic(items)}}</p>
               </td>
               <td
                 v-if="item.slot"
@@ -449,6 +453,16 @@ export default {
         selection.selectAllChildren(e.target);
       } else {
         window.getSelection().removeAllRanges();
+      }
+    },
+    handleContextMenu(e) {
+      if (e && e.target && e.target.dataset.col ) {
+        let row = e.target.dataset.row
+        let col = e.target.dataset.col
+        this.$emit("on-tdcontext-munu", {
+          content: this.showTableList[row][col],
+          e
+        });
       }
     },
     //排序

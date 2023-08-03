@@ -73,8 +73,8 @@ public class OrchestratorCopyJob implements Runnable {
         } catch (Exception e) {
             //保存错误信息
             String errorMsg = "CopyOrcError: " + e.getMessage();
-            if (errorMsg.length() > 1000) {
-                errorMsg = errorMsg.substring(0, 999);
+            if (errorMsg.length() > 128) {
+                errorMsg = errorMsg.substring(0, 127);
             }
             orchestratorCopyInfo.setIsCopying(0);
             orchestratorCopyInfo.setEndTime(new Date());

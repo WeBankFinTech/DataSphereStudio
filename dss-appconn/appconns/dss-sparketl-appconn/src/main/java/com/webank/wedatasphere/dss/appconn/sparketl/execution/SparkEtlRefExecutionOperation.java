@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.appconn.sparketl.execution;
 
 import com.google.gson.Gson;
-import com.webank.wedatasphere.dss.appconn.sparketl.SparkEtlAppConn;
 import com.webank.wedatasphere.dss.appconn.sparketl.constant.SparkEtlTaskStatusEnum;
 import com.webank.wedatasphere.dss.appconn.sparketl.utils.HttpUtils;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;

@@ -51,11 +51,12 @@
               v-model="stepOne.tbName"
               filterable
               clearable
+              :remote-method="remoteMethod1"
+              @on-open-change="queryWhenOpen"
               class="item-width"
               @on-change="handleTbInput">
-              <!--{{}}前后不能换行，会出现很多的换行符-->
               <Option
-                v-for="(item, index) in activeDB.children"
+                v-for="(item, index) in showTbOptions"
                 :value="item.value"
                 :key="item.name+index">{{ item.name }}</Option>
             </Select>
@@ -371,6 +372,7 @@ export default {
           { type: 'string', pattern: /^[a-zA-Z0-9_\u4e00-\u9fa5]*$/, message: this.$t('message.scripts.hiveTableExport.WJMZZCZW'), trigger: 'change' },
         ],
       },
+      showTbOptions: []
     };
   },
   computed: {
@@ -601,6 +603,26 @@ export default {
       const type = this.stepTwo.type === 'share' ? 'shareRootPath' : 'hdfsRootPath';
       const path = storage.get(type, 'session');
       this.stepTwo.path = path || '';
+    },
+
+    queryWhenOpen(isOpen) {
+      if (isOpen) {
+        this.getShowTbList()
+      }
+    },
+    getShowTbList(query) {
+      if (this.activeDB.children && query) {
+        this.showTbOptions = this.activeDB.children.filter(it => it.name.indexOf(query.toLowerCase()) > -1).slice(0, 250);
+        return
+      }
+      this.showTbOptions = this.activeDB.children.slice(0, 250);
+    },
+    remoteMethod1(query) {
+      if (query !== "") {
+        this.getShowTbList(query)
+      } else {
+        this.showTbOptions = []
+      }
     },
   },
 };

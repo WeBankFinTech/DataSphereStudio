@@ -29,7 +29,8 @@
           :data="bodyRows"
           :header="headRows"
           @on-scroll="changeScrollLeft"
-          @on-click="onColumnClick">
+          @on-click="onColumnClick"
+          @on-tdcontext-munu="onTdContextMenu">
         </template-list>
       </div>
     </div>
@@ -141,6 +142,9 @@ export default {
     },
     onColumnClick(index) {
       this.$emit('on-click', index);
+    },
+    onTdContextMenu(e) {
+      this.$emit("on-tdcontext-munu", e);
     },
     resize() {
       this.cache = {};

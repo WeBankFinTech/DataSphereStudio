@@ -6,7 +6,7 @@
         class="close-btn"
         @click="close"
         style="font-size: 1rem"
-        icon-class="fi-cross"
+        icon-class="close2"
       />
     </div>
     <div v-show="showForm">

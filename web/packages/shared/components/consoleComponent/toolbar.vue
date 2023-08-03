@@ -24,7 +24,7 @@
           v-model="popup.download"
           placement="right">
           <div @click.stop="openPopup('download')">
-            <SvgIcon :style="{ 'font-size': '20px' }" icon-class="downLoad" color="#515a6e" />
+            <SvgIcon :style="{ 'font-size': '20px' }" icon-class="download" color="#515a6e" />
             <span v-if="isIconLabelShow" :title="$t('message.common.download')" class="v-toolbar-icon">{{ $t('message.common.download') }}</span>
           </div>
           <div slot="content">
@@ -99,12 +99,13 @@
                 </RadioGroup>
               </Row>
             </div>
-            <div v-if="isAll">
+            <div v-if="isAll || +download.format === 1">
               <Row class="row-item">
                 {{$t('message.common.toolbar.downloadMode')}}
               </Row>
               <Row class="row-item">
                 <Checkbox v-model="allDownload">{{$t('message.common.toolbar.all')}}</Checkbox>
+                <span>(共{{resultList.length}}个结果集)</span>
               </Row>
             </div>
             <Row class="row-item" v-if="download.format == 2">
@@ -250,6 +251,9 @@ export default {
         export: this.baseinfo.exportResEnable !== false && isScriptis && this.activeTool === 'table' && this.resultType === '2',
         download: this.activeTool === 'table' && this.baseinfo.downloadResEnable  !== false,
       }
+    },
+    resultList() {
+      return this.script.resultList || [];
     }
   },
   mounted() {
@@ -283,6 +287,22 @@ export default {
       this[`${type}Confirm`]();
       this.cancelPopup(type);
     },
+    pause(msec) {
+      return new Promise(
+        (resolve) => {
+          setTimeout(resolve, msec || 1000);
+        }
+      );
+    },
+    async downloadAll(list, cb) {
+      const current = list.slice(0, 10);
+      cb && cb(current);
+      list = list.slice(10, list.length);
+      if(list.length > 0) {
+        await this.pause();
+        this.downloadAll(list, cb)
+      }
+    },
     downloadConfirm() {
       this.$Modal.confirm({
         title: this.$t('message.common.Prompt'),
@@ -300,13 +320,7 @@ export default {
           }
           const filename = `Result_${fileName}_${timestamp}`;
           let temPath = this.currentPath;
-          // api执行下载的结果集路径不一样
-          let apiPath = `${this.getResultUrl}/resultsetToExcel`;
-          if (this.isAll && this.allDownload) {
-            temPath = temPath.substring(0, temPath.lastIndexOf('/'));
-            apiPath = `${this.getResultUrl}/resultsetsToExcel`
-          }
-          let querys = 'path=' + temPath + '&charset=' + charset + '&outputFileType=' + splitor + '&nullValue=' + nullValue + '&outputFileName=' + filename + '&autoFormat=' + this.autoFormat;
+          let querys = '&charset=' + charset + '&outputFileType=' + splitor + '&nullValue=' + nullValue + '&autoFormat=' + this.autoFormat;
           // 如果是api执行页获取结果集，需要带上taskId
           if(this.getResultUrl !== 'filesystem') {
             querys += `&taskId=${this.work.taskID}`
@@ -315,23 +329,36 @@ export default {
           if(this.download.format == 1) {
             querys += `&csvSeparator=${encodeURIComponent(splitChar)}`
           }
-          let url = `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` + querys
           // 下载之前条用心跳接口确认是否登录
           await api.fetch('/user/heartbeat', 'get');
-          // 下载记录日志
-          api.fetch('/dss/scriptis/audit/download/save', {
-            creator: this.baseinfo.username,
-            tenant: this.baseinfo.proxyUserName,
-            path: temPath,
-            sql: this.script.executionCode || '',
-            createTime: Date.now()
-          }, 'post').catch(()=>{});
-          const link = document.createElement('a');
-          link.setAttribute('href', url);
-          link.setAttribute('download', '');
-          const evObj = document.createEvent('MouseEvents');
-          evObj.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, true, false, 0, null);
-          const flag = link.dispatchEvent(evObj);
+          // 全量下载和下载当前结果集
+          let apiPath = `${this.getResultUrl}/resultsetToExcel`;
+          let flag = false;
+          if (this.allDownload && +this.download.format == 1) {
+            const eventList = [];
+            this.downloadAll(this.resultList, (items) => {
+              for(let index = 0; index < items.length; index++) {
+                const item = items[index];
+                const name = `ResultSet${Number(item.path.substring(temPath.lastIndexOf('/')).split('.')[0].split('_')[1]) + 1}`
+                const queryStr = `${querys}&outputFileName=${name}&path=${item.path}`
+                let url = `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` + queryStr;
+                eventList.push(this.downloadFile(url, item.path));
+              }
+            })
+            if(eventList.filter(Boolean).length === this.resultList.length) {
+              flag = true;
+            }
+          } else if(this.isAll && this.allDownload && +this.download.format == 2) {
+            temPath = temPath.substring(0, temPath.lastIndexOf('/'));
+            apiPath = `${this.getResultUrl}/resultsetsToExcel`
+            querys += `&outputFileName=${filename}&path=${temPath}`
+            let url = `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` + querys
+            flag = this.downloadFile(url, temPath);
+          } else {
+            querys += `&outputFileName=${filename}&path=${temPath}`
+            let url = `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` + querys
+            flag = this.downloadFile(url, temPath);
+          }
           this.$nextTick(() => {
             if (flag) {
               this.$Message.success(this.$t('message.common.toolbar.success.download'));
@@ -339,6 +366,22 @@ export default {
           });
         }
       });
+    },
+    downloadFile(url, temPath) {
+      // 下载记录日志
+      api.fetch('/dss/scriptis/audit/download/save', {
+        creator: this.baseinfo.username,
+        tenant: this.baseinfo.proxyUserName,
+        path: temPath,
+        sql: this.script.executionCode || '',
+        createTime: Date.now()
+      }, 'post').catch(()=>{});
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', '');
+      const evObj = document.createEvent('MouseEvents');
+      evObj.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, true, false, 0, null);
+      return link.dispatchEvent(evObj);
     },
     resize() {
       const height = window.getComputedStyle(this.$refs.toolbar).height;

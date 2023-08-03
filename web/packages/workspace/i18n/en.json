@@ -162,6 +162,7 @@
       "Console": "Console"
     },
     "workspaceManagement": {
+      "resTemplateManage": "Resource Template Manage",
       "waring": "Warning",
       "ok": "OK",
       "cancel": "Cancel",
@@ -370,7 +371,9 @@
       "AppDevProcess": "Application development process",
       "createProject": "Create project",
       "config": "config",
-      "deleteSuccess": "{ name } Delete Success"
+      "deleteSuccess": "{ name } Delete Success",
+      "paramsTemplate": "Params Template",
+      "defaultTemplate": "Default Template"
     },
     "permissions": {
       "departManagement": "Department management",

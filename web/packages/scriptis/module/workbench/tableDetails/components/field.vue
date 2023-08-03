@@ -133,13 +133,13 @@ export default {
   },
   watch: {
     searchText(val) {
-      const reg = /^[\w]*$/;
+      const reg = /^[\u2E80-\uFE4F\w]*$/;
       if (val && reg.test(val)) {
         this.searchColList = [];
         const regexp = new RegExp(`.*${val}.*`, 'i');
         const tmpList = this.table;
         tmpList.forEach((o, index) => {
-          if (regexp.test(o.name)) {
+          if ([o.name, o.comment, o.alias].some(item => regexp.test(item || ''))) {
             o.index = index + 1
             this.searchColList.push(o);
           }

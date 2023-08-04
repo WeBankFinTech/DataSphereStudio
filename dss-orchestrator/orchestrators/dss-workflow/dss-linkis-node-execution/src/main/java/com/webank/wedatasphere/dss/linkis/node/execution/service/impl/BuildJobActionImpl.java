@@ -190,6 +190,8 @@ public class BuildJobActionImpl implements BuildJobAction {
     /**
      * spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。
      *
+     * 如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
+     *
      * @param paramMapCopy
      * @throws LinkisJobExecutionErrorException
      */
@@ -207,6 +209,16 @@ public class BuildJobActionImpl implements BuildJobAction {
                 }
             }
             startupMap.remove("spark.conf");
+            //如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
+            if (startupMap.containsKey("ec.conf.templateId")) {
+                startupMap.remove("spark.driver.memory");
+                startupMap.remove("spark.executor.memory");
+                startupMap.remove("spark.executor.cores");
+                startupMap.remove("spark.executor.instances");
+                Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
+                configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
+                paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);
+            }
             Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
             configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
             paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);

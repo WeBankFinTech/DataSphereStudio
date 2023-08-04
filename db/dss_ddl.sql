@@ -158,6 +158,7 @@ CREATE TABLE `dss_workspace` (
   `last_update_time` datetime DEFAULT NULL,
   `last_update_user` varchar(30) DEFAULT NULL COMMENT '最新修改用户',
   `workspace_type`  varchar(20) DEFAULT NULL comment '工作空间类型',
+  `admin_permission` tinyint(1) DEFAULT 1 NOT NULL COMMENT '工作空间管理员是否有权限查看该空间下所有项目，1可以，0不可以',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=224 DEFAULT CHARSET=utf8;

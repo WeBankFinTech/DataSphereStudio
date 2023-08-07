@@ -108,10 +108,10 @@ function changeCommonConf(){
   sed -i "s#wds.linkis.gateway.port.*#wds.linkis.gateway.port=$GATEWAY_PORT#g" $CONF_DSS_PROPERTIES
   sed -i "s#wds.linkis.gateway.url.*#wds.linkis.gateway.url=http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT/#g" $CONF_DSS_PROPERTIES
   sed -i "s#wds.linkis.gateway.wtss.url.*#wds.linkis.gateway.wtss.url=http://$GATEWAY_INSTALL_IP:$GATEWAY_PORT/#g" $CONF_DSS_PROPERTIES
-  sed -i "s#wds.linkis.bml.auth.token.value.*#wds.linkis.bml.auth.token.value=$BML_AUTH/#g" $CONF_DSS_PROPERTIES
-  sed -i "s#linkis.configuration.linkisclient.auth.token.value.*#linkis.configuration.linkisclient.auth.token.value=$BML_AUTH/#g" $CONF_DSS_PROPERTIES
-  sed -i "s#wds.linkis.context.client.auth.value.*#wds.linkis.context.client.auth.value=$BML_AUTH/#g" $CONF_DSS_PROPERTIES
-  sed -i "s#wds.linkis.errorcode.auth.token.*#wds.linkis.errorcode.auth.token=$BML_AUTH/#g" $CONF_DSS_PROPERTIES
+  sed -i "s#wds.linkis.bml.auth.token.value.*#wds.linkis.bml.auth.token.value=$BML_AUTH#g" $CONF_DSS_PROPERTIES
+  sed -i "s#linkis.configuration.linkisclient.auth.token.value.*#linkis.configuration.linkisclient.auth.token.value=$BML_AUTH#g" $CONF_DSS_PROPERTIES
+  sed -i "s#wds.linkis.context.client.auth.value.*#wds.linkis.context.client.auth.value=$BML_AUTH#g" $CONF_DSS_PROPERTIES
+  sed -i "s#wds.linkis.errorcode.auth.token.*#wds.linkis.errorcode.auth.token=$BML_AUTH#g" $CONF_DSS_PROPERTIES
 }
 
 ##function start

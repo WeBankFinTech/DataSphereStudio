@@ -23,11 +23,15 @@ function isSuccess(){
 function refresh() {
   while true; do
     response=$(curl -H "Token-Code:BML-AUTH" -H "Token-User:hadoop" -X GET http://${GATEWAY_INSTALL_IP}:${GATEWAY_PORT}/api/rest_j/v1/dss/framework/project/appconn/${APPCONN_NAME}/load)
-    if [[ $response == *"succeed"* ]]; then
+    if [[ $response == *"not appconn manager node"* ]]; then
+      echo 'not appconn manager node, we will try again 5 seconds later'
+      sleep 5
+    elif [[ $response == *"succeed"* ]]; then
+      echo $response
       break
     else
-      sleep 1
-    fi
+      echo $response
+      exit 1
   done
 }
 

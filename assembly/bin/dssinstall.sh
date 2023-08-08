@@ -69,9 +69,10 @@ if [ -z $DSS_FILE_NAME ]; then
 fi
 
 function replaceCommonIp() {
-    if [ -z "$DSS_SERVER_INSTALL_IP" ]; then
+  if [ -z "$DSS_SERVER_INSTALL_IP" ]; then
     DSS_SERVER_INSTALL_IP=$LOCAL_IP
   fi
+
   if [ -z "$DSS_SERVER_PORT" ]; then
     DSS_SERVER_PORT=9002
   fi
@@ -83,12 +84,13 @@ function replaceCommonIp() {
     DSS_APPS_SERVER_PORT=9003
   fi
 
- if [[ $GATEWAY_INSTALL_IP == "127.0.0.1" ]] || [ -z "$GATEWAY_INSTALL_IP" ]; then
+  if [[ $GATEWAY_INSTALL_IP == "127.0.0.1" ]] || [ -z "$GATEWAY_INSTALL_IP" ]; then
    GATEWAY_INSTALL_IP=$LOCAL_IP
- fi
- if [[ $EUREKA_INSTALL_IP == "127.0.0.1" ]] || [ -z "$EUREKA_INSTALL_IP" ]; then
+  fi
+
+  if [[ $EUREKA_INSTALL_IP == "127.0.0.1" ]] || [ -z "$EUREKA_INSTALL_IP" ]; then
     EUREKA_INSTALL_IP=$LOCAL_IP
- fi
+  fi
 }
 ##替换真实的IP
 replaceCommonIp

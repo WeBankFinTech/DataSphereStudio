@@ -130,6 +130,9 @@ public class AppConnManagerRestfulApi {
 
     @RequestMapping(path = "{appConnName}/load", method = RequestMethod.GET)
     public Message load(@PathVariable("appConnName") String appConnName) {
+        if (!Objects.equals(AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue(), AppConnManagerCoreConf.hostname)){
+            return Message.error("not appconn manager node,please try again");
+        }
         LOGGER.info("Try to reload AppConn {}.", appConnName);
         try {
             LOGGER.info("First, reload AppConn {}.", appConnName);

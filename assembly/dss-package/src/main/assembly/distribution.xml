@@ -68,38 +68,6 @@
       <lineEnding>unix</lineEnding>
     </fileSet>
 
-    <!--dss-framework-project-server-->
-<!--    <fileSet>-->
-<!--      <directory>-->
-<!--         ${basedir}/../../dss-framework/dss-framework-project-server/target/out/dss-framework-project-server/lib/-->
-<!--      </directory>-->
-<!--      <outputDirectory>lib/dss-framework/dss-framework-project-server</outputDirectory>-->
-<!--      <includes>-->
-<!--        <include>**/*</include>-->
-<!--      </includes>-->
-<!--    </fileSet>-->
-
-    <!--dss-framework-migrate-server-->
-<!--    <fileSet>-->
-<!--      <directory>-->
-<!--        ${basedir}/../../dss-framework/framework-plugins/dss-framework-migrate-server/target/-->
-<!--      </directory>-->
-<!--      <outputDirectory>lib/dss-framework/dss-framework-project-server</outputDirectory>-->
-<!--      <includes>-->
-<!--        <include>*${dss.version}.jar</include>-->
-<!--      </includes>-->
-<!--    </fileSet>-->
-
-    <!--dss-framework-orchestrator-server-->
-<!--    <fileSet>-->
-<!--      <directory>-->
-<!--        ${basedir}/../../dss-framework/dss-framework-orchestrator-server/target/out/dss-framework-orchestrator-server/lib/-->
-<!--      </directory>-->
-<!--      <outputDirectory>lib/dss-framework/dss-framework-orchestrator-server/</outputDirectory>-->
-<!--      <includes>-->
-<!--        <include>**/*</include>-->
-<!--      </includes>-->
-<!--    </fileSet>-->
     <!--dss-apps-server-->
     <fileSet>
       <directory>
@@ -203,6 +171,16 @@
     <fileSet>
       <directory>
         ${basedir}/../../dss-appconn/appconns/dss-dolphinscheduler-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-sparketl-appconn/target/out/
       </directory>
       <outputDirectory>dss-appconns</outputDirectory>
       <includes>

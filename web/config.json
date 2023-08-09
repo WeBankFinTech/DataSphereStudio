@@ -55,6 +55,13 @@
         "en": "dolphinScheduler/i18n/en.json",
         "zh-CN": "dolphinScheduler/i18n/zh.json"
       }
+    },
+    "sparketl": {
+      "routes": "sparketl/router/index",
+      "i18n": {
+        "en": "sparketl/utils/i18n/zh.json",
+        "zh-CN": "sparketl/utils/i18n/zh.json"
+      }
     }
   },
   "exts": {
@@ -81,7 +88,10 @@
       "template": "${username} ${time}",
       "timeupdate": 60000
     },
-    "env": "opensource"
+    "has_engineinfo": false,
+    "showVersionDiff": false,
+    "showScirptVarHelp": false,
+    "showUpdateNotice": false
   },
-  "version": "1.1.12"
+  "version": "1.1.2"
 }

@@ -43,6 +43,14 @@
                     <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
                     <groupId>org.springframework.cloud</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -54,11 +62,27 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-framework-orchestrator-server</artifactId>
             <version>${dss.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-workflow-server</artifactId>
             <version>${dss.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
@@ -74,6 +98,21 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-scriptis-server</artifactId>
             <version>${dss.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-user-guide-server</artifactId>
+            <version>${dss.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${fasterxml.jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${fasterxml.jackson.version}</version>
         </dependency>
 
     </dependencies>

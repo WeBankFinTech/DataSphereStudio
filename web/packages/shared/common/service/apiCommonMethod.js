@@ -9,7 +9,7 @@ const GetDicSecondList = (params) => {
   })
 }
 // 获取工作空间用户管理相关数据
-const GetWorkspaceUserManagement = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}getWorkspaceUsers`, params, 'get')
+const GetWorkspaceUserManagement = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}getWorkspaceUsers`, params, {method: 'get', cacheOptions: {time: 3000}})
 
 // 获取工作空间用户的列表
 const GetWorkspaceUserList = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}getAllWorkspaceUsers`, params, 'get')
@@ -25,6 +25,9 @@ const GetDepartments = () => api.fetch(`${API_PATH.WORKSPACE_FRAMEWORK_PATH}admi
 
 // 获取工作空间树形归属部门数据
 const GetTreeDepartments = () => api.fetch(`${API_PATH.WORKSPACE_FRAMEWORK_PATH}admin/dept/treeselect`, 'get')
+
+// GetTreeDepartments
+const getAllDepartments = () => api.fetch(`${API_PATH.WORKSPACE_FRAMEWORK_PATH}workspace/listAllDepartments`, 'get')
 
 // 判断工作空间是否重复
 const CheckWorkspaceNameExist = (params) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/exists`, params, 'get')
@@ -50,6 +53,9 @@ const AddFavorite = (workspaceId, data) => api.fetch(`${API_PATH.WORKSPACE_PATH}
 // 删除收藏菜单
 const RemoveFavorite = (data) => api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${data.workspaceId}/favorites/${data.applicationId}`, data, 'post')
 
+// 检查项目重名
+const CheckProjectNameRepeat = (name) => api.fetch(`${API_PATH.PROJECT_PATH}checkProjectName`, {name}, 'get')
+
 export {
   GetDicSecondList,
   GetAreaMap,
@@ -59,11 +65,13 @@ export {
   GetWorkspaceApplications,
   GetDepartments,
   GetTreeDepartments,
+  getAllDepartments,
   CheckWorkspaceNameExist,
   GetDicList,
   GetWorkspaceList,
   GetFavorites,
   AddFavorite,
   RemoveFavorite,
-  GetCollections
+  GetCollections,
+  CheckProjectNameRepeat
 }

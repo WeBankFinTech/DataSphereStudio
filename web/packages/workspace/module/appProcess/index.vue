@@ -10,7 +10,7 @@
           <div class="title">{{item.dicName}}</div>
           <p class="desc">{{item.dicValue}}</p>
           <Button v-if="item.url" class="link" @click="openTab(item.url)">{{item.title}}</Button>
-          <Button v-else class="link" disabled>敬请期待</Button>
+          <Button v-else class="link" disabled>{{ $t('message.workspace.Staytuned') }}</Button>
         </div>
         <SvgIcon :key="item.id" v-if="index !== appDevProcess.length - 1" class="icon-item" icon-class="right-ar"/>
       </div>

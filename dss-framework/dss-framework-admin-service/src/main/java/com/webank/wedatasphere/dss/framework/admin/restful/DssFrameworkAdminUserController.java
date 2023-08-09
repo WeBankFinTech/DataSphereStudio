@@ -17,6 +17,8 @@ import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnExce
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +32,9 @@ import java.util.Map;
 @RequestMapping(path = "/dss/framework/admin/user", produces = {"application/json"})
 @RestController
 public class DssFrameworkAdminUserController extends BaseController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DssFrameworkAdminUserController.class);
+
     @Resource
     private DssAdminUserService dssAdminUserService;
     @Autowired
@@ -38,7 +43,6 @@ public class DssFrameworkAdminUserController extends BaseController {
     DssUserMapper dssUserMapper;
 
     @RequestMapping(path = "list", method = RequestMethod.GET)
-//    public TableDataInfo list(DssAdminUser user) {
     public TableDataInfo list(@RequestParam(value = "userName", required = false) String userName,
                               @RequestParam(value = "deptId", required = false) Long deptId,
                               @RequestParam(value = "phonenumber", required = false) String phonenumber,
@@ -54,6 +58,7 @@ public class DssFrameworkAdminUserController extends BaseController {
         user.setParams(params);
         startPage();
         List<DssAdminUser> userList = dssAdminUserService.selectUserList(user);
+        LOGGER.info("try to get DssAdminUser list, userList:{}", userList);
         return getDataTable(userList);
     }
 
@@ -83,6 +88,7 @@ public class DssFrameworkAdminUserController extends BaseController {
             user.setCreateBy(SecurityFilter.getLoginUsername(req));
             int rows = dssAdminUserService.insertUser(user, getWorkspace(req));
             String userName = user.getUserName();
+            LOGGER.info("Add new user {}", userName);
             ldapService.addUser(AdminConf.LDAP_ADMIN_NAME.getValue(), AdminConf.LDAP_ADMIN_PASS.getValue(), AdminConf.LDAP_URL.getValue(), AdminConf.LDAP_BASE_DN.getValue(), userName, pwd);
             return Message.ok().data("rows", rows).message("新增成功");
         } catch (Exception exception) {
@@ -94,6 +100,7 @@ public class DssFrameworkAdminUserController extends BaseController {
     private Workspace getWorkspace(HttpServletRequest req) {
         Workspace workspace = new Workspace();
         try {
+            LOGGER.info("Put gateway url and cookies into workspace.");
             SSOHelper.addWorkspaceInfo(req, workspace);
         } catch (AppStandardWarnException ignored) {} // ignore it.
         return workspace;
@@ -121,6 +128,7 @@ public class DssFrameworkAdminUserController extends BaseController {
                 && UserConstants.NOT_UNIQUE.equals(dssAdminUserService.checkEmailUnique(user))) {
             return Message.error().message("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
+        LOGGER.info("Modify user {} info", user.getUserName());
         return Message.ok().data("修改用户成功。", dssAdminUserService.updateUser(user, getWorkspace(req)));
     }
 

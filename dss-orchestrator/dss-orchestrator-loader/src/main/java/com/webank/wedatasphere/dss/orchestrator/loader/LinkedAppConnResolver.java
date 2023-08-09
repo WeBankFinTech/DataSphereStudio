@@ -22,5 +22,12 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import java.util.List;
 
 public interface LinkedAppConnResolver {
+    /**
+     * 根据用户、工作空间、appconn的类型，获取所有注册过的符合条件的appconn
+     * @param userName 用户名
+     * @param workspaceName 工作空间名
+     * @param typeName appconn类型
+     * @return 注册过的符合条件的appconn
+     */
     List<AppConn>   resolveAppConnByUser(String userName, String workspaceName, String typeName);
 }

@@ -36,14 +36,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
-import java.security.cert.CertificateException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -54,21 +50,6 @@ public final class HttpClientUtil {
 	private static PoolingHttpClientConnectionManager connManager = null;
 	private static CloseableHttpClient httpclient = null;
 
-	private static TrustManager trustAllManager = new X509TrustManager() {
-		@Override
-		public void checkClientTrusted(java.security.cert.X509Certificate[] arg0, String arg1)
-				throws CertificateException {
-		}
-		@Override
-		public void checkServerTrusted(java.security.cert.X509Certificate[] arg0, String arg1)
-				throws CertificateException {
-		}
-		@Override
-		public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-			return null;
-		}
-
-	};
 
 	static {
 		httpclient = HttpClients.createDefault();

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+ @import '@dataspherestudio/shared/common/style/variables.scss';
 
 .field-table {
     .field-table-header,
@@ -23,6 +24,7 @@
         min-height: 46px;
         justify-content: center;
         align-items: center;
+        @include border-color(#dcdee2, $dark-border-color-base);
     }
     .field-table-header {
         justify-content: space-evenly;
@@ -38,15 +40,14 @@
     }
     .field-table-body {
         border-top: none;
-        background: #fff;
         justify-content: space-evenly;
-        padding-top: 12px;
+        padding-top: 8px;
         height: 70px;
         &:hover {
-            background-color: #ebf7ff;
+            @include bg-color(#ebf7ff, $dark-active-menu-item);
         }
         &.actived {
-            background-color: #ebf7ff;
+            @include bg-color(#ebf7ff, $dark-active-menu-item);
         }
     }
     .field-table-item {
@@ -112,4 +113,7 @@
         width: 5%;
         min-width: 50px;
     }
+    ::v-deep .ivu-form-item-error-tip {
+    padding-top: 2px;
+  }
 }

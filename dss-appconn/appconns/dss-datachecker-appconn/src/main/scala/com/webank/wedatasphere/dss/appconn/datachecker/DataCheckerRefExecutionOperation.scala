@@ -16,16 +16,16 @@
 
 package com.webank.wedatasphere.dss.appconn.datachecker
 
-import com.webank.wedatasphere.dss.common.utils.VariableUtils
 
 import java.util
 import java.util.{Properties, UUID}
+
 import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
 import org.apache.linkis.common.log.LogUtils
-import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.common.utils.{Utils, VariableUtils}
 
 import scala.collection.mutable
 

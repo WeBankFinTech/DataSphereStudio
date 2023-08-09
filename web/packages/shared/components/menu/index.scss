@@ -22,18 +22,20 @@
   padding: 0;
   cursor: pointer;
   border: 1px solid #ebeef5;
+  @include border-color($border-color-base, $dark-menu-base-color);
+  @include font-color(#3d3d3d, $dark-text-color);
   z-index: 99999;
   color: #646465;
   font-size: $text-sz-default;
   font-weight: 500;
-  background: #fff;
+  @include bg-color(#f8f9fc, $dark-menu-base-color);
   .ctx {
     position: relative;
     display: flex;
     background-color:transparent;
     .second-menu {
       width: 160px !important;
-      background: #fff;
+      @include bg-color(#f8f9fc, $dark-menu-base-color);
       position: absolute;
       right: -161px;
       top: 0px;
@@ -43,15 +45,15 @@
       border-radius: 4px;
       padding-left: 0;
       .ctx-item {
-        background: #fff;
         width: 160px;
-        color: #3d3d3d;
+        @include font-color(#3d3d3d, $dark-text-color);
         font-size: 12px;
       }
     }
     .ctx-menu {
       border: 1px solid #ebeef5;
-      background-color: white;
+      @include border-color($border-color-base, $dark-border-color-base);
+      @include bg-color(#f8f9fc, $dark-menu-base-color);
       position: absolute;
       left: 0;
       list-style: none;
@@ -61,7 +63,7 @@
       .ctx-divider {
         height: 1px !important;
         overflow: hidden;
-        background-color: #e3e3e3;
+        @include bg-color(#e3e3e3, $dark-border-color-base);
         margin: 5px 12px !important;
       }
 
@@ -78,7 +80,7 @@
 
         &:focus, &:hover {
           color: $text-over-color;
-          background-color: $grey-bg-color;
+          @include bg-color($grey-bg-color, $dark-menu-list-bg-color);
         }
 
         &.active:focus, &.active:hover {

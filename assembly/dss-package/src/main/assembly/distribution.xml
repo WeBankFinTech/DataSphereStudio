@@ -68,71 +68,28 @@
       <lineEnding>unix</lineEnding>
     </fileSet>
 
-    <!--dss-framework-project-server-->
+    <!--dss-apps-server-->
     <fileSet>
       <directory>
-         ${basedir}/../../dss-framework/dss-framework-project-server/target/out/dss-framework-project-server/lib/
+        ${basedir}/../../dss-apps/dss-apps-server/target/out/dss-apps-server/lib/
       </directory>
-      <outputDirectory>lib/dss-framework/dss-framework-project-server</outputDirectory>
+      <outputDirectory>lib/dss-apps-server/</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
 
-    <!--dss-framework-migrate-server-->
+    <!--dss-server-->
     <fileSet>
       <directory>
-        ${basedir}/../../dss-framework/framework-plugins/dss-framework-migrate-server/target/
+        ${basedir}/../../dss-server/target/out/dss-server/lib/
       </directory>
-      <outputDirectory>lib/dss-framework/dss-framework-project-server</outputDirectory>
-      <includes>
-        <include>*${dss.version}.jar</include>
-      </includes>
-    </fileSet>
-
-    <!--dss-framework-orchestrator-server-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-framework/dss-framework-orchestrator-server/target/out/dss-framework-orchestrator-server/lib/
-      </directory>
-      <outputDirectory>lib/dss-framework/dss-framework-orchestrator-server/</outputDirectory>
+      <outputDirectory>lib/dss-server/</outputDirectory>
       <includes>
         <include>**/*</include>
       </includes>
     </fileSet>
 
-    <!--dss-apiservice-server-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-apps/dss-apiservice-server/target/out/dss-apiservice-server/lib/
-      </directory>
-      <outputDirectory>lib/dss-apps/dss-apiservice-server</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
-
-    <!--dss-workflow-server-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-orchestrator/orchestrators/dss-workflow/dss-workflow-server/target/out/dss-workflow-server/lib/
-      </directory>
-      <outputDirectory>lib/dss-orchestrator/dss-workflow-server/</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
-
-    <!--dss-flow-execution-server-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-orchestrator/orchestrators/dss-workflow/dss-flow-execution-server/target/out/dss-flow-execution-server/lib/
-      </directory>
-      <outputDirectory>lib/dss-orchestrator/dss-flow-execution-server/</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
 
     <!--dss-datachecker-appconn-->
     <fileSet>
@@ -149,17 +106,6 @@
     <fileSet>
       <directory>
         ${basedir}/../../dss-appconn/appconns/dss-eventchecker-appconn/target/out/
-      </directory>
-      <outputDirectory>dss-appconns</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
-
-    <!--dss-orchestrator-framework-appconn-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-appconn/appconns/dss-orchestrator-framework-appconn/target/out/
       </directory>
       <outputDirectory>dss-appconns</outputDirectory>
       <includes>
@@ -211,17 +157,6 @@
       </includes>
     </fileSet>
 
-    <!--dss-qualitis-appconn-->
-<!--    <fileSet>
-      <directory>
-        ${basedir}/../../dss-appconn/appconns/dss-qualitis-appconn/target/out/
-      </directory>
-      <outputDirectory>dss-appconns</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>-->
-
     <!--dss-sendemail-appconn-esb-support-->
     <fileSet>
       <directory>
@@ -236,6 +171,16 @@
     <fileSet>
       <directory>
         ${basedir}/../../dss-appconn/appconns/dss-dolphinscheduler-appconn/target/out/
+      </directory>
+      <outputDirectory>dss-appconns</outputDirectory>
+      <includes>
+        <include>**/*</include>
+      </includes>
+    </fileSet>
+
+    <fileSet>
+      <directory>
+        ${basedir}/../../dss-appconn/appconns/dss-sparketl-appconn/target/out/
       </directory>
       <outputDirectory>dss-appconns</outputDirectory>
       <includes>
@@ -273,48 +218,5 @@
       </includes>
     </fileSet>
 
-    <!--dss-datapipe-server-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-apps/dss-scriptis-server/target/out/dss-scriptis-server/lib/
-      </directory>
-      <outputDirectory>lib/dss-apps/dss-scriptis-server</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
-
-    <!--dss-data-api-server-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-data-api/dss-data-api-server/target/out/dss-data-api-server/lib/
-      </directory>
-      <outputDirectory>lib/dss-data-api/dss-data-api-server</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
-
-    <!--dss-data-governance-server-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-data-governance/dss-data-governance-server/target/out/dss-data-governance-server/lib/
-      </directory>
-      <outputDirectory>lib/dss-data-governance/dss-data-governance-server</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
-
-    <!--dss-guide-server-->
-    <fileSet>
-      <directory>
-        ${basedir}/../../dss-apps/dss-user-guide/dss-user-guide-server/target/out/dss-user-guide-server/lib/
-      </directory>
-      <outputDirectory>lib/dss-guide/dss-guide-server</outputDirectory>
-      <includes>
-        <include>**/*</include>
-      </includes>
-    </fileSet>
   </fileSets>
 </assembly>

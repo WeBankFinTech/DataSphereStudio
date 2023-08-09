@@ -48,10 +48,11 @@ public class MdAnalysis {
             return null;
         }
         FileReader fr = null;
+        BufferedReader br = null;
         StringBuffer sb = new StringBuffer("");
         try {
             fr = new FileReader(filePath);
-            BufferedReader br = new BufferedReader(fr);
+            br = new BufferedReader(fr);
             String line = br.readLine();
             while (line != null) {
                 sb.append(line);
@@ -62,9 +63,14 @@ public class MdAnalysis {
             throw new RuntimeException(e);
         } finally {
             try {
-                fr.close();
+                if (br != null) {
+                    br.close();
+                }
+                if (fr != null) {
+                    fr.close();
+                }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                logger.error(String.valueOf(e));
             }
         }
         return sb.toString();
@@ -79,38 +85,39 @@ public class MdAnalysis {
      */
     public static List<Map<String, Map<String, String>>> analysisMd(String filePath, String type, String ignoreModel) throws IOException {
         logger.info("开始解析summary.md文件=============》");
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
-        List<Map<String, Map<String, String>>> mapList = new ArrayList<>();
-        String line = null;
-        boolean flag = false;
-        while ((line = br.readLine()) != null) {
-            Map<String, Map<String, String>> map = new HashMap<>();
-            Map<String, String> dataMap = new HashMap<>();
-            if (StringUtils.equals(type, "guide")) {
-                if (StringUtils.equals(line.trim(), type)) {
-                    logger.info("开始解析学习引导模块");
-                    flag = true;
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"))){
+            List<Map<String, Map<String, String>>> mapList = new ArrayList<>();
+            String line = null;
+            boolean flag = false;
+            while ((line = br.readLine()) != null) {
+                Map<String, Map<String, String>> map = new HashMap<>();
+                Map<String, String> dataMap = new HashMap<>();
+                if (StringUtils.equals(type, "guide")) {
+                    if (StringUtils.equals(line.trim(), type)) {
+                        logger.info("开始解析学习引导模块");
+                        flag = true;
+                    }
+                    if (StringUtils.equals(line.trim(), "knowledge") || ignoreModel.contains(line.trim())) {
+                        flag = false;
+                    }
                 }
-                if (StringUtils.equals(line.trim(), "knowledge") || ignoreModel.contains(line.trim())) {
-                    flag = false;
+                if (StringUtils.equals(type, "knowledge")) {
+                    if (StringUtils.equals(line.trim(), type)) {
+                        logger.info("开始解析知识库模块");
+                        flag = true;
+                    }
+                    if (StringUtils.equals(line.trim(), "guide") || ignoreModel.contains(line.trim())) {
+                        flag = false;
+                    }
+                }
+                if (flag) {
+                    absolveKnowledge(line, dataMap, map, mapList);
                 }
             }
-            if (StringUtils.equals(type, "knowledge")) {
-                if (StringUtils.equals(line.trim(), type)) {
-                    logger.info("开始解析知识库模块");
-                    flag = true;
-                }
-                if (StringUtils.equals(line.trim(), "guide") || ignoreModel.contains(line.trim())) {
-                    flag = false;
-                }
-            }
-            if (flag) {
-                absolveKnowledge(line, dataMap, map, mapList);
-            }
+            Y = 0;
+            Z = 0;
+            return mapList;
         }
-        Y = 0;
-        Z = 0;
-        return mapList;
     }
 
     private static void absolveKnowledge(String line, Map<String, String> dataMap, Map<String, Map<String, String>> map, List<Map<String, Map<String, String>>> mapList) {

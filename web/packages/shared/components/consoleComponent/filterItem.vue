@@ -5,11 +5,10 @@
       type="ios-checkbox-outline"
       v-if="item.checked"
       size="14"
-      color="#000"></Icon>
+    ></Icon>
     <Icon
       type="ios-square-outline"
       size="14"
-      color="#000"
       v-else></Icon>
     <span
       class="filter-view-item-text"

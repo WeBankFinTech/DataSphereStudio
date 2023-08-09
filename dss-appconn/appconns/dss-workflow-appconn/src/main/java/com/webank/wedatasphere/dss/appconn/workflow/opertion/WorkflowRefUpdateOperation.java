@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.protocol.RequestUpdateWorkflow;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
@@ -43,7 +44,8 @@ public class WorkflowRefUpdateOperation
         String description = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION);
         String uses = (String) requestRef.getDSSJobContent().get(OrchestratorRefConstant.ORCHESTRATION_USES);
         RequestUpdateWorkflow requestUpdateWorkflow = new RequestUpdateWorkflow(userName, flowId, flowName, description, uses);
-        ResponseUpdateWorkflow responseUpdateWorkflow = (ResponseUpdateWorkflow) sender.ask(requestUpdateWorkflow);
+        ResponseUpdateWorkflow responseUpdateWorkflow = RpcAskUtils.processAskException(sender.ask(requestUpdateWorkflow),
+                ResponseUpdateWorkflow.class, RequestUpdateWorkflow.class);
         if(responseUpdateWorkflow.getJobStatus() == JobStatus.Success) {
             return ResponseRef.newInternalBuilder().success();
         } else {

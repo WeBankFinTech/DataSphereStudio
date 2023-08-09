@@ -8,7 +8,7 @@
       <span>{{$t('message.scripts.importToHive.DRWJ')}}</span>
       <span @click="fullScreenModal" class="full-btn">
         <Icon :type="isFullScreen?'md-contract':'md-expand'" />
-        {{isFullScreen?'取消全屏':'全屏展示'}}
+        {{isFullScreen?$t('message.scripts.cancelfullscreen'):$t('message.scripts.fullscreen')}}
       </span>
     </div>
     <!-- content -->
@@ -154,8 +154,7 @@
             <Input
               v-model="secondStep.tbName"
               :disabled="!secondStep.dbName"
-              :placeholder="$t('message.scripts.importToHive.SRSJBM')">
-            </Input>
+              :placeholder="$t('message.scripts.importToHive.SRSJBM')" />
           </FormItem>
           <Row>
             <Col span="12">
@@ -165,12 +164,12 @@
                 prop="partitionValue"
               >
                 <div style="white-space: nowrap;">
-                  <span>{{ secondStep.partition }}</span>
+                  <span style="max-width: 40%;overflow: hidden;text-overflow: ellipsis;display: inline-block;vertical-align: top;" :title="secondStep.partition">{{ secondStep.partition }}</span>
                   <span> = </span>
                   <Input
                     ref="partition"
                     v-model="secondStep.partitionValue"
-                    style="width: calc(100% - 30px);"></Input>
+                    style="width: 50%" />
                 </div>
               </FormItem>
             </Col>
@@ -199,7 +198,7 @@
                 prop="partition"
               >
                 <Input
-                  v-model="secondStep.partition"></Input>
+                  v-model="secondStep.partition" />
               </FormItem>
             </Col>
             <Col
@@ -211,7 +210,7 @@
                 <span> = </span>
                 <Input
                   v-model="secondStep.partitionValue"
-                  style="width: calc(100% - 30px);"></Input>
+                  style="width: calc(100% - 30px);" />
               </FormItem>
             </Col>
           </Row>
@@ -586,7 +585,7 @@ export default {
       }
     },
     async handleTbInput(val, cb) {
-      const activeTB = find(this.activeDB.children, (o) => o.value === val);
+      const activeTB = find(this.activeDB.children, (o) => o.value.toLowerCase() === val.toLowerCase());
       if (!activeTB) {
         this.resetPartition();
         return cb();
@@ -723,7 +722,7 @@ export default {
       let poptipValidate = {
         fieldName: {
           pattern: /^[a-zA-Z0-9_]+$/,
-          message: '字段名只支持大小写字母、数字和下划线',
+          message: this.$t('message.scripts.fieldnamestyle'),
         },
         length: {
           pattern: /^[0-9]+$/,
@@ -808,7 +807,7 @@ export default {
       if (this.secondStep.fields.length > 1) {
         this.secondStep.fields.splice(index, 1);
       } else if (this.secondStep.fields.length === 1) {
-        this.$Message.warning('无法删除所有的字段！');
+        this.$Message.warning(this.$t('message.scripts.unableDel'));
       }
     },
     // 在滚动字段列表时，需要对列表名称是否符合规范进行验证

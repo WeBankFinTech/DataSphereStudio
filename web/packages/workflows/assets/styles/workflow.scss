@@ -112,7 +112,6 @@
       overflow: hidden;
       &-top {
         display: flex;
-        // height: 65px;
         width: 250px;
         padding: 0 12px;
         flex-direction: column;
@@ -122,15 +121,24 @@
           justify-content: space-between;
           align-items: center;
           &-txt {
-
             font-size: 14px;
-            color: rgba(0, 0, 0, 0.65);
             text-align: right;
             font-weight: 600;
+          }
+          .projcat-icon, .sort-icon {
+            margin-right: 7px;
           }
           &-icon {
             cursor: pointer;
             font-size: 16px;
+            display: flex;
+            align-self: start;
+            .icon {
+              font-size: 16px;
+              &:hover {
+                color: $link-color !important;
+              }
+            }
           }
         }
         &-b {

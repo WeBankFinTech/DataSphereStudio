@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.framework.workspace.dao;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import org.apache.ibatis.annotations.*;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -30,10 +31,16 @@ public interface DSSWorkspaceUserMapper {
 
     String getUserName(Long userID);
 
-    @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by,user_id)" +
-            "values(#{workspaceId}, #{username}, #{roleId}, now(), #{createdBy}, #{userId})")
+    @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by,user_id, update_user, update_time)" +
+            "values(#{workspaceId}, #{username}, #{roleId}, now(), #{createdBy}, #{userId}, #{updateUser}, now())")
     void setUserRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId,
-                                @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId);
+                                @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId,
+                                @Param("updateUser") String updateUser);
+
+    @Insert("insert into dss_workspace_user_role(workspace_id, username, role_id, create_time, created_by, user_id, update_user, update_time)" +
+            "values(#{workspaceId}, #{username}, #{roleId}, #{createTime}, #{createdBy}, #{userId}, #{updateUser}, now())")
+    void insertUserRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId, @Param("createTime") Date createTime,
+                                   @Param("username") String username, @Param("createdBy") String createdBy, @Param("userId") Long userId,@Param("updateUser") String updateUser);
 
     @Select("select role_id from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
     List<Integer> getRoleInWorkspace(@Param("workspaceId") int workspaceId, @Param("username") String username);
@@ -57,12 +64,14 @@ public interface DSSWorkspaceUserMapper {
 
     @Select({
             "<script>",
-            "select distinct created_by as creator, username as username, create_time as joinTime,workspace_id as workspaceId " +
+            "select created_by as creator, username as username, create_time as joinTime, workspace_id as workspaceId, group_concat(role_id) as roleIds, update_time as updateTime, update_user as updateUser " +
                     "from dss_workspace_user_role where workspace_id = #{workspaceId} ",
-            "<if test='username != null'>and username=#{username}</if> ",
+            "<if test='username != null'>and username like concat('%',#{username},'%')</if> " + "group by username " +
+                    "<if test='roleId != null'>HAVING FIND_IN_SET(#{roleId},roleIds)</if> " +
+                    "order by id desc",
             "</script>"
     })
-    List<DSSWorkspaceUser> getWorkspaceUsers(@Param("workspaceId") String workspaceId,@Param("username") String username);
+    List<DSSWorkspaceUser> getWorkspaceUsers(@Param("workspaceId") String workspaceId,@Param("username") String username, @Param("roleId") String roleId);
 
     @Select("select distinct created_by as creator, username as username, create_time as joinTime,workspace_id as workspaceId " +
             " from dss_workspace_user_role where role_id = #{roleId} and workspace_id = #{workspaceId}")
@@ -75,4 +84,16 @@ public interface DSSWorkspaceUserMapper {
     @Select("select count(1) from dss_workspace_user_role where workspace_id = #{workspaceId} and username = #{username}")
     Long getCountByUsername(@Param("username") String username, @Param("workspaceId") int workspaceId);
 
+    @Select("select distinct workspace_id, role_id as roleIds " +
+            "from dss_workspace_user_role where username = #{username} ")
+    List<DSSWorkspaceUser> getWorkspaceRoleByUsername(@Param("username") String username);
+
+    @Delete("delete from dss_workspace_user_role where username = #{username} ")
+    void deleteUserRolesByUserName(@Param("username") String username);
+
+    @Delete("delete from dss_user where username = #{username} ")
+    void deleteUserByUserName(@Param("username") String username);
+
+    @Delete("delete from dss_proxy_user where username = #{username} ")
+    void deleteProxyUserByUserName(@Param("username") String username);
 }

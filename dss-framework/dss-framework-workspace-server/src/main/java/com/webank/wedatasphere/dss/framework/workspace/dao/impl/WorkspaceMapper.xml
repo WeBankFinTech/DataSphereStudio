@@ -60,7 +60,8 @@
         source,
         last_update_time,
         last_update_user,
-        workspace_type
+        workspace_type,
+        admin_permission
         FROM
         dss_workspace WHERE id = #{workspaceId}
     </select>
@@ -117,7 +118,7 @@
         SELECT
         <!--        <include refid="menu_appInstances_cn"/>-->
         m.`id`,m.`title_cn` AS `title`, m.`desc_cn` AS `description`, m.`labels_cn` AS `labels`, m.image, m.`is_active`,
-        m.`icon`,m.`order`, app.`appconn_name` as `name`, app.`if_iframe`, app.`is_external`
+        m.`icon`,m.`order`, app.`appconn_name` as `name`, app.`if_iframe`, app.`is_external`,app.`is_micro_app`
         FROM dss_workspace_menu_appconn m
         JOIN dss_appconn app
         ON m.`appconn_id` = app.`id`
@@ -131,7 +132,7 @@
         SELECT
         <!--        <include refid="menu_appInstances_en"/>-->
         m.`id`,m.`title_en` AS `title`, m.`desc_en` AS `description`, m.`labels_en` AS `labels`, m.image, m.`is_active`,
-        m.`icon`,m.`order`, app.`appconn_name` as `name`, app.`if_iframe`, app.`is_external`
+        m.`icon`,m.`order`, app.`appconn_name` as `name`, app.`if_iframe`, app.`is_external`,app.`is_micro_app`
         FROM dss_workspace_menu_appconn m
         JOIN dss_appconn app
         ON m.`appconn_id` = app.`id`

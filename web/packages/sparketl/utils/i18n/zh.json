@@ -1,0 +1,45 @@
+{
+   "plugin" : {
+    "registryTableName": "注册表名",
+    "outputTableName": "输出表名",
+    "parameter": "参数",
+    "variable": "变量",
+    "saveMode": "写入模式",
+    "storageLevel": "缓存级别",
+    "enableCache": "开启缓存",
+    "open": "开启",
+    "close": "关闭",
+    "driver": "驱动类名",
+    "jdbcUrl": "jdbc Url",
+    "querySql": "查询语句",
+    "username": "用户名",
+    "password": "密码",
+    "sql": "sql",
+    "append": "追加",
+    "cover": "覆盖",
+    "sourceSql": "来源语句",
+    "sourceTable": "来源表",
+    "partitions": "分区数",
+    "partitionsColumn": "分区字段",
+    "filePriority": "文件优先",
+    "strongCheck": "强校验",
+    "targetDatabase": "目标库",
+    "targetTable": "目标表",
+    "datasource": "数据源",
+    "preQueries": "预执行SQL",
+    "addPreQueries": "添加预执行SQL",
+    "fileFormat": "文件格式",
+    "path": "文件路径",
+    "delete": "删除",
+    "columnNames": "字段名",
+    "enter": "请输入",
+    "common": {
+       "globalVariable": "全局变量",
+       "addPlugin": "添加插件",
+       "addPath": "写入路径",
+       "outTableName": "输出表名",
+       "registryTableName": "注册表名"
+     }
+    }
+
+}

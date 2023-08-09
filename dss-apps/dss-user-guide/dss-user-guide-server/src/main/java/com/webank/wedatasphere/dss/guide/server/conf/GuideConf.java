@@ -12,7 +12,7 @@ public interface GuideConf {
 
     CommonVars<String> HOST_IP_ADDRESS = CommonVars.apply("target.ip.address", "127.0.0.1");
 
-    CommonVars<String> TARGET_GITBOOK_PATH = CommonVars.apply("target.gitbook.path", "/appcom/Install/ApacheInstall");
+    CommonVars<String> TARGET_GITBOOK_PATH = CommonVars.apply("target.gitbook.path", "/appcom/Install/ApacheInstall/gitbook_books");
 
     CommonVars<String> SUMMARY_IGNORE_MODEL = CommonVars.apply("summary.ignore.model","km");
 

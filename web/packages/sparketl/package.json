@@ -1,0 +1,9 @@
+{
+  "name": "@dataspherestudio/sparketl",
+  "version": "1.0.0",
+  "dependencies": {
+    "@codemirror/lang-json": "^6.0.1",
+    "codemirror": "^5.65.13",
+    "vue-codemirror": "^4.0.6"
+  }
+}

@@ -9,10 +9,10 @@
             name="all"
             label="All"
           />
-          <TabPane
+          <!-- <TabPane
             :label="errorLabel"
             name="error"
-          />
+          /> -->
           <TabPane
             :label="warnLabel"
             name="warning"
@@ -73,18 +73,18 @@ export default {
       searchText: '',
       errorNum: 0,
       warnNum: 0,
-      errorLabel: (h) => {
-        return h('div', [
-          h('span', 'Error'),
-          h('Badge', {
-            props: {
-              count: this.errorNum,
-              className: 'err-badge',
-              type: 'error'
-            },
-          }),
-        ]);
-      },
+      // errorLabel: (h) => {
+      //   return h('div', [
+      //     h('span', 'Error'),
+      //     h('Badge', {
+      //       props: {
+      //         count: this.errorNum,
+      //         className: 'err-badge',
+      //         type: 'error'
+      //       },
+      //     }),
+      //   ]);
+      // },
       warnLabel: (h) => {
         return h('div', [
           h('span', 'Warning'),
@@ -100,14 +100,19 @@ export default {
     };
   },
   watch: {
-    'status': function(val){
-      if(val === 'Failed'){
-        this.curPage = 'error'
-      }
-    },
     logLine(val) {
       if (this.$refs.logEditor.editor) {
         this.$refs.logEditor.editor.revealLine(val);
+      }
+    },
+    logs() {
+      if (this.$refs.logEditor.editor && this.logs.all) {
+        const firstError = this.logs.all.split('\n').findIndex(line => line.indexOf('ERROR') > -1)
+        setTimeout(() => {
+          if (this.$refs.logEditor.editor) {
+            this.$refs.logEditor.editor.revealLine(firstError > 0 ? firstError + 1 : 1);
+          }
+        }, 1200);
       }
     }
   },

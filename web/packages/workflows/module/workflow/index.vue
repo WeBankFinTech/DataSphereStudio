@@ -39,8 +39,8 @@
       @versionDetailShow="versionDetailAction"
       @goto="versionGotoWorkflow"
     ></VersionDetail>
-    <!--新增和导入 二合一弹窗-->
-    <Modal v-model="mergeModalShow" :footer-hide="true" title="添加工作流">
+    <!--新增弹窗-->
+    <Modal v-model="mergeModalShow" :footer-hide="true" :title="$t('message.workflow.Addworkflow')">
       <WorkflowFormNew
         v-if="mergeModalShow"
         :workflow-data="currentOrchetratorData"
@@ -51,26 +51,6 @@
         @confirm="ProjectMergeConfirm"
       >
       </WorkflowFormNew>
-      <!-- <Tab-pane label="导入编排" name="upload">
-          <Upload
-            ref="uploadJson"
-            type="drag"
-            :data="uploadData"
-            :before-upload="handleUpload"
-            :on-success="handleSuccess"
-            :on-error="handleError"
-            :format="['zip']"
-            :max-size="2001000"
-            :action="uploadUrl">
-            <div class="upload-box">
-              <Icon
-                type="ios-cloud-upload"
-                size="52"
-                style="color: #3399ff"></Icon>
-              <p>{{ $t('message.orchestratorModes.clickOrDragFile') }}</p>
-            </div>
-          </Upload>
-        </Tab-pane> -->
     </Modal>
     <Spin v-if="loading" size="large" fix />
   </div>
@@ -83,7 +63,7 @@ import Void from "../common/voidPage/void.vue";
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import api from '@dataspherestudio/shared/common/service/api';
 import { GetAreaMap } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
-import axios from "axios";
+
 export default {
   props: {
     topTapList: {
@@ -120,7 +100,6 @@ export default {
     }
   },
   components: {
-    // projectContentItem: commonModule.component.workflowContentItem,
     WorkflowForm,
     WorkflowFormNew,
     VersionDetail,
@@ -128,7 +107,7 @@ export default {
   },
   data() {
     return {
-      mergeModalShow: false, // 二合一弹窗展示
+      mergeModalShow: false, //弹窗展示
       ProjectShow: false, // 添加工作流展示
       versionDetailShow: false,
       deleteProjectShow: false, // 删除工作流弹窗展示
@@ -140,10 +119,7 @@ export default {
       params: "",
       versionData: [], // 工作流版本信息
       currentOrchetratorData: null,
-      applicationAreaMap: [],
-      importModal: false,
-      uploadUrl: ``,
-      uploadData: null,
+      applicationAreaMap: []
     };
   },
   computed: {
@@ -213,7 +189,7 @@ export default {
           "post"
         )
         .then(() => {
-          this.$Message.success('操作成功');
+          this.$Message.success(this.$t('message.workflow.Success'));
           this.$emit('rollback', row.orchestratorId)
           this.versionDetail()
         })
@@ -257,7 +233,6 @@ export default {
       } else {
         this.mergeModalShow = true;
         this.init();
-        this.initUpload();
       }
     },
     ProjectMergeCancel() {
@@ -281,6 +256,10 @@ export default {
             cb()
           }
           this.init()
+        }).catch(()=>{
+          if (cb) {
+            cb()
+          }
         });
     },
     noticeParent(projectId) {
@@ -296,23 +275,29 @@ export default {
       this.init();
     },
     // 确认新增工作流
-    ProjectConfirm(orchestratorData) {
-      orchestratorData.labels = { route: this.getCurrentDsslabels() };
+    ProjectConfirm({data, cb}) {
+      data.labels = { route: this.getCurrentDsslabels() };
       this.loading = true;
       if (this.actionType === "add") {
         api
           .fetch(
             `${this.$API_PATH.ORCHESTRATOR_PATH}createOrchestrator`,
-            orchestratorData,
+            data,
             "post"
           )
           .then(() => {
             this.$Message.success(this.$t("message.workflow.createdSuccess"));
             this.getParams();
             this.getFlowData(this.params);
+            if (cb) {
+              cb(true)
+            }
           })
           .catch(() => {
             this.loading = false;
+            if (cb) {
+              cb()
+            }
           });
       } else {
         const {
@@ -326,7 +311,7 @@ export default {
           description,
           uses,
           labels
-        } = orchestratorData;
+        } = data;
         api
           .fetch(
             `${this.$API_PATH.ORCHESTRATOR_PATH}modifyOrchestrator`,
@@ -348,11 +333,14 @@ export default {
             this.loading = false;
             this.$Message.success(
               this.$t("message.workflow.eitorSuccess", {
-                name: orchestratorData.orchestratorName
+                name: data.orchestratorName
               })
             );
             this.getParams();
             this.getFlowData(this.params);
+            if (cb) {
+              cb(true)
+            }
             setTimeout(() => {
               this.$router.go(0);
             }, 1500);
@@ -360,6 +348,9 @@ export default {
           .catch(() => {
             this.loading = false;
             this.currentOrchetratorData.uses = this.$refs.workflowForm.originBusiness;
+            if (cb) {
+              cb()
+            }
           });
       }
     },
@@ -417,7 +408,7 @@ export default {
       this.init();
       this.ProjectShow = true;
       this.actionType = "modify";
-      this.currentOrchetratorData = project;
+      this.currentOrchetratorData = { ...project };
       this.currentOrchetratorData.taxonomyID = classifyId;
     },
     ProjectShowAction(val) {
@@ -495,7 +486,7 @@ export default {
     versionGotoWorkflow(row) {
       this.$emit("open-workflow", {
         ...this.$route.query,
-        id: row.id,
+        id: row.orchestratorId,
         orchestratorId: row.orchestratorId,
         version: String(row.id), // 在编排列表返回的是版本id
         name:
@@ -544,111 +535,6 @@ export default {
       this.$router.push({
         path: `/workspaceHome?workspaceId=${workspaceId}`
       });
-    },
-    // 编排的导出
-    orchestraorExport(orchestrator) {
-      const params = {
-        workspaceId: +this.$route.query.workspaceId,
-        projectId: +this.$route.query.projectID,
-        projectName: this.$route.query.projectName,
-        orchestratorId: orchestrator.orchestratorId,
-        orcVersionId: orchestrator.orchestratorVersionId,
-        addOrcVersion: false,
-        dssLabels: this.getCurrentDsslabels(),
-        labels: {
-          route: this.getCurrentDsslabels()
-        }
-      };
-      // 返回结构不一样
-      axios
-        .get(
-          `${location.protocol}//${window.location.host}/api/rest_j/v1/dss/framework/orchestrator/exportOrchestrator`,
-          {
-            params,
-            responseType: "arraybuffer"
-          }
-        )
-        .then(res => {
-          const blob = new Blob([res.data], { type: "application/zip" });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.style.display = "none";
-          a.href = url;
-          a.setAttribute(
-            "download",
-            `${this.$route.query.projectName}_${orchestrator.orchestratorName}`
-          );
-          const evObj = document.createEvent("MouseEvents");
-          evObj.initMouseEvent(
-            "click",
-            true,
-            true,
-            window,
-            0,
-            0,
-            0,
-            0,
-            0,
-            false,
-            false,
-            true,
-            false,
-            0,
-            null
-          );
-          a.dispatchEvent(evObj);
-          // const flag = a.dispatchEvent(evObj);
-          // this.$nextTick(() => {
-          //   if (flag) {
-          //     this.$Message.success(this.$t('message.orchestratorModes.exportSuccess'));
-          //   }
-          // });
-        })
-        .catch(() => {
-          this.$Message.error(this.$t("message.orchestratorModes.exportFail"));
-        });
-    },
-    initUpload() {
-      this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile?labels=dev`;
-      this.uploadData = {
-        projectName: this.$route.query.projectName,
-        projectID: +this.$route.query.projectID,
-        dssLabels: "dev"
-      };
-      // this.$refs.uploadJson.clearFiles();
-    },
-
-    orchestratorImport() {
-      this.uploadUrl = `/api/rest_j/v1/dss/framework/orchestrator/importOrchestratorFile`;
-      this.uploadData = {
-        projectName: this.$route.query.projectName,
-        projectID: +this.$route.query.projectID,
-        labels: JSON.stringify({
-          route: "dev"
-        })
-      };
-      this.importModal = true;
-    },
-    // 手动上传
-    handleUpload(file) {
-      if (file.name.indexOf(".zip") === -1) {
-        this.$Message.warning(this.$t("message.orchestratorModes.selectZip"));
-        return false;
-      }
-    },
-    handleSuccess(response, file) {
-      if (response.status === 0) {
-        this.$Message.success(
-          `${file.name} ${this.$t("message.orchestratorModes.importSuccess")}`
-        );
-        // 更新左侧tree，同时父组件会通知刷新flow
-        this.noticeParent();
-      }
-      this.ProjectMergeCancel();
-    },
-    handleError() {
-      this.$Message.error(this.$t("message.orchestratorModes.importFail"));
-      this.ProjectMergeCancel();
     },
     // 获取当前编排的环境
     getCurrentDsslabels() {

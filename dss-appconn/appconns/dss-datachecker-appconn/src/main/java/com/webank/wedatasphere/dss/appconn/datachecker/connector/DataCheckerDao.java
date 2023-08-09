@@ -31,10 +31,7 @@ import org.slf4j.Logger;
 
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +61,7 @@ public class DataCheckerDao {
 
     private static DataSource jobDS;
     private static DataSource bdpDS;
-    private static DataCheckerDao instance;
+    private static volatile DataCheckerDao instance;
 
     public static DataCheckerDao getInstance() {
         if (instance == null) {
@@ -244,19 +241,21 @@ public class DataCheckerDao {
         if (dataScape.equals("Partition")) {
             Pattern pattern = Pattern.compile("\\{([^\\}]+)\\}");
             Matcher matcher = pattern.matcher(dataObject);
-            String partitionName = null;
+            String partitionName = "";
             if (matcher.find()) {
                 partitionName = matcher.group(1);
             }
             partitionName = partitionName.replace("\'", "").replace("\"", "");
             tableName = tableName.split("\\{")[0];
-            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_PARTITION);
+            PreparedStatement pstmt = conn.prepareStatement(SQL_SOURCE_TYPE_JOB_PARTITION, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_PARTITION);
             pstmt.setString(1, dbName);
             pstmt.setString(2, tableName);
             pstmt.setString(3, partitionName);
             return pstmt;
         } else if (dataObjectArray.length == 2) {
-            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_TABLE);
+            PreparedStatement pstmt = conn.prepareStatement(SQL_SOURCE_TYPE_JOB_TABLE, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            PreparedStatement pstmt = conn.prepareCall(SQL_SOURCE_TYPE_JOB_TABLE);
             pstmt.setString(1, dbName);
             pstmt.setString(2, tableName);
             return pstmt;
@@ -281,9 +280,11 @@ public class DataCheckerDao {
         }
         PreparedStatement pstmt = null;
         if (timeScape.equals("NULL")) {
-            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
+            pstmt = conn.prepareStatement(SQL_SOURCE_TYPE_BDP, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP);
         } else {
-            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
+            pstmt = conn.prepareStatement(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            pstmt = conn.prepareCall(SQL_SOURCE_TYPE_BDP_WITH_TIME_CONDITION);
             pstmt.setInt(4, Integer.valueOf(timeScape) * 3600);
         }
         pstmt.setString(1, dbName);
@@ -293,8 +294,8 @@ public class DataCheckerDao {
     }
 
     private long getJobTotalCount(Map<String, String> proObjectMap, Connection conn, Logger log) {
-        String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT);
-        if (dataObject != null) {
+        String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT) == null ? "" : proObjectMap.get(DataChecker.DATA_OBJECT);
+        if (StringUtils.isNotBlank(dataObject)) {
             dataObject = dataObject.replace(" ", "").trim();
         }
         log.info("-------------------------------------- search hive/spark/mr data ");
@@ -309,8 +310,8 @@ public class DataCheckerDao {
     }
 
     private long getBdpTotalCount(Map<String, String> proObjectMap, Connection conn, Logger log, Properties props) {
-        String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT);
-        if (dataObject != null) {
+        String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT) == null ? "": proObjectMap.get(DataChecker.DATA_OBJECT);
+        if (StringUtils.isNotBlank(dataObject)) {
             dataObject = dataObject.replace(" ", "").trim();
         }
         String timeScape = props.getOrDefault(DataChecker.TIME_SCAPE, "NULL").toString();
@@ -329,8 +330,8 @@ public class DataCheckerDao {
         log.info("=============================调用BDP MASK接口查询数据状态==========================================");
         Map<String, String> resultMap = new HashMap();
         String maskUrl = props.getProperty(DataChecker.MASK_URL);
-        String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT);
-        if (dataObject != null) {
+        String dataObject = proObjectMap.get(DataChecker.DATA_OBJECT) == null ? "":proObjectMap.get(DataChecker.DATA_OBJECT);
+        if ( StringUtils.isNotBlank(dataObject)) {
             dataObject = dataObject.replace(" ", "").trim();
         }
         String dataScape = dataObject.contains("{") ? "Partition" : "Table";

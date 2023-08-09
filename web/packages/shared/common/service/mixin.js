@@ -70,9 +70,9 @@ export default {
       let url = app.homepageUri
       const openFn = (info) => {
         if (info.external) {
-          if (info.ifIframe) { // 在Iframe
+          if (info.ifIframe) {
             this.$router.push({
-              path: `/commonIframe/${info.name}`,
+              path: info.isMicroApp ? `/microApp/${info.name}` : `/commonIframe/${info.name}`, //isMicroApp判断是否微应用
               query: {
                 ...query,
                 url,

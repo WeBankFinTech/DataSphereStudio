@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.migrate.restful;
 
 import com.google.common.collect.Lists;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.IOType;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -14,12 +15,11 @@ import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.framework.project.server.service.BMLService;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
-import com.webank.wedatasphere.dss.migrate.conf.MigrateConf;
 import com.webank.wedatasphere.dss.migrate.exception.MigrateErrorException;
 import com.webank.wedatasphere.dss.migrate.service.MetaService;
 import com.webank.wedatasphere.dss.migrate.service.MigrateService;
@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInf
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.impl.SSOUrlBuilderOperationImpl;
@@ -49,6 +50,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,6 +58,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RequestMapping(path = "/dss/framework/release", produces = {"application/json"})
@@ -81,13 +84,13 @@ public class DSSMigrateRestful {
     @Autowired
     private DSSFrameworkProjectService dssFrameworkProjectService;
     @Autowired
+    @Qualifier("projectBmlService")
     BMLService bmlService;
     @Autowired
     private MetaService metaService;
 
-    // todo only dev开发中心
-    private Sender orchestratorSender = Sender.getSender(MigrateConf.ORC_SERVER_NAME);
-    private Sender workflowSender = Sender.getSender(MigrateConf.WORKFLOW_SERVER_NAME);
+    private Sender orchestratorSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+    private Sender workflowSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender();
 
 
     @PostMapping("/importOldDSSProject")
@@ -102,14 +105,13 @@ public class DSSMigrateRestful {
         //4.上传到bml
         //5.通过resourceId 和 version 导入到 dev的 orchestrator-server
         String userName = SecurityFilter.getLoginUsername(req);
-//        List<FormDataBodyPart> files = form.getFields("file");
         if (files == null || files.size() <= 0) {
             LOG.error("files are null, can not continue");
             return Message.error("no files to import");
         }
         //只取第一个文件
         MultipartFile p = files.get(0);
-        String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
+        String fileName = new String(Objects.requireNonNull(p.getOriginalFilename()).getBytes("ISO8859-1"), StandardCharsets.UTF_8);
         InputStream is = null;
         OutputStream os = null;
         try {
@@ -121,8 +123,6 @@ public class DSSMigrateRestful {
             is = p.getInputStream();
             os = IoUtils.generateExportOutputStream(inputPath);
             IOUtils.copy(is, os);
-//            Workspace workspace = new Workspace();
-            Cookie[] cookies = req.getCookies();
             Workspace workspace = getWorkspace(req);
             migrateService.migrate(userName, inputPath, workspace);
         } catch (Exception e) {
@@ -183,7 +183,6 @@ public class DSSMigrateRestful {
         }
         ssoUrlBuilderOperation.setDSSUrl(gateWayUrl);
         ssoUrlBuilderOperation.setWorkspace(workspace.getWorkspaceName());
-//        workspace.setSSOUrlBuilderOperation(ssoUrlBuilderOperation);
         return workspace;
     }
 
@@ -209,17 +208,13 @@ public class DSSMigrateRestful {
                                   @RequestParam(value = "dssLabels", required = false) String dssLabels,
                                   @RequestParam(name = "file") List<MultipartFile> files) throws Exception {
         String userName = SecurityFilter.getLoginUsername(req);
-//        List<FormDataBodyPart> files = form.getFields("file");
         if (files == null || files.size() <= 0) {
             LOG.error("files are null, can not continue");
             return Message.error("no files to import");
         }
         //只取第一个文件
-//        FormDataBodyPart p = files.get(0);
         MultipartFile p = files.get(0);
-//        FormDataContentDisposition fileDetail = p.getFormDataContentDisposition();
-//        String fileName = new String(fileDetail.getFileName().getBytes("ISO8859-1"), "UTF-8");
-        String fileName = new String(p.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
+        String fileName = new String(Objects.requireNonNull(p.getOriginalFilename()).getBytes("ISO8859-1"), StandardCharsets.UTF_8);
         InputStream is = null;
         OutputStream os = null;
         Message responseMsg = Message.ok();
@@ -269,7 +264,7 @@ public class DSSMigrateRestful {
 //            mkdir(orcPath);
             orchestratorInfo.setProjectId(projectVo.getId());
             orchestratorInfo.setName(flowName);
-            String oldUUID = migrateService.queryOrcUUIDByName(new Long(dssWorkspace.getId()), projectVo.getId(), flowName);
+            String oldUUID = migrateService.queryOrcUUIDByName((long) dssWorkspace.getId(), projectVo.getId(), flowName);
             if (null != oldUUID) {
                 orchestratorInfo.setUUID(oldUUID);
             } else {
@@ -286,9 +281,9 @@ public class DSSMigrateRestful {
             InputStream inputStream = new FileInputStream(orcZipPath);
             long importOrcId = 0L;
             try {
-                Map<String, Object> uploadMap = bmlService.upload(userName, inputStream, "default_orc.zip", projectVo.getName());
-                String resourceId = uploadMap.get("resourceId").toString();
-                String version = uploadMap.get("version").toString();
+                BmlResource bmlResource = bmlService.upload(userName, inputStream, "default_orc.zip", projectVo.getName());
+                String resourceId = bmlResource.getResourceId();
+                String version = bmlResource.getVersion();
                 //不能走release的importservice接口 因为dev标签没有import操作
                 importOrcId = migrateService.importOrcToOrchestrator(resourceId, version, projectVo, userName, "dev", workspace, orchestratorInfo);
             } finally {
@@ -378,16 +373,19 @@ public class DSSMigrateRestful {
         ResponseExportOrchestrator exportResponse = null;
         OrchestratorVo orchestratorVo;
         if (orcVersionId != null) {
-            orchestratorVo = (OrchestratorVo) orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, orcVersionId));
+            orchestratorVo = RpcAskUtils.processAskException(orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, orcVersionId)),
+                    OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         } else {
-            orchestratorVo = (OrchestratorVo) orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, null));
+            orchestratorVo = RpcAskUtils.processAskException(orchestratorSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, null)),
+                    OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         }
         orcVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
         LOG.info("export orchestrator orchestratorId " + orchestratorId + ",orcVersionId:" + orcVersionId);
         try {
             RequestExportOrchestrator requestExportOrchestrator = new RequestExportOrchestrator(
                     userName, orchestratorId, orcVersionId, projectName, dssLabelList, addOrcVersion, workspace);
-            exportResponse = (ResponseExportOrchestrator) orchestratorSender.ask(requestExportOrchestrator);
+            exportResponse = RpcAskUtils.processAskException(orchestratorSender.ask(requestExportOrchestrator),
+                    ResponseExportOrchestrator.class, RequestExportOrchestrator.class);
         } catch (Exception e) {
             LOG.error("export orchestrator failed for ", e);
             throw new DSSErrorException(100789, "export orchestrator failed for " + e.getMessage());
@@ -544,19 +542,17 @@ public class DSSMigrateRestful {
         requestOrchestratorVersion.setProjectId(projectId);
         requestOrchestratorVersion.setOrchestratorId(orcId);
         requestOrchestratorVersion.setUsername(userName);
-        ResponseOrchetratorVersion orchetratorVersion = (ResponseOrchetratorVersion) orchestratorSender.ask(requestOrchestratorVersion);
-        DSSOrchestratorVersion orchestratorLatestVersion = orchetratorVersion.getOrchestratorVersions().stream()
-                .filter((v) -> v.getValidFlag() == 1).sorted(new Comparator<DSSOrchestratorVersion>() {
-                    @Override
-                    public int compare(DSSOrchestratorVersion o1, DSSOrchestratorVersion o2) {
-                        // 注意是逆序
-                        if (o1.getVersion().compareToIgnoreCase(o2.getVersion()) < 0) {
-                            return 1;
-                        } else if (o1.getVersion().compareToIgnoreCase(o2.getVersion()) == 0) {
-                            return 0;
-                        } else {
-                            return -1;
-                        }
+        ResponseOrchetratorVersion orchestratorVersion = RpcAskUtils.processAskException(orchestratorSender.ask(requestOrchestratorVersion),
+                ResponseOrchetratorVersion.class, RequestOrchestratorVersion.class);
+        DSSOrchestratorVersion orchestratorLatestVersion = orchestratorVersion.getOrchestratorVersions().stream()
+                .filter((v) -> v.getValidFlag() == 1).sorted((o1, o2) -> {
+                    // 注意是逆序
+                    if (o1.getVersion().compareToIgnoreCase(o2.getVersion()) < 0) {
+                        return 1;
+                    } else if (o1.getVersion().compareToIgnoreCase(o2.getVersion()) == 0) {
+                        return 0;
+                    } else {
+                        return -1;
                     }
                 }).findFirst().get();
         return orchestratorLatestVersion;
@@ -564,7 +560,8 @@ public class DSSMigrateRestful {
 
     private String getLatestFlowBmlVersion(String username, long flowId) {
         RequestQueryWorkFlow requestQueryWorkFlow = new RequestQueryWorkFlow(username, flowId);
-        ResponseQueryWorkflow responseQueryWorkflow = (ResponseQueryWorkflow) workflowSender.ask(requestQueryWorkFlow);
+        ResponseQueryWorkflow responseQueryWorkflow = RpcAskUtils.processAskException(workflowSender.ask(requestQueryWorkFlow),
+                ResponseQueryWorkflow.class, RequestQueryWorkFlow.class);
         if (null != responseQueryWorkflow && null != responseQueryWorkflow.getDssFlow()) {
             return responseQueryWorkflow.getDssFlow().getBmlVersion();
         } else {
@@ -591,7 +588,7 @@ public class DSSMigrateRestful {
         // 1，获取项目下所有的工作流
         // 获取工作空间id，没有就报错
         List<DSSWorkspace> workspaces = dssWorkspaceService.getWorkspaces(username);
-        long workspaceId = 0l;
+        long workspaceId = 0L;
         DSSWorkspace dssWorkspace = workspaces.stream().filter((w) -> w.getName().equals(workspaceName)).findFirst().get();
         if (null == dssWorkspace) {
             LOG.error("Cannot find workspace {}, please create it first.", workspaceName);
@@ -620,7 +617,8 @@ public class DSSMigrateRestful {
         if (StringUtils.isBlank(requestOrchestratorInfos.getOrchestratorMode())) {
             requestOrchestratorInfos.setOrchestratorMode(DEFAULT_PROJECT_ORCHESTRATOR_MODE);
         }
-        ResponseOrchestratorInfos responseOrchestratorInfos = (ResponseOrchestratorInfos) orchestratorSender.ask(requestOrchestratorInfos);
+        ResponseOrchestratorInfos responseOrchestratorInfos = RpcAskUtils.processAskException(orchestratorSender.ask(requestOrchestratorInfos),
+                ResponseOrchestratorInfos.class, RequestOrchestratorInfos.class);
         int count = 0;
         if (CollectionUtils.isNotEmpty(responseOrchestratorInfos.getOrchestratorInfos())) {
             for (DSSOrchestratorInfo orchestratorInfo : responseOrchestratorInfos.getOrchestratorInfos()) {
@@ -632,7 +630,8 @@ public class DSSMigrateRestful {
                 requestOrchestratorVersion.setProjectId(orchestratorInfo.getProjectId());
                 ResponseOrchetratorVersion responseOrchetratorVersion = null;
                 try {
-                    responseOrchetratorVersion = (ResponseOrchetratorVersion) orchestratorSender.ask(requestOrchestratorVersion);
+                    responseOrchetratorVersion = RpcAskUtils.processAskException(orchestratorSender.ask(requestOrchestratorVersion),
+                            ResponseOrchetratorVersion.class, RequestOrchestratorVersion.class);
                 } catch (Exception e) {
                     DSSExceptionUtils.dealErrorException(60015, "Ask orchestrotor version failed " + BDPJettyServerHelper.gson().toJson(requestOrchestratorVersion), e,
                             DSSErrorException.class);
@@ -644,7 +643,7 @@ public class DSSMigrateRestful {
                                 // 注意，正序
                                 if (o1 < o2) {
                                     return -1;
-                                } else if (o1 == o2) {
+                                } else if (o1.equals(o2)) {
                                     return 0;
                                 } else {
                                     return 1;
@@ -672,7 +671,7 @@ public class DSSMigrateRestful {
                 projectName, labels, addOrcVersion, workspace);
         ResponseExportOrchestrator exportResponse = null;
         try {
-            exportResponse = (ResponseExportOrchestrator) orchestratorSender.ask(exportRequest);
+            exportResponse = RpcAskUtils.processAskException(orchestratorSender.ask(exportRequest), ResponseExportOrchestrator.class, RequestExportOrchestrator.class);
         } catch (Exception e) {
             DSSExceptionUtils.dealErrorException(60015, "export orchestrator ref failed " + BDPJettyServerHelper.gson().toJson(exportRequest), e,
                     DSSErrorException.class);

@@ -31,4 +31,8 @@ public interface DssMsgCacheOperation extends Operation {
 
     void setDSSMsgToSession(DSSMsg dssMsg, HttpServletRequest request);
 
+    void setExistsProxyUser(HttpServletRequest req);
+
+    boolean isExistsProxyUser(HttpServletRequest req);
+
 }

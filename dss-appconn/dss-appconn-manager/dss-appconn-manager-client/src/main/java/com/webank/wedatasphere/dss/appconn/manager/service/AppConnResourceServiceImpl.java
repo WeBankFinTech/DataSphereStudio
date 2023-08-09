@@ -23,7 +23,8 @@ import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnIndexFileUtils;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.bml.client.BmlClient;
 import org.apache.linkis.bml.client.BmlClientFactory;
 import org.apache.linkis.common.utils.Utils;
@@ -36,13 +37,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.webank.wedatasphere.dss.appconn.manager.conf.AppConnManagerClientConfiguration.APPCONN_WAIT_MAX_TIME;
 
 public class AppConnResourceServiceImpl implements AppConnResourceService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppConnResourceServiceImpl.class);
+    private final Map<String, Boolean> appConnIsLoaded = new HashMap<>();
 
     private BmlClient bmlClient = BmlClientFactory.createBmlClient();
 
@@ -57,69 +64,105 @@ public class AppConnResourceServiceImpl implements AppConnResourceService {
         }
         File appConnPath = new File(appConnHomePath, appConnName);
         Resource resource = appConnInfo.getAppConnResource();
-        if(!appConnPath.exists() && !appConnPath.mkdir()) {
-            throw new AppConnHomeNotExistsWarnException(20350, "Cannot create dir " + appConnPath.getPath() + " for AppConn " + appConnName);
-        }
-        if(AppConnIndexFileUtils.isLatestIndex(appConnPath, resource)) {
+        Supplier<Boolean> isLatest = () -> appConnPath.exists() && appConnPath.isDirectory()
+                && AppConnIndexFileUtils.isLatestIndex(appConnPath, resource);
+        if(isLatest.get()) {
+            if(!appConnIsLoaded.containsKey(appConnName)) {
+                synchronized (appConnIsLoaded) {
+                    if(!appConnIsLoaded.containsKey(appConnName)) {
+                        appConnIsLoaded.put(appConnName, true);
+                        LOGGER.warn("AppConn {} is newest, no necessary to reload it, just use it.", appConnName);
+                    }
+                }
+            }
             return appConnPath.getPath();
         }
-        if (StringUtils.isNotBlank(appConnInfo.getReference())) {
-            return appConnPath.getPath();
-        }
-        LOGGER.info("Try to download latest resource {} in version {} from BML for AppConn {}.", resource.getResourceId(),
-            resource.getVersion(), appConnName);
-        // At first, Download AppConn files from bml.
-        String zipFilePath = new File(appConnHomePath, appConnName + "_" + resource.getVersion() + ".zip").getPath();
-        bmlClient.downloadResource(Utils.getJvmUser(), resource.getResourceId(), resource.getVersion(),
-            "file://" + zipFilePath, true);
-        // Then, try to unzip it.
-        if(!deleteAppConnDir(appConnPath)) {
-            throw new AppConnHomeNotExistsWarnException(20350, "Cannot delete dir " + appConnPath.getPath() + " for AppConn " + appConnName);
+        File zipFilePath = new File(appConnHomePath, appConnName + "_" + resource.getVersion() + ".zip");
+        if(zipFilePath.exists()) {
+            long startTime = System.currentTimeMillis();
+            LOGGER.warn("I found the {} is exists, maybe another service is loading the AppConn {}, I will try to wait for {} at max.",
+                    zipFilePath, appConnName, APPCONN_WAIT_MAX_TIME.getValue().toString());
+            while(!isLatest.get()) {
+                Utils.sleepQuietly(3000);
+                if(System.currentTimeMillis() - startTime >= APPCONN_WAIT_MAX_TIME.getValue().toLong()) {
+                    break;
+                }
+            }
+            if(isLatest.get()) {
+                LOGGER.warn("AppConn {} is loaded by another service, now just use it.", appConnName);
+                synchronized (appConnIsLoaded) {
+                    appConnIsLoaded.put(appConnName, true);
+                }
+                return appConnPath.getPath();
+            } else {
+                LOGGER.warn("Since waited for {}, the AppConn {} has not been loaded by others, now I will try to load it by myself.", APPCONN_WAIT_MAX_TIME.getValue().toString(), appConnName);
+                deleteFile(zipFilePath, "Delete the zip file " + zipFilePath.getName() + " of AppConn " + appConnName +  " failed");
+            }
         }
         try {
-            ZipHelper.unzip(zipFilePath);
+            Files.createFile(zipFilePath.toPath());
+        } catch (IOException e) {
+            throw new AppConnHomeNotExistsWarnException(20350, "Cannot create zip file " + zipFilePath.getPath() + " for AppConn "
+                    + appConnName, e);
+        }
+        LOGGER.warn("Try to load AppConn {}......", appConnName);
+        LOGGER.info("First, download latest resource {} in version {} from BML for AppConn {}, and write it into file {}.", resource.getResourceId(),
+            resource.getVersion(), appConnName, zipFilePath);
+        // At first, Download AppConn files from bml.
+        bmlClient.downloadResource(Utils.getJvmUser(), resource.getResourceId(), resource.getVersion(),
+            "file://" + zipFilePath.getPath(), true);
+        // Then, try to unzip it.
+        if(appConnPath.exists()) {
+            try {
+                FileUtils.deleteDirectory(appConnPath);
+            } catch (IOException e) {
+                throw new AppConnHomeNotExistsWarnException(20350, "Cannot delete dir " + appConnPath.getPath() + " for AppConn " + appConnName, e);
+            }
+        }
+        LOGGER.info("Then, unzip the latest resource file {}.", zipFilePath);
+        try {
+            ZipHelper.unzip(zipFilePath.getPath());
         } catch (DSSErrorException e) {
-            throw new AppConnHomeNotExistsWarnException(20350, "Unzip " + zipFilePath + " failed, AppConn " + appConnName, e);
+            throw new AppConnHomeNotExistsWarnException(20350, "Unzip " + zipFilePath + " failed, AppConn is " + appConnName, e);
         }
 
         File oldIndexFile = AppConnIndexFileUtils.getIndexFile(appConnPath);
-
-        // update index file.
-        if (oldIndexFile != null && !oldIndexFile.delete()) {
-            throw new AppConnHomeNotExistsWarnException(20350, "Delete index file " + oldIndexFile.getName() + " failed, please ensure the permission is all right.");
+        // delete old index file.
+        if (oldIndexFile != null) {
+            LOGGER.info("Thirdly, delete the old index file {} for AppConn {}.", oldIndexFile, appConnName);
+            deleteFile(oldIndexFile, "Delete the index file " + oldIndexFile.getName() + " of AppConn " + appConnName +  " failed");
         }
-
-//      TODO  ZipUtils.fileToUnzip(zipFilePath, appConnHomePath.getPath());
-        // Only reserve latest 2 version files.
-        File[] historyZipFiles = appConnHomePath.listFiles((p, fileName) -> fileName.startsWith(appConnName) && fileName.endsWith(".zip"));
-        if(historyZipFiles.length > 2) {
-            List<File> files = Arrays.stream(historyZipFiles).sorted().collect(Collectors.toList());
-            // ignore delete failed.
-            IntStream.range(0, files.size() - 2).forEach(index -> files.get(index).delete());
-        }
-        // Finally, write index file.
+        // create new index file.
         Path indexFile = Paths.get(appConnPath.getPath(), AppConnIndexFileUtils.getIndexFileName(resource));
+        LOGGER.info("Finally, create the latest index file {} for AppConn {}.", indexFile.toFile(), appConnName);
         try {
             Files.createFile(indexFile);
         } catch (IOException e) {
             throw new AppConnHomeNotExistsWarnException(20350, "Cannot create index file " + indexFile.toFile().getPath() + " for AppConn "
                 + appConnName, e);
         }
+        synchronized (appConnIsLoaded) {
+            appConnIsLoaded.put(appConnName, true);
+        }
+        // Only reserve latest 2 version files.
+        File[] historyZipFiles = appConnHomePath.listFiles((p, fileName) -> fileName.startsWith(appConnName) && fileName.endsWith(".zip"));
+        if(historyZipFiles != null && historyZipFiles.length > 2) {
+            List<File> files = Arrays.stream(historyZipFiles).sorted().collect(Collectors.toList());
+            // ignore the failed deletion.
+            IntStream.range(0, files.size() - 2).forEach(index -> deleteFile(files.get(index), null));
+        }
+        LOGGER.warn("AppConn {} is loaded.", appConnName);
         return appConnPath.getPath();
     }
 
-    public boolean deleteAppConnDir(File f){
-        if(f.isDirectory()){
-            File[] files = f.listFiles();
-            for (File key : files) {
-                if(key.isFile()){
-                    key.delete();
-                }else{
-                    deleteAppConnDir(key);
-                }
+    private void deleteFile(File file, String errorMsg) {
+        try {
+            FileUtils.forceDelete(file);
+        } catch (IOException e) {
+            if(StringUtils.isNotEmpty(errorMsg)) {
+                throw new AppConnHomeNotExistsWarnException(20350, errorMsg + ". Please ensure the permission is all right.", e);
             }
         }
-        return f.delete();
     }
 
 }

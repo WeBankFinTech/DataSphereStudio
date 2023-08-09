@@ -56,7 +56,7 @@ export default {
               this.removeRuning(this.currentData.orchestratorId)
               this.$Modal.error({
                 title: this.$root.$t('message.workflow.publish.failed'),
-                content: `<p style="word-break: break-all;">发布失败</p>`,
+                content: `<p style="word-break: break-all;">{{ $t('message.workflow.Publishfailed') }}</p>`,
                 width: 500,
                 okText: this.$root.$t('message.workflow.publish.cancel'),
               });

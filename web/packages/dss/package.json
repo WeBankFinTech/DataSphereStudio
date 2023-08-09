@@ -1,19 +1,19 @@
 {
   "name": "@dataspherestudio/dss",
-  "version": "1.1.4",
+  "version": "1.1.2",
   "dependencies": {
-    "@dataspherestudio/scriptis": "^1.1.4",
-    "@dataspherestudio/shared": "^1.1.4"
+    "@dataspherestudio/scriptis": "^1.1.2",
+    "@dataspherestudio/shared": "^1.1.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "3.12.1",
     "@vue/cli-plugin-eslint": "3.12.1",
     "@vue/cli-service": "3.12.1",
-    "@vue/eslint-config-standard": "4.0.0"
+    "@vue/eslint-config-standard": "4.0.0",
+    "babel-plugin-transform-remove-console": "6.9.4"
   },
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "build-sandbox": "vue-cli-service build --mode sandbox"
+    "build": "vue-cli-service build"
   }
 }

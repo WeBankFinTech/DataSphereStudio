@@ -21,7 +21,7 @@ import com.webank.wedatasphere.dss.appconn.eventchecker.connector.EventDruidFact
 import com.webank.wedatasphere.dss.appconn.eventchecker.adapter.EventCheckAdapter;
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;

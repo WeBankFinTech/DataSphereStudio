@@ -24,7 +24,8 @@ import com.webank.wedatasphere.dss.appconn.datachecker.DataChecker;
 import okhttp3.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HttpUtils {
 
-  private static final Logger logger = Logger.getLogger(HttpUtils.class);
+  private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
   public static Response httpClientHandleBase(String actionUrl, RequestBody requestBody, Map<String, String> urlMap) throws IOException {
     String maskUrl = actionUrl + "appid=" + urlMap.get("appid") + "&&nonce=" + urlMap.get("nonce")

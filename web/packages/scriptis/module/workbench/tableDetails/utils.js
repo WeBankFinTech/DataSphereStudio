@@ -16,49 +16,49 @@
  */
 
 import moment from 'moment';
-
+import i18n from '@dataspherestudio/shared/common/i18n';
 const convertList = {
   lifecycle: [{
     value: 0,
-    label: '永久',
+    label: i18n.t('message.scripts.Permanent'),
   }, {
     value: 1,
-    label: '当天有效',
+    label: i18n.t('message.scripts.validday'),
   }, {
     value: 2,
-    label: '一周有效',
+    label: i18n.t('message.scripts.validweek'),
   }, {
     value: 3,
-    label: '一月有效',
+    label: i18n.t('message.scripts.validmonth'),
   }, {
     value: 4,
-    label: '半年有效',
+    label: i18n.t('message.scripts.validhalf'),
   }],
   modelLevel: [{
     value: 0,
-    label: 'ODS(原始数据层)',
+    label: `ODS(${i18n.t('message.scripts.datastore')})`,
   }, {
     value: 1,
-    label: 'DWD(明细数据层)',
+    label: `DWD(${i18n.t('message.scripts.warehouse')})`,
   }, {
     value: 2,
-    label: 'DWS(汇总数据层)',
+    label: `DWS(${i18n.t('message.scripts.warehouseservice')})`,
   }, {
     value: 3,
-    label: 'ADS(应用数据层)',
+    label: `ADS(${i18n.t('message.scripts.appservice')})`,
   }],
   useWay: [{
     value: 0,
-    label: '一次写多次读',
+    label: i18n.t('message.scripts.writemany'),
   }, {
     value: 1,
-    label: '增删改查',
+    label: i18n.t('message.scripts.curd'),
   }, {
     value: 2,
-    label: '多次覆盖写',
+    label: i18n.t('message.scripts.multoverride'),
   }, {
     value: 3,
-    label: '一次写偶尔读',
+    label: i18n.t('message.scripts.once'),
   }],
 };
 
@@ -74,7 +74,7 @@ function formatValue(item, field) {
     item.modeInfo = JSON.parse(item.modeInfo)
   }
   if (field.key === 'modeInfo.type') {
-    value = item.modeInfo ? item.modeInfo.type === 'index' ? "指标": '维度' : ''
+    value = item.modeInfo ? item.modeInfo.type === 'index' ? i18n.t('message.scripts.Metrics'): i18n.t('message.scripts.Dimensions') : ''
   }
   if (field.key === 'modeInfo.name') {
     value = item.modeInfo ? item.modeInfo.name : ''
@@ -82,7 +82,7 @@ function formatValue(item, field) {
   let formatted = value;
   switch (field.type) {
     case 'boolean':
-      formatted = value ? '是' : '否';
+      formatted = value ? i18n.t('message.scripts.Yes') : i18n.t('message.scripts.No');
       break;
     case 'timestramp':
       formatted = value == '0' || !value ? 0 : moment.unix(value).format('YYYY-MM-DD HH:mm:ss');

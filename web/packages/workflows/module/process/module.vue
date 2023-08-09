@@ -15,13 +15,8 @@
       @node-baseInfo="saveNodeBaseInfo"
       @node-param="saveNodeParam"
       @node-delete="nodeDelete"
-      @ctx-menu-associate="checkAssociated"
       @add="addNode"
-      @ctx-menu-relySelect="relySelect"
-      @ctx-menu-mycopy="copyNode"
-      @ctx-menu-mypaste="pasteNode"
-      @ctx-menu-allDelete="allDelete"
-      @ctx-menu-console="openConsole"
+      @on-ctx-menu="onContextMenu"
       @link-delete="linkDelete"
       @link-add="linkAdd">
       <template >
@@ -61,7 +56,7 @@
               class="button"
               @click="clickswitch('select')">
               <SvgIcon class="icon" icon-class="play-2" color="#666"/>
-              <span>选中执行</span>
+              <span>{{ $t('message.workflow.SelectRun') }}</span>
             </div>
             <div
               v-if="workflowIsExecutor"
@@ -77,7 +72,7 @@
               class="button"
               @click="reRun">
               <Icon class="icon" type="ios-refresh" color="#666" size="18"/>
-              <span>失败重跑</span>
+              <span>{{ $t('message.workflow.Rerun') }}</span>
             </div>
             <div class="devider" />
             <div
@@ -167,8 +162,8 @@
       @click="clickBaseInfo">
       <div class="process-module-param-modal-header">
         <h5>{{$t('message.workflow.process.baseInfo')}}</h5>
-        <div v-if="!myReadonly" class="save-button">
-          <Button size="small" @click.stop="saveNodeParameter"
+        <div class="save-button">
+          <Button  v-if="!myReadonly" size="small" @click.stop="saveNodeParameter"
             :disabled="false">{{$t('message.workflow.process.nodeParameter.BC')}}
           </Button>
         </div>
@@ -184,7 +179,6 @@
           :nodes="json && json.nodes"
           :consoleParams="consoleParams"
           @saveNode="saveNode"
-          @paramsChange="paramsChange"
         ></nodeParameter>
       </div>
     </div>
@@ -217,42 +211,6 @@
           @click="handleSave">{{$t('message.workflow.process.confirmSave')}}</Button>
       </div>
     </Modal>
-    <Modal
-      v-model="importModal">
-      <div
-        class="process-module-title"
-        slot="header">
-        {{$t('message.workflow.process.importJson')}}
-      </div>
-      <Upload
-        ref="uploadJson"
-        type="drag"
-        multiple
-        :before-upload="handleUpload"
-        :format="[json]"
-        :max-size="2001000"
-        action="">
-        <div style="padding: 20px 0">
-          <Icon
-            type="ios-cloud-upload"
-            size="52"
-            style="color: #3399ff"></Icon>
-          <p>{{$t('message.workflow.process.uplaodJson')}}</p>
-        </div>
-      </Upload>
-      <div v-show="importModel.names.length">
-        <div
-          v-for="filename in importModel.names"
-          :key="filename">
-          {{ filename }}
-        </div>
-      </div>
-      <div slot="footer">
-        <Button
-          type="primary"
-          @click="importJSON">{{$t('message.workflow.process.confirmImport')}}</Button>
-      </div>
-    </Modal>
     <Spin
       v-if="loading"
       size="large"
@@ -271,6 +229,7 @@
     <associate-script
       ref="associateScript"
       @click="associateScript"/>
+    <!-- 创建节点弹窗 -->
     <Modal
       :title="addNodeTitle"
       v-model="addNodeShow"
@@ -335,17 +294,16 @@
       </Form>
       <div slot="footer">
         <Button
+          v-if="$APP_CONF && $APP_CONF.showVersionDiff !== false"
+          @click="showDiff">{{$t('message.workflow.showVersionDiff')}}</Button>
+        <Button
           type="primary"
           :loading="saveingComment"
           :disabled="saveingComment"
           @click="workflowPublish">{{$t('message.workflow.ok')}}</Button>
       </div>
     </Modal>
-    <module v-model="showDispatchHistoryModel" width="1500" :footerDisable="false">
-      <div class="schedulisIframe">
-        <iframe class="iframeClass" :src="schedulislSrc" frameborder="0" width="100%" height="100%"/>
-      </div>
-    </module>
+    <!-- 导出弹窗 -->
     <Modal
       v-model="workflowExportShow"
       :title="$t('message.workflow.exportWorkflow')"
@@ -366,7 +324,7 @@
         </FormItem>
       </Form>
     </Modal>
-
+    <!-- 运行控制台 -->
     <console
       v-if="openningNode"
       ref="currentConsole"
@@ -376,15 +334,14 @@
       :height="consoleHeight"
       :style="getConsoleStyle"
       @close-console="closeConsole"></console>
-    <component
-      v-if="extComponents.name"
-      :is="extComponents.component"
+    <BottomTab
+      ref="bottomTab"
       :orchestratorId="orchestratorId"
       :orchestratorVersionId="orchestratorVersionId"
-      :appId="flowId"
+      :flowId="flowId"
       :product="product"
       :readonly="readonly"
-      @event-from-ext="eventFromExt"
+      @release="release"
     />
   </div>
 </template>
@@ -402,13 +359,13 @@ import { NODETYPE, ext } from '@/workflows/service/nodeType';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import util from '@dataspherestudio/shared/common/util';
-import plugin from '@dataspherestudio/shared/common/util/plugin';
 import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
-import module from './component/modal.vue';
 import moment from 'moment';
 import { getPublishStatus } from '@/workflows/service/api.js';
+import module from './index';
+import nodeIcons from './nodeicon';
+import BottomTab from './component/bottomTab.vue'
 
-const extComponents = plugin.emitHook('workflow_bottom_panel') || {}
 export default {
   components: {
     vueProcess,
@@ -417,7 +374,7 @@ export default {
     nodeParameter,
     associateScript,
     console,
-    module
+    BottomTab
   },
   mixins: [mixin],
   directives: {
@@ -484,9 +441,6 @@ export default {
       // 是否为父工作流
       isRootFlow: true,
       name: '',
-      versionId: '',
-      // 0 未发布过 1发布过
-      state: '',
       shapes: [],
       // 原始数据
       originalData: null,
@@ -508,34 +462,21 @@ export default {
       // 控制参数模态框是否显示
       isParamModalShow: false,
       isResourceShow: false,
-      // 是否显示导入JSON视图
-      importModal: false,
-      importModel: {
-        names: [],
-        files: [],
-        jsons: [],
-      },
       // 是否有改变
       jsonChange: false,
-      publishChangeCount: 0,
       loading: false,
       repetitionNameShow: false,
       repeatTitles: [],
       nodebaseinfoShow: false, // 自定义节点信息弹窗展示
       clickCurrentNode: {}, // 当前点击的节点
-      timerClick: '',
-
       viewOptions: {
         showBaseInfoOnAdd: false, // 不显示默认的拖拽添加节点弹出的基础信息面板
         shapeView: true, // 左侧shape列表
         control: true,
       },
-      paramsIsChange: false, // 判断参数是否有在做操作改变，是否自动保存
       addNodeShow: false, // 创建节点的弹窗显示
       cacheNode: null,
       addNodeTitle: this.$t('message.workflow.process.createSubFlow'), // 创建节点时弹窗的title
-      IframeProjectLoading: false,
-      // nodeBasicInfoData: [], // 后台返回的节点基本信息
       workflowIsExecutor: false, // 当前工作流是否再执行
       openningNode: null, // 上一次打开控制台的节点
       shapeWidth: 0, // 流程图插件左侧工具栏的宽度
@@ -545,45 +486,20 @@ export default {
       executorStatusTimer: '',
       workflowExecutorCache: [],
       isDispatch: false,
-      showDispatchHistoryModel: false,
-      schedulislSrc: '', // 调度历史跳转的url
       contextID: '',
       pubulishFlowComment: '',
       pubulishShow: false,
       flowVersion: '',
       isFlowPubulish: false,
-      // bmlVersion: '',
       workflowExportShow: false,
       exportDesc: '',
       exporTChangeVersion: false,
       changeNum: 0,
       consoleParams: [],
-      appId: null,
       consoleHeight: 250,
       needReRun: false,
       locked: false,
-      newOrchestratorVersionId: this.orchestratorVersionId,
       extraToolbar: [],
-      // 工作流icon
-      workFlowImage: {
-        'sql': require('./images/workflow/sql.png'),
-        'python': require('./images/workflow/python.png'),
-        'pyspark': require('./images/workflow/pyspark.png'),
-        'scala': require('./images/workflow/scala.png'),
-        'hql': require('./images/workflow/hql.png'),
-        'shell': require('./images/workflow/shell.png'),
-        'display': require('./images/workflow/display.png'),
-        'dashboard': require('./images/workflow/dashboard.png'),
-        'widget': require('./images/workflow/widget.png'),
-        'mlss': require('./images/workflow/mlss.png'),
-        'eventreceiver': require('./images/workflow/eventreceiver.png'),
-        'eventsender': require('./images/workflow/eventsender.png'),
-        'datachecker': require('./images/workflow/datachecker.png'),
-        'connector': require('./images/workflow/connector.png'),
-        'subFlow': require('./images/workflow/subflow.png'),
-        'sendemail': require('./images/workflow/sendemail.png'),
-      },
-      extComponents
     };
   },
   computed: {
@@ -631,7 +547,7 @@ export default {
               arr.push({
                 text: this.$t('message.workflow.process.console'),
                 value: 'console',
-                img: require('./images/menu/xitongguanlitai.svg'),
+                icon: 'xitongguanlitai'
               })
             }
           }
@@ -641,20 +557,38 @@ export default {
                 arr.push({
                   text: this.$t('message.workflow.process.associate'),
                   value: 'associate',
-                  img: require('./images/menu/associate.svg'), // 图标资源文件，也可以通过icon配置内置字体文件支持的className
+                  icon: 'associate', // 图标资源文件，也可以通过icon配置内置字体文件支持的className
                 });
               }
               arr.push({
                 text: this.$t('message.workflow.process.relySelect'),
                 value: 'relySelect',
-                img: require('./images/menu/flow.svg'),
+                icon: 'depselect',
+                children: [{
+                  text: this.$t('message.workflow.process.upstreamLevelOne'),
+                  value: 'relySelectUpOne',
+                  icon: 'depselect',
+                }, {
+                  text: this.$t('message.workflow.process.downstreamLevelOne'),
+                  value: 'relySelectDownOne',
+                  icon: 'depselect',
+                }, {
+                  text: this.$t('message.workflow.process.upAllLevel'),
+                  value: 'relySelectUp',
+                  icon: 'depselect',
+                }, {
+                  text: this.$t('message.workflow.process.downAllLevel'),
+                  value: 'relySelectDown',
+                  icon: 'depselect',
+                }
+                ]
               });
               // 通过节点类型去判断是否支持复制
               if (this.nodeCopy(node)) {
                 arr.push({
                   text: this.$t('message.workflow.copy'),
                   value: 'mycopy',
-                  img: require('./images/menu/fuzhi.svg'),
+                  icon: 'fuzhi',
                 });
               }
             }
@@ -663,20 +597,17 @@ export default {
             arr.push({
               text: this.$t('message.workflow.paste'),
               value: 'mypaste',
-              img: require('./images/menu/zhantie.svg'),
+              icon: 'zhantie',
             });
             arr.push({
               text: this.$t('message.workflow.process.allDelete'),
               value: 'allDelete',
-              img: require('./images/menu/delete.svg'),
+              icon: 'delete'
             });
           }
           return arr;
         }
       }
-    },
-    newFlowId() {
-      return this.appId || this.flowId
     }
   },
   created() {
@@ -684,7 +615,6 @@ export default {
   },
   watch: {
     jsonChange(val) {
-      this.publishChangeCount += 1;
       this.$emit('isChange', val);
     },
     workflowExecutorCache() {
@@ -694,7 +624,7 @@ export default {
   mounted() {
     this.workflowExecutorCache = storage.get('workflowExecutorCache', 'local') || [];
     // 查找缓存中是否有当前工作流
-    const currentExecutorFlow = this.workflowExecutorCache.filter((item) => item.flowId === this.newFlowId)
+    const currentExecutorFlow = this.workflowExecutorCache.filter((item) => item.flowId === this.flowId)
     if (currentExecutorFlow.length > 0) {
       this.workflowIsExecutor = true;
       this.queryWorkflowExecutor(currentExecutorFlow[0].execID, currentExecutorFlow[0].taskID)
@@ -712,16 +642,8 @@ export default {
     this.getConsoleParams();
     document.addEventListener('keyup', this.onKeyUp)
     this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
-    // todo mixin ? 事件命名空间？
-    plugin.on('call_app_method', (fn, args) => {
-      if (typeof this[fn] === 'function') {
-        this.fn(...args)
-      }
-    })
-    const refs = this.$refs
-    eventbus.on('workflow.fold.left.tree', () => {
-      refs.process && refs.process.layoutView()
-    });
+    eventbus.on('workflow.fold.left.tree', this.foldHandler);
+    eventbus.on('workflow.copying', this.onCopying);
   },
   beforeDestroy() {
     if (this.timer) {
@@ -736,9 +658,20 @@ export default {
     if (this.updateLockTimer) {
       clearTimeout(this.updateLockTimer)
     }
+    eventbus.off('workflow.fold.left.tree', this.foldHandler);
+    eventbus.off('workflow.copying', this.onCopying);
     document.removeEventListener('keyup', this.onKeyUp)
   },
   methods: {
+    foldHandler() {
+      const refs = this.$refs
+      refs.process && refs.process.layoutView()
+    },
+    onCopying(data) {
+      if (data.source.orchestratorId == this.orchestratorId) {
+        this.locked = !data.done
+      }
+    },
     eventFromExt(evt) {
       if (evt && evt.callFn && typeof this[evt.callFn] === 'function') {
         this[evt.callFn](...evt.params)
@@ -779,8 +712,8 @@ export default {
     paramsValid(param) {
       // 自定义函数的方法先写这里
       const validatorTitle = (rule, value, callback) => {
-        if (value === `${this.name}_`) {
-          callback(new Error(this.$t('message.workflow.process.nodeParameter.JDMCBNYGZL')));
+        if (value === `${this.name}`) {
+          callback(new Error(rule.message));
         } else {
           callback();
         }
@@ -805,7 +738,7 @@ export default {
             })
           } else if (item.validateType === 'Function') {
             temRule.push({
-              validator: validatorTitle,
+              validator: ['validatorTitle'].includes(item.validateRange) ? validatorTitle : () => {},
               trigger: 'blur'
             })
           }
@@ -862,6 +795,8 @@ export default {
           item.jobContent = node.jobContent;
           item.resources = node.resources;
           item.params = node.params;
+          item.modifyUser = this.getUserName();
+          item.modifyTime = Date.now();
         }
         return item;
       })
@@ -874,11 +809,13 @@ export default {
       this.originalData = this.json;
       // 更新节点之后自动保存json
       if (scriptisSave) {
-        this.autoSave('保存脚本', false);
+        this.autoSave(this.$t('message.workflow.Save'), false);
       }
     },
     getBaseInfo() {
       this.loading = true;
+      this.clickCurrentNode = {};
+      this.nodebaseinfoShow = false;
       this.changeNum = 0;
       this.getOriginJson();
     },
@@ -900,7 +837,7 @@ export default {
     },
     getOriginJson() {
       return api.fetch(`/dss/workflow/get`, {
-        flowId: this.newFlowId,
+        flowId: this.flowId,
         labels: this.getCurrentDsslabels()
       },'get').then((res) => {
         let json = this.convertJson(res.flow);
@@ -920,7 +857,6 @@ export default {
     },
     convertJson(flow) {
       this.name = flow.name;
-      this.state = flow.state;
       this.isRootFlow = flow.rootFlow;
       this.rank = flow.rank; // 工作流层级
       let json;
@@ -939,6 +875,7 @@ export default {
             return node;
           });
         }
+        this.orcVersion = json.orcVersion
       }
       return json;
     },
@@ -950,8 +887,8 @@ export default {
           if (item.children.length > 0) {
             item.children = item.children.map((subItem) => {
               // svg绘制的点太多，导致动画卡顿，使用图片代替
-              if (this.workFlowImage[subItem.title]) {
-                subItem.image = this.workFlowImage[subItem.title];
+              if (nodeIcons[subItem.title]) {
+                subItem.image = nodeIcons[subItem.title];
               } else if (subItem.image) {
                 subItem.image = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(subItem.image)))
               }
@@ -974,7 +911,7 @@ export default {
     },
     checkChange(obj) {
       // 剔除单击节点选中导致的change
-      // createTime,lastUpdateTime 流程图产生的数据
+      // createTime 流程图产生的数据
       // params 动态添加的，手动保存会更新jsonchange标志位
       const helpFn = function(obj = {}) {
         const temp = { nodes: [], edges: [] }
@@ -982,7 +919,7 @@ export default {
           obj.nodes.forEach(item => {
             const nodeItem = {}
             Object.keys(item).forEach(k => {
-              if(['selected','createTime','lastUpdateTime', 'params'].indexOf(k) < 0) {
+              if(['selected','createTime', 'updateTime', 'params'].indexOf(k) < 0) {
                 nodeItem[k] = item[k]
               }
             })
@@ -993,7 +930,7 @@ export default {
           obj.edges.forEach(item => {
             const link = {}
             Object.keys(item).forEach(k => {
-              if(['selected','createTime','lastUpdateTime', 'params'].indexOf(k) < 0) {
+              if(['selected','createTime', 'updateTime', 'params'].indexOf(k) < 0) {
                 link[k] = item[k]
               }
             })
@@ -1005,7 +942,7 @@ export default {
       return helpFn(obj) !== helpFn(this.lastObj)
     },
     initNode(arg) {
-      if(this.clickCurrentNode.id === arg.id) return; // 多出点击时，避免数据初始化
+      if(this.clickCurrentNode.id && this.clickCurrentNode.id === arg.id) return; // 多出点击时，避免数据初始化
       arg = this.bindNodeBasicInfo(arg);
       this.clickCurrentNode = JSON.parse(JSON.stringify(arg));
     },
@@ -1052,7 +989,6 @@ export default {
       this.dispatch('Workbench:updateFlowsNodeName', arg);
       // 当保存子流程节点的基础信息时，如果子流程节点没有 embeddedFlowId:"flow_id" 则先创建子流程节点
       let node = arg;
-      // let flage = false; // 避免创建子工作流有两个提示
       if (node.type == NODETYPE.FLOW) {
         if (this.rank >= 4) {
           return this.$Message.warning(this.$t('message.workflow.process.rankLimit'));
@@ -1069,12 +1005,11 @@ export default {
         }
 
         if (!node.jobContent.embeddedFlowId) {
-          // flage = true;
           // 调用接口创建
-          await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}addFlow`, {
+          const result = await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}addFlow`, {
             name: node.title,
             description: node.desc,
-            parentFlowID: Number(this.newFlowId),
+            parentFlowID: Number(this.flowId),
             workspaceName: this.getCurrentWorkspaceName(),
             projectName: this.$route.query.projectName,
             version: this.version,
@@ -1086,7 +1021,11 @@ export default {
               desc: this.$t('message.workflow.process.createSubSuccess'),
             });
             node.jobContent.embeddedFlowId = res.flow.id;
+            return true
           });
+          if (result !== true) {
+            return
+          }
         } else {
           await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}updateFlowBaseInfo`, {
             id: node.jobContent.embeddedFlowId,
@@ -1114,12 +1053,14 @@ export default {
           item.bindViewKey = node.bindViewKey || "";
           item.appTag = node.appTag;
           item.businessTag = node.businessTag;
+          item.modifyUser = this.getUserName();
+          item.modifyTime = Date.now();
         }
         return item;
       });
       this.originalData = this.json;
       this.jsonChange = true;
-      // if (!flage) return this.$Message.success(this.$t('message.workflow.process.saveParamsNotice'));
+      this.addNodeShow = false;
       // 保存工作流
       this.autoSave('paramsSave', false);
     },
@@ -1127,188 +1068,8 @@ export default {
       this.$emit('saveParam', arg);
     },
     /**
-         * 显示导入JSON视图
-         */
-    showImportJsonView() {
-      this.importModel.files = [];
-      this.importModel.jsons = [];
-      this.importModel.names = [];
-      this.$refs.uploadJson.clearFiles();
-      this.importModal = true;
-    },
-    handleUpload(file) {
-      if (file.name.indexOf('.json') === -1) {
-        this.$Message.warning(this.$t('message.workflow.process.uploadJson'));
-        return false;
-      }
-      const sizeResult = file.size >= 1024 * 1024;
-      if (sizeResult) return this.$Message.warning(this.$t('message.workflow.process.JsonLimit'));
-      if (this.importModel.names.indexOf(file.name) < 0) {
-        this.importModel.names.push(file.name);
-        this.importModel.files.push(file);
-      }
-
-      return false;
-    },
-    readFileJson(file) {
-      return new Promise((resolve) => {
-        let reader = new FileReader();
-        // Closure to capture the file information.
-        reader.onload = (e) => {
-          this.importModel.json = e.target.result;
-          resolve({ name: file.name, json: e.target.result });
-        };
-        // Read in the image file as a data URL.
-        reader.readAsText(file);
-      });
-    },
-    importJSON() {
-      if (this.importModel.files.length < 1) {
-        return this.$Message.warning(this.$t('message.workflow.process.jsonFormat'));
-      }
-      let fp = this.importModel.files.map((f) => this.readFileJson(f));
-      Promise.all(fp).then((res) => {
-        let valid = true;
-        res.forEach((fileItem) => {
-          // 检查数据结构
-          let json = {};
-          try {
-            json = JSON.parse(fileItem.json);
-          } catch (error) {
-            valid = false;
-            return this.$Message.warning(`${this.$t('message.workflow.process.jsonFormat')}：${error.message}`);
-          }
-
-          for (let i = 0; i < json.edges.length; i++) {
-            let edge = json.edges[i];
-            if (!edge.source || !edge.target || !edge.sourceLocation || !edge.targetLocation) {
-              return this.$Message.warning(this.$t('message.workflow.process.jsonEdgeNotice'));
-            }
-          }
-
-          for (let i = 0; i < json.nodes.length; i++) {
-            let node = json.nodes[i];
-            if (!node.layout || !node.jobType || !node.id) {
-              valid = false;
-              return this.$Message.warning(this.$t('message.workflow.process.jsonNodeNotice'));
-            } else if (node.layout) {
-              let layout = node.layout;
-              if (layout.x === undefined || layout.y === undefined || layout.width === undefined || layout.height === undefined) {
-                valid = false;
-                return this.$Message.warning(this.$t('message.workflow.process.jsonLayoutNotice'));
-              }
-            }
-          }
-
-          // 需要把 id -> key, jobType -> type，id即为名称
-          json.nodes.forEach((node) => {
-            node.key = node.id;
-            node.createTime = +new Date();
-            node.name = +new Date() + '' + Math.ceil(Math.random() * 1000); // 保存时使用时间戳作为文件名
-            node.type = node.jobType;
-            node.title = node.id;
-            if (node.jobContent && node.jobContent.code) {
-              node.resources = [];
-            }
-            node = this.bindNodeBasicInfo(node);
-            delete node.id;
-            delete node.jobType;
-          });
-          let validTypes = [];
-          this.shapes.forEach((it) => {
-            if (it.children) {
-              validTypes = validTypes.concat(it.children.map((child) => child.type).filter((t) => t));
-            }
-          });
-          validTypes = Array.from(new Set(validTypes));
-
-          if (json.edges && !Array.isArray(json.edges)) {
-            valid = false;
-            return this.$Message.warning(this.$t('message.workflow.process.jsonEdgesNoArray'));
-          }
-          if (json.nodes && !Array.isArray(json.nodes)) {
-            valid = false;
-            return this.$Message.warning(this.$t('message.workflow.process.jsonNodesNoArray'));
-          }
-          let invalidNodes = json.nodes.filter((node) => {
-            return validTypes.indexOf(node.type) < 0;
-          });
-
-          if (invalidNodes.length === json.nodes.length || json.nodes.length < 1) {
-            valid = false;
-            return this.$Message.warning(`${this.$t('message.workflow.process.jsonNoType')}（${validTypes.join('、')}）`);
-          } else {
-            invalidNodes.forEach((node) => console.warn(`${this.$t('message.workflow.process.nosupprotType')}${node.type}`, node));
-          }
-          if (valid) {
-            this.importModel.jsons.push(json);
-          }
-        });
-        if (valid) {
-          this.mergeJson();
-        }
-      });
-    },
-    mergeJson() {
-      this.importModel.jsons.forEach((json) => {
-        this.changeJsonData(json);
-      });
-      this.importModal = false;
-    },
-    changeJsonData(json) {
-      // importReplace 多次导入是覆盖还是追加
-      if (this.importReplace) {
-        this.originalData = json;
-      } else if (this.json) {
-        // 过滤掉重复节点，重复边
-        if (Array.isArray(this.json.nodes) && Array.isArray(json.nodes)) {
-          json.nodes = json.nodes.filter((node) => {
-            return !this.json.nodes.some((on) => {
-              return on.key === node.key;
-            });
-          });
-          json.nodes = this.json.nodes.concat(json.nodes).map((item) => {
-            if (item.type === NODETYPE.CONNECTOR) {
-              item.title = item.key = item.key + '_' + this.rank;
-            }
-            return item;
-          });
-        }
-        if (Array.isArray(this.json.edges) && Array.isArray(json.edges)) {
-          json.edges = json.edges.filter((node) => {
-            return !this.json.edges.some((on) => {
-              return on.source === node.source && on.target === node.target;
-            });
-          });
-          json.edges = this.json.edges.concat(json.edges).map((item) => { // 修改空节点名称，避免全局工程下节点同名，不是很严谨，但能减少使用人员去修改重名
-            if (/^CONNECTOR_/.test(item.source)) {
-              item.source = item.source + '_' + this.rank;
-            }
-            if (/^CONNECTOR_/.test(item.target)) {
-              item.target = item.target + '_' + this.rank;
-            }
-            return item;
-          });
-        }
-        this.json = this.originalData = json;
-      } else {
-        this.json = this.originalData = json;
-      }
-    },
-    /**
-         * 显示保存视图
-         */
-    showSaveView() {
-      if (this.workflowIsExecutor) return;
-      // 检查JSON
-      if (!this.validateJSON()) {
-        return;
-      }
-      this.saveModal = true;
-    },
-    /**
-         * 保存工作流
-         */
+     * 保存工作流
+     */
     handleSave: debounce(function () {
       this.save()
     }, 1500),
@@ -1339,7 +1100,7 @@ export default {
                 borderColor: '#6A85A7',
               })
             })
-            this.autoSave('手动保存', false);
+            this.autoSave(this.$t('message.workflow.Manually'), false);
           },
           onCancel: () => {
           },
@@ -1352,9 +1113,8 @@ export default {
             borderColor: '#6A85A7',
           })
         })
-        this.autoSave('手动保存', false);
+        this.autoSave(this.$t('message.workflow.Manually'), false);
       }
-      // });
     },
     autoSave(comment, f) {
       // 检查JSON
@@ -1410,16 +1170,18 @@ export default {
       return this.saveRequest(json, comment, f);
     },
     // 保存请求
-    saveRequest(json, comment, f, cb) {
+    saveRequest(json, comment, f) {
       const updateTime = Date.now();
       const paramsJson = JSON.parse(JSON.stringify(Object.assign(json, {
         comment: comment,
         type: this.type,
         updateTime,
+        updateUser: this.getUserName(),
         props: this.props,
         resources: this.resources,
         scheduleParams: this.scheduleParams,
-        contextID: this.contextID
+        contextID: this.contextID,
+        orcVersion: this.orcVersion
       })));
       if (this.schedulerAppConnName !== undefined) {
         paramsJson.schedulerAppConnName = this.schedulerAppConnName
@@ -1434,7 +1196,7 @@ export default {
         return node;
       });
       return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}saveFlow`, {
-        id: Number(this.newFlowId),
+        id: Number(this.flowId),
         json: JSON.stringify(paramsJson),
         projectName: this.$route.query.projectName,
         workspaceName: this.getCurrentWorkspaceName(),
@@ -1461,17 +1223,11 @@ export default {
           });
         }
         this.jsonChange = false;
-        if (cb) {
-          cb();
-        }
         // 保存成功后去更新tab的工作流数据
         this.$emit('updateWorkflowList');
         return res;
       }).catch(() => {
         this.loading = false;
-        if (cb) {
-          cb();
-        }
       });
     },
     /**
@@ -1492,7 +1248,7 @@ export default {
       let data = storage.get("flowEditLock") || {}
       const key = this.getUserName()
       const updateList = (data[key] || []).filter(it => it.projectId != this.$route.query.projectID)
-      updateList.push({ flowId: this.newFlowId, lock: flowEditLock, projectId: this.$route.query.projectID })
+      updateList.push({ flowId: this.flowId, lock: flowEditLock, projectId: this.$route.query.projectID })
       storage.set("flowEditLock", {
         [key]: updateList
       });
@@ -1500,7 +1256,7 @@ export default {
     getFlowEditLock() {
       const data = storage.get("flowEditLock") || {}
       const key = this.getUserName()
-      const item = (data[key] || []).find(it => it.flowId == this.newFlowId && it.projectId == this.$route.query.projectID)
+      const item = (data[key] || []).find(it => it.flowId == this.flowId && it.projectId == this.$route.query.projectID)
       return item && item.lock
     },
     updateLock() {
@@ -1700,12 +1456,39 @@ export default {
     },
     // 单击节点出来的右边的弹框的保存事件
     saveNode(node) { // 保存节点参数配置
-      this.saveNodeFunction(node)
-    },
-    // saveNode函数里面可以复用的代码
-    saveNodeFunction(node) {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonly'));
       this.saveNodeBaseInfo(node);
+    },
+    onContextMenu(menu, data) {
+      switch(menu) {
+        case 'associate':
+          this.checkAssociated(data);
+          break;
+        case 'console':
+          this.openConsole(data);
+          break;
+        case 'mycopy':
+          this.copyNode(data);
+          break;
+        case 'mypaste':
+          this.pasteNode(data);
+          break;
+        case 'allDelete':
+          this.allDelete();
+          break;
+        case 'relySelectUpOne':
+          this.relySelect(data, 'up-one');
+          break;
+        case 'relySelectDownOne':
+          this.relySelect(data, 'down-one');
+          break;
+        case 'relySelectUp':
+          this.relySelect(data, 'up');
+          break;
+        case 'relySelectDown':
+          this.relySelect(data, 'down');
+          break;
+      }
     },
     checkAssociated(node) {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonlyNoAssociated'));
@@ -1750,6 +1533,7 @@ export default {
           metadata: rst.metadata,
           projectName: this.$route.query.projectName || ''
         };
+        if (params.metadata && params.metadata.configuration) delete params.metadata.configuration.startup;
         api.fetch('/filesystem/saveScriptToBML', params, 'post')
           .then((res) => {
             this.$Message.success(this.$t('message.workflow.process.associaSuccess'));
@@ -1787,9 +1571,6 @@ export default {
         cb(false);
       });
     },
-    paramsChange(val) {
-      this.paramsIsChange = val;
-    },
     addNode(node) {
       // 关闭右侧弹窗
       this.nodebaseinfoShow = false;
@@ -1806,11 +1587,13 @@ export default {
         this.json.nodes = this.json.nodes.map((subItem) => {
           if (subItem.key === this.clickCurrentNode.key) {
             subItem.title = this.clickCurrentNode.title;
+            subItem.modifyUser = this.getUserName();
+            subItem.modifyTime = Date.now();
           }
           return subItem;
         });
         this.originalData = this.json;
-        this.autoSave('新增节点', false);
+        this.autoSave(this.$t('message.workflow.AddNode'), false);
         return;
       }
     },
@@ -1839,33 +1622,54 @@ export default {
     },
     // addFlowOk函数里可以复用的操作
     addFlowOkFunction() {
-      this.addNodeShow = false;
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonlyNoCeated'));
       this.saveNodeBaseInfo(this.clickCurrentNode);
     },
-    relySelect(node) {
+    relySelect(node, dir) {
       /**
        * 1.获取当前节点的key
        * 2.查找以当前key为source的节点
        * 3.遍历查找出来的节点数组，接着递归
        *  */
       let stepArray = [];
-      const stepArrayAction = (nodeKey) => {
+      const stepArrayAction = (nodeKey, level = 0) => {
+        level++;
         this.json.edges.forEach((item) => {
-          if (item.source === nodeKey) {
-            stepArray.push(item);
-            stepArrayAction(item.target);
+          if ( dir === 'down' && item.source === nodeKey) {
+            stepArray.push({...item, level});
+            stepArrayAction(item.target, level);
+          } else if(dir === 'up' && item.target === nodeKey) {
+            stepArray.push({...item, level});
+            stepArrayAction(item.source, level);
+          } else if(dir === 'down-one' && item.source === nodeKey) {
+            stepArray.push({...item, level});
+          } else if(dir === 'up-one' && item.target === nodeKey) {
+            stepArray.push({...item, level});
           }
         });
       };
       stepArrayAction(node.key);
       this.json.nodes = this.json.nodes.map((subItem) => {
-        if (stepArray.some((item) => item.target === subItem.key) || subItem.key === node.key) {
+        let runState
+        const inDeps = stepArray.filter((item) => (item.target === subItem.key && dir.includes('down')) || (item.source === subItem.key && dir.includes('up')))
+        if (subItem.key === node.key) subItem.selected = true;
+        if (inDeps.length ) {
           subItem.selected = true;
+          // runState = {
+          //   outerText: Math.max(...inDeps.map(it => it.level)),
+          //   outerStyle: {
+          //     position: 'absolute',
+          //     top: '12px',
+          //     right: '-30px',
+          //     width: '30px',
+          //     textAlign: 'center',
+          //     color: 'rgb(237, 64, 20)',
+          //   }
+          // }
         } else {
           subItem.selected = false;
         }
-        return subItem;
+        return {...subItem, runState};
       });
       this.originalData = this.json;
     },
@@ -1883,17 +1687,20 @@ export default {
       if (!this.cacheNode) {
         return this.$Message.warning(this.$t('message.workflow.process.firstCopy'));
       }
+      let tmpTitle = this.cacheNode.title+'_copy'
+      const hasNodeTitle = this.json.nodes.filter(it => it.title.indexOf(tmpTitle) > -1)
+      if (hasNodeTitle.length) {
+        tmpTitle = tmpTitle + hasNodeTitle.length
+      }
+      if (tmpTitle.length > 150) {
+        return this.$Message.warning(this.$t('message.workflow.process.namelength'));
+      }
       // 获取屏幕的缩放值
       let pageSize = this.$refs.process.getState().baseOptions.pageSize;
       const key = '' + new Date().getTime() + Math.ceil(Math.random() * 100);
       this.cacheNode.key = key;
       this.cacheNode.id = key;
       this.cacheNode.selected = true;
-      let tmpTitle = this.cacheNode.title+'_copy'
-      const hasNodeTitle = this.json.nodes.filter(it => it.title.indexOf(tmpTitle) > -1)
-      if (hasNodeTitle.length) {
-        tmpTitle = tmpTitle + hasNodeTitle.length
-      }
       this.cacheNode.title = tmpTitle
       this.cacheNode.createTime = Date.now()
       this.cacheNode.layout = {
@@ -1975,7 +1782,7 @@ export default {
       });
       this.originalData = this.json;
       if (selectNodeLength > selectNodes.length) {
-        this.$Message.warning('子工作流不支持批量删除！');
+        this.$Message.warning(this.$t('message.workflow.BatchDel'));
       }
       this.autoSave('allDelete', false);
     },
@@ -2013,7 +1820,7 @@ export default {
         cb();
         const newCreateParams = this.getCreatePrams(node);
         const createParams = {
-          flowID: this.newFlowId,
+          flowID: this.flowId,
           projectID: +this.$route.query.projectID,
           nodeType: node.type,
           nodeID: node.key,
@@ -2054,6 +1861,7 @@ export default {
         })
       } else {
         const params = {
+          flowID: this.flowId,
           nodeType: node.type,
           projectID: +this.$route.query.projectID,
           params: {
@@ -2108,7 +1916,7 @@ export default {
       const selectNodeLength = selectNodes.length
       if ( runFlag === 'select') {
         if (selectNodeLength < 1 ) {
-          return this.$Message.error('请先选择需要执行的节点');
+          return this.$Message.error(this.$t('message.workflow.PleaseSelectNode'));
         }
       }
       this.dispatch('workflowIndexedDB:clearNodeCache');
@@ -2126,7 +1934,7 @@ export default {
       // 如果是生产中心的只读模式不需要保存
       let a = null;
       if (!this.myReadonly) {
-        a = await this.autoSave('执行保存', false);
+        a = await this.autoSave(this.$t('message.workflow.Saving'), false);
         if (!a || !a.flowVersion) return;
 
       }
@@ -2134,7 +1942,7 @@ export default {
       const parmas = {
         executeApplicationName: "flowexecution",
         executionCode: JSON.stringify({
-          flowId: this.newFlowId,
+          flowId: this.flowId,
           version: !this.myReadonly ? a.flowVersion : this.flowVersion
         }),
         runType: "json",
@@ -2160,7 +1968,7 @@ export default {
         // 每次执行之后缓存工作流，关闭重新打开再接着获取状态
 
         this.workflowExecutorCache.push({
-          flowId: this.newFlowId,
+          flowId: this.flowId,
           execID: res.execID,
           taskID: res.taskID
         })
@@ -2180,7 +1988,7 @@ export default {
       clearTimeout(this.executorStatusTimer);
       // 清掉当前工作流执行的缓存
       this.workflowExecutorCache = this.workflowExecutorCache.filter((item) => {
-        item.flowId !== this.newFlowId;
+        item.flowId !== this.flowId;
       });
       if (this.task_killing) {
         return this.$Message.error('请求已发出，请勿重复点击');
@@ -2225,23 +2033,23 @@ export default {
           // Succees, Failed, Cancelled, Timeout
           this.workflowIsExecutor = false;
           if (status === 'Succeed') {
-            this.$Notice.success({desc: this.$t('message.workflow.projectDetail.workflowRunSuccess')})
+            this.$Notice.success({desc: this.$t('message.common.projectDetail.workflowRunSuccess')})
           }
           if (status === 'Failed') {
-            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunFail')})
+            this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunFail')})
             this.flowExecutorNode(execID, true);
           }
           if (status === 'Cancelled') {
-            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunCanceled')})
+            this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunCanceled')})
             this.flowExecutorNode(execID, true);
           }
           if (status === 'Timeout') {
-            this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunOvertime')})
+            this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunOvertime')})
             this.flowExecutorNode(execID, true);
           }
           // 清掉当前工作流执行的缓存
           this.workflowExecutorCache = this.workflowExecutorCache.filter((item) => {
-            return item.flowId !== this.newFlowId;
+            return item.flowId !== this.flowId;
           });
         }
       }).catch(() => {
@@ -2257,7 +2065,7 @@ export default {
           this.retryTimes = 0
           this.flowExecutorNode(execID, true);
         }
-        this.$Notice.error({desc: this.$t('message.workflow.projectDetail.workflowRunFail')})
+        this.$Notice.error({desc: this.$t('message.common.projectDetail.workflowRunFail')})
       })
     },
     flowExecutorNode(execID, end = false) {
@@ -2265,15 +2073,15 @@ export default {
         // 【0：未执行；1：运行中；2：已成功；3：已失败；4：已跳过】
         const actionStatus = {
           pendingJobs: {color: '#6A85A7', status: 0, iconType: '',
-            colorClass: '', isShowTime: false, title: '等待执行', showConsole: false},
+            colorClass: '', isShowTime: false, title: this.$t('message.workflow.Scheduled'), showConsole: false},
           runningJobs: {color: '#2E92F7', status: 1, iconType: 'status-loading',
-            colorClass: {'executor-loading': true}, isShowTime: true, title: '执行中', showConsole: true},
+            colorClass: {'executor-loading': true}, isShowTime: true, title: this.$t('message.workflow.Running'), showConsole: true},
           succeedJobs: {color: '#52C41A', status: 2,iconType: 'status-success',
-            colorClass: {'executor-success': true}, isShowTime: false, title: '执行成功', showConsole: true},
+            colorClass: {'executor-success': true}, isShowTime: false, title: this.$t('message.workflow.ExecuteSuccess'), showConsole: true},
           failedJobs: {color: '#FF4D4F', status: 3, iconType: 'status-fail',
-            colorClass: {'executor-faile': true}, isShowTime: false, title: '执行失败', showConsole: true},
+            colorClass: {'executor-faile': true}, isShowTime: false, title: this.$t('message.workflow.ExecuteFailed'), showConsole: true},
           skippedJobs: {color: '#B3C1D3', status: 4, iconType: 'status-skip',
-            colorClass: {'executor-skip': true}, isShowTime: false, title: '跳过', showConsole: false}
+            colorClass: {'executor-skip': true}, isShowTime: false, title: this.$t('message.workflow.Skip'), showConsole: false}
         };
         // 获取节点的状态，如果没有执行完成继续查询
         const  data = res;
@@ -2349,22 +2157,16 @@ export default {
       time=0;
       return timeResult;
     },
-    // 新建widget节点的弹框里，绑定view下拉框
-    // handleBindViewChange(key) {
-    //   // 更新当前选择的view的值 this.selectBindView
-    //   for (let i = 0; i < this.sqlNodeList.length; i++) {
-    //     if (key === this.sqlNodeList[i].key) {
-    //       this.selectBindView = this.sqlNodeList[i]
-    //       break
-    //     }
-    //   }
-    // },
     workflowPublishIsShow() {
       // 已经在发布不能再点击
       if(this.isFlowPubulish) return this.$Message.warning(this.$t('message.workflow.publishing'))
       this.pubulishShow = true;
       this.saveingComment = false;
       this.pubulishFlowComment = ''
+    },
+    showDiff() {
+      this.pubulishShow = false;
+      this.$refs.bottomTab.showPanel('version');
     },
     async workflowPublish() {
       if (this.saveingComment) {
@@ -2374,7 +2176,7 @@ export default {
       // 发布之前先保存
       let a
       try {
-        a = await this.autoSave('发布工作流', false);
+        a = await this.autoSave(this.$t('message.workflow.Publishwork'), false);
       } catch (e) {
         this.pubulishShow = false;
         this.isFlowPubulish = false;
@@ -2387,9 +2189,9 @@ export default {
       }      // 调用发布接口
       const params = {
         orchestratorId: this.orchestratorId,
-        orchestratorVersionId: this.newOrchestratorVersionId,
+        orchestratorVersionId: this.orchestratorVersionId,
         dssLabel: this.getCurrentDsslabels(),
-        workflowId: Number(this.newFlowId),
+        workflowId: Number(this.flowId),
         labels: {route: this.getCurrentDsslabels()},
         comment: this.pubulishFlowComment
       }
@@ -2406,7 +2208,7 @@ export default {
         this.pubulishShow = false;
         this.isFlowPubulish = false;
         this.saveingComment = false;
-        this.$Message.error(this.$t('message.workflow.projectDetail.publishFailed'));
+        this.$Message.error(this.$t('message.common.projectDetail.publishFailed'));
       })
     },
     clickToolItem(item) {
@@ -2424,15 +2226,15 @@ export default {
       if (type === 'publish') {
         typeName = this.$t('message.workflow.process.publish')
       }
-      const timer = setTimeout(() => {
+      this.timer = setTimeout(() => {
         timeoutValue += 2000;
-        getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
+        getPublishStatus(id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
             if (res.status === 'init' || res.status === 'running') {
-              clearTimeout(timer);
+              clearTimeout(this.timer);
               this.checkResult(id, timeoutValue, type);
             } else if (res.status === 'success') {
-              clearTimeout(timer);
+              clearTimeout(this.timer);
               this.isFlowPubulish = false;
               // 如果是导出成功需要下载文件
               if (type === 'export' && res.msg) {
@@ -2450,11 +2252,10 @@ export default {
                 });
               }
               this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
-              this.publishChangeCount = 0;
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
-              this.refreshOpen(this.getBaseInfo)
+              this.refreshOpen()
             } else if (res.status === 'failed') {
-              clearTimeout(timer);
+              clearTimeout(this.timer);
               this.isFlowPubulish = false;
               this.$Modal.error({
                 title: this.$t('message.workflow.workflowFail', { name: typeName }),
@@ -2463,57 +2264,24 @@ export default {
                 okText: this.$root.$t('message.workflow.publish.cancel'),
               });
               // 发布成功后，根工作流id会变化，导致修改工作流后保存的还是旧id
-              this.refreshOpen(this.getBaseInfo)
+              this.refreshOpen()
             }
           } else {
-            clearTimeout(timer);
+            clearTimeout(this.timer);
             this.isFlowPubulish = false;
-            this.$Message.warning(this.$t('message.workflow.projectDetail.workflowRunOvertime'));
+            this.$Message.warning(this.$t('message.common.projectDetail.workflowRunOvertime'));
           }
+          // 扩展插件发布历史列表更新
+          eventbus.emit('get_publish_status', res)
         }).catch(()=> {
           this.isFlowPubulish = false;
-          this.refreshOpen(this.getBaseInfo)
+          this.refreshOpen()
         });
       }, 2000);
     },
-    refreshOpen(cb) {
-      // 再次获取appId
-      this.loading = true;
-      const workspaceData = storage.get("currentWorkspace");
-      api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}openOrchestrator`, {
-        orchestratorId: this.orchestratorId,
-        labels: {route: this.getCurrentDsslabels()},
-        workspaceName: workspaceData.name
-      }, 'post').then((openOrchestrator) => {
-        this.loading = false;
-        if (openOrchestrator) {
-          const previd = `${this.orchestratorId}${this.newOrchestratorVersionId}`
-          const resVersion =  openOrchestrator.OrchestratorVo.dssOrchestratorVersion
-          // 发布成功后id变化，更新缓存，防止刷新页面重复打开工作流
-          let workspaceId = this.$route.query.workspaceId;
-          let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
-          workFlowLists.forEach(it => {
-            if (it.tabId == previd) {
-              it.version = resVersion.id
-              it.tabId = `${this.orchestratorId}${resVersion.id}`
-              it.query = {
-                ...it.query,
-                orchestratorVersionId: resVersion.id,
-                appId: resVersion.appId,
-                version: resVersion.id
-              }
-            }
-          });
-          sessionStorage.setItem(`work_flow_lists_${workspaceId}`, JSON.stringify(workFlowLists))
-          this.appId = resVersion.appId;
-          this.newOrchestratorVersionId = resVersion.id;
-          if(cb) {
-            cb();
-          }
-        }
-      }).catch(() => {
-        this.loading = false;
-      });
+    refreshOpen() {
+      this.$emit('close')
+      this.$emit('open')
     },
     dateFormatter(date) {
       return moment(date).format('YYYY-MM-DD HH:mm:ss');
@@ -2529,11 +2297,11 @@ export default {
 
     },
     async workflowExportOk() {
-      const a = await this.autoSave('导出', false);
+      const a = await this.autoSave(this.$t('message.workflow.Export'), false);
       if (!a) return
       this.isFlowPubulish = true;
       const params = {
-        rootFlowID: Number(this.newFlowId),
+        rootFlowID: Number(this.flowId),
         // projectVersionID: +this.projectVersionID,
         IOType: 'FLOW',
         comment: this.exportDesc,
@@ -2586,10 +2354,6 @@ export default {
       const key = `${username}-workflow-${this.orchestratorId}-taskId`;
       return key
     },
-    isCurrentOrchestrator(){
-      const username = this.getUserName();
-      return this.getTaskKey().replace(this.orchestratorId, '') ===  `${username}-workflow--taskId`;
-    },
     setTaskId(taskId) {
       const key = this.getTaskKey();
       storage.set(key, taskId);
@@ -2598,8 +2362,14 @@ export default {
       const key = this.getTaskKey();
       return storage.get(key);
     },
+    removeTaskId() {
+      const key = this.getTaskKey();
+      storage.remove(key);
+    },
     onKeyUp(e) {
-      if ((e.keyCode === 46 || e.keyCode === 8 && navigator.userAgent.indexOf('Mac') !== -1) && this.tabs[this.$parent.active].key === this.activeTabKey && e.target.nodeName!='INPUT' && e.target.nodeName!='TEXTAREA') {
+      const isDel = e.keyCode === 46 || e.keyCode === 8 && navigator.userAgent.indexOf('Mac') !== -1
+      if (e.altKey && e.ctrlKey) { return }
+      if (isDel && this.tabs[this.$parent.active].key === this.activeTabKey && e.target.nodeName!='INPUT' && e.target.nodeName!='TEXTAREA') {
         if (this.myReadonly) return
         let selectNodes = this.$refs.process.getSelectedNodes();
         const selectNodeLength = selectNodes.length
@@ -2608,6 +2378,25 @@ export default {
             this.allDelete();
           } else {
             this.nodeDelete(selectNodes[0])
+          }
+        }
+      }
+    },
+    async checkLastPublish(cb) {
+      const publishTaskId = this.getTaskId()
+      if (publishTaskId && this.orchestratorId == this.$route.query.flowId) {
+        let res
+        try {
+          res = await getPublishStatus(publishTaskId, this.getCurrentDsslabels())
+        } catch (error) {
+          this.removeTaskId()
+        }
+        if (res && res.status === 'running') {
+          this.isFlowPubulish = true
+          this.checkResult(publishTaskId, 0, 'publish')
+          // 打开发布历史panel
+          if (cb) {
+            cb()
           }
         }
       }

@@ -2,6 +2,12 @@
   "ignorePatterns": [
     {
       "pattern": "https://github.com/WeBankFinTech/DataSphereStudio-Doc"
+    },
+    {
+      "pattern": "http://localhost"
+    },
+    {
+      "pattern": "http://127.0.0.1"
     }
   ],
   "timeout": "10s",
@@ -14,4 +20,3 @@
     403
   ]
 }
-

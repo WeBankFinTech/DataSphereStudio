@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -114,7 +114,8 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
         String lastMsgId = "0";
         try {
             msgConn = getEventCheckerConnection(props,log);
-            pstmtForGetID = msgConn.prepareCall(sqlForReadMsgID);
+            pstmtForGetID = msgConn.prepareStatement(sqlForReadMsgID, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            pstmtForGetID = msgConn.prepareCall(sqlForReadMsgID);
             pstmtForGetID.setString(1, receiver);
             pstmtForGetID.setString(2, topic);
             pstmtForGetID.setString(3, msgName);
@@ -142,7 +143,8 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
         String[] consumedMsgInfo = null;
         try {
             msgConn = getEventCheckerConnection(props,log);
-            pstmt = msgConn.prepareCall(sqlForReadTMsg);
+            pstmt = msgConn.prepareStatement(sqlForReadTMsg, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+//            pstmt = msgConn.prepareCall(sqlForReadTMsg);
             pstmt.setString(1, topic);
             pstmt.setString(2, msgName);
             pstmt.setString(3, params[0]);

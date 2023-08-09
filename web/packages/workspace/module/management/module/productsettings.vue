@@ -12,6 +12,7 @@
         <label>{{$t('message.workspaceManagement.productsetting.status')}}<span>{{ $t('message.workspace.normal') }}</span></label>
         <label>{{$t('message.workspaceManagement.productsetting.desc')}}<span>{{ workspaceData.description}}</span></label>
         <label>{{$t('message.workspaceManagement.productsetting.workspaceType')}}<span>{{workspaceData.workspaceType === 'department' ? $t('message.workspace.departmentOrientation') : $t('message.workspace.projectOrientation')}}</span></label>
+        <label>{{$t('message.workspaceManagement.productsetting.adminviewall')}}<span>{{workspaceData.adminPermission ? $t('message.workspaceManagement.productsetting.yes') : $t('message.workspaceManagement.productsetting.no')}}</span></label>
       </div>
     </div>
     <!-- <div style="padding: 10px 0;">

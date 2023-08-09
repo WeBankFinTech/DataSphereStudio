@@ -25,6 +25,9 @@ public interface DSSWorkspaceConstant {
     CommonVars<String> DEFAULT_WORKSPACE_NAME
             = CommonVars.apply("wds.dss.workspace.default.name", "bdapWorkspace");
 
+    CommonVars<String> DEFAULT_0XWORKSPACE_NAME
+            = CommonVars.apply("wds.dss.workspace.0x.default.name", "bdapWorkspace_0X");
+
     CommonVars<String> DEFAULT_DEMO_WORKSPACE_NAME = CommonVars.apply("wds.dss.default.demo.workspace", "WDS_DSS_DEMO");
 
     String WORKSPACE_MANAGEMENT_NAME = CommonVars.apply("wds.dss.workspace.management.name", "工作空间管理").getValue();

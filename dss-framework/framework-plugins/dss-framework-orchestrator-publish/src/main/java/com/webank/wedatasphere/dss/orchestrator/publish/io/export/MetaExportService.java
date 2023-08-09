@@ -18,8 +18,11 @@ package com.webank.wedatasphere.dss.orchestrator.publish.io.export;
 
 
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public interface MetaExportService {
@@ -32,6 +35,9 @@ public interface MetaExportService {
      * @throws IOException
      */
     void export(DSSOrchestratorInfo dssOrchestratorInfo, String savePath) throws IOException;
+
+    void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException;
+
 
 
 }

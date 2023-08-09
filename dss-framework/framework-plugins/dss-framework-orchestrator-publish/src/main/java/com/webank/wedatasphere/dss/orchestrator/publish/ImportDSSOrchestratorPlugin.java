@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestImportOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -30,13 +31,22 @@ public interface ImportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
 
     /**
      * 导入Orchestrator
+     * 注意：导入导出接口只适合于不同环境下，先从A环境导出工作流，再导入到B环境的情况。
+     * 不适合用于在同一环境下的复制。同一环境的复制操作需使用copyOperation。
      * @param requestImportOrchestrator
      * @return
      * @throws DSSErrorException
      * @throws IOException
      * @throws ExternalOperationFailedException
      */
-    Long importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception;
+    DSSOrchestratorVersion importOrchestrator(RequestImportOrchestrator requestImportOrchestrator) throws Exception;
 
+    /**
+     * 导入复制的编排
+     * @param requestImportOrchestrator
+     * @return
+     * @throws Exception
+     */
+    Long importCopyOrchestrator(RequestImportOrchestrator requestImportOrchestrator, String suffix) throws Exception;
 
 }

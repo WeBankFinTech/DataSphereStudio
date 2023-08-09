@@ -43,7 +43,7 @@ source $DSS_CONF_DIR/config.sh
 function startApp(){
 echo "<-------------------------------->"
 echo "Begin to start $SERVER_NAME"
-SERVER_START_CMD="sh $DSS_INSTALL_HOME/sbin/dss-daemon.sh restart $SERVER_NAME"
+SERVER_START_CMD="sh $DSS_HOME/sbin/dss-daemon.sh restart $SERVER_NAME"
 if test -z "$SERVER_IP"
 then
   SERVER_IP=$local_host
@@ -80,101 +80,27 @@ echo "<-------------------------------->"
 sleep 3
 }
 
-
 function startDssProject(){
-	SERVER_NAME=dss-framework-project-server
-	SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
-	startApp
-	sleep 5
-
-# echo "------------------------Start to check whether the project service is registered to eureka successfully-----------------------------"
-#  #project服务启动并注册到eureka后再启动其他服务
-#  i=1
-#  while [[ -z $result ]] && [[ $i -le 24 ]]
-#  do
-#    sleep 5
-#    if [ -z $EUREKA_USERNAME ] || [ -z $EUREKA_PASSWORD ];then
-#        response=`curl  http://${EUREKA_INSTALL_IP}:${EUREKA_PORT}/eureka/apps/DSS-FRAMEWORK-PROJECT-SERVER`
-#    else
-#        response=`curl  http://${EUREKA_USENAME}:${EUREKA_PASSWORD}@${EUREKA_INSTALL_IP}:${EUREKA_PORT}/eureka/apps/DSS-FRAMEWORK-PROJECT-SERVER`
-#    fi
-#    let i++
-#  result=$(echo $response |grep 'DSS-FRAMEWORK-PROJECT-SERVER')
-#  done
-#  if [[ $i -eq 25 ]]; then
-#      echo "the project server start failed in two minutes,please check the log to find more error details."
-#      exit
-#  fi
-#  echo "------------------------the project service is registered to eureka successfully------------------------------------------------"
-
-	SERVER_NAME=dss-apiservice-server
-	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
+	SERVER_NAME=dss-apps-server
+	SERVER_IP=$DSS_APPS_SERVER_INSTALL_IP
 	startApp
 
-	SERVER_NAME=dss-scriptis-server
-  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
-  startApp
-
-	SERVER_NAME=dss-flow-execution-server
-	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
-	startApp
-
-	SERVER_NAME=dss-data-api-server
-	SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
-	startApp
-
-  SERVER_NAME=dss-data-governance-server
-	SERVER_IP=$DSS_DATA_GOVERNANCE_SERVER_INSTALL_IP
-  startApp
-
-  SERVER_NAME=dss-guide-server
-	SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
-  startApp
-
-  SERVER_NAME=dss-framework-orchestrator-server
-	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
-	startApp
-
-	SERVER_NAME=dss-workflow-server
-	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
+  SERVER_NAME=dss-server
+	SERVER_IP=$DSS_SERVER_INSTALL_IP
 	startApp
 
 }
 
 function checkDssService(){
-	SERVER_NAME=dss-framework-project-server
-	SERVER_IP=$DSS_FRAMEWORK_PROJECT_SERVER_INSTALL_IP
+	SERVER_NAME=dss-apps-server
+	SERVER_IP=$DSS_APPS_SERVER_INSTALL_IP
 	checkServer
 
-	SERVER_NAME=dss-framework-orchestrator-server
-	SERVER_IP=$DSS_FRAMEWORK_ORCHESTRATOR_SERVER_INSTALL_IP
+	SERVER_NAME=dss-server
+	SERVER_IP=$DSS_SERVER_INSTALL_IP
 	checkServer
 
-	SERVER_NAME=dss-apiservice-server
-	SERVER_IP=$DSS_APISERVICE_SERVER_INSTALL_IP
-	checkServer
-
-	SERVER_NAME=dss-scriptis-server
-  SERVER_IP=$DSS_SCRIPTIS_SERVER_INSTALL_IP
-  checkServer
-
-	SERVER_NAME=dss-workflow-server
-	SERVER_IP=$DSS_WORKFLOW_SERVER_INSTALL_IP
-	checkServer
-
-	SERVER_NAME=dss-flow-execution-server
-	SERVER_IP=$DSS_FLOW_EXECUTION_SERVER_INSTALL_IP
-	checkServer
-
-	SERVER_NAME=dss-data-api-server
-  SERVER_IP=$DSS_DATA_API_SERVER_INSTALL_IP
-  checkServer
-
-  SERVER_NAME=dss-guide-server
-  SERVER_IP=$DSS_GUIDE_SERVER_INSTALL_IP
-  checkServer
 }
-
 
 
 startDssProject

@@ -7,15 +7,15 @@
       :class="{ 'guide-show': show }"
     >
       <div class="guide-header">
-        <span class="header-txt">帮助文档</span>
+        <span class="header-txt">{{ $t('message.common.dss.dochelp') }}</span>
         <span class="header-close" @click="toggleGuide">
           <SvgIcon icon-class="close2" />
         </span>
       </div>
 
       <div class="guide-tabs">
-        <div class="guide-tab" :class="{ 'guide-tab-active' : currentTab == 'guide'}" @click="changeTab('guide')">学习引导</div>
-        <div class="guide-tab" :class="{ 'guide-tab-active' : currentTab == 'library'}" @click="changeTab('library')">知识库</div>
+        <div class="guide-tab" :class="{ 'guide-tab-active' : currentTab == 'guide'}" @click="changeTab('guide')">{{ $t('message.common.dss.learning') }}</div>
+        <div class="guide-tab" :class="{ 'guide-tab-active' : currentTab == 'library'}" @click="changeTab('library')">{{ $t('message.common.dss.knowledge') }}</div>
       </div>
 
       <div class="guide-navbar" v-show="currentTab == 'library'">
@@ -34,9 +34,9 @@
           </div>
         </div>
         <div class="navbar-breadcrumb" v-if="currentMode != 'home'">
-          <span class="breadcrumb-home" @click="changeToLibraryHome">文档首页</span>
+          <span class="breadcrumb-home" @click="changeToLibraryHome">{{ $t('message.common.dss.homepage') }}</span>
           <span class="breadcrumb-divider"></span>
-          <span class="breadcrumb-title">{{ currentMode == 'search' ? "搜索" : currentDoc.title }}</span>
+          <span class="breadcrumb-title">{{ currentMode == 'search' ? this.$t('message.common.dss.Search') : currentDoc.title }}</span>
         </div>
       </div>
 
@@ -65,7 +65,7 @@
           </div>
         </div>
         <div class="guide-box" v-if="guide.questions && guide.questions.length">
-          <div class="guide-box-title">常见问题</div>
+          <div class="guide-box-title">{{ $t('message.common.dss.faq') }}</div>
           <ul class="guide-questions">
             <li v-for="q in guide.questions" :key="q.title">
               <a @click="changeQuestionToLibraryDetail(q)">{{ q.title }}</a>
@@ -83,7 +83,7 @@
 
       <div v-if="$APP_CONF.user_guide" class="guide-footer">
         <a target="_blank" :href="$APP_CONF.user_guide">
-          前往用户手册
+          {{ $t('message.common.dss.manual') }}
         </a>
       </div>
     </div>

@@ -21,7 +21,7 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -204,23 +204,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--Metadata common-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.linkis</groupId>-->
-<!--            <artifactId>linkis-metadatamanager-common</artifactId>-->
-<!--            <version>${linkis.version}</version>-->
-<!--        </dependency>-->
+
         <dependency>
             <artifactId>hk2-api</artifactId>
             <groupId>org.glassfish.hk2</groupId>
             <version>2.4.0-b34</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.linkis</groupId>-->
-<!--            <artifactId>linkis-datasourcemanager-common</artifactId>-->
-<!--            <version>${linkis.version}</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
@@ -245,7 +235,6 @@
             <version>1.3</version>
             <scope>test</scope>
         </dependency>
-
 
         <dependency>
             <groupId>com.h2database</groupId>
@@ -285,66 +274,22 @@
             <version>1.5.2</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.cloud</groupId>-->
-<!--            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
-<!--            <version>${spring.cloud.version}</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>logback-classic</artifactId>-->
-<!--                    <groupId>ch.qos.logback</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>log4j-to-slf4j</artifactId>-->
-<!--                    <groupId>org.apache.logging.log4j</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>gson</artifactId>-->
-<!--                    <groupId>com.google.code.gson</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>jsr311-api</artifactId>-->
-<!--                    <groupId>javax.ws.rs</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>xstream</artifactId>-->
-<!--                    <groupId>com.thoughtworks.xstream</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>commons-math</artifactId>-->
-<!--                    <groupId>org.apache.commons</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>jackson-core</artifactId>-->
-<!--                    <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>spring-boot-autoconfigure</artifactId>-->
-<!--                    <groupId>org.springframework.boot</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>spring-boot-starter-aop</artifactId>-->
-<!--                    <groupId>org.springframework.boot</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>spring-boot-starter</artifactId>-->
-<!--                    <groupId>org.springframework.boot</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <artifactId>spring-boot-starter-cache</artifactId>-->
-<!--                    <groupId>org.springframework.boot</groupId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.springframework.cloud</groupId>-->
-<!--                    <artifactId>spring-cloud-starter-loadbalancer</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-
         <dependency>
             <artifactId>xstream</artifactId>
             <groupId>com.thoughtworks.xstream</groupId>
             <version>1.4.19</version>
+        </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-sso-integration-standard</artifactId>
+            <version>${dss.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>1.19.1</version>
         </dependency>
 
     </dependencies>

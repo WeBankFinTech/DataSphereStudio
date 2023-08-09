@@ -1,6 +1,6 @@
 <template>
   <div class="layout-footer" @mousemove="onMouseMove" :style="{'pointer-events': `${(isMouseDown || guideShow) ? 'initial' : 'none'}`}">
-    <div ref="footerChannel" class="tool-btns" @mousedown.prevent.stop="onMouseDown">
+    <div ref="footerChannel" class="tool-btns" :class="{min:min}" @mousedown.prevent.stop="onMouseDown">
       <template v-if="!min">
         <div class="footer-btn footer-doc" @click="toggleGuide">
           <SvgIcon icon-class="question" />
@@ -62,11 +62,11 @@ export default {
   },
   methods: {
     getRunningJob() {
-      api.fetch('/jobhistory/list', {
-        pageSize: 100,
-        status: 'Running,Inited,Scheduled',
-      }, 'get').then((rst) => {
-        this.num = rst.tasks.length;
+      // 换成展示引擎数
+      api.fetch('/linkisManager/rm/engines').then((rst) => {
+        if (rst.engines) {
+          this.num = rst.engines.length;
+        }
       });
     },
     'Footer:updateRunningJob'(num) {

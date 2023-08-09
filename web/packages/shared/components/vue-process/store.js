@@ -192,8 +192,7 @@ export function createStore() {
         if (data.type == 'node') {
           let hasKey = data.key && data.key.length > 0;
           for (let i = 0; i < len; i++) {
-            let selected = hasKey && (data.key.indexOf(state.nodes[i].key) > -1);
-            state.nodes[i].selected = selected;
+            state.nodes[i].selected =  hasKey && data.key.indexOf(state.nodes[i].key) > -1;
           }
         } else if (changeType && data.type == 'link') {
           for (let i = 0; i < len; i++) {
@@ -241,7 +240,7 @@ export function createStore() {
               if (choosingShapes.length > 0) {
                 let shape = choosingShapes[0];
                 let innerKeys = ['layout', 'type', 'title', 'desc', 'image', 'ready', 'viewOffsetX', 'viewOffsetY', 'width', 'height', 'borderWidth',
-                  'radiusWidth', 'anchorSize', 'borderColor', 'key', 'x', 'y', 'createTime', 'lastUpdateTime'];
+                  'radiusWidth', 'anchorSize', 'borderColor', 'key', 'x', 'y', 'createTime', 'modifyTime'];
                 // 把跟流程图逻辑无关的属性收集起来
                 let _other = {};
                 for (let p in node) {
@@ -263,7 +262,7 @@ export function createStore() {
                       params: node.params,
                       resources: node.resources,
                       createTime: node.createTime,
-                      lastUpdateTime: node.lastUpdateTime
+                      modifyTime: node.modifyTime
                     },
                     state.nodeOptions,
                     node.layout,

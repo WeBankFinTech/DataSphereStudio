@@ -266,7 +266,6 @@ export default {
           this.currentX = null;
           this.currentY = null;
           this.currentChange = null;
-          this.$emit('on-resized');
         });
         this.requestFrameIds.push(AnimationFrameId);
       }

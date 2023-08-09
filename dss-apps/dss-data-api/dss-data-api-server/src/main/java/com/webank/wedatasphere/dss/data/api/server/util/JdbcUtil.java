@@ -13,9 +13,10 @@ import java.util.List;
 public class JdbcUtil {
 
     public static ResultSet query(String sql, Connection connection) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ResultSet resultSet = preparedStatement.executeQuery();
-        return resultSet;
+        try(PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet;
+        }
     }
 
     public static Connection getConnection(DataSource ds) throws SQLException, ClassNotFoundException {
@@ -123,15 +124,15 @@ public class JdbcUtil {
                     sql = "show full columns from " + table;
             }
             log.info(sql);
-
-             resultSet = conn.prepareStatement(sql).executeQuery();
-            while (resultSet.next()) {
-                HashMap<String, String> colProp = new HashMap<>();
-                colProp.put("Comment",resultSet.getString("Comment"));
-                colProp.put("fieldType",resultSet.getString("Type"));
-                colProp.put("columnName",resultSet.getString("Field"));
-
-                list.add(colProp);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                resultSet = ps.executeQuery();
+                while (resultSet.next()) {
+                    HashMap<String, String> colProp = new HashMap<>();
+                    colProp.put("Comment", resultSet.getString("Comment"));
+                    colProp.put("fieldType", resultSet.getString("Type"));
+                    colProp.put("columnName", resultSet.getString("Field"));
+                    list.add(colProp);
+                }
             }
             return list;
         } catch (Exception e) {

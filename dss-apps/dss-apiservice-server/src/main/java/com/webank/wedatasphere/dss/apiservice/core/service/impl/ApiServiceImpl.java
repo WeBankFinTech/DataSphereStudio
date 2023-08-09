@@ -165,7 +165,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveByApp(ApiServiceVo apiService) throws Exception {
+    public ApiServiceVo saveByApp(ApiServiceVo apiService) throws Exception {
         String user = apiService.getCreator();
         String resourceId = null;
         try {
@@ -212,6 +212,7 @@ public class ApiServiceImpl implements ApiService {
 
             //insert a token record for self
             genTokenForPublisher(apiService,apiVersionVo.getId());
+            return apiService;
         } catch (Exception e) {
             LOG.error("one service insert error", e);
             if (StringUtils.isNotBlank(resourceId)) {
@@ -230,7 +231,7 @@ public class ApiServiceImpl implements ApiService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void  update(ApiServiceVo apiService) throws Exception {
+    public ApiServiceVo  update(ApiServiceVo apiService) throws Exception {
         try {
             if(null!=apiService.getTargetServiceId()) {
                 ApiVersionVo maxTargetApiVersionVo = getMaxVersion(apiService.getTargetServiceId());
@@ -288,6 +289,7 @@ public class ApiServiceImpl implements ApiService {
 
                     //insert a token record for self
                     genTokenForPublisher(apiService, apiServiceVersionVo.getId());
+                    return apiService;
                 }else {
                     throw new ApiServiceQueryException(800036,"Only can update the api service by owner! ");
                 }
@@ -414,14 +416,14 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Boolean enableApi(Long id,String userName) {
-        ApiServiceVo apiServiceVo = apiServiceDao.queryById(id);
+    public Boolean enableApi(String userName,ApiServiceVo apiServiceVo) {
+
         if(!checkUserWorkspace(userName,apiServiceVo.getWorkspaceId().intValue())){
             LOG.error("api service check workspace error");
             return false;
         }
         if(apiServiceVo.getCreator().equals(userName)) {
-
+            long id=apiServiceVo.getId();
             Integer updateCount = apiServiceDao.enableApi(id);
             List<ApiVersionVo> targetApiVersionList = apiServiceVersionDao.queryApiVersionByApiServiceId(id);
             ApiVersionVo maxTargetApiVersionVo = targetApiVersionList.stream().max(Comparator.comparing(ApiVersionVo::getVersion)).orElse(null);
@@ -435,13 +437,13 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Boolean disableApi(Long id,String userName) {
-        ApiServiceVo apiServiceVo = apiServiceDao.queryById(id);
+    public Boolean disableApi(String userName,ApiServiceVo apiServiceVo) {
         if(!checkUserWorkspace(userName,apiServiceVo.getWorkspaceId().intValue())){
             LOG.error("api service check workspace error");
             return false;
         }
         if(apiServiceVo.getCreator().equals(userName)) {
+            Long id=apiServiceVo.getId();
             Integer updateCount = apiServiceDao.disableApi(id);
             apiServiceTokenManagerDao.disableTokenStatusByApiId(id);
             apiServiceVersionDao.updateAllApiVersionStatusByApiServiceId(id, 0);
@@ -453,13 +455,13 @@ public class ApiServiceImpl implements ApiService {
 
 
     @Override
-    public Boolean deleteApi(Long id,String userName) {
-        ApiServiceVo apiServiceVo = apiServiceDao.queryById(id);
+    public Boolean deleteApi(String userName,ApiServiceVo apiServiceVo) {
         if(!checkUserWorkspace(userName,apiServiceVo.getWorkspaceId().intValue())){
             LOG.error("api service check workspace error");
             return false;
         }
         if(apiServiceVo.getCreator().equals(userName)) {
+            Long id = apiServiceVo.getId();
             Integer updateCount = apiServiceDao.deleteApi(id);
             apiServiceTokenManagerDao.disableTokenStatusByApiId(id);
             apiServiceVersionDao.updateAllApiVersionStatusByApiServiceId(id, 0);
@@ -470,14 +472,13 @@ public class ApiServiceImpl implements ApiService {
     }
 
     @Override
-    public Boolean updateComment(Long id, String comment, String userName) {
-        ApiServiceVo apiServiceVo = apiServiceDao.queryById(id);
+    public Boolean updateComment(String comment, String userName,ApiServiceVo apiServiceVo) {
         if(!checkUserWorkspace(userName,apiServiceVo.getWorkspaceId().intValue())){
             LOG.error("api service check workspace error");
             return false;
         }
         if(apiServiceVo.getCreator().equals(userName)) {
-            Integer updateCount = apiServiceDao.updateApiServiceComment(id,comment);
+            Integer updateCount = apiServiceDao.updateApiServiceComment(apiServiceVo.getId(),comment);
             return updateCount > 0;
         }else {
             return false;
@@ -490,7 +491,7 @@ public class ApiServiceImpl implements ApiService {
             List<Variable> variableList=null;
            if(metadata.entrySet().size() >0) {
                Variable[] v = VariableParser.getVariables(metadata);
-               variableList = Arrays.stream(v).filter(var -> !StringUtils.isEmpty(var.value())).collect(Collectors.toList());
+               variableList = Arrays.stream(v).filter(var -> !StringUtils.isEmpty(var.getValue())).collect(Collectors.toList());
 
            }
            if(variableList!=null) {
@@ -519,7 +520,7 @@ public class ApiServiceImpl implements ApiService {
         try {
             ScriptFsWriter writer = StorageScriptFsWriter.getScriptFsWriter(new FsPath(scriptPath), Consts.UTF_8.toString(), null);
             Variable[] v = VariableParser.getVariables(metadata);
-            List<Variable> variableList = Arrays.stream(v).filter(var -> !StringUtils.isEmpty(var.value())).collect(Collectors.toList());
+            List<Variable> variableList = Arrays.stream(v).filter(var -> !StringUtils.isEmpty(var.getValue())).collect(Collectors.toList());
             writer.addMetaData(new ScriptMetaData(variableList.toArray(new Variable[0])));
             writer.addRecord(new ScriptRecord(scriptContent));
             InputStream inputStream = writer.getInputStream();

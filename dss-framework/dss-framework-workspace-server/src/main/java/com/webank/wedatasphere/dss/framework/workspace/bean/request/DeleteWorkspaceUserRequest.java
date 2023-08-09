@@ -22,4 +22,12 @@ public class DeleteWorkspaceUserRequest implements Serializable {
     public void setUserName(String username) {
         this.userName = username;
     }
+
+    @Override
+    public String toString() {
+        return "DeleteWorkspaceUserRequest{" +
+                "workspaceId=" + workspaceId +
+                ", userName='" + userName + '\'' +
+                '}';
+    }
 }

@@ -28,6 +28,7 @@ import axios from 'axios';
 import module from '../index';
 import api from '@dataspherestudio/shared/common/service/api';
 import util from '@dataspherestudio/shared/common/util';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 import resizeMixin from './mixin.js';
 import table from '@dataspherestudio/shared/components/virtualTable';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
@@ -96,6 +97,7 @@ export default {
     initData() {
       this.pageingData();
       this.setInitCostTime();
+      const baseinfo = storage.get('baseInfo', 'local')
       this.column = [
         {
           width: 50,
@@ -153,12 +155,28 @@ export default {
             label: this.$t('message.scripts.history.columns.control.download'),
             action: this.downloadLog,
           }, {
-            label: '查看解决方案',
+            label: this.$t('message.scripts.history.columns.control.noticeopen'),
+            action: this.subscribe,
+            isHide: (data) => {
+              // 任务状态为：已提交/排队中/资源申请中/运行/超时/重试时
+              const status = ["Submitted","Inited","Scheduled","Running","Timeout","WaitForRetry"].indexOf(data.status) > -1
+              return baseinfo.enableTaskNotice !== false && status && data.subscribed !== 1
+            }
+          }, {
+            label: this.$t('message.scripts.history.columns.control.noticeclose'),
+            action: this.subscribe,
+            isHide: (data) => {
+              // 任务状态为：已提交/排队中/资源申请中/运行/超时/重试时
+              const status = ["Submitted","Inited","Scheduled","Running","Timeout","WaitForRetry"].indexOf(data.status) > -1
+              return baseinfo.enableTaskNotice !== false && data.subscribed === 1 && status
+            }
+          }, {
+            label: this.$t('message.scripts.solution'),
             action: this.viewFAQ,
             style: { color: '#ed4014'},
             isHide: (data)=> { return window.$APP_CONF && window.$APP_CONF.error_report && data && data.solution && data.solution.solutionUrl}
           }, {
-            label: '上报错误',
+            label: this.$t('message.scripts.reporterror'),
             action: this.report,
             style: { color: '#ed4014'},
             isHide: (data)=> { return window.$APP_CONF && window.$APP_CONF.error_report && data && data.status === 'Failed' && (!data.solution || !data.solution.solutionUrl)}
@@ -182,11 +200,6 @@ export default {
       const supportModes = this.getSupportModes();
       const match = supportModes.find((s) => s.rule.test(params.row.fileName));
       const ext = match ? match.ext : '.hql';
-      if (!params.row.logPath) {
-        await api.fetch(`/jobhistory/${params.row.taskID}/get`, 'get').then((rst) => {
-          params.row.logPath = rst.task.logPath;
-        });
-      }
       const name = `history_item_${params.row.taskID}${ext}`;
       const md5Id = util.md5(name);
       this.dispatch('Workbench:add', {
@@ -266,6 +279,24 @@ export default {
     viewFAQ({ row }) {
       row.solution && window.open(row.solution.solutionUrl, '_blank')
     },
+    subscribe(params) {
+      if (this.changeSubscribeStatus) return this.$Message.warning(this.$t('message.scripts.optlimit'))
+      this.changeSubscribeStatus = true;
+      const taskId = params.row.taskID;
+      const action = params.row.subscribed ? 'cancel' : 'add';
+      const scriptName = this.node ? this.node.title : params.row.fileName
+      api.fetch(`/dss/scriptis/task/subscribe`, {action, taskId, scriptName}, 'get').then(() => {
+        const index = this.history.findIndex(it => it.taskID === params.row.taskID)
+        if (index > -1) {
+          this.$set(this.history, index, {...this.history[index], subscribed: params.row.subscribed ? 0 : 1})
+        }
+        this.$Message.warning(action === 'add' ? this.$t('message.scripts.optsuccess') :this.$t('message.scripts.cancelOptSuccess'))
+      }).finally(() => {
+        setTimeout(() => {
+          this.changeSubscribeStatus = false
+        }, 5000);
+      });
+    },
     async report({row}) {
       const res = await api.fetch(`/jobhistory/${row.taskID}/get`, 'get') || { task: {}}
       if (res.task && (res.task.errCode || res.task.errDesc)) {
@@ -280,7 +311,7 @@ export default {
             errDesc: res.task.errDesc
           }
         }).then(()=>{
-          this.$Message.success('错误已上报')
+          this.$Message.success(this.$t('message.scripts.reported'))
         })
       }
     }

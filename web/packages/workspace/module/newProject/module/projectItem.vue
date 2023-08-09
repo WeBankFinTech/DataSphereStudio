@@ -23,11 +23,11 @@
                 {{subitem.name}}
               </span>
               <div v-if="subitem.canWrite() || checkCopyable(subitem, getUserName())" class="menu-bar">
-                <Button size="small" @click.stop>管理</Button>
+                <Button size="small" @click.stop>{{ $t('message.workspace.Management') }}</Button>
                 <ul class="menu-list">
-                  <li class="list-item" v-if="subitem.canDelete()" @click.stop="deleteProject(subitem)">删除</li>
-                  <li class="list-item" v-if="subitem.canWrite()" @click.stop="modify(currentData.id, subitem)">配置</li>
-                  <li class="list-item" v-if="$APP_CONF.copy_project_enable && checkCopyable(subitem, getUserName())"  @click.stop="copy(currentData.id, subitem)">复制</li>
+                  <li class="list-item" v-if="subitem.canDelete()" @click.stop="deleteProject(subitem)">{{ $t('message.workspace.Delete') }}</li>
+                  <li class="list-item" v-if="subitem.canWrite()" @click.stop="modify(currentData.id, subitem)">{{ $t('message.workspace.Configuration') }}</li>
+                  <li class="list-item" v-if="$APP_CONF.copy_project_enable && checkCopyable(subitem, getUserName())"  @click.stop="copy(currentData.id, subitem)">{{ $t('message.workspace.Copy') }}</li>
                   <!-- <li class="list-item" @click.stop="publish(currentData.id, subitem)">发布</li> -->
                 </ul>
               </div>
@@ -135,16 +135,11 @@ export default {
     },
     typelist() {
       return this.dataList.filter(item => item.showInCardList !== false).length
-    },
-    pageNumer() {
-      return Math.ceil(this.dataList.length / this.pagination.size);
     }
   },
   watch: {
-    pageNumer(val) {
-      if (val < this.pagination.current && val !== 0) {
-        this.pagination.current = val;
-      }
+    dataList() {
+      this.pagination.current = 1
     }
   },
   mounted() {
@@ -214,6 +209,7 @@ export default {
       this.pagination.current = page;
     },
     pageSizeChange(size) {
+      this.pagination.current = 1
       this.pagination.size = size;
     },
     // showResourceView(classifyId, project) {

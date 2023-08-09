@@ -14,7 +14,7 @@
       :filter-text="searchText"
       :node-props="nodeProps"
       :load-data-fn="loadDataFn"
-      :loading="compLoading"
+      :loading="treeLoading"
       :highlight-path="highlightPath"
       :is-root-default-open="isRootDefaultOpen"
       :currentNode="currentNode"
@@ -24,6 +24,10 @@
       @work-bench-edit="benchEdit"
       @work-bench-dblclick="benchdbClick"
       @work-bench-contextMenu="benchContextMenu"/>
+    <div class="we-file-tree is-empty" :style="{height:'100%',padding:'10px'}"
+      v-if="!(fileTree && fileTree.length) && treeLoading === 0">
+      <div>{{ $t('message.scripts.errorclick') }}<a @click="refresh">{{ $t('message.common.refresh') }}</a>{{ $t('message.scripts.retry') }}</div>
+    </div>
     <we-menu
       ref="treeContextMenu"
       id="file">
@@ -115,7 +119,7 @@
       :tree="hdfsTree"
       :load-data-fn="loadHdfsDataFn"
       :fs-type="fsType"
-      title="导入至HDFS"
+      :title="$t('message.scripts.contextMenu.importToHdfs')"
       @import="importToHdfs"
       @set-node="setNode"/>
     <we-import-to-hive
@@ -198,8 +202,7 @@ export default {
       fsType: 'share',
       dbList: [],
       hiveComponent: null,
-      loading: false,
-      compLoading: false,
+      loading: false, // delete loading
       treeLoading: false,
       highlightPath: '',
       isRootDefaultOpen: true,
@@ -239,7 +242,6 @@ export default {
         cb: (res) => {
           if (!res || res.value.length <= 0) {
             this.treeLoading = true;
-            this.compLoading = true;
             this.getRootPath((status) => {
               if (status) {
                 this.getTree((tree) => {
@@ -252,7 +254,6 @@ export default {
                 });
               } else {
                 this.treeLoading = false;
-                this.compLoading = false;
               }
             });
           } else {
@@ -296,15 +297,10 @@ export default {
       }
     },
     getTree(cb) {
-      const timeout = setTimeout(() => {
-        this.compLoading = true;
-      }, 2000);
       api.fetch(`/filesystem/getDirFileTrees`, {
         path: this.rootPath,
       }, 'get')
         .then((rst) => {
-          clearTimeout(timeout);
-          this.compLoading = false;
           if (rst) {
             const tree = rst.dirFileTrees;
             cb(tree);
@@ -312,8 +308,7 @@ export default {
           }
           this.timeoutFlag = true;
         }).catch(() => {
-          clearTimeout(timeout);
-          this.compLoading = false;
+          this.treeLoading = 0
           cb(false);
         });
     },
@@ -485,19 +480,22 @@ export default {
             cb(false);
             return this.$Message.error(`${this.$t('message.scripts.constants.error.fileExists')}：${path}`);
           }
-          // 如果不重名要判断该文件是否在tab中打开，如果代开阻止修改
+          // 判断是否在tab中打开，如果打开阻止修改
           this.dispatch('Workbench:isOpenTab', {
             newLabel: args.label,
             oldLabel: args.node.name,
             oldDest: args.node.path,
           }, (isOpenTab) => {
             if (isOpenTab) {
-              return this.$Message.error(`已打开的脚本不支持修改后缀名`);
+              return this.$Message.error(this.$t('message.scripts.hasopen'));
             } else {
               api.fetch('/filesystem/rename', {
                 oldDest: args.node.path,
                 newDest: path,
               }).then(() => {
+                if (this.currentNode && this.currentNode.data) {
+                  this.currentNode.data.path = path
+                }
                 cb(true);
               }).catch(() => {
                 cb(false);
@@ -556,6 +554,8 @@ export default {
             this.$Message.success(this.$t('message.scripts.constants.success.delete'));
             this.refresh('delete');
             this.currentNode.remove();
+            this.currentNode = { ...this.$refs.weFileTree.$refs.tree.root };
+            this.currentNode.data = { ...this.currentNode.data[0] };
           }).catch(() => {
             this.loading = false;
           });
@@ -601,28 +601,16 @@ export default {
     },
     loadDataFn(node, cb) {
       this.treeLoading = true;
-      const timeout = setTimeout(() => {
-        this.compLoading = true;
-      }, 2000);
       api.fetch(
         `/filesystem/getDirFileTrees`, {
           path: node.data.path,
         },
         'get'
       ).then((rst) => {
-        clearTimeout(timeout);
-        this.compLoading = false;
         this.treeLoading = false;
         const tree = rst.dirFileTrees.children;
         cb(tree);
-        // this.$nextTick(() => {
-        // seesion存储改为indexDB存储过程中，将存储的数据结构改变，以前是纯数组，现在是对象里的value值判断，所以得改项目里其他用到缓存地方的判断
-        // fileTree没有变动，应该不用更新到indexDB，由于树组件打开子节点会清空
-        // this.dispatch('IndexedDB:appendTree', { treeId: 'scriptTree', value: this.fileTree });
-        // });
       }).catch(() => {
-        clearTimeout(timeout);
-        this.compLoading = false;
         this.treeLoading = false;
       });
     },
@@ -656,7 +644,6 @@ export default {
         if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.data'));
         if (isEmpty(this.fileTree)) return this.initData();
         this.treeLoading = true;
-        this.compLoading = true;
         // const root = this.rootPath.slice(this.rootPath.indexOf('/') + 2, this.rootPath.length - 1);
         // 这里不能传''，后台没有传空的逻辑，如果为空时传根目录
         let nodePath = isEmpty(this.currentNode) ? this.rootPath : this.currentNode.data.path;
@@ -666,14 +653,9 @@ export default {
         } else if (type === 'new' && path) {
           nodePath = path.slice(0, path.lastIndexOf('/'));
         }
-        const timeout = setTimeout(() => {
-          this.compLoading = true;
-        }, 2000);
         api.fetch(`/filesystem/getDirFileTrees`, {
           path: nodePath,
         }, 'get').then((rst) => {
-          clearTimeout(timeout);
-          this.compLoading = false;
           this.treeLoading = false;
           // 非根目录的逻辑
           if (nodePath !== this.fileTree[0].path) {
@@ -703,8 +685,6 @@ export default {
             })
           }
         }).catch(() => {
-          clearTimeout(timeout);
-          this.compLoading = false;
           this.treeLoading = false;
         });
       };
@@ -713,7 +693,6 @@ export default {
         if (status) {
           getTreeData();
         } else {
-          this.compLoading = false;
           this.treeLoading = false;
         }
       });

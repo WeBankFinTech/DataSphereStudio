@@ -41,7 +41,7 @@
           <Icon type="ios-arrow-down" style="margin-left: 5px"></Icon>
         </div>
         <DropdownMenu slot="list" class="proj-list">
-          <div class="proj-name">工作空间列表</div>
+          <div class="proj-name">{{ $t('message.common.dss.worklist') }}</div>
           <div class="name-bar">
             <span
               v-for="p in workspaceList"
@@ -181,7 +181,7 @@ export default {
       userName: "",
       currentProject: {},
       projectList: [],
-      isSandbox: process.env.NODE_ENV === "sandbox",
+      isSandbox: this.$APP_CONF.isSandbox,
       workspaceList: [],
       currentWorkspace: {},
       menuList: [],
@@ -250,6 +250,7 @@ export default {
     $route(v) {
       // 设定条件只有切换在工作空间首页时才触发
       if (v.name === "workspaceHome") {
+        this.currentId = -1;
         this.init();
         this.getWorkspacesRoles()
           .then((res) => {
@@ -415,7 +416,7 @@ export default {
             this.collections = this.collections.concat(app);
           })
         } else {
-          this.$Message.warning('目前只支持钉五个快捷入口')
+          this.$Message.warning(this.$t('message.common.dss.fiveshortcut'))
         }
       }
     },
@@ -501,7 +502,6 @@ export default {
     // 切换工作空间
     changeWorkspace(workspace) {
       if (workspace.id === this.currentWorkspace.id) return;
-      storage.set("curWorkspace", workspace, "local");
       if (
         this.$route.path.indexOf("/dataService") !== -1 ||
         this.$route.path.indexOf("/dataManagement") !== -1
@@ -591,7 +591,7 @@ export default {
       this.isConsolePage = true;
       this.currentId = -1;
       const url =
-        location.origin + "/dss/linkis?noHeader=1&noFooter=1#/console";
+        location.origin + "/dss/linkis/?noHeader=1&noFooter=1#/console";
       this.$router.push({
         path: '/commonIframe/linkis',
         query: {

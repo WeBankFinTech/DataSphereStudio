@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.AbstractDevelopmentOperation;
@@ -28,6 +29,7 @@ import org.apache.linkis.rpc.Sender;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class WorkflowRefCopyOperation
@@ -45,10 +47,15 @@ public class WorkflowRefCopyOperation
         //插入version
         String version = workflowCopyRequestRef.getNewVersion();
         String description = (String) workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_DESCRIPTION);
+        Long targetProjectId = workflowCopyRequestRef.getRefProjectId();
+        Optional<Object> nodeSuffix = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NODE_SUFFIX));
+        Optional<Object> newFlowName = Optional.ofNullable(workflowCopyRequestRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_NAME));
         RequestCopyWorkflow requestCopyWorkflow = new RequestCopyWorkflow(userName,
                 workflowCopyRequestRef.getWorkspace(), appId, contextIdStr,
-                projectName, version, description, workflowCopyRequestRef.getDSSLabels());
-        ResponseCopyWorkflow responseCopyWorkflow = (ResponseCopyWorkflow) sender.ask(requestCopyWorkflow);
+                projectName, version, description, workflowCopyRequestRef.getDSSLabels(),
+                targetProjectId, (String) nodeSuffix.orElse(null), (String) newFlowName.orElse(null));
+        ResponseCopyWorkflow responseCopyWorkflow = RpcAskUtils.processAskException(sender.ask(requestCopyWorkflow),
+                ResponseCopyWorkflow.class, RequestCopyWorkflow.class);
         Map<String, Object> refJobContent = new HashMap<>(2);
         refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCopyWorkflow.getDssFlow().getId());
         refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, responseCopyWorkflow.getDssFlow().getFlowJson());

@@ -57,7 +57,7 @@ export default {
         content: value,
         contentHtml: render,
       }).then(() => {
-        this.$Message.success("保存成功");
+        this.$Message.success(this.$t('message.workspace.Savesucc'));
       });
     },
     // 绑定@imgAdd event
@@ -91,10 +91,10 @@ export default {
             //   method: null
             //   status: 1
             // }
-            this.$Message.error(response.data.message || "上传失败");
+            this.$Message.error(response.data.message || this.$t('message.workspace.Uploadfailed'));
           }
         } else {
-          this.$Message.error(response.data.message || "上传失败");
+          this.$Message.error(response.data.message || this.$t('message.workspace.Uploadfailed'));
         }
       });
     },

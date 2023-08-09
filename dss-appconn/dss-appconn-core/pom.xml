@@ -21,14 +21,15 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.1</version>
+        <version>1.1.2</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dss-appconn-core</artifactId>
 
     <properties>
-        <fasterxml.jackson.version>2.11.0</fasterxml.jackson.version>
+        <fasterxml.jackson.version>2.14.1</fasterxml.jackson.version>
         <commons-collections.version>3.2.2</commons-collections.version>
     </properties>
 

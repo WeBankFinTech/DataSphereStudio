@@ -49,7 +49,7 @@ export default {
       commit(this.$store, 'UPDATE_NODE', {
         key: this.node.key,
         obj: Object.assign(this.node, {
-          lastUpdateTime: Date.now(),
+          modifyTime: Date.now(),
           title: this.title,
           desc: this.desc
         })

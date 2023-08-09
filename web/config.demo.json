@@ -1,0 +1,39 @@
+{
+  "apps": {
+    "demo": {
+      "routes": "demo/router",
+      "module": "demo/module",
+      "i18n": {
+        "en": "demo/i18n/en.json",
+        "zh-CN": "demo/i18n/zh.json"
+      }
+    },
+    "sparketl": {
+      "routes": "sparketl/router/index",
+      "i18n": {
+        "en": "sparketl/utils/i18n/zh.json",
+        "zh-CN": "sparketl/utils/i18n/zh.json"
+      }
+    }
+  },
+  "exts": {
+  },
+  "components": {
+  },
+  "conf": {
+    "app_name": "DataSphere Studio",
+    "app_logo": "dss/assets/images/dssLogo.png",
+    "user_guide": "",
+    "faq_link": "/_book/",
+    "copy_project_enable": true,
+    "error_report": true,
+    "table_transfer": true,
+    "watermark": {
+      "show": true,
+      "template": "${username} ${time}",
+      "timeupdate": 60000
+    },
+    "update_chrome": "/_book/知识库/DSS常见问题/其他/DSS使用推荐的浏览器版本.html"
+  },
+  "version": "1.1.2"
+}

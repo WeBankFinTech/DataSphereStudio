@@ -67,7 +67,7 @@
         "visibleRole": "可见角色：",
         "test": "测试：",
         "applicant": "申请人：",
-        "status": "状态：",
+        "status": "状态",
         "path": "API路径：",
         "submitter": "提交人",
         "find": "查询",
@@ -256,7 +256,17 @@
           "buttonText": "查询"
         }
       },
-      "tagPlaceholder": "标签，按 enter 创建"
+      "tagPlaceholder": "标签，按 enter 创建",
+      "istitle": "我是标题",
+      "isdesc": "我是描述内容",
+      "cancel": "取消",
+      "tuned": "暂未开放！",
+      "manage": "管理",
+      "disableenable": "禁用/启用",
+      "more1024": "不能超过1024个字符！",
+      "moreline": "行数过多请分批查询！",
+      "outlimit": "超出限制请修改！",
+      "uninittask": "任务暂时未生成返回，请稍后再试或联系管理员！"
     }
   }
 }

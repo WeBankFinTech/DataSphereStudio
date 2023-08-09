@@ -21,8 +21,8 @@
     <parent>
         <artifactId>dss</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.1</version>
-       <!-- <relativePath>../../pom.xml</relativePath>-->
+        <version>1.1.2</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -39,6 +39,12 @@
                     <groupId>org.apache.commons</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-framework-proxy-user-service</artifactId>
+            <version>${dss.version}</version>
         </dependency>
 
         <dependency>

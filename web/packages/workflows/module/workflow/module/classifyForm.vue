@@ -1,7 +1,7 @@
 <template>
   <Modal
     v-model="ClassifyShow"
-    :title="actionType === 'add' ? '工作流分类 / 新建' : '工作流分类 / 修改'"
+    :title="ftitle"
     :closable="false">
     <Form
       :label-width="100"
@@ -10,29 +10,29 @@
       :rules="rulesValid"
       label-position="left">
       <FormItem
-        label="工作流分类名:"
+        :label="$t('message.workflow.WorkflowCategory')"
         prop="name">
         <Input
           v-model="projectData.name"
-          placeholder="请输入分类名"
-          :disabled="actionType === 'modify' && projectData.name === '我的工作流' || projectData.name === '我参与的工作流'"></Input>
+          :placeholder="$t('message.workflow.inputCategory')"
+          :disabled="actionType === 'modify' && projectData.name === this.$t('message.workflow.Myworkflow') || projectData.name === this.$t('message.workflow.WorkflowMy')"></Input>
       </FormItem>
-      <FormItem label="工作流分类描述:">
+      <FormItem :label="$t('message.workflow.workflowdesc')">
         <Input
           v-model="projectData.description"
           type="textarea"
-          placeholder="请输入分类名"></Input>
+          :placeholder="$t('message.workflow.inputCategory')"></Input>
       </FormItem>
     </Form>
     <div slot="footer">
       <Button
         type="text"
         size="large"
-        @click="Cancel">取消</Button>
+        @click="Cancel">{{ $t('message.workflow.Cancel') }}</Button>
       <Button
         type="primary"
         size="large"
-        @click="Ok">确认</Button>
+        @click="Ok">{{ $t('message.workflow.Confirm') }}</Button>
     </div>
   </Modal>
 </template>
@@ -57,9 +57,9 @@ export default {
       ClassifyShow: this.addClassifyShow,
       rulesValid: {
         name: [
-          { required: true, message: '请输入名称', trigger: 'blur' },
+          { required: true, message: this.$t('message.workflow.PleaseInputName'), trigger: 'blur' },
           { message: '名称长度不能大于20', max: 20 },
-          { type: 'string', pattern: /^[a-zA-Z\u4e00-\u9fa5][a-zA-Z0-9_\u4e00-\u9fa5]*$/, message: '必须以字母或中文开头，且只支持字母、数字、下划线和中文！', trigger: 'blur' },
+          { type: 'string', pattern: /^[a-zA-Z\u4e00-\u9fa5][a-zA-Z0-9_\u4e00-\u9fa5]*$/, message: this.$t('message.workflow.inputStyle'), trigger: 'blur' },
         ],
       },
     };
@@ -68,6 +68,9 @@ export default {
     projectData() {
       return this.projectClassify;
     },
+    ftitle() {
+      return this.actionType === 'add' ? `${this.$t('message.workflow.Create')} / ${this.$t('message.workflow.inputCategory')}` : `${this.$t('message.workflow.Edit')} / ${this.$t('message.workflow.inputCategory')}`
+    }
   },
   watch: {
     ClassifyShow(val) {
@@ -87,7 +90,7 @@ export default {
           this.$emit('addProjectClassifyConfirm', this.projectData);
           this.ClassifyShow = false;
         } else {
-          this.$Message.warning('验证项未通过，请检查后再试！');
+          this.$Message.warning(this.$t('message.workflow.failedNotice'));
         }
       });
     },

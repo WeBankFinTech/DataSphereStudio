@@ -22,7 +22,10 @@ import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import java.util.List;
 
 
-
+/**
+ * 一个编排抽象，代表了一类编排。包括了编排的类型、关联的appconn、支持的工具条类型等信息。
+ * 注意，编排并不是工作流，因此不会包含任何的节点内容
+ */
 public interface DSSOrchestrator {
 
    /**

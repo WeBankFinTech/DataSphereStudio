@@ -1,33 +1,115 @@
+.idea
+.idea/*
+
 .DS_Store
-.cache
 
-# for ide
+assembly/target
+assembly/dss-package/target
+
+
+# dss-commons
+dss-commons/dss-sender-service/target
+
+# dss-appconn
+dss-appconn/appconns/dss-datachecker-appconn/target
+dss-appconn/appconns/dss-eventchecker-appconn/target
+dss-appconn/appconns/dss-orchestrator-framework-appconn/target
+dss-appconn/appconns/dss-schedulis-appconn/target
+dss-appconn/appconns/dss-sendemail-appconn/esb-email-support/target
+dss-appconn/appconns/dss-sendemail-appconn/sendemail-appconn-core/target
+dss-appconn/appconns/dss-workflow-appconn/target
+dss-appconn/appconns/dss-sso-appconn/target
+dss-appconn/appconns/dss-scriptis-appconn-appconn/target
+dss-appconn/dss-appconn-core/target
+dss-appconn/dss-appconn-loader/target
+dss-appconn/dss-schedule-appconn-core/target
+dss-appconn/linkis-appconn-engineplugin/target
+dss-appconn/appconns/dss-dolphinscheduler-appconn/target
+dss-appconn/dss-appconn-manager/dss-appconn-manager-client/target
+dss-appconn/dss-appconn-manager/dss-appconn-manager-core/target
+dss-appconn/dss-scheduler-appconn/target
+dss-appconn/appconns/dss-scriptis-appconn/target/
+
+# dss-apps
+dss-apps/dss-apiservice-server/target
+dss-apps/dss-scriptis-server/target
+dss-apps/dss-apps-server/target
+dss-server/target
+
+#dss-guide
+dss-apps/dss-user-guide/dss-user-guide-server/src/main/resources/
+dss-apps/dss-user-guide/dss-user-guide-server/target
+
+# dss-commons
+dss-commons/dss-common/target
+dss-commons/dss-contextservice/target
+dss-commons/dss-bmlservice/target
+
+# dss-framework
+dss-framework/dss-appconn-framework/target
+dss-framework/dss-framework-common/target
+dss-framework/dss-framework-orchestrator-server/target
+dss-framework/dss-framework-project-server/target
+dss-framework/dss-framework-workspace-server/target
+dss-framework/framework-plugins/dss-framework-orchestrator-publish/target
+dss-framework/framework-plugins/dss-framework-release-server/target
+dss-framework/framework-plugins/dss-framework-migrate-server/target
+dss-framework/dss-framework-admin/target
+dss-framework/dss-framework-sql-template/target
+dss-framework/dss-framework-dbapi-server/target
+dss-framework/dss-framework-admin-service/target
+dss-framework/dss-framework-proxy-user-service/target
+
+
+# dss-orchestrator
+dss-orchestrator/dss-orchestrator-common/target
+dss-orchestrator/dss-orchestrator-core/target
+dss-orchestrator/dss-orchestrator-db/target
+dss-orchestrator/dss-orchestrator-loader/target
+dss-orchestrator/orchestrators/dss-workflow/dss-flow-execution-server/target
+dss-orchestrator/orchestrators/dss-workflow/dss-linkis-node-execution/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-common/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-server/target
+dss-orchestrator/dss-orchestrator-conversion-standard/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-conversion-standard/target
+dss-orchestrator/orchestrators/dss-workflow/dss-workflow-sdk/target
+
+# dss-standars
+dss-standard/dss-standard-common/target
+dss-standard/sso-standard/origin-sso-integration-standard/target
+dss-standard/sso-standard/spring-origin-sso-integration-plugin/target
+dss-standard/sso-standard/sso-integration-standard/target
+dss-standard/development-standard/development-process-standard/target
+dss-standard/development-standard/development-process-standard-execution/target
+dss-standard/structure-standard/dss-project-plugin/target
+dss-standard/structure-standard/dss-role-plugin/target
+dss-standard/structure-standard/dss-structure-integration-standard/target
+dss-standard/structure-standard/spring-origin-dss-project-plugin/target
+
+#dss-data-api
+dss-apps/dss-data-api/dss-data-api-server/src/main/resources
+dss-apps/dss-data-api/dss-api-sql-template/target
+dss-apps/dss-data-api/dss-data-api-server/target
+
+#dss-data-governance
+dss-apps/dss-data-governance/dss-data-governance-server/src/main/resources
+dss-apps/dss-data-governance/dss-data-governance-server/target
+dss-apps/dss-data-governance/dss-data-governance-common/target
+dss-apps/dss-data-governance/dss-data-asset-server/target
+dss-apps/dss-data-governance/dss-data-classification-server/target
+dss-apps/dss-data-governance/dss-data-warehouse-dao/target
+dss-apps/dss-data-governance/dss-data-warehouse-service/target
+dss-apps/dss-data-governance/dss-data-warehouse-server/target
+
+
+# plugins
+plugins/azkaban/linkis-jobtype/target
+plugins/linkis/dss-gateway-support/target
+
+logs
+logs/*
+
 *.iml
-*.ipr
-*.iws
-*.pyc
-*.pyo
-*.swp
-.idea/
-.idea_modules/
-.project
-.pydevproject
-.scala_dependencies
-.settings
-.classpath
-
-# For SBT
-.jvmopts
-
-# For Node.js
-node_modules/
-
-# generated file
-.mvn/wrapper/maven-wrapper.jar
-dist/
-out/
-target/
-
-# log folder
-logs/
-*.log
+/plugins/dolphinscheduler/dss-dolphinscheduler-client/target
+/plugins/dolphinscheduler/dolphinscheduler-prod-metrics/target
+/plugins/dolphinscheduler/dss-dolphinscheduler-token/target

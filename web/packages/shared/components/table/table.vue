@@ -104,7 +104,7 @@
           </tr>
         </table>
         <div v-show="showTableList.length < 1" class="no-data-tip" :style="noDataStyle">
-          暂无数据
+          {{ $t('message.common.No') }}
         </div>
         <div :style="{height:`${tableOtherBottom}px`}"></div>
       </div>
@@ -298,11 +298,8 @@ export default {
     },
     //滚动处理
     scrollProcessing() {
-      // const last = $event && $event.last;
       const bottomScroll = this.$el.querySelector("#bottomDiv");
-      // const topScroll = this.$el.querySelector("#topDiv");
       const direction = bottomScroll.scrollTop >= this.scrollTop; //滚动方向
-      // if(this.needLoad(last,bottomScroll))return;
       //记录上一次向下滚动的位置
       this.scrollTop = bottomScroll.scrollTop;
       direction ? this.handleScrollBottom() : this.handleScrollTop();
@@ -392,12 +389,11 @@ export default {
         }
         this.loadedNum = this.loadedNum + topNum - bottomNum; //重新计算实际渲染数据条数
         this.dataTop = this.dataTop - topNum * this.tdHeight; //重新计算渲染数据的高度
-        this.$nextTick(() => {
-          this.$el.querySelector("#bottomDiv").scrollTop =
-            this.$el.querySelector("#bottomDiv").scrollTop +
+        const h = this.$el.querySelector("#bottomDiv").scrollTop +
             bottomNum * this.tdHeight;
-        })
-        // this.scrollTop = this.$el.querySelector("#bottomDiv").scrollTop;
+        this.$el.querySelector("#bottomDiv").scrollTop = h
+        this.scrollTop = h
+
       } else if (type == "bottom") {
         this.showTableList.splice(0, topNum); //减去顶部数据
         for (let i = 0; i < bottomNum; i++) {
@@ -407,12 +403,10 @@ export default {
         }
         this.loadedNum = this.loadedNum - topNum + bottomNum; //重新计算实际渲染数据条数
         this.dataTop = this.dataTop + topNum * this.tdHeight; //重新计算渲染数据的高度
-        this.$nextTick(() => {
-          this.$el.querySelector("#bottomDiv").scrollTop =
-            this.$el.querySelector("#bottomDiv").scrollTop -
+        const h = this.$el.querySelector("#bottomDiv").scrollTop -
             topNum * this.tdHeight;
-        })
-        // this.scrollTop = this.$el.querySelector("#bottomDiv").scrollTop;
+        this.$el.querySelector("#bottomDiv").scrollTop = h
+        this.scrollTop = h;
       } else if (type == "bottomAll") {
         this.showTableList = []; //减去顶部数据
         let scrollNum = topNum;
@@ -423,7 +417,7 @@ export default {
         }
         this.loadedNum = bottomNum; //重新计算实际渲染数据条数
         this.dataTop = (scrollNum - this.loadNum) * this.tdHeight; //重新计算渲染数据的高度
-        // this.scrollTop = this.$el.querySelector("#bottomDiv").scrollTop;
+        this.scrollTop = this.$el.querySelector("#bottomDiv").scrollTop;
       } else if (type == "topAll") {
         this.showTableList = []; //减去顶部数据
         let scrollNum = bottomNum;
@@ -434,7 +428,7 @@ export default {
         }
         this.loadedNum = topNum; //重新计算实际渲染数据条数
         this.dataTop = (scrollNum - topNum + this.loadNum) * this.tdHeight; //重新计算渲染数据的高度
-        // this.scrollTop = this.$el.querySelector("#bottomDiv").scrollTop;
+        this.scrollTop = this.$el.querySelector("#bottomDiv").scrollTop;
       }
       this.showLoad = false;
     },

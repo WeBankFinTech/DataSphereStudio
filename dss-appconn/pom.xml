@@ -43,6 +43,7 @@
         <module>appconns/dss-dolphinscheduler-appconn</module>
         <module>appconns/dss-sso-appconn</module>
         <module>appconns/dss-scriptis-appconn</module>
+        <module>appconns/dss-sparketl-appconn</module>
     </modules>
 
 </project>

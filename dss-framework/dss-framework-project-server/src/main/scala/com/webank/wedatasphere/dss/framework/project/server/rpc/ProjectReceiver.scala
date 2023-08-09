@@ -19,9 +19,7 @@ package com.webank.wedatasphere.dss.framework.project.server.rpc
 import java.util
 
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject
-import com.webank.wedatasphere.dss.common.protocol.{ProxyUserCheckRequest, ResponseProxyUserCheck}
-import com.webank.wedatasphere.dss.common.protocol.project.{ProjectInfoRequest, ProjectRefIdRequest, ProjectRefIdResponse, ProjectRelationRequest, ProjectRelationResponse, ProjectUserAuthRequest, ProjectUserAuthResponse}
-import com.webank.wedatasphere.dss.framework.admin.service.DssProxyUserService
+import com.webank.wedatasphere.dss.common.protocol.project._
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo
 import com.webank.wedatasphere.dss.framework.project.service.{DSSProjectService, DSSProjectUserService}
@@ -38,8 +36,7 @@ import scala.concurrent.duration.Duration
 @Component
 class ProjectReceiver(projectService: DSSProjectService,
                       dssWorkspaceUserService: DSSWorkspaceUserService,
-                      projectUserService: DSSProjectUserService,
-                      dssProxyUserService: DssProxyUserService) extends Receiver {
+                      projectUserService: DSSProjectUserService) extends Receiver {
 
   override def receive(message: Any, sender: Sender): Unit = {
 
@@ -54,7 +51,7 @@ class ProjectReceiver(projectService: DSSProjectService,
         val appConnProjectId = projectService.getAppConnProjectId(dssProjectId, appConnName, dssLabels)
         new ProjectRelationResponse(dssProjectId, appConnName, dssLabels, appConnProjectId)
       case projectRefIdRequest: ProjectRefIdRequest =>
-        val refProjectId = projectService.getAppConnProjectId(projectRefIdRequest.getAppInstanceId, projectRefIdRequest.getDssProjectId);
+        val refProjectId = projectService.getAppConnProjectId(projectRefIdRequest.getAppInstanceId, projectRefIdRequest.getDssProjectId)
         new ProjectRefIdResponse(projectRefIdRequest.getAppInstanceId, projectRefIdRequest.getDssProjectId, refProjectId);
       case requestUserWorkspace: RequestUserWorkspace =>
         val userWorkspaceIds: util.List[Integer] = dssWorkspaceUserService.getUserWorkspaceIds(requestUserWorkspace.getUserName)
@@ -67,22 +64,18 @@ class ProjectReceiver(projectService: DSSProjectService,
       case projectInfoRequest: ProjectInfoRequest =>
         val dssProjectDO: DSSProjectDO = projectService.getProjectById(projectInfoRequest.getProjectId)
         val projectInfoVo: ProjectInfoVo = projectService.getProjectInfoById(projectInfoRequest.getProjectId)
-        val DSSProject = new DSSProject()
-        BeanUtils.copyProperties(dssProjectDO, DSSProject)
-        DSSProject.setWorkspaceName(projectInfoVo.getWorkspaceName)
-        DSSProject
+        val dssProject = new DSSProject()
+        BeanUtils.copyProperties(dssProjectDO, dssProject)
+        dssProject.setWorkspaceId(dssProjectDO.getWorkspaceId.intValue())
+        dssProject.setWorkspaceName(projectInfoVo.getWorkspaceName)
+        dssProject
 
-      case projectUserAuthRequest: ProjectUserAuthRequest => {
+      case projectUserAuthRequest: ProjectUserAuthRequest =>
         val projectId = projectUserAuthRequest.getProjectId
         val userName = projectUserAuthRequest.getUserName
         val projectDo: DSSProjectDO = projectService.getProjectById(projectId)
         val privList = projectUserService.getProjectUserPriv(projectId, userName).map(_.getPriv)
         new ProjectUserAuthResponse(projectId, userName, privList, projectDo.getCreateBy)
-      }
-      case proxyUserCheckRequest: ProxyUserCheckRequest => {
-        val isExists = dssProxyUserService.isExists(proxyUserCheckRequest.userName, proxyUserCheckRequest.proxyUser)
-        ResponseProxyUserCheck(isExists,dssProxyUserService.getProxyUserNameList(proxyUserCheckRequest.userName))
-      }
     }
   }
 

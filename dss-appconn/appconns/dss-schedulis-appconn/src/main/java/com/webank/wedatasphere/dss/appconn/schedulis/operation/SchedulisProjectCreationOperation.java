@@ -42,6 +42,8 @@ public class SchedulisProjectCreationOperation
 
     private String managerUrl;
 
+    public static final int WTSS_MAX_PROJECT_NAME_SIZE = 64;
+
     @Override
     protected String getAppConnName() {
         return SchedulisAppConn.SCHEDULIS_APPCONN_NAME;
@@ -57,11 +59,14 @@ public class SchedulisProjectCreationOperation
     @Override
     public ProjectResponseRef createProject(DSSProjectContentRequestRef.DSSProjectContentRequestRefImpl requestRef) throws ExternalOperationFailedException {
         logger.info("begin to create project in schedulis, project name is {}.", requestRef.getDSSProject().getName());
+        if (requestRef.getDSSProject().getName().length() > WTSS_MAX_PROJECT_NAME_SIZE) {
+            throw new ExternalOperationFailedException(60021, "project name is too long, it must be less then " + WTSS_MAX_PROJECT_NAME_SIZE + " in schedulis! ");
+        }
         if (CollectionUtils.isNotEmpty(requestRef.getDSSProjectPrivilege().getReleaseUsers())) {
             // 先校验运维用户是否存在于 Schedulis，如果不存在，则不能成功创建工程。
             requestRef.getDSSProjectPrivilege().getReleaseUsers().forEach(releaseUser -> {
                 if (!AzkabanUserService.containsUser(releaseUser, getBaseUrl(), ssoRequestOperation, requestRef.getWorkspace())) {
-                    throw new ExternalOperationFailedException(100323, "当前设置的发布用户: " + releaseUser + ", 在 Schedulis 系统中不存在，请联系 Schedulis 管理员创建该用户！");
+                    throw new ExternalOperationFailedException(100323, "当前设置的发布用户: " + releaseUser + ", 在 Schedulis 系统中不存在，请在Schedulis创建该用户！");
                 }
             });
         }
@@ -71,7 +76,7 @@ public class SchedulisProjectCreationOperation
         params.put("description", requestRef.getDSSProject().getDescription());
         try {
             String entStr = SchedulisHttpUtils.getHttpPostResult(projectUrl, params, ssoRequestOperation, requestRef.getWorkspace());
-            logger.error("新建工程 {}, Schedulis 返回的信息是 {}.", requestRef.getName(), entStr);
+            logger.info("新建工程 {}, Schedulis 返回的信息是 {}.", requestRef.getDSSProject().getName(), entStr);
             String message = AzkabanUtils.handleAzkabanEntity(entStr);
             if (!"success".equals(message)) {
                 throw new ExternalOperationFailedException(90008, "Schedulis 新建工程失败, 原因: " + message);

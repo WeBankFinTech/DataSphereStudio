@@ -2,16 +2,16 @@
   <div class="download-audit">
     <!-- 查询操作 -->
     <Form :model="searchBar" :rules="ruleInline" inline>
-      <FormItem prop="userName" label="用户名">
+      <FormItem prop="userName" :label="$t('message.scripts.Username')">
         <Input :maxlength="50" v-model="searchBar.userName"/>
       </FormItem>
-      <FormItem prop="time" label="下载时间">
+      <FormItem prop="time" :label="$t('message.scripts.downloadtime')">
         <DatePicker type="datetimerange" :transfer="true" :editable="false" placement="bottom-start" v-model="searchBar.time" style="width: 150px"></DatePicker>
       </FormItem>
       <FormItem>
-        <Button type="default" @click="reset" style="margin-right: 10px;" >重置</Button>
+        <Button type="default" @click="reset" style="margin-right: 10px;" >{{ $t('message.scripts.reset') }}</Button>
         <Button type="primary" @click="search(1)">
-          搜索
+          {{ $t('message.scripts.search') }}
         </Button>
       </FormItem>
     </Form>
@@ -51,20 +51,20 @@ export default {
       },
       columns: [
         {
-          title: '日期',
+          title: this.$t('message.scripts.Date'),
           key: 'createTime',
           minWidth: 150,
           align: "center",
           sortable: true
         },
         {
-          title: '用户',
+          title: this.$t('message.scripts.user'),
           key: 'creator',
           minWidth: 150,
           align: "center"
         },
         {
-          title: '下载路径',
+          title: this.$t('message.scripts.downloadpath'),
           key: 'path',
           minWidth: 200,
           align: "center"
@@ -113,7 +113,7 @@ export default {
         endTime: endTime ? this.timeFormat(endTime) : '',
         pn: current,
       }
-      api.fetch('/dss/framework/admin/audit/script/download/query', params,'get').then((res) => {
+      api.fetch('/dss/scriptis/audit/download/query', params,'get').then((res) => {
         this.tableData = res.data.list;
         this.page.current = res.data.pageNum == 0 ? 1 : res.data.pageNum;
         this.page.totalSize = res.data.total;

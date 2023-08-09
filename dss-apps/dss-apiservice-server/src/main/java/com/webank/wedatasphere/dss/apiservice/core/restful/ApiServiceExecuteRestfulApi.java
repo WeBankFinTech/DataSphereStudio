@@ -288,18 +288,18 @@ public class ApiServiceExecuteRestfulApi {
     }
 
     private Message getResponse(String user,String path, QueryRequest queryRequest, String httpMethod) {
-        Response response = ApiUtils.doAndResponse(() -> {
+        Message response = ApiUtils.doAndResponse(() -> {
             validParam(queryRequest);
             String token = queryRequest.getParams().get(ApiServiceConfiguration.API_SERVICE_TOKEN_KEY.getValue()).toString();
 
-            MessageVo messageVo = null;
+            Message messageVo = null;
             ApiServiceToken tokenDetail = null;
             boolean isParseRight = true;
             try {
                 tokenDetail = JwtManager.parseToken(token);
             }catch (Exception e) {
                 isParseRight = false;
-                messageVo = new MessageVo().setData("token解析错误，该token无效！");
+                messageVo = Message.error("token解析错误，该token无效！");
             }
             if(false == isParseRight) {
                 return messageVo;
@@ -310,20 +310,17 @@ public class ApiServiceExecuteRestfulApi {
                         queryRequest.getParams() == null ? new HashMap<>() : queryRequest.getParams(),
                         queryRequest.getModuleName(), httpMethod,tokenDetail,user);
                 if(null == query) {
-                    messageVo = new MessageVo().setMessage("用户任务执行出错，用户参数错误！").setStatus(1);
+                    messageVo = Message.error("用户输入了非法关键字！");
                     return messageVo;
                 }
 
-                HashMap<String,Object> queryRes = new HashMap<>();
-                queryRes.put("taskId",query.getTaskId());
-                queryRes.put("execId",query.getExecId());
-                messageVo = new MessageVo().setData(queryRes);
+                messageVo = Message.ok().data("taskId",query.getTaskId()).data("execId",query.getExecId());
             }else {
-                messageVo = new MessageVo().setData("Token is not correct");
+                messageVo = Message.error("Token is not correct");
             }
             return messageVo;
         });
-        return convertMessage(response);
+        return response;
     }
 
     //convert Response to Message

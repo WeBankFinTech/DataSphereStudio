@@ -28,7 +28,7 @@ public class AppConnLoaderFactory {
     private static final Logger logger = LoggerFactory.getLogger(AppConnLoaderFactory.class);
 
     private static Class<? extends AppConnLoader> clazz = CommonAppConnLoader.class;
-    private static AppConnLoader appConnLoader = null;
+    private static volatile AppConnLoader appConnLoader = null;
 
     @SuppressWarnings("unchecked")
     public static AppConnLoader getAppConnLoader(){

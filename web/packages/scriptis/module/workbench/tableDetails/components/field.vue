@@ -7,55 +7,66 @@
         slot="prefix"
         type="ios-search"/>
     </Input>
-    <div class="field-list-header">
-      <div class="field-list-item field-list-index">序号</div>
-      <div
-        class="field-list-item"
-        v-for="(item, index) in tableColumns"
-        :key="index"
-        :class="item.className">{{ item.title }}</div>
-    </div>
-    <virtual-list
-      ref="columnTables"
-      :size="46"
-      :remain="searchColList.length > maxSize ? maxSize : searchColList.length"
-      wtag="ul"
-      class="field-list">
-      <li
-        v-for="(item, index) in searchColList"
-        :key="index"
-        class="field-list-body"
-        :style="{'border-bottom': index === searchColList.length - 1 ? '1px solid #dcdee2' : 'none'}"
-        @click="clickItem($event, item)"
-      >
-        <div class="field-list-item field-list-index">{{ index + 1 }}</div>
+    <div style="position:relative">
+      <div class="field-list-header" id="tbheader" :class="{'ovy': searchColList.length > maxSize}">
         <div
           class="field-list-item"
-          :title="formatValue(item, field)"
-          v-for="(field, index2) in tableColumns"
-          :data-key="field.key"
-          :key="index2"
-          :class="field.className">{{ formatValue(item, field) }}</div>
-      </li>
-    </virtual-list>
+          v-for="(item, index) in columnCalc"
+          :key="index"
+          :style="{width: item.width? `${item.width}` : 'auto'}"
+          @mousemove.prevent.stop="mousemove"
+          @mouseup.prevent.stop="mouseup"
+        >{{ item.title }}
+          <div
+            class="resize-bar"
+            :data-col-index="index"
+            @mousedown="mousedown"
+          ></div>
+        </div>
+      </div>
+      <virtual-list
+        ref="columnTables"
+        :size="46"
+        :remain="searchColList.length > maxSize ? maxSize : searchColList.length"
+        wtag="ul"
+        class="field-list">
+        <li
+          v-for="(item, index) in searchColList"
+          :key="index"
+          class="field-list-body"
+          @click="clickItem($event, item)"
+        >
+          <div
+            class="field-list-item"
+            :title="formatValue(item, field)"
+            v-for="(field, index2) in columnCalc"
+            :data-key="field.key"
+            :key="index2"
+            :style="{width: columnCalc[index2].width? `${columnCalc[index2].width}` : 'auto'}">
+            {{ formatValue(item, field) }}
+          </div>
+        </li>
+      </virtual-list>
+      <div v-if="dragStartX" class="drag-line" :style="{left: dragLine.left, display: dragLine.show}" />
+    </div>
     <Modal v-model="editModelShow" :title="$t('message.scripts.createTable.titleModel')" :footer-hide="true">
       <Form :model="fieldModel" :label-width="80">
-        <Form-item prop="name" label="名称">
+        <Form-item prop="name" :label="$t('message.scripts.Name')">
           <Input v-model="fieldModel.name" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="type" label="类型">
+        <Form-item prop="type" :label="$t('message.scripts.Type')">
           <RadioGroup v-model="fieldModel.type">
-            <Radio label="index" disabled>指标</Radio>
-            <Radio label="dimension" disabled>维度</Radio>
+            <Radio label="index" disabled>{{ $t('message.scripts.Metrics') }}</Radio>
+            <Radio label="dimension" disabled>{{ $t('message.scripts.Dimensions') }}</Radio>
           </RadioGroup>
         </Form-item>
-        <Form-item prop="business" label="业务口径">
+        <Form-item prop="business" :label="$t('message.scripts.busst')">
           <Input v-model="fieldModel.business" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="calculate" label="计算口径">
+        <Form-item prop="calculate" :label="$t('message.scripts.calcst')">
           <Input v-model="fieldModel.calculate" placeholder="" :disabled="true"></Input>
         </Form-item>
-        <Form-item prop="formula" label="计算公式">
+        <Form-item prop="formula" :label="$t('message.scripts.Formula')">
           <Input v-model="fieldModel.formula" type="textarea" placeholder="" :disabled="true"></Input>
         </Form-item>
       </Form>
@@ -84,22 +95,41 @@ export default {
       editModelShow: false,
       fieldModel: {},
       tableColumns: [
-        { title: this.$t('message.scripts.tableDetails.ZDM'), key: 'name', className: 'field-table-name' },
-        { title: this.$t('message.scripts.tableDetails.ZDLX'), key: 'type', className: 'field-table-type' },
-        { title: this.$t('message.scripts.tableDetails.BM'), key: 'alias', className: 'field-table-alias' },
-        { title: this.$t('message.scripts.hiveTableExport.LX'), key: 'modeInfo.type', className: 'field-table-name' },
-        { title: this.$t('message.scripts.tableDetails.SFZJ'), key: 'primary', type: 'boolean', className: 'field-table-primary' },
-        { title: this.$t('message.scripts.tableDetails.SFFQ'), key: 'partitionField', type: 'boolean', className: 'field-table-part' },
-        { title: this.$t('message.scripts.tableDetails.model'), key: 'modeInfo.name', className: 'field-table-mode' },
-        { title: this.$t('message.scripts.tableDetails.ZDGZ'), key: 'rule', className: 'field-table-rule' },
-        { title: this.$t('message.scripts.tableDetails.MS'), key: 'comment', className: 'field-table-comment' },
+        { title: this.$t('message.scripts.Serial'), key: 'index', width: '5%' },
+        { title: this.$t('message.scripts.tableDetails.ZDM'), key: 'name', width: '10%' },
+        { title: this.$t('message.scripts.tableDetails.ZDLX'), key: 'type', width: '10%'  },
+        { title: this.$t('message.scripts.tableDetails.BM'), key: 'alias', width: '10%'  },
+        { title: this.$t('message.scripts.hiveTableExport.LX'), key: 'modeInfo.type', width: '10%'  },
+        { title: this.$t('message.scripts.tableDetails.SFZJ'), key: 'primary', type: 'boolean', width: '10%' },
+        { title: this.$t('message.scripts.tableDetails.SFFQ'), key: 'partitionField', type: 'boolean', width: '10%'  },
+        { title: this.$t('message.scripts.tableDetails.model'), key: 'modeInfo.name', width: '10%'  },
+        { title: this.$t('message.scripts.tableDetails.ZDGZ'), key: 'rule', width: '10%' },
+        { title: this.$t('message.scripts.tableDetails.MS'), key: 'comment', width: '15%' },
       ],
+      dragStartX: undefined,
+      dragEndX: undefined,
+      dragLine: {
+        show: 'none',
+        diff: 0,
+        left: 0
+      },
+      adjustCol: []
     };
   },
   computed: {
     maxSize() {
       return Math.floor((window.innerHeight - 242) / 46) - 1;
     },
+    columnCalc() {
+      return this.tableColumns.map((item, index) => {
+        return this.adjustCol[index] ? {
+          ...item,
+          width: this.adjustCol[index]
+        } : {
+          ...item
+        }
+      })
+    }
   },
   watch: {
     searchText(val) {
@@ -108,13 +138,17 @@ export default {
         this.searchColList = [];
         const regexp = new RegExp(`.*${val}.*`, 'i');
         const tmpList = this.table;
-        tmpList.forEach((o) => {
+        tmpList.forEach((o, index) => {
           if (regexp.test(o.name)) {
+            o.index = index + 1
             this.searchColList.push(o);
           }
         });
       } else {
-        this.searchColList = this.table;
+        this.searchColList = this.table.map((o, index)=> {
+          o.index = index + 1;
+          return o
+        });
       }
     },
   },
@@ -123,7 +157,10 @@ export default {
   },
   methods: {
     init() {
-      this.searchColList = this.table;
+      this.searchColList = this.table.map((o, index)=> {
+        o.index = index + 1;
+        return o
+      });
     },
     formatValue(item, field) {
       return utils.formatValue(item, field);
@@ -135,6 +172,48 @@ export default {
           if (this.fieldModel.name) this.editModelShow = true
         }
       }
+    },
+    mousedown(e) {
+      if (e && e.target && e.target.dataset.colIndex) {
+        this.dragColIndex = e.target.dataset.colIndex - 0
+        this.dragStartX = e.clientX
+        this.tableLeft = this.$el.getBoundingClientRect().x
+      }
+    },
+    mousemove(e) {
+      if (this.dragStartX !== undefined) {
+        this.dragEndX = e.clientX
+        this.dragLine = {
+          left: this.dragEndX - this.tableLeft + 'px',
+          diff: this.dragEndX - this.dragStartX,
+          show: 'block'
+        }
+      }
+    },
+    mouseup(e) {
+      if (this.dragStartX !== undefined) {
+        this.dragEndX = e.clientX
+        this.dragLine = {
+          left: this.dragEndX - this.tableLeft + 'px',
+          diff: this.dragEndX - this.dragStartX,
+          show: 'none'
+        }
+        this.dragStartX = undefined
+        this.adjustColWidth()
+      }
+
+    },
+    adjustColWidth() {
+      const adjustCol = []
+      this.$el.querySelectorAll('#tbheader .field-list-item').forEach(item => adjustCol.push(item.clientWidth))
+      adjustCol.forEach((item, index) => {
+        if (index === this.dragColIndex) {
+          adjustCol[index] = adjustCol[index] + this.dragLine.diff + 'px'
+        } else {
+          adjustCol[index] = adjustCol[index] + this.dragLine.diff / (adjustCol.length - 1) * -1 + 'px'
+        }
+      })
+      this.adjustCol = adjustCol
     }
   },
 };
@@ -150,6 +229,7 @@ export default {
           width: 100%;
           display: flex;
           border: 1px solid #dcdee2;
+          @include border-color($border-color-base, $dark-border-color-base);
           height: 46px;
           line-height: 46px;
       }
@@ -162,9 +242,13 @@ export default {
       }
       .field-list-body {
           border-bottom: none;
-          background: #fff;
+          @include bg-color($light-base-color, $dark-base-color);
           .field-table-mode {
             color: $primary-color
+          }
+          &:not(:first-child){
+              border-bottom: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
           }
       }
       .field-list-item {
@@ -176,38 +260,36 @@ export default {
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
-      }
-      .field-list-index {
-          width: 5%;
-          min-width: 50px;
-      }
-      .field-table-name {
-          width: 10%;
-      }
-      .field-table-mode {
-          width: 10%;
-      }
-      .field-table-type {
-          width: 10%;
-          min-width: 70px;
-      }
-      .field-table-alias {
-          width: 10%;
-      }
-      .field-table-primary {
-          width: 10%;
-          min-width: 70px;
-      }
-      .field-table-part {
-          width: 10%;
-          min-width: 70px;
-      }
-      .field-table-rule {
-          width: 10%;
-          min-width: 70px;
-      }
-      .field-table-comment {
-          width: 25%;
+          position: relative;
+          min-width: 80px;
+          max-width: 30%;
+          &:not(:first-child){
+              border-left: 1px solid $border-color-base;
+              @include border-color($border-color-base, $dark-border-color-base);
+          }
       }
   }
+  .resize-bar {
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    bottom: 0;
+    right: -5px;
+    cursor: col-resize;
+    z-index: 1;
+  }
+  .drag-line {
+    position: absolute;
+    top: 0;
+    width: 0px;
+    border-left: .5px dashed #eee;
+    height: 100%;
+    z-index: 1;
+    display: none;
+    pointer-events: none;
+  }
+  .ovy {
+    padding-right: 8px
+  }
+
 </style>

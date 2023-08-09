@@ -1,43 +1,49 @@
 <template>
   <div
     class="login"
-    @keyup.enter.stop.prevent="handleSubmit('loginForm')">
-    <i class="login-bg"/>
+    @keyup.enter.stop.prevent="handleSubmit('loginForm')"
+  >
+    <i class="login-bg" />
     <div class="login-main">
       <Form
         ref="loginForm"
         :model="loginForm"
-        :rules="ruleInline">
+        :rules="ruleInline"
+      >
         <FormItem>
           <span class="login-title">{{$t('message.common.login.loginTitle', {app_name: $APP_CONF.app_name})}}</span>
         </FormItem>
         <FormItem prop="user">
-          <div class="label">用户名</div>
+          <div class="label">{{ $t('message.common.dss.Username') }}</div>
           <Input
             v-model="loginForm.user"
             type="text"
             :placeholder="$t('message.common.login.userName')"
-            size="large"/>
+            size="large"
+          />
         </FormItem>
         <FormItem prop="password">
-          <div class="label">密码</div>
+          <div class="label">{{ $t('message.common.dss.Password') }}</div>
           <Input
             v-model="loginForm.password"
             type="password"
-            placeholder="请输入密码"
-            size="large" />
+            :placeholder="$t('message.common.dss.inputPassword')"
+            size="large"
+          />
+        </FormItem>
+        <FormItem>
           <Checkbox
             v-model="rememberUserNameAndPass"
             class="remember-user-name"
-            style="">{{$t('message.common.login.remenber')}}</Checkbox>
-        </FormItem>
-        <FormItem>
+            style=""
+          >{{$t('message.common.login.remenber')}}</Checkbox>
           <Button
             :loading="loading"
             type="primary"
             long
             size="large"
-            @click="handleSubmit('loginForm')">{{$t('message.common.login.login')}}</Button>
+            @click="handleSubmit('loginForm')"
+          >{{$t('message.common.login.login')}}</Button>
         </FormItem>
       </Form>
     </div>
@@ -52,6 +58,9 @@ import { config } from '@dataspherestudio/shared/common/config/db.js';
 import JSEncrypt from 'jsencrypt';
 import util from '@dataspherestudio/shared/common/util/';
 import tab from '@/scriptis/service/db/tab.js';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
+import plugin from '@dataspherestudio/shared/common/util/plugin'
+
 export default {
   data() {
     return {
@@ -85,9 +94,10 @@ export default {
     this.getPublicKey()
   },
   mounted() {
+    storage.set('close_db_table_suggest', false);
     const workspaceId = this.getCurrentWorkspaceId()
-    storage.remove('close_db_table_suggest')
     sessionStorage.removeItem(`work_flow_lists_${workspaceId}`)
+    this.checkChromeVersion()
   },
   methods: {
     logout() {
@@ -105,11 +115,11 @@ export default {
         micro_module: currentModules.microModule || 'dss'
       }, 'get').then((res) => {
         storage.set('noWorkSpace', false, 'local')
-        return res.workspaceHomePage.homePageUrl;
+        return res.workspaceHomePage;
       }).catch((e) => {
         storage.set('noWorkSpace', true, 'local');
         this.logout();
-        throw  e;
+        throw e;
       });
     },
     // 获取公钥接口
@@ -125,7 +135,7 @@ export default {
           if (!this.rememberUserNameAndPass) {
             storage.remove('saveUserNameAndPass', 'local');
           }
-          this.loginForm.user = this.loginForm.user.toLocaleLowerCase();
+          // this.loginForm.user = this.loginForm.user.toLocaleLowerCase();
           // 需要判断是否需要给密码加密
           let password = this.loginForm.password;
           let params = {};
@@ -155,42 +165,42 @@ export default {
           Object.keys(config.stores).map((key) => {
             db.db[key].clear();
           })
-          api
-            .fetch(`/user/login`, params)
-            .then((rst) => {
-              this.loading = false;
-              // 保存用户名
-              if (this.rememberUserNameAndPass) {
-                storage.set('saveUserNameAndPass', `${this.loginForm.user}&${this.loginForm.password}`, 'local');
+          let rst
+          try {
+            rst = await api.fetch(`/user/login`, params)
+            this.loading = false;
+            // 保存用户名
+            if (this.rememberUserNameAndPass) {
+              storage.set('saveUserNameAndPass', `${this.loginForm.user}&${this.loginForm.password}`, 'local');
+            }
+
+            if (rst) {
+              // 跳转去旧版
+              if (rst.redirectLinkisUrl) {
+                location.href = rst.redirectLinkisUrl;
+                return
               }
-              if (rst) {
-                // 跳转去旧版
-                if (rst.redirectLinkisUrl) {
-                  location.href = rst.redirectLinkisUrl;
-                  return
-                }
-                this.baseInfo = { username: this.loginForm.user };
-                storage.set('baseInfo', this.baseInfo, 'local');
-                this.getIsAdmin()
-                // 登录之后需要获取当前用户的调转首页的路径
-                this.getPageHomeUrl().then((res) => {
-                  this.$router.replace({path: res});
-                  this.$Message.success(this.$t('message.common.login.loginSuccess'));
-                })
-                this.getGlobalLimit().then(res => {
-                  storage.set('baseInfo', {
-                    ...this.baseInfo,
-                    ...res.globalLimits
-                  }, 'local')
-                })
+              this.baseInfo = { username: this.loginForm.user };
+              storage.set('baseInfo', this.baseInfo, 'local');
+              this.getIsAdmin()
+              // 登录之后需要获取当前用户的调转首页的路径
+              const homePageRes = await this.getPageHomeUrl()
+              const all_after_login = await plugin.emitHook('after_login', {
+                context: this,
+                homePageRes
+              })
+              eventbus.emit('watermark.refresh');
+              if (all_after_login.length) {
+                // 有hook返回则hook处理
+              } else {
+                this.$router.replace({ path: homePageRes.homePageUrl });
               }
-            })
-            .catch(() => {
-              if (this.rememberUserNameAndPass) {
-                storage.set('saveUserNameAndPass', `${this.loginForm.user}&${this.loginForm.password}`, 'local');
-              }
-              this.loading = false;
-            });
+              this.$Message.success(this.$t('message.common.login.loginSuccess'));
+            }
+          } catch (error) {
+            console.error(error)
+            this.loading = false
+          }
         } else {
           this.$Message.error(this.$t('message.common.login.vaildFaild'));
         }
@@ -200,14 +210,40 @@ export default {
     clearSession() {
       storage.clear();
     },
-    getGlobalLimit() {
-      return api.fetch(`/dss/scriptis/globalLimits`, {}, 'get')
-    },
     getIsAdmin() {
-      api.fetch(`/jobhistory/governanceStationAdmin`, {}, 'get').then((rst)=> {
+      api.fetch(`/jobhistory/governanceStationAdmin`, {}, 'get').then((rst) => {
         this.baseInfo = { username: this.loginForm.user, isAdmin: rst.admin }
         storage.set('baseInfo', this.baseInfo, 'local');
       })
+    },
+    checkChromeVersion() {
+      let arr = navigator.userAgent.split(' ');
+      let chromeVersion = '';
+      for (let i = 0; i < arr.length; i++) {
+        if (/chrome/i.test(arr[i]))
+          chromeVersion = arr[i]
+      }
+      let showversionTip = false
+      if (chromeVersion) {
+        chromeVersion = Number(chromeVersion.split('/')[1].split('.')[0]);
+        showversionTip = chromeVersion <= 66 || chromeVersion >= 80
+      } else {
+        showversionTip = true
+      }
+      const hasTip = storage.get('chrome-version-tip', 'local')
+      if (showversionTip && !hasTip) {
+        const link = `，<a href="${this.$APP_CONF.update_chrome}">${this.$t("message.common.dss.guide")}</a>`
+        const contact = `，${this.$t("message.common.dss.contactadmin")}`
+        this.$Modal.confirm({
+          title: this.$t('message.common.dss.Prompt'),
+          cancelText: this.$t('message.common.dss.noPrompt'),
+          onCancel: () => {
+            storage.set('chrome-version-tip', true, 'local');
+          },
+          content: `${chromeVersion ? this.$t('message.common.dss.currentbrower') + chromeVersion + '，' : ''}
+            ${this.$t('message.common.dss.Recommend')}Chrome 78 ${this.$APP_CONF.update_chrome ? link : contact}`
+        });
+      }
     }
   },
 };

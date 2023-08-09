@@ -8,7 +8,7 @@
         ref="formValidate"
       >
         <FormItem prop="onestopMenuId">
-          <span class="form-item-label">接入类别</span>
+          <span class="form-item-label">{{ $t('message.workspace.AccessCategories') }}</span>
           <Select v-model="formItem.onestopMenuId">
             <Option
               v-for="item in menuOptions"
@@ -31,15 +31,15 @@
           <Input v-model="formItem.url"></Input>
         </FormItem>
         <FormItem prop="homepageUrl">
-          <span class="form-item-label">首页</span>
+          <span class="form-item-label">{{ $t('message.workspace.Homepage') }}</span>
           <Input v-model="formItem.homepageUrl"></Input>
         </FormItem>
         <FormItem prop="projectUrl">
-          <span class="form-item-label">项目页</span>
+          <span class="form-item-label">{{ $t('message.workspace.Projectpage') }}</span>
           <Input v-model="formItem.projectUrl"></Input>
         </FormItem>
         <FormItem prop="redirectUrl">
-          <span class="form-item-label">单点接口</span>
+          <span class="form-item-label">{{ $t('message.workspace.Singleinter') }}</span>
           <Input v-model="formItem.redirectUrl"></Input>
         </FormItem>
         <FormItem prop="ifIframe">
@@ -47,42 +47,42 @@
           <i-switch v-model="formItem.ifIframe" />
         </FormItem>
         <FormItem prop="isActive">
-          <span class="swith-label">激活</span>
+          <span class="swith-label">{{ $t('message.workspace.Activate') }}</span>
           <i-switch v-model="formItem.isActive" />
         </FormItem>
         <FormItem prop="descCn">
-          <span class="form-item-label">描述</span>
+          <span class="form-item-label">{{ $t('message.workspace.Description') }}</span>
           <Input
             v-model="formItem.descCn"
             type="textarea"
             :autosize="{ minRows: 6, maxRows: 10 }"
-            placeholder="请输入描述"
+            :placeholder="$t('message.workspace.Pleaseinputdesc')"
           ></Input>
         </FormItem>
         <FormItem prop="descEn">
-          <span class="form-item-label">英文描述</span>
+          <span class="form-item-label">{{ $t('message.workspace.Engilish') }}</span>
           <Input
             v-model="formItem.descEn"
             type="textarea"
             :autosize="{ minRows: 6, maxRows: 18 }"
-            placeholder="请输入英文描述"
+            :placeholder="$t('message.workspace.Pleaseenputendesc')"
           ></Input>
         </FormItem>
         <!-- <FormItem>
           <span class="form-item-label">进入按钮描述</span>
-          <Input v-model="formItem.access_button_cn" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入英文描述"></Input>
+          <Input v-model="formItem.access_button_cn" type="textarea" :autosize="{minRows: 2,maxRows: 5}" :placeholder="$t('message.workspace.Pleaseenputendesc')"></Input>
         </FormItem>
         <FormItem>
           <span class="form-item-label">进入按钮英文描述</span>
-          <Input v-model="formItem.access_button_en" type="textarea" :autosize="{minRows: 2,maxRows: 5}" placeholder="请输入英文描述"></Input>
+          <Input v-model="formItem.access_button_en" type="textarea" :autosize="{minRows: 2,maxRows: 5}" :placeholder="$t('message.workspace.Pleaseenputendesc')"></Input>
         </FormItem> -->
         <FormItem>
-          <Button @click="handleCancel">取消</Button>
+          <Button @click="handleCancel">{{ $t('message.workspace.Cancel') }}</Button>
           <Button
             type="primary"
             style="margin-left: 8px"
             @click="handleSave(formItem)"
-          >提交</Button
+          >{{ $t('message.workspace.Submit') }}</Button
           >
         </FormItem>
       </Form>
@@ -92,9 +92,10 @@
 
 <script>
 import { formatComponentData } from "../../util/fomat";
+import i18n from '@dataspherestudio/shared/common/i18n';
 const tempFormItem = {
   onestopMenuId: 1,
-  titleCn: "新增组件",
+  titleCn: i18n.t('message.workspace.AddComp'),
   titleEn: "",
   url: "",
   homepageUrl: "",
@@ -119,7 +120,7 @@ export default {
       formItem: formatComponentData(this.componentData),
       ruleValidate: {
         onestopMenuId: [
-          { required: true, message: "接入类别不能为空", trigger: "blur" }
+          { required: true, message: this.$t('message.workspace.Access'), trigger: "blur" }
         ],
         titleCn: [
           { required: true, message: "组件/应用名不能为空", trigger: "blur" }
@@ -133,14 +134,14 @@ export default {
         ],
         url: [{ required: true, message: "baseurl不能为空", trigger: "blur" }],
         homepageUrl: [
-          { required: true, message: "首页不能为空", trigger: "blur" }
+          { required: true, message: this.$t('message.workspace.Home'), trigger: "blur" }
         ],
         projectUrl: [
-          { required: true, message: "项目页不能为空", trigger: "blur" }
+          { required: true, message: this.$t('message.workspace.ProjectEmpty'), trigger: "blur" }
         ],
-        descCn: [{ required: true, message: "描述不能为空", trigger: "blur" }],
+        descCn: [{ required: true, message: this.$t('message.workspace.DescriptionEmpty'), trigger: "blur" }],
         descEn: [
-          { required: true, message: "英文描述不能为空", trigger: "blur" }
+          { required: true, message: this.$t('message.workspace.EnDescEmpty'), trigger: "blur" }
         ]
       },
       menuOptions: []

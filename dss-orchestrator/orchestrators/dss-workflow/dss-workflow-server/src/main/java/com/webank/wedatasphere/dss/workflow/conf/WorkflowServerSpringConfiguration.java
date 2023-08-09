@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.conf;
 
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
@@ -37,6 +38,11 @@ public class WorkflowServerSpringConfiguration {
         publishService.setDssFlowService(dssFlowService);
         publishService.setWorkFlowParser(workFlowParser);
         return publishService;
+    }
+
+    @Bean(name = "workflowBmlService")
+    public BMLService createBmlService() {
+        return BMLService.getInstance();
     }
 
 }

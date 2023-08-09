@@ -75,7 +75,7 @@ public class AppDescImpl implements AppDesc {
         }
         // if all the labels is different form the target, then return null.
         if(maxSimilarity <= 0) {
-            LOG.error("{} has no such AppInstance machs the labels: {}.", appName, labels);
+            LOG.error("{} has no such AppInstance match the labels: {}.", appName, labels);
             throw new NoSuchAppInstanceException(60002, "No such AppInstance machs the labels.");
         }
         return Collections.singletonList(targetAppInstance);

@@ -16,7 +16,8 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
-import com.webank.wedatasphere.dss.appconn.core.AppConn;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationCreationOperation;
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationDeletionOperation;
@@ -29,10 +30,15 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.*;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
@@ -41,13 +47,16 @@ import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorEr
 import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelation;
 import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelationManager;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
+import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
-import com.webank.wedatasphere.dss.orchestrator.loader.LinkedAppConnResolver;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorCreateRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorDeleteRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
+import com.webank.wedatasphere.dss.orchestrator.server.job.OrchestratorCopyEnv;
+import com.webank.wedatasphere.dss.orchestrator.server.job.OrchestratorCopyJob;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -58,15 +67,19 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.protocol.util.ImmutablePair;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -76,14 +89,30 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     protected final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     @Autowired
     private OrchestratorMapper orchestratorMapper;
     @Autowired
-    private OrchestratorService newOrchestratorService;
+    private OrchestratorService orchestratorService;
     @Autowired
     private OrchestratorManager orchestratorManager;
     @Autowired
-    private LinkedAppConnResolver linkedAppConnResolver;
+    private OrchestratorCopyJobMapper orchestratorCopyJobMapper;
+    @Autowired
+    private OrchestratorCopyEnv orchestratorCopyEnv;
+
+    private static final int MAX_DESC_LENGTH = 250;
+    private static final int MAX_NAME_LENGTH = 128;
+
+    private final ThreadFactory orchestratorCopyThreadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("dss-orchestrator—copy-thread-%d")
+            .setDaemon(false)
+            .build();
+
+    private final ExecutorService orchestratorCopyThreadPool = new ThreadPoolExecutor(0, 200, 60L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(1024), orchestratorCopyThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+
     /**
      * 1.拿到的dss orchestrator的appconn
      * 2.然后创建
@@ -95,8 +124,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @SuppressWarnings("ConstantConditions")
     public CommonOrchestratorVo createOrchestrator(String username, OrchestratorCreateRequest orchestratorCreateRequest,
                                                    Workspace workspace) throws Exception {
+        //检查desc字段长度
+        if(orchestratorCreateRequest.getDescription().length() > MAX_DESC_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "描述过长，请限制在" + MAX_DESC_LENGTH + "以内");
+        }
+        if(orchestratorCreateRequest.getOrchestratorName().length() > MAX_NAME_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
+        }
         //是否存在相同的编排名称
-        newOrchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
+        orchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorCreateRequest.getProjectId(), username);
         //1.创建编排实体bean
@@ -126,7 +162,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 OrchestrationService::getOrchestrationCreationOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationCreationOperation) structureOperation)
                         .createOrchestration((DSSOrchestrationContentRequestRef) structureRequestRef), "create");
-        OrchestratorVo orchestratorVo = newOrchestratorService.createOrchestrator(username, workspace, dssProject.getName(),
+        OrchestratorVo orchestratorVo = orchestratorService.createOrchestrator(username, workspace, dssProject.getName(),
                 dssOrchestratorInfo.getProjectId(), dssOrchestratorInfo.getDesc(), dssOrchestratorInfo, dssLabels);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
         Long orchestratorVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
@@ -148,9 +184,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         ImmutablePair<OrchestrationService, AppInstance> orchestrationPair = getOrchestrationService(dssOrchestrator, userName, workspace, dssLabels);
         Long refProjectId, refOrchestrationId;
         if (askProjectSender) {
-            ProjectRefIdResponse projectRefIdResponse = (ProjectRefIdResponse) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                    .ask(new ProjectRefIdRequest(Optional.ofNullable(orchestrationPair).map(ImmutablePair::getValue).map(AppInstance::getId).orElse(null), dssOrchestrator.getProjectId()));
-            refProjectId = projectRefIdResponse.getRefProjectId();
+            ProjectRefIdResponse projectRefIdResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                    .ask(new ProjectRefIdRequest(Optional.ofNullable(orchestrationPair).map(ImmutablePair::getValue).map(AppInstance::getId).orElse(null), dssOrchestrator.getProjectId())), ProjectRefIdResponse.class, ProjectRefIdRequest.class);
+           refProjectId = projectRefIdResponse.getRefProjectId();
             refOrchestrationId = null;
         } else {
             DSSOrchestratorRefOrchestration refOrchestration = orchestratorMapper.getRefOrchestrationId(dssOrchestrator.getId());
@@ -185,11 +221,18 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public CommonOrchestratorVo modifyOrchestrator(String username, OrchestratorModifyRequest orchestratorModifyRequest, Workspace workspace) throws Exception {
+        //检查desc字段长度
+        if(orchestratorModifyRequest.getDescription().length() > MAX_DESC_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "描述字段过长，请限制在" + MAX_DESC_LENGTH + "以内");
+        }
+        if(orchestratorModifyRequest.getOrchestratorName().length() > MAX_NAME_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
+        }
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
         //是否存在相同的编排名称 //todo 返回orchestratorInfo而不是id
-        Long orchestratorId = newOrchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest);
+        Long orchestratorId = orchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest);
         LOGGER.info("{} begins to update a orchestrator {}.", username, orchestratorModifyRequest.getOrchestratorName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorModifyRequest.getLabels().getRoute()));
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorModifyRequest.getOrchestratorMode());
@@ -214,7 +257,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 OrchestrationService::getOrchestrationUpdateOperation,
                 (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
                         .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
-        newOrchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
+        orchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
         //3.将工程和orchestrator的关系存储到的数据库中
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         orchestratorVo.setOrchestratorId(orchestratorId);
@@ -228,15 +271,102 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorDeleteRequest.getLabels().getRoute()));
-        tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, orchestratorInfo,
-                OrchestrationService::getOrchestrationDeletionOperation,
-                (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
-                        .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
+        if(orchestratorDeleteRequest.getDeleteSchedulerWorkflow()) {
+            tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, orchestratorInfo,
+                    OrchestrationService::getOrchestrationDeletionOperation,
+                    (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
+                            .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
+        }
 
-        newOrchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
+        orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
+        orchestratorVo.setOrchestratorName(orchestratorInfo.getName());
+        orchestratorVo.setOrchestratorId(orchestratorInfo.getId());
         return orchestratorVo;
+    }
+
+    @Override
+    public OrchestratorUnlockVo unlockOrchestrator(String username, Workspace workspace, OrchestratorUnlockRequest request) throws DSSErrorException {
+        //编辑权限校验
+        DSSProject dssProject = validateOperation(request.getProjectId(), username);
+        DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(request.getId());
+        LOGGER.info("{} begins to unlock orchestrator {}.", username, orchestratorInfo.getName());
+        List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(request.getLabels().getRoute()));
+        OrchestratorUnlockVo orchestratorUnlockVo = orchestratorService.unlockOrchestrator(username, workspace,
+                dssProject.getName(), orchestratorInfo.getId(), request.getConfirmDelete(), dssLabels);
+        orchestratorUnlockVo.setOrchestratorName(orchestratorInfo.getName());
+        orchestratorUnlockVo.setOrchestratorId(orchestratorInfo.getId());
+        return orchestratorUnlockVo;
+    }
+
+    @Override
+    public String copyOrchestrator(String username, OrchestratorCopyRequest orchestratorCopyRequest, Workspace workspace) throws Exception{
+        if(orchestratorCopyRequest.getTargetOrchestratorName().length() > MAX_NAME_LENGTH){
+            DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
+        }
+        //校验编排名是可用
+        orchestratorService.isExistSameNameBeforeCreate(workspace.getWorkspaceId(), orchestratorCopyRequest.getTargetProjectId(), orchestratorCopyRequest.getTargetOrchestratorName());
+        //判断用户对项目是否有权限
+        DSSProject sourceProject = validateOperation(orchestratorCopyRequest.getSourceProjectId(), username);
+        DSSProject targetProject = validateOperation(orchestratorCopyRequest.getTargetProjectId(), username);
+
+        DSSOrchestratorInfo sourceOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorCopyRequest.getSourceOrchestratorId());
+        if (sourceOrchestratorInfo == null) {
+            LOGGER.error("orchestrator: {} not found.", orchestratorCopyRequest.getSourceOrchestratorName());
+            DSSExceptionUtils.dealErrorException(6013, "orchestrator not found.", DSSOrchestratorErrorException.class);
+        }
+        if (StringUtils.isBlank(orchestratorCopyRequest.getWorkflowNodeSuffix())) {
+            orchestratorCopyRequest.setWorkflowNodeSuffix("copy");
+        } else if (orchestratorCopyRequest.getWorkflowNodeSuffix().length() > 10) {
+            DSSExceptionUtils.dealErrorException(6014, "The node suffix length can not exceed 10. (节点后缀长度不能超过10)", DSSOrchestratorErrorException.class);
+        }
+        OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
+                targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
+                orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV),
+                workspace, Sender.getThisInstance()).setCopyTaskId(null).build();
+        OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
+        orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);
+        orchestratorCopyJob.setOrchestratorCopyEnv(orchestratorCopyEnv);
+        orchestratorCopyJob.getOrchestratorCopyInfo().setId(UUID.randomUUID().toString());
+
+        orchestratorCopyThreadPool.submit(orchestratorCopyJob);
+
+        return orchestratorCopyJob.getOrchestratorCopyInfo().getId();
+    }
+
+    @Override
+    public Pair<Long, List<OrchestratorCopyHistory>> getOrchestratorCopyHistory(String username, Workspace workspace, Long orchestratorId, Integer currentPage, Integer pageSize) throws Exception {
+        long total = 0L;
+
+        List<DSSOrchestratorCopyInfo> orchestratorCopyInfoList = orchestratorCopyJobMapper.getOrchestratorCopyInfoList(orchestratorId);
+        if (CollectionUtils.isEmpty(orchestratorCopyInfoList)) {
+            return new Pair<>(total, Lists.newArrayList());
+        }
+        total = orchestratorCopyInfoList.size();
+
+        List < OrchestratorCopyHistory > orchestratorCopyHistoryList = new ArrayList<>();
+        OrchestratorCopyHistory orchestratorCopyHistory;
+        for (DSSOrchestratorCopyInfo orchestratorCopyInfo: orchestratorCopyInfoList) {
+            orchestratorCopyHistory = new OrchestratorCopyHistory(orchestratorCopyInfo.getId(), orchestratorCopyInfo.getUsername(), workspace.getWorkspaceName(),
+                    orchestratorCopyInfo.getSourceOrchestratorName(), orchestratorCopyInfo.getTargetOrchestratorName(),
+                    orchestratorCopyInfo.getSourceProjectName(), orchestratorCopyInfo.getTargetProjectName(), orchestratorCopyInfo.getWorkflowNodeSuffix(),
+                    orchestratorCopyInfo.getMicroserverName(), orchestratorCopyInfo.getExceptionInfo(), orchestratorCopyInfo.getStatus(),
+                    orchestratorCopyInfo.getIsCopying(), DTF.format(LocalDateTime.ofInstant(orchestratorCopyInfo.getStartTime().toInstant(), ZoneId.systemDefault())),
+                    DTF.format(LocalDateTime.ofInstant(orchestratorCopyInfo.getEndTime().toInstant(), ZoneId.systemDefault())));
+            orchestratorCopyHistoryList.add(orchestratorCopyHistory);
+        }
+        return new Pair<>(total, orchestratorCopyHistoryList);
+    }
+
+    @Override
+    public Boolean getOrchestratorCopyStatus(Long sourceOrchestratorId) {
+        return StringUtils.isNotBlank(orchestratorCopyJobMapper.getOrchestratorCopyStatus(sourceOrchestratorId));
+    }
+
+    @Override
+    public DSSOrchestratorCopyInfo getOrchestratorCopyInfoById(String copyInfoId) {
+        return orchestratorCopyJobMapper.getOrchestratorCopyInfoById(copyInfoId);
     }
 
     protected ImmutablePair<OrchestrationService, AppInstance> getOrchestrationService(DSSOrchestratorInfo dssOrchestratorInfo,
@@ -248,16 +378,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             dssOrchestratorInfo.setLinkedAppConnNames(dssOrchestrator.getLinkedAppConn().stream().map(appConn -> appConn.getAppDesc().getAppName()).collect(Collectors.toList()));
         }
         SchedulerAppConn appConn = dssOrchestrator.getSchedulerAppConn();
-//        if (appConn == null) {
-//            throw new ExternalOperationWarnException(50322, "DSSOrchestrator " + dssOrchestrator.getName() + " has no SchedulerAppConn.");
-//        }
         if (appConn != null) {
             AppInstance appInstance = appConn.getAppDesc().getAppInstances().get(0);
             return new ImmutablePair<>(appConn.getOrCreateStructureStandard().getOrchestrationService(appInstance), appInstance);
         } else {
             return new ImmutablePair<>(null, null);
         }
-
     }
 
     /**
@@ -268,11 +394,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
      * @return
      * @throws DSSOrchestratorErrorException
      */
-    private DSSProject validateOperation(long projectId, String username) throws DSSOrchestratorErrorException {
+    public static DSSProject validateOperation(long projectId, String username) throws DSSOrchestratorErrorException {
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
-        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                .ask(projectInfoRequest);
+        DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
         if (dssProject == null) {
             DSSExceptionUtils.dealErrorException(6003, "工程不存在", DSSOrchestratorErrorException.class);
         }
@@ -282,9 +408,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         return dssProject;
     }
 
-    private boolean hasProjectEditPriv(Long projectId, String username) {
-        ProjectUserAuthResponse projectUserAuthResponse = (ProjectUserAuthResponse) DSSSenderServiceFactory.getOrCreateServiceInstance()
-                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username));
+    private static boolean hasProjectEditPriv(Long projectId, String username) {
+        ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username)), ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
         boolean hasEditPriv = false;
         if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
             hasEditPriv = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||

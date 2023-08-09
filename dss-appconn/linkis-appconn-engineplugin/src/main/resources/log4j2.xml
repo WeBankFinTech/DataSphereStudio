@@ -32,9 +32,21 @@
             <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY" />
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
         </Console>
+
+        <RollingFile name="AuditLog" append="true" fileName="/tmp/logs/dss/audit/sendemail-audit.log"
+                     filePattern="/tmp/logs/dss/audit/sendemail-audit-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%-40t] %c{1.} (%L) [%M] - %msg%xEx%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="100"/>
+        </RollingFile>
     </appenders>
 
     <loggers>
+        <logger name="com.webank.wedatasphere.dss.common.utils.AuditLogUtils" level="info" additivity="false">
+            <appender-ref ref="AuditLog"/>
+        </logger>
         <root level="INFO">
             <appender-ref ref="stderr"/>
             <appender-ref ref="Console"/>

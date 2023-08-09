@@ -57,7 +57,7 @@ export default {
       sysVersion: process.env.VUE_APP_VERSION,
       isUserMenuShow: false,
       userName: "",
-      isSandbox: process.env.NODE_ENV === "sandbox",
+      isSandbox: this.$APP_CONF.isSandbox,
     };
   },
   mixins: [mixin],

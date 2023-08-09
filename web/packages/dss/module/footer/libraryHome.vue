@@ -1,6 +1,6 @@
 <template>
   <div class="library-home">
-    <h2 class="library-home-title">文档目录</h2>
+    <h2 class="library-home-title">{{ $t('message.common.dss.dir') }}</h2>
     <library-tree
       :nodes="nodes"
       @on-item-click="handleTreeClick"

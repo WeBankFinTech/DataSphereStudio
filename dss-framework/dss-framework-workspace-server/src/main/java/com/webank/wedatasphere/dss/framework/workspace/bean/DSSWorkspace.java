@@ -32,6 +32,15 @@ public class DSSWorkspace {
     private Date lastUpdateTime;
     private String lastUpdateUser;
     private String workspaceType;
+    private int adminPermission;
+
+    public int getAdminPermission() {
+        return adminPermission;
+    }
+
+    public void setAdminPermission(int adminPermission) {
+        this.adminPermission = adminPermission;
+    }
 
     public String getWorkspaceType() {
         return workspaceType;

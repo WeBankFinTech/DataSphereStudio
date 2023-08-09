@@ -20,7 +20,11 @@ import org.apache.linkis.common.io.FsPath
 
 trait FsPathStoreEmailContent {
   private var fsPath: FsPath = _
+  private var fileType: String = _
 
   def getFsPath: FsPath = fsPath
   def setFsPath(fsPath: FsPath): Unit = this.fsPath = fsPath
+
+  def getFileType: String = fileType
+  def setFileType(fileType: String): Unit = this.fileType = fileType
 }

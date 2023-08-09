@@ -19,6 +19,7 @@
 
 .resource-simple-content {
     height: 400px;
+    position: relative;
     .queue-manager {
         position: $relative;
         width: 100%;
@@ -354,7 +355,7 @@
             align-items: center;
             >span {
                 margin-right: 5px;
-                width: 40px;
+                width: 70px;
                 font-size: $font-size-base;
                 @include font-color($light-text-color, $dark-text-color);
             }

@@ -21,8 +21,6 @@ import org.apache.linkis.common.conf.CommonVars
 
 object FlowExecutionEntranceConfiguration {
 
-  val WORKFLOW_APPLICATION_NAME = CommonVars("wds.dss.workflow.service.name", "DSS-WORKFLOW-SERVER-")
-
   val NODE_PRINT_FLAG = CommonVars("wds.linkis.flow.node.log.flag", false)
 
   val NODE_STATUS_POLLER_THREAD_SIZE = CommonVars("wds.dds.flow.node.status.poller.thread.size", 20)

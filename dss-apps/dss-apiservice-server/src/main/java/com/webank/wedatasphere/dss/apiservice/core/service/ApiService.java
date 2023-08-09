@@ -34,14 +34,14 @@ public interface ApiService {
 
 
 
-    void saveByApp(ApiServiceVo apiService) throws Exception;
+    ApiServiceVo saveByApp(ApiServiceVo apiService) throws Exception;
 
     /**
      * Update
      *
      * @param oneService oneService info
      */
-    void update(ApiServiceVo oneService) throws Exception;
+    ApiServiceVo update(ApiServiceVo oneService) throws Exception;
 
     /**
      * query
@@ -70,21 +70,20 @@ public interface ApiService {
 
     /**
      * enable api
-     * @param id api record id
      * @return
      */
-    Boolean enableApi(Long id,String userName);
+    Boolean enableApi(String userName,ApiServiceVo apiServiceVo);
 
     /**
      * disable api
-     * @param id api record id
+     * @param apiServiceVo 需要禁用的apiservice
      * @return
      */
-    Boolean disableApi(Long id,String userName);
+    Boolean disableApi(String userName,ApiServiceVo apiServiceVo);
 
-    Boolean deleteApi(Long id,String userName);
+    Boolean deleteApi(String userName,ApiServiceVo apiServiceVo);
 
-    Boolean updateComment(Long id,String comment,String userName);
+    Boolean updateComment(String comment, String userName,ApiServiceVo apiServiceVo);
 
     ApiServiceVo queryById(Long id,String userName);
 

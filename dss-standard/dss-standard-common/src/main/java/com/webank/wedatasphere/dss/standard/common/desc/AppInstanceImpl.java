@@ -92,4 +92,15 @@ public class AppInstanceImpl implements AppInstance {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+    @Override
+    public String toString() {
+        return "AppInstanceImpl{" +
+                "id=" + id +
+                ", baseUrl='" + baseUrl + '\'' +
+                ", homepageUri='" + homepageUri + '\'' +
+                ", config=" + config +
+                ", labels=" + labels +
+                '}';
+    }
 }

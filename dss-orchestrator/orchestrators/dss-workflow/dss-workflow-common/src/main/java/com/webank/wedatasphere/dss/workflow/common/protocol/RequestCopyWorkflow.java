@@ -32,6 +32,10 @@ public class RequestCopyWorkflow {
    private String  description;
    private List<DSSLabel> dssLabels;
 
+   private Long targetProjectId;
+   private String nodeSuffix;
+   private String newFlowName;
+
     public RequestCopyWorkflow(String userName,
                                Workspace workspace,
                                Long rootFlowId,
@@ -39,7 +43,10 @@ public class RequestCopyWorkflow {
                                String projectName,
                                String orcVersion,
                                String description,
-                               List<DSSLabel> dssLabels) {
+                               List<DSSLabel> dssLabels,
+                               Long targetProjectId,
+                               String nodeSuffix,
+                               String newFlowName) {
 
         this.userName = userName;
         this.workspace = workspace;
@@ -49,6 +56,10 @@ public class RequestCopyWorkflow {
         this.orcVersion = orcVersion;
         this.description = description;
         this.dssLabels = dssLabels;
+        this.targetProjectId = targetProjectId;
+        this.nodeSuffix = nodeSuffix;
+        this.newFlowName = newFlowName;
+
     }
 
     public String getUserName() {
@@ -113,5 +124,29 @@ public class RequestCopyWorkflow {
 
     public void setDssLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
+    }
+
+    public Long getTargetProjectId() {
+        return targetProjectId;
+    }
+
+    public void setTargetProjectId(Long targetProjectId) {
+        this.targetProjectId = targetProjectId;
+    }
+
+    public String getNodeSuffix() {
+        return nodeSuffix;
+    }
+
+    public void setNodeSuffix(String nodeSuffix) {
+        this.nodeSuffix = nodeSuffix;
+    }
+
+    public String getNewFlowName() {
+        return newFlowName;
+    }
+
+    public void setNewFlowName(String newFlowName) {
+        this.newFlowName = newFlowName;
     }
 }

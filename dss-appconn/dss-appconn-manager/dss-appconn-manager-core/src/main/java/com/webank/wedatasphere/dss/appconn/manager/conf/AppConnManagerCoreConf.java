@@ -29,7 +29,7 @@ public class AppConnManagerCoreConf {
         try {
             hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+           throw new RuntimeException("UnknownHost",e);
         }
     }
 

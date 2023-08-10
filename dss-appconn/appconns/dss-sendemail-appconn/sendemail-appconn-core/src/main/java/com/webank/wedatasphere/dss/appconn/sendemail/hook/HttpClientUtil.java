@@ -417,7 +417,7 @@ public final class HttpClientUtil {
 			//获得返回的结果
 			rtnStr = EntityUtils.toString(httpResponse.getEntity());
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("invoke failed",e);
 		} finally {
 			httpGet.releaseConnection();
 		}

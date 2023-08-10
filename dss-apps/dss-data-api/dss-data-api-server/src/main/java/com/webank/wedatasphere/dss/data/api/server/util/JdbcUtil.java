@@ -98,7 +98,7 @@ public class JdbcUtil {
                 if (conn != null)
                     conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+               // logger.error("invoke failed",e);
             }
         }
     }
@@ -145,7 +145,7 @@ public class JdbcUtil {
                 if (conn != null)
                     conn.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+               // logger.error("invoke failed",e);
             }
         }
     }

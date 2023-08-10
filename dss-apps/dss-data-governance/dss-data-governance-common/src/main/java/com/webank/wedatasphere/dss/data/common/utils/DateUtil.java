@@ -120,7 +120,7 @@ public class DateUtil {
         try {
             return df.parse(strDate);
         } catch (ParseException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return null;
         }
     }

@@ -25,7 +25,7 @@ GATEWAY_INSTALL_IP=127.0.0.1
 GATEWAY_PORT=9001
 
 ### Linkis BML Token
-BML_AUTH=BML-14ddab34fbd640afa523dd8d1496c3c3
+BML_AUTH=BML-AUTH
 
 ################### The install Configuration of all Micro-Services start #####################
 #

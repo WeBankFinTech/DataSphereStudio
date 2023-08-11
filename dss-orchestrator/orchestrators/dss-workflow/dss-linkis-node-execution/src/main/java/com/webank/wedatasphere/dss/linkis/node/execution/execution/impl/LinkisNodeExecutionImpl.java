@@ -21,10 +21,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.exception.LinkisJobExec
 import com.webank.wedatasphere.dss.linkis.node.execution.execution.LinkisNodeExecution;
 import com.webank.wedatasphere.dss.linkis.node.execution.job.Job;
 import com.webank.wedatasphere.dss.linkis.node.execution.listener.LinkisExecutionListener;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.CodeParser;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParamsParser;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobParser;
-import com.webank.wedatasphere.dss.linkis.node.execution.parser.JobRuntimeParamsParser;
+import com.webank.wedatasphere.dss.linkis.node.execution.parser.*;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.LinkisURLService;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.impl.BuildJobActionImpl;
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils;
@@ -59,6 +56,8 @@ public class LinkisNodeExecutionImpl implements LinkisNodeExecution , LinkisExec
         registerJobParser(new CodeParser());
         registerJobParser(new JobRuntimeParamsParser());
         registerJobParser(new JobParamsParser());
+        registerJobParser(new BML2LinkisJobParser());
+        registerJobParser(new AppConn2LinkisJobParser());
     }
 
     public static LinkisNodeExecution getLinkisNodeExecution() {

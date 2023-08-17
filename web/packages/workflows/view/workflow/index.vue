@@ -1231,7 +1231,7 @@ export default {
           e.stopPropagation()
         }}>
           <div class="tree-info">
-            <SvgIcon icon-class="more_more" />
+            <SvgIcon style="font-size:16px;margin-top: 6px;display: inline-block;" icon-class="more-more" />
           </div>
           <DropdownMenu slot="list">
             <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
@@ -1257,7 +1257,7 @@ export default {
           e.stopPropagation()
         }}>
           <div class="tree-info">
-            <SvgIcon icon-class="more_more" />
+            <SvgIcon style="font-size:16px;margin-top: 6px;display: inline-block;" icon-class="more-more" />
           </div>
           <DropdownMenu slot="list">
             {item.editable && <DropdownItem name="config_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_flow', item)}}>{this.$t('message.workflow.Configuration') }</DropdownItem>}

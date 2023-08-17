@@ -12,6 +12,7 @@ import com.webank.wedatasphere.dss.standard.app.development.service.RefExecution
 import com.webank.wedatasphere.dss.standard.app.development.utils.DevelopmentOperationUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import com.webank.wedatasphere.dss.standard.common.desc.AppInstanceImpl;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -33,7 +34,9 @@ public class AppConn2LinkisRefExecutionRestfulApi {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppConn2LinkisRefExecutionRestfulApi.class);
 
+    private AppInstance emptyAppInstance = new AppInstanceImpl();
 
+    // 仅仅用于表示依赖，希望AppConnManagerRestfulApi先完成所有AppConn的加载之后，本Restful再对外提供服务。
     @Autowired
     private AppConnManagerRestfulApi appConnManagerRestfulApi;
 
@@ -49,8 +52,10 @@ public class AppConn2LinkisRefExecutionRestfulApi {
         OnlyDevelopmentAppConn appConn = (OnlyDevelopmentAppConn) AppConnManager.getAppConnManager().getAppConn(appConnName);
         AppInstance appInstance;
         List<DSSLabel> labels = Arrays.asList(new EnvDSSLabel(labelStr));
-        if(appConn.getAppDesc().getAppInstances().size() == 1) {
-            appInstance = appConn.getAppDesc().getAppInstances().get(0);
+        // 原则上，AppConn2Linkis类型的AppConn，要么一个AppInstance都没有，要么就需按照AppConn的规范去录入AppInstance.
+        if(appConn.getAppDesc().getAppInstances().isEmpty()) {
+            LOGGER.info("AppConn {} has no appInstance, use empty appInstance to get operation.", appConnName);
+            appInstance = emptyAppInstance;
         } else {
             appInstance = appConn.getAppDesc().getAppInstancesByLabels(labels).get(0);
         }
@@ -61,6 +66,7 @@ public class AppConn2LinkisRefExecutionRestfulApi {
                     developmentRequestRef.setWorkspace(workspace).setUserName(userName).setDSSLabels(labels);
                     return ((AppConn2LinkisRefExecutionOperation) developmentOperation).execute((RefJobContentRequestRef) developmentRequestRef);
                 }, null, "fetch linkis jobContent from appConn " + appConnName + " failed.");
+        LOGGER.info("user {} transform jobContent from AppConn {} with responseRef {}.", userName, appConnName, DSSCommonUtils.COMMON_GSON.toJson(responseRef));
         return Message.ok().data("executionCode", responseRef.getCode()).data("params", responseRef.getParams())
                 .data("engineType", responseRef.getEngineType()).data("runType", responseRef.getRunType());
     }

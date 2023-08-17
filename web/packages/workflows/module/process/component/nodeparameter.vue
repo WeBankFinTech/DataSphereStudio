@@ -364,7 +364,6 @@ export default {
     },
     resourcesAction() {
       let resources = [];
-      // 写的啥jb代码，下面改了重复添加问题，有其它问题看历史版本吧
       const mapFlag = {}
       if (this.currentNode.jobContent && this.currentNode.jobContent.script) {
         this.currentNode.resources.forEach(item => {

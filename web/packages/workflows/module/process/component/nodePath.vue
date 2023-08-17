@@ -76,9 +76,9 @@
               style="
                 font-size: 14px;
                 position: absolute;
-                top: 4px;
+                top: 5px;
                 z-index: 1;
-                right: 0;
+                right: -3px;
               "
               icon-class="fi-expand-right"
             />
@@ -414,8 +414,8 @@ export default {
     .arrow {
       font-size: 12px;
       position: absolute;
-      left: -7px;
-      top: -2px;
+      left: -6px;
+      top: 1px;
     }
   }
 }

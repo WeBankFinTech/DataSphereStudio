@@ -60,6 +60,7 @@
  }
 
  .footer-btn {
+     @include font-color(#515a6e, #fff);
      display: flex;
      align-items: center;
      justify-content: center;
@@ -73,7 +74,6 @@
      font-size: 16px;
  }
  .footer-doc {
-     @include font-color(#333, #fff);
      @include bg-color(#fff, #373F50);
      @include border-color($border-color-base, #373F50);
  }

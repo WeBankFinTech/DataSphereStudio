@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutio
 import org.apache.linkis.filesystem.WorkspaceClientFactory;
 import org.apache.linkis.filesystem.request.WorkspaceClient;
 import org.apache.linkis.filesystem.response.ScriptFromBMLResponse;
+import org.apache.linkis.protocol.utils.TaskUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -78,8 +79,27 @@ public class CodeParser implements JobParser {
             linkisAppConnJob.setCode(executionCode);
         }
         if (executionParams.get("params") != null && executionParams.get("params") instanceof Map) {
-            if (linkisAppConnJob.getParams() != null) {
-                linkisAppConnJob.getParams().putAll( (Map<String, Object>)executionParams.get("params"));
+            Map<String, Object> params = (Map<String, Object>) executionParams.get("params");
+            if (!params.isEmpty()) {
+                linkisAppConnJob.getLogObj().info("add params from external resources: " + params);
+                // 为防止第三方传回 {"runtime":{},"startup":{},"variable":{},"special":{}}，将原params已有的runtime、startup等属性的map覆盖为空
+                // 因此以下一个个去确认
+                Map<String, Object> runtimeMap = TaskUtils.getRuntimeMap(params);
+                if(!runtimeMap.isEmpty()) {
+                    TaskUtils.addRuntimeMap(linkisAppConnJob.getParams(), runtimeMap);
+                }
+                Map<String, Object> specialMap = TaskUtils.getSpecialMap(params);
+                if(!specialMap.isEmpty()) {
+                    TaskUtils.addSpecialMap(linkisAppConnJob.getParams(), specialMap);
+                }
+                Map<String, Object> startupMap = TaskUtils.getStartupMap(params);
+                if(!startupMap.isEmpty()) {
+                    TaskUtils.addStartupMap(linkisAppConnJob.getParams(), startupMap);
+                }
+                Map<String, Object> variableMap = TaskUtils.getVariableMap(params);
+                if(!variableMap.isEmpty()) {
+                    TaskUtils.addVariableMap(linkisAppConnJob.getParams(), variableMap);
+                }
             }
         }
         dealExecutionParams(linkisAppConnJob, executionParams);

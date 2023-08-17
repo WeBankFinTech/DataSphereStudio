@@ -74,6 +74,7 @@ import hiveSidebarModule from '@/scriptis/module/hiveSidebar';
 import hdfsSidebarModule from '@/scriptis/module/hdfsSidebar';
 import settingModal from '@/scriptis/module/setting';
 import storage from '@dataspherestudio/shared/common/helper/storage';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 
 export default {
   components: {
@@ -102,7 +103,6 @@ export default {
   },
   //组建内的守卫
   beforeRouteLeave(to, from, next) {
-    let hasUnsave = false;
     const close = () => {
       if (window.languageClient) {
         // 用户退出，后端语言服务子进程无法关闭，要求前端发送关闭
@@ -124,33 +124,19 @@ export default {
 
       }
     }
-    if (this.$refs.workbenchContainer) {
-      if (this.$refs.workbenchContainer.worklist) {
-        // 检查是否有未保存的非临时脚本
-        hasUnsave = this.$refs.workbenchContainer.worklist.some(
-          (item) => item.unsave && !item.saveAs
-        );
-      }
-
-      if (hasUnsave) {
-        // 提示保存，用户选择不保存则继续跳转
-        this.$Modal.confirm({
-          title: this.$t('message.scripts.notsaved'),
-          content: this.$t('message.scripts.confirmcheck'),
-          okText: "",
-          cancelText: "",
-          onOk: () => {},
-          onCancel: () => {
-            close();
-            next(); //如果用户点击取消 则直接跳转到用户点击的路由页面
-          },
-        });
-      } else {
+    if (to.query.notcheck) {
+      close();
+      next();
+      return
+    }
+    let hasUnsave = this.checkUnsave((save)=>{
+      if (!save) {
         close();
         next();
       }
-    } else {
-      close();
+    })
+    if (!hasUnsave) {
+      close()
       next();
     }
   },
@@ -178,7 +164,18 @@ export default {
     } else if(baseInfo.proxyUserName) {
       this.proxyUserName = baseInfo.proxyUserName
     }
-    this.showSetting = !!baseInfo.proxyEnable
+    this.showSetting = !!baseInfo.proxyEnable;
+    eventbus.clear('check.scriptis.unsave');
+    eventbus.on('check.scriptis.unsave', () => {
+      return new Promise((resolve) => {
+        const hasUnsave = this.checkUnsave((unsave)=>{
+          resolve(unsave)
+        })
+        if (!hasUnsave) {
+          resolve(false)
+        }
+      })
+    });
   },
   beforeDestroy() {
     // 监听窗口变化，获取浏览器宽高
@@ -219,6 +216,37 @@ export default {
     },
     showSettingModal() {
       this.$refs.settingBtn.toggle()
+    },
+    checkUnsave(cb) {
+      let hasUnsave = false
+      if (this.$refs.workbenchContainer) {
+        if (this.$refs.workbenchContainer.worklist) {
+          // 检查是否有未保存的非临时脚本
+          hasUnsave = this.$refs.workbenchContainer.worklist.some(
+            (item) => item.unsave && !item.saveAs
+          );
+        }
+        if (hasUnsave) {
+          // 提示保存，用户选择不保存则继续跳转
+          this.$Modal.confirm({
+            title: this.$t('message.scripts.notsaved'),
+            content: this.$t('message.scripts.confirmcheck'),
+            okText: "",
+            cancelText: "",
+            onOk: () => {
+              if (cb) {
+                cb(true)
+              }
+            },
+            onCancel: () => {
+              if (cb) {
+                cb(false)
+              }
+            },
+          });
+        }
+      }
+      return hasUnsave
     }
   },
 };

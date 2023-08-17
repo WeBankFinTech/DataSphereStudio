@@ -54,6 +54,7 @@ let util = {
    * ! url应该是转义过的符合URI规范的链接地址，参数如未在obj定义则最终地址会丢失该参数
    */
   replaceHolder(url, obj = {}) {
+    if (!/\$\{([^}]*)}/.test(url)) return url
     obj = {
       dssurl: location.origin,
       cookies: document.cookie,

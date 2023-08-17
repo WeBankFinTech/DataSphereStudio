@@ -93,15 +93,18 @@ export default {
         },
       });
     },
-    logout() {
+    async logout() {
+      const unsave = await eventbus.emit('check.scriptis.unsave');
+      if (unsave) return
       api.fetch('/user/logout', {}).then(() => {
         this.$emit('clear-session');
         storage.set('need-refresh-proposals-hql', true);
         storage.set('need-refresh-proposals-python', true);
         // 手动退出清掉baseInfo
         storage.remove('baseInfo', 'local');
-        this.$router.push({ path: '/login' });
+        this.$router.push({ path: '/login',  query: { 'notcheck': true } });
       });
+
     },
     changeLang() {
       // 中文切换英文

@@ -111,6 +111,13 @@
         background-repeat: no-repeat;
         background-position: center;
     }
+    .fi-r {
+      background-image: url('../images/fi-r.svg');
+      width: 12px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+  }
     .fi-trino-sql {
       background-image: url('../images/trino.svg');
       width: 12px;

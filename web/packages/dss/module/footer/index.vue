@@ -3,7 +3,7 @@
     <div ref="footerChannel" class="tool-btns" :class="{min:min}" @mousedown.prevent.stop="onMouseDown">
       <template v-if="!min">
         <div class="footer-btn footer-doc" @click="toggleGuide">
-          <SvgIcon icon-class="question" />
+          <SvgIcon icon-class="guide-question" style="fontSize: 16px;margin-top: 2px;"/>
         </div>
         <resource-simple
           ref="resourceSimple"

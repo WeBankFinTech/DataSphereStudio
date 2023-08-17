@@ -113,7 +113,8 @@
           "path": {
             "required": "Please choose the path to export!"
           }
-        }
+        },
+        "resultSetNum": "There are {num} result sets"
       },
       "progress": {
         "title": "Execution progress",

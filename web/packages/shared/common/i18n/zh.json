@@ -114,7 +114,8 @@
           "path": {
             "required": "请选择导出路径！"
           }
-        }
+        },
+        "resultSetNum": "共{num}个结果集"
       },
       "progress": {
         "title": "运行进度",

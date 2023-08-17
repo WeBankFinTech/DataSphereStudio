@@ -87,6 +87,7 @@ export default {
           value: this.value,
           theme: this.theme,
           language: this.language,
+          fontFamily: 'Consolas,Menlo,Courier,monospace,"JinbiaoSong", "JinbiaoSongExt"'
         },
       );
       return config;

@@ -81,16 +81,18 @@ export default {
       delete data.templateIds
       api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}createOrchestrator`, data, 'post').then((res) => {
         this.$Message.success(this.$t('message.workflow.createdSuccess'));
-        const templateData = {
-          projectId: data.projectId,
-          orchestratorId: res.orchestratorId,
-          templateIds: curTemplateIds,
+        if (curTemplateIds) {
+          const templateData = {
+            projectId: data.projectId,
+            orchestratorId: res.orchestratorId,
+            templateIds: curTemplateIds,
+          }
+          api.fetch(
+            `${this.$API_PATH.ORCHESTRATOR_PATH}saveTemplateRef`,
+            templateData,
+            "put"
+          )
         }
-        api.fetch(
-          `${this.$API_PATH.ORCHESTRATOR_PATH}saveTemplateRef`,
-          templateData,
-          "put"
-        )
         this.$emit('on-tree-modal-confirm', {
           id: data.projectId
         })

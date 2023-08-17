@@ -468,10 +468,9 @@
    .designer-control {
      position: absolute;
      top: 0;
-     // bottom: 0; // ��ֹ�ڵ�
      right: 14px;
      width: 36px;
-     z-index: 1000;
+     z-index: 500;
 
      .designer-control-header {
        @include bg-color(#5c5c5c, #474E5D);

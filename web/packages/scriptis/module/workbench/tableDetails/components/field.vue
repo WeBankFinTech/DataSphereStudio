@@ -133,23 +133,20 @@ export default {
   },
   watch: {
     searchText(val) {
-      const reg = /^[\u2E80-\uFE4F\w]*$/;
-      if (val && reg.test(val)) {
-        this.searchColList = [];
-        const regexp = new RegExp(`.*${val}.*`, 'i');
-        const tmpList = this.table;
-        tmpList.forEach((o, index) => {
-          if ([o.name, o.comment, o.alias].some(item => regexp.test(item || ''))) {
-            o.index = index + 1
-            this.searchColList.push(o);
-          }
-        });
-      } else {
-        this.searchColList = this.table.map((o, index)=> {
-          o.index = index + 1;
-          return o
-        });
-      }
+      this.searchColList = [];
+      let specialCharacter = ['\\', '$', '(', ')', '*', '+', '.', '[', '?', '^', '{', '|'];
+      specialCharacter.map(v => {
+        let reg = new RegExp('\\' + v, 'gim');
+        val = val.replace(reg, '\\' + v);
+      });
+      const regexp = new RegExp(val, 'i');
+      const tmpList = this.table;
+      tmpList.forEach((o, index) => {
+        if ([o.name, o.comment, o.alias].some(item => regexp.test(item || ''))) {
+          o.index = index + 1
+          this.searchColList.push(o);
+        }
+      });
     },
   },
   mounted() {

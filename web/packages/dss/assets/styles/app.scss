@@ -14,12 +14,12 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-variant-numeric: tabular-nums;
   font-size: $font-size-small;
   @include font-color($text-color, $dark-text-color);
   line-height: $line-height-base;
   background-color: $workspace-background !important;
+  font-family: $font-family;
 }
 
 .layout {

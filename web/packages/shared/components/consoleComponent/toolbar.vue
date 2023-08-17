@@ -105,7 +105,7 @@
               </Row>
               <Row class="row-item">
                 <Checkbox v-model="allDownload">{{$t('message.common.toolbar.all')}}</Checkbox>
-                <span>(共{{resultList.length}}个结果集)</span>
+                <span>({{$t('message.common.resultsExport.resultSetNum', { num: resultList.length })}})</span>
               </Row>
             </div>
             <Row class="row-item" v-if="download.format == 2">

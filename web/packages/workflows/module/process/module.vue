@@ -1768,9 +1768,16 @@ export default {
           })
         }
       })
-      await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}batchDeleteAppConnNode`, {nodes}, 'post').then(() => {
-        this.$Message.success(this.$t('message.workflow.deleteSuccess'));
-      })
+      if (nodes.length) {
+        await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}batchDeleteAppConnNode`, {nodes}, 'post')
+      }
+      let msg = this.$t('message.workflow.deleteSuccess')
+      if (selectNodeLength > selectNodes.length) {
+        msg = this.$t('message.workflow.BatchDel');
+        this.$Message.warning(msg);
+      } else {
+        this.$Message.success(msg);
+      }
       selectNodes.forEach(node=>{
         this.$emit('deleteNode', node);
       })
@@ -1785,9 +1792,6 @@ export default {
         }
       });
       this.originalData = this.json;
-      if (selectNodeLength > selectNodes.length) {
-        this.$Message.warning(this.$t('message.workflow.BatchDel'));
-      }
       this.autoSave('allDelete', false);
     },
     /**

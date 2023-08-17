@@ -9,7 +9,7 @@
       <div class="designer-control-button" :title="$t('message.workflow.vueProcess.narrow')" @click="zoomin">
         <Icon name="suoxiao" />
       </div>
-      <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.narrow')" @click="toggleFullScreen">
+      <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.fullscreen')" @click="toggleFullScreen">
         <Icon name="quanping" />
       </div>
       <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.format')" @click="clickToolItem('format')">
@@ -21,7 +21,7 @@
       <div v-show="!state.mapMode" class="designer-control-button" :title="$t('message.workflow.vueProcess.search')" @click="clickToolItem('search')">
         <Icon name="search" />
       </div>
-      <div class="designer-control-button" :title="$t('message.workflow.vueProcess.narrow')" @click="clickNodePath">
+      <div class="designer-control-button" :title="$t('message.workflow.vueProcess.depsearch')" @click="clickNodePath">
         <SvgIcon icon-class="nodepath" />
       </div>
     </div>

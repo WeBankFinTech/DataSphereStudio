@@ -68,7 +68,7 @@ export default {
         path: 'engineinfo',
         children: [
           {
-            icon: 'engineHis',
+            icon: 'engineHistory',
             name: i18n.t('message.workspaceManagement.engineSearch'),
             path: 'enginelist',
             children: [],

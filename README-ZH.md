@@ -138,7 +138,7 @@
 
 - [DSS 的 Exchangis AppConn 插件安装指南](https://github.com/WeDataSphere/Exchangis/blob/master/docs/zh_CN/ch1/exchangis_appconn_deploy_cn.md)
 
-- [DSS 的 Streamis AppConn 插件安装指南](https://github.com/WeBankFinTech/Streamis/blob/main/docs/zh_CN/0.2.0/development/StreamisAppConn%E5%AE%89%E8%A3%85%E6%96%87%E6%A1%A3.md)
+- [DSS 的 Streamis AppConn 插件安装指南](https://github.com/WeBankFinTech/Streamis/blob/main/docs/zh_CN/%E5%AE%89%E8%A3%85%E6%96%87%E6%A1%A3/AppConn%E7%9A%84%E4%BD%BF%E7%94%A8.md)
 
 - [DSS 的 Prophecis AppConn 插件安装指南](https://github.com/WeBankFinTech/Prophecis/blob/master/docs/zh_CN/Deployment_Documents/Prophecis%20Appconn%E5%AE%89%E8%A3%85%E6%96%87%E6%A1%A3.md)
 

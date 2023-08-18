@@ -97,7 +97,7 @@
         :disabled="isNodeMap">{{$t('message.workflow.process.nodeParameter.BC')}}
       </Button>
     </div>
-    <templateSelectDrawer ref="templateSelectDrawer" v-show="isTemplateDrawerShow" @isShow="handleTemplateShow" 
+    <templateSelectDrawer ref="templateSelectDrawer" v-show="isTemplateDrawerShow" @isShow="handleTemplateShow"
       :nodeInfo="nodeData" :templateList="templateList" @submit="handleTemplateSelect"
       :defaultTemplateId="currentNode.ecConfTemplateId"></templateSelectDrawer>
   </div>
@@ -424,8 +424,8 @@ export default {
         delete this.currentNode.ecConfTemplateId
         delete this.currentNode.ecConfTemplateName
       } else {
-        this.currentNode.jobParams['ec.conf.templateId'] = this.currentNode.ecConfTemplateId 
-        this.currentNode.params.configuration['startup']['ec.conf.templateId'] = this.currentNode.ecConfTemplateId 
+        this.currentNode.jobParams['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
+        this.currentNode.params.configuration['startup']['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
       }
       this.validFrom();
     },
@@ -450,7 +450,6 @@ export default {
     },
     resourcesAction() {
       let resources = [];
-      // 写的啥jb代码，下面改了重复添加问题，有其它问题看历史版本吧
       const mapFlag = {}
       if (this.currentNode.jobContent && this.currentNode.jobContent.script) {
         this.currentNode.resources.forEach(item => {

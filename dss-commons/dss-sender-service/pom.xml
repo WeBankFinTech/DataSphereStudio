@@ -40,6 +40,17 @@
             <groupId>org.apache.linkis</groupId>
             <artifactId>linkis-rpc</artifactId>
             <version>${linkis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>commons-fileupload</artifactId>
+                    <groupId>commons-fileupload</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <artifactId>commons-fileupload</artifactId>
+            <groupId>commons-fileupload</groupId>
+            <version>1.5</version>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>

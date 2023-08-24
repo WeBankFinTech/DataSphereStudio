@@ -80,8 +80,8 @@ class DataCheckerRefExecutionOperation
             }
             rows.foreach(row => if (row.contains("=")) {
               val endLocation = row.indexOf("=")
-              val rowKey = row.substring(0, endLocation)
-              val rowEnd = row.substring(endLocation + 1)
+              val rowKey = row.trim.substring(0, endLocation)
+              val rowEnd = row.trim.substring(endLocation + 1)
               tmpProperties.put(rowKey, rowEnd)
             })
           } else {

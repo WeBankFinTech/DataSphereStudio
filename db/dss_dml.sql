@@ -163,6 +163,7 @@ insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`l
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (41,'executeUser','请填写执行用户','Please enter execute user','执行用户','executeUser','Input',1,NULL,NULL,0,NULL,0,1,1,0,'runtime');
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (42,'Filter','请填写过滤条件','Please enter filter','过滤条件','Filter','Input',1,NULL,NULL,0,NULL,0,1,1,0,'runtime');
 INSERT  INTO `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (45,'ReuseEngine','请选择是否复用引擎','Please choose to reuse engin or not','是否复用引擎','reuse-engine-or-not','Select',1,'[\"true\",\"false\"]','true',0,NULL,0,1,1,0,'startup');
+INSERT  INTO `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (46,'wds.linkis.engineconn.java.driver.memory','请填写引擎内存','please input driver memory','wds.linkis.engineconn.java.driver.memory','wds-linkis-engineconn.java.driver.memory','Input',0,NULL,'1G',0,NULL,0,1,1,0,'runtime');
 
 DELETE FROM dss_workflow_node_to_ui;
 select @workflow_node_sql:=id from dss_workflow_node where name='sql';
@@ -206,6 +207,7 @@ select @node_ui_job_desc:=id from dss_workflow_node_ui where `key`='job.desc';
 select @node_ui_upStreams:=id from dss_workflow_node_ui where `key`='upStreams';
 select @node_ui_executeUser:=id from dss_workflow_node_ui where `key`='executeUser';
 select @node_ui_ReuseEngine:=id from dss_workflow_node_ui where `key`='ReuseEngine';
+select @node_ui_DriverMemory:=id from dss_workflow_node_ui where `key`='wds.linkis.engineconn.java.driver.memory';
 
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_title);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_sql,@node_ui_desc);
@@ -278,6 +280,7 @@ insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@work
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_subFlow,@node_ui_businessTag);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_subFlow,@node_ui_appTag);
 INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_subFlow,@node_ui_ReuseEngine);
+insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_hql,@node_ui_DriverMemory);
 
 DELETE FROM dss_workflow_node_ui_validate;
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('7','NumInterval','[1,15]','驱动器内存大小，默认值：2','Drive memory size, default value: 2','blur');
@@ -311,6 +314,7 @@ INSERT INTO `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_ra
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('60', 'Regex', '^[0-9.]*g{0,1}$', 'Spark内存设置如2g', 'Drive memory size, default value: 2', 'blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('61','Regex','^(.|\s){1,5000}$','长度在1到5000个字符','The length is between 1 and 5000 characters','blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('62','Regex','^.{1,150}$','长度在1到150个字符','The length is between 1 and 150 characters','blur');
+insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('63', 'Regex', '^([1-9]|10|[1-9])(g|G){0,1}$', '设置范围为[1,10],设置超出限制', 'hive memory limit 1,10', 'blur');
 
 DELETE FROM dss_workflow_node_ui_to_validate;
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_source_type,31);
@@ -389,6 +393,7 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_spark_driver_memory,60);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_spark_executor_memory,60);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_job_desc,61);
+insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_DriverMemory,63);
 
 
 DELETE FROM dss_workspace_appconn_role;

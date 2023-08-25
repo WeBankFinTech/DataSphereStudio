@@ -117,8 +117,8 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
         params.put(DSSCommonUtils.DSS_EXECUTE_BY_PROXY_USER_KEY, FlowExecutionConf.DSS_EXECUTE_BY_PROXY_USER_ENABLE.getValue());
         logger.info("submit to entranceServer content:{}",json);
-        String execID = entranceServer.execute(json);
-        Job job = entranceServer.getJob(execID).get();
+        Job job = entranceServer.execute(json);
+        String execID = job.getId();
         JobRequest task = ((EntranceJob) job).getJobRequest();
         Long taskID = task.getId();
         pushLog(LogUtils.generateInfo("You have submitted a new job, script code (after variable substitution) is"), job);
@@ -135,7 +135,6 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         return message;
     }
 
-    @Override
     @RequestMapping(value = "/{id}/status",method = RequestMethod.GET)
     public Message status(@PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
         logger.info("Begin to get status for execId:{}", id);

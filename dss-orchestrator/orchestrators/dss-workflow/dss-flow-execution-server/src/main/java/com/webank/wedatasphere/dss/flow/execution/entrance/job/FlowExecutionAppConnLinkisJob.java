@@ -33,7 +33,7 @@ public class FlowExecutionAppConnLinkisJob extends AbstractAppConnLinkisJob {
     @Override
     public String getUser() {
         String labels = getJobProps().getOrDefault(DSSCommonUtils.DSS_LABELS_KEY, DSSCommonUtils.ENV_LABEL_VALUE_DEV);
-        boolean executeByProxyUserInDevEnable = "true".equalsIgnoreCase(getJobProps().get(DSSCommonUtils.DSS_LABELS_KEY));
+        boolean executeByProxyUserInDevEnable = "true".equalsIgnoreCase(getJobProps().get(DSSCommonUtils.DSS_EXECUTE_BY_PROXY_USER_KEY));
         String submitUser = getSubmitUser();
         if (DSSCommonUtils.ENV_LABEL_VALUE_DEV.equals(labels) && !executeByProxyUserInDevEnable) {
             return submitUser;

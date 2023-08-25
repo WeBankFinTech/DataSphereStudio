@@ -34,8 +34,9 @@ public class FlowExecutionCommonLinkisJob extends AbstractCommonLinkisJob {
     @Override
     public String getUser() {
         String labels = getJobProps().getOrDefault(DSSCommonUtils.DSS_LABELS_KEY, DSSCommonUtils.ENV_LABEL_VALUE_DEV);
+        boolean executeByProxyUserInDevEnable = "true".equalsIgnoreCase(getJobProps().get(DSSCommonUtils.DSS_LABELS_KEY));
         String submitUser = getSubmitUser();
-        if(DSSCommonUtils.ENV_LABEL_VALUE_DEV.equals(labels)) {
+        if(DSSCommonUtils.ENV_LABEL_VALUE_DEV.equals(labels) && !executeByProxyUserInDevEnable) {
             return submitUser;
         } else {
             String proxyUser = getJobProps().get(FlowExecutionEntranceConfiguration.PROXY_USER());

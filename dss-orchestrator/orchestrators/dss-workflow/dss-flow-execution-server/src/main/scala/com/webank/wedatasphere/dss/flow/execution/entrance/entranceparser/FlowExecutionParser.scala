@@ -37,7 +37,7 @@ class FlowExecutionParser(persistenceManager: PersistenceManager) extends Common
     job.setJobRequest(jobRequest)
     job.setUser(jobRequest.getExecuteUser)
     job.setCreator("FlowEntrance")
-    job.setParams(jobRequest.getParams.toMap[String, Any])
+    job.setParams(jobRequest.getParams)
     job.setEntranceListenerBus(getEntranceContext.getOrCreateEventListenerBus)
     job.setListenerEventBus(null)
     job.setProgress(0f)

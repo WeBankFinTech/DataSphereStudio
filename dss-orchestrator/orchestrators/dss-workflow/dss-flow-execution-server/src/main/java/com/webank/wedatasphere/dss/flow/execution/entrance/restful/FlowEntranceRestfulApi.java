@@ -135,8 +135,9 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         return message;
     }
 
+    @Override
     @RequestMapping(value = "/{id}/status",method = RequestMethod.GET)
-    public Message status(@PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
+    public Message status(HttpServletRequest req, @PathVariable("id") String id, @RequestParam(required = false, name = "taskID") String taskID) {
         logger.info("Begin to get status for execId:{}", id);
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];

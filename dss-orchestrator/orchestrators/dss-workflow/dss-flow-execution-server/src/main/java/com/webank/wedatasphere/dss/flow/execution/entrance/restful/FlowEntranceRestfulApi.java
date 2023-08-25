@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
 import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionConf;
 import com.webank.wedatasphere.dss.flow.execution.entrance.dao.TaskMapper;
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
 import com.webank.wedatasphere.dss.flow.execution.entrance.enums.ExecuteStrategyEnum;
@@ -114,6 +115,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         params.put("workspace", workspace);
         String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
+        params.put(DSSCommonUtils.DSS_EXECUTE_BY_PROXY_USER_KEY, FlowExecutionConf.DSS_EXECUTE_BY_PROXY_USER_ENABLE.getValue());
         logger.info("submit to entranceServer content:{}",json);
         String execID = entranceServer.execute(json);
         Job job = entranceServer.getJob(execID).get();

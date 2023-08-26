@@ -176,9 +176,9 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         logger.info("End to get status for execId:{}", id);
         return message;
     }
-
+    @Override
     @RequestMapping(path = {"/{id}/kill"},method = {RequestMethod.GET})
-    public Message kill(@PathVariable("id") String id, @RequestParam(value = "taskID",required = false) Long taskID) {
+    public Message kill(HttpServletRequest req @PathVariable("id") String id, @RequestParam(value = "taskID",required = false) Long taskID) {
         logger.info("Begin to kill task:{}", id);
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option job;

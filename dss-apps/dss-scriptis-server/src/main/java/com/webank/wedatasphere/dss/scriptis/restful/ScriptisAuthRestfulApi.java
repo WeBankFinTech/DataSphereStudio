@@ -53,4 +53,11 @@ public class ScriptisAuthRestfulApi {
                 .data("content", GlobalLimitsUtils.getGlobalLimitMap(globalLimitName));
     }
 
+    @RequestMapping(value = "/userLimits/{limitName}", method = RequestMethod.GET)
+    public Message userLimit(HttpServletRequest req, @PathVariable("limitName") String limitName) {
+        String username = SecurityFilter.getLoginUsername(req);
+        return Message.ok()
+                .data("userLimits", scriptisAuthService.getUserLimits(username, limitName));
+    }
+
 }

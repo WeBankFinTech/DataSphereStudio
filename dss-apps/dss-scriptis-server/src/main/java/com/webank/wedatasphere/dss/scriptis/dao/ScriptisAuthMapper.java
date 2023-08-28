@@ -6,7 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public class ScriptisAuthMapper {
+public interface ScriptisAuthMapper {
 
     List<DssConfig> getUserLimits(@Param("limitName") String limitName);
 

@@ -624,3 +624,14 @@ CREATE TABLE `dss_proxy_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `dss_config`;
+CREATE TABLE `dss_config`
+(
+`id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+`key` varchar(64) NOT NULL COMMENT '配置key',
+`value` varchar(1024) DEFAULT NULL COMMENT '配置value',
+PRIMARY KEY (`id`),
+key `idx_config_key` (`key`)
+) ENGINE = InnoDB
+DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_bin COMMENT ='dss配置表';
+

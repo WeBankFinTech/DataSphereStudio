@@ -14,23 +14,13 @@
  *
  */
 
-package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain
+package com.webank.wedatasphere.dss.appconn.sendemail.email.domain
 
-import org.apache.linkis.common.io.FsPath
+import java.io.File
 
-trait FsPathStoreEmailContent {
-  private var fsPath: FsPath = _
-  private var fileType: String = _
-  private var fileName: String = _
-
-  def getFsPath: FsPath = fsPath
-  def setFsPath(fsPath: FsPath): Unit = this.fsPath = fsPath
-
-  def getFileType: String = fileType
-  def setFileType(fileType: String): Unit = this.fileType = fileType
-
-
-  def getFileName: String = fileName
-  def setFileName(fileName: String): Unit = this.fileName = fileName
-
+class ExcelAttachment(name: String, b64: String) extends Attachment {
+  override def getName: String = name
+  override def getBase64Str: String = b64
+  override def getFile: File = null
+  override def getMediaType: String = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 }

@@ -5,18 +5,12 @@ import com.webank.wedatasphere.dss.common.utils.GlobalLimitsUtils;
 import com.webank.wedatasphere.dss.scriptis.service.ScriptisAuthService;
 import org.apache.linkis.common.conf.BDPConfiguration;
 import org.apache.linkis.server.Message;
-import org.apache.linkis.server.conf.ServerConfiguration;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration.GLOBAL_LIMITS_PREFIX;
@@ -53,8 +47,8 @@ public class ScriptisAuthRestfulApi {
                 .data("content", GlobalLimitsUtils.getGlobalLimitMap(globalLimitName));
     }
 
-    @RequestMapping(value = "/userLimits/{limitName}", method = RequestMethod.GET)
-    public Message userLimit(HttpServletRequest req, @PathVariable("limitName") String limitName) {
+    @RequestMapping(value = "/userLimits", method = RequestMethod.GET)
+    public Message userLimit(HttpServletRequest req, @RequestParam(value = "limitName",required = false) String limitName) {
         String username = SecurityFilter.getLoginUsername(req);
         return Message.ok()
                 .data("userLimits", scriptisAuthService.getUserLimits(username, limitName));

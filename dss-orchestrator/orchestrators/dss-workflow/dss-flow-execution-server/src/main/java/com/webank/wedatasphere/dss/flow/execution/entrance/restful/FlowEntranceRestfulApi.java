@@ -65,7 +65,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
     @Autowired
     private TaskMapper taskMapper;
     @Override
-    @EntranceServerBeanAnnotation.EntranceServerAutowiredAnnotation
+    @Autowired
     public void setEntranceServer(EntranceServer entranceServer) {
         super.setEntranceServer(entranceServer);
         this.entranceServer = entranceServer;

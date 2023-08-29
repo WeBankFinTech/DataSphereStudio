@@ -121,7 +121,14 @@ class DataCheckerRefExecutionOperation
     action match {
       case action: DataCheckerExecutionAction =>
         action.getExecutionRequestRefContext.appendLog("DataCheck is running!")
-        if (action.getState.isCompleted) return action.getState
+        if (action.getState.isCompleted) {
+          Utils.tryCatch(action.dc.begineCheck(action))(t => {
+            action.setState(RefExecutionState.Success)
+            logger.info("DataChecker run success for " + t.getMessage, t)
+            action.getExecutionRequestRefContext.appendLog("DataCheck run success!")
+          })
+          return action.getState
+        }
         Utils.tryCatch(action.dc.begineCheck(action))(t => {
           action.setState(RefExecutionState.Failed)
           logger.error("DataChecker run failed for " + t.getMessage, t)

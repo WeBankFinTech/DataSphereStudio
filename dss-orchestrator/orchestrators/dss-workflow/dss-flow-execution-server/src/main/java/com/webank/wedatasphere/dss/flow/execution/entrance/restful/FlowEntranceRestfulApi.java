@@ -115,7 +115,7 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         params.put("workspace", workspace);
         String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
-        params.put(DSSCommonUtils.DSS_EXECUTE_BY_PROXY_USER_KEY, FlowExecutionConf.DSS_EXECUTE_BY_PROXY_USER_ENABLE.getValue());
+        params.put(DSSCommonUtils.DSS_EXECUTE_BY_PROXY_USER_KEY, FlowExecutionConf.DSS_EXECUTE_BY_PROXY_USER_ENABLE.getValue().toString());
         logger.info("submit to entranceServer content:{}",json);
         Job job = entranceServer.execute(json);
         String execID = job.getId();

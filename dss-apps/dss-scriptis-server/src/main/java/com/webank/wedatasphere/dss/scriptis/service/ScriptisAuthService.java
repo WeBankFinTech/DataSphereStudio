@@ -6,5 +6,5 @@ public interface ScriptisAuthService {
 
     Map<String,Object> getGlobalLimits(String username);
 
-    Map<String, Boolean> getUserLimits(String username, String limitName);
+    Map<String, Object> getUserLimits(String username, String limitName);
 }

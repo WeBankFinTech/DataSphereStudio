@@ -5,6 +5,8 @@ public class DssConfig {
     private String key;
     private String value;
 
+    private String condition;
+
     public Integer getId() {
         return id;
     }
@@ -29,4 +31,11 @@ public class DssConfig {
         this.value = value;
     }
 
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
 }

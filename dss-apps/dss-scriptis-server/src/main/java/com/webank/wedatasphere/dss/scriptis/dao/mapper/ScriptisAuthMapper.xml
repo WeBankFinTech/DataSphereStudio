@@ -4,7 +4,7 @@
 
 	<select id="getUserLimits"
 			resultType="com.webank.wedatasphere.dss.scriptis.pojo.entity.DssConfig">
-		SELECT `key`,`value` FROM `dss_config` WHERE `key` like #{limitName} '%'
+		SELECT `key`,`value`,`condition` FROM `dss_config` WHERE `key` like #{limitName} '%'
 	</select>
 
 </mapper>

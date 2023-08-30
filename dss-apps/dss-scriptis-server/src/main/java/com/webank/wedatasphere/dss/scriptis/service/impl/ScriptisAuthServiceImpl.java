@@ -4,7 +4,7 @@ import com.webank.wedatasphere.dss.common.utils.GlobalLimitsUtils;
 import com.webank.wedatasphere.dss.scriptis.dao.ScriptisAuthMapper;
 import com.webank.wedatasphere.dss.scriptis.pojo.entity.DssConfig;
 import com.webank.wedatasphere.dss.scriptis.service.ScriptisAuthService;
-import org.apache.linkis.protocol.util.ImmutablePair;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
@@ -13,8 +13,8 @@ import java.util.Map;
 
 public class ScriptisAuthServiceImpl implements ScriptisAuthService {
 
-    public static final String USER_LIMITS_PREFIX = "wds.dss.global.limits.";
-    public static final String USER_LIMITS_SUFFIX = ".user";
+    public static final String USER_LIMITS_PREFIX = "wds.dss.user.limits.";
+    public static final String DOWNLOAD_COUNT = "downloadCount";
 
     @Autowired
     private ScriptisAuthMapper authMapper;
@@ -25,14 +25,19 @@ public class ScriptisAuthServiceImpl implements ScriptisAuthService {
     }
 
     public Map<String, Object> getUserLimits(String username, String limitName) {
-        String userLimitPrefix = USER_LIMITS_PREFIX + limitName;
+        String userLimitPrefix = StringUtils.join(USER_LIMITS_PREFIX, limitName);
         List<DssConfig> userLimits = authMapper.getUserLimits(userLimitPrefix);
-        return userLimits.stream().filter(dssConfig -> dssConfig.getKey().endsWith(USER_LIMITS_SUFFIX))
-                .map(dssConfig -> {
-                    String key = dssConfig.getKey().substring(userLimitPrefix.length(), dssConfig.getKey().length() - USER_LIMITS_SUFFIX.length());
-                    Integer limit = dssConfig.getValue().contains(username) ? 1000000 : -1;
-                    return new ImmutablePair<>(key, limit);
-                })
-                .collect(HashMap::new, (map, pair) -> map.put(pair.getKey(), pair.getValue()), HashMap::putAll);
+        Map<String, Object> res = new HashMap<>();
+        userLimits.forEach(dssConfig -> {
+            String key = dssConfig.getKey().substring(userLimitPrefix.length());
+            if (DOWNLOAD_COUNT.equals(key)) {
+                Integer limitCount = StringUtils.contains(dssConfig.getCondition(),username) ? Integer.parseInt(dssConfig.getValue()) : -1;
+                res.put(key,limitCount);
+            }else {
+                res.put(key,dssConfig.getValue());
+            }
+
+        });
+        return res;
     }
 }

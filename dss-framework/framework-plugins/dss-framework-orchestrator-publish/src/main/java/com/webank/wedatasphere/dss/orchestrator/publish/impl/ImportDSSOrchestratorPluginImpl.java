@@ -192,7 +192,10 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         String orchestrationContent = (String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY);
         List<String[]> paramConfTemplateIds = (List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
         if(null != existFlag){
-            addOrchestratorVersionHook.beforeAdd(oldVersion,Collections.emptyMap());
+            if(oldVersion!=null) {
+                //如果生产中心的所有orc版本的valid_flag都是0（之前的所有发布都在convert期间失败了），那么oldVersion是为空的。
+                addOrchestratorVersionHook.beforeAdd(oldVersion, Collections.emptyMap());
+            }
             //如果Orchestrator已经导入过，目前只更新版本信息，并更新基础信息name,其它信息不修改。
             orchestratorMapper.updateOrchestrator(importDssOrchestratorInfo);
         }else{

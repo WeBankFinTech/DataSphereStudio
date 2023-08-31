@@ -14,7 +14,6 @@ import java.util.Map;
 public class ScriptisAuthServiceImpl implements ScriptisAuthService {
 
     public static final String USER_LIMITS_PREFIX = "wds.dss.user.limits.";
-    public static final String DOWNLOAD_COUNT = "downloadCount";
 
     @Autowired
     private ScriptisAuthMapper authMapper;
@@ -30,13 +29,8 @@ public class ScriptisAuthServiceImpl implements ScriptisAuthService {
         Map<String, Object> res = new HashMap<>();
         userLimits.forEach(dssConfig -> {
             String key = dssConfig.getKey().substring(userLimitPrefix.length());
-            if (DOWNLOAD_COUNT.equals(key)) {
-                Integer limitCount = StringUtils.contains(dssConfig.getCondition(),username) ? Integer.parseInt(dssConfig.getValue()) : -1;
-                res.put(key,limitCount);
-            }else {
-                res.put(key,dssConfig.getValue());
-            }
-
+            Object val = StringUtils.contains(dssConfig.getCondition(),username) ? Integer.parseInt(dssConfig.getValue()) : null;
+            res.put(key,val);
         });
         return res;
     }

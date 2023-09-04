@@ -627,9 +627,10 @@ CREATE TABLE `dss_proxy_user` (
 DROP TABLE IF EXISTS `dss_config`;
 CREATE TABLE `dss_config`
 (
-`id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT '主键',
+`id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
 `key` varchar(64) NOT NULL COMMENT '配置key',
-`value` varchar(1024) DEFAULT NULL COMMENT '配置value',
+`value` varchar(128) NOT NULL COMMENT '配置value',
+`condition` varchar(1024) DEFAULT NULL COMMENT '生效条件',
 PRIMARY KEY (`id`),
 key `idx_config_key` (`key`)
 ) ENGINE = InnoDB

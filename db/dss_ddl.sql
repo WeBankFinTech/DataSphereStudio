@@ -624,15 +624,17 @@ CREATE TABLE `dss_proxy_user` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `dss_config`;
-CREATE TABLE `dss_config`
+DROP TABLE IF EXISTS `dss_user_limit`;
+CREATE TABLE `dss_user_limit`
 (
 `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-`key` varchar(64) NOT NULL COMMENT '配置key',
-`value` varchar(128) NOT NULL COMMENT '配置value',
-`condition` varchar(1024) DEFAULT NULL COMMENT '生效条件',
+`limit_name` varchar(64) NOT NULL COMMENT '限制项名称',
+`value` varchar(128) NOT NULL COMMENT '限制项value',
+`user_name` varchar(1024) DEFAULT NULL COMMENT '限制用户',
+`create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+`update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY (`id`),
-key `idx_config_key` (`key`)
+key `idx_limit_name` (`key`)
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_bin COMMENT ='dss配置表';
+DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_bin COMMENT ='dss用户限制表';
 

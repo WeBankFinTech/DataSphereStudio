@@ -3,8 +3,13 @@
 <mapper namespace="com.webank.wedatasphere.dss.scriptis.dao.ScriptisAuthMapper">
 
 	<select id="getUserLimits"
-			resultType="com.webank.wedatasphere.dss.scriptis.pojo.entity.DssConfig">
-		SELECT `key`,`value`,`condition` FROM `dss_config` WHERE `key` like #{limitName} '%'
+			resultType="com.webank.wedatasphere.dss.scriptis.pojo.entity.DssUserLimit">
+		SELECT `limit_name`,`value`,`user_name` FROM `dss_user_limit`
+		<where>
+			<if test="limitName != null and limitName != ''">
+				`limit_name` like CONCAT(#{limitName},'%')
+			</if>
+		</where>
 	</select>
 
 </mapper>

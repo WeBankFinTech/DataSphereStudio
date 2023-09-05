@@ -634,7 +634,7 @@ CREATE TABLE `dss_user_limit`
 `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 PRIMARY KEY (`id`),
-key `idx_limit_name` (`key`)
+key `idx_limit_name` (`limit_name`)
 ) ENGINE = InnoDB
 DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_bin COMMENT ='dss用户限制表';
 

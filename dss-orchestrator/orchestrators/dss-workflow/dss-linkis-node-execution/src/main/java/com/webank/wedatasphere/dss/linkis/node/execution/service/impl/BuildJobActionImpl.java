@@ -197,6 +197,15 @@ public class BuildJobActionImpl implements BuildJobAction {
      */
     private void replaceSparkConfParams(Map<String, Object> paramMapCopy) throws LinkisJobExecutionErrorException {
         Map<String, Object> startupMap = TaskUtils.getStartupMap(paramMapCopy);
+        //如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
+        if (startupMap.containsKey("ec.conf.templateId")) {
+            startupMap.remove("spark.driver.memory");
+            startupMap.remove("spark.executor.memory");
+            startupMap.remove("spark.executor.cores");
+            startupMap.remove("spark.executor.instances");
+            startupMap.remove("wds.linkis.engineconn.java.driver.memory");
+            startupMap.remove("spark.conf");
+        }
         if (startupMap.containsKey("spark.conf")) {
             String sparkConfVal = (String) startupMap.get("spark.conf");
             List<String> kvList = Arrays.stream(sparkConfVal.split(";")).filter(StringUtils::isNotBlank).collect(Collectors.toList());
@@ -209,20 +218,10 @@ public class BuildJobActionImpl implements BuildJobAction {
                 }
             }
             startupMap.remove("spark.conf");
-            //如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
-            if (startupMap.containsKey("ec.conf.templateId")) {
-                startupMap.remove("spark.driver.memory");
-                startupMap.remove("spark.executor.memory");
-                startupMap.remove("spark.executor.cores");
-                startupMap.remove("spark.executor.instances");
-                Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
-                configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
-                paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);
-            }
-            Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
-            configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
-            paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);
         }
+        Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
+        configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
+        paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);
     }
 
     //TODO

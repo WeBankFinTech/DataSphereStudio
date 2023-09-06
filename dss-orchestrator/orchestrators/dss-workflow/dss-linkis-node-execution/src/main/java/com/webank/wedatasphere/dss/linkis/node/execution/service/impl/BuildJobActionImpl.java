@@ -206,19 +206,6 @@ public class BuildJobActionImpl implements BuildJobAction {
             startupMap.remove("wds.linkis.engineconn.java.driver.memory");
             startupMap.remove("spark.conf");
         }
-        if (startupMap.containsKey("spark.conf")) {
-            String sparkConfVal = (String) startupMap.get("spark.conf");
-            List<String> kvList = Arrays.stream(sparkConfVal.split(";")).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-            for (String l : kvList) {
-                String[] kv = l.split("=");
-                if (kv.length != 2) {
-                    throw new LinkisJobExecutionErrorException(90103, "wrong spark.conf params. please recheck!");
-                } else {
-                    startupMap.put(kv[0], kv[1]);
-                }
-            }
-            startupMap.remove("spark.conf");
-        }
         Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
         configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
         paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);

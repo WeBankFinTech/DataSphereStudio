@@ -56,6 +56,11 @@
         <span>{{ $t('message.scripts.constants.upload') }}</span>
       </we-menu-item>
       <we-menu-item
+        v-if="currentNode.isLeaf"
+        @select="handleMove">
+        <span>{{ $t('message.scripts.contextMenu.move') }}</span>
+      </we-menu-item>
+      <we-menu-item
         v-if="currentNode._level!=1"
         @select="handleEditBefore">
         <span>{{ $t('message.scripts.constants.rename') }}</span>
@@ -140,6 +145,15 @@
       ref="delete"
       :loading="loading"
       @delete="handleDelete"/>
+    <move
+      ref="moveFile"
+      :node="newDialog.node"
+      :is-leaf="newDialog.isLeaf"
+      :default-path="newDialog.defaultPath"
+      :tree="filterTree"
+      :load-data-fn="loadDataFn"
+      :filter-node="filterNode"
+      @update="handleMoveUpdate" />
   </div>
 </template>
 <script>
@@ -156,6 +170,7 @@ import weImportToHive from '@/scriptis/components/importToHive';
 import deleteDialog from '@dataspherestudio/shared/components/deleteDialog';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import module from './index';
+import move from './move';
 const PREFIX = 'file://';
 export default {
   name: 'WorkSidebar',
@@ -167,6 +182,7 @@ export default {
     showDialog,
     weImportToHive,
     deleteDialog,
+    move
   },
   mixins: [mixin],
   props: {
@@ -469,6 +485,47 @@ export default {
       this.currentNode.changeEditState(true);
       this.currentNode.isEditState = true;
     },
+    handleMove() {
+      if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.data'));
+      let node = isArray(this.currentNode.data) ? this.currentNode.data[0] : this.currentNode.data;
+      this.dispatch('Workbench:isOpenTab', {
+        oldDest: node.path,
+      }, (isOpenTab) => {
+        if (isOpenTab) {
+          return this.$Message.error(this.$t('message.scripts.hasopen'));
+        } else {
+          this.filterTree = cloneDeep(this.fileTree);
+          this.fsType = 'share';
+          this.newDialog = {
+            type: this.$t('message.scripts.deleteType.script'),
+            isNew: true,
+            node,
+            isLeaf: true,
+            scriptType: this.getSupportModes().filter((item) => item.isCanBeNew),
+            defaultPath: node.parentPath,
+          };
+          if (this.$refs.moveFile) {
+            this.$refs.moveFile.open();
+          }
+        }
+      })
+    },
+    handleMoveUpdate(params) {
+      api.fetch('/filesystem/rename', params).then(() => {
+        if (params.cb) {
+          params.cb()
+          this.refresh('move', params.newDest)
+          if (this.currentNode.parent.data.path !== this.rootPath) {
+            this.currentNode.parent.data.expanded = false
+          }
+          this.currentNode.parent.data.children = this.currentNode.parent.data.children.filter(it => it.path !== this.currentNode.data.path)
+          // 删除本地缓存
+          this.dispatch('Workbench:deleteDirOrFile', this.currentNode.data.path)
+        }
+        this.$Message.success(this.$t("message.scripts.move.success"))
+      }).catch(() => {
+      });
+    },
     beforeChange(args, cb) {
       let path = args.node.path;
       path = path.slice(0, path.lastIndexOf('/') + 1) + args.label;
@@ -552,10 +609,10 @@ export default {
           }).then(() => {
             this.loading = false;
             this.$Message.success(this.$t('message.scripts.constants.success.delete'));
-            this.refresh('delete');
             this.currentNode.remove();
             this.currentNode = { ...this.$refs.weFileTree.$refs.tree.root };
             this.currentNode.data = { ...this.currentNode.data[0] };
+            this.refresh('delete');
           }).catch(() => {
             this.loading = false;
           });
@@ -644,11 +701,14 @@ export default {
         if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.data'));
         if (isEmpty(this.fileTree)) return this.initData();
         this.treeLoading = true;
-        // const root = this.rootPath.slice(this.rootPath.indexOf('/') + 2, this.rootPath.length - 1);
-        // 这里不能传''，后台没有传空的逻辑，如果为空时传根目录
+
         let nodePath = isEmpty(this.currentNode) ? this.rootPath : this.currentNode.data.path;
-        if (this.currentNode.isLeaf || type === 'edit' || type === 'delete') {
-          // 如果是文件、编辑或删除的时候，要请求上一级文件夹的数据
+        if (type === 'move') {
+          nodePath = path.slice(0, path.lastIndexOf('/'));
+        } else if (type === 'delete') {
+          nodePath = this.currentNode.data.parentPath || nodePath;
+        } else if (this.currentNode.isLeaf || type === 'edit') {
+          // 如果是文件、编辑的时候，要请求上一级文件夹的数据
           nodePath = this.currentNode.data.parentPath;
         } else if (type === 'new' && path) {
           nodePath = path.slice(0, path.lastIndexOf('/'));

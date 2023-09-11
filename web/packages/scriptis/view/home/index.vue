@@ -146,12 +146,7 @@ export default {
       return navItemHeight * this.leftSideNavList.length + 100;
     },
   },
-  created() {
-  },
-  async mounted() {
-    this.init();
-    // 监听窗口变化，获取浏览器宽高
-    window.addEventListener('resize', this.getHeight);
+  async created() {
     let baseInfo = storage.get('baseInfo', 'local') || {}
     const globalRes = await this.getGlobalLimit()
     baseInfo = {
@@ -159,6 +154,18 @@ export default {
       ...globalRes.globalLimits
     }
     storage.set('baseInfo', baseInfo, 'local')
+    // languageServerDefaultEnable = true 默认启用language server
+    const uselsp = localStorage.getItem('scriptis-edditor-type')
+    if (baseInfo.languageServerDefaultEnable && uselsp === null ) {
+      localStorage.setItem('scriptis-edditor-type', 'lsp');
+      location.reload();
+    }
+  },
+  mounted() {
+    this.init();
+    // 监听窗口变化，获取浏览器宽高
+    window.addEventListener('resize', this.getHeight);
+    const baseInfo = storage.get('baseInfo', 'local');
     if (baseInfo.proxyEnable && !baseInfo.proxyUserName) {
       this.showSettingModal()
     } else if(baseInfo.proxyUserName) {

@@ -48,11 +48,6 @@
           <Option value="0">否</Option>
         </Select>
       </FormItem>
-      <!-- <template v-if="isRefTemplate === '1'">
-        <FormItem label="参数模板名称">
-          <Input v-model="currentNode.jobParams['ec.conf.templateName']" placeholder="请选择参数模板名称" readonly @on-focus="openTemplateDrawer"></Input>
-        </FormItem>
-      </template> -->
       <template v-if="isRefTemplate === '1'">
         <FormItem label="参数模板名称" prop="ecConfTemplateName">
           <Input v-model="currentNode.ecConfTemplateName" placeholder="请选择参数模板名称" readonly @on-focus="openTemplateDrawer"></Input>
@@ -60,7 +55,7 @@
       </template>
       <template>
         <template v-for="item in curNodeParamsList">
-          <template v-if="item.position === 'runtime' || item.position === 'startup'">
+          <template v-if="checkShow(item) && (item.position === 'runtime' || item.position === 'startup')">
             <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
               <Input v-model="currentNode.jobParams[poinToLink(item.key)]" :type="filterFormType(item.uiType)" :rows="6"
                 :placeholder="item.desc" :disabled="item.uiType === 'Disable'"
@@ -83,7 +78,7 @@
               </Select>
             </FormItem>
           </template>
-          <template v-if="item.uiType === 'Upload'">
+          <template v-if="checkShow(item) && item.uiType === 'Upload'">
             <FormItem :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName">
               <resource :resources="resources" :is-ripetition="true" :node-type="nodeData.type" :readonly="readonly"
                 @update-resources="updateResources"></resource>
@@ -223,6 +218,8 @@ export default {
           if(v.workflowDefault) {
             this.$set(this.currentNode, 'ecConfTemplateName', v.templateName);
             this.$set(this.currentNode, 'ecConfTemplateId', v.templateId);
+            this.currentNode.jobParams['ec.conf.templateId'] = v.templateId
+            this.currentNode.params.configuration['startup']['ec.conf.templateId'] = v.templateId
           }
         })
       }
@@ -231,6 +228,8 @@ export default {
     handleTemplateSelect(templateObj) {
       this.$set(this.currentNode, 'ecConfTemplateName', templateObj.templateName);
       this.$set(this.currentNode, 'ecConfTemplateId', templateObj.templateId);
+      this.currentNode.jobParams['ec.conf.templateId'] = templateObj.templateId
+      this.currentNode.params.configuration['startup']['ec.conf.templateId'] = templateObj.templateId
     },
     // 打开选择参数模板的抽屉
     async openTemplateDrawer() {
@@ -258,6 +257,7 @@ export default {
       });
     },
     // 控制台设置的参数赋值
+    // 应当根据不同节点类型获取各自的参数配置，目前有spark和hive及通用配置，后端说不会有重复key值，沿用之前设计加hive的
     consoleParamsDefault(originDefalut, key, rst) {
       let value = originDefalut;
       if (rst.length > 0) {
@@ -273,6 +273,15 @@ export default {
         if (rst[1].fullTree[0] && key === 'wds.linkis.rm.yarnqueue') {
           value = rst[1].fullTree[0].settings[0].configValue || rst[1].fullTree[0].settings[0].defaultValue;
         }
+        rst[2].fullTree.forEach(item =>{
+          if (item && item.settings.length > 0) {
+            item.settings.forEach((it) => {
+              if (it.key === key) {
+                value =  it.configValue || it.defaultValue;
+              }
+            });
+          }
+        })
       }
       return value;
     },
@@ -311,6 +320,16 @@ export default {
           callback(new Error(this.$t('message.workflow.process.nodeParameter.QTXZQJSON')));
         }
       };
+      // eslint-disable-next-line no-unused-vars
+      const validateJobDesc = (rule, value, callback) => {
+        const reg = new RegExp('(check\\.object\\.\\d+)=([\\s\\S]*?)\\1')
+        if(reg.test(value)) {
+          callback(new Error(rule.message));
+        } else {
+          callback();
+        }
+      }
+
       const numInterval = (rule, value, callback) => {
         const reg = new RegExp(`[0-9]`);
         // 比较大小
@@ -343,7 +362,7 @@ export default {
           } else if (item.validateType === 'Function') {
             temRule.push({
               // 只有和上面定义的函数名相同才让执行
-              validator: ['validatorTitle', 'validateJson'].includes(item.validateRange) ? eval(item.validateRange) : () => {},
+              validator: ['validatorTitle', 'validateJson', 'validateJobDesc'].includes(item.validateRange) ? eval(item.validateRange) : () => {},
               message: item.message,
               trigger: item.trigger || 'blur'
             })
@@ -485,6 +504,27 @@ export default {
           return 'text';
       }
     },
+    /**
+     * 检查数据是否符合条件
+     * @param {*} data
+     * @param {*} condition
+     * @returns
+     */
+    checkShow(item) {
+      const data = this.currentNode
+      if (item.condition && this.isRefTemplate == 1) {
+        let Fn = Function
+        let fn = item.condition.replace(/\${([^}]+)}/g, function (a, b) {
+          return `__node__data.${b}`
+        })
+        try {
+          return new Fn('__node__data', 'return ' + fn)(data);
+        } catch (e) {
+          //
+        }
+      }
+      return true
+    }
   },
 };
 

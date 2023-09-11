@@ -324,6 +324,11 @@ export default {
           // 如果是api执行页获取结果集，需要带上taskId
           if(this.getResultUrl !== 'filesystem') {
             querys += `&taskId=${this.work.taskID}`
+          } else {
+            const res = await api.fetch('/dss/scriptis/userLimits', 'get');
+            if(res && res.userLimits && res.userLimits.downloadCount) {
+              querys+= `&limit=${res.userLimits.downloadCount}`
+            }
           }
           const splitChar = [',',';','\t',' ','|'][this.download.splitChar - 1] || ','
           if(this.download.format == 1) {

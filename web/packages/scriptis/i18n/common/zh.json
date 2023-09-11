@@ -20,9 +20,15 @@
         "addCatalog": "新建目录",
         "addScript": "新建脚本",
         "importToHive": "导入至Hive",
+        "move": "移动",
         "importToHdfs": "导入至HDFS",
         "copyscript": "复制脚本",
         "stickscript": "粘贴"
+      },
+      "move": {
+        "success": "文件已完成移动",
+        "warn": "目标路径已存在重名文件",
+        "title": "文件移动"
       },
       "warning": {
         "getRootPath": "未请求到工作空间根目录，请刷新重试！",
@@ -771,6 +777,7 @@
       "dbinfs": "库基本信息",
       "tableifs": "库表信息",
       "transfer": "批量转移",
+      "download": "下载数据",
       "transferTitle": "表属主转移",
       "transferForm": {
         "title": "申请单标题",

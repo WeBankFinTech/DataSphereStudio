@@ -718,6 +718,7 @@ export default {
         this.removeWork(findWork)
         cb("save")
       }
+      this.dispatch("IndexedDB:clearTab", md5Path)
     },
     "Workbench:saveAs"(work) {
       this.$refs.saveAs.open(work)

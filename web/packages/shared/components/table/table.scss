@@ -145,14 +145,6 @@
   border-right: 1px solid #e8eaec;
   transition: background-color 0.2s ease-in-out;
   @include border-color(#e8eaec, $dark-border-color-base);
-  .content {
-    width: 100%;
-    white-space: pre-line;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 }
 .trselect td {
   @include bg-color(#ebf7ff, $dark-active-menu-item);

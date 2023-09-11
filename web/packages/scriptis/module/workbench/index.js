@@ -28,7 +28,7 @@ export default {
       'updateResult', 'appendResult', 'getResult', 'clearResult', 'changResultKey',
       'updateProgress', 'clearProgress', 'getProgress', 'changProgressKey',
       'getTabs', 'recordTab', 'toggleTab', 'removeTab', 'changeTabKey',
-      'getGlobalCache', 'setGlobalCache', 'updateGlobalCache', 'removeGlobalCache', 'getTree', 'appendTree'
+      'getGlobalCache', 'setGlobalCache', 'updateGlobalCache', 'removeGlobalCache', 'getTree', 'appendTree', 'clearTab'
     ],
     WebSocket: ['init', 'send'],
     WorkSidebar: ['setHighLight', 'showTree', 'revealInSideBar'],

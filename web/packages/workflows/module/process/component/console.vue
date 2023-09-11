@@ -133,11 +133,9 @@ export default {
   mounted() {
   },
   methods: {
-    killExecute(flag = false) {
+    killExecute() {
       this.execute.trigger('stop');
-      if (flag) {
-        this.execute.trigger('kill');
-      }
+      this.execute.trigger('kill');
     },
     createScript() {
       const node = this.node;
@@ -172,7 +170,7 @@ export default {
         this.queryState();
       }
     },
-    queryState() {
+    queryState(monitor = true) {
       if (this.node.runState.execID) {
         const option = {
           taskID: this.node.runState.taskID,
@@ -181,7 +179,13 @@ export default {
           nodeId: this.node.key,
           openLog: true
         }
-        this.monitoringData();
+        if (monitor) {
+          this.monitoringData();
+        } else {
+          if (this.script.progress.current >= 1) {
+            return
+          }
+        }
         this.execute.halfExecute(option);
       }
     },
@@ -457,6 +461,7 @@ export default {
       // 每次右键控制台，都会创建一个新实例，所以把上一个执行的实例先停掉
       if (this.execute) {
         this.killExecute();
+        this.execute = null;
       }
       this.resetQuery();
       const nodeId = this.node.key;
@@ -479,9 +484,13 @@ export default {
               if (!cache.log.all) {
                 this.getLogs();
               }
+            } else {
+              needQuery = false;
             }
           } else {
             this.createScript();
+          }
+          if (needQuery) {
             this.$nextTick(() => {
               this.createExecute(needQuery);
             })

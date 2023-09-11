@@ -88,13 +88,10 @@
                 class="bottom-td"
                 :class="{'null-text': items[item.key] === 'NULL'}"
                 :key="index"
-                :style="{width: item.width?`${item.width}px`:'auto'}"
+                :style="{width: item.width?`${item.width}px`:'auto', height:`${tdHeight}px`}"
+                :title="item.logic==undefined?items[item.key]:item.logic(items)"
               >
-                <p class="content"
-                  :data-row="indexs"
-                  :data-col="item.key"
-                  :title="item.logic==undefined?items[item.key]:item.logic(items)"
-                  :style="{height:`${tdHeight}px`}">{{item.logic==undefined?items[item.key]:item.logic(items)}}</p>
+                {{item.logic==undefined?items[item.key]:item.logic(items)}}
               </td>
               <td
                 v-if="item.slot"
@@ -456,11 +453,9 @@ export default {
       }
     },
     handleContextMenu(e) {
-      if (e && e.target && e.target.dataset.col ) {
-        let row = e.target.dataset.row
-        let col = e.target.dataset.col
+      if (e && e.target && e.target.tagName == "TD") {
         this.$emit("on-tdcontext-munu", {
-          content: this.showTableList[row][col],
+          content: e.target.title,
           e
         });
       }

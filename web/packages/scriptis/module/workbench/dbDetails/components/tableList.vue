@@ -19,6 +19,7 @@
       <Button class="margin-right" type="primary" :title="$t('message.scripts.realsearchTip')" @click="handleGetTables(true)">{{ $t('message.scripts.searchnow') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
       <Button v-if="canTransfer" class="margin-right" type="success" @click="transfer">{{ $t('message.scripts.transfer') }}</Button>
+      <Button class="margin-right" type="success" @click="download">{{ $t('message.scripts.download') }}</Button>
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
     </div>
     <div class="table-data">
@@ -164,6 +165,7 @@
   </div>
 </template>
 <script>
+import qs from 'qs';
 import utils from '@dataspherestudio/shared/common/util';
 import virtualList from '@dataspherestudio/shared/components/virtualList';
 import api from '@dataspherestudio/shared/common/service/api';
@@ -276,7 +278,6 @@ export default {
     getDbTables() {
       const params = {
         dbName: this.dbName,
-        // tableOwner: this.tableOwner,
         isTableOwner: this.isTableOwner,
         tableName: this.tableName,
         orderBy: this.orderBy,
@@ -333,6 +334,18 @@ export default {
       } else {
         this.$Message.warning({ content: this.$t('message.scripts.selectfirst') });
       }
+    },
+    download() {
+      const params = {
+        dbName: this.dbName,
+        isTableOwner: this.isTableOwner,
+        tableName: this.tableName,
+        orderBy: this.orderBy,
+        exactTableName: false
+      }
+      if (this.isRealTime) params.isRealTime = true
+      const paramsStr = qs.stringify(params)
+      window.open("/api/rest_j/v1/dss/datapipe/datasource/downloadTableMetaData?" + paramsStr, '_blank');
     },
     deleteSome() {
       this.confirmModalType = 'delete'

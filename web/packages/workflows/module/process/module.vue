@@ -2042,6 +2042,12 @@ export default {
         } else {
           // Succees, Failed, Cancelled, Timeout
           this.workflowIsExecutor = false;
+          // 工作流执行状态和节点执行状态轮询不同步，工作流执行成功后，若节点执行状态尚未成功，再次查询更新进度 dpms 312293
+          if (this.openningNode) {
+            setTimeout(()=> {
+              this.$refs.currentConsole.queryState(false);
+            }, 1000)
+          }
           if (status === 'Succeed') {
             this.$Notice.success({desc: this.$t('message.common.projectDetail.workflowRunSuccess')})
           }
@@ -2348,6 +2354,10 @@ export default {
       api.fetch('/configuration/getFullTreesByAppName', {
         engineType: '通用设置',
         creator: '通用设置',
+      }, 'get'),
+      api.fetch('/configuration/getFullTreesByAppName', {
+        engineType: 'hive',
+        creator: 'nodeexecution',
       }, 'get')]).then((res) => {
         this.consoleParams = res;
       }).catch(() => {

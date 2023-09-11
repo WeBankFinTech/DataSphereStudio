@@ -980,7 +980,7 @@ export default {
           });
           cb();
         }).catch(() => {
-          this.execute.trigger('stop');
+          this.execute.queryStatusaAfterKill = 0
           cb();
         });
       } else {

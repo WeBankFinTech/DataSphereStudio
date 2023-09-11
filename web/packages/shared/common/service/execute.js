@@ -244,6 +244,17 @@ Execute.prototype.outer = function(outerUrl, ret) {
 };
 
 Execute.prototype.queryStatus = function({ isKill }) {
+  if (['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.status) >= 0) {
+    return
+  }
+  // kill 接口失败设置queryStatusaAfterKill为0，之后再轮询状态5次 dpms 312308
+  if (this.execute.queryStatusaAfterKill >= 5) {
+    delete this.execute.queryStatusaAfterKill
+    return
+  }
+  if (this.execute.queryStatusaAfterKill >=0 ) {
+    this.execute.queryStatusaAfterKill++
+  }
   const requestStatus = (ret) => {
     if (isKill) {
       deconstructStatusIfKill(this, ret);
@@ -509,6 +520,8 @@ function deconstructStatusIfKill(execute, ret) {
       execute.queryStatus({ isKill: true });
     }, 5000);
   } else {
+    execute.trigger('steps', ret.status);
+    execute.trigger('status', ret.status);
     const msg = '查询已被取消';
     queryException(execute, 'warning', msg);
   }
@@ -564,7 +577,6 @@ function deconstructStatus(execute, ret) {
  * @param {*} execute
  */
 function whenSuccess(execute) {
-  console.log(execute.runType)
   if (execute.runType !== 'pipeline') {
     // stateEnd是需要获取结果集的，获取结果集的同时会更新历史
     execute.trigger('stateEnd');

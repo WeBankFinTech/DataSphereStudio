@@ -20,9 +20,15 @@
         "addCatalog": "New directory",
         "addScript": "New script",
         "importToHive": "Import to Hive",
+        "move": "Move",
         "importToHdfs": "Import to HDFS",
         "copyscript": "Copy script",
         "stickscript": "Stick script"
+      },
+      "move": {
+        "success": "Successfully Moved",
+        "warn": "Duplicate file name in target directory",
+        "title": "Move File"
       },
       "warning": {
         "getRootPath": "Failed to request Workspace root directory, please refresh to retry!",
@@ -772,6 +778,7 @@
       "dbinfs": "Database information",
       "tableifs": "Table information",
       "transfer": "Table Transfer",
+      "download": "Download",
       "transferTitle": "Table Transfer",
       "transferForm": {
         "title": "Title",

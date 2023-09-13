@@ -220,6 +220,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     }
 
     private void lazyLoadAppConns() {
+        if(lazyLoad){
+            LOGGER.info("lazyLoad set to true,isLoaded={}",isLoaded);
+        }
         if (lazyLoad && !isLoaded) {
             synchronized (this.appConns) {
                 if (lazyLoad && !isLoaded) {

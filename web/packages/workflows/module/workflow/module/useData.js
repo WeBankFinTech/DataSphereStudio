@@ -6,6 +6,9 @@ export const useData = () => {
   const getTemplateByOrchestratorId = async (params) => {
     let templateObjectArray = []
     let templateIdArray = []
+    if(!params.orchestratorId) {
+      return [];
+    }
     await api.fetch(`${apiPre}getWrokflowDefaultTemplates`, params, 'get').then(res => {
       templateObjectArray = res.wrokflowDefaultTemplates || []
     })

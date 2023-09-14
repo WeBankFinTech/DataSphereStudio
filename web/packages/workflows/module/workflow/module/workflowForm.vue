@@ -206,7 +206,10 @@ export default {
           currentData.orchestratorWayArray = value.orchestratorWays;
         }
       }
-      const res = await getTemplateByOrchestratorId({orchestratorId: currentData.orchestratorId})
+      let res = [];
+      if (currentData.orchestratorId) {
+        res = await getTemplateByOrchestratorId({orchestratorId: currentData.orchestratorId})
+      }
       currentData.templateIds = res;
       this.workflowDataCurrent = {
         ...currentData
@@ -225,7 +228,8 @@ export default {
           orchestratorId: this.workflowDataCurrent.orchestratorId
         }
         this.initTemplates = await getTemplateDatas(params);
-        this.defaultTemplates = JSON.parse(JSON.stringify(this.initTemplates)) 
+        // this.defaultTemplates = JSON.parse(JSON.stringify(this.initTemplates)) 
+        this.handleTemplateIdsChange(this.workflowDataCurrent.templateIds)
       }
     },
     handleTemplateIdsChange(vArray) {

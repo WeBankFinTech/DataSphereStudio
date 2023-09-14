@@ -45,7 +45,6 @@ class DSSWorkspaceUserRestfulTest {
                 .header("Token-Code", "HPMS-KhFGSQkdaaCPBYfE")
                 .contentType(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse().getContentAsString();
-        System.out.println(content);
     }
     @Order ( 1 )
     @SneakyThrows
@@ -56,7 +55,6 @@ class DSSWorkspaceUserRestfulTest {
                 .header("Token-Code", "HPMS-KhFGSQkdaaCPBYfE")
                 .contentType("application/json")
         ).andReturn().getResponse().getContentAsString();
-        System.out.println(content);
     }
 
     @Order ( 3 )

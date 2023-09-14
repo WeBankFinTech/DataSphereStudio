@@ -52,7 +52,7 @@
                 <p
                   v-for="(p, index1) in hoverList"
                   :key="index1"
-                  :style="{'color': p.includes(this.$t('message.common.Failed')) ? 'red' : '#67c23a'}"
+                  :style="{'color': p.includes($t('message.common.Failed')) ? 'red' : '#67c23a'}"
                   style="line-height: 24px;">{{ p }}</p>
               </div>
             </Tooltip>

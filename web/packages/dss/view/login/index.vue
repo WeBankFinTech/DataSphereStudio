@@ -95,6 +95,7 @@ export default {
   },
   mounted() {
     storage.set('close_db_table_suggest', false);
+    storage.remove('scriptis_execute_req_log');
     const workspaceId = this.getCurrentWorkspaceId()
     sessionStorage.removeItem(`work_flow_lists_${workspaceId}`)
     this.checkChromeVersion()

@@ -460,7 +460,8 @@ export default {
     checkFromCache() {
       // 每次右键控制台，都会创建一个新实例，所以把上一个执行的实例先停掉
       if (this.execute) {
-        this.killExecute();
+        clearTimeout(this.execute.executeTimout);
+        clearTimeout(this.execute.statusTimeout);
         this.execute = null;
       }
       this.resetQuery();

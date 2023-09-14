@@ -23,6 +23,19 @@ import { Message } from 'iview';
 import i18n from '@dataspherestudio/shared/common/i18n'
 
 /**
+ * 记录轮询接口请求日志
+ * @param {execID,taskID,path,reqtime,restime,data} log
+ */
+function executeReqLog(log) {
+  let list = storage.get('scriptis_execute_req_log') || []
+  if (list.length > 2000) {
+    list = list.slice(1000)
+  }
+  list.push(log)
+  storage.set('scriptis_execute_req_log',list)
+}
+
+/**
  * 提供脚本运行相关方法，包括执行方法，状态轮询，日志接收，获取结果等
  * * 1.默认使用socket方式通信，若socket连接失败则使用http方式
  * * 2.点击执行调用start方法，收到taskID后进入执行中状态
@@ -65,7 +78,7 @@ function Execute(data) {
   });
   this.on('execute:queryState', () => {
     this.queryStatus({ isKill: false });
-    this.queryProgress();
+    this.queryProgress(); // ?
   });
   this.on('stateEnd', () => {
     this.getResultPath();
@@ -244,9 +257,6 @@ Execute.prototype.outer = function(outerUrl, ret) {
 };
 
 Execute.prototype.queryStatus = function({ isKill }) {
-  if (['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.status) >= 0) {
-    return
-  }
   // kill 接口失败设置queryStatusaAfterKill为0，之后再轮询状态5次 dpms 312308
   if (this.execute.queryStatusaAfterKill >= 5) {
     delete this.execute.queryStatusaAfterKill
@@ -262,28 +272,56 @@ Execute.prototype.queryStatus = function({ isKill }) {
       deconstructStatus(this, ret);
     }
   };
-  api.fetch(`/entrance/${this.id}/status`, {taskID: this.taskID}, 'get')
-    .then((ret) => {
-      if (ret.status === 3) { // 停止状态轮询
-        if (ret.message) {
-          Message.error(ret.message);
-        }
-        this.trigger('queryError');
-        return
-      }
-      this.status = ret.status;
-      requestStatus(ret);
+  if (this.id) {
+    executeReqLog({
+      execID: this.id,
+      taskID: this.taskID,
+      path: '/status',
+      reqtime: Date.now(),
     })
-    .catch(() => {
-      requestStatus({
-        status: this.status
+    api.fetch(`/entrance/${this.id}/status`, {taskID: this.taskID}, 'get')
+      .then((ret) => {
+        executeReqLog({
+          execID: this.id,
+          taskID: this.taskID,
+          path: '/status',
+          restime: Date.now(),
+          data: ret
+        })
+        if (ret.status === 3) { // 停止状态轮询
+          if (ret.message) {
+            Message.error(ret.message);
+          }
+          this.trigger('queryError');
+          return
+        }
+        this.status = ret.status;
+        requestStatus(ret);
+      })
+      .catch(() => {
+        requestStatus({
+          status: this.status
+        });
       });
-    });
+  }
 };
 
 Execute.prototype.queryProgress = function() {
+  executeReqLog({
+    execID: this.id,
+    taskID: this.taskID,
+    path: '/progressWithResource',
+    reqtime: Date.now(),
+  })
   api.fetch(`/entrance/${this.id}/progressWithResource`, 'get')
     .then((rst) => {
+      executeReqLog({
+        execID: this.id,
+        taskID: this.taskID,
+        path: '/progressWithResource',
+        restime: Date.now(),
+        data: rst
+      })
       this.trigger('progress', { progress: rst.progress, progressInfo: rst.progressInfo, yarnMetrics: rst.yarnMetrics });
     });
 };
@@ -515,6 +553,9 @@ Execute.prototype.updateLastHistory = function(option, cb) {
  * @param {*} ret
  */
 function deconstructStatusIfKill(execute, ret) {
+  if (['Succeed', 'Failed', 'Timeout'].indexOf(ret.status) >= 0) {
+    return
+  }
   if (ret.status !== 'Cancelled') {
     execute.statusTimeout = setTimeout(() => {
       execute.queryStatus({ isKill: true });

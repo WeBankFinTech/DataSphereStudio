@@ -843,7 +843,7 @@ export default {
             if (this.script.steps.indexOf(status) === -1) {
               this.script.steps.push(status);
               // 针对可能有WaitForRetry状态后，后台会重新推送Scheduled或running状态的时候
-            } else if (lastStep !== status) {
+            } else if (this.script.steps.indexOf(status) !== -1 && lastStep !== status) {
               this.script.steps.push(status);
             }
             this.dispatch('IndexedDB:updateProgress', {

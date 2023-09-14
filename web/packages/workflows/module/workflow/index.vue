@@ -246,14 +246,28 @@ export default {
     ProjectMergeConfirm({data, cb}) {
       data.dssLabels = [this.getCurrentDsslabels()];
       data.labels = { route: this.getCurrentDsslabels() };
+      const curTemplateIds = data.templateIds;
+      delete data.templateIds
       api
         .fetch(
           `${this.$API_PATH.ORCHESTRATOR_PATH}createOrchestrator`,
           data,
           "post"
         )
-        .then(() => {
+        .then((res) => {
           this.$Message.success(this.$t("message.workflow.createdSuccess"));
+          if (curTemplateIds) {
+            const templateData = {
+              projectId: data.projectId,
+              orchestratorId: res.orchestratorId,
+              templateIds: curTemplateIds,
+            }
+            api.fetch(
+              `${this.$API_PATH.ORCHESTRATOR_PATH}saveTemplateRef`,
+              templateData,
+              "put"
+            )
+          }
           this.ProjectMergeCancel();
           // 更新左侧tree，同时父组件会通知刷新flow
           this.noticeParent(data.projectId);
@@ -429,7 +443,10 @@ export default {
       this.actionType = "modify";
       this.currentOrchetratorData = { ...project };
       this.currentOrchetratorData.taxonomyID = classifyId;
-      const res = await getTemplateByOrchestratorId({orchestratorId: this.currentOrchetratorData.orchestratorId})
+      let res = [];
+      if (this.currentOrchetratorData.orchestratorId) {
+        res = await getTemplateByOrchestratorId({orchestratorId: this.currentOrchetratorData.orchestratorId})
+      }
       this.initTemplateIdData = res;
     },
     ProjectShowAction(val) {

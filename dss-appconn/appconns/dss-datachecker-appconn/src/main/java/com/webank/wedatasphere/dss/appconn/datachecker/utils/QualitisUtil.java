@@ -240,7 +240,7 @@ public class QualitisUtil {
   public static String buildUrI(String baseUrl, String path, String appId, String appToken,
       String nonce, String timestamp) throws NoSuchAlgorithmException, URISyntaxException {
     String signature = getSignature(appId, appToken, nonce, timestamp);
-    StringBuffer uriBuffer = new StringBuffer(baseUrl);
+    StringBuilder uriBuffer = new StringBuilder(baseUrl);
     uriBuffer.append(path).append("?")
         .append("app_id=").append(appId).append("&")
         .append("nonce=").append(nonce).append("&")

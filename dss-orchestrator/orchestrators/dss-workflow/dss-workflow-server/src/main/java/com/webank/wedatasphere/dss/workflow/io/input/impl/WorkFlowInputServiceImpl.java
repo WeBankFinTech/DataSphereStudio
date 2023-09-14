@@ -95,7 +95,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         String flowJson = bmlService.readLocalTextFile(userName, flowJsonPath);
         //生成新的节点key。
         Set<String> nodeKeys=findFlowNodeKeys(flowJson);
-        Map<String, String> oldNewNodeKeyMap = nodeKeys.stream().collect(Collectors.toMap(Function.identity(), v -> UUID.randomUUID().toString()));
+        Map<String, String> oldNewNodeKeyMap = nodeKeys.stream().collect(Collectors.toMap(Function.identity(), v -> UUID.randomUUID().toString(),(e1,e2)->e1));
         String updateFlowJson=flowJson;
         for (Map.Entry<String, String> entry : oldNewNodeKeyMap.entrySet()) {
             String oldKey=entry.getKey();

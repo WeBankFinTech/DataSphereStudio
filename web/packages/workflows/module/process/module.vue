@@ -1912,23 +1912,38 @@ export default {
       return node;
     },
     // 点击节流
-    clickswitch: debounce(
-      function(type){
-        this.workflowIsExecutor ? this.workflowStop() : this.workflowRun(type)
-      },1000
-    ),
+    clickswitch(type){
+      if ( type === 'select') {
+        let selectNodes = this.$refs.process.getSelectedNodes();
+        const selectNodeLength = selectNodes.length
+        if (selectNodeLength < 1 ) {
+          return this.$Message.error(this.$t('message.workflow.PleaseSelectNode'));
+        }
+        selectNodes.forEach((node) => {
+          this.$refs.process.setNodeRunState(node.key, {
+          })
+        })
+      } else if(!this.workflowIsExecutor) {
+        let json = JSON.parse(JSON.stringify(this.json));
+        json.nodes.forEach((node) => {
+          this.$refs.process.setNodeRunState(node.key, {
+          })
+        })
+      }
+      debounce(() => {
+        if (this.workflowIsExecutor) {
+          this.workflowStop()
+        } else {
+          this.workflowRun(type)
+        }
+      }, 1000)()
+    },
     // 失败重跑
     reRun() {
       this.workflowRun('rerun')
     },
     async workflowRun(runFlag) {
       let selectNodes = this.$refs.process.getSelectedNodes();
-      const selectNodeLength = selectNodes.length
-      if ( runFlag === 'select') {
-        if (selectNodeLength < 1 ) {
-          return this.$Message.error(this.$t('message.workflow.PleaseSelectNode'));
-        }
-      }
       this.dispatch('workflowIndexedDB:clearNodeCache');
       // 重新执行清掉上次的计时器
       clearTimeout(this.excuteTimer);

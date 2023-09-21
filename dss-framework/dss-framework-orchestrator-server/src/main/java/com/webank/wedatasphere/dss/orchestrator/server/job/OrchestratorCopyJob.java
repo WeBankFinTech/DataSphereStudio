@@ -1,17 +1,22 @@
 package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.google.common.collect.Lists;
+import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationCreationOperation;
+import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.OrchestrationService;
+import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.DSSOrchestrationContentRequestRef;
+import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.OrchestrationResponseRef;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
+import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyVo;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.impl.OrchestratorFrameworkServiceImpl;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefCopyOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.CopyRequestRef;
 import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentResponseRef;
@@ -32,6 +37,12 @@ public class OrchestratorCopyJob implements Runnable {
     private OrchestratorCopyVo orchestratorCopyVo;
 
     protected OrchestratorCopyEnv orchestratorCopyEnv;
+
+    private OrchestratorFrameworkServiceImpl orchestratorFrameworkServiceImpl;
+
+    private OrchestratorService orchestratorService;
+
+    private OrchestratorMapper orchestratorMapper;
 
     private DSSOrchestratorCopyInfo orchestratorCopyInfo = new DSSOrchestratorCopyInfo(UUID.randomUUID().toString());
 
@@ -66,9 +77,10 @@ public class OrchestratorCopyJob implements Runnable {
         newOrchestrator.setDesc("copy from " + sourceOrchestrator.getName());
         newOrchestrator.setUpdateTime(null);
         newOrchestrator.setUpdateUser(null);
+        DSSOrchestratorVersion dssOrchestratorVersion = null;
 
         try {
-            doOrchestratorCopy(orchestratorCopyVo.getUsername(), orchestratorCopyVo.getWorkspace(), newOrchestrator,
+            dssOrchestratorVersion = doOrchestratorCopy(orchestratorCopyVo.getUsername(), orchestratorCopyVo.getWorkspace(), newOrchestrator,
                     orchestratorCopyVo.getTargetProjectName(), Lists.newArrayList(orchestratorCopyVo.getDssLabel()), appId);
         } catch (Exception e) {
             //保存错误信息
@@ -91,9 +103,37 @@ public class OrchestratorCopyJob implements Runnable {
         orchestratorCopyInfo.setSuccessNode(Lists.newArrayList("All"));
         orchestratorCopyInfo.setStatus(1);
         orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateCopyStatus(orchestratorCopyInfo);
+
+        List<DSSLabel> dssLabels = new ArrayList<>();
+        dssLabels.add(orchestratorCopyVo.getDssLabel());
+
+        //2.如果调度系统要求同步创建工作流，向调度系统发送创建工作流的请求
+        OrchestrationResponseRef orchestrationResponseRef = orchestratorFrameworkServiceImpl.tryOrchestrationOperation(dssLabels, true, orchestratorCopyVo.getUsername(),
+                orchestratorCopyVo.getTargetProjectName(), orchestratorCopyVo.getWorkspace(), newOrchestrator,
+                OrchestrationService::getOrchestrationCreationOperation,
+                (structureOperation, structureRequestRef) -> ((OrchestrationCreationOperation) structureOperation)
+                        .createOrchestration((DSSOrchestrationContentRequestRef) structureRequestRef), "create");
+
+        try {
+            orchestratorService.copyOrchestrator(orchestratorCopyVo.getUsername(), orchestratorCopyVo.getWorkspace(), orchestratorCopyVo.getTargetProjectName(),
+                    orchestratorCopyVo.getTargetProjectId(), newOrchestrator.getDesc(), newOrchestrator, dssLabels);
+        } catch (Exception e) {
+            throw new RuntimeException("error happened when copying orc.", e);
+        }
+
+        Long orchestratorId = newOrchestrator.getId();
+        Long orchestratorVersionId = dssOrchestratorVersion.getId();
+        //4.将工程和orchestrator的关系存储到的数据库中
+        if (orchestrationResponseRef != null) {
+            Long refProjectId = (Long) orchestrationResponseRef.toMap().get("refProjectId");
+            orchestratorMapper.addOrchestratorRefOrchestration(new DSSOrchestratorRefOrchestration(orchestratorId, refProjectId, orchestrationResponseRef.getRefOrchestrationId()));
+        } else {
+            LOGGER.info("copy orchestration {} with orchestratorId is {}, and versionId is {}, and orchestrationResponseRef is null.", newOrchestrator.getName(), orchestratorId, orchestratorVersionId);
+
+        }
     }
 
-    private void doOrchestratorCopy(String userName,
+    private DSSOrchestratorVersion doOrchestratorCopy(String userName,
                                     Workspace workspace,
                                     DSSOrchestratorInfo dssOrchestratorInfo,
                                     String projectName,
@@ -132,6 +172,7 @@ public class OrchestratorCopyJob implements Runnable {
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestrator(dssOrchestratorInfo);
         dssOrchestratorVersion.setOrchestratorId(dssOrchestratorInfo.getId());
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestratorVersion(dssOrchestratorVersion);
+        return dssOrchestratorVersion;
     }
 
 
@@ -157,5 +198,29 @@ public class OrchestratorCopyJob implements Runnable {
 
     public void setOrchestratorCopyInfo(DSSOrchestratorCopyInfo orchestratorCopyInfo) {
         this.orchestratorCopyInfo = orchestratorCopyInfo;
+    }
+
+    public OrchestratorFrameworkServiceImpl getOrchestratorFrameworkServiceImpl() {
+        return orchestratorFrameworkServiceImpl;
+    }
+
+    public void setOrchestratorFrameworkServiceImpl(OrchestratorFrameworkServiceImpl orchestratorFrameworkServiceImpl) {
+        this.orchestratorFrameworkServiceImpl = orchestratorFrameworkServiceImpl;
+    }
+
+    public OrchestratorService getOrchestratorService() {
+        return orchestratorService;
+    }
+
+    public void setOrchestratorService(OrchestratorService orchestratorService) {
+        this.orchestratorService = orchestratorService;
+    }
+
+    public OrchestratorMapper getOrchestratorMapper() {
+        return orchestratorMapper;
+    }
+
+    public void setOrchestratorMapper(OrchestratorMapper orchestratorMapper) {
+        this.orchestratorMapper = orchestratorMapper;
     }
 }

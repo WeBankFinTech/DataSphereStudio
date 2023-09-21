@@ -177,7 +177,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         return commonOrchestratorVo;
     }
 
-    private <K extends StructureRequestRef, V extends ResponseRef> V tryOrchestrationOperation(List<DSSLabel> dssLabels, Boolean askProjectSender, String userName, String projectName,
+    public <K extends StructureRequestRef, V extends ResponseRef> V tryOrchestrationOperation(List<DSSLabel> dssLabels, Boolean askProjectSender, String userName, String projectName,
                                                                                                Workspace workspace, DSSOrchestratorInfo dssOrchestrator,
                                                                                                Function<OrchestrationService, StructureOperation> getOrchestrationOperation,
                                                                                                BiFunction<StructureOperation, K, V> responseRefConsumer, String operationName) {

@@ -47,6 +47,10 @@
                     <artifactId>linkis-common</artifactId>
                     <groupId>org.apache.linkis</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>snakeyaml</artifactId>
+                    <groupId>org.yaml</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 

@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>1.1.0.15-SNAPSHOT</version>
+    <version>1.1.0.16-SNAPSHOT</version>
 
     <modules>
         <module>dss-commons</module>
@@ -40,7 +40,7 @@
     </modules>
 
     <properties>
-        <dss.version>1.1.0.15-SNAPSHOT</dss.version>
+        <dss.version>1.1.0.16-SNAPSHOT</dss.version>
         <linkis.version>1.1.14-wds</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>

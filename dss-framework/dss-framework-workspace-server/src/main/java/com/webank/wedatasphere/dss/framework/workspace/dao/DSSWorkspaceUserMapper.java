@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import org.apache.ibatis.annotations.*;
@@ -109,4 +110,11 @@ public interface DSSWorkspaceUserMapper {
             "</script>"
     })
     void deleteUserRoles(@Param("username") String username, @Param("workspaceIds") Integer[] workspaceIds, @Param("roleIds") Integer[] roleIds);
+
+    @Select("select id,username from dss_user where del_flag='0'")
+    @Results({
+            @Result(property = "userId", column = "id"),
+            @Result(property = "userName", column = "username")
+    })
+    List<DSSUserRoleComponentPriv> getAllUsers();
 }

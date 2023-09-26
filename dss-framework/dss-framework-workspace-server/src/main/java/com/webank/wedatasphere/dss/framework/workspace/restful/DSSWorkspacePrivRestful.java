@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateRoleComponentPrivRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateRoleMenuPrivRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomepageSettingVO;
@@ -29,8 +30,6 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspacePrivS
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
-import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -134,5 +133,11 @@ public class DSSWorkspacePrivRestful {
     @RequestMapping(path ="updateRoleHomepage", method = RequestMethod.POST)
     public Message updateRoleHomepage(){
         return null;
+    }
+
+    @RequestMapping(path ="getAllUserPrivs", method = RequestMethod.GET)
+    public Message getAllUserPrivs(){
+        List<DSSUserRoleComponentPriv> allUserPrivs = dssWorkspaceService.getAllUserPrivs();
+        return Message.ok().data("userPrivs",allUserPrivs);
     }
 }

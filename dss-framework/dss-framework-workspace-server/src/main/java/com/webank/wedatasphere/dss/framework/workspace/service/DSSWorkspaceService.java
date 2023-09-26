@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceAssociateDepartments;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
@@ -108,4 +109,5 @@ public interface DSSWorkspaceService {
 
     boolean checkAdminByWorkspace(String username, int workspaceId);
 
+    List<DSSUserRoleComponentPriv> getAllUserPrivs();
 }

@@ -49,7 +49,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperati
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
@@ -652,6 +652,25 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return (workspace.getName().equals(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue()) &&
                 org.apache.commons.lang3.ArrayUtils.contains(AdminConf.SUPER_ADMIN_LIST, username)) ||
                 username.equals(workspace.getCreateBy());
+    }
+
+    @Override
+    public List<DSSUserRoleComponentPriv> getAllUserPrivs() {
+        List<DSSUserRoleComponentPriv> users = dssWorkspaceUserMapper.getAllUsers();
+        for (DSSUserRoleComponentPriv user : users){
+            List<DSSWorkspaceRoleVO> workspaceRoles = dssWorkspaceUserMapper.getWorkspaceRoleByUsername(user.getUserName());
+            List<DSSUserRoleComponentPriv.RoleInfo> roleInfos = workspaceRoles.stream().map(workspaceRole -> {
+                DSSUserRoleComponentPriv.RoleInfo roleInfo = new DSSUserRoleComponentPriv.RoleInfo();
+                roleInfo.setRoleCode(StringUtils.joinWith("-", workspaceRole.getWorkspaceId(), workspaceRole.getRoleId()));
+                roleInfo.setRoleName(StringUtils.joinWith("-", workspaceRole.getWorkspaceName(), workspaceDBHelper.getRoleNameById(workspaceRole.getRoleId())));
+                roleInfo.setRoleNameCn(StringUtils.joinWith("-", workspaceRole.getWorkspaceName(), workspaceDBHelper.getRoleFrontName(workspaceRole.getRoleId())));
+                List<DSSUserRoleComponentPriv.RoleInfo.PrivInfo> componentPriv = dssWorkspaceMenuMapper.getComponentPrivByWorkspaceRole(workspaceRole.getWorkspaceId(), workspaceRole.getRoleId());
+                roleInfo.setPrivs(componentPriv);
+                return roleInfo;
+            }).collect(Collectors.toList());
+            user.setRoles(roleInfos);
+        }
+        return users;
     }
 
     private void joinWorkspaceForNewUser(String userName, Long userId) {

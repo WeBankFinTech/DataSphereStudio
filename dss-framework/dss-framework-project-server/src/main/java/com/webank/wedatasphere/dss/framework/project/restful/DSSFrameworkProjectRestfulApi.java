@@ -44,6 +44,7 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -112,6 +113,11 @@ public class DSSFrameworkProjectRestfulApi {
         }
         LOGGER.info("user {} begin to getAllProjects, projectId: {}.", username, projectRequest.getId());
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
+        if(!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()){
+            dssProjectVos = dssProjectVos.stream().filter(item->
+                    (item.getEditUsers().contains(username) || item.getReleaseUsers().contains(username))
+                            && item.getEditable()).collect(Collectors.toList());
+        }
         return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
     }
 

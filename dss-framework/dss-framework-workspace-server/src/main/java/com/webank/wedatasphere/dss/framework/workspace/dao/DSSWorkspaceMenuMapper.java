@@ -83,7 +83,7 @@ public interface DSSWorkspaceMenuMapper {
     @Select("SELECT dcr.appconn_id,doma.title_en,doma.title_cn " +
             "FROM dss_workspace_appconn_role dcr " +
             "LEFT JOIN dss_workspace_menu_appconn doma ON dcr.appconn_id = doma.appconn_id " +
-            "WHERE dcr.workspace_id = #{workspaceId} AND dcr.role_id=#{roleId} AND dcr.priv>0")
+            "WHERE dcr.workspace_id = #{workspaceId} AND dcr.role_id=#{roleId} AND dcr.priv>0 AND doma.appconn_id IS NOT NULL")
     @Results({
             @Result(property = "privCode", column = "appconn_id"),
             @Result(property = "privName", column = "title_en"),

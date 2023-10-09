@@ -195,7 +195,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             int minRoleId = Collections.min(roleIds);
             String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceIds.get(0), minRoleId);
             if ("/workspace".equals(homepageUrl)) {
+                //兼容旧的默认首页配置
                 homepageUrl = "/workspaceHome";
+            }else if("/workspaceHome/scheduleCenter".equals(homepageUrl)){
+                //兼容旧的生产中心首页配置
+                homepageUrl = "/scheduleCenter";
             }
             if (StringUtils.isNotEmpty(homepageUrl)) {
                 homepageUrl = homepageUrl + "?workspaceId=" + workspaceIds.get(0);

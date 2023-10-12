@@ -18,3 +18,7 @@ eureka:
     enabled: false
 #    register-with-eureka: false
 #    fetchRegistry: false
+
+mybatis-plus:
+  mapper-locations: classpath*:com/webank/wedatasphere/dss/framework/workspace/dao/impl/*.xml
+  type-aliases-package: com.webank.wedatasphere.dss.framework.workspace.bean

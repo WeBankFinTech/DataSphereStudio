@@ -117,4 +117,7 @@ public interface DSSWorkspaceUserMapper {
             @Result(property = "userName", column = "username")
     })
     List<DSSUserRoleComponentPriv> getAllUsers();
+
+    List<DSSUserRoleComponentPriv> getWorkspaceRolePrivByUsername(@Param("list") List<DSSUserRoleComponentPriv> list);
+
 }

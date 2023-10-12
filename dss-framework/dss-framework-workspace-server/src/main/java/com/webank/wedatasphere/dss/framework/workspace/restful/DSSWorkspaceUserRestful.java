@@ -250,7 +250,7 @@ public class DSSWorkspaceUserRestful {
                 return Message.error("Token:" + token + " has no permission to revoke userRole.");
             }
         }else {
-            return Message.error("User:" + userName + " has no permission to clear user.");
+            return Message.error("User:" + userName + " has no permission to revoke userRole.");
         }
         dssWorkspaceUserService.revokeUserRoles(userName, workspaceIds, roleIds);
         AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,

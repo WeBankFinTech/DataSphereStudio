@@ -158,4 +158,5 @@ public class DSSWorkspacePrivRestful {
         PageInfo<DSSUserRoleComponentPriv> allUserPrivs = dssWorkspaceService.getAllUserPrivs(currentPage, pageSize);
         return Message.ok().data("totalCount",allUserPrivs.getTotal()).data("userPrivs",allUserPrivs.getList());
     }
+
 }

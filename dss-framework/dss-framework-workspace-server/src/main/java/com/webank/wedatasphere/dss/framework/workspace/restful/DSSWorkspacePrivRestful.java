@@ -156,7 +156,8 @@ public class DSSWorkspacePrivRestful {
             return Message.error("Token cannot be empty.");
         }
         PageInfo<DSSUserRoleComponentPriv> allUserPrivs = dssWorkspaceService.getAllUserPrivs(currentPage, pageSize);
-        return Message.ok().data("totalCount",allUserPrivs.getTotal()).data("userPrivs",allUserPrivs.getList());
+        return Message.ok().data("totalCount",allUserPrivs.getTotal()).data("totalPage",allUserPrivs.getPages())
+                .data("userPrivs",allUserPrivs.getList());
     }
 
 }

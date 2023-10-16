@@ -49,6 +49,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
@@ -659,14 +660,13 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     public PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize) {
         PageMethod.startPage(currentPage,pageSize);
         List<DSSUserRoleComponentPriv> users = dssWorkspaceUserMapper.getAllUsers();
-        List<DSSUserRoleComponentPriv> userRolePrivs = dssWorkspaceUserMapper.getWorkspaceRolePrivByUsername(users);
+        Map<String, DSSUserRoleComponentPriv> userRolePrivMap = dssWorkspaceUserMapper.getWorkspaceRolePrivByUsername(users);
         //处理用户没有角色权限时只返回用户
         for (DSSUserRoleComponentPriv user : users) {
-            for (DSSUserRoleComponentPriv userRolePriv : userRolePrivs) {
-                if (userRolePriv.getUserName().equals(user.getUserName())) {
-                    user.setRoles(userRolePriv.getRoles());
-                }
+            if (MapUtils.isEmpty(userRolePrivMap) || Objects.isNull(userRolePrivMap.get(user.getUserName()))) {
+                continue;
             }
+            user.setRoles(userRolePrivMap.get(user.getUserName()).getRoles());
         }
         return new PageInfo<>(users);
     }

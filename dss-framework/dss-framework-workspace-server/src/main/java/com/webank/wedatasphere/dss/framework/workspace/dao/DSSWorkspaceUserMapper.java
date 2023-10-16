@@ -24,6 +24,7 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 @Mapper
@@ -118,6 +119,7 @@ public interface DSSWorkspaceUserMapper {
     })
     List<DSSUserRoleComponentPriv> getAllUsers();
 
-    List<DSSUserRoleComponentPriv> getWorkspaceRolePrivByUsername(@Param("list") List<DSSUserRoleComponentPriv> list);
+    @MapKey("userName")
+    Map<String, DSSUserRoleComponentPriv> getWorkspaceRolePrivByUsername(@Param("list") List<DSSUserRoleComponentPriv> list);
 
 }

@@ -49,7 +49,7 @@
                 dss_workspace_user_role dwur
         INNER JOIN dss_workspace dw ON dwur.workspace_id = dw.id
         INNER JOIN dss_workspace_role dwr ON dwr.id = dwur.role_id
-        LEFT JOIN dss_workspace_appconn_role dcr ON dcr.workspace_id = dwur.workspace_id AND dcr.role_id=dwur.role_id AND dcr.priv>0
+        INNER JOIN dss_workspace_appconn_role dcr ON dcr.workspace_id = dwur.workspace_id AND dcr.role_id=dwur.role_id AND dcr.priv>0
         INNER JOIN dss_workspace_menu_appconn doma ON doma.appconn_id = dcr.appconn_id
         WHERE
         dwur.username in

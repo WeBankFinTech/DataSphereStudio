@@ -335,6 +335,9 @@ export default {
       const index = item.opt.findIndex((el) => el.value === val);
       this.currentDb = index;
       this.$emit('get-tables', val);
+      if (this.attrInfo.basic.name){
+        this.$refs.basicAttr[0].validateField('name');
+      }
     },
   },
 };

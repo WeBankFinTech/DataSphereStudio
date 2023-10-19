@@ -180,6 +180,7 @@
         "MS": "描述",
         "FQXX": "分区信息",
         "DJFQCK": "请点击根分区查看分区大小",
+        "LastWriteTime": "最近写入时间",
         "WFQSJ": "暂无表分区数据",
         "BXX": "表信息",
         "BZD": "字段数",
@@ -879,7 +880,14 @@
       "fullscreen": "全屏展示",
       "fieldnamestyle": "字段名只支持大小写字母、数字和下划线",
       "unableDel": "无法删除所有的字段！",
-      "scriptUsage": "脚本使用说明"
+      "scriptUsage": "脚本使用说明",
+      "generate_rename_statement": "生成rename语句",
+      "select_database": "请选择目标数据库",
+      "system_generated": "以下代码由系统自动生成",
+      "copy_paste_board": "复制至粘贴板",
+      "generate_script": "生成执行脚本",
+      "select_data_table": "请选择数据表",
+      "paste_successfully": "成功复制至粘贴板"
     }
   }
 }

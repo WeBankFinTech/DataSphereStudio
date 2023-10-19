@@ -18,9 +18,20 @@
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
       <Button class="margin-right" type="primary" :title="$t('message.scripts.realsearchTip')" @click="handleGetTables(true)">{{ $t('message.scripts.searchnow') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
-      <Button v-if="canTransfer" class="margin-right" type="success" @click="transfer">{{ $t('message.scripts.transfer') }}</Button>
-      <Button class="margin-right" type="success" @click="download">{{ $t('message.scripts.download') }}</Button>
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
+      <Dropdown @on-click="dropdownClick">
+        <Button type="primary">
+          {{ $t('message.apiServices.query.more') }}
+          <Icon type="ios-arrow-down"></Icon>
+        </Button>
+        <template #list>
+          <DropdownMenu>
+            <DropdownItem v-if="canTransfer" name="transfer">{{ $t('message.scripts.transfer') }}</DropdownItem>
+            <DropdownItem name="download">{{ $t('message.scripts.download') }}</DropdownItem>
+            <DropdownItem name="rename">{{ $t('message.scripts.generate_rename_statement') }}</DropdownItem>
+          </DropdownMenu>
+        </template>
+      </Dropdown>
     </div>
     <div class="table-data">
       <div class="field-list-header">
@@ -33,8 +44,8 @@
         <div
           class="field-list-item"
           v-for="(item, index) in columns"
-          :key="index"
-          :class="item.className">{{ item.title }}</div>
+          :class="index === 0? 'table-name-item': ''"
+          :key="index">{{ item.title }}</div>
       </div>
       <virtual-list
         ref="columnTables"
@@ -55,6 +66,7 @@
           <div class="field-list-item">{{ index + 1 }}</div>
           <div
             class="field-list-item"
+            :class="index2 === 0? 'table-name-item': ''"
             :title="formatValue(item, field)"
             v-for="(field, index2) in columns"
             :key="index2"
@@ -160,6 +172,34 @@
           }}</Button>
         </div>
       </Modal>
+      <!-- rename -->
+      <Modal v-model="showRename" ref="renameModalRef" :title="$t('message.scripts.generate_rename_statement')" width="800px" @on-cancel="renameClose">
+        <Form v-show="!renameScript" ref="renameForm" :model="renameForm" :rules="renameRule" :label-width="120">
+          <FormItem :label="$t('message.scripts.select_database')" prop="dbSelected">
+            <Select v-model="renameForm.dbSelected">
+              <Option v-for="item in databaseList" :value="item.name" :key="item.id">{{ item.name }}</Option>
+            </Select>
+          </FormItem>
+        </Form>
+        <div v-show="renameScript">
+          - - {{ $t("message.scripts.system_generated") }}
+          <pre class="rename-code">{{  renameScript }}</pre>
+        </div>
+        <div slot="footer">
+          <Button type="text" size="large" @click="renameClose">{{
+            $t("message.workspaceManagement.cancel")
+          }}</Button>
+          <Button v-if="!renameScript" type="primary" size="large" @click="handleRename('next')">{{
+            $t("message.scripts.createTable.next")
+          }}</Button>
+          <Button v-if="renameScript" type="primary" size="large" @click="handleRename('copy')">
+            {{ $t("message.scripts.copy_paste_board") }}
+          </Button>
+          <Button v-if="renameScript" type="primary" size="large" @click="handleRename('create')">
+            {{ $t("message.scripts.generate_script") }}
+          </Button>
+        </div>
+      </Modal>
     </div>
     <Spin v-if="loading" fix></Spin>
   </div>
@@ -169,6 +209,7 @@ import qs from 'qs';
 import utils from '@dataspherestudio/shared/common/util';
 import virtualList from '@dataspherestudio/shared/components/virtualList';
 import api from '@dataspherestudio/shared/common/service/api';
+
 export default {
   props: {
     dbName: {
@@ -261,8 +302,24 @@ export default {
         desc: ''
       },
       confirmModalType: 'delete',
-      saveTransing: false
+      saveTransing: false,
+      renameForm: {
+        dbSelected: '',
+      },
+      renameRule: {
+        dbSelected: [{
+          required: true,
+          message: this.$t('message.scripts.transferForm.required'),
+          trigger: 'change',
+        }]
+      },
+      showRename: false,
+      databaseList: [],
+      renameScript: '',
     }
+  },
+  mounted() {
+    this.getDatabases();
   },
   methods: {
     formatValue(item, field) {
@@ -443,7 +500,92 @@ export default {
         return item.tableOwner === u
       }).every(it => it.selected)
       this.searchColList = [...this.searchColList]
-    }
+    },
+    // rename code
+    renameClose() {
+      this.renameScript = "";
+      this.renameForm.dbSelected = "";
+      this.showRename = false;
+      this.changeCheckAll(false);
+    },
+    beforeRename() {
+      if(!this.selectedItems.length) {
+        this.$Message.warning({ content: this.$t("message.scripts.select_data_table") });
+        return;
+      }
+      this.showRename = true;
+      this.$nextTick(() => {
+        this.$refs.renameForm.resetFields();
+      });
+    },
+    openScriptTab() {
+      const tables = this.selectedItems.map(item => item.tableName);
+      const filename = `${tables[0]}_rename.hql`;
+      const md5 = utils.md5(this.renameForm.dbSelected + tables.join(""));
+      this.dispatch("Workbench:add", {
+        id: md5,
+        filename,
+        filepath: "",
+        code: this.renameScript,
+        unsave: true,
+      }, () => {});
+      this.renameClose();
+    },
+    async handleRename(type) {
+      this.$refs.renameForm.validate(valid => {
+        if(!valid) return;
+        if (type === "next") {
+          this.selectedItems.forEach(item => {
+            this.renameScript += `alter table ${this.dbName}.${item.tableName} rename to ${this.renameForm.dbSelected}.${item.tableName};\n`;
+          });
+        } else if(type === "create") {
+          this.openScriptTab();
+        } else if(type === "copy") {
+          const textArea = document.createElement("textarea");
+          textArea.value = this.renameScript;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textArea);
+          this.$Message.success(this.$t("message.scripts.paste_successfully"));
+        }
+      });
+    },
+    dropdownClick(name) {
+      switch(name) {
+        case 'transfer':
+          this.transfer();
+          break;
+        case 'download':
+          this.download();
+          break;
+        case 'rename':
+          this.beforeRename();
+          break;
+        default:
+          break;
+      }
+    },
+    getDatabases() {
+      // 取indexedDB缓存
+      this.dispatch('IndexedDB:getTree', {
+        name: 'hiveTree',
+        cb: (res) => {
+          if (!res || res.value.length <= 0) {
+            api.fetch(`/datasource/dbs`, 'get').then((rst) => {
+              rst.dbs.forEach((db) => {
+                this.databaseList.push({
+                  id: utils.guid(),
+                  name: db.dbName
+                });
+              });
+            });
+          } else { 
+            this.databaseList = res.value;
+          }    
+        }
+      });
+    },
   }
 }
 </script>
@@ -501,6 +643,14 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
   }
+  .table-name-item {
+    width: 20%
+  }
+}
+
+.rename-code {
+  overflow: auto;
+  max-height: 500px;
 }
 </style>
 

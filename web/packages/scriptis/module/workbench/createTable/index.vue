@@ -98,6 +98,7 @@ export default {
             chartset: 'utf-8',
             quote: '',
             isHasHeader: false,
+            sheet: [],
           },
         },
         target: {
@@ -338,13 +339,16 @@ export default {
         isOverwrite: false,
         columns: columns,
       };
+      if (!isXls) {
+        delete source.table.sheet
+      }
       const sourceP = {
         path,
         pathType: source.table.type,
         hasHeader: source.table.isHasHeader,
         encoding: isXls ? '' : source.table.chartset,
         fieldDelimiter: isXls ? '' : source.table.separator,
-        sheet: target.sheetName && target.sheetName.toString(),
+        sheet: source.table.sheet &&  source.table.sheet.toString(),
         quote,
         escapeQuotes,
       };

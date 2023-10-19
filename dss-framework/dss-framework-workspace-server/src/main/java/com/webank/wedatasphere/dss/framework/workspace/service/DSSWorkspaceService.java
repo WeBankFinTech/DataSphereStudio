@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
+import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
@@ -109,5 +110,5 @@ public interface DSSWorkspaceService {
 
     boolean checkAdminByWorkspace(String username, int workspaceId);
 
-    List<DSSUserRoleComponentPriv> getAllUserPrivs();
+    PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize);
 }

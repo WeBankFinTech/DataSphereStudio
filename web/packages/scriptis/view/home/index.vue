@@ -165,13 +165,6 @@ export default {
     this.init();
     // 监听窗口变化，获取浏览器宽高
     window.addEventListener('resize', this.getHeight);
-    const baseInfo = storage.get('baseInfo', 'local');
-    if (baseInfo.proxyEnable && !baseInfo.proxyUserName) {
-      this.showSettingModal()
-    } else if(baseInfo.proxyUserName) {
-      this.proxyUserName = baseInfo.proxyUserName
-    }
-    this.showSetting = !!baseInfo.proxyEnable;
     eventbus.clear('check.scriptis.unsave');
     eventbus.on('check.scriptis.unsave', () => {
       return new Promise((resolve) => {
@@ -183,6 +176,15 @@ export default {
         }
       })
     });
+    setTimeout(() => {
+      const baseInfo = storage.get('baseInfo', 'local');
+      if (baseInfo.proxyEnable && !baseInfo.proxyUserName) {
+        this.showSettingModal()
+      } else if(baseInfo.proxyUserName) {
+        this.proxyUserName = baseInfo.proxyUserName
+      }
+      this.showSetting = !!baseInfo.proxyEnable;
+    }, 1500)
   },
   beforeDestroy() {
     // 监听窗口变化，获取浏览器宽高

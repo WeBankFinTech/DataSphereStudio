@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.page.PageMethod;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
@@ -48,6 +49,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
@@ -659,22 +661,18 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public List<DSSUserRoleComponentPriv> getAllUserPrivs() {
+    public PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize) {
+        PageMethod.startPage(currentPage,pageSize);
         List<DSSUserRoleComponentPriv> users = dssWorkspaceUserMapper.getAllUsers();
-        for (DSSUserRoleComponentPriv user : users){
-            List<DSSWorkspaceRoleVO> workspaceRoles = dssWorkspaceUserMapper.getWorkspaceRoleByUsername(user.getUserName());
-            List<DSSUserRoleComponentPriv.RoleInfo> roleInfos = workspaceRoles.stream().map(workspaceRole -> {
-                DSSUserRoleComponentPriv.RoleInfo roleInfo = new DSSUserRoleComponentPriv.RoleInfo();
-                roleInfo.setRoleCode(StringUtils.joinWith("-", workspaceRole.getWorkspaceId(), workspaceRole.getRoleId()));
-                roleInfo.setRoleName(StringUtils.joinWith("-", workspaceRole.getWorkspaceName(), workspaceDBHelper.getRoleNameById(workspaceRole.getRoleId())));
-                roleInfo.setRoleNameCn(StringUtils.joinWith("-", workspaceRole.getWorkspaceName(), workspaceDBHelper.getRoleFrontName(workspaceRole.getRoleId())));
-                List<DSSUserRoleComponentPriv.RoleInfo.PrivInfo> componentPriv = dssWorkspaceMenuMapper.getComponentPrivByWorkspaceRole(workspaceRole.getWorkspaceId(), workspaceRole.getRoleId());
-                roleInfo.setPrivs(componentPriv);
-                return roleInfo;
-            }).collect(Collectors.toList());
-            user.setRoles(roleInfos);
+        Map<String, DSSUserRoleComponentPriv> userRolePrivMap = dssWorkspaceUserMapper.getWorkspaceRolePrivByUsername(users);
+        //处理用户没有角色权限时只返回用户
+        for (DSSUserRoleComponentPriv user : users) {
+            if (MapUtils.isEmpty(userRolePrivMap) || Objects.isNull(userRolePrivMap.get(user.getUserName()))) {
+                continue;
+            }
+            user.setRoles(userRolePrivMap.get(user.getUserName()).getRoles());
         }
-        return users;
+        return new PageInfo<>(users);
     }
 
     private void joinWorkspaceForNewUser(String userName, Long userId) {

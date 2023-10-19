@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.framework.workspace.dao;
 
 
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentRolePriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceHomepageSetting;
 import org.apache.ibatis.annotations.*;
@@ -80,14 +79,4 @@ public interface DSSWorkspaceMenuMapper {
     })
     List<DSSWorkspaceComponentRolePriv> getDefaultComponentRolePriv01();
 
-    @Select("SELECT dcr.appconn_id,doma.title_en,doma.title_cn " +
-            "FROM dss_workspace_appconn_role dcr " +
-            "LEFT JOIN dss_workspace_menu_appconn doma ON dcr.appconn_id = doma.appconn_id " +
-            "WHERE dcr.workspace_id = #{workspaceId} AND dcr.role_id=#{roleId} AND dcr.priv>0")
-    @Results({
-            @Result(property = "privCode", column = "appconn_id"),
-            @Result(property = "privName", column = "title_en"),
-            @Result(property = "privNameCn", column = "title_cn")
-    })
-    List<DSSUserRoleComponentPriv.RoleInfo.PrivInfo> getComponentPrivByWorkspaceRole(@Param("workspaceId") int workspaceId, @Param("roleId") int roleId);
 }

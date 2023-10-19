@@ -52,8 +52,8 @@ export default {
 <style lang="scss" scoped>
 @import '@dataspherestudio/shared/common/style/variables.scss';
 .editor-setting {
-  width: 20%;
-  min-width: 200px;
+  width: 30%;
+  min-width: 300px;
   @include bg-color($light-base-color, $dark-base-color);
   border-left: $border-width-base $border-style-base $border-color-base;
   @include border-color($border-color-base, $dark-workspace-background);

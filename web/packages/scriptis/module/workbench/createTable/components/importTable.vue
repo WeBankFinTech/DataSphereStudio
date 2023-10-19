@@ -14,6 +14,7 @@
         v-if="source.importType === 'csv' || source.importType === 'xlsx'"
         :import-type="source.importType"
         :options="source.table"
+        :sheetArray="target.sheetName"
         @isPathLeaf="$emit('isPathLeaf', arguments)"
         @get-fields="getFields"></csv>
     </Card>
@@ -148,6 +149,11 @@ export default {
         });
         this.target.importFieldsData.fields = this.target.importFieldsData.fields.slice();
         this.target.sheetName = rst.formate.sheetName;
+        if(this.target.sheetName.length > 0) {
+          this.source.table.sheet = [this.target.sheetName[0]];
+        } else {
+          this.source.table.sheet = [];
+        }
       }).catch(() => {
       });
     },

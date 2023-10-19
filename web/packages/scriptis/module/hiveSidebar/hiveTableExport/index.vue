@@ -562,9 +562,7 @@ export default {
     parseTableColumn() {
       this.stepOne.column = [];
       const setColumns = () => {
-        this.$nextTick(() => {
-          this.stepOne.column = map(this.activeTB.children, (o) => o.name);
-        });
+        this.stepOne.column = map(this.activeTB.children, (o) => o.name);
       };
       if (!isEmpty(this.activeTB.children)) {
         setColumns();

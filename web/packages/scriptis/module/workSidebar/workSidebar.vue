@@ -283,6 +283,16 @@ export default {
     changeTreeByType(type) {
       if (type === 'share') {
         this.filterTree = cloneDeep(this.fileTree);
+        this.filterTree[0].children = this.filterTree[0].children.filter( function (node) {
+          if (!node.isLeaf) return true;
+          const tabSuffix = node.name.substr(
+            node.name.lastIndexOf('.'),
+            node.name.length
+          );
+          const reg = ['.xlsx', '.xls', '.csv', '.txt'];
+          const isVaild = indexOf(reg, tabSuffix) !== -1;
+          return isVaild;
+        })
         this.hiveDataLoadFn = this.loadDataFn;
       } else if (type === 'hdfs') {
         this.getHdfsTree().then(({ hdfsTree, loadDataFn }) => {
@@ -780,6 +790,7 @@ export default {
                   this.loadHdfsDataFn = f.loadDataFn;
                   // 树结构存储到indexedDB
                   this.dispatch('IndexedDB:appendTree', { treeId: 'hdfsTree', value: this.hdfsTree });
+                  this.filterHdfsTreeData();
                   resolve({
                     hdfsTree: this.hdfsTree,
                     loadDataFn: this.loadHdfsDataFn,
@@ -790,6 +801,18 @@ export default {
           });
         });
       });
+    },
+    filterHdfsTreeData() {
+      this.hdfsTree[0].children = this.hdfsTree[0].children.filter( function (node) {
+        if (!node.isLeaf) return true;
+        const tabSuffix = node.name.substr(
+          node.name.lastIndexOf('.'),
+          node.name.length
+        );
+        const reg = ['.xlsx', '.xls', '.csv', '.txt'];
+        const isVaild = indexOf(reg, tabSuffix) !== -1;
+        return isVaild;
+      })
     },
     importToHdfs(node) {
       const name = `new_stor_${Date.now()}.out`;

@@ -790,6 +790,7 @@ export default {
     },
     emitTypeChange() {
       this.$emit('on-type-change', this.firstStep.type);
+      this.firstStep.exportPath = '';
     },
     debounceValidateField: debounce((prop, that) => {
       that.$refs.secondForm.validateField(prop, () => {});

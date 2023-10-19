@@ -127,7 +127,7 @@ export default {
         const isHasSize = !isEmpty(partNode) && partNode.title.indexOf(this.$t('message.scripts.tableDetails.DX')) === -1;
         if (partNode && isFirstLevel && isHasSize && str) {
           // \xa0代表空格
-          partNode.title += `\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0（${this.$t('message.scripts.tableDetails.FQDX')}${nodePartition.partitionSize}，${this.$t('message.scripts.tableDetails.WJS')}${nodePartition.fileNum}，创建时间：${str}）`;
+          partNode.title += `\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0（${this.$t('message.scripts.tableDetails.FQDX')}${nodePartition.partitionSize}，${this.$t('message.scripts.tableDetails.WJS')}${nodePartition.fileNum}，${this.$t('message.scripts.tableDetails.LastWriteTime')}：${str}）`;
           partNode.isRender = true;
         }
       }

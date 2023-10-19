@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 
+import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -30,9 +31,11 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspacePrivS
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.webank.wedatasphere.dss.framework.common.conf.TokenConf.HPMS_USER_TOKEN;
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
 
 
@@ -136,8 +140,24 @@ public class DSSWorkspacePrivRestful {
     }
 
     @RequestMapping(path ="getAllUserPrivs", method = RequestMethod.GET)
-    public Message getAllUserPrivs(){
-        List<DSSUserRoleComponentPriv> allUserPrivs = dssWorkspaceService.getAllUserPrivs();
-        return Message.ok().data("userPrivs",allUserPrivs);
+    public Message getAllUserPrivs(@RequestParam Integer currentPage, @RequestParam Integer pageSize){
+        if(currentPage<1 || pageSize<1){
+            return Message.error("page param error（分页参数错误）");
+        }
+        if (pageSize > 100) {
+            return Message.error("request parameter pageSize is too large and should not exceed 100（参数pageSize不应超过100）");
+        }
+        String token = ModuleUserUtils.getToken(httpServletRequest);
+        if (StringUtils.isNotBlank(token)) {
+            if(!token.equals(HPMS_USER_TOKEN)){
+                return Message.error("Token:" + token + " has no permission to get all userPrivs.");
+            }
+        }else {
+            return Message.error("Token cannot be empty.");
+        }
+        PageInfo<DSSUserRoleComponentPriv> allUserPrivs = dssWorkspaceService.getAllUserPrivs(currentPage, pageSize);
+        return Message.ok().data("totalCount",allUserPrivs.getTotal()).data("totalPage",allUserPrivs.getPages())
+                .data("userPrivs",allUserPrivs.getList());
     }
+
 }

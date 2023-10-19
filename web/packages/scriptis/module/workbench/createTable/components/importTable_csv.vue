@@ -69,6 +69,22 @@
             :loading="isLoading"
             @click="getFileContent">{{$t('message.scripts.createTable.HQBZDSJ')}}</Button>
         </FormItem>
+        <template  v-if="importType === 'xlsx'">
+          <FormItem
+            :label="$t('message.scripts.importToHive.SHEETB')"
+          >
+            <Select
+              v-model="options.sheet"
+              multiple="multiple"
+              class="step-from-sheet">
+              <Option
+                v-for="(item, index) in sheetArray"
+                :value="item"
+                :key="index"
+                :label="item">{{ item }}</Option>
+            </Select>
+          </FormItem>
+        </template>
       </template>
     </Form>
     <Modal
@@ -103,6 +119,10 @@ export default {
       type: Object,
       required: true,
     },
+    sheetArray: {
+      type: Array,
+      required: false,
+    }
   },
   data() {
     return {
@@ -253,6 +273,7 @@ export default {
     },
     changeTreeByType() {
       this.getTree(this.options.type);
+      this.options.exportPath = '';
     },
     reset() {
       this.tmpTreePath = '';

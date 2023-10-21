@@ -71,8 +71,12 @@ class FlowEntranceEngine extends Executor with ConcurrentTaskOperateSupport with
                   for (flowParser <- flowParsers) {
                     flowParser.parse(job)
                   }
-                }{ t =>
-                   throw new FlowExecutionErrorException(90101, s"Failed to parser flow of job(${job.getId})", t)
+                } { t =>
+                  if (t.isInstanceOf[FlowExecutionErrorException]) {
+                    throw t
+                  } else {
+                    throw new FlowExecutionErrorException(90101, s"Failed to parser flow of job(${job.getId})", t)
+                  }
                 }
               }
               this.SUBMIT_JOB_LOCK.synchronized {

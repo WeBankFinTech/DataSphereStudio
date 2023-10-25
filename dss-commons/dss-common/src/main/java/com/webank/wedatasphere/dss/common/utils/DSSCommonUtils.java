@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.utils.JsonUtils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,7 +57,9 @@ public class DSSCommonUtils {
                 } else {
                     return new JsonPrimitive(t);
                 }
-            }).create();
+            })
+            .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsLong()))
+            .create();
 
     public static final ObjectMapper JACKSON = JsonUtils.jackson();
 

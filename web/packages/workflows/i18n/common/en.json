@@ -162,7 +162,6 @@
       },
       "process": {
         "index": {
-          "DTMS": "Map mode",
           "ZDMS": "ReadOnly mode",
           "BJMS": "Edit mode",
           "WBCSFGB": "There are still unsaved nodes under this workflow. Do you want to close?",

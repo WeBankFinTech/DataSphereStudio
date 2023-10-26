@@ -102,6 +102,7 @@ export default {
         storage.set('need-refresh-proposals-python', true);
         // 手动退出清掉baseInfo
         storage.remove('baseInfo', 'local');
+        window.username = undefined;
         this.$router.push({ path: '/login',  query: { 'notcheck': true } });
       });
 

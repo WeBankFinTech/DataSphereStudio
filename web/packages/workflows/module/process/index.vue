@@ -59,7 +59,6 @@
             :open-files="openFiles"
             :orchestratorId="item.data.orchestratorId"
             :orchestratorVersionId="item.data.orchestratorVersionId"
-            @changeMap="changeTitle"
             @node-dblclick="dblclickNode(index, arguments)"
             @isChange="isChange(index, arguments)"
             @save-node="saveNode"
@@ -143,7 +142,7 @@ export default {
     }
   },
   mounted() {
-    this.changeTitle(false);
+    this.changeTitle();
   },
   methods: {
     release(obj) {
@@ -474,16 +473,11 @@ export default {
         return item;
       });
     },
-    changeTitle(val) {
-      // 地图模式下，名字为地图模式；最新工作流可编辑时，名字为编辑模式；历史版本进去时，为只读模式
-      if (val) {
-        this.tabs[0].title = this.$t("message.workflow.process.index.DTMS");
+    changeTitle() {
+      if (this.query.readonly === "true") {
+        this.tabs[0].title = this.$t("message.workflow.process.index.ZDMS");
       } else {
-        if (this.query.readonly === "true") {
-          this.tabs[0].title = this.$t("message.workflow.process.index.ZDMS");
-        } else {
-          this.tabs[0].title = this.$t("message.workflow.process.index.BJMS");
-        }
+        this.tabs[0].title = this.$t("message.workflow.process.index.BJMS");
       }
     }
   }

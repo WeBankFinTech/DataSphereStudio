@@ -389,6 +389,10 @@ export default {
       this.execute.run = false;
     }
     clearTimeout(this.autoSaveTimer);
+    if(this.canceledTimeout) {
+      clearTimeout(this.canceledTimeout);
+      this.canceledTimeout = null;
+    }
     let runningScripts = storage.get(this._running_scripts_key, 'local') || {};
     if (this.script.running && this.execute && this.execute.taskID && this.execute.id) {
       runningScripts[this.script.id] = {
@@ -978,7 +982,17 @@ export default {
             name: name,
             duration: 3,
           });
-          cb();
+          // kill请求发送成功后status还没有变成Canceled，会有状态请求的轮询，此时应当等待canceled之后才能进行下次执行 dpms 400007
+          const fn = () => {
+            if (this.script.steps.indexOf('Cancelled') > -1) {
+              cb()
+            } else {
+              this.canceledTimeout = setTimeout(() => {
+                fn()
+              }, 1000)
+            }
+          }
+          fn()
         }).catch(() => {
           this.execute.queryStatusaAfterKill = 0
           cb();
@@ -1128,7 +1142,20 @@ export default {
         showPanel: type,
       }
       if (type === 'log') {
-        this.localLogShow();
+        const taskID = this.work.taskID || (this.script.history[0] && this.script.history[0].taskID)
+        // dpms: /#/product/100199/bug/detail/222584
+        // dpms: /#/product/100199/bug/detail/398827
+        if (['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.script.status) > -1) {
+          if (this.execute && this.execute.resultsetInfo) {
+            this.getLogs(this.execute.resultsetInfo)
+          } else if(taskID){
+            api.fetch(`/jobhistory/${taskID}/get`, 'get').then(rst => {
+              this.getLogs(rst.task)
+            })
+          }
+        } else {
+          this.localLogShow();
+        }
       }
     },
     localLogShow() {

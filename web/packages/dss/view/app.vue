@@ -80,6 +80,18 @@ export default {
         this.getMaskText()
       },400)
     });
+    const user_cache = this.getUserName()
+    // 切换浏览器tab，激活时判断登录用户和当前页面用户不一致（在其它tab登录了别的用户），需要刷新页面
+    window.addEventListener("visibilitychange", () => {
+      const user_cache = this.getUserName()
+      const user_change = window.username != user_cache && (window.username || user_cache)
+      if (document.hidden == false && user_change) {
+        location.href = '/'
+      }
+    });
+    if (user_cache && !window.username) {
+      window.username = user_cache
+    }
   },
   methods: {
     getUserName() {

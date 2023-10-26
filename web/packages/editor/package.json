@@ -1,8 +1,8 @@
 {
   "name": "@dataspherestudio/editor",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "dependencies": {
-    "@dataspherestudio/shared": "^1.1.16",
+    "@dataspherestudio/shared": "^1.1.17",
     "dt-sql-parser": "1.2.1"
   }
 }

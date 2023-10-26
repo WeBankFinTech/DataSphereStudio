@@ -12,7 +12,7 @@
           ref="submitForm"
           :model="formData"
           :rules="formValid"
-          :label-width="100"
+          :label-width="120"
         >
           <FormItem
             prop="id"
@@ -56,6 +56,15 @@
             <Input v-model="formData.duration" placeholder="取值范围1-7300,永久请输入星号：*">
               <template #append><span>天</span></template>
             </Input>
+          </FormItem>
+          <FormItem
+            prop="sensitive"
+            label="是否涉及一级数据"
+          >
+            <Select v-model="formData.sensitive" placeholder="请检查API的查询结果是否包含一级敏感数据：微众卡号，出生日期">
+              <Option value="1">是</Option>
+              <Option value="0">否</Option>
+            </Select>
           </FormItem>
           <FormItem
             prop="importance"
@@ -118,6 +127,7 @@ export default {
         applyUser: [],
         duration: '',
         importance: '',
+        sensitive: '',
         attentionUser: []
       },
       applyUserList: [],
@@ -203,6 +213,22 @@ export default {
             }
           }
         ],
+        sensitive: [
+          {
+            required: true,
+            trigger: "change",
+            validator: (rule, value, callback) => {
+              value = value.trim()
+              if (!value) {
+                return callback(new Error('请选择是否涉及一级数据'))
+              }
+              if (value == '1') {
+                callback(new Error('查询结果中涉及一级数据的API不允许提交审批'))
+              }
+              return callback()
+            }
+          }
+        ],
         importance: [
           {
             required: true,
@@ -270,6 +296,7 @@ export default {
             applyUser: this.formData.applyUser.join(','),
             duration: this.formData.duration.trim() === '*' ? '*' : this.formData.duration.trim() - 0 + '',
             importance: this.formData.importance,
+            sensitive: this.formData.sensitive,
             attentionUser: this.formData.attentionUser.join(','),
             creator: this.getUserName(),
             submitApiInfos,

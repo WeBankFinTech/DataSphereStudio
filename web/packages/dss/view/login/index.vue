@@ -92,6 +92,15 @@ export default {
       this.loginForm.password = userNameAndPass.split('&')[1];
     }
     this.getPublicKey()
+    // 已登录跳转去首页
+    // 未登录停留再登陆页面
+    let baseinfo = storage.get('baseInfo', 'local');
+    if (baseinfo) {
+      this.getIsAdmin(() => {
+        window.username = baseinfo.username;
+        this.afterLogin()
+      })
+    }
   },
   mounted() {
     storage.set('close_db_table_suggest', false);
@@ -182,20 +191,10 @@ export default {
                 return
               }
               this.baseInfo = { username: this.loginForm.user };
+              window.username = this.loginForm.user;
               storage.set('baseInfo', this.baseInfo, 'local');
               this.getIsAdmin()
-              // 登录之后需要获取当前用户的调转首页的路径
-              const homePageRes = await this.getPageHomeUrl()
-              const all_after_login = await plugin.emitHook('after_login', {
-                context: this,
-                homePageRes
-              })
-              eventbus.emit('watermark.refresh');
-              if (all_after_login.length) {
-                // 有hook返回则hook处理
-              } else {
-                this.$router.replace({ path: homePageRes.homePageUrl });
-              }
+              this.afterLogin()
               this.$Message.success(this.$t('message.common.login.loginSuccess'));
             }
           } catch (error) {
@@ -211,11 +210,29 @@ export default {
     clearSession() {
       storage.clear();
     },
-    getIsAdmin() {
+    getIsAdmin(cb) {
       api.fetch(`/jobhistory/governanceStationAdmin`, {}, 'get').then((rst) => {
-        this.baseInfo = { username: this.loginForm.user, isAdmin: rst.admin }
-        storage.set('baseInfo', this.baseInfo, 'local');
+        if (cb) {
+          cb()
+        } else {
+          this.baseInfo = { username: this.loginForm.user, isAdmin: rst.admin }
+          storage.set('baseInfo', this.baseInfo, 'local');
+        }
       })
+    },
+    async afterLogin() {
+      // 登录之后需要获取当前用户的调转首页的路径
+      const homePageRes = await this.getPageHomeUrl()
+      const all_after_login = await plugin.emitHook('after_login', {
+        context: this,
+        homePageRes
+      })
+      eventbus.emit('watermark.refresh');
+      if (all_after_login.length) {
+        // 有hook返回则hook处理
+      } else {
+        this.$router.replace({ path: homePageRes.homePageUrl });
+      }
     },
     checkChromeVersion() {
       let arr = navigator.userAgent.split(' ');

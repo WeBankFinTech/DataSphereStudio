@@ -1,8 +1,8 @@
 {
   "name": "@dataspherestudio/workspace",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "dependencies": {
-    "@dataspherestudio/shared": "^1.1.16",
+    "@dataspherestudio/shared": "^1.1.17",
     "@riophae/vue-treeselect": "0.4.0",
     "highlight.js": "9.18.3",
     "mavon-editor": "2.10.4"

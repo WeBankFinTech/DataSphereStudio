@@ -356,6 +356,10 @@ export default {
       this.updateBread();
       this.tryOpenWorkFlow();
     });
+    // 获取该用户下可编辑的project展示tree
+    this.getAllProjects(res => {
+      this.rawUserProjects = res;
+    }, { filterProject: true })
     if (this.$route.query.projectID) {
       this.currentTreeId = +this.$route.query.projectID;
       this.openNode = {
@@ -478,13 +482,14 @@ export default {
         })
     },
     // 获取所有project展示tree
-    getAllProjects(callback) {
+    getAllProjects(callback, params) {
       this.loadingTree = true;
       api
         .fetch(
           `${this.$API_PATH.PROJECT_PATH}getAllProjects`,
           {
             workspaceId: +this.$route.query.workspaceId,
+            ...(params || {})
           },
           "post"
         )
@@ -1372,7 +1377,7 @@ export default {
           break;
         case "copy_flow":
           this.showCopyForm = true
-          this.$refs.copyForm.init(node, this.rawProjects)
+          this.$refs.copyForm.init(node, this.rawUserProjects)
           break;
       }
     },

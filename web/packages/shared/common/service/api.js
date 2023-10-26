@@ -153,7 +153,7 @@ const api = {
       if (window.location.href.indexOf('/#/login') < 0) {
         window.location.href = '/#/login'
       }
-      if (!showLoginTips) {
+      if (!showLoginTips && res.data.method.indexOf('jobhistory/governanceStationAdmin') < 0) {
         showLoginTips = true
         setTimeout(() => {
           showLoginTips = false

@@ -1,8 +1,8 @@
 {
   "name": "@dataspherestudio/dolphinScheduler",
-  "version": "1.1.16",
+  "version": "1.1.17",
   "dependencies": {
-    "@dataspherestudio/shared": "^1.1.16",
+    "@dataspherestudio/shared": "^1.1.17",
     "bootstrap": "^3.4.1",
     "d3": "3.5.17",
     "dayjs": "1.10.7",

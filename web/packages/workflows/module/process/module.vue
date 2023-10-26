@@ -1,6 +1,7 @@
 <template>
   <div ref="processModule" class="process-module" :class="{'is-publishing': isFlowPubulish, 'locked': locked}">
     <vueProcess
+      v-if="viewMode === 'drag'"
       ref="process"
       :shapes="shapes"
       :value="originalData"
@@ -113,7 +114,7 @@
           </div>
         </div>
       </template>
-      <!-- 生产中心保留执行和地图模式 -->
+      <!-- 生产中心保留执行-->
       <template v-if="myReadonly">
         <template v-if="product && isLatest">
           <div
@@ -134,7 +135,91 @@
           </div>
         </template>
       </template>
+      <div
+        class="button view_mode_btn table_mode"
+        title="表格模式"
+        @click.stop="changeViewMode('table')">
+        <SvgIcon class="icon" icon-class="listview" style="opacity: 0.65;"/>
+      </div>
+      <div
+        class="button view_mode_btn active"
+        title="拖拽模式"
+        @click.stop="changeViewMode('drag')">
+        <SvgIcon class="icon" icon-class="dragmode" style="opacity: 0.65"/>
+      </div>
     </vueProcess>
+    <div v-else-if="viewMode === 'table'" class="designer">
+      <div class="designer-toolbar">
+        <div v-if="!myReadonly">
+          <div
+            class="button"
+            :title="$t('message.workflow.process.params')"
+            ref="paramButton"
+            @click.stop="showParamView">
+            <SvgIcon class="icon" icon-class="canshu" style="opacity: 0.65"/>
+            <span>{{$t('message.workflow.process.params')}}</span>
+          </div>
+          <div class="devider" />
+          <div
+            class="button"
+            ref="resourceButton"
+            :title="$t('message.workflow.process.resource')"
+            @click.stop="showResourceView">
+            <SvgIcon class="icon" icon-class="ziyuan" style="opacity: 0.65"/>
+            <span>{{$t('message.workflow.process.resource')}}</span>
+          </div>
+          <div class="devider" />
+          <div
+            :title="$t('message.workflow.process.save')"
+            class="button"
+            @click="handleSave">
+            <SvgIcon class="icon" icon-class="baocun" style="opacity: 0.65"/>
+            <span>{{$t('message.workflow.process.save')}}</span>
+          </div>
+          <div v-if="type==='flow'" class="devider" />
+        </div>
+        <!-- 预留运维发布的区别-->
+        <div v-if="publish">
+          <div
+            v-if="type==='flow'"
+            :title="$t('message.workflow.process.publish')"
+            class="button"
+            @click="workflowPublishIsShow">
+            <template v-if="!isFlowPubulish">
+              <SvgIcon class="icon" icon-class="fabu" style="opacity: 0.65"/>
+              <span>{{$t('message.workflow.process.publish')}}</span>
+            </template>
+            <Spin v-else class="public_loading">
+              <Icon type="ios-loading" size=18 class="public-splin-load"></Icon>
+              <span>{{$t('message.workflow.publishing')}}</span>
+            </Spin>
+          </div>
+          <div v-for="toolItem in extraToolbar" :key="toolItem.name">
+            <div class="devider"></div>
+            <div
+              class="button"
+              @click.stop="clickToolItem(toolItem)">
+              <SvgIcon class="icon" icon-class="ds-center" />
+              <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
+            </div>
+          </div>
+        </div>
+        <div
+          class="button view_mode_btn active table_mode"
+          title="表格模式"
+          @click.stop="changeViewMode('table')">
+          <SvgIcon class="icon" icon-class="listview" style="opacity: 0.65;"/>
+        </div>
+        <div
+          class="button view_mode_btn"
+          title="拖拽模式"
+          @click.stop="changeViewMode('drag')">
+          <SvgIcon class="icon" icon-class="dragmode" style="opacity: 0.65"/>
+        </div>
+      </div>
+      <iframe class="iframeClass" id="iframe" ref="ifr" style="padding-top:36px" :src="tableViewUrl" frameborder="0" width="100%" height="100%" />
+      <Spin v-if="iframeloading" fix>{{ $t('message.common.Loading') }}</Spin>
+    </div>
     <div
       class="process-module-param"
       v-clickoutside="handleOutsideClick"
@@ -335,6 +420,7 @@
       :style="getConsoleStyle"
       @close-console="closeConsole"></console>
     <BottomTab
+      v-show="viewMode === 'drag'"
       ref="bottomTab"
       :orchestratorId="orchestratorId"
       :orchestratorVersionId="orchestratorVersionId"
@@ -503,7 +589,9 @@ export default {
       needReRun: false,
       locked: false,
       extraToolbar: [],
-      showNodePathPanel: false
+      showNodePathPanel: false,
+      iframeloading: false,
+      viewMode: 'drag' // drag or table
     };
   },
   computed: {
@@ -612,6 +700,9 @@ export default {
           return arr;
         }
       }
+    },
+    tableViewUrl() {
+      return `/next-web/#/workspace/workflow?workspaceId=${this.$route.query.workspaceId}&projectID=${this.$route.query.projectID}&flowId=${this.flowId}&labels=dev`
     }
   },
   created() {
@@ -648,6 +739,7 @@ export default {
     this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
     eventbus.on('workflow.fold.left.tree', this.foldHandler);
     eventbus.on('workflow.copying', this.onCopying);
+    window.addEventListener('message', this.msgEvent, false)
   },
   beforeDestroy() {
     if (this.timer) {
@@ -664,9 +756,24 @@ export default {
     }
     eventbus.off('workflow.fold.left.tree', this.foldHandler);
     eventbus.off('workflow.copying', this.onCopying);
-    document.removeEventListener('keyup', this.onKeyUp)
+    document.removeEventListener('keyup', this.onKeyUp);
+    window.removeEventListener('message', this.msgEvent, false);
   },
   methods: {
+    msgEvent(e) {
+      if (e.data) {
+        try {
+          let data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data || {}
+          if (data.type === 'dss-nextweb'&& data.flowId == this.flowId) {
+            if (data.action === 'opennode') {
+              this.dblclick(data.node)
+            }
+          }
+        } catch(err) {
+          window.console.error(err)
+        }
+      }
+    },
     foldHandler() {
       const refs = this.$refs
       refs.process && refs.process.layoutView()
@@ -1903,7 +2010,7 @@ export default {
       shapes.map((item) => {
         if (item.children.length > 0) {
           item.children.map((subItem) => {
-            if (subItem.type === node.type) {
+            if (subItem.type === node.type || subItem.type === node.jobType) {
               node = Object.assign(subItem, node);
             }
           })
@@ -2438,6 +2545,20 @@ export default {
     },
     showSearchPath() {
       this.showNodePathPanel = true
+    },
+    changeViewMode(mode) {
+      this.viewMode = mode
+      if (mode == 'table') {
+        this.iframeloading = true
+      }
+      this.$nextTick(()=> {
+        const ifr = this.$refs.ifr;
+        if (ifr) {
+          ifr.onload = () => {
+            this.iframeloading = false
+          }
+        }
+      })
     }
   }
 }

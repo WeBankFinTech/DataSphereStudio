@@ -43,7 +43,7 @@
   }
 }
 
-.process-module {
+div.process-module {
   position: relative;
   height: 100%;
   width: 100%;
@@ -68,6 +68,23 @@
       padding: 0 10px;
       color: #515a6e;
       font-size: $font-size-base;
+    }
+  }
+
+  div.view_mode_btn.button {
+    padding: 10px;
+    float: right;
+    display: flex;
+    align-items: center;
+    &.active {
+      @include bg-color($light-base-color, $dark-base-color);
+      color: $link-color;
+    }
+    .icon {
+      margin-right: 0;
+    }
+    &.table_mode {
+      margin-right: 15px;
     }
   }
 

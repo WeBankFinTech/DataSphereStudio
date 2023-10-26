@@ -442,6 +442,8 @@ export default {
       if (this.isRefTemplate === '0') {
         delete this.currentNode.ecConfTemplateId
         delete this.currentNode.ecConfTemplateName
+        delete this.currentNode.jobParams['ec.conf.templateId']
+        delete this.currentNode.params.configuration['startup']['ec.conf.templateId']
       } else {
         this.currentNode.jobParams['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
         this.currentNode.params.configuration['startup']['ec.conf.templateId'] = this.currentNode.ecConfTemplateId

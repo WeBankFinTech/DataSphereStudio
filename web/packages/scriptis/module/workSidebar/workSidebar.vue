@@ -619,10 +619,10 @@ export default {
           }).then(() => {
             this.loading = false;
             this.$Message.success(this.$t('message.scripts.constants.success.delete'));
-            this.currentNode.remove();
-            this.currentNode = { ...this.$refs.weFileTree.$refs.tree.root };
-            this.currentNode.data = { ...this.currentNode.data[0] };
+            const parent = { ...this.currentNode.parent, data: {...this.currentNode.parent.data } }
             this.refresh('delete');
+            this.currentNode.remove();
+            this.currentNode = parent
           }).catch(() => {
             this.loading = false;
           });

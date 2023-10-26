@@ -83,9 +83,6 @@ public class DssProxyUserController {
     public Message setProxyUserCookie(@RequestBody DssProxyUserImpl userRep,
                                       HttpServletRequest req,
                                       HttpServletResponse resp) {
-        if(!ProxyUserConfiguration.isProxyUserEnable()) {
-            return Message.error("proxy user service is not enable, please ask admin for help.");
-        }
         String username = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(userRep.getUserName())) {
             return Message.error("userName is null.");

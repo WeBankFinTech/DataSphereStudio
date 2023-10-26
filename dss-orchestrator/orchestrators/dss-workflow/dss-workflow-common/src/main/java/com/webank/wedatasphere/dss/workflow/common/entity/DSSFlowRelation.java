@@ -21,6 +21,14 @@ public class DSSFlowRelation {
     private Long flowID;
     private Long parentFlowID;
 
+    public DSSFlowRelation() {
+    }
+
+    public DSSFlowRelation(Long flowID, Long parentFlowID) {
+        this.flowID = flowID;
+        this.parentFlowID = parentFlowID;
+    }
+
     public Long getId() {
         return id;
     }

@@ -584,7 +584,7 @@ export default {
       } else {
         // 关闭语法检查时，如果编辑器上有错误色块，先清除
         const decora = vm.decorations || [];
-        vm.decorations = vm.editor.deltaDecorations(decora, []);
+        vm.decorations = vm.editor && vm.editor.deltaDecorations(decora, []);
         if (cb) {
           cb(true);
         }

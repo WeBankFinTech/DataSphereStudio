@@ -142,7 +142,7 @@
               @on-change="handleHiveDbChange"
             >
               <Option
-                v-for="(item) in dbList"
+                v-for="(item) in dbFilterList"
                 :label="item.name"
                 :value="item.name"
                 :key="item.name"/>
@@ -295,6 +295,7 @@ export default {
   data() {
     let that = this;
     return {
+      dbFilterList: [],
       modal: {
         show: false,
         width: '780px',
@@ -505,6 +506,16 @@ export default {
         this.debounceValidateField('tbName', this);
       }
     },
+    dbList(newDbList) {
+      const reg = ['_qml', '_ind', '_work'];
+      this.dbFilterList = newDbList.filter(item => {
+        const tabSuffix = item.name.substr(
+          item.name.lastIndexOf('_'),
+          item.name.length
+        );
+        return indexOf(reg, tabSuffix) !== -1;
+      });
+    }
   },
   methods: {
     open(path) {

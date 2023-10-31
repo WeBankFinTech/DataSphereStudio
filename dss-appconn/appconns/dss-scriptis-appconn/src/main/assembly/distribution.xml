@@ -44,6 +44,15 @@
             <outputDirectory>icons</outputDirectory>
         </fileSet>
 
+        <fileSet>
+            <directory>${basedir}/src/main/svgs</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0777</fileMode>
+            <outputDirectory>svgs</outputDirectory>
+        </fileSet>
+
     </fileSets>
 
 </assembly>

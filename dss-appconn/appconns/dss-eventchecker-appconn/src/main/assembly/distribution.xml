@@ -69,12 +69,12 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/src/main/svgs</directory>
+            <directory>${basedir}/src/main/pngs</directory>
             <includes>
                 <include>*</include>
             </includes>
             <fileMode>0777</fileMode>
-            <outputDirectory>svgs</outputDirectory>
+            <outputDirectory>pngs</outputDirectory>
         </fileSet>
 
         <fileSet>

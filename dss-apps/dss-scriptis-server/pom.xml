@@ -67,6 +67,10 @@
                     <artifactId>linkis-common</artifactId>
                     <groupId>org.apache.linkis</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>xstream</artifactId>
+                    <groupId>com.thoughtworks.xstream</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -225,11 +229,6 @@
             <artifactId>junit-platform-launcher</artifactId>
             <version>1.5.2</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <artifactId>xstream</artifactId>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <version>1.4.19</version>
         </dependency>
 
     </dependencies>

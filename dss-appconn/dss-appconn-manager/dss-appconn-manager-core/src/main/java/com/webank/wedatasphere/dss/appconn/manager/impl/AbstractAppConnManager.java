@@ -245,6 +245,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     @Override
     public AppConn getAppConn(String appConnName) {
         lazyLoadAppConns();
+        if(appConns.isEmpty()){
+            throw new AppConnWarnException(25344,"appconn list has not been loaded,please try again later.");
+        }
         return appConns.get(appConnName.toLowerCase());
     }
 

@@ -105,7 +105,7 @@
         "XDF": "限定符",
         "WXDF": "无限定符",
         "HXWBT": "首行为表头",
-        "HQBZDSJ": "获取表字段数据",
+        "HQBXX": "获取表信息",
         "XZWJLJ": "请选择文件路径",
         "GXMLDR": "共享目录导入",
         "DR": "导入",
@@ -330,7 +330,9 @@
         "HQFQSB": "获取分区信息失败",
         "ZQDRWJLJ": "请正确选择导入文件路径",
         "QQRSJKMCXX": "请确认数据库名称填写信息",
-        "QQRSFCF": "请确认是否复写"
+        "QQRSFCF": "请确认是否复写",
+        "TJHJXDRSJ": "提交后继续导入数据",
+        "TJBJS": "提交并结束"
       },
       "hiveTableExport": {
         "DCB": "导出表",
@@ -598,7 +600,7 @@
           "save": "保存",
           "saveAs": "另存为"
         },
-        "tips": "<div style='font-weight:600'>Scriptis使用指引：</div><div style='padding-left:10px'>1.设置参数:在管理台设置队列及参数<br>2.新建脚本:右键新建所需脚本<br>3.编辑脚本:在对应的脚本文件中编辑Sql或命令<br>4.提交执行:运行选中的sql或命令<br>5.结果查询:查询执行结果及日志</div><div style='font-weight:600'>前往<a href='_book/快速入门/Scriptis快速入门.html' target='_blank'>快速使用Scriptis</a>了解更详细的使用指引</div>",
+        "tips": "<div style='font-weight:600'>Scriptis使用指引：</div><div style='padding-left:10px'>1.设置参数:在管理台设置队列及参数<br>2.新建脚本:右键新建所需脚本<br>3.编辑脚本:在对应的脚本文件中编辑Sql或命令<br>4.提交执行:运行选中的sql或命令<br>5.结果查询:查询执行结果及日志</div><div style='font-weight:600'>前往<a href='{book}/快速入门/Scriptis快速入门.html' target='_blank'>快速使用Scriptis</a>了解更详细的使用指引</div>",
         "warning": {
           "noDBInfo": "未获取到数据库表信息，脚本联想词功能可能存在异常！可刷新重试！",
           "noUDF": "未获取到UDF和方法函数信息，脚本联想词功能可能存在异常！可刷新重试！",

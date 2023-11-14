@@ -105,7 +105,7 @@
         "XDF": "Limited qualifier",
         "WXDF": "Unlimited qualifier",
         "HXWBT": "Use the first line as table header",
-        "HQBZDSJ": "Request table column data",
+        "HQBXX": "Request table data",
         "XZWJLJ": "Please choose file path",
         "GXMLDR": "Import from shared directory",
         "DR": "Import",
@@ -330,7 +330,9 @@
         "HQFQSB": "Failed to request partition information",
         "ZQDRWJLJ": "Please choose the path correctly",
         "QQRSJKMCXX": "Please confirm the database name",
-        "QQRSFCF": "Please confirm whether to overwrite"
+        "QQRSFCF": "Please confirm whether to overwrite",
+        "TJHJXDRSJ": "Continue importing data after submission",
+        "TJBJS": "Commit and close"
       },
       "hiveTableExport": {
         "DCB": "Export form table",
@@ -599,7 +601,7 @@
           "save": "Save",
           "saveAs": "Save As"
         },
-        "tips": "<div style='font-weight:600'>Guidelines for Scriptis：</div><div style='padding-left:10px'>1. Set parameters: Set the queue and parameters on the management console<br>2. New Script: Right click to create the required script<br>3. Edit script: edit sql or command in the corresponding script file<br>4. Submit for execution: run the selected sql or command<br>5. Result query: query execution results and logs</div><div style='font-weight:600'>Go to <a href='_book/快速入门/Scriptis快速入门.html' target='_blank'>Quickly Use Scriptis</a> for more detailed instructions</div>",
+        "tips": "<div style='font-weight:600'>Guidelines for Scriptis：</div><div style='padding-left:10px'>1. Set parameters: Set the queue and parameters on the management console<br>2. New Script: Right click to create the required script<br>3. Edit script: edit sql or command in the corresponding script file<br>4. Submit for execution: run the selected sql or command<br>5. Result query: query execution results and logs</div><div style='font-weight:600'>Go to <a href='{book}/快速入门/Scriptis快速入门.html' target='_blank'>Quickly Use Scriptis</a> for more detailed instructions</div>",
         "warning": {
           "noDBInfo": "Failed to request database/table information, word association in script may not be working well! Please refresh to retry!",
           "noUDF": "Failed to request UDF and Method information, word association in script may not be working well! Please refresh to retry!",

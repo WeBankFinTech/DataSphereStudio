@@ -1024,12 +1024,12 @@ export default {
         escapeQuotes = true;
         quote = option.quote;
       }
-      const url = `/filesystem/formate?path=${option.exportPath}&encoding=${encoding}&fieldDelimiter=${fieldDelimiter}&hasHeader=${option.isHasHeader}&escapeQuotes=${escapeQuotes}&quote=${quote}`;
+      const url = `/filesystem/getSheetInfo?path=${option.exportPath}&encoding=${encoding}&fieldDelimiter=${fieldDelimiter}&hasHeader=${option.isHasHeader}&escapeQuotes=${escapeQuotes}&quote=${quote}`;
       api.fetch(url, {}, {
         method: 'get',
         timeout: '600000',
       }).then((rst) => {
-        cb(rst.formate);
+        cb(rst.sheetInfo);
       }).catch(() => {
         cb(false);
       });

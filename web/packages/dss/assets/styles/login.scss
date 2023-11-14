@@ -47,7 +47,6 @@
         z-index: $zindex-spin;
         .login-title {
             font-size: 20px;
-            font-weight: 400px;
             display: block;
             text-align: center;
             color:  #044B93;
@@ -79,12 +78,5 @@
     }
     .ivu-form-item {
         margin-bottom: 20px;
-    }
-}
-.radioGroup {
-    padding-left: 20px;
-    display: block;
-    .ivu-radio-group-item {
-        width: 100%;
     }
 }

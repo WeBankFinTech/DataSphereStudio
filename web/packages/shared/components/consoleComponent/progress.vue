@@ -150,6 +150,8 @@ export default {
         }
         return Number(num1.toString().replace(".", "")) * Number(num2.toString().replace(".", "")) / Math.pow(10, baseNum);
       };
+      // /product/100199/story/detail/324369
+      if (this.steps.indexOf("Succeed") > -1 && this.script.progress.current < 1) return 100;
       return numMulti(this.script.progress.current , 100);
     },
     waitingSize() {

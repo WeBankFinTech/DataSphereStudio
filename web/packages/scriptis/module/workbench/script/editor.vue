@@ -68,28 +68,41 @@
         </div>
       </div>
     </div>
-    <div class="editor-content">
-      <we-editor
-        ref="editor"
-        v-model="script.data"
-        :language="script.lang"
-        :id="script.id"
-        :read-only="script.readOnly"
-        :script-type="scriptType"
-        :file-path="work.filepath || script.id + work.filename"
-        :application="script.application"
-        type="code"
-        @on-operator="heartBeat"
-        @on-run="run"
-        @on-save="save"
-        @is-parse-success="changeParseSuccess"/>
-      <setting
-        ref="setting"
+    <we-panel diretion="horizontal" @on-move-end="resizePanel" :class='["editor-content", {"margin-right-300": showConfig} ]'>
+      <we-panel-item
+        :index="1"
+        :min="300"
+      >
+        <we-editor
+          ref="editor"
+          v-model="script.data"
+          :language="script.lang"
+          :id="script.id"
+          :read-only="script.readOnly"
+          :script-type="scriptType"
+          :file-path="work.filepath || script.id + work.filename"
+          :application="script.application"
+          type="code"
+          @on-operator="heartBeat"
+          @on-run="run"
+          @on-save="save"
+          @is-parse-success="changeParseSuccess"/>
+      </we-panel-item>
+      <we-panel-item
+        :index="2"
+        :disable="!showConfig"
+        class="setting-panel"
         v-show="showConfig"
-        :script="script"
-        :work="work"
-        @setting-close="settingClose"/>
-    </div>
+        :min="showConfig ? 100 : 8"
+        :width="showConfig ? 200 : 8"
+      >
+        <setting
+          ref="setting"
+          :script="script"
+          :work="work"
+          @setting-close="settingClose"/>
+      </we-panel-item>
+    </we-panel>
   </div>
 </template>
 <script>
@@ -149,6 +162,10 @@ export default {
       if (!val) {
         this.$refs.setting.origin = JSON.stringify(this.script.params);
       }
+    },
+    showConfig() {
+      // 更新代码宽度
+      this.resizePanel()
     }
   },
   mounted() {
@@ -159,6 +176,11 @@ export default {
       if (args.id === this.script.id) {
         this.$refs.editor.insertValueIntoEditor(args.value);
       }
+    },
+    resizePanel() {
+      this.$nextTick(() => {
+        this.$refs.editor.layout()
+      })
     },
     // 点击全屏展示
     topFullScreen() {
@@ -269,10 +291,17 @@ export default {
 @import '@dataspherestudio/shared/common/style/variables.scss';
   .editor {
     height: 100%;
+    /deep/.we-panel.we-panel-horizontal .we-panel-dash  {
+      // 防止被外层.we-panel.we-panel-vertical .we-panel-dash覆盖
+      cursor: ew-resize;
+    }
     .editor-content {
       height: calc(100% - 32px);
       display: flex;
       @include bg-color($light-base-color, $dark-menu-base-color);
+    }
+    .setting-panel {
+      overflow-x: auto;
     }
   }
   .workbench-body-navbar {

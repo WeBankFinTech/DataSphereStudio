@@ -102,6 +102,8 @@
 import directoryDialog from '@dataspherestudio/shared/components/directoryDialog/index.vue';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import i18n from '@dataspherestudio/shared/common/i18n';
+import mixin from '@dataspherestudio/shared/common/service/mixin';
+
 export default {
   name: 'NewDialog',
   components: {
@@ -163,6 +165,7 @@ export default {
     loadDataFn: Function,
     filterNode: Function,
   },
+  mixins: [mixin],
   data() {
     return {
       show: false,
@@ -222,7 +225,8 @@ export default {
         ".sh": "ShellUsageGuide",
         ".ngql": "NebulaUsageGuide",
       }
-      return item ? baseinfo[scriptGuideMap[this.ext]] || '' : ''
+      const handbook = this.getHandbookUrl()
+      return handbook + (item ? baseinfo[scriptGuideMap[this.ext]] || '' : '')
     }
   },
   methods: {

@@ -266,7 +266,7 @@ export default {
             console.error(err);
           });
       }
-      this.isHomePage = v.name === "workspaceHome" || v.name === "newhome"
+      this.isHomePage = v.name === "workspaceHome"
       if (v.query.menuApplicationId) {
         this.isHomePage = false
         this.isConsolePage = false

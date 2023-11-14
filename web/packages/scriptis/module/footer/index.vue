@@ -25,6 +25,8 @@
 <script>
 import resourceSimpleModule from '@dataspherestudio/shared/components/resourceSimple';
 import api from '@dataspherestudio/shared/common/service/api';
+import mixin from '@dataspherestudio/shared/common/service/mixin';
+
 export default {
   components: {
     resourceSimple: resourceSimpleModule.component,
@@ -38,6 +40,7 @@ export default {
       isMouseMove: false
     };
   },
+  mixins: [mixin],
   created() {
     // 让其它接口请求保持在getBasicInfo接口后面请求
     setTimeout(() => {
@@ -74,7 +77,7 @@ export default {
     },
     toggleGuide() {
       if (!this.isMouseMove) {
-        window.open("/_book/", '_blank');
+        window.open(this.getHandbookUrl(), '_blank');
       }
     },
     toast() {

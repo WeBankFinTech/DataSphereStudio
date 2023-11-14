@@ -215,7 +215,7 @@ export default {
       isControlBtnShow: false,
       tabLeft: false,
       tabRight: false,
-      tips: this.$t("message.scripts.container.tips"),
+      tips: this.$t("message.scripts.container.tips", { book: this.getHandbookUrl() }),
       isTopPanelFull: false,
       loading: false,
     }

@@ -33,19 +33,28 @@
         </template>
       </Dropdown>
     </div>
-    <div class="table-data">
-      <div class="field-list-header">
-        <div class="field-list-item" style="width:6%;">
+    <div class="table-data" style="position:relative">
+      <div class="field-list-header" id="dbtbheader" :class="{'ovy': searchColList.length > maxSize}">
+        <div class="field-list-item" style="width: 50px">
           <Checkbox
             v-model="selectAll"
             @on-change="changeCheckAll"
           /></div>
-        <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
+        <div class="field-list-item" style="width: 50px">{{ $t('message.scripts.Serial') }}</div>
         <div
           class="field-list-item"
-          v-for="(item, index) in columns"
-          :class="index === 0? 'table-name-item': ''"
-          :key="index">{{ item.title }}</div>
+          v-for="(item, index) in columnCalc"
+          :key="index"
+          :class="item.className"
+          :style="{width: item.width? `${item.width}` : 'auto'}"
+          @mousemove.prevent.stop="mousemove"
+          @mouseup.prevent.stop="mouseup">{{ item.title }}
+          <div
+            class="resize-bar"
+            :data-col-index="index"
+            @mousedown="mousedown"
+          ></div>
+        </div>
       </div>
       <virtual-list
         ref="columnTables"
@@ -57,22 +66,25 @@
           v-for="(item, index) in searchColList"
           :key="index"
           class="field-list-body">
-          <div class="field-list-item" style="width:6%;">
+          <div class="field-list-item" style="width:50px;">
             <Checkbox
               v-model="item.selected"
               @on-change="changeCheckList"
               :disabled="item.tableOwner !== getUserName()"
             /></div>
-          <div class="field-list-item">{{ index + 1 }}</div>
+          <div class="field-list-item" style="width: 50px">{{ pageData.pageSize * (pageData.currentPage - 1) + index + 1 }}</div>
           <div
             class="field-list-item"
             :class="index2 === 0? 'table-name-item': ''"
             :title="formatValue(item, field)"
-            v-for="(field, index2) in columns"
+            v-for="(field, index2) in columnCalc"
+            :data-key="field.key"
+            :style="{width: columnCalc[index2].width? `${columnCalc[index2].width}` : 'auto'}"
             :key="index2"
           >{{ formatValue(item, field) }}</div>
         </li>
       </virtual-list>
+      <div v-if="dragStartX" class="drag-line" :style="{left: dragLine.left, display: dragLine.show}" />
       <Page
         class="page-bar"
         :total="pageData.total"
@@ -234,6 +246,16 @@ export default {
     },
     canTransfer() {
       return this.$APP_CONF.table_transfer && /(_bak|_work)$/.test(this.dbName)
+    },
+    columnCalc() {
+      return this.columns.map((item, index) => {
+        return this.adjustCol[index] ? {
+          ...item,
+          width: this.adjustCol[index]
+        } : {
+          ...item
+        }
+      })
     }
   },
   watch: {
@@ -244,16 +266,16 @@ export default {
   data() {
     return {
       columns: [
-        { title: this.$t('message.scripts.tablename'), key: 'tableName'},
-        { title: this.$t('message.scripts.tbalias'), key: 'tableAlias'},
-        { title: this.$t('message.scripts.createtime'), key: 'createTime'},
-        { title: this.$t('message.scripts.tablesize'), key: 'tableSize'},
-        { title: this.$t('message.scripts.tbowner'), key: 'tableOwner'},
-        { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString'},
-        { title: this.$t('message.scripts.iscompress'), key: 'compressed', type: 'boolean'},
-        { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat'},
-        { title: this.$t('message.scripts.lastaccess'), key: 'viewTime'},
-        { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime'},
+        { title: this.$t('message.scripts.tablename'), key: 'tableName', width: '20%'},
+        { title: this.$t('message.scripts.tbalias'), key: 'tableAlias', width: '10%'},
+        { title: this.$t('message.scripts.createtime'), key: 'createTime', width: '10%'},
+        { title: this.$t('message.scripts.tablesize'), key: 'tableSize', width: '8%'},
+        { title: this.$t('message.scripts.tbowner'), key: 'tableOwner', width: '8%'},
+        { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString', width: '8%'},
+        { title: this.$t('message.scripts.iscompress'), key: 'compressed', type: 'boolean', width: '8%'},
+        { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat', width: '8%'},
+        { title: this.$t('message.scripts.lastaccess'), key: 'viewTime', width: '10%'},
+        { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime', width: '10%'},
       ],
       showConfirmModal: false,
       pageData: {
@@ -303,6 +325,14 @@ export default {
       },
       confirmModalType: 'delete',
       saveTransing: false,
+      dragStartX: undefined,
+      dragEndX: undefined,
+      dragLine: {
+        show: 'none',
+        diff: 0,
+        left: 0
+      },
+      adjustCol: [],
       renameForm: {
         dbSelected: '',
       },
@@ -501,6 +531,49 @@ export default {
       }).every(it => it.selected)
       this.searchColList = [...this.searchColList]
     },
+    mousedown(e) {
+      if (e && e.target && e.target.dataset.colIndex) {
+        this.dragColIndex = e.target.dataset.colIndex - 0
+        this.dragStartX = e.clientX
+        this.tableLeft = this.$el.getBoundingClientRect().x
+      }
+    },
+    mousemove(e) {
+      if (this.dragStartX !== undefined) {
+        this.dragEndX = e.clientX
+        this.dragLine = {
+          left: this.dragEndX - this.tableLeft + 'px',
+          diff: this.dragEndX - this.dragStartX,
+          show: 'block'
+        }
+      }
+    },
+    mouseup(e) {
+      if (this.dragStartX !== undefined) {
+        this.dragEndX = e.clientX
+        this.dragLine = {
+          left: this.dragEndX - this.tableLeft + 'px',
+          diff: this.dragEndX - this.dragStartX,
+          show: 'none'
+        }
+        this.dragStartX = undefined
+        this.adjustColWidth()
+      }
+
+    },
+    adjustColWidth() {
+      let adjustCol = []
+      this.$el.querySelectorAll('#dbtbheader .field-list-item').forEach(item => adjustCol.push(item.getBoundingClientRect().width))
+      adjustCol = adjustCol.slice(2)
+      adjustCol.forEach((item, index) => {
+        if (index === this.dragColIndex) {
+          adjustCol[index] = adjustCol[index] + this.dragLine.diff + 'px'
+        } else {
+          adjustCol[index] = adjustCol[index] + this.dragLine.diff / (adjustCol.length - 1) * -1 + 'px'
+        }
+      })
+      this.adjustCol = adjustCol
+    },
     // rename code
     renameClose() {
       this.renameScript = "";
@@ -580,9 +653,9 @@ export default {
                 });
               });
             });
-          } else { 
+          } else {
             this.databaseList = res.value;
-          }    
+          }
         }
       });
     },
@@ -628,13 +701,12 @@ export default {
   .field-list-body {
       border-bottom: none;
       @include bg-color($light-base-color, $dark-base-color);
-      &:not(:first-child){
+      &:last-child{
           border-bottom: 1px solid $border-color-base;
           @include border-color($border-color-base, $dark-border-color-base);
       }
   }
   .field-list-item {
-      width: 11%;
       padding: 0 10px;
       display: inline-block;
       height: 100%;
@@ -642,12 +714,35 @@ export default {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      position: relative;
+      &:not(:first-child){
+          border-left: 1px solid $border-color-base;
+          @include border-color($border-color-base, $dark-border-color-base);
+      }
   }
-  .table-name-item {
-    width: 20%
+  .resize-bar {
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    bottom: 0;
+    right: -5px;
+    cursor: col-resize;
+    z-index: 1;
+  }
+  .drag-line {
+    position: absolute;
+    top: 0;
+    width: 0px;
+    border-left: .5px dashed #eee;
+    height: 100%;
+    z-index: 1;
+    display: none;
+    pointer-events: none;
   }
 }
-
+.ovy {
+  padding-right: 8px
+}
 .rename-code {
   overflow: auto;
   max-height: 500px;

@@ -81,8 +81,8 @@
         <Spin size="large" fix v-if="loading"></Spin>
       </div>
 
-      <div v-if="$APP_CONF.user_guide" class="guide-footer">
-        <a target="_blank" :href="$APP_CONF.user_guide">
+      <div v-if="$APP_CONF.handbook" class="guide-footer">
+        <a target="_blank" :href="$APP_CONF.handbook">
           {{ $t('message.common.dss.manual') }}
         </a>
       </div>

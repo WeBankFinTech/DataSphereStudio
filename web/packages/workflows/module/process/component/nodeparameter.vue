@@ -322,8 +322,16 @@ export default {
       };
       // eslint-disable-next-line no-unused-vars
       const validateJobDesc = (rule, value, callback) => {
-        const reg = new RegExp('(check\\.object\\.\\d+)=([\\s\\S]*?)\\1')
-        if(reg.test(value)) {
+        let tmp = {}
+        let hasDuplicate = false
+        value.split('\n').filter(it => it).map(it => it.trim().split('=')[0]).forEach(it => {
+          if (tmp[it]) {
+            hasDuplicate = true
+          } else {
+            tmp[it] = 1
+          }
+        })
+        if (hasDuplicate) {
           callback(new Error(rule.message));
         } else {
           callback();
@@ -451,9 +459,10 @@ export default {
       this.validFrom();
     },
     validFrom() {
+
       this.$refs.baseInfoForm.validate((baseInfoValid) => {
         if (baseInfoValid) {
-          if (this.$refs.parameterForm) {
+          if (this.$refs.parameterForm && this.isRefTemplate === '1') {
             this.$refs.parameterForm.validate((valid) => {
               if (valid) {
                 this.$emit('saveNode', this.currentNode);

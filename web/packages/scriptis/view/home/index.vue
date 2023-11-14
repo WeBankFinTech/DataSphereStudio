@@ -133,6 +133,8 @@ export default {
       if (!save) {
         close();
         next();
+      } else {
+        next({...from, query: {...from.query, unsave: Date.now()}})
       }
     })
     if (!hasUnsave) {
@@ -193,7 +195,10 @@ export default {
   },
   methods: {
     getGlobalLimit() {
-      return api.fetch(`/dss/scriptis/globalLimits`, {}, 'get')
+      return api.fetch(`/dss/scriptis/globalLimits`, {}, {
+        method: 'get',
+        cacheOptions: {time: 3000}
+      })
     },
     getHeight() {
       this.resize(window.innerHeight);

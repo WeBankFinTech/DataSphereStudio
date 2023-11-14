@@ -13,8 +13,6 @@
       @message="message"
       @node-click="click"
       @node-dblclick="dblclick"
-      @node-baseInfo="saveNodeBaseInfo"
-      @node-param="saveNodeParam"
       @node-delete="nodeDelete"
       @add="addNode"
       @on-ctx-menu="onContextMenu"
@@ -411,7 +409,7 @@
     </Modal>
     <!-- 运行控制台 -->
     <console
-      v-if="openningNode"
+      v-if="openningNode && viewMode === 'drag'"
       ref="currentConsole"
       :node="openningNode"
       :stop="workflowIsExecutor"
@@ -702,7 +700,7 @@ export default {
       }
     },
     tableViewUrl() {
-      return `/next-web/#/workspace/workflow?workspaceId=${this.$route.query.workspaceId}&projectID=${this.$route.query.projectID}&flowId=${this.flowId}&labels=dev`
+      return `/next-web/#/workspace/workflow?workspaceId=${this.$route.query.workspaceId}&projectId=${this.$route.query.projectID}&flowId=${this.flowId}&labels=${this.getCurrentDsslabels()}`
     }
   },
   created() {
@@ -765,8 +763,12 @@ export default {
         try {
           let data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data || {}
           if (data.type === 'dss-nextweb'&& data.flowId == this.flowId) {
-            if (data.action === 'opennode') {
+            if (data.action === 'open_node') {
               this.dblclick(data.node)
+            } else if(data.action === 'node_dependance') {
+              this.showSearchPath()
+            } else if(data.action === 'node_params') {
+              this.click(data.node)
             }
           }
         } catch(err) {
@@ -1003,6 +1005,8 @@ export default {
               } else if (subItem.image) {
                 subItem.image = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(subItem.image)))
               }
+              // 1.1.18改用统一后台配置
+              // subItem.image = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(subItem.image)))
               return subItem
             })
           }
@@ -1174,9 +1178,17 @@ export default {
       this.addNodeShow = false;
       // 保存工作流
       this.autoSave('paramsSave', false);
-    },
-    saveNodeParam(...arg) {
-      this.$emit('saveParam', arg);
+      // 表格模式更新
+      if (this.viewMode === 'table') {
+        const ifr = this.$refs.ifr;
+        if (ifr) {
+          setTimeout(()=> {
+            ifr.contentWindow.postMessage(JSON.stringify({
+              type: 'dss_change_node'
+            }), "*");
+          }, 600)
+        }
+      }
     },
     /**
      * 保存工作流
@@ -1268,7 +1280,7 @@ export default {
           node.resources = [];
         }
         // 保存之前删掉执行的状态信息
-        if(node.runState) {
+        if (node.runState) {
           delete node.runState
         }
 
@@ -2547,9 +2559,12 @@ export default {
       this.showNodePathPanel = true
     },
     changeViewMode(mode) {
+      if (this.viewMode === mode) return
       this.viewMode = mode
       if (mode == 'table') {
+        this.originalData = this.json;
         this.iframeloading = true
+        this.openningNode = null
       }
       this.$nextTick(()=> {
         const ifr = this.$refs.ifr;

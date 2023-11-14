@@ -202,7 +202,7 @@ export default {
     },
     adjustColWidth() {
       const adjustCol = []
-      this.$el.querySelectorAll('#tbheader .field-list-item').forEach(item => adjustCol.push(item.clientWidth))
+      this.$el.querySelectorAll('#tbheader .field-list-item').forEach(item => adjustCol.push(item.getBoundingClientRect().width))
       adjustCol.forEach((item, index) => {
         if (index === this.dragColIndex) {
           adjustCol[index] = adjustCol[index] + this.dragLine.diff + 'px'
@@ -243,7 +243,7 @@ export default {
           .field-table-mode {
             color: $primary-color
           }
-          &:not(:first-child){
+          &:last-child {
               border-bottom: 1px solid $border-color-base;
               @include border-color($border-color-base, $dark-border-color-base);
           }

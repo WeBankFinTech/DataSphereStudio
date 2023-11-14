@@ -138,6 +138,10 @@ export default {
         return this.$route.query.workspaceName || cache && cache.name
       }
       return storage.get('currentWorkspace');
+    },
+    getHandbookUrl() {
+      let baseInfo = storage.get('baseInfo', 'local') || {}
+      return baseInfo.dss ? baseInfo.dss.handbookUrl || window.$APP_CONF.handbook : window.$APP_CONF.handbook
     }
   },
 };

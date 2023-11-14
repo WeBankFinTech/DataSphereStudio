@@ -139,9 +139,9 @@
           border-radius: 2px;
           padding: 25px;
           position: relative;
-          background: url("../../assets/images/bgc-imag.svg") center center
+          background: url("../../assets/images/bgc-imag.svg") center right
             no-repeat;
-          background-size: 100%;
+          background-size: contain;
           margin-right: 25px;
 
           :last-child {

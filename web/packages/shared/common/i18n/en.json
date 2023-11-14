@@ -325,6 +325,7 @@
         "all": "all",
         "downloadMode": "Download Mode :",
         "selectsplit": "Please Select Separator :",
+        "keepNewline": "Keep Line Break:",
         "autoformat": "Format",
         "deepAnalysis": "Deep Analysis",
         "success": {
@@ -544,7 +545,6 @@
       "safetips": "Currently downloading data, which may involve sensitive data. Please ensure data security",
       "Knowledge": "Knowledge base",
       "manual": "User manual",
-      "guide": "UDF user guide",
       "Help": "Help",
       "Add": "Add",
       "Cut": "Cut",

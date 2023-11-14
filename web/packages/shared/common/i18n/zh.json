@@ -333,6 +333,7 @@
         "all": "是否全量",
         "downloadMode": "下载方式：",
         "selectsplit": "请选择分隔符：",
+        "keepNewline": "是否保留换行符：",
         "autoformat": "自动格式化",
         "deepAnalysis": "分 析 进 阶",
         "success": {
@@ -544,7 +545,6 @@
       "safetips": "当前进行数据下载，可能涉及敏感数据，请保障数据的安全",
       "Knowledge": "知识库",
       "manual": "用户手册",
-      "guide": "自定义参数使用指引",
       "Help": "使用帮助",
       "Add": "添加",
       "Cut": "剪切",

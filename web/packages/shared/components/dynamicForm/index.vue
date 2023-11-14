@@ -2,7 +2,7 @@
   <div class="dynamic-form">
     <div class="dynamic-form-header-wrap">
       <h4 class="dynamic-form-header-title">{{ title }}</h4>
-      <a target="_blank" href="/_book/知识库/用户手册/Scriptis/变量管理.html">{{ $t('message.common.Help') }}</a>
+      <a target="_blank" :href="`${handbookUrl}/知识库/用户手册/Scriptis/变量管理.html`">{{ $t('message.common.Help') }}</a>
     </div>
     <Form ref="dynamicForm" :model="formDynamic" class="dynamic-form-content">
       <FormItem v-for="(item, index) in formDynamic.list" :key="index">
@@ -49,6 +49,8 @@
   </div>
 </template>
 <script>
+import mixin from '@dataspherestudio/shared/common/service/mixin';
+
 export default {
   props: {
     title: String,
@@ -57,6 +59,7 @@ export default {
       default: () => []
     }
   },
+  mixins: [mixin],
   data() {
     return {
       formDynamic: {
@@ -77,7 +80,8 @@ export default {
           callback(new Error(this.$t("message.common.dynamicForm.someKey")));
         }
         callback();
-      }
+      },
+      handbookUrl: this.getHandbookUrl()
     };
   },
   watch: {

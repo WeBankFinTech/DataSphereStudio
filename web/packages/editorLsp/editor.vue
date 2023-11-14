@@ -181,6 +181,9 @@ export default {
     this.editorModel = null
   },
   methods: {
+    layout() {
+      this.editor.layout()
+    },
     // 初始化
     initMonaco() {
       if (this.type !== 'log') {

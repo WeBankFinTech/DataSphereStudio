@@ -99,6 +99,29 @@
                 </RadioGroup>
               </Row>
             </div>
+            <div>
+              <Row class="row-item">
+                {{$t('message.common.toolbar.keepNewline')}}
+              </Row>
+              <Row class="row-item">
+                <RadioGroup
+                  v-model="download.keepNewline"
+                >
+                  <Radio
+                    name="1"
+                    label="1"
+                  >
+                    {{ $t('message.scripts.Yes') }}
+                  </Radio>
+                  <Radio
+                    name="0"
+                    label="0"
+                  >
+                    {{ $t('message.scripts.No') }}
+                  </Radio>
+                </RadioGroup>
+              </Row>
+            </div>
             <div v-if="isAll || +download.format === 1">
               <Row class="row-item">
                 {{$t('message.common.toolbar.downloadMode')}}
@@ -226,6 +249,7 @@ export default {
         coding: '1',
         nullValue: '1',
         splitChar: '1',
+        keepNewline: '0'
       },
       isIconLabelShow: true,
       iconSize: 14,
@@ -267,7 +291,8 @@ export default {
           format: '1',
           coding: '1',
           nullValue: '1',
-          splitChar: '1'
+          splitChar: '1',
+          keepNewline: '0'
         }
       }
       if (type === 'export') {
@@ -311,6 +336,7 @@ export default {
           const splitor = this.download.format === '1' ? 'csv' : 'xlsx';
           const charset = this.download.coding === '1' ? 'utf-8' : 'gbk';
           const nullValue = this.download.nullValue === '1' ? 'NULL' : 'BLANK';
+          const keepNewline = this.download.keepNewline === '1' ? 'true' : 'false';
           const timestamp = moment.unix(moment().unix()).format('MMDDHHmm');
           let fileName = ''
           if ( this.script.fileName && this.script.fileName !== 'undefined') {
@@ -320,7 +346,7 @@ export default {
           }
           const filename = `Result_${fileName}_${timestamp}`;
           let temPath = this.currentPath;
-          let querys = '&charset=' + charset + '&outputFileType=' + splitor + '&nullValue=' + nullValue + '&autoFormat=' + this.autoFormat;
+          let querys = `&charset=${charset}&outputFileType=${splitor}&nullValue=${nullValue}&autoFormat=${this.autoFormat}&keepNewline=${keepNewline}`;
           // 如果是api执行页获取结果集，需要带上taskId
           if(this.getResultUrl !== 'filesystem') {
             querys += `&taskId=${this.work.taskID}`

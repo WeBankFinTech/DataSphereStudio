@@ -6,6 +6,7 @@
           :addProject="createProjectHandler"
           :addWrokFlow="ProjectMergeAdd"
           :goto="gotoLastWorkflow"
+          @importWorkflowSuccess="noticeParent"
         />
       </template>
     </div>

@@ -18,8 +18,12 @@
             style="margin-left: 8px"
             icon="md-add"
             @click.stop="addWrokFlow"
-          >{{ $t('message.workflow.Addworkflow') }}</Button
-          >
+          >{{ $t('message.workflow.Addworkflow') }}</Button>
+          <Button
+            type="primary"
+            style="margin-left: 8px"
+            @click.stop="importWrokFlow"
+          >{{ $t('message.workflow.Importworkflow') }}</Button>
         </div>
       </div>
     </div>
@@ -37,10 +41,31 @@
         </div>
       </div>
     </div>
+    <!--导入弹窗-->
+    <Modal v-model="importModalShow" :footer-hide="true" :title="$t('message.workflow.Importworkflow')">
+      <Form
+        :label-width="100"
+        ref="projectForm"
+        v-if="importModalShow"
+        :model="workflowDataCurrent"
+        :rules="formValid">
+        <FormItem
+          label="dwsCookie"
+          prop="dwsCookie">
+          <Input
+            v-model="workflowDataCurrent.dwsCookie"
+            type="text"
+            :maxlength=201
+            :placeholder="$t('message.workflow.inputImportWorkflowDwsCookie')"></Input>
+        </FormItem>
+        <Button style="margin-left:100px" type="primary" @click="importConfirm" :loading="isConfirmLoading">导入</Button>
+      </Form>
+    </Modal>
   </div>
 </template>
 
 <script>
+import api from '@dataspherestudio/shared/common/service/api';
 export default {
   name: "Void",
   props: {
@@ -57,12 +82,51 @@ export default {
       default: () => {}
     }
   },
-  mounted() {
-  },
   data() {
     return {
-      lastWorkflowList: []
+      lastWorkflowList: [],
+      isConfirmLoading: false,
+      importModalShow: false,
+      workflowDataCurrent: {
+        dwsCookie: ''
+      }
     };
+  },
+  computed: {
+    formValid() {
+      return {
+        dwsCookie: [
+          { required: true, message: this.$t('message.workflow.inputImportWorkflowDwsCookie'), trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    importWrokFlow() {
+      this.importModalShow = true
+    },
+    importConfirm() {
+      this.$refs.projectForm.validate((valid) => {
+        if (valid) {
+          this.isConfirmLoading = true
+          api.fetch('/dss/framework/orchestrator/dwsmigrate/migrateProject', {
+            dwsCookie: this.workflowDataCurrent.dwsCookie,
+            projectName: this.$route.query.projectName || '',
+            projectID: this.$route.query.projectID || ''
+          }, 'get').then(() => {
+            this.$Message.success('导入成功')
+            this.isConfirmLoading = false
+            this.$emit('importWorkflowSuccess', this.$route.query.projectID)
+            this.importModalShow = false
+          }).catch(() => {
+            this.isConfirmLoading = false
+          })
+        } else {
+          this.isConfirmLoading = false;
+          this.$Message.warning(this.$t("message.workflow.failedNotice"));
+        }
+      });
+    }
   }
 };
 </script>

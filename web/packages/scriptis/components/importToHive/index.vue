@@ -13,7 +13,7 @@
     </div>
     <!-- content -->
     <div
-      class="we-import-to-hive"
+      class="we-import-to-hive we-import-fix-style"
       :class="{'first-step': modal.step === 0}">
       <div class="we-import-to-hive-steps">
         <Steps
@@ -50,12 +50,18 @@
           <FormItem
             :label="$t('message.scripts.importToHive.LJ')"
           >
+            <Input
+              v-if="!hideDir"
+              v-model="filterText"
+              :placeholder="$t('message.common.navBar.dataStudio.searchPlaceholder')"
+              class="we-directory-input"></Input>
             <directory-dialog
               :height="226"
               :tree="tree"
               :is-hide="hideDir"
               :load-data-fn="loadDataFn"
-              :filter-node="filterNode"
+              :filter-node="handelFilterNode"
+              :filter-text="filterText"
               :path="firstStep.exportPath"
               :fs-type="firstStep.type"
               :is-root-default-open="true"
@@ -217,20 +223,23 @@
           <FormItem
             v-if="isXlsType"
             :label="$t('message.scripts.importToHive.SHEETB')"
+            prop="moreSheet"
           >
             <Select
               v-model="secondStep.moreSheet"
-              multiple="multiple"
-              class="step-from-sheet">
+              class="step-from-sheet"
+              @on-change="handleSheetChange"
+            >
               <Option
                 v-for="(item, index) in secondStep.sheetList"
-                :value="item"
+                :value="item.label"
                 :key="index"
-                :label="item">{{ item }}</Option>
+                :label="item.label">{{ item.label }}</Option>
             </Select>
           </FormItem>
           <!-- <p class="step-form-title">{{ $t('message.scripts.importToHive.ZG') }}</p> -->
           <field-list
+            :key="secondStep.moreSheet"
             :list="secondStep.fields"
             :static-data="staticData"
             :is-xls="isXlsType"
@@ -253,11 +262,17 @@
         :loading="modal.loading"
         @click="prevStep">{{ $t('message.scripts.importToHive.SYB') }}</Button>
       <Button
+        v-if="modal.step === 1 && isXlsType"
+        :loading="modal.loading"
+        type="primary"
+        :disabled="validator.isView"
+        @click="submit('continue')">{{ $t('message.scripts.importToHive.TJHJXDRSJ') }}</Button>
+      <Button
         v-if="modal.step === 1"
         :loading="modal.loading"
         type="primary"
         :disabled="validator.isView"
-        @click="submit">{{ $t('message.scripts.importToHive.TJ') }}</Button>
+        @click="submit('close')">{{ $t('message.scripts.importToHive.TJBJS') }}</Button>
     </template>
   </Modal>
 </template>
@@ -317,7 +332,7 @@ export default {
       secondStep: {
         tbName: '',
         dbName: '',
-        moreSheet: [],
+        moreSheet: '',
         sheetList: [],
         partition: '',
         partitionValue: '',
@@ -401,6 +416,10 @@ export default {
             },
           },
         ],
+        moreSheet: [{
+          required: true,
+          message: 'sheet表不能为空',
+        }],
       },
       staticData: {
         type: [
@@ -447,7 +466,9 @@ export default {
       lastScrollEnd: 0,
       isFullScreen: false,
       directoryHeight: 280,
-      hideDir: false
+      hideDir: false,
+      operStatus: 'close',
+      filterText: ''
     };
   },
   computed: {
@@ -518,6 +539,17 @@ export default {
     }
   },
   methods: {
+    handelFilterNode(node) {
+      let label = node.label;
+      let textValid = true;
+      if (this.filterText) {
+        let searchText = this.filterText;
+        label = label.toLowerCase();
+        searchText = searchText.toLowerCase();
+        textValid = label.indexOf(searchText) !== -1;
+      }
+      return textValid && this.filterNode(node)
+    },
     open(path) {
       if (this.modal.loading) {
         return this.$Message.warning(this.$t('message.scripts.importToHive.WJZZZXDR'));
@@ -531,14 +563,24 @@ export default {
       }
       this.firstStep.type = this.fsType;
       this.modal.show = true;
+      this.operStatus = 'close'
       this.modal.step = 0;
       this.validator.isLeaf = true;
       this.isFullScreen = false;
       this.directoryHeight = 280;
+      this.filterText = '';
     },
 
     close() {
-      this.modal.show = false;
+      if (this.operStatus === 'close') {
+        this.modal.show = false;
+      } else {
+        this.secondStep.tbName = '';
+        this.secondStep.partition = '';
+        this.secondStep.partitionValue = '';
+        this.secondStep.moreSheet = '';
+        this.secondStep.fields = [];
+      }
     },
     validPartitionValue(value, cb) {
       let item = this.partitionManager.areas.indexOf(value);
@@ -563,7 +605,7 @@ export default {
       this.secondStep = {
         tbName: '',
         dbName: '',
-        moreSheet: [],
+        moreSheet: '',
         sheetList: [],
         partition: '',
         partitionValue: '',
@@ -660,6 +702,13 @@ export default {
       const path = this.firstStep.exportPath;
       return path.slice(path.lastIndexOf('/') + 1, path.lastIndexOf('.'));
     },
+    buildList(obj) {
+      let res = [];
+      Object.keys(obj).forEach(key => {
+        res.push({ value: obj[key], label: key })
+      })
+      return res;
+    },
     nextStep() {
       if (!this.validator.isLeaf) return this.$Message.error(this.$t('message.scripts.importToHive.ZQDRWJLJ'));
       this.modal.loading = true;
@@ -677,21 +726,28 @@ export default {
           this.secondStep.dbName = findIndDbName(dbList);
           this.handleHiveDbChange(this.secondStep.dbName);
         });
-        let { sheetName, columnName, columnType } = format;
         this.modal.step = 1;
-        this.secondStep.sheetList = sheetName;
-        this.secondStep.moreSheet = sheetName ? sheetName[0] : '';
-        this.secondStep.fields = columnName.map((item, index) => {
+        const sheetList = this.buildList(format);
+        this.secondStep.sheetList = sheetList;
+        this.secondStep.moreSheet = sheetList ? sheetList[0].label : '';
+        this.handleSheetChange(this.secondStep.moreSheet);
+      });
+    },
+    handleSheetChange(val) {
+      if(val) {
+        const item = this.secondStep.sheetList.find(item => item.label === val).value || {};
+        const arr = this.buildList(item);
+        this.secondStep.fields = arr.map((item, index) => {
           return {
-            fieldName: item,
-            type: columnType[index],
+            fieldName: item.label,
+            type: item.value,
             comment: '',
             commentShow: false,
             dateFormat: '',
             index
           };
         });
-      });
+      }
     },
     prevStep() {
       this.modal.step = 0;
@@ -713,6 +769,9 @@ export default {
       }
       if (this.secondStep.isNewPartition) {
         validProps.push('partition');
+      }
+      if(this.isXlsType) {
+        validProps.push('moreSheet');
       }
       for (let prop of validProps) {
         let validateMsg = await this.validateFieldSync(prop);
@@ -767,7 +826,8 @@ export default {
       });
       return errMsg;
     },
-    async submit() {
+    async submit(status) {
+      this.operStatus = status;
       let isValid = await this.beforeSubmit();
       let fieldErrMsg = this.fieldsValidate();
       if (fieldErrMsg) return this.$Message.error(fieldErrMsg);
@@ -863,5 +923,8 @@ export default {
   padding-top: 5px;
   cursor: pointer;
   color: #2d8cf0
+}
+.we-import-fix-style {
+  overflow: initial;
 }
 </style>

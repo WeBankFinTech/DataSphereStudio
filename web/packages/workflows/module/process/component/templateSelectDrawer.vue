@@ -9,12 +9,12 @@
   >
     <Collapse v-model="activePanelArray" @on-change="handlePanelChange">
       <Panel :name="item.templateId" v-for="(item,index) in templateList" :key="item.templateId">
-        <Radio v-model="radioData[index]" :true-value="true" :false-value="false" @on-change="handleRadioChange">
-          <span>{{item.templateName}}</span>
+        <Radio v-model="radioData[index]" :true-value="true" :false-value="false" @on-change="handleRadioChange" style="width:85%;overflow: hidden;text-overflow: ellipsis;">
+          <span :title="item.templateName">{{item.templateName}}</span>
         </Radio>
         <div slot="content">
           <div v-for="(confItem,confIndex) in item.conf" :key="confIndex">
-            <span>{{confItem.key}}</span>:&nbsp;<span style="color: black">{{confItem.configValue}}</span> 
+            <span>{{confItem.key}}</span>:&nbsp;<span style="color: black">{{confItem.configValue}}</span>
           </div>
           <div><span>模板描述</span>:&nbsp;<span style="color: black">{{item.desc}}</span></div>
         </div>
@@ -44,7 +44,7 @@ export default {
     defaultTemplateId: {
       type: String,
       default: ''
-    }, 
+    },
   },
   data() {
     return {
@@ -56,7 +56,7 @@ export default {
     }
   },
   mounted() {
-    this.initRadioData() 
+    this.initRadioData()
   },
   methods: {
     initRadioData() {
@@ -76,7 +76,7 @@ export default {
           this.$set(this.radioData, index, false)
         }
       })
-      this.cacheRadioData = JSON.parse(JSON.stringify(this.radioData)) 
+      this.cacheRadioData = JSON.parse(JSON.stringify(this.radioData))
     },
     async handlePanelChange(vArray) {
       vArray.forEach(async (v)=> {
@@ -87,8 +87,8 @@ export default {
           const descRes = await getTemplateDescById({
             templateId: this.templateList[index].templateId
           })
-          let curTemplate = JSON.parse(JSON.stringify(this.templateList[index])) 
-          curTemplate.conf = JSON.parse(JSON.stringify(descRes.conf)) 
+          let curTemplate = JSON.parse(JSON.stringify(this.templateList[index]))
+          curTemplate.conf = JSON.parse(JSON.stringify(descRes.conf))
           curTemplate.desc = JSON.parse(JSON.stringify(descRes.description))
           this.$set(this.templateList, index, curTemplate)
         }

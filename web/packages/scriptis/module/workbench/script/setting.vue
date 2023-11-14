@@ -52,16 +52,18 @@ export default {
 <style lang="scss" scoped>
 @import '@dataspherestudio/shared/common/style/variables.scss';
 .editor-setting {
-  width: 30%;
-  min-width: 300px;
+  width: 100%;
+  min-width: 200px;
+  height: 100%;
+  // min-width: 50px;
   @include bg-color($light-base-color, $dark-base-color);
   border-left: $border-width-base $border-style-base $border-color-base;
   @include border-color($border-color-base, $dark-workspace-background);
-  overflow-y: auto;
-  position: $absolute;
-  top: 32px;
-  right: 0;
-  bottom: 0;
+  overflow: auto;
+  // position: $absolute;
+  // top: 32px;
+  // right: 0;
+  // bottom: 0;
   .editor-setting-header {
     border-bottom: $border-width-base $border-style-base #e8eaec;
     @include border-color($border-color-base, $dark-border-color-base);

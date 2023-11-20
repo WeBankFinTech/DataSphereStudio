@@ -138,8 +138,8 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
     private String dealSchedulisErrorMsg(String errorMsg) {
         Matcher matcher = ERROR_PATTERN.matcher(errorMsg);
         if (matcher.find() && matcher.group().length() >= SCHEDULIS_MAX_SIZE) {
-            errorMsg = "wokflow name " + matcher.group().split("/")[1] + " is to long, please abide the rules of schedulis: projectName + workflowName*3 + 12 <= 250 ";
-        }
+            errorMsg = "wokflow name " + matcher.group().split("/")[1] + " is to long, please abide the rules of schedulis: projectName + workflowName*3 + 12 <= 250 " +
+                    "(工作流名称太长，需要满足规则 项目名长度 + 工作流长度*3 + 12 <= 250)";        }
         return errorMsg;
     }
 }

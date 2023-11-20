@@ -398,7 +398,11 @@ public class DataCheckerDao {
         log.info("-------------------------------------- dataObject: " + dataObject);
         try (PreparedStatement pstmt = getJobStatement(conn, dataObject)) {
             ResultSet rs = pstmt.executeQuery();
-            long ret = rs.last() ? rs.getRow() : 0;
+//            long ret = rs.last() ? rs.getRow() : 0;
+            long ret = 0L;
+            while (rs.next()) {
+                ret ++;
+            }
             log.info("-------------------------------------- hive/spark/mr data result:"+ret);
             return ret;
         } catch (SQLException e) {
@@ -416,7 +420,11 @@ public class DataCheckerDao {
         log.info("-------------------------------------- dataObject: " + dataObject.toString());
         try (PreparedStatement pstmt = getBdpStatement(conn, dataObject, timeScape)) {
             ResultSet rs = pstmt.executeQuery();
-            long ret=rs.last() ? rs.getRow() : 0;
+            long ret = 0L;
+            while (rs.next()) {
+                ret ++;
+            }
+//            long ret=rs.last() ? rs.getRow() : 0;
             log.info("-------------------------------------- bdp data result:"+ret);
             return ret;
         } catch (SQLException e) {
@@ -437,7 +445,11 @@ public class DataCheckerDao {
         log.info("-------------------------------------- dataObject: " + dataObject.toString());
         try (PreparedStatement pstmt = getDopsStatement(conn, dataObject)) {
             ResultSet rs = pstmt.executeQuery();
-            long count = rs.last() ? rs.getRow() : 0;
+            long count = 0L;
+            while (rs.next()) {
+                count ++;
+            }
+//            long count = rs.last() ? rs.getRow() : 0;
             log.info("-------------------------------------- dops data check table or partition,count:"+count);
             if(count>0){
                 return CheckDataObject.Type.PARTITION == dataObject.getType() ? 2 : 1;
@@ -453,7 +465,11 @@ public class DataCheckerDao {
 
         try(PreparedStatement pstmt = getDopsStatementCheckAllPartition(conn, dataObject)){
             ResultSet rs = pstmt.executeQuery();
-            long count = rs.last() ? rs.getRow() : 0;
+            long count = 0L;
+            while (rs.next()) {
+                count ++;
+            }
+//            long count = rs.last() ? rs.getRow() : 0;
             log.info("-------------------------------------- dops data check all partition result count:"+count);
             if(count>0){
                 return 3;

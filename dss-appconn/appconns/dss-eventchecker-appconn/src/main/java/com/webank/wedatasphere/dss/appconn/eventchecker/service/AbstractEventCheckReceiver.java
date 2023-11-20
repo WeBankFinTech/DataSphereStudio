@@ -119,7 +119,10 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
             pstmtForGetID.setString(2, topic);
             pstmtForGetID.setString(3, msgName);
             rs = pstmtForGetID.executeQuery();
-            lastMsgId = rs.last()==true ? rs.getString("msg_id"):"0";
+            while (rs.next()) {
+                lastMsgId = rs.getString("msg_id");
+            }
+//            lastMsgId = rs.last()==true ? rs.getString("msg_id"):"0";
         } catch (SQLException e) {
             throw new RuntimeException("get Offset failed " + e);
         }finally {
@@ -152,13 +155,25 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
                     + ", Topic: " + topic + ", MessageName: " + msgName + ", LastMessageID: " + params[2]);
             rs = pstmt.executeQuery();
 
-            if(rs.last()){
+            while (rs.next()) {
                 consumedMsgInfo = new String[4];
-                String[] msgKey = new String[]{"msg_id","msg_name","sender","msg"};
-                for (int i = 0;i <= 3;i++) {
-                    consumedMsgInfo[i] = rs.getString(msgKey[i]);
+                String[] msgKey = new String[]{"msg_id", "msg_name", "sender", "msg"};
+                for (int i = 0; i < msgKey.length; i++) {
+                    try {
+                        consumedMsgInfo[i] = rs.getString(msgKey[i]);
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Error while reading data from ResultSet", e);
+                    }
                 }
             }
+
+//            if(rs.last()){
+//                consumedMsgInfo = new String[4];
+//                String[] msgKey = new String[]{"msg_id","msg_name","sender","msg"};
+//                for (int i = 0;i <= 3;i++) {
+//                    consumedMsgInfo[i] = rs.getString(msgKey[i]);
+//                }
+//            }
         } catch (SQLException e) {
             throw new RuntimeException("EventChecker failed to receive message" + e);
         } finally {

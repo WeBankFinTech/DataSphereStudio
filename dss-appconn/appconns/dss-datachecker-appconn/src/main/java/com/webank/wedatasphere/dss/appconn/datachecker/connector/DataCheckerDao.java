@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -115,7 +116,8 @@ public class DataCheckerDao {
 
         String dataCheckerInfo = props.getProperty(DataChecker.DATA_OBJECT);
         if (null != action.getExecutionRequestRefContext()) {
-            action.getExecutionRequestRefContext().appendLog("=============================Data Check Start==========================================");
+            Date startCheckDate = new Date();
+            action.getExecutionRequestRefContext().appendLog(startCheckDate + "=============================Data Check Start==========================================");
 //            action.getExecutionRequestRefContext().appendLog("Database table partition info : " + dataCheckerInfo);
         }
         log.info("(DataChecker info) database table partition info : " + dataCheckerInfo);
@@ -152,9 +154,10 @@ public class DataCheckerDao {
                     }).collect(Collectors.toList());
             boolean flag = allCheckRes.stream().allMatch(res -> res.equals(true));
             if (flag) {
+                Date endCheckDate = new Date();
                 log.info("=============================Data Check End,check result:true==========================================");
                 if (null != action.getExecutionRequestRefContext()) {
-                    action.getExecutionRequestRefContext().appendLog("=============================Data Check End,check result:true==========================================");
+                    action.getExecutionRequestRefContext().appendLog(endCheckDate + "=============================Data Check End,check result:true==========================================");
                 }
                 return true;
             }
@@ -162,10 +165,10 @@ public class DataCheckerDao {
         } catch (SQLException e) {
             throw new RuntimeException("get DataChecker result failed", e);
         }
-
+        Date endCheckDate = new Date();
         log.info("=============================Data Check End,check result:false==========================================");
         if (null != action.getExecutionRequestRefContext()) {
-            action.getExecutionRequestRefContext().appendLog("=============================Data Check End,,check result:false==========================================");
+            action.getExecutionRequestRefContext().appendLog(endCheckDate + "=============================Data Check End,check result:false==========================================");
         }
         return false;
     }

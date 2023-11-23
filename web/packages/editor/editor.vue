@@ -158,6 +158,9 @@ export default {
     this.editorModel = null
   },
   methods: {
+    layout() {
+      this.editor.layout()
+    },
     // 初始化
     initMonaco() {
       this.editor = monaco.editor.create(this.$el, this.currentConfig);
@@ -191,10 +194,9 @@ export default {
     },
     changeTheme(theme) {
       if (theme == 'dark') {
-        monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
-      }
-      if (theme == 'light') {
-        monaco.editor.setTheme('logview');
+        this.monaco.editor.setTheme('logview-dark'); // dark模式使用自带的vs-dark theme
+      } else {
+        this.monaco.editor.setTheme('logview');
       }
     },
     changeInnerText(elList, text) {

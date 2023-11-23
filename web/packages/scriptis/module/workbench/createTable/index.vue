@@ -418,7 +418,19 @@ export default {
             }
           });
         } else {
-          resolve();
+          let fieldError = '';
+          this.attrInfo.target.importFieldsData.fields.forEach((it) => {
+            if (!it.name) {
+              fieldError = this.$t('message.scripts.importToHive.ZDMC');
+            } else if (!/^[a-zA-Z0-9_]+$/.test(it.name)) {
+              fieldError = this.$t('message.scripts.fieldnamestyle');
+            }
+          });
+          if(fieldError) {
+            this.$Message.warning(fieldError);
+          } else {
+            resolve();
+          }
         }
       });
     },

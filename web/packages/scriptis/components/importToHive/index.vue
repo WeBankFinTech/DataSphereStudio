@@ -727,10 +727,28 @@ export default {
           this.handleHiveDbChange(this.secondStep.dbName);
         });
         this.modal.step = 1;
-        const sheetList = this.buildList(format);
-        this.secondStep.sheetList = sheetList;
-        this.secondStep.moreSheet = sheetList ? sheetList[0].label : '';
-        this.handleSheetChange(this.secondStep.moreSheet);
+        let exportPath = this.firstStep.exportPath;
+        const pathSuffix = exportPath.substr(exportPath.lastIndexOf('.'), exportPath.length);
+        if(pathSuffix !== '.txt') {
+          const sheetList = this.buildList(format);
+          this.secondStep.sheetList = sheetList;
+          this.secondStep.moreSheet = sheetList ? sheetList[0].label : '';
+          this.handleSheetChange(this.secondStep.moreSheet);
+        } else {
+          let { sheetName, columnName, columnType } = format;
+          this.secondStep.sheetList = sheetName;
+          this.secondStep.moreSheet = sheetName ? sheetName[0] : '';
+          this.secondStep.fields = columnName.map((item, index) => {
+            return {
+              fieldName: item,
+              type: columnType[index],
+              comment: '',
+              commentShow: false,
+              dateFormat: '',
+              index
+            };
+          });
+        }
       });
     },
     handleSheetChange(val) {
@@ -818,7 +836,10 @@ export default {
           let key = keys[i];
           let rule = poptipValidate[key];
           let { pattern, message } = rule;
-          if (field[key] && pattern && !pattern.test(field[key])) {
+          if (key === 'fieldName' && !field[key]) {
+            errMsg = this.$t('message.scripts.importToHive.ZDMC');
+            return errMsg;
+          } else if (field[key] && pattern && !pattern.test(field[key])) {
             errMsg = message;
             return errMsg;
           }
@@ -889,7 +910,7 @@ export default {
         this.lastScrollEnd = data.end;
         // 只有滚动停止后再去验证
         const toGetCheck = debounce((that, data) => {
-          for (let i = data.start; i < data.end; i++) {
+          for (let i = data.start; i <= data.end; i++) {
             // 表单的fields里面保存有表单需要进行验证的项，而且只有可视区域的
             const item = this.$refs.secondForm.fields.find((item) => item.prop === `fields.${i}.fieldName`)
             if (item) {

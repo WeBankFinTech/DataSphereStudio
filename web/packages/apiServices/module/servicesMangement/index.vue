@@ -365,6 +365,8 @@ export default {
     }
     .remarksContent {
       flex: 1;
+      word-wrap: break-word;
+      max-width: 90%;
     }
     .remarksButton {
       margin-left: 20px;

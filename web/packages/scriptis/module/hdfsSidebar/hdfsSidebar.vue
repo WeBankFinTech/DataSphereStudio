@@ -718,12 +718,18 @@ export default {
         escapeQuotes = true;
         quote = option.quote;
       }
-      const url = `/filesystem/getSheetInfo?path=${option.exportPath}&encoding=${encoding}&fieldDelimiter=${fieldDelimiter}&hasHeader=${option.isHasHeader}&escapeQuotes=${escapeQuotes}&quote=${quote}`;
+      const pathSuffix = option.exportPath.substr(option.exportPath.lastIndexOf('.'), option.exportPath.length);
+      const apiName = pathSuffix === '.txt' ? 'formate' : 'getSheetInfo';
+      const url = `/filesystem/${apiName}?path=${option.exportPath}&encoding=${encoding}&fieldDelimiter=${fieldDelimiter}&hasHeader=${option.isHasHeader}&escapeQuotes=${escapeQuotes}&quote=${quote}`;
       api.fetch(url, {}, {
         method: 'get',
         timeout: '600000',
       }).then((rst) => {
-        cb(rst.sheetInfo);
+        if(pathSuffix === '.txt') {
+          cb(rst.formate);
+        } else {
+          cb(rst.sheetInfo);
+        }
       }).catch(() => {
         cb(false);
       });

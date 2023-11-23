@@ -104,11 +104,12 @@
                 @on-change="changeCheckAllConfirm"
               />
             </div>
-            <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
+            <div class="field-list-item" style="width:50px;">{{ $t('message.scripts.Serial') }}</div>
             <div
               class="field-list-item"
-              v-for="(item, index) in columns"
+              v-for="(item, index) in columnCalc"
               :key="index"
+              :style="{width: item.width? `${item.width}` : 'auto'}"
               :class="item.className">{{ item.title }}</div>
           </div>
           <virtual-list
@@ -126,11 +127,12 @@
                   v-model="item.selected"
                   @on-change="changeCheck"
                 /></div>
-              <div class="field-list-item">{{ index + 1 }}</div>
+              <div class="field-list-item" style="width:50px;">{{ index + 1 }}</div>
               <div
                 class="field-list-item"
                 :title="formatValue(item, field)"
-                v-for="(field, index2) in columns"
+                v-for="(field, index2) in columnCalc"
+                :style="{width: columnCalc[index2].width? `${columnCalc[index2].width}` : 'auto'}"
                 :key="index2"
               >{{ formatValue(item, field) }}</div>
             </li>

@@ -216,10 +216,9 @@ export default {
 
     changeTheme(theme) {
       if (theme == 'dark') {
-        monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
-      }
-      if (theme == 'light') {
-        monaco.editor.setTheme('logview');
+        this.monaco.editor.setTheme('logview-dark'); // dark模式使用自带的vs-dark theme
+      } else {
+        this.monaco.editor.setTheme('logview');
       }
     },
   }

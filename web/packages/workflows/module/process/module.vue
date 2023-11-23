@@ -1315,6 +1315,8 @@ export default {
         if(node.contextID) {
           delete node.contextID;
         }
+        // todo 改成白名单的key值过滤，防止随意塞数据到flowjson里
+        delete node.nodeUiVOS;
         delete node.jobParams;
         return node;
       });
@@ -1840,6 +1842,7 @@ export default {
       if(this.cacheNode.runState) {
         delete this.cacheNode.runState;
       }
+      delete this.cacheNode.enableCopy;
       this.json.nodes = this.json.nodes.map((subItem) => {
         subItem.selected = false;
         return subItem;
@@ -2018,12 +2021,14 @@ export default {
     },
     // 根据节点类型将后台节点基础信息加入
     bindNodeBasicInfo(node) {
+      // todo 现在工作流保存数据结构混乱，很多没有必要保存的数据放到flowjson里提交了，需要梳理，保存提交前需要过滤
+      delete node.nodeUiVOS
       const shapes = JSON.parse(JSON.stringify(this.shapes));
       shapes.map((item) => {
         if (item.children.length > 0) {
           item.children.map((subItem) => {
             if (subItem.type === node.type || subItem.type === node.jobType) {
-              node = Object.assign(subItem, node);
+              node = Object.assign(subItem, node); // 待优化
             }
           })
         }

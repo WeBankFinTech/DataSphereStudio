@@ -54,6 +54,7 @@ import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
@@ -66,6 +67,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -330,6 +332,30 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
             return ((QueryJumpUrlResponseRef) responseRef).getJumpUrl();
         } else {
             throw new ExternalOperationFailedException(50025, "AppConn " + node.getNodeType() + " don't support to get jumpUrl!");
+        }
+    }
+
+    @Override
+    public byte[] getNodeIcon(String nodeType)  {
+        NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(nodeType);
+        if(nodeInfo==null){
+            String msg = String.format("%s note type not exist,please check appconn install successfully", nodeType);
+            logger.error(msg);
+            throw new DSSRuntimeException(msg);
+        }
+        String appConnHomePath = AppConnManager.getAppConnManager().getAppConnHomePath(nodeInfo.getAppConnName());
+        File iconPath = new File(appConnHomePath, nodeInfo.getIconPath());
+        String appConnName= nodeInfo.getAppConnName();
+        if(!iconPath.exists()) {
+            throw new DSSRuntimeException("Get icon failed. Caused by: AppConn " + appConnName + "'s " + iconPath + " not exists.");
+        } else if(!iconPath.isFile()) {
+            throw new DSSRuntimeException("Get icon failed. Caused by: AppConn " + appConnName + "'s " + iconPath + " is not a file.");
+        }
+        try {
+            return FileUtils.readFileToByteArray(iconPath);
+        } catch (IOException e) {
+            logger.error("read icon file failed,appConnName:"+appConnName,e);
+            throw new DSSRuntimeException("read icon file failed,appConnName:" + appConnName);
         }
     }
 

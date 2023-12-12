@@ -48,12 +48,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -123,7 +121,7 @@ public class NodeRestfulApi {
         BeanUtils.copyProperties(nodeInfo, nodeInfoVO);
         nodeInfoVO.setTitle(nodeInfo.getName());
         nodeInfoVO.setType(nodeInfo.getNodeType());
-        nodeInfoVO.setImage(getIcon(nodeInfo));
+        nodeInfoVO.setImage("");
         Function<NodeUi, String> descriptionSupplier = internationalization(req, NodeUi::getDescriptionEn, NodeUi::getDescription);
         Function<NodeUi, String> labelNameSupplier = internationalization(req, NodeUi::getLableNameEn, NodeUi::getLableName);
         ArrayList<NodeUiVO> nodeUiVOS = new ArrayList<>();
@@ -146,15 +144,11 @@ public class NodeRestfulApi {
         return nodeInfoVO;
     }
 
-    private String getIcon(NodeInfo nodeInfo) throws IOException {
-        String appConnHomePath = AppConnManager.getAppConnManager().getAppConnHomePath(nodeInfo.getAppConnName());
-        File iconPath = new File(appConnHomePath, nodeInfo.getIconPath());
-        if(!iconPath.exists()) {
-            throw new IOException("Get icon failed. Caused by: AppConn " + nodeInfo.getAppConnName() + "'s " + iconPath + " not exists.");
-        } else if(!iconPath.isFile()) {
-            throw new IOException("Get icon failed. Caused by: AppConn " + nodeInfo.getAppConnName() + "'s " + iconPath + " is not a file.");
-        }
-        return FileUtils.readFileToString(iconPath);
+
+    @RequestMapping(path ="nodeIcon/{nodeType}", method = RequestMethod.GET)
+    public void getIcon(HttpServletResponse response, @PathVariable("nodeType") String nodeType) throws IOException {
+        byte[] icon = workflowNodeService.getNodeIcon(nodeType);
+        response.getOutputStream().write(icon);
     }
 
     @RequestMapping(value = "/createAppConnNode",method = RequestMethod.POST)

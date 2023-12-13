@@ -128,6 +128,9 @@ export default {
       if (oldval && this.execute) {
         this.killExecute();
       }
+    },
+    height(val) {
+      this.scriptViewState.bottomContentHeight = val - 5
     }
   },
   mounted() {

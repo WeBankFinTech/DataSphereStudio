@@ -406,13 +406,13 @@ export default {
         this.stepActive = 0;
         this.reset();
         if (this.tableDetail) {
-          let { dbName, name } = this.tableDetail;
-          Object.assign(this.stepOne, {
-            exportType: '',
-            dbName,
-            tbName: name,
-          });
           this.$nextTick(() => {
+            let { dbName, name } = this.tableDetail;
+            Object.assign(this.stepOne, {
+              exportType: '',
+              dbName,
+              tbName: name,
+            });
             this.getPartitionInfo();
           });
         }

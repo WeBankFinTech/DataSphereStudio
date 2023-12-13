@@ -61,7 +61,7 @@
             </div>
           </template>
         </div>
-        <div class="workbench-tab-control" v-if="isControlBtnShow">
+        <!-- <div class="workbench-tab-control" v-if="isControlBtnShow">
           <Icon
             type="ios-arrow-dropleft-circle"
             :class="{ disable: tabLeft }"
@@ -72,7 +72,7 @@
             :class="{ disable: tabRight }"
             @click="tabMoving('left')"
           ></Icon>
-        </div>
+        </div> -->
         <div class="workbench-tab-button">
           <Dropdown
             trigger="click"
@@ -1265,7 +1265,7 @@ export default {
       flex-wrap: nowrap;
       justify-content: flex-start;
       align-items: center;
-      height: 40px;
+      height: 45px;
       @include bg-color($light-base-color, $dark-base-color);
       width: calc(100% - 45px);
       overflow: hidden;
@@ -1274,9 +1274,16 @@ export default {
         overflow-y: hidden;
         padding-left: 16px;
         &::-webkit-scrollbar {
-          width: 0;
-          height: 0;
-          background-color: transparent;
+          height: 6px;
+        }
+        &::-webkit-scrollbar-thumb {
+          box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+          border-radius: 3px;
+          background-color: #787d8b;
+        }
+        &::-webkit-scrollbar-track {
+          box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+          border-radius: 3px;
         }
         .list-group > span {
           white-space: nowrap;

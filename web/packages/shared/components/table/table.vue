@@ -8,6 +8,7 @@
         id="topDiv"
         class="table-top"
         :style="{right:`${(calcScrollBarWidth)}px`}"
+        @contextmenu.prevent.stop="headerContextMenu"
         @dblclick="headDblclick"
       >
         <table
@@ -182,6 +183,7 @@ export default {
   },
   data() {
     return {
+      showHeaderMenu: false,
       showLoad: false,
       showTableList: [], //实际显示的表格数据
       loadedNum: 0, //实际渲染的数据数量
@@ -457,6 +459,18 @@ export default {
         this.$emit("on-tdcontext-munu", {
           content: e.target.title,
           e
+        });
+      }
+    },
+    headerContextMenu() {
+      if (this.adjustCol.length) {
+        this.$Modal.confirm({
+          title: this.$t("message.common.dss.Prompt"),
+          content: this.$t("message.common.dss.adjustcolwidth"),
+          mask: false,
+          onOk: () => {
+            this.adjustCol = []
+          }
         });
       }
     },

@@ -528,7 +528,7 @@ export default {
       }
     },
     dbList(newDbList) {
-      const reg = ['_qml', '_ind', '_work'];
+      const reg = ['_qml', '_ind', '_work', '_tmp', '_bak'];
       this.dbFilterList = newDbList.filter(item => {
         const tabSuffix = item.name.substr(
           item.name.lastIndexOf('_'),

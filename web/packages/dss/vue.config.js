@@ -228,6 +228,53 @@ module.exports = {
         symbolId: 'icon-[name]'
       })
       .end()
+    config.optimization.splitChunks({
+      chunks: "all",
+      cacheGroups: {
+        "monaco-editor": {
+          test: /[\\/]monaco-editor[\\/]/,
+          name: "monaco-editor",
+          enforce: true,
+          reuseExistingChunk: true
+        },
+        iview: {
+          test: /[\\/]iview[\\/]/,
+          name: "iview",
+          enforce: true,
+          reuseExistingChunk: true
+        },
+        "moment-timezone": {
+          test: /[\\/]moment-timezone[\\/]/,
+          name: "moment-timezone",
+          enforce: true,
+          reuseExistingChunk: true
+        },
+        "echarts": {
+          test: /[\\/]echarts[\\/]/,
+          name: "echarts",
+          enforce: true,
+          reuseExistingChunk: true
+        },
+        "butterfly-dag": {
+          test: /[\\/]butterfly-dag[\\/]/,
+          name: "butterfly-dag",
+          enforce: true,
+          reuseExistingChunk: true
+        },
+        "shared": {
+          test: /[\\/]shared[\\/]/,
+          name: "shared",
+          enforce: true,
+          reuseExistingChunk: true
+        },
+        "jquery": {
+          test: /[\\/]jquery[\\/]/,
+          name: "jquery",
+          enforce: true,
+          // reuseExistingChunk: true
+        }
+      }
+    })
   },
   configureWebpack: configWrap({
     resolve: {

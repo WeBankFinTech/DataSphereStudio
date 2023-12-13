@@ -734,10 +734,10 @@ export default {
     this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth; // 自适应控制台宽度
     this.getConsoleParams();
     document.addEventListener('keyup', this.onKeyUp)
-    this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
     eventbus.on('workflow.fold.left.tree', this.foldHandler);
     eventbus.on('workflow.copying', this.onCopying);
-    window.addEventListener('message', this.msgEvent, false)
+    window.addEventListener('message', this.msgEvent, false);
+    window.addEventListener('resize', this.resizeConsole, false);
   },
   beforeDestroy() {
     if (this.timer) {
@@ -756,8 +756,12 @@ export default {
     eventbus.off('workflow.copying', this.onCopying);
     document.removeEventListener('keyup', this.onKeyUp);
     window.removeEventListener('message', this.msgEvent, false);
+    window.removeEventListener('resize', this.resizeConsole, false);
   },
   methods: {
+    resizeConsole() {
+      this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
+    },
     msgEvent(e) {
       if (e.data) {
         try {

@@ -1,12 +1,17 @@
 <template>
   <div class="field-list">
-    <Input
-      v-model="searchText"
-      :placeholder="$t('message.scripts.tableDetails.SSZDMC')">
-      <Icon
-        slot="prefix"
-        type="ios-search"/>
-    </Input>
+    <div class="field-list-search">
+      <Input
+        v-model="searchText"
+        :placeholder="$t('message.scripts.tableDetails.SSZDMC')">
+        <Icon
+          slot="prefix"
+          type="ios-search"/>
+      </Input>
+      <div class="field-list-search__button">
+        <Button type="success" @click="handleCopy">{{ $t('message.scripts.tableDetails.FZBZDXX') }}</Button>
+      </div>
+    </div>
     <div style="position:relative">
       <div class="field-list-header" id="tbheader" :class="{'ovy': searchColList.length > maxSize}">
         <div
@@ -211,6 +216,29 @@ export default {
         }
       })
       this.adjustCol = adjustCol
+    },
+    handleCopy() {
+      const contents = [this.columnCalc.map(item => item.title).join('\t')];
+      const columnKeys = this.columnCalc.map(item => item.key);
+      this.searchColList.forEach(item => {
+        let items = []
+        columnKeys.forEach(key => {
+          if (['primary','partitionField'].includes(key) && typeof item[key] === 'boolean') {
+            items.push(item[key] ? '是' : '否');
+          } else {
+            items.push(item[key]);
+          }
+        })
+        contents.push(items.join('\t'));
+      })
+      const text = contents.join('\n');
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      this.$Message.success(this.$t("message.scripts.paste_successfully"));
     }
   },
 };
@@ -229,6 +257,13 @@ export default {
           @include border-color($border-color-base, $dark-border-color-base);
           height: 46px;
           line-height: 46px;
+      }
+      .field-list-search {
+        display: flex;
+        &__button {
+          flex: 0 0 150px;
+          margin-left: 10px;
+        }
       }
       .field-list-header {
           background-color: #5e9de0;

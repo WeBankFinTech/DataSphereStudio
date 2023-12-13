@@ -192,7 +192,8 @@
         "WJS": "文件数：",
         "YES": "对",
         "GSHJX": "进行格式化成",
-        "ZJXYGE": "组件需要的格式"
+        "ZJXYGE": "组件需要的格式",
+        "FZBZDXX": "复制表字段信息"
       },
       "logView": {
         "taskId": "任务ID：",

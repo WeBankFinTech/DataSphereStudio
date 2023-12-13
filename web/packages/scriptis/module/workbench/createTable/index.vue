@@ -436,12 +436,12 @@ export default {
     },
     createTable() {
       this.getValidate().then(() => {
-        const tabName = `create_table_${this.attrInfo.basic.name}`;
+        const tabName = `create_table_${this.attrInfo.basic.name}_${Date.now()}.scala`;
         const md5Path = util.md5(tabName);
         const code = JSON.stringify(this.getParams());
         this.dispatch('Workbench:add', {
           id: md5Path,
-          filename: tabName + '.scala',
+          filename: tabName,
           filepath: '',
           saveAs: true,
           noLoadCache: true,

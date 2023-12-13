@@ -165,9 +165,9 @@
         <span v-if="isIconLabelShow" class="v-toolbar-icon">{{$t('message.common.toolbar.rowToColumn')}}</span>
       </li>
       <li
+        v-if="activeTool === 'table'"
         @click="openPopup('filter')"
-        :title="$t('message.common.toolbar.resultGroupLineFilter')"
-        v-if="showFilter">
+        :title="$t('message.common.toolbar.resultGroupLineFilter')">
         <SvgIcon :style="{ 'font-size': '20px' }" icon-class="export" color="#515a6e"/>
         <span
           class="v-toolbar-icon"
@@ -209,10 +209,6 @@ export default {
     currentPath: {
       type: String,
       default: '',
-    },
-    showFilter: {
-      type: Boolean,
-      default: false
     },
     script: [Object],
     row: {

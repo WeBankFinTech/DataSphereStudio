@@ -149,6 +149,7 @@ public class NodeRestfulApi {
     public void getIcon(HttpServletResponse response, @PathVariable("nodeType") String nodeType) throws IOException {
         byte[] icon = workflowNodeService.getNodeIcon(nodeType);
         response.setContentType("image/svg+xml");
+        response.addHeader("Cache-Control", "max-age=3600, no-transform");
         response.getOutputStream().write(icon);
     }
 

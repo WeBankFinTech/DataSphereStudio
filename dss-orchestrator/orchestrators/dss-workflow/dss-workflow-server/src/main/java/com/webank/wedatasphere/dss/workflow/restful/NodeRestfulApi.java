@@ -148,6 +148,7 @@ public class NodeRestfulApi {
     @RequestMapping(path ="nodeIcon/{nodeType}", method = RequestMethod.GET)
     public void getIcon(HttpServletResponse response, @PathVariable("nodeType") String nodeType) throws IOException {
         byte[] icon = workflowNodeService.getNodeIcon(nodeType);
+        response.setContentType("image/svg+xml");
         response.getOutputStream().write(icon);
     }
 

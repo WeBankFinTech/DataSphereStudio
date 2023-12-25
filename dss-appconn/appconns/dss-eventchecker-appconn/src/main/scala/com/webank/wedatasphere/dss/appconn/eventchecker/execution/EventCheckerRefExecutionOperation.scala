@@ -70,6 +70,7 @@ class EventCheckerRefExecutionOperation
   }
 
   override def submit(requestRef: RefExecutionRequestRef.RefExecutionContextRequestRef): RefExecutionAction = {
+    requestRef.getExecutionRequestRefContext
     val nodeAction = new EventCheckerExecutionAction()
     nodeAction.setId(UUID.randomUUID().toString)
     import scala.collection.JavaConversions.mapAsScalaMap

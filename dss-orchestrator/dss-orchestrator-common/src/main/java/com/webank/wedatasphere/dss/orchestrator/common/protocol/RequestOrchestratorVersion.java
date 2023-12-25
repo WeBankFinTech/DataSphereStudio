@@ -22,13 +22,12 @@ public class RequestOrchestratorVersion {
     private String username;
     private Long projectId;
     private Long orchestratorId;
-    private String dssLabel;
 
 
-    public static RequestOrchestratorVersion newInstance(String username, Long projectId, Long orchestratorId, String dssLabel) {
+
+    public static RequestOrchestratorVersion newInstance(String username, Long projectId, Long orchestratorId) {
         RequestOrchestratorVersion requestOrchestratorVersion = new RequestOrchestratorVersion();
         requestOrchestratorVersion.setOrchestratorId(orchestratorId);
-        requestOrchestratorVersion.setDssLabel(dssLabel);
         requestOrchestratorVersion.setProjectId(projectId);
         requestOrchestratorVersion.setUsername(username);
         return requestOrchestratorVersion;
@@ -59,11 +58,7 @@ public class RequestOrchestratorVersion {
         this.orchestratorId = orchestratorId;
     }
 
-    public String getDssLabel() {
-        return dssLabel;
-    }
 
-    public void setDssLabel(String dssLabel) {
-        this.dssLabel = dssLabel;
-    }
+
+
 }

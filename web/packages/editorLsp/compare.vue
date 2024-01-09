@@ -108,9 +108,9 @@ export default {
   mounted() {
     document.addEventListener('keyup', this.esc, false);
     this.initMonaco(monaco)
+    this.monaco = monaco;
     this.changeTheme(localStorage.getItem('theme'));
     eventbus.on('theme.change', this.changeTheme);
-    this.monaco = monaco;
 
   },
 

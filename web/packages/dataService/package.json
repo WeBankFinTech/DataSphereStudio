@@ -1,7 +1,7 @@
 {
   "name": "@dataspherestudio/dataService",
-  "version": "1.1.18",
+  "version": "1.1.19",
   "dependencies": {
-    "@dataspherestudio/shared": "^1.1.18"
+    "@dataspherestudio/shared": "^1.1.19"
   }
 }

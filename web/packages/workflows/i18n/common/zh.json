@@ -91,9 +91,10 @@
         "depsearch": "节点路径",
         "format": "一键格式化",
         "returnFormat": "恢复到格式化之前的状态",
-        "straight": "直线",
-        "slash": "斜线",
+        "straight": "折线",
+        "slash": "直线",
         "width": "节点宽度",
+        "formattingLable": "格式化方式",
         "formatting": "格式化",
         "cancel": "取消",
         "whetherReturnFormat": "是否要恢复到格式化之前的状态？",
@@ -114,7 +115,12 @@
         "attributeName": "请输入属性名",
         "propertyValue": "请输入属性值",
         "search": "搜索",
-        "comp": "组件"
+        "comp": "组件",
+        "klayLayout": "klay 布局",
+        "breadthfirstLayout": "广度优先",
+        "modeChange": "模式切换",
+        "modeVueProcess": "vueProcess(旧)",
+        "modeCyeditor": "cyeditor(新)"
       },
       "tabs": {
         "progress": "进度",

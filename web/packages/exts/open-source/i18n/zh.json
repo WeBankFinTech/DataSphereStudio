@@ -56,6 +56,7 @@
           "contentLengthLimit": "长度不能大于150",
           "contentLengthLimit50": "长度不能大于50",
           "contentLengthLimitTwo": "长度不能大于200",
+          "contentLengthLimitMax": "长度不能大于1024",
           "pathRepeat": "API路径已存在",
           "nameRepeat": "API名称已存在",
           "chineseCheck": "只支持中文",

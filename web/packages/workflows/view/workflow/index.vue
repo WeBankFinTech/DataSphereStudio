@@ -14,6 +14,7 @@
           <div class="project-nav-tree-top-t">
             <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
             <div class="project-nav-tree-top-t-icon">
+              <Icon type="ios-add-circle-outline" class="icon sort-icon" style="margin-top: 2px;" @click="createProject"></Icon>
               <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
                 <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
                 <DropdownMenu slot="list">
@@ -44,7 +45,7 @@
               <SvgIcon
                 icon-class="dev_center_flod"
                 class="icon"
-                style="opacity: 0.65"
+                style="opacity: 0.65;margin-top: 2px;"
                 @click="handleTreeToggle"
               />
             </div>
@@ -193,6 +194,7 @@
 </template>
 <script>
 import qs from 'qs';
+import { debounce } from 'lodash';
 import Workflow from '@/workflows/module/workflow';
 import WorkflowModal from '@/workflows/module/workflow/module/workflowModal.vue';
 import Process from '@/workflows/module/process';
@@ -1381,9 +1383,9 @@ export default {
           break;
       }
     },
-    resize() {
+    resize: debounce(function() {
       this.height = this.$el.clientHeight
-    },
+    }, 300),
     setVirtualRolesForProj(res) {
       if (this.modeOfKey == "streamis_prod") {
         this.projectsTree = res.projects

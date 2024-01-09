@@ -126,6 +126,9 @@
         "queuememory": "队列内存使用率",
         "queuecpu": "队列CPU使用率",
         "watingList": "前面还有 {num} 个job在等待",
+        "showCompareDetail": "查看字段对比详情",
+        "inconsistentFieldsDetail": "字段数据类型不一致详情",
+        "showSolution": "查看解决方案",
         "columns": {
           "id": {
             "title": "名称"

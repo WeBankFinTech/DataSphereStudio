@@ -1,0 +1,17 @@
+.scriptis_usage_guide .steps {
+  display: flex;
+  justify-content:space-between;
+  margin:20px 15px 20px 0;
+  font-size:12px
+}
+.scriptis_usage_guide .step-item {
+  position:relative;
+  width:120px;
+  padding: 10px;
+  background:#eaf4ff
+}
+
+.scriptis_usage_guide .index {
+  position:absolute;
+  color:#2C5CCB
+}

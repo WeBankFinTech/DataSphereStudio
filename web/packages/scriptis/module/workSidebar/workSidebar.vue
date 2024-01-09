@@ -169,6 +169,7 @@ import showDialog from '@dataspherestudio/shared/components/directoryDialog/show
 import weImportToHive from '@/scriptis/components/importToHive';
 import deleteDialog from '@dataspherestudio/shared/components/deleteDialog';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
+import plugin from '@dataspherestudio/shared/common/util/plugin'
 import module from './index';
 import move from './move';
 const PREFIX = 'file://';
@@ -248,9 +249,42 @@ export default {
     },
   },
   mounted() {
+    this.initListenerCopilotEvent()
     this.initData();
   },
+  beforeDestroy() {
+    this.destroyCopilotEvent()
+  },
   methods: {
+    destroyCopilotEvent() {
+      plugin.clear('copilot_web_listener_create')
+    },
+    initListenerCopilotEvent() {
+      plugin.on('copilot_web_listener_create', (regs) => {
+        this.getRootPath(status => {
+          if (status) {
+            const name = 'copilot_' + Date.now() + '.hql'
+            let path = this.rootPath
+            if (this.currentNode.data) {
+              const { isLeaf, path: filePath, parentPath } = this.currentNode.data
+              path = isLeaf ? parentPath : filePath
+            }
+            const node = {
+              name,
+              path: `${path}/${name}`,
+              businessType: "",
+              description: "",
+              isLeaf: true,
+              copy: false,
+              type: "脚本文件",
+            };
+            this.handleCreate(node).then(() => {
+              plugin.emit('copilot_web_listener_inster', regs)
+            });
+          }
+        })
+      })
+    },
     initData() {
       // 取indexedDB缓存
       this.dispatch('IndexedDB:getTree', {
@@ -456,18 +490,23 @@ export default {
       });
     },
     handleCreate(node) {
-      this.handleCreating(node, (flag) => {
-        if (flag) {
-          if (node.isLeaf) {
-            this.openToTABAction(node);
+      return new Promise((resolve, reject) => {
+        this.handleCreating(node, (flag) => {
+          if (flag) {
+            if (node.isLeaf) {
+              this.openToTABAction(node);
+            }
+            let text = node.copy ? this.$t('message.scripts.constants.success.stick') : this.$t('message.scripts.constants.success.add')
+            this.$Message.success(text);
+            setTimeout(() => {
+              this.refresh('new', node.path);
+              resolve(flag)
+            }, 500);
+          } else {
+            reject(flag)
           }
-          let text = node.copy ? this.$t('message.scripts.constants.success.stick') : this.$t('message.scripts.constants.success.add')
-          this.$Message.success(text);
-          setTimeout(() => {
-            this.refresh('new', node.path);
-          }, 500);
-        }
-      });
+        });
+      })
     },
     handleCreating(node, cb) {
       const url = node.isLeaf

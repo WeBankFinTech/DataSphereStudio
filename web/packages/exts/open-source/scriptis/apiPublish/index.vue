@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isApiPublish && showScriptsType && work.filepath">
+  <div v-if="isApiPublish && showScriptsType && work.filepath" class="workbench-body-navbar-item">
     <div
       v-if="!script.readOnly && isSupport">
       <Icon type="ios-hammer" />

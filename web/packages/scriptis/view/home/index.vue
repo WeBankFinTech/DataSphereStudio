@@ -63,6 +63,7 @@
       </we-panel-item>
     </we-panel>
     <settingModal ref="settingBtn" />
+    <component v-if="copilotEntryComponent" :is="copilotEntryComponent.component" />
   </div>
 </template>
 <script>
@@ -75,6 +76,9 @@ import hdfsSidebarModule from '@/scriptis/module/hdfsSidebar';
 import settingModal from '@/scriptis/module/setting';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
+import plugin from '@dataspherestudio/shared/common/util/plugin'
+
+const [{ copilotEntryComponent }] = plugin.emitHook('copilot_web_component') || []
 
 export default {
   components: {
@@ -98,7 +102,8 @@ export default {
       level: 0,
       navHeight: 0,
       showSetting: false,
-      proxyUserName: ''
+      proxyUserName: '',
+      copilotEntryComponent
     };
   },
   //组建内的守卫
@@ -187,11 +192,20 @@ export default {
       }
       this.showSetting = !!baseInfo.proxyEnable;
     }, 1500)
+    plugin.on('copilot_web_listener_createAndInster', (regs) => {
+      if (this.leftModule.key !== 2) {
+        this.chooseLeftModule(this.leftSideNavList[0])
+      }
+      this.$nextTick(() => {
+        plugin.emit('copilot_web_listener_create', regs)
+      })
+    })
   },
   beforeDestroy() {
     // 监听窗口变化，获取浏览器宽高
     this.$Notice.close('show-db-table-many-tip')
     window.removeEventListener('resize', this.getHeight);
+    plugin.emitHook('copilot_web_listener_event_remove')
   },
   methods: {
     getGlobalLimit() {

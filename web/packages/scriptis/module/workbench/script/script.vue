@@ -40,6 +40,10 @@
               class="workbench-tab-item" @click="showPanelTab('history')">
               <span>{{ $t('message.scripts.tabs.history') }}</span>
             </div>
+            <div v-if="bottomTab.fieldDetail & isShowFieldDetailTab" :class="{active: scriptViewState.showPanel == 'fieldDetail'}"
+              class="workbench-tab-item" style="min-width: 200px" @click="showPanelTab('fieldDetail')">
+              <span>{{ $t('message.common.progress.inconsistentFieldsDetail') }}</span>
+            </div>
             <template v-for="(comp, index) in extComponents">
               <component
                 :key="comp.name + '_head' + index"
@@ -64,6 +68,7 @@
             :script="script"
             :script-view-state="scriptViewState"
             :execute="execute"
+            @compareDetail="openCompareDetail"
             @open-panel="openPanel" />
           <result
             v-if="bottomTab.show_result"
@@ -86,6 +91,10 @@
             :script-view-state="scriptViewState"
             :run-type="script.runType"
             :node="node" />
+          <field
+            v-if="bottomTab.show_fieldDetail"
+            :codePrecheckRes="script.codePrecheckRes"
+          />
           <template v-for="(comp, index) in extComponents">
             <component
               v-if="scriptViewState.showPanel == comp.name"
@@ -126,6 +135,7 @@ import editor from './editor.vue';
 import history from './history.vue';
 import result from '@dataspherestudio/shared/components/consoleComponent/result.vue';
 import log from '@dataspherestudio/shared/components/consoleComponent/log.vue';
+import field from './field.vue';
 import weProgress from '@dataspherestudio/shared/components/consoleComponent/progress.vue';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
@@ -140,6 +150,7 @@ export default {
     log,
     history,
     weProgress,
+    field,
   },
   props: {
     work: {
@@ -181,7 +192,8 @@ export default {
       execute: null,
       postType: 'http',
       saveLoading: false,
-      extComponents
+      extComponents,
+      isShowFieldDetailTab: false
     };
   },
   mixins: [mixin],
@@ -206,10 +218,12 @@ export default {
         result: this.scriptResult.total || (this.script.resultList && this.script.resultList.length),
         log: this.isLogShow || this.work.type === 'historyScript',
         history: this.work.type !== 'historyScript',
+        fieldDetail: (this.script.codePrecheckRes && this.script.codePrecheckRes.checkData &&this.script.codePrecheckRes.checkData.length > 0 )|| false,
         show_progress: showPanel === 'progress',
         show_result: showPanel === 'result',
         show_log: showPanel === 'log',
-        show_history: showPanel === 'history'
+        show_history: showPanel === 'history',
+        show_fieldDetail: showPanel === 'fieldDetail',
       }
     }
   },
@@ -374,6 +388,7 @@ export default {
     this.$nextTick(() => {
       this.dispatch('WebSocket:init');
       this.resizePanel();
+      this.initListenerCopilotEvent()
     });
     window.onbeforeunload = () => {
       if (this.work.unsave || this.script.running) {
@@ -410,8 +425,28 @@ export default {
       this.execute = null;
     }
     window.onbeforeunload = null;
+    plugin.off('copilot_web_listener_inster', this.insterCode)
   },
   methods: {
+    /**
+      events: [{
+          eventType?: any,
+          arg?: {}
+      }]
+     * @param {*} param0 
+     */
+    initListenerCopilotEvent() {
+      plugin.on('copilot_web_listener_inster', this.insterCode)
+    },
+    insterCode({ code }) {
+      if (this.current !== this.work.id) return
+      if (this.script.data) {
+        this.script.data += `\n${code}`
+      } else {
+        this.script.data += code
+      }
+      this.$Message.success("code inster success");
+    },
     // panel 分割线拖动调整大小
     resizePanel: debounce(function() {
       if (this.$el && this.$refs.topPanel && (this.$el.clientHeight - this.$refs.topPanel.$el.clientHeight > 0)) {
@@ -493,15 +528,11 @@ export default {
       }
     },
     getCacheWork(work) {
-      let {
-        filepath,
-        filename
-      } = work;
       return new Promise((resolve) => {
         this.dispatch('IndexedDB:getTabs', (tabs) => {
           let currentTab = null;
           for (let tab of tabs) {
-            if (tab.filepath === filepath && tab.filename === filename) {
+            if (tab.id === work.id) {
               currentTab = tab;
               break;
             }
@@ -541,8 +572,14 @@ export default {
 
       return initData;
     },
-    run(option, cb) {
+    openCompareDetail() {
+      this.isShowFieldDetailTab = true;
+      this.showPanelTab('fieldDetail');
+    },
+    async run(option, cb) {
       this.handleLines = {}
+      this.script.codePrecheckRes = {};
+      this.isShowFieldDetailTab = false;
       if (option && option.id === this.script.id) {
         if (window.$Wa) window.$Wa.clickStat('run',this.script.fileName);
         if (this.scriptViewState.topPanelFull) {
@@ -944,6 +981,25 @@ export default {
             rst: this.script.progress,
           });
         });
+        // 只有hive或者spark引擎类型才会调用代码关联审查 置于末尾，不影响其余事件
+        if ((this.script.application === 'spark' && this.script.runType === 'sql') || (this.script.application === 'hive' && this.script.runType === 'hql')) {
+          var formData = new FormData();
+          const variable = isEmpty(this.script.params.variable) ? {} : util.convertArrayToObject(this.script.params.variable);
+          let params = {
+            'variable': variable,
+            'configuration': {}
+          };
+          formData.append('params', JSON.stringify(params));
+          formData.append('code', this.script.executionCode);
+          formData.append('engineType', this.script.application);
+          formData.append('type', 'union');
+          const codePrecheckRes = await api.fetch('/validator/code-precheck',formData,'post');
+          // 如果拿到代码审查结果时，代码已运行完成，则不进行操作
+          if (!this.script.progress || !this.script.progress.costTime) {
+            this.script.codePrecheckRes = codePrecheckRes;
+            this.$refs.progressTab.updateCodePreCheck(codePrecheckRes);
+          }
+        }
       }
     },
     resetData() {

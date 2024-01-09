@@ -59,6 +59,7 @@
             :open-files="openFiles"
             :orchestratorId="item.data.orchestratorId"
             :orchestratorVersionId="item.data.orchestratorVersionId"
+            :newTipVisible="newTipVisible"
             @node-dblclick="dblclickNode(index, arguments)"
             @isChange="isChange(index, arguments)"
             @save-node="saveNode"
@@ -138,11 +139,17 @@ export default {
       setIntervalID: "",
       setTime: 40,
       showTip: true,
-      openFiles: {}
+      openFiles: {},
+      newTipVisible: (localStorage.getItem('entryProcessNum') || 0) < 4
     }
   },
   mounted() {
     this.changeTitle();
+    const entryProcessNum = localStorage.getItem('entryProcessNum') || 0
+    localStorage.setItem('entryProcessNum', +entryProcessNum + 1)
+    setTimeout(() => {
+      this.newTipVisible = false
+    }, 5000)
   },
   methods: {
     release(obj) {

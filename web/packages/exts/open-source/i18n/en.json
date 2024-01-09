@@ -56,6 +56,7 @@
           "contentLengthLimit": "Length limit 155",
           "contentLengthLimit50": "Length limit 50",
           "contentLengthLimitTwo": "Length limit 200",
+          "contentLengthLimitMax": "Length limit 1024",
           "pathRepeat": "Api path exists",
           "nameRepeat": "Api name exists",
           "chineseCheck": "Chainese only",

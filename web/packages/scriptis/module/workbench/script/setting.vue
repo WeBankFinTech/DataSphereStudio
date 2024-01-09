@@ -39,7 +39,7 @@ export default {
   watch: {
     'script.params': {
       handler: function(val) {
-        this.work.unsave = !isEqual(JSON.parse(this.origin), val);
+        this.work.unsave = !this.script.readOnly && !isEqual(JSON.parse(this.origin), val);
       },
       deep: true,
     },

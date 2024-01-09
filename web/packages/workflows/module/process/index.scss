@@ -97,6 +97,9 @@ div.process-module {
     @include font-color(#ccc, $dark-text-desc-color);
 
   }
+  div.button.active {
+    color: $info-color;
+  }
 
   .designer .designer-shape {
     padding-bottom: 30px;

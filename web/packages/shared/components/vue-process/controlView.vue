@@ -3,6 +3,14 @@
   <div class="designer-control">
     <div class="designer-control-header" />
     <div class="designer-control-buttons">
+      <div class="designer-control-button" :title="$t('message.workflow.vueProcess.modeChange')" @click="showModeChangeClick">
+        <Poptip :value="newTipVisible" placement="left-start" :disabled="true">
+          <SvgIcon icon-class="mode-change" />
+          <template #content>
+            <span>这里有新功能了哦！快来试试吧！！！</span>
+          </template>
+        </Poptip>
+      </div>
       <div class="designer-control-button" :title="$t('message.workflow.vueProcess.amplification')" @click="zoomout">
         <Icon name="fangda" />
       </div>
@@ -74,6 +82,27 @@
         <div v-if="nodes.length < 1 " class="no-data">{{ $t('message.common.nodeNotFound') }}</div>
       </div>
     </div>
+    <div v-show="modeDialogVisible" class="designer-control-dialog">
+      <div class="line-type">
+        <label>{{ $t('message.workflow.vueProcess.modeChange') }}</label>
+        <input id="vueprocess" type="radio" name="vueprocess" value="vueprocess" :checked="mode === 'vueprocess'" @click="mode = 'vueprocess'">
+        <label for="vueprocess">
+          {{ $t('message.workflow.vueProcess.modeVueProcess') }}
+        </label>
+        <input id="cyeditor" type="radio" name="cyeditor" value="cyeditor" :checked="mode === 'cyeditor'" @click="mode = 'cyeditor'">
+        <label for="cyeditor">
+          {{ $t('message.workflow.vueProcess.modeCyeditor') }}
+        </label>
+      </div>
+      <div class="operations">
+        <div class="dialog-btn comfirm-btn" @click="modeChange">
+          {{ $t('message.workflow.Confirm') }}
+        </div>
+        <div class="dialog-btn" @click="modeDialogVisible = false">
+          {{ $t('message.workflow.vueProcess.cancel') }}
+        </div>
+      </div>
+    </div>
     <div>
       {{ state.baseOptions.pageSize * 100 + "%" }}
     </div>
@@ -88,6 +117,12 @@ export default {
     Icon
   },
   mixins: [mixin],
+  props: {
+    newTipVisible: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       pageSizeList: [
@@ -110,7 +145,9 @@ export default {
       nodeWidth: 40,
       // 搜索节点
       searchPanel: false,
-      searchText: ''
+      searchText: '',
+      mode: 'vueprocess',
+      modeDialogVisible: false
     }
   },
   mounted() {
@@ -124,6 +161,26 @@ export default {
     }
   },
   methods: {
+    // 切换模式
+    modeChange() {
+      this.modeDialogVisible = false;
+      if (this.mode === 'vueprocess') return
+      const isChangeCyeditorMode = localStorage.getItem('isChangeCyeditorMode')
+      if (isChangeCyeditorMode) {
+        this.$emit('modeChange', this.mode)
+        return
+      }
+      this.$Modal.confirm({
+        title: '模式切换提示',
+        content: '切换模式后，原模式下的流程结构会被初始化，节点位置会发生变化，请确认是否切换',
+        okText: '确认切换',
+        cancelText: '暂不切换',
+        onOk: () => {
+          localStorage.setItem('isChangeCyeditorMode', true)
+          this.$emit('modeChange', this.mode)
+        },
+      });
+    },
     zoomout() {
       let index = this.pageSizeList.findIndex((page) => page.value === this.state.baseOptions.pageSize);
       if (index !== -1) {
@@ -191,7 +248,14 @@ export default {
       this.$emit('resetToOriginalData')
       this.confirmResetDialogVisible = false
     },
+    showModeChangeClick() {
+      this.modeDialogVisible = true
+      this.formatDialogVisible = false
+      this.confirmResetDialogVisible = false
+      this.searchPanel = false
+    },
     clickToolItem(item) {
+      this.modeDialogVisible = false
       if (item === 'search') {
         this.searchText = ''
         this.formatDialogVisible = false

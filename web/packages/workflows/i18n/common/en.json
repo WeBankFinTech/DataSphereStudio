@@ -94,6 +94,7 @@
         "straight": "Straight",
         "slash": "Slash",
         "width": "Width",
+        "formattingLable": "Format way",
         "formatting": "Format",
         "cancel": "cancel",
         "whetherReturnFormat": "Whether or not to return to format before?",
@@ -114,7 +115,12 @@
         "attributeName": "Please enter attribute name",
         "propertyValue": "Please enter value",
         "search": "search",
-        "comp": "Components"
+        "comp": "Components",
+        "klayLayout": "Klay layout",
+        "breadthfirstLayout": "Breadth first layout",
+        "modeChange": "Mode change",
+        "modeVueProcess": "vueProcess(old)",
+        "modeCyeditor": "cyeditor(new)"
       },
       "tabs": {
         "progress": "Progress",

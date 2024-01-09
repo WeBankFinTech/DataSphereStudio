@@ -125,6 +125,9 @@
         "queuememory": "Queue Memory",
         "queuecpu": "Queue CPU",
         "watingList": "{num} jobs wating in front",
+        "showCompareDetail": "View Details",
+        "inconsistentFieldsDetail": "Inconsistent Fields Detail",
+        "showSolution": "View Solutions",
         "columns": {
           "id": {
             "title": "Name"

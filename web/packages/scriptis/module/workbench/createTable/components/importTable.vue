@@ -164,7 +164,7 @@ export default {
         } else {
           const sheetList = this.buildList(rst.sheetInfo || {});
           this.target.sheetName = sheetList;
-          this.target.importFieldsData.fields = this.buildList(sheetList[0].value || {}).map((item, index) => {
+          this.target.importFieldsData.fields = sheetList[0].value.map((item, index) => {
             return {
               name: item.label,
               type: item.value,
@@ -191,8 +191,7 @@ export default {
     handleSheetChange(val) {
       this.fieldTableKey = val;
       if(val) {
-        const item = this.target.sheetName.find(item => item.label === val).value || {};
-        const arr = this.buildList(item);
+        const arr = this.target.sheetName.find(item => item.label === val).value || [];
         this.target.importFieldsData.fields  = arr.map((item, index) => {
           return {
             name: item.label,
@@ -215,7 +214,11 @@ export default {
     buildList(obj) {
       let res = [];
       Object.keys(obj).forEach(key => {
-        res.push({ value: obj[key], label: key })
+        const items = (obj[key] || []).map(item => {
+          const [label, value] = Object.entries(item || {})[0];
+          return { value, label };
+        })
+        res.push({ value: items, label: key })
       })
       return res;
     },

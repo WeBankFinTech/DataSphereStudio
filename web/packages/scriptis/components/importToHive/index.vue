@@ -705,7 +705,11 @@ export default {
     buildList(obj) {
       let res = [];
       Object.keys(obj).forEach(key => {
-        res.push({ value: obj[key], label: key })
+        const items = (obj[key] || []).map(item => {
+          const [label, value] = Object.entries(item || {})[0];
+          return { value, label };
+        })
+        res.push({ value: items, label: key })
       })
       return res;
     },
@@ -753,8 +757,7 @@ export default {
     },
     handleSheetChange(val) {
       if(val) {
-        const item = this.secondStep.sheetList.find(item => item.label === val).value || {};
-        const arr = this.buildList(item);
+        const arr = this.secondStep.sheetList.find(item => item.label === val).value || [];
         this.secondStep.fields = arr.map((item, index) => {
           return {
             fieldName: item.label,

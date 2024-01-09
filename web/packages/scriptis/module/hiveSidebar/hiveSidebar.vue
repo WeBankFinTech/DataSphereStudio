@@ -461,8 +461,8 @@ export default {
         this.reflesh()
       }
     },
-    queryTable() {
-      const tabName = `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
+    queryTable(name) {
+      const tabName = typeof name === 'string' ? name : `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
       const code = `select * from ${tabName} limit 100`;
       const filename = `${tabName}_select.hql`;
       const md5Path = util.md5(filename);
@@ -484,7 +484,7 @@ export default {
       });
     },
     describeTable() {
-      const filename = `${this.$t('message.scripts.hiveTableDesc.tableDetail')}(${this.currentAcitved.name})`;
+      const filename = `${this.$t('message.scripts.hiveTableDesc.tableDetail')}(${this.currentAcitved.dbName||''}_${this.currentAcitved.name})`;
       const md5 = util.md5(filename);
       const ext = plugin.emitHook('script_dbtb_details', {
         context: this,

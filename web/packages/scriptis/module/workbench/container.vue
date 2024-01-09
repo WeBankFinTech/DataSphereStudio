@@ -169,6 +169,7 @@ import { Work } from "./modal.js"
 import { find, uniq, isEmpty, last, debounce } from "lodash"
 import elementResizeEvent from '@dataspherestudio/shared/common/helper/elementResizeEvent'
 import mixin from '@dataspherestudio/shared/common/service/mixin'
+import plugin from '@dataspherestudio/shared/common/util/plugin'
 const maxTabLen = 20
 export default {
   components: {
@@ -253,11 +254,38 @@ export default {
   mounted() {
     this.init()
     elementResizeEvent.bind(this.$el, this.resize)
+    this.initListenerCopilotEvent()
   },
   beforeDestroy() {
     elementResizeEvent.unbind(this.$el)
+    this.destroyCopilotEvent()
   },
   methods: {
+    destroyCopilotEvent() {
+      plugin.clear('copilot_web_listener_viewTableData')
+      plugin.clear('copilot_web_listener_queryStructure')
+    },
+    initListenerCopilotEvent() {
+      plugin.emitHook('get_copilot_web_listener_event_class', 'table').then(eventClass => {
+        const tableEvent = new eventClass({
+          dispatch: this.dispatch,
+          $t: this.$t
+        })
+        plugin.on('copilot_web_listener_viewTableData', ({ tableName }) => {
+          tableEvent.queryTable(tableName)
+        })
+        plugin.on('copilot_web_listener_queryStructure', ({ tableName }) => {
+          const [dbName, fileName] = tableName.split('.')
+          const filenamePath = `${this.$t('message.scripts.hiveTableDesc.tableDetail')}(${fileName})`;
+          tableEvent.describeTable({
+            dbName,
+            fileName,
+            filenamePath
+          })
+        })
+      })
+      
+    },
     init() {
       this.loading = true;
       this.dispatch('IndexedDB:getGlobalCache', {

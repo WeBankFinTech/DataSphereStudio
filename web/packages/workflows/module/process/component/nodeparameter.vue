@@ -324,13 +324,15 @@ export default {
       const validateJobDesc = (rule, value, callback) => {
         let tmp = {}
         let hasDuplicate = false
-        value.split('\n').filter(it => it).map(it => it.trim().split('=')[0]).forEach(it => {
-          if (tmp[it]) {
-            hasDuplicate = true
-          } else {
-            tmp[it] = 1
-          }
-        })
+        if (value) {
+          value.split('\n').filter(it => it).map(it => it.trim().split('=')[0]).forEach(it => {
+            if (tmp[it]) {
+              hasDuplicate = true
+            } else {
+              tmp[it] = 1
+            }
+          })
+        }
         if (hasDuplicate) {
           callback(new Error(rule.message));
         } else {
@@ -462,7 +464,7 @@ export default {
 
       this.$refs.baseInfoForm.validate((baseInfoValid) => {
         if (baseInfoValid) {
-          if (this.$refs.parameterForm && this.isRefTemplate === '1') {
+          if (this.$refs.parameterForm) {
             this.$refs.parameterForm.validate((valid) => {
               if (valid) {
                 this.$emit('saveNode', this.currentNode);

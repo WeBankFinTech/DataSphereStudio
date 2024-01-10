@@ -61,7 +61,7 @@ public class LinkisJobExecutionConfiguration {
     public final static CommonVars<String> LINKIS_ADMIN_USER = CommonVars.apply("wds.linkis.client.flow.adminuser","ws");
 
 
-    public final static CommonVars<String> LINKIS_AUTHOR_USER_TOKEN = CommonVars.apply("wds.linkis.client.flow.author.user.token","WS-AUTH");
+    public final static CommonVars<String> LINKIS_AUTHOR_USER_TOKEN = CommonVars.apply("wds.linkis.client.flow.author.user.token","admin-kmsnd");
 
     public final static CommonVars<String> LINKIS_JOB_CREATOR = CommonVars.apply("wds.linkis.flow.job.creator","nodeexecution");
 

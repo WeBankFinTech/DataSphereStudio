@@ -59,7 +59,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private AppConnResourceService appConnResourceService;
     private AppConnRefreshThread appConnRefreshThread;
 
-    private static AppConnManager appConnManager;
+    private static volatile AppConnManager appConnManager;
     private static boolean lazyLoad = false;
 
     public static void setLazyLoad() {
@@ -87,8 +87,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
             }
+            return appConnManager;
         }
-        return appConnManager;
     }
 
     @Override

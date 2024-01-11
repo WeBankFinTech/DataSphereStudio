@@ -53,7 +53,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private final AppConnLoader appConnLoader = AppConnLoaderFactory.getAppConnLoader();
 
     private final Map<String, AppConn> appConns = new HashMap<>();
-    private volatile boolean isLoaded = false;
+    private boolean isLoaded = false;
     private List<AppConn> appConnList = null;
     AppConnInfoService appConnInfoService;
     private AppConnResourceService appConnResourceService;
@@ -223,11 +223,10 @@ public abstract class AbstractAppConnManager implements AppConnManager {
         if(lazyLoad){
             LOGGER.info("lazyLoad set to true,isLoaded={}",isLoaded);
         }
-        if ( !isLoaded) {
+        if (lazyLoad && !isLoaded) {
             synchronized (this.appConns) {
-                if ( !isLoaded) {
+                if (lazyLoad && !isLoaded) {
                     loadAppConns();
-                    isLoaded=true;
                 }
             }
         }

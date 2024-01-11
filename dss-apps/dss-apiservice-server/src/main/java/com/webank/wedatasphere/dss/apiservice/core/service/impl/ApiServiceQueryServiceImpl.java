@@ -23,10 +23,8 @@ import com.webank.wedatasphere.dss.apiservice.core.bo.ApiServiceToken;
 import com.webank.wedatasphere.dss.apiservice.core.bo.LinkisExecuteResult;
 import com.webank.wedatasphere.dss.apiservice.core.config.ApiServiceConfiguration;
 import com.webank.wedatasphere.dss.apiservice.core.constant.ParamType;
-import com.webank.wedatasphere.dss.apiservice.core.constant.ParamTypeEnum;
 import com.webank.wedatasphere.dss.apiservice.core.constant.RequireEnum;
 import com.webank.wedatasphere.dss.apiservice.core.dao.*;
-import com.webank.wedatasphere.dss.apiservice.core.exception.ApiExecuteException;
 import com.webank.wedatasphere.dss.apiservice.core.exception.ApiServiceQueryException;
 import com.webank.wedatasphere.dss.apiservice.core.execute.ApiServiceExecuteJob;
 import com.webank.wedatasphere.dss.apiservice.core.execute.DefaultApiServiceJob;
@@ -72,6 +70,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -80,7 +80,8 @@ import static java.util.stream.Collectors.toMap;
 @Service
 public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
     private static final Logger LOG = LoggerFactory.getLogger(ApiServiceQueryServiceImpl.class);
-
+    private static final Pattern pattern = Pattern.compile("--+");
+    private static final String REPLACEMENT = "\\-";
 
     Map<String, ApiServiceJob> runJobs = new HashMap<>();
 
@@ -215,9 +216,14 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
             }
 
             // 用户请求的参数值注入检查，排除token
-            for(String k: reqParams.keySet()){
+            for(Map.Entry<String, Object> entry: reqParams.entrySet()){
+                String k = entry.getKey();
+                String v = String.valueOf(entry.getValue());
+                if (v.contains("--")){
+                    entry.setValue(replaceSymbol(v));
+                }
                 if(!k.equals(ApiServiceConfiguration.API_SERVICE_TOKEN_KEY.getValue())
-                   && SQLCheckUtil.doParamInjectionCheck(reqParams.get(k).toString())) {
+                   && SQLCheckUtil.doParamInjectionCheck((String) reqParams.get(k))) {
                     // 如果注入直接返回null
                     LOG.warn("用户参数存在非法的关键字{}", reqParams.get(k).toString());
                     return null;
@@ -542,5 +548,22 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
         }
         return res;
 
+    }
+
+    private static String replaceSymbol(String str) {
+        StringBuffer sb = new StringBuffer();
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()){
+            String match = matcher.group();
+            int length = match.length();
+            StringBuilder replacement = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                replacement.append(REPLACEMENT);
+            }
+            //避免将replacement识别为正则，将替换字符追加到sb中
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement.toString()));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 }

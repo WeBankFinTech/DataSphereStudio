@@ -53,7 +53,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private final AppConnLoader appConnLoader = AppConnLoaderFactory.getAppConnLoader();
 
     private final Map<String, AppConn> appConns = new HashMap<>();
-    private boolean isLoaded = false;
+    private volatile boolean isLoaded = false;
     private List<AppConn> appConnList = null;
     AppConnInfoService appConnInfoService;
     private AppConnResourceService appConnResourceService;

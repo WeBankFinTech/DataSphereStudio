@@ -192,6 +192,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
                     + KEY_SPLIT + projectRequest.getUsername();
 
+            LOGGER.info("user:{} get project privilege info ,workspaceId:{}, projectId:{}, projectName:{}, pusername:{}, editPriv:{}",
+                    projectRequest.getUsername(), projectRequest.getWorkspaceId(), projectVo.getId(), projectVo.getName(), pusername, editPriv);
+
             Map<String, List<String>> userPricMap = new HashMap<>();
             String[] tempstrArr = pusername.split(MODE_SPLIT);
 
@@ -211,6 +214,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setAccessUsers(CollectionUtils.isEmpty(accessUsers) ? new ArrayList<>() : accessUsers.stream().distinct().collect(Collectors.toList()));
             projectResponse.setEditUsers(CollectionUtils.isEmpty(editUsers) ? new ArrayList<>() : editUsers.stream().distinct().collect(Collectors.toList()));
             projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
+
+            LOGGER.info("user:{} get project access users info, workspaceId:{}, projectId:{}, projectName:{}, accessUsers:{}, editUsers:{}, releaseUsers:{}",
+                    projectRequest.getUsername(), projectRequest.getWorkspaceId(), projectVo.getId(), projectVo.getName(), accessUsers, editUsers, releaseUsers);
 
             // 用户是否具有编辑权限  编辑权限和创建者都有
             if (!StringUtils.isEmpty(pusername) &&

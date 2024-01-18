@@ -644,10 +644,17 @@ export default {
     apiDataFill(id) {
       const currentApi = this.apiList.find((item) => item.id == id);
       if (currentApi) {
-        this.updateApiData.approvalName = currentApi.approvalVo.approvalName;
-        // 如果之前绑定的用户被删除，需要清掉
-        this.updateApiData.applyUser = currentApi.approvalVo.applyUser.split(',').filter((item) => this.applyUserList.some((i) => i.name === item));
-        this.updateApiData.proxyUser = currentApi.approvalVo.executeUser;
+        if (currentApi.approvalVo) {
+          this.updateApiData.approvalName = currentApi.approvalVo.approvalName;
+          // 如果之前绑定的用户被删除，需要清掉
+          this.updateApiData.applyUser = currentApi.approvalVo.applyUser.split(',').filter((item) => this.applyUserList.some((i) => i.name === item));
+          this.updateApiData.proxyUser = currentApi.approvalVo.executeUser;
+        } else {
+          this.updateApiData.approvalName = 'default';
+          this.updateApiData.applyUser = [];
+          this.updateApiData.proxyUser = '';
+        }
+
         this.updateApiData.comment = currentApi.comment || '';
       }
     },

@@ -190,6 +190,7 @@ CREATE TABLE `dss_workspace_dictionary` (
   `icon` varchar(200) DEFAULT NULL COMMENT '图标',
   `order_num` int(2) DEFAULT '1' COMMENT '序号',
   `remark` varchar(1000) DEFAULT NULL COMMENT '备注',
+  `checked` tinyint(1) DEFAULT '0' COMMENT '默认勾选，1表示勾选，0表示未勾选',
   `create_user` varchar(100) DEFAULT NULL COMMENT '创建人',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_user` varchar(100) DEFAULT NULL COMMENT '更新人',

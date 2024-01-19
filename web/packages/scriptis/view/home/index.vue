@@ -78,8 +78,7 @@ import storage from '@dataspherestudio/shared/common/helper/storage';
 import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 
-const [{ copilotEntryComponent }] = plugin.emitHook('copilot_web_component') || []
-
+const [ copilotWebComponent ] = plugin.emitHook('copilot_web_component') || []
 export default {
   components: {
     workbench: workbenchModule.component,
@@ -103,7 +102,7 @@ export default {
       navHeight: 0,
       showSetting: false,
       proxyUserName: '',
-      copilotEntryComponent
+      copilotEntryComponent: copilotWebComponent ? copilotWebComponent.copilotEntryComponent : null
     };
   },
   //组建内的守卫

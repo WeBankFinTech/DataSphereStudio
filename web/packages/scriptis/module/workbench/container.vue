@@ -688,9 +688,9 @@ export default {
               ismodifyByOldTab,
               currentNodeKey: this.node ? this.node.key : "",
             },
-            () => {
+            (isOpen) => {
               this.loading = false
-              cb(rst)
+              cb(rst, isOpen)
               if (option.source) {
                 this.save(rst, option)
               }

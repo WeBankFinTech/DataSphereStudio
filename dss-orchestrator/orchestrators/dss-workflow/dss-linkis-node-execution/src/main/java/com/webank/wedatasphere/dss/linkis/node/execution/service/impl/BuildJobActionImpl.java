@@ -148,15 +148,18 @@ public class BuildJobActionImpl implements BuildJobAction {
 
         JobSubmitAction.Builder builder = JobSubmitAction.builder()
                 .addExecuteCode(code)
-                .setUser(job.getUser())
                 .addExecuteUser(job.getUser())
                 .setParams(paramMapCopy)
                 .setLabels(labels)
                 .setRuntimeParams(job.getRuntimeParams());
         if (job instanceof LinkisJob) {
+            LinkisJob linkisJob = (LinkisJob) job;
+            builder = builder.setUser(linkisJob.getSubmitUser());
             Map<String, Object> source = new HashMap<>();
-            source.putAll(((LinkisJob) job).getSource());
+            source.putAll(linkisJob.getSource());
             builder = builder.setSource(source);
+        }else{
+            builder = builder.setUser(job.getUser());
         }
         // 将execute接口带来的额外variable参数，带进来  todo check
         Map<String, Object> propMap = new HashMap<>();

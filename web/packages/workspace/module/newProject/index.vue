@@ -113,7 +113,7 @@
       :title="$t('message.common.projectDetail.deleteProject')"
       @on-ok="deleteProjectConfirm"
     >
-      {{$t('message.common.projectDetail.confirmDeleteProject')}}{{ deleteProjectItem.name }}?
+      <div style="word-wrap: break-word;">{{$t('message.common.projectDetail.confirmDeleteProject')}}{{ deleteProjectItem.name }}?</div>
       <br />
       <br />
       <Checkbox v-model="ifDelOtherSys">{{ $t('message.workspace.Simultaneously') }}</Checkbox>
@@ -314,7 +314,7 @@ export default {
     addProject() {
       this.actionType = 'add'
       this.init()
-      this.$refs.projectForm.showProject(this.currentProjectData)
+      this.$refs.projectForm.showProject(this.currentProjectData, 'add')
     },
     // 确认新增工程 || 确认修改
     ProjectConfirm(projectData, callback) {
@@ -478,7 +478,7 @@ export default {
       this.init()
       this.actionType = 'modify'
       this.currentProjectData = project
-      this.$refs.projectForm.showProject(project)
+      this.$refs.projectForm.showProject(project, 'edit')
     },
     // 点击工程跳转到工作流
     gotoWorkflow(item, subItem) {

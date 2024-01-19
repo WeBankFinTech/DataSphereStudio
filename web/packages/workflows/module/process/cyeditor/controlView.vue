@@ -133,7 +133,7 @@ export default {
       type: Object,
       default: () => ({
         name: 'klay',
-        fit: false,
+        fit: true,
       })
     }
   },
@@ -219,7 +219,7 @@ export default {
       const data = {
         klay: {
           name: 'klay',
-          fit: false,
+          fit: true,
           klay: {
             spacing: 50,
           }
@@ -311,7 +311,7 @@ export default {
       top: 50px;
       right: 40px;
       min-width: 220px;
-      width: max-content;
+      // width: max-content;
       height: auto;
       border-radius: 5px;
       @include bg-color(#fff, $dark-base-color);

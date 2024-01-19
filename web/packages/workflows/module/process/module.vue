@@ -35,10 +35,10 @@
         @click-itembar="handleClickToolbar"
       />
     </vueProcess>
-    <div v-else class="designer" style="z-index:1">
+    <div v-else class="designer" :style="{ 'z-index': isfullScreen ? 6 : 1}">
       <div class="designer-toolbar">
         <DesignToolbar
-          :viewMode="preDragViewMode"
+          :viewMode="viewMode"
           :readonly="myReadonly"
           :workflowIsExecutor="workflowIsExecutor"
           :needReRun="needReRun"
@@ -61,6 +61,7 @@
         :readable="myReadonly"
         :viewMode="viewMode"
         :newTipVisible="newTipVisible"
+        @screenSizeChange="screenSizeChange"
         @change="change"
         @message="message"
         @node-click="click"
@@ -505,7 +506,7 @@ export default {
       locked: false,
       showNodePathPanel: false,
       iframeloading: false,
-      preDragViewMode: 'vueprocess',// table切回用于暂存 vueprocess or cyeditor
+      isfullScreen: false,
       viewMode: 'vueprocess' //  vueprocess, cyeditor or table
     };
   },
@@ -1042,6 +1043,7 @@ export default {
         // iframe节点
         await this.saveCommonIframe(node);
       }
+
       // 为了表单校验，基础信息弹窗保存的节点已不再是响应式，需重新赋值给json
 
       this.json.nodes = this.json.nodes.map((item) => {
@@ -1058,9 +1060,10 @@ export default {
           item.modifyUser = this.getUserName();
           item.modifyTime = Date.now();
         }
+        item.selected = item.key === node.key
         return item;
       });
-      this.originalData = this.json;
+      this.originalData = {...this.json};
       this.jsonChange = true;
       this.addNodeShow = false;
       // 保存工作流
@@ -1697,7 +1700,7 @@ export default {
           }
           return subItem;
         });
-        this.originalData = this.json;
+        this.originalData = { ...this.json };
         this.autoSave(this.$t('message.workflow.AddNode'), false);
         return;
       }
@@ -1844,7 +1847,7 @@ export default {
         }
         return subItem;
       });
-      this.originalData = this.json;
+      this.originalData = { ...this.json };
     },
     clickBaseInfo() {
       this.nodeSelectedFalse(this.clickCurrentNode);
@@ -1969,7 +1972,7 @@ export default {
           this.json.nodes = this.json.nodes.filter((subItem) => {
             return node.key != subItem.key;
           });
-          this.originalData = this.json;
+          this.originalData = { ...this.json };
         })
       }
       // 更新
@@ -2553,7 +2556,9 @@ export default {
         this.originalData = this.json;
         this.iframeloading = true
         this.openningNode = null
-        this.preDragViewMode = this.viewMode
+        if (this.viewMode !== 'table') {
+          this.preDragViewMode = this.viewMode
+        }
         this.viewMode = mode
         this.$nextTick(()=> {
           const ifr = this.$refs.ifr;
@@ -2563,8 +2568,11 @@ export default {
             }
           }
         })
-      } else {
-        this.viewMode = mode || this.viewMode
+      } else if(mode || this.preDragViewMode) {
+        this.viewMode = mode || this.preDragViewMode
+        if (this.viewMode !== 'table') {
+          this.preDragViewMode = this.viewMode
+        }
         // 切换至原拖拽模式，节点位置负值处理
         if (this.viewMode === 'vueprocess') {
           let x = 0
@@ -2590,6 +2598,9 @@ export default {
         }
         this.originalData = this.json;
       }
+    },
+    screenSizeChange(fullScreen) {
+      this.isfullScreen = fullScreen
     },
     handleClickToolbar(action, arg) {
       this[action](arg)

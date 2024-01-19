@@ -109,8 +109,11 @@ div.process-module {
     }
   }
 
-  .designer .designer-toolbar .devider {
-    @include border-color(#DEE4EC, $dark-text-color);
+  .designer .designer-toolbar {
+    z-index: 1;
+    .devider {
+      @include border-color(#DEE4EC, $dark-text-color);
+    }
   }
   &.locked {
     pointer-events: none;

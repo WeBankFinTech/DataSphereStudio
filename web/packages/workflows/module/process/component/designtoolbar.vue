@@ -151,13 +151,15 @@
     </template>
     <div
       class="button view_mode_btn table_mode"
+      :class="{active: viewMode === 'table'}"
       title="表格模式"
       @click.stop="handleClick('changeViewMode','table')"
     >
       <SvgIcon class="icon" icon-class="listview" style="opacity: 0.65" />
     </div>
     <div
-      class="button view_mode_btn active"
+      class="button view_mode_btn"
+      :class="{active: viewMode !=='table'}"
       title="拖拽模式"
     >
       <SvgIcon class="icon" icon-class="dragmode" style="opacity: 0.65" @click.stop="handleClick('changeViewMode','')" />
@@ -255,7 +257,7 @@ export default {
           this.$emit('click-itembar', 'workflowPublishIsShow')
           break
         case 'changeViewMode':
-          this.$emit('click-itembar', 'changeViewMode', arg || this.viewMode)
+          this.$emit('click-itembar', 'changeViewMode', arg)
           break
         default:
           break

@@ -121,7 +121,7 @@ class ContextMenu {
   show(e) {
     if (e.target.data().type === 'edgehandle') return
     this.triggerEvt = e;
-    if (typeof this._options.beforeShow === 'function' && !this.isShow) {
+    if (typeof this._options.beforeShow === 'function') {
       const show = this._options.beforeShow(e, this._options.menus.slice(0))
       if (!show) return
       if (show && show.then) {

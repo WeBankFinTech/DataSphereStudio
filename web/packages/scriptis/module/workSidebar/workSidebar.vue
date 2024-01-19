@@ -278,8 +278,12 @@ export default {
               copy: false,
               type: "脚本文件",
             };
-            this.handleCreate(node).then(() => {
-              plugin.emit('copilot_web_listener_inster', regs)
+            this.handleCreate(node, (_, isOpen) => {
+              if (isOpen) {
+                setTimeout(() => {
+                  plugin.emit('copilot_web_listener_inster', regs)
+                }, 500);
+              }
             });
           }
         })
@@ -390,7 +394,7 @@ export default {
         this.openToTABAction(node.data);
       }
     },
-    openToTABAction(node) {
+    openToTABAction(node, openCallBack) {
       const openNode = node || this.currentNode.data;
       const path = openNode.path;
       const source = openNode.copy ? this.path : '';
@@ -398,7 +402,7 @@ export default {
         source,
         path,
         filename: openNode.name,
-      }, () => {});
+      }, openCallBack || (() => {}));
     },
     copyPathAction() {
       util.executeCopy(this.currentNode.data.path);
@@ -489,12 +493,12 @@ export default {
         type: result[0] || PREFIX,
       });
     },
-    handleCreate(node) {
+    handleCreate(node, openCallBack) {
       return new Promise((resolve, reject) => {
         this.handleCreating(node, (flag) => {
           if (flag) {
             if (node.isLeaf) {
-              this.openToTABAction(node);
+              this.openToTABAction(node, openCallBack);
             }
             let text = node.copy ? this.$t('message.scripts.constants.success.stick') : this.$t('message.scripts.constants.success.add')
             this.$Message.success(text);

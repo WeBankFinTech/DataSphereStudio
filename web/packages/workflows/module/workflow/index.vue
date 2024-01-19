@@ -14,11 +14,13 @@
       v-model="deleteProjectShow"
       :title="$t('message.orchestratorModes.deleteOrchestrator')"
       @on-ok="deleteProjectConfirm"
-    >{{
-      `${$t("message.orchestratorModes.confirmDeleteOrchestrator")}${
-        deleteProjectItem.orchestratorName
-      } ？`
-    }}</Modal
+    ><div style="word-wrap: break-word;">
+      {{
+        `${$t("message.orchestratorModes.confirmDeleteOrchestrator")}${
+          deleteProjectItem.orchestratorName
+        } ？`
+      }}
+    </div></Modal
     >
     <!--修改编排-->
     <WorkflowForm

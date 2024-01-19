@@ -205,7 +205,6 @@ export default {
             return true
           },
         }
-        console.warn(v)
         let config = {
           disabled: this.disabled,
           cy: {
@@ -254,6 +253,8 @@ export default {
         editor = this.instance.editor
         cy = this.instance.cy
         let timer
+        // 初始化
+        this.updataNodeStatuStyle()
         cy.on('mouseover', 'node', (e) => {
           clearTimeout(timer)
           // hover title
@@ -313,12 +314,7 @@ export default {
           this.hasChange()
           const data = this.getJsonData()
           this.$emit('change', data)
-          if (!this.$refs.nodestaus) return
-          let pan  = cy.pan();
-          let zoom = cy.zoom();
-          let transform = "translate(" + (pan.x + 200) + "px," + pan.y  + "px) scale(" + zoom + ")";
-          this.$refs.nodestaus.style.msTransform = transform;
-          this.$refs.nodestaus.style.transform = transform;
+          this.updataNodeStatuStyle()
         });
 
         cy.on('position bounds', 'node', (ev) => {
@@ -406,13 +402,24 @@ export default {
       if (v.config) {
         v.config.pan && (pan = v.config.pan)
         v.config.layoutType && !this.layoutType && (this.layoutType = v.config.layoutType)
-        v.config.zoom && !this.zoomSize && (this.zoomSize = v.config.zoom || 1)
+      }
+      if (!this.zoomSize) {
+        this.zoomSize = (v.config && v.config.zoom) ? v.config.zoom : 1
       }
       editor.json({
         elements: data,
         pan,
         zoom: this.zoomSize
       })
+    },
+    updataNodeStatuStyle() {
+      if (!this.$refs.nodestaus || !this.instance) return
+      const cy = this.instance.cy;
+      let pan  = cy.pan();
+      let zoom = cy.zoom();
+      let transform = "translate(" + (pan.x + 200) + "px," + pan.y  + "px) scale(" + zoom + ")";
+      this.$refs.nodestaus.style.msTransform = transform;
+      this.$refs.nodestaus.style.transform = transform;
     },
     getNodeTypes() {
       const list = []
@@ -490,7 +497,6 @@ export default {
       }
     },
     hasChange() {
-      // 仅节点的增删触发change
       const data = this.getJsonData()
       this.$emit('change', data)
     },
@@ -538,6 +544,7 @@ export default {
     },
     screenSizeChange() {
       this.fullScreen = !this.fullScreen
+      this.$emit('screenSizeChange', this.fullScreen)
     },
     // 切换模式
     modeChange(mode) {

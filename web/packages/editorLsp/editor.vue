@@ -74,7 +74,7 @@ export default {
       let typeConfig = types[this.type];
       let config = merge(
         {
-          automaticLayout: false,
+          automaticLayout: true,
           scrollBeyondLastLine: false,
           minimap: {
             enabled: false,
@@ -161,8 +161,8 @@ export default {
     })
     this.editor = editor
     this.monaco = monaco
-    this.editorModel = this.editor.getModel();
     this.initMonaco()
+    this.editorModel = this.editor.getModel();
     this.changeTheme(localStorage.getItem('theme'));
     eventbus.on('theme.change', this.changeTheme);
   },

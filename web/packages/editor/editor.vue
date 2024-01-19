@@ -73,7 +73,7 @@ export default {
       let typeConfig = types[this.type];
       let config = merge(
         {
-          automaticLayout: false,
+          automaticLayout: true,
           scrollBeyondLastLine: false,
           minimap: {
             enabled: false,

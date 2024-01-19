@@ -324,26 +324,13 @@ class CyEditor extends EventBus {
           this._plugins.edgehandles.enable();
         }
       }
-    }
-    if (typeof key === 'string') {
+    } else if (typeof key === 'string') {
       this.editorOptions[key] = value
       if (typeof this._handleOptonsChange[key] === 'function') {
         this._handleOptonsChange[key].call(this, value)
       }
     } else if (typeof key === 'object') {
       Object.assign(this.editorOptions, key)
-    }
-    let { dragAddNodes, snapGrid } = this.editorOptions
-    // drag node add to cy
-    if (dragAddNodes && this.cy) {
-      this._plugins.dragAddNodes = this.cy.dragAddNodes({
-        container: '.cy-editor-container .left',
-        nodeTypes: this.editorOptions.nodeTypes,
-      })
-    }
-    // snap-grid
-    if (snapGrid && this.cy) {
-      this._plugins.cySnapToGrid = this.cy.snapToGrid()
     }
   }
 

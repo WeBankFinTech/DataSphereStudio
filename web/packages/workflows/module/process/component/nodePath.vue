@@ -263,7 +263,9 @@ export default {
             return contain ? listItems : undefined
           } else {
             // 层级等于
-            const len = listItems.length === Number(this.saveModel.number) + 1 || listItems.length === this.saveModel.number * 2 + 1
+            const len = this.saveModel.updown.length > 1
+              ? listItems.length === this.saveModel.number * 2 + 1 :
+              listItems.length === Number(this.saveModel.number) + 1
             return len && contain ? listItems : undefined
           }
         }

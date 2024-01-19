@@ -14,7 +14,7 @@
           <div class="project-nav-tree-top-t">
             <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
             <div class="project-nav-tree-top-t-icon">
-              <Icon type="ios-add-circle-outline" class="icon sort-icon" style="margin-top: 2px;" @click="createProject"></Icon>
+              <SvgIcon class="icon sort-icon" icon-class="xinzeng" style="display: inline-flex;margin-top: 4px;" @click="createProject" />
               <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
                 <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
                 <DropdownMenu slot="list">
@@ -399,7 +399,7 @@ export default {
         devProcessList: [],
         releaseUsers: [],
       };
-      this.$refs.projectForm.showProject(this.currentProjectData)
+      this.$refs.projectForm.showProject(this.currentProjectData, 'add')
     },
     handleTreeToggle() {
       this.treeFold = !this.treeFold;
@@ -658,9 +658,9 @@ export default {
     async onConfigProject(project) {
       if (project.id !== this.currentProjectData.id) {
         const data = await this.fetchProjectDataById(project.id)
-        this.$refs.projectForm.showProject(data)
+        this.$refs.projectForm.showProject(data, 'edit')
       } else {
-        this.$refs.projectForm.showProject(this.currentProjectData)
+        this.$refs.projectForm.showProject(this.currentProjectData, 'edit')
       }
       this.actionType = "modify";
     },

@@ -232,6 +232,7 @@ export default {
     return {
       ProjectShow: false,
       originBusiness: "",
+      mode: "",
       devProcess: [
         {
           id: 1,
@@ -344,14 +345,15 @@ export default {
     projectData(value) {
       const cloneObj = _.cloneDeep(value);
       this.projectDataCurrent = cloneObj;
-      // 设置开发流程的默认参数
-      let curProcessList = [];
-      this.devProcess.forEach((item) => {
-        if(item.checked === 1) {
-          curProcessList.push(item.dicValue)
-        }
-      })
-      this.projectDataCurrent.devProcessList = curProcessList;
+      if (this.mode === 'add') {
+        let curProcessList = [];
+        this.devProcess.forEach((item) => {
+          if(item.checked === 1) {
+            curProcessList.push(item.dicValue)
+          }
+        })
+        this.projectDataCurrent.devProcessList = curProcessList;
+      }     
     },
   },
   methods: {
@@ -401,7 +403,7 @@ export default {
       tmpArr.splice(index, 1);
       this.projectDataCurrent.business = tmpArr.toString();
     },
-    showProject(params) {
+    showProject(params,mode) {
       this.ProjectShow = true
       this.$refs.projectForm.resetFields()
       // 新增只有一项自动勾选
@@ -409,6 +411,7 @@ export default {
         params.orchestratorModeList = [this.orchestratorModeList.list[0].dicKey]
       }
       this.projectDataCurrent = {...params}
+      this.mode = mode
     }
   },
 };

@@ -438,41 +438,43 @@ export default {
     },
 
     save() {
-      this.resourcesAction();
-      // 没有值降默认值回填
-      if(this.currentNode.jobParams && this.currentNode.params.configuration) {
-        this.curNodeParamsList.map((item) => {
-          if ((item.position === 'runtime' || item.position === 'startup') && this.currentNode.params) {
-            const value = this.currentNode.jobParams[this.poinToLink(item.key)] ? this.currentNode.jobParams[this.poinToLink(item.key)] : item.defaultValue;
-            this.currentNode.params.configuration[item.position][item.key] = value;
-          }
-        })
-      }
-      // 未选择模板时删除对应模板数据
-      if (this.isRefTemplate === '0') {
-        delete this.currentNode.ecConfTemplateId
-        delete this.currentNode.ecConfTemplateName
-        delete this.currentNode.jobParams['ec.conf.templateId']
-        delete this.currentNode.params.configuration['startup']['ec.conf.templateId']
-      } else {
-        this.currentNode.jobParams['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
-        this.currentNode.params.configuration['startup']['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
-      }
-      this.validFrom();
+      this.validFrom(() => {
+        this.resourcesAction();
+        // 没有值降默认值回填
+        if (this.currentNode.jobParams && this.currentNode.params.configuration) {
+          this.curNodeParamsList.map((item) => {
+            if ((item.position === 'runtime' || item.position === 'startup') && this.currentNode.params) {
+              const value = this.currentNode.jobParams[this.poinToLink(item.key)] ? this.currentNode.jobParams[this.poinToLink(item.key)] : item.defaultValue;
+              this.currentNode.params.configuration[item.position][item.key] = value;
+            }
+          })
+        }
+        // 未选择模板时删除对应模板数据
+        if (this.isRefTemplate === '0') {
+          delete this.currentNode.ecConfTemplateId
+          delete this.currentNode.ecConfTemplateName
+          delete this.currentNode.jobParams['ec.conf.templateId']
+          delete this.currentNode.params.configuration['startup']['ec.conf.templateId']
+        } else {
+          this.currentNode.jobParams['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
+          this.currentNode.params.configuration['startup']['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
+        }
+      });
     },
-    validFrom() {
-
+    validFrom(cb) {
       this.$refs.baseInfoForm.validate((baseInfoValid) => {
         if (baseInfoValid) {
           if (this.$refs.parameterForm) {
             this.$refs.parameterForm.validate((valid) => {
               if (valid) {
+                cb()
                 this.$emit('saveNode', this.currentNode);
               } else {
                 this.$Message.warning(this.$t('message.workflow.process.nodeParameter.BCSB'));
               }
             });
           } else {
+            cb()
             this.$emit('saveNode', this.currentNode);
           }
         } else {

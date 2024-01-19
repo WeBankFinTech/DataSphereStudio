@@ -511,7 +511,7 @@
        min-width: 220px;
       //  height: 120px;
        @include bg-color(#fff, $dark-base-color);
-       border: 2px solid rgba(0, 0, 0, 0.5);
+       border: 1px solid rgba(0, 0, 0, 0.5);
        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
 
        .line-type {
@@ -591,10 +591,12 @@
          }
        }
        input {
-         width: 280px;
+         flex: 1;
        }
        .search-head {
          margin-bottom: 5px;
+         display: flex;
+         align-items: center;
        }
        .node-item {
          height: 28px;

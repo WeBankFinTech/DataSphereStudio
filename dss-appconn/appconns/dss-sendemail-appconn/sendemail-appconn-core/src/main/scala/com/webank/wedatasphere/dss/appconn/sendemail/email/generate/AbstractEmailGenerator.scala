@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.appconn.sendemail.email.{Email, EmailGenerato
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.ExecutionRequestRefContext
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.RefExecutionRequestRef
 import org.apache.linkis.common.utils.{Logging, VariableUtils}
+import java.util
 
 trait AbstractEmailGenerator extends EmailGenerator with Logging{
 
@@ -46,7 +47,12 @@ trait AbstractEmailGenerator extends EmailGenerator with Logging{
       case (k, v) => logger.info(s"K is $k, V is $v")
     }
     val subject = if (runtimeMap.get("subject") != null) {
-      VariableUtils.replace(runtimeMap.get("subject").toString)
+      val subjectStr = runtimeMap.get("subject").toString
+        .replaceAll("YYYY-MM-DD-1", "\\${run_date}NO_TIMESTAMP")
+        .replaceAll("YYYY-MM-DD", "\\${run_today}NO_TIMESTAMP")
+      val tmp: util.HashMap[String, Any] = new util.HashMap[String, Any]()
+      tmp.put(VariableUtils.RUN_DATE, requestRef.getRunDate)
+      VariableUtils.replace(subjectStr, tmp)
     } else{
       "This is an email"
     }

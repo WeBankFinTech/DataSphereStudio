@@ -28,6 +28,7 @@ class MultiEmailContentGenerator extends AbstractEmailContentGenerator with Logg
     case multiContentEmail: MultiContentEmail =>
       formatSubjectOfOldVersion(email)
       formatSubject(multiContentEmail)
+      logger.info("email subject is "+email.getSubject)
       if (multiContentEmail.getEmailType.equals("html")) {
         setHtmlContent(multiContentEmail)
       } else {

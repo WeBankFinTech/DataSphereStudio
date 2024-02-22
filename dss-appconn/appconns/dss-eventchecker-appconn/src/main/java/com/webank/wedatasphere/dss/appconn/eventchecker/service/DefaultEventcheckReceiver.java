@@ -75,33 +75,17 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
         boolean afterSendFlag = (null != afterSend && "true".equals(afterSend.trim().toLowerCase()));
         String[] executeType = null;
         try {
-            if ("0".equals(lastMsgId)){
-                if(receiveTodayFlag){
-                    if(afterSendFlag){
-                        executeType = new String[]{nowStartTime,todayEndTime,"0"};
-                    }else{
-                        executeType = new String[]{todayStartTime,todayEndTime,"0"};
-                    }
+            if(receiveTodayFlag){
+                if(afterSendFlag){
+                    executeType = new String[]{nowStartTime,todayEndTime,lastMsgId};
                 }else{
-                    if(afterSendFlag){
-                        executeType = new String[]{nowStartTime,allEndTime,"0"};
-                    }else{
-                        executeType = new String[]{allStartTime,allEndTime,"0"};
-                    }
+                    executeType = new String[]{todayStartTime,todayEndTime,lastMsgId};
                 }
             }else{
-                if(receiveTodayFlag){
-                    if(afterSendFlag){
-                        executeType = new String[]{nowStartTime,todayEndTime,lastMsgId};
-                    }else{
-                        executeType = new String[]{todayStartTime,todayEndTime,lastMsgId};
-                    }
+                if(afterSendFlag){
+                    executeType = new String[]{nowStartTime,allEndTime,lastMsgId};
                 }else{
-                    if(afterSendFlag){
-                        executeType = new String[]{nowStartTime,allEndTime,lastMsgId};
-                    }else{
-                        executeType = new String[]{allStartTime,allEndTime,lastMsgId};
-                    }
+                    executeType = new String[]{allStartTime,allEndTime,lastMsgId};
                 }
             }
         }catch(Exception e){

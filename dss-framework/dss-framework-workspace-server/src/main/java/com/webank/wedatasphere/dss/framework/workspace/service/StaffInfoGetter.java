@@ -29,5 +29,6 @@ public interface StaffInfoGetter {
 
     List<String> getAllDepartments();
 
+    StaffInfo getStaffInfoByUsername(String username);
 
 }

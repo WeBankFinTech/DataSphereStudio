@@ -41,7 +41,7 @@
 
     <properties>
         <dss.version>1.1.0.20-SNAPSHOT</dss.version>
-        <linkis.version>1.1.20-wds-SNAPSHOT</linkis.version>
+        <linkis.version>1.1.19-wds-SNAPSHOT</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>

@@ -48,8 +48,8 @@ trait AbstractEmailGenerator extends EmailGenerator with Logging{
     }
     val subject = if (runtimeMap.get("subject") != null) {
       val subjectStr = runtimeMap.get("subject").toString
-        .replaceAll("YYYY-MM-DD-1", "\\${run_date}NO_TIMESTAMP")
-        .replaceAll("YYYY-MM-DD", "\\${run_today}NO_TIMESTAMP")
+        .replaceAll("YYYY-MM-DD-1", "\\${run_date_std}NO_TIMESTAMP")
+        .replaceAll("YYYY-MM-DD", "\\${run_today_std}NO_TIMESTAMP")
       val tmp: util.HashMap[String, Any] = new util.HashMap[String, Any]()
       tmp.put(VariableUtils.RUN_DATE, requestRef.getRunDate)
       VariableUtils.replace(subjectStr, tmp)

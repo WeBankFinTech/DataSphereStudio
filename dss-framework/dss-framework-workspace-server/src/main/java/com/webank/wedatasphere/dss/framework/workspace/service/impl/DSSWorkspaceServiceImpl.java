@@ -676,16 +676,15 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     private void joinWorkspaceForNewUser(String userName, Long userId) {
-        StaffInfo staffInfo = staffInfoGetter.getStaffInfoByUsername(userName);
-        String userOrgName = (staffInfo == null) ? staffInfoGetter.getFullOrgNameByUsername(userName): staffInfo.getOrgFullName();
-        String orgName = staffInfo.getOrgName();
+        String userOrgName = staffInfoGetter.getFullOrgNameByUsername(userName);
+        String orgName = userOrgName.split("-")[0];
         List<DSSWorkspaceAssociateDepartments> workspaceAssociateDepartments = dssWorkspaceMapper.getWorkspaceAssociateDepartments();
         Set<ImmutablePair<Long, String>> needToAdd = new HashSet<>();
         for (DSSWorkspaceAssociateDepartments item : workspaceAssociateDepartments) {
             String departments = item.getDepartments();
             if (StringUtils.isNotBlank(departments) && StringUtils.isNotBlank(item.getRoleIds())) {
                 Arrays.stream(departments.split(",")).forEach(org -> {
-                    if (org.equals(userOrgName) || orgName.equals(org.contains("-")?org.split("-")[0]:org)) {
+                    if (org.equals(userOrgName) || orgName.equals(org.split("-")[0])) {
                         needToAdd.add(new ImmutablePair<>(item.getWorkspaceId(), item.getRoleIds()));
                     }
                 });

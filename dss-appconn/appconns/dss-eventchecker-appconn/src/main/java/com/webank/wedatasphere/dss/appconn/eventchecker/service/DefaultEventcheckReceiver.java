@@ -54,7 +54,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
         try{
             String lastMsgId = getOffset(jobId,props,log);
             String[] executeType = createExecuteType(jobId,props,log,lastMsgId);
-            if(executeType!=null && executeType.length ==3){
+            if(executeType!=null && executeType.length ==5){
                 String[] consumedMsgInfo = getMsg(props, log,executeType);
                 if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){
                     result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId);
@@ -73,19 +73,21 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
     private String[] createExecuteType(int jobId, Properties props, Logger log,String lastMsgId){
         boolean receiveTodayFlag = (null != receiveToday && "true".equals(receiveToday.trim().toLowerCase()));
         boolean afterSendFlag = (null != afterSend && "true".equals(afterSend.trim().toLowerCase()));
+        //只有receiveTodayFlag为true时，useRunDateFlag才有意义。
+        Boolean useRunDateFlag = receiveTodayFlag && (null != useRunDate && "true".equalsIgnoreCase(useRunDate.trim()));
         String[] executeType = null;
         try {
             if(receiveTodayFlag){
                 if(afterSendFlag){
-                    executeType = new String[]{nowStartTime,todayEndTime,lastMsgId};
+                    executeType = new String[]{nowStartTime,todayEndTime,lastMsgId,useRunDateFlag.toString(),runDate};
                 }else{
-                    executeType = new String[]{todayStartTime,todayEndTime,lastMsgId};
+                    executeType = new String[]{todayStartTime,todayEndTime,lastMsgId,useRunDateFlag.toString(),runDate};
                 }
             }else{
                 if(afterSendFlag){
-                    executeType = new String[]{nowStartTime,allEndTime,lastMsgId};
+                    executeType = new String[]{nowStartTime,allEndTime,lastMsgId,useRunDateFlag.toString(),runDate};
                 }else{
-                    executeType = new String[]{allStartTime,allEndTime,lastMsgId};
+                    executeType = new String[]{allStartTime,allEndTime,lastMsgId,useRunDateFlag.toString(),runDate};
                 }
             }
         }catch(Exception e){

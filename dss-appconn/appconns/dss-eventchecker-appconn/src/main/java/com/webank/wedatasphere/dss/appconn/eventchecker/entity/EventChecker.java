@@ -45,6 +45,7 @@ public class EventChecker implements Runnable{
 	public final static String SAVE_KEY="msg.savekey";
 	public final static String USER_TIME="msg.init.querytime";
 	public final static String TODAY="only.receive.today";
+	public final static String USE_RUN_DATE ="use.rundate";
 	public final static String AFTERSEND="msg.after.send";
 
 	private Properties p;

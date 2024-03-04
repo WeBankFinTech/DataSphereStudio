@@ -54,6 +54,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
         try{
             String lastMsgId = getOffset(jobId,props,log);
             String[] executeType = createExecuteType(jobId,props,log,lastMsgId);
+            log.info("event receiver executeType[]:{},{},{},{},{}",executeType[0],executeType[1],executeType[2],executeType[3],executeType[4]);
             if(executeType!=null && executeType.length ==5){
                 String[] consumedMsgInfo = getMsg(props, log,executeType);
                 if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){

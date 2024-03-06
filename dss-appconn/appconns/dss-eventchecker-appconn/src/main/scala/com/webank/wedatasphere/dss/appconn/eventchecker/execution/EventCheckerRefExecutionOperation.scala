@@ -76,10 +76,7 @@ class EventCheckerRefExecutionOperation
     val InstanceConfig = this.service.getAppInstance.getConfig
     val scalaParams: scala.collection.mutable.Map[String, Object] = requestRef.getExecutionRequestRefContext.getRuntimeMap
     val properties = new Properties()
-    val variableParams: scala.collection.mutable.Map[String, Object] = requestRef.getRefJobContent.get("variable").asInstanceOf[java.util.Map[String, Object]]
-    if (variableParams.exists(x => x._1.equalsIgnoreCase(VariableUtils.RUN_DATE))) {
-      properties.put(VariableUtils.RUN_DATE, variableParams.get(VariableUtils.RUN_DATE))
-    }
+    properties.put(VariableUtils.RUN_DATE,requestRef.getRunDate)
     InstanceConfig.foreach { record =>
       if(null == record._2) {
         properties.put(record._1, "")}

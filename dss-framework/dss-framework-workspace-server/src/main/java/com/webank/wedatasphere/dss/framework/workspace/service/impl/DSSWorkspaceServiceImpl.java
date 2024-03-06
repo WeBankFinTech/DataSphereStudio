@@ -686,7 +686,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             String departments = item.getDepartments();
             if (StringUtils.isNotBlank(departments) && StringUtils.isNotBlank(item.getRoleIds())) {
                 Arrays.stream(departments.split(",")).forEach(org -> {
-                    if (org.equals(userOrgName) || orgName.equals(org.split("-")[0])) {
+                    if (org.equals(userOrgName) || orgName.equals(org)) {
                         needToAdd.add(new ImmutablePair<>(item.getWorkspaceId(), item.getRoleIds()));
                     }
                 });

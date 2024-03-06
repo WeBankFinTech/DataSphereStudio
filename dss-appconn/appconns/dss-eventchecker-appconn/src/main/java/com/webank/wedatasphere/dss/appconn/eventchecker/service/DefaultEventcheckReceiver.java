@@ -78,17 +78,17 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
         Boolean useRunDateFlag = receiveTodayFlag && (null != useRunDate && "true".equalsIgnoreCase(useRunDate.trim()));
         String[] executeType = null;
         try {
-            if(receiveTodayFlag){
-                if(afterSendFlag){
-                    executeType = new String[]{nowStartTime,todayEndTime,lastMsgId,useRunDateFlag.toString(),runDate};
-                }else{
-                    executeType = new String[]{todayStartTime,todayEndTime,lastMsgId,useRunDateFlag.toString(),runDate};
+            if (receiveTodayFlag && !useRunDateFlag) {
+                if (afterSendFlag) {
+                    executeType = new String[]{nowStartTime, todayEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
+                } else {
+                    executeType = new String[]{todayStartTime, todayEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
                 }
-            }else{
-                if(afterSendFlag){
-                    executeType = new String[]{nowStartTime,allEndTime,lastMsgId,useRunDateFlag.toString(),runDate};
-                }else{
-                    executeType = new String[]{allStartTime,allEndTime,lastMsgId,useRunDateFlag.toString(),runDate};
+            } else {
+                if (afterSendFlag) {
+                    executeType = new String[]{nowStartTime, allEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
+                } else {
+                    executeType = new String[]{allStartTime, allEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
                 }
             }
         }catch(Exception e){

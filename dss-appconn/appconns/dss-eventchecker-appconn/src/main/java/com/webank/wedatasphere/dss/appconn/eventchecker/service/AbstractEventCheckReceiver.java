@@ -138,7 +138,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
      * Consistent entrance to consumer message
      */
     String[] getMsg(Properties props, Logger log,String ... params){
-        boolean useRunDate=Boolean.getBoolean(params[3]);
+        boolean useRunDate=Boolean.parseBoolean(params[3]);
         String sqlForReadTMsg;
         if(useRunDate){
             sqlForReadTMsg ="SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >?  AND run_date =?ORDER BY msg_id ASC LIMIT 1";
@@ -159,6 +159,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
             pstmt.setString(4, params[1]);
             pstmt.setString(5, params[2]);
             if(useRunDate){
+                log.info("use run_date, run_date:{}", params[4]);
                 pstmt.setString(6,params[4]);
             }
             log.info("param {} StartTime: " + params[0] + ", EndTime: " + params[1]

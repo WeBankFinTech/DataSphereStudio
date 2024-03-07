@@ -229,7 +229,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         String roleId = StringUtils.isBlank(roleName) ? null : String.valueOf(workspaceDBHelper.getRoleIdByName(roleName));
         PageHelper.startPage(pageNow, pageSize);
         // 转译用户名模糊查询中的特殊字符
-        String queryName = StringUtils.isNotEmpty(username) && username.contains("_") ? username.split("_")[0] + "\\" + username.split("_")[1] : username;
+        String queryName = StringUtils.isNotEmpty(username) && username.contains("_")
+                ? username.replaceAll("_", "\\\\_")
+                : username;
         List<DSSWorkspaceUser> workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, queryName, roleId);
         PageInfo<DSSWorkspaceUser> pageInfo = new PageInfo<>(workspaceUsers);
         total.add(pageInfo.getTotal());

@@ -60,7 +60,7 @@ public interface DSSWorkspaceUserMapper {
 
     @Select({
             "<script>",
-            "select created_by as creator, username as username, create_time as joinTime, workspace_id as workspaceId, group_concat(role_id) as roleIds, update_time as updateTime, update_user as updateUser " +
+            "select created_by as creator, username as username, create_time as joinTime, workspace_id as workspaceId, group_concat(DISTINCT role_id) as roleIds, update_time as updateTime, update_user as updateUser " +
                     "from dss_workspace_user_role where workspace_id = #{workspaceId} ",
             "<if test='username != null'>and username like concat('%',#{username},'%')</if> " + "group by username " +
                     "<if test='roleId != null'>HAVING FIND_IN_SET(#{roleId},roleIds)</if> " +

@@ -683,20 +683,24 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         String userOrgName = staffInfoGetter.getFullOrgNameByUsername(userName);
         String orgName = userOrgName.split("-")[0];
         List<DSSWorkspaceAssociateDepartments> workspaceAssociateDepartments = dssWorkspaceMapper.getWorkspaceAssociateDepartments();
-        Set<ImmutablePair<Long, String>> needToAdd = new HashSet<>();
+        Set<Map<Long, String>> needToAdd = new HashSet<>();
         for (DSSWorkspaceAssociateDepartments item : workspaceAssociateDepartments) {
             String departments = item.getDepartments();
             if (StringUtils.isNotBlank(departments) && StringUtils.isNotBlank(item.getRoleIds())) {
                 Arrays.stream(departments.split(",")).forEach(org -> {
                     if (org.equals(userOrgName) || orgName.equals(org)) {
-                        needToAdd.add(new ImmutablePair<>(item.getWorkspaceId(), item.getRoleIds()));
+                        Map<Long, String> pair = new HashMap<>();
+                        pair.put(item.getWorkspaceId(), item.getRoleIds());
+                        needToAdd.add(pair);
                     }
                 });
             }
         }
-        needToAdd.forEach(pair -> {
-            Arrays.stream(pair.getValue().split(",")).forEach(roleId -> {
-                dssWorkspaceUserMapper.insertUserRoleInWorkspace(pair.getKey().intValue(), Integer.parseInt(roleId),new Date(), userName, "system", userId, "system");
+        needToAdd.forEach(map -> {
+            map.forEach((key, value) -> {
+                Arrays.stream(value.split(",")).forEach(roleId -> {
+                    dssWorkspaceUserMapper.insertUserRoleInWorkspace(key.intValue(), Integer.parseInt(roleId), new Date(), userName, "system", userId, "system");
+                });
             });
         });
     }

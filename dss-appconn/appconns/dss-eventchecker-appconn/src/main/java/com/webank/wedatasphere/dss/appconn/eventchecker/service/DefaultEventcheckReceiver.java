@@ -75,7 +75,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
         boolean receiveTodayFlag = (null != receiveToday && "true".equals(receiveToday.trim().toLowerCase()));
         boolean afterSendFlag = (null != afterSend && "true".equals(afterSend.trim().toLowerCase()));
         //只有receiveTodayFlag为true时，useRunDateFlag才有意义。
-        Boolean useRunDateFlag = receiveTodayFlag && (null != useRunDate && "true".equalsIgnoreCase(useRunDate.trim()));
+        Boolean useRunDateFlag = receiveTodayFlag && (null == useRunDate || "true".equalsIgnoreCase(useRunDate.trim()));
         String[] executeType = null;
         try {
             if (receiveTodayFlag && !useRunDateFlag) {

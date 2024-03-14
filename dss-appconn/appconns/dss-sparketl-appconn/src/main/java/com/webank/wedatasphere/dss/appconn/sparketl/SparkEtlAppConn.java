@@ -9,8 +9,6 @@ import org.apache.linkis.common.conf.CommonVars;
 
 public class SparkEtlAppConn extends AbstractAppConn implements OnlyDevelopmentAppConn {
 
-    public static final String SPARKETL_APPCONN_NAME = CommonVars.apply("wds.dss.appconn.sparketl.name", "sparketl").getValue();
-
     private SparkEtlDevelopmentStandard developmentStandard;
 
     @Override
@@ -22,8 +20,5 @@ public class SparkEtlAppConn extends AbstractAppConn implements OnlyDevelopmentA
     public DevelopmentIntegrationStandard getOrCreateDevelopmentStandard() {
         return developmentStandard;
     }
-
-
-
 
 }

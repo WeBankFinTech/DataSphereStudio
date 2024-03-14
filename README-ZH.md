@@ -105,9 +105,7 @@
 
  &nbsp; &nbsp; &nbsp; &nbsp;如果您想试用 Demo 环境，请加入DataSphere Studio社区用户群（**加群方式请翻到本文档末尾处**），联系 **WeDataSphere 入群机器人** 获取邀请码。
 
- &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境用户注册页面：[点我进入](https://dss-open.wedatasphere.com/#/register)
-
- &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境登录页面：[点我进入](https://dss-open.wedatasphere.com/#/login)
+ &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo 环境登录页面：[点我进入](http://106.52.77.156:8085/)
 
 
 ## 下载
@@ -138,7 +136,7 @@
 
 - [DSS 的 Exchangis AppConn 插件安装指南](https://github.com/WeDataSphere/Exchangis/blob/master/docs/zh_CN/ch1/exchangis_appconn_deploy_cn.md)
 
-- [DSS 的 Streamis AppConn 插件安装指南](https://github.com/WeBankFinTech/Streamis/blob/main/docs/zh_CN/0.2.0/development/StreamisAppConn%E5%AE%89%E8%A3%85%E6%96%87%E6%A1%A3.md)
+- [DSS 的 Streamis AppConn 插件安装指南](https://github.com/WeBankFinTech/Streamis/blob/main/docs/zh_CN/%E5%AE%89%E8%A3%85%E6%96%87%E6%A1%A3/AppConn%E7%9A%84%E4%BD%BF%E7%94%A8.md)
 
 - [DSS 的 Prophecis AppConn 插件安装指南](https://github.com/WeBankFinTech/Prophecis/blob/master/docs/zh_CN/Deployment_Documents/Prophecis%20Appconn%E5%AE%89%E8%A3%85%E6%96%87%E6%A1%A3.md)
 
@@ -170,7 +168,7 @@
 
  &nbsp; &nbsp; &nbsp; &nbsp;对 DSS 的任何问题和建议，敬请提交 issue，以便跟踪处理和经验沉淀共享。
 
- &nbsp; &nbsp; &nbsp; &nbsp;您也可以扫描下面的二维码，加入我们的 微信/QQ群，以获得更快速的响应。
+ &nbsp; &nbsp; &nbsp; &nbsp;您也可以扫描下面的二维码，加入我们的 微信群，以获得更快速的响应。
 
 ![交流](images/zh_CN/readme/communication.png)
 

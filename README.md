@@ -103,9 +103,7 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;If you want to try out the Demo environment, please join the DataSphere Studio community user group (**Please refer to the end of the document**), and contact **WeDataSphere Group Robot** to get an invitation code.
 
- &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo environment user registration page: [click me to enter](https://dss-open.wedatasphere.com/#/register)
-
- &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo environment login page: [click me to enter](https://dss-open.wedatasphere.com/#/login)
+ &nbsp; &nbsp; &nbsp; &nbsp;DataSphereStudio Demo environment login page: [click me to enter](http://106.52.77.156:8085/)
 
 ##  Download
 
@@ -136,7 +134,7 @@ English | [中文](README-ZH.md)
 
 - [Exchangis AppConn Plugin Installation Guide for DSS](https://github.com/WeDataSphere/Exchangis/blob/master/docs/en_US/ch1/exchangis_appconn_deploy_en.md)
 
-- [Streamis AppConn Plugin Installation Guide for DSS](https://github.com/WeBankFinTech/Streamis/blob/main/docs/en_US/0.2.0/development/StreamisAppConnInstallationDocument.md)
+- [Streamis AppConn Plugin Installation Guide for DSS](https://github.com/WeBankFinTech/Streamis/blob/main/docs/en_US/0.3.0/development/StreamisAppConnInstallationDocument.md)
 
 - [Prophecis AppConn Plugin Installation Guide for DSS](https://github.com/WeBankFinTech/Prophecis/blob/master/docs/zh_CN/Deployment_Documents/Prophecis%20Appconn%E5%AE%89%E8%A3%85%E6%96%87%E6%A1%A3.md)
 
@@ -168,7 +166,7 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;For any questions or suggestions, please kindly submit an issue.
 
- &nbsp; &nbsp; &nbsp; &nbsp;You can scan the QR code below to join our WeChat and QQ group to get more immediate response.
+ &nbsp; &nbsp; &nbsp; &nbsp;You can scan the QR code below to join our WeChat to get more immediate response.
 
 ![communication](images/en_US/readme/communication.png)
 

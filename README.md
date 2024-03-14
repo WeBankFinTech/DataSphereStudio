@@ -166,7 +166,7 @@ English | [中文](README-ZH.md)
 
  &nbsp; &nbsp; &nbsp; &nbsp;For any questions or suggestions, please kindly submit an issue.
 
- &nbsp; &nbsp; &nbsp; &nbsp;You can scan the QR code below to join our WeChat and QQ group to get more immediate response.
+ &nbsp; &nbsp; &nbsp; &nbsp;You can scan the QR code below to join our WeChat to get more immediate response.
 
 ![communication](images/en_US/readme/communication.png)
 

@@ -168,7 +168,7 @@
 
  &nbsp; &nbsp; &nbsp; &nbsp;对 DSS 的任何问题和建议，敬请提交 issue，以便跟踪处理和经验沉淀共享。
 
- &nbsp; &nbsp; &nbsp; &nbsp;您也可以扫描下面的二维码，加入我们的 微信/QQ群，以获得更快速的响应。
+ &nbsp; &nbsp; &nbsp; &nbsp;您也可以扫描下面的二维码，加入我们的 微信群，以获得更快速的响应。
 
 ![交流](images/zh_CN/readme/communication.png)
 

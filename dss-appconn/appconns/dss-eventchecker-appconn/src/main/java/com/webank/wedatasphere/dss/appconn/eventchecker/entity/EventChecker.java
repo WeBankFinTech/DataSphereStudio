@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.appconn.eventchecker.service.EventCheckerService;
 import com.webank.wedatasphere.dss.appconn.eventchecker.cs.CSEventReceiverHelper;
 import com.webank.wedatasphere.dss.appconn.eventchecker.execution.EventCheckerExecutionAction;
+import com.webank.wedatasphere.dss.appconn.eventchecker.utils.Utils;
 import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -107,7 +108,7 @@ public class EventChecker implements Runnable{
 				if (p.containsKey(MSG) && StringUtils.isNotEmpty(p.getProperty(MSG)) && p.getProperty(MSG).length() > 250) {
 					throw new RuntimeException("parameter " + MSG + " length less than 250 !");
 				}
-				success = wbDao.sendMsg(execId, p, logger);
+				success = wbDao.sendMsg(execId, p, logger, backAction);
 				if (success) {
 					backAction.setState(RefExecutionState.Success);
 
@@ -122,6 +123,7 @@ public class EventChecker implements Runnable{
 				throw new RuntimeException("Please input correct parameter of msg.type, Select RECEIVE Or SEND.");
 			}
 		}catch (Exception ex){
+			Utils.log(backAction,ex);
 			backAction.setState(RefExecutionState.Failed);
 			throw ex;
 		}
@@ -145,7 +147,7 @@ public class EventChecker implements Runnable{
 			if (StringUtils.isNotEmpty(userTime)) {
 				p.put(USER_TIME, userTime);
 			}
-			success = wbDao.reciveMsg(execId, p, logger);
+			success = wbDao.reciveMsg(execId, p, logger, backAction);
 			if (success) {
 				backAction.saveKeyAndValue(getJobSaveKeyAndValue());
 				backAction.setState(RefExecutionState.Success);

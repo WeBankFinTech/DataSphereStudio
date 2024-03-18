@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
+import com.webank.wedatasphere.dss.appconn.eventchecker.execution.EventCheckerExecutionAction;
 import org.apache.log4j.Logger;
 
 import java.util.Properties;
@@ -34,9 +35,9 @@ public class EventCheckerService {
         return instance;
     }
 
-    public boolean sendMsg(int jobId, Properties props, Logger log) {
+    public boolean sendMsg(int jobId, Properties props, Logger log, EventCheckerExecutionAction backAction) {
         if(props!=null){
-            return new EventCheckSender(props).sendMsg(jobId,props,log);
+            return new EventCheckSender(props,backAction).sendMsg(jobId,props,log);
         }else{
             log.error("create EventCheckSender failed {}");
             return false;
@@ -50,9 +51,9 @@ public class EventCheckerService {
      * query manner, and the target message is repeatedly queried within a time period
      * when the set target is not exceeded.
      */
-    public boolean reciveMsg(int jobId, Properties props, Logger log) {
+    public boolean reciveMsg(int jobId, Properties props, Logger log,EventCheckerExecutionAction backAction) {
         if(props!=null){
-            return new DefaultEventcheckReceiver(props).reciveMsg(jobId,props,log);
+            return new DefaultEventcheckReceiver(props,backAction).reciveMsg(jobId,props,log);
         }else{
             log.error("create EventCheckSender failed {}");
             return false;

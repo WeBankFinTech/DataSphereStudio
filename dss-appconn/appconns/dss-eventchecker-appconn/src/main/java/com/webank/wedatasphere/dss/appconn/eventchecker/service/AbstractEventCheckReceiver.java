@@ -18,6 +18,8 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker;
 
+import com.webank.wedatasphere.dss.appconn.eventchecker.execution.EventCheckerExecutionAction;
+import com.webank.wedatasphere.dss.appconn.eventchecker.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.log4j.Logger;
@@ -33,7 +35,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
     /**
      * Fill the result into the source
      */
-    String setConsumedMsg(Properties props, Logger log, String[] consumedMsgInfo){
+    String setConsumedMsg(Properties props, Logger log, String[] consumedMsgInfo,EventCheckerExecutionAction backAction){
         String vNewMsgID = "";
         try {
             if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){
@@ -50,6 +52,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
                         + ", messageBody: " + vMsg);
             }
         }catch (Exception e) {
+            Utils.log(backAction,e);
             log.error("Error set consumed message failed {} setConsumedMsg failed" + e);
             return vNewMsgID;
         }
@@ -59,12 +62,12 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
     /**
      * Update consumption status
      */
-    boolean updateMsgOffset(int jobId, Properties props, Logger log, String[] consumedMsgInfo,String lastMsgId){
+    boolean updateMsgOffset(int jobId, Properties props, Logger log, String[] consumedMsgInfo, String lastMsgId, EventCheckerExecutionAction backAction){
         boolean result = false;
         String vNewMsgID = "-1";
         PreparedStatement updatePstmt = null;
         Connection msgConn = null;
-        vNewMsgID = setConsumedMsg(props,log,consumedMsgInfo);
+        vNewMsgID = setConsumedMsg(props,log,consumedMsgInfo,backAction);
         try {
             if(StringUtils.isNotEmpty(vNewMsgID) && StringUtils.isNotBlank(vNewMsgID) && !"-1".equals(vNewMsgID)){
                 msgConn = getEventCheckerConnection(props,log);
@@ -93,6 +96,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
                 result = false;
             }
         }catch (SQLException e){
+            Utils.log(backAction,e);
             log.error("Error update Msg Offset" + e);
             return false;
         }finally {
@@ -105,7 +109,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
     /**
      * get consumption progress
      */
-    String getOffset(int jobId, Properties props, Logger log){
+    String getOffset(int jobId, Properties props, Logger log, EventCheckerExecutionAction backAction){
         String sqlForReadMsgID = "SELECT msg_id FROM event_status WHERE receiver=? AND topic=? AND msg_name=?";
         PreparedStatement pstmtForGetID = null;
         Connection msgConn = null;
@@ -121,6 +125,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
             rs = pstmtForGetID.executeQuery();
             lastMsgId = rs.last()==true ? rs.getString("msg_id"):"0";
         } catch (SQLException e) {
+            Utils.log(backAction,e);
             throw new RuntimeException("get Offset failed " + e);
         }finally {
             closeQueryStmt(pstmtForGetID,log);
@@ -134,7 +139,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
     /**
      * Consistent entrance to consumer message
      */
-    String[] getMsg(Properties props, Logger log,String ... params){
+    String[] getMsg(Properties props, Logger log, EventCheckerExecutionAction backAction,String ... params){
         String sqlForReadTMsg = "SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >? ORDER BY msg_id ASC LIMIT 1";
         PreparedStatement pstmt = null;
         Connection msgConn = null;
@@ -160,6 +165,7 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
                 }
             }
         } catch (SQLException e) {
+            Utils.log(backAction,e);
             throw new RuntimeException("EventChecker failed to receive message" + e);
         } finally {
             closeQueryStmt(pstmt, log);

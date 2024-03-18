@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.utils;
 
+import com.webank.wedatasphere.dss.appconn.eventchecker.execution.EventCheckerExecutionAction;
+
 /**
  * A util helper class full of static methods that are commonly used.
  */
@@ -30,5 +32,13 @@ public class Utils {
         }
 
         return a.equals(b);
+    }
+
+    public static void log(EventCheckerExecutionAction nodeContext, String log) {
+        nodeContext.getExecutionRequestRefContext().appendLog(log);
+    }
+
+    public static void log(EventCheckerExecutionAction nodeContext, Exception e) {
+        nodeContext.getExecutionRequestRefContext().appendLog(ExceptionUtils.stacktraceToOneLineString(e,3000));
     }
 }

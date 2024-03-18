@@ -1,6 +1,5 @@
 package com.webank.wedatasphere.dss.data.governance
 
-
 import com.webank.wedatasphere.dss.data.governance.request._
 import com.webank.wedatasphere.dss.data.governance.response._
 

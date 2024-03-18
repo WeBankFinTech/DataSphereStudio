@@ -88,7 +88,7 @@ public class HiveSchemaDdlBuilder {
 
         builder.append("( ");
         boolean isFirstColumn = true;
-        for (HiveSchema.Column c : hiveSchema.getColumns()) {
+        for (Column c : hiveSchema.getColumns()) {
             if (!c.isPartition()) {
                 if (isFirstColumn) {
                     isFirstColumn = false;

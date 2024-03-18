@@ -18,9 +18,8 @@
 
 package com.webank.wedatasphere.dss.data.governance
 
+import org.apache.linkis.DataWorkCloudApplication
 import org.apache.linkis.common.utils.Logging
-import org.apache.linkis.{DataWorkCloudApplication, LinkisBaseServerApp}
-
 
 
 object DataAssetsApplication extends Logging {

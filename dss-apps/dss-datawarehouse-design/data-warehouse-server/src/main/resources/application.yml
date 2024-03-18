@@ -1,5 +1,7 @@
 server:
   port: 20080
+  servlet:
+    context-path: /api/rest_j/v1
 spring:
   application:
     name: data-warehouse-server

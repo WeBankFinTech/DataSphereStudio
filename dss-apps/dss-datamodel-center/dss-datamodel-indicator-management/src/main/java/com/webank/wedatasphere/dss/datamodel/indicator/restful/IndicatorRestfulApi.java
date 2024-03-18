@@ -13,21 +13,15 @@ import com.webank.wedatasphere.warehouse.client.action.ListDwThemeDomainAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.validation.Valid;
 import java.io.IOException;
 
 
-@Component
-@Path("/datamodel")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "datamodel", produces = {"application/json;charset=utf-8"})
 public class IndicatorRestfulApi implements AuthenticationClientStrategy {
 
 
@@ -47,11 +41,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @return
      * @throws IOException
      */
-    @POST
-    @Path("/indicators")
-    public Response add(@Context HttpServletRequest req, @RequestBody IndicatorAddVO vo) throws Exception {
+    @RequestMapping( value = "/indicators", method = RequestMethod.POST)
+    public Message add(HttpServletRequest req, @Valid @RequestBody IndicatorAddVO vo) throws Exception {
         LOGGER.info("indicatorAddVO : {}", vo);
-        return Message.messageToResponse(Message.ok().data("count",indicatorService.addIndicator(vo,"1" )));
+        return Message.ok().data("count",indicatorService.addIndicator(vo,"1" ));
     }
 
 
@@ -63,11 +56,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @return
      * @throws Exception
      */
-    @PUT
-    @Path("/indicators/{id}")
-    public Response update(@Context HttpServletRequest req, @PathParam("id") Long id , @RequestBody IndicatorUpdateVO vo) throws Exception {
+    @RequestMapping( value = "/indicators/{id}", method = RequestMethod.PUT)
+    public Message update(HttpServletRequest req, @PathVariable("id") Long id , @RequestBody IndicatorUpdateVO vo) throws Exception {
         LOGGER.info("update id : {}, indicatorUpdateVO : {}", id, vo);
-        return Message.messageToResponse(Message.ok().data("count",indicatorService.updateIndicator(id,vo)));
+        return Message.ok().data("count",indicatorService.updateIndicator(id,vo));
     }
 
 
@@ -78,11 +70,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param vo
      * @return
      */
-    @PUT
-    @Path("/indicators/enable/{id}")
-    public Response enable(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody IndicatorEnableVO vo) {
+    @RequestMapping( value = "/indicators/enable/{id}", method = RequestMethod.PUT)
+    public Message enable(HttpServletRequest req, @PathVariable("id") Long id, @RequestBody IndicatorEnableVO vo) {
         LOGGER.info("enable id : {}, vo : {}", id, vo);
-        return Message.messageToResponse(Message.ok().data("count", indicatorService.enableIndicator(id, vo)));
+        return Message.ok().data("count", indicatorService.enableIndicator(id, vo));
     }
 
 
@@ -91,11 +82,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param req
      * @return
      */
-    @POST
-    @Path("/indicators/list")
-    public Response list(@Context HttpServletRequest req, @RequestBody IndicatorQueryVO vo){
+    @RequestMapping( value = "/indicators/list", method = RequestMethod.POST)
+    public Message list(HttpServletRequest req, @RequestBody IndicatorQueryVO vo){
         LOGGER.info("list vo : {}",vo);
-        return Message.messageToResponse(indicatorService.listIndicators(vo));
+        return indicatorService.listIndicators(vo);
     }
 
 
@@ -106,11 +96,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param id
      * @return
      */
-    @GET
-    @Path("/indicators/{id}")
-    public Response query(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+    @RequestMapping( value = "/indicators/{id}", method = RequestMethod.GET)
+    public Message query(HttpServletRequest req, @PathVariable("id") Long id) throws ErrorException {
         LOGGER.info("query id : {}", id);
-        return Message.messageToResponse(indicatorService.queryById(id));
+        return indicatorService.queryById(id);
     }
 
     /**
@@ -119,11 +108,11 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param id
      * @return
      */
-    @DELETE
-    @Path("/indicators/{id}")
-    public Response delete(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+
+    @RequestMapping( value = "/indicators/{id}", method = RequestMethod.DELETE)
+    public Message delete(HttpServletRequest req, @PathVariable("id") Long id) throws ErrorException {
         LOGGER.info("delete id : {}", id);
-        return Message.messageToResponse(Message.ok().data("count",indicatorService.deleteIndicator(id)));
+        return Message.ok().data("count",indicatorService.deleteIndicator(id));
     }
 
 
@@ -135,11 +124,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @return
      * @throws IOException
      */
-    @POST
-    @Path("/indicators/versions/{id}")
-    public Response addVersion(@Context HttpServletRequest req, @PathParam("id") Long id,@RequestBody IndicatorVersionAddVO vo) throws Exception {
+    @RequestMapping( value = "/indicators/versions/{id}", method = RequestMethod.POST)
+    public Message addVersion(HttpServletRequest req, @PathVariable("id") Long id,@Valid @RequestBody IndicatorVersionAddVO vo) throws Exception {
         LOGGER.info("indicatorVersionAddVO : {}", vo);
-        return Message.messageToResponse(Message.ok().data("count",indicatorService.addIndicatorVersion(id,vo)));
+        return Message.ok().data("count",indicatorService.addIndicatorVersion(id,vo));
     }
 
 
@@ -152,11 +140,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @return
      * @throws IOException
      */
-    @POST
-    @Path("/indicators/versions/rollback")
-    public Response versionRollBack(@Context HttpServletRequest req,IndicatorVersionRollBackVO vo) throws Exception {
+    @RequestMapping( value = "/indicators/versions/rollback", method = RequestMethod.POST)
+    public Message versionRollBack(HttpServletRequest req,@Valid @RequestBody IndicatorVersionRollBackVO vo) throws Exception {
         LOGGER.info("indicatorVersionRollBackVO : {}", vo);
-        return Message.messageToResponse(Message.ok().data("count",indicatorService.versionRollBack(vo)));
+        return Message.ok().data("count",indicatorService.versionRollBack(vo));
     }
 
 
@@ -166,11 +153,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param req
      * @return
      */
-    @POST
-    @Path("/indicators/versions/list")
-    public Response indicatorVersionsList(@Context HttpServletRequest req, @RequestBody IndicatorVersionQueryVO vo){
+    @RequestMapping( value = "/indicators/versions/list", method = RequestMethod.POST)
+    public Message indicatorVersionsList(HttpServletRequest req, @RequestBody IndicatorVersionQueryVO vo){
         LOGGER.info("version list vo : {}",vo);
-        return Message.messageToResponse(indicatorService.listIndicatorVersions(vo));
+        return indicatorService.listIndicatorVersions(vo);
     }
 
 
@@ -179,11 +165,10 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param req
      * @return
      */
-    @POST
-    @Path("/themes/list")
-    public Response themesList(@Context HttpServletRequest req){
+    @RequestMapping( value = "/themes/list", method = RequestMethod.POST)
+    public Message themesList(HttpServletRequest req){
         ListDwThemeDomainAction action = ListDwThemeDomainAction.builder().setUser(getStrategyUser(req)).setIsAvailable(true).build();
-        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listThemeDomains(action).getAll()));
+        return Message.ok().data("list",governanceDwRemoteClient.listThemeDomains(action).getAll());
     }
 
     /**
@@ -191,12 +176,11 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param req
      * @return
      */
-    @POST
-    @Path("/layers/list")
-    public Response layerList(@Context HttpServletRequest req,@RequestBody LayerVO vo){
+    @RequestMapping( value = "/layers/list", method = RequestMethod.POST)
+    public Message layerList(HttpServletRequest req,@RequestBody LayerVO vo){
         LOGGER.info("layerList vo : {}",vo);
         ListDwLayerAction action = ListDwLayerAction.builder().setIsAvailable(true).setDb(vo.getDbName()).setUser(getStrategyUser(req)).build();
-        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listLayers(action).getAll()));
+        return Message.ok().data("list",governanceDwRemoteClient.listLayers(action).getAll());
     }
 
     /**
@@ -204,12 +188,12 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param req
      * @return
      */
-    @POST
-    @Path("/cycles/list")
-    public Response cycleList(@Context HttpServletRequest req,@RequestBody CycleVO vo){
+
+    @RequestMapping( value = "/cycles/list", method = RequestMethod.POST)
+    public Message cycleList(HttpServletRequest req,@RequestBody CycleVO vo){
         LOGGER.info("cycleList vo : {}",vo);
         ListDwStatisticalPeriodAction action =ListDwStatisticalPeriodAction.builder().setUser(getStrategyUser(req)).setLayer(vo.getLayer()).setIsAvailable(true).setTheme(vo.getTheme()).build();
-        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listStatisticalPeriods(action).getAll()));
+        return Message.ok().data("list",governanceDwRemoteClient.listStatisticalPeriods(action).getAll());
     }
 
     /**
@@ -217,18 +201,18 @@ public class IndicatorRestfulApi implements AuthenticationClientStrategy {
      * @param req
      * @return
      */
-    @POST
-    @Path("/modifiers/list")
-    public Response modifierList(@Context HttpServletRequest req,@RequestBody ModifierVO vo){
+
+    @RequestMapping( value = "/modifiers/list", method = RequestMethod.POST)
+    public Message modifierList(HttpServletRequest req,@RequestBody ModifierVO vo){
         LOGGER.info("modifierList vo : {}",vo);
         ListDwModifierAction action = ListDwModifierAction.builder().setUser(getStrategyUser(req)).setLayer(vo.getLayer()).setIsAvailable(true).setTheme(vo.getTheme()).build();
-        return Message.messageToResponse(Message.ok().data("list",governanceDwRemoteClient.listModifiers(action).getAll()));
+        return Message.ok().data("list",governanceDwRemoteClient.listModifiers(action).getAll());
     }
 
 
-    @POST
-    @Path("/current/user")
-    public Response currentUser(@Context HttpServletRequest req){
-        return Message.messageToResponse(Message.ok().data("user",getStrategyUser(req)));
+
+    @RequestMapping( value = "/current/user", method = RequestMethod.POST)
+    public Message currentUser(HttpServletRequest req){
+        return Message.ok().data("user",getStrategyUser(req));
     }
 }

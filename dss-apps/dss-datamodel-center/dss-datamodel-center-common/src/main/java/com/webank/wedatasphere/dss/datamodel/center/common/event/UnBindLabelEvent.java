@@ -1,6 +1,5 @@
 package com.webank.wedatasphere.dss.datamodel.center.common.event;
 
-import javafx.application.Application;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.context.ApplicationEvent;

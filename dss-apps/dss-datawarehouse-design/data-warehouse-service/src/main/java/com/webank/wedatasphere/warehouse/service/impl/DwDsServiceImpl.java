@@ -7,7 +7,6 @@ import com.webank.wedatasphere.dss.framework.workspace.client.response.GetWorksp
 import com.webank.wedatasphere.dss.framework.workspace.client.response.GetWorkspaceUsersResult;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.datasource.client.impl.LinkisMetadataSourceRemoteClient;
-import org.apache.linkis.datasource.client.request.GetMetadataSourceAllDatabasesAction;
 import org.apache.linkis.datasource.client.response.GetMetadataSourceAllDatabasesResult;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -15,6 +14,9 @@ import com.webank.wedatasphere.warehouse.LinkisRemoteClientHolder;
 import com.webank.wedatasphere.warehouse.exception.DwException;
 import com.webank.wedatasphere.warehouse.exception.DwExceptionCode;
 import com.webank.wedatasphere.warehouse.service.DwDsService;
+import org.apache.linkis.ujes.client.UJESClient;
+import org.apache.linkis.ujes.client.request.GetDBSAction;
+import org.apache.linkis.ujes.client.response.GetDBSResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,11 +34,11 @@ public class DwDsServiceImpl implements DwDsService {
         String userName = SecurityFilter.getLoginUsername(request);
         LOGGER.info("listAllDataSources userName:" + userName);
         try {
-            LinkisMetadataSourceRemoteClient client = LinkisRemoteClientHolder.getMetadataSourceRemoteClient();
+            UJESClient client = LinkisRemoteClientHolder.getMetadataSourceRemoteClient();
 
-            GetMetadataSourceAllDatabasesAction action = GetMetadataSourceAllDatabasesAction.builder().setUser(userName).build();
-            GetMetadataSourceAllDatabasesResult result = client.getAllDBMetaDataSource(action);
-            List<String> dbs = result.getDbs();
+            GetDBSAction action = GetDBSAction.builder().setUser(userName).build();
+            GetDBSResult result = client.getDBS(action);
+            List<String> dbs = result.getDBSName();
             return Message.ok().data("list", dbs);
         } catch (Exception e) {
             if (e instanceof ErrorException) {

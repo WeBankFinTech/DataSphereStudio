@@ -3,9 +3,9 @@ package com.webank.wedatasphere.dss.data.governance.service;
 
 
 import com.webank.wedatasphere.dss.data.governance.conf.ClientStrategy;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.server.security.SecurityFilter;
-import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 

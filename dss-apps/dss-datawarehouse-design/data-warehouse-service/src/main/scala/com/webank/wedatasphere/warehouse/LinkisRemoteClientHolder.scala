@@ -3,10 +3,11 @@ package com.webank.wedatasphere.warehouse
 import com.webank.wedatasphere.dss.data.governance.impl.LinkisDataAssetsRemoteClient
 import com.webank.wedatasphere.dss.datamodel.center.client.impl.LinkisDatamodelCenterRemoteClient
 import com.webank.wedatasphere.dss.framework.workspace.client.impl.LinkisWorkSpaceRemoteClient
-import org.apache.linkis.datasource.client.impl.{LinkisDataSourceRemoteClient, LinkisMetadataSourceRemoteClient}
+import org.apache.linkis.datasource.client.impl.LinkisDataSourceRemoteClient
 import org.apache.linkis.httpclient.dws.authentication.TokenAuthenticationStrategy
 import org.apache.linkis.httpclient.dws.config.{DWSClientConfig, DWSClientConfigBuilder}
 import com.webank.wedatasphere.warehouse.client.DwDataSourceConfiguration
+import org.apache.linkis.ujes.client.UJESClient
 
 import java.lang
 import java.util.concurrent.TimeUnit
@@ -42,7 +43,7 @@ object LinkisRemoteClientHolder {
 
   val dataSourceClient = new LinkisDataSourceRemoteClient(clientConfig)
 
-  val metadataSourceRemoteClient = new LinkisMetadataSourceRemoteClient(clientConfig)
+  val metadataSourceRemoteClient = UJESClient.apply(clientConfig)
 
   var dataModelRemoteClient = new LinkisDatamodelCenterRemoteClient(clientConfig)
 
@@ -66,7 +67,7 @@ object LinkisRemoteClientHolder {
     dataAssetsRemoteClient
   }
 
-  def getMetadataSourceRemoteClient: LinkisMetadataSourceRemoteClient = {
+  def getMetadataSourceRemoteClient: UJESClient = {
     metadataSourceRemoteClient
   }
 }

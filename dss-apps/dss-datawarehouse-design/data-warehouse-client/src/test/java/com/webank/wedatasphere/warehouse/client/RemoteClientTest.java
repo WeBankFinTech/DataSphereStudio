@@ -18,11 +18,6 @@ import java.util.concurrent.TimeUnit;
 public class RemoteClientTest {
 
     public static void main(String[] args) {
-//        LinkisMetadataSourceRemoteClient client = getMetadataSourceRemoteClient();
-//        GetMetadataSourceAllDatabasesAction action = GetMetadataSourceAllDatabasesAction.builder().setUser("hdfs").build();
-//        GetMetadataSourceAllDatabasesResult result = client.getAllDBMetaDataSource(action);
-//        List<String> dbs = result.getDbs();
-//        System.out.println(dbs);
         DWSClientConfig clientConfig = ((DWSClientConfigBuilder) (DWSClientConfigBuilder.newBuilder().addServerUrl("http://dss.shineweng.com:8088")
                 .connectionTimeout(30000).discoveryEnabled(true)
                 .discoveryFrequency(1, TimeUnit.MINUTES)

@@ -1,7 +1,6 @@
 package com.webank.wedatasphere.dss.datamodel.measure.restful;
 
-import com.google.common.collect.Lists;
-import com.webank.wedatasphere.dss.datamodel.center.common.exception.DSSDatamodelCenterException;
+
 import com.webank.wedatasphere.dss.datamodel.measure.service.MeasureService;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureAddVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureEnableVO;
@@ -9,25 +8,17 @@ import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureQueryVO;
 import com.webank.wedatasphere.dss.datamodel.measure.vo.MeasureUpdateVO;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.server.Message;
-import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 
-@Component
-@Path("/datamodel/")
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "datamodel", produces = {"application/json;charset=utf-8"})
 public class MeasureRestfulApi {
 
 
@@ -44,12 +35,10 @@ public class MeasureRestfulApi {
      * @return
      * @throws IOException
      */
-    @POST
-    @Path("/measures")
-    public Response add(@Context HttpServletRequest req, @RequestBody MeasureAddVO vo) throws ErrorException{
+    @RequestMapping( value = "/measures", method = RequestMethod.POST)
+    public Message add(HttpServletRequest req, @RequestBody MeasureAddVO vo) throws ErrorException{
         LOGGER.info("measureAddVO : {}", vo);
-        //String userName = SecurityFilter.getLoginUsername(req);
-        return Message.messageToResponse(Message.ok().data("id", measureService.addMeasure(vo)));
+        return Message.ok().data("id", measureService.addMeasure(vo));
     }
 
     /**
@@ -59,11 +48,10 @@ public class MeasureRestfulApi {
      * @param vo
      * @return
      */
-    @PUT
-    @Path("/measures/enable/{id}")
-    public Response enable(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody MeasureEnableVO vo) {
+    @RequestMapping( value = "/measures/enable/{id}", method = RequestMethod.PUT)
+    public Message enable(HttpServletRequest req, @PathVariable("id") Long id, @RequestBody MeasureEnableVO vo) {
         LOGGER.info("enable id : {}, vo : {}", id, vo);
-        return Message.messageToResponse(Message.ok().data("count", measureService.enableMeasure(id, vo)));
+        return Message.ok().data("count", measureService.enableMeasure(id, vo));
     }
 
     /**
@@ -73,11 +61,10 @@ public class MeasureRestfulApi {
      * @param vo
      * @return
      */
-    @PUT
-    @Path("/measures/{id}")
-    public Response update(@Context HttpServletRequest req, @PathParam("id") Long id, @RequestBody MeasureUpdateVO vo) throws ErrorException{
+    @RequestMapping( value = "/measures/{id}", method = RequestMethod.PUT)
+    public Message update(HttpServletRequest req, @PathVariable("id") Long id, @RequestBody MeasureUpdateVO vo) throws ErrorException{
         LOGGER.info("update id : {}, vo : {}", id, vo);
-        return Message.messageToResponse(Message.ok().data("count",measureService.updateMeasure(id,vo)));
+        return Message.ok().data("count",measureService.updateMeasure(id,vo));
     }
 
 
@@ -87,11 +74,11 @@ public class MeasureRestfulApi {
      * @param id
      * @return
      */
-    @GET
-    @Path("/measures/{id}")
-    public Response query(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+
+    @RequestMapping( value = "/measures/{id}", method = RequestMethod.GET)
+    public Message query(HttpServletRequest req, @PathVariable("id") Long id) throws ErrorException {
         LOGGER.info("query id : {}", id);
-        return Message.messageToResponse(Message.ok().data("detail",measureService.queryById(id)));
+        return Message.ok().data("detail",measureService.queryById(id));
     }
 
     /**
@@ -100,11 +87,10 @@ public class MeasureRestfulApi {
      * @param id
      * @return
      */
-    @DELETE
-    @Path("/measures/{id}")
-    public Response delete(@Context HttpServletRequest req, @PathParam("id") Long id) throws ErrorException {
+    @RequestMapping( value = "/measures/{id}", method = RequestMethod.DELETE)
+    public Message delete(HttpServletRequest req, @PathVariable("id") Long id) throws ErrorException {
         LOGGER.info("delete id : {}", id);
-        return Message.messageToResponse(Message.ok().data("count",measureService.deleteMeasure(id)));
+        return Message.ok().data("count",measureService.deleteMeasure(id));
     }
 
     /**
@@ -112,10 +98,9 @@ public class MeasureRestfulApi {
      * @param req
      * @return
      */
-    @POST
-    @Path("/measures/list")
-    public Response list(@Context HttpServletRequest req,@RequestBody MeasureQueryVO vo){
+    @RequestMapping( value = "/measures/list", method = RequestMethod.POST)
+    public Message list(HttpServletRequest req,@RequestBody MeasureQueryVO vo){
         LOGGER.info("list vo : {}",vo);
-        return Message.messageToResponse(measureService.listMeasures(vo));
+        return measureService.listMeasures(vo);
     }
 }

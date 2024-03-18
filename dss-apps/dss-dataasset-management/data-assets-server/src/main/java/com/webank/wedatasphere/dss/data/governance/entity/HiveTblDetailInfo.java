@@ -29,5 +29,4 @@ public class HiveTblDetailInfo implements Serializable {
         private  String guid;
         private  String comment;
     }
-
 }

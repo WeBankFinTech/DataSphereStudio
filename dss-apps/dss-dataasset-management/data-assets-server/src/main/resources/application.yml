@@ -1,12 +1,18 @@
 server:
-  port: 20082
+  port: 9355
+  servlet:
+    context-path: /api/rest_j/v1
 spring:
   application:
-    name: data-assets-server
+    name: data-assets
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:20303/eureka/
+  instance:
+    metadata-map:
+      test: wedatasphere
+
 management:
   endpoints:
     web:
@@ -14,6 +20,3 @@ management:
         include: refresh,info
 logging:
   config: classpath:log4j2.xml
-#mybatis-plus:
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

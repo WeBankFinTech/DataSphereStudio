@@ -138,7 +138,7 @@ public class AtlasClient extends AtlasClientV2 {
         atlasTypesDef.setClassificationDefs(Lists.newArrayList(atlasClassificationDef));
         MultivaluedMap<String, String> params =  new MultivaluedMapImpl();
         params.add("type","classification");
-        return  callAPI(AtlasClientV2.API_V2.CREATE_TYPE_DEFS, String.class, gson.toJson(atlasTypesDef),params);
+        return  callAPI(API_V2.CREATE_TYPE_DEFS, String.class, gson.toJson(atlasTypesDef),params);
     }
 
     // Glossary APIs
@@ -233,7 +233,23 @@ public class AtlasClient extends AtlasClientV2 {
         searchParameters.setIncludeClassificationAttributes(true);
         searchParameters.setExcludeDeletedEntities(excludeDeletedEntities);
         searchParameters.setAttributes(returnColumnsParams);
-       return  callAPI(AtlasClientV2.API_V2.FACETED_SEARCH, String.class, gson.toJson(searchParameters),new MultivaluedMapImpl());
+       return  callAPI(API_V2.FACETED_SEARCH, String.class, gson.toJson(searchParameters),new MultivaluedMapImpl());
+    }
+
+    /**
+     * 根据关键字检索实体
+     */
+    public String basicSearchPostForLabel(final String typeName, final String termName,final boolean excludeDeletedEntities) throws AtlasServiceException {
+        SearchParameters searchParameters = new SearchParameters();
+        Set<String> returnColumnsParams = Sets.newHashSet( "parameters", "lastAccessTime");
+        searchParameters.setTypeName(typeName);
+        searchParameters.setTermName(termName);
+        searchParameters.setIncludeSubClassifications(true);
+        searchParameters.setIncludeSubTypes(true);
+        searchParameters.setIncludeClassificationAttributes(true);
+        searchParameters.setExcludeDeletedEntities(excludeDeletedEntities);
+        searchParameters.setAttributes(returnColumnsParams);
+        return  callAPI(API_V2.FACETED_SEARCH, String.class, gson.toJson(searchParameters),new MultivaluedMapImpl());
     }
 
     /**

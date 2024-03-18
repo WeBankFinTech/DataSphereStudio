@@ -3,18 +3,17 @@ package com.webank.wedatasphere.warehouse.restful;
 import org.apache.linkis.server.Message;
 import com.webank.wedatasphere.warehouse.service.DwDsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
-@Component
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-@Path("/data-warehouse")
+
+
+@RestController
+@RequestMapping(value = "/data-warehouse", produces = {"application/json;charset=utf-8"})
 public class DwDsRestfulApi {
 
     private final DwDsService dwDsService;
@@ -25,25 +24,25 @@ public class DwDsRestfulApi {
     }
 
     // list all hive dbs
-    @GET
-    @Path("/dbs/hive")
-    public Response getAllHiveDbs(@Context HttpServletRequest request) throws Exception {
+
+    @RequestMapping( value = "/dbs/hive", method = RequestMethod.GET)
+    public Message getAllHiveDbs(HttpServletRequest request) throws Exception {
         Message message = this.dwDsService.getAllHiveDbs(request);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("/workspace/{id}/principal_users")
-    public Response getAllAvailableUsers(@Context HttpServletRequest request, @PathParam(value = "id") String id) throws Exception {
+
+    @RequestMapping( value = "/workspace/{id}/principal_users", method = RequestMethod.GET)
+    public Message getAllAvailableUsers(HttpServletRequest request, @PathVariable(value = "id") String id) throws Exception {
         Message message = this.dwDsService.getPrincipalUsers(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
-    @GET
-    @Path("/workspace/{id}/principal_roles")
-    public Response getAllAvailableRoles(@Context HttpServletRequest request, @PathParam(value = "id") String id) throws Exception {
+
+    @RequestMapping( value = "/workspace/{id}/principal_roles", method = RequestMethod.GET)
+    public Message getAllAvailableRoles(HttpServletRequest request, @PathVariable(value = "id") String id) throws Exception {
         Message message = this.dwDsService.getPrincipalRoles(request, id);
-        return Message.messageToResponse(message);
+        return message;
     }
 
 }

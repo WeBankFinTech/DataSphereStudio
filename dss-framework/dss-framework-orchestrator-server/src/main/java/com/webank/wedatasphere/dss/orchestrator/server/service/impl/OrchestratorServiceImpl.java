@@ -239,6 +239,47 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public OrchestratorVo copyOrchestrator(String userName,
+                                           Workspace workspace,
+                                           String projectName,
+                                           Long projectId,
+                                           String description,
+                                           DSSOrchestratorInfo dssOrchestratorInfo,
+                                           List<DSSLabel> dssLabels) throws Exception {
+        OrchestratorVo orchestratorVo = new OrchestratorVo();
+        //todo 增加校验
+        String uuid = UUID.randomUUID().toString();
+
+        //作为Orchestrator的唯一标识，包括跨环境导入导出也不发生变化。
+        dssOrchestratorInfo.setUUID(uuid);
+
+        String version = OrchestratorUtils.generateNewVersion();
+        String contextId = contextService.createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), version, userName);
+        LOGGER.info("Create a new ContextId: {} for new orchestrator {}.", contextId, dssOrchestratorInfo.getName());
+        //1. 访问DSS工作流微模块创建工作流
+        RefJobContentResponseRef appRef = tryRefOperation(dssOrchestratorInfo, userName, workspace, dssLabels, null,
+                developmentService -> ((RefCRUDService) developmentService).getRefCreationOperation(),
+                dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
+                projectRefRequestRef -> projectRefRequestRef.setProjectName(projectName).setRefProjectId(projectId),
+                (developmentOperation, developmentRequestRef) -> {
+                    DSSOrchestrator dssOrchestrator = orchestratorManager.getOrCreateOrchestrator(userName,
+                            workspace.getWorkspaceName(), dssOrchestratorInfo.getType(), dssLabels);
+                    Map<String, Object> dssJobContent = MapUtils.newCommonMapBuilder()
+                            .put(OrchestratorRefConstant.DSS_ORCHESTRATOR_INFO_KEY, dssOrchestratorInfo)
+                            .put(OrchestratorRefConstant.ORCHESTRATOR_VERSION_KEY, version)
+                            .put(OrchestratorRefConstant.ORCHESTRATION_SCHEDULER_APP_CONN, Optional.ofNullable(dssOrchestrator)
+                                    .map(DSSOrchestrator::getSchedulerAppConn).map(AppConn::getAppDesc).map(AppDesc::getAppName)
+                                    .map(Object::toString).orElse("NULL")).build();
+                    DSSJobContentRequestRef requestRef = (DSSJobContentRequestRef) developmentRequestRef;
+                    requestRef.setDSSJobContent(dssJobContent);
+                    return ((RefCreationOperation) developmentOperation).createRef(requestRef);
+                }, "create");
+
+        return orchestratorVo;
+    }
+
+    @Override
     public OrchestratorUnlockVo unlockOrchestrator(String userName,
                                                    Workspace workspace,
                                                    String projectName,

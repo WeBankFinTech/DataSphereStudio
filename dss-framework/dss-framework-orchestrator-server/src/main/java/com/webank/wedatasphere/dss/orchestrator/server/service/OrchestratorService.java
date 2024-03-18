@@ -70,6 +70,18 @@ public interface OrchestratorService {
                             String projectName,
                             Long orchestratorInfoId,
                             List<DSSLabel> dssLabels) throws Exception;
+    /**
+     * 复制编排
+     *
+     */
+    OrchestratorVo copyOrchestrator(String userName,
+                                    Workspace workspace,
+                                    String projectName,
+                                    Long projectId,
+                                    String description,
+                                    DSSOrchestratorInfo dssOrchestratorInfo,
+                                    List<DSSLabel> dssLabels) throws Exception;
+
 
     /**
      * 解锁编排对应的工作流

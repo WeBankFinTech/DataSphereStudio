@@ -20,4 +20,7 @@ package com.webank.wedatasphere.dss.apiservice.core.constant;
 public class ApiCommonConstant {
     public static final String DEFAULT_APPROVAL_NO="0001";
     public static final Integer API_DELETE_STATUS=2;
+    public static final String PAGE = "1";
+    public static final String PAGE_SIZE = "5000";
+    public static final String CHARSET = "utf-8";
 }

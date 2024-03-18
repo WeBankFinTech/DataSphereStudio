@@ -155,12 +155,14 @@ public class ExecuteCodeHelper {
 
 
 
-    public static  String getResultContent(String user, String path, int maxSize,UJESClient client) {
+    public static  String getResultContent(String user, String path,int page, int maxSize,String charset,UJESClient client) {
 
         String fileContent = client.resultSet(ResultSetAction.builder()
-                    .setPath(path)
-                    .setUser(user)
-                    .setPageSize(maxSize).build()).getResponseBody();
+                .setPath(path)
+                .setUser(user)
+                .setPage(page)
+                .setCharset(charset)
+                .setPageSize(maxSize).build()).getResponseBody();
 
         return fileContent;
     }

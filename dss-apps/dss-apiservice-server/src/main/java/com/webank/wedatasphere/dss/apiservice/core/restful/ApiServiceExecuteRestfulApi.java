@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.webank.wedatasphere.dss.apiservice.core.bo.*;
 import com.webank.wedatasphere.dss.apiservice.core.config.ApiServiceConfiguration;
+import com.webank.wedatasphere.dss.apiservice.core.constant.ApiCommonConstant;
 import com.webank.wedatasphere.dss.apiservice.core.exception.ApiServiceQueryException;
 import com.webank.wedatasphere.dss.apiservice.core.execute.ExecuteCodeHelper;
 import com.webank.wedatasphere.dss.apiservice.core.execute.LinkisJobSubmit;
@@ -156,9 +157,9 @@ public class ApiServiceExecuteRestfulApi {
     public void openFile(HttpServletRequest req,
                              @RequestParam(required = false, name = "path") String path,
                              @RequestParam(required = false, name = "taskId") String taskId,
-                             @DefaultValue("1") @RequestParam(required = false, name = "page") Integer page,
-                             @DefaultValue("5000") @RequestParam(required = false, name = "pageSize") Integer pageSize,
-                             @DefaultValue("utf-8") @RequestParam(required = false, name = "charset") String charset,
+                             @RequestParam(required = false, name = "page",defaultValue = ApiCommonConstant.PAGE) Integer page,
+                             @RequestParam(required = false, name = "pageSize",defaultValue = ApiCommonConstant.PAGE_SIZE) Integer pageSize,
+                             @RequestParam(required = false, name = "charset",defaultValue = ApiCommonConstant.CHARSET) String charset,
                              HttpServletResponse resp) throws IOException, ApiServiceQueryException {
         String userName = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(path)) {
@@ -172,7 +173,7 @@ public class ApiServiceExecuteRestfulApi {
         if(null != apiServiceJob && userName.equals(apiServiceJob.getSubmitUser())) {
             Map<String, String> props = new HashMap<>();
             UJESClient client = LinkisJobSubmit.getClient(props);
-            fileContent = ExecuteCodeHelper.getResultContent(apiServiceJob.getProxyUser(), path, pageSize, client);
+            fileContent = ExecuteCodeHelper.getResultContent(apiServiceJob.getProxyUser(), path, page, pageSize, charset, client);
         }else{
             fileContent="当前用户不存在运行的TaskId: "+taskId;
         }

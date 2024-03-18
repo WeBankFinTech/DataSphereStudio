@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.origin.request.action.DSSPos
 import com.webank.wedatasphere.dss.standard.app.sso.request.SSORequestOperation;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.httpclient.request.HttpAction;
 import org.apache.linkis.httpclient.response.HttpResult;
 import org.slf4j.Logger;
@@ -52,7 +53,8 @@ public class SchedulisHttpUtils {
         SSOUrlBuilderOperation ssoUrlBuilderOperation = getSSORequestOperation(url, workspace);
         action.setUrl(ssoUrlBuilderOperation.getBuiltUrl());
         HttpResult previewResult = ssoRequestOperation.requestWithSSO(ssoUrlBuilderOperation, action);
-        if (previewResult.getStatusCode() == 200 || previewResult.getStatusCode() == 0) {
+        if (StringUtils.isNotBlank(previewResult.getResponseBody())
+                && (previewResult.getStatusCode() == 200 || previewResult.getStatusCode() == 0)  ) {
             return previewResult.getResponseBody();
         } else {
             logger.error("request Schedulis failed, responseBody is {}.", previewResult.getResponseBody());

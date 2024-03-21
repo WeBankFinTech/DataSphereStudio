@@ -219,7 +219,7 @@ export default {
         this.choose(active);
       }
     },
-    check(node) {
+    check(node, showTips = true) {
       if (node) {
         let boolean = true;
         this.tabs.map(item => {
@@ -233,12 +233,12 @@ export default {
             boolean = true;
           }
         });
-        if (!boolean) {
+        if (!boolean && showTips) {
           this.$Message.warning(this.$t("message.workflow.process.index.CCXE"));
         }
         return boolean;
       } else {
-        if (this.tabs.length > 10) {
+        if (this.tabs.length > 10 && showTips) {
           this.$Message.warning(this.$t("message.workflow.process.index.CCXE"));
           return false;
         }
@@ -387,9 +387,10 @@ export default {
       }
     },
     saveIDE(index, args) {
-      if (!this.check()) {
+      if (!this.check(null, args[0].showTips)) {
         return;
       }
+      delete args[0].showTips;
       if (args[0].data) {
         this.tabs[index].data = args[0].data;
       }

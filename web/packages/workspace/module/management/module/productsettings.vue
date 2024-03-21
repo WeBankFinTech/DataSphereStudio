@@ -154,7 +154,7 @@ export default {
       width: 100%;
       text-align: center;
       padding: 10px 19px;
-      /deep/ th.columnClass {
+      ::v-deep th.columnClass {
         // background-color: #515a6e;
         @include bg-color(#515a6e, #f3f3f3);
         // color: #FFF;

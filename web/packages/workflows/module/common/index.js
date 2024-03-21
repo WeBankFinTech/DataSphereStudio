@@ -21,7 +21,6 @@ export default {
     Project: ['loading', 'getData'],
   },
   component: {
-    iframe: () => import('./iframe/index.vue'),
-    publish: () => import('./projectPublishForm.vue'),
+    iframe: () => import('./iframe/index.vue')
   },
 };

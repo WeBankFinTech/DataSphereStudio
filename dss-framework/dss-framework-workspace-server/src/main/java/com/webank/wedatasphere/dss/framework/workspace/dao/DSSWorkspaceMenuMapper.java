@@ -78,4 +78,5 @@ public interface DSSWorkspaceMenuMapper {
             @Result(property = "updateBy", column = "update_by")
     })
     List<DSSWorkspaceComponentRolePriv> getDefaultComponentRolePriv01();
+
 }

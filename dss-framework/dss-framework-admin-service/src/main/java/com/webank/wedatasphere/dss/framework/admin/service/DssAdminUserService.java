@@ -16,6 +16,8 @@ public interface DssAdminUserService extends IService<DssAdminUser> {
 
     void insertOrUpdateUser(String username, Workspace workspace);
 
+    void insertIfNotExist(String username, Workspace workspace);
+
     int insertUser(DssAdminUser user, Workspace workspace);
 
     List<DssAdminUser> selectUserList(DssAdminUser user);
@@ -26,4 +28,7 @@ public interface DssAdminUserService extends IService<DssAdminUser> {
 
     int updateUser(DssAdminUser user, Workspace workspace);
 
+    List<String> getAllUsername();
+
+    void deleteUser(String userName);
 }

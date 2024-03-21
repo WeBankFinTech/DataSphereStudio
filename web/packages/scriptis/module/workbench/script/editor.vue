@@ -291,7 +291,7 @@ export default {
 @import '@dataspherestudio/shared/common/style/variables.scss';
   .editor {
     height: 100%;
-    /deep/.we-panel.we-panel-horizontal .we-panel-dash  {
+    ::v-deep.we-panel.we-panel-horizontal .we-panel-dash  {
       // 防止被外层.we-panel.we-panel-vertical .we-panel-dash覆盖
       cursor: ew-resize;
     }

@@ -134,7 +134,7 @@ export default {
       top: 50%;
       right: -40px;
       font-size: 30px;
-      /deep/.svg-icon {
+      ::v-deep.svg-icon {
         height: 20px;
       }
     }

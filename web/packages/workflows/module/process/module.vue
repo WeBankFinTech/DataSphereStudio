@@ -859,8 +859,8 @@ export default {
         this.props = json.props;
         this.scheduleParams = json.scheduleParams || {};
       }
-      if (json.config) {
-        json.config.type && (this.viewMode = json.config.type)
+      if (json.config && json.config.type != 'table') {
+        this.viewMode = json.config.type
       }
       this.$nextTick(() => {
         this.loading = false;
@@ -1108,11 +1108,13 @@ export default {
           onOk: () => {
             this.saveModal = false;
             let json = JSON.parse(JSON.stringify(this.json));
-            json.nodes.forEach((node) => {
-              this.$refs.process.setNodeRunState(node.key, {
-                borderColor: '#6A85A7',
+            if (this.viewMode !== 'table' && this.$refs.process) {
+              json.nodes.forEach((node) => {
+                this.$refs.process.setNodeRunState(node.key, {
+                  borderColor: '#6A85A7',
+                })
               })
-            })
+            }
             this.autoSave(this.$t('message.workflow.Manually'), false);
           },
           onCancel: () => {
@@ -1121,11 +1123,13 @@ export default {
       } else {
         this.saveModal = false;
         let json = JSON.parse(JSON.stringify(this.json));
-        json.nodes.forEach((node) => {
-          this.$refs.process.setNodeRunState(node.key, {
-            borderColor: '#6A85A7',
+        if (this.viewMode !== 'table' && this.$refs.process) {
+          json.nodes.forEach((node) => {
+            this.$refs.process.setNodeRunState(node.key, {
+              borderColor: '#6A85A7',
+            })
           })
-        })
+        }
         this.autoSave(this.$t('message.workflow.Manually'), false);
       }
     },
@@ -1182,7 +1186,7 @@ export default {
       // 拖拽模式保存
       json.config = {
         ...json.config,
-        type: this.viewMode
+        type: this.viewMode === 'table' ? this.preDragViewMode || 'vueprocess' : this.viewMode
       }
       if (flage) return this.$Message.warning(this.$t('message.workflow.validNameDesc'));
       const isFiveNode = json.nodes.filter((item) => {

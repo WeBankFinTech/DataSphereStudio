@@ -208,7 +208,13 @@ module.exports = {
         lessOptions: {
           javascriptEnabled: true
         }
-      }
+      },
+      scss: {
+        implementation: require('sass'),
+        sassOptions: {
+          fiber: false,
+        },
+      },
     }
   },
   chainWebpack: (config) => {

@@ -272,7 +272,7 @@ export default {
     margin-top: 20px;
   }
   .viewModal {
-    /deep/.ivu-modal {
+    ::v-deep.ivu-modal {
       width: 80%!important;
       min-width: 700px;
     }

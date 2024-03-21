@@ -105,7 +105,7 @@ export default {
     };
   },
   methods: {
-    getQueueList() {
+    getQueueList(type) {
       this.loading = true;
       // 获取队列资源使用状态
       api.fetch('/linkisManager/rm/queues').then((res) => {
@@ -121,6 +121,10 @@ export default {
             this.queueList.push(obj)
           })
         });
+        if (type === 'current' && this.current) {
+          this.getQueueInfo(this.current);
+          return;
+        }
         this.current = this.queueList[0] ? this.queueList[0].text : '';
         this.getQueueInfo(this.queueList[0].text);
       }).catch(() => {

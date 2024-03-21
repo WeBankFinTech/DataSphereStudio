@@ -194,6 +194,7 @@ export default {
         }
       })
       this.isRefTemplate = this.currentNode.ecConfTemplateId ? '1':'0'
+      jobParams['ec-conf-templateId'] = this.currentNode.ecConfTemplateId
       this.$set(this.currentNode, 'jobParams', jobParams);
     }
   },
@@ -218,17 +219,22 @@ export default {
           if(v.workflowDefault) {
             this.$set(this.currentNode, 'ecConfTemplateName', v.templateName);
             this.$set(this.currentNode, 'ecConfTemplateId', v.templateId);
-            this.currentNode.jobParams['ec.conf.templateId'] = v.templateId
+            this.currentNode.jobParams['ec-conf-templateId'] = v.templateId
             this.currentNode.params.configuration['startup']['ec.conf.templateId'] = v.templateId
           }
         })
+      } else if (this.currentNode.ecConfTemplateName) {
+        this.currentNode.jobParams['ec-conf-templateId'] = this.currentNode.ecConfTemplateId
+      }
+      if (v === '0') {
+        delete this.currentNode.jobParams['ec-conf-templateId']
       }
     },
     // 选择参数模板
     handleTemplateSelect(templateObj) {
       this.$set(this.currentNode, 'ecConfTemplateName', templateObj.templateName);
       this.$set(this.currentNode, 'ecConfTemplateId', templateObj.templateId);
-      this.currentNode.jobParams['ec.conf.templateId'] = templateObj.templateId
+      this.currentNode.jobParams['ec-conf-templateId'] = templateObj.templateId
       this.currentNode.params.configuration['startup']['ec.conf.templateId'] = templateObj.templateId
     },
     // 打开选择参数模板的抽屉
@@ -453,10 +459,10 @@ export default {
         if (this.isRefTemplate === '0') {
           delete this.currentNode.ecConfTemplateId
           delete this.currentNode.ecConfTemplateName
-          delete this.currentNode.jobParams['ec.conf.templateId']
+          delete this.currentNode.jobParams['ec-conf-templateId']
           delete this.currentNode.params.configuration['startup']['ec.conf.templateId']
         } else {
-          this.currentNode.jobParams['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
+          this.currentNode.jobParams['ec-conf-templateId'] = this.currentNode.ecConfTemplateId
           this.currentNode.params.configuration['startup']['ec.conf.templateId'] = this.currentNode.ecConfTemplateId
         }
       });
@@ -520,21 +526,36 @@ export default {
       }
     },
     /**
-     * 检查数据是否符合条件
+     * 检查数据是否符合条件，仅支持runtime starup参数配置时控制
+     *  ${params.configuration.runtime['only.receive.today']}=='true'
+     *  !${params.configuration.startup['ec.conf.templateId']}
      * @param {*} data
      * @param {*} condition
      * @returns
      */
     checkShow(item) {
       const data = this.currentNode
-      if (item.condition && this.isRefTemplate == 1) {
+      if (item.condition) {
+        let condition = item.condition
+        // condition 示例：
+        // ${params.configuration.runtime['only.receive.today']}
+        // !${params.configuration.startup['ec.conf.templateId']}
+        // 后端配置根据params路径位置写规则
+        // 前端编辑参数存在jobParams，需要转换，以上示例转换如下
+        // ${jobParams['only-receive-today']}
+        // !${jobParams['ec-conf-templateId']}
+        if (condition.indexOf('params.configuration') > 0) {
+          condition = condition.replaceAll('params.configuration.runtime','jobParams').replaceAll('params.configuration.startup','jobParams')
+          condition = this.poinToLink(condition)
+        }
         let Fn = Function
-        let fn = item.condition.replace(/\${([^}]+)}/g, function (a, b) {
+        let fn = condition.replace(/\${([^}]+)}/g, function (a, b) {
           return `__node__data.${b}`
         })
         try {
           return new Fn('__node__data', 'return ' + fn)(data);
         } catch (e) {
+          console.log(e)
           //
         }
       }

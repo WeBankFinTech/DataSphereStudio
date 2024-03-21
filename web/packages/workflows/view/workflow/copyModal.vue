@@ -151,7 +151,7 @@ export default {
       }
       this.projects = projects.filter((item) => {
         setVirtualRoles(item, this.getUserName());
-        return  item.canPublish() || item.editable
+        return item.canPublish() || item.editable
       })
     }
   },

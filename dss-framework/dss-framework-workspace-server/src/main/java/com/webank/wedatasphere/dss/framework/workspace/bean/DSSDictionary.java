@@ -124,6 +124,18 @@ public class DSSDictionary implements Serializable {
      */
     private Date updateTime;
 
+    /**
+     * 默认勾选工作流开发流程
+     */
+    private Integer checked;
+
+    public Integer getChecked() {
+        return checked;
+    }
+
+    public void setChecked(Integer checked) {
+        this.checked = checked;
+    }
 
     public Integer getId() {
         return id;
@@ -298,7 +310,8 @@ public class DSSDictionary implements Serializable {
                 ", createUser='" + createUser + '\'' +
                 ", createTime=" + createTime +
                 ", updateUser='" + updateUser + '\'' +
-                ", updateTime=" + updateTime +
+                ", updateTime=" + updateTime + '\'' +
+                ", checked=" + checked +
                 '}';
     }
 }

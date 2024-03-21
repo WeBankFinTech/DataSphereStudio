@@ -156,8 +156,9 @@ export default {
     resize() {
       this.navHeight = window.innerHeight;
     },
-    'IDE:saveNode'(args) {
+    'IDE:saveNode'(args, showTips = true) {
       if (args.node && this.node.key === args.node.key) {
+        args.showTips = showTips;
         this.$emit('save', args);
       }
     },

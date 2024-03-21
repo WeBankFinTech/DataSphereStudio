@@ -566,7 +566,7 @@ export default {
     },
     // 判断是否符合脚本类型
     showScriptsType() {
-      return [ 'spark', 'hive' ].includes(this.script.scriptType)
+      return [ 'spark', 'hive', 'hql' ].includes(this.script.scriptType)
     }
   },
   watch: {
@@ -626,6 +626,7 @@ export default {
     // 获取当前工作空间当前用户的api列表
     getApiList() {
       api.fetch('/dss/apiservice/getUserServices', {
+        type: this.script.application,
         workspaceId: this.$route.query.workspaceId
       }, {
         method: 'get',

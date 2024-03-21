@@ -313,6 +313,9 @@
       "disableReq": "请先禁用规则",
       "edit": "编辑",
       "deletesuccess": "删除成功",
+      "yes": "是",
+      "no": "否",
+      "crossCluster": "是否为跨集群队列",
       "ruleform": {
         "edittitle": "编辑释放规则",
         "addtitle": "新增释放规则",
@@ -341,7 +344,8 @@
         "createUser": "创建人",
         "createTime": "创建时间",
         "modifyTime": "修改时间",
-        "modifyUser": "修改人"
+        "modifyUser": "修改人",
+        "plsselectCross": "请选择是否为跨集群队列"
       },
       "selectfirst": "请先选择",
       "hasBusy": "存在状态为繁忙的引擎被选中，强制停止会导致该引擎上正在运行的任务失败，建议停止前与引擎创建者确认。",

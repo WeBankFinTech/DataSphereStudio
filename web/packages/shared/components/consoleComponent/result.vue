@@ -80,16 +80,17 @@
         v-if="result.hugeData"
         :style="{ height: resultHeight + 'px', padding: '15px' }"
       >
-        {{ $t('message.common.resulttip')
-        }}<a
-          :href="`/#/results?workspaceId=${
-            $route.query.workspaceId
-          }&resultPath=${resultPath}&fileName=${
-            script.fileName || script.ti
-          }&from=${$route.name}&taskID=${taskID}`"
-          target="_blank"
-        >{{ $t('message.common.viewSet') }}</a
-        >
+        <p v-if="result.tipMsg">{{ result.tipMsg }}</p>
+        <p v-else>{{ $t('message.common.resulttip')}}
+          <a
+            :href="`/#/results?workspaceId=${
+              $route.query.workspaceId
+            }&resultPath=${resultPath}&fileName=${
+              script.fileName || script.ti
+            }&from=${$route.name}&taskID=${taskID}`"
+            target="_blank"
+          >{{ $t('message.common.viewSet') }}</a>
+        </p>
       </div>
     </div>
     <!-- resultType: 2 visual|dataWrangler -->
@@ -149,6 +150,25 @@
         }}</span>
       </div>
     </div>
+    <Modal
+      v-model="modal.show"
+      :width="600"
+      :fullscreen="modal.isFullScreen"
+      closable
+      footer-hide
+      class='modal-detail'
+    >
+      <div slot="header">
+        <span>{{$t('message.common.detail')}}</span>
+        <span @click="fullScreenModal" class="full-btn">
+          <Icon :type="modal.isFullScreen?'md-contract':'md-expand'" />
+          {{modal.isFullScreen?$t('message.scripts.cancelfullscreen'):$t('message.scripts.fullscreen')}}
+        </span>
+      </div>
+      <div class='modal-content'>
+        {{modal.content}}
+      </div>
+    </Modal>
   </div>
 </template>
 <script>
@@ -191,6 +211,11 @@ export default {
   mixins: [mixin],
   data() {
     return {
+      modal: {
+        show: false,
+        isFullScreen: false,
+        content: '',
+      },
       data: {
         headRows: [],
         bodyRows: [],
@@ -374,28 +399,14 @@ export default {
         cb()
       }
     },
+    fullScreenModal() {
+      this.modal.isFullScreen = !this.modal.isFullScreen
+    },
     handleTdContextmenu({ content }) {
       if (content.split(/\n/).length > 1) {
-        this.$Modal.info({
-          title: this.$t('message.common.detail'),
-          closable: true,
-          width: 600,
-          render: (h) => {
-            return h(
-              'div',
-              {
-                style: {
-                  'word-break': 'break-all',
-                  'line-height': '20px',
-                  'white-space': 'pre-line',
-                  'max-height': '500px',
-                  overflow: 'auto',
-                },
-              },
-              content
-            )
-          },
-        })
+        this.modal.show = true;
+        this.modal.content = content;
+        this.modal.isFullScreen = false;
       }
     },
     arraySortByName(list, valueType, key) {
@@ -610,7 +621,7 @@ export default {
       if (this.script.resultList && this.script.resultList[resultSet])
         this.$set(this.script.resultList[resultSet], 'result', tmpResult)
       this.dispatch('IndexedDB:updateResult', {
-        tabId: this.script.id,
+        tabId: this.script.id || this.work.id,
         resultSet: resultSet,
         showPanel: this.scriptViewState.showPanel,
         ...this.script.resultList,
@@ -835,7 +846,7 @@ export default {
 .result-normal-table .columnClass {
   height: 30px;
   line-height: 1.25;
-  /deep/.ivu-table-cell {
+  ::v-deep.ivu-table-cell {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -851,6 +862,25 @@ export default {
         color: #ffffff;
       }
     }
+  }
+}
+.modal-detail {
+  .full-btn {
+    float: right;
+    margin-right: 30px;
+    padding-top: 5px;
+    cursor: pointer;
+    color: #2d8cf0
+  };
+  .modal-content {
+    word-break: break-all;
+    line-height: 20px;
+    white-space: pre-line;
+    max-height: 500px;
+    overflow: auto;
+    margin-top: -16px;
+    font-size: 14px;
+    color: #515a6e;
   }
 }
 </style>

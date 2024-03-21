@@ -73,8 +73,8 @@ public class OrchestratorCopyJob implements Runnable {
         } catch (Exception e) {
             //保存错误信息
             String errorMsg = "CopyOrcError: " + e.getMessage();
-            if (errorMsg.length() > 1000) {
-                errorMsg = errorMsg.substring(0, 999);
+            if (errorMsg.length() > 128) {
+                errorMsg = errorMsg.substring(0, 127);
             }
             orchestratorCopyInfo.setIsCopying(0);
             orchestratorCopyInfo.setEndTime(new Date());
@@ -82,8 +82,8 @@ public class OrchestratorCopyJob implements Runnable {
             orchestratorCopyInfo.setStatus(0);
             orchestratorCopyInfo.setExceptionInfo(errorMsg);
             orchestratorCopyEnv.getOrchestratorCopyJobMapper().updateErrorMsgById(orchestratorCopyInfo);
-            LOGGER.error("copy orc error: sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
-                    orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(), e);
+            LOGGER.error("copy orc error. copyID:{}, sourceProjectName:{},targetProjectName:{}, sourceOrchestratorName:{}, targetOrchestratorName:{}. Exception:",
+                    orchestratorCopyInfo.getId(), orchestratorCopyVo.getSourceProjectName(), orchestratorCopyVo.getTargetProjectName(), sourceOrchestrator.getName(), orchestratorCopyVo.getTargetOrchestratorName(), e);
             throw new RuntimeException("error happened when copying orc.", e);
         }
         orchestratorCopyInfo.setIsCopying(0);
@@ -128,10 +128,11 @@ public class OrchestratorCopyJob implements Runnable {
                 }, "copy");
         dssOrchestratorVersion.setAppId((Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY));
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
-
+        List<String[]> paramConfTemplateIds=(List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestrator(dssOrchestratorInfo);
         dssOrchestratorVersion.setOrchestratorId(dssOrchestratorInfo.getId());
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestratorVersion(dssOrchestratorVersion);
+        orchestratorCopyEnv.getAddOrchestratorVersionHook().afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
     }
 
 

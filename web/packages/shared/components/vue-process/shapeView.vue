@@ -3,7 +3,7 @@
     <div class="shape-head">
       <div class="head-title">{{$t('message.workflow.vueProcess.comp')}}</div>
       <div class="head-btn" @click="toggleShape">
-        <SvgIcon icon-class="putaway"/>
+        <SvgIcon icon-class="dev_center_flod" />
       </div>
     </div>
     <input v-model="searchValue" :placeholder="$t('message.workflow.vueProcess.search')" class="shape-search">

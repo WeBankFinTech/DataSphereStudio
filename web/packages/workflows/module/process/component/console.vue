@@ -128,16 +128,17 @@ export default {
       if (oldval && this.execute) {
         this.killExecute();
       }
+    },
+    height(val) {
+      this.scriptViewState.bottomContentHeight = val - 5
     }
   },
   mounted() {
   },
   methods: {
-    killExecute(flag = false) {
+    killExecute() {
       this.execute.trigger('stop');
-      if (flag) {
-        this.execute.trigger('kill');
-      }
+      this.execute.trigger('kill');
     },
     createScript() {
       const node = this.node;
@@ -172,7 +173,7 @@ export default {
         this.queryState();
       }
     },
-    queryState() {
+    queryState(monitor = true) {
       if (this.node.runState.execID) {
         const option = {
           taskID: this.node.runState.taskID,
@@ -181,7 +182,13 @@ export default {
           nodeId: this.node.key,
           openLog: true
         }
-        this.monitoringData();
+        if (monitor) {
+          this.monitoringData();
+        } else {
+          if (this.script.progress.current >= 1) {
+            return
+          }
+        }
         this.execute.halfExecute(option);
       }
     },
@@ -208,7 +215,8 @@ export default {
           'path': this.execute.currentResultPath,
           'current': 1,
           'size': 20,
-          hugeData: !!ret.hugeData
+          hugeData: !!ret.hugeData,
+          tipMsg: ret.tipMsg
         };
         if (this.execute.resultList[0]) {
           this.$set(this.execute.resultList[0], 'result', storeResult);
@@ -397,7 +405,17 @@ export default {
         }, 'get')
           .then((ret) => {
             let result =  {}
-            if (ret.metadata && ret.metadata.length >= 500) {
+            if (ret.display_prohibited) {
+              result = {
+                'headRows': [],
+                'bodyRows': [],
+                'total': ret.totalLine,
+                'type': ret.type,
+                'path': resultPath,
+                hugeData: true,
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
+              };
+            } else if (ret.metadata && ret.metadata.length >= 500) {
               result = {
                 'headRows': [],
                 'bodyRows': [],
@@ -456,7 +474,9 @@ export default {
     checkFromCache() {
       // 每次右键控制台，都会创建一个新实例，所以把上一个执行的实例先停掉
       if (this.execute) {
-        this.killExecute();
+        clearTimeout(this.execute.executeTimout);
+        clearTimeout(this.execute.statusTimeout);
+        this.execute = null;
       }
       this.resetQuery();
       const nodeId = this.node.key;
@@ -479,9 +499,13 @@ export default {
               if (!cache.log.all) {
                 this.getLogs();
               }
+            } else {
+              needQuery = false;
             }
           } else {
             this.createScript();
+          }
+          if (needQuery) {
             this.$nextTick(() => {
               this.createExecute(needQuery);
             })
@@ -563,7 +587,7 @@ export default {
       left: 0 !important;
       position: fixed;
       z-index: 1050;
-      height: 100% !important;
+      height: calc(100% - 54px) !important;
       width: 100% !important;
     }
     .workbench-tabs {

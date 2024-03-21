@@ -70,6 +70,15 @@
         </fileSet>
 
         <fileSet>
+            <directory>${basedir}/src/main/pngs</directory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0777</fileMode>
+            <outputDirectory>pngs</outputDirectory>
+        </fileSet>
+
+        <fileSet>
             <directory>${basedir}/src/main/resources</directory>
             <includes>
                 <include>init.sql</include>

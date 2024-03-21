@@ -30,6 +30,8 @@ import java.util.Map;
 public interface WorkFlowParser {
     List<Resource> getWorkFlowResources(String workFlowJson);
 
+    List<String> getParamConfTemplate(String workFlowJson);
+
     List<DSSNode> getWorkFlowNodes(String workFlowJson);
 
     List<DSSEdge> getWorkFlowEdges(String workFlowJson);

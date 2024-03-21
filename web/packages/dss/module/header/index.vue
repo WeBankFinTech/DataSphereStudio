@@ -1,148 +1,146 @@
 <template>
-  <div>
-    <div class="layout-header">
-      <div class="layout-header-menu-icon">
-        <product-menu
-          v-if="isNavShowMenu"
-          :apps="menuList"
-          :favorites="favorites"
-          :collections="collections"
-          :use-default-action="false"
-          @menu-click="handleMenuClick"
-          @favorite-remove="removeFavorite"
-          @favorite-add="addFavorite"
-          @collect-add="addCollection"
-          @collect-remove="removeCollection"
-          ref="vueLubanMenu"
-        >
-          <div class="luban-menu-trigger">
-            <img src="../../assets/images/luban-menu-trigger.png" />
-          </div>
-        </product-menu>
-
-        <div class="logo">
-          <img
-            @click.stop="goHome"
-            class="logo-img"
-            :style="{ cursor: 'pointer' }"
-            :src="$APP_CONF.app_logo"
-            :alt="$APP_CONF.app_name"
-          />
-
-          <span class="version">{{ sysVersion }}</span>
-        </div>
-      </div>
-      <Dropdown
-        class="project-dro"
-        v-if="showWorkspaceNav && !currentProject.id"
+  <div class="layout-header">
+    <div class="layout-header-menu-icon">
+      <product-menu
+        v-if="isNavShowMenu"
+        :apps="menuList"
+        :favorites="favorites"
+        :collections="collections"
+        :use-default-action="false"
+        @menu-click="handleMenuClick"
+        @favorite-remove="removeFavorite"
+        @favorite-add="addFavorite"
+        @collect-add="addCollection"
+        @collect-remove="removeCollection"
+        ref="vueLubanMenu"
       >
-        <div class="project">
-          {{ currentWorkspace.name }}
-          <Icon type="ios-arrow-down" style="margin-left: 5px"></Icon>
+        <div class="luban-menu-trigger">
+          <img src="../../assets/images/luban-menu-trigger.png" />
         </div>
-        <DropdownMenu slot="list" class="proj-list">
-          <div class="proj-name">{{ $t('message.common.dss.worklist') }}</div>
+      </product-menu>
+
+      <div class="logo">
+        <img
+          @click.stop="goHome"
+          class="logo-img"
+          :style="{ cursor: 'pointer' }"
+          :src="$APP_CONF.app_logo"
+          :alt="$APP_CONF.app_name"
+        />
+
+        <span class="version">{{ sysVersion }}</span>
+      </div>
+    </div>
+    <Dropdown
+      class="project-dro"
+      v-if="showWorkspaceNav && !currentProject.id"
+    >
+      <div class="project">
+        {{ currentWorkspace.name }}
+        <Icon type="ios-arrow-down" style="margin-left: 5px"></Icon>
+      </div>
+      <DropdownMenu slot="list" class="proj-list">
+        <div class="proj-name">{{ $t('message.common.dss.worklist') }}</div>
+        <div class="name-bar">
+          <span
+            v-for="p in workspaceList"
+            :key="p.id"
+            :class="{ active: p.id == currentWorkspace.id }"
+            class="proj-item"
+            @click="changeWorkspace(p)"
+          >{{ p.name }}</span
+          >
+        </div>
+      </DropdownMenu>
+    </Dropdown>
+
+    <Dropdown class="project-dro" v-if="currentProject.id">
+      <div class="project">
+        {{ currentProject.name }}
+        <Icon type="ios-arrow-down" style="margin-left: 5px"></Icon>
+      </div>
+      <DropdownMenu slot="list" class="proj-list">
+        <div v-for="proj in projectList" :key="proj.id">
+          <div class="proj-name">{{ proj.name }}</div>
           <div class="name-bar">
             <span
-              v-for="p in workspaceList"
-              :key="p.id"
-              :class="{ active: p.id == currentWorkspace.id }"
+              v-for="p in proj.dwsProjectList"
+              @click="changeProj(proj, p)"
+              :key="proj.id + p.id"
+              :class="{ active: p.id == currentProject.id }"
               class="proj-item"
-              @click="changeWorkspace(p)"
             >{{ p.name }}</span
             >
           </div>
-        </DropdownMenu>
-      </Dropdown>
-
-      <Dropdown class="project-dro" v-if="currentProject.id">
-        <div class="project">
-          {{ currentProject.name }}
-          <Icon type="ios-arrow-down" style="margin-left: 5px"></Icon>
         </div>
-        <DropdownMenu slot="list" class="proj-list">
-          <div v-for="proj in projectList" :key="proj.id">
-            <div class="proj-name">{{ proj.name }}</div>
-            <div class="name-bar">
-              <span
-                v-for="p in proj.dwsProjectList"
-                @click="changeProj(proj, p)"
-                :key="proj.id + p.id"
-                :class="{ active: p.id == currentProject.id }"
-                class="proj-item"
-              >{{ p.name }}</span
-              >
-            </div>
-          </div>
-        </DropdownMenu>
-      </Dropdown>
-      <div
-        v-clickoutside="handleOutsideClick"
-        :class="{ selected: isUserMenuShow }"
-        class="user"
-        @click="handleUserClick"
-      >
-        <div class="userName">
-          <span>{{ userName || "Null" }}</span>
-          <Icon
-            v-show="!isUserMenuShow"
-            type="ios-arrow-down"
-            class="user-icon"
-          />
-          <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon" />
-        </div>
-        <userMenu v-show="isUserMenuShow" @clear-session="clearSession" />
-      </div>
-      <!-- 需要用户可以手动自定义 -->
-      <ul class="menu" v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId">
-        <li
-          class="menu-item"
-          @click="goSpaceHome"
-          :class="isHomePage ? 'header-actived' : '' "
-        >
-          {{ $t("message.common.home") }}
-        </li>
-        <li
-          class="menu-item"
-          v-if="$route.query.workspaceId"
-          @click="goConsole"
-          :class="isConsolePage ? 'header-actived' : '' "
-        >
-          {{$t("message.common.management")}}
-        </li>
-        <li
-          v-for="app in comCollections"
-          :key="app.id"
-          class="menu-item"
-          :class="app.menuApplicationId == currentId ? 'header-actived' : '' "
-        >
-          <Dropdown
-            class="menu-item-dropdown"
-            v-if="app.appInstances && app.appInstances.length > 1"
-            @on-click="handleMenuClick(app, $event)"
-          >
-            <span>{{ app.title }}</span>
-            <DropdownMenu slot="list" class="list">
-              <Dropdown-item
-                v-for="(it, idx) in app.appInstances"
-                :key="idx"
-                :name="idx"
-              >{{ it.name || item.title }}</Dropdown-item
-              >
-            </DropdownMenu>
-          </Dropdown>
-          <span v-else  @click="goCollectedUrl(app)">{{ app.title }}</span>
-        </li>
-      </ul>
-      <div class="icon-group">
+      </DropdownMenu>
+    </Dropdown>
+    <div
+      v-clickoutside="handleOutsideClick"
+      :class="{ selected: isUserMenuShow }"
+      class="user"
+      @click="handleUserClick"
+    >
+      <div class="userName">
+        <span>{{ userName || "Null" }}</span>
         <Icon
-          v-if="isSandbox"
-          :title="$t('message.common.home')"
-          class="book"
-          type="ios-chatboxes"
-          @click="linkTo('freedback')"
-        ></Icon>
+          v-show="!isUserMenuShow"
+          type="ios-arrow-down"
+          class="user-icon"
+        />
+        <Icon v-show="isUserMenuShow" type="ios-arrow-up" class="user-icon" />
       </div>
+      <userMenu v-show="isUserMenuShow" @clear-session="clearSession" />
+    </div>
+    <!-- 需要用户可以手动自定义 -->
+    <ul class="menu" v-if="$route.path !== '/newhome' && $route.path !== '/bankhome' && $route.query.workspaceId">
+      <li
+        class="menu-item"
+        @click="goSpaceHome"
+        :class="isHomePage ? 'header-actived' : '' "
+      >
+        {{ $t("message.common.home") }}
+      </li>
+      <li
+        class="menu-item"
+        v-if="$route.query.workspaceId"
+        @click="goConsole"
+        :class="isConsolePage ? 'header-actived' : '' "
+      >
+        {{$t("message.common.management")}}
+      </li>
+      <li
+        v-for="app in comCollections"
+        :key="app.id"
+        class="menu-item"
+        :class="app.menuApplicationId == currentId ? 'header-actived' : '' "
+      >
+        <Dropdown
+          class="menu-item-dropdown"
+          v-if="app.appInstances && app.appInstances.length > 1"
+          @on-click="handleMenuClick(app, $event)"
+        >
+          <span>{{ app.title }}</span>
+          <DropdownMenu slot="list" class="list">
+            <Dropdown-item
+              v-for="(it, idx) in app.appInstances"
+              :key="idx"
+              :name="idx"
+            >{{ it.name || item.title }}</Dropdown-item
+            >
+          </DropdownMenu>
+        </Dropdown>
+        <span v-else  @click="goCollectedUrl(app)">{{ app.title }}</span>
+      </li>
+    </ul>
+    <div class="icon-group">
+      <Icon
+        v-if="isSandbox"
+        :title="$t('message.common.home')"
+        class="book"
+        type="ios-chatboxes"
+        @click="linkTo('freedback')"
+      ></Icon>
     </div>
   </div>
 </template>
@@ -266,7 +264,7 @@ export default {
             console.error(err);
           });
       }
-      this.isHomePage = v.name === "workspaceHome" || v.name === "newhome"
+      this.isHomePage = v.name === "workspaceHome"
       if (v.query.menuApplicationId) {
         this.isHomePage = false
         this.isConsolePage = false

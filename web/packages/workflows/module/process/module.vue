@@ -1,139 +1,83 @@
 <template>
   <div ref="processModule" class="process-module" :class="{'is-publishing': isFlowPubulish, 'locked': locked}">
     <vueProcess
+      v-if="viewMode === 'vueprocess'"
       ref="process"
       :shapes="shapes"
       :value="originalData"
       :ctx-menu-options="nodeMenuOptions"
       :view-options="viewOptions"
       :disabled="workflowIsExecutor || myReadonly"
+      :newTipVisible="newTipVisible"
       @toggle-shape="toggleShape"
       @change="change"
       @message="message"
       @node-click="click"
       @node-dblclick="dblclick"
-      @node-baseInfo="saveNodeBaseInfo"
-      @node-param="saveNodeParam"
       @node-delete="nodeDelete"
       @add="addNode"
       @on-ctx-menu="onContextMenu"
+      @search-node-path="showSearchPath"
       @link-delete="linkDelete"
+      @changeViewMode="handleClickToolbar"
       @link-add="linkAdd">
-      <template >
-        <!-- 这里需要做控制，只读和发布的区别-->
-        <div>
-          <div v-if="!myReadonly">
-            <div
-              class="button"
-              :title="$t('message.workflow.process.params')"
-              ref="paramButton"
-              @click.stop="showParamView">
-              <SvgIcon class="icon" icon-class="canshu" style="opacity: 0.65"/>
-              <span>{{$t('message.workflow.process.params')}}</span>
-            </div>
-            <div class="devider" />
-            <div
-              class="button"
-              ref="resourceButton"
-              :title="$t('message.workflow.process.resource')"
-              @click.stop="showResourceView">
-              <SvgIcon class="icon" icon-class="ziyuan" style="opacity: 0.65"/>
-              <span>{{$t('message.workflow.process.resource')}}</span>
-            </div>
-            <div class="devider" />
-            <div
-              v-if="!workflowIsExecutor"
-              :title="$t('message.workflow.process.run')"
-              class="button"
-              @click="clickswitch">
-              <SvgIcon class="icon" icon-class="play-2" color="#666"/>
-              <span>{{$t('message.workflow.process.run')}}</span>
-            </div>
-            <div class="devider" v-if="!workflowIsExecutor" />
-            <div
-              v-if="!workflowIsExecutor"
-              :title="$t('message.workflow.process.run')"
-              class="button"
-              @click="clickswitch('select')">
-              <SvgIcon class="icon" icon-class="play-2" color="#666"/>
-              <span>{{ $t('message.workflow.SelectRun') }}</span>
-            </div>
-            <div
-              v-if="workflowIsExecutor"
-              :title="$t('message.workflow.process.stop')"
-              class="button"
-              @click="clickswitch">
-              <SvgIcon class="icon" className='stop' icon-class="stop-2" color="#666"/>
-              <span>{{$t('message.workflow.process.stop')}}</span>
-            </div>
-            <div class="devider" v-if="needReRun" />
-            <div
-              v-if='!workflowIsExecutor && needReRun'
-              class="button"
-              @click="reRun">
-              <Icon class="icon" type="ios-refresh" color="#666" size="18"/>
-              <span>{{ $t('message.workflow.Rerun') }}</span>
-            </div>
-            <div class="devider" />
-            <div
-              :title="$t('message.workflow.process.save')"
-              class="button"
-              @click="handleSave">
-              <SvgIcon class="icon" icon-class="baocun" style="opacity: 0.65"/>
-              <span>{{$t('message.workflow.process.save')}}</span>
-            </div>
-            <div v-if="type==='flow'" class="devider" />
-          </div>
-          <!-- 预留运维发布的区别-->
-          <div v-if="publish">
-            <div
-              v-if="type==='flow'"
-              :title="$t('message.workflow.process.publish')"
-              class="button"
-              @click="workflowPublishIsShow">
-              <template v-if="!isFlowPubulish">
-                <SvgIcon class="icon" icon-class="fabu" style="opacity: 0.65"/>
-                <span>{{$t('message.workflow.process.publish')}}</span>
-              </template>
-              <Spin v-else class="public_loading">
-                <Icon type="ios-loading" size=18 class="public-splin-load"></Icon>
-                <span>{{$t('message.workflow.publishing')}}</span>
-              </Spin>
-            </div>
-            <div v-for="toolItem in extraToolbar" :key="toolItem.name">
-              <div class="devider"></div>
-              <div
-                class="button"
-                @click.stop="clickToolItem(toolItem)">
-                <SvgIcon class="icon" icon-class="ds-center" />
-                <span>{{$t('message.workflow.process.gotoScheduleCenter')}}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-      <!-- 生产中心保留执行和地图模式 -->
-      <template v-if="myReadonly">
-        <template v-if="product && isLatest">
-          <div
-            v-if="!workflowIsExecutor"
-            :title="$t('message.workflow.process.run')"
-            class="button"
-            @click="clickswitch">
-            <SvgIcon class="icon" icon-class="play-2" />
-            <span>{{$t('message.workflow.process.run')}}</span>
-          </div>
-          <div
-            v-if="workflowIsExecutor"
-            :title="$t('message.workflow.process.stop')"
-            class="button"
-            @click="clickswitch">
-            <SvgIcon class="icon" className='stop' icon-class="stop-2" />
-            <span>{{$t('message.workflow.process.stop')}}</span>
-          </div>
-        </template>
-      </template>
+      <DesignToolbar
+        viewMode="vueprocess"
+        :readonly="myReadonly"
+        :workflowIsExecutor="workflowIsExecutor"
+        :needReRun="needReRun"
+        :isFlowPubulish="isFlowPubulish"
+        :isLatest="isLatest"
+        :publish="publish"
+        :product="product"
+        :flowId="flowId"
+        :type="type"
+        @click-itembar="handleClickToolbar"
+      />
     </vueProcess>
+    <div v-else class="designer" :style="{ 'z-index': isfullScreen ? 6 : 1}">
+      <div class="designer-toolbar">
+        <DesignToolbar
+          :viewMode="viewMode"
+          :readonly="myReadonly"
+          :workflowIsExecutor="workflowIsExecutor"
+          :needReRun="needReRun"
+          :isFlowPubulish="isFlowPubulish"
+          :isLatest="isLatest"
+          :publish="publish"
+          :product="product"
+          :flowId="flowId"
+          :type="type"
+          @click-itembar="handleClickToolbar"
+        />
+      </div>
+      <cyeditor v-if="viewMode === 'cyeditor'"
+        style="top: 36px"
+        ref="process"
+        :shapes="shapes"
+        :value="originalData || {nodes:[],edges: []}"
+        :ctx-menu-options="nodeMenuOptions"
+        :disabled="workflowIsExecutor || myReadonly"
+        :readable="myReadonly"
+        :viewMode="viewMode"
+        :newTipVisible="newTipVisible"
+        @screenSizeChange="screenSizeChange"
+        @change="change"
+        @message="message"
+        @node-click="click"
+        @node-dblclick="dblclick"
+        @node-delete="nodeDelete"
+        @node-add="addNode"
+        @on-ctx-menu="onContextMenu"
+        @link-add="linkAdd"
+        @search-node-path="showSearchPath"
+        @changeViewMode="handleClickToolbar"
+      />
+      <template v-if="viewMode === 'table'">
+        <iframe class="iframeClass" id="iframe" ref="ifr" style="padding-top:36px" :src="tableViewUrl" frameborder="0" width="100%" height="100%" />
+        <Spin v-if="iframeloading" fix>{{ $t('message.common.Loading') }}</Spin>
+      </template>
+    </div>
     <div
       class="process-module-param"
       v-clickoutside="handleOutsideClick"
@@ -324,9 +268,50 @@
         </FormItem>
       </Form>
     </Modal>
+    <!-- 批量关联上下游节点 -->
+    <Modal
+      v-model="addEdgesShow"
+      :title="`批量关联节点（根节点：${addEdgesForm.currentNodeName}）`"
+      class="repetition-name"
+      @on-visible-change="cancelEdges">
+      <Form
+        label-position="top"
+        ref="addChildrenRef"
+      >
+        <FormItem label="上游一级节点" >
+          <Select
+            v-model="addEdgesForm.upstreamNodes"
+            placeholder="请选择"
+            multiple
+            filterable
+            @on-change="changeNodes('upstream', $event)">
+            <Option v-for="item in upstreamNodeList" :value="item.key" :key="item.key">{{item.title}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="下游一级节点" >
+          <Select
+            v-model="addEdgesForm.downstreamNodes"
+            placeholder="请选择"
+            multiple
+            filterable
+            @on-change="changeNodes('downstream', $event)">
+            <Option v-for="item in downstreamNodeList" :value="item.key" :key="item.key">{{item.title}}</Option>
+          </Select>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button
+          type="text"
+          size="large"
+          @click="cancelEdges(false)">{{$t('message.workflow.cancel')}}</Button>
+        <Button
+          type="primary"
+          @click="addEdges">{{$t('message.workflow.ok')}}</Button>
+      </div>
+    </Modal>
     <!-- 运行控制台 -->
     <console
-      v-if="openningNode"
+      v-if="openningNode && viewMode !== 'table'"
       ref="currentConsole"
       :node="openningNode"
       :stop="workflowIsExecutor"
@@ -335,6 +320,7 @@
       :style="getConsoleStyle"
       @close-console="closeConsole"></console>
     <BottomTab
+      v-show="viewMode !== 'table'"
       ref="bottomTab"
       :orchestratorId="orchestratorId"
       :orchestratorVersionId="orchestratorVersionId"
@@ -343,6 +329,7 @@
       :readonly="readonly"
       @release="release"
     />
+    <NodePath :data="json" :show="showNodePathPanel" @close="showNodePathPanel = false" @open-params="click" @open-node="dblclick" />
   </div>
 </template>
 <script>
@@ -354,17 +341,20 @@ import console from './component/console.vue';
 import api from '@dataspherestudio/shared/common/service/api';
 import clickoutside from '@dataspherestudio/shared/common/helper/clickoutside';
 import associateScript from './component/associateScript.vue';
-import { throttle, debounce } from 'lodash';
+import { throttle, debounce  } from 'lodash';
 import { NODETYPE, ext } from '@/workflows/service/nodeType';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
-import util from '@dataspherestudio/shared/common/util';
 import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
 import moment from 'moment';
 import { getPublishStatus } from '@/workflows/service/api.js';
 import module from './index';
 import nodeIcons from './nodeicon';
-import BottomTab from './component/bottomTab.vue'
+import BottomTab from './component/bottomTab.vue';
+import NodePath from './component/nodePath.vue';
+import cyeditor from './cyeditor/index.vue'
+import DesignToolbar from './component/designtoolbar.vue';
+import { hasCycle } from './utils';
 
 export default {
   components: {
@@ -374,7 +364,10 @@ export default {
     nodeParameter,
     associateScript,
     console,
-    BottomTab
+    BottomTab,
+    NodePath,
+    cyeditor,
+    DesignToolbar
   },
   mixins: [mixin],
   directives: {
@@ -431,6 +424,10 @@ export default {
     orchestratorVersionId: {
       type: [Number, String],
       default: null
+    },
+    newTipVisible: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -473,8 +470,18 @@ export default {
         showBaseInfoOnAdd: false, // 不显示默认的拖拽添加节点弹出的基础信息面板
         shapeView: true, // 左侧shape列表
         control: true,
+        linkType: 'straight' // straight：直线（直角折线）；curve：斜线
       },
       addNodeShow: false, // 创建节点的弹窗显示
+      addEdgesShow: false, // 批量创建节点的弹窗显示
+      addEdgesForm: {
+        currentNode: '',
+        currentNodeName: '',
+        upstreamNodes: [],
+        downstreamNodes: []
+      },
+      upstreamNodeList: [],
+      downstreamNodeList: [],
       cacheNode: null,
       addNodeTitle: this.$t('message.workflow.process.createSubFlow'), // 创建节点时弹窗的title
       workflowIsExecutor: false, // 当前工作流是否再执行
@@ -494,12 +501,14 @@ export default {
       workflowExportShow: false,
       exportDesc: '',
       exporTChangeVersion: false,
-      changeNum: 0,
       consoleParams: [],
       consoleHeight: 250,
       needReRun: false,
       locked: false,
-      extraToolbar: [],
+      showNodePathPanel: false,
+      iframeloading: false,
+      isfullScreen: false,
+      viewMode: 'vueprocess' //  vueprocess, cyeditor or table
     };
   },
   computed: {
@@ -591,6 +600,11 @@ export default {
                   icon: 'fuzhi',
                 });
               }
+              arr.push({
+                value: 'addEdges',
+                text: '批量关联节点',
+                icon: 'addLink'
+              })
             }
           }
           if (type === 'view'&& !this.myReadonly) {
@@ -608,6 +622,9 @@ export default {
           return arr;
         }
       }
+    },
+    tableViewUrl() {
+      return `/next-web/#/workspace/workflow?workspaceId=${this.$route.query.workspaceId}&projectId=${this.$route.query.projectID}&flowId=${this.flowId}&labels=${this.getCurrentDsslabels()}`
     }
   },
   created() {
@@ -631,9 +648,6 @@ export default {
       this.workflowExeteId = currentExecutorFlow[0].execID
       this.workflowTaskId = currentExecutorFlow[0].taskID
     }
-    if (!this.myReadonly) {
-      this.getToolbarsConfig()
-    }
     // 基础信息
     this.setShapes().then(() => {
       this.getBaseInfo();
@@ -641,9 +655,10 @@ export default {
     this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth; // 自适应控制台宽度
     this.getConsoleParams();
     document.addEventListener('keyup', this.onKeyUp)
-    this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
     eventbus.on('workflow.fold.left.tree', this.foldHandler);
     eventbus.on('workflow.copying', this.onCopying);
+    window.addEventListener('message', this.msgEvent, false);
+    window.addEventListener('resize', this.resizeConsole, false);
   },
   beforeDestroy() {
     if (this.timer) {
@@ -660,12 +675,37 @@ export default {
     }
     eventbus.off('workflow.fold.left.tree', this.foldHandler);
     eventbus.off('workflow.copying', this.onCopying);
-    document.removeEventListener('keyup', this.onKeyUp)
+    document.removeEventListener('keyup', this.onKeyUp);
+    window.removeEventListener('message', this.msgEvent, false);
+    window.removeEventListener('resize', this.resizeConsole, false);
   },
   methods: {
+    resizeConsole: debounce(function() {
+      this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
+    }, 300),
+    msgEvent(e) {
+      if (e.data) {
+        try {
+          let data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data || {}
+          if (data.type === 'dss-nextweb'&& data.flowId == this.flowId) {
+            if (data.action === 'open_node') {
+              this.dblclick(data.node)
+            } else if(data.action === 'node_dependance') {
+              this.showSearchPath()
+            } else if(data.action === 'node_params') {
+              this.click(data.node)
+            }
+          }
+        } catch(err) {
+          window.console.error(err)
+        }
+      }
+    },
     foldHandler() {
-      const refs = this.$refs
-      refs.process && refs.process.layoutView()
+      if (this.viewMode === 'vueprocess') {
+        const refs = this.$refs
+        refs.process && refs.process.layoutView()
+      }
     },
     onCopying(data) {
       if (data.source.orchestratorId == this.orchestratorId) {
@@ -676,15 +716,6 @@ export default {
       if (evt && evt.callFn && typeof this[evt.callFn] === 'function') {
         this[evt.callFn](...evt.params)
       }
-    },
-    getToolbarsConfig() {
-      api.fetch(`/dss/workflow/getExtraToolBars`, {
-        projectId: +this.$route.query.projectID,
-        workflowId: this.flowId,
-        labels: {route: this.getCurrentDsslabels()},
-      },'post').then(res => {
-        this.extraToolbar = res.extraBars
-      })
     },
     release(obj) {
       this.$emit('release', obj);
@@ -816,7 +847,6 @@ export default {
       this.loading = true;
       this.clickCurrentNode = {};
       this.nodebaseinfoShow = false;
-      this.changeNum = 0;
       this.getOriginJson();
     },
     initAction(json) {
@@ -829,6 +859,9 @@ export default {
         this.resources = json.resources;
         this.props = json.props;
         this.scheduleParams = json.scheduleParams || {};
+      }
+      if (json.config && json.config.type != 'table') {
+        this.viewMode = json.config.type
       }
       this.$nextTick(() => {
         this.loading = false;
@@ -860,15 +893,11 @@ export default {
       this.isRootFlow = flow.rootFlow;
       this.rank = flow.rank; // 工作流层级
       let json;
-      // 没传version则默认取最新的
       json = flow.flowJson;
-      // this.bmlVersion = flow.bmlVersion;
 
-      // JSON:  优先缓存 > 通过id去查关联JSON数据
       if (json) {
         json = JSON.parse(json);
         if (json.nodes && Array.isArray(json.nodes)) {
-          // 需要把 id -> key, jobType -> type
           json.nodes = json.nodes.map((node) => {
             node.type = node.jobType;
             delete node.jobType;
@@ -882,7 +911,10 @@ export default {
     setShapes() {
       return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}listNodeType`, {
         labels: this.getCurrentDsslabels()
-      },'get').then((res) => {
+      }, {
+        method: 'get',
+        cacheOptions: { time: 2 * 60 * 1000 },
+      }).then((res) => {
         this.shapes = res.nodeTypes.map((item) => {
           if (item.children.length > 0) {
             item.children = item.children.map((subItem) => {
@@ -891,6 +923,8 @@ export default {
                 subItem.image = nodeIcons[subItem.title];
               } else if (subItem.image) {
                 subItem.image = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(subItem.image)))
+              } else {
+                subItem.image = `/api/rest_j/v1/dss/workflow/nodeIcon/${subItem.type}`
               }
               return subItem
             })
@@ -900,46 +934,17 @@ export default {
       });
     },
     change(obj) {
-      this.json = obj;
-      this.changeNum++
+      if (!obj) return
       const change = this.checkChange(obj)
-      this.lastObj = JSON.parse(JSON.stringify(obj))
-      if (this.changeNum > 2 && change) {
+      this.json = obj;
+      if (change) {
         this.heartBeat();
         this.jsonChange = true;
       }
     },
     checkChange(obj) {
-      // 剔除单击节点选中导致的change
-      // createTime 流程图产生的数据
-      // params 动态添加的，手动保存会更新jsonchange标志位
-      const helpFn = function(obj = {}) {
-        const temp = { nodes: [], edges: [] }
-        if (obj.nodes) {
-          obj.nodes.forEach(item => {
-            const nodeItem = {}
-            Object.keys(item).forEach(k => {
-              if(['selected','createTime', 'updateTime', 'params'].indexOf(k) < 0) {
-                nodeItem[k] = item[k]
-              }
-            })
-            temp.nodes.push(nodeItem)
-          })
-        }
-        if (obj.edges) {
-          obj.edges.forEach(item => {
-            const link = {}
-            Object.keys(item).forEach(k => {
-              if(['selected','createTime', 'updateTime', 'params'].indexOf(k) < 0) {
-                link[k] = item[k]
-              }
-            })
-            temp.edges.push(link)
-          })
-        }
-        return JSON.stringify(temp)
-      }
-      return helpFn(obj) !== helpFn(this.lastObj)
+      // 节点增删,连线增删视为发生改变
+      return this.json ? obj.edges.length != this.json.edges.length ||  obj.nodes.length != this.json.nodes.length : true
     },
     initNode(arg) {
       if(this.clickCurrentNode.id && this.clickCurrentNode.id === arg.id) return; // 多出点击时，避免数据初始化
@@ -1037,35 +1042,44 @@ export default {
         }
       } else {
         // iframe节点
-        await this.saveCommonIframe(node, () => {
-          // flage = true;
-        });
+        await this.saveCommonIframe(node);
       }
+
       // 为了表单校验，基础信息弹窗保存的节点已不再是响应式，需重新赋值给json
 
       this.json.nodes = this.json.nodes.map((item) => {
         if (item.key === node.key) {
           item.title = node.title;
           item.desc = node.desc;
+          item.ecConfTemplateName = node.ecConfTemplateName;
+          item.ecConfTemplateId = node.ecConfTemplateId;
           item.jobContent = node.jobContent;
           item.resources = node.resources || [];
           item.params = node.params; // 节点参数现在存在这里，和jobparams一样
-          item.bindViewKey = node.bindViewKey || "";
           item.appTag = node.appTag;
           item.businessTag = node.businessTag;
           item.modifyUser = this.getUserName();
           item.modifyTime = Date.now();
         }
+        item.selected = item.key === node.key
         return item;
       });
-      this.originalData = this.json;
+      this.originalData = {...this.json};
       this.jsonChange = true;
       this.addNodeShow = false;
       // 保存工作流
       this.autoSave('paramsSave', false);
-    },
-    saveNodeParam(...arg) {
-      this.$emit('saveParam', arg);
+      // 表格模式更新
+      if (this.viewMode === 'table') {
+        const ifr = this.$refs.ifr;
+        if (ifr) {
+          setTimeout(()=> {
+            ifr.contentWindow.postMessage(JSON.stringify({
+              type: 'dss_change_node'
+            }), "*");
+          }, 600)
+        }
+      }
     },
     /**
      * 保存工作流
@@ -1095,11 +1109,13 @@ export default {
           onOk: () => {
             this.saveModal = false;
             let json = JSON.parse(JSON.stringify(this.json));
-            json.nodes.forEach((node) => {
-              this.$refs.process.setNodeRunState(node.key, {
-                borderColor: '#6A85A7',
+            if (this.viewMode !== 'table' && this.$refs.process) {
+              json.nodes.forEach((node) => {
+                this.$refs.process.setNodeRunState(node.key, {
+                  borderColor: '#6A85A7',
+                })
               })
-            })
+            }
             this.autoSave(this.$t('message.workflow.Manually'), false);
           },
           onCancel: () => {
@@ -1108,11 +1124,13 @@ export default {
       } else {
         this.saveModal = false;
         let json = JSON.parse(JSON.stringify(this.json));
-        json.nodes.forEach((node) => {
-          this.$refs.process.setNodeRunState(node.key, {
-            borderColor: '#6A85A7',
+        if (this.viewMode !== 'table' && this.$refs.process) {
+          json.nodes.forEach((node) => {
+            this.$refs.process.setNodeRunState(node.key, {
+              borderColor: '#6A85A7',
+            })
           })
-        })
+        }
         this.autoSave(this.$t('message.workflow.Manually'), false);
       }
     },
@@ -1122,46 +1140,55 @@ export default {
         this.loading = false;
         return false;
       }
-      // 需要把 key -> id,  type -> jobType， title -> id
+      if (this.viewMode === 'cyeditor' && comment === 'deleteSave') {
+        this.originalData = this.json;
+      }
       let json = JSON.parse(JSON.stringify(this.json));
-      json.edges.forEach((edge) => {
-        let sources = json.nodes.filter((node) => {
-          return node.key == edge.source;
-        });
-        if (sources.length > 0) {
-          let source = sources[0];
-          edge.source = source.key;
-        }
-        let targets = json.nodes.filter((node) => {
-          return node.key == edge.target;
-        });
-        if (targets.length > 0) {
-          let target = targets[0];
-          edge.target = target.key;
-        }
-      });
       let flage = false;
-      json.nodes.forEach((node) => {
+      // 节点连线保存数据key白名单
+      json.nodes =  json.nodes.map((node) => {
+        const keys = [
+          'ecConfTemplateId',
+          'ecConfTemplateName',
+          'jobContent',
+          'key',
+          'title',
+          'desc',
+          'layout',
+          'params',
+          'resources',
+          'createTime',
+          'modifyTime',
+          'modifyUser',
+          'id',
+          'jobType',
+          'businessTag',
+          'type',
+          'appTag'
+        ]
+        const data = {}
+        keys.forEach(it => {
+          data[it] = node[it]
+        })
         const reg = /^[a-zA-Z][a-zA-Z0-9_]*$/;
 
         if (!node.title.match(reg)) {
           return flage = true;
         }
-        node.id = node.key;
-        node.jobType = node.type;
-        node.selected = false; // 保存之前初始化选中状态
-        delete node.type;
-        delete node.menu; // 删除菜单配置
+        data.id = data.key;
+        data.jobType = data.type;
+        delete data.type;
         // 将用户保存的resources值为空字符串转为空数组
-        if (!node.resources) {
-          node.resources = [];
+        if (!data.resources) {
+          data.resources = [];
         }
-        // 保存之前删掉执行的状态信息
-        if(node.runState) {
-          delete node.runState
-        }
-
+        return data
       });
+      // 拖拽模式保存
+      json.config = {
+        ...json.config,
+        type: this.viewMode === 'table' ? this.preDragViewMode || 'vueprocess' : this.viewMode
+      }
       if (flage) return this.$Message.warning(this.$t('message.workflow.validNameDesc'));
       const isFiveNode = json.nodes.filter((item) => {
         return !item.jobContent && item.jobType === NODETYPE.FLOW && this.rank >= 4;
@@ -1186,15 +1213,6 @@ export default {
       if (this.schedulerAppConnName !== undefined) {
         paramsJson.schedulerAppConnName = this.schedulerAppConnName
       }
-
-      paramsJson.nodes = paramsJson.nodes.map((node) => {
-        // 删除节点里的contextID
-        if(node.contextID) {
-          delete node.contextID;
-        }
-        delete node.jobParams;
-        return node;
-      });
       return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}saveFlow`, {
         id: Number(this.flowId),
         json: JSON.stringify(paramsJson),
@@ -1243,6 +1261,18 @@ export default {
         this.isResourceShow = false;
         this.isDispatch = false;
       }
+    },
+    changeLinkType(type) {
+      this.viewOptions = {
+        ...this.viewOptions,
+        linkType: type
+      }
+    },
+    changeLinkStraight(k) {
+      this.$refs.process.changeLinkType(k, 'straight')
+    },
+    changeLinkCurve(k) {
+      this.$refs.process.changeLinkType(k, 'curve')
     },
     setFlowEditLock(flowEditLock) {
       let data = storage.get("flowEditLock") || {}
@@ -1392,7 +1422,9 @@ export default {
         await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}deleteFlow`, params, 'post').then(() => {
           this.$Message.success(this.$t('message.workflow.deleteSuccess'));
           this.$emit('deleteNode', node);
-          this.$refs.process.deleteNode(node.key)
+          if (this.$refs.process.deleteNode) {
+            this.$refs.process.deleteNode(node.key)
+          }
           // 如果删除的是当前修改参数的节点，关闭侧边栏
           if (this.clickCurrentNode.key === node.key) {
             this.clickCurrentNode = {};
@@ -1420,7 +1452,9 @@ export default {
           await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}deleteAppConnNode`,params, 'post').then(() => {
             this.$Message.success(this.$t('message.workflow.deleteSuccess'));
             this.$emit('deleteNode', node);
-            this.$refs.process.deleteNode(node.key)
+            if (this.$refs.process.deleteNode) {
+              this.$refs.process.deleteNode(node.key)
+            }
 
             // 如果删除的是当前修改参数的节点，关闭侧边栏
             if (this.clickCurrentNode.key === node.key) {
@@ -1436,7 +1470,9 @@ export default {
           })
         } else {
           this.$emit('deleteNode', node);
-          this.$refs.process.deleteNode(node.key);
+          if (this.$refs.process.deleteNode) {
+            this.$refs.process.deleteNode(node.key);
+          }
           // 如果删除的是当前修改参数的节点，关闭侧边栏
           if (this.clickCurrentNode.key === node.key) {
             this.clickCurrentNode = {};
@@ -1459,7 +1495,7 @@ export default {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonly'));
       this.saveNodeBaseInfo(node);
     },
-    onContextMenu(menu, data) {
+    onContextMenu(menu, data, type) {
       switch(menu) {
         case 'associate':
           this.checkAssociated(data);
@@ -1488,6 +1524,85 @@ export default {
         case 'relySelectDown':
           this.relySelect(data, 'down');
           break;
+        case 'delete':
+          if (this.viewMode === 'cyeditor') {
+            if (type ==='node') {
+              this.nodeDelete(data)
+            } else if(type === 'link') {
+              this.linkDelete(data)
+            }
+          }
+          break;
+        case 'addEdges':
+          this.beforeAddEdges(data);
+          break;
+      }
+    },
+    getNoBindNode(id) {
+      const upstreamIds = this.json.edges.filter(item => item.target === id).map(item => item.source);
+      const downstreamIds = this.json.edges.filter(item => item.source === id).map(item => item.target);
+      const ids = [ id, ...upstreamIds, ...downstreamIds ];
+      const results = this.json.nodes.filter(item => !ids.includes(item.id || item.key));
+      return results;
+    },
+    beforeAddEdges(node) {
+      this.addEdgesShow = true;
+      this.addEdgesForm.currentNode = node.id || node.key;
+      this.addEdgesForm.currentNodeName = node.title;
+      const list = this.getNoBindNode(node.id || node.key)
+      list.forEach((item) => {
+        item.key = item.id || item.key;
+      });
+      this.upstreamNodeList = list;
+      this.downstreamNodeList = list;
+    },
+    async addEdges() {
+      const { currentNode, upstreamNodes, downstreamNodes } = this.addEdgesForm;
+      const newEdges = [ ...this.json.edges ];
+      upstreamNodes.forEach(item => {
+        newEdges.push({
+          source: item,
+          target: currentNode,
+        })
+      });
+      downstreamNodes.forEach(item => {
+        newEdges.push({
+          source: currentNode,
+          target: item,
+        })
+      });
+      if(hasCycle(newEdges)) {
+        this.$Message['warning']({
+          content: '关联节点上下游节点存在闭环',
+          duration: 2,
+        });
+        return;
+      }
+      this.json.edges = [ ...newEdges ];
+      this.autoSave('addEdges', false);
+      this.originalData = { ...this.json };
+      this.cancelEdges(false);
+    },
+    cancelEdges(val) {
+      if (!val) {
+        this.addEdgesShow = false;
+        this.addEdgesForm = {
+          currentNode: '',
+          currentNodeName: '',
+          upstreamNodes: [],
+          downstreamNodes: []
+        }
+        this.upstreamNodeList = [];
+        this.downstreamNodeList = [];
+      }
+    },
+    changeNodes(type) {
+      const { currentNode, upstreamNodes, downstreamNodes } = this.addEdgesForm;
+      const list = this.getNoBindNode(currentNode);
+      if (type === 'upstream') {
+        this.downstreamNodeList = list.filter(item => !upstreamNodes.includes(item.key))
+      } else {
+        this.upstreamNodeList = list.filter(item => !downstreamNodes.includes(item.key))
       }
     },
     checkAssociated(node) {
@@ -1529,7 +1644,6 @@ export default {
         const params = {
           fileName,
           scriptContent: rst.fileContent[0][0],
-          creator: node.creator,
           metadata: rst.metadata,
           projectName: this.$route.query.projectName || ''
         };
@@ -1542,7 +1656,6 @@ export default {
               fileName,
               resourceId: res.resourceId,
               version: res.version,
-              creator: node.creator || '',
               projectName: this.$route.query.projectName || ''
             };
             this.$emit('check-opened', node, (isOpened) => {
@@ -1592,7 +1705,7 @@ export default {
           }
           return subItem;
         });
-        this.originalData = this.json;
+        this.originalData = { ...this.json };
         this.autoSave(this.$t('message.workflow.AddNode'), false);
         return;
       }
@@ -1671,7 +1784,7 @@ export default {
         }
         return {...subItem, runState};
       });
-      this.originalData = this.json;
+      this.originalData = { ...this.json };
     },
     heartBeat: throttle(() => {
       api.fetch('/user/heartbeat', 'get');
@@ -1696,7 +1809,10 @@ export default {
         return this.$Message.warning(this.$t('message.workflow.process.namelength'));
       }
       // 获取屏幕的缩放值
-      let pageSize = this.$refs.process.getState().baseOptions.pageSize;
+      let pageSize = 1
+      if (this.$refs.process.getState) {
+        pageSize = this.$refs.process.getState().baseOptions.pageSize;
+      }
       const key = '' + new Date().getTime() + Math.ceil(Math.random() * 100);
       this.cacheNode.key = key;
       this.cacheNode.id = key;
@@ -1717,12 +1833,13 @@ export default {
       if(this.cacheNode.runState) {
         delete this.cacheNode.runState;
       }
+      delete this.cacheNode.enableCopy;
       this.json.nodes = this.json.nodes.map((subItem) => {
         subItem.selected = false;
         return subItem;
       });
       this.json.nodes.push(JSON.parse(JSON.stringify(this.cacheNode)));
-      this.originalData = this.json;
+      this.originalData = { ...this.json };
       this.click(this.cacheNode)
     },
     // 由于插件的selected不是响应式，所以得手动改变
@@ -1735,7 +1852,7 @@ export default {
         }
         return subItem;
       });
-      this.originalData = this.json;
+      this.originalData = { ...this.json };
     },
     clickBaseInfo() {
       this.nodeSelectedFalse(this.clickCurrentNode);
@@ -1764,9 +1881,16 @@ export default {
           })
         }
       })
-      await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}batchDeleteAppConnNode`, {nodes}, 'post').then(() => {
-        this.$Message.success(this.$t('message.workflow.deleteSuccess'));
-      })
+      if (nodes.length) {
+        await api.fetch(`${this.$API_PATH.WORKFLOW_PATH}batchDeleteAppConnNode`, {nodes}, 'post')
+      }
+      let msg = this.$t('message.workflow.deleteSuccess')
+      if (selectNodeLength > selectNodes.length) {
+        msg = this.$t('message.workflow.BatchDel');
+        this.$Message.warning(msg);
+      } else {
+        this.$Message.success(msg);
+      }
       selectNodes.forEach(node=>{
         this.$emit('deleteNode', node);
       })
@@ -1780,10 +1904,7 @@ export default {
           return true;
         }
       });
-      this.originalData = this.json;
-      if (selectNodeLength > selectNodes.length) {
-        this.$Message.warning(this.$t('message.workflow.BatchDel'));
-      }
+      this.originalData = { ...this.json };
       this.autoSave('allDelete', false);
     },
     /**
@@ -1813,11 +1934,9 @@ export default {
         this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth;
       }
     },
-    saveCommonIframe(node, cb) {
-      if (!(node.supportJump && node.shouldCreationBeforeNode)) return;
-      this.loading = true;
-      if (!node.jobContent) {
-        cb();
+    saveCommonIframe(node) {
+      // 创建
+      if (node.supportJump && node.shouldCreationBeforeNode && !node.jobContent) {
         const newCreateParams = this.getCreatePrams(node);
         const createParams = {
           flowID: this.flowId,
@@ -1832,6 +1951,7 @@ export default {
             route: this.getCurrentDsslabels()
           }
         }
+        this.loading = true;
         return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}createAppConnNode`, createParams).then((res) => {
           // 由于vsbi的错误信息返回的这里，所以得判断是否成功给予提示
           let commomData = {};
@@ -1857,9 +1977,11 @@ export default {
           this.json.nodes = this.json.nodes.filter((subItem) => {
             return node.key != subItem.key;
           });
-          this.originalData = this.json;
+          this.originalData = { ...this.json };
         })
-      } else {
+      }
+      // 更新
+      if (node.jumpType == 1 && node.jobContent) {
         const params = {
           flowID: this.flowId,
           nodeType: node.type,
@@ -1873,6 +1995,7 @@ export default {
             route: this.getCurrentDsslabels()
           }
         }
+        this.loading = true;
         return api.fetch(`${this.$API_PATH.WORKFLOW_PATH}updateAppConnNode`, params, 'post').then(() => {
           this.$Message.success(this.$t('message.workflow.updataSuccess'))
         }).catch(() => {})
@@ -1889,12 +2012,12 @@ export default {
     },
     // 根据节点类型将后台节点基础信息加入
     bindNodeBasicInfo(node) {
-      const shapes = JSON.parse(JSON.stringify(this.shapes));
-      shapes.map((item) => {
+      if (node.nodeUiVOS) delete node.nodeUiVOS
+      this.shapes.forEach((item) => {
         if (item.children.length > 0) {
-          item.children.map((subItem) => {
-            if (subItem.type === node.type) {
-              node = Object.assign(subItem, node);
+          item.children.forEach((subItem) => {
+            if (subItem.type === node.type || subItem.type === node.jobType) {
+              node = Object.assign({}, subItem, node);
             }
           })
         }
@@ -1902,23 +2025,38 @@ export default {
       return node;
     },
     // 点击节流
-    clickswitch: debounce(
-      function(type){
-        this.workflowIsExecutor ? this.workflowStop() : this.workflowRun(type)
-      },1000
-    ),
+    clickswitch(type){
+      if ( type === 'select') {
+        let selectNodes = this.$refs.process.getSelectedNodes();
+        const selectNodeLength = selectNodes.length
+        if (selectNodeLength < 1 ) {
+          return this.$Message.error(this.$t('message.workflow.PleaseSelectNode'));
+        }
+        selectNodes.forEach((node) => {
+          this.$refs.process.setNodeRunState(node.key, {
+          })
+        })
+      } else if(!this.workflowIsExecutor) {
+        let json = JSON.parse(JSON.stringify(this.json));
+        json.nodes.forEach((node) => {
+          this.$refs.process.setNodeRunState(node.key, {
+          })
+        })
+      }
+      debounce(() => {
+        if (this.workflowIsExecutor) {
+          this.workflowStop()
+        } else {
+          this.workflowRun(type)
+        }
+      }, 1000)()
+    },
     // 失败重跑
     reRun() {
       this.workflowRun('rerun')
     },
     async workflowRun(runFlag) {
       let selectNodes = this.$refs.process.getSelectedNodes();
-      const selectNodeLength = selectNodes.length
-      if ( runFlag === 'select') {
-        if (selectNodeLength < 1 ) {
-          return this.$Message.error(this.$t('message.workflow.PleaseSelectNode'));
-        }
-      }
       this.dispatch('workflowIndexedDB:clearNodeCache');
       // 重新执行清掉上次的计时器
       clearTimeout(this.excuteTimer);
@@ -2032,6 +2170,12 @@ export default {
         } else {
           // Succees, Failed, Cancelled, Timeout
           this.workflowIsExecutor = false;
+          // 工作流执行状态和节点执行状态轮询不同步，工作流执行成功后，若节点执行状态尚未成功，再次查询更新进度 dpms 312293
+          if (this.openningNode) {
+            setTimeout(()=> {
+              this.$refs.currentConsole.queryState(false);
+            }, 1000)
+          }
           if (status === 'Succeed') {
             this.$Notice.success({desc: this.$t('message.common.projectDetail.workflowRunSuccess')})
           }
@@ -2211,15 +2355,6 @@ export default {
         this.$Message.error(this.$t('message.common.projectDetail.publishFailed'));
       })
     },
-    clickToolItem(item) {
-      if (item.url){
-        if(item.url.startsWith('http')){
-          util.windowOpen(item.url);
-        } else {
-          this.$router.push({path: item.url, query: Object.assign({}, this.$route.query)});
-        }
-      }
-    },
     // 发布和导出共用查询接口
     checkResult(id, timeoutValue, type = 'publish') {
       let typeName = this.$t('message.workflow.export')
@@ -2318,12 +2453,18 @@ export default {
         this.autoSave('deleteLink', true);
         clearTimeout(timerId);
       }, 500);
+      if (this.viewMode === 'cyeditor') {
+        this.originalData = this.json;
+      }
     },
     linkAdd() {
       const timerId = setTimeout(() => {
         this.autoSave('addLink', true);
         clearTimeout(timerId);
       }, 500);
+      if (this.viewMode === 'cyeditor') {
+        this.originalData = this.json;
+      }
     },
     closeParamsBar() {
       // 关闭参数参数窗口
@@ -2338,6 +2479,10 @@ export default {
       api.fetch('/configuration/getFullTreesByAppName', {
         engineType: '通用设置',
         creator: '通用设置',
+      }, 'get'),
+      api.fetch('/configuration/getFullTreesByAppName', {
+        engineType: 'hive',
+        creator: 'nodeexecution',
       }, 'get')]).then((res) => {
         this.consoleParams = res;
       }).catch(() => {
@@ -2400,6 +2545,70 @@ export default {
           }
         }
       }
+    },
+    showSearchPath() {
+      this.showNodePathPanel = true
+    },
+    changeViewMode(mode) {
+      if (this.viewMode === mode) return
+      if (this.jsonChange) {
+        return this.message({
+          type: 'error',
+          msg: '请先保存'
+        })
+      }
+      if (mode == 'table') {
+        this.originalData = this.json;
+        this.iframeloading = true
+        this.openningNode = null
+        if (this.viewMode !== 'table') {
+          this.preDragViewMode = this.viewMode
+        }
+        this.viewMode = mode
+        this.$nextTick(()=> {
+          const ifr = this.$refs.ifr;
+          if (ifr) {
+            ifr.onload = () => {
+              this.iframeloading = false
+            }
+          }
+        })
+      } else if(mode || this.preDragViewMode) {
+        this.viewMode = mode || this.preDragViewMode
+        if (this.viewMode !== 'table') {
+          this.preDragViewMode = this.viewMode
+        }
+        // 切换至原拖拽模式，节点位置负值处理
+        if (this.viewMode === 'vueprocess') {
+          let x = 0
+          let y = 0
+          this.json.nodes.map(it => {
+            if (it.layout.x < x) {
+              x = it.layout.x
+            }
+            if (it.layout.y < y) {
+              y = it.layout.y
+            }
+          })
+          if (x < 0 || y < 0) {
+            this.json.nodes.forEach(element => {
+              element.layout.x = element.layout.x + x * -1
+              element.layout.y = element.layout.y + y * -1
+            });
+          }
+          // 新模式切换旧模式，连线类型修改
+          this.json.edges.forEach(element => {
+            element.linkType = 'curve'
+          });
+        }
+        this.originalData = this.json;
+      }
+    },
+    screenSizeChange(fullScreen) {
+      this.isfullScreen = fullScreen
+    },
+    handleClickToolbar(action, arg) {
+      this[action](arg)
     }
   }
 }

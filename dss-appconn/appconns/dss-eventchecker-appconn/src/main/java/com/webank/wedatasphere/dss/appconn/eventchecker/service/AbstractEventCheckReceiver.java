@@ -120,7 +120,10 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
             pstmtForGetID.setString(2, topic);
             pstmtForGetID.setString(3, msgName);
             rs = pstmtForGetID.executeQuery();
-            lastMsgId = rs.last()==true ? rs.getString("msg_id"):"0";
+            while (rs.next()) {
+                lastMsgId = rs.getString("msg_id");
+            }
+//            lastMsgId = rs.last()==true ? rs.getString("msg_id"):"0";
         } catch (SQLException e) {
             throw new RuntimeException("get Offset failed " + e);
         }finally {
@@ -136,7 +139,14 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
      * Consistent entrance to consumer message
      */
     String[] getMsg(Properties props, Logger log,String ... params){
-        String sqlForReadTMsg = "SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >? ORDER BY msg_id ASC LIMIT 1";
+        boolean useRunDate=Boolean.parseBoolean(params[3]);
+        String sqlForReadTMsg;
+        if(useRunDate){
+            sqlForReadTMsg ="SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >?  AND run_date =?ORDER BY msg_id ASC LIMIT 1";
+        } else{
+            sqlForReadTMsg="SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >? ORDER BY msg_id ASC LIMIT 1";
+        }
+
         PreparedStatement pstmt = null;
         Connection msgConn = null;
         ResultSet rs = null;
@@ -150,17 +160,33 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
             pstmt.setString(3, params[0]);
             pstmt.setString(4, params[1]);
             pstmt.setString(5, params[2]);
+            if(useRunDate){
+                log.info("use run_date, run_date:{}", params[4]);
+                pstmt.setString(6,params[4]);
+            }
             log.info("param {} StartTime: " + params[0] + ", EndTime: " + params[1]
                     + ", Topic: " + topic + ", MessageName: " + msgName + ", LastMessageID: " + params[2]);
             rs = pstmt.executeQuery();
 
-            if(rs.last()){
+            while (rs.next()) {
                 consumedMsgInfo = new String[4];
-                String[] msgKey = new String[]{"msg_id","msg_name","sender","msg"};
-                for (int i = 0;i <= 3;i++) {
-                    consumedMsgInfo[i] = rs.getString(msgKey[i]);
+                String[] msgKey = new String[]{"msg_id", "msg_name", "sender", "msg"};
+                for (int i = 0; i < msgKey.length; i++) {
+                    try {
+                        consumedMsgInfo[i] = rs.getString(msgKey[i]);
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Error while reading data from ResultSet", e);
+                    }
                 }
             }
+
+//            if(rs.last()){
+//                consumedMsgInfo = new String[4];
+//                String[] msgKey = new String[]{"msg_id","msg_name","sender","msg"};
+//                for (int i = 0;i <= 3;i++) {
+//                    consumedMsgInfo[i] = rs.getString(msgKey[i]);
+//                }
+//            }
         } catch (SQLException e) {
             throw new RuntimeException("EventChecker failed to receive message" + e);
         } finally {

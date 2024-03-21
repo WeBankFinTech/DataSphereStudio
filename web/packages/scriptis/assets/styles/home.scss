@@ -16,121 +16,128 @@
  */
 
 @import '@dataspherestudio/shared/common/style/variables.scss';
+.fi-flink-sql {
+  background-image: url('../images/flink.svg');
+  width: 12px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.fi-presto {
+  background-image: url('../images/presto.svg');
+  width: 12px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.fi-r {
+  background-image: url('../images/fi-r.svg');
+  width: 12px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.fi-trino-sql {
+  background-image: url('../images/trino.svg');
+  width: 12px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
-.home-page{
-    position: $relative;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    z-index: 1;
-    .container{
-        flex: 1;
-    }
-    .center-panel{
-        border-left: $border-width-base $border-style-base $border-color-base;
-        @include border-color($border-color-base, $dark-base-color);
-    }
-
-    .right-panel{
-        border-left: $border-width-base $border-style-base $border-color-base;
-    }
-
-    .nav-list{
-        width: 44px;
-        height: 100%;
-        border-right: $border-width-base $border-style-base $border-color-base;
-        @include border-color($border-color-base, $dark-menu-base-color);
-        // background: $table-thead-bg;
-        @include bg-color($table-thead-bg, $dark-base-color);
-        .nav-warp{
-            position: $absolute;
-            height: 100%;
-            top: 0;
-            left: 0;
-            overflow: hidden;
-        }
-        .nav-item{
-            width: 43px;
-            padding: 32px 4px;
-            text-align: center;
-            cursor: pointer;
-            @include font-color(#333, $dark-text-color);
-            &.actived{
-                width: 44px;
-                border-left: 3px solid $primary-color;
-                @include border-color($primary-color, $dark-primary-color);
-                // border-bottom: $border-width-base $border-style-base $border-color-base;
-                // border-top: $border-width-base $border-style-base $border-color-base;
-                @include bg-color($active-menu-item, $dark-menu-base-color);
-                @include font-color($primary-color, $dark-primary-color);
-            }
-            &:hover{
-                @include font-color($primary-color, $dark-primary-color);
-            }
-            .nav-icon{
-                font-size: $font-size-large;
-            }
-            .nav-name{
-                width: 100%;
-                white-space: normal;
-                word-break: break-all;
-                display: inline-block;
-                line-height: $font-size-large;
-            }
-        }
-    }
-    .cur-proxy-user {
-      position: absolute;
-      bottom: 10px;
-      padding-left: 5px;
-    }
-    .narrow {
-        width: 30px;
-        .nav-item {
-            width: 100%;
-            padding: 30px 4px;
-            &.actived {
-                width: 30px;
-            }
-            .nav-icon{
-                font-size: $font-size-base;
-            }
-        }
-    }
-    .fi-flink-sql {
-        background-image: url('../images/flink.svg');
-        width: 12px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-    .fi-presto-sql {
-        background-image: url('../images/presto.svg');
-        width: 12px;
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-    .fi-trino-sql {
-      background-image: url('../images/trino.svg');
-      width: 12px;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
+.home-page {
+  position: $relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  z-index: 1;
+  .container {
+    flex: 1;
   }
-    // @media screen and(max-height: 790px) {
-    //     .nav-list {
-    //         width: 30px;
-    //         .nav-item {
-    //             width: 100%;
-    //             padding: 30px 4px;
-    //             &.actived {
-    //                 width: 30px;
-    //             }
-    //             .nav-icon{
-    //                 font-size: $font-size-base;
-    //             }
-    //         }
-    //     }
-    // }
+  .center-panel {
+    border-left: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-base-color);
+  }
+
+  .right-panel {
+    border-left: $border-width-base $border-style-base $border-color-base;
+  }
+
+  .nav-list {
+    width: 44px;
+    height: 100%;
+    border-right: $border-width-base $border-style-base $border-color-base;
+    @include border-color($border-color-base, $dark-menu-base-color);
+    // background: $table-thead-bg;
+    @include bg-color($table-thead-bg, $dark-base-color);
+    .nav-warp {
+      position: $absolute;
+      height: 100%;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+    }
+    .nav-item {
+      width: 43px;
+      padding: 32px 4px;
+      text-align: center;
+      cursor: pointer;
+      @include font-color(#333, $dark-text-color);
+      &.actived {
+        width: 44px;
+        border-left: 3px solid $primary-color;
+        @include border-color($primary-color, $dark-primary-color);
+        // border-bottom: $border-width-base $border-style-base $border-color-base;
+        // border-top: $border-width-base $border-style-base $border-color-base;
+        @include bg-color($active-menu-item, $dark-menu-base-color);
+        @include font-color($primary-color, $dark-primary-color);
+      }
+      &:hover {
+        @include font-color($primary-color, $dark-primary-color);
+      }
+      .nav-icon {
+        font-size: $font-size-large;
+      }
+      .nav-name {
+        width: 100%;
+        white-space: normal;
+        word-break: break-all;
+        display: inline-block;
+        line-height: $font-size-large;
+      }
+    }
+  }
+  .cur-proxy-user {
+    position: absolute;
+    bottom: 10px;
+    padding-left: 5px;
+  }
+  .narrow {
+    width: 30px;
+    .nav-item {
+      width: 100%;
+      padding: 30px 4px;
+      &.actived {
+        width: 30px;
+      }
+      .nav-icon {
+        font-size: $font-size-base;
+      }
+    }
+  }
+  // @media screen and(max-height: 790px) {
+  //     .nav-list {
+  //         width: 30px;
+  //         .nav-item {
+  //             width: 100%;
+  //             padding: 30px 4px;
+  //             &.actived {
+  //                 width: 30px;
+  //             }
+  //             .nav-icon{
+  //                 font-size: $font-size-base;
+  //             }
+  //         }
+  //     }
+  // }
 }

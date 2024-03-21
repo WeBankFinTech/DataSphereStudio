@@ -3,7 +3,6 @@
   "version": "1.1.19",
   "dependencies": {
     "@dataspherestudio/shared": "^1.1.19",
-    "monaco-languageclient": "0.13.0",
     "reconnecting-websocket": "4.4.0",
     "vscode-ws-jsonrpc": "0.2.0"
   }

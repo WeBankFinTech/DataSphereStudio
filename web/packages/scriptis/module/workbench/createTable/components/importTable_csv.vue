@@ -67,8 +67,25 @@
           <Button
             type="primary"
             :loading="isLoading"
-            @click="getFileContent">{{$t('message.scripts.createTable.HQBZDSJ')}}</Button>
+            @click="getFileContent">{{$t('message.scripts.createTable.HQBXX')}}</Button>
         </FormItem>
+        <template  v-if="importType === 'xlsx'">
+          <FormItem
+            :label="$t('message.scripts.importToHive.SHEETB')"
+          >
+            <Select
+              v-model="options.sheet"
+              class="step-from-sheet"
+              @on-change="handleSheet"
+            >
+              <Option
+                v-for="(item, index) in sheetArray"
+                :value="item.label"
+                :key="index"
+                :label="item.label">{{ item.label }}</Option>
+            </Select>
+          </FormItem>
+        </template>
       </template>
     </Form>
     <Modal
@@ -76,9 +93,15 @@
       :title="$t('message.scripts.createTable.XZWJLJ')"
       @on-ok="confirm"
       @on-cancel="cancel">
+      <Input
+        v-model="filterText"
+        :placeholder="$t('message.common.navBar.dataStudio.searchPlaceholder')"
+        class="we-directory-input"></Input>
       <directory-dialog
+        ref="directoryTree"
         :tree="fileTree"
         :load-data-fn="loadDataFn"
+        :filter-text="filterText"
         :filter-node="filterNode"
         :path="tmpTreePath"
         :fs-type="options.type"
@@ -103,6 +126,10 @@ export default {
       type: Object,
       required: true,
     },
+    sheetArray: {
+      type: Array,
+      required: false,
+    }
   },
   data() {
     return {
@@ -158,6 +185,7 @@ export default {
       isLoading: false,
       isTreeModalShow: false,
       tmpTreePath: '',
+      filterText: '',
     };
   },
   computed: {
@@ -176,7 +204,7 @@ export default {
     },
     isPathLeaf(val) {
       this.$emit('isPathLeaf', val);
-    }
+    },
   },
   mounted() {
     this.getTree('share');
@@ -235,15 +263,22 @@ export default {
     },
     // 过滤文件夹
     getFilterNode(type) {
-      return (node) => {
+      return (node= {}) => {
+        let label = node.data.name || '';
         const reg = type === 'csv' ? ['.csv', '.txt'] : ['.xlsx', '.xls'];
-        if (!node.isLeaf) return true;
-        const tabSuffix = node.label.substr(
-          node.label.lastIndexOf('.'),
-          node.label.length
+        const tabSuffix = label.substr(
+          label.lastIndexOf('.'),
+          label.length
         );
-        const isVaild = indexOf(reg, tabSuffix) !== -1;
-        return isVaild;
+        let labelValid = !node.isLeaf || indexOf(reg, tabSuffix) !== -1;
+        let textValid = true;
+        if (this.filterText) {
+          let searchText = this.filterText;
+          label = label.toLowerCase();
+          searchText = searchText.toLowerCase();
+          textValid = label.indexOf(searchText) !== -1;
+        }
+        return labelValid && textValid;
       };
     },
     setNode(node) {
@@ -253,6 +288,7 @@ export default {
     },
     changeTreeByType() {
       this.getTree(this.options.type);
+      this.options.exportPath = '';
     },
     reset() {
       this.tmpTreePath = '';
@@ -267,6 +303,10 @@ export default {
       this.$emit('get-fields', this.options);
     },
     confirm() {
+      if(this.options.exportPath !== this.tmpTreePath) {
+        this.options.sheet = '';
+        this.$emit('clear-fields');
+      }
       this.options.exportPath = this.tmpTreePath;
       this.isTreeModalShow = false;
     },
@@ -276,7 +316,11 @@ export default {
     },
     onPathInputFocus() {
       this.isTreeModalShow = true;
+      this.filterText = '';
     },
+    handleSheet(val) {
+      this.$emit('on-change', val);
+    }
   },
 };
 </script>

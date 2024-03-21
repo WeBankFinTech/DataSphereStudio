@@ -153,7 +153,7 @@ const api = {
       if (window.location.href.indexOf('/#/login') < 0) {
         window.location.href = '/#/login'
       }
-      if (!showLoginTips) {
+      if (!showLoginTips && res.data.method.indexOf('jobhistory/governanceStationAdmin') < 0) {
         showLoginTips = true
         setTimeout(() => {
           showLoginTips = false
@@ -451,6 +451,14 @@ const showErrMsg = function (error) {
     });
   }
 }
+// 对于某些特殊接口，接口报错时不做展示
+const isShowErr = (url) => {
+  const noShowUrlList = ['/validator/code-precheck'];
+  if (noShowUrlList.includes(url)) {
+    return false;
+  }
+  return true;
+}
 const action = function (url, data, option) {
   return param(url, data, option)
     .then(success, fail)
@@ -467,10 +475,14 @@ const action = function (url, data, option) {
           setTimeout(() => {
             showApiErrorTips = true
           }, 3000)
-          showErrMsg(error)
+          if (isShowErr(url)) {
+            showErrMsg(error)
+          }
         }
       } else {
-        showErrMsg(error)
+        if (isShowErr(url)) {
+          showErrMsg(error)
+        }
       }
       setTimeout(() => {
         lastMsg = ''

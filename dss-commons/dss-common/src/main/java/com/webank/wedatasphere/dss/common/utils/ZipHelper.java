@@ -63,8 +63,7 @@ public class ZipHelper {
             throw new DSSErrorException(90001,dirPath + " does not exist, can not zip");
         }
         //先用简单的方法，调用新进程进行压缩
-        String[] strArr = dirPath.split(File.separator);
-        String shortPath = strArr[strArr.length - 1];
+        String shortPath =new File(dirPath).getName();
         String workPath = dirPath.substring(0, dirPath.length() - shortPath.length() - 1);
         List<String> list = new ArrayList<>();
         list.add(ZIP_CMD);
@@ -136,7 +135,7 @@ public class ZipHelper {
         }
         //先用简单的方法，调用新进程进行压缩
         String[] strArr = dirPath.split(File.separator);
-        String shortPath = strArr[strArr.length - 1];
+        String shortPath = new File(dirPath).getName();
         String workPath = dirPath.substring(0, dirPath.length() - shortPath.length() - 1);
         List<String> list = new ArrayList<>();
         list.add(UN_ZIP_CMD);

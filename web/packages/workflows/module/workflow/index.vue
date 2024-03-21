@@ -6,6 +6,7 @@
           :addProject="createProjectHandler"
           :addWrokFlow="ProjectMergeAdd"
           :goto="gotoLastWorkflow"
+          @importWorkflowSuccess="noticeParent"
         />
       </template>
     </div>
@@ -13,11 +14,13 @@
       v-model="deleteProjectShow"
       :title="$t('message.orchestratorModes.deleteOrchestrator')"
       @on-ok="deleteProjectConfirm"
-    >{{
-      `${$t("message.orchestratorModes.confirmDeleteOrchestrator")}${
-        deleteProjectItem.orchestratorName
-      } ？`
-    }}</Modal
+    ><div style="word-wrap: break-word;">
+      {{
+        `${$t("message.orchestratorModes.confirmDeleteOrchestrator")}${
+          deleteProjectItem.orchestratorName
+        } ？`
+      }}
+    </div></Modal
     >
     <!--修改编排-->
     <WorkflowForm
@@ -63,7 +66,11 @@ import Void from "../common/voidPage/void.vue";
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import api from '@dataspherestudio/shared/common/service/api';
 import { GetAreaMap } from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
+import { useData } from './module/useData';
 
+const {
+  getTemplateByOrchestratorId,
+} = useData();
 export default {
   props: {
     topTapList: {
@@ -119,7 +126,8 @@ export default {
       params: "",
       versionData: [], // 工作流版本信息
       currentOrchetratorData: null,
-      applicationAreaMap: []
+      applicationAreaMap: [],
+      initTemplateIdData: []
     };
   },
   computed: {
@@ -241,14 +249,28 @@ export default {
     ProjectMergeConfirm({data, cb}) {
       data.dssLabels = [this.getCurrentDsslabels()];
       data.labels = { route: this.getCurrentDsslabels() };
+      const curTemplateIds = data.templateIds;
+      delete data.templateIds
       api
         .fetch(
           `${this.$API_PATH.ORCHESTRATOR_PATH}createOrchestrator`,
           data,
           "post"
         )
-        .then(() => {
+        .then((res) => {
           this.$Message.success(this.$t("message.workflow.createdSuccess"));
+          if (curTemplateIds) {
+            const templateData = {
+              projectId: data.projectId,
+              orchestratorId: res.orchestratorId,
+              templateIds: curTemplateIds,
+            }
+            api.fetch(
+              `${this.$API_PATH.ORCHESTRATOR_PATH}saveTemplateRef`,
+              templateData,
+              "put"
+            )
+          }
           this.ProjectMergeCancel();
           // 更新左侧tree，同时父组件会通知刷新flow
           this.noticeParent(data.projectId);
@@ -336,6 +358,20 @@ export default {
                 name: data.orchestratorName
               })
             );
+            const strInit = this.initTemplateIdData.sort().join(',')
+            const strCur = data.templateIds.sort().join(',')
+            if (!(strCur === strInit)) {
+              const templateData = {
+                projectId: data.projectId,
+                orchestratorId: data.id,
+                templateIds: data.templateIds,
+              }
+              api.fetch(
+                `${this.$API_PATH.ORCHESTRATOR_PATH}saveTemplateRef`,
+                templateData,
+                "put"
+              )
+            }
             this.getParams();
             this.getFlowData(this.params);
             if (cb) {
@@ -404,12 +440,17 @@ export default {
       };
     },
     // 修改编排
-    projectModify(classifyId, project) {
+    async projectModify(classifyId, project) {
       this.init();
       this.ProjectShow = true;
       this.actionType = "modify";
       this.currentOrchetratorData = { ...project };
       this.currentOrchetratorData.taxonomyID = classifyId;
+      let res = [];
+      if (this.currentOrchetratorData.orchestratorId) {
+        res = await getTemplateByOrchestratorId({orchestratorId: this.currentOrchetratorData.orchestratorId})
+      }
+      this.initTemplateIdData = res;
     },
     ProjectShowAction(val) {
       this.ProjectShow = val;

@@ -23,6 +23,19 @@ import { Message } from 'iview';
 import i18n from '@dataspherestudio/shared/common/i18n'
 
 /**
+ * 记录轮询接口请求日志
+ * @param {execID,taskID,path,reqtime,restime,data} log
+ */
+function executeReqLog(log) {
+  let list = storage.get('scriptis_execute_req_log') || []
+  if (list.length > 2000) {
+    list = list.slice(1000)
+  }
+  list.push(log)
+  storage.set('scriptis_execute_req_log',list)
+}
+
+/**
  * 提供脚本运行相关方法，包括执行方法，状态轮询，日志接收，获取结果等
  * * 1.默认使用socket方式通信，若socket连接失败则使用http方式
  * * 2.点击执行调用start方法，收到taskID后进入执行中状态
@@ -65,7 +78,7 @@ function Execute(data) {
   });
   this.on('execute:queryState', () => {
     this.queryStatus({ isKill: false });
-    this.queryProgress();
+    this.queryProgress(); // ?
   });
   this.on('stateEnd', () => {
     this.getResultPath();
@@ -183,12 +196,15 @@ Execute.prototype.restore = function({ execID, taskID }) {
   this.trigger('execute:queryState');
 };
 
-Execute.prototype.halfExecute = function({ execID, taskID, openLog }) {
+Execute.prototype.halfExecute = function({ execID, taskID, openLog, isQueryHistory }) {
   this.id = execID;
   this.taskID = taskID;
   this.run = true;
   this.postType = 'http';
   this.openLog = openLog
+  if (isQueryHistory) {
+    return this.queryStatus({ isKill: false });
+  }
   this.trigger('execute:queryState');
 };
 
@@ -244,6 +260,14 @@ Execute.prototype.outer = function(outerUrl, ret) {
 };
 
 Execute.prototype.queryStatus = function({ isKill }) {
+  // kill 接口失败设置queryStatusaAfterKill为0，之后再轮询状态5次 dpms 312308
+  if (this.execute.queryStatusaAfterKill >= 5) {
+    delete this.execute.queryStatusaAfterKill
+    return
+  }
+  if (this.execute.queryStatusaAfterKill >=0 ) {
+    this.execute.queryStatusaAfterKill++
+  }
   const requestStatus = (ret) => {
     if (isKill) {
       deconstructStatusIfKill(this, ret);
@@ -251,85 +275,120 @@ Execute.prototype.queryStatus = function({ isKill }) {
       deconstructStatus(this, ret);
     }
   };
-  api.fetch(`/entrance/${this.id}/status`, {taskID: this.taskID}, 'get')
-    .then((ret) => {
-      if (ret.status === 3) { // 停止状态轮询
-        if (ret.message) {
-          Message.error(ret.message);
-        }
-        this.trigger('queryError');
-        return
-      }
-      this.status = ret.status;
-      requestStatus(ret);
+  if (this.id) {
+    executeReqLog({
+      execID: this.id,
+      taskID: this.taskID,
+      path: '/status',
+      reqtime: Date.now(),
     })
-    .catch(() => {
-      requestStatus({
-        status: this.status
+    api.fetch(`/entrance/${this.id}/status`, {taskID: this.taskID}, 'get')
+      .then((ret) => {
+        executeReqLog({
+          execID: this.id,
+          taskID: this.taskID,
+          path: '/status',
+          restime: Date.now(),
+          data: ret
+        })
+        if (ret.status === 3) { // 停止状态轮询
+          if (ret.message) {
+            Message.error(ret.message);
+          }
+          this.trigger('queryError');
+          return
+        }
+        this.status = ret.status;
+        requestStatus(ret);
+      })
+      .catch(() => {
+        requestStatus({
+          status: this.status
+        });
       });
-    });
+  }
 };
 
 Execute.prototype.queryProgress = function() {
+  executeReqLog({
+    execID: this.id,
+    taskID: this.taskID,
+    path: '/progressWithResource',
+    reqtime: Date.now(),
+  })
   api.fetch(`/entrance/${this.id}/progressWithResource`, 'get')
     .then((rst) => {
+      executeReqLog({
+        execID: this.id,
+        taskID: this.taskID,
+        path: '/progressWithResource',
+        restime: Date.now(),
+        data: rst
+      })
       this.trigger('progress', { progress: rst.progress, progressInfo: rst.progressInfo, yarnMetrics: rst.yarnMetrics });
     });
 };
 
 Execute.prototype.queryLog = function() {
-  const fromLine = this.fromLine
-  // dpms: /#/product/100199/bug/detail/222584
-  if ( this.openLog && ['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.status) !== -1) {
-    if (this.resultsetInfo) {
-      return api.fetch('/filesystem/openLog', {
-        path: this.resultsetInfo.logPath
-      }, 'get').then((rst) => {
-        if (rst) {
-          this.trigger('log', rst.log);
+  try {
+    const fromLine = this.fromLine
+    // dpms: /#/product/100199/bug/detail/222584
+    if ( this.openLog && ['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.status) !== -1) {
+      if (this.resultsetInfo) {
+        return api.fetch('/filesystem/openLog', {
+          path: this.resultsetInfo.logPath
+        }, 'get').then((rst) => {
+          if (rst) {
+            this.trigger('log', rst.log);
+          }
           return Promise.resolve();
+        }).catch(() => {
+          return Promise.resolve();
+        });
+      } else {
+        const taskUrl = this.getResultUrl !== 'filesystem' ? this.getResultUrl : 'jobhistory';
+        return api.fetch(`/${taskUrl}/${this.taskID}/get`, 'get')
+          .then((rst) => {
+            if (rst.task) {
+              this.resultsetInfo = rst.task;
+              return api.fetch('/filesystem/openLog', {
+                path: this.resultsetInfo.logPath
+              }, 'get').then((rst) => {
+                if (rst) {
+                  this.trigger('log', rst.log);
+                }
+                return Promise.resolve();
+              }).catch(() => {
+                return Promise.resolve();
+              });
+            }
+            return Promise.resolve();
+          })
+      }
+    }
+
+    return api.fetch(`/entrance/${this.id}/log`, {
+      fromLine,
+      size: -1,
+    }, 'get')
+      .then((rst) => {
+        this.fromLine = rst.fromLine;
+        this.handleLines = this.handleLines || {}
+        if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) {
+          return  Promise.resolve();
+        } else if(this.fromLine) {
+          this.handleLines[fromLine+'_'+this.fromLine] = 1
         }
+        this.trigger('log', rst.log);
+        return Promise.resolve();
       }).catch(() => {
         return Promise.resolve();
       });
-    } else {
-      const taskUrl = this.getResultUrl !== 'filesystem' ? this.getResultUrl : 'jobhistory';
-      return api.fetch(`/${taskUrl}/${this.taskID}/get`, 'get')
-        .then((rst) => {
-          if (rst.task) {
-            this.resultsetInfo = rst.task;
-            return api.fetch('/filesystem/openLog', {
-              path: this.resultsetInfo.logPath
-            }, 'get').then((rst) => {
-              if (rst) {
-                this.trigger('log', rst.log);
-                return Promise.resolve();
-              }
-            }).catch(() => {
-              return Promise.resolve();
-            });
-          }
-        })
-    }
+  } catch (error) {
+    console.error('---queryLog---', error)
+    return Promise.resolve();
   }
-
-  return api.fetch(`/entrance/${this.id}/log`, {
-    fromLine,
-    size: -1,
-  }, 'get')
-    .then((rst) => {
-      this.fromLine = rst.fromLine;
-      this.handleLines = this.handleLines || {}
-      if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) {
-        return  Promise.resolve();
-      } else if(this.fromLine) {
-        this.handleLines[fromLine+'_'+this.fromLine] = 1
-      }
-      this.trigger('log', rst.log);
-      return Promise.resolve();
-    }).catch(() => {
-      return Promise.resolve();
-    });
+  
 };
 
 Execute.prototype.getResultPath = function() {
@@ -428,7 +487,16 @@ Execute.prototype.getFirstResult = function() {
     const pageSize = 5000;
     api.fetch(url, params, 'get')
       .then((rst) => {
-        if (rst.metadata && rst.metadata.length >= 500) {
+        if (rst.display_prohibited) {
+          this.trigger('result', {
+            metadata: [],
+            fileContent: [],
+            type: rst.type,
+            totalLine: rst.totalLine,
+            hugeData: true,
+            tipMsg: localStorage.getItem("locale") === "en" ? rst.en_msg : rst.zh_msg
+          });
+        } else if (rst.metadata && rst.metadata.length >= 500) {
           this.trigger('result', {
             metadata: [],
             fileContent: [],
@@ -504,11 +572,16 @@ Execute.prototype.updateLastHistory = function(option, cb) {
  * @param {*} ret
  */
 function deconstructStatusIfKill(execute, ret) {
+  if (['Succeed', 'Failed', 'Timeout'].indexOf(ret.status) >= 0) {
+    return
+  }
   if (ret.status !== 'Cancelled') {
     execute.statusTimeout = setTimeout(() => {
       execute.queryStatus({ isKill: true });
     }, 5000);
   } else {
+    execute.trigger('steps', ret.status);
+    execute.trigger('status', ret.status);
     const msg = '查询已被取消';
     queryException(execute, 'warning', msg);
   }
@@ -564,7 +637,6 @@ function deconstructStatus(execute, ret) {
  * @param {*} execute
  */
 function whenSuccess(execute) {
-  console.log(execute.runType)
   if (execute.runType !== 'pipeline') {
     // stateEnd是需要获取结果集的，获取结果集的同时会更新历史
     execute.trigger('stateEnd');

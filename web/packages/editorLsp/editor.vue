@@ -74,7 +74,7 @@ export default {
       let typeConfig = types[this.type];
       let config = merge(
         {
-          automaticLayout: false,
+          automaticLayout: true,
           scrollBeyondLastLine: false,
           minimap: {
             enabled: false,
@@ -88,6 +88,7 @@ export default {
           value: this.value,
           theme: this.theme,
           language: this.language,
+          fontFamily: 'Consolas,Menlo,Courier,monospace,"JinbiaoSong", "JinbiaoSongExt"'
         },
       );
       return config;
@@ -160,17 +161,29 @@ export default {
     })
     this.editor = editor
     this.monaco = monaco
-    this.editorModel = this.editor.getModel();
     this.initMonaco()
+    this.editorModel = this.editor.getModel();
     this.changeTheme(localStorage.getItem('theme'));
     eventbus.on('theme.change', this.changeTheme);
   },
   beforeDestroy: function() {
     // 销毁 editor，进行gc
+    if(this.actions) {
+      this.actions.forEach(it => {
+        it.dispose()
+      })
+    }
     this.editor && this.editor.dispose();
+    this.editorModel && this.editorModel.dispose();
     eventbus.off('theme.change', this.changeTheme);
+    this.editor = null
+    this.monaco = null
+    this.editorModel = null
   },
   methods: {
+    layout() {
+      this.editor.layout()
+    },
     // 初始化
     initMonaco() {
       if (this.type !== 'log') {
@@ -207,9 +220,8 @@ export default {
     },
     changeTheme(theme) {
       if (theme == 'dark') {
-        this.monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
-      }
-      if (theme == 'light') {
+        this.monaco.editor.setTheme('logview-dark'); // dark模式使用自带的vs-dark theme
+      } else {
         this.monaco.editor.setTheme('logview');
       }
     },
@@ -291,8 +303,8 @@ export default {
     },
     addActions() {
       const vm = this;
-
-      this.editor.addAction({
+      this.actions = [];
+      const action_0 = this.editor.addAction({
         id: 'editor.action.execute',
         label: this.$t('message.common.monacoMenu.YXJB'),
         keybindings: [this.monaco.KeyCode.F3],
@@ -304,7 +316,7 @@ export default {
         },
       });
 
-      this.editor.addAction({
+      const action_1 = this.editor.addAction({
         id: 'find',
         label: this.$t('message.common.monacoMenu.CZ'),
         keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_F],
@@ -316,7 +328,7 @@ export default {
         },
       });
 
-      this.editor.addAction({
+      const action_2 = this.editor.addAction({
         id: 'replace',
         label: this.$t('message.common.monacoMenu.TH'),
         keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_H],
@@ -328,7 +340,7 @@ export default {
         },
       });
 
-      this.editor.addAction({
+      const action_3 = this.editor.addAction({
         id: 'commentLine',
         label: this.$t('message.common.monacoMenu.HZS'),
         keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.US_SLASH],
@@ -340,7 +352,7 @@ export default {
         },
       });
 
-      this.editor.addAction({
+      const action_4 = this.editor.addAction({
         id: 'paste',
         label: this.$t('message.common.monacoMenu.ZT'),
         keybindings: [],
@@ -358,7 +370,7 @@ export default {
         },
       });
 
-      this.editor.addAction({
+      const action_5 = this.editor.addAction({
         id: 'gotoLine',
         label: this.$t('message.common.monacoMenu.TDZDH'),
         keybindings: [this.monaco.KeyMod.CtrlCmd | this.monaco.KeyCode.KEY_G],
@@ -373,7 +385,7 @@ export default {
       // 打开、关闭库表联想
       this.closeDbTbSuggest = this.editor.createContextKey('closeDbTbSuggest', !this.dbtbsuggest);
       this.openDbTbSuggest = this.editor.createContextKey('openDbTbSuggest', this.dbtbsuggest);
-      this.editor.addAction({
+      const action_6 = this.editor.addAction({
         id: 'closeDbTbSuggest',
         label: this.$t('message.common.monacoMenu.GBKBTS'),
         keybindings: [],
@@ -392,7 +404,7 @@ export default {
         },
       });
 
-      this.editor.addAction({
+      const action_7 = this.editor.addAction({
         id: 'openDbTbSuggest',
         label: this.$t('message.common.monacoMenu.DKKBTS'),
         keybindings: [],
@@ -412,7 +424,7 @@ export default {
       // 打开、关闭自动换行
       this.closeAutoBreak = this.editor.createContextKey('closeAutoBreak', this.autobreak);
       this.openAutoBreak = this.editor.createContextKey('openAutoBreak', !this.autobreak);
-      this.editor.addAction({
+      const action_8 = this.editor.addAction({
         id: 'closeAutoBreak',
         label: this.$t('message.common.monacoMenu.GBZDHH'),
         keybindings: [],
@@ -431,7 +443,7 @@ export default {
         },
       });
 
-      this.editor.addAction({
+      const action_9 = this.editor.addAction({
         id: 'openAutoBreak',
         label: this.$t('message.common.monacoMenu.DKZDHH'),
         keybindings: [],
@@ -447,9 +459,9 @@ export default {
           vm.editor.updateOptions({wordWrap: 'on'});
         },
       });
-      this.editor.addAction({
+      const action_10 = this.editor.addAction({
         id: 'newdbsuggest',
-        label: this.$t('message.common.monacoMenu.dbcomplition'),
+        label: this.$t('message.common.monacoMenu.closeLanguageServe'),
         keybindings: [],
         keybindingContext: null,
         contextMenuGroupId: 'control',
@@ -459,12 +471,12 @@ export default {
           location.reload();
         },
       });
-
+      this.actions = [ action_0, action_1, action_2, action_3, action_4, action_5, action_6, action_7, action_8, action_9, action_10]
       if (this.language === 'hql') {
         // 控制语法检查
         this.closeParser = this.editor.createContextKey('closeParser', !this.isParserClose);
         this.openParser = this.editor.createContextKey('openParser', this.isParserClose);
-        this.editor.addAction({
+        const action_11 = this.editor.addAction({
           id: 'closeParser',
           label: this.$t('message.common.monacoMenu.GBYFJC'),
           keybindings: [],
@@ -482,7 +494,7 @@ export default {
           },
         });
 
-        this.editor.addAction({
+        const action_12 = this.editor.addAction({
           id: 'openParser',
           label: this.$t('message.common.monacoMenu.DKYFJC'),
           keybindings: [],
@@ -497,6 +509,8 @@ export default {
             vm.deltaDecorations();
           },
         });
+        this.actions.push(action_11);
+        this.actions.push(action_12);
       }
     },
     deltaDecorations: debounce(function(value, cb) {
@@ -517,7 +531,7 @@ export default {
       } else {
         // 关闭语法检查时，如果编辑器上有错误色块，先清除
         const decora = vm.decorations || [];
-        vm.decorations = vm.editor.deltaDecorations(decora, []);
+        vm.decorations = vm.editor && vm.editor.deltaDecorations(decora, []);
       }
       if (cb) {
         cb();

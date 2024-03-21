@@ -97,7 +97,6 @@ hr {
  */
 
 pre {
-    font-family: monospace, monospace; /* 1 */
     font-size: 1em; /* 2 */
 }
 
@@ -161,7 +160,6 @@ strong {
 code,
 kbd,
 samp {
-    font-family: monospace, monospace; /* 1 */
     font-size: 1em; /* 2 */
 }
 
@@ -261,7 +259,6 @@ input,
 optgroup,
 select,
 textarea {
-    font-family: sans-serif; /* 1 */
     font-size: 100%; /* 1 */
     line-height: 1.15; /* 1 */
     margin: 0; /* 2 */
@@ -471,13 +468,13 @@ body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, fieldset, legen
     margin: 0;
     padding: 0;
   }
-  
+
   button, input, select, textarea {
     font-family: inherit;
     font-size: inherit;
     line-height: inherit;
   }
-  
+
   ul,
   ol {
       list-style: none;

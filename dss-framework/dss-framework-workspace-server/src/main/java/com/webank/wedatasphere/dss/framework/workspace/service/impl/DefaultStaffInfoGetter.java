@@ -44,4 +44,9 @@ public class DefaultStaffInfoGetter implements StaffInfoGetter {
         List<String> allDepartments = Arrays.asList("WeDataSphere-linkisGroup");
         return allDepartments;
     }
+
+    @Override
+    public StaffInfo getStaffInfoByUsername(String username) {
+        return new StaffInfo();
+    }
 }

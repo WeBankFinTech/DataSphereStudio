@@ -469,7 +469,7 @@ $per-border-color: #dee4ec;
     width: 50px;
     height: 44px;
   }
-  /deep/.ivu-tooltip-inner {
+  ::v-deep.ivu-tooltip-inner {
     background-color: rgba(70, 76, 91, 1);
   }
 }

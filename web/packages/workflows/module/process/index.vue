@@ -59,7 +59,7 @@
             :open-files="openFiles"
             :orchestratorId="item.data.orchestratorId"
             :orchestratorVersionId="item.data.orchestratorVersionId"
-            @changeMap="changeTitle"
+            :newTipVisible="newTipVisible"
             @node-dblclick="dblclickNode(index, arguments)"
             @isChange="isChange(index, arguments)"
             @save-node="saveNode"
@@ -139,11 +139,17 @@ export default {
       setIntervalID: "",
       setTime: 40,
       showTip: true,
-      openFiles: {}
+      openFiles: {},
+      newTipVisible: (localStorage.getItem('entryProcessNum') || 0) < 4
     }
   },
   mounted() {
-    this.changeTitle(false);
+    this.changeTitle();
+    const entryProcessNum = localStorage.getItem('entryProcessNum') || 0
+    localStorage.setItem('entryProcessNum', +entryProcessNum + 1)
+    setTimeout(() => {
+      this.newTipVisible = false
+    }, 5000)
   },
   methods: {
     release(obj) {
@@ -213,7 +219,7 @@ export default {
         this.choose(active);
       }
     },
-    check(node) {
+    check(node, showTips = true) {
       if (node) {
         let boolean = true;
         this.tabs.map(item => {
@@ -227,12 +233,12 @@ export default {
             boolean = true;
           }
         });
-        if (!boolean) {
+        if (!boolean && showTips) {
           this.$Message.warning(this.$t("message.workflow.process.index.CCXE"));
         }
         return boolean;
       } else {
-        if (this.tabs.length > 10) {
+        if (this.tabs.length > 10 && showTips) {
           this.$Message.warning(this.$t("message.workflow.process.index.CCXE"));
           return false;
         }
@@ -381,9 +387,10 @@ export default {
       }
     },
     saveIDE(index, args) {
-      if (!this.check()) {
+      if (!this.check(null, args[0].showTips)) {
         return;
       }
+      delete args[0].showTips;
       if (args[0].data) {
         this.tabs[index].data = args[0].data;
       }
@@ -474,16 +481,11 @@ export default {
         return item;
       });
     },
-    changeTitle(val) {
-      // 地图模式下，名字为地图模式；最新工作流可编辑时，名字为编辑模式；历史版本进去时，为只读模式
-      if (val) {
-        this.tabs[0].title = this.$t("message.workflow.process.index.DTMS");
+    changeTitle() {
+      if (this.query.readonly === "true") {
+        this.tabs[0].title = this.$t("message.workflow.process.index.ZDMS");
       } else {
-        if (this.query.readonly === "true") {
-          this.tabs[0].title = this.$t("message.workflow.process.index.ZDMS");
-        } else {
-          this.tabs[0].title = this.$t("message.workflow.process.index.BJMS");
-        }
+        this.tabs[0].title = this.$t("message.workflow.process.index.BJMS");
       }
     }
   }

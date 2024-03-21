@@ -28,7 +28,7 @@
           </span>
           <div class="navbar-head-search">
             <div class="icon-prefix">
-              <SvgIcon icon-class="search-icon" />
+              <SvgIcon icon-class="search" />
             </div>
             <Input v-model="keyword" clearable @on-enter="changeToLibrarySearch" />
           </div>
@@ -81,8 +81,8 @@
         <Spin size="large" fix v-if="loading"></Spin>
       </div>
 
-      <div v-if="$APP_CONF.user_guide" class="guide-footer">
-        <a target="_blank" :href="$APP_CONF.user_guide">
+      <div v-if="$APP_CONF.handbook" class="guide-footer">
+        <a target="_blank" :href="$APP_CONF.handbook">
           {{ $t('message.common.dss.manual') }}
         </a>
       </div>
@@ -450,7 +450,7 @@ export default {
           font-size: 16px;
           @include font-color(#333, $dark-text-color);
         }
-        /deep/.ivu-input {
+        ::v-deep.ivu-input {
           text-indent: 24px;
         }
       }
@@ -580,7 +580,7 @@ export default {
             height: auto;
             opacity: 1;
             transform: translateY(0);
-            /deep/img {
+            ::v-deepimg {
               display: block;
               border: 0;
               max-width: 100%;

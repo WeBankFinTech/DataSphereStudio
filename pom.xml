@@ -23,7 +23,7 @@
     <packaging>pom</packaging>
     <groupId>com.webank.wedatasphere.dss</groupId>
     <artifactId>dss</artifactId>
-    <version>1.1.2</version>
+    <version>1.1.0.20-SNAPSHOT</version>
 
     <modules>
         <module>dss-commons</module>
@@ -34,14 +34,15 @@
         <module>dss-apps</module>
         <module>dss-server</module>
         <module>plugins/azkaban/linkis-jobtype</module>
+        <module>plugins/linkis/dss-gateway-support</module>
         <module>assembly</module>
         <module>plugins/dolphinscheduler</module>
     </modules>
 
     <properties>
-        <dss.version>1.1.2</dss.version>
-        <linkis.version>1.4.0</linkis.version>
-        <scala.version>2.12.17</scala.version>
+        <dss.version>1.1.0.20-SNAPSHOT</dss.version>
+        <linkis.version>1.1.19-wds-SNAPSHOT</linkis.version>
+        <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
         <gson.version>2.8.5</gson.version>
@@ -51,14 +52,14 @@
         <httpmime.version>4.5.4</httpmime.version>
         <beanutils.version>1.9.4</beanutils.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring-framework.version>5.2.23.RELEASE</spring-framework.version>
+        <spring.version>5.2.22.RELEASE</spring.version>
         <mybatis.spring.boot.version>2.1.2</mybatis.spring.boot.version>
         <spring.boot.version>2.3.12.RELEASE</spring.boot.version>
         <spring.cloud.version>2.2.6.RELEASE</spring.cloud.version>
         <commons.math.version>3.1.1</commons.math.version>
         <commons.lang3.version>3.8.1</commons.lang3.version>
         <commons.lang.version>2.6</commons.lang.version>
-        <xstream.version>1.4.19</xstream.version>
+        <xstream.version>1.4.20</xstream.version>
         <jersey.version>2.30.1</jersey.version>
     </properties>
 
@@ -113,42 +114,6 @@
                 <artifactId>xstream</artifactId>
                 <groupId>com.thoughtworks.xstream</groupId>
                 <version>${xstream.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-framework-bom</artifactId>
-                <version>${spring-framework.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter</artifactId>
-                <version>${spring.boot.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-logging</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${spring.boot.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-starter-tomcat</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -240,11 +205,6 @@
                     <configuration>
                         <scalaVersion>${scala.version}</scalaVersion>
                         <recompileMode>all</recompileMode>
-                        <args>
-                            <arg>-nobootcp</arg>
-                            <arg>-target:jvm-${jdk.compile.version}</arg>
-                        </args>
-
 <!--                        <useZincServer>true</useZincServer>-->
                     </configuration>
                 </plugin>

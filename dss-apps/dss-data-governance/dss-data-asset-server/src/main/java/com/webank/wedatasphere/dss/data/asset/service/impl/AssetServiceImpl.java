@@ -171,7 +171,7 @@ public class AssetServiceImpl implements AssetService {
         try {
             storage = metaInfoMapper.getTableInfo(dbName, tableName, isPartTable);
         } catch (SQLException e) {
-            e.printStackTrace();
+           // logger.error("invoke failed",e);
         }
 
         HiveTblDetailInfo.HiveTblBasicInfo basic = new HiveTblDetailInfo.HiveTblBasicInfo();
@@ -272,7 +272,7 @@ public class AssetServiceImpl implements AssetService {
             try {
                 hivePartInfo = metaInfoMapper.getPartInfo(dbName, tableName);
             } catch (SQLException e) {
-                e.printStackTrace();
+//                logger.error("invoke failed",e);
             }
             return hivePartInfo;
 

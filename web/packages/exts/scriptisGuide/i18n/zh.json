@@ -1,0 +1,25 @@
+{
+  "message": {
+    "ext": {
+      "scriptisGuide": {
+        "uninitTitle": "用户初始化未完成",
+        "uninitContent": "请前往数据地图（dm.weoa.com）提交相关服务单申请。<br>若您已提交申请，请确保您的审批单状态为已完成。",
+        "gotit": "我知道了",
+        "viewGuide": "查看申请指引",
+        "setParams": "设置参数",
+        "setinConsole": "在管理台设置队列及参数",
+        "newScript": "新建脚本",
+        "createContext": "右键新建所需脚本",
+        "editScript": "编辑脚本",
+        "edittip": "在对应的脚本文件中编辑sql或命令",
+        "summitRun": "提交执行",
+        "selectSqlRun": "运行选中的sql或命令",
+        "queryReusult": "结果查询",
+        "queryTip": "查询执行结果及日志",
+        "scriptisUse": "Scriptis使用指引",
+        "quickstart": "快速使用Scriptis",
+        "starttext": "前往了解更详细的使用指引"
+      }
+    }
+  }
+}

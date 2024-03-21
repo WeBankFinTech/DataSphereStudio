@@ -158,6 +158,9 @@ public class DSSWorkspaceRestful {
     public Message getWorkspaceHomePage(@RequestParam(required = false, name = "micro_module") String moduleName) throws Exception {
         //如果用户的工作空间大于两个，那么就直接返回/workspace页面
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
+//        if (username != null && username.toLowerCase().startsWith("hduser")) {
+//            return Message.error("Do not allow hduser* accounts to log in DSS system.");
+//        }
         Workspace workspace = new Workspace();
         try {
             LOGGER.info("Put gateway url and cookies into workspace.");

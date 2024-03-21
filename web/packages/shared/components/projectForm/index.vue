@@ -232,6 +232,7 @@ export default {
     return {
       ProjectShow: false,
       originBusiness: "",
+      mode: "",
       devProcess: [
         {
           id: 1,
@@ -344,6 +345,15 @@ export default {
     projectData(value) {
       const cloneObj = _.cloneDeep(value);
       this.projectDataCurrent = cloneObj;
+      if (this.mode === 'add') {
+        let curProcessList = [];
+        this.devProcess.forEach((item) => {
+          if(item.checked === 1) {
+            curProcessList.push(item.dicValue)
+          }
+        })
+        this.projectDataCurrent.devProcessList = curProcessList;
+      }     
     },
   },
   methods: {
@@ -393,13 +403,15 @@ export default {
       tmpArr.splice(index, 1);
       this.projectDataCurrent.business = tmpArr.toString();
     },
-    showProject(params) {
+    showProject(params,mode) {
       this.ProjectShow = true
+      this.$refs.projectForm.resetFields()
       // 新增只有一项自动勾选
       if (this.orchestratorModeList && this.orchestratorModeList.list.length === 1 && !params.name) {
         params.orchestratorModeList = [this.orchestratorModeList.list[0].dicKey]
       }
       this.projectDataCurrent = {...params}
+      this.mode = mode
     }
   },
 };

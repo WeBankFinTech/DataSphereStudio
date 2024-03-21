@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -84,12 +83,10 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
             ProjectResponseRef responseRef = projectSearchOperation.searchProject(new RefProjectContentRequestRef.RefProjectContentRequestRefImpl()
                     .setProjectName(projectName).setWorkspace(projectToRelConversionRequestRef.getWorkspace()));
             if (responseRef.isFailed()) {
-                //接口调用返回其他错误，如网络错误
                 throw new ExternalOperationFailedException(90012, responseRef.getErrorMsg());
             }
-            if (responseRef.isSucceed() && responseRef.getRefProjectId() == null) {
-                //项目在schedulis不存在
-                throw new DSSRuntimeException(90012, "the project: " + projectName + " is not exists in schedulis.(工作流对应项目在schedulis已被删除，请在schedulis中重新创建同名项目)");
+            if (responseRef.isSucceed() && StringUtils.isNotBlank(responseRef.getErrorMsg() )) {
+                throw new DSSRuntimeException(90012, responseRef.getErrorMsg());
             }
             //项目存在，则继续执行如下步骤
             String projectPath = azkabanConvertedRel.getStorePath();
@@ -141,8 +138,8 @@ public class AzkabanWorkflowToRelSynchronizer implements WorkflowToRelSynchroniz
     private String dealSchedulisErrorMsg(String errorMsg) {
         Matcher matcher = ERROR_PATTERN.matcher(errorMsg);
         if (matcher.find() && matcher.group().length() >= SCHEDULIS_MAX_SIZE) {
-            errorMsg = "wokflow name " + matcher.group().split("/")[1] + " is to long, please abide the rules of schedulis: projectName + workflowName*3 + 12 <= 250 ";
-        }
+            errorMsg = "wokflow name " + matcher.group().split("/")[1] + " is to long, please abide the rules of schedulis: projectName + workflowName*3 + 12 <= 250 " +
+                    "(工作流名称太长，需要满足规则 项目名长度 + 工作流长度*3 + 12 <= 250)";        }
         return errorMsg;
     }
 }

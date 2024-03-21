@@ -79,6 +79,17 @@
           :maxlength=201
           :placeholder="$t('message.workflow.inputWorkflowDesc')"></Input>
       </FormItem>
+      <FormItem
+        :label="$t('message.Project.defaultTemplate')"
+        prop="templateIds"
+        v-if="!$APP_CONF.open_source"
+      >
+        <Select v-model="workflowDataCurrent.templateIds" @on-change="handleTemplateIdsChange" multiple>
+          <OptionGroup v-for="e in defaultTemplates" :label="e.enginType" :key="e.type">
+            <Option v-for="item in e.child" :value="item.templateId" :key="item.templateId" :disabled="item.disabled">{{ item.templateName }}</Option>
+          </OptionGroup>
+        </Select>
+      </FormItem>
     </Form>
     <div slot="footer">
       <Button
@@ -97,11 +108,16 @@
 <script>
 import tag from '@dataspherestudio/shared/components/tag/index.vue';
 import api from '@dataspherestudio/shared/common/service/api';
+import { useData } from './useData.js';
 const FORMITEMTYPE = {
   RADIO: 'radio',
   SELECT: 'select',
   CHECKBOX: 'checkbox'
 }
+const {
+  getTemplateDatas,
+  getTemplateByOrchestratorId,
+} = useData();
 export default {
   components: {
     'we-tag': tag,
@@ -144,7 +160,9 @@ export default {
       isPublished: false,
       workflowDataCurrent: {},
       FORMITEMTYPE,
-      levels: []
+      levels: [],
+      initTemplates: [],
+      defaultTemplates: [],
     };
   },
   computed: {
@@ -179,7 +197,7 @@ export default {
       }
       this.$emit('show', val);
     },
-    workflowData(value){
+    async workflowData(value){
       const currentData = value;
       if (value && value.orchestratorWays && this.orchestratorModeList.list.length > 0) {
         if ([this.FORMITEMTYPE.RADIO, this.FORMITEMTYPE.SELECT].includes(this.orchestratorModeList.list.find((item) => item.dicKey === value.orchestratorMode).dicValue)) {
@@ -188,15 +206,64 @@ export default {
           currentData.orchestratorWayArray = value.orchestratorWays;
         }
       }
+      let res = [];
+      if (currentData.orchestratorId) {
+        res = await getTemplateByOrchestratorId({orchestratorId: currentData.orchestratorId})
+      }
+      currentData.templateIds = res;
       this.workflowDataCurrent = {
         ...currentData
       };
+      this.getTemplateDataByOrchestrator()
     }
   },
   mounted() {
     this.fetchLevelData()
   },
   methods: {
+    async getTemplateDataByOrchestrator() {
+      if(!this.$APP_CONF.open_source) {
+        const params = {
+          projectId: this.projectData.id,
+          orchestratorId: this.workflowDataCurrent.orchestratorId
+        }
+        this.initTemplates = await getTemplateDatas(params);
+        // this.defaultTemplates = JSON.parse(JSON.stringify(this.initTemplates)) 
+        this.handleTemplateIdsChange(this.workflowDataCurrent.templateIds)
+      }
+    },
+    handleTemplateIdsChange(vArray) {
+      this.defaultTemplates = JSON.parse(JSON.stringify(this.initTemplates)) 
+      vArray.forEach(v => {
+        const curType = this.searchValueType(v);
+        this.defaultTemplates.forEach((type,index) => {
+          if (type.enginType === curType) {
+            type.child.forEach(template => {
+              if (template.templateId === v) {
+                template.disabled = false
+              }
+              else {
+                template.disabled = true
+              }
+            }
+            )
+          }
+          this.$set(this.defaultTemplates, index, type)
+        });
+      })
+    },
+    // 查找
+    searchValueType(v) {
+      let enginType = '';
+      this.defaultTemplates.forEach(type => {
+        type.child.forEach(template => {
+          if (template.templateId === v) {
+            enginType =  template.enginType
+          }
+        })
+      })
+      return enginType
+    },
     // 处理编排模式值类型不同方法,最终只存数组
     modeValueTypeChange(workflowDataCurrent) {
       let currentData = JSON.parse(JSON.stringify(workflowDataCurrent));

@@ -16,10 +16,15 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.webank.wedatasphere.dss.common.entity.PageInfo;
+import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceAddUserHook;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -31,12 +36,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
 @Service
 public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DSSWorkspaceUserServiceImpl.class);
     @Autowired
@@ -47,10 +54,25 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     @Autowired
     private WorkspaceDBHelper workspaceDBHelper;
+    @Autowired
+    private DssAdminUserService dssUserService;
+    @Autowired
+    private DSSWorkspaceAddUserHook dssWorkspaceAddUserHook;
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addWorkspaceUser(List<Integer> roleIds, long workspaceId, String userName, String creator, String userId) {
+
+        //保存 - 保存用户角色关系 dss_workspace_user_role
+        for (Integer roleId : roleIds) {
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspaceId, roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), creator);
+        }
+        dssWorkspaceAddUserHook.afterAdd(userName,workspaceId);
+    }
 
     @Override
     @Transactional(rollbackFor = Throwable.class)
-    public void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator) {
+    public void updateWorkspaceUser(List<Integer> roles, long workspaceId, String userName, String creator) {
         //获取用户创建时间
         DSSWorkspaceUser workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(String.valueOf(workspaceId), userName, null).stream().findFirst().get();
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
@@ -93,8 +115,16 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<String> getAllWorkspaceUsers(int workspaceId) {
+    public List<String> getAllWorkspaceUsers(long workspaceId) {
         return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
+    }
+
+    @Override
+    public PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize) {
+        PageHelper.startPage(pageNow,pageSize);
+        List<String> dos= dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
+        com.github.pagehelper.PageInfo<String> doPage = new com.github.pagehelper.PageInfo<>(dos);
+        return new PageInfo<>(doPage.getList(), doPage.getTotal());
     }
 
     @Override
@@ -119,29 +149,28 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<Map<String,Object>> getUserRoleByUserName(String userName) {
-        List<DSSWorkspaceUser> workspaceRoles = dssWorkspaceUserMapper.getWorkspaceRoleByUsername(userName);
-        List<Map<String,Object>> list = new ArrayList<>();
-        workspaceRoles.forEach(workspaceRole -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("workspaceId", workspaceRole.getWorkspaceId());
-            map.put("roleId", workspaceRole.getRoleIds());
-            map.put("roleName", workspaceDBHelper.getRoleFrontName(Integer.parseInt(workspaceRole.getRoleIds())));
-            list.add(map);
-        });
-        return list;
+    public Long getUserCount(long workspaceId) {
+        return dssWorkspaceUserMapper.getUserCountByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    public List<DSSWorkspaceRoleVO> getUserRoleByUserName(String userName) {
+        List<DSSWorkspaceRoleVO> workspaceUserRoles = dssWorkspaceUserMapper.getWorkspaceRoleByUsername(userName);
+        workspaceUserRoles.forEach(workspaceUserRole -> workspaceUserRole.setRoleName(workspaceDBHelper.getRoleFrontName(workspaceUserRole.getRoleId())));
+        return workspaceUserRoles;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean clearUserByUserName(String userName) {
-        if(staffInfoGetter.getAllUsers().stream().anyMatch(staffInfo -> staffInfo.getEnglishName().equals(userName))) {
-            dssWorkspaceUserMapper.deleteUserByUserName(userName);
-            dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
-            dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
-            return true;
-        }else{
-            return false;
-        }
+    public void clearUserByUserName(String userName) {
+        dssWorkspaceUserMapper.deleteUserByUserName(userName);
+        dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
+        dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds) {
+        dssWorkspaceUserMapper.deleteUserRoles(userName, workspaceIds, roleIds);
     }
 }

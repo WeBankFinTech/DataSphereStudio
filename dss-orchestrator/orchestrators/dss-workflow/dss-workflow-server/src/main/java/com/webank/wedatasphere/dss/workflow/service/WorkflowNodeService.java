@@ -67,5 +67,6 @@ public interface WorkflowNodeService {
     ExportResponseRef exportNode(String userName, CommonAppConnNode node);
 
     String getNodeJumpUrl(Map<String, Object> params, CommonAppConnNode node, String userName) throws ExternalOperationFailedException;
+    byte[] getNodeIcon(String nodeType);
 
 }

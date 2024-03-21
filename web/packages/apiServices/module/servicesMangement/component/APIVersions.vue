@@ -120,12 +120,14 @@ export default {
           key: "status",
           align: "center",
           render: (h, scope) => {
+            const colors = ['red','rgb(18, 150, 219)','#0F1222','#F29360']
+            const list = [this.$t('message.apiServices.disable'),this.$t('message.apiServices.enable'),this.$t('message.apiServices.unsubmit'),this.$t('message.apiServices.submited')]
             return h(
               "span",
               {
-                style: { color: scope.row.status === 1 ? 'rgb(18, 150, 219)': 'red'}
+                style: { color: colors[scope.row.status]}
               },
-              scope.row.status === 1 ? this.$t('message.apiServices.enable') : this.$t('message.apiServices.disable')
+              list[scope.row.status]
             );
           }
         },
@@ -137,6 +139,11 @@ export default {
         {
           title: this.$t('message.apiServices.apiTable.creator'),
           key: "creator",
+          align: "center"
+        },
+        {
+          title: this.$t('message.apiServices.apiTable.executeUser'),
+          key: "executeUser",
           align: "center"
         },
         {
@@ -265,7 +272,7 @@ export default {
     margin-top: 20px;
   }
   .viewModal {
-    /deep/.ivu-modal {
+    ::v-deep.ivu-modal {
       width: 80%!important;
       min-width: 700px;
     }

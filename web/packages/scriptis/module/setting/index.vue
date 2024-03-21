@@ -64,7 +64,7 @@ export default {
       }
     },
     getPuserData() {
-      api.fetch(`/dss/scriptis/proxy/list`, {
+      api.fetch(`/dss/scriptis/proxy/listProxyUsers`, {
       }, 'get').then(res => {
         this.pusers = res.proxyUserList || []
       })

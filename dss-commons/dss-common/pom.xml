@@ -22,7 +22,7 @@
     <parent>
         <artifactId>dss-commons</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.2</version>
+        <version>1.1.0.20-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>dss-common</artifactId>
@@ -115,33 +115,27 @@
                     <groupId>com.fasterxml.jackson.core</groupId>
                     <artifactId>jackson-databind</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>ooxml-schemas</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <artifactId>spring-aop</artifactId>
             <groupId>org.springframework</groupId>
-            <version>${spring-framework.version}</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <artifactId>spring-context-support</artifactId>
             <groupId>org.springframework</groupId>
-            <version>${spring-framework.version}</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
-            <version>${spring-framework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring-framework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring-framework.version}</version>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.linkis</groupId>
@@ -159,12 +153,7 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.connector.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.linkis</groupId>
-            <artifactId>linkis-mybatis</artifactId>
-            <version>${linkis.version}</version>
-            <scope>provided</scope>
+            <!--                <scope>test</scope>-->
         </dependency>
     </dependencies>
 

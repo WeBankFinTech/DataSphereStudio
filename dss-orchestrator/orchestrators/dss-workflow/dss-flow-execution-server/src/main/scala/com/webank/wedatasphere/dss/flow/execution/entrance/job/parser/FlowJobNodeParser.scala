@@ -27,7 +27,9 @@ import com.webank.wedatasphere.dss.linkis.node.execution.conf.LinkisJobExecution
 import com.webank.wedatasphere.dss.linkis.node.execution.entity.BMLResource
 import com.webank.wedatasphere.dss.linkis.node.execution.utils.LinkisJobExecutionUtils
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl
-import org.apache.linkis.common.utils.Logging
+import org.apache.linkis.common.utils.{Logging, Utils}
+import org.apache.linkis.common.variable.{CustomDateType, CustomHourType}
+import org.apache.linkis.common.variable.DateTypeUtils.{getCurHour, getToday, getYesterday}
 import org.apache.linkis.entrance.execute.EntranceJob
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -81,7 +83,26 @@ class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
           propsMap.put(CONTEXT_ID, workflow.getContextID)
         case _ =>
       }
-
+      var run_date: CustomDateType = null
+      if (!flowVar.containsKey("run_date")) {
+        //如果用户没有在工作流里定义run_date，则取工作流开始运行的时间，自动加到参数里
+        run_date = new CustomDateType(getYesterday(false), false)
+        flowVar.put("run_date", run_date.toString())
+      } else {
+        //如果用户自定义了run_date，则以用户自定义为准
+        Utils.tryCatch {
+          val run_date_str = flowVar.get("run_date").asInstanceOf[String]
+          run_date = new CustomDateType(run_date_str, false)
+        }(t => {
+          logger.error("parse run_date  failed, we will get System run_date ", t)
+          run_date = new CustomDateType(getYesterday(false), false)
+        })
+      }
+      if (!flowVar.containsKey("run_today_h")) {
+        val run_today = new CustomDateType(getToday(std = false, run_date + 1), false)
+        val run_today_h = new CustomHourType(getCurHour(std = false, run_today.toString), false)
+        flowVar.put("run_today_h", run_today_h.toString())
+      }
       params.put(PROPS_MAP, propsMap)
       params.put(FLOW_VAR_MAP, flowVar)
       val flowNameAndResources = new util.HashMap[String, util.List[BMLResource]]()

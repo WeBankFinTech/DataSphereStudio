@@ -108,9 +108,9 @@ export default {
   mounted() {
     document.addEventListener('keyup', this.esc, false);
     this.initMonaco(monaco)
+    this.monaco = monaco;
     this.changeTheme(localStorage.getItem('theme'));
     eventbus.on('theme.change', this.changeTheme);
-    this.monaco = monaco;
 
   },
 
@@ -216,10 +216,9 @@ export default {
 
     changeTheme(theme) {
       if (theme == 'dark') {
-        monaco.editor.setTheme('vs-dark'); // dark模式使用自带的vs-dark theme
-      }
-      if (theme == 'light') {
-        monaco.editor.setTheme('logview');
+        this.monaco.editor.setTheme('logview-dark'); // dark模式使用自带的vs-dark theme
+      } else {
+        this.monaco.editor.setTheme('logview');
       }
     },
   }

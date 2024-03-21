@@ -64,7 +64,7 @@ public class HttpUtils {
       returnData = response.body().string();
       logger.info("mask interface return message：" + returnData);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("invoke failed",e);
     }
     return returnData;
   }
@@ -85,7 +85,7 @@ public class HttpUtils {
       returnData = response.body().string();
       logger.info("interface return message：" + returnData);
     } catch (IOException e) {
-      e.printStackTrace();
+      logger.error("invoke failed",e);
     }
     return returnData;
   }

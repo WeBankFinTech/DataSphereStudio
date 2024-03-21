@@ -178,6 +178,14 @@
   box-shadow: 0px 4px 8px 0px rgba(2, 16, 31, 0.1);
   display: none;
   padding: 0;
+  .designer-menu-li-icon {
+    display: inline-block;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
+    margin-top: -1px;
+    @include font-color($text-color, $dark-text-color);
+  }
 }
 .cy-editor-ctx-menu .ctx-menu-item {
   height: 30px;

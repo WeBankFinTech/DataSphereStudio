@@ -619,10 +619,10 @@ export default {
     // padding-bottom: 0px;
     border-bottom: 1px solid #dee4ec;
     @include border-color($border-color-base, $dark-border-color-base);
-    /deep/.ivu-form-item-label {
+    ::v-deep.ivu-form-item-label {
       @include font-color($workspace-title-color, $dark-workspace-title-color);
     }
-    /deep/.ivu-input {
+    ::v-deep.ivu-input {
       @include bg-color(
         $workspace-body-bg-color,
         $dark-workspace-body-bg-color

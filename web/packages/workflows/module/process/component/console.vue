@@ -215,7 +215,8 @@ export default {
           'path': this.execute.currentResultPath,
           'current': 1,
           'size': 20,
-          hugeData: !!ret.hugeData
+          hugeData: !!ret.hugeData,
+          tipMsg: ret.tipMsg
         };
         if (this.execute.resultList[0]) {
           this.$set(this.execute.resultList[0], 'result', storeResult);
@@ -404,7 +405,17 @@ export default {
         }, 'get')
           .then((ret) => {
             let result =  {}
-            if (ret.metadata && ret.metadata.length >= 500) {
+            if (ret.display_prohibited) {
+              result = {
+                'headRows': [],
+                'bodyRows': [],
+                'total': ret.totalLine,
+                'type': ret.type,
+                'path': resultPath,
+                hugeData: true,
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
+              };
+            } else if (ret.metadata && ret.metadata.length >= 500) {
               result = {
                 'headRows': [],
                 'bodyRows': [],

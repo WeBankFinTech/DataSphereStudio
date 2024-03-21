@@ -528,9 +528,12 @@ export default {
           resolve(flow);
         });
     },
-    importSended(target){
+    importSended(target, orchestratorId){
       this.getFlow({id: target.id, name: target.name}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
+        this.tabList = this.tabList.filter(item => {
+          return item.query.orchestratorId !== orchestratorId
+        }) 
       })
     },
     handleTreeModal(project) {

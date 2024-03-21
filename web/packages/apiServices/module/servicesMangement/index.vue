@@ -352,7 +352,7 @@ export default {
       font-size: 14px;
       vertical-align: middle;
       @include bg-color($light-base-color, $dark-base-color);
-      /deep/.ivu-breadcrumb-item-separator {
+      ::v-deep.ivu-breadcrumb-item-separator {
         color: #080808;
       }
     }
@@ -374,7 +374,7 @@ export default {
     }
   }
   .approvalNoItem {
-    /deep/.ivu-form-item-content {
+    ::v-deep.ivu-form-item-content {
       display: flex;
       align-items: center;
     }

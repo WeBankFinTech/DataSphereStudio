@@ -34,6 +34,7 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.ClassUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.sender.service.conf.DSSSenderServiceConf;
 import com.webank.wedatasphere.dss.standard.common.desc.AppDescImpl;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstanceImpl;
 import org.apache.commons.lang.StringUtils;
@@ -52,13 +53,13 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private final AppConnLoader appConnLoader = AppConnLoaderFactory.getAppConnLoader();
 
     private final Map<String, AppConn> appConns = new HashMap<>();
-    private boolean isLoaded = false;
+    private volatile boolean isLoaded = false;
     private List<AppConn> appConnList = null;
     AppConnInfoService appConnInfoService;
     private AppConnResourceService appConnResourceService;
     private AppConnRefreshThread appConnRefreshThread;
 
-    private static AppConnManager appConnManager;
+    private static volatile AppConnManager appConnManager;
     private static boolean lazyLoad = false;
 
     public static void setLazyLoad() {
@@ -73,14 +74,21 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             if (appConnManager == null) {
                 //appconn-manager-core包无法引入manager-client包，会有maven循环依赖，这里通过反射获取client的实现类
                 //ismanager=false时，获取client端的AppConnManager实现类，ismanager=true时，获取appconn-framework端的AppConnManager实现类。
-                appConnManager = !AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue() ? ClassUtils.getInstanceOrWarn(AppConnManagerImpl.class) :
-                        //通过包名过滤
-                        ClassUtils.getInstanceOrDefault(AppConnManager.class, c -> c.getPackage().getName().contains("com.webank.wedatasphere.dss.framework.appconn"), new AppConnManagerImpl());
+                if (Objects.equals(AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue(), AppConnManagerCoreConf.hostname)
+                        && "dss-server-dev".equals(DSSSenderServiceConf.CURRENT_DSS_SERVER_NAME.getValue())) {
+                    //通过包名过滤
+                    appConnManager = ClassUtils.getInstanceOrDefault(AppConnManager.class, c -> c.getPackage().getName().contains("com.webank.wedatasphere.dss.framework.appconn"), new AppConnManagerImpl());
+                } else {
+                    appConnManager = ClassUtils.getInstanceOrWarn(AppConnManagerImpl.class);
+                }
+//                appConnManager = !AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue() ? ClassUtils.getInstanceOrWarn(AppConnManagerImpl.class) :
+//                        //通过包名过滤
+//                        ClassUtils.getInstanceOrDefault(AppConnManager.class, c -> c.getPackage().getName().contains("com.webank.wedatasphere.dss.framework.appconn"), new AppConnManagerImpl());
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
             }
+            return appConnManager;
         }
-        return appConnManager;
     }
 
     @Override
@@ -212,6 +220,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     }
 
     private void lazyLoadAppConns() {
+        if(lazyLoad){
+            LOGGER.info("lazyLoad set to true,isLoaded={}",isLoaded);
+        }
         if (lazyLoad && !isLoaded) {
             synchronized (this.appConns) {
                 if (lazyLoad && !isLoaded) {
@@ -234,6 +245,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     @Override
     public AppConn getAppConn(String appConnName) {
         lazyLoadAppConns();
+        if(appConns.isEmpty()){
+            throw new AppConnWarnException(25344,"appconn list has not been loaded,please try again later.");
+        }
         return appConns.get(appConnName.toLowerCase());
     }
 

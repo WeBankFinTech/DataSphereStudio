@@ -202,6 +202,13 @@ export default {
     async changTreeKey({ oldKey, newKey }) { // 改变key值
       await tree.modifyPrimaryKey(oldKey, newKey);
     },
+    clearTab(tabId) {
+      log.remove(tabId);
+      history.remove(tabId);
+      result.remove(tabId);
+      progress.remove(tabId);
+      tab.remove(tabId);
+    }
   },
 };
 

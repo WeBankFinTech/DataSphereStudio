@@ -1,12 +1,17 @@
 <template>
   <div class="field-list">
-    <Input
-      v-model="searchText"
-      :placeholder="$t('message.scripts.tableDetails.SSZDMC')">
-      <Icon
-        slot="prefix"
-        type="ios-search"/>
-    </Input>
+    <div class="field-list-search">
+      <Input
+        v-model="searchText"
+        :placeholder="$t('message.scripts.tableDetails.SSZDMC')">
+        <Icon
+          slot="prefix"
+          type="ios-search"/>
+      </Input>
+      <div class="field-list-search__button">
+        <Button type="success" @click="handleCopy">{{ $t('message.scripts.tableDetails.FZBZDXX') }}</Button>
+      </div>
+    </div>
     <div style="position:relative">
       <div class="field-list-header" id="tbheader" :class="{'ovy': searchColList.length > maxSize}">
         <div
@@ -133,23 +138,20 @@ export default {
   },
   watch: {
     searchText(val) {
-      const reg = /^[\w]*$/;
-      if (val && reg.test(val)) {
-        this.searchColList = [];
-        const regexp = new RegExp(`.*${val}.*`, 'i');
-        const tmpList = this.table;
-        tmpList.forEach((o, index) => {
-          if (regexp.test(o.name)) {
-            o.index = index + 1
-            this.searchColList.push(o);
-          }
-        });
-      } else {
-        this.searchColList = this.table.map((o, index)=> {
-          o.index = index + 1;
-          return o
-        });
-      }
+      this.searchColList = [];
+      let specialCharacter = ['\\', '$', '(', ')', '*', '+', '.', '[', '?', '^', '{', '|'];
+      specialCharacter.map(v => {
+        let reg = new RegExp('\\' + v, 'gim');
+        val = val.replace(reg, '\\' + v);
+      });
+      const regexp = new RegExp(val, 'i');
+      const tmpList = this.table;
+      tmpList.forEach((o, index) => {
+        if ([o.name, o.comment, o.alias].some(item => regexp.test(item || ''))) {
+          o.index = index + 1
+          this.searchColList.push(o);
+        }
+      });
     },
   },
   mounted() {
@@ -205,7 +207,7 @@ export default {
     },
     adjustColWidth() {
       const adjustCol = []
-      this.$el.querySelectorAll('#tbheader .field-list-item').forEach(item => adjustCol.push(item.clientWidth))
+      this.$el.querySelectorAll('#tbheader .field-list-item').forEach(item => adjustCol.push(item.getBoundingClientRect().width))
       adjustCol.forEach((item, index) => {
         if (index === this.dragColIndex) {
           adjustCol[index] = adjustCol[index] + this.dragLine.diff + 'px'
@@ -214,6 +216,29 @@ export default {
         }
       })
       this.adjustCol = adjustCol
+    },
+    handleCopy() {
+      const contents = [this.columnCalc.map(item => item.title).join('\t')];
+      const columnKeys = this.columnCalc.map(item => item.key);
+      this.searchColList.forEach(item => {
+        let items = []
+        columnKeys.forEach(key => {
+          if (['primary','partitionField'].includes(key) && typeof item[key] === 'boolean') {
+            items.push(item[key] ? '是' : '否');
+          } else {
+            items.push(item[key]);
+          }
+        })
+        contents.push(items.join('\t'));
+      })
+      const text = contents.join('\n');
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      this.$Message.success(this.$t("message.scripts.paste_successfully"));
     }
   },
 };
@@ -233,6 +258,13 @@ export default {
           height: 46px;
           line-height: 46px;
       }
+      .field-list-search {
+        display: flex;
+        &__button {
+          flex: 0 0 150px;
+          margin-left: 10px;
+        }
+      }
       .field-list-header {
           background-color: #5e9de0;
           color: #fff;
@@ -246,7 +278,7 @@ export default {
           .field-table-mode {
             color: $primary-color
           }
-          &:not(:first-child){
+          &:last-child {
               border-bottom: 1px solid $border-color-base;
               @include border-color($border-color-base, $dark-border-color-base);
           }

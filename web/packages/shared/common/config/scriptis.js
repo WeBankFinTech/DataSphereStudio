@@ -47,7 +47,7 @@ export default Object.freeze([{
   ext: '.psql',
   scriptType: 'psql', // 脚本类型
   abbr: 'psql',
-  logo: 'fi-presto-sql',
+  logo: 'fi-presto',
   color: '#3a3837',
   isCanBeNew: true, // 是否能新建
   label: 'Presto Sql',

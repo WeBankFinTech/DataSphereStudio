@@ -33,6 +33,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.plugin.AbstractDSSOrchestra
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.orchestrator.db.hook.AddOrchestratorVersionHook;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult;
@@ -47,6 +48,7 @@ import com.webank.wedatasphere.dss.standard.app.development.service.RefExportSer
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -55,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +84,8 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private ContextService contextService;
     @Autowired
     private OrchestratorManager orchestratorManager;
+    @Autowired
+    AddOrchestratorVersionHook addOrchestratorVersionHook;
 
     @Override
     public OrchestratorExportResult exportOrchestrator(String userName, Long orchestratorId, Long orcVersionId, String projectName,
@@ -169,6 +174,8 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                                             List<DSSLabel> dssLabels) throws DSSErrorException {
         //对于导出来说,json需替换 subflowID
         DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,1);
+        DSSOrchestratorVersion oldVersion = new DSSOrchestratorVersion();
+        BeanUtils.copyProperties(dssOrchestratorVersion,oldVersion);
         // TODO: 2020/3/25 set updator(userID 修改为userName后)
         dssOrchestratorVersion.setUpdateTime(new Date());
         Long oldOrcVersionId = dssOrchestratorVersion.getId();
@@ -210,10 +217,13 @@ public class ExportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                 }, "increase");
         dssOrchestratorVersion.setAppId((Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY));
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
+        List<String[]> paramConfTemplateIds=(List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
         //update appConn node contextId
         dssOrchestratorVersion.setFormatContextId(contextId);
         orchestratorMapper.updateOrchestratorVersion(updateCommentVersion);
+        addOrchestratorVersionHook.beforeAdd(oldVersion, Collections.emptyMap());
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
+        addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
         return dssOrchestratorVersion.getId();
     }
 

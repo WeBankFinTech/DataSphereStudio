@@ -1,0 +1,259 @@
+@import "@dataspherestudio/shared/common/style/variables.scss";
+.cy-editor-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  &.hide_shapes_panel {
+    .left {
+      display: none;
+    }
+    .cy {
+      padding-left: 0;
+    }
+  }
+}
+
+.cy-editor-container .left {
+  position: absolute;
+  width: 200px;
+  left: 0px;
+  height: 100%;
+  z-index: 2;
+  @include bg-color(#f7f9fb, $dark-workflow-bg-color);
+  overflow: auto;
+}
+
+.cy-editor-container .left .shapes {
+  padding: 16px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.cy-editor-container .panel-title {
+  padding: 8px 20px;
+  // background: #ebeef2;
+  @include bg-color(#ebeef2, $dark-disabled-bg-color);
+  box-sizing: border-box;
+}
+.cy-editor-container .shape-item{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.cy-editor-container .shape-item img {
+  width: 40px;
+  height: 40px;
+  padding: 4px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0);
+  box-sizing: border-box;
+}
+.cy-editor-container .shape-item span {
+  flex: 1;
+}
+.cy-editor-container .shape-item:hover {
+  cursor: move;
+  outline: 1px solid #ccc;
+}
+.cy-editor-container .shape-search {
+  display: block;
+  width: 80%;
+  margin: 10px auto;
+}
+.cy-editor-container .shape-head {
+  display: flex;
+  padding: 0 10px 0 20px;
+  height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #DEE4EC;
+  @include border-color(#DEE4EC, $dark-base-color);
+  .head-title {
+    font-size: 14px;
+    @include font-color(#333, $dark-workflow-font-color);
+  }
+  .head-btn {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    font-size: 20px;
+    cursor: pointer;
+    &:hover {
+      @include font-color(#000, #fff);
+    };
+    .svg-container {
+      color: currentcolor;
+      .svg-icon {
+        width: 1em;
+        height: 1em;
+        vertical-align: -0.15em;
+        fill: currentColor;
+        overflow: hidden;
+      }
+    }
+  }
+}
+.cy-editor-container .tool-overlay {
+  position: absolute;
+  right: 20px;
+  top: 0;
+  width: 200px;
+  padding: 5px;
+  @include bg-color(#f7f9fb, $dark-workflow-bg-color);
+}
+.cy-editor-container .thumb {
+  position: relative;
+  height: 160px;
+  border: none;
+}
+
+.cy {
+  position: relative;
+  padding-left: 200px;
+  height: 100%;
+  overflow: hidden;
+}
+
+/*
+ *  navigator
+*/
+
+.cytoscape-navigator {
+  border: 1px solid #e4e4e4;
+  // background: #fff;
+  @include bg-color(#fff, $dark-workflow-bg-color);
+  z-index: 99999;
+  width: 100%;
+  height: 100%;
+  min-width: 100px;
+  min-height: 100px;
+  overflow: hidden;
+}
+
+.cytoscape-navigator > img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.cytoscape-navigator > canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 101;
+}
+
+.cytoscape-navigatorView {
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: move;
+  background: #b7e1ed;
+  opacity: 0.5;
+  z-index: 102;
+}
+
+.cytoscape-navigatorOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 103;
+}
+
+/*
+* context menu
+*/
+.cy-editor-ctx-menu {
+  position: absolute;
+  width: 150px;
+  z-index: 1000;
+  border: 1px solid;
+  @include border-color(#ddd, gray);
+  // background: #ebeef2;
+  @include bg-color(#ebeef2, $dark-workflow-bg-color);
+  @include font-color($text-color, $dark-workflow-font-color);
+  border-radius: 4px;
+  box-shadow: 0px 4px 8px 0px rgba(2, 16, 31, 0.1);
+  display: none;
+  padding: 0;
+  .designer-menu-li-icon {
+    display: inline-block;
+    vertical-align: middle;
+    height: 16px;
+    width: 16px;
+    margin-top: -1px;
+    @include font-color($text-color, $dark-text-color);
+  }
+}
+.cy-editor-ctx-menu .ctx-menu-item {
+  height: 30px;
+  line-height: 30px;
+  padding: 0 15px;
+  border: 1px solid;
+  @include border-color(#ebeef2, gray);
+  box-sizing: border-box;
+  position: relative;
+  .icon {
+    pointer-events: none;
+  }
+}
+.cy-editor-ctx-menu .ctx-menu-item:hover {
+  @include bg-color(#40a9ff, #808695);
+  color: #f7f9fb;
+  border: 1px solid;
+  @include border-color(#40a9ff, gray);
+}
+.cy-editor-ctx-menu .ctx-menu-item-disabled {
+  color: gray;
+}
+.cy-editor-ctx-menu .ctx-menu-item-disabled:hover {
+  background: transparent;
+  color: gray;
+  border: 1px solid #fff;
+}
+
+.cy-editor-ctx-menu .ctx-menu-item .ctx-menu-item-title {
+  margin: 0 5px 0 10px;
+}
+
+
+.cy-editor-ctx-menu .ctx-menu-item .ctx-submenu-wrap {
+    display: none;
+}
+
+.cy-editor-ctx-menu .ctx-menu-item:hover .ctx-submenu-wrap {
+  display: block;
+  position: absolute;
+  transform: translateX(100%);
+  top: -1px;
+  background: #ebeef2;
+  width: 135px;
+  color: #657180;
+  border: 1px solid #ddd;
+}
+
+.cy-editor-ctx-menu .ctx-menu-item .ctx-submenu-wrap .ctx-submenu-item {
+  cursor: pointer;
+  padding: 0 15px;
+}
+
+.cy-editor-ctx-menu .ctx-menu-item .ctx-submenu-wrap .ctx-submenu-item:hover {
+    background: #40a9ff;
+    color: #fff;
+}
+
+.cy-editor-ctx-menu .ctx-menu-item .ctx-submenu-wrap .ctx-submenu-item span {
+  margin-left: 10px;
+}
+
+
+.cyeditor-dom-node {
+  width: 150px;
+  height: 40px;
+  line-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 6px;
+}

@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.flow.execution.entrance.restful;
 
 import com.webank.wedatasphere.dss.common.entity.DSSWorkspace;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionConf;
 import com.webank.wedatasphere.dss.flow.execution.entrance.dao.TaskMapper;
 import com.webank.wedatasphere.dss.flow.execution.entrance.entity.WorkflowQueryTask;
 import com.webank.wedatasphere.dss.flow.execution.entrance.enums.ExecuteStrategyEnum;
@@ -26,6 +27,7 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.log.LogUtils;
 import org.apache.linkis.entrance.EntranceServer;
+import org.apache.linkis.entrance.annotation.EntranceServerBeanAnnotation;
 import org.apache.linkis.entrance.execute.EntranceJob;
 import org.apache.linkis.entrance.restful.EntranceRestfulApi;
 import org.apache.linkis.entrance.utils.JobHistoryHelper;
@@ -38,7 +40,6 @@ import org.apache.linkis.scheduler.queue.SchedulerEventState;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
-import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,8 +115,10 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         params.put("workspace", workspace);
         String label = ((Map<String, Object>) json.get(DSSCommonUtils.DSS_LABELS_KEY)).get("route").toString();
         params.put(DSSCommonUtils.DSS_LABELS_KEY, label);
+        params.put(DSSCommonUtils.DSS_EXECUTE_BY_PROXY_USER_KEY, FlowExecutionConf.DSS_EXECUTE_BY_PROXY_USER_ENABLE.getValue().toString());
+        logger.info("submit to entranceServer content:{}",json);
         Job job = entranceServer.execute(json);
-        String  execID = job.getId();
+        String execID = job.getId();
         JobRequest task = ((EntranceJob) job).getJobRequest();
         Long taskID = task.getId();
         pushLog(LogUtils.generateInfo("You have submitted a new job, script code (after variable substitution) is"), job);
@@ -139,7 +142,6 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         Message message = null;
         String realId = ZuulEntranceUtils.parseExecID(id)[3];
         Option<Job> job;
-        ModuleUserUtils.getOperationUser(req, "status realId: " + realId);
         try {
             job = entranceServer.getJob(realId);
         } catch (Exception e) {
@@ -174,7 +176,6 @@ public class FlowEntranceRestfulApi extends EntranceRestfulApi {
         logger.info("End to get status for execId:{}", id);
         return message;
     }
-
     @Override
     @RequestMapping(path = {"/{id}/kill"},method = {RequestMethod.GET})
     public Message kill(HttpServletRequest req, @PathVariable("id") String id, @RequestParam(value = "taskID",required = false) Long taskID) {

@@ -236,7 +236,7 @@ public class AtlasService {
             try {
                 atlasClassificationDefList.add(this.getClassificationDefByName(item));
             } catch (AtlasServiceException exception) {
-                exception.printStackTrace();
+//                logger.error("invoke failed",e);
             }
 
         });
@@ -320,7 +320,7 @@ public class AtlasService {
                 try {
                     this.deleteClassification(guid, ele.getTypeName());
                 } catch (AtlasServiceException exception) {
-                    exception.printStackTrace();
+//                    exception.printStackTrace();
                 }
             });
         }

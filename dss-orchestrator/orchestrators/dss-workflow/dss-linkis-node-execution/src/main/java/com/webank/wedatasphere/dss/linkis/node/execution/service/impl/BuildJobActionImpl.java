@@ -147,15 +147,18 @@ public class BuildJobActionImpl implements BuildJobAction {
 
         JobSubmitAction.Builder builder = JobSubmitAction.builder()
                 .addExecuteCode(code)
-                .setUser(job.getUser())
                 .addExecuteUser(job.getUser())
                 .setParams(paramMapCopy)
                 .setLabels(labels)
                 .setRuntimeParams(job.getRuntimeParams());
         if (job instanceof LinkisJob) {
+            LinkisJob linkisJob = (LinkisJob) job;
+            builder = builder.setUser(linkisJob.getSubmitUser());
             Map<String, Object> source = new HashMap<>();
-            source.putAll(((LinkisJob) job).getSource());
+            source.putAll(linkisJob.getSource());
             builder = builder.setSource(source);
+        }else{
+            builder = builder.setUser(job.getUser());
         }
         // 将execute接口带来的额外variable参数，带进来  todo check
         Map<String, Object> propMap = new HashMap<>();
@@ -189,27 +192,29 @@ public class BuildJobActionImpl implements BuildJobAction {
     /**
      * spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。
      *
+     * 如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
+     *
      * @param paramMapCopy
      * @throws LinkisJobExecutionErrorException
      */
     private void replaceSparkConfParams(Map<String, Object> paramMapCopy) throws LinkisJobExecutionErrorException {
         Map<String, Object> startupMap = TaskUtils.getStartupMap(paramMapCopy);
-        if (startupMap.containsKey("spark.conf")) {
-            String sparkConfVal = (String) startupMap.get("spark.conf");
-            List<String> kvList = Arrays.stream(sparkConfVal.split(";")).filter(StringUtils::isNotBlank).collect(Collectors.toList());
-            for (String l : kvList) {
-                String[] kv = l.split("=");
-                if (kv.length != 2) {
-                    throw new LinkisJobExecutionErrorException(90103, "wrong spark.conf params. please recheck!");
-                } else {
-                    startupMap.put(kv[0], kv[1]);
-                }
-            }
+        logger.info("try process keys in template");
+        //如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
+        if (startupMap.containsKey("ec.conf.templateId")) {
+            logger.info("remove keys in template");
+            logger.info("before remove startup map:{}",startupMap.keySet());
+            startupMap.remove("spark.driver.memory");
+            startupMap.remove("spark.executor.memory");
+            startupMap.remove("spark.executor.cores");
+            startupMap.remove("spark.executor.instances");
+            startupMap.remove("wds.linkis.engineconn.java.driver.memory");
             startupMap.remove("spark.conf");
-            Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
-            configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
-            paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);
+            logger.info("after remove startup map:{}",startupMap.keySet());
         }
+        Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);
+        configurationMap.put(TaskConstant.PARAMS_CONFIGURATION_STARTUP, startupMap);
+        paramMapCopy.put(TaskConstant.PARAMS_CONFIGURATION, configurationMap);
     }
 
     //TODO

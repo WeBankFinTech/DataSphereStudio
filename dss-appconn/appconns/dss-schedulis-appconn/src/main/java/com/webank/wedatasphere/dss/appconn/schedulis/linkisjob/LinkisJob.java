@@ -26,6 +26,7 @@ public class LinkisJob {
     private String dependencies;
     private Map<String, String> conf;
     private String command;
+    private String comment;
 
     public String getName() {
         return name;
@@ -83,4 +84,11 @@ public class LinkisJob {
         this.command = command;
     }
 
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 }

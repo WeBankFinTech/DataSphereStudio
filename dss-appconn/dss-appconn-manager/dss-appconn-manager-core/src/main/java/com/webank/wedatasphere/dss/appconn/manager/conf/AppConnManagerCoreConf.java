@@ -18,7 +18,21 @@ package com.webank.wedatasphere.dss.appconn.manager.conf;
 
 import org.apache.linkis.common.conf.CommonVars;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class AppConnManagerCoreConf {
-    // 默认值为false，只有dev的其中一个服务需要开启该配置作为manager节点
-    public static final CommonVars<Boolean> IS_APPCONN_MANAGER = CommonVars.apply("wds.dss.appconn.framework.ismanager", false);
+
+    public static String hostname;
+
+    static {
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+           throw new RuntimeException("UnknownHost",e);
+        }
+    }
+
+    //在配置文件中，需要将该参数配置为主节点的hostname
+    public static final CommonVars<String> IS_APPCONN_MANAGER = CommonVars.apply("wds.dss.appconn.framework.ismanager", "");
 }

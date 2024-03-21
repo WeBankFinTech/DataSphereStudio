@@ -300,15 +300,36 @@ export function createStore() {
                 } else {
                   linkBorderColor = state.linkerOptions.borderColor
                 }
+                let beginNodeArrow = edge.sourceLocation
+                let endNodeArrow = edge.targetLocation
+                if (!beginNodeArrow || !endNodeArrow) {
+                  if (endNode.x - beginNode.x > 200) {
+                    beginNodeArrow = 'right'
+                    endNodeArrow = 'left'
+                  } else if (beginNode.x - endNode.x > 200) {
+                    beginNodeArrow = 'left'
+                    endNodeArrow = 'right'
+                  } else if (endNode.y - beginNode.y > 100 ) {
+                    beginNodeArrow = 'bottom'
+                    endNodeArrow = 'top'
+                  } else if (beginNode.y - endNode.y > 100 ) {
+                    beginNodeArrow = 'top'
+                    endNodeArrow = 'bottom'
+                  } else {
+                    beginNodeArrow = 'right'
+                    endNodeArrow = 'left'
+                  }
+                }
+
                 commit(this, 'ADD_LINKER', {
                   key: edge.key || getKey(),
                   beginNode: beginNode,
-                  beginNodeArrow: edge.sourceLocation,
+                  beginNodeArrow,
                   endNode: endNode,
                   data: edge.data,
                   linkType: edge.linkType,
                   label: edge.label,
-                  endNodeArrow: edge.targetLocation,
+                  endNodeArrow,
                   ...state.linkerOptions,
                   borderColor: linkBorderColor
                 });

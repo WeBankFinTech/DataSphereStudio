@@ -28,5 +28,6 @@ public class AzkabanConstant {
     public final static String JOB_COMMAND = "command";
     public final static  String FLOW_CONTEXT_ID = "wds.linkis.flow.contextID=";
     public final static String LINKIS_VERSION = "linkis.version";
+    public final static String JOB_COMMENT = "comment";
 
 }

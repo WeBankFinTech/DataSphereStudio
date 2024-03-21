@@ -63,6 +63,7 @@
       </we-panel-item>
     </we-panel>
     <settingModal ref="settingBtn" />
+    <component v-if="copilotEntryComponent" :is="copilotEntryComponent.component" />
   </div>
 </template>
 <script>
@@ -74,7 +75,10 @@ import hiveSidebarModule from '@/scriptis/module/hiveSidebar';
 import hdfsSidebarModule from '@/scriptis/module/hdfsSidebar';
 import settingModal from '@/scriptis/module/setting';
 import storage from '@dataspherestudio/shared/common/helper/storage';
+import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
+import plugin from '@dataspherestudio/shared/common/util/plugin'
 
+const [ copilotWebComponent ] = plugin.emitHook('copilot_web_component') || []
 export default {
   components: {
     workbench: workbenchModule.component,
@@ -97,12 +101,12 @@ export default {
       level: 0,
       navHeight: 0,
       showSetting: false,
-      proxyUserName: ''
+      proxyUserName: '',
+      copilotEntryComponent: copilotWebComponent ? copilotWebComponent.copilotEntryComponent : null
     };
   },
   //组建内的守卫
   beforeRouteLeave(to, from, next) {
-    let hasUnsave = false;
     const close = () => {
       if (window.languageClient) {
         // 用户退出，后端语言服务子进程无法关闭，要求前端发送关闭
@@ -124,33 +128,21 @@ export default {
 
       }
     }
-    if (this.$refs.workbenchContainer) {
-      if (this.$refs.workbenchContainer.worklist) {
-        // 检查是否有未保存的非临时脚本
-        hasUnsave = this.$refs.workbenchContainer.worklist.some(
-          (item) => item.unsave && !item.saveAs
-        );
-      }
-
-      if (hasUnsave) {
-        // 提示保存，用户选择不保存则继续跳转
-        this.$Modal.confirm({
-          title: this.$t('message.scripts.notsaved'),
-          content: this.$t('message.scripts.confirmcheck'),
-          okText: "",
-          cancelText: "",
-          onOk: () => {},
-          onCancel: () => {
-            close();
-            next(); //如果用户点击取消 则直接跳转到用户点击的路由页面
-          },
-        });
-      } else {
+    if (to.query.notcheck) {
+      close();
+      next();
+      return
+    }
+    let hasUnsave = this.checkUnsave((save)=>{
+      if (!save) {
         close();
         next();
+      } else {
+        next({...from, query: {...from.query, unsave: Date.now()}})
       }
-    } else {
-      close();
+    })
+    if (!hasUnsave) {
+      close()
       next();
     }
   },
@@ -160,12 +152,7 @@ export default {
       return navItemHeight * this.leftSideNavList.length + 100;
     },
   },
-  created() {
-  },
-  async mounted() {
-    this.init();
-    // 监听窗口变化，获取浏览器宽高
-    window.addEventListener('resize', this.getHeight);
+  async created() {
     let baseInfo = storage.get('baseInfo', 'local') || {}
     const globalRes = await this.getGlobalLimit()
     baseInfo = {
@@ -173,21 +160,58 @@ export default {
       ...globalRes.globalLimits
     }
     storage.set('baseInfo', baseInfo, 'local')
-    if (baseInfo.proxyEnable && !baseInfo.proxyUserName) {
-      this.showSettingModal()
-    } else if(baseInfo.proxyUserName) {
-      this.proxyUserName = baseInfo.proxyUserName
+    // languageServerDefaultEnable = true 默认启用language server
+    const uselsp = localStorage.getItem('scriptis-edditor-type')
+    if (baseInfo.languageServerDefaultEnable && uselsp === null ) {
+      localStorage.setItem('scriptis-edditor-type', 'lsp');
+      location.reload();
     }
-    this.showSetting = !!baseInfo.proxyEnable
+  },
+  mounted() {
+    this.init();
+    // 监听窗口变化，获取浏览器宽高
+    window.addEventListener('resize', this.getHeight);
+    eventbus.clear('check.scriptis.unsave');
+    eventbus.on('check.scriptis.unsave', () => {
+      return new Promise((resolve) => {
+        const hasUnsave = this.checkUnsave((unsave)=>{
+          resolve(unsave)
+        })
+        if (!hasUnsave) {
+          resolve(false)
+        }
+      })
+    });
+    setTimeout(() => {
+      const baseInfo = storage.get('baseInfo', 'local');
+      if (baseInfo.proxyEnable && !baseInfo.proxyUserName) {
+        this.showSettingModal()
+      } else if(baseInfo.proxyUserName) {
+        this.proxyUserName = baseInfo.proxyUserName
+      }
+      this.showSetting = !!baseInfo.proxyEnable;
+    }, 1500)
+    plugin.on('copilot_web_listener_createAndInster', (regs) => {
+      if (this.leftModule.key !== 2) {
+        this.chooseLeftModule(this.leftSideNavList[0])
+      }
+      this.$nextTick(() => {
+        plugin.emit('copilot_web_listener_create', regs)
+      })
+    })
   },
   beforeDestroy() {
     // 监听窗口变化，获取浏览器宽高
     this.$Notice.close('show-db-table-many-tip')
     window.removeEventListener('resize', this.getHeight);
+    plugin.emitHook('copilot_web_listener_event_remove')
   },
   methods: {
     getGlobalLimit() {
-      return api.fetch(`/dss/scriptis/globalLimits`, {}, 'get')
+      return api.fetch(`/dss/scriptis/globalLimits`, {}, {
+        method: 'get',
+        cacheOptions: {time: 3000}
+      })
     },
     getHeight() {
       this.resize(window.innerHeight);
@@ -219,6 +243,37 @@ export default {
     },
     showSettingModal() {
       this.$refs.settingBtn.toggle()
+    },
+    checkUnsave(cb) {
+      let hasUnsave = false
+      if (this.$refs.workbenchContainer) {
+        if (this.$refs.workbenchContainer.worklist) {
+          // 检查是否有未保存的非临时脚本
+          hasUnsave = this.$refs.workbenchContainer.worklist.some(
+            (item) => item.unsave && !item.saveAs
+          );
+        }
+        if (hasUnsave) {
+          // 提示保存，用户选择不保存则继续跳转
+          this.$Modal.confirm({
+            title: this.$t('message.scripts.notsaved'),
+            content: this.$t('message.scripts.confirmcheck'),
+            okText: "",
+            cancelText: "",
+            onOk: () => {
+              if (cb) {
+                cb(true)
+              }
+            },
+            onCancel: () => {
+              if (cb) {
+                cb(false)
+              }
+            },
+          });
+        }
+      }
+      return hasUnsave
     }
   },
 };

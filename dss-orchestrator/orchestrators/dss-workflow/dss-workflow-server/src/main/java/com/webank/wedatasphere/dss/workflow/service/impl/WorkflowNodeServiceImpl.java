@@ -54,6 +54,7 @@ import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
@@ -66,6 +67,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -193,7 +195,10 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
                         ((QueryJumpUrlRequestRef) refJobContentRequestRef).setSSOUrlBuilderOperation(getSSOUrlBuilderOperation(appConn, node.getWorkspace()));
                     }
                 },
-                dssContextRequestRef -> dssContextRequestRef.setContextId(node.getContextId()),
+                dssContextRequestRef -> {
+                    logger.info("execute dssContextRequestRef setters. contextId:{}", node.getContextId());
+                    dssContextRequestRef.setContextId(node.getContextId());
+                },
                 projectRefRequestRef -> {
                     Long refProjectId;
                     //todo 第一次导入时用的是dev的refProjectId
@@ -202,9 +207,11 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 //                    } else {
                     refProjectId = parseProjectId(node.getProjectId(), appConn.getAppDesc().getAppName(), node.getDssLabels());
 //                    }
+                    logger.info("execute projectRefRequestRef setters. DSSProjectId:{},RefProjectId:{},projectName:{}", node.getProjectId(),refProjectId,node.getProjectName());
                     projectRefRequestRef.setDSSProjectId(node.getProjectId()).setRefProjectId(refProjectId).setProjectName(node.getProjectName());
                 },
                 (developmentOperation, developmentRequestRef) -> {
+                    logger.info("execute developmentRequestRef setters. lablel:{},username:{},workspace:{},name:{},noteType:{}", node.getDssLabels(), userName, node.getWorkspace(), name, node.getNodeType());
                     developmentRequestRef.setDSSLabels(node.getDssLabels()).setUserName(userName).setWorkspace(node.getWorkspace()).setName(name).setType(node.getNodeType());
                     return requestRefOperationFunction.apply(developmentOperation, (K) developmentRequestRef);
                 }, responseRefConsumer, appConn.getAppDesc().getAppName() + " try to " + operation + " workflow node " + name);
@@ -243,6 +250,7 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
 
     @Override
     public Map<String, Object> updateNode(String userName, CommonAppConnNode node) throws ExternalOperationFailedException {
+        logger.info("update node. node name:{}", node.getName());
         tryNodeOperation(userName, node, this::getRefCRUDService, developmentService -> ((RefCRUDService) developmentService).getRefUpdateOperation(),
                 (developmentOperation, developmentRequestRef) -> ((RefUpdateOperation) developmentOperation).updateRef((UpdateRequestRef) developmentRequestRef), null, "update");
         return node.getJobContent();
@@ -324,6 +332,30 @@ public class WorkflowNodeServiceImpl implements WorkflowNodeService {
             return ((QueryJumpUrlResponseRef) responseRef).getJumpUrl();
         } else {
             throw new ExternalOperationFailedException(50025, "AppConn " + node.getNodeType() + " don't support to get jumpUrl!");
+        }
+    }
+
+    @Override
+    public byte[] getNodeIcon(String nodeType)  {
+        NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(nodeType);
+        if(nodeInfo==null){
+            String msg = String.format("%s note type not exist,please check appconn install successfully", nodeType);
+            logger.error(msg);
+            throw new DSSRuntimeException(msg);
+        }
+        String appConnHomePath = AppConnManager.getAppConnManager().getAppConnHomePath(nodeInfo.getAppConnName());
+        File iconPath = new File(appConnHomePath, nodeInfo.getIconPath());
+        String appConnName= nodeInfo.getAppConnName();
+        if(!iconPath.exists()) {
+            throw new DSSRuntimeException("Get icon failed. Caused by: AppConn " + appConnName + "'s " + iconPath + " not exists.");
+        } else if(!iconPath.isFile()) {
+            throw new DSSRuntimeException("Get icon failed. Caused by: AppConn " + appConnName + "'s " + iconPath + " is not a file.");
+        }
+        try {
+            return FileUtils.readFileToByteArray(iconPath);
+        } catch (IOException e) {
+            logger.error("read icon file failed,appConnName:"+appConnName,e);
+            throw new DSSRuntimeException("read icon file failed,appConnName:" + appConnName);
         }
     }
 

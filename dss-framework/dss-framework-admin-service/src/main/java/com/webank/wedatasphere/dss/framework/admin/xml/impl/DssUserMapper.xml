@@ -124,4 +124,11 @@
     </insert>
 
 
+    <select id="getAllUsername" resultType="java.lang.String">
+        SELECT username FROM dss_user
+    </select>
+    <delete id="deleteUser">
+        DELETE FROM dss_user where username = #{userName}
+    </delete>
+
 </mapper>

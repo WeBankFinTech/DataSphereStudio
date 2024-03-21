@@ -18,6 +18,7 @@
 import Vue from 'vue';
 import contentMenu from './contentMenu.vue';
 
+let $component
 /**
  * 右键菜单
  * @param {*} option
@@ -26,9 +27,14 @@ export default function ContentMenu(option) {
   if (option.autoClose === undefined) {
     option.autoClose = true;
   }
+  if ($component) {
+    $component.$destroy();
+    $component.$el.remove();
+    $component = null;
+  }
   // 初始化
   let $swap = document.body;
-  let $component = new Vue({
+  $component = new Vue({
     components: {
       'contentMenu': contentMenu
     },
@@ -68,9 +74,11 @@ export default function ContentMenu(option) {
 
   return {
     destroy() {
-      $component.$destroy();
-      $component.$el.remove();
-      $component = null;
+      if ($component) {
+        $component.$destroy();
+        $component.$el.remove();
+        $component = null;
+      }
     }
   }
 }

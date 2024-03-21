@@ -2,14 +2,16 @@
   <div :style="getStyle()" :class="{'show-toolbar': showActionView}" class="designer" @mousemove="moveShape" @mouseup="stopMoveShape">
     <ShapeView v-show="showViews.shapeView && !shapeFold" ref="shapeView" :shapes="myShapes" :shapeFold="shapeFold" @on-toggle-shape="toggleShape" />
     <div class="designer-expand" v-if="shapeFold" @click="toggleShape">
-      <SvgIcon icon-class="unfold" />
+      <SvgIcon icon-class="dev_center_open" />
     </div>
     <ActionView v-if="showActionView">
       <slot />
     </ActionView>
     <ControlView v-if="showViews.control"
+      :newTipVisible="newTipVisible"
       @format="format"
       @resetToOriginalData="resetToOriginalData"
+      @modeChange="modeChange"
       @viewNode="nodeScroolIntoView" />
     <NodeView ref="designerView"
       :shapeFold="shapeFold"
@@ -110,6 +112,10 @@ export default {
       default() {
         return ctxMenuOptions
       }
+    },
+    newTipVisible: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -234,6 +240,9 @@ export default {
         }
       }
     },
+    modeChange(mode) {
+      this.$emit('changeViewMode', 'changeViewMode', mode)
+    },
     getResult(type) {
       // 连线关系
       let edges = [];
@@ -249,6 +258,7 @@ export default {
             target: link.endNode.key,
             label: link.label,
             data: link.data,
+            linkType: link.linkType,
             sourceLocation: link.beginNodeArrow,
             targetLocation: link.endNodeArrow
           })
@@ -375,18 +385,12 @@ export default {
       if (this.state.draging.type == 'shape' && this.state.nodes.length > 0) {
         let lasNode = this.state.nodes[this.state.nodes.length - 1];
         if (e.pageX - this.state.baseOptions.shapeViewOffsetX > this.state.shapeOptions.viewWidth) {
-          // 获取创建用户，适应dss，如果没有给空
-          let creator = '';
-          if (localStorage.getItem('baseInfo') && localStorage.getItem('baseInfo').username) {
-            creator =  localStorage.getItem('baseInfo').username;
-          }
           // 超出临界，保存节点
           commit(this.$store, 'UPDATE_NODE', {
             key: lasNode.key,
             obj: Object.assign(lasNode, {
               createTime: Date.now(),
-              ready: true,
-              creator
+              ready: true
             })
           });
           // 默认打开基础信息配置
@@ -437,6 +441,7 @@ export default {
          */
     setNodeRunState(key, state, readonly ) {
       if (readonly && this.state.disabled) return
+      console.warn(key, state, readonly)
       let node = this.getNodeByKey(key);
       if (node) {
         this.$set(node, 'runState', state);
@@ -477,6 +482,19 @@ export default {
     layoutView() {
       this.$refs.designerView.initView()
       this.$refs.shapeView.initView()
+    },
+    changeLinkType(k, type) {
+      console.log(k,type)
+      if (k && type) {
+        const index = this.state.links.findIndex(it => it.key === k);
+        commit(this.$store, 'UPDATE_LINKER', {
+          index,
+          obj: {
+            ... this.state.links[index],
+            linkType: type
+          }
+        });
+      }
     }
   }
 };

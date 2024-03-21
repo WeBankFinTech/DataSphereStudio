@@ -8,6 +8,7 @@
         id="topDiv"
         class="table-top"
         :style="{right:`${(calcScrollBarWidth)}px`}"
+        @contextmenu.prevent.stop="headerContextMenu"
         @dblclick="headDblclick"
       >
         <table
@@ -52,6 +53,7 @@
         id="bottomDiv"
         class="table-bottom"
         @scroll.stop="handleScroll"
+        @contextmenu.prevent.stop="handleContextMenu"
       >
         <div :style="{height:`${dataTop}px`}"></div>
         <table
@@ -68,8 +70,8 @@
             @click="rowClick(items,indexs+dataTop/tdHeight)"
             @dblclick="rowDblclick(items,indexs+dataTop/tdHeight)"
             :key="indexs"
-            :style="{'line-height':`${tdHeight}px`}"
             :class="selectIndex==indexs?'trselect':'trhover'"
+            :style="{height:`${tdHeight}px`}"
           >
             <td
               class="bottom-td"
@@ -177,10 +179,15 @@ export default {
       default(){
         return 16
       }
-    }
+    },
+    isOffset: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
+      showHeaderMenu: false,
       showLoad: false,
       showTableList: [], //实际显示的表格数据
       loadedNum: 0, //实际渲染的数据数量
@@ -451,6 +458,26 @@ export default {
         window.getSelection().removeAllRanges();
       }
     },
+    handleContextMenu(e) {
+      if (e && e.target && e.target.tagName == "TD") {
+        this.$emit("on-tdcontext-munu", {
+          content: e.target.title,
+          e
+        });
+      }
+    },
+    headerContextMenu() {
+      if (this.adjustCol.length) {
+        this.$Modal.confirm({
+          title: this.$t("message.common.dss.Prompt"),
+          content: this.$t("message.common.dss.adjustcolwidth"),
+          mask: false,
+          onOk: () => {
+            this.adjustCol = []
+          }
+        });
+      }
+    },
     //排序
     handleSort(index, type) {
       let column = this.columns[index];
@@ -529,7 +556,7 @@ export default {
     // 判断是否出现竖直滚动条
     scrollBarWidthCalc() {
       let bottomDiv = this.$el.querySelector("#bottomDiv");
-      return  bottomDiv && bottomDiv.scrollHeight > bottomDiv.clientHeight ? this.scrollBarWidth : 0
+      return  bottomDiv && bottomDiv.scrollHeight > bottomDiv.clientHeight && this.isOffset ? this.scrollBarWidth : 0
     },
     mousedown(e) {
       if (e && e.target && e.target.dataset.colIndex) {

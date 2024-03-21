@@ -47,7 +47,7 @@ export default {
       }
     },
     handleOk () {
-      if (this.proxyUser!== this.baseInfo.proxyUserName) {
+      if (this.proxyUser !== this.baseInfo.proxyUserName) {
         api.fetch(`/dss/framework/proxy/setProxyUser`, {
           userName: this.baseInfo.username,
           proxyUserName: this.proxyUser
@@ -68,7 +68,8 @@ export default {
           // window.location.reload()
         })
       } else {
-        this.toggle()
+        this.visible = false;
+        this.$emit('set-proxy');
       }
     },
     handleCancel() {
@@ -77,7 +78,7 @@ export default {
       });
     },
     getPuserData() {
-      api.fetch(`/dss/framework/proxy/list`, {
+      api.fetch(`/dss/framework/proxy/listProxyUsers`, {
       }, 'get').then(res => {
         this.pusers = res.proxyUserList || []
       })

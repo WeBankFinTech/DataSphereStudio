@@ -35,18 +35,22 @@ import com.webank.wedatasphere.dss.apiservice.core.service.ApiService;
 import com.webank.wedatasphere.dss.apiservice.core.util.DateUtil;
 import com.webank.wedatasphere.dss.apiservice.core.util.SQLCheckUtil;
 import com.webank.wedatasphere.dss.apiservice.core.vo.*;
+//import com.webank.wedatasphere.dss.oneservice.core.jdbc.JdbcUtil;
 import com.webank.wedatasphere.dss.apiservice.core.exception.ApiServiceRuntimeException;
 import com.webank.wedatasphere.dss.apiservice.core.service.ApiServiceQueryService;
 import com.webank.wedatasphere.dss.apiservice.core.util.AssertUtil;
 import com.webank.wedatasphere.dss.apiservice.core.util.ModelMapperUtil;
+//import com.webank.wedatasphere.dss.oneservice.core.vo.*;
 import com.webank.wedatasphere.dss.apiservice.core.vo.ApiServiceVo;
 import org.apache.linkis.bml.client.BmlClient;
 import org.apache.linkis.bml.client.BmlClientFactory;
 import org.apache.linkis.bml.protocol.BmlDownloadResponse;
 import org.apache.linkis.common.io.FsPath;
 import org.apache.linkis.storage.source.FileSource;
+import org.apache.linkis.storage.source.FileSource$;
 import org.apache.linkis.ujes.client.UJESClient;
 import org.apache.linkis.ujes.client.response.JobExecuteResult;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.slf4j.Logger;
@@ -66,6 +70,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
@@ -74,7 +80,8 @@ import static java.util.stream.Collectors.toMap;
 @Service
 public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
     private static final Logger LOG = LoggerFactory.getLogger(ApiServiceQueryServiceImpl.class);
-
+    private static final Pattern pattern = Pattern.compile("--+");
+    private static final String REPLACEMENT = "\\-";
 
     Map<String, ApiServiceJob> runJobs = new HashMap<>();
 
@@ -135,8 +142,10 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
     @Autowired
     private ApiServiceTokenManagerDao apiServiceTokenManagerDao;
 
+
     @Autowired
     private ApiService apiService;
+
 
     @Autowired
     private  ApiServiceAccessDao apiServiceAccessDao;
@@ -205,9 +214,14 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
             }
 
             // 用户请求的参数值注入检查，排除token
-            for(String k: reqParams.keySet()){
+            for(Map.Entry<String, Object> entry: reqParams.entrySet()){
+                String k = entry.getKey();
+                String v = String.valueOf(entry.getValue());
+                if (v.contains("--")){
+                    entry.setValue(replaceSymbol(v));
+                }
                 if(!k.equals(ApiServiceConfiguration.API_SERVICE_TOKEN_KEY.getValue())
-                   && SQLCheckUtil.doParamInjectionCheck(reqParams.get(k).toString())) {
+                   && SQLCheckUtil.doParamInjectionCheck((String) reqParams.get(k))) {
                     // 如果注入直接返回null
                     LOG.warn("用户参数存在非法的关键字{}", reqParams.get(k).toString());
                     return null;
@@ -448,4 +462,40 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
         return runJobs.get(taskId);
     }
 
+
+    private static String getRunTypeFromScriptsPath(String scriptsPath) {
+
+        String res = "sql";
+        String fileFlag = scriptsPath.substring(scriptsPath.lastIndexOf(".") + 1);
+        switch (fileFlag) {
+            case "sh":
+                res = "shell";
+                break;
+            case "py":
+                res= "pyspark";
+                break;
+            default:
+                res = fileFlag;
+                break;
+        }
+        return res;
+
+    }
+
+    private static String replaceSymbol(String str) {
+        StringBuffer sb = new StringBuffer();
+        Matcher matcher = pattern.matcher(str);
+        while (matcher.find()){
+            String match = matcher.group();
+            int length = match.length();
+            StringBuilder replacement = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                replacement.append(REPLACEMENT);
+            }
+            //避免将replacement识别为正则，将替换字符追加到sb中
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement.toString()));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
 }

@@ -31,6 +31,10 @@
       "ok": "确认",
       "cancel": "取消",
       "delete": "删除",
+      "close": "关闭",
+      "reset": "重置",
+      "clear": "清空",
+      "selectAll": "全选",
       "failedNotice": "验证项未通过，请检查后再试！",
       "project": "工程",
       "home": "首页",
@@ -114,13 +118,17 @@
           "path": {
             "required": "请选择导出路径！"
           }
-        }
+        },
+        "resultSetNum": "共{num}个结果集"
       },
       "progress": {
         "title": "运行进度",
         "queuememory": "队列内存使用率",
         "queuecpu": "队列CPU使用率",
         "watingList": "前面还有 {num} 个job在等待",
+        "showCompareDetail": "查看字段对比详情",
+        "inconsistentFieldsDetail": "字段数据类型不一致详情",
+        "showSolution": "查看解决方案",
         "columns": {
           "id": {
             "title": "名称"
@@ -203,6 +211,8 @@
         "DKZDHH": "自动换行",
         "newdbcomplition": "库表联想-Beta",
         "dbcomplition": "库表联想-Release",
+        "closeLanguageServe": "关闭语言服务器开关[Beta]",
+        "openLanguageServe": "打开语言服务器开关[Beta]",
         "GBZDHH": "关闭自动换行",
         "GYFSYGWYF": "该语法属于高危语法，请谨慎操作！"
       },
@@ -332,6 +342,7 @@
         "all": "是否全量",
         "downloadMode": "下载方式：",
         "selectsplit": "请选择分隔符：",
+        "keepNewline": "是否保留换行符：",
         "autoformat": "自动格式化",
         "deepAnalysis": "分 析 进 阶",
         "success": {
@@ -475,6 +486,11 @@
         "inputPassword": "请输入密码",
         "Prompt": "提示",
         "noPrompt": "不再提示",
+        "adjustcolwidth": "当前列宽已调整，是否重置列宽？",
+        "selectedcol": "已选中列",
+        "colfiltertip": "请勾选需要展示的列，并点击确定进行筛选。",
+        "colfiltertip_1": "点击重置还原展示全部列。",
+        "maxcol": "最多选择50列",
         "currentbrower": "当前浏览器版本：",
         "Recommend": "为了更好地体验推荐使用",
         "Version": "版本",
@@ -543,7 +559,6 @@
       "safetips": "当前进行数据下载，可能涉及敏感数据，请保障数据的安全",
       "Knowledge": "知识库",
       "manual": "用户手册",
-      "guide": "自定义参数使用指引",
       "Help": "使用帮助",
       "Add": "添加",
       "Cut": "剪切",

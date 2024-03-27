@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAppConnManager.class);
     private final AppConnLoader appConnLoader = AppConnLoaderFactory.getAppConnLoader();
 
-    private final Map<String, AppConn> appConns = new HashMap<>();
+    private final Map<String, AppConn> appConns = new ConcurrentHashMap<>();
     private volatile boolean isLoaded = false;
     private List<AppConn> appConnList = null;
     AppConnInfoService appConnInfoService;

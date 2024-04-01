@@ -23,12 +23,14 @@ import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.GitUserEntity;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceGitService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -71,6 +73,9 @@ public class DSSWorkspaceRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private HttpServletResponse httpServletResponse;
+
+    @Autowired
+    private DSSWorkspaceGitService dssWorkspaceGitService;
 
     @RequestMapping(path = "createWorkspace", method = RequestMethod.POST)
     public Message createWorkspace(@RequestBody CreateWorkspaceRequest createWorkspaceRequest) throws ErrorException {
@@ -332,6 +337,20 @@ public class DSSWorkspaceRestful {
         AuditLogUtils.printLog(username, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
                 OperateTypeEnum.REM_FROM_FAVORITES, json);
         return Message.ok().data("favoriteId", favoriteId);
+    }
+
+    @RequestMapping(path = "/workspaces/git", method = RequestMethod.POST)
+    public Message associateGit(@RequestBody GitUserEntity gitUser) {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        dssWorkspaceGitService.associateGit(gitUser, username);
+        return Message.ok();
+    }
+
+    @RequestMapping(path = "/workspaces/git", method = RequestMethod.GET)
+    public Message selectGit(@RequestParam Long workspaceId) {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(workspaceId);
+        return Message.ok().data("gitUser", gitUser);
     }
 
 

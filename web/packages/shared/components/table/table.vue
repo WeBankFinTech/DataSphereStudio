@@ -179,7 +179,11 @@ export default {
       default(){
         return 16
       }
-    }
+    },
+    isOffset: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -552,7 +556,7 @@ export default {
     // 判断是否出现竖直滚动条
     scrollBarWidthCalc() {
       let bottomDiv = this.$el.querySelector("#bottomDiv");
-      return  bottomDiv && bottomDiv.scrollHeight > bottomDiv.clientHeight ? this.scrollBarWidth : 0
+      return  bottomDiv && bottomDiv.scrollHeight > bottomDiv.clientHeight && this.isOffset ? this.scrollBarWidth : 0
     },
     mousedown(e) {
       if (e && e.target && e.target.dataset.colIndex) {

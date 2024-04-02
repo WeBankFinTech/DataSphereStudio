@@ -450,7 +450,7 @@ export default {
           font-size: 16px;
           @include font-color(#333, $dark-text-color);
         }
-        /deep/.ivu-input {
+        ::v-deep.ivu-input {
           text-indent: 24px;
         }
       }
@@ -580,7 +580,7 @@ export default {
             height: auto;
             opacity: 1;
             transform: translateY(0);
-            /deep/img {
+            ::v-deepimg {
               display: block;
               border: 0;
               max-width: 100%;

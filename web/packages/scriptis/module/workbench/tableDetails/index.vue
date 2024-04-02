@@ -232,7 +232,7 @@ export default {
   animation: ani-demo-spin 1s linear infinite;
 }
 .table-detail-tabs {
-  /deep/
+  ::v-deep
   .ivu-tabs-bar {
     .ivu-tabs-nav-container {
       font-size: $tag-font-size;

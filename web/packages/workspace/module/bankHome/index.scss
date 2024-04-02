@@ -325,7 +325,7 @@
         $workspace-body-bg-color,
         $dark-workspace-body-bg-color
       );
-      /deep/.ivu-tabs-nav {
+      ::v-deep.ivu-tabs-nav {
         @include font-color(
           $workspace-title-color,
           $dark-workspace-title-color

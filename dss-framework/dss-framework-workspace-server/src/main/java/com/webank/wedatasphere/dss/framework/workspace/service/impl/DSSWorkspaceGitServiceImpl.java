@@ -4,7 +4,9 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.GitUserEntity;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceGitMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceGitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
 
     @Autowired

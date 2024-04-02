@@ -3,22 +3,32 @@
     <!-- top -->
     <div class="tab-card-t">
       <div class="tab-card-t-l">
-        <SvgIcon icon-class="biao" style="fontSize: 16px;" />
-        <span style="marginLeft: 8px; fontSize: 16px" v-html="model.name "></span>
+        <SvgIcon icon-class="biao" style="fontsize: 16px" />
+        <span
+          style="marginleft: 8px; fontsize: 16px"
+          v-html="model.name"
+        ></span>
       </div>
       <div class="tab-card-t-r">
         <!-- <span>读取次数：{{ model.readCount }}次</span> -->
-        <div>负责人：<span v-html="model.owner" class="content-html"></span></div>
+        <div>
+          负责人：<span v-html="model.owner" class="content-html"></span>
+        </div>
         <div :title="model.createTime">创建时间：{{ model.createTime }}</div>
       </div>
-
     </div>
 
     <!-- bottom -->
     <div class="tab-card-b">
-      <div :title="model.dbName">数据库：<span v-html="model.dbName" class="content-html"></span></div>
-      <div :title="subject">主题域：<span v-html="subject" class="content-html"></span></div>
-      <div :title="layer">分层：<span v-html="layer" class="content-html"></span></div>
+      <div :title="model.dbName">
+        数据库：<span v-html="model.dbName" class="content-html"></span>
+      </div>
+      <div :title="subject">
+        主题域：<span v-html="subject" class="content-html"></span>
+      </div>
+      <div :title="layer">
+        分层：<span v-html="layer" class="content-html"></span>
+      </div>
     </div>
 
     <div class="tab-card-b">
@@ -33,7 +43,12 @@
     <div class="tab-card-b" style="width: 100%">
       <div v-if="model.labels.length > 0">
         <span>标签：</span>
-        <span class="tab-card-b-tag content-html" v-for="(label, idx) in model.labels" :key="idx" v-html="label"></span>
+        <span
+          class="tab-card-b-tag content-html"
+          v-for="(label, idx) in model.labels"
+          :key="idx"
+          v-html="label"
+        ></span>
       </div>
       <div v-else>
         <span>标签：-</span>
@@ -46,57 +61,60 @@
         <span
           v-for="(item, idx) in model.columns"
           :key="idx"
-          v-html="idx + 1 < model.columns.length ? item+'/' : item"
-          class="content-html"></span>
+          v-html="idx + 1 < model.columns.length ? item + '/' : item"
+          class="content-html"
+        ></span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { EventBus } from "../../../module/common/eventBus/event-bus";
+import { EventBus } from '../../../module/common/eventBus/event-bus'
 export default {
-  name: "tabCard",
+  name: 'tabCard',
   props: {
     model: {
       type: Object,
-      default: null
+      default: null,
     },
   },
   data() {
     return {
       modal: [],
-      query: ''
+      query: '',
     }
   },
   mounted() {
-    EventBus.$on("onQueryForHighLight", query => {
+    EventBus.$on('onQueryForHighLight', (query) => {
       this.query = query
-    });
+    })
   },
   destroyed() {
-    EventBus.$off("onQueryForHighLight")
+    EventBus.$off('onQueryForHighLight')
   },
   methods: {
     onChoose() {
-      this.$emit("on-choose", this.model);
-    }
+      this.$emit('on-choose', this.model)
+    },
   },
   computed: {
     subject: function () {
-      let classifications = this.model.classifications;
-      let subject = "";
+      let classifications = this.model.classifications
+      let subject = ''
       if (classifications && classifications.length) {
-        classifications.forEach(classification => {
-          if (classification.superTypeNames &&
-              classification.superTypeNames.length) {
-            if (classification.superTypeNames[0] === "subject") {
-              subject = classification.typeName;
+        classifications.forEach((classification) => {
+          if (
+            classification.superTypeNames &&
+            classification.superTypeNames.length
+          ) {
+            if (classification.superTypeNames[0] === 'subject') {
+              subject = classification.typeName
             }
           }
-        });
+        })
       }
-      if( this.query ) {
+      if (this.query) {
         let reg = new RegExp(this.query, 'g')
         let _query = `<span>${this.query}</span>`
         subject = subject.replace(reg, _query)
@@ -104,32 +122,36 @@ export default {
       return subject
     },
     layer: function () {
-      let classifications = this.model.classifications;
-      let layer = "";
+      let classifications = this.model.classifications
+      let layer = ''
       if (classifications && classifications.length) {
-        classifications.forEach(classification => {
-          if (classification.superTypeNames &&
-              classification.superTypeNames.length) {
-            if (classification.superTypeNames[0] === "layer" ||
-                  classification.superTypeNames[0] === "layer_system") {
-              layer = classification.typeName;
+        classifications.forEach((classification) => {
+          if (
+            classification.superTypeNames &&
+            classification.superTypeNames.length
+          ) {
+            if (
+              classification.superTypeNames[0] === 'layer' ||
+              classification.superTypeNames[0] === 'layer_system'
+            ) {
+              layer = classification.typeName
             }
           }
-        });
+        })
       }
-      if( this.query ) {
+      if (this.query) {
         let reg = new RegExp(this.query, 'g')
         let _query = `<span>${this.query}</span>`
         layer = layer.replace(reg, _query)
       }
-      return layer;
-    }
-  }
-};
+      return layer
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
-@import "@dataspherestudio/shared/common/style/variables.scss";
+@import '@dataspherestudio/shared/common/style/variables.scss';
 .tab-card-wrap {
   min-height: 10.5vh;
   padding-left: 24px;
@@ -151,7 +173,7 @@ export default {
     &-l {
       @include font-color(#3495f7, $dark-text-color);
       &::after {
-        content: "";
+        content: '';
         border-left: 1px solid #dee4ec;
         @include border-color(#dee4ec, $dark-border-color-base);
         width: 0;
@@ -162,7 +184,6 @@ export default {
       }
     }
     &-r {
-
       font-size: 14px;
       @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       text-align: left;
@@ -179,7 +200,7 @@ export default {
     text-align: left;
     line-height: 22px;
     margin-top: 8px;
-    >div {
+    > div {
       text-overflow: ellipsis;
       white-space: nowrap;
       word-break: break-all;
@@ -193,7 +214,7 @@ export default {
     &-field {
       height: 40px;
       line-height: 40px;
-      @include bg-color(#F4F7FB, $dark-border-color-base);
+      @include bg-color(#f4f7fb, $dark-border-color-base);
       padding-left: 12px;
 
       font-size: 14px;
@@ -202,17 +223,16 @@ export default {
     }
 
     &-tag {
-      background: rgba(0,0,0,0.04);
-      border: 1px solid #DEE4EC;
+      background: rgba(0, 0, 0, 0.04);
+      border: 1px solid #dee4ec;
       border-radius: 2px;
       padding: 4px 8px;
     }
   }
 }
 .content-html {
-  /deep/ span {
-    color: #3495F7;
+  ::v-deep span {
+    color: #3495f7;
   }
 }
-
 </style>

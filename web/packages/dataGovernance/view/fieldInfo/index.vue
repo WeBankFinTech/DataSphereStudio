@@ -30,7 +30,7 @@
             <Button
               data-name="select"
               type="primary"
-              @click="e => copy(e, selectSQL)"
+              @click="(e) => copy(e, selectSQL)"
             >复制</Button
             >
           </div>
@@ -48,7 +48,7 @@
               id="copy-button"
               data-clipboard-action="copy"
               data-clipboard-target="#copy-button"
-              @click="e => copy(e, DDLsql)"
+              @click="(e) => copy(e, DDLsql)"
             >复制</Button
             >
           </div>
@@ -76,193 +76,193 @@
 </template>
 
 <script>
-import clipboard from "../../utils/clipboard";
-import { fomatSqlForShow, fomatSqlForCopy } from "../../utils/fomatSQL";
-import { getSelectSql, getSelectDdl, putCommetBulk } from "../../service/api";
+import clipboard from '../../utils/clipboard'
+import { fomatSqlForShow, fomatSqlForCopy } from '../../utils/fomatSQL'
+import { getSelectSql, getSelectDdl, putCommetBulk } from '../../service/api'
 export default {
-  name: "fieldInfo",
+  name: 'fieldInfo',
   props: {
     fieldInfo: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     rangeFieldInfo: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
       isEdit: false,
       fieldColumns: [
-        { title: "序号", key: "id" },
-        { title: "字段名称", key: "name" },
-        { title: "类型", key: "type" },
+        { title: '序号', key: 'id' },
+        { title: '字段名称', key: 'name' },
+        { title: '类型', key: 'type' },
         {
-          title: "描述",
-          key: "comment",
+          title: '描述',
+          key: 'comment',
           render: (h, params) => {
-            let that = this;
+            let that = this
             if (that.isEdit) {
-              return h("input", {
+              return h('input', {
                 domProps: {
-                  value: params.row.comment
+                  value: params.row.comment,
                 },
                 on: {
-                  input: function(event) {
-                    params.row.comment = event.target.value;
+                  input: function (event) {
+                    params.row.comment = event.target.value
                     that.fieldInfoData[params.index].comment =
-                      event.target.value;
-                  }
+                      event.target.value
+                  },
                 },
                 style: {
-                  border: "1px solid #dee4ec",
-                  "border-radius": "4px",
-                  "padding-left": "12px"
-                }
-              });
+                  border: '1px solid #dee4ec',
+                  'border-radius': '4px',
+                  'padding-left': '12px',
+                },
+              })
             } else {
-              return h("span", {}, params.row.comment);
+              return h('span', {}, params.row.comment)
             }
-          }
-        }
+          },
+        },
       ],
       rangeColumns: [
-        { title: "序号", key: "id" },
-        { title: "字段名称", key: "name" },
-        { title: "类型", key: "type" },
+        { title: '序号', key: 'id' },
+        { title: '字段名称', key: 'name' },
+        { title: '类型', key: 'type' },
         {
-          title: "描述",
-          key: "comment",
+          title: '描述',
+          key: 'comment',
           render: (h, params) => {
-            let that = this;
+            let that = this
             if (that.isEdit) {
-              return h("input", {
+              return h('input', {
                 domProps: {
-                  value: params.row.comment
+                  value: params.row.comment,
                 },
                 on: {
-                  input: function(event) {
-                    params.row.comment = event.target.value;
+                  input: function (event) {
+                    params.row.comment = event.target.value
                     that.rangeInfoData[params.index].comment =
-                      event.target.value;
-                  }
+                      event.target.value
+                  },
                 },
                 style: {
-                  border: "1px solid #dee4ec",
-                  "border-radius": "4px",
-                  "padding-left": "12px"
-                }
-              });
+                  border: '1px solid #dee4ec',
+                  'border-radius': '4px',
+                  'padding-left': '12px',
+                },
+              })
             } else {
-              return h("span", {}, params.row.comment);
+              return h('span', {}, params.row.comment)
             }
-          }
-        }
+          },
+        },
       ],
       fieldInfoData: this.fieldInfo,
       rangeInfoData: this.rangeFieldInfo,
       selectFlag: false,
       DDLflag: false,
-      selectSQL: "",
-      DDLsql: ""
-    };
+      selectSQL: '',
+      DDLsql: '',
+    }
   },
   watch: {
     fieldInfo: {
       handler(newVal) {
-        this.fieldInfoData = newVal;
+        this.fieldInfoData = newVal
       },
-      deep: true
+      deep: true,
     },
     rangeFieldInfo: {
       handler(newVal) {
-        this.rangeInfoData = newVal;
+        this.rangeInfoData = newVal
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   computed: {
     selectSql() {
-      return fomatSqlForShow(this.selectSQL);
+      return fomatSqlForShow(this.selectSQL)
     },
     ddlSql() {
-      return fomatSqlForShow(this.DDLsql);
-    }
+      return fomatSqlForShow(this.DDLsql)
+    },
   },
   methods: {
     edit() {
-      this.isEdit = true;
+      this.isEdit = true
     },
     onCancel() {
-      this.isEdit = false;
+      this.isEdit = false
     },
     onSave() {
-      this.isEdit = false;
-      let that = this;
-      let fieldInfoData = this.fieldInfoData.slice(0);
-      let rangeInfoData = this.rangeFieldInfo.slice(0);
-      let resMap = Object.create(null);
+      this.isEdit = false
+      let that = this
+      let fieldInfoData = this.fieldInfoData.slice(0)
+      let rangeInfoData = this.rangeFieldInfo.slice(0)
+      let resMap = Object.create(null)
       if (fieldInfoData.length) {
-        fieldInfoData.forEach(item => {
-          resMap[item.guid] = item.comment;
-        });
+        fieldInfoData.forEach((item) => {
+          resMap[item.guid] = item.comment
+        })
       }
       if (rangeInfoData.length) {
-        rangeInfoData.forEach(item => {
-          resMap[item.guid] = item.comment;
-        });
+        rangeInfoData.forEach((item) => {
+          resMap[item.guid] = item.comment
+        })
       }
       putCommetBulk(resMap)
-        .then(data => {
+        .then((data) => {
           if (data.result) {
-            that.$Message.success(data.result);
+            that.$Message.success(data.result)
           }
         })
-        .catch(err => {
-          console.log("putCommetBulk", err);
-        });
+        .catch((err) => {
+          console.log('putCommetBulk', err)
+        })
     },
     createSelect() {
-      this.selectFlag = true;
+      this.selectFlag = true
       // 请求 Select语句数据
-      let guid = this.$route.params.guid;
+      let guid = this.$route.params.guid
       getSelectSql(guid)
-        .then(data => {
+        .then((data) => {
           if (data.result) {
-            this.selectSQL = data.result;
+            this.selectSQL = data.result
           }
         })
-        .catch(err => {
-          console.log("getSelectSql", err);
-        });
+        .catch((err) => {
+          console.log('getSelectSql', err)
+        })
     },
     createDDL() {
-      this.DDLflag = true;
+      this.DDLflag = true
       // 请求 DDL语句数据
-      let guid = this.$route.params.guid;
+      let guid = this.$route.params.guid
       getSelectDdl(guid)
-        .then(data => {
+        .then((data) => {
           if (data.result) {
-            this.DDLsql = data.result;
+            this.DDLsql = data.result
           }
         })
-        .catch(err => {
-          console.log("getSelectSql", err);
-        });
+        .catch((err) => {
+          console.log('getSelectSql', err)
+        })
     },
     // 复制
     copy(e, sql) {
-      let str = "";
-      str = fomatSqlForCopy(sql);
-      clipboard(str, e);
-    }
-  }
-};
+      let str = ''
+      str = fomatSqlForCopy(sql)
+      clipboard(str, e)
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
-@import "@dataspherestudio/shared/common/style/variables.scss";
+@import '@dataspherestudio/shared/common/style/variables.scss';
 .field-info-wrap {
   padding-left: 24px;
   padding-right: 24px;
@@ -281,7 +281,6 @@ export default {
   .field-info-b {
     margin-top: 25px;
     &-header {
-
       font-size: 14px;
       @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
       line-height: 22px;
@@ -303,7 +302,7 @@ export default {
   overflow-y: auto;
   max-height: 200px;
   div {
-    /deep/ span {
+    ::v-deep span {
       font-weight: bold;
       margin-right: 6px;
     }

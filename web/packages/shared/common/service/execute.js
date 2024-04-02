@@ -196,12 +196,15 @@ Execute.prototype.restore = function({ execID, taskID }) {
   this.trigger('execute:queryState');
 };
 
-Execute.prototype.halfExecute = function({ execID, taskID, openLog }) {
+Execute.prototype.halfExecute = function({ execID, taskID, openLog, isQueryHistory }) {
   this.id = execID;
   this.taskID = taskID;
   this.run = true;
   this.postType = 'http';
   this.openLog = openLog
+  if (isQueryHistory) {
+    return this.queryStatus({ isKill: false });
+  }
   this.trigger('execute:queryState');
 };
 
@@ -327,58 +330,65 @@ Execute.prototype.queryProgress = function() {
 };
 
 Execute.prototype.queryLog = function() {
-  const fromLine = this.fromLine
-  // dpms: /#/product/100199/bug/detail/222584
-  if ( this.openLog && ['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.status) !== -1) {
-    if (this.resultsetInfo) {
-      return api.fetch('/filesystem/openLog', {
-        path: this.resultsetInfo.logPath
-      }, 'get').then((rst) => {
-        if (rst) {
-          this.trigger('log', rst.log);
+  try {
+    const fromLine = this.fromLine
+    // dpms: /#/product/100199/bug/detail/222584
+    if ( this.openLog && ['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.status) !== -1) {
+      if (this.resultsetInfo) {
+        return api.fetch('/filesystem/openLog', {
+          path: this.resultsetInfo.logPath
+        }, 'get').then((rst) => {
+          if (rst) {
+            this.trigger('log', rst.log);
+          }
           return Promise.resolve();
+        }).catch(() => {
+          return Promise.resolve();
+        });
+      } else {
+        const taskUrl = this.getResultUrl !== 'filesystem' ? this.getResultUrl : 'jobhistory';
+        return api.fetch(`/${taskUrl}/${this.taskID}/get`, 'get')
+          .then((rst) => {
+            if (rst.task) {
+              this.resultsetInfo = rst.task;
+              return api.fetch('/filesystem/openLog', {
+                path: this.resultsetInfo.logPath
+              }, 'get').then((rst) => {
+                if (rst) {
+                  this.trigger('log', rst.log);
+                }
+                return Promise.resolve();
+              }).catch(() => {
+                return Promise.resolve();
+              });
+            }
+            return Promise.resolve();
+          })
+      }
+    }
+
+    return api.fetch(`/entrance/${this.id}/log`, {
+      fromLine,
+      size: -1,
+    }, 'get')
+      .then((rst) => {
+        this.fromLine = rst.fromLine;
+        this.handleLines = this.handleLines || {}
+        if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) {
+          return  Promise.resolve();
+        } else if(this.fromLine) {
+          this.handleLines[fromLine+'_'+this.fromLine] = 1
         }
+        this.trigger('log', rst.log);
+        return Promise.resolve();
       }).catch(() => {
         return Promise.resolve();
       });
-    } else {
-      const taskUrl = this.getResultUrl !== 'filesystem' ? this.getResultUrl : 'jobhistory';
-      return api.fetch(`/${taskUrl}/${this.taskID}/get`, 'get')
-        .then((rst) => {
-          if (rst.task) {
-            this.resultsetInfo = rst.task;
-            return api.fetch('/filesystem/openLog', {
-              path: this.resultsetInfo.logPath
-            }, 'get').then((rst) => {
-              if (rst) {
-                this.trigger('log', rst.log);
-                return Promise.resolve();
-              }
-            }).catch(() => {
-              return Promise.resolve();
-            });
-          }
-        })
-    }
+  } catch (error) {
+    console.error('---queryLog---', error)
+    return Promise.resolve();
   }
-
-  return api.fetch(`/entrance/${this.id}/log`, {
-    fromLine,
-    size: -1,
-  }, 'get')
-    .then((rst) => {
-      this.fromLine = rst.fromLine;
-      this.handleLines = this.handleLines || {}
-      if (this.handleLines[fromLine+'_'+this.fromLine] && this.fromLine) {
-        return  Promise.resolve();
-      } else if(this.fromLine) {
-        this.handleLines[fromLine+'_'+this.fromLine] = 1
-      }
-      this.trigger('log', rst.log);
-      return Promise.resolve();
-    }).catch(() => {
-      return Promise.resolve();
-    });
+  
 };
 
 Execute.prototype.getResultPath = function() {
@@ -477,7 +487,16 @@ Execute.prototype.getFirstResult = function() {
     const pageSize = 5000;
     api.fetch(url, params, 'get')
       .then((rst) => {
-        if (rst.metadata && rst.metadata.length >= 500) {
+        if (rst.display_prohibited) {
+          this.trigger('result', {
+            metadata: [],
+            fileContent: [],
+            type: rst.type,
+            totalLine: rst.totalLine,
+            hugeData: true,
+            tipMsg: localStorage.getItem("locale") === "en" ? rst.en_msg : rst.zh_msg
+          });
+        } else if (rst.metadata && rst.metadata.length >= 500) {
           this.trigger('result', {
             metadata: [],
             fileContent: [],

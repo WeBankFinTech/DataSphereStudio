@@ -40,7 +40,7 @@ class ContextMenu {
 
   _initDom() {
     function getSvgIcon(icon) {
-      return `<svg aria-hidden="true" class="icon designer-menu-li-icon"><use xlink:href="#icon-${icon}"></use></svg>`
+      return icon ? `<svg aria-hidden="true" class="icon designer-menu-li-icon"><use xlink:href="#icon-${icon}"></use></svg>` : ''
     }
     this.ctxmenu.innerHTML = this._options.menus.reduce((str, item) => {
       return str + `<div class="ctx-menu-item ${item.disabled ? 'ctx-menu-item-disabled' : ''}" data-menu-item="${item.id}">

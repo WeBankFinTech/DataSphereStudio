@@ -210,6 +210,8 @@
         "DKZDHH": "Auto Break",
         "newdbcomplition": "DB/Table suggest-Beta",
         "dbcomplition": "DB/Table suggest-Release",
+        "closeLanguageServe": "Turn off the language server switch [Beta]",
+        "openLanguageServe": "Turn on the language server switch [Beta]",
         "GBZDHH": "Close auto break",
         "GYFSYGWYF": "This is highly dangerous syntax, please be cautious!"
       },

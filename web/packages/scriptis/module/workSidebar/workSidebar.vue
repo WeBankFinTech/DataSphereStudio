@@ -172,6 +172,9 @@ import mixin from '@dataspherestudio/shared/common/service/mixin';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 import module from './index';
 import move from './move';
+import {
+  Notice
+} from 'iview';
 const PREFIX = 'file://';
 export default {
   name: 'WorkSidebar',
@@ -394,8 +397,24 @@ export default {
         this.openToTABAction(node.data);
       }
     },
+    validFileName(input) {
+      var pattern = /^[\u4E00-\u9FA5a-zA-Z0-9_.]+$/;
+      const msg = '当前脚本名称不符合规范（仅支持中文、大小写字母、数字和下划线），可能会影响脚本的执行，请修改脚本名称!';
+      if (!pattern.test(input)) {
+        Notice.error({
+          name: 'validFileName' + input,
+          duration: 6,
+          closable: true,
+          title: this.$t('message.common.errTitle'),
+          desc: msg,
+        });
+      }
+    },
     openToTABAction(node, openCallBack) {
       const openNode = node || this.currentNode.data;
+      if (openNode && openNode.name) {
+        this.validFileName(openNode.name)
+      }
       const path = openNode.path;
       const source = openNode.copy ? this.path : '';
       this.dispatch('Workbench:openFile', {

@@ -41,7 +41,7 @@
           </div>
           <div class="devider" />
           <div
-            v-if="!workflowIsExecutor"
+            v-if="!workflowIsExecutor && viewMode !== 'table'"
             :title="$t('message.workflow.process.run')"
             class="button"
             @click="handleClick('clickswitch')"
@@ -49,9 +49,9 @@
             <SvgIcon class="icon" icon-class="stop" color="#666" />
             <span>{{ $t('message.workflow.process.run') }}</span>
           </div>
-          <div class="devider" v-if="!workflowIsExecutor" />
+          <div class="devider" v-if="!workflowIsExecutor && viewMode !== 'table'" />
           <div
-            v-if="!workflowIsExecutor"
+            v-if="!workflowIsExecutor && viewMode !== 'table'"
             :title="$t('message.workflow.process.run')"
             class="button"
             @click="handleClick('clickswitch', 'select')"
@@ -60,7 +60,7 @@
             <span>{{ $t('message.workflow.SelectRun') }}</span>
           </div>
           <div
-            v-if="workflowIsExecutor"
+            v-if="workflowIsExecutor && viewMode !== 'table'"
             :title="$t('message.workflow.process.stop')"
             class="button"
             @click="handleClick('clickswitch')"
@@ -73,16 +73,16 @@
             />
             <span>{{ $t('message.workflow.process.stop') }}</span>
           </div>
-          <div class="devider" v-if="needReRun" />
+          <div class="devider" v-if="needReRun && viewMode !== 'table'" />
           <div
-            v-if="!workflowIsExecutor && needReRun"
+            v-if="!workflowIsExecutor && needReRun && viewMode !== 'table'"
             class="button"
             @click="handleClick('reRun')"
           >
             <Icon class="icon" type="ios-refresh" color="#666" size="18" />
             <span>{{ $t('message.workflow.Rerun') }}</span>
           </div>
-          <div class="devider" />
+          <div class="devider" v-if="viewMode !== 'table'" />
           <div
             :title="$t('message.workflow.process.save')"
             class="button"

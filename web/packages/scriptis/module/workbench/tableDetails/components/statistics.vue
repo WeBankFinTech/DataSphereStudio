@@ -186,7 +186,7 @@ export default {
       width: 100%;
       .statistics-card {
           height: 100%;
-          /deep/
+          ::v-deep
           .ivu-card-body {
               height: calc(100% - 52px);
           }

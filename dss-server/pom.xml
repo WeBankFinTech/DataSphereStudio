@@ -51,6 +51,11 @@
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-git-server</artifactId>
+            <version>${dss.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-framework-project-server</artifactId>
             <version>${dss.version}</version>
         </dependency>

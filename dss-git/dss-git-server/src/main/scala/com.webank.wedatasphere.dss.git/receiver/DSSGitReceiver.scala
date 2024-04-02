@@ -20,11 +20,12 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjec
 import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.slf4j.{Logger, LoggerFactory}
+import org.springframework.stereotype.Component
 
 import java.util
 import scala.concurrent.duration.Duration
 
-
+@Component
 class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitWorkflowManagerService: DSSGitWorkflowManagerService) extends Receiver {
 
   override def receive(message: Any, sender: Sender): Unit = {}

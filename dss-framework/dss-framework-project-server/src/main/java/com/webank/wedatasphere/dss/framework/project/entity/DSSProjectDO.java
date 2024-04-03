@@ -104,6 +104,11 @@ public class DSSProjectDO implements Serializable {
 
     private Integer visible;
 
+    /**
+     * 1-接入git 0-不接入（默认）
+     */
+    private Boolean associateGit;
+
     public Long getId() {
         return id;
     }
@@ -350,6 +355,15 @@ public class DSSProjectDO implements Serializable {
                 ", devProcess='" + devProcess + '\'' +
                 ", orchestratorMode='" + orchestratorMode + '\'' +
                 ", visible=" + visible +
+                ", associateGit=" + associateGit +
                 '}';
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

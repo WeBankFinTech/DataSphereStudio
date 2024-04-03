@@ -21,9 +21,11 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
@@ -42,6 +44,10 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitCreateProjectRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
@@ -49,6 +55,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProject
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -275,6 +282,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         if(!dssProjectDO.getUsername().equalsIgnoreCase(username)){
             throw new DSSErrorException(600002, "刪除工程失敗，沒有删除权限!" );
         }
+        // 对于DSS项目进行归档
+        archiveGitProject(username, projectDeleteRequest, workspace, dssProjectDO);
         if(projectDeleteRequest.isIfDelOtherSys()) {
             LOGGER.warn("User {} requires to delete all projects with name {} in third-party AppConns.", username, dssProjectDO.getName());
             Map<AppInstance, Long> appInstanceToRefProjectId = new HashMap<>(10);
@@ -297,6 +306,19 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         }
         projectMapper.deleteProject(projectDeleteRequest.getId());
         LOGGER.warn("User {} deleted project {}.", username, dssProjectDO.getName());
+    }
+
+    private void archiveGitProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) {
+        if (dssProjectDO.getAssociateGit()) {
+            Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            Map<String, BmlResource> file = new HashMap<>();
+            // 测试数据 key表示项目名、value为项目BmlResource资源
+            GitArchiveProjectRequest request1 = new GitArchiveProjectRequest(workspace.getWorkspaceId(), dssProjectDO.getName(), username);
+            LOGGER.info("-------=======================begin to archive project: {}=======================-------", dssProjectDO.getName());
+            Object ask = gitSender.ask(request1);
+            GitArchivePorjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitArchivePorjectResponse.class, GitCreateProjectRequest.class);
+            LOGGER.info("-------=======================End to archive project: {}=======================-------: {}", dssProjectDO.getName(), responseWorkflowValidNode);
+        }
     }
 
     @Override

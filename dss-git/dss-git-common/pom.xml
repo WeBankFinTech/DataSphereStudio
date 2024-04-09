@@ -5,7 +5,7 @@
     <parent>
         <artifactId>dss-git</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.1.0.20-SNAPSHOT</version>
+        <version>1.1.0.20-gitflow</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

@@ -140,7 +140,7 @@ public class BuildJobActionImpl implements BuildJobAction {
 
 
         //是否复用引擎，不复用就为空
-        if(!isReuseEngine(job.getParams())){
+        if(!isAppconnJob(job) && !isReuseEngine(job.getParams())){
             labels.put("executeOnce", "");
         }
         Map<String, Object> paramMapCopy = (HashMap<String, Object>) SerializationUtils.clone(new HashMap<String, Object>(job.getParams()));
@@ -188,6 +188,13 @@ public class BuildJobActionImpl implements BuildJobAction {
             }
         }
         return true;
+    }
+
+    /**
+     * 是否为appconnjob
+     */
+    private boolean isAppconnJob(Job job){
+        return APPCONN.equals(job.getEngineType());
     }
 
     /**

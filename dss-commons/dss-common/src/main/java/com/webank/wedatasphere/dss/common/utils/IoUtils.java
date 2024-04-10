@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * IO通用类。提供对一次IO操作的临时目录创建、文件创建、IO流创建功能。
@@ -37,6 +35,7 @@ public class IoUtils {
     private static Logger logger = LoggerFactory.getLogger(IoUtils.class);
     private static final String DATE_FORMAT = "yyyyMMddHHmmssSSS";
     private static final String DEFAULT_IO_FILE_NAME = "IO.properties";
+    public static final String FLOW_META_DIRECTORY_NAME = ".metaConf";
 
     /**
      * 生成一个基础目录，这个目录用于某次任务的临时文件目录
@@ -51,7 +50,62 @@ public class IoUtils {
         return addFileSeparator(baseUrl, dataStr, userName, projectName, subDir);
     }
 
-    private static String addFileSeparator(String... str) {
+    public static List<String> getSubdirectoriesNames(String directoryPath) {
+        File directory = new File(directoryPath);
+        File[] subdirectories = directory.listFiles(File::isDirectory); // 使用文件过滤器获取只有目录的File数组
+
+        List<String> subdirectoriesNames = new ArrayList<>();
+        if (subdirectories != null) {
+            for (File subdirectory : subdirectories) {
+                subdirectoriesNames.add(subdirectory.getName()); // 将目录名称添加到列表中
+            }
+        }
+        return subdirectoriesNames;
+    }
+
+    /**
+     * 生成一个临时目录
+     * @param userName 用户名
+     * @return 临时目录
+     */
+    public static String generateTempIOPath(String userName){
+        String baseUrl = DSSCommonConf.DSS_EXPORT_URL.getValue();
+        String dataStr = new SimpleDateFormat(DATE_FORMAT).format(new Date());
+        return addFileSeparator(baseUrl, dataStr, userName);
+    }
+
+    /**
+     * 生产一个项目文件夹
+     * @param userName
+     * @param projectName
+     * @return
+     */
+    public static String generateProjectIOPath(String userName,String projectName){
+        String baseUrl = DSSCommonConf.DSS_EXPORT_URL.getValue();
+        String dataStr = new SimpleDateFormat(DATE_FORMAT).format(new Date());
+        return addFileSeparator(baseUrl, dataStr, userName, projectName);
+    }
+
+    /**
+     * 生成一个工作流元数据目录，这个目录用于某次任务的临时文件目录
+     */
+    public static String generateFlowMetaIOPath(String projectPath,String flowName) {
+        String baseUrl = DSSCommonConf.DSS_EXPORT_URL.getValue();
+        String dataStr = new SimpleDateFormat(DATE_FORMAT).format(new Date());
+        return addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME,flowName);
+    }
+
+
+    /**
+     * 生成一个工作流代码目录，这个目录用于某次任务的临时文件目录
+     */
+    public static String generateFlowCodeIOPath(String projectPath,String flowName) {
+        String baseUrl = DSSCommonConf.DSS_EXPORT_URL.getValue();
+        String dataStr = new SimpleDateFormat(DATE_FORMAT).format(new Date());
+        return addFileSeparator(projectPath, flowName);
+    }
+
+    public static String addFileSeparator(String... str) {
         return Arrays.stream(str).reduce((a, b) -> a + File.separator + b).orElse("");
     }
 

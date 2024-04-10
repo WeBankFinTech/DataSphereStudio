@@ -17,6 +17,9 @@
 package com.webank.wedatasphere.dss.orchestrator.publish.io.export.impl;
 
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
@@ -33,12 +36,42 @@ import java.util.List;
 @Service("orcMetaExportService")
 public class MetaExportServiceImpl implements MetaExportService {
 
+    public static final String ORCHESTRATOR_META_KEY = "dss_orchestrator";
+    public static final String FLOW_META_FILE_NAME = ".flowmeta";
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-
     private final String fileName = "meta.txt";
 
 
+    @Override
+    public void exportNew(DSSOrchestratorInfo dssOrchestratorInfo, String flowMetaPath) throws IOException {
+        File flowMetaFile = new File(flowMetaPath + File.separator + FLOW_META_FILE_NAME);
+        Gson gson = new Gson();
+
+        if (flowMetaFile.exists()) {
+            // 初始化JsonObject为null
+            JsonObject jsonObject = null;
+            // 先读取现有内容
+            try (FileReader reader = new FileReader(flowMetaFile)) {
+                jsonObject = new JsonParser().parse(reader).getAsJsonObject();
+            } // try-with-resources会自动关闭reader
+            // 更新JsonObject
+            if (jsonObject != null) {
+                jsonObject.add(ORCHESTRATOR_META_KEY, gson.toJsonTree(dssOrchestratorInfo));
+            }
+
+            // 写回修改后的内容
+            try (FileWriter writer = new FileWriter(flowMetaFile)) {
+                gson.toJson(jsonObject, writer);
+            } // try-with-resources会自动关闭writer
+
+            System.out.println("JSON文件已更新并保存。");
+        } else {
+            // 文件不存在，直接创建并写入orchestratorInfo信息
+            try (FileWriter writer = new FileWriter(flowMetaFile)) {
+                gson.toJson(dssOrchestratorInfo, writer);
+            } // try-with-resources会自动关闭writer
+        }
+    }
     @Override
     public void export(DSSOrchestratorInfo dssOrchestratorInfo, String savePath) throws IOException {
 

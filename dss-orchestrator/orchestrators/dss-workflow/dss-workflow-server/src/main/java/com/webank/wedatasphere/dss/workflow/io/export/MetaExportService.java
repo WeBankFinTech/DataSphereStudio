@@ -26,5 +26,6 @@ public interface MetaExportService {
 
 
     void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException;
+    void exportFlowBaseInfoNew(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException;
 
 }

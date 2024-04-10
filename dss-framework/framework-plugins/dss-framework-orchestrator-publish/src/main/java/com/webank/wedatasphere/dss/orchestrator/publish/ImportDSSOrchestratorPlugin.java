@@ -28,6 +28,17 @@ import java.util.List;
 
 
 public interface ImportDSSOrchestratorPlugin extends DSSOrchestratorPlugin {
+    /**
+     * 导入Orchestrator
+     * 注意：导入导出接口只适合于不同环境下，先从A环境导出工作流，再导入到B环境的情况。
+     * 不适合用于在同一环境下的复制。同一环境的复制操作需使用copyOperation。
+     * @param requestImportOrchestrator
+     * @return
+     * @throws DSSErrorException
+     * @throws IOException
+     * @throws ExternalOperationFailedException
+     */
+    DSSOrchestratorVersion importOrchestratorNew(RequestImportOrchestrator requestImportOrchestrator) throws Exception;
 
     /**
      * 导入Orchestrator

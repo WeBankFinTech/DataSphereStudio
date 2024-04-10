@@ -431,7 +431,6 @@ public class DataCheckerDao {
             log.info("-------------------------------------- bdp data result:"+ret);
             return ret;
         } catch (SQLException e) {
-            log.error("fetch data from bdp error", e);
             return 0;
         }
     }

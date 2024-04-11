@@ -127,7 +127,11 @@ public class ZipHelper {
      * @throws DSSErrorException 解压出现异常
      */
 
-    public static String unzip(String dirPath)throws DSSErrorException {
+    public static String unzip(String dirPath)throws DSSErrorException{
+        return unzip(dirPath, false);
+    }
+
+    public static String unzip(String dirPath,boolean deleteOriginZip)throws DSSErrorException {
         File file = new File(dirPath);
         if(!file.exists()){
             logger.error("{} 不存在, 不能解压zip文件", dirPath);
@@ -165,6 +169,9 @@ public class ZipHelper {
             int exitCode = process.waitFor();
             if (exitCode != 0){
                 throw new DSSErrorException(90007,errMsg.toString());
+            }
+            if(deleteOriginZip){
+                file.delete();
             }
         }catch(final Exception e){
             logger.error("{} 解压缩 zip 文件失败, reason: ", e);

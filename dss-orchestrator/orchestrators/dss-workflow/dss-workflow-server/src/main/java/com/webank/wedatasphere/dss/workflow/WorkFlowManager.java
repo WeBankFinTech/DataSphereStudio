@@ -96,7 +96,23 @@ public interface WorkFlowManager {
                         Long flowID) throws DSSErrorException;
 
     ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete) throws DSSErrorException;
-
+    /**
+     * 导出工作流
+     * @param userName
+     * @param flowID
+     * @param dssProjectId
+     * @param projectName
+     * @param workspace
+     * @param dssLabels
+     * @return 导出的工作流，以Bml资源的形式返回
+     * @throws Exception
+     */
+    BmlResource exportWorkflowNew(String userName,
+                                  Long flowID,
+                                  Long dssProjectId,
+                                  String projectName,
+                                  Workspace workspace,
+                                  List<DSSLabel> dssLabels) throws Exception;
     /**
      * 导出工作流
      * @param userName
@@ -115,6 +131,11 @@ public interface WorkFlowManager {
                                Workspace workspace,
                                List<DSSLabel> dssLabels) throws Exception;
 
+    List<DSSFlow> importWorkflowNew(String userName,
+                                    String resourceId,
+                                    String bmlVersion,
+                                    DSSFlowImportParam dssFlowImportParam,
+                                    List<DSSLabel> dssLabels) throws Exception;
     List<DSSFlow> importWorkflow(String userName,
                                  String resourceId,
                                  String bmlVersion,

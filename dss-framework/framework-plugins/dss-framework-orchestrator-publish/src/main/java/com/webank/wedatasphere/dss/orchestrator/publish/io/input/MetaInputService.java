@@ -32,6 +32,7 @@ public interface MetaInputService {
 
 
     List<DSSOrchestratorInfo> importOrchestrator(String basePath) throws IOException;
+    DSSOrchestratorInfo importOrchestratorNew(String flowMetaPath) throws IOException;
 
     List<DSSFlow> inputFlow(String basePath) throws IOException;
 

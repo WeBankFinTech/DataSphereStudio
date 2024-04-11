@@ -286,7 +286,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                         dssFlow, updateNodeJson, updateContextId, nodePath,
                         workspace, orcVersion, dssLabels);
                 Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
-                String nodeParams = readNodeParam(userName, nodePath);
+                String nodeParamsJson = readNodeParam(userName, nodePath);
 
                 //更新subflowID
                 String nodeType = nodeJsonMap.get("jobType").toString();
@@ -308,8 +308,8 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                         throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                     }
                 }
-                if (nodeParams != null && !"null".equalsIgnoreCase(nodeParams)) {
-                    nodeJsonMap.put("params", nodeParams);
+                if (nodeParamsJson != null && !"null".equalsIgnoreCase(nodeParamsJson)) {
+                    nodeJsonMap.put("params", BDPJettyServerHelper.jacksonJson().readValue(nodeParamsJson, Map.class));
                 }
                 nodeJsonListRes.add(nodeJsonMap);
 

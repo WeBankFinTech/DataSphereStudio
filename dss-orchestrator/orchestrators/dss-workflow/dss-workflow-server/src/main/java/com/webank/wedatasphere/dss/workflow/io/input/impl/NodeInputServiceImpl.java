@@ -70,7 +70,7 @@ public class NodeInputServiceImpl implements NodeInputService {
     public String uploadResourceToBmlNew(String userName, String nodeJson, String nodePath, String projectName) throws IOException {
         List<Resource> resources = nodeParser.getNodeResource(nodeJson);
         Map<String, Object> jobContent = nodeParser.getNodeJobContent(nodeJson);
-        String scriptName = Optional.ofNullable(jobContent.get("script")).map(Object::toString).orElse(null);
+        String scriptName = Optional.ofNullable(jobContent).map(e->e.get("script")).map(Object::toString).orElse(null);
         if (resources != null && resources.size() > 0) {
             resources.forEach(resource -> {
                 if (resource.getVersion() != null && resource.getFileName() != null && resource.getResourceId() != null) {
@@ -80,7 +80,7 @@ public class NodeInputServiceImpl implements NodeInputService {
                         fileName = fileName.substring(fileName.lastIndexOf('.'));
                     }
                     String filePath = IoUtils.addFileSeparator(nodePath, fileName);
-                    InputStream resourceInputStream = readResource(userName, resource, filePath);
+                    InputStream resourceInputStream = bmlService.readLocalResourceFile(userName, filePath);
                     BmlResource bmlReturnMap = bmlService.upload(userName,
                             resourceInputStream, UUID.randomUUID().toString() + ".json", projectName);
                     resource.setResourceId(bmlReturnMap.getResourceId());

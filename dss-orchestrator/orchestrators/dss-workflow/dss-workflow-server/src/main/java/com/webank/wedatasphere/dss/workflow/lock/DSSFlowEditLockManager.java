@@ -16,26 +16,38 @@
 
 package com.webank.wedatasphere.dss.workflow.lock;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
+import com.webank.wedatasphere.dss.workflow.util.DSSFlowStatusUtils;
 import org.apache.linkis.DataWorkCloudApplication;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.rpc.Sender;
 import org.apache.poi.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
+
+import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.FLOW_STATUS_PUSH;
+import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.FLOW_STATUS_SAVE;
 
 
 /**
@@ -49,6 +61,8 @@ public class DSSFlowEditLockManager {
 
     private static LockMapper lockMapper;
 
+    private static FlowMapper flowMapper;
+
 
     private static final DelayQueue<UnLockEvent> unLockEvents = new DelayQueue<>();
     private static final ThreadLocal<SimpleDateFormat> sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -61,7 +75,16 @@ public class DSSFlowEditLockManager {
         LOGGER.info("编辑锁超时时间为：{} ms", DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue());
         init();
         //程序重启时，删除所有编辑锁
-        lockMapper.deleteALL();
+        List<String> publishList = lockMapper.selectFlowIdByStatus(DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
+        List<String> pushList = lockMapper.selectFlowIdByStatus(DSSWorkFlowConstant.FLOW_STATUS_PUSH);
+        List<String> result = new ArrayList<>();
+        result.addAll(publishList);
+        result.addAll(pushList);
+        if (!CollectionUtils.isEmpty(result)) {
+            lockMapper.deleteExpectAfterSave(result);
+        }else {
+            lockMapper.deleteALL();
+        }
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             try {
                 UnLockEvent pop = unLockEvents.poll();
@@ -173,6 +196,13 @@ public class DSSFlowEditLockManager {
             if (StringUtils.isNotBlank(flowEditLock)) {
                 DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
                 if (dssFlowEditLock != null) {
+                    String status = lockMapper.selectStatusByFlowId(dssFlowEditLock.getFlowID());
+                    if (DSSWorkFlowConstant.FLOW_STATUS_SAVE.equals(status)) {
+                        DSSFlow dssFlow = flowMapper.selectFlowByID(dssFlowEditLock.getFlowID());
+                        DSSProject projectInfo = getProjectInfo(dssFlow.getProjectId());
+//                        pushProject(projectInfo.getName(), projectInfo.getWorkspaceId(), "resurce", "version", "path", projectInfo.getUsername(), "comment");
+                        DSSFlowStatusUtils.updateFlowStatus(dssFlow.getId(), FLOW_STATUS_PUSH);
+                    }
                     lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), dssFlowEditLock.getFlowID());
                 }
             }
@@ -181,6 +211,29 @@ public class DSSFlowEditLockManager {
             throw new DSSErrorException(60059, "工作流编辑锁主动释放失败，flowId:" + flowEditLock + "");
         }
     }
+
+    public static DSSProject getProjectInfo(Long projectId) throws DSSErrorException {
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(projectId);
+        DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
+        if (dssProject == null) {
+            throw new DSSErrorException(90001, "工程不存在");
+        }
+        return dssProject;
+    }
+
+    public static void pushProject(String projectName, Long workspaceId, String resource, String version, String path, String username, String comment) {
+        LOGGER.info("-------=======================begin to add testGit1=======================-------");
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        Map<String, BmlResource> file = new HashMap<>();
+        // 测试数据 key表示项目名、value为项目BmlResource资源
+        file.put(path, new BmlResource(resource, version));
+        GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, comment, username);
+        GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
+        LOGGER.info("-------=======================End to add testGit1=======================-------: {}", responseWorkflowValidNode);
+    }
+
 
     public static String updateLock(String lock) throws DSSErrorException {
         if (StringUtils.isBlank(lock)) {
@@ -206,6 +259,10 @@ public class DSSFlowEditLockManager {
     }
 
     public static boolean isLockExpire(DSSFlowEditLock flowEditLock) {
+        String status = lockMapper.selectStatusByFlowId(flowEditLock.getFlowID());
+        if (StringUtils.isEmpty(status) && DSSWorkFlowConstant.FLOW_STATUS_SAVE.equals(status)) {
+            return false;
+        }
         return System.currentTimeMillis() - flowEditLock.getUpdateTime().getTime() >= DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue();
     }
 

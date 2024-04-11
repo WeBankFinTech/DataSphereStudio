@@ -73,4 +73,31 @@
         delete from dss_workflow_edit_lock
     </delete>
 
+
+    <delete id="deleteExpectAfterSave">
+        delete from dss_workflow_edit_lock where flow_id not in
+        <foreach collection="list" item="index" separator="," open="(" close=")">
+            #{index}
+        </foreach>
+    </delete>
+
+    <insert id="insertFlowStatus">
+        INSERT INTO dss_workflow_status (`flow_id`, `status`, `create_time`, `update_time`)
+        VALUES
+        (#{flowID}, #{status}, NOW(), NOW())
+    </insert>
+
+    <update id="updateFlowStatus">
+        update dss_workflow_status set `status` = #{status}, `update_time` = NOW()
+        where `flow_id` = #{flowID}
+    </update>
+
+    <select id="selectFlowIdByStatus" resultType="java.lang.String">
+        select `flow_id` from dss_workflow_status where `status` = #{status}
+    </select>
+
+    <select id="selectStatusByFlowId" resultType="java.lang.String">
+        select `status` from dss_workflow_status where `flow_id` = #{flowID} order by update_time limit 1
+    </select>
+
 </mapper>

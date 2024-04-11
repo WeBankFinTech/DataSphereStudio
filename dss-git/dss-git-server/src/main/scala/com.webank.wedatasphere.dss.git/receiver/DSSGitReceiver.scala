@@ -25,7 +25,6 @@ import org.springframework.stereotype.Component
 import java.util
 import scala.concurrent.duration.Duration
 
-@Component
 class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitWorkflowManagerService: DSSGitWorkflowManagerService) extends Receiver {
 
   override def receive(message: Any, sender: Sender): Unit = {}

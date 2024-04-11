@@ -60,4 +60,10 @@ public class DSSWorkFlowConstant {
      * 仅仅用于兼容老的、已经创建的工作量，用于自动路由到一个默认的调度系统。
      */
     public static final CommonVars<String> DEFAULT_SCHEDULER_APP_CONN = CommonVars.apply("wds.dss.workflow.scheduler.default", "schedulis");
+    /**
+     * 工作流状态：save-已发布 push-已提交 publish-已保存
+     */
+    public static final String FLOW_STATUS_SAVE = "save";
+    public static final String FLOW_STATUS_PUSH = "push";
+    public static final String FLOW_STATUS_PUBLISH = "publish";
 }

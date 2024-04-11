@@ -34,6 +34,7 @@ import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
+import com.webank.wedatasphere.dss.workflow.util.DSSFlowStatusUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
@@ -97,6 +98,7 @@ public class PublishServiceImpl implements PublishService {
             if (response.getResponse().isFailed()) {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
             }
+            DSSFlowStatusUtils.updateFlowStatus(workflowId, DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
             return response.getId();
         } catch (DSSErrorException e) {
             throw e;

@@ -40,7 +40,7 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
   override def receiveAndReply(message: Any, sender: Sender): Any = message match {
 
     case reqExportOrchestrator: RequestExportOrchestrator =>
-      val dssExportOrcResource: OrchestratorExportResult = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestrator(
+      val dssExportOrcResource: OrchestratorExportResult = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestratorNew(
         reqExportOrchestrator.getUserName,
         reqExportOrchestrator.getOrchestratorId,
         reqExportOrchestrator.getOrcVersionId,
@@ -53,7 +53,7 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
       )
 
     case requestImportOrchestrator: RequestImportOrchestrator =>
-      val dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestrator(requestImportOrchestrator)
+      val dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestratorNew(requestImportOrchestrator)
       ResponseImportOrchestrator(dssOrchestratorVersion.getOrchestratorId,dssOrchestratorVersion.getVersion)
 
     case addVersionAfterPublish: RequestAddVersionAfterPublish =>

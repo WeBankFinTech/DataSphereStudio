@@ -47,6 +47,7 @@ import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
@@ -89,6 +90,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private FlowMapper flowMapper;
+    @Autowired
+    private LockMapper lockMapper;
     @Autowired
     private NodeInfoMapper nodeInfoMapper;
     @Autowired
@@ -305,7 +308,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
-        DSSFlowStatusUtils.updateFlowStatus(flowID, FLOW_STATUS_SAVE);
+        lockMapper.insertFlowStatus(flowID, FLOW_STATUS_SAVE);
         return version;
     }
 

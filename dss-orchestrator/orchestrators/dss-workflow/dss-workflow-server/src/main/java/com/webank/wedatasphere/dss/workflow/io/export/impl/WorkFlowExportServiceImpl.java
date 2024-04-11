@@ -306,9 +306,6 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             JsonObject node = element.getAsJsonObject();
             JsonElement params = node.remove("params");
             String nodeName = Optional.ofNullable(node.get("title")).map(JsonElement::getAsString).orElse(null);
-            if (params == null || nodeName == null) {
-                continue;
-            }
             String nodeParamsPath = IoUtils.addFileSeparator(flowCodePath, nodeName, NODE_PARAMS_FILE_NAME);
             String paramsJson = gson.toJson(params);
             try (

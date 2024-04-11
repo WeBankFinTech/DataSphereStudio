@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.io.export.impl;
 
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
@@ -25,17 +26,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.io.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MetaExportServiceImpl implements MetaExportService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    public static final String FLOW_META_FILE_NAME = ".flowmeta";
+    public static final String FLOW_META_KEY = "dss_flow";
+    public static final String FLOW_RELATION_META_KEY = "dss_flow_relation";
 
     private final String fileName = "meta.txt";
 
+    @Override
+    public void exportFlowBaseInfoNew(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException {
 
+        try (
+                OutputStream outputStream = IoUtils.generateExportOutputStream(savePath + File.separator + FLOW_META_FILE_NAME)
+        ) {
+            Map<String, Object> flowMetaMap = new HashMap<>(2);
+            flowMetaMap.put(FLOW_META_KEY, allDSSFlows);
+            flowMetaMap.put(FLOW_RELATION_META_KEY, allFlowRelations);
+            String flowMetaStr = DSSCommonUtils.COMMON_GSON.toJson(flowMetaMap);
+            org.apache.commons.io.IOUtils.write(flowMetaStr,outputStream,"UTF-8");
+        }
+    }
     @Override
     public void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException {
 

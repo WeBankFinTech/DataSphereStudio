@@ -308,7 +308,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                         throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                     }
                 }
-                if (nodeParams != null) {
+                if (nodeParams != null && !"null".equalsIgnoreCase(nodeParams)) {
                     nodeJsonMap.put("params", nodeParams);
                 }
                 nodeJsonListRes.add(nodeJsonMap);

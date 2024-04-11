@@ -19,6 +19,8 @@ import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.dao.DuplicateKeyException;
 
+import java.util.List;
+
 
 public interface LockMapper {
 
@@ -48,4 +50,16 @@ public interface LockMapper {
     void clearExpire(@Param("expireTime") String expireTime, @Param("flowId") long flowId);
 
     void deleteALL();
+
+
+    void deleteExpectAfterSave(@Param("list") List<String> list);
+
+
+    void insertFlowStatus(@Param("flowID") Long flowID, @Param("status") String status);
+
+    void updateFlowStatus(@Param("flowID") Long flowID, @Param("status") String status);
+
+    List<String> selectFlowIdByStatus( @Param("status") String status);
+
+    String selectStatusByFlowId(@Param("flowID") Long flowID);
 }

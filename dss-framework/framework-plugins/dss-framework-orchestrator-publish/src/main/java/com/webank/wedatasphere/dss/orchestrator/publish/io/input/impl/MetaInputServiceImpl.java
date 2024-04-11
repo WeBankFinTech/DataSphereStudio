@@ -17,6 +17,9 @@
 package com.webank.wedatasphere.dss.orchestrator.publish.io.input.impl;
 
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaInputService;
@@ -26,11 +29,10 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
+
+import static com.webank.wedatasphere.dss.orchestrator.publish.io.export.impl.MetaExportServiceImpl.*;
 
 
 @Service("orcMetaInputService")
@@ -40,6 +42,16 @@ public class MetaInputServiceImpl implements MetaInputService {
 
     private final String fileName = "meta.txt";
 
+    @Override
+    public DSSOrchestratorInfo importOrchestratorNew( String flowMetaPath) throws IOException {
+        File flowMetaFile = new File(flowMetaPath + File.separator + FLOW_META_FILE_NAME);
+        JsonParser jsonParser = new JsonParser();
+        Gson gson = new Gson();
+        try (FileReader reader = new FileReader(flowMetaFile)) {
+            JsonObject jsonObject = jsonParser.parse(reader).getAsJsonObject();
+            return gson.fromJson(jsonObject.get(ORCHESTRATOR_META_KEY), DSSOrchestratorInfo.class);
+        }
+    }
     @Override
     public List<DSSOrchestratorInfo> importOrchestrator(String basePath) throws IOException {
         try (InputStream inputStream = generateInputstream(basePath)) {

@@ -32,6 +32,7 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import com.webank.wedatasphere.dss.workflow.util.DSSFlowStatusUtils;
@@ -51,6 +52,8 @@ public class PublishServiceImpl implements PublishService {
     private DSSFlowService dssFlowService;
     @Autowired
     private WorkFlowParser workFlowParser;
+    @Autowired
+    private LockMapper lockMapper;
 
     public void setDssFlowService(DSSFlowService dssFlowService) {
         this.dssFlowService = dssFlowService;
@@ -98,7 +101,7 @@ public class PublishServiceImpl implements PublishService {
             if (response.getResponse().isFailed()) {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
             }
-            DSSFlowStatusUtils.updateFlowStatus(workflowId, DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
+            lockMapper.insertFlowStatus(workflowId, DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
             return response.getId();
         } catch (DSSErrorException e) {
             throw e;

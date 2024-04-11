@@ -201,7 +201,7 @@ public class DSSFlowEditLockManager {
                         DSSFlow dssFlow = flowMapper.selectFlowByID(dssFlowEditLock.getFlowID());
                         DSSProject projectInfo = getProjectInfo(dssFlow.getProjectId());
 //                        pushProject(projectInfo.getName(), projectInfo.getWorkspaceId(), "resurce", "version", "path", projectInfo.getUsername(), "comment");
-                        DSSFlowStatusUtils.updateFlowStatus(dssFlow.getId(), FLOW_STATUS_PUSH);
+                        lockMapper.insertFlowStatus(dssFlow.getId(), FLOW_STATUS_PUSH);
                     }
                     lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), dssFlowEditLock.getFlowID());
                 }

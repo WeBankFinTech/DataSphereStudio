@@ -35,7 +35,6 @@ import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
-import com.webank.wedatasphere.dss.workflow.util.DSSFlowStatusUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;

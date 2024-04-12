@@ -29,7 +29,6 @@ import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
-import com.webank.wedatasphere.dss.workflow.util.DSSFlowStatusUtils;
 import org.apache.linkis.DataWorkCloudApplication;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.commons.lang.StringUtils;

@@ -117,7 +117,7 @@
                 </exclusion>
                 <exclusion>
                     <groupId>org.apache.poi</groupId>
-                    <artifactId>ooxml-schemas</artifactId>
+                    <artifactId>poi-ooxml-schemas</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -59,7 +59,6 @@ import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.SaveFlowHook;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
-import com.webank.wedatasphere.dss.workflow.util.DSSFlowStatusUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;

@@ -75,7 +75,7 @@ public class DSSGitUtils {
     }
 
     public static void remote(Repository repository, String projectName, GitUserEntity gitUser) {
-        File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + projectName +"/.git");
+        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator + ".git");
 
         try {
             Git git = new Git(repository);
@@ -83,7 +83,7 @@ public class DSSGitUtils {
             // 添加远程仓库引用
             git.remoteAdd()
                     .setName("origin")
-                    .setUri(new URIish(GitServerConfig.GIT_URL_PRE.getValue() + gitUser.getGitUser() + "/" + projectName +".git"))
+                    .setUri(new URIish(GitServerConfig.GIT_URL_PRE.getValue() + gitUser.getGitUser() + File.separator + projectName +".git"))
                     .call();
 
             logger.info("remote success");
@@ -96,8 +96,8 @@ public class DSSGitUtils {
 
     public static void create(String projectName, GitUserEntity gitUserDO) {
         logger.info("start success");
-        File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + projectName); // 指定仓库的目录
-        File respo = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" +  projectName +"/.git");
+        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName); // 指定仓库的目录
+        File respo = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator +  projectName + File.separator +".git");
         if (!respo.exists()) {
             try {
                 // 初始化仓库
@@ -186,7 +186,7 @@ public class DSSGitUtils {
 
 
     public static void reset(String projectName) {
-        String repoPath = GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + projectName +"/.git"; // 仓库路径
+        String repoPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator + ".git"; // 仓库路径
         try (Repository repository = new FileRepositoryBuilder()
                 .setGitDir(new File(repoPath))
                 .build();
@@ -203,7 +203,7 @@ public class DSSGitUtils {
     }
 
     public static void checkoutTargetCommit(GitRevertRequest request) {
-        File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName()+  "/.git");
+        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName()+ File.separator + ".git");
         String commitId = request.getCommitId(); // 替换为目标commit的完整哈希值
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
@@ -295,7 +295,7 @@ public class DSSGitUtils {
     }
 
     public static Set<String> status(String projectName) {
-        File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + projectName +"/.git"); // 修改为你的仓库路径
+        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator +".git"); // 修改为你的仓库路径
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build()) {
             Git git = new Git(repository);
@@ -357,7 +357,7 @@ public class DSSGitUtils {
     }
 
     public static void archiveLocal(String projectName) {
-        File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + projectName +  "/.git");
+        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator + ".git");
         if (!repoDir.exists()) {
             logger.info("file {} not exists", repoDir.getAbsolutePath());
             return ;
@@ -367,7 +367,7 @@ public class DSSGitUtils {
             // 删除名为"origin"的远程仓库配置
             git.remoteRemove().setRemoteName("origin").call();
             // 删除本地文件
-            FileUtils.removeDirectory(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + projectName);
+            FileUtils.removeDirectory(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName);
             logger.info("Remote 'origin' removed successfully.");
         } catch (GitAPIException | IOException e) {
             logger.error("revert remote failed, the reason is: ",e);
@@ -375,7 +375,7 @@ public class DSSGitUtils {
     }
 
     public static void updateLocal(GitBaseRequest request, String filePath) {
-        File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName() + "/.git");
+        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + ".git");
         Repository repository = null;
         try {
             repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
@@ -391,9 +391,9 @@ public class DSSGitUtils {
         }
     }
 
-    public static InputStream getTargetCommitFileContent(String projectName, String commitId, String filePath) {
-        String repoPath = GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + projectName +  "/.git";
-
+    public static String getTargetCommitFileContent(String projectName, String commitId, String filePath) {
+        String repoPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator +".git";
+        String content = "";
         try {
             FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
             try (Repository repository = repositoryBuilder.setGitDir(new File(repoPath))
@@ -423,7 +423,8 @@ public class DSSGitUtils {
                         try {
                             ObjectLoader loader = repository.open(objectId);
                             byte[] bytes = loader.getBytes();
-                            logger.info("File content: " + new String(bytes));
+                            content = new String(bytes);
+                            logger.info("File content: " + content);
                         } catch (Exception e) {
                             logger.error("getFileContent Failed, the reason is: ", e);
                         }
@@ -435,12 +436,12 @@ public class DSSGitUtils {
         } catch (IOException e) {
             logger.error("getFileContent Failed, the reason is: ", e);
         }
-        return null;
+        return content;
     }
 
     public static void getCommitId(String projectName, int num) {
         // 获取当前CommitId，
-        File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue()  + "/" + projectName + "/.git");
+        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator +".git");
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
              Git git = new Git(repository)) {

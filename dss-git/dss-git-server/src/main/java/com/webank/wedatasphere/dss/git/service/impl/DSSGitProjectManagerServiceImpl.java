@@ -47,7 +47,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 本地创建Git项目
             DSSGitUtils.create(request.getProjectName(), gitUser);
             // 获取git项目
-            File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName() + "/.git");
+            File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator +".git");
             Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
             // 关联远端Git
             DSSGitUtils.remote(repository, request.getProjectName(), gitUser);

@@ -23,6 +23,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -47,7 +49,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         Repository repository = null;
         try {
             // Path to the Git repository (.git directory or its parent)
-            File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName() + "/.git");
+            File repoDir = new File("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git");
             // 当前机器不存在就新建
             if (repoDir.exists()) {
                 repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
@@ -85,7 +87,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         GitCommitResponse commitResponse = null;
         try {
             // Path to the Git repository (.git directory or its parent)
-            File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName() + "/.git");
+            File repoDir = new File("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git");
             // 当前机器不存在就新建
             if (repoDir.exists()) {
                 repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
@@ -115,8 +117,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitSearchResponse search(GitSearchRequest request) {
-        String gitDir = GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName() + "/.git";
-        String workTree = GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName() ;
+        String gitDir = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git";
+        String workTree = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() ;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-l", request.getSearchContent()
         ));
@@ -124,7 +126,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         List<String> fileList = process(gitCommands);
         List<String> filePathList = new ArrayList<>();
         for (String file : fileList) {
-            filePathList.add(GitServerConfig.GIT_SERVER_PATH.getValue()+ "/" + request.getProjectName() + "/" + file);
+            filePathList.add("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue())+ "/" + request.getProjectName() + "/" + file);
         }
 
         List<String> fileCommands = new ArrayList<>(Arrays.asList(
@@ -240,7 +242,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         GitDeleteResponse deleteResponse = null;
         try {
             // Path to the Git repository (.git directory or its parent)
-            File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName() + "/.git");
+            File repoDir = new File("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git");
             // 当前机器不存在就新建
             if (repoDir.exists()) {
                 repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
@@ -279,10 +281,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             return null;
         }
         Repository repository = null;
-        GitCommitResponse commitResponse = null;
+        GitFileContentResponse contentResponse = null;
         try {
             // Path to the Git repository (.git directory or its parent)
-            File repoDir = new File(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + request.getProjectName() + "/.git");
+            File repoDir = new File("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git");
             // 当前机器不存在就新建
             if (repoDir.exists()) {
                 repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
@@ -292,7 +294,14 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
-            DSSGitUtils.getTargetCommitFileContent(request.getProjectName(), request.getCommitId(), request.getFilePath());
+            String content = DSSGitUtils.getTargetCommitFileContent(request.getProjectName(), request.getCommitId(), request.getFilePath());
+            String fullpath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getFilePath());
+            File file = new File(fullpath);
+            String fileName = file.getName();
+            BmlResource bmlResource = FileUtils.uploadResourceToBML(bmlService, gitUser.getGitUser(), content, fileName, request.getProjectName());
+            logger.info("upload success, the fileName is : {}", request.getFilePath());
+            contentResponse.setBmlResource(bmlResource);
+            return contentResponse;
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
         } finally {

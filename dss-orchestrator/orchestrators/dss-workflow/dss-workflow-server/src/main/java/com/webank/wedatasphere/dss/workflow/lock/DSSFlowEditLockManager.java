@@ -201,7 +201,7 @@ public class DSSFlowEditLockManager {
                     // 对于接入Git的项目，工作流解锁加入额外处理
                     if (projectInfo.getAssociateGit()) {
                         String status = lockMapper.selectStatusByFlowId(dssFlowEditLock.getFlowID());
-                        if (DSSWorkFlowConstant.FLOW_STATUS_SAVE.equals(status)) {
+                        if (!StringUtils.isEmpty(status) && DSSWorkFlowConstant.FLOW_STATUS_SAVE.equals(status)) {
 //                        pushProject(projectInfo.getName(), projectInfo.getWorkspaceId(), "resurce", "version", "path", projectInfo.getUsername(), "comment");
                             lockMapper.insertFlowStatus(dssFlow.getId(), FLOW_STATUS_PUSH);
                         }

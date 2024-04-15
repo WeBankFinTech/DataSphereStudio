@@ -7,7 +7,9 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitBaseRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GItDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -487,6 +489,47 @@ public class DSSGitUtils {
             logger.error("get current commit failed, the reason is : ", e);
             return null;
         }
+    }
+
+    public static GitHistoryResponse listCommitsBetween(Repository repository, String startCommitId, String endCommitId) throws Exception {
+        List<GitCommitResponse> gitCommitResponseList = new ArrayList<>();
+
+        ObjectId start = repository.resolve(startCommitId);
+        ObjectId end = repository.resolve(endCommitId);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try (RevWalk walk = new RevWalk(repository)) {
+            RevCommit startCommit = walk.parseCommit(start);
+            RevCommit endCommit = walk.parseCommit(end);
+
+            walk.markStart(startCommit);
+            if (endCommit.getParentCount() > 0) {  // Check if endCommit has any parents
+                walk.markUninteresting(walk.parseCommit(endCommit.getParent(0))); // Mark parent of end commit as uninteresting
+            }
+
+            for (RevCommit commit : walk) {
+                PersonIdent authorIdent = commit.getAuthorIdent(); // 获取提交人信息
+                GitCommitResponse commitResponse = new GitCommitResponse();
+                commitResponse.setCommitId(commit.getId().getName());
+                commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
+                commitResponse.setComment(commit.getShortMessage());
+                commitResponse.setCommitUser(commit.getAuthorIdent().getName());
+                gitCommitResponseList.add(commitResponse);
+                System.out.println("Commit Hash: " + commit.getName()); // 提交的Hash值
+                System.out.println("Commit Time: " + authorIdent.getWhen()); // 提交时间
+                System.out.println("Commit Message: " + commit.getFullMessage()); // 提交信息
+                System.out.println("Author: " + authorIdent.getName() + " <" + authorIdent.getEmailAddress() + ">"); // 提交人
+                System.out.println("-----------------------------------------------------");
+            }
+        }
+        GitHistoryResponse historyResponse = new GitHistoryResponse();
+        historyResponse.setResponses(gitCommitResponseList);
+        return historyResponse;
+    }
+
+    public static String generateGitPath(String projectName) {
+        // eg ： /data/GitInstall/testGit/.git
+        return DSSGitConstant.GIT_PATH_PRE + projectName + DSSGitConstant.GIT_PATH_SUFFIX;
     }
 
 

@@ -24,7 +24,7 @@ public class FileUtils {
 
     public static void addFiles(String projectName) {
 
-        String filePath = GitServerConfig.GIT_SERVER_PATH.getValue() + "/" + projectName +"/file1.txt";
+        String filePath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + projectName +"/file1.txt";
         List<String> lines = Arrays.asList("The first line", "The second line");
 
         try {
@@ -52,7 +52,7 @@ public class FileUtils {
     }
 
     public static void addDirectory (String directory) {
-        String filePath = GitServerConfig.GIT_SERVER_PATH.getValue() + "/testGit1/file1.txt";
+        String filePath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/testGit1/file1.txt";
         List<String> lines = Arrays.asList("The first line", "The second line");
 
         try {
@@ -88,6 +88,16 @@ public class FileUtils {
         }
     }
 
+    public static BmlResource uploadResourceToBML(BMLService bmlService, String userName, String content, String fileName, String projectName) {
+        Map<String, Object> bmlReturnMap = bmlService.upload(userName, content, fileName, projectName);
+
+        BmlResource bmlResource = new BmlResource();
+        bmlResource.setResourceId(bmlReturnMap.get("resourceId").toString());
+        bmlResource.setVersion(bmlReturnMap.get("version").toString());
+
+        return bmlResource;
+    }
+
     public static String unzipFile(String zipFile) {
         logger.info("-------=======================beginning to uznip testGit1=======================-------{}", zipFile);
 
@@ -121,9 +131,9 @@ public class FileUtils {
     }
 
     public static void removeAndUpdate (BMLService bmlService, String path,  BmlResource bmlResource, String username) {
-        FileUtils.removeDirectory(GitServerConfig.GIT_SERVER_PATH.getValue() + "/" +path);
+        FileUtils.removeDirectory("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" +path);
         try {
-            downloadAndUnzipBMLResource(bmlService, path, bmlResource, username, GitServerConfig.GIT_SERVER_PATH.getValue());
+            downloadAndUnzipBMLResource(bmlService, path, bmlResource, username, "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()));
         }catch (DSSErrorException e) {
             logger.error("unzip BML Resource Failed, the reason is : ", e);
         }
@@ -158,5 +168,17 @@ public class FileUtils {
             }
         }
         throw new IOException();
+    }
+
+    public static String normalizePath(String path) {
+        path = path.trim();
+        while(path.startsWith(File.separator)) {
+            path = path.substring(File.separator.length());
+        }
+        while(path.endsWith(File.separator)) {
+            path = path.substring(0, path.length()-File.separator.length());
+        }
+        
+        return path;
     }
 }

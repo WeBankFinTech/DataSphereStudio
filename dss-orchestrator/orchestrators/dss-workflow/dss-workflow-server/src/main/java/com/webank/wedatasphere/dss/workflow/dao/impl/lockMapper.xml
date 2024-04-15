@@ -97,7 +97,7 @@
     </select>
 
     <select id="selectStatusByFlowId" resultType="java.lang.String">
-        select `status` from dss_workflow_status where `flow_id` = #{flowID} order by update_time limit 1
+        select `status` from dss_workflow_status where `flow_id` = #{flowID} order by update_time desc limit 1
     </select>
 
 </mapper>

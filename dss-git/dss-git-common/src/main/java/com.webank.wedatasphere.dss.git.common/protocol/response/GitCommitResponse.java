@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.git.common.protocol.response;
 
-/**
- * @author zhaobincai
- * @date 2024/3/25 10:15
- */
+
 public class GitCommitResponse{
     private String commitId;
     private String commitTime;

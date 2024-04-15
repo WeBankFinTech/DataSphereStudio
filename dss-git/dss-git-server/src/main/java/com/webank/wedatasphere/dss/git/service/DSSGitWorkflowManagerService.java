@@ -16,4 +16,6 @@ public interface DSSGitWorkflowManagerService {
     GitDeleteResponse delete(GitDeleteRequest request) throws ExecutionException, InterruptedException;
 
     GitFileContentResponse getFileContent(GitFileContentRequest request);
+
+    GitHistoryResponse getHistory(GitHistoryRequest request);
 }

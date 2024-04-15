@@ -2,10 +2,6 @@ package com.webank.wedatasphere.dss.git.common.protocol.response;
 
 import java.util.List;
 
-/**
- * @author zhaobincai
- * @date 2024/3/28 15:06
- */
 public class GitDeleteResponse {
     private String projectName;
 

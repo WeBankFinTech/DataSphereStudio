@@ -309,17 +309,20 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
-        DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(flowID);
-        //仅对接入Git的项目 更新状态为 保存
-        if (projectInfo!= null && projectInfo.getAssociateGit()) {
-            String status = lockMapper.selectStatusByFlowId(flowID);
-            if (StringUtils.isEmpty(status)) {
-                lockMapper.insertFlowStatus(flowID, FLOW_STATUS_SAVE);
-            } else {
-                lockMapper.updateFlowStatus(flowID,FLOW_STATUS_SAVE);
+        try {
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(flowID);
+            //仅对接入Git的项目 更新状态为 保存
+            if (projectInfo != null && projectInfo.getAssociateGit()) {
+                String status = lockMapper.selectStatusByFlowId(flowID);
+                if (StringUtils.isEmpty(status)) {
+                    lockMapper.insertFlowStatus(flowID, FLOW_STATUS_SAVE);
+                } else {
+                    lockMapper.updateFlowStatus(flowID, FLOW_STATUS_SAVE);
+                }
             }
+        } catch (DSSErrorException e) {
+            logger.error("getProjectInfo failed by:", e);
         }
-
         return version;
     }
 

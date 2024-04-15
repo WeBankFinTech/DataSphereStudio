@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.git.common.protocol.response;
 
-/**
- * @author zhaobincai
- * @date 2024/3/28 15:06
- */
+
 public class GitCheckProjectResponse{
     private String projectName;
     /**

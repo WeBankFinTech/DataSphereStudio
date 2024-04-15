@@ -48,15 +48,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         GItDiffResponse diff = null;
         Repository repository = null;
         try {
-            // Path to the Git repository (.git directory or its parent)
-            File repoDir = new File("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git");
-            // 当前机器不存在就新建
-            if (repoDir.exists()) {
-                repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-            } else {
-                repository = FileRepositoryBuilder.create(new File(String.valueOf(repoDir)));
-                DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
-            }
+            // 拼接.git路径
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            // 获取git仓库
+            File repoDir = new File(gitPath);
+            repository = getRepository(repoDir, request.getProjectName(), gitUser);
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 解压BML文件到本地 todo 对接Server时放开调试
@@ -86,15 +82,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         Repository repository = null;
         GitCommitResponse commitResponse = null;
         try {
-            // Path to the Git repository (.git directory or its parent)
-            File repoDir = new File("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git");
-            // 当前机器不存在就新建
-            if (repoDir.exists()) {
-                repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-            } else {
-                repository = FileRepositoryBuilder.create(new File(String.valueOf(repoDir)));
-                DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
-            }
+            // 拼接.git路径
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            // 获取git仓库
+            File repoDir = new File(gitPath);
+            repository = getRepository(repoDir, request.getProjectName(), gitUser);
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 解压BML文件到本地 todo 对接Server时放开调试
@@ -241,15 +233,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         Repository repository = null;
         GitDeleteResponse deleteResponse = null;
         try {
-            // Path to the Git repository (.git directory or its parent)
-            File repoDir = new File("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git");
-            // 当前机器不存在就新建
-            if (repoDir.exists()) {
-                repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-            } else {
-                repository = FileRepositoryBuilder.create(new File(String.valueOf(repoDir)));
-                DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
-            }
+            // 拼接.git路径
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            // 获取git仓库
+            File repoDir = new File(gitPath);
+            repository = getRepository(repoDir, request.getProjectName(), gitUser);
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             List<String> deleteFileList = request.getDeleteFileList();
@@ -283,15 +271,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         Repository repository = null;
         GitFileContentResponse contentResponse = null;
         try {
-            // Path to the Git repository (.git directory or its parent)
-            File repoDir = new File("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git");
-            // 当前机器不存在就新建
-            if (repoDir.exists()) {
-                repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-            } else {
-                repository = FileRepositoryBuilder.create(new File(String.valueOf(repoDir)));
-                DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
-            }
+            // 拼接.git路径
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            // 获取git仓库
+            File repoDir = new File(gitPath);
+            repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
             String content = DSSGitUtils.getTargetCommitFileContent(request.getProjectName(), request.getCommitId(), request.getFilePath());
@@ -308,5 +293,46 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             repository.close();
         }
        return null;
+    }
+
+    @Override
+    public GitHistoryResponse getHistory(GitHistoryRequest request) {
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId());
+        if (gitUser == null) {
+            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+            return null;
+        }
+
+        Repository repository = null;
+        GitHistoryResponse response = new GitHistoryResponse();
+        try {
+            // 拼接.git路径
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            // 获取git仓库
+            File repoDir = new File(gitPath);
+            repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            // 本地保持最新状态
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+
+            response = DSSGitUtils.listCommitsBetween(repository, request.getStartCommitId(), request.getEndCommitId());
+
+        } catch (Exception e) {
+            logger.error("pull failed, the reason is ",e);
+        } finally {
+            repository.close();
+        }
+        return response;
+    }
+
+    private Repository getRepository(File repoDir, String projectName, GitUserEntity gitUser) throws IOException {
+        Repository repository = null;
+        // 当前机器不存在就新建
+        if (repoDir.exists()) {
+            repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
+        } else {
+            repository = FileRepositoryBuilder.create(new File(String.valueOf(repoDir)));
+            DSSGitUtils.remote(repository, projectName, gitUser);
+        }
+        return repository;
     }
 }

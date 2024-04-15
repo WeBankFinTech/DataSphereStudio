@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.git.server.receiver
 
-import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitRequest, GitCreateProjectRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitRevertRequest, GitSearchRequest}
+import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitRequest, GitCreateProjectRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRevertRequest, GitSearchRequest}
 import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.slf4j.{Logger, LoggerFactory}
@@ -46,6 +46,8 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       gitWorkflowManagerService.delete(gitDeleteRequest)
     case gitFileContentRequest: GitFileContentRequest =>
       gitWorkflowManagerService.getFileContent(gitFileContentRequest)
+    case gitHistoryRequest: GitHistoryRequest =>
+      gitWorkflowManagerService.getHistory(gitHistoryRequest)
     case _ => None
   }
 

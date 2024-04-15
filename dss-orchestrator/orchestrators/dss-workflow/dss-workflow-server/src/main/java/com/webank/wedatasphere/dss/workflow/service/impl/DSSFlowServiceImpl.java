@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -54,6 +55,7 @@ import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
@@ -307,7 +309,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
-        lockMapper.insertFlowStatus(flowID, FLOW_STATUS_SAVE);
+        DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(flowID);
+        //仅对接入Git的项目 更新状态为 保存
+        if (projectInfo!= null && projectInfo.getAssociateGit()) {
+            lockMapper.insertFlowStatus(flowID, FLOW_STATUS_SAVE);
+        }
+
         return version;
     }
 

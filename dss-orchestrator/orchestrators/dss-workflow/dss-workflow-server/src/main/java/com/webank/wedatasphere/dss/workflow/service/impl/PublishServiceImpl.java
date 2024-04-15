@@ -101,10 +101,15 @@ public class PublishServiceImpl implements PublishService {
             if (response.getResponse().isFailed()) {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
             }
-            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(flowID);
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(workflowId);
             //仅对接入Git的项目更新状态为 发布-publish
             if (projectInfo.getAssociateGit()) {
-                lockMapper.insertFlowStatus(workflowId, DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
+                String status = lockMapper.selectStatusByFlowId(workflowId);
+                if (StringUtils.isEmpty(status)) {
+                    lockMapper.insertFlowStatus(workflowId, DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
+                } else {
+                    lockMapper.updateFlowStatus(workflowId,DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
+                }
             }
 
             return response.getId();

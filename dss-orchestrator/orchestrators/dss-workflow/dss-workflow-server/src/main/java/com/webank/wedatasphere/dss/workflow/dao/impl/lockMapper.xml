@@ -85,7 +85,6 @@
         INSERT INTO dss_workflow_status (`flow_id`, `status`, `create_time`, `update_time`)
         VALUES
         (#{flowID}, #{status}, NOW(), NOW())
-        ON DUPLICATE KEY UPDATE `status` = #{status}, `update_time` = NOW()
     </insert>
 
     <update id="updateFlowStatus">

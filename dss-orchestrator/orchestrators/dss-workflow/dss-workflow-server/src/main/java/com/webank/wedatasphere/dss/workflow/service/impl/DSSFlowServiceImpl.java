@@ -312,7 +312,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(flowID);
         //仅对接入Git的项目 更新状态为 保存
         if (projectInfo!= null && projectInfo.getAssociateGit()) {
-            lockMapper.insertFlowStatus(flowID, FLOW_STATUS_SAVE);
+            String status = lockMapper.selectStatusByFlowId(flowID);
+            if (StringUtils.isEmpty(status)) {
+                lockMapper.insertFlowStatus(flowID, FLOW_STATUS_SAVE);
+            } else {
+                lockMapper.updateFlowStatus(flowID,FLOW_STATUS_SAVE);
+            }
         }
 
         return version;

@@ -33,6 +33,7 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.commons.lang.StringUtils;
@@ -43,7 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
-import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.DEFAULT_SCHEDULER_APP_CONN;
+import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.*;
 
 public class PublishServiceImpl implements PublishService {
 
@@ -100,7 +101,12 @@ public class PublishServiceImpl implements PublishService {
             if (response.getResponse().isFailed()) {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
             }
-            lockMapper.insertFlowStatus(workflowId, DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(flowID);
+            //仅对接入Git的项目更新状态为 发布-publish
+            if (projectInfo.getAssociateGit()) {
+                lockMapper.insertFlowStatus(workflowId, DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
+            }
+
             return response.getId();
         } catch (DSSErrorException e) {
             throw e;

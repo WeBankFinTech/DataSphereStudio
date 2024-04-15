@@ -195,12 +195,16 @@ public class DSSFlowEditLockManager {
             if (StringUtils.isNotBlank(flowEditLock)) {
                 DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
                 if (dssFlowEditLock != null) {
-                    String status = lockMapper.selectStatusByFlowId(dssFlowEditLock.getFlowID());
-                    if (DSSWorkFlowConstant.FLOW_STATUS_SAVE.equals(status)) {
-                        DSSFlow dssFlow = flowMapper.selectFlowByID(dssFlowEditLock.getFlowID());
-                        DSSProject projectInfo = getProjectInfo(dssFlow.getProjectId());
+                    // 获取当前项目信息
+                    DSSFlow dssFlow = flowMapper.selectFlowByID(dssFlowEditLock.getFlowID());
+                    DSSProject projectInfo = getProjectInfo(dssFlow.getProjectId());
+                    // 对于接入Git的项目，工作流解锁加入额外处理
+                    if (projectInfo.getAssociateGit()) {
+                        String status = lockMapper.selectStatusByFlowId(dssFlowEditLock.getFlowID());
+                        if (DSSWorkFlowConstant.FLOW_STATUS_SAVE.equals(status)) {
 //                        pushProject(projectInfo.getName(), projectInfo.getWorkspaceId(), "resurce", "version", "path", projectInfo.getUsername(), "comment");
-                        lockMapper.insertFlowStatus(dssFlow.getId(), FLOW_STATUS_PUSH);
+                            lockMapper.insertFlowStatus(dssFlow.getId(), FLOW_STATUS_PUSH);
+                        }
                     }
                     lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), dssFlowEditLock.getFlowID());
                 }

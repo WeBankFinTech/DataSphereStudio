@@ -310,7 +310,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
         try {
-            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(flowID);
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(dssFlow.getProjectId());
             //仅对接入Git的项目 更新状态为 保存
             if (projectInfo != null && projectInfo.getAssociateGit()) {
                 String status = lockMapper.selectStatusByFlowId(flowID);

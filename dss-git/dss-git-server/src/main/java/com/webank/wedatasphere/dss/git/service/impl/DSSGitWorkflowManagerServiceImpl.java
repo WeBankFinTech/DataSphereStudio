@@ -23,8 +23,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -39,13 +37,13 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Qualifier("workflowBmlService")
     private BMLService bmlService;
     @Override
-    public GItDiffResponse diff(GitDiffRequest request) {
+    public GitDiffResponse diff(GitDiffRequest request) {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId());
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
         }
-        GItDiffResponse diff = null;
+        GitDiffResponse diff = null;
         Repository repository = null;
         try {
             // 拼接.git路径

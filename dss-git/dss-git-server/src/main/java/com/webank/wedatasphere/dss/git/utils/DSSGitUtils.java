@@ -5,7 +5,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitBaseRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GItDiffResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.config.GitServerConfig;
@@ -137,7 +137,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static GItDiffResponse diff(String projectName) {
+    public static GitDiffResponse diff(String projectName) {
 
         Set<String> status = status(projectName);
         GitTree root = new GitTree("");
@@ -146,7 +146,7 @@ public class DSSGitUtils {
         }
         // 打印树形结构
         printTree("", root);
-        return new GItDiffResponse(root);
+        return new GitDiffResponse(root);
     }
 
     // 打印树结构

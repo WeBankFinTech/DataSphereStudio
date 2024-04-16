@@ -7,7 +7,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import java.util.concurrent.ExecutionException;
 
 public interface DSSGitWorkflowManagerService {
-    GItDiffResponse diff(GitDiffRequest request) throws ExecutionException, InterruptedException;
+    GitDiffResponse diff(GitDiffRequest request) throws ExecutionException, InterruptedException;
 
     GitCommitResponse commit(GitCommitRequest request) throws ExecutionException, InterruptedException;
 

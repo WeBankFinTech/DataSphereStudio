@@ -18,8 +18,10 @@ package com.webank.wedatasphere.dss.workflow.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.entity.request.SubmitFlowRequest;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import org.apache.linkis.common.exception.ErrorException;
 
@@ -72,4 +74,6 @@ public interface DSSFlowService {
     boolean checkIsExistSameFlow(String jsonFlow);
 
     List<String> checkIsSave(Long parentFlowID, String jsonFlow);
+
+    GitTree submitFlow(SubmitFlowRequest flowRequest, String username, Workspace workspace);
 }

@@ -201,7 +201,7 @@ export default {
       let validRepeat = await this.validateRepeat();
       this.$refs.editor.deltaDecorations(selectCode, () => {
         if (!validRepeat) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
-        if (this.loading) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
+        if (this.loading || this.killing) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
         if (!selectCode) {
           return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.emptyCode'));
         }
@@ -219,10 +219,10 @@ export default {
       });
     },
     stop() {
-      if (this.loading) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
-      this.loading = true;
+      if (this.killing) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
+      this.killing = true;
       this.$emit('on-stop', () => {
-        this.loading = false;
+        this.killing = false;
       });
     },
     async save() {
@@ -291,7 +291,7 @@ export default {
 @import '@dataspherestudio/shared/common/style/variables.scss';
   .editor {
     height: 100%;
-    /deep/.we-panel.we-panel-horizontal .we-panel-dash  {
+    ::v-deep.we-panel.we-panel-horizontal .we-panel-dash  {
       // 防止被外层.we-panel.we-panel-vertical .we-panel-dash覆盖
       cursor: ew-resize;
     }

@@ -162,7 +162,7 @@
       position: relative;
       flex: 1;
       .tabs-content {
-        /deep/ .ivu-tabs-tab {
+        ::v-deep .ivu-tabs-tab {
           font-size: $font-size-large;
         }
       }

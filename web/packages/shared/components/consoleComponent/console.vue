@@ -6,6 +6,7 @@
       <div class="workbench-tab-wrapper">
         <div class="workbench-tab">
           <div
+            v-if="!isHistory"
             :class="{active: scriptViewState.showPanel == 'progress'}"
             class="workbench-tab-item"
             @click="showPanelTab('progress')">
@@ -19,18 +20,25 @@
             <span>{{ $t('message.common.tabs.result') }}</span>
           </div>
           <div
-            v-if="isLogShow"
+            v-if="isLogShow || isHistory"
             :class="{active: scriptViewState.showPanel == 'log'}"
             class="workbench-tab-item"
             @click="showPanelTab('log')">
             <span>{{ $t('message.common.tabs.log') }}</span>
+          </div>
+          <div
+            v-if="!isHistory"
+            :class="{active: scriptViewState.showPanel == 'history'}"
+            class="workbench-tab-item"
+            @click="showPanelTab('history')">
+            <span>{{ $t('message.common.tabs.history') }}</span>
           </div>
         </div>
       </div>
       <div
         class="workbench-container">
         <we-progress
-          v-if="scriptViewState.showPanel == 'progress'"
+          v-if="scriptViewState.showPanel == 'progress' && !isHistory"
           :script="script"
           :execute="execute"
           :script-view-state="scriptViewState"
@@ -51,6 +59,13 @@
           :logs="script.log"
           :log-line="script.logLine"
           :script-view-state="scriptViewState"/>
+        <History
+          v-if="scriptViewState.showPanel == 'history'"
+          :history="historyList"
+          :run-type="script.runType"
+          :script-view-state="scriptViewState"
+          @viewHistory="viewHistory"
+        />
       </div>
     </div>
   </div>
@@ -62,6 +77,7 @@ import storage from '@dataspherestudio/shared/common/helper/storage';
 import {debounce, isUndefined, isEmpty, last} from 'lodash';
 import {Script} from './modal.js';
 import result from './result.vue';
+import History from './history.vue'
 import log from './log.vue';
 import weProgress from './progress.vue';
 import Execute from '@dataspherestudio/shared/common/service/execute';
@@ -71,6 +87,7 @@ export default {
     result,
     log,
     weProgress,
+    History
   },
   mixins: [mixin],
   props: {
@@ -90,13 +107,21 @@ export default {
     getResultUrl: {
       type: String,
       defalut: `filesystem`
+    },
+    isHistory: {
+      type: Boolean,
+      default: false
+    },
+    historyList: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
     return {
       execute: null,
       scriptViewState: {
-        showPanel: 'progress',
+        showPanel: this.isHistory ? 'result' : 'progress',
         cacheLogScroll: 0,
         bottomContentHeight: this.height || '250'
       },
@@ -113,6 +138,7 @@ export default {
         log: { all: '', error: '', warning: '', info: '' },
         logLine: 1,
         resultList: null,
+        history: []
       },
     }
   },
@@ -138,16 +164,31 @@ export default {
   mounted() {
   },
   methods: {
+    viewHistory(...rest) {
+      this.$emit('viewHistory', ...rest)
+    },
     killExecute(flag = false) {
-      this.execute.trigger('stop');
-      if (flag) {
-        this.execute.trigger('kill');
+      if (this.execute) {
+        this.execute.trigger('stop');
+        if (flag) {
+          this.execute.trigger('kill');
+        }
       }
+
     },
     createScript() {
+      // 历史服务中work无runtype字段，使用文件后缀名截取
+      let runType = this.work.runType
+      if (!runType && this.work.filename) {
+        const fileParts = this.work.filename.split('.');
+        if (fileParts.length > 1) {
+          runType = fileParts[fileParts.length - 1];
+        }
+      }
       this.script = new Script({
         id: this.work.id,
         title: this.work.name,
+        runType: runType,
         scriptViewState: this.scriptViewState,
       });
     },
@@ -181,6 +222,8 @@ export default {
           isRestore: true,
           id: this.work.id,
           nodeId: this.work.key || undefined,
+          openLog: this.isHistory,
+          isQueryHistory: this.isHistory
         }
         this.execute.halfExecute(option);
         this.monitoringData();
@@ -211,7 +254,8 @@ export default {
           'path': this.execute.currentResultPath,
           'current': 1,
           'size': 20,
-          hugeData: !!ret.hugeData
+          hugeData: !!ret.hugeData,
+          tipMsg: ret.tipMsg
         };
         if (this.execute.resultList[0]) {
           this.$set(this.execute.resultList[0], 'result', storeResult);
@@ -277,8 +321,13 @@ export default {
       });
       this.execute.on('status', (status) => {
         this.script.status = status;
+        if(['Failed', 'Cancelled', 'Timeout'].includes(status) && this.isHistory) {
+          this.openPanel('log')
+        }
       });
       this.execute.on('querySuccess', ({ type, task }) => {
+        if (this.isHistory) return;
+        this.$emit("updateHistory", task)
         const costTime = util.convertTimestamp(task.costTime);
         this.script.progress = {
           ...this.script.progress,
@@ -323,9 +372,13 @@ export default {
       this.execute.on('costTime', (time) => {
         this.script.progress.costTime = util.convertTimestamp(time);
       });
+      this.execute.on('history', (info) => {
+        if (this.isHistory) return;
+        this.$emit("updateHistory", info)
+      })
     },
     resetQuery() {
-      this.showPanelTab('progress');
+      this.showPanelTab(this.isHistory ? 'result' : 'progress');
       this.isLogShow = false;
       this.localLog = {
         log: { all: '', error: '', warning: '', info: '' },
@@ -390,14 +443,32 @@ export default {
         }, 'get')
           .then((ret) => {
             let result = {}
-            if (ret.metadata && ret.metadata.length >= 500) {
+            if (ret.display_prohibited) {
               result = {
                 'headRows': [],
                 'bodyRows': [],
                 'total': ret.totalLine,
                 'type': ret.type,
                 'path': resultPath,
-                hugeData: true
+                hugeData: true,
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
+              };
+            } else if (ret.column_limit_display) {
+              result = {
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+                'headRows': ret.metadata,
+                'bodyRows': ret.fileContent,
+                // 如果totalLine是null，就显示为0
+                'total': ret.totalLine ? ret.totalLine : 0,
+                // 如果内容为null,就显示暂无数据
+                'type': ret.fileContent ? ret.type : 0,
+                'cache': {
+                  offsetX: 0,
+                  offsetY: 0,
+                },
+                'path': resultPath,
+                'current': 1,
+                'size': 20,
               };
             } else {
               result = {
@@ -495,6 +566,7 @@ export default {
     border-top: $border-width-base $border-style-base $border-color-base;
     @include border-color($border-color-base, $dark-border-color-base);
     @include bg-color($light-base-color, $dark-base-color);
+    flex: 1;
     .workbench-tabs {
       position: $relative;
       height: 100%;

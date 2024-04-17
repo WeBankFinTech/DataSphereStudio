@@ -1,10 +1,16 @@
 <template>
   <Modal
     v-model="show"
-    :width="width">
-    <p slot="header">
+    :width="width"
+    :fullscreen="modal.isFullScreen"
+  >
+    <div slot="header">
       <span>{{ $t('message.scripts.hiveTableExport.DCB') }}</span>
-    </p>
+      <span @click="fullScreenModal" class="full-btn">
+        <Icon :type="modal.isFullScreen?'md-contract':'md-expand'" />
+        {{modal.isFullScreen?$t('message.scripts.cancelfullscreen'):$t('message.scripts.fullscreen')}}
+      </span>
+    </div>
     <div class="we-table-export">
       <template>
         <Steps
@@ -28,7 +34,9 @@
           :model="stepOne"
           :rules="stepOnerules"
           :label-width="80"
-          class="we-table-export-form" >
+          class="we-table-export-form"
+          :style="modal.isFullScreen ? { height: '790px' } : {}"
+        >
           <FormItem
             :label="$t('message.scripts.hiveTableExport.SJKM')"
             prop="dbName">
@@ -136,6 +144,7 @@
             prop="chartset">
             <Select
               v-model="stepOne.chartset"
+              class="item-width"
               :placeholder="$t('message.scripts.hiveTableExport.XZBMGS')">
               <Option
                 v-for="(item) in libs.chartset"
@@ -148,6 +157,7 @@
             :label="$t('message.scripts.hiveTableExport.KZTH')"
             prop="nullValue">
             <Select
+              class="item-width"
               v-model="stepOne.nullValue">
               <Option
                 v-for="(item, index) in libs.replacementList"
@@ -167,14 +177,16 @@
           :model="stepTwo"
           :rules="stepTworules"
           :label-width="80"
-          class="we-table-export-form">
+          class="we-table-export-form"
+          :style="modal.isFullScreen ? { height: '790px' } : {}"
+        >
           <FormItem
             :label="$t('message.scripts.hiveTableExport.LX')"
             prop="type">
             <Select
               v-model="stepTwo.type"
               :placeholder="$t('message.scripts.hiveTableExport.QXZLX')"
-              style="width: 378px;"
+              class="item-width"
               @on-change="handleTypeChange">
               <Option
                 v-for="(item) in libs.types"
@@ -186,13 +198,16 @@
           <FormItem
             :label="$t('message.scripts.hiveTableExport.DCZ')"
             prop="path">
-            <directory-dialog
-              :tree="tree"
-              :load-data-fn="loadDataFn"
-              :filter-node="filterNode"
-              :path="stepTwo.path"
-              :fs-type="stepTwo.type"
-              @set-node="setNode"/>
+            <div class="item-width">
+              <directory-dialog
+                :tree="tree"
+                :load-data-fn="loadDataFn"
+                :filter-node="filterNode"
+                :path="stepTwo.path"
+                :fs-type="stepTwo.type"
+                :height="modal.isFullScreen ? 500 : 120"
+                @set-node="setNode"/>
+            </div>
           </FormItem>
           <FormItem
             :label="$t('message.scripts.hiveTableExport.WJM')"
@@ -200,7 +215,8 @@
             <Input
               v-model="stepTwo.fileName"
               :placeholder="$t('message.scripts.hiveTableExport.TRDCWJMC')"
-              style="width: 350px;">
+              style="width: 94%"
+            >
             </Input>
             <span>.{{ stepOne.exportType }}</span>
           </FormItem>
@@ -278,6 +294,9 @@ export default {
       }
     };
     return {
+      modal: {
+        isFullScreen: false,
+      },
       show: false,
       stepActive: 0,
       isLoading: false,
@@ -313,6 +332,7 @@ export default {
           { label: this.$t('message.scripts.hiveTableExport.FH'), value: ';' },
           { label: this.$t('message.scripts.hiveTableExport.ZBF'), value: '\\t' },
           { label: this.$t('message.scripts.hiveTableExport.KG'), value: '%20' },
+          { label: this.$t('message.scripts.hiveTableExport.SX'), value: '|' },
         ],
         exportTypes: [
           { label: 'xlsx', value: 'xlsx' },
@@ -399,6 +419,9 @@ export default {
     },
   },
   methods: {
+    fullScreenModal() {
+      this.modal.isFullScreen = !this.modal.isFullScreen
+    },
     async open() {
       if (this.isLoading) {
         this.$Message.warning(this.$t('message.scripts.hiveTableExport.CBDC'));

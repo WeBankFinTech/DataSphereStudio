@@ -212,6 +212,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-framework-orchestrator-server</artifactId>
+            <version>${dss.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

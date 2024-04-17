@@ -133,7 +133,7 @@ public interface OrchestratorService {
 
     Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest) throws DSSFrameworkErrorException;
 
-    List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username);
+    List<OrchestratorBaseInfo> getOrchestratorInfos(OrchestratorRequest orchestratorRequest, String username);
 
     ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos);
 

@@ -440,7 +440,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
      * @return list of OrchestratorBaseInfo
      */
     @Override
-    public List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username) {
+    public List<OrchestratorBaseInfo> getOrchestratorInfos(OrchestratorRequest orchestratorRequest, String username) {
         List<DSSOrchestratorInfo> list = orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{
             put("workspace_id", orchestratorRequest.getWorkspaceId());
             put("project_id", orchestratorRequest.getProjectId());

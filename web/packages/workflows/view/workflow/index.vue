@@ -1,163 +1,177 @@
 <template>
-  <div class="workflow-wrap">
-    <div class="workflow-nav-tree" :class="{ 'tree-fold': treeFold }">
-      <div class="workflow-nav-tree-switch" @click="handleTreeToggle">
-        <span class="project-nav-tree-top-t-icon">
-          <SvgIcon
-            icon-class="dev_center_flod"
-            style="opacity: 0.65"
-          />
-        </span>
-      </div>
-      <div class="project-nav-tree">
-        <div class="project-nav-tree-top">
-          <div class="project-nav-tree-top-t">
-            <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
-            <div class="project-nav-tree-top-t-icon">
-              <SvgIcon class="icon sort-icon" icon-class="xinzeng" style="display: inline-flex;margin-top: 4px;" @click="createProject" />
-              <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
-                <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
-                <DropdownMenu slot="list">
-                  <DropdownItem
-                    v-for="(item) in sortTypeList"
-                    :name="item.value"
-                    :key="item.value"
-                  >{{ item.lable}}</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-              <Dropdown class="projcat-icon" @on-click="filerSort($event,'filter')">
-                <Icon :type="{all: 'ios-funnel-outline',owner:'ios-person-add',share:'md-share'}[filterBar.cat] " class="icon" size="16"></Icon>
-                <DropdownMenu slot="list">
-                  <DropdownItem
-                    name="all"
-                    key="all"
-                  >{{ $t('message.workflow.AllProj') }}</DropdownItem>
-                  <DropdownItem
-                    name="owner"
-                    key="owner"
-                  >{{ $t('message.workflow.Individual') }}</DropdownItem>
-                  <DropdownItem
-                    name="share"
-                    key="share"
-                  >{{ $t('message.workflow.ShareProj') }}</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
+  <div class="workflow-wrap workflow-drag-wrap">
+    <we-panel
+      diretion="horizontal">
+      <we-panel-item
+        :index="1"
+        :width="panelWidth"
+        :min="minPanelWidth"
+        :max="maxPanelWidth"
+        @on-change="handlePanelChange"
+        class="left-panel">
+        <div class="workflow-nav-tree" :class="{ 'tree-fold': treeFold }">
+          <div class="workflow-nav-tree-switch" @click="handleTreeToggle">
+            <span class="project-nav-tree-top-t-icon">
               <SvgIcon
                 icon-class="dev_center_flod"
-                class="icon"
-                style="opacity: 0.65;margin-top: 2px;"
-                @click="handleTreeToggle"
+                style="opacity: 0.65"
               />
-            </div>
+            </span>
           </div>
-        </div>
-        <virtual-tree
-          class="tree-container"
-          keyText="id"
-          :size="32"
-          :list="projectsTree"
-          :render="renderNode"
-          :open="openNode"
-          :height="height - 30"
-          @we-open-node="openNodeChange"
-          @we-click="handleTreeClick" />
-        <Spin v-show="loadingTree" size="large" fix />
-      </div>
-      <WorkflowModal
-        :treeModalShow="treeModalShow"
-        :currentTreeProject="currentTreeProject"
-        :orchestratorModeList="orchestratorModeList"
-        :currentMode="currentMode"
-        :selectOrchestratorList="selectOrchestratorList"
-        :projectNameList="formatProjectNameList"
-        @on-tree-modal-cancel="handleTreeModalCancel"
-        @on-tree-modal-confirm="handleTreeModalConfirm"
-      >
-      </WorkflowModal>
-    </div>
-
-    <WorkflowTabList
-      :class="{ 'tree-fold': treeFold }"
-      :treeFold="treeFold"
-      :loading="loading"
-      :modeOfKey="modeOfKey"
-      :buttonText="selectDevprocess"
-      :bottomTapList="tabList"
-      :modeName="modeName"
-      :currentTab="current"
-      @bandleTapTab="onTabClick"
-      @handleTabRemove="onTabRemove"
-      @handleChangeButton="handleChangeButton"
-    >
-      <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
-        <div
-          class="workflowListContainer"
-          v-show="(tabList.length < 1 && projectsTree.length > 0)"
-        >
-          <Workflow
-            class="workflowListLeft"
-            ref="workflow"
-            :refreshFlow="refreshFlow"
-            :projectData="currentProjectData"
+          <div class="project-nav-tree">
+            <div class="project-nav-tree-top">
+              <div class="project-nav-tree-top-t">
+                <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
+                <div class="project-nav-tree-top-t-icon">
+                  <SvgIcon class="icon sort-icon" icon-class="xinzeng" style="display: inline-flex;margin-top: 4px;" @click="createProject" />
+                  <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
+                    <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
+                    <DropdownMenu slot="list">
+                      <DropdownItem
+                        v-for="(item) in sortTypeList"
+                        :name="item.value"
+                        :key="item.value"
+                      >{{ item.lable}}</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                  <Dropdown class="projcat-icon" @on-click="filerSort($event,'filter')">
+                    <Icon :type="{all: 'ios-funnel-outline',owner:'ios-person-add',share:'md-share'}[filterBar.cat] " class="icon" size="16"></Icon>
+                    <DropdownMenu slot="list">
+                      <DropdownItem
+                        name="all"
+                        key="all"
+                      >{{ $t('message.workflow.AllProj') }}</DropdownItem>
+                      <DropdownItem
+                        name="owner"
+                        key="owner"
+                      >{{ $t('message.workflow.Individual') }}</DropdownItem>
+                      <DropdownItem
+                        name="share"
+                        key="share"
+                      >{{ $t('message.workflow.ShareProj') }}</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
+                  <SvgIcon
+                    icon-class="dev_center_flod"
+                    class="icon"
+                    style="opacity: 0.65;margin-top: 2px;"
+                    @click="handleTreeToggle"
+                  />
+                </div>
+              </div>
+            </div>
+            <virtual-tree
+              class="tree-container"
+              keyText="id"
+              :size="32"
+              :list="projectsTree"
+              :render="renderNode"
+              :open="openNode"
+              :height="height - 30"
+              @we-open-node="openNodeChange"
+              @we-click="handleTreeClick" />
+            <Spin v-show="loadingTree" size="large" fix />
+          </div>
+          <WorkflowModal
+            :treeModalShow="treeModalShow"
+            :currentTreeProject="currentTreeProject"
             :orchestratorModeList="orchestratorModeList"
             :currentMode="currentMode"
             :selectOrchestratorList="selectOrchestratorList"
-            :projectsTree="projectsTree"
-            :top-tab-list="tabList"
-            :create-project-handler="createProject"
-            @open-workflow="openWorkflow"
-            @delete-workflow="deleteWorkflow"
-            @rollback="onRollBack"
+            :projectNameList="formatProjectNameList"
+            @on-tree-modal-cancel="handleTreeModalCancel"
             @on-tree-modal-confirm="handleTreeModalConfirm"
           >
-          </Workflow>
+          </WorkflowModal>
         </div>
-
-        <template
-          v-for="(item, index) in tabList.filter(
-            (i) => i.type === DEVPROCESS.DEVELOPMENTCENTER
-          )"
+      </we-panel-item>
+      <we-panel-item
+        :index="2"
+        class="center-panel">
+        <WorkflowTabList
+          :class="{ 'tree-fold': treeFold }"
+          :treeFold="treeFold"
+          :loading="loading"
+          :modeOfKey="modeOfKey"
+          :buttonText="selectDevprocess"
+          :bottomTapList="tabList"
+          :modeName="modeName"
+          :currentTab="current"
+          @bandleTapTab="onTabClick"
+          @handleTabRemove="onTabRemove"
+          @handleChangeButton="handleChangeButton"
         >
-          <commonIframe
-            v-if="item.url && item.isIframe"
-            v-show="item.tabId === current.tabId"
-            :key="item.name"
-            :url="current.url"
-          ></commonIframe>
-          <process
-            v-else-if="item.orchestratorMode.startsWith(ORCHESTRATORMODES.WORKFLOW) && item.tabId === current.tabId"
-            :key="item.tabId"
-            :query="item.query"
-            @updateWorkflowList="updateWorkflowList"
-            @isChange="isChange(index, arguments)"
-            @close="onTabRemove(item.tabId, false)"
-            @open="reopen(item)"
-            @release="(p)=>{openItemAction({...p, name: `${item.name}(${$t('message.workflow.historicalVersion')})`})}"
-          ></process>
-          <template v-else>
-            <!-- 其他模式 -->
+          <template v-if="modeOfKey === DEVPROCESS.DEVELOPMENTCENTER">
+            <div
+              class="workflowListContainer"
+              v-show="(tabList.length < 1 && projectsTree.length > 0)"
+            >
+              <Workflow
+                class="workflowListLeft"
+                ref="workflow"
+                :refreshFlow="refreshFlow"
+                :projectData="currentProjectData"
+                :orchestratorModeList="orchestratorModeList"
+                :currentMode="currentMode"
+                :selectOrchestratorList="selectOrchestratorList"
+                :projectsTree="projectsTree"
+                :top-tab-list="tabList"
+                :create-project-handler="createProject"
+                @open-workflow="openWorkflow"
+                @delete-workflow="deleteWorkflow"
+                @rollback="onRollBack"
+                @on-tree-modal-confirm="handleTreeModalConfirm"
+              >
+              </Workflow>
+            </div>
+
+            <template
+              v-for="(item, index) in tabList.filter(
+                (i) => i.type === DEVPROCESS.DEVELOPMENTCENTER
+              )"
+            >
+              <commonIframe
+                v-if="item.url && item.isIframe"
+                v-show="item.tabId === current.tabId"
+                :key="item.name"
+                :url="current.url"
+              ></commonIframe>
+              <process
+                v-else-if="item.orchestratorMode.startsWith(ORCHESTRATORMODES.WORKFLOW) && item.tabId === current.tabId"
+                :key="item.tabId"
+                :query="item.query"
+                @updateWorkflowList="updateWorkflowList"
+                @isChange="isChange(index, arguments)"
+                @close="onTabRemove(item.tabId, false)"
+                @open="reopen(item)"
+                @release="(p)=>{openItemAction({...p, name: `${item.name}(${$t('message.workflow.historicalVersion')})`})}"
+              ></process>
+              <template v-else>
+                <!-- 其他模式 -->
+              </template>
+            </template>
           </template>
-        </template>
-      </template>
-      <template v-if="modeOfKey === 'streamis_prod'">
-        <Streamis class="streamisContainer" :project-name="$route.query.projectName"/>
-      </template>
-      <template v-else>
-        <!-- 其他应用流程 -->
-      </template>
-    </WorkflowTabList>
-    <ProjectForm
-      ref="projectForm"
-      :action-type="actionType"
-      :project-data="currentProjectData"
-      :applicationAreaMap="applicationAreaMap"
-      :classify-list="cacheData"
-      :framework="true"
-      :workspace-users="workspaceUsers"
-      :orchestratorModeList="orchestratorModeList"
-      @getDevProcessData="getDevProcessData"
-      @confirm="ProjectConfirm"
-    ></ProjectForm>
+          <template v-if="modeOfKey === 'streamis_prod'">
+            <Streamis class="streamisContainer" :project-name="$route.query.projectName"/>
+          </template>
+          <template v-else>
+            <!-- 其他应用流程 -->
+          </template>
+        </WorkflowTabList>
+        <ProjectForm
+          ref="projectForm"
+          :action-type="actionType"
+          :project-data="currentProjectData"
+          :applicationAreaMap="applicationAreaMap"
+          :classify-list="cacheData"
+          :framework="true"
+          :workspace-users="workspaceUsers"
+          :orchestratorModeList="orchestratorModeList"
+          @getDevProcessData="getDevProcessData"
+          @confirm="ProjectConfirm"
+        ></ProjectForm>
+      </we-panel-item>
+    </we-panel>
 
     <!-- 删除项目弹窗 -->
     <Modal
@@ -301,7 +315,11 @@ export default {
         accessUsers: [],
         releaseUsers: [],
         editUsers: []
-      }
+      },
+      panelWidth: 250,
+      minPanelWidth: 250,
+      maxPanelWidth: 375,
+      currentPanelWidth: 250
     }
   },
   filters,
@@ -401,8 +419,18 @@ export default {
       };
       this.$refs.projectForm.showProject(this.currentProjectData, 'add')
     },
+    handlePanelChange(data) {
+      if (data.width >= this.minPanelWidth && data.width <= this.maxPanelWidth) {
+        this.currentPanelWidth = data.width;
+      }
+    },
     handleTreeToggle() {
       this.treeFold = !this.treeFold;
+      if (this.treeFold) {
+        this.panelWidth = 1;
+      } else {
+        this.panelWidth = this.currentPanelWidth;
+      }
       setTimeout(()=>{
         eventbus.emit('workflow.fold.left.tree');
       }, 800)
@@ -450,11 +478,15 @@ export default {
       });
     },
     // 获取工程的数据
-    async getProjectData(callback) {
-      const data = await this.fetchProjectDataById()
-      this.currentProjectData = data
-      this.getSelectDevProcess();
-      this.getSelectOrchestratorList();
+    async getProjectData(callback, id) {
+      const data = await this.fetchProjectDataById(id)
+      if (data) {
+        this.currentProjectData = data
+        this.getSelectDevProcess();
+        this.getSelectOrchestratorList();
+      } else {
+        // 获取工程数据失败
+      }
       this.loading = false;
       if (callback) {
         callback()
@@ -474,13 +506,15 @@ export default {
           "post"
         )
         .then((res) => {
-          const project = res.projects[0];
-          setVirtualRoles(project, this.getUserName());
-          const data = {
-            ...res.projects[0],
-            canWrite: project.canWrite(),
-          };
-          return data;
+          if (res.projects.length) {
+            const project = res.projects[0];
+            setVirtualRoles(project, this.getUserName());
+            const data = {
+              ...res.projects[0],
+              canWrite: project.canWrite(),
+            };
+            return data;
+          }
         })
     },
     // 获取所有project展示tree
@@ -528,9 +562,12 @@ export default {
           resolve(flow);
         });
     },
-    importSended(target){
+    importSended(target, orchestratorId){
       this.getFlow({id: target.id, name: target.name}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
+        this.tabList = this.tabList.filter(item => {
+          return item.query.orchestratorId !== orchestratorId
+        }) 
       })
     },
     handleTreeModal(project) {
@@ -672,6 +709,17 @@ export default {
         sure: false,
         ifDelOtherSys: this.ifDelOtherSys,
       };
+      const afterDelete = () => {
+        if (this.deleteProjectItem.id == this.currentProjectData.id) {
+          setTimeout(() => {
+            this.$router.go(-1);
+          }, 1000);
+        } else {
+          this.projectsTree  = this.projectsTree.filter((item) => {
+            return item.id != this.deleteProjectItem.id;
+          })
+        }
+      };
       api
         .fetch(`${this.$API_PATH.PROJECT_PATH}deleteProject`, params, "post")
         .then((res) => {
@@ -697,9 +745,7 @@ export default {
                         "message.workflow.success"
                       )}`
                     );
-                    setTimeout(() => {
-                      this.$router.go(0);
-                    }, 1000);
+                    afterDelete()
                   })
                   .catch(() => {
                     this.loading = false;
@@ -713,9 +759,7 @@ export default {
                 name: this.deleteProjectItem.name,
               })
             );
-            setTimeout(() => {
-              this.$router.go(0);
-            }, 1000);
+            afterDelete()
           }
         })
         .catch(() => {
@@ -980,7 +1024,7 @@ export default {
           )
           .then(() => {
             typeof callback == "function" && callback(true);
-            this.getProjectData();
+            this.getProjectData(() => {}, projectData.id);
             this.$Message.success(
               this.$t("message.common.projectDetail.eidtorProjectSuccess", {
                 name: projectData.name,
@@ -1590,9 +1634,28 @@ export default {
   font-size: 12px;
   @include font-color($light-text-color, $dark-text-color);
 }
+
+.workflow-drag-wrap {
+  .workflow-nav-tree {
+    position: unset;
+    width: 100%;
+    &.tree-fold {
+      position: fixed;
+    }
+    .project-nav-tree-top {
+      width: 100%;
+    }
+    .project-nav-tree {
+      width: 100%;
+    }
+  }
+  .workflowTabContainer {
+    margin-left: 0px;
+  }
+}
 </style>
 <style lang="scss">
-.workflow-wrap {
+.workflow-drag-wrap {
   .tree-container {
     .tree-info,.tree-add {
       display: none
@@ -1600,15 +1663,32 @@ export default {
     .node-item {
       height: 32px;
       line-height: 32px;
+      .node-name {
+        max-width: 100%;
+        display: inline-block;
+        vertical-align: top;
+      }
       &:hover {
+        .node-name {
+          max-width: 100%;
+          width: calc(100% - 64px);
+          display: inline-block;
+          vertical-align: top;
+        }
         .tree-info,.tree-add{
           display: block
         }
       }
-      .node-name {
-        max-width: 72%;
-        display: inline-block;
-        vertical-align: top;
+      &:not(.level-1):hover {
+        .node-name {
+          max-width: 100%;
+          width: calc(100% - 36px);
+          display: inline-block;
+          vertical-align: top;
+        }
+        .tree-info,.tree-add{
+          display: block
+        }
       }
     }
   }

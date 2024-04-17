@@ -313,6 +313,9 @@
       "disableReq": "Please disable the rule first",
       "edit": "Edit",
       "deletesuccess": "Delete successfully",
+      "yes": "Yes",
+      "no": "No",
+      "crossCluster": "Whether it is a cross-cluster queue",
       "ruleform": {
         "edittitle": "Edit rules",
         "addtitle": "Add rules",
@@ -341,7 +344,8 @@
         "createUser": "Creator",
         "createTime": "Create time",
         "modifyTime": "Modify time",
-        "modifyUser": "Modifier"
+        "modifyUser": "Modifier",
+        "plsselectCross": "Select whether to cross-cluster"
       },
       "selectfirst": "Please select!",
       "hasBusy": "If an engine with busy status is selected, forcing it to stop will cause the running tasks on that engine to fail, so it is recommended to check with the engine creator before stopping.",

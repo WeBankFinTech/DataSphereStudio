@@ -473,7 +473,7 @@ export default {
 
       const action_10 =this.editor.addAction({
         id: 'newdbsuggest',
-        label: this.$t('message.common.monacoMenu.newdbcomplition'),
+        label: this.$t('message.common.monacoMenu.openLanguageServe'),
         keybindings: [],
         keybindingContext: null,
         contextMenuGroupId: 'control',

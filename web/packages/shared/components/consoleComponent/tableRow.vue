@@ -2,6 +2,7 @@
   <Modal
     v-model="show"
     width="700"
+    :fullscreen="modal.isFullScreen"
     class="table-row">
     <div
       slot="header">
@@ -12,6 +13,10 @@
           class="table-row-input"
           v-model="searchText"
           :placeholder="$t('message.common.tableRow.search')"></Input>
+        <span @click="fullScreenModal" class="full-btn">
+          <Icon :type="modal.isFullScreen?'md-contract':'md-expand'" />
+          {{modal.isFullScreen?$t('message.scripts.cancelfullscreen'):$t('message.scripts.fullscreen')}}
+        </span>
       </div>
     </div>
     <div :class="{'noselectable': baseinfo.resCopyEnable === false}">
@@ -19,9 +24,10 @@
         border
         highlight-row
         outer-sort
-        :tableHeight="400"
+        :tableHeight="modal.isFullScreen ? 790:400"
         :columns="columns"
         :tableList="filterRow"
+        :isOffset="false"
         class="table-row-table">
       </wb-table>
     </div>
@@ -49,6 +55,9 @@ export default {
   data() {
     return {
       show: false,
+      modal: {
+        isFullScreen: false,
+      },
       columns: [{
         type: 'index',
         title: '#',
@@ -78,6 +87,9 @@ export default {
     },
   },
   methods: {
+    fullScreenModal() {
+      this.modal.isFullScreen = !this.modal.isFullScreen
+    },
     open() {
       this.show = true;
       this.format();
@@ -108,6 +120,13 @@ export default {
         width: 200px;
         float: right;
       }
+    .full-btn {
+      float: right;
+      margin-right: 30px;
+      padding-top: 5px;
+      cursor: pointer;
+      color: #2d8cf0
+    };
     }
     .table-row-table {
       .ivu-table th {

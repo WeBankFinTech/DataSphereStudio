@@ -68,33 +68,33 @@ export default {
   .library-detail-content {
     padding: 0 15px 15px;
     @include font-color(#666, $dark-text-color);
-    /deep/img {
+    ::v-deepimg {
       display: block;
       border: 0;
       max-width: 100%;
       cursor: pointer;
     }
-    /deep/h1 {
+    ::v-deeph1 {
       font-size: 18px;
       margin: 6px 0;
     }
-    /deep/h2 {
+    ::v-deeph2 {
       font-size: 16px;
       margin: 6px 0;
     }
-    /deep/h3 {
+    ::v-deeph3 {
       font-size: 14px;
       margin: 6px 0;
     }
-    /deep/h4 {
+    ::v-deeph4 {
       font-size: 12px;
       margin: 6px 0;
     }
-    /deep/h5 {
+    ::v-deeph5 {
       font-size: 12px;
       margin: 6px 0;
     }
-    p /deep/p {
+    p ::v-deepp {
       margin: 5px;
     }
   }

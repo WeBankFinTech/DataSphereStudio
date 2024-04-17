@@ -94,6 +94,7 @@
           <field
             v-if="bottomTab.show_fieldDetail"
             :codePrecheckRes="script.codePrecheckRes"
+            :script-view-state="scriptViewState"
           />
           <template v-for="(comp, index) in extComponents">
             <component
@@ -193,7 +194,7 @@ export default {
       postType: 'http',
       saveLoading: false,
       extComponents,
-      isShowFieldDetailTab: false
+      isShowFieldDetailTab: false,
     };
   },
   mixins: [mixin],
@@ -772,6 +773,7 @@ export default {
             'path': this.execute.currentResultPath,
             'current': 1,
             'size': 20,
+            tipMsg: ret.tipMsg,
             hugeData: !!ret.hugeData
           };
           this.$set(this.execute.resultList[0], 'result', storeResult);
@@ -995,7 +997,7 @@ export default {
           formData.append('type', 'union');
           const codePrecheckRes = await api.fetch('/validator/code-precheck',formData,'post');
           // 如果拿到代码审查结果时，代码已运行完成，则不进行操作
-          if (!this.script.progress || !this.script.progress.costTime) {
+          if (this.$refs.progressTab && (!this.script.progress || !this.script.progress.costTime)) {
             this.script.codePrecheckRes = codePrecheckRes;
             this.$refs.progressTab.updateCodePreCheck(codePrecheckRes);
           }
@@ -1106,7 +1108,7 @@ export default {
               params: this.script.params
             }
 
-          });
+          }, false);
           this.work.unsave = false;
           // 提交最新的内容，更新script.data和script.oldData
           this.script.oldData = this.script.data;
@@ -1251,18 +1253,33 @@ export default {
         const url = '/filesystem/openFile';
         api.fetch(url, {
           path: resultPath,
+          enableLimit: true,
           pageSize,
         }, 'get')
           .then((ret) => {
             let result = {}
-            if (ret.metadata && ret.metadata.length >= 500) {
+            if (ret.display_prohibited) {
               result = {
                 'headRows': [],
                 'bodyRows': [],
                 'total': ret.totalLine,
                 'type': ret.type,
                 'path': resultPath,
-                hugeData: true
+                hugeData: true,
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
+              };
+            } else if (ret.column_limit_display) {
+              result = {
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+                'headRows': ret.metadata,
+                'bodyRows': ret.fileContent,
+                // 如果totalLine是null，就显示为0
+                'total': ret.totalLine ? ret.totalLine : 0,
+                // 如果内容为null,就显示暂无数据
+                'type': ret.fileContent ? ret.type : 0,
+                'path': resultPath,
+                'current': 1,
+                'size': 20,
               };
             } else {
               result = {
@@ -1407,17 +1424,28 @@ export default {
           api.fetch(url2, {
             path: currentResultPath,
             page: 1,
+            enableLimit: true,
             pageSize: 5000,
           }, 'get').then((ret) => {
             let tmpResult
-            if (ret.metadata && ret.metadata.length >= 500) {
-              tmpResult = {
+            if (ret.display_prohibited) {
+              result = {
                 'headRows': [],
                 'bodyRows': [],
                 'total': ret.totalLine,
                 'type': ret.type,
                 'path': currentResultPath,
-                hugeData: true
+                hugeData: true,
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
+              };
+            } else if (ret.column_limit_display) {
+              tmpResult = {
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+                'headRows': ret.metadata,
+                'bodyRows': ret.fileContent,
+                'total': ret.totalLine,
+                'type': ret.type,
+                'path': currentResultPath,
               };
             } else {
               tmpResult = {

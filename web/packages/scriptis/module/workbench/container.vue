@@ -266,24 +266,28 @@ export default {
       plugin.clear('copilot_web_listener_queryStructure')
     },
     initListenerCopilotEvent() {
-      plugin.emitHook('get_copilot_web_listener_event_class', 'table').then(eventClass => {
-        const tableEvent = new eventClass({
-          dispatch: this.dispatch,
-          $t: this.$t
-        })
-        plugin.on('copilot_web_listener_viewTableData', ({ tableName }) => {
-          tableEvent.queryTable(tableName)
-        })
-        plugin.on('copilot_web_listener_queryStructure', ({ tableName }) => {
-          const [dbName, fileName] = tableName.split('.')
-          const filenamePath = `${this.$t('message.scripts.hiveTableDesc.tableDetail')}(${fileName})`;
-          tableEvent.describeTable({
-            dbName,
-            fileName,
-            filenamePath
+      try {
+        plugin.emitHook('get_copilot_web_listener_event_class', 'table').then(eventClass => {
+          const tableEvent = new eventClass({
+            dispatch: this.dispatch,
+            $t: this.$t
+          })
+          plugin.on('copilot_web_listener_viewTableData', ({ tableName }) => {
+            tableEvent.queryTable(tableName)
+          })
+          plugin.on('copilot_web_listener_queryStructure', ({ tableName }) => {
+            const [dbName, fileName] = tableName.split('.')
+            const filenamePath = `${this.$t('message.scripts.hiveTableDesc.tableDetail')}(${fileName})`;
+            tableEvent.describeTable({
+              dbName,
+              fileName,
+              filenamePath
+            })
           })
         })
-      })
+      } catch (error) {
+        console.log(error)
+      }
       
     },
     init() {
@@ -1218,7 +1222,7 @@ export default {
 <style lang="scss" scoped>
 @import "@dataspherestudio/shared/common/style/variables.scss";
 .workbench {
-  /deep/.ivu-tabs.ivu-tabs-card {
+  ::v-deep.ivu-tabs.ivu-tabs-card {
     border-top: $border-width-base $border-style-base #dcdee2;
     @include border-color($border-color-base, $dark-border-color-base);
     .ivu-tabs-bar .ivu-tabs-tab {

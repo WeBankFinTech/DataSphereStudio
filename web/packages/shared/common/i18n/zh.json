@@ -211,6 +211,8 @@
         "DKZDHH": "自动换行",
         "newdbcomplition": "库表联想-Beta",
         "dbcomplition": "库表联想-Release",
+        "closeLanguageServe": "关闭语言服务器开关[Beta]",
+        "openLanguageServe": "打开语言服务器开关[Beta]",
         "GBZDHH": "关闭自动换行",
         "GYFSYGWYF": "该语法属于高危语法，请谨慎操作！"
       },

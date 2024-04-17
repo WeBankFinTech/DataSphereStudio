@@ -19,11 +19,15 @@ package com.webank.wedatasphere.dss.framework.project.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
@@ -32,21 +36,24 @@ import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
+import com.webank.wedatasphere.dss.framework.project.entity.OrchestratorBatchImportInfo;
 import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.*;
+import com.webank.wedatasphere.dss.framework.project.entity.response.BatchExportResult;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
-import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
+import com.webank.wedatasphere.dss.framework.project.service.ExportService;
+import com.webank.wedatasphere.dss.framework.project.service.ImportService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCreateProjectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
@@ -55,12 +62,15 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProject
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.project.utils.ProjectOperationUtils.tryProjectOperation;
@@ -70,13 +80,28 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     @Autowired
     private DSSProjectMapper projectMapper;
     @Autowired
-    private DSSProjectUserService projectUserService;
+    private ExportService exportService;
     @Autowired
     private DSSProjectUserMapper projectUserMapper;
+    @Autowired
+    private OrchestratorService orchestratorService;
+    @Autowired
+    private DSSProjectService projectService;
+    @Autowired
+    private ImportService importService;
+
+
+
 
     public static final String MODE_SPLIT = ",";
     public static final String KEY_SPLIT = "-";
     private final String SUPPORT_ABILITY = ProjectConf.SUPPORT_ABILITY.getValue();
+    private final ThreadFactory projectOperateThreadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("dss-project-operate-thread-%d")
+            .setDaemon(false)
+            .build();
+    private final ExecutorService projectOperateThreadPool = new ThreadPoolExecutor(5, 200, 0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(1024), projectOperateThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 
     @Override
     public DSSProjectDO createProject(String username, ProjectCreateRequest projectCreateRequest) {
@@ -393,6 +418,29 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
         }
         return projectResponseList;
+    }
+    @Override
+    public void exportAllOrchestrators(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
+                                       String username, String proxyUser, Workspace workspace) throws Exception {
+        Long projectId=exportAllOrchestratorsReqest.getProjectId();
+        EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
+        List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(
+                new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId())
+                , exportAllOrchestratorsReqest.getLabels());
+        ProjectInfoVo projectVO=projectService.getProjectInfoById(projectId);
+       exportService.batchExport(username, projectId, orchestrators, projectVO.getProjectName(), envLabel, workspace);
+    }
+
+    @Override
+    public void importAllOrchestrators(ProjectInfoVo projectInfo, BmlResource importResource, String username,
+                                    String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception {
+
+    importService.batchImportOrc(username, projectInfo.getId(),
+                        projectInfo.getProjectName(), importResource, checkCode, envLabel, workspace);
+
+
+
+
     }
 
 }

@@ -19,11 +19,9 @@ package com.webank.wedatasphere.dss.orchestrator.server.restful;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
@@ -41,7 +39,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import scala.tools.nsc.typechecker.Implicits;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -95,7 +92,7 @@ public class DSSFrameworkOrchestratorRestful {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
             LOGGER.info("user {} begin to geyAllOrchestrator, requestBody:{}", username, orchestratorRequest);
-            return Message.ok("获取编排模式成功").data("page", orchestratorService.getListByPage(orchestratorRequest, username));
+            return Message.ok("获取编排模式成功").data("page", orchestratorService.getOrchestratorInfos(orchestratorRequest, username));
         } catch (Exception e) {
             LOGGER.error("getAllOrchestratorError ", e);
             return Message.error("获取编排模式失败:" + e.getMessage());

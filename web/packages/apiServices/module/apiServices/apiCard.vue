@@ -209,7 +209,7 @@ export default {
       right: 0;
       z-index: $zindex-select;
       transform: translateY(-50%);
-      /deep/.ivu-select-dropdown {
+      ::v-deep.ivu-select-dropdown {
         max-width: none;
       }
     }

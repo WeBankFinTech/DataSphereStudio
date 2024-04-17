@@ -68,7 +68,7 @@ public class DSSCommonUtils {
     public static final String DSS_LABELS_KEY = "labels";
     public static final String DSS_EXECUTE_BY_PROXY_USER_KEY = "execByProxyUser";
 
-    public static final CommonVars<String> DSS_HOME = CommonVars.apply("DSS_HOME", "");
+    public static final CommonVars<String> DSS_HOME = CommonVars.apply("DSS_HOME", "/appcom/Install/dss");
 
     public static long parseToLong(Object val) {
         if (val instanceof Double) {

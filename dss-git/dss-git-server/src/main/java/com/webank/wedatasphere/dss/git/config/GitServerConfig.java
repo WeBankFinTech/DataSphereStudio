@@ -11,5 +11,7 @@ public class GitServerConfig {
 
     public static final CommonVars<Integer> GIT_THREAD_NUM = CommonVars.apply("wds.dss.git.thread.num", 23);
 
+    public static final CommonVars<String> GIT_SERVER_META_PATH = CommonVars.apply("wds.dss.git.server.meta.path", ".metaConf");
+
     public static final CommonVars<String> GIT_THREAD_NAME = CommonVars.apply("wds.dss.git.thread.name", "gitServer-Thread-");
 }

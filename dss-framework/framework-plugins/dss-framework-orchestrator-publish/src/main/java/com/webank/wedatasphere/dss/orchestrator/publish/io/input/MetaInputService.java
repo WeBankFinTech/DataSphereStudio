@@ -32,7 +32,14 @@ public interface MetaInputService {
 
 
     List<DSSOrchestratorInfo> importOrchestrator(String basePath) throws IOException;
-    DSSOrchestratorInfo importOrchestratorNew(String flowMetaPath) throws IOException;
+
+    /**
+     * 读取编排元数据
+     * @param flowMetaPath 工作流的元数据目录，比如/temp/projectName/.metaconf/demoflow/
+     * @return
+     * @throws IOException
+     */
+    DSSOrchestratorInfo importOrchestratorNew(String flowMetaPath) ;
 
     List<DSSFlow> inputFlow(String basePath) throws IOException;
 

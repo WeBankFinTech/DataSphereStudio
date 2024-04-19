@@ -44,6 +44,7 @@ import com.webank.wedatasphere.dss.standard.app.development.service.RefExportSer
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import org.apache.commons.io.FileUtils;
 import org.apache.linkis.common.exception.ErrorException;
 
 import java.io.*;
@@ -116,16 +117,7 @@ public class ExportServiceImpl implements ExportService {
         if(orchestrators==null||orchestrators.isEmpty()){
             throw new DSSRuntimeException("workflow list is empty,nothing to export.(导出的工作流列表为空，没有任何工作流可以导出)");
         }
-        String exportSaveBasePath = IoUtils.generateIOPath(userName, projectName, "");
-        //写入元数据
-        String metaInfoPath=exportSaveBasePath+ File.separator+"meta.json";
-        String metaInfo=new Gson().toJson(orchestrators);
-        try(OutputStream metaOutStream=IoUtils.generateExportOutputStream(metaInfoPath)) {
-            metaOutStream.write(metaInfo.getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            LOGGER.error("write meta failed",e);
-            throw new RuntimeException(e);
-        }
+        String exportSaveBasePath = IoUtils.generateTempIOPath(userName);
         for (OrchestratorBaseInfo orchestrator : orchestrators) {
             OrchestratorInfo orchestratorInfo = new OrchestratorInfo(orchestrator.getOrchestratorId(), orchestrator.getOrchestratorVersionId());
             BmlResource bmlOneOrc= export(userName, projectId, orchestratorInfo,
@@ -133,8 +125,10 @@ public class ExportServiceImpl implements ExportService {
                     .getBmlResource();
             String orcPath=exportSaveBasePath+orchestrator.getOrchestratorName()+".zip";
             bmlService.downloadToLocalPath(userName,bmlOneOrc.getResourceId(),bmlOneOrc.getVersion(),orcPath);
+            ZipHelper.unzipFile(orcPath, exportSaveBasePath,true);
         }
-        String zipFile = ZipHelper.zip(exportSaveBasePath);
+        String projectPath = IoUtils.addFileSeparator(exportSaveBasePath, projectName);
+        String zipFile = ZipHelper.zip(projectPath,true);
         LOGGER.info("export zip file locate at {}",zipFile);
         //先上传
         InputStream inputStream = bmlService.readLocalResourceFile(userName, zipFile);
@@ -151,6 +145,7 @@ public class ExportServiceImpl implements ExportService {
         }
         LOGGER.info("export zip file upload to bmlResourceId:{} bmlResourceVersion:{}",
                 bmlResource.getResourceId(),bmlResource.getVersion());
+        FileUtils.deleteQuietly(new File(zipFile));
         return new BatchExportResult(bmlResource,checkCode);
     }
 

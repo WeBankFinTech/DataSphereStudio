@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish.io.input.impl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaInputService;
@@ -43,13 +44,15 @@ public class MetaInputServiceImpl implements MetaInputService {
     private final String fileName = "meta.txt";
 
     @Override
-    public DSSOrchestratorInfo importOrchestratorNew( String flowMetaPath) throws IOException {
+    public DSSOrchestratorInfo importOrchestratorNew( String flowMetaPath)  {
         File flowMetaFile = new File(flowMetaPath + File.separator + FLOW_META_FILE_NAME);
         JsonParser jsonParser = new JsonParser();
         Gson gson = new Gson();
         try (FileReader reader = new FileReader(flowMetaFile)) {
             JsonObject jsonObject = jsonParser.parse(reader).getAsJsonObject();
             return gson.fromJson(jsonObject.get(ORCHESTRATOR_META_KEY), DSSOrchestratorInfo.class);
+        }catch (IOException e){
+            throw new DSSRuntimeException(100000, "read flowMeta file failed,path" + flowMetaPath, e);
         }
     }
     @Override

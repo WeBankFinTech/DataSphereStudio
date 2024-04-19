@@ -34,8 +34,11 @@ import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorE
 import com.webank.wedatasphere.dss.framework.project.entity.OrchestratorBatchImportInfo;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.framework.project.service.ImportService;
+import com.webank.wedatasphere.dss.framework.project.utils.ExportAndImportSupportUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.orchestrator.publish.io.input.MetaInputService;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.standard.app.development.operation.RefImportOperation;
 import com.webank.wedatasphere.dss.standard.app.development.ref.ImportRequestRef;
@@ -54,7 +57,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -63,6 +71,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import static com.webank.wedatasphere.dss.common.utils.IoUtils.FLOW_META_DIRECTORY_NAME;
 
 /**
  * created by cooperyang on 2020/12/9
@@ -78,6 +88,8 @@ public class ImportServiceImpl implements ImportService {
     @Autowired
     @Qualifier("projectBmlService")
     private BMLService bmlService;
+    @Autowired
+    private MetaInputService metaInputService;
 
     @Override
     @SuppressWarnings("ConstantConditions")
@@ -141,8 +153,9 @@ public class ImportServiceImpl implements ImportService {
             throw new DSSRuntimeException("checkCode does not match the upload file,please check your upload file and checkCode");
         }
         //下载到本地处理
-        String importSaveBasePath = IoUtils.generateIOPath(userName, "","");
+        String importSaveBasePath = IoUtils.generateTempIOPath(userName);
         String importFile=importSaveBasePath+File.separator+projectName+".zip";
+
         LOGGER.info("import zip file locate at {}",importFile);
         //下载压缩包
         bmlService.downloadToLocalPath(userName, bmlResource.getResourceId(), bmlResource.getVersion(), importFile);
@@ -157,18 +170,32 @@ public class ImportServiceImpl implements ImportService {
             throw new DSSRuntimeException("upload file format error(导入包格式错误)");
         }
         //解压
-        String unzipImportFile= ZipHelper.unzip(importFile);
-        LOGGER.info("import unziped file locate at {}",unzipImportFile);
+        ZipHelper.unzipFile(importFile,importSaveBasePath,true);
+        String projectPath = IoUtils.addFileSeparator(importSaveBasePath, projectName);
+        LOGGER.info("import unziped file locate at {}",projectPath);
         //解析元数据
-        String metaInfoPath=unzipImportFile+ File.separator+"meta.json";
-        String metaJson = bmlService.readLocalTextFile(userName, metaInfoPath);
-        Type type=new TypeToken<List<OrchestratorBaseInfo>>(){}.getType();
-        List<OrchestratorBaseInfo> importOrcs=new Gson().fromJson(metaJson,type);
+        String metaPath = IoUtils.addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME);
+        List<OrchestratorBaseInfo> importOrcMetas;
+        try (Stream<Path> paths = Files.walk(Paths.get(metaPath), 1)) {
+            importOrcMetas = paths.filter(Files::isDirectory)  // 确保它是一个目录
+                    .filter(path -> !path.equals(Paths.get(metaPath)))  // 排除根目录本身
+                    .map(path -> path.toAbsolutePath().toString())
+                    .map(metaInputService::importOrchestratorNew)
+                    .map(OrchestratorBaseInfo::convertFrom)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new DSSRuntimeException("read import package failed,please check package struct(导入包格式错误，请检查导入包格式）");
+        }
+        String separateTargetPath = IoUtils.generateTempIOPath(userName);
+        //分离各个工作流
+        Map<String, Path> flowProjectPaths = ExportAndImportSupportUtils.separateFlows(importSaveBasePath, projectName, separateTargetPath);
 
-        Iterator<File> iterator= FileUtils.iterateFiles(new File(unzipImportFile),new String[]{"zip"},false);
+
+
         List<OrchestratorBaseInfo> importResultInfo = new ArrayList<>();
-        while (iterator.hasNext()){
-            File orcZipFile=iterator.next();
+        for (Path path : flowProjectPaths.values()) {
+            String zipFilePath = ZipHelper.zip(path.toAbsolutePath().toString());
+            File orcZipFile=new File(zipFilePath);
             InputStream inputStream = bmlService.readLocalResourceFile(userName, orcZipFile.getAbsolutePath());
             BmlResource uploadResult = bmlService.upload(userName, inputStream,
                     orcZipFile.getName() , projectName);
@@ -176,7 +203,11 @@ public class ImportServiceImpl implements ImportService {
             OrchestratorBaseInfo importInfo = importOrc(orcName, userName, projectId, projectName, uploadResult, dssLabel, workspace.getWorkspaceName(), workspace);
             importResultInfo.add(importInfo);
         }
-        return new OrchestratorBatchImportInfo(importOrcs,importResultInfo);
+        //清理文件
+        FileUtils.deleteQuietly(new File(importSaveBasePath));
+        FileUtils.deleteQuietly(new File(separateTargetPath));
+
+        return new OrchestratorBatchImportInfo(importOrcMetas,importResultInfo);
     }
     private String readImportZipProjectName(String zipFilePath) throws IOException {
         try(ZipFile zipFile =new ZipFile(zipFilePath)){
@@ -191,4 +222,5 @@ public class ImportServiceImpl implements ImportService {
         }
         throw new IOException();
     }
+
 }

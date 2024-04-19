@@ -31,17 +31,11 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
-import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
@@ -59,7 +53,6 @@ import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
-import com.webank.wedatasphere.dss.workflow.entity.request.SubmitFlowRequest;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -76,7 +69,6 @@ import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
-import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -777,48 +769,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (relation == null) {
             flowMapper.insertFlowRelation(flowID, parentFlowID);
         }
-    }
-
-    @Override
-    public GitTree submitFlow(SubmitFlowRequest flowRequest, String username, Workspace workspace) {
-        // todo 1. 去除第三方节点实体的zip包——resource/工作流名/appconn-resource文件夹，并上传到bml
-
-        // 2. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
-        DSSFlow dssFlow = flowMapper.selectFlowByID(flowRequest.getFlowId());
-        BmlResource bmlResource = null;
-        try {
-
-            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(dssFlow.getProjectId());
-            List<DSSLabel> dssLabelList = new ArrayList<>();
-            dssLabelList.add(new EnvDSSLabel(flowRequest.getLabels().getRoute()));
-            bmlResource = workFlowManager.exportWorkflowNew(username, flowRequest.getFlowId(), projectInfo.getId(), flowRequest.getProjectName(), workspace, dssLabelList);
-        } catch (DSSErrorException e) {
-            logger.error("getProjectInfo failed by:", e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-
-        // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
-        GitDiffResponse diff = diff(dssFlow.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
-        if (diff == null) {
-            logger.info("change is empty");
-            return null;
-        }
-
-        //4. 返回文件列表
-        return diff.getTree();
-    }
-
-    private GitDiffResponse diff(String path, BmlResource bmlResource, String username, Long workspaceId, String projectName) {
-        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        Map<String, BmlResource> file = new HashMap<>();
-        file.put(path, bmlResource);
-        GitDiffRequest request1 = new GitDiffRequest(workspaceId, projectName, file, username);
-        logger.info("-------=======================begin to diff {}=======================-------", request1.getProjectName());
-        GitDiffResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitDiffResponse.class, GitDiffRequest.class);
-        logger.info("-------=======================End to diff testGit1=======================-------: {}", responseWorkflowValidNode);
-        return responseWorkflowValidNode;
     }
 
 }

@@ -29,15 +29,23 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.RefOrchestrationContentRequestRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.protocol.RequestExportWorkflow;
+import com.webank.wedatasphere.dss.common.protocol.ResponseExportWorkflow;
 import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
@@ -420,6 +428,85 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
         }
         return hasEditPriv || projectUserAuthResponse.getProjectOwner().equals(username);
+    }
+
+    @Override
+    public GitTree diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+        BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
+
+        // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
+        GitDiffResponse diff = diff(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
+        if (diff == null) {
+            LOGGER.info("change is empty");
+            return null;
+        }
+
+        //4. 返回文件列表
+        return diff.getTree();
+    }
+
+    private GitDiffResponse diff(String path, BmlResource bmlResource, String username, Long workspaceId, String projectName) {
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        Map<String, BmlResource> file = new HashMap<>();
+        file.put(path, bmlResource);
+        GitDiffRequest request1 = new GitDiffRequest(workspaceId, projectName, file, username);
+        LOGGER.info("-------=======================begin to diff {}=======================-------", request1.getProjectName());
+        GitDiffResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitDiffResponse.class, GitDiffRequest.class);
+        LOGGER.info("-------=======================End to diff testGit1=======================-------: {}", responseWorkflowValidNode);
+        return responseWorkflowValidNode;
+    }
+
+
+    private BmlResource uploadWorkflowToGit(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace, DSSOrchestratorInfo orchestrator) {
+        // todo 1. 去除第三方节点实体的zip包——resource/工作流名/appconn-resource文件夹，并上传到bml
+
+        // 2. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
+        long flowId = flowRequest.getFlowId();
+
+        Long projectId = orchestrator.getProjectId();
+        String projectName = flowRequest.getProjectName();
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(flowRequest.getLabels().getRoute()));
+        RequestExportWorkflow requestExportWorkflow = new RequestExportWorkflow(username,
+                flowId,
+                projectId,
+                projectName,
+                DSSCommonUtils.COMMON_GSON.toJson(workspace),
+                dssLabelList);
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
+        ResponseExportWorkflow responseExportWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
+                ResponseExportWorkflow.class, RequestExportWorkflow.class);
+        Map<String, Object> resourceMap = new HashMap<>(2);
+        BmlResource bmlResource = new BmlResource(responseExportWorkflow.resourceId(), responseExportWorkflow.version());
+
+        return bmlResource;
+    }
+
+    @Override
+    public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+        BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
+
+        // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
+        GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName(), flowRequest.getComment());
+        if (commit == null) {
+            LOGGER.error("change is empty");
+        }
+
+        //4. 返回文件列表
+        return ;
+    }
+
+    private GitCommitResponse push (String path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
+        LOGGER.info("-------=======================begin to add testGit1=======================-------");
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        Map<String, BmlResource> file = new HashMap<>();
+        file.put(path, bmlResource);
+        GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, comment, username);
+        GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
+        LOGGER.info("-------=======================End to add testGit1=======================-------: {}", responseWorkflowValidNode);
+        return responseWorkflowValidNode;
     }
 
 }

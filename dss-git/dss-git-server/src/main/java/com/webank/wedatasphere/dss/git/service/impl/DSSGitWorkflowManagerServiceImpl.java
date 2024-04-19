@@ -56,7 +56,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 解压BML文件到本地 todo 对接Server时放开调试
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
-                FileUtils.removeAndUpdate(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
+                FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
+                FileUtils.update(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
             }
             diff = DSSGitUtils.diff(request.getProjectName());
             // 重置本地
@@ -90,7 +91,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 解压BML文件到本地 todo 对接Server时放开调试
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
-                FileUtils.removeAndUpdate(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
+                FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
+                FileUtils.update(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
             }
             // 提交
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, request.getComment());

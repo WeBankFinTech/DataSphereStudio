@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
@@ -268,5 +269,23 @@ public class DSSFrameworkOrchestratorRestful {
     public Message getVersionByOrchestratorId(@RequestBody QueryOrchestratorVersion queryOrchestratorVersion) throws Exception {
         List list = orchestratorService.getVersionByOrchestratorId(queryOrchestratorVersion.getOrchestratorId());
         return Message.ok().data("list", list);
+    }
+
+    @RequestMapping(value = "diffFlow", method = RequestMethod.POST)
+    public Message diff(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        GitTree gitTree = orchestratorFrameworkService.diffFlow(submitFlowRequest, userName, workspace);
+        return Message.ok().data("tree", gitTree);
+    }
+
+    @RequestMapping(value = "submitFlow", method = RequestMethod.POST)
+    public Message submitFlow(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        orchestratorFrameworkService.submitFlow(submitFlowRequest, userName, workspace);
+        return Message.ok();
     }
 }

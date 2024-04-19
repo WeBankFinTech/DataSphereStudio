@@ -371,19 +371,4 @@ public class FlowRestfulApi {
         return Message.ok();
     }
 
-    @RequestMapping(value = "submitFlow", method = RequestMethod.POST)
-    public Message submitFlow(@RequestBody SubmitFlowRequest submitFlowRequest) {
-        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
-        //若工作流已经被其他用户抢锁，则当前用户不能再保存成功
-        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
-                .findFirst().map(Cookie::getValue).get();
-        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
-        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
-            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
-        }
-        GitTree gitTree = flowService.submitFlow(submitFlowRequest, userName, workspace);
-        return Message.ok().data("tree", gitTree);
-    }
-
 }

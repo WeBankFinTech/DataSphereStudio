@@ -7,6 +7,8 @@ import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.git.config.GitServerConfig;
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,8 +132,25 @@ public class FileUtils {
         return destFile;
     }
 
-    public static void removeAndUpdate (BMLService bmlService, String path,  BmlResource bmlResource, String username) {
-        FileUtils.removeDirectory("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" +path);
+    public static void removeFlowNode(String path, String projectName) {
+        // 删除node节点
+        String flowNodePathPre =  FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName ;
+        String flowNodePath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + path;
+        String flowNodeMetaPath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + path;
+        // 1.删除工作流节点代码
+        removeDirectory(flowNodePath);
+        // 2. 删除工作流节点对应.metaConf文件
+        removeDirectory(flowNodeMetaPath);
+    }
+
+    public static void removeProject(String path) {
+        // 删除node节点
+        String projectPath =  File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + path ;
+        // 1.删除项目
+        removeDirectory(projectPath);
+    }
+
+    public static void update(BMLService bmlService, String path,  BmlResource bmlResource, String username) {
         try {
             downloadAndUnzipBMLResource(bmlService, path, bmlResource, username, "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()));
         }catch (DSSErrorException e) {
@@ -180,5 +199,62 @@ public class FileUtils {
         }
         
         return path;
+    }
+
+    public static String unzip(String dirPath,boolean deleteOriginZip)throws DSSErrorException {
+        File file = new File(dirPath);
+        if(!file.exists()){
+            logger.error("{} 不存在, 不能解压zip文件", dirPath);
+            throw new DSSErrorException(90001,dirPath + " does not exist, can not unzip");
+        }
+        //先用简单的方法，调用新进程进行压缩
+        String[] strArr = dirPath.split(File.separator);
+        String shortPath = new File(dirPath).getName();
+        String workPath = dirPath.substring(0, dirPath.length() - shortPath.length() - 1);
+        List<String> list = new ArrayList<>();
+        list.add("unzip");
+        list.add("-o");
+        String longZipFilePath = dirPath.replace(".zip","");
+        list.add(shortPath);
+        ProcessBuilder processBuilder = new ProcessBuilder(list);
+        processBuilder.redirectErrorStream(true);
+        processBuilder.directory(new File(workPath));
+        BufferedReader infoReader = null;
+        BufferedReader errorReader = null;
+        try{
+            Process process = processBuilder.start();
+            infoReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String infoLine = null;
+            while((infoLine = infoReader.readLine()) != null){
+                logger.info("process output: {} ", infoLine);
+            }
+            String errorLine = null;
+            StringBuilder errMsg = new StringBuilder();
+            while((errorLine = errorReader.readLine()) != null){
+                if (StringUtils.isNotEmpty(errorLine)){
+                    errMsg.append(errorLine).append("\n");
+                }
+                logger.error("process error: {} ", errorLine);
+            }
+            int exitCode = process.waitFor();
+            if (exitCode != 0){
+                throw new DSSErrorException(90007,errMsg.toString());
+            }
+            if(deleteOriginZip){
+                file.delete();
+            }
+        }catch(final Exception e){
+            logger.error("{} 解压缩 zip 文件失败, reason: ", e);
+            DSSErrorException exception = new DSSErrorException(90009,dirPath + " to zip file failed");
+            exception.initCause(e);
+            throw exception;
+        } finally {
+
+            logger.info("生成解压目录{}", longZipFilePath);
+            IOUtils.closeQuietly(infoReader);
+            IOUtils.closeQuietly(errorReader);
+        }
+        return longZipFilePath;
     }
 }

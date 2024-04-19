@@ -1,12 +1,14 @@
-package com.webank.wedatasphere.dss.workflow.entity.request;
+package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 
-public class SubmitFlowRequest {
+public class OrchestratorSubmitRequest {
     private Long flowId;
     private String dssLabel;
     private LabelRouteVO labels;
     private String projectName;
+    private String comment;
+    private Long orchestratorId;
 
     public Long getFlowId() {
         return flowId;
@@ -38,5 +40,21 @@ public class SubmitFlowRequest {
 
     public void setProjectName(String projectName) {
         this.projectName = projectName;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Long getOrchestratorId() {
+        return orchestratorId;
+    }
+
+    public void setOrchestratorId(Long orchestratorId) {
+        this.orchestratorId = orchestratorId;
     }
 }

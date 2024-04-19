@@ -43,7 +43,8 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // Http请求Git，创建project
             DSSGitUtils.init(request.getProjectName(), gitUser);
             // 解压BML文件到本地 todo 对接Server时放开调试
-            FileUtils.removeAndUpdate(bmlService, request.getProjectName(), request.getBmlResource(), request.getUsername());
+            FileUtils.removeProject(request.getProjectName());
+            FileUtils.update(bmlService, request.getProjectName(), request.getBmlResource(), request.getUsername());
             // 本地创建Git项目
             DSSGitUtils.create(request.getProjectName(), gitUser);
             // 获取git项目

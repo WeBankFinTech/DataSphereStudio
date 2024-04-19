@@ -24,11 +24,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ZipHelper {
 
@@ -126,11 +126,52 @@ public class ZipHelper {
      * @return 解压后的文件夹名
      * @throws DSSErrorException 解压出现异常
      */
-
+    @Deprecated
     public static String unzip(String dirPath)throws DSSErrorException{
         return unzip(dirPath, false);
     }
-
+    /**
+     * 解压一个zip文件
+     * @param zipFilePath zip文件的全路径名
+     * @destDirectory 解压到的目的地
+     * @return 解压后的文件夹名
+     * @throws DSSErrorException 解压出现异常
+     */
+    public static void unzipFile(String zipFilePath, String destDirectory, boolean deleteOriginZip) throws DSSErrorException {
+        File destDir = new File(destDirectory);
+        // 使用 try-with-resources 确保资源被自动关闭
+        File zipFile = new File(zipFilePath);
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFilePath))) {
+            byte[] buffer = new byte[1024];
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                File newFile = new File(destDir, zipEntry.getName());
+                if (zipEntry.isDirectory()) {
+                    newFile.mkdirs();
+                } else {
+                    // 为解压后的文件创建文件输出流
+                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                    }
+                }
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+        }catch(final Exception e){
+            logger.error(" 解压缩 zip 文件失败, reason: ", e);
+            DSSErrorException exception = new DSSErrorException(90009, "unzip" + zipFilePath + " to " + destDirectory + "zip file failed");
+            exception.initCause(e);
+            throw exception;
+        }
+        // 如果指定删除原zip文件
+        if (deleteOriginZip) {
+            new File(zipFilePath).delete();
+        }
+    }
+    @Deprecated
     public static String unzip(String dirPath,boolean deleteOriginZip)throws DSSErrorException {
         File file = new File(dirPath);
         if(!file.exists()){

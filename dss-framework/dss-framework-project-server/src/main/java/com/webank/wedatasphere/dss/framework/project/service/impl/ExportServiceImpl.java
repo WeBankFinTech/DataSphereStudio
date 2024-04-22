@@ -112,7 +112,7 @@ public class ExportServiceImpl implements ExportService {
     }
 
     @Override
-    public BatchExportResult batchExport(String userName, Long projectId, List<OrchestratorBaseInfo> orchestrators,
+    public String batchExport(String userName, Long projectId, List<OrchestratorBaseInfo> orchestrators,
                                          String projectName, DSSLabel dssLabel, Workspace workspace) throws ErrorException {
         if(orchestrators==null||orchestrators.isEmpty()){
             throw new DSSRuntimeException("workflow list is empty,nothing to export.(导出的工作流列表为空，没有任何工作流可以导出)");
@@ -125,28 +125,10 @@ public class ExportServiceImpl implements ExportService {
                     .getBmlResource();
             String orcPath=exportSaveBasePath+orchestrator.getOrchestratorName()+".zip";
             bmlService.downloadToLocalPath(userName,bmlOneOrc.getResourceId(),bmlOneOrc.getVersion(),orcPath);
+            LOGGER.info("export orchestrator file locate at {}",orcPath);
             ZipHelper.unzipFile(orcPath, exportSaveBasePath,true);
         }
-        String projectPath = IoUtils.addFileSeparator(exportSaveBasePath, projectName);
-        String zipFile = ZipHelper.zip(projectPath,true);
-        LOGGER.info("export zip file locate at {}",zipFile);
-        //先上传
-        InputStream inputStream = bmlService.readLocalResourceFile(userName, zipFile);
-        BmlResource bmlResource= bmlService.upload(userName, inputStream, projectName + ".OrcsExport", projectName);
-        //上传完之后，计算上传后二进制流的md5
-        String checkCode;
-        try(InputStream zipInputStream=(InputStream)bmlService.download(userName,
-                bmlResource.getResourceId(),
-                bmlResource.getVersion()).get("is")) {
-            checkCode=  DigestUtils.md5Hex(zipInputStream);
-        } catch (IOException e) {
-            LOGGER.error("md5 sum failed",e);
-            throw new DSSRuntimeException(e.getMessage());
-        }
-        LOGGER.info("export zip file upload to bmlResourceId:{} bmlResourceVersion:{}",
-                bmlResource.getResourceId(),bmlResource.getVersion());
-        FileUtils.deleteQuietly(new File(zipFile));
-        return new BatchExportResult(bmlResource,checkCode);
+        return IoUtils.addFileSeparator(exportSaveBasePath, projectName);
     }
 
     @Override

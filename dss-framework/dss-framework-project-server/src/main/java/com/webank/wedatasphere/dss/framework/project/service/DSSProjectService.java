@@ -21,7 +21,6 @@ import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
-import com.webank.wedatasphere.dss.framework.project.entity.OrchestratorBatchImportInfo;
 import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
@@ -31,7 +30,6 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public interface DSSProjectService  extends IService<DSSProjectDO> {
 
@@ -83,7 +81,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
     /**
      * 批量导出工程内的所有编排
      */
-    void exportAllOrchestrators(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest, String username, String proxyUser, Workspace workspace) throws Exception;
+    BmlResource exportProject(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest, String username, String proxyUser, Workspace workspace) throws Exception;
 
     /**
      * 批量导入编排到指定工程
@@ -96,7 +94,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
      * @param workspace 导入工作空间
 
      */
-    void importAllOrchestrators(ProjectInfoVo projectInfo, BmlResource importResource, String username,
-                             String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception;
+    void importProject(ProjectInfoVo projectInfo, BmlResource importResource, String username,
+                       String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception;
 
 }

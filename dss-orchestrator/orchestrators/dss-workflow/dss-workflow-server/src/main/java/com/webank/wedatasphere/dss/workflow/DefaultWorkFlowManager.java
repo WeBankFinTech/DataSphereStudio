@@ -31,7 +31,9 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestPushOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponsePushOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.OrchestrationToRelConversionRequestRef;
@@ -43,9 +45,7 @@ import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUnlockWorkflow;
+import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
@@ -68,6 +68,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -433,6 +434,50 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
             }
         }
         throw new IOException();
+    }
+
+    @Override
+    public ResponseLockWorkflow lockWorkFlow(RequestLockWorkflow requestLockWorkflow) throws DSSErrorException {
+        Cookie[] cookies = requestLockWorkflow.getCookies();
+        Long flowID = requestLockWorkflow.getFlowId();
+        String username =requestLockWorkflow.getUsername();
+        //若工作流已经被其他用户抢锁，则当前用户不能再保存成功
+        String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowID);
+        if (flowEditLock != null) {
+            DSSFlow dssFlow = flowService.getFlow(flowID);
+            // 尝试获取工作流编辑锁
+            try {
+                //只有父工作流才有锁，子工作流复用父工作流的锁
+                if(dssFlow.getRootFlow()) {
+                    DSSFlowEditLockManager.tryAcquireLock(dssFlow, username, ticketId);
+                }
+            } catch (DSSErrorException e) {
+                if (DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
+                    logger.error(e.getDesc());
+                    return new ResponseLockWorkflow(ResponseLockWorkflow.LOCK_FAILED, flowEditLock.getOwner());
+                }
+                throw e;
+            }
+        }
+        return new ResponseLockWorkflow(ResponseLockWorkflow.LOCK_SUCCESS, null);
+    }
+
+
+    @Override
+    public ResponsePushOrchestrator updateLockStatus(RequestPushOrchestrator requestPushOrchestrator) {
+        String status = lockMapper.selectStatusByFlowId(requestPushOrchestrator.getFlowId());
+        logger.info("status is :" +  status);
+        logger.info("flowId is :" +  requestPushOrchestrator.getFlowId());
+        if (StringUtils.isEmpty(status)) {
+            lockMapper.insertFlowStatus(requestPushOrchestrator.getFlowId(), DSSWorkFlowConstant.FLOW_STATUS_PUSH);
+        } else {
+            lockMapper.updateFlowStatus(requestPushOrchestrator.getFlowId(), DSSWorkFlowConstant.FLOW_STATUS_PUSH);
+        }
+
+        status = lockMapper.selectStatusByFlowId(requestPushOrchestrator.getFlowId());
+        return new ResponsePushOrchestrator(status);
     }
 
 }

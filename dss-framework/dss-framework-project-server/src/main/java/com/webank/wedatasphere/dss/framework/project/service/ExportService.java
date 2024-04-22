@@ -50,8 +50,9 @@ public interface ExportService {
     /**
      * 批量导出编排,打包到一起生成一个bml文件
      * @param orchestrators 需要导出的编排们
+     * @return 编排导出后的目录。目录下是一个个编排
      */
-    BatchExportResult batchExport(String userName, Long projectId, List<OrchestratorBaseInfo> orchestrators,
+    String batchExport(String userName, Long projectId, List<OrchestratorBaseInfo> orchestrators,
                                   String projectName, DSSLabel dssLabel, Workspace workspace) throws ErrorException;
 
 

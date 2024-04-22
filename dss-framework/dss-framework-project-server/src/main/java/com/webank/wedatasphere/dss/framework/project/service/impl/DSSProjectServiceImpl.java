@@ -28,10 +28,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.service.BMLService;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
-import com.webank.wedatasphere.dss.common.utils.ZipHelper;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
@@ -62,6 +59,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletio
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -73,6 +71,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
@@ -455,9 +454,28 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     @Override
     public void importProject(ProjectInfoVo projectInfo, BmlResource importResource, String username,
                               String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception {
-
-    importService.batchImportOrc(username, projectInfo.getId(),
-                        projectInfo.getProjectName(), importResource, checkCode, envLabel, workspace);
+        String projectName = projectInfo.getProjectName();
+        //下载到本地处理
+        String importSaveBasePath = IoUtils.generateTempIOPath(username);
+        String importFile=importSaveBasePath+File.separator+projectName+".zip";
+        LOGGER.info("import zip file locate at {}",importFile);
+        //下载压缩包
+        bmlService.downloadToLocalPath(username, importResource.getResourceId(), importResource.getVersion(), importFile);
+        try{
+            String  originProjectName=ZipHelper.readImportZipProjectName(importFile);
+            if(!projectName.equals(originProjectName)){
+                String msg=String.format("target project name must be same with origin project name.origin project name:%s,target project name:%s(导入的目标工程名必须与导出时源工程名保持一致。源工程名：%s，目标工程名：%s)"
+                        ,originProjectName,projectName,originProjectName,projectName);
+                throw new DSSRuntimeException(msg);
+            }
+        }catch (IOException e){
+            throw new DSSRuntimeException("upload file format error(导入包格式错误)");
+        }
+        //解压
+        ZipHelper.unzipFile(importFile,importSaveBasePath,true);
+        String projectPath = IoUtils.addFileSeparator(importSaveBasePath, projectName);
+        importService.batchImportOrc(username, projectInfo.getId(),
+                        projectInfo.getProjectName(), projectPath, checkCode, envLabel, workspace);
 
 
 

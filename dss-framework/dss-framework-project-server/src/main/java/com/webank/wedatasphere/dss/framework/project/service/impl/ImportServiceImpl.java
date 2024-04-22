@@ -134,44 +134,10 @@ public class ImportServiceImpl implements ImportService {
     }
 
     @Override
-    public OrchestratorBatchImportInfo batchImportOrc(String userName, Long projectId, String projectName,
-                                                      BmlResource bmlResource, String checkCode,
+    public OrchestratorBatchImportInfo batchImportOrc(String userName, Long projectId, String projectName, String projectPath, String checkCode,
                                                       DSSLabel dssLabel, Workspace workspace)
             throws ErrorException{
-        //先核对md5
-        String md5code;
-        try(InputStream zipInputStream=(InputStream)bmlService.download(userName,
-                bmlResource.getResourceId(),
-                bmlResource.getVersion()).get("is")) {
-            md5code=  DigestUtils.md5Hex(zipInputStream);
-        } catch (IOException e) {
-            LOGGER.error("md5 sum failed",e);
-            throw new DSSRuntimeException(e.getMessage());
-        }
-        if(!md5code.equals(checkCode)){
-            LOGGER.error("checkCode does not match the upload file。input code:{},real code:{}",checkCode,md5code);
-            throw new DSSRuntimeException("checkCode does not match the upload file,please check your upload file and checkCode");
-        }
-        //下载到本地处理
-        String importSaveBasePath = IoUtils.generateTempIOPath(userName);
-        String importFile=importSaveBasePath+File.separator+projectName+".zip";
-
-        LOGGER.info("import zip file locate at {}",importFile);
-        //下载压缩包
-        bmlService.downloadToLocalPath(userName, bmlResource.getResourceId(), bmlResource.getVersion(), importFile);
-        try{
-            String  originProjectName=readImportZipProjectName(importFile);
-            if(!projectName.equals(originProjectName)){
-                String msg=String.format("target project name must be same with origin project name.origin project name:%s,target project name:%s(导入的目标工程名必须与导出时源工程名保持一致。源工程名：%s，目标工程名：%s)"
-                        ,originProjectName,projectName,originProjectName,projectName);
-                throw new DSSRuntimeException(msg);
-            }
-        }catch (IOException e){
-            throw new DSSRuntimeException("upload file format error(导入包格式错误)");
-        }
-        //解压
-        ZipHelper.unzipFile(importFile,importSaveBasePath,true);
-        String projectPath = IoUtils.addFileSeparator(importSaveBasePath, projectName);
+        String importSaveBasePath = Paths.get(projectPath).getParent().toString();
         LOGGER.info("import unziped file locate at {}",projectPath);
         //解析元数据
         String metaPath = IoUtils.addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME);
@@ -208,19 +174,6 @@ public class ImportServiceImpl implements ImportService {
         FileUtils.deleteQuietly(new File(separateTargetPath));
 
         return new OrchestratorBatchImportInfo(importOrcMetas,importResultInfo);
-    }
-    private String readImportZipProjectName(String zipFilePath) throws IOException {
-        try(ZipFile zipFile =new ZipFile(zipFilePath)){
-            Enumeration<? extends ZipEntry> entries =zipFile.entries();
-            if(entries.hasMoreElements()){
-                String projectName=entries.nextElement().getName();
-                while (projectName.endsWith(File.separator)){
-                    projectName = projectName.substring(0, projectName.length() - 1);
-                }
-                return projectName;
-            }
-        }
-        throw new IOException();
     }
 
 }

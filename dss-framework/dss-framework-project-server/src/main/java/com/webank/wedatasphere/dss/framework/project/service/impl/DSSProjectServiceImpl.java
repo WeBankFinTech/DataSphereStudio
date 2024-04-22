@@ -20,6 +20,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
@@ -50,6 +53,7 @@ import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCreateProjectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -70,12 +74,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.project.utils.ProjectOperationUtils.tryProjectOperation;
@@ -103,6 +104,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
     public static final String MODE_SPLIT = ",";
     public static final String KEY_SPLIT = "-";
+    public static final String PROJECT_META_FILE_NAME = ".projectmeta";
     private final String SUPPORT_ABILITY = ProjectConf.SUPPORT_ABILITY.getValue();
     private final ThreadFactory projectOperateThreadFactory = new ThreadFactoryBuilder()
             .setNameFormat("dss-project-operate-thread-%d")
@@ -435,9 +437,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(
                 new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId())
                 , exportAllOrchestratorsReqest.getLabels());
-        ProjectInfoVo projectVO=projectService.getProjectInfoById(projectId);
-        String projectName = projectVO.getProjectName();
+        DSSProjectDO projectDO=projectService.getProjectById(projectId);
+        String projectName = projectDO.getName();
         String projectPath = exportService.batchExport(username, projectId, orchestrators, projectName, envLabel, workspace);
+        exportProjectMeta(projectDO, projectPath);
         String zipFile = ZipHelper.zip(projectPath,true);
         LOGGER.info("export project file locate at {}",zipFile);
         //先上传
@@ -479,6 +482,22 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
 
 
+
+    }
+
+    /**
+     * 导出项目元数据
+     * @param projectDO 项目元数据
+     * @param projectPath 项目目录
+     * @throws IOException
+     */
+    private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws IOException {
+        File projectMetaFile = new File(projectPath + File.separator + PROJECT_META_FILE_NAME);
+        Gson gson = new Gson();
+        // 文件不存在，直接创建并写入orchestratorInfo信息
+        try (FileWriter writer = new FileWriter(projectMetaFile)) {
+            gson.toJson(projectDO, writer);
+        }
 
     }
 

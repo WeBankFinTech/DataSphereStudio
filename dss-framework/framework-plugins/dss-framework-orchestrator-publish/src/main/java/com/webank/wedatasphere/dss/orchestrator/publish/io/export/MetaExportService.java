@@ -35,7 +35,7 @@ public interface MetaExportService {
      * @throws IOException
      */
     void export(DSSOrchestratorInfo dssOrchestratorInfo, String savePath) throws IOException;
-    void exportNew(DSSOrchestratorInfo dssOrchestratorInfo, String savePath) throws IOException;
+    void exportNew(DSSOrchestratorInfo dssOrchestratorInfo, String flowMetaPath) throws IOException;
 
     void exportFlowBaseInfo(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException;
 

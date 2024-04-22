@@ -26,8 +26,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public class ZipHelper {
@@ -226,6 +228,19 @@ public class ZipHelper {
             IOUtils.closeQuietly(errorReader);
         }
         return longZipFilePath;
+    }
+    public static String readImportZipProjectName(String zipFilePath) throws IOException {
+        try(ZipFile zipFile =new ZipFile(zipFilePath)){
+            Enumeration<? extends ZipEntry> entries =zipFile.entries();
+            if(entries.hasMoreElements()){
+                String projectName=entries.nextElement().getName();
+                while (projectName.endsWith(File.separator)){
+                    projectName = projectName.substring(0, projectName.length() - 1);
+                }
+                return projectName;
+            }
+        }
+        throw new IOException();
     }
 
     private static boolean deleteDir(File dir) {

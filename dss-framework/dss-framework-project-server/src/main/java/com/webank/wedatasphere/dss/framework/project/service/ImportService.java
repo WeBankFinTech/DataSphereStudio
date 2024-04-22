@@ -45,12 +45,12 @@ public interface ImportService {
     /**
      * 批量导入编排
      * @param userName 导入人用户名
-     * @param bmlResource 导入的资源
+     * @param projectPath 导入的资源目录文件夹路径
      * @param checkCode 校验码
      * @param dssLabel 标签
      * @param workspace 导入的工作空间
      * @return 导入的编排信息
      */
-    OrchestratorBatchImportInfo batchImportOrc(String userName, Long projectId, String projectName, BmlResource bmlResource,
+    OrchestratorBatchImportInfo batchImportOrc(String userName, Long projectId, String projectName, String projectPath,
                                                String checkCode, DSSLabel dssLabel, Workspace workspace)throws ErrorException;
 }

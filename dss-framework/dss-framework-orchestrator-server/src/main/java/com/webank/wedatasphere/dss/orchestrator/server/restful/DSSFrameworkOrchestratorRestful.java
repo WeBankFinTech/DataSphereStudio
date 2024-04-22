@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
@@ -31,8 +32,11 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCop
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.dss.workflow.common.protocol.RequestLockWorkflow;
+import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseLockWorkflow;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -43,6 +47,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -275,7 +280,15 @@ public class DSSFrameworkOrchestratorRestful {
     public Message diff(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
 
+        RequestLockWorkflow requestLockWorkflow = new RequestLockWorkflow(userName, httpServletRequest.getCookies(), submitFlowRequest.getFlowId());
+        ResponseLockWorkflow responseLockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getWorkflowSender(dssLabelList).ask(requestLockWorkflow), ResponseLockWorkflow.class, RequestLockWorkflow.class);
+        if (responseLockWorkflow.getUnlockStatus() == ResponseLockWorkflow.LOCK_FAILED) {
+            return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
+        }
         GitTree gitTree = orchestratorFrameworkService.diffFlow(submitFlowRequest, userName, workspace);
         return Message.ok().data("tree", gitTree);
     }
@@ -284,6 +297,16 @@ public class DSSFrameworkOrchestratorRestful {
     public Message submitFlow(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
+
+        RequestLockWorkflow requestLockWorkflow = new RequestLockWorkflow(userName, httpServletRequest.getCookies(), submitFlowRequest.getFlowId());
+        ResponseLockWorkflow responseLockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                .getWorkflowSender(dssLabelList).ask(requestLockWorkflow), ResponseLockWorkflow.class, RequestLockWorkflow.class);
+        if (responseLockWorkflow.getUnlockStatus() == ResponseLockWorkflow.LOCK_FAILED) {
+            return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
+        }
 
         orchestratorFrameworkService.submitFlow(submitFlowRequest, userName, workspace);
         return Message.ok();

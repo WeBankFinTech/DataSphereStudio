@@ -22,12 +22,12 @@ import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestPushOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponsePushOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUnlockWorkflow;
+import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
 import org.apache.linkis.common.exception.ErrorException;
 
@@ -160,4 +160,7 @@ public interface WorkFlowManager {
      */
     ResponseSubFlowContextIds getSubFlowContextIdsByFlowIds(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException;
 
+    ResponseLockWorkflow lockWorkFlow(RequestLockWorkflow requestLockWorkflow) throws DSSErrorException;
+
+    ResponsePushOrchestrator updateLockStatus(RequestPushOrchestrator requestPushOrchestrator);
 }

@@ -27,9 +27,11 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
@@ -61,13 +63,17 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -89,6 +95,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     private DSSProjectService projectService;
     @Autowired
     private ImportService importService;
+    @Autowired
+    @Qualifier("projectBmlService")
+    private BMLService bmlService;
 
 
 
@@ -420,20 +429,32 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         return projectResponseList;
     }
     @Override
-    public void exportAllOrchestrators(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
-                                       String username, String proxyUser, Workspace workspace) throws Exception {
+    public BmlResource exportProject(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
+                                     String username, String proxyUser, Workspace workspace) throws Exception {
         Long projectId=exportAllOrchestratorsReqest.getProjectId();
         EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
         List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(
                 new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId())
                 , exportAllOrchestratorsReqest.getLabels());
         ProjectInfoVo projectVO=projectService.getProjectInfoById(projectId);
-       exportService.batchExport(username, projectId, orchestrators, projectVO.getProjectName(), envLabel, workspace);
+        String projectName = projectVO.getProjectName();
+        String projectPath = exportService.batchExport(username, projectId, orchestrators, projectName, envLabel, workspace);
+        String zipFile = ZipHelper.zip(projectPath,true);
+        LOGGER.info("export project file locate at {}",zipFile);
+        //先上传
+        InputStream inputStream = bmlService.readLocalResourceFile(username, zipFile);
+        BmlResource bmlResource= bmlService.upload(username, inputStream, projectName + ".OrcsExport", projectName);
+
+        LOGGER.info("export zip file upload to bmlResourceId:{} bmlResourceVersion:{}",
+                bmlResource.getResourceId(),bmlResource.getVersion());
+        FileUtils.deleteQuietly(new File(zipFile));
+        return bmlResource;
+
     }
 
     @Override
-    public void importAllOrchestrators(ProjectInfoVo projectInfo, BmlResource importResource, String username,
-                                    String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception {
+    public void importProject(ProjectInfoVo projectInfo, BmlResource importResource, String username,
+                              String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception {
 
     importService.batchImportOrc(username, projectInfo.getId(),
                         projectInfo.getProjectName(), importResource, checkCode, envLabel, workspace);

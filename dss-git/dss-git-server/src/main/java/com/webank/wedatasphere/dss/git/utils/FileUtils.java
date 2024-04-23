@@ -105,7 +105,7 @@ public class FileUtils {
 
         String longZipFilePath = "";
         try {
-            longZipFilePath = ZipHelper.unzip(zipFile);
+            longZipFilePath = unzip(zipFile, true);
             File file = new File(zipFile);
             logger.info("开始删除目录 {}", zipFile);
             if (file.delete()){

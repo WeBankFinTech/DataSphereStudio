@@ -50,6 +50,7 @@ public class MetaExportServiceImpl implements MetaExportService {
             flowMetaMap.put(FLOW_META_KEY, allDSSFlows);
             flowMetaMap.put(FLOW_RELATION_META_KEY, allFlowRelations);
             String flowMetaStr = DSSCommonUtils.COMMON_GSON.toJson(flowMetaMap);
+            flowMetaStr = DSSCommonUtils.prettyJson(flowMetaStr);
             org.apache.commons.io.IOUtils.write(flowMetaStr,outputStream,"UTF-8");
         }
     }

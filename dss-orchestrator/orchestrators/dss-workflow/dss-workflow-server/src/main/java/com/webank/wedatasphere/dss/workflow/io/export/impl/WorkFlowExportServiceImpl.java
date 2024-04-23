@@ -26,6 +26,7 @@ import com.webank.wedatasphere.dss.common.entity.node.Node;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -308,6 +309,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             String nodeName = Optional.ofNullable(node.get("title")).map(JsonElement::getAsString).orElse(null);
             String nodeParamsPath = IoUtils.addFileSeparator(flowCodePath, nodeName, NODE_PARAMS_FILE_NAME);
             String paramsJson = gson.toJson(params);
+            paramsJson = DSSCommonUtils.prettyJson(paramsJson);
             try (
 
                     OutputStream outputStream = IoUtils.generateExportOutputStream(nodeParamsPath )
@@ -318,7 +320,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             }
 
         }
-        return gson.toJson(jsonObject);
+        String flowJsonWithoutParams = gson.toJson(jsonObject);
+        return DSSCommonUtils.prettyJson(flowJsonWithoutParams) ;
 
     }
     @Override

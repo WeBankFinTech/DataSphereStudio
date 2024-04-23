@@ -496,7 +496,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         Gson gson = new Gson();
         // 文件不存在，直接创建并写入orchestratorInfo信息
         try (FileWriter writer = new FileWriter(projectMetaFile)) {
-            gson.toJson(projectDO, writer);
+            String jsonStr = gson.toJson(projectDO);
+            jsonStr = DSSCommonUtils.prettyJson(jsonStr);
+            writer.write(jsonStr);
         }
 
     }

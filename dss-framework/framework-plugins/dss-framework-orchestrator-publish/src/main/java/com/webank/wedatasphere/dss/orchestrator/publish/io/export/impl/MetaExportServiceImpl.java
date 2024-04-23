@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.orchestrator.publish.io.export.impl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
@@ -61,15 +62,19 @@ public class MetaExportServiceImpl implements MetaExportService {
 
             // 写回修改后的内容
             try (FileWriter writer = new FileWriter(flowMetaFile)) {
-                gson.toJson(jsonObject, writer);
-            } // try-with-resources会自动关闭writer
+                String jsonStr = gson.toJson(jsonObject);
+                jsonStr = DSSCommonUtils.prettyJson(jsonStr);
+                writer.write(jsonStr);
+            }
 
             System.out.println("JSON文件已更新并保存。");
         } else {
             // 文件不存在，直接创建并写入orchestratorInfo信息
             try (FileWriter writer = new FileWriter(flowMetaFile)) {
-                gson.toJson(dssOrchestratorInfo, writer);
-            } // try-with-resources会自动关闭writer
+                String jsonStr = gson.toJson(dssOrchestratorInfo);
+                jsonStr = DSSCommonUtils.prettyJson(jsonStr);
+                writer.write(jsonStr);
+            }
         }
     }
     @Override

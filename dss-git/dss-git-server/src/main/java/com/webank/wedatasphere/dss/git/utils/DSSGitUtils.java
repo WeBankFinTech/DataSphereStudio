@@ -231,7 +231,7 @@ public class DSSGitUtils {
             retry += 1;
             try {
                 allProjectName = getAllProjectName(gitUser);
-                return !allProjectName.contains(name);
+                return allProjectName.contains(name);
             } catch (DSSErrorException e) {
                 logger.info("getAllProjectName failed, try again");
                 if (retry >= 3) {
@@ -240,7 +240,7 @@ public class DSSGitUtils {
                 }
             }
         }
-        return !allProjectName.contains(name);
+        return allProjectName.contains(name);
 
     }
 

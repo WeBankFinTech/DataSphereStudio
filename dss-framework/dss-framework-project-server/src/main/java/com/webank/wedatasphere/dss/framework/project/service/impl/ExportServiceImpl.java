@@ -114,9 +114,6 @@ public class ExportServiceImpl implements ExportService {
     @Override
     public String batchExport(String userName, Long projectId, List<OrchestratorBaseInfo> orchestrators,
                                          String projectName, DSSLabel dssLabel, Workspace workspace) throws ErrorException {
-        if(orchestrators==null||orchestrators.isEmpty()){
-            throw new DSSRuntimeException("workflow list is empty,nothing to export.(导出的工作流列表为空，没有任何工作流可以导出)");
-        }
         String exportSaveBasePath = IoUtils.generateTempIOPath(userName);
         for (OrchestratorBaseInfo orchestrator : orchestrators) {
             OrchestratorInfo orchestratorInfo = new OrchestratorInfo(orchestrator.getOrchestratorId(), orchestrator.getOrchestratorVersionId());

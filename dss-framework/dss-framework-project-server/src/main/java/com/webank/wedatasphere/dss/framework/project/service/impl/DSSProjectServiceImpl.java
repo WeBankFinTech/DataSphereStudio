@@ -75,6 +75,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -491,8 +494,22 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
      * @param projectPath 项目目录
      * @throws IOException
      */
-    private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws IOException {
-        File projectMetaFile = new File(projectPath + File.separator + PROJECT_META_FILE_NAME);
+    private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws Exception {
+        String path = projectPath + File.separator + PROJECT_META_FILE_NAME;
+        File projectMetaFile = new File(path);
+        if (!projectMetaFile.exists()) {
+            try {
+                Path filePath = Paths.get(path);
+                // 确保父级路径存在
+                Files.createDirectories(filePath.getParent());
+                // 创建文件
+                Files.createFile(filePath);
+                LOGGER.info("create success");
+            } catch (Exception e) {
+                LOGGER.error("create File {} failed, the reason is : {}", path, e);
+                throw new Exception("create File failed");
+            }
+        }
         Gson gson = new Gson();
         // 文件不存在，直接创建并写入orchestratorInfo信息
         try (FileWriter writer = new FileWriter(projectMetaFile)) {

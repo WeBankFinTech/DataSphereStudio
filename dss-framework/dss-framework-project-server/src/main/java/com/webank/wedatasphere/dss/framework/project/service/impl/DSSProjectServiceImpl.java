@@ -495,8 +495,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
      * @param projectPath 项目目录
      * @throws IOException
      */
-    private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws IOException {
-        File projectMetaFile = new File(projectPath + File.separator + PROJECT_META_FILE_NAME);
+    private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws Exception {
+        String path = projectPath + File.separator + PROJECT_META_FILE_NAME;
+        File projectMetaFile = new File(path);
         if (!projectMetaFile.exists()) {
             try {
                 Path filePath = Paths.get(path);

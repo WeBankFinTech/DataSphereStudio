@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
@@ -493,12 +494,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
      */
     private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws IOException {
         File projectMetaFile = new File(projectPath + File.separator + PROJECT_META_FILE_NAME);
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         // 文件不存在，直接创建并写入orchestratorInfo信息
         try (FileWriter writer = new FileWriter(projectMetaFile)) {
-            String jsonStr = gson.toJson(projectDO);
-            jsonStr = DSSCommonUtils.prettyJson(jsonStr);
-            writer.write(jsonStr);
+            gson.toJson(projectDO, writer);
         }
 
     }

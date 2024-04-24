@@ -18,9 +18,9 @@ package com.webank.wedatasphere.dss.orchestrator.publish.io.export.impl;
 
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.publish.io.export.MetaExportService;
@@ -46,7 +46,7 @@ public class MetaExportServiceImpl implements MetaExportService {
     @Override
     public void exportNew(DSSOrchestratorInfo dssOrchestratorInfo, String flowMetaPath) throws IOException {
         File flowMetaFile = new File(flowMetaPath + File.separator + FLOW_META_FILE_NAME);
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         if (flowMetaFile.exists()) {
             // 初始化JsonObject为null
@@ -62,19 +62,15 @@ public class MetaExportServiceImpl implements MetaExportService {
 
             // 写回修改后的内容
             try (FileWriter writer = new FileWriter(flowMetaFile)) {
-                String jsonStr = gson.toJson(jsonObject);
-                jsonStr = DSSCommonUtils.prettyJson(jsonStr);
-                writer.write(jsonStr);
-            }
+                gson.toJson(jsonObject, writer);
+            } // try-with-resources会自动关闭writer
 
             System.out.println("JSON文件已更新并保存。");
         } else {
             // 文件不存在，直接创建并写入orchestratorInfo信息
             try (FileWriter writer = new FileWriter(flowMetaFile)) {
-                String jsonStr = gson.toJson(dssOrchestratorInfo);
-                jsonStr = DSSCommonUtils.prettyJson(jsonStr);
-                writer.write(jsonStr);
-            }
+                gson.toJson(dssOrchestratorInfo, writer);
+            } // try-with-resources会自动关闭writer
         }
     }
     @Override

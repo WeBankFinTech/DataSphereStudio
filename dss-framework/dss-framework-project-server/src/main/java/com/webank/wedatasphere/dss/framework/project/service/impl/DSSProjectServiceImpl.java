@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
@@ -494,9 +495,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
      * @param projectPath 项目目录
      * @throws IOException
      */
-    private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws Exception {
-        String path = projectPath + File.separator + PROJECT_META_FILE_NAME;
-        File projectMetaFile = new File(path);
+    private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws IOException {
+        File projectMetaFile = new File(projectPath + File.separator + PROJECT_META_FILE_NAME);
         if (!projectMetaFile.exists()) {
             try {
                 Path filePath = Paths.get(path);
@@ -510,12 +510,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                 throw new Exception("create File failed");
             }
         }
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         // 文件不存在，直接创建并写入orchestratorInfo信息
         try (FileWriter writer = new FileWriter(projectMetaFile)) {
-            String jsonStr = gson.toJson(projectDO);
-            jsonStr = DSSCommonUtils.prettyJson(jsonStr);
-            writer.write(jsonStr);
+            gson.toJson(projectDO, writer);
         }
 
     }

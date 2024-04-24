@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.io.export.impl;
 
+import com.google.gson.GsonBuilder;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
@@ -49,8 +50,7 @@ public class MetaExportServiceImpl implements MetaExportService {
             Map<String, Object> flowMetaMap = new HashMap<>(2);
             flowMetaMap.put(FLOW_META_KEY, allDSSFlows);
             flowMetaMap.put(FLOW_RELATION_META_KEY, allFlowRelations);
-            String flowMetaStr = DSSCommonUtils.COMMON_GSON.toJson(flowMetaMap);
-            flowMetaStr = DSSCommonUtils.prettyJson(flowMetaStr);
+            String flowMetaStr = new GsonBuilder().setPrettyPrinting().create().toJson(flowMetaMap);
             org.apache.commons.io.IOUtils.write(flowMetaStr,outputStream,"UTF-8");
         }
     }

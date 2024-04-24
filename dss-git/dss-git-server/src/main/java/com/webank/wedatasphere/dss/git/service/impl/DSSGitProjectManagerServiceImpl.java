@@ -53,7 +53,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 关联远端Git
             DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
             // 提交
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, "init project: " + request.getProjectName());
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, "init project: " + request.getProjectName() + "by " + request.getUsername());
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);

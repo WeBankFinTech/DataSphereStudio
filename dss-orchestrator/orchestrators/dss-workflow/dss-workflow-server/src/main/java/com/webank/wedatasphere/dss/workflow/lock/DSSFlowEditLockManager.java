@@ -274,6 +274,7 @@ public class DSSFlowEditLockManager {
             synchronized (DSSFlowEditLockManager.class) {
                 if (!isInit) {
                     lockMapper = DataWorkCloudApplication.getApplicationContext().getBean(LockMapper.class);
+                    flowMapper = DataWorkCloudApplication.getApplicationContext().getBean(FlowMapper.class);
                     isInit = true;
                 }
             }

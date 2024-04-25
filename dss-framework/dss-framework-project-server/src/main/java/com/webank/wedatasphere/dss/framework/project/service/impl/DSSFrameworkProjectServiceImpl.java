@@ -191,7 +191,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
         }
         // 校验接入git
-        if (dbProject.getAssociateGit() != null) {
+        if (projectModifyRequest.getAssociateGit() != null) {
             checkAssociateGit(projectModifyRequest, dbProject, username, workspace);
             ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
             exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
@@ -388,7 +388,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             throw new DSSProjectErrorException(71000, "项目接入git后无法取消");
         }
         // 对于首次接入git的项目需要校验项目名称并且进行git初始化
-        if (!dbProject.getAssociateGit() && projectModifyRequest.getAssociateGit() && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
+        if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit() && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
             checkGitName(projectModifyRequest.getName(), workspace, username);
             // todo resource version Info
             // initGitProject(workspace.getWorkspaceId(), projectCreateRequest.getName(),);

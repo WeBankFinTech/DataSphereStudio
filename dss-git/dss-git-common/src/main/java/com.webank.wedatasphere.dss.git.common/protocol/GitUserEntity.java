@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.framework.workspace.bean;
+package com.webank.wedatasphere.dss.git.common.protocol;
 
 
 import java.util.Date;
@@ -7,28 +7,19 @@ public class GitUserEntity {
     private Long id;
     private Long workspaceId;
     private String gitUser;
+    private String gitPassword;
+    private String gitUrl;
     private String gitToken;
     private Date createTime;
     private Date updateTime;
     private String createBy;
     private String updateBy;
+    /**
+     * read-只读、write-编辑权限
+     */
+    private String type;
 
     public GitUserEntity() {
-    }
-
-    public GitUserEntity(Long workspaceId, String gitUser, String gitToken, String updateBy) {
-        this.workspaceId = workspaceId;
-        this.gitUser = gitUser;
-        this.gitToken = gitToken;
-        this.updateBy = updateBy;
-    }
-
-    public GitUserEntity(Long workspaceId, String gitUser, String gitToken, String createBy, String updateBy) {
-        this.workspaceId = workspaceId;
-        this.gitUser = gitUser;
-        this.gitToken = gitToken;
-        this.createBy = createBy;
-        this.updateBy = updateBy;
     }
 
     public Long getId() {
@@ -93,5 +84,29 @@ public class GitUserEntity {
 
     public void setUpdateBy(String updateBy) {
         this.updateBy = updateBy;
+    }
+
+    public String getGitPassword() {
+        return gitPassword;
+    }
+
+    public void setGitPassword(String gitPassword) {
+        this.gitPassword = gitPassword;
+    }
+
+    public String getGitUrl() {
+        return gitUrl;
+    }
+
+    public void setGitUrl(String gitUrl) {
+        this.gitUrl = gitUrl;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

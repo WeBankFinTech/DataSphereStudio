@@ -1,8 +1,8 @@
 package com.webank.wedatasphere.dss.git.utils;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
-import com.webank.wedatasphere.dss.framework.workspace.bean.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
+import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitBaseRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
@@ -324,7 +324,7 @@ public class DSSGitUtils {
             tree.addAll(status.getConflicting());
 
             return tree;
-        } catch (IOException | org.eclipse.jgit.api.errors.GitAPIException e) {
+        } catch (IOException | GitAPIException e) {
             logger.error("get git status Failed, the reason is : ", e);
             return new HashSet<>();
         }

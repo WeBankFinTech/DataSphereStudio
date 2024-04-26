@@ -21,30 +21,37 @@ import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
-import com.webank.wedatasphere.dss.framework.workspace.bean.GitUserEntity;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceGitService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.linkis.common.exception.ErrorException;
+import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -73,9 +80,6 @@ public class DSSWorkspaceRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private HttpServletResponse httpServletResponse;
-
-    @Autowired
-    private DSSWorkspaceGitService dssWorkspaceGitService;
 
     @RequestMapping(path = "createWorkspace", method = RequestMethod.POST)
     public Message createWorkspace(@RequestBody CreateWorkspaceRequest createWorkspaceRequest) throws ErrorException {
@@ -339,17 +343,29 @@ public class DSSWorkspaceRestful {
         return Message.ok().data("favoriteId", favoriteId);
     }
 
-    @RequestMapping(path = "/workspaces/git", method = RequestMethod.POST)
-    public Message associateGit(@RequestBody GitUserEntity gitUser) {
+    @RequestMapping(path = "git", method = RequestMethod.POST)
+    public Message associateGit(@RequestBody com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity gitUser) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
-        dssWorkspaceGitService.associateGit(gitUser, username);
+        if (StringUtils.isEmpty(gitUser.getType())) {
+            return Message.error("需指定当前帐号配置读写权限");
+        }
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitUserUpdateRequest gitUserUpdateRequest = new GitUserUpdateRequest();
+        gitUserUpdateRequest.setGitUser(gitUser);
+        gitUserUpdateRequest.setUsername(username);
+        GitUserUpdateResponse response = RpcAskUtils.processAskException(gitSender.ask(gitUserUpdateRequest), GitUserUpdateResponse.class, GitUserUpdateRequest.class);
         return Message.ok();
     }
 
-    @RequestMapping(path = "/workspaces/git", method = RequestMethod.GET)
-    public Message selectGit(@RequestParam Long workspaceId) {
+    @RequestMapping(path = "git", method = RequestMethod.GET)
+    public Message selectGit(@RequestParam Long workspaceId, @RequestParam String type) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(workspaceId);
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
+        gitUserInfoRequest.setWorkspaceId(workspaceId);
+        gitUserInfoRequest.setType(type);
+        GitUserInfoResponse response = RpcAskUtils.processAskException(gitSender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
+        GitUserEntity gitUser = response.getGitUser();
         return Message.ok().data("gitUser", gitUser);
     }
 

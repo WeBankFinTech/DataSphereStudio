@@ -14,10 +14,10 @@
  *
  */
 
-package com.webank.wedatasphere.dss.git.server.receiver
+package com.webank.wedatasphere.dss.git.receiver
 
-import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitRequest, GitCreateProjectRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRevertRequest, GitSearchRequest}
-import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
+import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitRequest, GitCreateProjectRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRevertRequest, GitSearchRequest, GitUserInfoRequest, GitUserUpdateRequest}
+import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService, DSSWorkspaceGitService}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.slf4j.{Logger, LoggerFactory}
 import org.springframework.stereotype.Component
@@ -25,7 +25,8 @@ import org.springframework.stereotype.Component
 import java.util
 import scala.concurrent.duration.Duration
 
-class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitWorkflowManagerService: DSSGitWorkflowManagerService) extends Receiver {
+class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitWorkflowManagerService: DSSGitWorkflowManagerService,
+                     workspaceGitService: DSSWorkspaceGitService) extends Receiver {
 
   override def receive(message: Any, sender: Sender): Unit = {}
 
@@ -48,6 +49,10 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       gitWorkflowManagerService.getFileContent(gitFileContentRequest)
     case gitHistoryRequest: GitHistoryRequest =>
       gitWorkflowManagerService.getHistory(gitHistoryRequest)
+    case gitUserUpdateRequest: GitUserUpdateRequest =>
+      workspaceGitService.associateGit(gitUserUpdateRequest)
+    case gitUserInfoRequest: GitUserInfoRequest =>
+      workspaceGitService.selectGitUserInfo(gitUserInfoRequest)
     case _ => None
   }
 

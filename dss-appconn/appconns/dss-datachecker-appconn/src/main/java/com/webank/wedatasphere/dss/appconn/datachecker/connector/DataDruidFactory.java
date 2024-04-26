@@ -25,7 +25,6 @@ import java.util.Properties;
 
 public class DataDruidFactory {
 	private static volatile DruidDataSource jobInstance;
-    private static volatile DruidDataSource bdpInstance;
 
     private static volatile DruidDataSource dopsInstance;
     private static volatile DruidDataSource msgInstance;
@@ -43,20 +42,6 @@ public class DataDruidFactory {
             }
         }
         return jobInstance;
-    }
-    public static DruidDataSource getBDPInstance(Properties props, Logger log) {
-        if (bdpInstance == null ) {
-            synchronized (DataDruidFactory.class) {
-                if(bdpInstance == null) {
-                    try {
-                        bdpInstance = createDataSource(props, log, "BDP");
-                    } catch (Exception e) {
-                        throw new RuntimeException("Error creating BDP Druid DataSource", e);
-                    }
-                }
-            }
-        }
-        return bdpInstance;
     }
 
     public static DruidDataSource getDopsInstance(Properties props, Logger log) {

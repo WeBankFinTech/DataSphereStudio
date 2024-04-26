@@ -14,10 +14,10 @@
  *
  */
 
-package com.webank.wedatasphere.dss.git.server.receiver
+package com.webank.wedatasphere.dss.git.receiver
 
-import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitBaseRequest, GitCheckProjectRequest, GitCommitRequest, GitCreateProjectRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRevertRequest, GitSearchRequest}
-import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
+import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitBaseRequest, GitCheckProjectRequest, GitCommitRequest, GitCreateProjectRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRevertRequest, GitSearchRequest, GitUserInfoRequest, GitUserUpdateRequest}
+import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService, DSSWorkspaceGitService}
 
 import javax.annotation.PostConstruct
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
@@ -34,10 +34,13 @@ class DSSGitChooser extends ReceiverChooser {
   @Autowired
   var gitWorkflowManagerService: DSSGitWorkflowManagerService = _
 
+  @Autowired
+  var workspaceGitService: DSSWorkspaceGitService = _
+
   var receiver: Option[DSSGitReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new DSSGitReceiver(gitProjectManagerService, gitWorkflowManagerService))
+  def init(): Unit = receiver = Some(new DSSGitReceiver(gitProjectManagerService, gitWorkflowManagerService, workspaceGitService))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: GitCreateProjectRequest => receiver
@@ -49,6 +52,8 @@ class DSSGitChooser extends ReceiverChooser {
     case _: GitFileContentRequest => receiver
     case _: GitDeleteRequest => receiver
     case _: GitHistoryRequest => receiver
+    case _: GitUserUpdateRequest => receiver
+    case _: GitUserInfoRequest => receiver
     case _ => None
   }
 }

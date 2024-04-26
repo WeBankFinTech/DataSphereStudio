@@ -13,9 +13,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.linkis</groupId>
+            <artifactId>linkis-mybatis</artifactId>
+            <version>${linkis.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-common</artifactId>
-            <version>1.1.0.20-gitflow-SNAPSHOT</version>
+            <version>${dss.version}</version>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>

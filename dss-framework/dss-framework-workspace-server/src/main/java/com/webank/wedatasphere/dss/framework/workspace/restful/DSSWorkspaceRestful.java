@@ -344,7 +344,7 @@ public class DSSWorkspaceRestful {
     }
 
     @RequestMapping(path = "git", method = RequestMethod.POST)
-    public Message associateGit(@RequestBody com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity gitUser) {
+    public Message associateGit(@RequestBody GitUserEntity gitUser) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         if (StringUtils.isEmpty(gitUser.getType())) {
             return Message.error("需指定当前帐号配置读写权限");

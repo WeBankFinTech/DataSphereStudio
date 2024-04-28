@@ -13,5 +13,7 @@ public class GitServerConfig {
 
     public static final CommonVars<String> GIT_SERVER_META_PATH = CommonVars.apply("wds.dss.git.server.meta.path", ".metaConf");
 
+    public static final CommonVars<Integer> GIT_SEARCH_RESULT_LIMIT = CommonVars.apply("wds.dss.git.search.limit", 30);
+
     public static final CommonVars<String> GIT_THREAD_NAME = CommonVars.apply("wds.dss.git.thread.name", "gitServer-Thread-");
 }

@@ -19,29 +19,10 @@ public class GitSearchRequest extends GitBaseRequest{
      * 搜索条件：节点类型（后缀）
      */
     private List<String> type;
-    /**
-     * 分页条件：第一页无需关心，下一页需携带上一页最后一个文件名
-     */
-    private String currentPageLastFile;
+    private Integer pageSize;
+    private Integer pageNow;
 
     public GitSearchRequest() {
-    }
-
-    public GitSearchRequest(List<String> path, String searchContent, String fileName, List<String> type, String currentPageLastFile) {
-        this.path = path;
-        this.searchContent = searchContent;
-        this.fileName = fileName;
-        this.type = type;
-        this.currentPageLastFile = currentPageLastFile;
-    }
-
-    public GitSearchRequest(Long workspaceId, String projectName, List<String> path, String searchContent, String fileName, List<String> type, String currentPageLastFile) {
-        super(workspaceId, projectName);
-        this.path = path;
-        this.searchContent = searchContent;
-        this.fileName = fileName;
-        this.type = type;
-        this.currentPageLastFile = currentPageLastFile;
     }
 
 
@@ -77,11 +58,20 @@ public class GitSearchRequest extends GitBaseRequest{
         this.type = type;
     }
 
-    public String getCurrentPageLastFile() {
-        return currentPageLastFile;
+
+    public Integer getPageSize() {
+        return pageSize;
     }
 
-    public void setCurrentPageLastFile(String currentPageLastFile) {
-        this.currentPageLastFile = currentPageLastFile;
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Integer getPageNow() {
+        return pageNow;
+    }
+
+    public void setPageNow(Integer pageNow) {
+        this.pageNow = pageNow;
     }
 }

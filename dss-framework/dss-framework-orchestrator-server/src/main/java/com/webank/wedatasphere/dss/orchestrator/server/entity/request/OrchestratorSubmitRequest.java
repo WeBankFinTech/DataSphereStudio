@@ -4,7 +4,6 @@ import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 
 public class OrchestratorSubmitRequest {
     private Long flowId;
-    private String dssLabel;
     private LabelRouteVO labels;
     private String projectName;
     private String comment;
@@ -16,14 +15,6 @@ public class OrchestratorSubmitRequest {
 
     public void setFlowId(Long flowId) {
         this.flowId = flowId;
-    }
-
-    public String getDssLabel() {
-        return dssLabel;
-    }
-
-    public void setDssLabel(String dssLabel) {
-        this.dssLabel = dssLabel;
     }
 
     public LabelRouteVO getLabels() {

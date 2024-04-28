@@ -121,7 +121,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         logger.info(gitCommands.toString());
         List<String> fileList = process(gitCommands);
         int start = (request.getPageNow()-1) * request.getPageSize();
-        int end = (start + request.getPageSize()) >= request.getPageSize()? request.getPageSize() : start + request.getPageSize();
+        int end = Math.min((start + request.getPageSize()), fileList.size());
         if (request.getPageNow() < 0 || start >= fileList.size()) {
             throw new DSSErrorException(0101001, "当前请求页" + request.getPageNow() + "超出搜索指定范围");
         }

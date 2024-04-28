@@ -137,9 +137,9 @@ public class DSSGitUtils {
         }
     }
 
-    public static GitDiffResponse diff(String projectName) {
+    public static GitDiffResponse diff(String projectName, List<String> fileList) {
 
-        Set<String> status = status(projectName);
+        Set<String> status = status(projectName, fileList);
         GitTree root = new GitTree("");
         for (String statu : status) {
             root.addChild(statu);
@@ -296,12 +296,18 @@ public class DSSGitUtils {
         return projectNames;
     }
 
-    public static Set<String> status(String projectName) {
+    public static Set<String> status(String projectName, List<String> fileList) {
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator +".git"); // 修改为你的仓库路径
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build()) {
             Git git = new Git(repository);
-            Status status = git.status().call();
+            StatusCommand statusCommand = git.status();
+            // 仅关注当前diff改动涉及的文件夹
+            for (String file : fileList) {
+                statusCommand.addPath(file);
+            }
+
+            Status status = statusCommand.call();
 
             logger.info("Modified files:");
             logger.info("Modified files: {} , \nUntracked files: {}, \nAdded to index: {}, \nChanged files: {}, \nRemoved files: {}, \nMissing files: {}, \nConflicting files: {} ",

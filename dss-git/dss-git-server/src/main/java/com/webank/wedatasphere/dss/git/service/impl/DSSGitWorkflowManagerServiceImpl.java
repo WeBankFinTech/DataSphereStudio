@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.git.service.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
@@ -56,11 +57,13 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 解压BML文件到本地 todo 对接Server时放开调试
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
+            List<String> fileList = new ArrayList<>();
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
+                fileList.add(entry.getKey());
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
                 FileUtils.update(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
             }
-            diff = DSSGitUtils.diff(request.getProjectName());
+            diff = DSSGitUtils.diff(request.getProjectName(), fileList);
             // 重置本地
             DSSGitUtils.reset(request.getProjectName());
         } catch (Exception e) {
@@ -109,7 +112,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
-    public GitSearchResponse search(GitSearchRequest request) {
+    public GitSearchResponse search(GitSearchRequest request) throws DSSErrorException {
         String gitDir = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git";
         String workTree = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() ;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
@@ -117,80 +120,36 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         ));
         logger.info(gitCommands.toString());
         List<String> fileList = process(gitCommands);
+        int start = (request.getPageNow()-1) * request.getPageSize();
+        int end = (start + request.getPageSize()) >= request.getPageSize()? request.getPageSize() : start + request.getPageSize();
+        if (request.getPageNow() < 0 || start >= fileList.size()) {
+            throw new DSSErrorException(0101001, "当前请求页" + request.getPageNow() + "超出搜索指定范围");
+        }
+        final List<String> subList = fileList.subList(start, end);
         List<String> filePathList = new ArrayList<>();
-        for (String file : fileList) {
+        for (String file : subList) {
             filePathList.add("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue())+ "/" + request.getProjectName() + "/" + file);
         }
 
-        List<String> fileCommands = new ArrayList<>(Arrays.asList(
-                "wc", "-l"
-        ));
-
-        fileCommands.addAll(filePathList);
-
-        List<String> process = process(fileCommands);
-        Map<String, Integer> map =new LinkedHashMap<>();
-        for (String content: process) {
-            String[] split = content.trim().split("\\s+");
-            logger.info("content : {}", content);
-            logger.info("split 0 : {}", split[0]);
-            logger.info("split 1 : {}", split[1]);
-            if (split.length == 2) {
-                int line = Integer.parseInt(split[0]);
-                if (line == 0) {
-                    line ++;
-                }
-                String fileName = split[1];
-                if(fileName.equals("total")) {
-                    continue;
-                }
-                map.put(fileName, line);
-            }
-        }
-        List<String> currentFiles = new ArrayList<>();
-         {
-        int total = 0;
-        boolean flag = StringUtils.isEmpty(request.getCurrentPageLastFile());
-        logger.info("flag before: {}", flag);
-        for(Map.Entry<String, Integer> entry: map.entrySet()) {
-            logger.info("entry key : {}", entry.getKey());
-            logger.info("entry value : {}", entry.getValue());
-            logger.info("flag 1111111: {}", flag);
-            if (total + entry.getValue() >= 1000) {
-                break;
-            }
-            if (!StringUtils.isEmpty(request.getCurrentPageLastFile()) && request.getCurrentPageLastFile().equals(entry.getKey())) {
-                flag = true;
-                continue;
-            }
-            if (flag) {
-                total += entry.getValue();
-                currentFiles.add(entry.getKey());
-            }
-        }
-        }
 
 
-        List<String> gitCurrentCommands = new ArrayList<>(Arrays.asList(
+        List<String> gitBaseCommand = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-n", request.getSearchContent()
         ));
-        gitCurrentCommands.addAll(currentFiles);
-        logger.info(gitCurrentCommands.toString());
-        List<String> fileCurrentList = process(gitCurrentCommands);
         Map<String, List<String>> result = new LinkedHashMap<>();
-        for (String fileContent : fileCurrentList) {
-            String[] split = fileContent.split(":", 2);
 
-            String fileName = split[0];
-            String fileSearchContent = split[1];
-            if (result.containsKey(fileName)) {
-                result.get(fileName).add(fileSearchContent);
-            }else {
-                List<String> content = new ArrayList<>();
-                content.add(fileSearchContent);
-                result.put(fileName, content);
-            }
+        for (String file : filePathList) {
+            List<String> gitSearchCommand = new ArrayList<>();
+            gitSearchCommand.addAll(gitBaseCommand);
+            gitSearchCommand.add(file);
+            logger.info(gitSearchCommand.toString());
+
+            final List<String> searchResult = process(gitSearchCommand);
+            final List<String> subSearchResult = searchResult.size() > GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()? searchResult.subList(0, GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()) : searchResult;
+
+            result.put(file, subSearchResult);
         }
+
         return new GitSearchResponse(result, fileList.size());
     }
 

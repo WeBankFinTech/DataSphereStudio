@@ -290,7 +290,7 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
         }
         GitTree gitTree = orchestratorFrameworkService.diffFlow(submitFlowRequest, userName, workspace);
-        return Message.ok().data("tree", gitTree);
+        return Message.ok().data("tree", gitTree.getChildren());
     }
 
     @RequestMapping(value = "submitFlow", method = RequestMethod.POST)

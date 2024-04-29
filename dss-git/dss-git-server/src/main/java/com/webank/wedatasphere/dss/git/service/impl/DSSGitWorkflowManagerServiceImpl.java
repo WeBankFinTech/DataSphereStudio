@@ -114,7 +114,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
-    public GitSearchResponse search(GitSearchRequest request) throws DSSErrorException {
+    public GitSearchResponse search(GitSearchRequest request) {
         String gitDir = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() + "/.git";
         String workTree = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + request.getProjectName() ;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
@@ -173,7 +173,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         int start = (request.getPageNow()-1) * request.getPageSize();
         int end = Math.min((start + request.getPageSize()), fileList.size());
         if (request.getPageNow() < 0 || start >= fileList.size()) {
-            throw new DSSErrorException(0101001, "当前请求页" + request.getPageNow() + "超出搜索指定范围");
+            logger.error("当前请求页" + request.getPageNow() + "超出搜索指定范围");
+            return new GitSearchResponse(result, 0);
         }
         final List<String> subList = fileList.subList(start, end);
         List<String> filePathList = new ArrayList<>();

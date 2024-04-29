@@ -157,6 +157,7 @@ public class AppConnResourceServiceImpl implements AppConnResourceService {
 
     private void deleteFile(File file, String errorMsg) {
         try {
+            LOGGER.info("delete appconn file:{}", file.getAbsolutePath());
             FileUtils.forceDelete(file);
         } catch (IOException e) {
             if(StringUtils.isNotEmpty(errorMsg)) {

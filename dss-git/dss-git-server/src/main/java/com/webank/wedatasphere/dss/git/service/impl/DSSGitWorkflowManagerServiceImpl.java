@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerService {
@@ -118,8 +120,56 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-l", request.getSearchContent()
         ));
+        List<String> workflowNode = request.getPath();
+        String fileName = request.getFileName();
+        List<String> typeList = request.getType();
+        List<String> path = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(workflowNode)) {
+            if (!StringUtils.isEmpty(fileName)) {
+                workflowNode = workflowNode.stream().map(s -> s + "/*" + fileName + "*").collect(Collectors.toList());
+                if (!CollectionUtils.isEmpty(typeList)) {
+                    for (String workflow : workflowNode) {
+                        for (String type : typeList) {
+                            path.add(workflow + "." + type);
+                        }
+                    }
+                }
+            }else if (!CollectionUtils.isEmpty(typeList)) {
+                for (String workflow : workflowNode) {
+                    for (String type : typeList) {
+                        path.add(workflow + "/**/*." + type);
+                    }
+                }
+            }
+
+            if (CollectionUtils.isEmpty(path)) {
+                path = workflowNode;
+            }
+        }else if (!StringUtils.isEmpty(fileName)) {
+            if (!CollectionUtils.isEmpty(typeList)) {
+                for (String type : typeList) {
+                    path.add("/*" + fileName + "*/." + type);
+                }
+            }else {
+                path.add("/*" + fileName + "*");
+            }
+        }else if (!CollectionUtils.isEmpty(typeList)) {
+            for (String type : typeList) {
+                path.add("*." + type);
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(path)) {
+            gitCommands.add("--");
+            gitCommands.addAll(path);
+        }
         logger.info(gitCommands.toString());
         List<String> fileList = process(gitCommands);
+        Map<String, List<String>> result = new LinkedHashMap<>();
+
+        if (CollectionUtils.isEmpty(fileList)) {
+            return new GitSearchResponse(result, 0);
+        }
         int start = (request.getPageNow()-1) * request.getPageSize();
         int end = Math.min((start + request.getPageSize()), fileList.size());
         if (request.getPageNow() < 0 || start >= fileList.size()) {
@@ -136,11 +186,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         List<String> gitBaseCommand = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-n", request.getSearchContent()
         ));
-        Map<String, List<String>> result = new LinkedHashMap<>();
+
 
         for (String file : filePathList) {
-            List<String> gitSearchCommand = new ArrayList<>();
-            gitSearchCommand.addAll(gitBaseCommand);
+            List<String> gitSearchCommand = new ArrayList<>(gitBaseCommand);
             gitSearchCommand.add(file);
             logger.info(gitSearchCommand.toString());
 

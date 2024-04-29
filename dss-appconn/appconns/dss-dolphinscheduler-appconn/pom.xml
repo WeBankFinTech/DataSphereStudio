@@ -18,7 +18,6 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-scheduler-appconn</artifactId>
             <version>${dss.version}</version>
-
             <scope>provided</scope>
         </dependency>
 

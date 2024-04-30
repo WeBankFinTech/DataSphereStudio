@@ -4,33 +4,22 @@ import java.util.List;
 
 public class DSSWorkspaceUsersVo {
 
-    private List<String> editUsers;
 
-    private List<String> accessUsers;
+    private List<DepartmentUserVo> editUsers;
 
-    private List<String> releaseUsers;
+    private List<DepartmentUserVo> accessUsers;
 
-    public List<String> getAccessUsers() {
-        return accessUsers;
-    }
+    private List<DepartmentUserVo> releaseUsers;
 
-    public List<String> getEditUsers() {
-        return editUsers;
-    }
-
-    public List<String> getReleaseUsers() {
-        return releaseUsers;
-    }
-
-    public void setAccessUsers(List<String> accessUsers) {
+    public void setAccessUsers(List<DepartmentUserVo> accessUsers) {
         this.accessUsers = accessUsers;
     }
 
-    public void setReleaseUsers(List<String> releaseUsers) {
+    public void setReleaseUsers(List<DepartmentUserVo> releaseUsers) {
         this.releaseUsers = releaseUsers;
     }
 
-    public void setEditUsers(List<String> editUsers) {
+    public void setEditUsers(List<DepartmentUserVo> editUsers) {
         this.editUsers = editUsers;
     }
 }

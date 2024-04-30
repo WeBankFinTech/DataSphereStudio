@@ -40,6 +40,13 @@ import scala.collection.JavaConverters.asScalaBufferConverter
 object FlowExecutionUtils {
 
   def isSkippedNode(node: WorkflowNode, paramsMap: java.util.Map[String, Any]): Boolean = {
+    val skip = Option(node.getDSSNode).map(_.getParams).map(_.get("configuration"))
+      .map(_.asInstanceOf[java.util.Map[String, Object]].get("special"))
+      .map(_.asInstanceOf[java.util.Map[String, Object]].get("auto.disabled"))
+      .map(_.toString).exists("true".equalsIgnoreCase)
+    if (skip) {
+      return true
+    }
     val executeStrategy = paramsMap.get("executeStrategy")
     if (executeStrategy != null) {
       return StrategyFactory.getNodeSkipStrategy(executeStrategy.toString).isSkippedNode(node, paramsMap, isReversedChoose = false)

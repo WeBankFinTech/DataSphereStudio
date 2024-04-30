@@ -23,10 +23,7 @@ import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.RevokeUserRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUsersVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleCheckService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
@@ -113,8 +110,8 @@ public class DSSWorkspaceUserRestful {
     @RequestMapping(path = "existUserInWorkspace", method = RequestMethod.GET)
     public Message existUserInWorkspace(@RequestParam(WORKSPACE_ID_STR) int workspaceId, @RequestParam("queryUserName") String queryUserName) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
-        List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
-        boolean existFlag = users.stream().anyMatch(user -> user.equalsIgnoreCase(queryUserName));
+        List<DepartmentUserVo> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
+        boolean existFlag = users.stream().anyMatch(user -> user.getName().equalsIgnoreCase(queryUserName));
         LOGGER.info("Check exist user result:" + existFlag + ", query user  is " + queryUserName + ",workSpace id is " + workspaceId);
         return Message.ok().data("existFlag", existFlag);
     }

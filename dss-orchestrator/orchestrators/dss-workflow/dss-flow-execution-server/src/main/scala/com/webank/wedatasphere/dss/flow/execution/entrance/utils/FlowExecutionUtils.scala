@@ -40,10 +40,20 @@ import scala.collection.JavaConverters.asScalaBufferConverter
 object FlowExecutionUtils {
 
   def isSkippedNode(node: WorkflowNode, paramsMap: java.util.Map[String, Any]): Boolean = {
-    val skip = Option(node.getDSSNode).map(_.getParams).map(_.get("configuration"))
-      .map(_.asInstanceOf[java.util.Map[String, Object]].get("special"))
-      .map(_.asInstanceOf[java.util.Map[String, Object]].get("auto.disabled"))
-      .map(_.toString).exists("true".equalsIgnoreCase)
+    val skip = Option(node.getDSSNode)
+      .flatMap(node => Option(node.getParams))
+      .flatMap(params => Option(params.get("configuration")))
+      .flatMap {
+        case config: java.util.Map[_, _] => Option(config.get("special"))
+        case _ => None
+      }
+      .flatMap {
+        case special: java.util.Map[_, _] => Option(special.get("auto.disabled"))
+        case _ => None
+      }
+      .map(_.toString)
+      .exists("true".equalsIgnoreCase)
+
     if (skip) {
       return true
     }

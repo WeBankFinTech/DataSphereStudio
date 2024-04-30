@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.git.service.impl;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.config.GitServerConfig;
@@ -35,7 +36,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
     @Override
     public GitCreateProjectResponse create(GitCreateProjectRequest request) {
         logger.info("-------=======================beginning to create testGit1=======================-------");
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), DSSGitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -65,7 +66,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
 
     @Override
     public GitArchivePorjectResponse archive(GitArchiveProjectRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), DSSGitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -79,7 +80,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
 
     @Override
     public GitCheckProjectResponse checkProject(GitCheckProjectRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), DSSGitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;

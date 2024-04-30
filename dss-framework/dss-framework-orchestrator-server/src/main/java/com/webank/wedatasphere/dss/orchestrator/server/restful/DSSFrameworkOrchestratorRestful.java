@@ -24,7 +24,12 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
@@ -38,6 +43,7 @@ import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestLockWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseLockWorkflow;
 import org.apache.commons.math3.util.Pair;
+import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -47,9 +53,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RequestMapping(path = "/dss/framework/orchestrator", produces = {"application/json"})
 @RestController
@@ -310,5 +318,46 @@ public class DSSFrameworkOrchestratorRestful {
 
         orchestratorFrameworkService.submitFlow(submitFlowRequest, userName, workspace);
         return Message.ok();
+    }
+
+    @RequestMapping(path = "gitUrl", method = RequestMethod.GET)
+    public Message gitUrl(@RequestParam(required = true, name = "projectName") String projectName,
+                          @RequestParam(required = false, name = "workflowName") String workflowName,
+                          HttpServletResponse response) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
+        gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
+        gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
+
+        GitUserInfoResponse infoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
+        String gitUsername = infoResponse.getGitUser().getGitUser();
+        String gitPassword = infoResponse.getGitUser().getGitPassword();
+        String authenToken = "";
+        try {
+            authenToken = orchestratorService.getAuthenToken(gitUsername, gitPassword);
+        } catch (ExecutionException e) {
+            LOGGER.error("git登陆失败，原因为: ", e);
+            return Message.error("git登陆失败，请检查git节点配置的用户名/密码");
+        }
+        // 获取顶级域名
+        String domainIp = UrlUtils.normalizeIp(OrchestratorConf.GIT_DOMAIN_URL.getValue());
+        int lastDotIndex = domainIp.lastIndexOf(".");
+        String topDomain = "";
+        if (lastDotIndex != -1) {
+            int secondToLastIndexOf = domainIp.substring(0, lastDotIndex).lastIndexOf(".");
+            if (secondToLastIndexOf != -1) {
+                topDomain = domainIp.substring(secondToLastIndexOf);
+            }
+        }
+        String cookie = "_gitlab_session=" + authenToken + ";path=/; Domain="+ topDomain +"; HttpOnly; +";
+        LOGGER.info("Cookie is {}", cookie);
+        response.setHeader("Access-Control-Allow-Origin", topDomain);
+        response.addHeader("Set-Cookie", cookie);
+
+        return Message.ok();
+
     }
 }

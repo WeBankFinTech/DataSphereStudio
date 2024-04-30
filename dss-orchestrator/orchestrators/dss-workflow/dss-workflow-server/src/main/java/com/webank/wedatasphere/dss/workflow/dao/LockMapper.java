@@ -57,9 +57,9 @@ public interface LockMapper {
 
     void insertFlowStatus(@Param("flowID") Long flowID, @Param("status") String status);
 
-    void updateFlowStatus(@Param("flowID") Long flowID, @Param("status") String status);
+    void updateOrchestratorStatus(@Param("flowID") Long flowID, @Param("status") String status);
 
-    List<String> selectFlowIdByStatus( @Param("status") String status);
+    List<String> selectOrchestratorByStatus( @Param("status") String status);
 
-    String selectStatusByFlowId(@Param("flowID") Long flowID);
+    String selectOrchestratorStatus(@Param("flowID") Long flowID);
 }

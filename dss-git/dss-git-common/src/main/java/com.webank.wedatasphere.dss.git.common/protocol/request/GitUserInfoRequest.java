@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.git.common.protocol.request;
 
-/**
- * @author zhaobincai
- * @date 2024/4/26 15:17
- */
+
 public class GitUserInfoRequest {
     private Long workspaceId;
     private String type;

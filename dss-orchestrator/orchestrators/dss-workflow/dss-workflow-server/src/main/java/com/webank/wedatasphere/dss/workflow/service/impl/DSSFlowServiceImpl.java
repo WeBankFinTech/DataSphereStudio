@@ -36,6 +36,7 @@ import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
@@ -316,13 +317,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         try {
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(dssFlow.getProjectId());
             //仅对接入Git的项目 更新状态为 保存
-            if (projectInfo.getAssociateGit()) {
-                String status = lockMapper.selectStatusByFlowId(flowID);
-                if (StringUtils.isEmpty(status)) {
-                    lockMapper.insertFlowStatus(flowID, FLOW_STATUS_SAVE);
-                } else {
-                    lockMapper.updateFlowStatus(flowID, FLOW_STATUS_SAVE);
-                }
+            if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
+                lockMapper.updateOrchestratorStatus(flowID, OrchestratorRefConstant.FLOW_STATUS_SAVE);
             }
         } catch (DSSErrorException e) {
             logger.error("getProjectInfo failed by:", e);

@@ -274,4 +274,22 @@
             #{item.id}
         </foreach>
     </update>
+
+    <update id="updateOrchestratorStatus">
+        update dss_orchestrator
+        <set>
+            `status` = #{status}
+        </set>
+        where `id` = #{id}
+    </update>
+
+    <select id="selectOrchestratorStatus" resultType="java.lang.String">
+        select `status` from dss_orchestrator where `id` = #{id}
+    </select>
+
+    <select id="selectOrchestratorByStatus" resultType="java.lang.Long">
+        select id from dss_orchestrator where `status` = #{status}
+    </select>
+
+
 </mapper>

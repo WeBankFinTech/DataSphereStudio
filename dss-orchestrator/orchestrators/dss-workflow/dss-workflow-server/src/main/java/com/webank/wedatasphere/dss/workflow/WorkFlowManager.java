@@ -22,9 +22,7 @@ import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestPushOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponsePushOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.*;
@@ -33,7 +31,6 @@ import org.apache.linkis.common.exception.ErrorException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 public interface WorkFlowManager {
 
@@ -162,5 +159,5 @@ public interface WorkFlowManager {
 
     ResponseLockWorkflow lockWorkFlow(RequestLockWorkflow requestLockWorkflow) throws DSSErrorException;
 
-    ResponsePushOrchestrator updateLockStatus(RequestPushOrchestrator requestPushOrchestrator);
+
 }

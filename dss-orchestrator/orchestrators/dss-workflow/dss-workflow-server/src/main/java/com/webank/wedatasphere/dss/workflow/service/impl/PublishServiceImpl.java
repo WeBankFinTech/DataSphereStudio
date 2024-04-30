@@ -26,6 +26,7 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestrationStatus;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
@@ -33,7 +34,6 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
-import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.commons.lang.StringUtils;
@@ -102,13 +102,8 @@ public class PublishServiceImpl implements PublishService {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
             }
             //仅对接入Git的项目更新状态为 发布-publish
-            if (dssProject.getAssociateGit()) {
-                String status = lockMapper.selectStatusByFlowId(workflowId);
-                if (StringUtils.isEmpty(status)) {
-                    lockMapper.insertFlowStatus(workflowId, DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
-                } else {
-                    lockMapper.updateFlowStatus(workflowId,DSSWorkFlowConstant.FLOW_STATUS_PUBLISH);
-                }
+            if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
+                lockMapper.updateOrchestratorStatus(workflowId,OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
             }
 
             return response.getId();

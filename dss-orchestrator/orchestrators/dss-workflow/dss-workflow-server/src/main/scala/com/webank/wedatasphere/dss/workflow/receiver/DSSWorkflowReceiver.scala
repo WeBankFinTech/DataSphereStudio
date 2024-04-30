@@ -20,7 +20,7 @@ import com.webank.wedatasphere.dss.common.entity.BmlResource
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol._
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.{RequestConvertOrchestrations, RequestPushOrchestrator}
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow
@@ -109,9 +109,6 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
 
     case requestLockWorkflow: RequestLockWorkflow =>
       workflowManager.lockWorkFlow(requestLockWorkflow)
-
-    case requestPushOrchestrator: RequestPushOrchestrator =>
-      workflowManager.updateLockStatus(requestPushOrchestrator)
 
     case _ => throw new DSSErrorException(90000, "Not support protocol " + message)
   }

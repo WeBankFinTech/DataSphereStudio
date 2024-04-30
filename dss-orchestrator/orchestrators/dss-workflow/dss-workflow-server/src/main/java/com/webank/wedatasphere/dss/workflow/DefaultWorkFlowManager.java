@@ -31,9 +31,7 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOrchestrations;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestPushOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponsePushOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.operation.DSSToRelConversionOperation;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.DSSToRelConversionRequestRef;
 import com.webank.wedatasphere.dss.orchestrator.converter.standard.ref.OrchestrationToRelConversionRequestRef;
@@ -72,8 +70,6 @@ import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -465,20 +461,6 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
 
-    @Override
-    public ResponsePushOrchestrator updateLockStatus(RequestPushOrchestrator requestPushOrchestrator) {
-        String status = lockMapper.selectStatusByFlowId(requestPushOrchestrator.getFlowId());
-        logger.info("status is :" +  status);
-        logger.info("flowId is :" +  requestPushOrchestrator.getFlowId());
-        if (StringUtils.isEmpty(status)) {
-            lockMapper.insertFlowStatus(requestPushOrchestrator.getFlowId(), DSSWorkFlowConstant.FLOW_STATUS_PUSH);
-        } else {
-            lockMapper.updateFlowStatus(requestPushOrchestrator.getFlowId(), DSSWorkFlowConstant.FLOW_STATUS_PUSH);
-        }
-
-        status = lockMapper.selectStatusByFlowId(requestPushOrchestrator.getFlowId());
-        return new ResponsePushOrchestrator(status);
-    }
 
 }
 

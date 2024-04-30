@@ -50,8 +50,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCop
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestPushOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponsePushOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
 import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelation;
@@ -60,6 +59,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
+import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
@@ -497,7 +497,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
 
         //4. 返回文件列表
-        updateLockStatus(flowRequest);
+        orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
     }
 
     private GitCommitResponse push (String path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
@@ -509,17 +509,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
         LOGGER.info("-------=======================End to add testGit1=======================-------: {}", responseWorkflowValidNode);
         return responseWorkflowValidNode;
-    }
-
-    private void updateLockStatus(OrchestratorSubmitRequest flowRequest) {
-        LOGGER.info("-------=======================begin to update testGit1=======================------- {}", flowRequest.getFlowId());
-        List<DSSLabel> dssLabelList = new ArrayList<>();
-        dssLabelList.add(new EnvDSSLabel(flowRequest.getLabels().getRoute()));
-        RequestPushOrchestrator requestPushOrchestrator = new RequestPushOrchestrator(flowRequest.getFlowId());
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
-        ResponsePushOrchestrator responsePushOrchestrator = RpcAskUtils.processAskException(sender.ask(requestPushOrchestrator),
-                ResponsePushOrchestrator.class, RequestPushOrchestrator.class);
-        LOGGER.info("-------=======================End to update testGit1=======================------- {}", flowRequest.getFlowId());
     }
 
 }

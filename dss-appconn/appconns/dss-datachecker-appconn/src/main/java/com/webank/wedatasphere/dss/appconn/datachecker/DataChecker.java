@@ -62,7 +62,7 @@ public class DataChecker {
         maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
         //test over time
 //        maxWaitTime = Long.valueOf(p.getProperty(DataChecker.WAIT_TIME, "1")) * 120 * 1000;
-        queryFrequency = Integer.valueOf(p.getProperty(DataChecker.QUERY_FREQUENCY, "30000"));
+        queryFrequency = Integer.valueOf(p.getProperty(DataChecker.QUERY_FREQUENCY, "60000"));
 
     }
 

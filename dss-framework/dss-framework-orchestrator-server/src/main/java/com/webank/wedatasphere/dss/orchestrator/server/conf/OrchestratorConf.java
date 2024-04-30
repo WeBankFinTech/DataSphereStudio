@@ -25,4 +25,9 @@ public class OrchestratorConf {
     public static final CommonVars<String> DSS_CS_CLEAR_ENV = CommonVars.apply("wds.dss.server.cs.clear.env", "DEV");
     public static final  CommonVars<String> DSS_CS_CLEAR_CRON = CommonVars.apply("wds.dss.server.scheduling.clear.cs.cron", "");
 
+    public static final CommonVars<String> GIT_USER = CommonVars.apply("wds.dss.server.git.user", "user_login");
+    public static final CommonVars<String> GIT_PASSWD = CommonVars.apply("wds.dss.server.git.password", "user_password");
+    public static final CommonVars<String> GIT_SUBMIT = CommonVars.apply("wds.dss.server.git.submit", "input[class='btn btn-success qa-sign-in-button']");
+    public static final CommonVars<String> GIT_TIME = CommonVars.apply("wds.dss.server.git.time", "1");
+    public static final CommonVars<String> GIT_DOMAIN_URL = CommonVars.apply("wds.dss.server.git.url", ***REMOVED***
 }

@@ -107,7 +107,7 @@ public class DataCheckerDao {
         }
         log.info("(DataChecker info) database table partition info : " + dataCheckerInfo);
         long waitTime = Long.valueOf(props.getProperty(DataChecker.WAIT_TIME, "1")) * 3600 * 1000;
-        int queryFrequency = Integer.valueOf(props.getProperty(DataChecker.QUERY_FREQUENCY, "30000"));
+        int queryFrequency = Integer.valueOf(props.getProperty(DataChecker.QUERY_FREQUENCY, "60000"));
 //		String timeScape = props.getProperty(DataChecker.TIME_SCAPE, "NULL");
         log.info("(DataChecker info) wait time : " + waitTime);
         log.info("(DataChecker info) query frequency : " + queryFrequency);

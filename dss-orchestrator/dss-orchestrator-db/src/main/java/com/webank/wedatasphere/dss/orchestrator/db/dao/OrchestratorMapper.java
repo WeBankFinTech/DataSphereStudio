@@ -126,4 +126,10 @@ public interface OrchestratorMapper {
     List<DSSOrchestratorVersion> getHistoryOrcVersion(@Param("remainVersion") int remainVersion);
 
     void batchUpdateOrcInfo(@Param("list") List<DSSOrchestratorVersion> historyOrcVersion);
+
+    void updateOrchestratorStatus(@Param("id") Long id, @Param("status") String status);
+
+    String selectOrchestratorStatus(@Param("id") Long id);
+
+    List<Long> selectOrchestratorByStatus(@Param("status") String status);
 }

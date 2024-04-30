@@ -87,17 +87,20 @@
         (#{flowID}, #{status}, NOW(), NOW())
     </insert>
 
-    <update id="updateFlowStatus">
-        update dss_workflow_status set `status` = #{status}, `update_time` = NOW()
-        where `flow_id` = #{flowID}
+    <update id="updateOrchestratorStatus">
+        update dss_orchestrator
+        <set>
+            `status` = #{status}
+        </set>
+        where `id` = #{id}
     </update>
 
-    <select id="selectFlowIdByStatus" resultType="java.lang.String">
-        select `flow_id` from dss_workflow_status where `status` = #{status}
+    <select id="selectOrchestratorStatus" resultType="java.lang.String">
+        select `status` from dss_orchestrator where `id` = #{id}
     </select>
 
-    <select id="selectStatusByFlowId" resultType="java.lang.String">
-        select `status` from dss_workflow_status where `flow_id` = #{flowID} order by update_time desc limit 1
+    <select id="selectOrchestratorByStatus" resultType="java.lang.Long">
+        select id from dss_orchestrator where `status` = #{status}
     </select>
 
 </mapper>

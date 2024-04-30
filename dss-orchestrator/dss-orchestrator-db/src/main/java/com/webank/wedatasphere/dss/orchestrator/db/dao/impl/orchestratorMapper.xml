@@ -22,7 +22,7 @@
 
     <sql id="orchestrator_main">
         id,`name`,`type`,`desc`,`creator`,`create_time`,`project_id`,`uses`,`appconn_name`,`uuid`,`secondary_type` ,
-        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`orchestrator_level`,`update_user`,`update_time`
+        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`orchestrator_level`,`update_user`,`update_time`,`is_default_reference`
     </sql>
 
     <sql id="orchestrator_version">
@@ -49,7 +49,8 @@
         VALUES
         (#{id},#{name},#{type},#{desc},#{creator},#{createTime},#{projectId},#{uses},#{appConnName},
         #{uuid},#{secondaryType},
-        #{workspaceId},#{orchestratorMode},#{orchestratorWay},#{orchestratorLevel},#{updateUser},#{updateTime})
+        #{workspaceId},#{orchestratorMode},#{orchestratorWay},#{orchestratorLevel},#{updateUser},#{updateTime}
+        ,#{isDefaultReference})
     </insert>
 
     <update id="updateOrchestrator"
@@ -64,6 +65,7 @@
             <if test="orchestratorLevel != null">`orchestrator_level`=#{orchestratorLevel},</if>
             <if test="updateUser != null">`update_user`=#{updateUser},</if>
             <if test="updateTime != null">`update_time`=#{updateTime},</if>
+            <if test="isDefaultReference != null">`is_default_reference`=#{isDefaultReference},</if>
         </trim>
         WHERE id = #{id}
     </update>

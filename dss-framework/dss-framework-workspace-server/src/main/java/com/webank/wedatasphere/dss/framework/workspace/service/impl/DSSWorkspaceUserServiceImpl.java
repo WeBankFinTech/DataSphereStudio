@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceAddUserHook;
@@ -115,8 +116,29 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<String> getAllWorkspaceUsers(long workspaceId) {
-        return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
+    public List<DepartmentUserVo> getAllWorkspaceUsers(long workspaceId) {
+        return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId).stream().map(
+                        workspaceUser -> changeToUserVO(workspaceUser))
+                .collect(Collectors.toList());
+    }
+
+    private DepartmentUserVo changeToUserVO(String userName) {
+        DepartmentUserVo vo = new DepartmentUserVo();
+        vo.setName(userName);
+        String orgFullName = staffInfoGetter.getFullOrgNameByUsername(userName);
+        if (org.apache.commons.lang3.StringUtils.isNotEmpty(orgFullName)) {
+            try {
+                String departmentName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0];
+                String officeName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[1];
+                vo.setDepartment(departmentName);
+                vo.setOffice(officeName);
+            } catch (Exception e) {
+                //LOGGER.warn("fail to get department and office {} ", e.getMessage());
+                vo.setDepartment(WorkspaceServerConstant.DEFAULT_DEPARTMENT);
+                vo.setOffice(WorkspaceServerConstant.DEFAULT_OFFICE);
+            }
+        }
+        return vo;
     }
 
     @Override

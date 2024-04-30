@@ -32,6 +32,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnl
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public interface OrchestratorService {
@@ -138,5 +139,7 @@ public interface OrchestratorService {
     ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos);
 
     void batchClearContextId();
+
+    String getAuthenToken(String gitUsername, String gitPassword) throws ExecutionException;
 
 }

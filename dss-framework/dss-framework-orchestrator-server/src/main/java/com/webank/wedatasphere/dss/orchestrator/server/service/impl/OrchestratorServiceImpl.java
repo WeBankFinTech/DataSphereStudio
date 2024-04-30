@@ -29,6 +29,7 @@ import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
@@ -66,6 +67,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
 import org.apache.linkis.rpc.Sender;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -73,8 +78,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -541,6 +549,74 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         } catch (Exception e) {
             LOGGER.warn("execute linkis batch clear csId failed", e);
         }
+    }
+
+    @Override
+    public String getAuthenToken(String gitUsername, String gitPassword) throws ExecutionException {
+        // 启动chromedriver
+        String url = "";
+        WebDriver driver = generateChromeDriver(this.getClass().getClassLoader().getResource(DSSOrchestratorConstant.CHROME_DRIVER_PATH).getPath(), null);
+        String token = "";
+        try {
+            //设置超时时间
+            driver.manage().timeouts().implicitlyWait(Long.parseLong(OrchestratorConf.GIT_TIME.getValue()), TimeUnit.SECONDS);
+            driver.manage().window().maximize();
+            driver.manage().window().setSize(new Dimension(1920, 1080));
+            driver.get(UrlUtils.normalizeIp(url));
+            WebElement elementUserName = driver.findElement(By.id(OrchestratorConf.GIT_USER.getValue()));
+            WebElement elementPassWord = driver.findElement(By.id(OrchestratorConf.GIT_PASSWD.getValue()));
+            WebElement elementBtn = driver.findElement(By.cssSelector(OrchestratorConf.GIT_SUBMIT.getValue()));
+            elementUserName.sendKeys(gitUsername);
+            elementPassWord.sendKeys(gitPassword);
+            elementBtn.submit();
+            driver.navigate().refresh();
+            LOGGER.info("for user getting... " + UrlUtils.normalizeIp(OrchestratorConf.GIT_DOMAIN_URL.getValue()));
+            Set<Cookie> cookies = driver.manage().getCookies();
+            LOGGER.info("cookies： {}", cookies.toString());
+            for (Cookie cookie:cookies) {
+                if (cookie.getName().equals("_gitlab_session"))
+                {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+            LOGGER.info("driver cookies: {}", token);
+        } catch (Exception e) {
+            LOGGER.info("error bescause: ", e);
+        } finally {
+            driver.manage().deleteAllCookies();
+            driver.quit();
+        }
+        return token;
+    }
+
+
+    private WebDriver generateChromeDriver(String path, Proxy seleniumProxy) throws ExecutionException {
+        File file = new File(path);
+        if (!file.canExecute() && !file.setExecutable(true)) {
+            throw new ExecutionException(new Exception(path + "is not executable!"));
+        }
+
+        System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, path);
+
+        ChromeOptions options = new ChromeOptions();
+        options.setProxy(seleniumProxy);
+        options.addArguments("headless");
+        options.addArguments("no-sandbox");
+        options.addArguments("disable-gpu");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("disable-features=NetworkService");
+        options.addArguments("ignore-certificate-errors");
+        options.addArguments("silent");
+        options.addArguments("--disable-application-cache");
+
+        options.addArguments("disable-dev-shm-usage");
+        options.addArguments("remote-debugging-port=9012");
+
+
+
+        return new ChromeDriver(options);
     }
 
 }

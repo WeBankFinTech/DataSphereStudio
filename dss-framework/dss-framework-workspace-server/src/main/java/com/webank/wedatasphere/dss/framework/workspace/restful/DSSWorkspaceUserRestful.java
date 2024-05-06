@@ -95,14 +95,14 @@ public class DSSWorkspaceUserRestful {
 
     @RequestMapping(path = "getAllWorkspaceUsers", method = RequestMethod.GET)
     public Message getAllWorkspaceUsers() {
-        DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
+        DSSWorkspaceUsersDepartmentVo dssWorkspaceUsersVo = new DSSWorkspaceUsersDepartmentVo();
         // workspaceId改为从cookie取
         int workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
-        dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
+        dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
 //        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
 //        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
-        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
-        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
+        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
         return Message.ok().data("users", dssWorkspaceUsersVo);
     }
 
@@ -110,8 +110,8 @@ public class DSSWorkspaceUserRestful {
     @RequestMapping(path = "existUserInWorkspace", method = RequestMethod.GET)
     public Message existUserInWorkspace(@RequestParam(WORKSPACE_ID_STR) int workspaceId, @RequestParam("queryUserName") String queryUserName) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
-        List<DepartmentUserVo> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
-        boolean existFlag = users.stream().anyMatch(user -> user.getName().equalsIgnoreCase(queryUserName));
+        List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
+        boolean existFlag = users.stream().anyMatch(user -> user.equalsIgnoreCase(queryUserName));
         LOGGER.info("Check exist user result:" + existFlag + ", query user  is " + queryUserName + ",workSpace id is " + workspaceId);
         return Message.ok().data("existFlag", existFlag);
     }

@@ -50,7 +50,10 @@ public interface DSSWorkspaceUserService {
 
     List<StaffInfoVO> listAllDSSUsers();
 
-    List<DepartmentUserVo> getAllWorkspaceUsers(long workspaceId);
+    List<String> getAllWorkspaceUsers(long workspaceId);
+
+    List<DepartmentUserVo> getAllWorkspaceUsersDepartment(long workspaceId) ;
+
     PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize);
 
     List<Integer> getUserWorkspaceIds(String userName);

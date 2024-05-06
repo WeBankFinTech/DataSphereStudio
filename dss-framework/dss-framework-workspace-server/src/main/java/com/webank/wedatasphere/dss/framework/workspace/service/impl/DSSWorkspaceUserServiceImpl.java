@@ -116,7 +116,12 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<DepartmentUserVo> getAllWorkspaceUsers(long workspaceId) {
+    public List<String> getAllWorkspaceUsers(long workspaceId) {
+        return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
+    }
+
+    @Override
+    public List<DepartmentUserVo> getAllWorkspaceUsersDepartment(long workspaceId) {
         return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId).stream().map(
                         workspaceUser -> changeToUserVO(workspaceUser))
                 .collect(Collectors.toList());

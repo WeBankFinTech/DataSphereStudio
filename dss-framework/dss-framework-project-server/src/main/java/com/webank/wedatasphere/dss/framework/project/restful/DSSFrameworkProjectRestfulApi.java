@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
@@ -34,11 +35,15 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.ProjectHttpRequestHook;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
 import com.webank.wedatasphere.dss.framework.proxy.exception.DSSProxyUserErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitSearchRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitSearchResponse;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.common.exception.WarnException;
+import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -309,6 +314,15 @@ public class DSSFrameworkProjectRestfulApi {
         }
         List<ProjectResponse> dssProjectVos = projectService.getDeletedProjects(projectRequest);
         return Message.ok("获取工作空间已删除的工程成功").data("projects", dssProjectVos);
+    }
+
+    @RequestMapping(path = "searchGit", method = RequestMethod.POST)
+    public Message searchGit(HttpServletRequest request, @RequestBody GitSearchRequest searchRequest) {
+        String username = SecurityFilter.getLoginUsername(request);
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitSearchResponse gitSearchResponse = RpcAskUtils.processAskException(sender.ask(searchRequest), GitSearchResponse.class, GitSearchRequest.class);
+
+        return Message.ok().data("data", gitSearchResponse);
     }
 
 

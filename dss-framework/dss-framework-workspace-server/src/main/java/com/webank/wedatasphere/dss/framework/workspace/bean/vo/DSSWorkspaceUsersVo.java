@@ -5,21 +5,21 @@ import java.util.List;
 public class DSSWorkspaceUsersVo {
 
 
-    private List<DepartmentUserVo> editUsers;
+    private List<String> editUsers;
 
-    private List<DepartmentUserVo> accessUsers;
+    private List<String> accessUsers;
 
-    private List<DepartmentUserVo> releaseUsers;
+    private List<String> releaseUsers;
 
-    public void setAccessUsers(List<DepartmentUserVo> accessUsers) {
+    public void setAccessUsers(List<String> accessUsers) {
         this.accessUsers = accessUsers;
     }
 
-    public void setReleaseUsers(List<DepartmentUserVo> releaseUsers) {
+    public void setReleaseUsers(List<String> releaseUsers) {
         this.releaseUsers = releaseUsers;
     }
 
-    public void setEditUsers(List<DepartmentUserVo> editUsers) {
+    public void setEditUsers(List<String> editUsers) {
         this.editUsers = editUsers;
     }
 }

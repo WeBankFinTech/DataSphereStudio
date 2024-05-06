@@ -1,14 +1,16 @@
 package com.webank.wedatasphere.dss.git.common.protocol.response;
 
 
+import com.webank.wedatasphere.dss.git.common.protocol.GitSearchResult;
+
 import java.util.List;
 import java.util.Map;
 
 public class GitSearchResponse{
-    private Map<String, List<String>> result;
+    private List<GitSearchResult> result;
     private Integer total;
 
-    public GitSearchResponse(Map<String, List<String>> result, Integer total) {
+    public GitSearchResponse(List<GitSearchResult> result, Integer total) {
         this.result = result;
         this.total = total;
     }
@@ -16,11 +18,11 @@ public class GitSearchResponse{
     public GitSearchResponse() {
     }
 
-    public Map<String, List<String>> getResult() {
+    public List<GitSearchResult> getResult() {
         return result;
     }
 
-    public void setResult(Map<String, List<String>> result) {
+    public void setResult(List<GitSearchResult> result) {
         this.result = result;
     }
 

@@ -3,6 +3,7 @@ package com.webank.wedatasphere.dss.git.service.impl;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.git.common.protocol.GitSearchResult;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
@@ -166,7 +167,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         logger.info(gitCommands.toString());
         List<String> fileList = process(gitCommands);
-        Map<String, List<String>> result = new LinkedHashMap<>();
+        List<GitSearchResult> result = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(fileList)) {
             return new GitSearchResponse(result, 0);
@@ -177,6 +178,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             logger.error("当前请求页" + request.getPageNow() + "超出搜索指定范围");
             return new GitSearchResponse(result, 0);
         }
+        // subList 截断的List及子集 不允许List变更
         final List<String> subList = fileList.subList(start, end);
         List<String> filePathList = new ArrayList<>();
         for (String file : subList) {
@@ -195,11 +197,13 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             gitSearchCommand.add(file);
             logger.info(gitSearchCommand.toString());
 
+            // subList 截断的List及子集 不允许List变更
             final List<String> searchResult = process(gitSearchCommand);
             final List<String> subSearchResult = searchResult.size() > GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()? searchResult.subList(0, GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()) : searchResult;
 
-            result.put(file, subSearchResult);
+            result.add(new GitSearchResult(file, subSearchResult));
         }
+
 
         return new GitSearchResponse(result, fileList.size());
     }

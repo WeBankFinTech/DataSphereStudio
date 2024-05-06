@@ -1,8 +1,10 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class DepartmentUserVo {
+public class DepartmentUserVo implements Serializable {
+    private static final long serialVersionUID=1L;
     private String name;
     private String department;
     private String office;

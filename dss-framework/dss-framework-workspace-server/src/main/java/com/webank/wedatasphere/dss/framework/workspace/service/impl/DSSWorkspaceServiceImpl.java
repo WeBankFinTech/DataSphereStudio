@@ -438,6 +438,13 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
+    public List<String> getAllDepartments() {
+        List<String> allDepartments = staffInfoGetter.getAllDepartments().stream()
+                .map(department->department.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0]).distinct().collect(Collectors.toList());
+        return allDepartments;
+    }
+
+    @Override
     public void associateDepartments(Long workspaceId, String departments, String roles, String user) throws DSSErrorException {
         List<Integer> userRoles = dssWorkspaceUserMapper.getRoleInWorkspace(workspaceId.intValue(), user);
         //管理员鉴权

@@ -23,4 +23,16 @@ public class DSSWorkspaceUsersDepartmentVo implements Serializable {
     public void setEditUsers(List<DepartmentUserVo> editUsers) {
         this.editUsers = editUsers;
     }
+
+    public List<DepartmentUserVo> getEditUsers() {
+        return editUsers;
+    }
+
+    public List<DepartmentUserVo> getAccessUsers() {
+        return accessUsers;
+    }
+
+    public List<DepartmentUserVo> getReleaseUsers() {
+        return releaseUsers;
+    }
 }

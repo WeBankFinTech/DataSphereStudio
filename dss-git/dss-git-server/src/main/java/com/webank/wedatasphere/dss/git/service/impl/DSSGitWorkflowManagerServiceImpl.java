@@ -329,7 +329,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
-            response = DSSGitUtils.listCommitsBetween(repository, request.getStartCommitId(), request.getEndCommitId());
+            List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilePath(), 5);
+            if (CollectionUtils.isEmpty(latestCommit)) {
+                logger.error("get Commit failed, the reason is null");
+            }else {
+                response.setResponses(latestCommit);
+            }
 
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
@@ -369,13 +374,19 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
-            commitResponse = DSSGitUtils.getLatestCommit(repository, request.getFilepath());
+            List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilepath(), 1);
+            if (CollectionUtils.isEmpty(latestCommit)) {
+                logger.error("get latestCommit failed, the reason is null");
+            } else {
+                commitResponse = latestCommit.get(0);
+                return commitResponse;
+            }
 
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
         } finally {
             repository.close();
         }
-        return commitResponse;
+        return null;
     }
 }

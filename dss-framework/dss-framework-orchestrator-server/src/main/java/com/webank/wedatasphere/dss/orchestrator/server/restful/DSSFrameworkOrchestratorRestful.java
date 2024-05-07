@@ -26,6 +26,7 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
@@ -375,7 +376,17 @@ public class DSSFrameworkOrchestratorRestful {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
         String orchestratorStatus = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
-        
+
         return Message.ok();
+    }
+
+    @RequestMapping(value = "publish/history", method = RequestMethod.GET)
+    public Message getHistory(@RequestParam Long orchestratorId, @RequestParam String projectName) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        GitHistoryResponse history = orchestratorFrameworkService.getHistory(workspace.getWorkspaceId(), orchestratorId, projectName);
+
+        return Message.ok().data("history", history);
     }
 }

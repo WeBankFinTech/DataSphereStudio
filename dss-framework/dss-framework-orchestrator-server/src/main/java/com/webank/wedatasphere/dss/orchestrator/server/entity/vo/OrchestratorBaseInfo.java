@@ -130,6 +130,7 @@ public class OrchestratorBaseInfo {
      */
     private Boolean releasable;
 
+    private String status;
 
     public Long getId() {
         return id;
@@ -323,4 +324,11 @@ public class OrchestratorBaseInfo {
         return dssInfo;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

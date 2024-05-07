@@ -497,24 +497,23 @@ public class DSSGitUtils {
         }
     }
 
-    public static GitCommitResponse getLatestCommit(Repository repository, String filePath) {
-        GitCommitResponse commitResponse = new GitCommitResponse();
+    public static List<GitCommitResponse> getLatestCommit(Repository repository, String filePath, Integer num) {
+        List<GitCommitResponse> commitResponseList = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         try (Git git = new Git(repository)) {
-            // 获取文件的提交历史
-            Iterable<org.eclipse.jgit.revwalk.RevCommit> logs = git.log()
-                    .addPath(filePath)
-                    .call();
+            Iterable<RevCommit> commits = git.log().addPath(filePath).setMaxCount(num).call();
+            for (RevCommit commit : commits) {
+                GitCommitResponse commitResponse = new GitCommitResponse();
+                commitResponse.setCommitId(commit.getId().getName());
+                commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
+                commitResponse.setComment(commit.getShortMessage());
+                commitResponse.setCommitUser(commit.getAuthorIdent().getName());
+                logger.info("提交ID: " + commit.getId().getName());
+                commitResponseList.add(commitResponse);
+            }
 
-            // 获取最近的一个提交
-            RevCommit latestCommit = logs.iterator().next();
-            commitResponse.setCommitId(latestCommit.getId().getName());
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            commitResponse.setCommitTime(sdf.format(latestCommit.getAuthorIdent().getWhen()));
-            commitResponse.setComment(latestCommit.getShortMessage());
-            commitResponse.setCommitUser(latestCommit.getAuthorIdent().getName());
-
-            logger.info("最近的提交ID: " + latestCommit.getId().getName());
-            return commitResponse; // 返回commitId字符串
+            return commitResponseList;
         } catch (GitAPIException e) {
             logger.error("get latestCommitId failed, the reason is: ", e);
             return null;

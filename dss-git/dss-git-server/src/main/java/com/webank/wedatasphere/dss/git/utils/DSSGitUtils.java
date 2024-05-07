@@ -497,6 +497,30 @@ public class DSSGitUtils {
         }
     }
 
+    public static GitCommitResponse getLatestCommit(Repository repository, String filePath) {
+        GitCommitResponse commitResponse = new GitCommitResponse();
+        try (Git git = new Git(repository)) {
+            // 获取文件的提交历史
+            Iterable<org.eclipse.jgit.revwalk.RevCommit> logs = git.log()
+                    .addPath(filePath)
+                    .call();
+
+            // 获取最近的一个提交
+            RevCommit latestCommit = logs.iterator().next();
+            commitResponse.setCommitId(latestCommit.getId().getName());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            commitResponse.setCommitTime(sdf.format(latestCommit.getAuthorIdent().getWhen()));
+            commitResponse.setComment(latestCommit.getShortMessage());
+            commitResponse.setCommitUser(latestCommit.getAuthorIdent().getName());
+
+            logger.info("最近的提交ID: " + latestCommit.getId().getName());
+            return commitResponse; // 返回commitId字符串
+        } catch (GitAPIException e) {
+            logger.error("get latestCommitId failed, the reason is: ", e);
+            return null;
+        }
+    }
+
     public static GitHistoryResponse listCommitsBetween(Repository repository, String startCommitId, String endCommitId) throws Exception {
         List<GitCommitResponse> gitCommitResponseList = new ArrayList<>();
 

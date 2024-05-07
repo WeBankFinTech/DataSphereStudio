@@ -2,17 +2,21 @@ package com.webank.wedatasphere.dss.git.common.protocol.request;
 
 public class GitCurrentCommitRequest extends GitBaseRequest{
     private String username;
+    private String filepath;
 
-    public GitCurrentCommitRequest(String username) {
-        this.username = username;
-    }
-
-    public GitCurrentCommitRequest(Long workspaceId, String projectName, String username) {
-        super(workspaceId, projectName);
-        this.username = username;
-    }
 
     public GitCurrentCommitRequest() {
+    }
+
+    public GitCurrentCommitRequest(String username, String filepath) {
+        this.username = username;
+        this.filepath = filepath;
+    }
+
+    public GitCurrentCommitRequest(Long workspaceId, String projectName, String username, String filepath) {
+        super(workspaceId, projectName);
+        this.username = username;
+        this.filepath = filepath;
     }
 
     public String getUsername() {
@@ -21,5 +25,13 @@ public class GitCurrentCommitRequest extends GitBaseRequest{
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getFilepath() {
+        return filepath;
+    }
+
+    public void setFilepath(String filepath) {
+        this.filepath = filepath;
     }
 }

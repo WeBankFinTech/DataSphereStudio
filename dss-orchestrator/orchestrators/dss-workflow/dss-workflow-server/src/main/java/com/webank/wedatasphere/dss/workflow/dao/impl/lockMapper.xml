@@ -103,4 +103,12 @@
         select id from dss_orchestrator where `status` = #{status}
     </select>
 
+    <update id="updateOrchestratorVersionCommitId">
+        update dss_orchestrator_version_info
+        <set>
+            `commit_id` = #{commitId}
+        </set>
+        where `app_id` = #{flowID}
+    </update>
+
 </mapper>

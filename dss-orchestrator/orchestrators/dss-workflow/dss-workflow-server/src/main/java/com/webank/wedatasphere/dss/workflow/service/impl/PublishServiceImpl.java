@@ -23,6 +23,8 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitCurrentCommitRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestrationStatus;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
@@ -104,6 +106,12 @@ public class PublishServiceImpl implements PublishService {
             //仅对接入Git的项目更新状态为 发布-publish
             if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
                 lockMapper.updateOrchestratorStatus(workflowId,OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
+                // 获取当前文件Commit
+                Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+                GitCurrentCommitRequest currentCommitRequest = new GitCurrentCommitRequest(workspace.getWorkspaceId(), dssProject.getName(), convertUser);
+                GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(currentCommitRequest), GitCommitResponse.class, GitCurrentCommitRequest.class);
+                // 更新commitId
+                lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), dssFlow.getId());
             }
 
             return response.getId();

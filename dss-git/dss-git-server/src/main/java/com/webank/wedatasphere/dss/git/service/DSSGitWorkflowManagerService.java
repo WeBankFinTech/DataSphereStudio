@@ -18,4 +18,6 @@ public interface DSSGitWorkflowManagerService {
     GitFileContentResponse getFileContent(GitFileContentRequest request);
 
     GitHistoryResponse getHistory(GitHistoryRequest request);
+
+    GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request);
 }

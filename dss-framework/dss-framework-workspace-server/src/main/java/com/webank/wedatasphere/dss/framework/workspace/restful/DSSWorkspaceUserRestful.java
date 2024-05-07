@@ -95,15 +95,28 @@ public class DSSWorkspaceUserRestful {
 
     @RequestMapping(path = "getAllWorkspaceUsers", method = RequestMethod.GET)
     public Message getAllWorkspaceUsers() {
-        DSSWorkspaceUsersDepartmentVo dssWorkspaceUsersVo = new DSSWorkspaceUsersDepartmentVo();
+        DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
         // workspaceId改为从cookie取
         int workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
-        dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+        dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
 //        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
 //        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
-        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
-        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
+        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
         return Message.ok().data("users", dssWorkspaceUsersVo);
+    }
+
+    @RequestMapping(path = "getAllWorkspaceUsersWithDepartment", method = RequestMethod.GET)
+    public Message getAllWorkspaceUsersWithDepartment() {
+        DSSWorkspaceUsersDepartmentVo dSSWorkspaceUsersDepartmentVo = new DSSWorkspaceUsersDepartmentVo();
+        // workspaceId改为从cookie取
+        int workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+        dSSWorkspaceUsersDepartmentVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+//        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
+//        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
+        dSSWorkspaceUsersDepartmentVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+        dSSWorkspaceUsersDepartmentVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+        return Message.ok().data("users", dSSWorkspaceUsersDepartmentVo);
     }
 
 

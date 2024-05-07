@@ -62,4 +62,6 @@ public interface LockMapper {
     List<String> selectOrchestratorByStatus( @Param("status") String status);
 
     String selectOrchestratorStatus(@Param("flowID") Long flowID);
+
+    void updateOrchestratorVersionCommitId(@Param("commitId")String commitId, @Param("workflowId")Long flowID);
 }

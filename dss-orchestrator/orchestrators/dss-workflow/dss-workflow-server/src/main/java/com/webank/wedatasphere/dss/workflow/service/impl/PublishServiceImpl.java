@@ -108,7 +108,7 @@ public class PublishServiceImpl implements PublishService {
                 lockMapper.updateOrchestratorStatus(workflowId,OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
                 // 获取当前文件Commit
                 Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-                GitCurrentCommitRequest currentCommitRequest = new GitCurrentCommitRequest(workspace.getWorkspaceId(), dssProject.getName(), convertUser);
+                GitCurrentCommitRequest currentCommitRequest = new GitCurrentCommitRequest(workspace.getWorkspaceId(), dssProject.getName(), convertUser, dssFlow.getName());
                 GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(currentCommitRequest), GitCommitResponse.class, GitCurrentCommitRequest.class);
                 // 更新commitId
                 lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), dssFlow.getId());

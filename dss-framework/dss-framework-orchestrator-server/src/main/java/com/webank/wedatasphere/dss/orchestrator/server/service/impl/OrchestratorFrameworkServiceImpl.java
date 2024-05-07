@@ -126,6 +126,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private final ExecutorService orchestratorCopyThreadPool = new ThreadPoolExecutor(0, 200, 60L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(1024), orchestratorCopyThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 
+    private final ThreadFactory pushOrchestratorThreadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("orchestrator-push-git-thread-%d")
+            .setDaemon(false)
+            .build();
+
+    private final ExecutorService pushOrchestratorThreadPool = new ThreadPoolExecutor(0, 20, 120L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(1024), pushOrchestratorThreadFactory, new ThreadPoolExecutor.AbortPolicy());
     /**
      * 1.拿到的dss orchestrator的appconn
      * 2.然后创建
@@ -487,26 +494,28 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
-        //todo 1. 异步提交，开始提交状态 save->pushing->push
-        orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-        //2. 获取编排信息
-        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
-        //3. 获取上传工作流信息
-        BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
-        // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
-        //4. 调用git服务上传
-        try {
-            GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName(), flowRequest.getComment());
-            if (commit == null) {
-                LOGGER.info("change is empty");
+        pushOrchestratorThreadPool.submit(() ->{
+            //1. 异步提交，开始提交状态 save->pushing->push
+            orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+            //2. 获取编排信息
+            DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+            //3. 获取上传工作流信息
+            BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
+            // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
+            //4. 调用git服务上传
+            try {
+                GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName(), flowRequest.getComment());
+                if (commit == null) {
+                    LOGGER.info("change is empty");
+                    orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
+                }
+                //5. 返回文件列表
+                orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+            } catch (Exception e) {
+                LOGGER.error("push failed, the reason is : ", e);
                 orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
             }
-            //5. 返回文件列表
-            orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
-        } catch (Exception e) {
-            LOGGER.error("push failed, the reason is : ", e);
-            orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
-        }
+        });
     }
 
     private GitCommitResponse push (String path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {

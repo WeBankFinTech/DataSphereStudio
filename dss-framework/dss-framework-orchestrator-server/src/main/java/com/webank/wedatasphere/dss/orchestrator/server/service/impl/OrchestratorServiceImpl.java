@@ -77,6 +77,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -477,6 +478,13 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 orchestratorBaseInfo.setOrchestratorId(dssOrchestratorInfo.getId());
                 orchestratorBaseInfo.setEditable(isEditable || isReleasable);
                 orchestratorBaseInfo.setReleasable(isReleasable);
+                if (!StringUtils.isEmpty(dssOrchestratorInfo.getStatus()) && dssOrchestratorInfo.getStatus().equals(OrchestratorRefConstant.FLOW_STATUS_PUSHING)
+                        && dssOrchestratorInfo.getStatus().equals(OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED)) {
+                    orchestratorBaseInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                } else {
+                    orchestratorBaseInfo.setStatus(dssOrchestratorInfo.getStatus());
+                }
+
                 retList.add(orchestratorBaseInfo);
             }
         }

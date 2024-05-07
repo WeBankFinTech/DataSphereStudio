@@ -50,4 +50,6 @@ public interface OrchestratorFrameworkService {
     GitTree diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 
     void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+
+    String getOrchestratorStatus(Long orchestratorId);
 }

@@ -369,7 +369,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
-            commitResponse = DSSGitUtils.getCurrentCommit(repository);
+            commitResponse = DSSGitUtils.getLatestCommit(repository, request.getFilepath());
 
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);

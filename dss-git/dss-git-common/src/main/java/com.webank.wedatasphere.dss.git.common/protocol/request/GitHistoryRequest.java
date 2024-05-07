@@ -1,19 +1,7 @@
 package com.webank.wedatasphere.dss.git.common.protocol.request;
 
 public class GitHistoryRequest extends GitBaseRequest{
-    private String startCommitId;
-    private String endCommitId;
-
-    public GitHistoryRequest(String startCommitId, String endCommitId) {
-        this.startCommitId = startCommitId;
-        this.endCommitId = endCommitId;
-    }
-
-    public GitHistoryRequest(Long workspaceId, String projectName, String startCommitId, String endCommitId) {
-        super(workspaceId, projectName);
-        this.startCommitId = startCommitId;
-        this.endCommitId = endCommitId;
-    }
+    private String filePath;
 
     public GitHistoryRequest() {
     }
@@ -22,19 +10,20 @@ public class GitHistoryRequest extends GitBaseRequest{
         super(workspaceId, projectName);
     }
 
-    public String getStartCommitId() {
-        return startCommitId;
+    public GitHistoryRequest(String filePath) {
+        this.filePath = filePath;
     }
 
-    public void setStartCommitId(String startCommitId) {
-        this.startCommitId = startCommitId;
+    public GitHistoryRequest(Long workspaceId, String projectName, String filePath) {
+        super(workspaceId, projectName);
+        this.filePath = filePath;
     }
 
-    public String getEndCommitId() {
-        return endCommitId;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setEndCommitId(String endCommitId) {
-        this.endCommitId = endCommitId;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

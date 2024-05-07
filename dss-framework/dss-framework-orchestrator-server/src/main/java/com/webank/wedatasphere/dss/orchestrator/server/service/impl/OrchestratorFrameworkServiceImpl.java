@@ -44,8 +44,10 @@ import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorE
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitHistoryRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
@@ -532,6 +534,18 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Override
     public String getOrchestratorStatus(Long orchestratorId) {
         return orchestratorMapper.selectOrchestratorStatus(orchestratorId);
+    }
+
+    @Override
+    public GitHistoryResponse getHistory(Long workspaceId, Long orchestratorId, String projectName) {
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
+        String workflowName = orchestrator.getName();
+
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitHistoryRequest historyRequest = new GitHistoryRequest(workspaceId, projectName, workflowName);
+        GitHistoryResponse gitHistoryResponse = RpcAskUtils.processAskException(sender.ask(historyRequest), GitHistoryResponse.class, GitHistoryRequest.class);
+
+        return gitHistoryResponse;
     }
 
 }

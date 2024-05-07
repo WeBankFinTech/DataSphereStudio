@@ -350,4 +350,32 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         return repository;
     }
+
+    @Override
+    public GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request) {
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        if (gitUser == null) {
+            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+            return null;
+        }
+        Repository repository = null;
+        GitCommitResponse commitResponse = null;
+        try {
+            // 拼接.git路径
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            // 获取git仓库
+            File repoDir = new File(gitPath);
+            repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            // 本地保持最新状态
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+
+            commitResponse = DSSGitUtils.getCurrentCommit(repository);
+
+        } catch (Exception e) {
+            logger.error("pull failed, the reason is ",e);
+        } finally {
+            repository.close();
+        }
+        return commitResponse;
+    }
 }

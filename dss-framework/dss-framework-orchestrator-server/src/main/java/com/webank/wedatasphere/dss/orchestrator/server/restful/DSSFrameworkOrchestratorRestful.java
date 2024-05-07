@@ -375,9 +375,7 @@ public class DSSFrameworkOrchestratorRestful {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
         String orchestratorStatus = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
-
         
-
         return Message.ok();
     }
 }

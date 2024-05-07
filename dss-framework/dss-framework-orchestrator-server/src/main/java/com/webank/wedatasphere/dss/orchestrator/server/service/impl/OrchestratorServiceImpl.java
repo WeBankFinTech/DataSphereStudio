@@ -560,9 +560,9 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    public String getAuthenToken(String gitUsername, String gitPassword) throws ExecutionException {
+    public String getAuthenToken(String gitUrlPre, String gitUsername, String gitPassword) throws ExecutionException {
         // 启动chromedriver
-        String url = "";
+//        String url = "";
         WebDriver driver = generateChromeDriver(this.getClass().getClassLoader().getResource(DSSOrchestratorConstant.CHROME_DRIVER_PATH).getPath(), null);
         String token = "";
         try {
@@ -570,7 +570,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             driver.manage().timeouts().implicitlyWait(Long.parseLong(OrchestratorConf.GIT_TIME.getValue()), TimeUnit.SECONDS);
             driver.manage().window().maximize();
             driver.manage().window().setSize(new Dimension(1920, 1080));
-            driver.get(UrlUtils.normalizeIp(url));
+            driver.get(UrlUtils.normalizeIp(gitUrlPre));
             WebElement elementUserName = driver.findElement(By.id(OrchestratorConf.GIT_USER.getValue()));
             WebElement elementPassWord = driver.findElement(By.id(OrchestratorConf.GIT_PASSWD.getValue()));
             WebElement elementBtn = driver.findElement(By.cssSelector(OrchestratorConf.GIT_SUBMIT.getValue()));

@@ -42,7 +42,13 @@ public interface OrchestratorRefConstant {
      * 工作流状态：save-已发布 push-已提交 publish-已保存
      */
     public static final String FLOW_STATUS_SAVE = "save";
+
+    public static final String FLOW_STATUS_PUSHING = "pushing";
+
+    public static final String FLOW_STATUS_PUSH_FAILED = "push_failed";
+
     public static final String FLOW_STATUS_PUSH = "push";
+
     public static final String FLOW_STATUS_PUBLISH = "publish";
 
 }

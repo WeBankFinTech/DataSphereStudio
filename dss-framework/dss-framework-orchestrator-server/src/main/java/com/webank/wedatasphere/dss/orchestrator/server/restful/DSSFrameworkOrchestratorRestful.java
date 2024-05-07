@@ -360,4 +360,16 @@ public class DSSFrameworkOrchestratorRestful {
         return Message.ok();
 
     }
+
+    @RequestMapping(value = "submitFlow/status", method = RequestMethod.GET)
+    public Message submitFlow(@RequestParam Long orchestratorId) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        String orchestratorStatus = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
+
+        
+
+        return Message.ok();
+    }
 }

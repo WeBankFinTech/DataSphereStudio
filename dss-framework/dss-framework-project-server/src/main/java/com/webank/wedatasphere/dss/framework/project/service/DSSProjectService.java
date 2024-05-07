@@ -37,7 +37,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
     DSSProjectDO createProject(String username, ProjectCreateRequest projectCreateRequest);
 
 
-    void modifyProject(String username, ProjectModifyRequest modifyRequest) throws DSSProjectErrorException;
+    DSSProjectDO modifyProject(String username, ProjectModifyRequest modifyRequest) throws DSSProjectErrorException;
 
     /**
      * 旧工程导入到新环境的，修改新环境工程相关字段
@@ -96,5 +96,8 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
      */
     void importProject(ProjectInfoVo projectInfo, BmlResource importResource, String username,
                        String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception;
+
+    BmlResource exportOnlyProjectMeta(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
+                                  String username, String proxyUser, Workspace workspace) throws Exception;
 
 }

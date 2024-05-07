@@ -139,7 +139,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
     //修改dss_project工程字段
     @Override
-    public void modifyProject(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException {
+    public DSSProjectDO modifyProject(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException {
         //校验当前登录用户是否含有修改权限
 //        projectUserService.isEditProjectAuth(projectModifyRequest.getId(), username);
         DSSProjectDO project = new DSSProjectDO();
@@ -159,6 +159,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         updateWrapper.eq("id", projectModifyRequest.getId());
         updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());
         projectMapper.update(project, updateWrapper);
+
+        return project;
     }
 
     /**
@@ -517,6 +519,31 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             gson.toJson(projectDO, writer);
         }
 
+    }
+
+    @Override
+    public BmlResource exportOnlyProjectMeta(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
+                                         String username, String proxyUser, Workspace workspace) throws Exception {
+        Long projectId=exportAllOrchestratorsReqest.getProjectId();
+        EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
+        List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(
+                new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId())
+                , exportAllOrchestratorsReqest.getLabels());
+        DSSProjectDO projectDO=projectService.getProjectById(projectId);
+        String projectName = projectDO.getName();
+        String exportSaveBasePath = IoUtils.generateTempIOPath(username);
+        String projectPath = IoUtils.addFileSeparator(exportSaveBasePath, projectName);
+        exportProjectMeta(projectDO, projectPath);
+        String zipFile = ZipHelper.zip(projectPath,true);
+        LOGGER.info("export project file locate at {}",zipFile);
+        //先上传
+        InputStream inputStream = bmlService.readLocalResourceFile(username, zipFile);
+        BmlResource bmlResource= bmlService.upload(username, inputStream, projectName + ".OrcsExport", projectName);
+
+        LOGGER.info("export zip file upload to bmlResourceId:{} bmlResourceVersion:{}",
+                bmlResource.getResourceId(),bmlResource.getVersion());
+        FileUtils.deleteQuietly(new File(zipFile));
+        return bmlResource;
     }
 
 }

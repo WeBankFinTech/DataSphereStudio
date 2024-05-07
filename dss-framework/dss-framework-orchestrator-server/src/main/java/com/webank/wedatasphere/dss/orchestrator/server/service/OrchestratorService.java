@@ -140,6 +140,6 @@ public interface OrchestratorService {
 
     void batchClearContextId();
 
-    String getAuthenToken(String gitUsername, String gitPassword) throws ExecutionException;
+    String getAuthenToken(String gitUrl, String gitUsername, String gitPassword) throws ExecutionException;
 
 }

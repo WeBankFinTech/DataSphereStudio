@@ -487,17 +487,26 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        //todo 1. 异步提交，开始提交状态 save->pushing->push
+        orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+        //2. 获取编排信息
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+        //3. 获取上传工作流信息
         BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
-
         // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
-        GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName(), flowRequest.getComment());
-        if (commit == null) {
-            LOGGER.error("change is empty");
+        //4. 调用git服务上传
+        try {
+            GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName(), flowRequest.getComment());
+            if (commit == null) {
+                LOGGER.info("change is empty");
+                orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
+            }
+            //5. 返回文件列表
+            orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+        } catch (Exception e) {
+            LOGGER.error("push failed, the reason is : ", e);
+            orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
         }
-
-        //4. 返回文件列表
-        orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
     }
 
     private GitCommitResponse push (String path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
@@ -509,6 +518,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
         LOGGER.info("-------=======================End to add testGit1=======================-------: {}", responseWorkflowValidNode);
         return responseWorkflowValidNode;
+    }
+
+    @Override
+    public String getOrchestratorStatus(Long orchestratorId) {
+        return orchestratorMapper.selectOrchestratorStatus(orchestratorId);
     }
 
 }

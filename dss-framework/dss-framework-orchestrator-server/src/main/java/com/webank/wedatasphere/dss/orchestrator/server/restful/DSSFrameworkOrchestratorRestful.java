@@ -332,15 +332,16 @@ public class DSSFrameworkOrchestratorRestful {
         gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
         gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
 
-        GitUserInfoResponse infoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
-        String gitUsername = infoResponse.getGitUser().getGitUser();
-        String gitPassword = infoResponse.getGitUser().getGitPassword();
+        GitUserInfoResponse readInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
+        String gitUsername = readInfoResponse.getGitUser().getGitUser();
+        String gitPassword = readInfoResponse.getGitUser().getGitPassword();
+        String gitUrlPre = UrlUtils.normalizeIp(readInfoResponse.getGitUser().getGitUrl());
         String authenToken = "";
         try {
-            authenToken = orchestratorService.getAuthenToken(gitUsername, gitPassword);
+            authenToken = orchestratorService.getAuthenToken(gitUrlPre, gitUsername, gitPassword);
         } catch (ExecutionException e) {
             LOGGER.error("git登陆失败，原因为: ", e);
-            return Message.error("git登陆失败，请检查git节点配置的用户名/密码");
+            return Message.error("git登陆失败，请检查git节点配置的用户名/密码/url");
         }
         // 获取顶级域名
         String domainIp = UrlUtils.normalizeIp(OrchestratorConf.GIT_DOMAIN_URL.getValue());
@@ -356,8 +357,15 @@ public class DSSFrameworkOrchestratorRestful {
         LOGGER.info("Cookie is {}", cookie);
         response.setHeader("Access-Control-Allow-Origin", topDomain);
         response.addHeader("Set-Cookie", cookie);
-
-        return Message.ok();
+        // 获取命名空间
+        GitUserInfoRequest gitWriteUserRequest = new GitUserInfoRequest();
+        gitWriteUserRequest.setWorkspaceId(workspace.getWorkspaceId());
+        gitWriteUserRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserInfoResponse writeInfoResponse = RpcAskUtils.processAskException(sender.ask(gitWriteUserRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
+        String namespace = writeInfoResponse.getGitUser().getGitUser();
+        // 拼接跳转的url
+        String gitUrl = gitUrlPre + "/" + namespace + "/" + projectName + "/" + workflowName;
+        return Message.ok().data("gitUrl", UrlUtils.normalizeIp(gitUrl));
 
     }
 

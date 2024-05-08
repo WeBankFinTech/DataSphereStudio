@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
+import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
@@ -331,12 +332,12 @@ public class DSSFrameworkOrchestratorRestful {
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
         gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
-        gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
+        gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_READ_TYPE);
 
         GitUserInfoResponse readInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
         String gitUsername = readInfoResponse.getGitUser().getGitUser();
         String gitPassword = readInfoResponse.getGitUser().getGitPassword();
-        String gitUrlPre = UrlUtils.normalizeIp(readInfoResponse.getGitUser().getGitUrl());
+        String gitUrlPre = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
         String authenToken = "";
         try {
             authenToken = orchestratorService.getAuthenToken(gitUrlPre, gitUsername, gitPassword);
@@ -344,8 +345,8 @@ public class DSSFrameworkOrchestratorRestful {
             LOGGER.error("git登陆失败，原因为: ", e);
             return Message.error("git登陆失败，请检查git节点配置的用户名/密码/url");
         }
-        // 获取顶级域名
-        String domainIp = UrlUtils.normalizeIp(OrchestratorConf.GIT_DOMAIN_URL.getValue());
+        // 获取顶级域名 eg: ***REMOVED*** -> weoa.com
+        String domainIp = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
         int lastDotIndex = domainIp.lastIndexOf(".");
         String topDomain = "";
         if (lastDotIndex != -1) {

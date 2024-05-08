@@ -228,7 +228,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         Map<String, BmlResource> file = new HashMap<>();
         // 测试数据 key表示项目名、value为项目BmlResource资源
         file.put(".metaConf", bmlResource);
-        GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, "update Project by" + username, username);
+        GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, "update Project", username);
         LOGGER.info("-------=======================begin to update project: {}=======================-------", projectName);
         GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
         LOGGER.info("-------=======================End to update project: {}=======================-------: {}", projectName, responseWorkflowValidNode);

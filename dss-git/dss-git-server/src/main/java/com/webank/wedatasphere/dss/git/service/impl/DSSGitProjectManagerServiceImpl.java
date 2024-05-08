@@ -7,6 +7,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
 import com.webank.wedatasphere.dss.git.service.DSSGitProjectManagerService;
 import com.webank.wedatasphere.dss.git.service.DSSWorkspaceGitService;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
@@ -55,7 +56,8 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 关联远端Git
             DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
             // 提交
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, "init project: " + request.getProjectName() + "by " + request.getUsername());
+            String comment = "init project: " + request.getProjectName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);

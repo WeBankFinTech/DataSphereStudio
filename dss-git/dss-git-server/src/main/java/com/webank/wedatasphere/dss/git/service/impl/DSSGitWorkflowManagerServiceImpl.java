@@ -8,6 +8,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
 import com.webank.wedatasphere.dss.git.service.DSSGitWorkflowManagerService;
 import com.webank.wedatasphere.dss.git.service.DSSWorkspaceGitService;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
@@ -57,7 +58,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            // 解压BML文件到本地 todo 对接Server时放开调试
+            // 解压BML文件到本地
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
             List<String> fileList = new ArrayList<>();
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
@@ -94,14 +95,15 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            // 解压BML文件到本地 todo 对接Server时放开调试
+            // 解压BML文件到本地
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
                 FileUtils.update(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
             }
             // 提交
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, request.getComment());
+            String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
 

@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.git.config;
+package com.webank.wedatasphere.dss.git.common.protocol.config;
 
 import org.apache.linkis.common.conf.CommonVars;
 
@@ -15,5 +15,8 @@ public class GitServerConfig {
 
     public static final CommonVars<Integer> GIT_SEARCH_RESULT_LIMIT = CommonVars.apply("wds.dss.git.search.limit", 30);
 
-    public static final CommonVars<String> GIT_THREAD_NAME = CommonVars.apply("wds.dss.git.thread.name", "gitServer-Thread-");
+    public static final CommonVars<String> GIT_USER = CommonVars.apply("wds.dss.server.git.user", "user_login");
+    public static final CommonVars<String> GIT_PASSWD = CommonVars.apply("wds.dss.server.git.password", "user_password");
+    public static final CommonVars<String> GIT_SUBMIT = CommonVars.apply("wds.dss.server.git.submit", "input[class='btn btn-success qa-sign-in-button']");
+    public static final CommonVars<String> GIT_TIME = CommonVars.apply("wds.dss.server.git.time", "1");
 }

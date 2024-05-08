@@ -1,6 +1,6 @@
 package com.webank.wedatasphere.dss.git.thread;
 
-import com.webank.wedatasphere.dss.git.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 
 
 public class GitServerThreadFactory {

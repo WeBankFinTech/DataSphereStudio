@@ -1,14 +1,7 @@
 package com.webank.wedatasphere.dss.git.thread;
 
-import com.webank.wedatasphere.dss.git.config.GitServerConfig;
-import org.apache.linkis.common.utils.Utils;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.stereotype.Component;
-
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.*;
 
 public class GitServerThreadPool {

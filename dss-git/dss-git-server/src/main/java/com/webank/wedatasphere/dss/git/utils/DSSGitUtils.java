@@ -8,7 +8,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
-import com.webank.wedatasphere.dss.git.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;

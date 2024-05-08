@@ -1,15 +1,13 @@
 package com.webank.wedatasphere.dss.git.service.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
-import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitSearchResult;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
-import com.webank.wedatasphere.dss.git.config.GitServerConfig;
-import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.service.DSSGitWorkflowManagerService;
 import com.webank.wedatasphere.dss.git.service.DSSWorkspaceGitService;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;

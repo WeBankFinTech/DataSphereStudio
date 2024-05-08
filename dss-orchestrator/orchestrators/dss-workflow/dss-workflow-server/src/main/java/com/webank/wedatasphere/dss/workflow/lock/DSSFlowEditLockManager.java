@@ -184,7 +184,7 @@ public class DSSFlowEditLockManager {
         }
     }
 
-    public static void deleteLock(String flowEditLock) throws DSSErrorException {
+    public static void deleteLock(String flowEditLock, String username) throws DSSErrorException {
         try {
             if (StringUtils.isNotBlank(flowEditLock)) {
                 DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
@@ -196,7 +196,7 @@ public class DSSFlowEditLockManager {
                     if (projectInfo.getAssociateGit()) {
                         String status = lockMapper.selectOrchestratorStatus(dssFlowEditLock.getFlowID());
                         if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
-                            pushProject(projectInfo.getName(), new Long(projectInfo.getWorkspaceId()), dssFlow.getResourceId(), dssFlow.getBmlVersion(), dssFlow.getName(), projectInfo.getUsername(), "force unlock");
+                            pushProject(projectInfo.getName(), new Long(projectInfo.getWorkspaceId()), dssFlow.getResourceId(), dssFlow.getBmlVersion(), dssFlow.getName(), username, "force unlock");
                             lockMapper.updateOrchestratorStatus(dssFlow.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
                         }
                     }

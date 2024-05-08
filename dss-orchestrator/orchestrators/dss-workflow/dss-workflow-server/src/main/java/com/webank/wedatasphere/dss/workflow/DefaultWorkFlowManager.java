@@ -195,7 +195,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         } else if (!Boolean.TRUE.equals(confirmDelete)) {
             return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NEED_SECOND_CONFIRM, editLock.getUsername());
         }
-        DSSFlowEditLockManager.deleteLock(editLock.getLockContent());
+        DSSFlowEditLockManager.deleteLock(editLock.getLockContent(), userName);
         return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.UNLOCK_SUCCESS, null);
     }
     @Override

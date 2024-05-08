@@ -121,9 +121,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace, username);
         //3.保存dss_project
         DSSProjectDO project = dssProjectService.createProject(username, projectCreateRequest);
-        // 对于接入git的项目校验项目名称
+        // 同步项目信息至git
         if(projectCreateRequest.getAssociateGit() != null && projectCreateRequest.getAssociateGit()) {
-            checkGitName(projectCreateRequest.getName(), workspace, username);
             ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
             exportAllOrchestratorsReqest.setProjectId(project.getId());
             exportAllOrchestratorsReqest.setComment("test");
@@ -192,6 +191,11 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
         }
 
+        // 校验接入git
+        if (projectModifyRequest.getAssociateGit() != null) {
+            checkAssociateGit(projectModifyRequest, dbProject, username, workspace);
+        }
+
         //调用第三方的工程修改接口
         dbProject.setUsername(username);
         dbProject.setApplicationArea(Integer.valueOf(projectModifyRequest.getApplicationArea()));
@@ -207,25 +211,16 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         //3.修改dss_project DSS基本工程信息
         DSSProjectDO dssProjectDO = dssProjectService.modifyProject(username, projectModifyRequest);
 
-        // 校验接入git
+        // 同步项目配置元数据到git
         if (projectModifyRequest.getAssociateGit() != null) {
-            checkAssociateGit(projectModifyRequest, dbProject, username, workspace);
             ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
             exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
-            exportAllOrchestratorsReqest.setComment("test");
+            exportAllOrchestratorsReqest.setComment("update Project");
             exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
 
-            BmlResource bmlResource;
-            if (dbProject.getAssociateGit() != null && dbProject.getAssociateGit()) {
-                // 对于首次转为接入git的项目，要进行整个项目的导入导出
-                bmlResource = dssProjectService.exportProject(exportAllOrchestratorsReqest, username, "", workspace);
-            }else {
-                // 对于已接入git的项目，只更新元数据即可
-                bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
-            }
+            BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
             updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
         }
-
     }
 
     private void updateProject(Long workspaceId, String projectName,BmlResource bmlResource, String username ) {

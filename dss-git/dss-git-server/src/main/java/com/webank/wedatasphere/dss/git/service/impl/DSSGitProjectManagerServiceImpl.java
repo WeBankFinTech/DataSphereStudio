@@ -6,8 +6,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
-import com.webank.wedatasphere.dss.git.config.GitServerConfig;
-import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.service.DSSGitProjectManagerService;
 import com.webank.wedatasphere.dss.git.service.DSSWorkspaceGitService;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
@@ -41,17 +40,18 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
         }
+        Repository repository;
         try {
             // Http请求Git，创建project
             DSSGitUtils.init(request.getProjectName(), gitUser);
-            // 解压BML文件到本地 todo 对接Server时放开调试
+            // 解压BML文件到本地
             FileUtils.removeProject(request.getProjectName());
             FileUtils.update(bmlService, request.getProjectName(), request.getBmlResource(), request.getUsername());
             // 本地创建Git项目
             DSSGitUtils.create(request.getProjectName(), gitUser);
             // 获取git项目
             File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator +".git");
-            Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
+            repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
             // 关联远端Git
             DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
             // 提交
@@ -73,7 +73,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         }
         // 远程归档
         DSSGitUtils.archive(request.getProjectName(), gitUser);
-        // 删除本地项目（todo 多节点）
+        // 删除本地项目
         DSSGitUtils.archiveLocal(request.getProjectName());
         return null;
     }

@@ -8,7 +8,6 @@ public class GitUserEntity {
     private Long workspaceId;
     private String gitUser;
     private String gitPassword;
-    private String gitUrl;
     private String gitToken;
     private Date createTime;
     private Date updateTime;
@@ -92,14 +91,6 @@ public class GitUserEntity {
 
     public void setGitPassword(String gitPassword) {
         this.gitPassword = gitPassword;
-    }
-
-    public String getGitUrl() {
-        return gitUrl;
-    }
-
-    public void setGitUrl(String gitUrl) {
-        this.gitUrl = gitUrl;
     }
 
     public String getType() {

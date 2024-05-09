@@ -140,7 +140,7 @@ public class BuildJobActionImpl implements BuildJobAction {
 
 
         //是否复用引擎，不复用就为空
-        if(!isReuseEngine(job.getParams())){
+        if(!isAppconnJob(job) && !isReuseEngine(job.getParams())){
             labels.put("executeOnce", "");
         }
         Map<String, Object> paramMapCopy = (HashMap<String, Object>) SerializationUtils.clone(new HashMap<String, Object>(job.getParams()));
@@ -191,6 +191,13 @@ public class BuildJobActionImpl implements BuildJobAction {
     }
 
     /**
+     * 是否为appconnjob
+     */
+    private boolean isAppconnJob(Job job){
+        return APPCONN.equals(job.getEngineType());
+    }
+
+    /**
      * spark自定义参数配置输入，例如spark.sql.shuffle.partitions=10。多个参数使用分号分隔。
      *
      * 如果节点指定了参数模板，则需要把节点内与模板相同的参数取消掉，保证模板优先级高于节点参数
@@ -211,6 +218,8 @@ public class BuildJobActionImpl implements BuildJobAction {
             startupMap.remove("spark.executor.instances");
             startupMap.remove("wds.linkis.engineconn.java.driver.memory");
             startupMap.remove("spark.conf");
+            startupMap.remove("mapreduce.job.running.map.limit");
+            startupMap.remove("mapreduce.job.running.reduce.limit");
             logger.info("after remove startup map:{}",startupMap.keySet());
         }
         Map<String, Object> configurationMap = TaskUtils.getMap(paramMapCopy, TaskConstant.PARAMS_CONFIGURATION);

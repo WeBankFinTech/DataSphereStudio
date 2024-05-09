@@ -38,6 +38,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestra
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -71,6 +72,8 @@ public class DSSFrameworkOrchestratorRestful {
     private OrchestratorFrameworkService orchestratorFrameworkService;
     @Autowired
     private OrchestratorService orchestratorService;
+    @Autowired
+    private OrchestratorPluginService orchestratorPluginService;
     @Autowired
     private HttpServletRequest httpServletRequest;
 
@@ -299,7 +302,7 @@ public class DSSFrameworkOrchestratorRestful {
         if (responseLockWorkflow.getUnlockStatus() == ResponseLockWorkflow.LOCK_FAILED) {
             return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
         }
-        GitTree gitTree = orchestratorFrameworkService.diffFlow(submitFlowRequest, userName, workspace);
+        GitTree gitTree = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
         return Message.ok().data("tree", gitTree.getChildren());
     }
 
@@ -318,7 +321,7 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
         }
 
-        orchestratorFrameworkService.submitFlow(submitFlowRequest, userName, workspace);
+        orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
         return Message.ok();
     }
 

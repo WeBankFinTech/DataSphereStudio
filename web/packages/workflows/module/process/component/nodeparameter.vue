@@ -545,7 +545,7 @@ export default {
         // ${jobParams['only-receive-today']}
         // !${jobParams['ec-conf-templateId']}
         if (condition.indexOf('params.configuration') > 0) {
-          condition = condition.replaceAll('params.configuration.runtime','jobParams').replaceAll('params.configuration.startup','jobParams')
+          condition = condition.replace(/params\.configuration\.runtime/g,'jobParams').replace(/params\.configuration\.startup/g,'jobParams')
           condition = this.poinToLink(condition)
         }
         let Fn = Function

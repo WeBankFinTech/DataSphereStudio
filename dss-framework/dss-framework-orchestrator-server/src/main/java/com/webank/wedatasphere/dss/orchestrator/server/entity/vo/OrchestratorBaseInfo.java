@@ -101,6 +101,8 @@ public class OrchestratorBaseInfo {
 
     private String orchestratorLevel;
 
+    private String isDefaultReference;
+
     private boolean flowEditLockExist = false;
 
     public Boolean getEditable() {
@@ -266,6 +268,14 @@ public class OrchestratorBaseInfo {
 
     public void setOrchestratorLevel(String orchestratorLevel) {
         this.orchestratorLevel = orchestratorLevel;
+    }
+
+    public String getIsDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setIsDefaultReference(String isDefaultReference) {
+        this.isDefaultReference = isDefaultReference;
     }
 
     public static OrchestratorBaseInfo convertFrom(DSSOrchestratorInfo dssInfo){

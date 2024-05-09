@@ -478,6 +478,7 @@ Execute.prototype.getFirstResult = function() {
     let params = {
       path: this.currentResultPath,
       pageSize,
+      enableLimit: true,
     }
     // 如果是api执行需要带上taskId
     if (this.getResultUrl !== 'filesystem') {
@@ -496,13 +497,10 @@ Execute.prototype.getFirstResult = function() {
             hugeData: true,
             tipMsg: localStorage.getItem("locale") === "en" ? rst.en_msg : rst.zh_msg
           });
-        } else if (rst.metadata && rst.metadata.length >= 500) {
+        } else if (rst.column_limit_display) {
           this.trigger('result', {
-            metadata: [],
-            fileContent: [],
-            type: rst.type,
-            totalLine: rst.totalLine,
-            hugeData: true
+            ...rst,
+            tipMsg: localStorage.getItem("locale") === "en" ? rst.en_msg : rst.zh_msg
           });
         } else {
           this.trigger('result', rst);

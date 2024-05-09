@@ -28,6 +28,7 @@ public class SchedulisProjectSearchOperation
         params.put("project", requestRef.getProjectName());
         params.put("ajax", "fetchprojectflows");
         try {
+            logger.info("request url from Schedulis is: {}.", queryUrl);
             String responseBody = SchedulisHttpUtils.getHttpGetResult(queryUrl, params, ssoRequestOperation, requestRef.getWorkspace());
             logger.info("responseBody from Schedulis is: {}.", responseBody);
             Map<String,Object> map = DSSCommonUtils.COMMON_GSON.fromJson(responseBody, new TypeToken<Map<String,Object>>(){}.getType());

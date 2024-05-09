@@ -86,10 +86,6 @@ public class FlowRestfulApi {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
-    @PostConstruct
-    public void init() {
-        AppConnManagerUtils.autoLoadAppConnManager();
-    }
 
     /**
      * 添加subflow节点

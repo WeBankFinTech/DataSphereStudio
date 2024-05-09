@@ -14,7 +14,7 @@
         >
       </li>
       <li
-        v-if="activeTool === 'table'"
+        v-if="activeTool === 'table' && toolbarShow.filter"
         @click="openPopup('filter')"
         :title="$t('message.common.toolbar.resultGroupLineFilter')"
       >
@@ -294,15 +294,18 @@ export default {
         this.$route.name === 'Home' ||
         (this.$route.name === 'results' && this.$route.query.from === 'Home')
       let canDownload = true
+      let canFilter = true
       try {
-        // display_prohibited 的结果集不支持下载
+        // display_prohibited、column_limit_display的结果集不支持下载
         if (this.script.resultList[this.script.resultSet].result.tipMsg) {
           canDownload = false
+          canFilter = false
         }
       } catch (error) {
         //
       }
       return {
+        filter: canFilter,
         export:
           this.baseinfo.exportResEnable !== false &&
           isScriptis &&

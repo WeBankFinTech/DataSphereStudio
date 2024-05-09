@@ -52,6 +52,7 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -364,8 +365,11 @@ public class DSSFrameworkOrchestratorRestful {
         GitUserInfoResponse writeInfoResponse = RpcAskUtils.processAskException(sender.ask(gitWriteUserRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
         String namespace = writeInfoResponse.getGitUser().getGitUser();
         // 拼接跳转的url
-        String gitUrl = gitUrlPre + "/" + namespace + "/" + projectName + "/" + workflowName;
-        return Message.ok().data("gitUrl", UrlUtils.normalizeIp(gitUrl));
+        String gitUrlProject = gitUrlPre + "/" + namespace + "/" + projectName;
+        if (!StringUtils.isEmpty(workflowName)) {
+            gitUrlProject +=  "/tree/master/" + workflowName;
+        }
+        return Message.ok().data("gitUrl", UrlUtils.normalizeIp(gitUrlProject));
 
     }
 

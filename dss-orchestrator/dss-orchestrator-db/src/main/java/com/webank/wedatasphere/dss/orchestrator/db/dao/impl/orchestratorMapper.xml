@@ -293,5 +293,23 @@
         select id from dss_orchestrator where `status` = #{status}
     </select>
 
+    <insert id="insertOrchestratorSubmitJob" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        insert dss_orchestrator_submit_job_info into (orchestrator_id, create_time, update_time, instance_name, status) Values
+        (#{orchestratorId}, Now(), Now(), #{instanceName}, #{status})
+    </insert>
+
+    <update id="updateOrchestratorSubmitJobStatus">
+        update dss_orchestrator_submit_job_info
+        <set>
+            error_msg = #{errMsg} ,update_time = Now() , status = #{status}
+        </set>
+        where orchestrator_id = #{orchestratorId}
+    </update>
+
+    <select id="selectSubmitJobStatus" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        select id, orchestrator_id, create_time, update_time, instance_name, status, error_msg from dss_orchestrator_submit_job_info
+        where orchestrator_id = #{orchestratorId}
+    </select>
+
 
 </mapper>

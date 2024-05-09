@@ -43,9 +43,11 @@ public interface OrchestratorRefConstant {
      */
     public static final String FLOW_STATUS_SAVE = "save";
 
-    public static final String FLOW_STATUS_PUSHING = "pushing";
+    public static final String FLOW_STATUS_PUSHING = "running";
 
-    public static final String FLOW_STATUS_PUSH_FAILED = "push_failed";
+    public static final String FLOW_STATUS_PUSH_FAILED = "failed";
+
+    public static final String FLOW_STATUS_PUSH_SUCCESS = "success";
 
     public static final String FLOW_STATUS_PUSH = "push";
 

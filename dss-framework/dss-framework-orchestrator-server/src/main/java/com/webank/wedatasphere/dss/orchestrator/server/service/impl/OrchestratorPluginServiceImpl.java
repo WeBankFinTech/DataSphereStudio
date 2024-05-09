@@ -34,10 +34,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
@@ -46,7 +43,6 @@ import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext;
 import com.webank.wedatasphere.dss.orchestrator.core.plugin.DSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorPublishJob;
 import com.webank.wedatasphere.dss.orchestrator.publish.ConversionDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf;
@@ -217,10 +213,20 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     @Override
     public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
         releaseThreadPool.submit(() ->{
-            //1. 异步提交，开始提交状态 save->pushing->push
-            orchestratorMapper.updateOrchestratorSubmitJobStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSHING, "");
+            //1. 异步提交，更新提交状态
+            Long orchestratorId = flowRequest.getOrchestratorId();
+            OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
+            if (orchestratorSubmitJob == null) {
+                OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
+                submitJob.setOrchestratorId(orchestratorId);
+                submitJob.setInstanceName(Sender.getThisInstance());
+                submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+                orchestratorMapper.insertOrchestratorSubmitJobStatus(submitJob);
+            } else {
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSHING, "");
+            }
             //2. 获取编排信息
-            DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+            DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
             //3. 获取上传工作流信息
             BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
             // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
@@ -230,12 +236,12 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 if (commit == null) {
                     LOGGER.info("change is empty");
                 }
-                orchestratorMapper.updateOrchestratorSubmitJobStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
                 //5. 返回文件列表
-                orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+                orchestratorMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
             } catch (Exception e) {
                 LOGGER.error("push failed, the reason is : ", e);
-                orchestratorMapper.updateOrchestratorSubmitJobStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
             }
         });
     }

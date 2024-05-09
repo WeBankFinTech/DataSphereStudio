@@ -218,7 +218,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
         releaseThreadPool.submit(() ->{
             //1. 异步提交，开始提交状态 save->pushing->push
-            orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+            orchestratorMapper.updateOrchestratorSubmitJobStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSHING, "");
             //2. 获取编排信息
             DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
             //3. 获取上传工作流信息
@@ -229,13 +229,13 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName(), flowRequest.getComment());
                 if (commit == null) {
                     LOGGER.info("change is empty");
-                    orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
                 }
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
                 //5. 返回文件列表
                 orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
             } catch (Exception e) {
                 LOGGER.error("push failed, the reason is : ", e);
-                orchestratorMapper.updateOrchestratorStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(flowRequest.getOrchestratorId(), OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
             }
         });
     }

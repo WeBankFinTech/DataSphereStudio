@@ -67,10 +67,10 @@ public class EventChecker implements Runnable{
 		String waitTime = p.getProperty(EventChecker.WAIT_TIME, "1");
 		Double doubleWaitTime = Double.valueOf(waitTime) * 3600 * 1000;
 		maxWaitTime = Long.valueOf(doubleWaitTime.longValue());
-		String query_frequency = p.getProperty(EventChecker.QUERY_FREQUENCY, "30000");
+		String query_frequency = p.getProperty(EventChecker.QUERY_FREQUENCY, "60000");
 		queryFrequency = Integer.valueOf(query_frequency);
-		if(queryFrequency <10000){
-			queryFrequency = 10000;
+		if(queryFrequency <60000){
+			queryFrequency = 60000;
 		}
 	}
 

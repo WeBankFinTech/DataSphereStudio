@@ -479,6 +479,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 orchestratorBaseInfo.setOrchestratorId(dssOrchestratorInfo.getId());
                 orchestratorBaseInfo.setEditable(isEditable || isReleasable);
                 orchestratorBaseInfo.setReleasable(isReleasable);
+                orchestratorBaseInfo.setIsDefaultReference(dssOrchestratorInfo.getIsDefaultReference());
                 if (!StringUtils.isEmpty(dssOrchestratorInfo.getStatus()) && dssOrchestratorInfo.getStatus().equals(OrchestratorRefConstant.FLOW_STATUS_PUSHING)
                         && dssOrchestratorInfo.getStatus().equals(OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED)) {
                     orchestratorBaseInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);

@@ -954,8 +954,8 @@ export default {
       clearTimeout(this.timerClick);
       this.timerClick = setTimeout(() => {
         if (this.workflowIsExecutor) return;
-        this.initNode(arg);
         this.nodebaseinfoShow = true;
+        this.initNode(arg);
         this.$emit('node-click', arg);
       }, 200);
     },
@@ -1238,7 +1238,7 @@ export default {
           this.$Notice.success({
             desc: this.$t('message.workflow.process.autoSaveWorkflow'),
           });
-        }
+        }        
         this.jsonChange = false;
         // 保存成功后去更新tab的工作流数据
         this.$emit('updateWorkflowList');
@@ -2573,6 +2573,7 @@ export default {
           }
         })
       } else if(mode || this.preDragViewMode) {
+
         this.viewMode = mode || this.preDragViewMode
         if (this.viewMode !== 'table') {
           this.preDragViewMode = this.viewMode
@@ -2595,10 +2596,6 @@ export default {
               element.layout.y = element.layout.y + y * -1
             });
           }
-          // 新模式切换旧模式，连线类型修改
-          this.json.edges.forEach(element => {
-            element.linkType = 'curve'
-          });
         }
         this.originalData = this.json;
       }

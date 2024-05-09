@@ -1253,6 +1253,7 @@ export default {
         const url = '/filesystem/openFile';
         api.fetch(url, {
           path: resultPath,
+          enableLimit: true,
           pageSize,
         }, 'get')
           .then((ret) => {
@@ -1267,14 +1268,18 @@ export default {
                 hugeData: true,
                 tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
               };
-            } else if (ret.metadata && ret.metadata.length >= 500) {
+            } else if (ret.column_limit_display) {
               result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+                'headRows': ret.metadata,
+                'bodyRows': ret.fileContent,
+                // 如果totalLine是null，就显示为0
+                'total': ret.totalLine ? ret.totalLine : 0,
+                // 如果内容为null,就显示暂无数据
+                'type': ret.fileContent ? ret.type : 0,
                 'path': resultPath,
-                hugeData: true
+                'current': 1,
+                'size': 20,
               };
             } else {
               result = {
@@ -1419,6 +1424,7 @@ export default {
           api.fetch(url2, {
             path: currentResultPath,
             page: 1,
+            enableLimit: true,
             pageSize: 5000,
           }, 'get').then((ret) => {
             let tmpResult
@@ -1432,14 +1438,14 @@ export default {
                 hugeData: true,
                 tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
               };
-            } else if (ret.metadata && ret.metadata.length >= 500) {
+            } else if (ret.column_limit_display) {
               tmpResult = {
-                'headRows': [],
-                'bodyRows': [],
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+                'headRows': ret.metadata,
+                'bodyRows': ret.fileContent,
                 'total': ret.totalLine,
                 'type': ret.type,
                 'path': currentResultPath,
-                hugeData: true
               };
             } else {
               tmpResult = {

@@ -77,11 +77,6 @@ public class DSSFrameworkOrchestratorRestful {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
-    @PostConstruct
-    public void init() {
-        AppConnManagerUtils.autoLoadAppConnManager();
-    }
-
     /**
      * 创建编排模式
      *

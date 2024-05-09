@@ -23,10 +23,7 @@ import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.RevokeUserRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUserVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceUsersVo;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleCheckService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
@@ -107,6 +104,19 @@ public class DSSWorkspaceUserRestful {
         dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
         dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
         return Message.ok().data("users", dssWorkspaceUsersVo);
+    }
+
+    @RequestMapping(path = "getAllWorkspaceUsersWithDepartment", method = RequestMethod.GET)
+    public Message getAllWorkspaceUsersWithDepartment() {
+        DSSWorkspaceUsersDepartmentVo dSSWorkspaceUsersDepartmentVo = new DSSWorkspaceUsersDepartmentVo();
+        // workspaceId改为从cookie取
+        int workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+        dSSWorkspaceUsersDepartmentVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+//        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
+//        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
+        dSSWorkspaceUsersDepartmentVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+        dSSWorkspaceUsersDepartmentVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsersDepartment(workspaceId));
+        return Message.ok().data("users", dSSWorkspaceUsersDepartmentVo);
     }
 
 

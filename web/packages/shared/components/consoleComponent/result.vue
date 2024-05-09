@@ -132,6 +132,7 @@
       >
       </result-set-list>
       <div class="page" v-if="resultType === '2' && !result.hugeData">
+        <p v-if="result.tipMsg" :title="result.tipMsg" style="margin-right: 20px;max-width: calc(100% - 250px);overflow: hidden;text-overflow: ellipsis;">{{ result.tipMsg }}</p>
         <Page
           :transfer="true"
           ref="page"
@@ -828,11 +829,12 @@ export default {
     text-align: center;
     padding-left: 10px;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     .page {
+      width: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-evenly;
     }
     .set {
       width: 90px;

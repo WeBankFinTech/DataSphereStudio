@@ -111,6 +111,18 @@ public class DSSWorkspaceRestful {
     }
 
     /**
+     * 返回所有department
+     *
+     * @param workspaceId
+     * @return
+     */
+    @RequestMapping(path = "getAllDepartments", method = RequestMethod.GET)
+    public Message getAllDepartments(@RequestParam(value = WORKSPACE_ID_STR, required = false) String workspaceId) {
+        List<String> departments = dssWorkspaceService.getAllDepartments();
+        return Message.ok().data("departments", departments);
+    }
+
+    /**
      * 绑定工作空间和部门-科室关系
      *
      * @return

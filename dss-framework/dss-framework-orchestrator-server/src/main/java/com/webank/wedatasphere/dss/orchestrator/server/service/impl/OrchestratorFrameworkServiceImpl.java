@@ -437,7 +437,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public String getOrchestratorStatus(Long orchestratorId) {
-        return orchestratorMapper.selectOrchestratorStatus(orchestratorId);
+        return orchestratorMapper.selectSubmitJobStatus(orchestratorId);
     }
 
     @Override

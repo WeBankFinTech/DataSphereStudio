@@ -172,6 +172,37 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         if (CollectionUtils.isEmpty(fileList)) {
             return new GitSearchResponse(result, 0);
         }
+
+        String excludeDirectory = GitServerConfig.GIT_SEARCH_EXCLUDE_DIRECTORY.getValue();
+        String excludeFile = GitServerConfig.GIT_SEARCH_EXCLUDE_FILE.getValue();
+
+        List<String> excludeDirList = StringUtils.isEmpty(excludeDirectory)? new ArrayList<>() : Arrays.asList(excludeDirectory.split(","));
+        List<String> excludeFileList = StringUtils.isEmpty(excludeFile)? new ArrayList<>() : Arrays.asList(excludeFile.split(","));
+
+        Set<String> excludeResult = new HashSet<>();
+        for (String file : fileList) {
+            //排除指定文件夹下的内容
+            for (String excludeDir : excludeDirList) {
+                if (file.startsWith(excludeDir)) {
+                    excludeResult.add(file);
+                    break;
+                }
+            }
+            // 排除指定文件下的内容
+            for (String exclude : excludeFileList) {
+                if (file.endsWith("/" + exclude)) {
+                    excludeResult.add(file);
+                }
+            }
+        }
+
+        if (!CollectionUtils.isEmpty(excludeResult)) {
+            fileList.removeAll(excludeResult);
+            if (CollectionUtils.isEmpty(fileList)) {
+                return new GitSearchResponse(result, 0);
+            }
+        }
+
         int start = (request.getPageNow()-1) * request.getPageSize();
         int end = Math.min((start + request.getPageSize()), fileList.size());
         if (request.getPageNow() < 0 || start >= fileList.size()) {
@@ -179,7 +210,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             return new GitSearchResponse(result, 0);
         }
         // subList 截断的List及子集 不允许List变更
-        final List<String> subList = fileList.subList(start, end);
+        List<String> subList = new ArrayList<>(fileList.subList(start, end));
         List<String> filePathList = new ArrayList<>();
         for (String file : subList) {
             filePathList.add("/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue())+ "/" + request.getProjectName() + "/" + file);
@@ -199,7 +230,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
             // subList 截断的List及子集 不允许List变更
             final List<String> searchResult = process(gitSearchCommand);
-            final List<String> subSearchResult = searchResult.size() > GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()? searchResult.subList(0, GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()) : searchResult;
+            List<String> subSearchResult = null;
+            if (searchResult.size() > GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()) {
+                subSearchResult = new ArrayList<>(searchResult.subList(0, GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()));
+            } else {
+                subSearchResult = searchResult;
+            }
 
             result.add(new GitSearchResult(file, subSearchResult));
         }

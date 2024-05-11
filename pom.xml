@@ -40,7 +40,7 @@
     </modules>
 
     <properties>
-        <dss.version>1.3.1</dss.version>
+        <dss.version>1.3.0-SNAPSHOT</dss.version>
         <linkis.version>1.3.0-wds-SNAPSHOT</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>

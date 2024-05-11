@@ -48,10 +48,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitHistoryRequest
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorRefOrchestration;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
@@ -437,7 +434,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public String getOrchestratorStatus(Long orchestratorId) {
-        return orchestratorMapper.selectSubmitJobStatus(orchestratorId);
+        OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
+        return orchestratorSubmitJob.getStatus();
     }
 
     @Override

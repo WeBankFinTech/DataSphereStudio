@@ -155,6 +155,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setOrchestratorMode(ProjectStringUtils.getModeStr(projectModifyRequest.getOrchestratorModeList()));
         project.setBusiness(projectModifyRequest.getBusiness());
         project.setProduct(projectModifyRequest.getProduct());
+        project.setAssociateGit(projectModifyRequest.getAssociateGit());
 
         UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", projectModifyRequest.getId());

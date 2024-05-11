@@ -130,6 +130,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setUpdateTime(new Date());
         project.setDescription(projectCreateRequest.getDescription());
         project.setApplicationArea(projectCreateRequest.getApplicationArea());
+        project.setAssociateGit(projectCreateRequest.getAssociateGit());
         //开发流程，编排模式组拼接 前后进行英文逗号接口
         project.setDevProcess(ProjectStringUtils.getModeStr(projectCreateRequest.getDevProcessList()));
         project.setOrchestratorMode(ProjectStringUtils.getModeStr(projectCreateRequest.getOrchestratorModeList()));

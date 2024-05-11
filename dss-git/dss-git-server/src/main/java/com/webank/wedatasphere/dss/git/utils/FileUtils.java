@@ -71,6 +71,11 @@ public class FileUtils {
 
     public static void removeDirectory (String removeDirectoryPath) {
         try {
+            File file = new File(removeDirectoryPath);
+            if (!file.exists()) {
+                logger.info("file {} not exist", removeDirectoryPath);
+                return;
+            }
             Path dirToBeDeleted = Paths.get(removeDirectoryPath);
             // 使用Files.walk收集所有路径，然后按照逆序排序，确保文件/子文件夹在其父文件夹之前被删除
             Files.walk(dirToBeDeleted)

@@ -19,4 +19,8 @@ public class GitServerConfig {
     public static final CommonVars<String> GIT_PASSWD = CommonVars.apply("wds.dss.server.git.password", "user_password");
     public static final CommonVars<String> GIT_SUBMIT = CommonVars.apply("wds.dss.server.git.submit", "input[class='btn btn-success qa-sign-in-button']");
     public static final CommonVars<String> GIT_TIME = CommonVars.apply("wds.dss.server.git.time", "1");
+
+    public static final CommonVars<String> GIT_SEARCH_EXCLUDE_DIRECTORY = CommonVars.apply("wds.dss.server.git.search.exclude.dir", ".metaConf");
+
+    public static final CommonVars<String> GIT_SEARCH_EXCLUDE_FILE = CommonVars.apply("wds.dss.server.git.search.exclude.file", ".properties");
 }

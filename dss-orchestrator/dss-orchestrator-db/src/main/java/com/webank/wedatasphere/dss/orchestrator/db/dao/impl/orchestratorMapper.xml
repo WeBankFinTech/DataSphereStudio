@@ -278,7 +278,7 @@
     </update>
 
     <update id="updateOrchestratorStatus">
-        update dss_orchestrator
+        update dss_orchestrator_info
         <set>
             `status` = #{status}
         </set>
@@ -286,11 +286,11 @@
     </update>
 
     <select id="selectOrchestratorStatus" resultType="java.lang.String">
-        select `status` from dss_orchestrator where `id` = #{id}
+        select `status` from dss_orchestrator_info where `id` = #{id}
     </select>
 
     <select id="selectOrchestratorByStatus" resultType="java.lang.Long">
-        select id from dss_orchestrator where `status` = #{status}
+        select id from dss_orchestrator_info where `status` = #{status}
     </select>
 
     <insert id="insertOrchestratorSubmitJob" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">

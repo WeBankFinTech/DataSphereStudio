@@ -215,23 +215,23 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         releaseThreadPool.submit(() ->{
             //1. 异步提交，更新提交状态
             Long orchestratorId = flowRequest.getOrchestratorId();
-            OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
-            if (orchestratorSubmitJob == null) {
-                OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
-                submitJob.setOrchestratorId(orchestratorId);
-                submitJob.setInstanceName(Sender.getThisInstance());
-                submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-                orchestratorMapper.insertOrchestratorSubmitJobStatus(submitJob);
-            } else {
-                orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSHING, "");
-            }
-            //2. 获取编排信息
-            DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
-            //3. 获取上传工作流信息
-            BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
-            // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
-            //4. 调用git服务上传
             try {
+                OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
+                if (orchestratorSubmitJob == null) {
+                    OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
+                    submitJob.setOrchestratorId(orchestratorId);
+                    submitJob.setInstanceName(Sender.getThisInstance());
+                    submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+                    orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+                } else {
+                    orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSHING, "");
+                }
+                //2. 获取编排信息
+                DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
+                //3. 获取上传工作流信息
+                BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
+                // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
+                //4. 调用git服务上传
                 GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName(), flowRequest.getComment());
                 if (commit == null) {
                     LOGGER.info("change is empty");

@@ -135,7 +135,7 @@ public interface OrchestratorMapper {
 
     void updateOrchestratorSubmitJobStatus(@Param("orchestratorId") Long orchestratorId, @Param("status") String status, @Param("errMsg") String errMsg);
 
-    void insertOrchestratorSubmitJobStatus(OrchestratorSubmitJob orchestratorSubmitJob);
+    void insertOrchestratorSubmitJob(OrchestratorSubmitJob orchestratorSubmitJob);
 
     OrchestratorSubmitJob selectSubmitJobStatus(@Param("orchestratorId") Long orchestratorId);
 

@@ -380,7 +380,7 @@ public class DSSFrameworkOrchestratorRestful {
 
         String orchestratorStatus = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
 
-        return Message.ok();
+        return Message.ok().data("status", orchestratorStatus);
     }
 
     @RequestMapping(value = "publish/history", method = RequestMethod.GET)

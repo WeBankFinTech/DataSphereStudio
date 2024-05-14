@@ -18,11 +18,11 @@ package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -31,9 +31,9 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitRenameRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitRevertResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -70,6 +70,7 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.workflow.common.protocol.*;
+import io.protostuff.Rpc;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
@@ -374,7 +375,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         if (!StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
             Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
             GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), userName);
-            GitRevertResponse gitRevertResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitRevertResponse.class, GitRevertRequest.class);
+            GitCommitResponse gitRevertResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
         }
 
         String newVersion = OrchestratorUtils.increaseVersion(latestVersion);
@@ -457,7 +458,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
     //是否存在相同的编排名称,如果不存在相同的编排名称則返回编排id
     @Override
-    public Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest) throws DSSFrameworkErrorException {
+    public Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest, DSSProject dssProject, String username) throws DSSFrameworkErrorException {
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorModifRequest.getId());
         if (orchestratorInfo == null) {
             DSSFrameworkErrorException.dealErrorException(60000, "编排模式ID=" + orchestratorModifRequest.getId() + "不存在");
@@ -465,6 +466,9 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         //若修改了编排名称，检查是否存在相同的编排名称
         if (!orchestratorModifRequest.getOrchestratorName().equals(orchestratorInfo.getName())) {
             isExistSameNameBeforeCreate(orchestratorModifRequest.getWorkspaceId(), orchestratorModifRequest.getProjectId(), orchestratorModifRequest.getOrchestratorName());
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            GitRenameRequest renameRequest = new GitRenameRequest(orchestratorInfo.getWorkspaceId(), dssProject.getName(), orchestratorInfo.getName(), orchestratorModifRequest.getOrchestratorName(), username);
+            GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(renameRequest), GitCommitResponse.class, GitRenameRequest.class);
         }
         return orchestratorInfo.getId();
     }

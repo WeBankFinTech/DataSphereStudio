@@ -427,7 +427,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
-    public GitRevertResponse gitCheckOut(GitRevertRequest request) throws IOException {
+    public GitCommitResponse gitCheckOut(GitRevertRequest request) throws IOException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -452,8 +452,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             if (CollectionUtils.isEmpty(latestCommit)) {
                 logger.error("get latestCommit failed, the reason is null");
             } else {
-                commitResponse = latestCommit.get(0);
-                return new GitRevertResponse(commitResponse.getCommitId());
+                return commitResponse;
             }
 
         } catch (Exception e) {
@@ -465,7 +464,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
-    public GitRemoveResponse removeFile(GitRemoveRequest request) {
+    public GitCommitResponse removeFile(GitRemoveRequest request) {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -496,6 +495,41 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         } finally {
             repository.close();
         }
-        return new GitRemoveResponse(commitResponse.getCommitId());
+        return commitResponse;
+    }
+
+    @Override
+    public GitCommitResponse rename(GitRenameRequest request) {
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        if (gitUser == null) {
+            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+            return null;
+        }
+        Repository repository = null;
+        GitCommitResponse commitResponse = null;
+        try {
+            // 拼接.git路径
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            // 获取git仓库
+            File repoDir = new File(gitPath);
+            repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            // 本地保持最新状态
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            // 同步删除对应节点
+            String olfFilePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getOldName());
+            String filePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getName());;
+            FileUtils.renameFile(olfFilePath, filePath);
+            // 提交
+            String comment = "rename workflowNode " + request.getName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
+
+            commitResponse = DSSGitUtils.getCurrentCommit(repository);
+
+        } catch (Exception e) {
+            logger.error("pull failed, the reason is ",e);
+        } finally {
+            repository.close();
+        }
+        return commitResponse;
     }
 }

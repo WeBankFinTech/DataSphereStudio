@@ -261,4 +261,20 @@ public class FileUtils {
         }
         return longZipFilePath;
     }
+
+    public static void renameFile(String oldFileName, String fileName) {
+        File oldFile = new File(oldFileName);
+        File file = new File(fileName);
+        // 检查原文件夹是否存在
+        if (oldFile.exists()) {
+            // 尝试重命名文件夹
+            if (oldFile.renameTo(file)) {
+                logger.info("Folder renamed successfully.");
+            } else {
+                logger.error("Failed to rename folder.");
+            }
+        } else {
+            logger.error("Folder does not exist.");
+        }
+    }
 }

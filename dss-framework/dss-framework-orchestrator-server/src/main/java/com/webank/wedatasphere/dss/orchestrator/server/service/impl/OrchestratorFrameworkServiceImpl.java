@@ -43,6 +43,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitRemoveRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
 import com.webank.wedatasphere.dss.orchestrator.core.type.DSSOrchestratorRelation;
@@ -282,13 +283,18 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
                             .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
         }
-        // git删除成功之后再删除库表记录
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        List<String> path = new ArrayList<>();
-        path.add(orchestratorInfo.getName());
-        GitRemoveRequest removeRequest = new GitRemoveRequest(workspace.getWorkspaceId(), dssProject.getName(), path, username);
-        GitCommitResponse gitRemoveResponse = RpcAskUtils.processAskException(sender.ask(removeRequest), GitCommitResponse.class, GitRemoveRequest.class);
-
+        try {
+            // git删除成功之后再删除库表记录
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            List<String> path = new ArrayList<>();
+            path.add(orchestratorInfo.getName());
+            GitRemoveRequest removeRequest = new GitRemoveRequest(workspace.getWorkspaceId(), dssProject.getName(), path, username);
+            RpcAskUtils.processAskException(sender.ask(removeRequest), GitCommitResponse.class, GitRemoveRequest.class);
+            orchestratorMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+        } catch (Exception e) {
+            LOGGER.error("git remove failed, the reason is: ", e);
+            orchestratorMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+        }
         orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         orchestratorOperateService.deleteTemplateOperate(orchestratorInfo.getId());
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());

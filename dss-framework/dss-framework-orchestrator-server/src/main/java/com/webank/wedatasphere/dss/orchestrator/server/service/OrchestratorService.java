@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
 
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
@@ -132,7 +133,7 @@ public interface OrchestratorService {
     //**** new method
     void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String orchestratorName) throws DSSFrameworkErrorException;
 
-    Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest) throws DSSFrameworkErrorException;
+    Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest, DSSProject dssProject, String username) throws DSSFrameworkErrorException;
 
     List<OrchestratorBaseInfo> getOrchestratorInfos(OrchestratorRequest orchestratorRequest, String username);
 

@@ -468,7 +468,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             isExistSameNameBeforeCreate(orchestratorModifRequest.getWorkspaceId(), orchestratorModifRequest.getProjectId(), orchestratorModifRequest.getOrchestratorName());
             Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
             GitRenameRequest renameRequest = new GitRenameRequest(orchestratorInfo.getWorkspaceId(), dssProject.getName(), orchestratorInfo.getName(), orchestratorModifRequest.getOrchestratorName(), username);
-            GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(renameRequest), GitCommitResponse.class, GitRenameRequest.class);
+            RpcAskUtils.processAskException(sender.ask(renameRequest), GitCommitResponse.class, GitRenameRequest.class);
         }
         return orchestratorInfo.getId();
     }

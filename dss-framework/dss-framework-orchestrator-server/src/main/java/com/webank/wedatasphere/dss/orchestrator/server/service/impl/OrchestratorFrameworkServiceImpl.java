@@ -45,9 +45,11 @@ import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitHistoryRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitRemoveRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitRemoveResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
@@ -290,6 +292,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
                             .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
         }
+        // git删除成功之后再删除库表记录
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        List<String> path = new ArrayList<>();
+        path.add(orchestratorInfo.getName());
+        GitRemoveRequest removeRequest = new GitRemoveRequest(workspace.getWorkspaceId(), dssProject.getName(), path, username);
+        GitRemoveResponse gitRemoveResponse = RpcAskUtils.processAskException(sender.ask(removeRequest), GitRemoveResponse.class, GitRemoveRequest.class);
 
         orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         orchestratorOperateService.deleteTemplateOperate(orchestratorInfo.getId());

@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -30,6 +31,9 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitRevertResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -49,8 +53,10 @@ import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.*;
@@ -102,6 +108,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     private ContextService contextService;
     @Autowired
     AddOrchestratorVersionHook addOrchestratorVersionHook;
+    @Autowired
+    private OrchestratorPluginService orchestratorPluginService;
 
     private static final int VALID_FLAG = 1;
 
@@ -362,6 +370,13 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         List<DSSLabel> labels = new ArrayList<>();
         labels.add(dssLabel);
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
+        //git回滚
+        if (!StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), userName);
+            GitRevertResponse gitRevertResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitRevertResponse.class, GitRevertRequest.class);
+        }
+
         String newVersion = OrchestratorUtils.increaseVersion(latestVersion);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
         String comment = "回滚工作流到版本:" + version;
@@ -401,6 +416,18 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
         addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
 //        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
+
+        //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
+        if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            OrchestratorSubmitRequest submitRequest = new OrchestratorSubmitRequest();
+            submitRequest.setFlowId(dssOrchestratorVersion.getAppId());
+            submitRequest.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
+            submitRequest.setProjectName(projectName);
+            submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
+            orchestratorPluginService.submitFlow(submitRequest, userName, workspace);
+        }
+
         return dssOrchestratorVersion.getVersion();
     }
 

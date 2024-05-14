@@ -371,12 +371,6 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         List<DSSLabel> labels = new ArrayList<>();
         labels.add(dssLabel);
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
-        //git回滚
-        if (!StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
-            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-            GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), userName);
-            GitCommitResponse gitRevertResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
-        }
 
         String newVersion = OrchestratorUtils.increaseVersion(latestVersion);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
@@ -418,15 +412,24 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
 //        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
 
-        //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
-        if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
+        try {
             Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-            OrchestratorSubmitRequest submitRequest = new OrchestratorSubmitRequest();
-            submitRequest.setFlowId(dssOrchestratorVersion.getAppId());
-            submitRequest.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
-            submitRequest.setProjectName(projectName);
-            submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
-            orchestratorPluginService.submitFlow(submitRequest, userName, workspace);
+            //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
+            if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
+                OrchestratorSubmitRequest submitRequest = new OrchestratorSubmitRequest();
+                submitRequest.setFlowId(dssOrchestratorVersion.getAppId());
+                submitRequest.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
+                submitRequest.setProjectName(projectName);
+                submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
+                orchestratorPluginService.submitFlow(submitRequest, userName, workspace);
+            } else {
+                GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), userName);
+                RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
+            }
+            orchestratorMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
+        } catch (Exception e) {
+            LOGGER.error("git revert failed, the reason is :", e);
+            orchestratorMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
         }
 
         return dssOrchestratorVersion.getVersion();

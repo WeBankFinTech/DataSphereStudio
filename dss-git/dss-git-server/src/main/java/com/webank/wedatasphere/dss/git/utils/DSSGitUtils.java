@@ -204,7 +204,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static void checkoutTargetCommit(GitRevertRequest request) {
+    public static void checkoutTargetCommit(GitRevertRequest request) throws GitAPIException, IOException {
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName()+ File.separator + ".git");
         String commitId = request.getCommitId(); // 替换为目标commit的完整哈希值
 
@@ -214,13 +214,14 @@ public class DSSGitUtils {
             // 检出（回滚）指定commit的文件版本
             git.checkout()
                     .setStartPoint(commitId)
-                    .addPaths(request.getPath())
+                    .addPath(request.getPath())
                     .call();
 
             logger.info("File " + repoDir.getAbsolutePath() + " has been rolled back to the version at commit: " + commitId);
 
         } catch (GitAPIException | IOException e) {
-            e.printStackTrace();
+            logger.error("check out failed by : ", e);
+            throw e;
         }
     }
 
@@ -391,7 +392,6 @@ public class DSSGitUtils {
             logger.error("get remote repos Failed, the reason is : ", e);
         }
         try (Git git = new Git(repository)) {
-//            git.reset().addPath(filePath).call();
             git.reset().addPath(filePath).setMode(ResetCommand.ResetType.HARD).setRef("origin/master").call();
             logger.info("File has been unstaged: " + filePath);
         } catch (GitAPIException e) {
@@ -468,7 +468,6 @@ public class DSSGitUtils {
                 logger.info("Commit Time: " + commitTime);
                 logger.info("Commit Message: " + commitMessage);
                 logger.info("Commit Author: " + commitAuthor);
-                logger.info("-----------------------------------");
             }
         } catch (IOException | GitAPIException e) {
             logger.error("get git log failed, the reason is: ", e);
@@ -544,11 +543,10 @@ public class DSSGitUtils {
                 commitResponse.setComment(commit.getShortMessage());
                 commitResponse.setCommitUser(commit.getAuthorIdent().getName());
                 gitCommitResponseList.add(commitResponse);
-                System.out.println("Commit Hash: " + commit.getName()); // 提交的Hash值
-                System.out.println("Commit Time: " + authorIdent.getWhen()); // 提交时间
-                System.out.println("Commit Message: " + commit.getFullMessage()); // 提交信息
-                System.out.println("Author: " + authorIdent.getName() + " <" + authorIdent.getEmailAddress() + ">"); // 提交人
-                System.out.println("-----------------------------------------------------");
+                logger.info("Commit Hash: " + commit.getName()); // 提交的Hash值
+                logger.info("Commit Time: " + authorIdent.getWhen()); // 提交时间
+                logger.info("Commit Message: " + commit.getFullMessage()); // 提交信息
+                logger.info("Author: " + authorIdent.getName() + " <" + authorIdent.getEmailAddress() + ">"); // 提交人
             }
         }
         GitHistoryResponse historyResponse = new GitHistoryResponse();

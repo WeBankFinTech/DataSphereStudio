@@ -6,7 +6,7 @@ public class GitSearchRequest extends GitBaseRequest{
     /**
      * 搜索条件：工作流（相对路径）
      */
-    private List<String> path;
+    private List<String> workflowNameList;
     /**
      * 搜索条件：关键字
      */
@@ -14,11 +14,11 @@ public class GitSearchRequest extends GitBaseRequest{
     /**
      * 搜索条件：文件名
      */
-    private String fileName;
+    private String nodeName;
     /**
      * 搜索条件：节点类型（后缀）
      */
-    private List<String> type;
+    private List<String> typeList;
     private Integer pageSize;
     private Integer pageNow;
 
@@ -26,12 +26,12 @@ public class GitSearchRequest extends GitBaseRequest{
     }
 
 
-    public List<String> getPath() {
-        return path;
+    public List<String> getWorkflowNameList() {
+        return workflowNameList;
     }
 
-    public void setPath(List<String> path) {
-        this.path = path;
+    public void setWorkflowNameList(List<String> workflowNameList) {
+        this.workflowNameList = workflowNameList;
     }
 
     public String getSearchContent() {
@@ -42,20 +42,20 @@ public class GitSearchRequest extends GitBaseRequest{
         this.searchContent = searchContent;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getNodeName() {
+        return nodeName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
     }
 
-    public List<String> getType() {
-        return type;
+    public List<String> getTypeList() {
+        return typeList;
     }
 
-    public void setType(List<String> type) {
-        this.type = type;
+    public void setTypeList(List<String> typeList) {
+        this.typeList = typeList;
     }
 
 

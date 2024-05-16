@@ -80,6 +80,8 @@ public class ProjectResponse implements Serializable {
      */
     private List<String> orchestratorModeList;
 
+    private Boolean associateGit;
+
     public Date getCreateTime() {
         return createTime;
     }
@@ -228,6 +230,15 @@ public class ProjectResponse implements Serializable {
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
                 ", editable=" + editable +
+                ", associateGit=" + associateGit +
                 '}';
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

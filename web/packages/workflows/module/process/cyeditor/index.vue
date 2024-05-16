@@ -411,6 +411,18 @@ export default {
         pan,
         zoom: this.zoomSize
       })
+
+      // 设置禁用的样式
+      cy.style().selector('.disabled-node').style({
+        'background-color': '#fafafa',
+        'color': '#cfd0d3'
+      })
+      data.nodes.forEach(function(nodeItem) {
+        var node = cy.getElementById(nodeItem.data.id);
+        if (nodeItem.disabled) {
+          node.addClass('disabled-node');
+        }
+      });
     },
     updataNodeStatuStyle() {
       if (!this.$refs.nodestaus || !this.instance) return

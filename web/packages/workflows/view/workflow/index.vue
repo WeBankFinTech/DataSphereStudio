@@ -1085,6 +1085,7 @@ export default {
                 // 编排的版本id
                 params.version = params.orchestratorVersionId =
                   openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
+                params.isDefaultReference = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.isDefaultReference;
                 this.openItemAction(params);
               } else {
                 return this.$Message.warning(
@@ -1148,12 +1149,19 @@ export default {
         tabId: `${params.id}${params.version}`, // 相同编排的不同版本
         isChange: false,
         orchestratorMode: params.orchestratorMode, // 后面根据具体的编排模式确认类型字段
-        type: DEVPROCESS.DEVELOPMENTCENTER
+        type: DEVPROCESS.DEVELOPMENTCENTER,
+        isDefaultReference: params.isDefaultReference
       };
-      const hasIn = this.tabList.find(it=>it.tabId === this.current.tabId)
-      if(!hasIn){
-        this.tabList.push(this.current);
+      const hasInIndex = this.tabList.findIndex(it=>it.tabId === this.current.tabId)
+      if(hasInIndex !== -1) {
+        this.tabList.splice(hasInIndex,1);
       }
+      this.tabList.push(this.current);
+      // 下述写法，工作流数据未及时更新
+      //  const hasIn = this.tabList.find(it=>it.tabId === this.current.tabId)
+      // if(!hasIn){
+      //   this.tabList.push(this.current);
+      // }
     },
     onTabRemove(tabId, del) {
       let index = "";

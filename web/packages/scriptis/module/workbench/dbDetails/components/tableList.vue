@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="search-header">
+    <div class="search-header" v-if="!isAdminMode">
       <!-- <Input v-model="tableOwner" class="searce-item margin-right" placeholder="请输入用户名">
       </Input> -->
       <Input v-model="tableName" class="searce-item margin-right" :placeholder="$t('message.scripts.plstablename')">
@@ -16,10 +16,9 @@
         <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
       </Select>
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
-      <Button class="margin-right" type="primary" :title="$t('message.scripts.realsearchTip')" @click="handleGetTables(true)">{{ $t('message.scripts.searchnow') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
-      <Dropdown @on-click="dropdownClick">
+      <Dropdown class="margin-right" @on-click="dropdownClick">
         <Button type="primary">
           {{ $t('message.apiServices.query.more') }}
           <Icon type="ios-arrow-down"></Icon>
@@ -32,6 +31,38 @@
           </DropdownMenu>
         </template>
       </Dropdown>
+      <Button v-if="isWorkspaceAdmin && isContainDb" type="text" @click="changeViewMode(true)">切换管理员视图</Button>
+    </div>
+    <div class="search-header" v-else>
+      <Input v-model="tableName" class="searce-item margin-right" :placeholder="$t('message.scripts.plstablename')">
+      </Input>
+      <Select v-model="orderBy" class="searce-item margin-right">
+        <Option value="1">{{ $t('message.scripts.defaultsort') }}</Option>
+        <Option value="2">{{ $t('message.scripts.ordersize') }}</Option>
+        <Option value='3'>{{ $t('message.scripts.ordercreatetime') }}</Option>
+        <Option value="4">{{ $t('message.scripts.orderaccesstime') }}</Option>
+      </Select>
+      <!-- <Select v-model="isTableOwner" class="searce-item margin-right">
+        <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
+        <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
+      </Select> -->
+      <Input v-model="tableOwner" class="searce-item margin-right" placeholder="请输入表属主">
+      </Input>
+      <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
+      <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
+      <Dropdown class="margin-right" @on-click="dropdownClick">
+        <Button type="primary">
+          {{ $t('message.apiServices.query.more') }}
+          <Icon type="ios-arrow-down"></Icon>
+        </Button>
+        <template #list>
+          <DropdownMenu>
+            <DropdownItem v-if="canTransfer" name="transfer">{{ $t('message.scripts.transfer') }}</DropdownItem>
+            <DropdownItem name="download">{{ $t('message.scripts.download') }}</DropdownItem>
+          </DropdownMenu>
+        </template>
+      </Dropdown>
+      <Button type="text" @click="changeViewMode(false)">切换普通视图</Button>
     </div>
     <div class="table-data" style="position:relative">
       <div class="field-list-header" id="dbtbheader" :class="{'ovy': searchColList.length > maxSize}">
@@ -70,7 +101,7 @@
             <Checkbox
               v-model="item.selected"
               @on-change="changeCheckList"
-              :disabled="item.tableOwner !== getUserName()"
+              :disabled="!isAdminMode && item.tableOwner !== getUserName()"
             /></div>
           <div class="field-list-item" style="width: 50px">{{ pageData.pageSize * (pageData.currentPage - 1) + index + 1 }}</div>
           <div
@@ -246,8 +277,11 @@ export default {
       })
       return list
     },
+    isContainDb() {
+      return /(_bak|_work)$/.test(this.dbName)
+    },
     canTransfer() {
-      return this.$APP_CONF.table_transfer && /(_bak|_work)$/.test(this.dbName)
+      return this.$APP_CONF.table_transfer && this.isContainDb
     },
     columnCalc() {
       return this.columns.map((item, index) => {
@@ -348,6 +382,8 @@ export default {
       showRename: false,
       databaseList: [],
       renameScript: '',
+      isAdminMode: false,
+      isWorkspaceAdmin: false, // 工作空间管理员
     }
   },
   mounted() {
@@ -357,27 +393,30 @@ export default {
     formatValue(item, field) {
       return utils.formatValue(item, field);
     },
-    handleGetTables(isreal) {
+    handleGetTables() {
       this.selectAll = false;
       this.pageData.currentPage = 1;
-      this.isRealTime = isreal === true
       this.getDbTables();
     },
     // 获取库表
     getDbTables() {
       const params = {
         dbName: this.dbName,
-        isTableOwner: this.isTableOwner,
         tableName: this.tableName,
         orderBy: this.orderBy,
         pageSize: this.pageData.pageSize,
         currentPage: this.pageData.currentPage
       }
-      if (this.isRealTime) params.isRealTime = true
+      if (this.isAdminMode)  {
+        params.tableOwner = this.tableOwner
+      } else {
+        params.isTableOwner = this.isTableOwner
+      }
       this.loading = true;
       api.fetch('/dss/datapipe/datasource/getTableMetaDataInfo', params, 'get').then((rst) => {
         this.searchColList = rst.tableList;
         this.pageData.total = rst.total;
+        this.isWorkspaceAdmin = rst.isWorkspaceAdmin;
         this.loading = false;
         this.$emit('tableListChange', this.searchColList)
       }).catch(() => {
@@ -402,9 +441,12 @@ export default {
         dbName: this.dbName,
         orderBy: this.orderBy,
         tableName: this.tableName,
-        isTableOwner: this.isTableOwner
       }
-      if (this.isRealTime) params.isRealTime = true
+      if (this.isAdminMode) {
+        params.tableOwner = this.tableOwner
+      } else {
+        params.isTableOwner = this.isTableOwner
+      }
       api.fetch('/dss/datapipe/datasource/getTablesName', params, 'get').then((rst) => {
         let tablesName = rst.tablesName;
         this.loading = false;
@@ -427,12 +469,15 @@ export default {
     download() {
       const params = {
         dbName: this.dbName,
-        isTableOwner: this.isTableOwner,
         tableName: this.tableName,
         orderBy: this.orderBy,
         exactTableName: false
       }
-      if (this.isRealTime) params.isRealTime = true
+      if (this.isAdminMode) {
+        params.tableOwner = this.tableOwner
+      } else {
+        params.isTableOwner = this.isTableOwner
+      }
       const paramsStr = qs.stringify(params)
       window.open("/api/rest_j/v1/dss/datapipe/datasource/downloadTableMetaData?" + paramsStr, '_blank');
     },
@@ -458,6 +503,11 @@ export default {
         return
       }
       if (this.confirmModalType == 'transfer') {
+        const tableOwners = [...new Set(toDeleted.map(item => item.tableOwner))];
+        if (this.isAdminMode && tableOwners.length > 1) {
+          this.$Message.warning({ content: '每次仅支持转移一位用户的表' });
+          return
+        }
         // 批量转移
         this.showTransferForm = true
         this.showConfirmModal = false
@@ -519,10 +569,16 @@ export default {
         item.selected = v
       })
     },
+    changeViewMode(val) {
+      this.changeCheckAll(false);
+      this.isAdminMode = val;
+      this.tableOwner = '';
+      this.handleGetTables();
+    },
     changeCheckAll(v) {
       const u = this.getUserName()
       this.searchColList = this.searchColList.map(item => {
-        item.selected = v && item.tableOwner === u
+        item.selected = v && (this.isAdminMode || item.tableOwner === u)
         return item
       })
     },

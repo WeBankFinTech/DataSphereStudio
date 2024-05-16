@@ -484,6 +484,7 @@
         "Username": "用户名",
         "Password": "密码",
         "inputPassword": "请输入密码",
+        "inputPasswordNext": "PIN+TOKEN(测试环境使用静态密码)",
         "Prompt": "提示",
         "noPrompt": "不再提示",
         "adjustcolwidth": "当前列宽已调整，是否重置列宽？",

@@ -28,6 +28,7 @@
         :anchor-size="node.anchorSize"
         :image="node.image"
         :selected="node.selected"
+        :disabled="node.disabled"
         :run-state="node.runState"
         :node-anchors="node.nodeAnchors"
         @operat-node="operatNode" />

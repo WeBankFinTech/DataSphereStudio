@@ -234,6 +234,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setArchive(projectVo.getArchive());
             projectResponse.setCreateTime(projectVo.getCreateTime());
             projectResponse.setUpdateTime(projectVo.getUpdateTime());
+            projectResponse.setAssociateGit(projectVo.getAssociateGit());
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
             projectResponseList.add(projectResponse);

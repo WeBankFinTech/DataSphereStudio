@@ -3,7 +3,7 @@
     :style="getNodeStyle"
     :title="title"
     class="node-box"
-    :class="{'node-selected': isChoose}"
+    :class="{'node-disabled': isDisabled, 'node-selected': isChoose}"
     @click="click"
     @dblclick="dblclick"
     @mousedown.stop="mousedown"
@@ -112,6 +112,10 @@ export default {
       type: Boolean,
       default: false
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
     nodeAnchors: {
       type: Array,
       dafault: () => []
@@ -121,10 +125,13 @@ export default {
     return {
       component: null,
       currentBorderColor: this.borderColor,
-      isChoose: this.selected
+      isChoose: this.selected,
     };
   },
   computed: {
+    isDisabled() {
+      return this.disabled;
+    },
     getNodeStyle() {
       let styelObj
       if (this.state.mapMode && this.nodeType !== 'canvas') {

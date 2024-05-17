@@ -413,9 +413,10 @@ export default {
       })
 
       // 设置禁用的样式
+      const nodeThemeColor = getThemeColorConsants()
       cy.style().selector('.disabled-node').style({
-        'background-color': '#fafafa',
-        'color': '#cfd0d3'
+        'background-color': nodeThemeColor.nodeDisabledBg,
+        'color': nodeThemeColor.nodeDisabledColor
       })
       data.nodes.forEach(function(nodeItem) {
         var node = cy.getElementById(nodeItem.data.id);
@@ -568,6 +569,9 @@ export default {
       this.instance.cy.style().selector('node[name]').style({
         'background-color': themeColor.nodeBg,
         'color': themeColor.nodeColor
+      }).selector('.disabled-node').style({
+        'background-color': themeColor.nodeDisabledBg,
+        'color': themeColor.nodeDisabledColor
       }).update()
     },
     nodeScroolIntoView(id) {

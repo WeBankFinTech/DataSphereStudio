@@ -14,6 +14,9 @@
       "saveErr": "保存失败！",
       "createdTitle": "建表向导",
       "saveToWidget": "保存widget到解决方案",
+      "query": {
+        "more": "更多"
+      },
       "contextMenu": {
         "openToTab": "打开到侧边",
         "copyPath": "复制路径",
@@ -193,7 +196,11 @@
         "YES": "对",
         "GSHJX": "进行格式化成",
         "ZJXYGE": "组件需要的格式",
-        "FZBZDXX": "复制表字段信息"
+        "FZBZDXX": "复制表字段信息",
+        "QHPTST": "切换普通视图",
+        "QHGLYST": "切换管理员视图",
+        "QSRBSZ": "请输入表属主",
+        "MCJZCZYYWYH": "每次仅支持转移一位用户的表"
       },
       "logView": {
         "taskId": "任务ID：",

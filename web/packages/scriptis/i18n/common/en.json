@@ -14,6 +14,9 @@
       "saveErr": "Save failed!",
       "createdTitle": "Table creation guide",
       "saveToWidget": "Save widget to solution",
+      "query": {
+        "more": "More"
+      },
       "contextMenu": {
         "openToTab": "Open as a tab",
         "copyPath": "Copy path",
@@ -193,7 +196,11 @@
         "YES": "Yes",
         "GSHJX": "Formatted to",
         "ZJXYGE": "The format required by the component",
-        "FZBZDXX": "Copy table field information"
+        "FZBZDXX": "Copy table field information",
+        "QHPTST": "Switch common view",
+        "QHGLYST": "Switch administrator view",
+        "QSRBSZ": "Please enter the table owner",
+        "MCJZCZYYWYH": "Only one user's table can be transferred at a time"
       },
       "logView": {
         "taskId": "Task ID：",

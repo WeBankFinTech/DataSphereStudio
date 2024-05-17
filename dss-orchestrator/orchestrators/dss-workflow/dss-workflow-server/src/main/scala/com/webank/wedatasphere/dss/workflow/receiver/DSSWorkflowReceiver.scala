@@ -107,9 +107,6 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
     case requestWorkflowIdList : RequestSubFlowContextIds =>
       workflowManager.getSubFlowContextIdsByFlowIds(requestWorkflowIdList)
 
-    case requestLockWorkflow: RequestLockWorkflow =>
-      workflowManager.lockWorkFlow(requestLockWorkflow)
-
     case _ => throw new DSSErrorException(90000, "Not support protocol " + message)
   }
 

@@ -116,6 +116,10 @@ export default {
       type: Boolean,
       default: false
     },
+    disabledBorderColor: {
+      type: String,
+      default: '#6a85a766'
+    },
     nodeAnchors: {
       type: Array,
       dafault: () => []
@@ -270,7 +274,7 @@ export default {
       let ctx = this.canvasCtx;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.lineWidth = this.borderWidth * this.state.baseOptions.pageSize;
-      ctx.strokeStyle = this.currentBorderColor;
+      ctx.strokeStyle = this.isDisabled ? this.disabledBorderColor : this.currentBorderColor;
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
       this.roundedRect(

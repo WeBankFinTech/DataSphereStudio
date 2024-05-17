@@ -130,6 +130,24 @@ public class DSSGitUtils {
                 logger.info("Pull successful!");
             } else {
                 logger.info("Pull failed: " + result.toString());
+                // 冲突时以远程仓库为准
+                if (result.getMergeResult().getConflicts() != null) {
+                    logger.info("Conflicts occurred. Resolving with remote as priority...");
+                    result.getMergeResult().getConflicts().keySet().forEach(path -> {
+                        try {
+                            // 检出冲突文件的远程版本
+                            git.checkout().setStartPoint("origin/" + result.getFetchResult().getTrackingRefUpdates().iterator().next().getRemoteName())
+                                    .addPath(path)
+                                    .call();
+                            // 添加解决后的文件到暂存区
+                            git.add().addFilepattern(path).call();
+                        } catch (GitAPIException e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    // 提交合并
+                    git.commit().setMessage("Merge resolved with remote as priority").call();
+                }
             }
 
         } catch (Exception e) {

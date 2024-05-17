@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -362,14 +363,13 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String rollbackOrchestrator(String userName, Long projectId, String projectName,
-                                       Long orchestratorId, String version, DSSLabel dssLabel, Workspace workspace) throws Exception {
+                                       Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception {
         //1.新建一个版本
         //2.然后将version的版本内容进行去workflow进行cp
         //3.然后把生产的内容进行update到数据库
         DSSOrchestratorVersion oldOrcVersion=orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
         String latestVersion = oldOrcVersion.getVersion();
-        List<DSSLabel> labels = new ArrayList<>();
-        labels.add(dssLabel);
+        DSSLabel envDSSLabel = new EnvDSSLabel(labels.getRoute());
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
 
         String newVersion = OrchestratorUtils.increaseVersion(latestVersion);
@@ -390,7 +390,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         String contextId = contextService.createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
         dssOrchestratorVersion.setContextId(contextId);
         LOGGER.info("Create a new ContextId {} for rollback the orchestration {} to version {}.", contextId, dssOrchestratorInfo.getName(), version);
-        RefJobContentResponseRef responseRef = tryRefOperation(dssOrchestratorInfo, userName, workspace, Collections.singletonList(dssLabel), null,
+        RefJobContentResponseRef responseRef = tryRefOperation(dssOrchestratorInfo, userName, workspace, Collections.singletonList(envDSSLabel), null,
                 developmentService -> ((RefCRUDService) developmentService).getRefCopyOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
                 projectRefRequestRef -> projectRefRequestRef.setRefProjectId(dssOrchestratorInfo.getProjectId()).setProjectName(projectName),
@@ -420,6 +420,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 submitRequest.setFlowId(dssOrchestratorVersion.getAppId());
                 submitRequest.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
                 submitRequest.setProjectName(projectName);
+                submitRequest.setLabels(labels);
                 submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
                 orchestratorPluginService.submitFlow(submitRequest, userName, workspace);
             } else {

@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
@@ -241,10 +242,10 @@ public class DSSFrameworkOrchestratorRestful {
         Long projectId = rollbackOrchestratorRequest.getProjectId();
         String projectName = rollbackOrchestratorRequest.getProjectName();
         Workspace workspace = SSOHelper.getWorkspace(request);
-        DSSLabel envDSSLabel = new EnvDSSLabel(rollbackOrchestratorRequest.getLabels().getRoute());
+        LabelRouteVO labels = rollbackOrchestratorRequest.getLabels();
         try {
             LOGGER.info("user {} begin to rollbackOrchestrator, params:{}", username, rollbackOrchestratorRequest);
-            String newVersion = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, envDSSLabel, workspace);
+            String newVersion = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, labels, workspace);
             Message message = Message.ok("回滚版本成功").data("newVersion", newVersion);
             return message;
         } catch (final Throwable t) {

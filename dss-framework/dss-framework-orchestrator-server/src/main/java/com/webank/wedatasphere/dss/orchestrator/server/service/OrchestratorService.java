@@ -20,6 +20,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.service;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
@@ -128,7 +129,7 @@ public interface OrchestratorService {
     List<DSSOrchestratorVersion> getOrchestratorVersions(String username, Long projectId, Long orchestratorId);
 
     String rollbackOrchestrator(String username, Long projectId, String projectName,
-                                Long orchestratorId, String version, DSSLabel dssLabel, Workspace workspace) throws Exception;
+                                Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception;
 
     //**** new method
     void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String orchestratorName) throws DSSFrameworkErrorException;

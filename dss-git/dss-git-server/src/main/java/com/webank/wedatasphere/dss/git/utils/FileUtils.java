@@ -109,7 +109,7 @@ public class FileUtils {
 
         String longZipFilePath = "";
         try {
-            longZipFilePath = unzip(zipFile, true);
+            longZipFilePath = unzip(zipFile, false);
             File file = new File(zipFile);
             logger.info("开始删除目录 {}", zipFile);
             if (file.delete()){

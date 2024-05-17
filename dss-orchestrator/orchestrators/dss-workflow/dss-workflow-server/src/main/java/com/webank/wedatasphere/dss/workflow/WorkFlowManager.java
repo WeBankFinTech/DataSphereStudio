@@ -157,7 +157,5 @@ public interface WorkFlowManager {
      */
     ResponseSubFlowContextIds getSubFlowContextIdsByFlowIds(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException;
 
-    ResponseLockWorkflow lockWorkFlow(RequestLockWorkflow requestLockWorkflow) throws DSSErrorException;
-
 
 }

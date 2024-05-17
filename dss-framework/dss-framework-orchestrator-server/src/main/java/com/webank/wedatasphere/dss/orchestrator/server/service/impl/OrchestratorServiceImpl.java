@@ -71,6 +71,7 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.workflow.common.protocol.*;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import io.protostuff.Rpc;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.client.ContextClient;
@@ -112,6 +113,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     AddOrchestratorVersionHook addOrchestratorVersionHook;
     @Autowired
     private OrchestratorPluginService orchestratorPluginService;
+    @Autowired
+    private LockMapper lockMapper;
 
     private static final int VALID_FLAG = 1;
 
@@ -427,10 +430,10 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), userName);
                 RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
             }
-            orchestratorMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
+            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
         } catch (Exception e) {
             LOGGER.error("git revert failed, the reason is :", e);
-            orchestratorMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
+            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
         }
 
         return dssOrchestratorVersion.getVersion();

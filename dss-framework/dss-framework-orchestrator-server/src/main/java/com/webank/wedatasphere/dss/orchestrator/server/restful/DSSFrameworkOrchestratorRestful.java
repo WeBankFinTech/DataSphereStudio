@@ -46,6 +46,9 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestLockWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseLockWorkflow;
+import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
@@ -57,6 +60,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -78,6 +82,8 @@ public class DSSFrameworkOrchestratorRestful {
     private OrchestratorPluginService orchestratorPluginService;
     @Autowired
     private HttpServletRequest httpServletRequest;
+    @Autowired
+    private LockMapper lockMapper;
 
     /**
      * 创建编排模式
@@ -293,11 +299,11 @@ public class DSSFrameworkOrchestratorRestful {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
 
-        RequestLockWorkflow requestLockWorkflow = new RequestLockWorkflow(userName, httpServletRequest.getCookies(), submitFlowRequest.getFlowId());
-        ResponseLockWorkflow responseLockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
-                .getWorkflowSender(dssLabelList).ask(requestLockWorkflow), ResponseLockWorkflow.class, RequestLockWorkflow.class);
-        if (responseLockWorkflow.getUnlockStatus() == ResponseLockWorkflow.LOCK_FAILED) {
-            return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
         GitTree gitTree = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
         return Message.ok().data("tree", gitTree.getChildren());
@@ -311,11 +317,11 @@ public class DSSFrameworkOrchestratorRestful {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
 
-        RequestLockWorkflow requestLockWorkflow = new RequestLockWorkflow(userName, httpServletRequest.getCookies(), submitFlowRequest.getFlowId());
-        ResponseLockWorkflow responseLockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
-                .getWorkflowSender(dssLabelList).ask(requestLockWorkflow), ResponseLockWorkflow.class, RequestLockWorkflow.class);
-        if (responseLockWorkflow.getUnlockStatus() == ResponseLockWorkflow.LOCK_FAILED) {
-            return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
 
         orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);

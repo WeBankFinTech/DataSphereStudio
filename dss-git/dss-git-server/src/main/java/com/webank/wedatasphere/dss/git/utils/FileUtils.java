@@ -109,14 +109,7 @@ public class FileUtils {
 
         String longZipFilePath = "";
         try {
-            longZipFilePath = unzip(zipFile, false);
-            File file = new File(zipFile);
-            logger.info("开始删除目录 {}", zipFile);
-            if (file.delete()){
-                logger.info("结束删除目录 {} 成功", zipFile);
-            }else{
-                logger.info("删除目录 {} 失败", zipFile);
-            }
+            longZipFilePath = unzip(zipFile, true);
         } catch (Exception e) {
             logger.error("unzip failed, the reason is ");
         }
@@ -246,7 +239,12 @@ public class FileUtils {
                 throw new DSSErrorException(90007,errMsg.toString());
             }
             if(deleteOriginZip){
-                file.delete();
+                logger.info("开始删除目录 {}", file);
+                if (file.delete()){
+                    logger.info("结束删除目录 {} 成功", file);
+                }else{
+                    logger.info("删除目录 {} 失败", file);
+                }
             }
         }catch(final Exception e){
             logger.error("{} 解压缩 zip 文件失败, reason: ", e);

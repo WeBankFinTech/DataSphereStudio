@@ -17,6 +17,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.eclipse.jgit.api.*;
+import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -31,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -152,6 +154,36 @@ public class DSSGitUtils {
 
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
+        }
+    }
+
+    public static void pullTargetFile(Repository repository, String projectName, GitUserEntity gitUser, List<String> paths) {
+        try {
+            if (CollectionUtils.isEmpty(paths)) {
+                return ;
+            }
+
+            // Opening the repository
+            Git git = new Git(repository);
+            // 拉取最新提交记录，但不进行合并
+            git.fetch().call();
+            // 设置需要更新的文件或文件夹路径
+            try {
+                git.checkout()
+                        .setStartPoint("origin/master")
+                        .addPaths(paths)
+                        .call();
+            } catch (CheckoutConflictException e) {
+                logger.info("Conflicts occurred, resetting local changes to match remote...");
+                git.reset()
+                        .setMode(ResetCommand.ResetType.HARD)
+                        .setRef("refs/remotes/origin/master")
+                        .call();
+                logger.info("reset success");
+            }
+
+        } catch (GitAPIException e) {
+            e.printStackTrace();
         }
     }
 

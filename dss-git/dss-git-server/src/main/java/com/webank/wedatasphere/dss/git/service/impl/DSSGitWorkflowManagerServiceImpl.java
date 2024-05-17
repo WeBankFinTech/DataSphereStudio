@@ -56,11 +56,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
-            // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 解压BML文件到本地
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
-            List<String> fileList = new ArrayList<>();
+            List<String> fileList = new ArrayList<>(bmlResourceMap.keySet());
+            // 本地保持最新状态
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 fileList.add(entry.getKey());
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
@@ -93,10 +93,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
-            // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 解压BML文件到本地
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
+            List<String> fileList = new ArrayList<>(bmlResourceMap.keySet());
+            // 本地保持最新状态
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
                 FileUtils.update(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
@@ -289,8 +290,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            List<String> fileList = request.getDeleteFileList();
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
             List<String> deleteFileList = request.getDeleteFileList();
             for (String path : deleteFileList) {
                 File file = new File(path);
@@ -327,8 +329,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            List<String> fileList = Collections.singletonList(request.getFilePath());
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
 
             String content = DSSGitUtils.getTargetCommitFileContent(request.getProjectName(), request.getCommitId(), request.getFilePath());
             String fullpath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getFilePath());
@@ -362,8 +365,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            List<String> fileList = Collections.singletonList(request.getFilePath());
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
 
             List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilePath(), 5);
             if (CollectionUtils.isEmpty(latestCommit)) {
@@ -407,8 +411,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            List<String> fileList = Collections.singletonList(request.getFilepath());
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
 
             List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilepath(), 1);
             if (CollectionUtils.isEmpty(latestCommit)) {
@@ -441,8 +446,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            List<String> fileList = Collections.singletonList(request.getPath());
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
             // 回滚
             DSSGitUtils.checkoutTargetCommit(request);
             // push
@@ -478,8 +484,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
+            List<String> fileList = request.getPath();
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
             // 同步删除对应节点
             for (String path : request.getPath()) {
                 FileUtils.removeFlowNode(path, request.getProjectName());
@@ -513,11 +520,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 获取git仓库
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
-            // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 同步删除对应节点
             String olfFilePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator +  FileUtils.normalizePath(request.getOldName());
             String filePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator +  FileUtils.normalizePath(request.getName());;
+            List<String> fileList = Collections.singletonList(olfFilePath);
+            // 本地保持最新状态
+            DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
             FileUtils.renameFile(olfFilePath, filePath);
             // 提交
             String comment = "rename workflowNode " + request.getName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();

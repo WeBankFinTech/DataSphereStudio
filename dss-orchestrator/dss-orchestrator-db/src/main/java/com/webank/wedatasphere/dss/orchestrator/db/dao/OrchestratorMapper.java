@@ -127,12 +127,6 @@ public interface OrchestratorMapper {
 
     void batchUpdateOrcInfo(@Param("list") List<DSSOrchestratorVersion> historyOrcVersion);
 
-    void updateOrchestratorStatus(@Param("id") Long id, @Param("status") String status);
-
-    String selectOrchestratorStatus(@Param("id") Long id);
-
-    List<Long> selectOrchestratorByStatus(@Param("status") String status);
-
     void updateOrchestratorSubmitJobStatus(@Param("orchestratorId") Long orchestratorId, @Param("status") String status, @Param("errMsg") String errMsg);
 
     void insertOrchestratorSubmitJob(OrchestratorSubmitJob orchestratorSubmitJob);

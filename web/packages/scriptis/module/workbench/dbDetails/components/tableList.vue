@@ -20,7 +20,7 @@
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
       <Dropdown class="margin-right" @on-click="dropdownClick">
         <Button type="primary">
-          {{ $t('message.apiServices.query.more') }}
+          {{ $t('message.scripts.query.more') }}
           <Icon type="ios-arrow-down"></Icon>
         </Button>
         <template #list>
@@ -31,7 +31,7 @@
           </DropdownMenu>
         </template>
       </Dropdown>
-      <Button v-if="isWorkspaceAdmin && isContainDb" type="text" @click="changeViewMode(true)">切换管理员视图</Button>
+      <Button v-if="isWorkspaceAdmin && isContainDb" type="text" @click="changeViewMode(true)">{{ $t('message.scripts.tableDetails.QHGLYST') }}</Button>
     </div>
     <div class="search-header" v-else>
       <Input v-model="tableName" class="searce-item margin-right" :placeholder="$t('message.scripts.plstablename')">
@@ -46,13 +46,13 @@
         <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
         <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
       </Select> -->
-      <Input v-model="tableOwner" class="searce-item margin-right" placeholder="请输入表属主">
+      <Input v-model="tableOwner" class="searce-item margin-right" :placeholder="$t('message.scripts.tableDetails.QSRBSZ')">
       </Input>
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
       <Dropdown class="margin-right" @on-click="dropdownClick">
         <Button type="primary">
-          {{ $t('message.apiServices.query.more') }}
+          {{ $t('message.scripts.query.more') }}
           <Icon type="ios-arrow-down"></Icon>
         </Button>
         <template #list>
@@ -62,7 +62,7 @@
           </DropdownMenu>
         </template>
       </Dropdown>
-      <Button type="text" @click="changeViewMode(false)">切换普通视图</Button>
+      <Button type="text" @click="changeViewMode(false)">{{ $t('message.scripts.tableDetails.QHPTST') }}</Button>
     </div>
     <div class="table-data" style="position:relative">
       <div class="field-list-header" id="dbtbheader" :class="{'ovy': searchColList.length > maxSize}">
@@ -505,7 +505,7 @@ export default {
       if (this.confirmModalType == 'transfer') {
         const tableOwners = [...new Set(toDeleted.map(item => item.tableOwner))];
         if (this.isAdminMode && tableOwners.length > 1) {
-          this.$Message.warning({ content: '每次仅支持转移一位用户的表' });
+          this.$Message.warning({ content: this.$t('message.scripts.tableDetails.MCJZCZYYWYH')  });
           return
         }
         // 批量转移

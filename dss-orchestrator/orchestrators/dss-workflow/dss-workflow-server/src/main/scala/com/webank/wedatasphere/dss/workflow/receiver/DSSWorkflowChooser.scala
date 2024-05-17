@@ -50,7 +50,6 @@ class DSSWorkflowChooser extends ReceiverChooser {
     case _: RequestConvertOrchestrations => receiver
     case _: RequestSubFlowContextIds => receiver
     case _: RequestDeleteBmlSource => receiver
-    case _: RequestLockWorkflow => receiver
 
     case _ => None
   }

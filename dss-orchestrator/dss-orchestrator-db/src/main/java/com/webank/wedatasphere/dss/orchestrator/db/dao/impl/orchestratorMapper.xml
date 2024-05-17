@@ -290,22 +290,6 @@
         </foreach>
     </update>
 
-    <update id="updateOrchestratorStatus">
-        update dss_orchestrator_info
-        <set>
-            `status` = #{status}
-        </set>
-        where `id` = #{id}
-    </update>
-
-    <select id="selectOrchestratorStatus" resultType="java.lang.String">
-        select `status` from dss_orchestrator_info where `id` = #{id}
-    </select>
-
-    <select id="selectOrchestratorByStatus" resultType="java.lang.Long">
-        select `id` from dss_orchestrator_info where `status` = #{status}
-    </select>
-
     <insert id="insertOrchestratorSubmitJob" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
         insert into dss_orchestrator_submit_job_info (`orchestrator_id`, `create_time`, `update_time`, `instance_name`, `status`) values
         (#{orchestratorId}, Now(), Now(), #{instanceName}, #{status})

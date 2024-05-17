@@ -69,6 +69,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
@@ -106,6 +107,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private OrchestratorCopyEnv orchestratorCopyEnv;
     @Autowired
     private OrchestratorOperateService orchestratorOperateService;
+    @Autowired
+    private LockMapper lockMapper;
 
     private static final int MAX_DESC_LENGTH = 250;
     private static final int MAX_NAME_LENGTH = 128;
@@ -290,10 +293,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             path.add(orchestratorInfo.getName());
             GitRemoveRequest removeRequest = new GitRemoveRequest(workspace.getWorkspaceId(), dssProject.getName(), path, username);
             RpcAskUtils.processAskException(sender.ask(removeRequest), GitCommitResponse.class, GitRemoveRequest.class);
-            orchestratorMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+            lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
         } catch (Exception e) {
             LOGGER.error("git remove failed, the reason is: ", e);
-            orchestratorMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+            lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
         }
         orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         orchestratorOperateService.deleteTemplateOperate(orchestratorInfo.getId());

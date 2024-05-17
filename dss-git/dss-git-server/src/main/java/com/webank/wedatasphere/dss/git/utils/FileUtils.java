@@ -247,7 +247,7 @@ public class FileUtils {
                 }
             }
         }catch(final Exception e){
-            logger.error("{} 解压缩 zip 文件失败, reason: ", e);
+            logger.error( file + " 解压缩 zip 文件失败, reason: ", e);
             DSSErrorException exception = new DSSErrorException(90009,dirPath + " to zip file failed");
             exception.initCause(e);
             throw exception;

@@ -100,6 +100,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
             // 提交
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
+            // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
@@ -317,6 +319,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                     }
                 }
             }
+            // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 提交
             DSSGitUtils.push(repository, request.getProjectName(), gitUser,"delete " + request.getDeleteFileList());
         } catch (Exception e) {
@@ -486,6 +490,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
             // 提交
             String comment = "delete workflowNode " + request.getPath().toString() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
+            // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
@@ -524,6 +530,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             FileUtils.renameFile(oldFileMetaPath, fileMetaPath);
             // 提交
             String comment = "rename workflowNode " + request.getName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
+            // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);

@@ -278,7 +278,7 @@ public class DSSGitUtils {
     public static boolean checkProjectName(String name, GitUserEntity gitUser) throws DSSErrorException {
         int retry = 0;
         List<String> allProjectName = new ArrayList<>();
-        while (retry < 3) {
+        while (true) {
             retry += 1;
             try {
                 allProjectName = getAllProjectName(gitUser);
@@ -291,7 +291,6 @@ public class DSSGitUtils {
                 }
             }
         }
-        return allProjectName.contains(name);
 
     }
 

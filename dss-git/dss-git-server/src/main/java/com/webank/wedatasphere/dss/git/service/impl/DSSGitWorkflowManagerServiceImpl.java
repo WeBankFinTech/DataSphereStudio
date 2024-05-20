@@ -521,12 +521,18 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             File repoDir = new File(gitPath);
             repository = getRepository(repoDir, request.getProjectName(), gitUser);
             // 同步删除对应节点
-            String olfFilePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator +  FileUtils.normalizePath(request.getOldName());
-            String filePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator +  FileUtils.normalizePath(request.getName());;
-            List<String> fileList = Collections.singletonList(olfFilePath);
+            String olfFilePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(request.getOldName());
+            String filePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(request.getName());
+
+            String oldFileMetaPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getOldName());
+            String fileMetaPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getName());
+            List<String> fileList = new ArrayList<>();
+            fileList.add(oldFileMetaPath);
+            fileList.add(olfFilePath);
             // 本地保持最新状态
             DSSGitUtils.pullTargetFile(repository, request.getProjectName(), gitUser, fileList);
             FileUtils.renameFile(olfFilePath, filePath);
+            FileUtils.renameFile(oldFileMetaPath, fileMetaPath);
             // 提交
             String comment = "rename workflowNode " + request.getName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);

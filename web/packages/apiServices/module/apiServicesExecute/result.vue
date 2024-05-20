@@ -155,15 +155,13 @@ export default {
     },
     // 验证发布和更新的默认值是否满足条件
     verificationValue (row) {
+      const method = this.workInfo.method || '';
       let flag;
-      if(row.defaultValue.length > 1024 && Number(row.type) !== 4) {
-        this.$Message.error({ content: this.$t('message.apiServices.more1024') });
-        flag = true;
-      } else if(row.type == 4 && row.defaultValue.split('\n').length > 5000) {
-        this.$Message.error({ content: this.$t('message.apiServices.moreline') });
+      if (method.toUpperCase() === 'GET' && row.defaultValue.length > 500) {
+        this.$Message.error({ content: '不能超过500字符' });
         flag = true;
       } else {
-        flag = false
+        flag = false;
       }
       console.warn(row)
       this.$set(this.tip, row.name, flag)
@@ -211,6 +209,14 @@ export default {
         if (this.showConditionList.length > 0) {
           this.$refs.searchFrom.validate(valid => {
             if (valid) {
+              const method = this.workInfo.method || '';
+              if (method.toUpperCase() === 'GET') {
+                const conditionStr = this.showConditionList.map(item => item.defaultValue).filter(item => item).join('');
+                if (conditionStr.length > 3000) {
+                  this.$Message.error({ content: '输入内容总长度不能超过3000字符' });
+                  return;
+                }
+              }
               this.executAction();
             } else {
               console.log(this.showConditionList)
@@ -337,6 +343,8 @@ export default {
     margin: 0 25px;
     .content-top {
       padding: 25px;
+      max-height: 600px;
+      overflow-y: auto;
       .alert-bar {
         margin-left: 15px;
       }

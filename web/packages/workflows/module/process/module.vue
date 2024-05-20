@@ -122,6 +122,7 @@
           :readonly="myReadonly"
           :nodes="json && json.nodes"
           :consoleParams="consoleParams"
+          :tabs="tabs"
           @saveNode="saveNode"
         ></nodeParameter>
       </div>
@@ -354,6 +355,11 @@ import NodePath from './component/nodePath.vue';
 import cyeditor from './cyeditor/index.vue'
 import DesignToolbar from './component/designtoolbar.vue';
 import { hasCycle } from './utils';
+import { useData } from './component/useData.js';
+
+const {
+  getTemplateDatas,
+} = useData();
 
 export default {
   components: {
@@ -679,6 +685,22 @@ export default {
     window.removeEventListener('resize', this.resizeConsole, false);
   },
   methods: {
+    // 获取当前节点对应的模板信息
+    async getTemplateDataByProject(jobType) {
+      const params = {
+        projectId: this.$route.query.projectID,
+        orchestratorId: this.$route.query.flowId,
+        jobType,
+      }
+      const res = await getTemplateDatas(params);
+      let templateList = [];
+      res.forEach(e=> {
+        e.child.forEach(d => {
+          templateList.push(Object.assign(d))
+        })
+      });
+      return templateList;
+    },
     resizeConsole: debounce(function() {
       this.consoleHeight = this.$el ? this.$el.clientHeight / 2 : 250
     }, 300),
@@ -898,6 +920,10 @@ export default {
         json = JSON.parse(json);
         if (json.nodes && Array.isArray(json.nodes)) {
           json.nodes = json.nodes.map((node) => {
+            node.disabled = false;
+            if (node.params && node.params.configuration && node.params.configuration.special) {
+              node.disabled = node.params.configuration.special['auto.disabled'] === 'true';
+            }
             node.type = node.jobType;
             delete node.jobType;
             return node;
@@ -973,6 +999,20 @@ export default {
       } else {
         // 为node信息添加modelType字段方便脚本格式判断
         arg[0].modelType = ext[arg[0].type];
+        // dpms  /product/100199/story/detail/365928 配置了模板则传递参数时根据配置过滤
+        if (arg[0].params && arg[0].params.configuration && arg[0].params.configuration.startup["ec.conf.templateId"]) {
+          arg[0].nodeUiVOS.forEach((item) => {
+            let show = this.$refs.nodeParameter.checkShow(item, arg[0]);
+            if (show === false) {
+              if (typeof item.condition === 'string' && item.condition && item.condition.indexOf('configuration.startup') > -1) {
+                delete arg[0].params.configuration.startup[item.key];
+              }
+              if (typeof item.condition === 'string' && item.condition && item.condition.indexOf('configuration.runtime') > -1) {
+                delete arg[0].params.configuration.runtime[item.key];
+              }
+            }
+          })
+        }
         this.$emit('node-dblclick', arg);
       }
     },
@@ -1059,6 +1099,10 @@ export default {
           item.businessTag = node.businessTag;
           item.modifyUser = this.getUserName();
           item.modifyTime = Date.now();
+          item.disabled = false;
+          if (item.params && node.params.configuration && node.params.configuration.special) {
+            item.disabled = node.params.configuration.special['auto.disabled'] === 'true';
+          }
         }
         item.selected = item.key === node.key
         return item;
@@ -1683,11 +1727,12 @@ export default {
         cb(false);
       });
     },
-    addNode(node) {
+    async addNode(node) {
       // 关闭右侧弹窗
       this.nodebaseinfoShow = false;
       // 新拖入的节点，自动生成新的不重复名称,给名称后面加四位随机数
       node = this.bindNodeBasicInfo(node);
+      const templateList = await this.getTemplateDataByProject(node.type);
       this.clickCurrentNode = JSON.parse(JSON.stringify(node));
       this.clickCurrentNode.title = this.clickCurrentNode.title + '_' + Math.round(Math.random()*10000);
       // 弹窗提示由后台控制
@@ -1701,6 +1746,24 @@ export default {
             subItem.title = this.clickCurrentNode.title;
             subItem.modifyUser = this.getUserName();
             subItem.modifyTime = Date.now();
+            // 对于新增节点根据默认值情况做赋值
+            if (this.tabs[0].data.isDefaultReference === '1') {
+              templateList.forEach((v) => {
+                if(v.workflowDefault) {
+                  subItem.ecConfTemplateId = v.templateId;
+                  subItem.ecConfTemplateName = v.templateName;
+                  subItem.params = {
+                    configuration: {
+                      special: {},
+                      runtime: {},
+                      startup: {
+                        'ec.conf.templateId': v.templateId,
+                      }
+                    }
+                  }
+                }
+              });
+            }
           }
           return subItem;
         });

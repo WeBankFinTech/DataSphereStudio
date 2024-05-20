@@ -302,6 +302,9 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         JsonObject jsonObject = parser.parse(flowJson).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        if (nodeJsonArray == null) {
+            return gson.toJson(jsonObject);
+        }
         for (JsonElement element : nodeJsonArray) {
             JsonObject node = element.getAsJsonObject();
             JsonElement params = node.remove("params");

@@ -400,4 +400,14 @@ public class DSSFrameworkOrchestratorRestful {
 
         return Message.ok().data("history", history);
     }
+
+    @RequestMapping(value = "allType", method = RequestMethod.GET)
+    public Message allType(@RequestParam Long orchestratorId, @RequestParam String projectName) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        List<String> type = Arrays.asList(".sql",".hql",".jdbc", ".py", ".python", ".scala", ".sh");
+
+        return Message.ok().data("type", type);
+    }
 }

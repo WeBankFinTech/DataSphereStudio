@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.git.service.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.git.common.protocol.GitSearchLine;
 import com.webank.wedatasphere.dss.git.common.protocol.GitSearchResult;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
@@ -229,16 +230,39 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             gitSearchCommand.add(file);
             logger.info(gitSearchCommand.toString());
 
-            // subList 截断的List及子集 不允许List变更
-            final List<String> searchResult = process(gitSearchCommand);
+            List<String> searchResult = process(gitSearchCommand);
             List<String> subSearchResult = null;
             if (searchResult.size() > GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()) {
                 subSearchResult = new ArrayList<>(searchResult.subList(0, GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()));
             } else {
                 subSearchResult = searchResult;
             }
+            List<GitSearchLine> keyLines = new ArrayList<>();
+            for (String resultLine : subSearchResult) {
+                // 找到第一个冒号的位置
+                int colonIndex = resultLine.indexOf(':');
 
-            result.add(new GitSearchResult(file, subSearchResult));
+                // 如果存在冒号，去除它之前的所有内容 /testGit/test/.sql:1:test -> 1:test
+                if (colonIndex != -1 && colonIndex + 1 < resultLine.length()) {
+                    resultLine = resultLine.substring(colonIndex + 1);
+                    // 找到第二个冒号位置
+                    int colonIndexSec = resultLine.indexOf(':');
+                    if (colonIndexSec != -1 && colonIndexSec + 1 < resultLine.length()) {
+                        Integer num = Integer.valueOf(resultLine.substring(0, colonIndexSec));
+                        String line = resultLine.substring(colonIndexSec + 1);
+                        // 只添加符合要求的结果
+                        GitSearchLine searchLine = new GitSearchLine(num, line);
+                        keyLines.add(searchLine);
+                    }
+                }
+            }
+            // 处理文件路径 /data/GitInstall/testGit/test/.sql -> testGit/test/.sql
+            String pre = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue())+ "/";
+            if (file.startsWith(pre)) {
+                file = file.substring(pre.length());
+            }
+
+            result.add(new GitSearchResult(file, keyLines));
         }
 
 

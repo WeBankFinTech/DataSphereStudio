@@ -41,7 +41,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
         }
-        Repository repository;
+        Repository repository = null;
         try {
             // Http请求Git，创建project
             DSSGitUtils.init(request.getProjectName(), gitUser);
@@ -51,7 +51,8 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 本地创建Git项目
             DSSGitUtils.create(request.getProjectName(), gitUser);
             // 获取git项目
-            File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator +".git");
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            File repoDir = new File(gitPath);
             repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
             // 关联远端Git
             DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
@@ -62,6 +63,10 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);
 //            throw new DSSErrorException(010001, "create project failed");
+        } finally {
+            if (repository != null) {
+                repository.close();
+            }
         }
         return null;
     }

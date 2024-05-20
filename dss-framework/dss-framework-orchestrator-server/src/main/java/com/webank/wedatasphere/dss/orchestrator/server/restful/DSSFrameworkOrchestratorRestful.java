@@ -331,6 +331,7 @@ public class DSSFrameworkOrchestratorRestful {
     @RequestMapping(path = "gitUrl", method = RequestMethod.GET)
     public Message gitUrl(@RequestParam(required = true, name = "projectName") String projectName,
                           @RequestParam(required = false, name = "workflowName") String workflowName,
+                          @RequestParam(required = false, name = "workflowNodeName") String workflowNodeName,
                           HttpServletResponse response) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);

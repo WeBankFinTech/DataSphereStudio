@@ -3,10 +3,14 @@ export function getThemeColorConsants(theme) {
   const isDark = themeInfo == 'dark'
   const themeColor = isDark ? {
     nodeBg: '#2a303c',
-    nodeColor: 'rgba(255,255,255,0.65)'
+    nodeColor: 'rgba(255,255,255,0.65)',
+    nodeDisabledBg: '#515a6f',
+    nodeDisabledColor: '#999'
   } : {
     nodeBg: '#eee',
-    nodeColor: '#1E232D'
+    nodeColor: '#1E232D',
+    nodeDisabledBg: '#fafafa',
+    nodeDisabledColor: '#cfd0d3'
   }
   return themeColor
 }

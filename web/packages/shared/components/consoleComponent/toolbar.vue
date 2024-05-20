@@ -132,7 +132,7 @@
                 $t('message.common.toolbar.autoformat')
               }}</Checkbox>
             </Row>
-            <div v-if="isAll || +download.format === 1">
+            <div v-if="isApiAll || isNotApiAll || +download.format === 1">
               <Row class="row-item">
                 {{ $t('message.common.toolbar.downloadMode') }}
               </Row>
@@ -283,11 +283,14 @@ export default {
     }
   },
   computed: {
-    isAll() {
+    isNotApiAll() {
       return (
-        ['hql', 'sql'].includes(this.script.runType) &&
+        ['hql', 'sql', 'tsql'].includes(this.script.runType) &&
         this.download.format === '2' && this.getResultUrl !== 'dss/apiservice'
       )
+    },
+    isApiAll() {
+      return this.download.format === '2' && this.getResultUrl === 'dss/apiservice'
     },
     toolbarShow() {
       let isScriptis =
@@ -431,7 +434,7 @@ export default {
               flag = true
             }
           } else if (
-            this.isAll &&
+            this.isNotApiAll &&
             this.allDownload &&
             +this.download.format == 2
           ) {
@@ -439,6 +442,17 @@ export default {
             temPath = temPath.substring(0, temPath.lastIndexOf('/'))
             apiPath = `${this.getResultUrl}/resultsetsToExcel`
             querys += `&outputFileName=${filename}&path=${temPath}`
+            let url =
+              `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
+              querys
+            flag = this.downloadFile(url, temPath)
+          } else if (
+            this.isApiAll &&
+            this.allDownload && 
+            +this.download.format == 2
+          ) {
+            temPath = temPath.substring(0, temPath.lastIndexOf('/'))
+            querys += `&outputFileName=${filename}&path=${temPath}&isFullExcel=true`
             let url =
               `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
               querys

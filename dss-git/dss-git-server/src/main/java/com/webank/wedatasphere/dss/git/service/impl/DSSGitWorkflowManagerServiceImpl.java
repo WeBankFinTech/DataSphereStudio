@@ -67,7 +67,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
             diff = DSSGitUtils.diff(request.getProjectName(), fileList);
             // 重置本地
-            DSSGitUtils.reset(request.getProjectName());
+            DSSGitUtils.reset(repository, request.getProjectName());
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
         }
@@ -346,7 +346,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
-            String content = DSSGitUtils.getTargetCommitFileContent(request.getProjectName(), request.getCommitId(), request.getFilePath());
+            String content = DSSGitUtils.getTargetCommitFileContent(repository, request.getProjectName(), request.getCommitId(), request.getFilePath());
             String fullpath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getFilePath());
             File file = new File(fullpath);
             String fileName = file.getName();
@@ -451,7 +451,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 回滚
-            DSSGitUtils.checkoutTargetCommit(request);
+            DSSGitUtils.checkoutTargetCommit(repository, request);
             // push
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, "revert by : " + request.getUsername());
 

@@ -402,7 +402,7 @@ public class DSSFrameworkOrchestratorRestful {
     }
 
     @RequestMapping(value = "allType", method = RequestMethod.GET)
-    public Message allType(@RequestParam Long orchestratorId, @RequestParam String projectName) {
+    public Message allType(HttpServletRequest req) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 

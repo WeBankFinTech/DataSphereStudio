@@ -3,12 +3,14 @@ package com.webank.wedatasphere.dss.git.utils;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
+import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitBaseRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -48,7 +50,7 @@ import java.util.Set;
 public class DSSGitUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
-    public static void init(String projectName, GitUserEntity gitUserDO) throws DSSErrorException {
+    public static void init(String projectName, GitUserEntity gitUserDO) {
         if (checkProjectName(projectName, gitUserDO)) {
             try {
                 URL url = new URL(GitServerConfig.GIT_URL_PRE.getValue() + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue());
@@ -71,28 +73,30 @@ public class DSSGitUtils {
                 connection.disconnect();
                 logger.info("init success");
             } catch (Exception e) {
-               logger.error("init failed by ", e);
+               throw new GitErrorException(80001, "git init failed, the reason is: ", e);
             }
         } else {
-            logger.info("projectName {} already exists", projectName);
+            throw new GitErrorException(80001, "git init failed, the reason is: projectName " + projectName +" already exists");
         }
     }
 
     public static void remote(Repository repository, String projectName, GitUserEntity gitUser) {
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator + ".git");
-
+        // 拼接git remote Url
+        String remoteUrl = GitServerConfig.GIT_URL_PRE.getValue() + gitUser.getGitUser() + File.separator + projectName + ".git";
         try {
             Git git = new Git(repository);
 
             // 添加远程仓库引用
             git.remoteAdd()
                     .setName("origin")
-                    .setUri(new URIish(GitServerConfig.GIT_URL_PRE.getValue() + gitUser.getGitUser() + File.separator + projectName +".git"))
+                    .setUri(new URIish(remoteUrl))
                     .call();
 
             logger.info("remote success");
-        } catch (GitAPIException | URISyntaxException e) {
-            logger.error("remote failed by : ", e);
+        } catch (URISyntaxException e) {
+            throw new GitErrorException(80001, "connect Uri " + remoteUrl +" failed, the reason is: ", e);
+        } catch (GitAPIException  e) {
+            throw new GitErrorException(80001, "remote git failed, the reason is: ", e);
         }
 
     }
@@ -101,7 +105,7 @@ public class DSSGitUtils {
     public static void create(String projectName, GitUserEntity gitUserDO) {
         logger.info("start success");
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName); // 指定仓库的目录
-        File respo = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator +  projectName + File.separator +".git");
+        File respo = new File(generateGitPath(projectName));
         if (!respo.exists()) {
             try {
                 // 初始化仓库
@@ -113,47 +117,42 @@ public class DSSGitUtils {
 
                 git.close(); // 不再需要时关闭Git对象
             } catch (GitAPIException e) {
-                logger.error("gitCreate failed by : ", e);
+                throw new GitErrorException(80001, "git Create failed, the reason is: ", e);
             }
+        } else {
+            logger.info(respo + " already exists");
         }
     }
 
     public static void pull(Repository repository, String projectName, GitUserEntity gitUser) {
         try {
-            // Opening the repository
             Git git = new Git(repository);
 
-            // Pulling changes from the remote repository
-            PullCommand pullCmd = git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser.getGitUser(), gitUser.getGitToken()));
-            PullResult result = pullCmd.call();
+            int i = 1;
+            while (true) {
+                i += 1;
+                // 拉取远程仓库更新至本地
+                PullCommand pullCmd = git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser.getGitUser(), gitUser.getGitToken()));
+                PullResult result = pullCmd.call();
 
-            // Checking the pull result
-            if(result.isSuccessful()) {
-                logger.info("Pull successful!");
-            } else {
-                logger.info("Pull failed: " + result.toString());
-                // 冲突时以远程仓库为准
-                if (result.getMergeResult().getConflicts() != null) {
-                    logger.info("Conflicts occurred. Resolving with remote as priority...");
-                    result.getMergeResult().getConflicts().keySet().forEach(path -> {
-                        try {
-                            // 检出冲突文件的远程版本
-                            git.checkout().setStartPoint("origin/" + result.getFetchResult().getTrackingRefUpdates().iterator().next().getRemoteName())
-                                    .addPath(path)
-                                    .call();
-                            // 添加解决后的文件到暂存区
-                            git.add().addFilepattern(path).call();
-                        } catch (GitAPIException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                    // 提交合并
-                    git.commit().setMessage("Merge resolved with remote as priority").call();
+                // 成功直接返回，失败清空本地修改重试最多3次
+                if (result.isSuccessful()) {
+                    logger.info("Pull successful!");
+                    break;
+                } else if (i <= 3){
+                    logger.info("Pull failed : " + result.toString());
+                    // 冲突时以远程仓库为准
+                    if (result.getMergeResult().getConflicts() != null) {
+                        logger.info("Conflicts occurred. Resolving with remote as priority...");
+                        // 丢失本地修改，处理冲突
+                        reset(repository, projectName);
+                    }
+                }else {
+                    throw new GitErrorException(80001, "git pull failed");
                 }
             }
-
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
+            throw new GitErrorException(80001, "git pull failed, the reason is: ", e);
         }
     }
 
@@ -232,46 +231,43 @@ public class DSSGitUtils {
 
             logger.info("Changes pushed to remote repository.");
         } catch (GitAPIException e) {
-            logger.error("push failed, the reeason is ", e);
+            reset(repository, projectName);
+            throw new GitErrorException(80001, "git push failed, the reason is: ", e);
         }
     }
 
 
-    public static void reset(String projectName) {
-        String repoPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator + ".git"; // 仓库路径
-        try (Repository repository = new FileRepositoryBuilder()
-                .setGitDir(new File(repoPath))
-                .build();
-             Git git = new Git(repository)) {
+    public static void reset(Repository repository, String projectName) {
+        try {
+            Git git = new Git(repository);
 
             git.reset().setMode(ResetCommand.ResetType.HARD).call();
 
             git.clean().setForce(true).setCleanDirectories(true).call();
 
-            logger.info("File has been unstaged: " + projectName);
-        } catch (GitAPIException | IOException e) {
-            logger.error("reset failed, the reason is ", e);
+            logger.info("git reset success : " + projectName);
+        } catch (GitAPIException e) {
+            throw new GitErrorException(80001, "git reset failed, the reason is: ", e);
         }
     }
 
-    public static void checkoutTargetCommit(GitRevertRequest request) throws GitAPIException, IOException {
+    public static void checkoutTargetCommit(Repository repository, GitRevertRequest request) throws GitAPIException, IOException {
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName()+ File.separator + ".git");
         String commitId = request.getCommitId(); // 替换为目标commit的完整哈希值
 
-        try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-             Git git = new Git(repository)) {
-
+        try {
+            Git git = new Git(repository);
             // 检出（回滚）指定commit的文件版本
             git.checkout()
                     .setStartPoint(commitId)
                     .addPath(request.getPath())
                     .call();
 
+            logger.info("git check out success");
             logger.info("File " + repoDir.getAbsolutePath() + " has been rolled back to the version at commit: " + commitId);
 
-        } catch (GitAPIException | IOException e) {
-            logger.error("check out failed by : ", e);
-            throw e;
+        } catch (GitAPIException e) {
+            throw new GitErrorException(80001, "git check out failed, the reason is: ", e);
         }
     }
 
@@ -286,8 +282,7 @@ public class DSSGitUtils {
             } catch (DSSErrorException e) {
                 logger.info("getAllProjectName failed, try again");
                 if (retry >= 3) {
-                    logger.error("getAllProjectName failed, the reason is: ", e);
-                    throw new DSSErrorException(01001, "getAllProjectName failed");
+                    throw new GitErrorException(80001, "getAllProjectName failed, the reason is: ", e);
                 }
             }
         }
@@ -300,7 +295,7 @@ public class DSSGitUtils {
 
         List<String> projectNames = new ArrayList<>();
         do {
-        String gitLabUrl = "http://git.bdp.weoa.com/api/v4/projects?per_page=100&page=" + page; // 修改为你的GitLab实例的URL
+        String gitLabUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/projects?per_page=100&page=" + page; // 修改为你的GitLab实例的URL
         // 创建HttpClient实例
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             // 创建HttpGet请求
@@ -320,13 +315,11 @@ public class DSSGitUtils {
                 logger.info("projectNames is: {}", projectNames.toString());
                 // 添加到总项目列表中
                 allProjectNames.addAll(projectNames);
-            } catch (Exception e) {
-                logger.error("getProjectsName failed, the reason is JSON: ", e);
-                throw new DSSErrorException(010001, "json 解析失败");
             }
         } catch (IOException e) {
-            logger.info("getProjectsName failed, the reason is: ", e);
-            throw new DSSErrorException(010001, "Internal error，网络请求失败");
+            throw new GitErrorException(80001, "getProjectsName failed, the reason is ", e);
+        } catch (Exception e) {
+            throw new GitErrorException(80001, "getProjectsName failed, the reason is JSON: ", e);
         }
             page++;
         } while (projectNames.size() > 0);
@@ -381,15 +374,14 @@ public class DSSGitUtils {
 
             return tree;
         } catch (IOException | GitAPIException e) {
-            logger.error("get git status Failed, the reason is : ", e);
-            return new HashSet<>();
+            throw new GitErrorException(80001, "git status failed, the reason is : ", e);
         }
     }
 
     public static void archive(String projectName, GitUserEntity gitUserDO) {
         try {
             String projectUrlEncoded = java.net.URLEncoder.encode(gitUserDO.getGitUser() + "/" + projectName, "UTF-8");
-            URL url = new URL("http://git.bdp.weoa.com/api/v4/projects/" + projectUrlEncoded + "/archive");
+            URL url = new URL(GitServerConfig.GIT_URL_PRE + "/api/v4/projects/" + projectUrlEncoded + "/archive");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("PRIVATE-TOKEN", gitUserDO.getGitToken());
@@ -410,7 +402,7 @@ public class DSSGitUtils {
             logger.info(response.toString());
 
         } catch (Exception e) {
-            logger.error("archive failed by : ", e);
+            throw new GitErrorException(80001, "git archive failed, the reason is : ", e);
         }
     }
 
@@ -427,82 +419,56 @@ public class DSSGitUtils {
             // 删除本地文件
             FileUtils.removeDirectory(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName);
             logger.info("Remote 'origin' removed successfully.");
-        } catch (GitAPIException | IOException e) {
-            logger.error("revert remote failed, the reason is: ",e);
-        }
-    }
-
-    public static void updateLocal(GitBaseRequest request, String filePath) {
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + ".git");
-        Repository repository = null;
-        try {
-            repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-        } catch (IOException e) {
-            logger.error("get remote repos Failed, the reason is : ", e);
-        }
-        try (Git git = new Git(repository)) {
-            git.reset().addPath(filePath).setMode(ResetCommand.ResetType.HARD).setRef("origin/master").call();
-            logger.info("File has been unstaged: " + filePath);
         } catch (GitAPIException e) {
-            logger.error("updateLocal repos Failed, the reason is : ", e);
+            throw new GitErrorException(80001, "git archive failed, the reason is : ", e);
+        } catch (IOException e) {
+            throw new GitErrorException(80001, "archive failed, the reason is : ", e);
         }
     }
 
-    public static String getTargetCommitFileContent(String projectName, String commitId, String filePath) {
-        String repoPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator +".git";
+    public static String getTargetCommitFileContent(Repository repository, String projectName, String commitId, String filePath) {
         String content = "";
         try {
-            FileRepositoryBuilder repositoryBuilder = new FileRepositoryBuilder();
-            try (Repository repository = repositoryBuilder.setGitDir(new File(repoPath))
-                    .readEnvironment()
-                    .findGitDir()
-                    .build()) {
-
-                ObjectId lastCommitId = repository.resolve(commitId);
-
-                // Instantiate a RevWalk to walk over commits based on some criteria
-                try (RevWalk revWalk = new RevWalk(repository)) {
-                    RevCommit commit = revWalk.parseCommit(lastCommitId);
-                    RevTree tree = commit.getTree();
-                    logger.info("Having tree: " + tree);
-
-                    // Now use a TreeWalk to iterate over all files in the Tree recursively
-                    // You can set filters to narrow down the results if needed
-                    try (TreeWalk treeWalk = new TreeWalk(repository)) {
-                        treeWalk.addTree(tree);
-                        treeWalk.setRecursive(true);
-                        treeWalk.setFilter(PathFilter.create(filePath));
-                        if (!treeWalk.next()) {
-                            throw new IllegalStateException("Did not find expected file '" + filePath + "'");
-                        }
-
-                        ObjectId objectId = treeWalk.getObjectId(0);
-                        try {
-                            ObjectLoader loader = repository.open(objectId);
-                            byte[] bytes = loader.getBytes();
-                            content = new String(bytes);
-                            logger.info("File content: " + content);
-                        } catch (Exception e) {
-                            logger.error("getFileContent Failed, the reason is: ", e);
-                        }
+            // 获取最新的commitId
+            ObjectId lastCommitId = repository.resolve(commitId);
+            // 获取提交记录
+            try (RevWalk revWalk = new RevWalk(repository)) {
+                RevCommit commit = revWalk.parseCommit(lastCommitId);
+                RevTree tree = commit.getTree();
+                logger.info("Having tree: " + tree);
+                // 遍历获取最近提交记录
+                try (TreeWalk treeWalk = new TreeWalk(repository)) {
+                    treeWalk.addTree(tree);
+                    treeWalk.setRecursive(true);
+                    treeWalk.setFilter(PathFilter.create(filePath));
+                    if (!treeWalk.next()) {
+                        throw new IllegalStateException("Did not find expected file '" + filePath + "'");
                     }
 
-                    revWalk.dispose();
+                    ObjectId objectId = treeWalk.getObjectId(0);
+                    try {
+                        ObjectLoader loader = repository.open(objectId);
+                        byte[] bytes = loader.getBytes();
+                        content = new String(bytes);
+                        logger.info("File content: " + content);
+                    } catch (Exception e) {
+                        logger.error("getFileContent Failed, the reason is: ", e);
+                    }
                 }
+                revWalk.dispose();
             }
         } catch (IOException e) {
-            logger.error("getFileContent Failed, the reason is: ", e);
+            throw new GitErrorException(80001, "getFileContent failed, the reason is : ", e);
         }
         return content;
     }
 
-    public static void getCommitId(String projectName, int num) {
+    public static void getCommitId(Repository repository, String projectName, int num) {
         // 获取当前CommitId，
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator +".git");
 
-        try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-             Git git = new Git(repository)) {
-
+        try {
+            Git git = new Git(repository);
             Iterable<RevCommit> commits = git.log().setMaxCount(num).call();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -518,8 +484,8 @@ public class DSSGitUtils {
                 logger.info("Commit Message: " + commitMessage);
                 logger.info("Commit Author: " + commitAuthor);
             }
-        } catch (IOException | GitAPIException e) {
-            logger.error("get git log failed, the reason is: ", e);
+        } catch (GitAPIException e) {
+            throw new GitErrorException(80001, "git log failed, the reason is : ", e);
         }
     }
 
@@ -540,8 +506,7 @@ public class DSSGitUtils {
                 return commitResponse; // 返回commitId字符串
             }
         } catch (IOException e) {
-            logger.error("get current commit failed, the reason is : ", e);
-            return null;
+            throw new GitErrorException(80001, "get current commit failed, the reason is : ", e);
         }
     }
 
@@ -563,26 +528,20 @@ public class DSSGitUtils {
 
             return commitResponseList;
         } catch (GitAPIException e) {
-            logger.error("get latestCommitId failed, the reason is: ", e);
-            return null;
+            throw new GitErrorException(80001, "get latestCommitId failed, the reason is : ", e);
         }
     }
 
-    public static GitHistoryResponse listCommitsBetween(Repository repository, String startCommitId, String endCommitId) throws Exception {
+    public static GitHistoryResponse listCommitsBetween(Repository repository, String oldCommitId, String newCommitId) throws Exception {
         List<GitCommitResponse> gitCommitResponseList = new ArrayList<>();
-
-        ObjectId start = repository.resolve(startCommitId);
-        ObjectId end = repository.resolve(endCommitId);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try (RevWalk walk = new RevWalk(repository)) {
-            RevCommit startCommit = walk.parseCommit(start);
-            RevCommit endCommit = walk.parseCommit(end);
+            Git git = new Git(repository);
 
-            walk.markStart(startCommit);
-            if (endCommit.getParentCount() > 0) {  // Check if endCommit has any parents
-                walk.markUninteresting(walk.parseCommit(endCommit.getParent(0))); // Mark parent of end commit as uninteresting
-            }
+            Iterable<RevCommit> commits = git.log()
+                    .addRange(repository.resolve(oldCommitId), repository.resolve(newCommitId))
+                    .call();
 
             for (RevCommit commit : walk) {
                 PersonIdent authorIdent = commit.getAuthorIdent(); // 获取提交人信息
@@ -597,6 +556,8 @@ public class DSSGitUtils {
                 logger.info("Commit Message: " + commit.getFullMessage()); // 提交信息
                 logger.info("Author: " + authorIdent.getName() + " <" + authorIdent.getEmailAddress() + ">"); // 提交人
             }
+        } catch (Exception e) {
+            throw new GitErrorException(80001, "get log between " + oldCommitId + " and " + newCommitId + "failed, the reason is : ", e);
         }
         GitHistoryResponse historyResponse = new GitHistoryResponse();
         historyResponse.setResponses(gitCommitResponseList);

@@ -23,11 +23,20 @@ import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchestratorInfos;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
@@ -43,6 +52,7 @@ import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +102,9 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     @Autowired
     private DSSFlowService flowService;
 
+    protected Sender getOrchestratorSender() {
+        return DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+    }
 
 
     @Override
@@ -105,11 +118,14 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         //生成rootflow及所有子flow的Relations
         List<Long> flowIds = dssFlowList.stream().map(DSSFlow::getId).collect(Collectors.toList());
         List<DSSFlowRelation> flowRelations = flowIds.isEmpty() ? new ArrayList<>() : flowMapper.listFlowRelation(flowIds);
+        // 生成rootflow orchestrator信息
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx
         String projectPath = IoUtils.generateProjectIOPath(userName, projectName);
         // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx/.flowmeta/flow_all_type_node/
         String flowMetaPath = IoUtils.generateFlowMetaIOPath(projectPath, rootFlow.getName());
-        metaExportService.exportFlowBaseInfoNew(dssFlowList, flowRelations, flowMetaPath);
+        metaExportService.exportFlowBaseInfoNew(orchestratorVo, dssFlowList, flowRelations, flowMetaPath);
         logger.info(userName + "-开始导出Flow：" + rootFlow.getName());
         List<DSSFlow> dssFlows = new ArrayList<>();
         for (DSSFlow dssFlow : dssFlowList) {

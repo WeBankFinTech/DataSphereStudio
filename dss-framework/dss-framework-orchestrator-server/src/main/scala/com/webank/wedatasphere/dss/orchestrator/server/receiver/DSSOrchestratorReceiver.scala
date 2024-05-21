@@ -90,12 +90,15 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
     case requestQueryByIdOrchestrator: RequestQueryByIdOrchestrator => {
       val orcVersionId = requestQueryByIdOrchestrator.getOrcVersionId
       val orchestratorId = requestQueryByIdOrchestrator.getOrchestratorId
-      if (orchestratorId != null) {
+      if (orcVersionId != null) {
         orchestratorService.getOrchestratorVoByIdAndOrcVersionId(orchestratorId, orcVersionId)
       } else {
         orchestratorService.getOrchestratorVoById(orchestratorId)
       }
     }
+
+    case requestQuertByAppIdOrchestrator: RequestQuertByAppIdOrchestrator =>
+      orchestratorService.getOrchestratorByAppId(requestQuertByAppIdOrchestrator.getAppId)
 
     case _ => throw new DSSErrorException(90000, "Not support message type " + message)
   }

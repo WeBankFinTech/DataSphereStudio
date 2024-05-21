@@ -38,6 +38,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitRespons
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
@@ -664,6 +665,15 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
 
         return new ChromeDriver(options);
+    }
+
+    @Override
+    public OrchestratorVo getOrchestratorByAppId(Long appId) {
+        OrchestratorInfo orcInfoByAppId = orchestratorMapper.getOrcInfoByAppId(appId);
+        if (orcInfoByAppId == null) {
+            return null;
+        }
+        return getOrchestratorVoById(orcInfoByAppId.getOrchestratorId());
     }
 
 }

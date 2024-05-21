@@ -1,7 +1,7 @@
 package com.webank.wedatasphere.dss.git.common.protocol.response;
 
 
-public class GitArchivePorjectResponse extends GitBaseResponse {
+public class GitArchivePorjectResponse{
     private String projectName;
 
     public GitArchivePorjectResponse(String projectName) {
@@ -9,10 +9,6 @@ public class GitArchivePorjectResponse extends GitBaseResponse {
     }
 
     public GitArchivePorjectResponse() {
-    }
-
-    public GitArchivePorjectResponse(String status, int index, String message) {
-        super(status, index, message);
     }
 
     public String getProjectName() {

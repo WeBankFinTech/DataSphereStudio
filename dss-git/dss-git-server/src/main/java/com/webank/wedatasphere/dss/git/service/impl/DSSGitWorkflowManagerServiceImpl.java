@@ -91,7 +91,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
             // 解压BML文件到本地
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
-            List<String> fileList = new ArrayList<>(bmlResourceMap.keySet());
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
@@ -305,7 +304,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
-            List<String> fileList = request.getDeleteFileList();
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             List<String> deleteFileList = request.getDeleteFileList();
@@ -342,7 +340,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
-            List<String> fileList = Collections.singletonList(request.getFilePath());
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
@@ -416,7 +413,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser);){
-            List<String> fileList = Collections.singletonList(request.getFilepath());
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
@@ -447,7 +443,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
-            List<String> fileList = Collections.singletonList(request.getPath());
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 回滚
@@ -481,7 +476,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
-            List<String> fileList = request.getPath();
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 同步删除对应节点
@@ -540,5 +534,27 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             logger.error("pull failed, the reason is ",e);
         }
         return commitResponse;
+    }
+
+    public GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) {
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        if (gitUser == null) {
+            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+            return null;
+        }
+        GitHistoryResponse response = new GitHistoryResponse();
+        // 拼接.git路径
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        // 获取git仓库
+        File repoDir = new File(gitPath);
+        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+            // 本地保持最新状态
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+
+            response = DSSGitUtils.listCommitsBetween(repository, request.getOldCommitId(), request.getNewCommitId(), request.getDirName());
+        } catch (Exception e) {
+            logger.error("pull failed, the reason is ",e);
+        }
+        return response;
     }
 }

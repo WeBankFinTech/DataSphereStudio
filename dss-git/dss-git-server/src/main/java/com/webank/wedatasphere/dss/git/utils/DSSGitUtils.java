@@ -532,7 +532,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static GitHistoryResponse listCommitsBetween(Repository repository, String oldCommitId, String newCommitId) throws Exception {
+    public static GitHistoryResponse listCommitsBetween(Repository repository, String oldCommitId, String newCommitId, String path) throws Exception {
         List<GitCommitResponse> gitCommitResponseList = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -541,6 +541,7 @@ public class DSSGitUtils {
 
             Iterable<RevCommit> commits = git.log()
                     .addRange(repository.resolve(oldCommitId), repository.resolve(newCommitId))
+                    .addPath(path)
                     .call();
 
             for (RevCommit commit : walk) {

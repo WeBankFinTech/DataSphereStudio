@@ -342,9 +342,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         } else if (orchestratorCopyRequest.getWorkflowNodeSuffix().length() > 10) {
             DSSExceptionUtils.dealErrorException(6014, "The node suffix length can not exceed 10. (节点后缀长度不能超过10)", DSSOrchestratorErrorException.class);
         }
+        String dssLabel = null;
+        if (orchestratorCopyRequest.getLabels()!= null && orchestratorCopyRequest.getLabels().getRoute() != null) {
+            dssLabel = orchestratorCopyRequest.getLabels().getRoute();
+        } else {
+            dssLabel = DSSCommonUtils.ENV_LABEL_VALUE_DEV;
+        }
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
                 targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
-                orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV),
+                orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(dssLabel),
                 workspace, Sender.getThisInstance()).setCopyTaskId(null).build();
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);

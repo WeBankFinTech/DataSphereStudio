@@ -125,6 +125,8 @@ public class AppConnResourceServiceImpl implements AppConnResourceService {
         } catch (DSSErrorException e) {
             throw new AppConnHomeNotExistsWarnException(20350, "Unzip " + zipFilePath + " failed, AppConn is " + appConnName, e);
         }
+        //解压完了，zip包就没用了，删掉。
+        deleteFile(zipFilePath, "Delete the zip file " + zipFilePath.getName() + " of AppConn " + appConnName +  " failed");
 
         File oldIndexFile = AppConnIndexFileUtils.getIndexFile(appConnPath);
         // delete old index file.

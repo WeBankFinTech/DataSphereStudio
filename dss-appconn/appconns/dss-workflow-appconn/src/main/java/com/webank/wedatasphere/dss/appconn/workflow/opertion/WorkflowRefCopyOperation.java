@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -28,6 +29,7 @@ import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseCopyWorkflow
 import org.apache.linkis.rpc.Sender;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,7 +56,9 @@ public class WorkflowRefCopyOperation
                 workflowCopyRequestRef.getWorkspace(), appId, contextIdStr,
                 projectName, version, description, workflowCopyRequestRef.getDSSLabels(),
                 targetProjectId, (String) nodeSuffix.orElse(null), (String) newFlowName.orElse(null));
-        ResponseCopyWorkflow responseCopyWorkflow = RpcAskUtils.processAskException(sender.ask(requestCopyWorkflow),
+        List<DSSLabel> dssLabels = workflowCopyRequestRef.getDSSLabels();
+        Sender tempSend = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabels);
+        ResponseCopyWorkflow responseCopyWorkflow = RpcAskUtils.processAskException(tempSend.ask(requestCopyWorkflow),
                 ResponseCopyWorkflow.class, RequestCopyWorkflow.class);
         Map<String, Object> refJobContent = new HashMap<>(2);
         refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCopyWorkflow.getDssFlow().getId());

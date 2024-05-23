@@ -340,7 +340,8 @@ public class DSSFrameworkOrchestratorRestful {
         GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
         gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
         gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_READ_TYPE);
-
+        // 跳转git需解密处理
+        gitUserInfoRequest.setDecrypt(true);
         GitUserInfoResponse readInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
         String gitUsername = readInfoResponse.getGitUser().getGitUser();
         String gitPassword = readInfoResponse.getGitUser().getGitPassword();

@@ -3,26 +3,27 @@ package com.webank.wedatasphere.dss.git.service.impl;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
-import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
-import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.git.dao.DSSWorkspaceGitMapper;
 import com.webank.wedatasphere.dss.git.service.DSSWorkspaceGitService;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 @Service
@@ -114,6 +115,34 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         } catch (Exception e) {
             throw new DSSErrorException(800001, "加密失败");
         }
+    }
+
+    public boolean gitTokenTest() {
+        String token = "DxusLyPpQsjy4SVWPnKC";  // 你的 GitLab 令牌
+        String expectedUsername = "zhaobincai";  // 期望匹配的用户名
+        String apiUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/user";  // GitLab API 用户信息端点
+
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            URIBuilder builder = new URIBuilder(apiUrl);
+            HttpGet request = new HttpGet(builder.build());
+            request.setHeader("PRIVATE-TOKEN", token);
+
+            HttpResponse response = client.execute(request);
+            String jsonResponse = EntityUtils.toString(response.getEntity());
+            JSONObject userData = new JSONObject(jsonResponse);
+
+            String actualUsername = userData.getString("username");
+
+            if (response.getStatusLine().getStatusCode() == 200 && actualUsername.equals(expectedUsername)) {
+                System.out.println("Token is valid and matches the username: " + actualUsername);
+            } else {
+                System.out.println("Token is invalid or does not match the expected username.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error verifying token: " + e.getMessage());
+        }
+
+        return true;
     }
 
 }

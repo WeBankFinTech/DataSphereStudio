@@ -55,6 +55,7 @@ import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.common.utils.ByteTimeUtils;
 import org.apache.linkis.common.utils.Utils;
@@ -216,9 +217,13 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Override
     public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        Long orchestratorId = flowRequest.getOrchestratorId();
+        String status = lockMapper.selectOrchestratorStatus(orchestratorId);
+        if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
+            throw new DSSErrorException(800001, "提交前请先保存工作流");
+        }
         releaseThreadPool.submit(() ->{
             //1. 异步提交，更新提交状态
-            Long orchestratorId = flowRequest.getOrchestratorId();
             try {
                 OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
                 if (orchestratorSubmitJob == null) {

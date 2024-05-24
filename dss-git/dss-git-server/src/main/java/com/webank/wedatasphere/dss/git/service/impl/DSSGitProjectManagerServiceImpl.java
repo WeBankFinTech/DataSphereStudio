@@ -4,6 +4,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
@@ -72,7 +73,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
     }
 
     @Override
-    public GitArchivePorjectResponse archive(GitArchiveProjectRequest request) {
+    public GitArchivePorjectResponse archive(GitArchiveProjectRequest request) throws GitErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());

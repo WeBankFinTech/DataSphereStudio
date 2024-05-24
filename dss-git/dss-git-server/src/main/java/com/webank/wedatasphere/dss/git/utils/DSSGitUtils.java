@@ -50,7 +50,7 @@ import java.util.Set;
 public class DSSGitUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
-    public static void init(String projectName, GitUserEntity gitUserDO) throws GitErrorException{
+    public static void init(String projectName, GitUserEntity gitUserDO) throws Exception{
         if (checkProjectName(projectName, gitUserDO)) {
             try {
                 URL url = new URL(GitServerConfig.GIT_URL_PRE.getValue() + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue());
@@ -82,7 +82,7 @@ public class DSSGitUtils {
 
     public static void remote(Repository repository, String projectName, GitUserEntity gitUser)throws GitErrorException {
         // 拼接git remote Url
-        String remoteUrl = GitServerConfig.GIT_URL_PRE.getValue() + gitUser.getGitUser() + File.separator + projectName + ".git";
+        String remoteUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + gitUser.getGitUser() + File.separator + projectName + ".git";
         try {
             Git git = new Git(repository);
 
@@ -186,7 +186,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static GitDiffResponse diff(String projectName, List<String> fileList) {
+    public static GitDiffResponse diff(String projectName, List<String> fileList)throws GitErrorException{
 
         Set<String> status = status(projectName, fileList);
         GitTree root = new GitTree("");

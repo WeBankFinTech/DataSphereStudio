@@ -22,6 +22,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerService {
@@ -59,7 +62,9 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
             // 提交
             String comment = "init project: " + request.getProjectName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
+            // 首次创建提交项目整体
+            List<String> paths = Arrays.asList(".");
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);

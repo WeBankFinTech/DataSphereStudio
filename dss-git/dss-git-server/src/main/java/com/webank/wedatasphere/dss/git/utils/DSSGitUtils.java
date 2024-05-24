@@ -208,14 +208,17 @@ public class DSSGitUtils {
 
 
 
-    public static void push(Repository repository, String projectName, GitUserEntity gitUser, String comment) throws GitErrorException{
+    public static void push(Repository repository, String projectName, GitUserEntity gitUser, String comment, List<String> paths) throws GitErrorException{
 
         try {
             Git git = new Git(repository);
             // 添加新增、更改到暂存区
-            git.add().addFilepattern(".").call(); // 添加所有更改
-            // 添加删除到暂存区
-            git.add().setUpdate(true).addFilepattern(".").call();
+            for (String path : paths) {
+                // 添加所有更改
+                git.add().addFilepattern(path).call();
+                // 添加删除到暂存区
+                git.add().setUpdate(true).addFilepattern(path).call();
+            }
 
             // 创建新的提交
             git.commit()

@@ -3,8 +3,10 @@ package com.webank.wedatasphere.dss.git.service.impl;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitConnectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitConnectResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
@@ -18,6 +20,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +32,7 @@ import java.util.Arrays;
 
 @Service
 public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private DSSWorkspaceGitMapper workspaceGitMapper;
@@ -117,10 +122,14 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         }
     }
 
-    public boolean gitTokenTest() {
-        String token = "DxusLyPpQsjy4SVWPnKC";  // 你的 GitLab 令牌
-        String expectedUsername = "zhaobincai";  // 期望匹配的用户名
-        String apiUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/user";  // GitLab API 用户信息端点
+    @Override
+    public GitConnectResponse gitTokenTest(GitConnectRequest connectTestRequest)throws DSSErrorException {
+        // GitLab 令牌
+        String token = connectTestRequest.getToken();
+        // 期望匹配的用户名
+        String expectedUsername = connectTestRequest.getUsername();
+        // GitLab API 用户信息接口
+        String apiUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/user";
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
             URIBuilder builder = new URIBuilder(apiUrl);
@@ -134,15 +143,16 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             String actualUsername = userData.getString("username");
 
             if (response.getStatusLine().getStatusCode() == 200 && actualUsername.equals(expectedUsername)) {
-                System.out.println("Token is valid and matches the username: " + actualUsername);
+                logger.info("Token is valid and matches the username: " + actualUsername);
+                return new GitConnectResponse(true);
             } else {
-                System.out.println("Token is invalid or does not match the expected username.");
+                logger.info("Token is invalid or does not match the expected username.");
+                return new GitConnectResponse(false);
             }
         } catch (Exception e) {
-            System.out.println("Error verifying token: " + e.getMessage());
+            logger.info("Error verifying token: " + e.getMessage());
+            throw new DSSErrorException(800001, "verifying token failed, the reason is:" + e);
         }
-
-        return true;
     }
 
 }

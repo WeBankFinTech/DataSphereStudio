@@ -53,7 +53,7 @@ public class DSSGitUtils {
     public static void init(String projectName, GitUserEntity gitUserDO) throws Exception, GitErrorException{
         if (checkProjectName(projectName, gitUserDO)) {
             try {
-                URL url = new URL(GitServerConfig.GIT_URL_PRE.getValue() + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue());
+                URL url = new URL(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/" +GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue());
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("PRIVATE-TOKEN", gitUserDO.getGitToken());
@@ -82,7 +82,7 @@ public class DSSGitUtils {
 
     public static void remote(Repository repository, String projectName, GitUserEntity gitUser)throws GitErrorException {
         // 拼接git remote Url
-        String remoteUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + gitUser.getGitUser() + File.separator + projectName + ".git";
+        String remoteUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/" +gitUser.getGitUser() + File.separator + projectName + ".git";
         try {
             Git git = new Git(repository);
 

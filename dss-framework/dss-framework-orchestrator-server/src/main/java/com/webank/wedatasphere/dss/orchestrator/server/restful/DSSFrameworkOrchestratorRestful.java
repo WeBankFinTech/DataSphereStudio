@@ -323,8 +323,13 @@ public class DSSFrameworkOrchestratorRestful {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
+        try {
+            orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
+        } catch (Exception e) {
+            return Message.error("提交工作流失败，请保存工作流重试，原因为：", e);
+        }
 
-        orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
+
         return Message.ok();
     }
 

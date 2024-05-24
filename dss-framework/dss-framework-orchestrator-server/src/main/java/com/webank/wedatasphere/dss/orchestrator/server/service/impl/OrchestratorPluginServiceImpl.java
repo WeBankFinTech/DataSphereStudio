@@ -216,7 +216,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+    public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException {
         Long orchestratorId = flowRequest.getOrchestratorId();
         String status = lockMapper.selectOrchestratorStatus(orchestratorId);
         if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {

@@ -618,7 +618,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             elementPassWord.sendKeys(gitPassword);
             elementBtn.submit();
             driver.navigate().refresh();
-            LOGGER.info("for user getting... " + UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
+            LOGGER.info("for user getting... " + UrlUtils.normalizeIp(gitUrlPre));
             Set<Cookie> cookies = driver.manage().getCookies();
             LOGGER.info("cookies： {}", cookies.toString());
             for (Cookie cookie:cookies) {

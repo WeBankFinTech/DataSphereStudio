@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutionException;
 public interface DSSGitProjectManagerService {
     GitCreateProjectResponse create(GitCreateProjectRequest request) throws ExecutionException, InterruptedException;
 
-    GitArchivePorjectResponse archive(GitArchiveProjectRequest request) throws ExecutionException, InterruptedException;
+    GitArchivePorjectResponse archive(GitArchiveProjectRequest request) throws DSSErrorException;
 
     GitCheckProjectResponse checkProject(GitCheckProjectRequest request) throws DSSErrorException;
 

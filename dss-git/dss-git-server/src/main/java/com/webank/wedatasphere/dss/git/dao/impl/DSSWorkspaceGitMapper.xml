@@ -18,8 +18,8 @@
 
 <mapper namespace="com.webank.wedatasphere.dss.git.dao.DSSWorkspaceGitMapper">
     <insert id="insert" parameterType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
-        insert into dss_workspace_associate_git (workspace_id, git_user, git_password, git_token, create_time, update_time, create_by, update_by, type)
-        VALUES (#{workspaceId}, #{gitUser}, #{gitPassword}, #{gitToken}, now(), now(), #{createBy}, #{updateBy}, #{type})
+        insert into dss_workspace_associate_git (workspace_id, git_user, git_password, git_token, git_url, create_time, update_time, create_by, update_by, type)
+        VALUES (#{workspaceId}, #{gitUser}, #{gitPassword}, #{gitToken}, #{gitUrl}, now(), now(), #{createBy}, #{updateBy}, #{type})
     </insert>
 
     <update id="update" parameterType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
@@ -40,7 +40,7 @@
     </update>
 
     <select id="selectByWorkspaceId" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
-        select id, workspace_id, git_user, git_token, create_time, update_time, create_by, update_by, type
+        select id, workspace_id, git_user, git_token, git_url, create_time, update_time, create_by, update_by, type
         from dss_workspace_associate_git
         where workspace_id = #{workspaceId} and `type` = #{type}
     </select>

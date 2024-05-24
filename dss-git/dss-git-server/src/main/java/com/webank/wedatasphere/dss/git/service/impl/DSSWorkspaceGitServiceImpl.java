@@ -97,10 +97,14 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
 
     @Override
     public GitUserEntity selectGit(Long workspaceId, String type) {
-        GitUserEntity gitUserEntity = workspaceGitMapper.selectByWorkspaceId(workspaceId, type);
-        String decryptPassword = generateKeys(gitUserEntity.getGitToken(), Cipher.DECRYPT_MODE);
-        gitUserEntity.setGitToken(decryptPassword);
-        return gitUserEntity;
+        try {
+            GitUserEntity gitUserEntity = workspaceGitMapper.selectByWorkspaceId(workspaceId, type);
+            String decryptPassword = generateKeys(gitUserEntity.getGitToken(), Cipher.DECRYPT_MODE);
+            gitUserEntity.setGitToken(decryptPassword);
+            return gitUserEntity;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private String generateKeys(String password, int mode) throws DSSErrorException{

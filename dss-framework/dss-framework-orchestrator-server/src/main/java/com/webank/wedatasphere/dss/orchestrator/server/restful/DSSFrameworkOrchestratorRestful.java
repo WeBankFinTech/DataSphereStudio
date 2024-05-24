@@ -345,7 +345,7 @@ public class DSSFrameworkOrchestratorRestful {
         GitUserInfoResponse readInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
         String gitUsername = readInfoResponse.getGitUser().getGitUser();
         String gitPassword = readInfoResponse.getGitUser().getGitPassword();
-        String gitUrlPre = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
+        String gitUrlPre = UrlUtils.normalizeIp(readInfoResponse.getGitUser().getGitUrl());
         String authenToken = "";
         try {
             authenToken = orchestratorService.getAuthenToken(gitUrlPre, gitUsername, gitPassword);
@@ -354,7 +354,7 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("git登陆失败，请检查git节点配置的用户名/密码/url");
         }
         // 获取顶级域名 eg: ***REMOVED*** -> weoa.com
-        String domainIp = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
+        String domainIp = UrlUtils.normalizeIp(gitUrlPre);
         int lastDotIndex = domainIp.lastIndexOf(".");
         String topDomain = "";
         if (lastDotIndex != -1) {

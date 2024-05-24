@@ -59,6 +59,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         }
         if (oldGitUserDo == null) {
             gitUser.setCreateBy(userName);
+            gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
             workspaceGitMapper.insert(gitUser);
         }else {
             workspaceGitMapper.update(gitUser);

@@ -6,6 +6,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.GitSearchLine;
 import com.webank.wedatasphere.dss.git.common.protocol.GitSearchResult;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
@@ -390,12 +391,16 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     private Repository getRepository(File repoDir, String projectName, GitUserEntity gitUser) throws IOException {
         Repository repository = null;
-        // 当前机器不存在就新建
-        if (repoDir.exists()) {
-            repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-        } else {
-            repository = FileRepositoryBuilder.create(new File(String.valueOf(repoDir)));
-            DSSGitUtils.remote(repository, projectName, gitUser);
+        try {
+            // 当前机器不存在就新建
+            if (repoDir.exists()) {
+                repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
+            } else {
+                repository = FileRepositoryBuilder.create(new File(String.valueOf(repoDir)));
+                DSSGitUtils.remote(repository, projectName, gitUser);
+            }
+        } catch (Exception e) {
+            logger.info("get repository failed, the reason is: ", e);
         }
         return repository;
     }

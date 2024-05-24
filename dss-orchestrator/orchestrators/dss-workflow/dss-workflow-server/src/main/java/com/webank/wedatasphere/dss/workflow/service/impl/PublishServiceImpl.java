@@ -25,9 +25,8 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCurrentCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestrationStatus;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -92,13 +91,24 @@ public class PublishServiceImpl implements PublishService {
             }
             //仅对接入Git的项目更新状态为 发布-publish
             GitCommitResponse gitCommitResponse = null;
+            OrchestratorVo orchestratorVo = null;
             if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
+                orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(workflowId)),
+                        OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                if (orchestratorVo == null) {
+                    throw new DSSErrorException(800001, "编排不存在");
+                }
+                String status = lockMapper.selectOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId());
+                if (!org.apache.commons.lang3.StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_PUSH)) {
+                    throw new DSSErrorException(800001, "提交前请先提交工作流");
+                }
+
                 // 获取当前文件Commit
                 Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
                 GitCurrentCommitRequest currentCommitRequest = new GitCurrentCommitRequest(workspace.getWorkspaceId(), dssProject.getName(), convertUser, dssFlow.getName());
                 gitCommitResponse = RpcAskUtils.processAskException(sender.ask(currentCommitRequest), GitCommitResponse.class, GitCurrentCommitRequest.class);
                 // 更新commitId
-                lockMapper.updateOrchestratorStatus(workflowId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
+                lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
             }
             String schedulerAppConnName = workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME);
             if (StringUtils.isBlank(schedulerAppConnName)) {
@@ -117,7 +127,7 @@ public class PublishServiceImpl implements PublishService {
                 // 更新commitId
                 lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), dssFlow.getId());
                 // 更新工作流状态
-                lockMapper.updateOrchestratorStatus(workflowId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
+                lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
             }
 
             return response.getId();

@@ -24,5 +24,5 @@ public class GitServerConfig {
 
     public static final CommonVars<String> GIT_SEARCH_EXCLUDE_FILE = CommonVars.apply("wds.dss.server.git.search.exclude.file", ".properties");
 
-    public static final CommonVars<String> LINKIS_MYSQL_PUB_KEY = CommonVars.apply("wds.linkis.mysql.pub.key", "abc");
+    public static final CommonVars<String> LINKIS_MYSQL_PRI_KEY = CommonVars.apply("wds.linkis.mysql.pri.key", "abc");
 }

@@ -94,7 +94,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            List<String> paths = new ArrayList<>();
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
+                paths.add(entry.getKey());
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
                 FileUtils.update(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
             }
@@ -102,7 +104,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
         } catch (Exception e) {
@@ -321,7 +323,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 提交
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser,"delete " + request.getDeleteFileList());
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser,"delete " + request.getDeleteFileList(), request.getDeleteFileList());
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
         }
@@ -453,7 +455,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 回滚
             DSSGitUtils.checkoutTargetCommit(repository, request);
             // push
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, "revert by : " + request.getUsername());
+            List<String> paths = Arrays.asList(request.getPath());
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, "revert by : " + request.getUsername(), paths);
 
             List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getPath(), 1);
             if (CollectionUtils.isEmpty(latestCommit)) {
@@ -491,7 +494,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String comment = "delete workflowNode " + request.getPath().toString() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, request.getPath());
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
 
@@ -531,7 +534,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String comment = "rename workflowNode " + request.getName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
+            List<String> paths = Arrays.asList(request.getName());
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
 

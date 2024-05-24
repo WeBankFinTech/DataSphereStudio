@@ -103,7 +103,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         return gitUserEntity;
     }
 
-    private String generateKeys(String password, int mode) {
+    private String generateKeys(String password, int mode) throws DSSErrorException{
         // 定义一个字符串作为密钥源
         String keyString = GitServerConfig.LINKIS_MYSQL_PUB_KEY.getValue();
         if (keyString.length() < 16) {

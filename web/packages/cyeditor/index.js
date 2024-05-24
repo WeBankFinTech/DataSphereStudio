@@ -218,6 +218,8 @@ class CyEditor extends EventBus {
         container: this.editorContianer.querySelector('.cy-editor-container .left'),
         nodeTypes: this.editorOptions.nodeTypes,
       })
+    } else {
+      this.editorContianer.className += ' hide_shapes_panel'
     }
 
     // snap-grid
@@ -235,7 +237,7 @@ class CyEditor extends EventBus {
 
     // context-menu
     if (contextMenu) {
-      this._plugins.contextMenu = this.cy.contextMenu(contextMenu)
+      this._plugins.contextMenu = this.cy.contextMenu({editorOptions: this.editorOptions, ...contextMenu})
     }
   }
 

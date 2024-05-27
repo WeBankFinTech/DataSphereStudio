@@ -105,7 +105,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             if (gitUserEntity == null) {
                 return null;
             }
-            if (decrypt != null && !decrypt) {
+            if (decrypt == null || !decrypt) {
                 return gitUserEntity;
             }
             // 密码 token 解密处理

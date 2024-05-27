@@ -45,7 +45,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     private BMLService bmlService;
     @Override
     public GitDiffResponse diff(GitDiffRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -78,7 +78,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse commit(GitCommitRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -296,7 +296,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitDeleteResponse delete(GitDeleteRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -332,7 +332,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitFileContentResponse getFileContent(GitFileContentRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -362,7 +362,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitHistoryResponse getHistory(GitHistoryRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -409,7 +409,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -439,7 +439,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse gitCheckOut(GitRevertRequest request) throws IOException {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -473,7 +473,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse removeFile(GitRemoveRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -506,7 +506,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse rename(GitRenameRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -546,7 +546,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     public GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;

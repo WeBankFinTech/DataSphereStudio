@@ -15,7 +15,7 @@ public interface DSSWorkspaceGitService {
 
     GitUserInfoResponse selectGitUserInfo(GitUserInfoRequest gitUserInfoRequest) throws DSSErrorException;
 
-    GitUserEntity selectGit(Long workspaceId, String type);
+    GitUserEntity selectGit(Long workspaceId, String type, Boolean decrypt);
 
     GitConnectResponse gitTokenTest(GitConnectRequest connectTestRequest) throws DSSErrorException;
 }

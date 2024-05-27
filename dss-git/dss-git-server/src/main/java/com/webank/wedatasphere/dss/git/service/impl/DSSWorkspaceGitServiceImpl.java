@@ -29,6 +29,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Arrays;
+import java.util.Base64;
 
 @Service
 public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
@@ -46,7 +47,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         GitUserEntity gitUser = gitUserCreateRequest.getGitUser();
         String userName = gitUserCreateRequest.getUsername();
         // 不存在则更新，存在则新增
-        GitUserEntity oldGitUserDo = selectGit(gitUser.getWorkspaceId(), gitUser.getType());
+        GitUserEntity oldGitUserDo = selectGit(gitUser.getWorkspaceId(), gitUser.getType(), true);
         gitUser.setUpdateBy(userName);
         // 密码 token 加密处理
         if (!StringUtils.isEmpty(gitUser.getGitPassword())) {
@@ -76,19 +77,8 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         }
         Long workspaceId = gitUserInfoRequest.getWorkspaceId();
         String type = gitUserInfoRequest.getType();
-        GitUserEntity gitUserEntity = selectGit(workspaceId, type);
-        Boolean decrypt = gitUserInfoRequest.getDecrypt();
-        if (decrypt != null && decrypt) {
-            // 密码 token 解密处理
-            if (!StringUtils.isEmpty(gitUserEntity.getGitPassword())) {
-                String encryptPassword = generateKeys(gitUserEntity.getGitPassword(), Cipher.DECRYPT_MODE);
-                gitUserEntity.setGitPassword(encryptPassword);
-            }
-            if (!StringUtils.isEmpty(gitUserEntity.getGitToken())) {
-                String encryptToken = generateKeys(gitUserEntity.getGitToken(), Cipher.DECRYPT_MODE);
-                gitUserEntity.setGitToken(encryptToken);
-            }
-        }
+        GitUserEntity gitUserEntity = selectGit(workspaceId, type, gitUserInfoRequest.getDecrypt());
+
 
         GitUserInfoResponse gitUserInfoResponse = new GitUserInfoResponse();
         gitUserInfoResponse.setGitUser(gitUserEntity);
@@ -96,9 +86,15 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
     }
 
     @Override
-    public GitUserEntity selectGit(Long workspaceId, String type) {
+    public GitUserEntity selectGit(Long workspaceId, String type, Boolean decrypt) {
         try {
             GitUserEntity gitUserEntity = workspaceGitMapper.selectByWorkspaceId(workspaceId, type);
+            if (gitUserEntity == null) {
+                return null;
+            }
+            if (decrypt != null && !decrypt) {
+                return gitUserEntity;
+            }
             // 密码 token 解密处理
             if (!StringUtils.isEmpty(gitUserEntity.getGitPassword())) {
                 String encryptPassword = generateKeys(gitUserEntity.getGitPassword(), Cipher.DECRYPT_MODE);
@@ -120,6 +116,9 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         if (keyString.length() < 16) {
             throw new DSSErrorException(800001, "密钥长度必须大于16位");
         }
+        if (StringUtils.isEmpty(password)) {
+            throw new DSSErrorException(800001, "密码或token为空");
+        }
         try {
             // 确保密钥长度合适，AES 密钥长度为 128 位 (16 字节)
             byte[] keyBytes = keyString.substring(0, 16).getBytes();
@@ -127,8 +126,14 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             // 加密Cipher对象
             Cipher encryptCipher = Cipher.getInstance("AES");
             encryptCipher.init(mode, key);
-            byte[] encrypted = encryptCipher.doFinal(password.getBytes());
-            return Arrays.toString(encrypted);
+            if (mode == Cipher.ENCRYPT_MODE) {
+                byte[] encrypted = encryptCipher.doFinal(password.getBytes());
+                return Base64.getEncoder().encodeToString(encrypted);
+            } else {
+                byte[] decode = Base64.getDecoder().decode(password);
+                byte[] encrypted = encryptCipher.doFinal(decode);
+                return new String(encrypted);
+            }
         } catch (Exception e) {
             throw new DSSErrorException(800001, "加密失败");
         }

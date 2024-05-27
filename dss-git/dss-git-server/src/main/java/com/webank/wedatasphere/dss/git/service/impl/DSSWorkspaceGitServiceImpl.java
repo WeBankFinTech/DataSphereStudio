@@ -3,6 +3,8 @@ package com.webank.wedatasphere.dss.git.service.impl;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitConnectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
@@ -46,6 +48,14 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         }
         GitUserEntity gitUser = gitUserCreateRequest.getGitUser();
         String userName = gitUserCreateRequest.getUsername();
+        // 工作空间--git编辑权限用户 为一一对应关系
+        if (gitUser.getType().equals(GitConstant.GIT_ACCESS_WRITE_TYPE)) {
+            GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
+            if (gitUserEntity != null) {
+                throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的编辑用户，请更换用户");
+            }
+        }
+
         // 不存在则更新，存在则新增
         GitUserEntity oldGitUserDo = selectGit(gitUser.getWorkspaceId(), gitUser.getType(), true);
         gitUser.setUpdateBy(userName);
@@ -63,6 +73,9 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
             workspaceGitMapper.insert(gitUser);
         }else {
+            if (!oldGitUserDo.getGitUser().equals(gitUser.getGitUser())) {
+                throw new DSSErrorException(800001, "用户名不得修改");
+            }
             workspaceGitMapper.update(gitUser);
         }
 

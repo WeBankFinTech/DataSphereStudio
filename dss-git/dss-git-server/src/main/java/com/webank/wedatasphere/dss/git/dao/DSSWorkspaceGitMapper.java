@@ -12,4 +12,6 @@ public interface DSSWorkspaceGitMapper {
     void update(GitUserEntity gitUserDO);
 
     GitUserEntity selectByWorkspaceId(@Param("workspaceId") Long workspaceId, @Param("type") String type);
+
+    GitUserEntity selectByUser(@Param("gitUser") String gitUser);
 }

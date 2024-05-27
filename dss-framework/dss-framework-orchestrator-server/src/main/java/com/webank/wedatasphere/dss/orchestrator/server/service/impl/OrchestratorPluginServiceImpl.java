@@ -281,7 +281,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 projectId,
                 projectName,
                 DSSCommonUtils.COMMON_GSON.toJson(workspace),
-                dssLabelList);
+                dssLabelList,
+                false);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
         ResponseExportWorkflow responseExportWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
                 ResponseExportWorkflow.class, RequestExportWorkflow.class);

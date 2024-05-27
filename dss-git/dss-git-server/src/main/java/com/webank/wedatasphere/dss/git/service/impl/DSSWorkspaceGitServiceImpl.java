@@ -4,7 +4,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
-import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitConnectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;

@@ -39,7 +39,6 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
 
     @Override
     public GitCreateProjectResponse create(GitCreateProjectRequest request) {
-        logger.info("-------=======================beginning to create testGit1=======================-------");
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());

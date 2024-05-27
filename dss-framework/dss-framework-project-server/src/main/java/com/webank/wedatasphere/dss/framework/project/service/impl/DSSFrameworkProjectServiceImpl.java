@@ -35,14 +35,9 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitCheckProjectRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitCreateProjectRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitCheckProjectResponse;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitCreateProjectResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.request.*;
+import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
@@ -364,6 +359,16 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     }
 
     private void checkGitName(String name, Workspace workspace, String username) throws DSSProjectErrorException {
+        // 校验工作空间是否完成Git账号配置
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
+        gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
+        gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserInfoResponse writeInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
+        if (writeInfoResponse.getGitUser() == null) {
+            DSSExceptionUtils.dealErrorException(60021,"工作空间管理员未完成Git账号配置", DSSProjectErrorException.class);
+        }
+        // 校验Git名称
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         GitCheckProjectRequest request1 = new GitCheckProjectRequest(workspace.getWorkspaceId(), name, username);
         LOGGER.info("-------=======================begin to check project: {}=======================-------", name);

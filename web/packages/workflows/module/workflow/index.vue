@@ -332,23 +332,29 @@ export default {
           id,
           description,
           uses,
-          labels
+          labels,
+          isDefaultReference,
         } = data;
+        const params = {
+          workspaceId,
+          projectId,
+          orchestratorName,
+          // orchestratorId,
+          orchestratorMode,
+          orchestratorWays,
+          id,
+          description,
+          uses,
+          labels,
+          isDefaultReference
+        }
+        if (!data.templateIds || data.templateIds.length === 0) {
+          delete params.isDefaultReference
+        }
         api
           .fetch(
             `${this.$API_PATH.ORCHESTRATOR_PATH}modifyOrchestrator`,
-            {
-              workspaceId,
-              projectId,
-              orchestratorName,
-              // orchestratorId,
-              orchestratorMode,
-              orchestratorWays,
-              id,
-              description,
-              uses,
-              labels
-            },
+            params,
             "post"
           )
           .then(() => {
@@ -436,7 +442,8 @@ export default {
         orchestratorMode: "",
         orchestratorWays: null,
         projectId: this.$route.query.projectID,
-        workspaceId: this.$route.query.workspaceId
+        workspaceId: this.$route.query.workspaceId,
+        isDefaultReference: "0",
       };
     },
     // 修改编排

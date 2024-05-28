@@ -40,6 +40,7 @@
         b.product,b.source,b.isArchive,b.create_time createTime,b.update_time updateTime,
         b.dev_process devProcess,b.orchestrator_mode orchestratorMode,
         b.visible visible,
+        b.associate_git associateGit,
         GROUP_CONCAT(CONCAT(a.project_id,'-',a.priv,'-',a.username)) pusername
         FROM dss_project_user a
         LEFT JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id
@@ -80,6 +81,7 @@
         b.product,b.source,b.isArchive,b.create_time createTime,b.update_time updateTime,
         b.dev_process devProcess,b.orchestrator_mode orchestratorMode,
         b.visible visible,
+        b.associate_git associateGit,
         GROUP_CONCAT(CONCAT(a.project_id,'-',a.priv,'-',a.username)) pusername
         FROM dss_project_user a
         LEFT JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id

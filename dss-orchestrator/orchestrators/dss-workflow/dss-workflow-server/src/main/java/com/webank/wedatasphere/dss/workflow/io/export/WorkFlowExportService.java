@@ -30,10 +30,12 @@ public interface WorkFlowExportService {
      * @param userName 用户名
      * @param workspace 所属工作空间
      * @param dssLabels label列表
+     * @param exportExternalNodeAppConnResource 是否导出第三方节点的物料
      * @return 导出的工作流压缩包的文件地址
      * @throws Exception
      */
-    String exportFlowInfoNew(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace, List<DSSLabel> dssLabels) throws Exception;
+    String exportFlowInfoNew(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace,
+                             List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception;
 
     /**
      * 将一个工作流导出成压缩包，存放到本地磁盘，并返回压缩包的路径

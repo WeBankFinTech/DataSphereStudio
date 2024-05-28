@@ -4,6 +4,7 @@ package com.webank.wedatasphere.dss.git.service;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public interface DSSGitWorkflowManagerService {
@@ -20,4 +21,10 @@ public interface DSSGitWorkflowManagerService {
     GitHistoryResponse getHistory(GitHistoryRequest request);
 
     GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request);
+
+    GitCommitResponse gitCheckOut(GitRevertRequest request) throws IOException;
+
+    GitCommitResponse removeFile(GitRemoveRequest request);
+
+    GitCommitResponse rename(GitRenameRequest request);
 }

@@ -101,6 +101,7 @@ public interface WorkFlowManager {
      * @param projectName
      * @param workspace
      * @param dssLabels
+     * @param exportExternalNodeAppConnResource 是否导出第三方节点的物料
      * @return 导出的工作流，以Bml资源的形式返回
      * @throws Exception
      */
@@ -109,7 +110,8 @@ public interface WorkFlowManager {
                                   Long dssProjectId,
                                   String projectName,
                                   Workspace workspace,
-                                  List<DSSLabel> dssLabels) throws Exception;
+                                  List<DSSLabel> dssLabels,
+            boolean exportExternalNodeAppConnResource) throws Exception;
     /**
      * 导出工作流
      * @param userName
@@ -156,8 +158,6 @@ public interface WorkFlowManager {
      * @return
      */
     ResponseSubFlowContextIds getSubFlowContextIdsByFlowIds(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException;
-
-    ResponseLockWorkflow lockWorkFlow(RequestLockWorkflow requestLockWorkflow) throws DSSErrorException;
 
 
 }

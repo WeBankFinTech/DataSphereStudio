@@ -56,6 +56,11 @@
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-workflow-server</artifactId>
+            <version>${dss.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-framework-common</artifactId>
             <version>${dss.version}</version>
         </dependency>

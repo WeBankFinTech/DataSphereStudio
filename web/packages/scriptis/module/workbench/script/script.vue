@@ -985,17 +985,20 @@ export default {
         });
         // 只有hive或者spark引擎类型才会调用代码关联审查 置于末尾，不影响其余事件
         if ((this.script.application === 'spark' && this.script.runType === 'sql') || (this.script.application === 'hive' && this.script.runType === 'hql')) {
-          var formData = new FormData();
           const variable = isEmpty(this.script.params.variable) ? {} : util.convertArrayToObject(this.script.params.variable);
           let params = {
             'variable': variable,
             'configuration': {}
           };
-          formData.append('params', JSON.stringify(params));
-          formData.append('code', this.script.executionCode);
-          formData.append('engineType', this.script.application);
-          formData.append('type', 'union');
-          const codePrecheckRes = await api.fetch('/validator/code-precheck',formData,'post');
+          const codePrecheckRes = await api.fetch('/validator/code-precheck', {
+            params: JSON.stringify(params),
+            code: this.script.executionCode,
+            engineType: this.script.application,
+            type: 'union'
+          }, {
+            method: 'post',
+            useFormQuery: true,
+          });
           // 如果拿到代码审查结果时，代码已运行完成，则不进行操作
           if (this.$refs.progressTab && (!this.script.progress || !this.script.progress.costTime)) {
             this.script.codePrecheckRes = codePrecheckRes;

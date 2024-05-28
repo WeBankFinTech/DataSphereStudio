@@ -110,13 +110,6 @@ public class FileUtils {
         String longZipFilePath = "";
         try {
             longZipFilePath = unzip(zipFile, true);
-            File file = new File(zipFile);
-            logger.info("开始删除目录 {}", zipFile);
-            if (file.delete()){
-                logger.info("结束删除目录 {} 成功", zipFile);
-            }else{
-                logger.info("删除目录 {} 失败", zipFile);
-            }
         } catch (Exception e) {
             logger.error("unzip failed, the reason is ");
         }
@@ -246,10 +239,15 @@ public class FileUtils {
                 throw new DSSErrorException(90007,errMsg.toString());
             }
             if(deleteOriginZip){
-                file.delete();
+                logger.info("开始删除目录 {}", file);
+                if (file.delete()){
+                    logger.info("结束删除目录 {} 成功", file);
+                }else{
+                    logger.info("删除目录 {} 失败", file);
+                }
             }
         }catch(final Exception e){
-            logger.error("{} 解压缩 zip 文件失败, reason: ", e);
+            logger.error( file + " 解压缩 zip 文件失败, reason: ", e);
             DSSErrorException exception = new DSSErrorException(90009,dirPath + " to zip file failed");
             exception.initCause(e);
             throw exception;
@@ -260,5 +258,21 @@ public class FileUtils {
             IOUtils.closeQuietly(errorReader);
         }
         return longZipFilePath;
+    }
+
+    public static void renameFile(String oldFileName, String fileName) {
+        File oldFile = new File(oldFileName);
+        File file = new File(fileName);
+        // 检查原文件夹是否存在
+        if (oldFile.exists()) {
+            // 尝试重命名文件夹
+            if (oldFile.renameTo(file)) {
+                logger.info("Folder renamed successfully.");
+            } else {
+                logger.error("Failed to rename folder.");
+            }
+        } else {
+            logger.error("Folder does not exist.");
+        }
     }
 }

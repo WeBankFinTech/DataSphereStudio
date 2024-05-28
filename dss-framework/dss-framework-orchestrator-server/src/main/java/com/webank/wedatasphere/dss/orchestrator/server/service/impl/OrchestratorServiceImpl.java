@@ -18,10 +18,12 @@ package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -30,9 +32,13 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitRenameRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
@@ -49,8 +55,10 @@ import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.operation.*;
@@ -64,6 +72,8 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.workflow.common.protocol.*;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import io.protostuff.Rpc;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
@@ -102,6 +112,10 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     private ContextService contextService;
     @Autowired
     AddOrchestratorVersionHook addOrchestratorVersionHook;
+    @Autowired
+    private OrchestratorPluginService orchestratorPluginService;
+    @Autowired
+    private LockMapper lockMapper;
 
     private static final int VALID_FLAG = 1;
 
@@ -353,15 +367,15 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String rollbackOrchestrator(String userName, Long projectId, String projectName,
-                                       Long orchestratorId, String version, DSSLabel dssLabel, Workspace workspace) throws Exception {
+                                       Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception {
         //1.新建一个版本
         //2.然后将version的版本内容进行去workflow进行cp
         //3.然后把生产的内容进行update到数据库
         DSSOrchestratorVersion oldOrcVersion=orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
         String latestVersion = oldOrcVersion.getVersion();
-        List<DSSLabel> labels = new ArrayList<>();
-        labels.add(dssLabel);
+        DSSLabel envDSSLabel = new EnvDSSLabel(labels.getRoute());
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
+
         String newVersion = OrchestratorUtils.increaseVersion(latestVersion);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
         String comment = "回滚工作流到版本:" + version;
@@ -380,7 +394,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         String contextId = contextService.createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion(), userName);
         dssOrchestratorVersion.setContextId(contextId);
         LOGGER.info("Create a new ContextId {} for rollback the orchestration {} to version {}.", contextId, dssOrchestratorInfo.getName(), version);
-        RefJobContentResponseRef responseRef = tryRefOperation(dssOrchestratorInfo, userName, workspace, Collections.singletonList(dssLabel), null,
+        RefJobContentResponseRef responseRef = tryRefOperation(dssOrchestratorInfo, userName, workspace, Collections.singletonList(envDSSLabel), null,
                 developmentService -> ((RefCRUDService) developmentService).getRefCopyOperation(),
                 dssContextRequestRef -> dssContextRequestRef.setContextId(contextId),
                 projectRefRequestRef -> projectRefRequestRef.setRefProjectId(dssOrchestratorInfo.getProjectId()).setProjectName(projectName),
@@ -401,6 +415,28 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
         addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
 //        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
+
+        try {
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
+            if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
+                OrchestratorSubmitRequest submitRequest = new OrchestratorSubmitRequest();
+                submitRequest.setFlowId(dssOrchestratorVersion.getAppId());
+                submitRequest.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
+                submitRequest.setProjectName(projectName);
+                submitRequest.setLabels(labels);
+                submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
+                orchestratorPluginService.submitFlow(submitRequest, userName, workspace);
+            } else {
+                GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), userName);
+                RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
+            }
+            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
+        } catch (Exception e) {
+            LOGGER.error("git revert failed, the reason is :", e);
+            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
+        }
+
         return dssOrchestratorVersion.getVersion();
     }
 
@@ -430,7 +466,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
     //是否存在相同的编排名称,如果不存在相同的编排名称則返回编排id
     @Override
-    public Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest) throws DSSFrameworkErrorException {
+    public Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest, DSSProject dssProject, String username) throws DSSFrameworkErrorException {
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorModifRequest.getId());
         if (orchestratorInfo == null) {
             DSSFrameworkErrorException.dealErrorException(60000, "编排模式ID=" + orchestratorModifRequest.getId() + "不存在");
@@ -438,6 +474,9 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         //若修改了编排名称，检查是否存在相同的编排名称
         if (!orchestratorModifRequest.getOrchestratorName().equals(orchestratorInfo.getName())) {
             isExistSameNameBeforeCreate(orchestratorModifRequest.getWorkspaceId(), orchestratorModifRequest.getProjectId(), orchestratorModifRequest.getOrchestratorName());
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            GitRenameRequest renameRequest = new GitRenameRequest(orchestratorInfo.getWorkspaceId(), dssProject.getName(), orchestratorInfo.getName(), orchestratorModifRequest.getOrchestratorName(), username);
+            RpcAskUtils.processAskException(sender.ask(renameRequest), GitCommitResponse.class, GitRenameRequest.class);
         }
         return orchestratorInfo.getId();
     }
@@ -579,7 +618,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             elementPassWord.sendKeys(gitPassword);
             elementBtn.submit();
             driver.navigate().refresh();
-            LOGGER.info("for user getting... " + UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
+            LOGGER.info("for user getting... " + UrlUtils.normalizeIp(gitUrlPre));
             Set<Cookie> cookies = driver.manage().getCookies();
             LOGGER.info("cookies： {}", cookies.toString());
             for (Cookie cookie:cookies) {
@@ -626,6 +665,15 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
 
         return new ChromeDriver(options);
+    }
+
+    @Override
+    public OrchestratorVo getOrchestratorByAppId(Long appId) {
+        OrchestratorInfo orcInfoByAppId = orchestratorMapper.getOrcInfoByAppId(appId);
+        if (orcInfoByAppId == null) {
+            return null;
+        }
+        return getOrchestratorVoById(orcInfoByAppId.getOrchestratorId());
     }
 
 }

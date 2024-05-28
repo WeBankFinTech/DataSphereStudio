@@ -33,7 +33,6 @@
 - 子应用可以配置自己的layout需要在应用router模块导出配置subAppRoutes
 - 子应用支持使用自己的header，需要在config.json里配置模块路径
 - 各应用需要使用iView作为UI库，并提供路由，国际化等配置写入config.json
-- 各应用间不要相互直接依赖，确有依赖通过lerna管理
 - 可复用组件，资源需要合理放置，packages/shared 共享组件方法，修改需要注意影响
 - 各应用路由应以应用名做统一前缀
 - 各应用之间需要事件通信，应当在config.json 里声明对应module文件路径
@@ -51,11 +50,7 @@
 
 ```
 # 安装依赖
-lerna bootstrap 
-# 添加依赖通过lerna add 添加
-lerna add <package>[@version]
-# 指定组件添加依赖
-lerna add <package>[@version] --@scope=@dataspherestudio/workspace
+npm i
 # 开发启动DSS
 npm run serve
 # 运行部分模块子应用，支持通过module组合。如科管版本：

@@ -23,6 +23,9 @@ import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
@@ -197,7 +200,13 @@ public class DSSFlowEditLockManager {
                         String status = lockMapper.selectOrchestratorStatus(dssFlowEditLock.getFlowID());
                         if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
                             pushProject(projectInfo.getName(), new Long(projectInfo.getWorkspaceId()), dssFlow.getResourceId(), dssFlow.getBmlVersion(), dssFlow.getName(), username, "force unlock");
-                            lockMapper.updateOrchestratorStatus(dssFlow.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+                            Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+                            OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlowEditLock.getFlowID())),
+                                    OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                            if (orchestratorVo == null) {
+                                throw new DSSErrorException(800001, "编排不存在");
+                            }
+                            lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
                         }
                     }
                     lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), dssFlowEditLock.getFlowID());

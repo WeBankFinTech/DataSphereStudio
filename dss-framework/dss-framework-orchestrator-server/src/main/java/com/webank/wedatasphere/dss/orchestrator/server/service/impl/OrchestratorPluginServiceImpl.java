@@ -53,7 +53,9 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.request.Orchestrat
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.common.utils.ByteTimeUtils;
 import org.apache.linkis.common.utils.Utils;
@@ -82,6 +84,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Autowired
     private CommonUpdateConvertJobStatus commonUpdateConvertJobStatus;
+
+    @Autowired
+    private LockMapper lockMapper;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
 
@@ -211,10 +216,14 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+    public void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException {
+        Long orchestratorId = flowRequest.getOrchestratorId();
+        String status = lockMapper.selectOrchestratorStatus(orchestratorId);
+        if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
+            throw new DSSErrorException(800001, "提交前请先保存工作流");
+        }
         releaseThreadPool.submit(() ->{
             //1. 异步提交，更新提交状态
-            Long orchestratorId = flowRequest.getOrchestratorId();
             try {
                 OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
                 if (orchestratorSubmitJob == null) {
@@ -238,7 +247,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 }
                 orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
                 //5. 返回文件列表
-                orchestratorMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
+                lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
             } catch (Exception e) {
                 LOGGER.error("push failed, the reason is : ", e);
                 orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
@@ -272,7 +281,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 projectId,
                 projectName,
                 DSSCommonUtils.COMMON_GSON.toJson(workspace),
-                dssLabelList);
+                dssLabelList,
+                false);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
         ResponseExportWorkflow responseExportWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
                 ResponseExportWorkflow.class, RequestExportWorkflow.class);

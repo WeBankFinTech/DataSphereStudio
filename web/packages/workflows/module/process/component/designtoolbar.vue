@@ -228,7 +228,7 @@ export default {
           {
             projectId: +this.$route.query.projectID,
             workflowId: this.flowId,
-            labels: { route: this.getCurrentDsslabels() },
+            labels: { route: this.getCurrentDsslabels() || 'dev' },
           },
           'post'
         )

@@ -41,7 +41,7 @@ export default (options = {}) => async config => {
   if (!responsePromise) {
     responsePromise = (async () => {
       try {
-        const response = await axios.defaults.adapter(config)
+        const response = await axios.getAdapter(['xhr', 'http'])(config)
         return Promise.resolve(response)
       } catch (reason) {
         cache.clear(index)

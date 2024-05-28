@@ -4,6 +4,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
@@ -21,6 +22,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerService {
@@ -35,13 +39,12 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
 
     @Override
     public GitCreateProjectResponse create(GitCreateProjectRequest request) {
-        logger.info("-------=======================beginning to create testGit1=======================-------");
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
         }
-        Repository repository;
+        Repository repository = null;
         try {
             // Http请求Git，创建project
             DSSGitUtils.init(request.getProjectName(), gitUser);
@@ -51,24 +54,31 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 本地创建Git项目
             DSSGitUtils.create(request.getProjectName(), gitUser);
             // 获取git项目
-            File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator +".git");
+            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+            File repoDir = new File(gitPath);
             repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
             // 关联远端Git
             DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
             // 提交
             String comment = "init project: " + request.getProjectName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment);
+            // 首次创建提交项目整体
+            List<String> paths = Arrays.asList(".");
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);
 //            throw new DSSErrorException(010001, "create project failed");
+        } finally {
+            if (repository != null) {
+                repository.close();
+            }
         }
         return null;
     }
 
     @Override
-    public GitArchivePorjectResponse archive(GitArchiveProjectRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+    public GitArchivePorjectResponse archive(GitArchiveProjectRequest request) throws GitErrorException {
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
@@ -82,7 +92,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
 
     @Override
     public GitCheckProjectResponse checkProject(GitCheckProjectRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;

@@ -234,6 +234,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setArchive(projectVo.getArchive());
             projectResponse.setCreateTime(projectVo.getCreateTime());
             projectResponse.setUpdateTime(projectVo.getUpdateTime());
+            projectResponse.setAssociateGit(projectVo.getAssociateGit());
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
             projectResponseList.add(projectResponse);
@@ -499,7 +500,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
      * @param projectPath 项目目录
      * @throws IOException
      */
-    private  void exportProjectMeta(  DSSProjectDO projectDO, String projectPath) throws Exception {
+    private  void exportProjectMeta(DSSProjectDO projectDO, String projectPath) throws Exception {
         String path = projectPath + File.separator + PROJECT_META_FILE_NAME;
         File projectMetaFile = new File(path);
         if (!projectMetaFile.exists()) {

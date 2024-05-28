@@ -51,7 +51,7 @@ public class DSSGitUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
     public static void init(String projectName, GitUserEntity gitUserDO) throws Exception, GitErrorException{
-        if (checkProjectName(projectName, gitUserDO)) {
+        if (!checkProjectName(projectName, gitUserDO)) {
             try {
                 URL url = new URL(UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/" +GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue());
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();

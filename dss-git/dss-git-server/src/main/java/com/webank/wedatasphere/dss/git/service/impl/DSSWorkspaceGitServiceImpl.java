@@ -5,9 +5,11 @@ import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitConnectRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoByRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitConnectResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoListResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
@@ -29,8 +31,8 @@ import org.springframework.stereotype.Service;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
-import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
@@ -50,7 +52,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         // 工作空间--git编辑权限用户 为一一对应关系
         if (gitUser.getType().equals(GitConstant.GIT_ACCESS_WRITE_TYPE)) {
             GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
-            if (gitUserEntity != null) {
+            if (gitUserEntity != null && !gitUserEntity.getWorkspaceId().equals(gitUser.getWorkspaceId())) {
                 throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的编辑用户，请更换用户");
             }
         }
@@ -103,9 +105,6 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             GitUserEntity gitUserEntity = workspaceGitMapper.selectByWorkspaceId(workspaceId, type);
             if (gitUserEntity == null) {
                 return null;
-            }
-            if (decrypt == null || !decrypt) {
-                return gitUserEntity;
             }
             // 密码 token 解密处理
             if (!StringUtils.isEmpty(gitUserEntity.getGitPassword())) {
@@ -182,6 +181,14 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             logger.info("Error verifying token: " + e.getMessage());
             throw new DSSErrorException(800001, "verifying token failed, the reason is:" + e);
         }
+    }
+
+    @Override
+    public GitUserInfoListResponse getGitUserByType(GitUserInfoByRequest infoByRequest) {
+        List<GitUserEntity> gitUserEntities = workspaceGitMapper.selectGitUser(infoByRequest.getWorkspaceId(), infoByRequest.getType(), infoByRequest.getGitUserName());
+        GitUserInfoListResponse gitUserInfoListResponse = new GitUserInfoListResponse();
+        gitUserInfoListResponse.setGitUserEntities(gitUserEntities);
+        return gitUserInfoListResponse;
     }
 
 }

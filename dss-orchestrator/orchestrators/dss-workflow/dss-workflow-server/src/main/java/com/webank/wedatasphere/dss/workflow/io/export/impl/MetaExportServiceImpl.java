@@ -19,10 +19,13 @@ package com.webank.wedatasphere.dss.workflow.io.export.impl;
 import com.google.gson.GsonBuilder;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.io.export.MetaExportService;
 import com.webank.wedatasphere.dss.workflow.io.export.MetaWriter;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -38,11 +41,13 @@ public class MetaExportServiceImpl implements MetaExportService {
     public static final String FLOW_META_FILE_NAME = ".flowmeta";
     public static final String FLOW_META_KEY = "dss_flow";
     public static final String FLOW_RELATION_META_KEY = "dss_flow_relation";
+    public static final String ORCHESTRATOR_META_KEY = "dss_orchestrator";
+    public static final String ORCHESTRATOR_VERSION_META_KEY = "dss_orchestrator_version";
 
     private final String fileName = "meta.txt";
 
     @Override
-    public void exportFlowBaseInfoNew(List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException {
+    public void exportFlowBaseInfoNew(OrchestratorVo orchestratorVo, List<DSSFlow> allDSSFlows, List<DSSFlowRelation> allFlowRelations, String savePath) throws IOException {
 
         try (
                 OutputStream outputStream = IoUtils.generateExportOutputStream(savePath + File.separator + FLOW_META_FILE_NAME)
@@ -50,6 +55,8 @@ public class MetaExportServiceImpl implements MetaExportService {
             Map<String, Object> flowMetaMap = new HashMap<>(2);
             flowMetaMap.put(FLOW_META_KEY, allDSSFlows);
             flowMetaMap.put(FLOW_RELATION_META_KEY, allFlowRelations);
+            flowMetaMap.put(ORCHESTRATOR_META_KEY, orchestratorVo.getDssOrchestratorInfo());
+            flowMetaMap.put(ORCHESTRATOR_VERSION_META_KEY, orchestratorVo.getDssOrchestratorVersion());
             String flowMetaStr = new GsonBuilder().setPrettyPrinting().create().toJson(flowMetaMap);
             org.apache.commons.io.IOUtils.write(flowMetaStr,outputStream,"UTF-8");
         }

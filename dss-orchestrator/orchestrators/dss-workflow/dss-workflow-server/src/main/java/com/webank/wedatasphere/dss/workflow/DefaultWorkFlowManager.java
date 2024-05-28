@@ -201,9 +201,9 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     @Override
     public BmlResource exportWorkflowNew(String userName, Long flowId, Long dssProjectId,
                                          String projectName, Workspace workspace,
-                                         List<DSSLabel> dssLabels) throws Exception {
+                                         List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
         DSSFlow dssFlow = flowService.getFlowByID(flowId);
-        String exportPath = workFlowExportService.exportFlowInfoNew(dssProjectId, projectName, flowId, userName, workspace, dssLabels);
+        String exportPath = workFlowExportService.exportFlowInfoNew(dssProjectId, projectName, flowId, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
         InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
         BmlResource bmlResource = bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
         logger.info("export workflow success.  flowId:{},bmlResource:{} .",flowId,bmlResource);
@@ -419,11 +419,11 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     private String readImportZipProjectName(String zipFilePath) throws IOException {
-        try(ZipFile zipFile =new ZipFile(zipFilePath)){
-            Enumeration<? extends ZipEntry> entries =zipFile.entries();
-            if(entries.hasMoreElements()){
-                String name=entries.nextElement().getName();
-                if(name.endsWith("\\")||name.endsWith("/")){
+        try (ZipFile zipFile = new ZipFile(zipFilePath)) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            if (entries.hasMoreElements()) {
+                String name = entries.nextElement().getName();
+                if (name.endsWith("\\") || name.endsWith("/")) {
                     name = name.substring(0, name.length() - 1);
                 }
                 return name;
@@ -431,36 +431,6 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         }
         throw new IOException();
     }
-
-    @Override
-    public ResponseLockWorkflow lockWorkFlow(RequestLockWorkflow requestLockWorkflow) throws DSSErrorException {
-        Cookie[] cookies = requestLockWorkflow.getCookies();
-        Long flowID = requestLockWorkflow.getFlowId();
-        String username =requestLockWorkflow.getUsername();
-        //若工作流已经被其他用户抢锁，则当前用户不能再保存成功
-        String ticketId = Arrays.stream(cookies).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
-                .findFirst().map(Cookie::getValue).get();
-        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowID);
-        if (flowEditLock != null) {
-            DSSFlow dssFlow = flowService.getFlow(flowID);
-            // 尝试获取工作流编辑锁
-            try {
-                //只有父工作流才有锁，子工作流复用父工作流的锁
-                if(dssFlow.getRootFlow()) {
-                    DSSFlowEditLockManager.tryAcquireLock(dssFlow, username, ticketId);
-                }
-            } catch (DSSErrorException e) {
-                if (DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
-                    logger.error(e.getDesc());
-                    return new ResponseLockWorkflow(ResponseLockWorkflow.LOCK_FAILED, flowEditLock.getOwner());
-                }
-                throw e;
-            }
-        }
-        return new ResponseLockWorkflow(ResponseLockWorkflow.LOCK_SUCCESS, null);
-    }
-
-
 
 }
 

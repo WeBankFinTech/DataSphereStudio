@@ -4,12 +4,12 @@ import java.util.List;
 
 public class GitSearchResult {
     private String path;
-    private List<String> keyLines;
+    private List<GitSearchLine> keyLines;
 
     public GitSearchResult() {
     }
 
-    public GitSearchResult(String path, List<String> keyLines) {
+    public GitSearchResult(String path, List<GitSearchLine> keyLines) {
         this.path = path;
         this.keyLines = keyLines;
     }
@@ -22,11 +22,11 @@ public class GitSearchResult {
         this.path = path;
     }
 
-    public List<String> getKeyLines() {
+    public List<GitSearchLine> getKeyLines() {
         return keyLines;
     }
 
-    public void setKeyLines(List<String> keyLines) {
+    public void setKeyLines(List<GitSearchLine> keyLines) {
         this.keyLines = keyLines;
     }
 }

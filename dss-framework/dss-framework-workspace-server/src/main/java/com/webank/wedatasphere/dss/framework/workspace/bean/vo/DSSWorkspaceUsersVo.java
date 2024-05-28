@@ -22,4 +22,16 @@ public class DSSWorkspaceUsersVo {
     public void setEditUsers(List<String> editUsers) {
         this.editUsers = editUsers;
     }
+
+    public List<String> getEditUsers() {
+        return editUsers;
+    }
+
+    public List<String> getAccessUsers() {
+        return accessUsers;
+    }
+
+    public List<String> getReleaseUsers() {
+        return releaseUsers;
+    }
 }

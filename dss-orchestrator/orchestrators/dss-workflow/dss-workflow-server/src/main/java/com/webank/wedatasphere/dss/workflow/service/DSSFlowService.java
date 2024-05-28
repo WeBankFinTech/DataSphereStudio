@@ -54,7 +54,7 @@ public interface DSSFlowService {
                     String userName,
                     String workspaceName,
                     String projectName
-    ) throws IOException;
+    ) throws IOException, DSSErrorException;
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,

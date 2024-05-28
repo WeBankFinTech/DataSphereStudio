@@ -57,11 +57,11 @@ public interface LockMapper {
 
     void insertFlowStatus(@Param("flowID") Long flowID, @Param("status") String status);
 
-    void updateOrchestratorStatus(@Param("flowID") Long flowID, @Param("status") String status);
+    void updateOrchestratorStatus(@Param("id") Long id, @Param("status") String status);
 
     List<String> selectOrchestratorByStatus( @Param("status") String status);
 
     String selectOrchestratorStatus(@Param("id") Long id);
 
-    void updateOrchestratorVersionCommitId(@Param("commitId")String commitId, @Param("workflowId")Long flowID);
+    void updateOrchestratorVersionCommitId(@Param("commitId")String commitId, @Param("flowID")Long flowID);
 }

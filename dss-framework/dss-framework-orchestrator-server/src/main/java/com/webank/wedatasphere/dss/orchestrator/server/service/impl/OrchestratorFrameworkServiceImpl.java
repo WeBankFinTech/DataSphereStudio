@@ -29,24 +29,18 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.RefOrchestrationContentRequestRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
-import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.protocol.RequestExportWorkflow;
-import com.webank.wedatasphere.dss.common.protocol.ResponseExportWorkflow;
 import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
-import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitHistoryRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitRemoveRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
@@ -58,7 +52,6 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
-import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
@@ -76,6 +69,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.StructureRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math3.util.Pair;
@@ -113,6 +107,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private OrchestratorCopyEnv orchestratorCopyEnv;
     @Autowired
     private OrchestratorOperateService orchestratorOperateService;
+    @Autowired
+    private LockMapper lockMapper;
 
     private static final int MAX_DESC_LENGTH = 250;
     private static final int MAX_NAME_LENGTH = 128;
@@ -244,7 +240,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
         //是否存在相同的编排名称 //todo 返回orchestratorInfo而不是id
-        Long orchestratorId = orchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest);
+        Long orchestratorId = orchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest, dssProject, username);
         LOGGER.info("{} begins to update a orchestrator {}.", username, orchestratorModifyRequest.getOrchestratorName());
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorModifyRequest.getLabels().getRoute()));
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorModifyRequest.getOrchestratorMode());
@@ -290,7 +286,18 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
                             .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
         }
-
+        try {
+            // git删除成功之后再删除库表记录
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            List<String> path = new ArrayList<>();
+            path.add(orchestratorInfo.getName());
+            GitRemoveRequest removeRequest = new GitRemoveRequest(workspace.getWorkspaceId(), dssProject.getName(), path, username);
+            RpcAskUtils.processAskException(sender.ask(removeRequest), GitCommitResponse.class, GitRemoveRequest.class);
+            lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+        } catch (Exception e) {
+            LOGGER.error("git remove failed, the reason is: ", e);
+            lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+        }
         orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
         orchestratorOperateService.deleteTemplateOperate(orchestratorInfo.getId());
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());
@@ -335,9 +342,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         } else if (orchestratorCopyRequest.getWorkflowNodeSuffix().length() > 10) {
             DSSExceptionUtils.dealErrorException(6014, "The node suffix length can not exceed 10. (节点后缀长度不能超过10)", DSSOrchestratorErrorException.class);
         }
+        String dssLabel = null;
+        if (orchestratorCopyRequest.getLabels()!= null && orchestratorCopyRequest.getLabels().getRoute() != null) {
+            dssLabel = orchestratorCopyRequest.getLabels().getRoute();
+        } else {
+            dssLabel = DSSCommonUtils.ENV_LABEL_VALUE_DEV;
+        }
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
                 targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
-                orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV),
+                orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(dssLabel),
                 workspace, Sender.getThisInstance()).setCopyTaskId(null).build();
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);

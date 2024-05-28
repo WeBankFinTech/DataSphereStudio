@@ -32,13 +32,13 @@ import i18n from '../i18n'
 // 什么一个数组用于存储每个请求的取消函数和标识
 let pending = [];
 let cancelConfig = null;
-let CancelToken = axios.CancelToken;
+const abortController = new AbortController();
 let removePending = (config) => {
   for (let p = 0; p < pending.length; p++) {
     const params = JSON.stringify(config.params);
     // 如果存在则执行取消操作
     if (pending[p].u === config.url + '&' + config.method + '&' + params) {
-      // pending[p].f();// 执行取消操作
+      // pending[p]['controller'].abort();// 执行取消操作
       pending.splice(p, 1); // 移除记录
     }
   }
@@ -52,6 +52,16 @@ let cutReq = (config) => {
     }
   }
 };
+
+let getErrorMsg = (message) => {
+  let msg;
+  if (message === 'Request failed with status code 414') {
+    msg = 'URL长度超出最大限制';
+  } else if (message === 'Request failed with status code 413') {
+    msg = '请求体内容超出最大限制';
+  }
+  return msg;
+}
 
 const instance = axios.create({
   baseURL: process.env.VUE_APP_MN_CONFIG_PREFIX || `${location.protocol}//${window.location.host}/api/rest_j/v1/`,
@@ -98,15 +108,13 @@ instance.interceptors.request.use((config) => {
     return config;
   } else {
     const params = JSON.stringify(config.params);
+    pending.push({
+      u: config.url + '&' + config.method + '&' + params,
+      controller: abortController,
+    });
     // 用于正常请求出现错误时移除
     cancelConfig = config;
-    config.cancelToken = new CancelToken((c) => {
-      // 添加标识和取消函数
-      pending.push({
-        u: config.url + '&' + config.method + '&' + params,
-        f: c,
-      });
-    });
+    config.signal = abortController.signal;
     return config;
   }
 }, (error) => {
@@ -121,11 +129,22 @@ instance.interceptors.response.use((response) => {
   removePending(response.config);
   return response;
 }, (error) => {
-  error.config.metadata.endTime = Date.now()
-  const duration = error.config.metadata.endTime - error.config.metadata.sartTime
-  if (window.$Wa && duration > 2000) window.$Wa.log(`接口耗时 ${duration}: ${error.config.url}`);
+  if (error.config) {
+    error.config.metadata.endTime = Date.now()
+    const duration = error.config.metadata.endTime - error.config.metadata.sartTime
+    if (window.$Wa && duration > 2000) window.$Wa.log(`接口耗时 ${duration}: ${error.config.url}`);
+  }
   // 出现接口异常或者超时时的判断
-  if ((error.message && error.message.indexOf('timeout') >= 0) || (error.request && error.request.status !== 200)) {
+  if (error.code === 'ERR_BAD_REQUEST' && getErrorMsg(error.message)) {
+    if (!error.response) error.response = {};
+    error.response.data = {
+      message: getErrorMsg(error.message),
+      method: '',
+      status: 1,
+      data: {solution: null}
+    }
+    return error.response;
+  } else if ((error.message && error.message.indexOf('timeout') >= 0) || (error.request && error.request.status !== 200)) {
     for (let p in pending) {
       if (pending[p].u === cancelConfig.url + '&' + cancelConfig.method + '&' + JSON.stringify(cancelConfig.params)) {
         pending.splice(p, 1); // 移除记录
@@ -133,7 +152,7 @@ instance.interceptors.response.use((response) => {
     }
     // 优先返回后台返回的错误信息，其次是接口返回
     return error.response || error;
-  } else if (axios.Cancel) {
+  } else if (axios.isCancel(error)) {
     // 如果是pengding状态，弹出提示！
     return {
       // data: { message: '接口请求中！请稍后……' },

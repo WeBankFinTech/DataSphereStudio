@@ -17,6 +17,7 @@ public class GitUserEntity {
      * read-只读、write-编辑权限
      */
     private String type;
+    private String gitUrl;
 
     public GitUserEntity() {
     }
@@ -99,5 +100,13 @@ public class GitUserEntity {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getGitUrl() {
+        return gitUrl;
+    }
+
+    public void setGitUrl(String gitUrl) {
+        this.gitUrl = gitUrl;
     }
 }

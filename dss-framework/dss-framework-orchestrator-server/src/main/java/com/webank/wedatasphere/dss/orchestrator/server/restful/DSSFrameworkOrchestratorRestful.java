@@ -21,6 +21,7 @@ import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
@@ -45,6 +46,9 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestLockWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseLockWorkflow;
+import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
@@ -56,6 +60,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -77,6 +82,8 @@ public class DSSFrameworkOrchestratorRestful {
     private OrchestratorPluginService orchestratorPluginService;
     @Autowired
     private HttpServletRequest httpServletRequest;
+    @Autowired
+    private LockMapper lockMapper;
 
     /**
      * 创建编排模式
@@ -241,10 +248,10 @@ public class DSSFrameworkOrchestratorRestful {
         Long projectId = rollbackOrchestratorRequest.getProjectId();
         String projectName = rollbackOrchestratorRequest.getProjectName();
         Workspace workspace = SSOHelper.getWorkspace(request);
-        DSSLabel envDSSLabel = new EnvDSSLabel(rollbackOrchestratorRequest.getLabels().getRoute());
+        LabelRouteVO labels = rollbackOrchestratorRequest.getLabels();
         try {
             LOGGER.info("user {} begin to rollbackOrchestrator, params:{}", username, rollbackOrchestratorRequest);
-            String newVersion = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, envDSSLabel, workspace);
+            String newVersion = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, labels, workspace);
             Message message = Message.ok("回滚版本成功").data("newVersion", newVersion);
             return message;
         } catch (final Throwable t) {
@@ -292,11 +299,11 @@ public class DSSFrameworkOrchestratorRestful {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
 
-        RequestLockWorkflow requestLockWorkflow = new RequestLockWorkflow(userName, httpServletRequest.getCookies(), submitFlowRequest.getFlowId());
-        ResponseLockWorkflow responseLockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
-                .getWorkflowSender(dssLabelList).ask(requestLockWorkflow), ResponseLockWorkflow.class, RequestLockWorkflow.class);
-        if (responseLockWorkflow.getUnlockStatus() == ResponseLockWorkflow.LOCK_FAILED) {
-            return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
         GitTree gitTree = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
         return Message.ok().data("tree", gitTree.getChildren());
@@ -310,20 +317,26 @@ public class DSSFrameworkOrchestratorRestful {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
 
-        RequestLockWorkflow requestLockWorkflow = new RequestLockWorkflow(userName, httpServletRequest.getCookies(), submitFlowRequest.getFlowId());
-        ResponseLockWorkflow responseLockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
-                .getWorkflowSender(dssLabelList).ask(requestLockWorkflow), ResponseLockWorkflow.class, RequestLockWorkflow.class);
-        if (responseLockWorkflow.getUnlockStatus() == ResponseLockWorkflow.LOCK_FAILED) {
-            return Message.error("当前工作流被用户" + responseLockWorkflow.getLockOwner() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + responseLockWorkflow.getLockOwner() + "确认");
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
+        try {
+            orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
+        } catch (Exception e) {
+            return Message.error("提交工作流失败，请保存工作流重试，原因为：", e);
         }
 
-        orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
+
         return Message.ok();
     }
 
     @RequestMapping(path = "gitUrl", method = RequestMethod.GET)
     public Message gitUrl(@RequestParam(required = true, name = "projectName") String projectName,
                           @RequestParam(required = false, name = "workflowName") String workflowName,
+                          @RequestParam(required = false, name = "workflowNodeName") String workflowNodeName,
                           HttpServletResponse response) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
@@ -332,11 +345,12 @@ public class DSSFrameworkOrchestratorRestful {
         GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
         gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
         gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_READ_TYPE);
-
+        // 跳转git需解密处理
+        gitUserInfoRequest.setDecrypt(true);
         GitUserInfoResponse readInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
         String gitUsername = readInfoResponse.getGitUser().getGitUser();
         String gitPassword = readInfoResponse.getGitUser().getGitPassword();
-        String gitUrlPre = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
+        String gitUrlPre = UrlUtils.normalizeIp(readInfoResponse.getGitUser().getGitUrl());
         String authenToken = "";
         try {
             authenToken = orchestratorService.getAuthenToken(gitUrlPre, gitUsername, gitPassword);
@@ -345,7 +359,7 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("git登陆失败，请检查git节点配置的用户名/密码/url");
         }
         // 获取顶级域名 eg: http://git.bdp.weoa.com -> weoa.com
-        String domainIp = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
+        String domainIp = UrlUtils.normalizeIp(gitUrlPre);
         int lastDotIndex = domainIp.lastIndexOf(".");
         String topDomain = "";
         if (lastDotIndex != -1) {
@@ -391,5 +405,15 @@ public class DSSFrameworkOrchestratorRestful {
         GitHistoryResponse history = orchestratorFrameworkService.getHistory(workspace.getWorkspaceId(), orchestratorId, projectName);
 
         return Message.ok().data("history", history);
+    }
+
+    @RequestMapping(value = "allType", method = RequestMethod.GET)
+    public Message allType(HttpServletRequest req) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        List<String> type = Arrays.asList(".sql",".hql",".jdbc", ".py", ".python", ".scala", ".sh");
+
+        return Message.ok().data("type", type);
     }
 }

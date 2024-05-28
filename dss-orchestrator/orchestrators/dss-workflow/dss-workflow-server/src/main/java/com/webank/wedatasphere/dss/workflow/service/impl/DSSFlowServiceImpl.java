@@ -293,6 +293,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
             logger.info("saveFlow is not change");
+            updateTOSaveStatus(dssFlow);
             return dssFlow.getBmlVersion();
         } else {
             logger.info("saveFlow is change");
@@ -324,11 +325,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
+        updateTOSaveStatus(dssFlow);
+        return version;
+    }
+
+    private void updateTOSaveStatus(DSSFlow dssFlow) {
         try {
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(dssFlow.getProjectId());
             //仅对接入Git的项目 更新状态为 保存
             if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
-                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(flowID)),
+                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
                         OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
                 lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
             }
@@ -336,7 +342,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             logger.error("getProjectInfo failed by:", e);
             throw new DSSRuntimeException(e.getErrCode(),"更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
         }
-        return version;
     }
 
     /**

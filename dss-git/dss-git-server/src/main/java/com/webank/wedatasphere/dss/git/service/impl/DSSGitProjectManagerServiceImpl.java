@@ -39,9 +39,10 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
 
     @Override
     public GitCreateProjectResponse create(GitCreateProjectRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+        Long workspaceId = request.getWorkspaceId();
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+            logger.error("the workspace : {} don't associate with git", workspaceId);
             return null;
         }
         Repository repository = null;
@@ -49,11 +50,11 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // Http请求Git，创建project
             DSSGitUtils.init(request.getProjectName(), gitUser);
             // 解压BML文件到本地
-            FileUtils.downloadBMLResource(bmlService, request.getProjectName(), request.getBmlResource(), request.getUsername());
-            FileUtils.removeProject(request.getProjectName());
-            FileUtils.unzipBMLResource(request.getProjectName());
+            FileUtils.downloadBMLResource(bmlService, request.getProjectName(), request.getBmlResource(), request.getUsername(), workspaceId);
+            FileUtils.removeProject(request.getProjectName(), workspaceId);
+            FileUtils.unzipBMLResource(request.getProjectName(), workspaceId);
             // 本地创建Git项目
-            DSSGitUtils.create(request.getProjectName(), gitUser);
+            DSSGitUtils.create(request.getProjectName(), gitUser, workspaceId);
             // 获取git项目
             String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
             File repoDir = new File(gitPath);
@@ -87,7 +88,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         // 远程归档
         DSSGitUtils.archive(request.getProjectName(), gitUser);
         // 删除本地项目
-        DSSGitUtils.archiveLocal(request.getProjectName());
+        DSSGitUtils.archiveLocal(request.getProjectName(), request.getWorkspaceId());
         return null;
     }
 

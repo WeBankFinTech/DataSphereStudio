@@ -63,8 +63,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 fileList.add(entry.getKey());
+                // 解压BML文件到本地
+                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
-                FileUtils.update(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
+                FileUtils.unzipBMLResource(entry.getKey());
             }
             diff = DSSGitUtils.diff(request.getProjectName(), fileList);
             // 重置本地
@@ -97,8 +99,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             List<String> paths = new ArrayList<>();
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 paths.add(entry.getKey());
+                // 解压BML文件到本地
+                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
-                FileUtils.update(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
+                FileUtils.unzipBMLResource(entry.getKey());
             }
             // 提交
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();

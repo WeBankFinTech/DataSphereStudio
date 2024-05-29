@@ -53,6 +53,7 @@ class DSSOrchestratorChooser extends ReceiverChooser {
     case _: RequestOrchestratorInfos => receiver
     case _: RequestQueryByIdOrchestrator => receiver
     case _: RequestQuertByAppIdOrchestrator => receiver
+    case _: RequestSubmitOrchestratorSync => receiver
     case _ => None
   }
 }

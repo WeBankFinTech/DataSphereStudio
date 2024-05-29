@@ -188,14 +188,14 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete) throws DSSErrorException {
+    public ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete, Workspace workspace) throws DSSErrorException {
         DSSFlowEditLock editLock = lockMapper.getFlowEditLockByID(flowId);
         if (editLock == null) {
             return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NONEED_UNLOCK, null);
         } else if (!Boolean.TRUE.equals(confirmDelete)) {
             return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NEED_SECOND_CONFIRM, editLock.getUsername());
         }
-        DSSFlowEditLockManager.deleteLock(editLock.getLockContent(), userName);
+        DSSFlowEditLockManager.deleteLock(editLock.getLockContent(), workspace);
         return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.UNLOCK_SUCCESS, null);
     }
     @Override

@@ -92,7 +92,7 @@ public interface WorkFlowManager {
     void deleteWorkflow(String userName,
                         Long flowID) throws DSSErrorException;
 
-    ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete) throws DSSErrorException;
+    ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete, Workspace workspace) throws DSSErrorException;
     /**
      * 导出工作流
      * @param userName

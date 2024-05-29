@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult
 import com.webank.wedatasphere.dss.orchestrator.publish.{ExportDSSOrchestratorPlugin, ImportDSSOrchestratorPlugin}
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest
 import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.slf4j.{Logger, LoggerFactory}
@@ -99,6 +100,16 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
 
     case requestQuertByAppIdOrchestrator: RequestQuertByAppIdOrchestrator =>
       orchestratorService.getOrchestratorByAppId(requestQuertByAppIdOrchestrator.getAppId)
+    case requestSubmitOrchestratorSync: RequestSubmitOrchestratorSync =>
+      val request = new OrchestratorSubmitRequest()
+      request.setOrchestratorId(requestSubmitOrchestratorSync.getOrchestratorId)
+      request.setProjectName(requestSubmitOrchestratorSync.getProjectName)
+      request.setFlowId(requestSubmitOrchestratorSync.getFlowId)
+      request.setLabels(request.getLabels)
+      request.setComment(request.getComment)
+      val username = requestSubmitOrchestratorSync.getUsername
+      val workspace = requestSubmitOrchestratorSync.getWorkspace
+      orchestratorPluginService.submitWorkflowToBML(request, username, workspace)
 
     case _ => throw new DSSErrorException(90000, "Not support message type " + message)
   }

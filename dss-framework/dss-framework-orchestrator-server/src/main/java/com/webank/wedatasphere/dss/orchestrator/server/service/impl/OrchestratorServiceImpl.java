@@ -73,7 +73,6 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
-import io.protostuff.Rpc;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
@@ -276,7 +275,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorInfoId, VALID_FLAG);
         LOGGER.info("user {} try to unlock the project {} 's orchestration(such as DSS workflow) {} of orchestrator {} in version {}.",
                 userName, projectName, dssOrchestratorVersion.getAppId(), dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion());
-        RequestUnlockWorkflow requestUnlockWorkflow = new RequestUnlockWorkflow(userName, dssOrchestratorVersion.getAppId(), confirmDelete);
+        RequestUnlockWorkflow requestUnlockWorkflow = new RequestUnlockWorkflow(userName, dssOrchestratorVersion.getAppId(), confirmDelete,  workspace);
         ResponseUnlockWorkflow responseUnlockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
                 .getWorkflowSender(dssLabels).ask(requestUnlockWorkflow), ResponseUnlockWorkflow.class, RequestUnlockWorkflow.class);
         switch (responseUnlockWorkflow.getUnlockStatus()) {

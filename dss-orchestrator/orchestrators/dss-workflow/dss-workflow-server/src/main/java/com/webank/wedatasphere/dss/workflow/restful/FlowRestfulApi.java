@@ -368,7 +368,8 @@ public class FlowRestfulApi {
     @RequestMapping(value = "/deleteFlowEditLock/{flowEditLock}", method = RequestMethod.POST)
     public Message deleteFlowEditLock(HttpServletRequest req, @PathVariable("flowEditLock") String flowEditLock) throws DSSErrorException {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
-        DSSFlowEditLockManager.deleteLock(flowEditLock, userName);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        DSSFlowEditLockManager.deleteLock(flowEditLock, workspace);
         return Message.ok();
     }
 

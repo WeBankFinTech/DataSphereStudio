@@ -52,8 +52,8 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         // 工作空间--git编辑权限用户 为一一对应关系
         if (gitUser.getType().equals(GitConstant.GIT_ACCESS_WRITE_TYPE)) {
             GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
-            if (gitUserEntity != null && !gitUserEntity.getWorkspaceId().equals(gitUser.getWorkspaceId())) {
-                throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的编辑用户，请更换用户");
+            if (gitUserEntity != null) {
+                throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户");
             }
         }
 

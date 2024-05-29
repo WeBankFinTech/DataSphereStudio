@@ -48,7 +48,7 @@
     <select id="selectByUser" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
         select id, workspace_id, git_user, git_token, git_password, git_url, create_time, update_time, create_by, update_by, type
         from dss_workspace_associate_git
-        where git_user = #{gitUser} and `type` = 'write' limit 1
+        where git_user = #{gitUser} limit 1
     </select>
 
     <select id="selectGitUser" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">

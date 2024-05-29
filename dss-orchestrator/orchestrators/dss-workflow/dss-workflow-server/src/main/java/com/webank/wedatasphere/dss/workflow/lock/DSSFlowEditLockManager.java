@@ -200,7 +200,7 @@ public class DSSFlowEditLockManager {
                     // 对于接入Git的项目，工作流解锁加入额外处理
                     if (projectInfo.getAssociateGit()) {
                         DSSOrchestratorInfo orchestratorInfo = getOrchestratorInfo(flowID);
-                        String status = lockMapper.selectOrchestratorStatus(flowID);
+                        String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
                         if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
                             pushProject(projectInfo.getName(), new Long(projectInfo.getWorkspaceId()), dssFlow.getResourceId(), dssFlow.getBmlVersion(), dssFlow.getName(), "system", "force unlock");
 

@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface DSSWorkspaceUserService {
@@ -52,7 +53,7 @@ public interface DSSWorkspaceUserService {
 
     List<String> getAllWorkspaceUsers(long workspaceId);
 
-    List<DepartmentUserVo> getAllWorkspaceUsersDepartment(long workspaceId) ;
+    Map<String, Map<String, List<String>>> getAllWorkspaceUsersDepartment(long workspaceId) ;
 
     PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize);
 

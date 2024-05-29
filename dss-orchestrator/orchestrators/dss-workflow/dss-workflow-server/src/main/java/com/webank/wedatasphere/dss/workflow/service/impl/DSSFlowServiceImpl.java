@@ -293,7 +293,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
             logger.info("saveFlow is not change");
-            updateTOSaveStatus(dssFlow);
             return dssFlow.getBmlVersion();
         } else {
             logger.info("saveFlow is change");

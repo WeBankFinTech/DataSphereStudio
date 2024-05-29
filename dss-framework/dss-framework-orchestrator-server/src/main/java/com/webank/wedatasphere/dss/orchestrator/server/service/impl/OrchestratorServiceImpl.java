@@ -428,7 +428,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
                 orchestratorPluginService.submitFlow(submitRequest, userName, workspace);
             } else {
-                GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), userName);
+                GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), "system");
                 RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
             }
             lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);

@@ -202,7 +202,7 @@ public class DSSFlowEditLockManager {
                         DSSOrchestratorInfo orchestratorInfo = getOrchestratorInfo(flowID);
                         String status = lockMapper.selectOrchestratorStatus(flowID);
                         if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
-                            pushProject(projectInfo.getName(), new Long(projectInfo.getWorkspaceId()), dssFlow.getResourceId(), dssFlow.getBmlVersion(), dssFlow.getName(), username, "force unlock");
+                            pushProject(projectInfo.getName(), new Long(projectInfo.getWorkspaceId()), dssFlow.getResourceId(), dssFlow.getBmlVersion(), dssFlow.getName(), "system", "force unlock");
 
                             lockMapper.updateOrchestratorStatus(orchestratorInfo.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
                         }

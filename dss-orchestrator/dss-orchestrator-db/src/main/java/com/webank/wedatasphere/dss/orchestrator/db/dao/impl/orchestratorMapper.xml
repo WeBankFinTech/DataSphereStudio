@@ -22,7 +22,7 @@
 
     <sql id="orchestrator_main">
         id,`name`,`type`,`desc`,`creator`,`create_time`,`project_id`,`uses`,`appconn_name`,`uuid`,`secondary_type` ,
-        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`orchestrator_level`,`update_user`,`update_time`,`is_default_reference`,`status`
+        `workspace_id`,`orchestrator_mode`,`orchestrator_way`,`orchestrator_level`,`update_user`,`update_time`,`is_default_reference`
     </sql>
 
     <sql id="orchestrator_version">
@@ -36,14 +36,14 @@
     <select id="getOrchestrator"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
         SELECT
-        <include refid="orchestrator_main"/>
+        <include refid="orchestrator_main"/>,`status`
         FROM `dss_orchestrator_info` WHERE id = #{id}
     </select>
 
     <select id="getOrchestratorByUUID"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
         SELECT
-        <include refid="orchestrator_main"/>
+        <include refid="orchestrator_main"/>, `status`
         FROM `dss_orchestrator_info` WHERE uuid = #{uuid}
     </select>
 
@@ -226,7 +226,7 @@
     <select id="queryOrchestratorInfos" parameterType="java.util.Map"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
         select
-        <include refid="orchestrator_main"/>
+        <include refid="orchestrator_main"/>, `status`
         from dss_orchestrator_info
         <where>
             <if test="params.workspace_id != null">

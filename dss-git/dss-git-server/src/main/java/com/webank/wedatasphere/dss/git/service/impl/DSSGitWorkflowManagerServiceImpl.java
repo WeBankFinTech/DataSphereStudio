@@ -45,9 +45,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     private BMLService bmlService;
     @Override
     public GitDiffResponse diff(GitDiffRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+        Long workspaceId = request.getWorkspaceId();
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+            logger.error("the workspace : {} don't associate with git", workspaceId);
             return null;
         }
         GitDiffResponse diff = null;
@@ -64,11 +65,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 fileList.add(entry.getKey());
                 // 解压BML文件到本地
-                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
-                FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
-                FileUtils.unzipBMLResource(entry.getKey());
+                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId);
+                FileUtils.removeFlowNode(entry.getKey(), request.getProjectName(), workspaceId);
+                FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
             }
-            diff = DSSGitUtils.diff(request.getProjectName(), fileList);
+            diff = DSSGitUtils.diff(request.getProjectName(), fileList, workspaceId);
             // 重置本地
             DSSGitUtils.reset(repository, request.getProjectName());
         } catch (Exception e) {
@@ -80,9 +81,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse commit(GitCommitRequest request) {
-        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+        Long workspaceId = request.getWorkspaceId();
+        GitUserEntity gitUser = dssWorkspaceGitService.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+            logger.error("the workspace : {} don't associate with git", workspaceId);
             return null;
         }
         GitCommitResponse commitResponse = null;
@@ -100,9 +102,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 paths.add(entry.getKey());
                 // 解压BML文件到本地
-                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername());
-                FileUtils.removeFlowNode(entry.getKey(), request.getProjectName());
-                FileUtils.unzipBMLResource(entry.getKey());
+                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId);
+                FileUtils.removeFlowNode(entry.getKey(), request.getProjectName(), workspaceId);
+                FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
             }
             // 提交
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
@@ -346,7 +348,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
             String content = DSSGitUtils.getTargetCommitFileContent(repository, request.getProjectName(), request.getCommitId(), request.getFilePath());
-            String fullpath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getFilePath());
+            String fullpath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + FileUtils.normalizePath(request.getFilePath());
             File file = new File(fullpath);
             String fileName = file.getName();
             BmlResource bmlResource = FileUtils.uploadResourceToBML(bmlService, gitUser.getGitUser(), content, fileName, request.getProjectName());
@@ -487,7 +489,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             // 同步删除对应节点
             for (String path : request.getPath()) {
-                FileUtils.removeFlowNode(path, request.getProjectName());
+                FileUtils.removeFlowNode(path, request.getProjectName(), request.getWorkspaceId());
             }
             // 提交
             String comment = "delete workflowNode " + request.getPath().toString() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
@@ -517,11 +519,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
             // 同步删除对应节点
-            String olfFilePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(request.getOldName());
-            String filePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(request.getName());
+            String olfFilePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(request.getOldName());
+            String filePath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(request.getName());
 
-            String oldFileMetaPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getOldName());
-            String fileMetaPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getName());
+            String oldFileMetaPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getOldName());
+            String fileMetaPath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + request.getProjectName() + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + FileUtils.normalizePath(request.getName());
             List<String> fileList = new ArrayList<>();
             fileList.add(oldFileMetaPath);
             fileList.add(olfFilePath);

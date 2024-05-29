@@ -12,6 +12,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryRespon
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -45,6 +46,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class DSSGitUtils {
@@ -504,12 +507,34 @@ public class DSSGitUtils {
                 walk.dispose();
                 commitResponse.setCommitId(commit.getId().getName());
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
-                commitResponse.setComment(commit.getShortMessage());
-                commitResponse.setCommitUser(commit.getAuthorIdent().getName());
-                return commitResponse; // 返回commitId字符串
+                String shortMessage = commit.getShortMessage();
+                commitResponse.setComment(shortMessage);
+                String userName = getUserName(shortMessage);
+                if (userName != null) {
+                    commitResponse.setCommitUser(userName);
+                } else {
+                    commitResponse.setCommitUser(commit.getAuthorIdent().getName());
+                }
+                // 返回commitId字符串
+                return commitResponse;
             }
         } catch (IOException e) {
             throw new GitErrorException(80001, "get current commit failed, the reason is : ", e);
+        }
+    }
+
+    public static String getUserName(String shortMessage) {
+        if (StringUtils.isEmpty(shortMessage)) {
+            return null;
+        }
+        Pattern pattern = Pattern.compile("by :\\s*(\\w+)");
+        Matcher matcher = pattern.matcher(shortMessage);
+
+        if (matcher.find()) {
+            // group(1) 是第一个括号中匹配到的内容
+            return matcher.group(1);
+        } else {
+            return null;
         }
     }
 
@@ -523,8 +548,14 @@ public class DSSGitUtils {
                 GitCommitResponse commitResponse = new GitCommitResponse();
                 commitResponse.setCommitId(commit.getId().getName());
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
-                commitResponse.setComment(commit.getShortMessage());
-                commitResponse.setCommitUser(commit.getAuthorIdent().getName());
+                String shortMessage = commit.getShortMessage();
+                commitResponse.setComment(shortMessage);
+                String userName = getUserName(shortMessage);
+                if (userName != null) {
+                    commitResponse.setCommitUser(userName);
+                } else {
+                    commitResponse.setCommitUser(commit.getAuthorIdent().getName());
+                }
                 logger.info("提交ID: " + commit.getId().getName());
                 commitResponseList.add(commitResponse);
             }

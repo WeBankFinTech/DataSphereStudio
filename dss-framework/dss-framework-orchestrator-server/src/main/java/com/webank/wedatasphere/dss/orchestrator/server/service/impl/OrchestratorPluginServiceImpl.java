@@ -220,7 +220,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         Long orchestratorId = flowRequest.getOrchestratorId();
         String status = lockMapper.selectOrchestratorStatus(orchestratorId);
         if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
-            throw new DSSErrorException(800001, "提交前请先保存工作流");
+            return ;
         }
         releaseThreadPool.submit(() ->{
             //1. 异步提交，更新提交状态

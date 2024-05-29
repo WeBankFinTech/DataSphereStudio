@@ -519,12 +519,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 orchestratorBaseInfo.setEditable(isEditable || isReleasable);
                 orchestratorBaseInfo.setReleasable(isReleasable);
                 orchestratorBaseInfo.setIsDefaultReference(dssOrchestratorInfo.getIsDefaultReference());
-                if (!StringUtils.isEmpty(dssOrchestratorInfo.getStatus()) && dssOrchestratorInfo.getStatus().equals(OrchestratorRefConstant.FLOW_STATUS_PUSHING)
-                        && dssOrchestratorInfo.getStatus().equals(OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED)) {
-                    orchestratorBaseInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
-                } else {
-                    orchestratorBaseInfo.setStatus(dssOrchestratorInfo.getStatus());
-                }
+                orchestratorBaseInfo.setStatus(dssOrchestratorInfo.getStatus());
 
                 retList.add(orchestratorBaseInfo);
             }
@@ -618,7 +613,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             elementPassWord.sendKeys(gitPassword);
             elementBtn.submit();
             driver.navigate().refresh();
-            LOGGER.info("for user getting... " + UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
+            LOGGER.info("for user getting... " + UrlUtils.normalizeIp(gitUrlPre));
             Set<Cookie> cookies = driver.manage().getCookies();
             LOGGER.info("cookies： {}", cookies.toString());
             for (Cookie cookie:cookies) {

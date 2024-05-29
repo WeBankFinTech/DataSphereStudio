@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserTreeVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -59,6 +61,12 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     private DssAdminUserService dssUserService;
     @Autowired
     private DSSWorkspaceAddUserHook dssWorkspaceAddUserHook;
+
+    private static final String NODE_TYPE_DEPARTMENT = "department";
+
+    private static final String NODE_TYPE_OFFICE = "office";
+
+    private static final String NODE_TYPE_USER = "user";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -121,10 +129,38 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<DepartmentUserVo> getAllWorkspaceUsersDepartment(long workspaceId) {
-        return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId).stream().map(
+    public List<DepartmentUserTreeVo> getAllWorkspaceUsersDepartment(long workspaceId) {
+        List<DepartmentUserVo> userList = dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId).stream().map(
                         workspaceUser -> changeToUserVO(workspaceUser))
                 .collect(Collectors.toList());
+        return structureVo2Tree(userList);
+    }
+
+    private List<DepartmentUserTreeVo> structureVo2Tree(List<DepartmentUserVo> userList) {
+      Map<String, Map<String, List<DepartmentUserTreeVo>>> userMap = userList.stream().collect(Collectors.groupingBy(DepartmentUserVo::getDepartment,
+                Collectors.groupingBy(DepartmentUserVo::getOffice, Collectors.mapping(user->{
+                    DepartmentUserTreeVo treeNode = new DepartmentUserTreeVo();
+                    treeNode.setName(user.getName());
+                    treeNode.setType(NODE_TYPE_USER);
+                    return treeNode;
+                }, Collectors.toList()))));
+        return userMap.keySet().stream().map(key->{
+            DepartmentUserTreeVo treeNode = new DepartmentUserTreeVo();
+            treeNode.setName(key);
+            treeNode.setType(NODE_TYPE_DEPARTMENT);
+            treeNode.setChild(buildTree4Office(userMap.get(key)));
+            return treeNode;
+        }).collect(Collectors.toList());
+    }
+
+    private List<DepartmentUserTreeVo> buildTree4Office(Map<String,List<DepartmentUserTreeVo>> officeMap){
+        return officeMap.keySet().stream().map(key->{
+            DepartmentUserTreeVo treeNode = new DepartmentUserTreeVo();
+            treeNode.setName(key);
+            treeNode.setType(NODE_TYPE_OFFICE);
+            treeNode.setChild(officeMap.get(key));
+            return treeNode;
+        }).collect(Collectors.toList());
     }
 
     private DepartmentUserVo changeToUserVO(String userName) {

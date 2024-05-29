@@ -147,26 +147,25 @@ public class FileUtils {
         removeDirectory(projectPath);
     }
 
-    public static void update(BMLService bmlService, String path,  BmlResource bmlResource, String username) {
-        try {
-            downloadAndUnzipBMLResource(bmlService, path, bmlResource, username, "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()));
-        }catch (DSSErrorException e) {
-            logger.error("unzip BML Resource Failed, the reason is : ", e);
-        }
-    }
-
-    private static void downloadAndUnzipBMLResource(BMLService bmlService, String path,BmlResource bmlResource, String userName, String dirPath) throws DSSErrorException {
+    public static void downloadBMLResource(BMLService bmlService, String path,  BmlResource bmlResource, String username) {
         //下载到本地处理
-        String importFile=dirPath + File.separator + path + ".zip";
+        String dirPath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue());
+        String importFile = dirPath + File.separator + path + ".zip";
         logger.info("import zip file locate at {}",importFile);
 
         try{
             //下载压缩包
-            bmlService.downloadToLocalPath(userName, bmlResource.getResourceId(), bmlResource.getVersion(), importFile);
+            bmlService.downloadToLocalPath(username, bmlResource.getResourceId(), bmlResource.getVersion(), importFile);
         }catch (Exception e){
             logger.error("download failed, the reason is :", e);
             throw new DSSRuntimeException("upload file format error(导入包格式错误)");
         }
+    }
+
+    public static void unzipBMLResource(String path) throws DSSErrorException {
+        //下载到本地处理
+        String dirPath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue());
+        String importFile= dirPath + File.separator + path + ".zip";
         //解压
         String unzipImportFile= FileUtils.unzipFile(importFile);
         logger.info("import unziped file locate at {}",unzipImportFile);

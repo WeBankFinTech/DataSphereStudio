@@ -19,16 +19,20 @@ package com.webank.wedatasphere.dss.workflow.lock;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestSubmitOrchestratorSync;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
@@ -188,7 +192,7 @@ public class DSSFlowEditLockManager {
         }
     }
 
-    public static void deleteLock(String flowEditLock, String username) throws DSSErrorException {
+    public static void deleteLock(String flowEditLock, Workspace workspace) throws DSSErrorException {
         try {
             if (StringUtils.isNotBlank(flowEditLock)) {
                 DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
@@ -199,12 +203,11 @@ public class DSSFlowEditLockManager {
                     DSSProject projectInfo = getProjectInfo(dssFlow.getProjectId());
                     // 对于接入Git的项目，工作流解锁加入额外处理
                     if (projectInfo.getAssociateGit()) {
-                        DSSOrchestratorInfo orchestratorInfo = getOrchestratorInfo(flowID);
+                        OrchestratorVo orchestratorVo = getOrchestratorInfo(flowID);
+                        DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
                         String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
                         if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
-                            pushProject(projectInfo.getName(), new Long(projectInfo.getWorkspaceId()), dssFlow.getResourceId(), dssFlow.getBmlVersion(), dssFlow.getName(), "system", "force unlock");
-
-                            lockMapper.updateOrchestratorStatus(orchestratorInfo.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+                            submitOrchestrator(orchestratorInfo.getId(), flowID, workspace);
                         }
                     }
                     lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowID);
@@ -227,25 +230,31 @@ public class DSSFlowEditLockManager {
         return dssProject;
     }
 
-    public static DSSOrchestratorInfo getOrchestratorInfo(Long flowID) throws  DSSErrorException{
+    public static OrchestratorVo getOrchestratorInfo(Long flowID) throws  DSSErrorException{
         Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(flowID)),
                 OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         if (orchestratorVo == null) {
             throw new DSSErrorException(800001, "编排不存在");
         }
-        return orchestratorVo.getDssOrchestratorInfo();
+        return orchestratorVo;
     }
 
-    public static void pushProject(String projectName, Long workspaceId, String resource, String version, String path, String username, String comment) {
+    public static void submitOrchestrator(Long orchestratorId, Long flowId, Workspace workspace) {
         LOGGER.info("-------=======================begin to add testGit1=======================-------");
-        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        Map<String, BmlResource> file = new HashMap<>();
-        // 测试数据 key表示项目名、value为项目BmlResource资源
-        file.put(path, new BmlResource(resource, version));
-        GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, comment, username);
-        GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
-        LOGGER.info("-------=======================End to add testGit1=======================-------: {}", responseWorkflowValidNode);
+        Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+        // 同步提交编排至BML以及push到git
+        RequestSubmitOrchestratorSync submitOrchestratorSync = new RequestSubmitOrchestratorSync();
+        submitOrchestratorSync.setOrchestratorId(orchestratorId);
+        submitOrchestratorSync.setFlowId(flowId);
+        submitOrchestratorSync.setComment("force unlock");
+        LabelRouteVO labelRouteVO = new LabelRouteVO();
+        labelRouteVO.setRoute("dev");
+        submitOrchestratorSync.setLabels(labelRouteVO);
+        submitOrchestratorSync.setUsername("system");
+        submitOrchestratorSync.setWorkspace(workspace);
+        GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(orcSender.ask(submitOrchestratorSync), GitCommitResponse.class, RequestSubmitOrchestratorSync.class);
+        LOGGER.info("-------=======================End to add submit=======================-------: {}", responseWorkflowValidNode);
     }
 
 
@@ -273,7 +282,8 @@ public class DSSFlowEditLockManager {
     }
 
     public static boolean isLockExpire(DSSFlowEditLock flowEditLock) throws DSSErrorException{
-        DSSOrchestratorInfo orchestratorInfo = getOrchestratorInfo(flowEditLock.getFlowID());
+        OrchestratorVo orchestratorVo = getOrchestratorInfo(flowEditLock.getFlowID());
+        DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
         String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
         if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
             return false;

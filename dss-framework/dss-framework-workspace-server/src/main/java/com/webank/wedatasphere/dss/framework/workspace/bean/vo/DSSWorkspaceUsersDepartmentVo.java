@@ -9,11 +9,11 @@ import java.util.Map;
 public class DSSWorkspaceUsersDepartmentVo implements Serializable {
 
     private static final long serialVersionUID=1L;
-    private Map<String, Map<String, List<String>>> editUsers;
+    private List<DepartmentUserTreeVo> editUsers;
 
-    private Map<String, Map<String, List<String>>> accessUsers;
+    private List<DepartmentUserTreeVo> accessUsers;
 
-    private Map<String, Map<String, List<String>>> releaseUsers;
+    private List<DepartmentUserTreeVo> releaseUsers;
 
 
 }

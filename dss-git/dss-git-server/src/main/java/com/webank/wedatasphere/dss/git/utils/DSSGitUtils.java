@@ -50,10 +50,10 @@ import java.util.Set;
 public class DSSGitUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
-    public static void init(String projectName, GitUserEntity gitUserDO) {
-        if (checkProjectName(projectName, gitUserDO)) {
+    public static void init(String projectName, GitUserEntity gitUserDO) throws Exception, GitErrorException{
+        if (!checkProjectName(projectName, gitUserDO)) {
             try {
-                URL url = new URL(GitServerConfig.GIT_URL_PRE.getValue() + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue());
+                URL url = new URL(UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/" +GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue());
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("PRIVATE-TOKEN", gitUserDO.getGitToken());
@@ -80,9 +80,9 @@ public class DSSGitUtils {
         }
     }
 
-    public static void remote(Repository repository, String projectName, GitUserEntity gitUser) {
+    public static void remote(Repository repository, String projectName, GitUserEntity gitUser)throws GitErrorException {
         // 拼接git remote Url
-        String remoteUrl = GitServerConfig.GIT_URL_PRE.getValue() + gitUser.getGitUser() + File.separator + projectName + ".git";
+        String remoteUrl = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/" +gitUser.getGitUser() + File.separator + projectName + ".git";
         try {
             Git git = new Git(repository);
 
@@ -102,7 +102,7 @@ public class DSSGitUtils {
     }
 
 
-    public static void create(String projectName, GitUserEntity gitUserDO) {
+    public static void create(String projectName, GitUserEntity gitUserDO) throws GitErrorException{
         logger.info("start success");
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName); // 指定仓库的目录
         File respo = new File(generateGitPath(projectName));
@@ -124,7 +124,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static void pull(Repository repository, String projectName, GitUserEntity gitUser) {
+    public static void pull(Repository repository, String projectName, GitUserEntity gitUser)throws GitErrorException {
         try {
             Git git = new Git(repository);
 
@@ -156,7 +156,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static void pullTargetFile(Repository repository, String projectName, GitUserEntity gitUser, List<String> paths) {
+    public static void pullTargetFile(Repository repository, String projectName, GitUserEntity gitUser, List<String> paths) throws Exception {
         try {
             if (CollectionUtils.isEmpty(paths)) {
                 return ;
@@ -186,7 +186,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static GitDiffResponse diff(String projectName, List<String> fileList) {
+    public static GitDiffResponse diff(String projectName, List<String> fileList)throws GitErrorException{
 
         Set<String> status = status(projectName, fileList);
         GitTree root = new GitTree("");
@@ -208,14 +208,17 @@ public class DSSGitUtils {
 
 
 
-    public static void push(Repository repository, String projectName, GitUserEntity gitUser, String comment) {
+    public static void push(Repository repository, String projectName, GitUserEntity gitUser, String comment, List<String> paths) throws GitErrorException{
 
         try {
             Git git = new Git(repository);
             // 添加新增、更改到暂存区
-            git.add().addFilepattern(".").call(); // 添加所有更改
-            // 添加删除到暂存区
-            git.add().setUpdate(true).addFilepattern(".").call();
+            for (String path : paths) {
+                // 添加所有更改
+                git.add().addFilepattern(path).call();
+                // 添加删除到暂存区
+                git.add().setUpdate(true).addFilepattern(path).call();
+            }
 
             // 创建新的提交
             git.commit()
@@ -237,7 +240,7 @@ public class DSSGitUtils {
     }
 
 
-    public static void reset(Repository repository, String projectName) {
+    public static void reset(Repository repository, String projectName)throws GitErrorException {
         try {
             Git git = new Git(repository);
 
@@ -251,7 +254,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static void checkoutTargetCommit(Repository repository, GitRevertRequest request) throws GitAPIException, IOException {
+    public static void checkoutTargetCommit(Repository repository, GitRevertRequest request) throws GitAPIException, IOException, GitErrorException {
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getProjectName()+ File.separator + ".git");
         String commitId = request.getCommitId(); // 替换为目标commit的完整哈希值
 
@@ -295,7 +298,7 @@ public class DSSGitUtils {
 
         List<String> projectNames = new ArrayList<>();
         do {
-        String gitLabUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/projects?per_page=100&page=" + page; // 修改为你的GitLab实例的URL
+        String gitLabUrl = UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/api/v4/projects?per_page=100&page=" + page; // 修改为你的GitLab实例的URL
         // 创建HttpClient实例
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             // 创建HttpGet请求
@@ -339,7 +342,7 @@ public class DSSGitUtils {
         return projectNames;
     }
 
-    public static Set<String> status(String projectName, List<String> fileList) {
+    public static Set<String> status(String projectName, List<String> fileList)throws GitErrorException {
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator +".git"); // 修改为你的仓库路径
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build()) {
@@ -378,10 +381,10 @@ public class DSSGitUtils {
         }
     }
 
-    public static void archive(String projectName, GitUserEntity gitUserDO) {
+    public static void archive(String projectName, GitUserEntity gitUserDO) throws GitErrorException {
         try {
             String projectUrlEncoded = java.net.URLEncoder.encode(gitUserDO.getGitUser() + "/" + projectName, "UTF-8");
-            URL url = new URL(GitServerConfig.GIT_URL_PRE + "/api/v4/projects/" + projectUrlEncoded + "/archive");
+            URL url = new URL(gitUserDO.getGitUrl() + "/api/v4/projects/" + projectUrlEncoded + "/archive");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("PRIVATE-TOKEN", gitUserDO.getGitToken());
@@ -406,7 +409,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static void archiveLocal(String projectName) {
+    public static void archiveLocal(String projectName) throws GitErrorException{
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator + ".git");
         if (!repoDir.exists()) {
             logger.info("file {} not exists", repoDir.getAbsolutePath());
@@ -426,7 +429,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static String getTargetCommitFileContent(Repository repository, String projectName, String commitId, String filePath) {
+    public static String getTargetCommitFileContent(Repository repository, String projectName, String commitId, String filePath) throws GitErrorException {
         String content = "";
         try {
             // 获取最新的commitId
@@ -463,7 +466,7 @@ public class DSSGitUtils {
         return content;
     }
 
-    public static void getCommitId(Repository repository, String projectName, int num) {
+    public static void getCommitId(Repository repository, String projectName, int num)throws GitErrorException {
         // 获取当前CommitId，
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName + File.separator +".git");
 
@@ -484,12 +487,12 @@ public class DSSGitUtils {
                 logger.info("Commit Message: " + commitMessage);
                 logger.info("Commit Author: " + commitAuthor);
             }
-        } catch (GitAPIException e) {
+        } catch (Exception e) {
             throw new GitErrorException(80001, "git log failed, the reason is : ", e);
         }
     }
 
-    public static GitCommitResponse getCurrentCommit(Repository repository) {
+    public static GitCommitResponse getCurrentCommit(Repository repository) throws GitErrorException{
         GitCommitResponse commitResponse = new GitCommitResponse();
         try {
             // 获取HEAD引用
@@ -510,7 +513,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static List<GitCommitResponse> getLatestCommit(Repository repository, String filePath, Integer num) {
+    public static List<GitCommitResponse> getLatestCommit(Repository repository, String filePath, Integer num) throws GitErrorException{
         List<GitCommitResponse> commitResponseList = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 

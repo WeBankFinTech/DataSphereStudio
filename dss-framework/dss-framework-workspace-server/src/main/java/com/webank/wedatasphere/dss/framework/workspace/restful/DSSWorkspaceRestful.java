@@ -35,8 +35,10 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceServi
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitConnectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitConnectResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -379,6 +381,20 @@ public class DSSWorkspaceRestful {
         GitUserInfoResponse response = RpcAskUtils.processAskException(gitSender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
         GitUserEntity gitUser = response.getGitUser();
         return Message.ok().data("gitUser", gitUser);
+    }
+
+
+    @RequestMapping(path = "gitConnect", method = RequestMethod.GET)
+    public Message gitConnect(@RequestParam String gitUserName, @RequestParam String gitPassword) {
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitConnectRequest connectRequest = new GitConnectRequest(gitUserName, gitPassword);
+        GitConnectResponse connectResponse = RpcAskUtils.processAskException(gitSender.ask(connectRequest), GitConnectResponse.class, GitConnectRequest.class);
+        if (connectResponse.getConnect()) {
+            return Message.ok().data("result", "success");
+        }else {
+            return Message.ok().data("result", "invalid");
+        }
     }
 
 

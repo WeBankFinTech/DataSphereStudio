@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service;
 
 import com.webank.wedatasphere.dss.common.entity.PageInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
-import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserTreeVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public interface DSSWorkspaceUserService {
 
     List<String> getAllWorkspaceUsers(long workspaceId);
 
-    List<DepartmentUserVo> getAllWorkspaceUsersDepartment(long workspaceId) ;
+    List<DepartmentUserTreeVo> getAllWorkspaceUsersDepartment(long workspaceId) ;
 
     PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize);
 

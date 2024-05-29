@@ -65,7 +65,8 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
         reqExportFlow.projectId,
         reqExportFlow.projectName,
         DSSCommonUtils.COMMON_GSON.fromJson(reqExportFlow.workspaceStr, classOf[Workspace]),
-        reqExportFlow.dssLabelList)
+        reqExportFlow.dssLabelList,
+        reqExportFlow.exportExternalNodeAppConnResource)
       ResponseExportWorkflow(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
         reqExportFlow.flowID)
 

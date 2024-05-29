@@ -323,8 +323,13 @@ public class DSSFrameworkOrchestratorRestful {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
+        try {
+            orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
+        } catch (Exception e) {
+            return Message.error("提交工作流失败，请保存工作流重试，原因为：", e);
+        }
 
-        orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
+
         return Message.ok();
     }
 
@@ -340,11 +345,12 @@ public class DSSFrameworkOrchestratorRestful {
         GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
         gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
         gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_READ_TYPE);
-
+        // 跳转git需解密处理
+        gitUserInfoRequest.setDecrypt(true);
         GitUserInfoResponse readInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
         String gitUsername = readInfoResponse.getGitUser().getGitUser();
         String gitPassword = readInfoResponse.getGitUser().getGitPassword();
-        String gitUrlPre = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
+        String gitUrlPre = UrlUtils.normalizeIp(readInfoResponse.getGitUser().getGitUrl());
         String authenToken = "";
         try {
             authenToken = orchestratorService.getAuthenToken(gitUrlPre, gitUsername, gitPassword);
@@ -353,7 +359,7 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("git登陆失败，请检查git节点配置的用户名/密码/url");
         }
         // 获取顶级域名 eg: http://git.bdp.weoa.com -> weoa.com
-        String domainIp = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
+        String domainIp = UrlUtils.normalizeIp(gitUrlPre);
         int lastDotIndex = domainIp.lastIndexOf(".");
         String topDomain = "";
         if (lastDotIndex != -1) {

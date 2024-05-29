@@ -23,6 +23,10 @@ import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
@@ -189,18 +193,21 @@ public class DSSFlowEditLockManager {
             if (StringUtils.isNotBlank(flowEditLock)) {
                 DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
                 if (dssFlowEditLock != null) {
+                    Long flowID = dssFlowEditLock.getFlowID();
                     // 获取当前项目信息
-                    DSSFlow dssFlow = flowMapper.selectFlowByID(dssFlowEditLock.getFlowID());
+                    DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
                     DSSProject projectInfo = getProjectInfo(dssFlow.getProjectId());
                     // 对于接入Git的项目，工作流解锁加入额外处理
                     if (projectInfo.getAssociateGit()) {
-                        String status = lockMapper.selectOrchestratorStatus(dssFlowEditLock.getFlowID());
+                        DSSOrchestratorInfo orchestratorInfo = getOrchestratorInfo(flowID);
+                        String status = lockMapper.selectOrchestratorStatus(flowID);
                         if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
                             pushProject(projectInfo.getName(), new Long(projectInfo.getWorkspaceId()), dssFlow.getResourceId(), dssFlow.getBmlVersion(), dssFlow.getName(), username, "force unlock");
-                            lockMapper.updateOrchestratorStatus(dssFlow.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+
+                            lockMapper.updateOrchestratorStatus(orchestratorInfo.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
                         }
                     }
-                    lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), dssFlowEditLock.getFlowID());
+                    lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowID);
                 }
             }
         } catch (Exception e) {
@@ -218,6 +225,16 @@ public class DSSFlowEditLockManager {
             throw new DSSErrorException(90001, "工程不存在");
         }
         return dssProject;
+    }
+
+    public static DSSOrchestratorInfo getOrchestratorInfo(Long flowID) throws  DSSErrorException{
+        Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(flowID)),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+        if (orchestratorVo == null) {
+            throw new DSSErrorException(800001, "编排不存在");
+        }
+        return orchestratorVo.getDssOrchestratorInfo();
     }
 
     public static void pushProject(String projectName, Long workspaceId, String resource, String version, String path, String username, String comment) {
@@ -255,9 +272,10 @@ public class DSSFlowEditLockManager {
         }
     }
 
-    public static boolean isLockExpire(DSSFlowEditLock flowEditLock) {
-        String status = lockMapper.selectOrchestratorStatus(flowEditLock.getFlowID());
-        if (StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
+    public static boolean isLockExpire(DSSFlowEditLock flowEditLock) throws DSSErrorException{
+        DSSOrchestratorInfo orchestratorInfo = getOrchestratorInfo(flowEditLock.getFlowID());
+        String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
+        if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
             return false;
         }
         return System.currentTimeMillis() - flowEditLock.getUpdateTime().getTime() >= DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue();

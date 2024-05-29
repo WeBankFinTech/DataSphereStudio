@@ -18,8 +18,8 @@
 
 <mapper namespace="com.webank.wedatasphere.dss.git.dao.DSSWorkspaceGitMapper">
     <insert id="insert" parameterType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
-        insert into dss_workspace_associate_git (workspace_id, git_user, git_password, git_token, create_time, update_time, create_by, update_by, type)
-        VALUES (#{workspaceId}, #{gitUser}, #{gitPassword}, #{gitToken}, now(), now(), #{createBy}, #{updateBy}, #{type})
+        insert into dss_workspace_associate_git (workspace_id, git_user, git_password, git_token, git_url, create_time, update_time, create_by, update_by, type)
+        VALUES (#{workspaceId}, #{gitUser}, #{gitPassword}, #{gitToken}, #{gitUrl}, now(), now(), #{createBy}, #{updateBy}, #{type})
     </insert>
 
     <update id="update" parameterType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
@@ -40,8 +40,29 @@
     </update>
 
     <select id="selectByWorkspaceId" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
-        select id, workspace_id, git_user, git_token, create_time, update_time, create_by, update_by, type
+        select id, workspace_id, git_user, git_token, git_password, git_url, create_time, update_time, create_by, update_by, type
         from dss_workspace_associate_git
-        where workspace_id = #{workspaceId} and `type` = #{type}
+        where workspace_id = #{workspaceId} and `type` = #{type} limit 1
+    </select>
+
+    <select id="selectByUser" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
+        select id, workspace_id, git_user, git_token, git_password, git_url, create_time, update_time, create_by, update_by, type
+        from dss_workspace_associate_git
+        where git_user = #{gitUser} and `type` = 'write' limit 1
+    </select>
+
+    <select id="selectGitUser" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
+        select id, workspace_id, git_user, git_token, git_password, git_url, create_time, update_time, create_by, update_by, type
+        from dss_workspace_associate_git
+        where 1=1
+        <if test="workspaceId != null">
+            and workspace_id = #{workspaceId}
+        </if>
+        <if test="type != null" >
+            and `type` = #{type}
+        </if>
+        <if test="gitUser != null" >
+            and git_user = #{gitUser}
+        </if>
     </select>
 </mapper>

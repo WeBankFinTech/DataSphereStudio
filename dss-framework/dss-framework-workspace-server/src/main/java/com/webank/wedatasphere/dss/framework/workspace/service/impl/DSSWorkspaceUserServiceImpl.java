@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.webank.wedatasphere.dss.common.entity.PageInfo;
+import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
@@ -38,7 +39,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -121,10 +124,16 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<DepartmentUserVo> getAllWorkspaceUsersDepartment(long workspaceId) {
-        return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId).stream().map(
+    public Map<String, Map<String, List<String>>> getAllWorkspaceUsersDepartment(long workspaceId) {
+        List<DepartmentUserVo> userList = dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId).stream().map(
                         workspaceUser -> changeToUserVO(workspaceUser))
                 .collect(Collectors.toList());
+        return structureVo2Map(userList);
+    }
+
+    private Map<String, Map<String, List<String>>> structureVo2Map(List<DepartmentUserVo> userList) {
+        return userList.stream().collect(Collectors.groupingBy(DepartmentUserVo::getDepartment,
+                Collectors.groupingBy(DepartmentUserVo::getOffice, Collectors.mapping(DepartmentUserVo::getName,Collectors.toList()))));
     }
 
     private DepartmentUserVo changeToUserVO(String userName) {

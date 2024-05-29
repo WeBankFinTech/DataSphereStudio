@@ -227,14 +227,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             logger.info(gitSearchCommand.toString());
 
             List<String> searchResult = process(gitSearchCommand);
-            List<String> subSearchResult = null;
-            if (searchResult.size() > GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()) {
-                subSearchResult = new ArrayList<>(searchResult.subList(0, GitServerConfig.GIT_SEARCH_RESULT_LIMIT.getValue()));
-            } else {
-                subSearchResult = searchResult;
-            }
+
             List<GitSearchLine> keyLines = new ArrayList<>();
-            for (String resultLine : subSearchResult) {
+            for (String resultLine : searchResult) {
                 // 找到第一个冒号的位置
                 int colonIndex = resultLine.indexOf(':');
 

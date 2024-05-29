@@ -23,9 +23,9 @@ import java.util.zip.ZipFile;
 public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
-    public static void addFiles(String projectName) {
+    public static void addFiles(String projectName, Long workspaceId) {
 
-        String filePath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + projectName +"/file1.txt";
+        String filePath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + workspaceId + File.separator +  projectName +"/file1.txt";
         List<String> lines = Arrays.asList("The first line", "The second line");
 
         try {
@@ -52,8 +52,8 @@ public class FileUtils {
         }
     }
 
-    public static void addDirectory (String directory) {
-        String filePath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/testGit1/file1.txt";
+    public static void addDirectory (String directory, Long workspaceId) {
+        String filePath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + workspaceId + File.separator +  "/testGit1/file1.txt";
         List<String> lines = Arrays.asList("The first line", "The second line");
 
         try {
@@ -129,9 +129,9 @@ public class FileUtils {
         return destFile;
     }
 
-    public static void removeFlowNode(String path, String projectName) {
+    public static void removeFlowNode(String path, String projectName, Long workspaceId) {
         // 删除node节点
-        String flowNodePathPre =  FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + projectName ;
+        String flowNodePathPre =  FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  projectName ;
         String flowNodePath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + path;
         String flowNodeMetaPath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + path;
         // 1.删除工作流节点代码
@@ -140,20 +140,22 @@ public class FileUtils {
         removeDirectory(flowNodeMetaPath);
     }
 
-    public static void removeProject(String path) {
+    public static void removeProject(String path, Long workspaceId) {
         // 删除node节点
-        String projectPath =  File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + path ;
+        String projectPath =  File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  path ;
         // 1.删除项目
         removeDirectory(projectPath);
     }
 
-    public static void downloadBMLResource(BMLService bmlService, String path,  BmlResource bmlResource, String username) {
+    public static void downloadBMLResource(BMLService bmlService, String path,  BmlResource bmlResource, String username, Long workspaceId) {
         //下载到本地处理
         String dirPath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue());
-        String importFile = dirPath + File.separator + path + ".zip";
+        String importFile = dirPath + File.separator + workspaceId + File.separator +  path + ".zip";
         logger.info("import zip file locate at {}",importFile);
 
         try{
+            // 确保父目录存在
+            Files.createDirectories(Paths.get(importFile).getParent());
             //下载压缩包
             bmlService.downloadToLocalPath(username, bmlResource.getResourceId(), bmlResource.getVersion(), importFile);
         }catch (Exception e){
@@ -162,10 +164,10 @@ public class FileUtils {
         }
     }
 
-    public static void unzipBMLResource(String path) throws DSSErrorException {
+    public static void unzipBMLResource(String path, Long workspaceId) throws DSSErrorException {
         //下载到本地处理
         String dirPath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue());
-        String importFile= dirPath + File.separator + path + ".zip";
+        String importFile= dirPath + File.separator + workspaceId + File.separator +  path + ".zip";
         //解压
         String unzipImportFile= FileUtils.unzipFile(importFile);
         logger.info("import unziped file locate at {}",unzipImportFile);

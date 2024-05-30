@@ -69,13 +69,12 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);
-//            throw new DSSErrorException(010001, "create project failed");
+            throw new DSSErrorException(010001, "create project failed, the reason is: " + e);
         } finally {
             if (repository != null) {
                 repository.close();
             }
         }
-        return null;
     }
 
     @Override

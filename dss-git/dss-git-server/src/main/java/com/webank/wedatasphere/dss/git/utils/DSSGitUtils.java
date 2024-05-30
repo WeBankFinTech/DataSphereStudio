@@ -601,7 +601,7 @@ public class DSSGitUtils {
 
     public static String generateGitPath(String projectName, Long workspaceId) {
         // eg ： /data/GitInstall/testGit/.git
-        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + DSSGitConstant.GIT_PATH_SUFFIX;
+        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + DSSGitConstant.GIT_PATH_SUFFIX;
     }
 
 

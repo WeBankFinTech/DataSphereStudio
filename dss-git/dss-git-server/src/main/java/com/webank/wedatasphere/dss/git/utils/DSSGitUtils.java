@@ -527,12 +527,12 @@ public class DSSGitUtils {
         if (StringUtils.isEmpty(shortMessage)) {
             return null;
         }
-        Pattern pattern = Pattern.compile("by :\\s*(\\w+)");
-        Matcher matcher = pattern.matcher(shortMessage);
 
-        if (matcher.find()) {
-            // group(1) 是第一个括号中匹配到的内容
-            return matcher.group(1);
+        int lastIndexOf = shortMessage.lastIndexOf(DSSGitConstant.GIT_PATH_SUFFIX);
+
+        if (lastIndexOf != -1) {
+            String username = shortMessage.substring(lastIndexOf + DSSGitConstant.GIT_PATH_SUFFIX.length());
+            return username;
         } else {
             return null;
         }

@@ -207,7 +207,7 @@ public class DSSFlowEditLockManager {
                         DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
                         String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
                         if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
-                            submitOrchestrator(orchestratorInfo.getId(), flowID, workspace);
+                            submitOrchestrator(orchestratorInfo.getId(), flowID, workspace, projectInfo.getName());
                         }
                     }
                     lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowID);
@@ -240,7 +240,7 @@ public class DSSFlowEditLockManager {
         return orchestratorVo;
     }
 
-    public static void submitOrchestrator(Long orchestratorId, Long flowId, Workspace workspace) {
+    public static void submitOrchestrator(Long orchestratorId, Long flowId, Workspace workspace, String projectName) {
         LOGGER.info("-------=======================begin to add testGit1=======================-------");
         Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
         // 同步提交编排至BML以及push到git
@@ -248,6 +248,7 @@ public class DSSFlowEditLockManager {
         submitOrchestratorSync.setOrchestratorId(orchestratorId);
         submitOrchestratorSync.setFlowId(flowId);
         submitOrchestratorSync.setComment("force unlock");
+        submitOrchestratorSync.setProjectName(projectName);
         LabelRouteVO labelRouteVO = new LabelRouteVO();
         labelRouteVO.setRoute("dev");
         submitOrchestratorSync.setLabels(labelRouteVO);

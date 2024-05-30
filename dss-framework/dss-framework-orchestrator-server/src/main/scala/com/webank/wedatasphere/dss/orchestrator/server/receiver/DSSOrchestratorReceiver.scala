@@ -105,8 +105,8 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
       request.setOrchestratorId(requestSubmitOrchestratorSync.getOrchestratorId)
       request.setProjectName(requestSubmitOrchestratorSync.getProjectName)
       request.setFlowId(requestSubmitOrchestratorSync.getFlowId)
-      request.setLabels(request.getLabels)
-      request.setComment(request.getComment)
+      request.setLabels(requestSubmitOrchestratorSync.getLabels)
+      request.setComment(requestSubmitOrchestratorSync.getComment)
       val username = requestSubmitOrchestratorSync.getUsername
       val workspace = requestSubmitOrchestratorSync.getWorkspace
       orchestratorPluginService.submitWorkflowToBML(request, username, workspace)

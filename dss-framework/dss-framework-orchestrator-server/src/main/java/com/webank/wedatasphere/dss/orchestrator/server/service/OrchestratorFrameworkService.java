@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
@@ -49,7 +50,7 @@ public interface OrchestratorFrameworkService {
     DSSOrchestratorCopyInfo getOrchestratorCopyInfoById(String copyInfoId);
 
 
-    String getOrchestratorStatus(Long orchestratorId);
+    OrchestratorSubmitJob getOrchestratorStatus(Long orchestratorId);
 
     GitHistoryResponse getHistory(Long workspaceId, Long orchestratorId, String projectName);
 }

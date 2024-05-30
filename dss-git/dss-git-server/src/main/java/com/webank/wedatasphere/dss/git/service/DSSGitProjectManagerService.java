@@ -7,7 +7,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import java.util.concurrent.ExecutionException;
 
 public interface DSSGitProjectManagerService {
-    GitCreateProjectResponse create(GitCreateProjectRequest request) throws ExecutionException, InterruptedException;
+    GitCreateProjectResponse create(GitCreateProjectRequest request) throws DSSErrorException;
 
     GitArchivePorjectResponse archive(GitArchiveProjectRequest request) throws DSSErrorException;
 

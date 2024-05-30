@@ -38,7 +38,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
     private BMLService bmlService;
 
     @Override
-    public GitCreateProjectResponse create(GitCreateProjectRequest request) {
+    public GitCreateProjectResponse create(GitCreateProjectRequest request) throws DSSErrorException{
         Long workspaceId = request.getWorkspaceId();
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {

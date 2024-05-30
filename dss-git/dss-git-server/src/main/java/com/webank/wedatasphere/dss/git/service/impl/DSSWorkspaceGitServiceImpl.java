@@ -49,11 +49,6 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         }
         GitUserEntity gitUser = gitUserCreateRequest.getGitUser();
         String userName = gitUserCreateRequest.getUsername();
-        // 工作空间--git编辑权限用户 为一一对应关系
-        GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
-        if (gitUserEntity != null) {
-            throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户");
-        }
 
 
         // 不存在则更新，存在则新增
@@ -69,6 +64,11 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             gitUser.setGitToken(encryptToken);
         }
         if (oldGitUserDo == null) {
+            // 工作空间--git编辑权限用户 为一一对应关系
+            GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
+            if (gitUserEntity != null) {
+                throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户");
+            }
             gitUser.setCreateBy(userName);
             gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
             workspaceGitMapper.insert(gitUser);

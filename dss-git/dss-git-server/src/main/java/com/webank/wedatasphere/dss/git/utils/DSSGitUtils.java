@@ -108,7 +108,7 @@ public class DSSGitUtils {
     public static void create(String projectName, GitUserEntity gitUserDO, Long workspaceId) throws GitErrorException{
         logger.info("start success");
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName); // 指定仓库的目录
-        File respo = new File(generateGitPath(projectName));
+        File respo = new File(generateGitPath(projectName, workspaceId));
         if (!respo.exists()) {
             try {
                 // 初始化仓库
@@ -599,9 +599,9 @@ public class DSSGitUtils {
         return historyResponse;
     }
 
-    public static String generateGitPath(String projectName) {
+    public static String generateGitPath(String projectName, Long workspaceId) {
         // eg ： /data/GitInstall/testGit/.git
-        return DSSGitConstant.GIT_PATH_PRE + projectName + DSSGitConstant.GIT_PATH_SUFFIX;
+        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + DSSGitConstant.GIT_PATH_SUFFIX;
     }
 
 

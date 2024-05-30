@@ -31,7 +31,9 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoReques
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
@@ -392,9 +394,16 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
-        String orchestratorStatus = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
-
-        return Message.ok().data("status", orchestratorStatus);
+        OrchestratorSubmitJob orchestratorSubmitJob = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
+        // 未提交
+        if (orchestratorSubmitJob == null) {
+            return Message.error("该编排未开始提交");
+        }
+        String status = orchestratorSubmitJob.getStatus();
+        if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equals(status)) {
+            return Message.error("提交失败，原因为：" + orchestratorSubmitJob.getErrorMsg());
+        }
+        return Message.ok().data("status", status);
     }
 
     @RequestMapping(value = "publish/history", method = RequestMethod.GET)

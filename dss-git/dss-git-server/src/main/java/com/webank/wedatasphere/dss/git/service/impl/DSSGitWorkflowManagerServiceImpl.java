@@ -399,8 +399,13 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             if (repoDir.exists()) {
                 repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
             } else {
-                repository = FileRepositoryBuilder.create(new File(String.valueOf(repoDir)));
+                // 本地创建Git项目
+                DSSGitUtils.create(projectName, gitUser, gitUser.getWorkspaceId());
+                // 获取git项目
+                String gitPath = DSSGitUtils.generateGitPath(projectName, gitUser.getWorkspaceId());
+                repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
                 DSSGitUtils.remote(repository, projectName, gitUser);
+                DSSGitUtils.pull(repository, projectName, gitUser);
             }
         } catch (Exception e) {
             logger.info("get repository failed, the reason is: ", e);

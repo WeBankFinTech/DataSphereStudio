@@ -74,7 +74,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
             workspaceGitMapper.insert(gitUser);
         }else {
-            if (!oldGitUserDo.getGitUser().equals(gitUser.getGitUser())) {
+            if (GitConstant.GIT_ACCESS_WRITE_TYPE.equals(gitUser.getType()) && !oldGitUserDo.getGitUser().equals(gitUser.getGitUser())) {
                 throw new DSSErrorException(800001, "用户名不得修改");
             }
             workspaceGitMapper.update(gitUser);

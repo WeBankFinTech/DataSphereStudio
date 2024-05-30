@@ -53,7 +53,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitDiffResponse diff = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
@@ -89,7 +89,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
         // 获取git仓库
         File repoDir = new File(gitPath);
 
@@ -121,7 +121,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitSearchResponse search(GitSearchRequest request) {
-        String gitDir = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitDir = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         String workTree = DSSGitConstant.GIT_PATH_PRE + request.getProjectName() ;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-l", request.getSearchContent()
@@ -304,7 +304,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitDeleteResponse deleteResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
@@ -340,7 +340,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitFileContentResponse contentResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
@@ -370,7 +370,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitHistoryResponse response = new GitHistoryResponse();
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
@@ -417,7 +417,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser);){
@@ -447,7 +447,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
@@ -481,7 +481,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
@@ -514,7 +514,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
@@ -554,7 +554,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         GitHistoryResponse response = new GitHistoryResponse();
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName());
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){

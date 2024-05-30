@@ -63,9 +63,9 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             String encryptToken = generateKeys(gitUser.getGitToken(), Cipher.ENCRYPT_MODE);
             gitUser.setGitToken(encryptToken);
         }
+        GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
         if (oldGitUserDo == null) {
-            // 工作空间--git编辑权限用户 为一一对应关系
-            GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
+            // 工作空间--git用户 为一一对应关系
             if (gitUserEntity != null) {
                 throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户");
             }
@@ -75,6 +75,9 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         }else {
             if (GitConstant.GIT_ACCESS_WRITE_TYPE.equals(gitUser.getType()) && !oldGitUserDo.getGitUser().equals(gitUser.getGitUser())) {
                 throw new DSSErrorException(800001, "用户名不得修改");
+            }
+            if (gitUserEntity != null && (!gitUserEntity.getWorkspaceId().equals(gitUser.getWorkspaceId()) || !gitUserEntity.getType().equals(gitUser.getType()))) {
+                throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户");
             }
             workspaceGitMapper.update(gitUser);
         }
@@ -156,9 +159,6 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         // 期望匹配的用户名
         String expectedUsername = connectTestRequest.getUsername();
         GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(expectedUsername);
-        if (gitUserEntity != null) {
-            throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户");
-        }
         // GitLab API 用户信息接口
         String apiUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/user";
 

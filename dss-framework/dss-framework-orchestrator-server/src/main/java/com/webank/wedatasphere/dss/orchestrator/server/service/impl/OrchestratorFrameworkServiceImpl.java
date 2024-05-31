@@ -453,6 +453,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     @Override
     public GitHistoryResponse getHistory(Long workspaceId, Long orchestratorId, String projectName) {
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
+        List<DSSOrchestratorVersion> versionByOrchestratorId = orchestratorMapper.getVersionByOrchestratorId(orchestratorId);
+
         String workflowName = orchestrator.getName();
 
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();

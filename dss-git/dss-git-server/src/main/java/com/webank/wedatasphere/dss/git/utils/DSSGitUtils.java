@@ -529,10 +529,10 @@ public class DSSGitUtils {
             return null;
         }
 
-        int lastIndexOf = shortMessage.lastIndexOf(DSSGitConstant.GIT_PATH_SUFFIX);
+        int lastIndexOf = shortMessage.lastIndexOf(DSSGitConstant.GIT_USERNAME_FLAG);
 
         if (lastIndexOf != -1) {
-            String username = shortMessage.substring(lastIndexOf + DSSGitConstant.GIT_PATH_SUFFIX.length());
+            String username = shortMessage.substring(lastIndexOf + DSSGitConstant.GIT_USERNAME_FLAG.length());
             return username;
         } else {
             return null;

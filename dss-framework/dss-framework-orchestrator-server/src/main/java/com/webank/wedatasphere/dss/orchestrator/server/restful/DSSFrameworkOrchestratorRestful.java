@@ -328,7 +328,7 @@ public class DSSFrameworkOrchestratorRestful {
         try {
             orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
         } catch (Exception e) {
-            return Message.error("提交工作流失败，请保存工作流重试，原因为：", e);
+            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
         }
 
 

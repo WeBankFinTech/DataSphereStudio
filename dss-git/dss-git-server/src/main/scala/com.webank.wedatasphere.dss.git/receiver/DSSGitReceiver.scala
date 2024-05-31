@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.git.receiver
 
-import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
+import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
 import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService, DSSWorkspaceGitService}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.slf4j.{Logger, LoggerFactory}
@@ -47,8 +47,8 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       gitWorkflowManagerService.delete(gitDeleteRequest)
     case gitFileContentRequest: GitFileContentRequest =>
       gitWorkflowManagerService.getFileContent(gitFileContentRequest)
-    case gitHistoryRequest: GitHistoryRequest =>
-      gitWorkflowManagerService.getHistory(gitHistoryRequest)
+    case gitCommitInfoBetweenRequest: GitCommitInfoBetweenRequest =>
+      gitWorkflowManagerService.getHistory(gitCommitInfoBetweenRequest)
     case gitUserUpdateRequest: GitUserUpdateRequest =>
       workspaceGitService.associateGit(gitUserUpdateRequest)
     case gitUserInfoRequest: GitUserInfoRequest =>

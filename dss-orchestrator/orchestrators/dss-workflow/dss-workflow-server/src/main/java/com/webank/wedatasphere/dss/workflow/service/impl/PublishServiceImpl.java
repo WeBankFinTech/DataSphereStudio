@@ -99,8 +99,8 @@ public class PublishServiceImpl implements PublishService {
                     throw new DSSErrorException(800001, "编排不存在");
                 }
                 String status = lockMapper.selectOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId());
-                if (!org.apache.commons.lang3.StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_PUSH)) {
-                    throw new DSSErrorException(800001, "提交前请先提交工作流");
+                if (OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
+                    throw new DSSErrorException(800001, "发布前请先提交工作流");
                 }
 
                 // 获取当前文件Commit

@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.git.service.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitSearchLine;
 import com.webank.wedatasphere.dss.git.common.protocol.GitSearchResult;
@@ -80,7 +81,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
-    public GitCommitResponse commit(GitCommitRequest request) {
+    public GitCommitResponse commit(GitCommitRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
@@ -115,6 +116,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
+            throw new DSSErrorException(010001, "commit workflow failed, the reason is: " + e);
         }
         return commitResponse;
     }
@@ -296,7 +298,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
-    public GitDeleteResponse delete(GitDeleteRequest request) {
+    public GitDeleteResponse delete(GitDeleteRequest request) throws DSSErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -326,13 +328,14 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 提交
             DSSGitUtils.push(repository, request.getProjectName(), gitUser,"delete " + request.getDeleteFileList(), request.getDeleteFileList());
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
+            logger.error("delete failed, the reason is ",e);
+            throw new DSSErrorException(010001, "delete workflow failed, the reason is: " + e);
         }
         return null;
     }
 
     @Override
-    public GitFileContentResponse getFileContent(GitFileContentRequest request) {
+    public GitFileContentResponse getFileContent(GitFileContentRequest request) throws DSSErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -356,13 +359,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             contentResponse.setBmlResource(bmlResource);
             return contentResponse;
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
+            throw new DSSErrorException(010001, "getFileContent failed, the reason is: " + e);
         }
-       return null;
     }
 
     @Override
-    public GitHistoryResponse getHistory(GitHistoryRequest request) {
+    public GitHistoryResponse getHistory(GitHistoryRequest request) throws DSSErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -387,12 +389,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
 
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
+            throw new DSSErrorException(010001, "getHistory failed, the reason is: " + e);
         }
         return response;
     }
 
-    private Repository getRepository(File repoDir, String projectName, GitUserEntity gitUser) throws IOException {
+    private Repository getRepository(File repoDir, String projectName, GitUserEntity gitUser) throws DSSErrorException {
         Repository repository = null;
         try {
             // 当前机器不存在就新建
@@ -409,12 +411,13 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
         } catch (Exception e) {
             logger.info("get repository failed, the reason is: ", e);
+            throw new DSSErrorException(010001, "get repository failed, the reason is: " + e);
         }
         return repository;
     }
 
     @Override
-    public GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request) {
+    public GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request) throws DSSErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -438,13 +441,14 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
 
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
+            logger.error("getCurrentCommit, the reason is ",e);
+            throw new DSSErrorException(010001, "getCurrentCommit failed, the reason is: " + e);
         }
         return null;
     }
 
     @Override
-    public GitCommitResponse gitCheckOut(GitRevertRequest request) throws IOException {
+    public GitCommitResponse gitCheckOut(GitRevertRequest request) throws DSSErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -473,12 +477,13 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
         } catch (Exception e) {
             logger.error("checkOut failed, the reason is ",e);
+            throw new DSSErrorException(010001, "checkOut failed, the reason is: " + e);
         }
         return null;
     }
 
     @Override
-    public GitCommitResponse removeFile(GitRemoveRequest request) {
+    public GitCommitResponse removeFile(GitRemoveRequest request) throws DSSErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -506,12 +511,13 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
+            throw new DSSErrorException(010001, "removeFile failed, the reason is: " + e);
         }
         return commitResponse;
     }
 
     @Override
-    public GitCommitResponse rename(GitRenameRequest request) {
+    public GitCommitResponse rename(GitRenameRequest request) throws DSSErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -546,12 +552,14 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
 
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
+            logger.error("rename failed, the reason is ",e);
+            throw new DSSErrorException(010001, "rename failed, the reason is: " + e);
         }
         return commitResponse;
     }
 
-    public GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) {
+    @Override
+    public GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) throws DSSErrorException {
         GitUserEntity gitUser = dssWorkspaceGitService.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
@@ -565,10 +573,19 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-
-            response = DSSGitUtils.listCommitsBetween(repository, request.getOldCommitId(), request.getNewCommitId(), request.getDirName());
+            if (StringUtils.isEmpty(request.getOldCommitId())) {
+                List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getDirName(), 5);
+                if (CollectionUtils.isEmpty(latestCommit)) {
+                    logger.error("get Commit failed, the reason is null");
+                }else {
+                    response.setResponses(latestCommit);
+                }
+            } else {
+                response = DSSGitUtils.listCommitsBetween(repository, request.getOldCommitId(), request.getNewCommitId(), request.getDirName());
+            }
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
+            throw new DSSErrorException(010001, "getHistory failed, the reason is: " + e);
         }
         return response;
     }

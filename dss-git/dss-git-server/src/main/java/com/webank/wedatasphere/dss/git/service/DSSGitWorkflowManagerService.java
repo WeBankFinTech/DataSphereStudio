@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.git.service;
 
 
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 
@@ -8,23 +9,25 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public interface DSSGitWorkflowManagerService {
-    GitDiffResponse diff(GitDiffRequest request) throws ExecutionException, InterruptedException;
+    GitDiffResponse diff(GitDiffRequest request) throws DSSErrorException;
 
-    GitCommitResponse commit(GitCommitRequest request) throws ExecutionException, InterruptedException;
+    GitCommitResponse commit(GitCommitRequest request) throws DSSErrorException;
 
-    GitSearchResponse search(GitSearchRequest request);
+    GitSearchResponse search(GitSearchRequest request) throws DSSErrorException;
 
-    GitDeleteResponse delete(GitDeleteRequest request) throws ExecutionException, InterruptedException;
+    GitDeleteResponse delete(GitDeleteRequest request) throws DSSErrorException;
 
-    GitFileContentResponse getFileContent(GitFileContentRequest request);
+    GitFileContentResponse getFileContent(GitFileContentRequest request) throws DSSErrorException;
 
-    GitHistoryResponse getHistory(GitHistoryRequest request);
+    GitHistoryResponse getHistory(GitHistoryRequest request) throws DSSErrorException;
 
-    GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request);
+    GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request) throws DSSErrorException;
 
     GitCommitResponse gitCheckOut(GitRevertRequest request) throws IOException;
 
-    GitCommitResponse removeFile(GitRemoveRequest request);
+    GitCommitResponse removeFile(GitRemoveRequest request) throws DSSErrorException;
 
-    GitCommitResponse rename(GitRenameRequest request);
+    GitCommitResponse rename(GitRenameRequest request) throws DSSErrorException;
+
+    GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) throws DSSErrorException;
 }

@@ -509,12 +509,15 @@ public class DSSGitUtils {
                 commitResponse.setCommitId(commit.getId().getName());
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
                 String shortMessage = commit.getShortMessage();
-                commitResponse.setComment(shortMessage);
+
                 String userName = getUserName(shortMessage);
                 if (userName != null) {
                     commitResponse.setCommitUser(userName);
+                    int userNameIndex = shortMessage.lastIndexOf(userName);
+                    commitResponse.setComment(shortMessage.substring(0, userNameIndex));
                 } else {
                     commitResponse.setCommitUser(commit.getAuthorIdent().getName());
+                    commitResponse.setComment(shortMessage);
                 }
                 // 返回commitId字符串
                 return commitResponse;

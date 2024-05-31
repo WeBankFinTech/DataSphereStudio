@@ -360,7 +360,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             GitArchiveProjectRequest request1 = new GitArchiveProjectRequest(workspace.getWorkspaceId(), dssProjectDO.getName(), username);
             LOGGER.info("-------=======================begin to archive project: {}=======================-------", dssProjectDO.getName());
             Object ask = gitSender.ask(request1);
-            GitArchivePorjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitArchivePorjectResponse.class, GitCreateProjectRequest.class);
+            GitArchivePorjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitArchivePorjectResponse.class, GitArchiveProjectRequest.class);
             LOGGER.info("-------=======================End to archive project: {}=======================-------: {}", dssProjectDO.getName(), responseWorkflowValidNode);
         }
     }

@@ -23,7 +23,7 @@ public interface DSSGitWorkflowManagerService {
 
     GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request) throws DSSErrorException;
 
-    GitCommitResponse gitCheckOut(GitRevertRequest request) throws IOException;
+    GitCommitResponse gitCheckOut(GitRevertRequest request) throws DSSErrorException;
 
     GitCommitResponse removeFile(GitRemoveRequest request) throws DSSErrorException;
 

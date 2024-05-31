@@ -20,7 +20,7 @@ public class GitServerConfig {
 
     public static final CommonVars<String> GIT_SEARCH_EXCLUDE_DIRECTORY = CommonVars.apply("wds.dss.server.git.search.exclude.dir", ".metaConf");
 
-    public static final CommonVars<String> GIT_SEARCH_EXCLUDE_FILE = CommonVars.apply("wds.dss.server.git.search.exclude.file", ".properties");
+    public static final CommonVars<String> GIT_SEARCH_EXCLUDE_FILE = CommonVars.apply("wds.dss.server.git.search.exclude.file", ".properties,.projectmeta");
 
     public static final CommonVars<String> LINKIS_MYSQL_PRI_KEY = CommonVars.apply("wds.linkis.mysql.pri.key", "abc");
 }

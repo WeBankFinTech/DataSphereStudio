@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class DepartmentUserTreeVo implements Serializable {
     private static final long serialVersionUID=1L;
+    private Integer id;
     private String name;
     private String type;
     private List<DepartmentUserTreeVo> child;

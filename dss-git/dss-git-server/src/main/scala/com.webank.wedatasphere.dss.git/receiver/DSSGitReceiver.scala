@@ -47,6 +47,8 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       gitWorkflowManagerService.delete(gitDeleteRequest)
     case gitFileContentRequest: GitFileContentRequest =>
       gitWorkflowManagerService.getFileContent(gitFileContentRequest)
+    case gitHistoryRequest: GitHistoryRequest =>
+      gitWorkflowManagerService.getHistory(gitHistoryRequest)
     case gitCommitInfoBetweenRequest: GitCommitInfoBetweenRequest =>
       gitWorkflowManagerService.getHistory(gitCommitInfoBetweenRequest)
     case gitUserUpdateRequest: GitUserUpdateRequest =>

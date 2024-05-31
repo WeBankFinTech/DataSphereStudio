@@ -51,6 +51,7 @@ class DSSGitChooser extends ReceiverChooser {
     case _: GitSearchRequest => receiver
     case _: GitFileContentRequest => receiver
     case _: GitDeleteRequest => receiver
+    case _: GitHistoryRequest => receiver
     case _: GitCommitInfoBetweenRequest => receiver
     case _: GitUserUpdateRequest => receiver
     case _: GitUserInfoRequest => receiver

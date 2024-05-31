@@ -6,6 +6,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
@@ -133,7 +134,7 @@ public class FileUtils {
         // 删除node节点
         String flowNodePathPre =  FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  projectName ;
         String flowNodePath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + path;
-        String flowNodeMetaPath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_META_PATH.getValue()) + File.separator + path;
+        String flowNodeMetaPath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + FileUtils.normalizePath(GitConstant.GIT_SERVER_META_PATH) + File.separator + path;
         // 1.删除工作流节点代码
         removeDirectory(flowNodePath);
         // 2. 删除工作流节点对应.metaConf文件

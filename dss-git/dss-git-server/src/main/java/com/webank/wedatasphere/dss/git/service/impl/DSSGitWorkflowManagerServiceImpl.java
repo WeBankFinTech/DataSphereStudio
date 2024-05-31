@@ -124,7 +124,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitSearchResponse search(GitSearchRequest request) {
         String gitDir = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
-        String workTree = DSSGitConstant.GIT_PATH_PRE + request.getProjectName() ;
+        String workTree = DSSGitConstant.GIT_PATH_PRE + request.getWorkspaceId()+ File.separator +request.getProjectName() ;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-l", request.getSearchContent()
         ));

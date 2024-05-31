@@ -127,7 +127,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitSearchResponse search(GitSearchRequest request) {
         String gitDir = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
-        String workTree = DSSGitConstant.GIT_PATH_PRE + request.getWorkspaceId() + File.separator + request.getProjectName() ;
+        String gitPathPre = DSSGitConstant.GIT_PATH_PRE;
+        String workTree = gitPathPre + request.getWorkspaceId() + File.separator + request.getProjectName() ;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-l", request.getSearchContent()
         ));
@@ -222,7 +223,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         List<String> subList = new ArrayList<>(fileList.subList(start, end));
         List<String> filePathList = new ArrayList<>();
         for (String file : subList) {
-            filePathList.add(DSSGitConstant.GIT_PATH_PRE + request.getWorkspaceId() + File.separator +request.getProjectName() + File.separator + file);
+            filePathList.add(gitPathPre + request.getWorkspaceId() + File.separator +request.getProjectName() + File.separator + file);
         }
 
 
@@ -259,8 +260,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 }
             }
             // 处理文件路径 /data/GitInstall/testGit/test/.sql -> testGit/test/.sql
-            if (file.startsWith(DSSGitConstant.GIT_PATH_PRE)) {
-                file = file.substring(DSSGitConstant.GIT_PATH_PRE.length());
+            if (file.startsWith(gitPathPre)) {
+                file = file.substring(gitPathPre.length());
             }
 
             result.add(new GitSearchResult(file, keyLines));

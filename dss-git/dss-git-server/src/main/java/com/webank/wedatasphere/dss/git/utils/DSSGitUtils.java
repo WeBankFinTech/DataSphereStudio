@@ -155,7 +155,8 @@ public class DSSGitUtils {
                 }
             }
         } catch (Exception e) {
-            throw new GitErrorException(80001, "git pull failed, the reason is: ", e);
+            // 丢失本地修改，处理冲突
+            reset(repository, projectName);
         }
     }
 

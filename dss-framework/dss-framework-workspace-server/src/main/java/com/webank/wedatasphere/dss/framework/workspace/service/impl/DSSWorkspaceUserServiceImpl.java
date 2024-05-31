@@ -41,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -137,25 +138,29 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     private List<DepartmentUserTreeVo> structureVo2Tree(List<DepartmentUserVo> userList) {
+      AtomicReference<Integer> id = new AtomicReference<>(0);
       Map<String, Map<String, List<DepartmentUserTreeVo>>> userMap = userList.stream().collect(Collectors.groupingBy(DepartmentUserVo::getDepartment,
                 Collectors.groupingBy(DepartmentUserVo::getOffice, Collectors.mapping(user->{
                     DepartmentUserTreeVo treeNode = new DepartmentUserTreeVo();
+                    treeNode.setId(id.getAndSet(id.get() + 1));
                     treeNode.setName(user.getName());
                     treeNode.setType(NODE_TYPE_USER);
                     return treeNode;
                 }, Collectors.toList()))));
         return userMap.keySet().stream().map(key->{
             DepartmentUserTreeVo treeNode = new DepartmentUserTreeVo();
+            treeNode.setId(id.getAndSet(id.get() + 1));
             treeNode.setName(key);
             treeNode.setType(NODE_TYPE_DEPARTMENT);
-            treeNode.setChild(buildTree4Office(userMap.get(key)));
+            treeNode.setChild(buildTree4Office(userMap.get(key),id));
             return treeNode;
         }).collect(Collectors.toList());
     }
 
-    private List<DepartmentUserTreeVo> buildTree4Office(Map<String,List<DepartmentUserTreeVo>> officeMap){
+    private List<DepartmentUserTreeVo> buildTree4Office(Map<String,List<DepartmentUserTreeVo>> officeMap,AtomicReference<Integer> id){
         return officeMap.keySet().stream().map(key->{
             DepartmentUserTreeVo treeNode = new DepartmentUserTreeVo();
+            treeNode.setId(id.getAndSet(id.get() + 1));
             treeNode.setName(key);
             treeNode.setType(NODE_TYPE_OFFICE);
             treeNode.setChild(officeMap.get(key));

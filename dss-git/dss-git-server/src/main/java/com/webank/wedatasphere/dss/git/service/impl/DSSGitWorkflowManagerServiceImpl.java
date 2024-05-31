@@ -381,7 +381,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
-            List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilePath(), 5);
+            List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilePath(), 100);
             if (CollectionUtils.isEmpty(latestCommit)) {
                 logger.error("get Commit failed, the reason is null");
             }else {

@@ -38,6 +38,7 @@ import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitInfoBetweenRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitHistoryRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRemoveRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
@@ -454,14 +455,26 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     public GitHistoryResponse getHistory(Long workspaceId, Long orchestratorId, String projectName) {
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         List<DSSOrchestratorVersion> versionByOrchestratorId = orchestratorMapper.getVersionByOrchestratorId(orchestratorId);
-
+        if (CollectionUtils.isEmpty(versionByOrchestratorId)) {
+            return new GitHistoryResponse();
+        }
         String workflowName = orchestrator.getName();
-
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        GitHistoryRequest historyRequest = new GitHistoryRequest(workspaceId, projectName, workflowName);
-        GitHistoryResponse gitHistoryResponse = RpcAskUtils.processAskException(sender.ask(historyRequest), GitHistoryResponse.class, GitHistoryRequest.class);
-
-        return gitHistoryResponse;
+        GitHistoryResponse historyResponse = null;
+        // 当前未有版本发布
+        if (versionByOrchestratorId.size() == 1 || versionByOrchestratorId.get(1).getCommitId() == null) {
+            GitHistoryRequest historyRequest = new GitHistoryRequest(workspaceId, projectName, workflowName);
+            historyResponse = RpcAskUtils.processAskException(sender.ask(historyRequest), GitHistoryResponse.class, GitHistoryRequest.class);
+        } else {
+            GitCommitInfoBetweenRequest commitInfoBetweenRequest = new GitCommitInfoBetweenRequest();
+            commitInfoBetweenRequest.setNewCommitId(versionByOrchestratorId.get(0).getCommitId());
+            commitInfoBetweenRequest.setOldCommitId(versionByOrchestratorId.get(1).getCommitId());
+            commitInfoBetweenRequest.setProjectName(projectName);
+            commitInfoBetweenRequest.setDirName(workflowName);
+            commitInfoBetweenRequest.setWorkspaceId(workspaceId);
+            historyResponse = RpcAskUtils.processAskException(sender.ask(commitInfoBetweenRequest), GitHistoryResponse.class, GitCommitInfoBetweenRequest.class);
+        }
+        return historyResponse;
     }
 
 }

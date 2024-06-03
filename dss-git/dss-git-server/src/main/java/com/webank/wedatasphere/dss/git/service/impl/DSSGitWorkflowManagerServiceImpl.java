@@ -127,8 +127,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitSearchResponse search(GitSearchRequest request) {
         String gitDir = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
-        String gitPathPre = DSSGitConstant.GIT_PATH_PRE;
-        String workTree = gitPathPre + request.getWorkspaceId() + File.separator + request.getProjectName() ;
+        String gitPathPre = DSSGitConstant.GIT_PATH_PRE + request.getWorkspaceId() + File.separator;
+        String workTree = gitPathPre + request.getProjectName() ;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-l", request.getSearchContent()
         ));
@@ -223,7 +223,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         List<String> subList = new ArrayList<>(fileList.subList(start, end));
         List<String> filePathList = new ArrayList<>();
         for (String file : subList) {
-            filePathList.add(gitPathPre + request.getWorkspaceId() + File.separator +request.getProjectName() + File.separator + file);
+            filePathList.add(gitPathPre + request.getProjectName() + File.separator + file);
         }
 
 

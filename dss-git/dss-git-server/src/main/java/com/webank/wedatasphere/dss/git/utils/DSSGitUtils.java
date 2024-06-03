@@ -510,15 +510,7 @@ public class DSSGitUtils {
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
                 String shortMessage = commit.getShortMessage();
 
-                String userName = getUserName(shortMessage);
-                if (userName != null) {
-                    commitResponse.setCommitUser(userName);
-                    int userNameIndex = shortMessage.lastIndexOf(userName);
-                    commitResponse.setComment(shortMessage.substring(0, userNameIndex));
-                } else {
-                    commitResponse.setCommitUser(commit.getAuthorIdent().getName());
-                    commitResponse.setComment(shortMessage);
-                }
+                getUserName(shortMessage, commitResponse, commit);
                 // 返回commitId字符串
                 return commitResponse;
             }
@@ -527,18 +519,21 @@ public class DSSGitUtils {
         }
     }
 
-    public static String getUserName(String shortMessage) {
+    public static void getUserName(String shortMessage, GitCommitResponse commitResponse, RevCommit commit) {
         if (StringUtils.isEmpty(shortMessage)) {
-            return null;
+            return ;
         }
 
         int lastIndexOf = shortMessage.lastIndexOf(DSSGitConstant.GIT_USERNAME_FLAG);
 
         if (lastIndexOf != -1) {
             String username = shortMessage.substring(lastIndexOf + DSSGitConstant.GIT_USERNAME_FLAG.length());
-            return username;
+            String comment = shortMessage.substring(0, lastIndexOf);
+            commitResponse.setCommitUser(username);
+            commitResponse.setComment(comment);
         } else {
-            return null;
+            commitResponse.setCommitUser(commit.getCommitterIdent().getName());
+            commitResponse.setComment(shortMessage);
         }
     }
 
@@ -553,13 +548,7 @@ public class DSSGitUtils {
                 commitResponse.setCommitId(commit.getId().getName());
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
                 String shortMessage = commit.getShortMessage();
-                commitResponse.setComment(shortMessage);
-                String userName = getUserName(shortMessage);
-                if (userName != null) {
-                    commitResponse.setCommitUser(userName);
-                } else {
-                    commitResponse.setCommitUser(commit.getAuthorIdent().getName());
-                }
+                getUserName(shortMessage, commitResponse, commit);
                 logger.info("提交ID: " + commit.getId().getName());
                 commitResponseList.add(commitResponse);
             }
@@ -576,19 +565,27 @@ public class DSSGitUtils {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         try (RevWalk walk = new RevWalk(repository)) {
             Git git = new Git(repository);
+            ObjectId commitIdNow = null;
+            if (newCommitId == null) {
+                ObjectId head = repository.resolve("HEAD");
+                commitIdNow = walk.parseCommit(head);
+            } else {
+                commitIdNow = repository.resolve(newCommitId);
+            }
+
 
             Iterable<RevCommit> commits = git.log()
-                    .addRange(repository.resolve(oldCommitId), repository.resolve(newCommitId))
+                    .addRange(repository.resolve(oldCommitId), commitIdNow)
                     .addPath(path)
                     .call();
 
-            for (RevCommit commit : walk) {
+            for (RevCommit commit : commits) {
                 PersonIdent authorIdent = commit.getAuthorIdent(); // 获取提交人信息
                 GitCommitResponse commitResponse = new GitCommitResponse();
                 commitResponse.setCommitId(commit.getId().getName());
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
-                commitResponse.setComment(commit.getShortMessage());
-                commitResponse.setCommitUser(commit.getAuthorIdent().getName());
+                String shortMessage = commit.getShortMessage();
+                getUserName(shortMessage, commitResponse, commit);
                 gitCommitResponseList.add(commitResponse);
                 logger.info("Commit Hash: " + commit.getName()); // 提交的Hash值
                 logger.info("Commit Time: " + authorIdent.getWhen()); // 提交时间

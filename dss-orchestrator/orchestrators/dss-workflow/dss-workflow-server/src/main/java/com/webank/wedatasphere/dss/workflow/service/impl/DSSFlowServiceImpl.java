@@ -324,7 +324,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
-        updateTOSaveStatus(dssFlow);
+        // 对子工作流无需更新状态
+        if (parentFlowID == null) {
+            updateTOSaveStatus(dssFlow);
+        }
+
         return version;
     }
 

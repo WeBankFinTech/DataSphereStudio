@@ -200,7 +200,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
             // 排除指定文件下的内容(.properties)
             for (String exclude : excludeFileList) {
-                if (file.endsWith(File.separator + exclude)) {
+                if (file.endsWith(exclude)) {
                     excludeResult.add(file);
                 }
             }

@@ -161,7 +161,7 @@
     <select id="getVersionByOrchestratorId"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT
-        <include refid="orchestrator_version"/>
+        <include refid="orchestrator_version"/>, commit_id
         FROM dss_orchestrator_version_info
         WHERE orchestrator_id = #{orchestratorId} and valid_flag = 1 and context_id != ''
         ORDER BY id DESC

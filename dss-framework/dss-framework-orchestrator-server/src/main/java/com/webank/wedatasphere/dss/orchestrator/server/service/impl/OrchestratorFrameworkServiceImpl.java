@@ -293,8 +293,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             List<String> path = new ArrayList<>();
             path.add(orchestratorInfo.getName());
             GitRemoveRequest removeRequest = new GitRemoveRequest(workspace.getWorkspaceId(), dssProject.getName(), path, username);
-            RpcAskUtils.processAskException(sender.ask(removeRequest), GitCommitResponse.class, GitRemoveRequest.class);
+            GitCommitResponse commitResponse = RpcAskUtils.processAskException(sender.ask(removeRequest), GitCommitResponse.class, GitRemoveRequest.class);
             lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
+            DSSOrchestratorVersion versionById = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorInfo.getId());
+            if (versionById != null) {
+                lockMapper.updateOrchestratorVersionCommitId(commitResponse.getCommitId(), versionById.getOrchestratorId());
+            }
         } catch (Exception e) {
             LOGGER.error("git remove failed, the reason is: ", e);
             lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);

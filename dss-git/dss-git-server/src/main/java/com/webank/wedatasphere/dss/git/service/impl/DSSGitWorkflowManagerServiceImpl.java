@@ -551,7 +551,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String comment = "rename workflowNode " + request.getName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            List<String> paths = Arrays.asList(request.getName());
+            List<String> paths = new ArrayList<>();
+            paths.add(olfFilePath);
+            paths.add(oldFileMetaPath);
+
+            paths.add(filePath);
+            paths.add(fileMetaPath);
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);

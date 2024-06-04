@@ -31,6 +31,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchestr
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
@@ -129,9 +130,11 @@ public interface OrchestratorService {
 
     List<DSSOrchestratorVersion> getOrchestratorVersions(String username, Long projectId, Long orchestratorId);
 
-    String rollbackOrchestrator(String username, Long projectId, String projectName,
-                                Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception;
+    OrchestratorRollBackGitVo rollbackOrchestrator(String username, Long projectId, String projectName,
+                                                   Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception;
 
+    void rollbackOrchestratorGit(OrchestratorRollBackGitVo rollBackGitVo, String userName, Long projectId, String projectName,
+                                 Long orchestratorId, LabelRouteVO labels, Workspace workspace) throws Exception;
     //**** new method
     void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String orchestratorName) throws DSSFrameworkErrorException;
 

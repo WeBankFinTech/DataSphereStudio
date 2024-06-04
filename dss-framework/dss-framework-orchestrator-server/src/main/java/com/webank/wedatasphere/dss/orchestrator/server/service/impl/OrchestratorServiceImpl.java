@@ -57,6 +57,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.request.Orchestrat
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -73,6 +74,7 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
@@ -365,7 +367,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String rollbackOrchestrator(String userName, Long projectId, String projectName,
+    public OrchestratorRollBackGitVo rollbackOrchestrator(String userName, Long projectId, String projectName,
                                        Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception {
         //1.新建一个版本
         //2.然后将version的版本内容进行去workflow进行cp
@@ -415,28 +417,48 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
 //        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
 
-        try {
-            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-            //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
-            if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
-                OrchestratorSubmitRequest submitRequest = new OrchestratorSubmitRequest();
-                submitRequest.setFlowId(dssOrchestratorVersion.getAppId());
-                submitRequest.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
-                submitRequest.setProjectName(projectName);
-                submitRequest.setLabels(labels);
-                submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
-                orchestratorPluginService.submitFlow(submitRequest, userName, workspace);
-            } else {
-                GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), "system");
-                RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
+        OrchestratorRollBackGitVo rollBackGitVo =new OrchestratorRollBackGitVo();
+        rollBackGitVo.setOldOrcVersion(oldOrcVersion);
+        rollBackGitVo.setDssOrchestratorInfo(dssOrchestratorInfo);
+        rollBackGitVo.setDssOrchestratorVersion(dssOrchestratorVersion);
+        rollBackGitVo.setVersion(dssOrchestratorVersion.getVersion());
+
+        return rollBackGitVo;
+    }
+
+    @Override
+    public void rollbackOrchestratorGit(OrchestratorRollBackGitVo rollBackGitVo, String userName, Long projectId, String projectName,
+                                        Long orchestratorId, LabelRouteVO labels, Workspace workspace) throws Exception{
+        if (rollBackGitVo == null) {
+            return;
+        }
+        DSSOrchestratorVersion oldOrcVersion = rollBackGitVo.getOldOrcVersion();
+        DSSOrchestratorInfo dssOrchestratorInfo = rollBackGitVo.getDssOrchestratorInfo();
+        DSSOrchestratorVersion dssOrchestratorVersion = rollBackGitVo.getDssOrchestratorVersion();
+        DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
+        if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
+            try {
+                Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+                //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
+                if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
+                    OrchestratorSubmitRequest submitRequest = new OrchestratorSubmitRequest();
+                    submitRequest.setFlowId(dssOrchestratorVersion.getAppId());
+                    submitRequest.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
+                    submitRequest.setProjectName(projectName);
+                    submitRequest.setLabels(labels);
+                    submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
+                    orchestratorPluginService.submitWorkflowToBML(submitRequest, userName, workspace);
+                } else {
+                    GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), "system");
+                    RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
+                }
+                lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
+            } catch (Exception e) {
+                lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                throw e;
             }
-            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
-        } catch (Exception e) {
-            LOGGER.error("git revert failed, the reason is :", e);
-            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
         }
 
-        return dssOrchestratorVersion.getVersion();
     }
 
 

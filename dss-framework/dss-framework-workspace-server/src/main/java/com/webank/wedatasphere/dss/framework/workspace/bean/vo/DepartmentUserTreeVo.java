@@ -13,4 +13,10 @@ public class DepartmentUserTreeVo implements Serializable {
     private String type;
     private List<DepartmentUserTreeVo> child;
 
+    public DepartmentUserTreeVo(Integer id, String name, String type, List<DepartmentUserTreeVo> child){
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.child = child;
+    }
 }

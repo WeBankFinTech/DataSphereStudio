@@ -471,8 +471,16 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             historyResponse = RpcAskUtils.processAskException(sender.ask(historyRequest), GitHistoryResponse.class, GitHistoryRequest.class);
         } else {
             GitCommitInfoBetweenRequest commitInfoBetweenRequest = new GitCommitInfoBetweenRequest();
-            commitInfoBetweenRequest.setNewCommitId(versionByOrchestratorId.get(0).getCommitId());
-            commitInfoBetweenRequest.setOldCommitId(versionByOrchestratorId.get(1).getCommitId());
+            String newCommitId = versionByOrchestratorId.get(0).getCommitId();
+            commitInfoBetweenRequest.setNewCommitId(newCommitId);
+            String oldCommitId = null;
+            for (DSSOrchestratorVersion version : versionByOrchestratorId) {
+                if (version.getCommitId()!= null && !version.getCommitId().equals(newCommitId)) {
+                    oldCommitId = version.getCommitId();
+                    break;
+                }
+            }
+            commitInfoBetweenRequest.setOldCommitId(oldCommitId);
             commitInfoBetweenRequest.setProjectName(projectName);
             commitInfoBetweenRequest.setDirName(workflowName);
             commitInfoBetweenRequest.setWorkspaceId(workspaceId);

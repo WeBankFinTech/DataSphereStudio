@@ -88,7 +88,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         DSSGitUtils.archive(request.getProjectName(), gitUser);
         // 删除本地项目
         DSSGitUtils.archiveLocal(request.getProjectName(), request.getWorkspaceId());
-        return null;
+        return new GitArchivePorjectResponse();
     }
 
     @Override

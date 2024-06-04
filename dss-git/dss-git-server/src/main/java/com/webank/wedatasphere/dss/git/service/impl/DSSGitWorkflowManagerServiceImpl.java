@@ -130,7 +130,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         String gitPathPre = DSSGitConstant.GIT_PATH_PRE + request.getWorkspaceId() + File.separator;
         String workTree = gitPathPre + request.getProjectName() ;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
-                "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-l", request.getSearchContent()
+                "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-F", "-l", request.getSearchContent()
         ));
         List<String> workflowNode = request.getWorkflowNameList();
         String fileName = request.getNodeName();
@@ -138,7 +138,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         List<String> path = new ArrayList<>();
         if (!CollectionUtils.isEmpty(workflowNode)) {
             if (!StringUtils.isEmpty(fileName)) {
-                workflowNode = workflowNode.stream().map(s -> s + "/*" + fileName + "*").collect(Collectors.toList());
+                workflowNode = workflowNode.stream().map(s -> s + "*" + fileName + "*").collect(Collectors.toList());
                 if (!CollectionUtils.isEmpty(typeList)) {
                     for (String workflow : workflowNode) {
                         for (String type : typeList) {
@@ -160,10 +160,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }else if (!StringUtils.isEmpty(fileName)) {
             if (!CollectionUtils.isEmpty(typeList)) {
                 for (String type : typeList) {
-                    path.add("/*" + fileName + "*/." + type);
+                    path.add("*" + fileName + "*/." + type);
                 }
             }else {
-                path.add("/*" + fileName + "*");
+                path.add("*" + fileName + "*");
             }
         }else if (!CollectionUtils.isEmpty(typeList)) {
             for (String type : typeList) {
@@ -229,7 +229,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
 
         List<String> gitBaseCommand = new ArrayList<>(Arrays.asList(
-                "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-n", request.getSearchContent()
+                "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-F", "-n", request.getSearchContent()
         ));
 
 

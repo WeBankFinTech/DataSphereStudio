@@ -39,6 +39,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLeve
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
@@ -253,8 +254,13 @@ public class DSSFrameworkOrchestratorRestful {
         LabelRouteVO labels = rollbackOrchestratorRequest.getLabels();
         try {
             LOGGER.info("user {} begin to rollbackOrchestrator, params:{}", username, rollbackOrchestratorRequest);
-            String newVersion = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, labels, workspace);
-            Message message = Message.ok("回滚版本成功").data("newVersion", newVersion);
+            OrchestratorRollBackGitVo rollbackOrchestrator = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, labels, workspace);
+            try {
+                orchestratorService.rollbackOrchestratorGit(rollbackOrchestrator, username, projectId, projectName, orchestratorId, labels, workspace);
+            } catch (Exception e) {
+                return Message.ok("回滚版本成功,git回滚失败，请重新保存并提交工作流").data("newVersion", rollbackOrchestrator.getVersion());
+            }
+            Message message = Message.ok("回滚版本成功").data("newVersion", rollbackOrchestrator.getVersion());
             return message;
         } catch (final Throwable t) {
             LOGGER.error("Failed to rollback orchestrator for user {} orchestratorId {}, projectId {} version {}",

@@ -95,7 +95,10 @@ public class DevelopmentOperationUtils {
             String error = String.format("%s failed. Caused by: %s.", errorMsg, ExceptionUtils.getRootCauseMessage(e));
             throw new ExternalOperationFailedException(50010, error, e);
         }
-        if(responseRef.isFailed()) {
+        if(responseRef == null) {
+            LOGGER.error("{} failed. Caused by: empty responseRef returned by AppConn.", errorMsg);
+            throw new ExternalOperationFailedException(61123, errorMsg + " failed. Caused by: empty responseRef returned by AppConn.");
+        } else if(responseRef.isFailed()) {
             LOGGER.error("{} failed. Caused by: {}.", errorMsg, responseRef.getErrorMsg());
             DSSExceptionUtils.dealWarnException(61123,
                     String.format("%s failed. Caused by: %s.", errorMsg, responseRef.getErrorMsg()),

@@ -15,7 +15,7 @@ CREATE TABLE `dss_workflow_execute_info` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---需要先添加一条记录，先删除原来spark节点内存校验的关联关系
+-- 需要先添加一条记录，先删除原来spark节点内存校验的关联关系
 INSERT INTO `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) VALUES ('Regex', '^[0-9.]*g{0,1}$', 'Spark内存设置如2g', 'Drive memory size, default value: 2', 'blur');
 
  CREATE TABLE `dss_orchestrator_job_info` (
@@ -30,7 +30,7 @@ INSERT INTO `dss_workflow_node_ui_validate` (`validate_type`, `validate_range`, 
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='dss_orchestrator_job_info表';
 
---------------------v1.1.2
+-------------------- v1.1.2
 
 DROP TABLE IF EXISTS `dss_admin_dept`;
 CREATE TABLE `dss_admin_dept` (

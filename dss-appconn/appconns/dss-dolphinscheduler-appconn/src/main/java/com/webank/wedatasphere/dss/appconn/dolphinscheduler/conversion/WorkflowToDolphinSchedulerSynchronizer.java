@@ -36,7 +36,7 @@ public class WorkflowToDolphinSchedulerSynchronizer implements WorkflowToRelSync
         DolphinSchedulerConvertedRel dolphinSchedulerConvertedRel = (DolphinSchedulerConvertedRel)convertedRel;
         OrchestrationToRelConversionRequestRef requestRef = dolphinSchedulerConvertedRel.getDSSToRelConversionRequestRef();
         Workflow workflow = dolphinSchedulerConvertedRel.getWorkflow();
-        checkSchedulerProject(workflow);
+//        checkSchedulerProject(workflow);
         Long dolphinSchedulerWorkflowId = requestRef.getRefOrchestrationId();
         DolphinSchedulerAppConn appConn = (DolphinSchedulerAppConn) dssToRelConversionOperation.getConversionService().getAppStandard().getAppConn();
         OrchestrationUpdateOperation updateOperation = appConn.getOrCreateStructureStandard().getOrchestrationService(dssToRelConversionOperation.getConversionService().getAppInstance())
@@ -47,14 +47,14 @@ public class WorkflowToDolphinSchedulerSynchronizer implements WorkflowToRelSync
         updateOperation.updateOrchestration(ref);
     }
 
-    private void checkSchedulerProject(Workflow flow) throws ExternalOperationFailedException {
-        List<WorkflowNode> nodes = flow.getWorkflowNodes();
-        for (WorkflowNode node : nodes) {
-            DSSNode dssNode = node.getDSSNode();
-            if (CollectionUtils.isEmpty(dssNode.getResources())) {
-                throw new ExternalOperationFailedException(90021, dssNode.getName() + "节点内容不能为空");
-            }
-        }
-    }
+//    private void checkSchedulerProject(Workflow flow) throws ExternalOperationFailedException {
+//        List<WorkflowNode> nodes = flow.getWorkflowNodes();
+//        for (WorkflowNode node : nodes) {
+//            DSSNode dssNode = node.getDSSNode();
+//            if (CollectionUtils.isEmpty(dssNode.getResources()) && dssNode.getJobContent().isEmpty()) {
+//                throw new ExternalOperationFailedException(90021, dssNode.getName() + "节点内容不能为空");
+//            }
+//        }
+//    }
 
 }

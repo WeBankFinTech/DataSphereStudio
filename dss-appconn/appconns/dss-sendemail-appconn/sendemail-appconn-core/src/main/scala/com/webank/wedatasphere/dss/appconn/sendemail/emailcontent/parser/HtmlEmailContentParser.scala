@@ -16,16 +16,14 @@
 
 package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser
 
-import com.google.gson.reflect.TypeToken
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{CsvAttachment, MultiContentEmail, PngAttachment}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.HtmlItem
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.HtmlEmailContent
 import org.apache.linkis.server.JSONUtils
 
 import java.nio.charset.StandardCharsets
-import java.util
 import java.util.Base64
-import scala.collection.JavaConversions._
+import scala.sys.error
 
 object HtmlEmailContentParser extends AbstractEmailContentParser[HtmlEmailContent] {
   override protected def parseEmailContent(emailContent: HtmlEmailContent,

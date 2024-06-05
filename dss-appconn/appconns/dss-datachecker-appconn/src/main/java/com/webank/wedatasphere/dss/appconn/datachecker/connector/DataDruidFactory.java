@@ -27,6 +27,7 @@ public class DataDruidFactory {
 	private static volatile DruidDataSource jobInstance;
 
     private static volatile DruidDataSource dopsInstance;
+
     private static volatile DruidDataSource msgInstance;
 
     public static DruidDataSource getJobInstance(Properties props, Logger log) {
@@ -36,7 +37,7 @@ public class DataDruidFactory {
                     try {
                         jobInstance = createDataSource(props, log, "Job");
                     } catch (Exception e) {
-                        throw new RuntimeException("Error creating job Druid DataSource", e);
+                        throw new RuntimeException("Error creating Druid DataSource", e);
                     }
                 }
             }
@@ -44,19 +45,19 @@ public class DataDruidFactory {
         return jobInstance;
     }
 
-    public static DruidDataSource getDopsInstance(Properties props, Logger log) {
-        if (dopsInstance == null) {
+    public static DruidDataSource getBDPInstance(Properties props, Logger log) {
+        if (bdpInstance == null ) {
             synchronized (DataDruidFactory.class) {
-                if (dopsInstance == null) {
+                if(bdpInstance == null) {
                     try {
-                        dopsInstance = createDataSource(props, log, "Dops");
+                        bdpInstance = createDataSource(props, log, "BDP");
                     } catch (Exception e) {
-                        throw new RuntimeException("Error creating DOPS Druid DataSource", e);
+                        throw new RuntimeException("Error creating Druid DataSource", e);
                     }
                 }
             }
         }
-        return dopsInstance;
+        return bdpInstance;
     }
 
     public static DruidDataSource getMsgInstance(Properties props, Logger log) {
@@ -111,22 +112,6 @@ public class DataDruidFactory {
                 }
             } catch (Exception e) {
                 log.error("password decore failed" + e);
-            }
-        }else if ("Dops".equals(type)) {
-            name = props.getProperty("dops.datachecker.jdo.option.name");
-            url = props.getProperty("dops.datachecker.jdo.option.url");
-            username = props.getProperty("dops.datachecker.jdo.option.username");
-            password=props.getProperty("dops.datachecker.jdo.option.password");
-            loginType = props.getProperty("dops.datachecker.jdo.option.login.type");
-            log.info("dops url is:" + url + "and name is:" + username);
-            try {
-                if ("base64".equals(loginType)) {
-                    password = new String(Base64.getDecoder().decode(props.getProperty("dops.datachecker.jdo.option.password").getBytes()), "UTF-8");
-                } else {
-                    password = props.getProperty("dops.datachecker.jdo.option.password");
-                }
-            } catch (Exception e) {
-                log.error("password decore failed", e);
             }
         }
         int initialSize = Integer.valueOf(props.getProperty("datachecker.jdo.option.initial.size", "1"));

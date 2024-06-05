@@ -324,20 +324,22 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
-        // 对子工作流无需更新状态
+        // 对子工作流,需更新父工作流状态，以便提交
         if (parentFlowID == null) {
-            updateTOSaveStatus(dssFlow);
+            updateTOSaveStatus(dssFlow.getProjectId(), dssFlow.getId());
+        } else {
+            updateTOSaveStatus(dssFlow.getProjectId(), parentFlowID);
         }
 
         return version;
     }
 
-    private void updateTOSaveStatus(DSSFlow dssFlow) {
+    private void updateTOSaveStatus(Long projectId, Long flowID) {
         try {
-            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(dssFlow.getProjectId());
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             //仅对接入Git的项目 更新状态为 保存
             if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
-                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
+                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(flowID)),
                         OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
                 lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
             }

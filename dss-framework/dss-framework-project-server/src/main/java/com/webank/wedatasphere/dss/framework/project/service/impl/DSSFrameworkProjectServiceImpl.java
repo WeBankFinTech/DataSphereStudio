@@ -227,7 +227,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         Map<String, BmlResource> file = new HashMap<>();
         // 测试数据 key表示项目名、value为项目BmlResource资源
-        file.put(GitConstant.GIT_SERVER_META_PATH , bmlResource);
+        file.put(".projectmeta", bmlResource);
         GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, "update Project", username);
         LOGGER.info("-------=======================begin to update project: {}=======================-------", projectName);
         GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);

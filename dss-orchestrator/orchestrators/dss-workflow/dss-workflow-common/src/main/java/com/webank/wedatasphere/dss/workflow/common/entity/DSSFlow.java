@@ -48,6 +48,18 @@ public class DSSFlow implements Flow {
     private String bmlVersion;
 
     private String metrics;
+    /**
+     * 工作流内（包括子工作流）的Tuple(flowId,templateId) 二元组。templateId是参数模板的id
+     */
+    private List<String[]> flowIdParamConfTemplateIdTuples;
+
+    public List<String[]> getFlowIdParamConfTemplateIdTuples() {
+        return flowIdParamConfTemplateIdTuples;
+    }
+
+    public void setFlowIdParamConfTemplateIdTuples(List<String[]> flowIdParamConfTemplateIdTuples) {
+        this.flowIdParamConfTemplateIdTuples = flowIdParamConfTemplateIdTuples;
+    }
 
     public String getMetrics() {
         return metrics;

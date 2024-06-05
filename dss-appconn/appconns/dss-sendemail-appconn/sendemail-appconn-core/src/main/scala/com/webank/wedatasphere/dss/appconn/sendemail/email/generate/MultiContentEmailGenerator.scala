@@ -45,7 +45,8 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
           val resultSetFactory = ResultSetFactory.getInstance
           EmailCSHelper.getJobIds(refContext).foreach { jobId =>
             refContext.fetchLinkisJobResultSetPaths(jobId).foreach { fsPath =>
-              var fileType = "";
+              var fileType = ""
+              var fileName = ""
               val reader = refContext.getResultSetReader(fsPath)
               val meta = reader.getMetaData.cloneMeta()
               Utils.tryFinally(meta match {
@@ -54,12 +55,13 @@ class MultiContentEmailGenerator extends AbstractEmailGenerator {
                   // 如果是pdf附件存字段pdf到multiContentEmail
                   if (data.get("type") != null && data.get("format") != null) {
                     fileType = data.get("format").toString
+                    if (data.get("viewName") != null) fileName = data.get("viewName").toString
                   }
                 case _ =>
               })(Utils.tryQuietly(reader.close()))
               val resultSet = resultSetFactory.getResultSetByPath(fsPath)
               val emailContent = resultSet.resultSetType() match {
-                case ResultSetFactory.PICTURE_TYPE => new PictureEmailContent(fsPath, fileType)
+                case ResultSetFactory.PICTURE_TYPE => new PictureEmailContent(fsPath, fileType, fileName)
                 case ResultSetFactory.HTML_TYPE =>
                   multiContentEmail.setEmailType("html")
                   new HtmlEmailContent (fsPath, fileType)

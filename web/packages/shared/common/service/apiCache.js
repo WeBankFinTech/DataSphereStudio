@@ -29,7 +29,7 @@ export const buildUniqueUrl = (url, method, params = {}, data = {}) => {
   url += `?${paramStr(params)}&${paramStr(data)}&${method}`
   return url
 }
-
+let timer
 // 防止重复请求
 export default (options = {}) => async config => {
   const defaultOptions = {
@@ -50,7 +50,9 @@ export default (options = {}) => async config => {
     })()
     cache.set(index, responsePromise)
     if (defaultOptions.time !== 0) {
-      setTimeout(() => {
+      clearTimeout(timer)
+      timer = null
+      timer = setTimeout(() => {
         cache.clear(index)
       }, defaultOptions.time)
     }

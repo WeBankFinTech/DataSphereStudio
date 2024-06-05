@@ -2,7 +2,10 @@
   <div class="main service-cener">
     <div class="tap-bar">
       <h3 class="title">
-        <Icon v-if="microModule !== 'apiServices'" type="md-arrow-round-back" @click="goBack" class="back"></Icon>
+        <SvgIcon v-if="microModule !== 'apiServices'" style="font-size: 16px;display: inline-block;transform: rotate(180deg);"
+          color="#444444"
+          @click="goBack"
+          icon-class="fi-expand-right"/>
         <span>{{$t('message.apiServices.title')}}</span>
       </h3>
     </div>
@@ -24,6 +27,7 @@
       </Col>
       <Col span="5">
         <Button class="search" type="primary" @click="getApiData">{{$t("message.apiServices.label.find")}}</Button>
+        <Button class="search" type="primary" @click="gotoSubmit">{{$t("message.apiServices.label.approve")}}</Button>
       </Col>
     </Row>
     <div class="workspace-header-right">
@@ -411,6 +415,13 @@ export default {
     this.getTagList();
     this.username = this.getUserName();
   },
+  mounted() {
+    // 切到非第一页,进入 管理页,再返回数据服务首页,要保留进管理页之前的分页
+    if (sessionStorage.getItem('apiservicesCurrentPage') && sessionStorage.getItem('apiservicesCurrentPage') !== 'null' && sessionStorage.getItem('apiservicesCurrentPage') !== 'undefined') {
+      this.page.pageNow = Number(sessionStorage.getItem('apiservicesCurrentPage'));
+      sessionStorage.removeItem('apiservicesCurrentPage')
+    }
+  },
   computed: {
     pageDatalist() {// 展示的数据
       let list = this.apiData;
@@ -504,6 +515,9 @@ export default {
         }
       })
     },
+    gotoSubmit() {
+      this.$router.push({ name: 'ServicesSubmit', query: { workspaceId: this.$route.query.workspaceId} })
+    },
     changeVisual(type) {
       this.visual = type;
     },
@@ -517,6 +531,7 @@ export default {
     commonAction(row, arg) { // 更多操作的id
       const id = arg[0];
       if (id === 1) { // 跳到管理页
+        sessionStorage.setItem('apiservicesCurrentPage', this.page.pageNow)
         this.$router.push({path: '/servicesMangement',query: {apiId: arg[0], workspaceId: this.$route.query.workspaceId, id: row.id, scriptPath: row.scriptPath }})
       } else if(id === 2) { // 禁用、启用
         // 发起请求
@@ -653,6 +668,7 @@ export default {
   height: $percent-all;
   display: flex;
   flex-direction: column;
+  overflow: auto;
   .title, .search-bar, .workspace-header-right, .page-bar {
     flex: none;
   }
@@ -719,9 +735,9 @@ export default {
     display: flex;
     align-items: $align-center;
     justify-content: space-between;
-    // .tabs-content {
-      // flex: 1;
-    // }
+    .tabs-content {
+      max-width: calc(100% - 150px);
+    }
     .showAll {
       margin: 0 10px;
       color: $primary-color;

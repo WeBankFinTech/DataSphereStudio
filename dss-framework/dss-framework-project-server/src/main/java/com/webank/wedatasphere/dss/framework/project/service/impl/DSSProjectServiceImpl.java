@@ -353,7 +353,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
     private void archiveGitProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) {
-        if (dssProjectDO.getAssociateGit()) {
+        if ( dssProjectDO.getAssociateGit() != null && dssProjectDO.getAssociateGit()) {
             Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
             Map<String, BmlResource> file = new HashMap<>();
             // 测试数据 key表示项目名、value为项目BmlResource资源

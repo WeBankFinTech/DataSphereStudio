@@ -13,6 +13,7 @@
         size="large"
         fix/>
       <we-tree
+        ref="tree"
         :data="tree"
         :node-props="nodeProps"
         :sort-fn="sortFn"
@@ -58,6 +59,10 @@ export default {
       type: Number,
       default: 120,
     },
+    filterText: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -72,6 +77,11 @@ export default {
   computed: {
     unPrefixPath() {
       return this.path && this.path.slice(7, this.path.length);
+    },
+  },
+  watch: {
+    filterText() {
+      this.$refs.tree.store.filter();
     },
   },
   methods: {

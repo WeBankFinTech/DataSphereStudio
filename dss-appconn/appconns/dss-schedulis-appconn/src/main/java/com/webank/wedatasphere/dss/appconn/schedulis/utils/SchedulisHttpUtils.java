@@ -80,4 +80,15 @@ public class SchedulisHttpUtils {
         return getHttpResult(url, getAction, ssoRequestOperation, workspace);
     }
 
+    public static String getHttpPostResult(String url,
+                                           Map<String, String> params,
+                                           Map<String, Object> payloads,
+                                           SSORequestOperation<HttpAction, HttpResult> ssoRequestOperation,
+                                           Workspace workspace) {
+        DSSPostAction getAction = new DSSPostAction();
+        getAction.getFormParams().putAll(params);
+        getAction.getRequestPayloads().putAll(payloads);
+        return getHttpResult(url, getAction, ssoRequestOperation, workspace);
+    }
+
 }

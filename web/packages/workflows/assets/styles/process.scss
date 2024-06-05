@@ -24,7 +24,7 @@
   .bread-crumb {
     margin: 5px;
   }
-  .process-readonly-tip-card {
+  div.process-readonly-tip-card {
     @include font-color(#fff, #000);
     font-size: $font-size-small;
     position: absolute;

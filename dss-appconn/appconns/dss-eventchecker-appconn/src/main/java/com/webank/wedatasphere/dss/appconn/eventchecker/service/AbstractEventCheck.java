@@ -42,6 +42,8 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
     String receiver;
     String sender;
     String receiveToday;
+    String useRunDate;
+    String runDate;
     String userTime;
     String waitTime;
     String query_frequency;
@@ -64,6 +66,8 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
         sender = props.getProperty(EventChecker.SENDER);
         msg = props.getProperty(EventChecker.MSG);
         receiveToday = props.getProperty(EventChecker.TODAY);
+        useRunDate = props.getProperty(EventChecker.USE_RUN_DATE);
+        runDate = props.getProperty("run_date");
         userTime = props.getProperty(EventChecker.USER_TIME);
         waitTime = props.getProperty(EventChecker.WAIT_TIME, "1");
         query_frequency = props.getProperty(EventChecker.QUERY_FREQUENCY, "30000");

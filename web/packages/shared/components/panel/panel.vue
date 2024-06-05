@@ -192,6 +192,7 @@ export default {
       }
     },
     handleMouseDown(index, event) {
+      if ((this.items[index-1] || {}).disable) return
       this.moveIndex = index;
       const mouseEvent = this.getStdMouseEvent(event);
       this.startX = mouseEvent.positionX;

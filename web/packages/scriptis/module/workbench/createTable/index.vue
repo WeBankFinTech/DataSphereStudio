@@ -98,6 +98,7 @@ export default {
             chartset: 'utf-8',
             quote: '',
             isHasHeader: false,
+            sheet: [],
           },
         },
         target: {
@@ -338,13 +339,16 @@ export default {
         isOverwrite: false,
         columns: columns,
       };
+      if (!isXls) {
+        delete source.table.sheet
+      }
       const sourceP = {
         path,
         pathType: source.table.type,
         hasHeader: source.table.isHasHeader,
         encoding: isXls ? '' : source.table.chartset,
         fieldDelimiter: isXls ? '' : source.table.separator,
-        sheet: target.sheetName && target.sheetName.toString(),
+        sheet: source.table.sheet &&  source.table.sheet.toString(),
         quote,
         escapeQuotes,
       };
@@ -414,18 +418,30 @@ export default {
             }
           });
         } else {
-          resolve();
+          let fieldError = '';
+          this.attrInfo.target.importFieldsData.fields.forEach((it) => {
+            if (!it.name) {
+              fieldError = this.$t('message.scripts.importToHive.ZDMC');
+            } else if (!/^[a-zA-Z0-9_]+$/.test(it.name)) {
+              fieldError = this.$t('message.scripts.fieldnamestyle');
+            }
+          });
+          if(fieldError) {
+            this.$Message.warning(fieldError);
+          } else {
+            resolve();
+          }
         }
       });
     },
     createTable() {
       this.getValidate().then(() => {
-        const tabName = `create_table_${this.attrInfo.basic.name}`;
+        const tabName = `create_table_${this.attrInfo.basic.name}_${Date.now()}.scala`;
         const md5Path = util.md5(tabName);
         const code = JSON.stringify(this.getParams());
         this.dispatch('Workbench:add', {
           id: md5Path,
-          filename: tabName + '.scala',
+          filename: tabName,
           filepath: '',
           saveAs: true,
           noLoadCache: true,

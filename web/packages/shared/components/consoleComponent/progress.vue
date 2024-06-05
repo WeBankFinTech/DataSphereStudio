@@ -25,6 +25,15 @@
         @click="clickTipButton"
       >{{ taskInfo.solution && taskInfo.solution.solutionUrl?this.$t('message.common.viewSolution'):this.$t('message.common.reporterr')}}</Button>
     </div>
+    <div v-else-if="codePreCheckInfo && codePreCheckInfo.checkData && codePreCheckInfo.checkData.length > 0" class="warn-color alert-tips-code">
+        <div class="button-container">
+          <Icon type="md-alert" size="14"/>
+          <span style="padding-left: 10px; flex:1">{{codePreCheckInfo.checkData[0].errorMessage}} </span>
+          <Button type="warning" size="small" @click="handleCompareDetail">{{ $t('message.common.progress.showCompareDetail') }}</Button>
+          <!-- <Button type="warning" size="small" @click="handleSolution">{{ $t('message.common.progress.showSolution') }}</Button> -->
+        </div>
+
+    </div>
     <Row
       class="total-progress"
       v-if="isWaittingSizeShow">
@@ -51,6 +60,7 @@
 import steps from './steps.vue';
 import weToolbar from './toolbar_progress.vue';
 import api from '@dataspherestudio/shared/common/service/api';
+import log from '../../../editor/languages/log';
 /**
  * 脚本执行进度tab面板
  * ! 1. 与工作流节点执行console.vue 共用
@@ -128,7 +138,8 @@ export default {
           },
         },
       ],
-      taskInfo: {}
+      taskInfo: {},
+      codePreCheckInfo: {}
     };
   },
   computed: {
@@ -139,7 +150,20 @@ export default {
       return this.script.status
     },
     percent() {
-      return Number((this.script.progress.current * 100).toFixed(2));
+      const numMulti = function (num1, num2) {
+        if (!num1 || !num2) return 0;
+        var baseNum = 0;
+        try { baseNum += num1.toString().split(".")[1].length; } catch (e) {
+          //
+        }
+        try { baseNum += num2.toString().split(".")[1].length; } catch (e) {
+          //
+        }
+        return Number(num1.toString().replace(".", "")) * Number(num2.toString().replace(".", "")) / Math.pow(10, baseNum);
+      };
+      // /product/100199/story/detail/324369
+      if (this.steps.indexOf("Succeed") > -1 && this.script.progress.current < 1) return 100;
+      return numMulti(this.script.progress.current , 100);
     },
     waitingSize() {
       return this.script.progress.waitingSize
@@ -148,7 +172,7 @@ export default {
       return this.script.progress.progressInfo
     },
     costTime() {
-      return this.script.progress.costTime || `0 second`
+      return this.script.progress.costTime || ``
     },
     isWaittingSizeShow() {
       // 当waitingSize等于null时，waitingSize >= 0为true；
@@ -180,6 +204,9 @@ export default {
           failedReason: ret.failedReason
         }
       }
+    }
+    if (this.script.codePrecheckRes) {
+      this.codePreCheckInfo = this.script.codePrecheckRes
     }
   },
   methods: {
@@ -265,6 +292,17 @@ export default {
     },
     updateErrorMsg(data) {
       this.taskInfo = data
+    },
+    updateCodePreCheck(data) {
+      this.codePreCheckInfo = data;
+      console.log('updateCodePreCheck', this.codePreCheckInfo)
+    },
+    handleCompareDetail() {
+      this.$emit('compareDetail');
+    },
+    // 1.1.19需求不开发
+    handleSolution() {
+      console.log('handleSolution');
     },
     clickTipButton() {
       if (this.taskInfo.solution && this.taskInfo.solution.solutionUrl) {
@@ -358,6 +396,14 @@ export default {
       padding: 5px;
       border-radius: 4px;
     }
+
+    .alert-tips-code {
+      align-items: center;
+      margin-bottom: 10px;
+      margin: 0 20px 15px 20px;
+      padding: 5px;
+      border-radius: 4px;
+    }
     .error-color {
       color: $error-color;
       background-color: #f1c7c763;
@@ -365,6 +411,12 @@ export default {
     .warn-color {
       color: $warning-color;
       background-color: #f79f531f;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
     }
   }
 </style>

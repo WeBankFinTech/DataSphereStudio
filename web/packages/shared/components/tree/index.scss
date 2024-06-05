@@ -34,7 +34,6 @@
     flex-direction: row;
     cursor: pointer;
     font-size: 12px;
-    font-family: 'font-dws-icon' !important;
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
@@ -49,9 +48,6 @@
       align-items: center;
     }
 
-    .we-tree-node__expand-icon:before {
-      content: '\e925';
-    }
 
     .we-tree-node__icon {
       margin-left: 5px;
@@ -198,20 +194,6 @@
 
 }
 
-.we-tree-node.is-expanded {
-  >.we-tree-node__content {
-    .we-tree-node__expand-icon:before {
-      content: '\e924';
-    }
-    .we-tree-node__icon:before {
-      content: '\e927';
-    }
-    .we-tree-node__icon.is-leaf:before {
-      content: '\e929';
-    }
-  }
-
-}
 
 .we-tree-node.is-current {
   >.we-tree-node__content {

@@ -1,0 +1,25 @@
+{
+  "message": {
+    "ext": {
+      "scriptisGuide": {
+        "uninitTitle": "User initialization not completed",
+        "uninitContent": "Please go to the data map (dm.weoa.com) to submit the relevant service ticket application.<br>If you have already submitted the application, please make sure that your approval ticket status is completed.",
+        "gotit": "I got it",
+        "viewGuide": "View Application Guide",
+        "setParams": "Set parameters",
+        "setinConsole": "Set the queue and parameters in the console",
+        "newScript": "New Script",
+        "createContext": "Right-click to create the desired script",
+        "editScript": "Edit script",
+        "edittip": "Edit sql or command in the corresponding script file",
+        "summitRun": "Submit for execution",
+        "selectSqlRun": "Run the selected sql or command",
+        "queryReusult": "Result query",
+        "queryTip": "Query execution results and logs",
+        "scriptisUse": "Scriptis usage guide",
+        "quickstart": "Quick Start Scriptis",
+        "starttext": "Go to learn more detailed instructions"
+      }
+    }
+  }
+}

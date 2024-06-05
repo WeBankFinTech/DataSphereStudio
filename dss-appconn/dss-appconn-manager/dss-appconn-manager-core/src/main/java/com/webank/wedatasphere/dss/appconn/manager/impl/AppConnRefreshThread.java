@@ -38,6 +38,13 @@ public class AppConnRefreshThread implements Runnable {
 
     @Override
     public void run() {
+        try{
+            run0();
+        }catch (Exception e){
+            LOGGER.error("refresh appconn failed,we will try again next time.",e);
+        }
+    }
+    private void run0() {
         LOGGER.info("try to refresh all AppConns.");
         List<? extends AppConnInfo> appConnInfos;
         try {

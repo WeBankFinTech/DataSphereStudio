@@ -1,5 +1,8 @@
 package com.webank.wedatasphere.dss.framework.proxy.restful;
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.DomainUtils;
 import com.webank.wedatasphere.dss.common.utils.ScalaFunctionAdapter;
@@ -16,20 +19,21 @@ import org.apache.linkis.server.Message;
 import org.apache.linkis.server.conf.ServerConfiguration;
 import org.apache.linkis.server.security.ProxyUserSSOUtils;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import scala.Tuple2;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.webank.wedatasphere.dss.framework.common.conf.TokenConf.HPMS_USER_TOKEN;
 import static com.webank.wedatasphere.dss.framework.proxy.conf.ProxyUserConfiguration.DS_PROXY_SELF_ENABLE;
 import static com.webank.wedatasphere.dss.framework.proxy.conf.ProxyUserConfiguration.DS_TRUST_TOKEN;
 
@@ -42,7 +46,7 @@ public class DssProxyUserController {
     @Autowired
     protected DssProxyUserService dssProxyUserService;
 
-    @RequestMapping(path = "list", method = RequestMethod.GET)
+    @RequestMapping(path = {"list","listProxyUsers"}, method = RequestMethod.GET)
     public Message getProxyUserList(HttpServletRequest request) {
         if(!ProxyUserConfiguration.isProxyUserEnable()) {
             return Message.error("proxy user service is not enable, please ask admin for help.");
@@ -79,9 +83,6 @@ public class DssProxyUserController {
     public Message setProxyUserCookie(@RequestBody DssProxyUserImpl userRep,
                                       HttpServletRequest req,
                                       HttpServletResponse resp) {
-        if(!ProxyUserConfiguration.isProxyUserEnable()) {
-            return Message.error("proxy user service is not enable, please ask admin for help.");
-        }
         String username = SecurityFilter.getLoginUsername(req);
         if (StringUtils.isEmpty(userRep.getUserName())) {
             return Message.error("userName is null.");
@@ -121,6 +122,13 @@ public class DssProxyUserController {
         cookie.setPath("/");
         resp.addCookie(cookie);
         return Message.ok("Success to add proxy user into cookie.");
+    }
+
+    @GetMapping("/getProxyUserName")
+    public Message getProxyUserName(@RequestParam("userName")String userName){
+        List<DssProxyUser> dssProxyUsers = dssProxyUserService.selectProxyUserList(userName, null);
+        List<String> proxyUsernames = dssProxyUsers.stream().map(DssProxyUser::getProxyUserName).collect(Collectors.toList());
+        return Message.ok().data("userNames", proxyUsernames);
     }
 
 }

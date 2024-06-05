@@ -91,9 +91,9 @@ export default {
       this.$refs['formRef'].validate(async (valid) => {
         if (valid) {
           try {
-            await this.importAction()
+            const res = await this.importAction();
             // this.$Message.success()
-            this.$emit('finish', this.project)
+            this.$emit('finish', this.project, res.importOrcId)
             this.$emit('_changeVisible', false)
             this.$refs['formRef'].resetFields()
           } catch (error) {

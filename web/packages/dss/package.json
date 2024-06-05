@@ -1,9 +1,9 @@
 {
   "name": "@dataspherestudio/dss",
-  "version": "1.1.2",
+  "version": "1.1.19",
   "dependencies": {
-    "@dataspherestudio/scriptis": "^1.1.2",
-    "@dataspherestudio/shared": "^1.1.2"
+    "@dataspherestudio/scriptis": "^1.1.19",
+    "@dataspherestudio/shared": "^1.1.19"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "3.12.1",
@@ -14,6 +14,8 @@
   },
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "serve-sit": "vue-cli-service serve --mode sit",
+    "build-sit": "vue-cli-service build --mode sit"
   }
 }

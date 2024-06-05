@@ -4,6 +4,7 @@ import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.orchestrator.db.hook.AddOrchestratorVersionHook;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
@@ -36,6 +37,9 @@ public class OrchestratorCopyEnv {
 
     @Autowired
     private ContextService contextService;
+
+    @Autowired
+    AddOrchestratorVersionHook addOrchestratorVersionHook;
 
     public ContextService getContextService() {
         return contextService;
@@ -70,6 +74,14 @@ public class OrchestratorCopyEnv {
 
     public void setOrchestratorMapper(OrchestratorMapper orchestratorMapper) {
         this.orchestratorMapper = orchestratorMapper;
+    }
+
+    public AddOrchestratorVersionHook getAddOrchestratorVersionHook() {
+        return addOrchestratorVersionHook;
+    }
+
+    public void setAddOrchestratorVersionHook(AddOrchestratorVersionHook addOrchestratorVersionHook) {
+        this.addOrchestratorVersionHook = addOrchestratorVersionHook;
     }
 
     public BMLService getBmlService() {

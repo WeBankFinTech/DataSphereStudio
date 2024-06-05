@@ -36,4 +36,38 @@
         SELECT username FROM `dss_user` WHERE id = #{userID}
     </select>
 
+    <select id="getWorkspaceRolePrivByUsername" resultMap="userWorkspaceRole">
+        SELECT
+            dwur.username,
+            CONCAT(dwur.workspace_id,'-',dwur.role_id) as roleCode,
+            CONCAT(dw.name,'-',dwr.name) as roleName,
+            CONCAT(dw.name,'-',dwr.front_name) as roleNameCn,
+            dcr.appconn_id,
+            doma.title_en,
+            doma.title_cn
+        FROM
+                dss_workspace_user_role dwur
+        INNER JOIN dss_workspace dw ON dwur.workspace_id = dw.id
+        INNER JOIN dss_workspace_role dwr ON dwr.id = dwur.role_id
+        INNER JOIN dss_workspace_appconn_role dcr ON dcr.workspace_id = dwur.workspace_id AND dcr.role_id=dwur.role_id AND dcr.priv>0
+        INNER JOIN dss_workspace_menu_appconn doma ON doma.appconn_id = dcr.appconn_id
+        WHERE
+        dwur.username in
+        <foreach collection='list' open='(' close=')' separator=',' item='user'> #{user.userName} </foreach>
+    </select>
+    <resultMap id="userWorkspaceRole" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv">
+        <id column="username" property="userName"/>
+        <collection property="roles" resultMap="workspaceRolePriv"/>
+    </resultMap>
+    <resultMap id="workspaceRolePriv" type="com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv$RoleInfo">
+        <id column="roleCode" property="roleCode"/>
+        <result column="roleName" property="roleName"/>
+        <result column="roleNameCn" property="roleNameCn"/>
+        <collection property="privs" ofType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv$RoleInfo$PrivInfo">
+            <id column="appconn_id" property="privCode"/>
+            <result column="title_en" property="privName"/>
+            <result column="title_cn" property="privNameCn"/>
+        </collection>
+    </resultMap>
+
 </mapper>

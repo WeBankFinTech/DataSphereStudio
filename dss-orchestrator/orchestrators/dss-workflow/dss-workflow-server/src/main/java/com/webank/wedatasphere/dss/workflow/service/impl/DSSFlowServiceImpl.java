@@ -56,6 +56,7 @@ import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
+import com.webank.wedatasphere.dss.workflow.service.SaveFlowHook;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -103,6 +104,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private NodeExportService nodeExportService;
     @Autowired
     private WorkflowNodeService workflowNodeService;
+
+    @Autowired
+    private SaveFlowHook saveFlowHook;
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
@@ -182,6 +186,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
     public DSSFlow addSubFlow(DSSFlow dssFlow, Long parentFlowID, String contextIDStr, String orcVersion, String schedulerAppConn) throws DSSErrorException {
+        if (checkExistSameSubflow(parentFlowID, dssFlow.getName())){
+            throw new DSSErrorException(90003, "子工作流名不能重复");
+        }
         DSSFlow parentFlow = flowMapper.selectFlowByID(parentFlowID);
         dssFlow.setProjectId(parentFlow.getProjectId());
         DSSFlow subFlow = addFlow(dssFlow, contextIDStr, orcVersion, schedulerAppConn);
@@ -277,7 +284,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
         jsonFlow = contextService.checkAndCreateContextID(jsonFlow, dssFlow.getBmlVersion(),
                 workspaceName, projectName, dssFlow.getName(), userName, false);
-
+        saveFlowHook.beforeSave(jsonFlow,dssFlow,parentFlowID);
         Map<String, Object> bmlReturnMap = bmlService.update(userName, resourceId, jsonFlow);
 
         dssFlow.setId(flowID);
@@ -295,7 +302,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             logger.error("Failed to saveContext: ", e);
             throw new DSSRuntimeException(e.getErrCode(),"保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
         }
-
+        saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
         return version;
     }
@@ -429,7 +436,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels, nodeSuffix);
-        return flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
+        DSSFlow copyFlow= flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
+        copyFlow.setFlowIdParamConfTemplateIdTuples(rootFlowWithSubFlows.getFlowIdParamConfTemplateIdTuples());
+        return copyFlow;
     }
 
 
@@ -531,14 +540,22 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow,
                 version, workspace, dssLabels);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
+        List<String[]> templateIds = new ArrayList<>();
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
                 updateFlowJson(userName, projectName, subflow, version, rootFlow.getId(),
                         contextIdStr, workspace, dssLabels, nodeSuffix);
+                templateIds.addAll(subflow.getFlowIdParamConfTemplateIdTuples());
             }
         }
 
         DSSFlow updateDssFlow = uploadFlowJsonToBml(userName, projectName, rootFlow, updateFlowJson);
+        List<String> tempIds = workFlowParser.getParamConfTemplate(updateFlowJson);
+        List<String[]> templateIdsInRoot = tempIds.stream()
+                .map(e->new String[]{updateDssFlow.getId().toString(),e})
+                .collect(Collectors.toList());
+        templateIds.addAll(templateIdsInRoot);
+        rootFlow.setFlowIdParamConfTemplateIdTuples(templateIds);
         //todo add dssflow to database
         flowMapper.updateFlowInputInfo(updateDssFlow);
         contextService.checkAndSaveContext(updateFlowJson, String.valueOf(parentFlowId));

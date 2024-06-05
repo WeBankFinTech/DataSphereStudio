@@ -17,7 +17,7 @@
 import api from '@dataspherestudio/shared/common/service/api';
 import result from '@dataspherestudio/shared/components/consoleComponent/result.vue';
 import SUPPORTED_LANG_MODES from '@dataspherestudio/shared/common/config/scriptis';
-import { find } from 'lodash'
+import { find, debounce } from 'lodash'
 export default {
   name: 'script-result',
   components: {
@@ -74,9 +74,9 @@ export default {
     this.scriptViewState.bottomContentHeight = this.$el.clientHeight
   },
   methods: {
-    getHeight() {
+    getHeight: debounce(function () {
       this.scriptViewState.bottomContentHeight = this.$el.clientHeight
-    },
+    }, 300),
     getResult(resultPath) {
       const pageSize = 5000;
       const url = '/filesystem/openFile';

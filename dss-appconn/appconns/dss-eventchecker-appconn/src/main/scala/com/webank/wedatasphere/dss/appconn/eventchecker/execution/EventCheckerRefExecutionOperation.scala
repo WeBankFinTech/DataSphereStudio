@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.appconn.eventchecker.execution
 
 import java.util.{Properties, UUID}
-
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker
 import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
@@ -25,7 +24,7 @@ import com.webank.wedatasphere.dss.standard.app.development.listener.ref.Executi
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.{AsyncExecutionResponseRef, ExecutionResponseRef, RefExecutionRequestRef}
 import org.apache.commons.io.IOUtils
 import org.apache.linkis.common.log.LogUtils
-import org.apache.linkis.common.utils.Utils
+import org.apache.linkis.common.utils.{Utils, VariableUtils}
 import org.apache.linkis.storage.LineRecord
 
 
@@ -70,12 +69,14 @@ class EventCheckerRefExecutionOperation
   }
 
   override def submit(requestRef: RefExecutionRequestRef.RefExecutionContextRequestRef): RefExecutionAction = {
+    requestRef.getExecutionRequestRefContext
     val nodeAction = new EventCheckerExecutionAction()
     nodeAction.setId(UUID.randomUUID().toString)
     import scala.collection.JavaConversions.mapAsScalaMap
     val InstanceConfig = this.service.getAppInstance.getConfig
     val scalaParams: scala.collection.mutable.Map[String, Object] = requestRef.getExecutionRequestRefContext.getRuntimeMap
     val properties = new Properties()
+    properties.put(VariableUtils.RUN_DATE,requestRef.getRunDate)
     InstanceConfig.foreach { record =>
       if(null == record._2) {
         properties.put(record._1, "")}

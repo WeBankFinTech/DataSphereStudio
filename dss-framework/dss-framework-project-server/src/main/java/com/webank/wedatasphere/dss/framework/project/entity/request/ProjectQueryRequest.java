@@ -33,6 +33,16 @@ public class ProjectQueryRequest implements Serializable {
 
     private String username;
 
+    private boolean filterProject;
+
+    public boolean getFilterProject() {
+        return filterProject;
+    }
+
+    public void setFilterProject(boolean filterProject) {
+        this.filterProject = filterProject;
+    }
+
     public Long getId() {
         return id;
     }

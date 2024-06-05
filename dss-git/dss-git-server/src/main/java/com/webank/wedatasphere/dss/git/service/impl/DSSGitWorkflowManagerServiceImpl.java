@@ -475,7 +475,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             if (CollectionUtils.isEmpty(latestCommit)) {
                 logger.error("get latestCommit failed, the reason is null");
             } else {
-                return commitResponse;
+                return latestCommit.get(0);
             }
 
         } catch (Exception e) {

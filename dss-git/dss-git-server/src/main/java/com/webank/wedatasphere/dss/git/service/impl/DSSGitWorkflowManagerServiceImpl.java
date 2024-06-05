@@ -222,7 +222,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         List<String> subList = new ArrayList<>(fileList.subList(start, end));
         List<String> filePathList = new ArrayList<>();
         for (String file : subList) {
-            filePathList.add(gitPathPre + request.getProjectName() + File.separator + file);
+            filePathList.add(workTree + File.separator + file);
         }
 
 
@@ -259,8 +259,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 }
             }
             // 处理文件路径 /data/GitInstall/testGit/test/.sql -> testGit/test/.sql
-            if (file.startsWith(gitPathPre)) {
-                file = file.substring(gitPathPre.length());
+            if (file.startsWith(workTree + File.separator)) {
+                file = file.substring(gitPathPre.length() + File.separator.length());
             }
 
             result.add(new GitSearchResult(file, keyLines));

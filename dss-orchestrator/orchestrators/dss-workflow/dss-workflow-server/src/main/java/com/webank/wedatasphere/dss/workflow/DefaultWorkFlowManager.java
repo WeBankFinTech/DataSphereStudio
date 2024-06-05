@@ -261,8 +261,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         //这里其实只会有1个元素
         List<DSSFlow> rootFlows = dwsFlowRelationList.stream().filter(DSSFlow::getRootFlow).collect(Collectors.toList());
         for (DSSFlow rootFlow : rootFlows) {
-            String flowCodePath0=IoUtils.addFileSeparator(projectPath,  rootFlow.getName());
-            String flowMetaPath0=IoUtils.addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME, rootFlow.getName());
+            String flowCodePath0=IoUtils.addFileSeparator(projectPath,  flowName);
+            String flowMetaPath0=IoUtils.addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME, flowName);
             workFlowInputService.inputWorkFlowNew(dssFlowImportParam.getUserName(),
                     rootFlow,
                     projectName,

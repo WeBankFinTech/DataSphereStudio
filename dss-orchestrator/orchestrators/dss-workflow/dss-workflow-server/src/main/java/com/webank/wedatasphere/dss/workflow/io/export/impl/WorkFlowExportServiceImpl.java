@@ -31,6 +31,7 @@ import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.common.utils.ZipHelper;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
@@ -119,27 +120,28 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         //生成rootflow及所有子flow的Relations
         List<Long> flowIds = dssFlowList.stream().map(DSSFlow::getId).collect(Collectors.toList());
         List<DSSFlowRelation> flowRelations = flowIds.isEmpty() ? new ArrayList<>() : flowMapper.listFlowRelation(flowIds);
-        // 生成rootflow orchestrator信息
-        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
-                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx
         String projectPath = IoUtils.generateProjectIOPath(userName, projectName);
         // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx/.flowmeta/flow_all_type_node/
-        String flowMetaPath = IoUtils.generateFlowMetaIOPath(projectPath, rootFlow.getName());
-        metaExportService.exportFlowBaseInfoNew(orchestratorVo, dssFlowList, flowRelations, flowMetaPath);
-        logger.info(userName + "-开始导出Flow：" + rootFlow.getName());
         List<DSSFlow> dssFlows = new ArrayList<>();
         for (DSSFlow dssFlow : dssFlowList) {
             if (dssFlow.getRootFlow()) {
+                // 生成rootflow orchestrator信息
+                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
+                        OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                DSSOrchestratorInfo dssOrchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
+                String flowMetaPath = IoUtils.generateFlowMetaIOPath(projectPath, dssOrchestratorInfo.getName());
+                metaExportService.exportFlowBaseInfoNew(orchestratorVo, dssFlowList, flowRelations, flowMetaPath);
+                logger.info(userName + "-开始导出Flow：" + dssOrchestratorInfo.getName());
                 String flowMetaFilePath = IoUtils.addFileSeparator(flowMetaPath, FLOW_FILE_NAME);
                 //导出工作流json文件
                 String flowJson = bmlService.readTextFromBML(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion());
                 if (!dssFlow.getHasSaved()) {
-                    logger.info("工作流{}从未保存过，忽略", dssFlow.getName());
+                    logger.info("工作流{}从未保存过，忽略", dssOrchestratorInfo.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
                     // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx/flow_all_type_node/
-                    String flowCodePath = IoUtils.generateFlowCodeIOPath(projectPath, rootFlow.getName());
-                    exportFlowResourcesNew(userName, dssProjectId, projectName, flowCodePath, flowJson, dssFlow.getName(), workspace, dssLabels,exportExternalNodeAppConnResource);
+                    String flowCodePath = IoUtils.generateFlowCodeIOPath(projectPath, dssOrchestratorInfo.getName());
+                    exportFlowResourcesNew(userName, dssProjectId, projectName, flowCodePath, flowJson, dssOrchestratorInfo.getName(), workspace, dssLabels,exportExternalNodeAppConnResource);
                     exportAllSubFlowsNew(userName, dssFlow, dssProjectId, projectName, flowCodePath,flowMetaPath, workspace, dssLabels,exportExternalNodeAppConnResource);
                     String flowJsonWithoutParams = extractAndExportParams(flowJson, flowCodePath);
                     try (

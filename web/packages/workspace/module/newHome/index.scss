@@ -69,7 +69,7 @@
           align-items: center;
           .header-search {
             flex: 50%;
-            /deep/.ivu-input {
+            ::v-deep.ivu-input {
               @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
               @include border-color($border-color-base, $dark-border-color-base);
             }
@@ -83,7 +83,7 @@
           // color: $text-desc-color;
           @include font-color($light-text-color, $dark-text-color);
           cursor: pointer;
-          /deep/.visualCatesIcon {
+          ::v-deep.visualCatesIcon {
             @include font-color($light-text-color, $dark-text-color);
           }
         }
@@ -139,9 +139,9 @@
           border-radius: 2px;
           padding: 25px;
           position: relative;
-          background: url("../../assets/images/bgc-imag.svg") center center
+          background: url("../../assets/images/bgc-imag.svg") center right
             no-repeat;
-          background-size: 100%;
+          background-size: contain;
           margin-right: 25px;
 
           :last-child {

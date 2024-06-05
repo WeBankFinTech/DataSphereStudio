@@ -18,7 +18,7 @@
 @import '@dataspherestudio/shared/common/style/variables.scss';
 
 .resource-simple-content {
-    height: 400px;
+    height: 432px;
     position: relative;
     .queue-manager {
         position: $relative;
@@ -50,6 +50,9 @@
                     margin-right: 30px;
                 }
             }
+        }
+        .queue-manager-footer {
+            padding:  16px 16px 0;
         }
         .queue-manager-top {
             .queue-manager-top-content {

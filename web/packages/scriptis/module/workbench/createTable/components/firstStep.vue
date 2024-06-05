@@ -297,7 +297,7 @@ export default {
       if (!this.dbList.length) {
         return;
       }
-      const list = this.dbList.filter((item) => /(_ind|_qml|_work)$/.test(item.name))
+      const list = this.dbList.filter((item) => /(_ind|_qml|_work|_tmp|_bak)$/.test(item.name))
       this.info[0].map[0].opt = list.map((item) => {
         return {
           label: item.name,
@@ -335,6 +335,9 @@ export default {
       const index = item.opt.findIndex((el) => el.value === val);
       this.currentDb = index;
       this.$emit('get-tables', val);
+      if (this.attrInfo.basic.name){
+        this.$refs.basicAttr[0].validateField('name');
+      }
     },
   },
 };

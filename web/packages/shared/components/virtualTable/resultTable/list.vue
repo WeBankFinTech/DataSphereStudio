@@ -1,6 +1,7 @@
 <template>
   <div
     class="list-view"
+    @contextmenu.prevent.stop="handleContextMenu"
     ref="list">
     <vuescroll
       ref="vuescroll"
@@ -24,7 +25,9 @@
             class="we-column-item"
             :class="{'null-text': content === 'NULL', 'active': contentIndex === activeRowIndex}"
             @click.stop="columnItemClick(contentIndex)">
-            <span class="we-column-item-content">{{ content }}</span>
+            <span
+              :data-tdcontent="content"
+              class="we-column-item-content">{{ content }}</span>
           </div>
         </div>
       </list-body>
@@ -96,6 +99,14 @@ export default {
     },
     changeActive() {
       this.activeRowIndex = null;
+    },
+    handleContextMenu(e) {
+      if (e && e.target && e.target.dataset.tdcontent ) {
+        this.$emit("on-tdcontext-munu", {
+          content: e.target.dataset.tdcontent,
+          e
+        });
+      }
     }
   },
 };

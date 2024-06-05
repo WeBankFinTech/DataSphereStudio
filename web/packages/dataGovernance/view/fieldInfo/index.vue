@@ -303,7 +303,7 @@ export default {
   overflow-y: auto;
   max-height: 200px;
   div {
-    /deep/ span {
+    ::v-deep span {
       font-weight: bold;
       margin-right: 6px;
     }

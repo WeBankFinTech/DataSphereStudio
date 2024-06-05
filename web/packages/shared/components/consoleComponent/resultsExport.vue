@@ -16,7 +16,7 @@
         ref="resultsExport"
         :model="exportOption"
         :rules="rules"
-        :label-width="80">
+        :label-width="110">
         <FormItem
           :label="$t('message.common.resultsExport.formItems.name.label')"
           prop="name">
@@ -36,6 +36,39 @@
           <RadioGroup v-model="exportOption.format">
             <Radio label="1">CSV</Radio>
             <Radio label="2">Excel</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem
+          :label="$t('message.common.toolbar.coding')"
+          prop="coding">
+          <RadioGroup v-model="exportOption.coding">
+            <Radio label="1">UTF-8</Radio>
+            <Radio label="2">GBK</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem
+          :label="$t('message.common.toolbar.replace')"
+          prop="nullValue">
+          <RadioGroup v-model="exportOption.nullValue">
+            <Radio label="1">NULL</Radio>
+            <Radio label="2">{{
+              $t('message.common.toolbar.emptyString')
+            }}</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem
+          v-if="exportOption.format == 1"
+          :label="$t('message.common.toolbar.selectsplit')"
+          prop="splitChar">
+          <RadioGroup v-model="exportOption.splitChar">
+            <Radio
+              v-for="item in splitList"
+              :label="item.value"
+              :name="item.value"
+              :key="item.value"
+            >
+              {{ item.label }}
+            </Radio>
           </RadioGroup>
         </FormItem>
         <FormItem
@@ -102,6 +135,10 @@ export default {
         name: '',
         path: '',
         format: '1',
+        coding: '1',
+        nullValue: '1',
+        splitChar: '1',
+        keepNewline: '0',
         autoFormat: false
       },
       fileTree: [],
@@ -117,11 +154,18 @@ export default {
           { required: true, message: this.$t('message.common.resultsExport.rules.path.required'), trigger: 'change' },
         ],
       },
+      splitList: [
+        { label: this.$t('message.scripts.hiveTableExport.DH'), value: '1', data: ',' },
+        { label: this.$t('message.scripts.hiveTableExport.FH'), value: '2', data: ';' },
+        { label: this.$t('message.scripts.hiveTableExport.ZBF'), value: '3', data: '\t' },
+        // { label: this.$t('message.scripts.hiveTableExport.KG'), value: '4', data: ' ' },
+        { label: this.$t('message.scripts.hiveTableExport.SX'), value: '5', data: '|' },
+      ],
     };
   },
   computed: {
     allDisbled() {
-      return ['hql', 'sql', 'py'].includes(this.script.runType);
+      return ['hql', 'sql', 'py', 'tsql'].includes(this.script.runType);
     }
   },
   methods: {
@@ -202,11 +246,26 @@ export default {
         noLoadCache: true,
         code
       }
+      const nullValue = this.exportOption.nullValue === '1' ? 'NULL' : 'BLANK'
+      const charset = this.exportOption.coding === '1' ? 'utf-8' : 'gbk'
+      const splitChar = (this.splitList.find(it => it.value == this.exportOption.splitChar) || {} ).data
       if (this.exportOption.format === '2') {
         params.params =  {
           configuration: {
             runtime: {
-              'wds.linkis.pipeline.export.excel.auto_format.enable': this.exportOption.autoFormat
+              'wds.linkis.pipeline.export.excel.auto_format.enable': this.exportOption.autoFormat,
+              "pipeline.output.charset": charset, //结果集导出字符集
+              "pipeline.output.shuffle.null.type": nullValue, //空值替换
+            }
+          }
+        }
+      } else if(this.exportOption.format === '1') {
+        params.params =  {
+          configuration: {
+            runtime: {
+              "pipeline.field.split": splitChar, //csv分隔符
+              "pipeline.output.charset": charset, //结果集导出字符集
+              "pipeline.output.shuffle.null.type": nullValue, //空值替换
             }
           }
         }
@@ -242,6 +301,10 @@ export default {
         name: '',
         path: '',
         format: '1',
+        coding: '1',
+        nullValue: '1',
+        splitChar: '1',
+        keepNewline: '0',
       };
       this.fileTree = [];
     },
@@ -265,6 +328,9 @@ export default {
     .result-modal-path {
         width: 100%;
         display: inline-block;
+    }
+    .ivu-form-item {
+        margin-bottom: 8px;
     }
 }
 .full-btn {

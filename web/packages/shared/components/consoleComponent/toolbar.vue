@@ -14,7 +14,7 @@
         >
       </li>
       <li
-        v-if="activeTool === 'table'"
+        v-if="activeTool === 'table' && toolbarShow.filter"
         @click="openPopup('filter')"
         :title="$t('message.common.toolbar.resultGroupLineFilter')"
       >
@@ -132,7 +132,7 @@
                 $t('message.common.toolbar.autoformat')
               }}</Checkbox>
             </Row>
-            <div v-if="isAll || +download.format === 1">
+            <div v-if="isApiAll || isNotApiAll || +download.format === 1">
               <Row class="row-item">
                 {{ $t('message.common.toolbar.downloadMode') }}
               </Row>
@@ -283,26 +283,33 @@ export default {
     }
   },
   computed: {
-    isAll() {
+    isNotApiAll() {
       return (
-        ['hql', 'sql'].includes(this.script.runType) &&
+        ['hql', 'sql', 'tsql'].includes(this.script.runType) &&
         this.download.format === '2' && this.getResultUrl !== 'dss/apiservice'
       )
+    },
+    isApiAll() {
+      return this.download.format === '2' && this.getResultUrl === 'dss/apiservice'
     },
     toolbarShow() {
       let isScriptis =
         this.$route.name === 'Home' ||
         (this.$route.name === 'results' && this.$route.query.from === 'Home')
       let canDownload = true
+      let canFilter = true
       try {
-        // display_prohibited 的结果集不支持下载
+        // display_prohibited、column_limit_display的结果集不支持下载
         if (this.script.resultList[this.script.resultSet].result.tipMsg) {
           canDownload = false
+          canFilter = false
         }
       } catch (error) {
         //
       }
       return {
+        filter: canFilter,
+
         export:
           this.baseinfo.exportResEnable !== false &&
           isScriptis &&
@@ -428,7 +435,7 @@ export default {
               flag = true
             }
           } else if (
-            this.isAll &&
+            this.isNotApiAll &&
             this.allDownload &&
             +this.download.format == 2
           ) {
@@ -436,6 +443,17 @@ export default {
             temPath = temPath.substring(0, temPath.lastIndexOf('/'))
             apiPath = `${this.getResultUrl}/resultsetsToExcel`
             querys += `&outputFileName=${filename}&path=${temPath}`
+            let url =
+              `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
+              querys
+            flag = this.downloadFile(url, temPath)
+          } else if (
+            this.isApiAll &&
+            this.allDownload && 
+            +this.download.format == 2
+          ) {
+            temPath = temPath.substring(0, temPath.lastIndexOf('/'))
+            querys += `&outputFileName=${filename}&path=${temPath}&isFullExcel=true`
             let url =
               `${window.location.protocol}//${window.location.host}/api/rest_j/v1/${apiPath}?` +
               querys

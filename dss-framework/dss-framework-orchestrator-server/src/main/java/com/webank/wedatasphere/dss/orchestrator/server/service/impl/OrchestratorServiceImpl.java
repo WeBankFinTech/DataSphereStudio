@@ -514,6 +514,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 orchestratorBaseInfo.setOrchestratorId(dssOrchestratorInfo.getId());
                 orchestratorBaseInfo.setEditable(isEditable || isReleasable);
                 orchestratorBaseInfo.setReleasable(isReleasable);
+                orchestratorBaseInfo.setIsDefaultReference(dssOrchestratorInfo.getIsDefaultReference());
                 retList.add(orchestratorBaseInfo);
             }
         }

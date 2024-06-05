@@ -201,7 +201,7 @@ export default {
       let validRepeat = await this.validateRepeat();
       this.$refs.editor.deltaDecorations(selectCode, () => {
         if (!validRepeat) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
-        if (this.loading) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
+        if (this.loading || this.killing) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
         if (!selectCode) {
           return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.emptyCode'));
         }
@@ -219,10 +219,10 @@ export default {
       });
     },
     stop() {
-      if (this.loading) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
-      this.loading = true;
+      if (this.killing) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
+      this.killing = true;
       this.$emit('on-stop', () => {
-        this.loading = false;
+        this.killing = false;
       });
     },
     async save() {

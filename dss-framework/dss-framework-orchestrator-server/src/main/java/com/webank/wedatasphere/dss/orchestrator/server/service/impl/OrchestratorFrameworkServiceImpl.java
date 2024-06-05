@@ -156,6 +156,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorCreateRequest.getOrchestratorWays()));
         dssOrchestratorInfo.setOrchestratorMode(orchestratorCreateRequest.getOrchestratorMode());
         dssOrchestratorInfo.setOrchestratorLevel(orchestratorCreateRequest.getOrchestratorLevel());
+        dssOrchestratorInfo.setIsDefaultReference(orchestratorCreateRequest.getIsDefaultReference());
         //1.去orchestratorFramework创建编排模式
         LOGGER.info("{} begins to create a orchestrator {}.", username, orchestratorCreateRequest);
         List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorCreateRequest.getLabels().getRoute()));
@@ -255,6 +256,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorModifyRequest.getOrchestratorWays()));
         dssOrchestratorInfo.setOrchestratorLevel(orchestratorModifyRequest.getOrchestratorLevel());
         dssOrchestratorInfo.setUses(orchestratorModifyRequest.getUses());
+        dssOrchestratorInfo.setIsDefaultReference(orchestratorModifyRequest.getIsDefaultReference());
         //1.如果调度系统要求同步创建工作流，向调度系统发送更新工作流的请求
         tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, dssOrchestratorInfo,
                 OrchestrationService::getOrchestrationUpdateOperation,
@@ -325,9 +327,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         } else if (orchestratorCopyRequest.getWorkflowNodeSuffix().length() > 10) {
             DSSExceptionUtils.dealErrorException(6014, "The node suffix length can not exceed 10. (节点后缀长度不能超过10)", DSSOrchestratorErrorException.class);
         }
+        String dssLabel = null;
+        if (orchestratorCopyRequest.getLabels()!= null && orchestratorCopyRequest.getLabels().getRoute() != null) {
+            dssLabel = orchestratorCopyRequest.getLabels().getRoute();
+        } else {
+            dssLabel = DSSCommonUtils.ENV_LABEL_VALUE_DEV;
+        }
         OrchestratorCopyVo orchestratorCopyVo = new OrchestratorCopyVo.Builder(username, sourceProject.getId(), sourceProject.getName(), targetProject.getId(),
                 targetProject.getName(), sourceOrchestratorInfo, orchestratorCopyRequest.getTargetOrchestratorName(),
-                orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV),
+                orchestratorCopyRequest.getWorkflowNodeSuffix(), new EnvDSSLabel(dssLabel),
                 workspace, Sender.getThisInstance()).setCopyTaskId(null).build();
         OrchestratorCopyJob orchestratorCopyJob = new OrchestratorCopyJob();
         orchestratorCopyJob.setOrchestratorCopyVo(orchestratorCopyVo);

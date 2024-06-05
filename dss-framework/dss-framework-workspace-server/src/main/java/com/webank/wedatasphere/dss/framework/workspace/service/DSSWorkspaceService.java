@@ -81,6 +81,8 @@ public interface DSSWorkspaceService {
 
     List<String> getAllDepartmentWithOffices();
 
+    List<String> getAllDepartments();
+
     void associateDepartments(Long workspaceId, String departments, String roles,String user) throws DSSErrorException;
 
     DSSWorkspaceAssociateDepartments getAssociateDepartmentsInfo(Long workspaceId);

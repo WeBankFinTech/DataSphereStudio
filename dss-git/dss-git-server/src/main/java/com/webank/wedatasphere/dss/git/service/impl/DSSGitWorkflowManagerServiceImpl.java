@@ -109,7 +109,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + entry.getKey();
                 paths.add(metaConfPath);
             }
-            paths.remove(GitConstant.GIT_SERVER_META_PATH );
             // 提交
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率

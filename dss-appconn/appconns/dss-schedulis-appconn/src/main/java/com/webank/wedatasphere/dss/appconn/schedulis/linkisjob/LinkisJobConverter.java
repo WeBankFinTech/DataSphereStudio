@@ -47,6 +47,7 @@ public class LinkisJobConverter implements NodeConverter {
         LinkisJob job = new LinkisJob();
         job.setConf(new HashMap<>());
         job.setName(workflowNode.getName());
+        job.setComment(workflowNode.getDSSNode().getDesc());
         convertHead(workflowNode,job);
         convertDependencies(workflowNode,job);
         convertProxyUser(workflowNode,job);
@@ -68,6 +69,7 @@ public class LinkisJobConverter implements NodeConverter {
         map.put(AzkabanConstant.ZAKABAN_DEPENDENCIES_KEY,job.getDependencies());
         map.put(WorkflowConstant.PROXY_USER,job.getProxyUser());
         map.put(AzkabanConstant.JOB_COMMAND,job.getCommand());
+        map.put(AzkabanConstant.JOB_COMMENT,job.getComment());
         Map<String, Object> labels = new HashMap<>(1);
         labels.put("route", SchedulerConf.JOB_LABEL.getValue());
         map.put(AzkabanConstant.JOB_LABELS, DSSCommonUtils.COMMON_GSON.toJson(labels));

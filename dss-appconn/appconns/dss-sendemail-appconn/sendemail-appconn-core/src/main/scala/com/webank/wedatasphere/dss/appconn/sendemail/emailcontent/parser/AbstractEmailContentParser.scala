@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.parser
 
 import java.lang.reflect.{ParameterizedType, Type}
+import java.util
 
 import com.webank.wedatasphere.dss.appconn.sendemail.email.Email
 import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.MultiContentEmail
@@ -53,6 +54,19 @@ abstract class AbstractEmailContentParser[T] extends EmailContentParser {
     else Utils.tryFinally(reader.getRecord match {
       case record: LineRecord => Option(record.getLine)
     })(IOUtils.closeQuietly(reader))
+  }
+
+  protected def getLineRecord(fsPathStore: FsPathStoreEmailContent): Option[String] = {
+    val reader = getResultSetReader(fsPathStore)
+    val result = new util.ArrayList[String]
+    Utils.tryFinally(
+      while (reader.hasNext) {
+        reader.getRecord match {
+          case record: LineRecord => result.add(record.getLine)
+        }
+      }
+    ) (IOUtils.closeQuietly(reader))
+    Option.apply(String.join("",result))
   }
 
   protected def getEmailContentClass: Type = getClass.getGenericSuperclass match {

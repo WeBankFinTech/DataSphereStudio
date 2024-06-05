@@ -1,0 +1,12 @@
+{
+  "name": "@dataspherestudio/cyeditor",
+  "version": "0.0.1",
+  "dependencies": {
+    "cytoscape": "3.27.0",
+    "cytoscape-klay": "^3.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "serve": "vue-cli-service serve example.js"
+  }
+}

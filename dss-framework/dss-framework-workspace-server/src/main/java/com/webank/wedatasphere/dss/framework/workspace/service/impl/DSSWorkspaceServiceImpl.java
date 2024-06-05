@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.github.pagehelper.page.PageMethod;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlySSOAppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
@@ -48,8 +49,9 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.slf4j.Logger;
@@ -119,8 +121,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             throw exception1;
         }
         Long userId = dssWorkspaceUserMapper.getUserID(userName);
-        dssWorkspaceUserMapper.setUserRoleInWorkspace(dssWorkspace.getId(),
-                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()), userName, userName, userId, userName);
+        dssWorkspaceUserMapper.insertUserRoleInWorkspace(dssWorkspace.getId(),
+                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()),new Date(), userName, userName, userId, userName);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
         dssComponentRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceComponentPrivs(dssWorkspace.getId(), userName));
@@ -136,22 +138,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspaceUserService.updateWorkspaceUser(roleIds, workspaceId, userName, userName);
     }
 
-
-    //把用户及角色添加到工作空间
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creator, String userId) {
-        //根据用户名 从用户表拿到用户id
-//        Long userId = dssUserService.getUserID(userName);
-        if (userId == null) {
-            //保存 - dss_user
-            dssUserService.insertOrUpdateUser(userName, workspace);
-        }
-        //保存 - 保存用户角色关系 dss_workspace_user_role
-        for (Integer roleId : roleIds) {
-            dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspace.getWorkspaceId(), roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), creator);
-        }
-    }
 
     //获取所有的工作空间
     @Override
@@ -182,11 +168,13 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         if (workspaceIds.size() == 0) {
             Long userId = dssWorkspaceUserMapper.getUserID(userName);
             int workspaceId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
-            dssWorkspaceUserMapper.setUserRoleInWorkspace(workspaceId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+            Integer analyserRole = workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName());
+
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId,analyserRole ,new Date(),
                     userName, "system", userId, "system");
             Integer workspace0xId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
             if (workspace0xId != null) {
-                dssWorkspaceUserMapper.setUserRoleInWorkspace(workspace0xId, workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName()),
+                dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspace0xId, analyserRole ,new Date(),
                         userName, "system", userId, "system");
             }
             //todo 初始化做的各项事情改为listener模式
@@ -207,7 +195,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             int minRoleId = Collections.min(roleIds);
             String homepageUrl = dssWorkspaceUserMapper.getHomepageUrl(workspaceIds.get(0), minRoleId);
             if ("/workspace".equals(homepageUrl)) {
+                //兼容旧的默认首页配置
                 homepageUrl = "/workspaceHome";
+            }else if("/workspaceHome/scheduleCenter".equals(homepageUrl)){
+                //兼容旧的生产中心首页配置
+                homepageUrl = "/scheduleCenter";
             }
             if (StringUtils.isNotEmpty(homepageUrl)) {
                 homepageUrl = homepageUrl + "?workspaceId=" + workspaceIds.get(0);
@@ -236,7 +228,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                                                       String roleName, int pageNow, int pageSize, List<Long> total) {
         String roleId = StringUtils.isBlank(roleName) ? null : String.valueOf(workspaceDBHelper.getRoleIdByName(roleName));
         PageHelper.startPage(pageNow, pageSize);
-        List<DSSWorkspaceUser> workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, username, roleId);
+        // 转译用户名模糊查询中的特殊字符
+        String queryName = StringUtils.isNotEmpty(username) && username.contains("_")
+                ? username.replaceAll("_", "\\\\_")
+                : username;
+        List<DSSWorkspaceUser> workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(workspaceId, queryName, roleId);
         PageInfo<DSSWorkspaceUser> pageInfo = new PageInfo<>(workspaceUsers);
         total.add(pageInfo.getTotal());
         return workspaceUsers.stream().map(
@@ -487,7 +483,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         List<String> users = dssWorkspaceUserMapper.getAllWorkspaceUsers(dssWorkSpace.getId());
         if (!users.contains(username)) {
-            throw new DSSFrameworkWarnException(30021, "You have no permission to access this workspace " + dssWorkSpace.getName());
+            throw new DSSFrameworkWarnException(30021, "user: " + username + " have no permission to access this workspace " + dssWorkSpace.getName());
         }
         String originDepartId = dssWorkSpace.getDepartment();
         if (StringUtils.isNotBlank(originDepartId)) {
@@ -668,23 +664,43 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 username.equals(workspace.getCreateBy());
     }
 
+    @Override
+    public PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize) {
+        PageMethod.startPage(currentPage,pageSize);
+        List<DSSUserRoleComponentPriv> users = dssWorkspaceUserMapper.getAllUsers();
+        Map<String, DSSUserRoleComponentPriv> userRolePrivMap = dssWorkspaceUserMapper.getWorkspaceRolePrivByUsername(users);
+        //处理用户没有角色权限时只返回用户
+        for (DSSUserRoleComponentPriv user : users) {
+            if (MapUtils.isEmpty(userRolePrivMap) || Objects.isNull(userRolePrivMap.get(user.getUserName()))) {
+                continue;
+            }
+            user.setRoles(userRolePrivMap.get(user.getUserName()).getRoles());
+        }
+        return new PageInfo<>(users);
+    }
+
     private void joinWorkspaceForNewUser(String userName, Long userId) {
         String userOrgName = staffInfoGetter.getFullOrgNameByUsername(userName);
+        String orgName = userOrgName.split("-")[0];
         List<DSSWorkspaceAssociateDepartments> workspaceAssociateDepartments = dssWorkspaceMapper.getWorkspaceAssociateDepartments();
-        Set<ImmutablePair<Long, String>> needToAdd = new HashSet<>();
+        Set<Map<Long, String>> needToAdd = new HashSet<>();
         for (DSSWorkspaceAssociateDepartments item : workspaceAssociateDepartments) {
             String departments = item.getDepartments();
             if (StringUtils.isNotBlank(departments) && StringUtils.isNotBlank(item.getRoleIds())) {
                 Arrays.stream(departments.split(",")).forEach(org -> {
-                    if (org.equals(userOrgName)) {
-                        needToAdd.add(new ImmutablePair<>(item.getWorkspaceId(), item.getRoleIds()));
+                    if (org.equals(userOrgName) || orgName.equals(org)) {
+                        Map<Long, String> pair = new HashMap<>();
+                        pair.put(item.getWorkspaceId(), item.getRoleIds());
+                        needToAdd.add(pair);
                     }
                 });
             }
         }
-        needToAdd.forEach(pair -> {
-            Arrays.stream(pair.getValue().split(",")).forEach(roleId -> {
-                dssWorkspaceUserMapper.setUserRoleInWorkspace(pair.getKey().intValue(), Integer.parseInt(roleId), userName, "system", userId, "system");
+        needToAdd.forEach(map -> {
+            map.forEach((key, value) -> {
+                Arrays.stream(value.split(",")).forEach(roleId -> {
+                    dssWorkspaceUserMapper.insertUserRoleInWorkspace(key.intValue(), Integer.parseInt(roleId), new Date(), userName, "system", userId, "system");
+                });
             });
         });
     }

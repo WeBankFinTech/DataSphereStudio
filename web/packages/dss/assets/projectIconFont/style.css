@@ -31,7 +31,7 @@
 .fi-guanlishitu:before {
   content: "\e608";
 }
-.fi-JDBC:before {
+.fi-jdbc:before {
   content: "\e75e";
 }
 .fi-scala:before {

@@ -59,6 +59,7 @@ public class WorkflowRefCopyOperation
         Map<String, Object> refJobContent = new HashMap<>(2);
         refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, responseCopyWorkflow.getDssFlow().getId());
         refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, responseCopyWorkflow.getDssFlow().getFlowJson());
+        refJobContent.put(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY, responseCopyWorkflow.getDssFlow().getFlowIdParamConfTemplateIdTuples());
         return RefJobContentResponseRef.newBuilder().setRefJobContent(refJobContent).success();
     }
 }

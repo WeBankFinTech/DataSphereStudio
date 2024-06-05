@@ -20,9 +20,15 @@
         "addCatalog": "新建目录",
         "addScript": "新建脚本",
         "importToHive": "导入至Hive",
+        "move": "移动",
         "importToHdfs": "导入至HDFS",
         "copyscript": "复制脚本",
         "stickscript": "粘贴"
+      },
+      "move": {
+        "success": "文件已完成移动",
+        "warn": "目标路径已存在重名文件",
+        "title": "文件移动"
       },
       "warning": {
         "getRootPath": "未请求到工作空间根目录，请刷新重试！",
@@ -99,7 +105,7 @@
         "XDF": "限定符",
         "WXDF": "无限定符",
         "HXWBT": "首行为表头",
-        "HQBZDSJ": "获取表字段数据",
+        "HQBXX": "获取表信息",
         "XZWJLJ": "请选择文件路径",
         "GXMLDR": "共享目录导入",
         "DR": "导入",
@@ -162,7 +168,7 @@
         "SXCP": "所属产品",
         "SSXM": "所属项目",
         "YT": "用途",
-        "SSZDMC": "搜索字段名称...",
+        "SSZDMC": "请搜索字段名，别名，描述...",
         "XH": "序号",
         "ZDM": "字段名",
         "ZDLX": "字段类型",
@@ -174,6 +180,7 @@
         "MS": "描述",
         "FQXX": "分区信息",
         "DJFQCK": "请点击根分区查看分区大小",
+        "LastWriteTime": "最近写入时间",
         "WFQSJ": "暂无表分区数据",
         "BXX": "表信息",
         "BZD": "字段数",
@@ -185,7 +192,8 @@
         "WJS": "文件数：",
         "YES": "对",
         "GSHJX": "进行格式化成",
-        "ZJXYGE": "组件需要的格式"
+        "ZJXYGE": "组件需要的格式",
+        "FZBZDXX": "复制表字段信息"
       },
       "logView": {
         "taskId": "任务ID：",
@@ -323,7 +331,9 @@
         "HQFQSB": "获取分区信息失败",
         "ZQDRWJLJ": "请正确选择导入文件路径",
         "QQRSJKMCXX": "请确认数据库名称填写信息",
-        "QQRSFCF": "请确认是否复写"
+        "QQRSFCF": "请确认是否复写",
+        "TJHJXDRSJ": "提交后继续导入数据",
+        "TJBJS": "提交并结束"
       },
       "hiveTableExport": {
         "DCB": "导出表",
@@ -591,7 +601,7 @@
           "save": "保存",
           "saveAs": "另存为"
         },
-        "tips": "<div style='font-weight:600'>Scriptis使用指引：</div><div style='padding-left:10px'>1.设置参数:在管理台设置队列及参数<br>2.新建脚本:右键新建所需脚本<br>3.编辑脚本:在对应的脚本文件中编辑Sql或命令<br>4.提交执行:运行选中的sql或命令<br>5.结果查询:查询执行结果及日志</div><div style='font-weight:600'>前往<a href='_book/快速入门/Scriptis快速入门.html' target='_blank'>快速使用Scriptis</a>了解更详细的使用指引</div>",
+        "tips": "<div style='font-weight:600'>Scriptis使用指引：</div><div style='padding-left:10px'>1.设置参数:在管理台设置队列及参数<br>2.新建脚本:右键新建所需脚本<br>3.编辑脚本:在对应的脚本文件中编辑Sql或命令<br>4.提交执行:运行选中的sql或命令<br>5.结果查询:查询执行结果及日志</div><div style='font-weight:600'>前往<a href='{book}/快速入门/Scriptis快速入门.html' target='_blank'>快速使用Scriptis</a>了解更详细的使用指引</div>",
         "warning": {
           "noDBInfo": "未获取到数据库表信息，脚本联想词功能可能存在异常！可刷新重试！",
           "noUDF": "未获取到UDF和方法函数信息，脚本联想词功能可能存在异常！可刷新重试！",
@@ -771,6 +781,7 @@
       "dbinfs": "库基本信息",
       "tableifs": "库表信息",
       "transfer": "批量转移",
+      "download": "下载数据",
       "transferTitle": "表属主转移",
       "transferForm": {
         "title": "申请单标题",
@@ -872,7 +883,14 @@
       "fullscreen": "全屏展示",
       "fieldnamestyle": "字段名只支持大小写字母、数字和下划线",
       "unableDel": "无法删除所有的字段！",
-      "scriptUsage": "脚本使用说明"
+      "scriptUsage": "脚本使用说明",
+      "generate_rename_statement": "生成rename语句",
+      "select_database": "请选择目标数据库",
+      "system_generated": "以下代码由系统自动生成",
+      "copy_paste_board": "复制至粘贴板",
+      "generate_script": "生成执行脚本",
+      "select_data_table": "请选择数据表",
+      "paste_successfully": "成功复制至粘贴板"
     }
   }
 }

@@ -18,22 +18,43 @@
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
       <Button class="margin-right" type="primary" :title="$t('message.scripts.realsearchTip')" @click="handleGetTables(true)">{{ $t('message.scripts.searchnow') }}</Button>
       <Button class="margin-right" type="success" @click="copyTableName">{{ $t('message.scripts.copytbanme') }}</Button>
-      <Button v-if="canTransfer" class="margin-right" type="success" @click="transfer">{{ $t('message.scripts.transfer') }}</Button>
       <Button class="margin-right" type="error" @click="deleteSome">{{ $t('message.scripts.batchdel') }}</Button>
+      <Dropdown @on-click="dropdownClick">
+        <Button type="primary">
+          {{ $t('message.apiServices.query.more') }}
+          <Icon type="ios-arrow-down"></Icon>
+        </Button>
+        <template #list>
+          <DropdownMenu>
+            <DropdownItem v-if="canTransfer" name="transfer">{{ $t('message.scripts.transfer') }}</DropdownItem>
+            <DropdownItem name="download">{{ $t('message.scripts.download') }}</DropdownItem>
+            <DropdownItem name="rename">{{ $t('message.scripts.generate_rename_statement') }}</DropdownItem>
+          </DropdownMenu>
+        </template>
+      </Dropdown>
     </div>
-    <div class="table-data">
-      <div class="field-list-header">
-        <div class="field-list-item" style="width:6%;">
+    <div class="table-data" style="position:relative">
+      <div class="field-list-header" id="dbtbheader" :class="{'ovy': searchColList.length > maxSize}">
+        <div class="field-list-item" style="width: 50px">
           <Checkbox
             v-model="selectAll"
             @on-change="changeCheckAll"
           /></div>
-        <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
+        <div class="field-list-item" style="width: 50px">{{ $t('message.scripts.Serial') }}</div>
         <div
           class="field-list-item"
-          v-for="(item, index) in columns"
+          v-for="(item, index) in columnCalc"
           :key="index"
-          :class="item.className">{{ item.title }}</div>
+          :class="item.className"
+          :style="{width: item.width? `${item.width}` : 'auto'}"
+          @mousemove.prevent.stop="mousemove"
+          @mouseup.prevent.stop="mouseup">{{ item.title }}
+          <div
+            class="resize-bar"
+            :data-col-index="index"
+            @mousedown="mousedown"
+          ></div>
+        </div>
       </div>
       <virtual-list
         ref="columnTables"
@@ -45,21 +66,25 @@
           v-for="(item, index) in searchColList"
           :key="index"
           class="field-list-body">
-          <div class="field-list-item" style="width:6%;">
+          <div class="field-list-item" style="width:50px;">
             <Checkbox
               v-model="item.selected"
               @on-change="changeCheckList"
               :disabled="item.tableOwner !== getUserName()"
             /></div>
-          <div class="field-list-item">{{ index + 1 }}</div>
+          <div class="field-list-item" style="width: 50px">{{ pageData.pageSize * (pageData.currentPage - 1) + index + 1 }}</div>
           <div
             class="field-list-item"
+            :class="index2 === 0? 'table-name-item': ''"
             :title="formatValue(item, field)"
-            v-for="(field, index2) in columns"
+            v-for="(field, index2) in columnCalc"
+            :data-key="field.key"
+            :style="{width: columnCalc[index2].width? `${columnCalc[index2].width}` : 'auto'}"
             :key="index2"
           >{{ formatValue(item, field) }}</div>
         </li>
       </virtual-list>
+      <div v-if="dragStartX" class="drag-line" :style="{left: dragLine.left, display: dragLine.show}" />
       <Page
         class="page-bar"
         :total="pageData.total"
@@ -79,11 +104,12 @@
                 @on-change="changeCheckAllConfirm"
               />
             </div>
-            <div class="field-list-item">{{ $t('message.scripts.Serial') }}</div>
+            <div class="field-list-item" style="width:50px;">{{ $t('message.scripts.Serial') }}</div>
             <div
               class="field-list-item"
-              v-for="(item, index) in columns"
+              v-for="(item, index) in columnCalc"
               :key="index"
+              :style="{width: item.width? `${item.width}` : 'auto'}"
               :class="item.className">{{ item.title }}</div>
           </div>
           <virtual-list
@@ -101,11 +127,12 @@
                   v-model="item.selected"
                   @on-change="changeCheck"
                 /></div>
-              <div class="field-list-item">{{ index + 1 }}</div>
+              <div class="field-list-item" style="width:50px;">{{ index + 1 }}</div>
               <div
                 class="field-list-item"
                 :title="formatValue(item, field)"
-                v-for="(field, index2) in columns"
+                v-for="(field, index2) in columnCalc"
+                :style="{width: columnCalc[index2].width? `${columnCalc[index2].width}` : 'auto'}"
                 :key="index2"
               >{{ formatValue(item, field) }}</div>
             </li>
@@ -159,14 +186,44 @@
           }}</Button>
         </div>
       </Modal>
+      <!-- rename -->
+      <Modal v-model="showRename" ref="renameModalRef" :title="$t('message.scripts.generate_rename_statement')" width="800px" @on-cancel="renameClose">
+        <Form v-show="!renameScript" ref="renameForm" :model="renameForm" :rules="renameRule" :label-width="120">
+          <FormItem :label="$t('message.scripts.select_database')" prop="dbSelected">
+            <Select v-model="renameForm.dbSelected">
+              <Option v-for="item in databaseList" :value="item.name" :key="item.id">{{ item.name }}</Option>
+            </Select>
+          </FormItem>
+        </Form>
+        <div v-show="renameScript">
+          - - {{ $t("message.scripts.system_generated") }}
+          <pre class="rename-code">{{  renameScript }}</pre>
+        </div>
+        <div slot="footer">
+          <Button type="text" size="large" @click="renameClose">{{
+            $t("message.workspaceManagement.cancel")
+          }}</Button>
+          <Button v-if="!renameScript" type="primary" size="large" @click="handleRename('next')">{{
+            $t("message.scripts.createTable.next")
+          }}</Button>
+          <Button v-if="renameScript" type="primary" size="large" @click="handleRename('copy')">
+            {{ $t("message.scripts.copy_paste_board") }}
+          </Button>
+          <Button v-if="renameScript" type="primary" size="large" @click="handleRename('create')">
+            {{ $t("message.scripts.generate_script") }}
+          </Button>
+        </div>
+      </Modal>
     </div>
     <Spin v-if="loading" fix></Spin>
   </div>
 </template>
 <script>
+import qs from 'qs';
 import utils from '@dataspherestudio/shared/common/util';
 import virtualList from '@dataspherestudio/shared/components/virtualList';
 import api from '@dataspherestudio/shared/common/service/api';
+
 export default {
   props: {
     dbName: {
@@ -191,6 +248,16 @@ export default {
     },
     canTransfer() {
       return this.$APP_CONF.table_transfer && /(_bak|_work)$/.test(this.dbName)
+    },
+    columnCalc() {
+      return this.columns.map((item, index) => {
+        return this.adjustCol[index] ? {
+          ...item,
+          width: this.adjustCol[index]
+        } : {
+          ...item
+        }
+      })
     }
   },
   watch: {
@@ -201,16 +268,16 @@ export default {
   data() {
     return {
       columns: [
-        { title: this.$t('message.scripts.tablename'), key: 'tableName'},
-        { title: this.$t('message.scripts.tbalias'), key: 'tableAlias'},
-        { title: this.$t('message.scripts.createtime'), key: 'createTime'},
-        { title: this.$t('message.scripts.tablesize'), key: 'tableSize'},
-        { title: this.$t('message.scripts.tbowner'), key: 'tableOwner'},
-        { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString'},
-        { title: this.$t('message.scripts.iscompress'), key: 'compressed', type: 'boolean'},
-        { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat'},
-        { title: this.$t('message.scripts.lastaccess'), key: 'viewTime'},
-        { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime'},
+        { title: this.$t('message.scripts.tablename'), key: 'tableName', width: '20%'},
+        { title: this.$t('message.scripts.tbalias'), key: 'tableAlias', width: '10%'},
+        { title: this.$t('message.scripts.createtime'), key: 'createTime', width: '10%'},
+        { title: this.$t('message.scripts.tablesize'), key: 'tableSize', width: '8%'},
+        { title: this.$t('message.scripts.tbowner'), key: 'tableOwner', width: '8%'},
+        { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString', width: '8%'},
+        { title: this.$t('message.scripts.iscompress'), key: 'compressed', type: 'boolean', width: '8%'},
+        { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat', width: '8%'},
+        { title: this.$t('message.scripts.lastaccess'), key: 'viewTime', width: '10%'},
+        { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime', width: '10%'},
       ],
       showConfirmModal: false,
       pageData: {
@@ -259,8 +326,32 @@ export default {
         desc: ''
       },
       confirmModalType: 'delete',
-      saveTransing: false
+      saveTransing: false,
+      dragStartX: undefined,
+      dragEndX: undefined,
+      dragLine: {
+        show: 'none',
+        diff: 0,
+        left: 0
+      },
+      adjustCol: [],
+      renameForm: {
+        dbSelected: '',
+      },
+      renameRule: {
+        dbSelected: [{
+          required: true,
+          message: this.$t('message.scripts.transferForm.required'),
+          trigger: 'change',
+        }]
+      },
+      showRename: false,
+      databaseList: [],
+      renameScript: '',
     }
+  },
+  mounted() {
+    this.getDatabases();
   },
   methods: {
     formatValue(item, field) {
@@ -276,7 +367,6 @@ export default {
     getDbTables() {
       const params = {
         dbName: this.dbName,
-        // tableOwner: this.tableOwner,
         isTableOwner: this.isTableOwner,
         tableName: this.tableName,
         orderBy: this.orderBy,
@@ -333,6 +423,18 @@ export default {
       } else {
         this.$Message.warning({ content: this.$t('message.scripts.selectfirst') });
       }
+    },
+    download() {
+      const params = {
+        dbName: this.dbName,
+        isTableOwner: this.isTableOwner,
+        tableName: this.tableName,
+        orderBy: this.orderBy,
+        exactTableName: false
+      }
+      if (this.isRealTime) params.isRealTime = true
+      const paramsStr = qs.stringify(params)
+      window.open("/api/rest_j/v1/dss/datapipe/datasource/downloadTableMetaData?" + paramsStr, '_blank');
     },
     deleteSome() {
       this.confirmModalType = 'delete'
@@ -430,7 +532,135 @@ export default {
         return item.tableOwner === u
       }).every(it => it.selected)
       this.searchColList = [...this.searchColList]
-    }
+    },
+    mousedown(e) {
+      if (e && e.target && e.target.dataset.colIndex) {
+        this.dragColIndex = e.target.dataset.colIndex - 0
+        this.dragStartX = e.clientX
+        this.tableLeft = this.$el.getBoundingClientRect().x
+      }
+    },
+    mousemove(e) {
+      if (this.dragStartX !== undefined) {
+        this.dragEndX = e.clientX
+        this.dragLine = {
+          left: this.dragEndX - this.tableLeft + 'px',
+          diff: this.dragEndX - this.dragStartX,
+          show: 'block'
+        }
+      }
+    },
+    mouseup(e) {
+      if (this.dragStartX !== undefined) {
+        this.dragEndX = e.clientX
+        this.dragLine = {
+          left: this.dragEndX - this.tableLeft + 'px',
+          diff: this.dragEndX - this.dragStartX,
+          show: 'none'
+        }
+        this.dragStartX = undefined
+        this.adjustColWidth()
+      }
+
+    },
+    adjustColWidth() {
+      let adjustCol = []
+      this.$el.querySelectorAll('#dbtbheader .field-list-item').forEach(item => adjustCol.push(item.getBoundingClientRect().width))
+      adjustCol = adjustCol.slice(2)
+      adjustCol.forEach((item, index) => {
+        if (index === this.dragColIndex) {
+          adjustCol[index] = adjustCol[index] + this.dragLine.diff + 'px'
+        } else {
+          adjustCol[index] = adjustCol[index] + this.dragLine.diff / (adjustCol.length - 1) * -1 + 'px'
+        }
+      })
+      this.adjustCol = adjustCol
+    },
+    // rename code
+    renameClose() {
+      this.renameScript = "";
+      this.renameForm.dbSelected = "";
+      this.showRename = false;
+      this.changeCheckAll(false);
+    },
+    beforeRename() {
+      if(!this.selectedItems.length) {
+        this.$Message.warning({ content: this.$t("message.scripts.select_data_table") });
+        return;
+      }
+      this.showRename = true;
+      this.$nextTick(() => {
+        this.$refs.renameForm.resetFields();
+      });
+    },
+    openScriptTab() {
+      const tables = this.selectedItems.map(item => item.tableName);
+      const filename = `${tables[0]}_rename.hql`;
+      const md5 = utils.md5(this.renameForm.dbSelected + tables.join(""));
+      this.dispatch("Workbench:add", {
+        id: md5,
+        filename,
+        filepath: "",
+        code: this.renameScript,
+        unsave: true,
+      }, () => {});
+      this.renameClose();
+    },
+    async handleRename(type) {
+      this.$refs.renameForm.validate(valid => {
+        if(!valid) return;
+        if (type === "next") {
+          this.selectedItems.forEach(item => {
+            this.renameScript += `alter table ${this.dbName}.${item.tableName} rename to ${this.renameForm.dbSelected}.${item.tableName};\n`;
+          });
+        } else if(type === "create") {
+          this.openScriptTab();
+        } else if(type === "copy") {
+          const textArea = document.createElement("textarea");
+          textArea.value = this.renameScript;
+          document.body.appendChild(textArea);
+          textArea.select();
+          document.execCommand("copy");
+          document.body.removeChild(textArea);
+          this.$Message.success(this.$t("message.scripts.paste_successfully"));
+        }
+      });
+    },
+    dropdownClick(name) {
+      switch(name) {
+        case 'transfer':
+          this.transfer();
+          break;
+        case 'download':
+          this.download();
+          break;
+        case 'rename':
+          this.beforeRename();
+          break;
+        default:
+          break;
+      }
+    },
+    getDatabases() {
+      // 取indexedDB缓存
+      this.dispatch('IndexedDB:getTree', {
+        name: 'hiveTree',
+        cb: (res) => {
+          if (!res || res.value.length <= 0) {
+            api.fetch(`/datasource/dbs`, 'get').then((rst) => {
+              rst.dbs.forEach((db) => {
+                this.databaseList.push({
+                  id: utils.guid(),
+                  name: db.dbName
+                });
+              });
+            });
+          } else {
+            this.databaseList = res.value;
+          }
+        }
+      });
+    },
   }
 }
 </script>
@@ -473,13 +703,12 @@ export default {
   .field-list-body {
       border-bottom: none;
       @include bg-color($light-base-color, $dark-base-color);
-      &:not(:first-child){
+      &:last-child{
           border-bottom: 1px solid $border-color-base;
           @include border-color($border-color-base, $dark-border-color-base);
       }
   }
   .field-list-item {
-      width: 11%;
       padding: 0 10px;
       display: inline-block;
       height: 100%;
@@ -487,7 +716,38 @@ export default {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      position: relative;
+      &:not(:first-child){
+          border-left: 1px solid $border-color-base;
+          @include border-color($border-color-base, $dark-border-color-base);
+      }
   }
+  .resize-bar {
+    position: absolute;
+    width: 10px;
+    height: 100%;
+    bottom: 0;
+    right: -5px;
+    cursor: col-resize;
+    z-index: 1;
+  }
+  .drag-line {
+    position: absolute;
+    top: 0;
+    width: 0px;
+    border-left: .5px dashed #eee;
+    height: 100%;
+    z-index: 1;
+    display: none;
+    pointer-events: none;
+  }
+}
+.ovy {
+  padding-right: 8px
+}
+.rename-code {
+  overflow: auto;
+  max-height: 500px;
 }
 </style>
 

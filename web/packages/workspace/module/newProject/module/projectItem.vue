@@ -277,7 +277,7 @@ export default {
             .menu-bar {
               position: relative;
               flex-basis: 40px;
-              /deep/.ivu-btn {
+              ::v-deep.ivu-btn {
                 @include bg-color($workspace-body-bg-color, $dark-workspace-body-bg-color);
                 @include border-color($border-color-base, $dark-border-color-base);
                 @include font-color($light-text-color, $dark-text-color);

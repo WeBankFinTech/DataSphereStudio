@@ -43,7 +43,7 @@
   }
 }
 
-.process-module {
+div.process-module {
   position: relative;
   height: 100%;
   width: 100%;
@@ -71,6 +71,23 @@
     }
   }
 
+  div.view_mode_btn.button {
+    padding: 10px;
+    float: right;
+    display: flex;
+    align-items: center;
+    &.active {
+      @include bg-color($light-base-color, $dark-base-color);
+      color: $link-color;
+    }
+    .icon {
+      margin-right: 0;
+    }
+    &.table_mode {
+      margin-right: 15px;
+    }
+  }
+
   .button[disabled] {
     // background-color: #f3f3f3;
     @include bg-color($disabled-bg-color, $dark-disabled-bg-color);
@@ -79,6 +96,9 @@
     // color: #ccc;
     @include font-color(#ccc, $dark-text-desc-color);
 
+  }
+  div.button.active {
+    color: $info-color;
   }
 
   .designer .designer-shape {
@@ -89,8 +109,11 @@
     }
   }
 
-  .designer .designer-toolbar .devider {
-    @include border-color(#DEE4EC, $dark-text-color);
+  .designer .designer-toolbar {
+    z-index: 1;
+    .devider {
+      @include border-color(#DEE4EC, $dark-text-color);
+    }
   }
   &.locked {
     pointer-events: none;
@@ -108,7 +131,8 @@
   border: $border-width-base $border-style-base $border-color-base;
   border-top: 0;
   box-shadow: -6px 0 6px -6px $shadow-color;
-  z-index: 1008;
+  // z-index: 1008;
+  z-index: 999;
   @include bg-color(#fff, $dark-base-color);
   @include border-color($border-color-base, $dark-background-color-header);
   overflow-y: auto;
@@ -193,7 +217,6 @@
 
 .process-module-title {
   font-size: 14px;
-  color: $title-color;
 }
 
 .workflow-arguments {

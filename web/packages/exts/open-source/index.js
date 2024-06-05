@@ -26,21 +26,30 @@ export default function () {
   // 登录后提示运维用户切换
   this.bindHook('after_login', async function ({homePageRes, context}) {
     await api.fetch(`${API_PATH.WORKSPACE_PATH}workspaces/${homePageRes.workspaceId}`, 'get')
-    return api.fetch('/dss/framework/admin/globalLimits', {}, 'get').then((res) => {
-      let baseInfo = storage.get('baseInfo', 'local')
-      baseInfo = {
-        ...baseInfo,
-        dss: {
-          ...res.globalLimits
-        }
-      }
-      storage.set('baseInfo', baseInfo, 'local')
-      if (baseInfo.dss.proxyEnable) {
-        createProxyModal(homePageRes.homePageUrl, context)
-      } else {
-        context.$router.replace({path: homePageRes.homePageUrl});
-      }
+    const scriptisLimits = await api.fetch(`/dss/scriptis/globalLimits`, {}, {
+      method: 'get',
+      cacheOptions: { time: 60000 }
     })
+    const dssLimits = await api.fetch('/dss/framework/admin/globalLimits', {}, 'get')
+    let baseInfo = storage.get('baseInfo', 'local')
+    baseInfo = {
+      ...baseInfo,
+      ...scriptisLimits.globalLimits,
+      dss: {
+        ...dssLimits.globalLimits
+      }
+    }
+    const uselsp = localStorage.getItem('scriptis-edditor-type')
+    if (baseInfo.dss.languageServerDefaultEnable && uselsp === null ) {
+      localStorage.setItem('scriptis-edditor-type', 'lsp');
+      // location.reload();
+    }
+    storage.set('baseInfo', baseInfo, 'local')
+    if (baseInfo.dss.proxyEnable) {
+      createProxyModal(homePageRes.homePageUrl, context)
+    } else {
+      context.$router.replace({path: homePageRes.homePageUrl});
+    }
   })
 
   // workflows: 工作流开发底部TAB面板复制历史

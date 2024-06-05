@@ -102,6 +102,22 @@ hooks = {
   //   mulit: true,
   //   listener: []
   // }
+  // copilot
+  copilot_web_component: {
+    type: 'component',
+    mulit: true,
+    listener: []
+  },
+  copilot_web_listener_event_remove: {
+    type: 'listener',
+    mulit: true,
+    listener: []
+  },
+  get_copilot_web_listener_event_class: {
+    type: 'listener',
+    mulit: false,
+    listener: []
+  }
 };
 
 const pluginModule = {

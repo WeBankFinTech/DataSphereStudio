@@ -2,7 +2,10 @@
   <div class="dataServicesContent">
     <nav class="title">
       <Breadcrumb class="breadcrumb" separator="/">
-        <Icon type="md-arrow-round-back" @click="goBack" class="back"></Icon>
+        <SvgIcon style="font-size: 16px;display: inline-block;transform: rotate(180deg);"
+          color="#444444"
+          @click="goBack"
+          icon-class="fi-expand-right"/>
         <BreadcrumbItem :to="{ name: 'Apiservices', query:{ workspaceId: $route.query.workspaceId }}">
           <!-- <Icon type="ios-home-outline" size="16"></Icon> -->
           {{$t('message.apiServices.title')}}
@@ -84,7 +87,7 @@
               </Input>
               <Button type="primary" @click="refreshAction">{{ $t('message.apiServices.buttonText.refresh') }}</Button>
             </FormItem>
-            <!-- <FormItem class="submit">
+          <!-- <FormItem class="submit">
               <Button @click="handleSubmit('formValidate')" type="primary">{{$t('message.apiServices.save')}}</Button>
             </FormItem> -->
           </Form>
@@ -172,13 +175,13 @@ export default {
   },
   created() {
     // 获取api相关数据
-    api.fetch('/dss/apiservice/queryById', {
+    api.fetch('/dss/apiservice/queryByManager', {
       id: this.$route.query.id,
     }, 'get').then((rst) => {
       if (rst.result) {
         // api的基础信息
         this.apiData = rst.result;
-        this.formValidate.approvalNo = this.apiData.approvalVo.approvalNo;
+        this.formValidate.approvalNo = this.apiData.approvalVo && this.apiData.approvalVo.approvalNo ? this.apiData.approvalVo.approvalNo : '';
         // 更改网页title
         document.title = rst.result.aliasName || rst.result.name;
         // 加工api信息tab的数据
@@ -349,7 +352,7 @@ export default {
       font-size: 14px;
       vertical-align: middle;
       @include bg-color($light-base-color, $dark-base-color);
-      /deep/.ivu-breadcrumb-item-separator {
+      ::v-deep.ivu-breadcrumb-item-separator {
         color: #080808;
       }
     }
@@ -362,6 +365,8 @@ export default {
     }
     .remarksContent {
       flex: 1;
+      word-wrap: break-word;
+      max-width: 90%;
     }
     .remarksButton {
       margin-left: 20px;
@@ -369,7 +374,7 @@ export default {
     }
   }
   .approvalNoItem {
-    /deep/.ivu-form-item-content {
+    ::v-deep.ivu-form-item-content {
       display: flex;
       align-items: center;
     }

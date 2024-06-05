@@ -17,9 +17,11 @@
 package com.webank.wedatasphere.dss.orchestrator.server.conf;
 
 import com.webank.wedatasphere.dss.common.service.BMLService;
-import com.webank.wedatasphere.dss.common.utils.AssembleCronUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorOperateService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.impl.OrchestratorOperateServiceImpl;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -48,6 +50,12 @@ public class OrchestratorSpringConf {
     @Bean
     public String getBatchClearCsTaskCron() {
         return OrchestratorConf.DSS_CS_CLEAR_CRON.getValue();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public OrchestratorOperateService createOrchestratorOperateService(){
+        return new OrchestratorOperateServiceImpl();
     }
 
 }

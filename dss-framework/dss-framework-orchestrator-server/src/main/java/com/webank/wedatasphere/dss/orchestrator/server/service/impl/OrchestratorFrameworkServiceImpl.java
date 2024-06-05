@@ -58,6 +58,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnl
 import com.webank.wedatasphere.dss.orchestrator.server.job.OrchestratorCopyEnv;
 import com.webank.wedatasphere.dss.orchestrator.server.job.OrchestratorCopyJob;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorOperateService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -101,6 +102,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private OrchestratorCopyJobMapper orchestratorCopyJobMapper;
     @Autowired
     private OrchestratorCopyEnv orchestratorCopyEnv;
+    @Autowired
+    private OrchestratorOperateService orchestratorOperateService;
 
     private static final int MAX_DESC_LENGTH = 250;
     private static final int MAX_NAME_LENGTH = 128;
@@ -279,6 +282,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
 
         orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
+        orchestratorOperateService.deleteTemplateOperate(orchestratorInfo.getId());
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         orchestratorVo.setOrchestratorName(orchestratorInfo.getName());

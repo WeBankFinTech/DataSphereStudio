@@ -136,11 +136,11 @@ export default {
         this.$refs.engine.getEngineData();
       });
     },
-    getQueue() {
+    getQueue(type) {
       this.switcher = 'queue';
       this.getPointList();
       this.$nextTick(() => {
-        this.$refs.queue.getQueueList();
+        this.$refs.queue.getQueueList(type);
       });
     },
     open() {
@@ -151,7 +151,7 @@ export default {
       } else if (this.switcher === 'session') {
         this.getEngines();
       } else {
-        this.getQueue();
+        this.getQueue('current');
       }
     },
     close() {

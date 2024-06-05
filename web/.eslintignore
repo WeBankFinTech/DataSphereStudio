@@ -1,4 +1,7 @@
 iconfont.js
 packages/dss/server/*
+packages/dss/public/*
+packages/dss/dist/*
+packages/cyeditor/*
 packages/*/node_modules/*/*
 "*.min.js"

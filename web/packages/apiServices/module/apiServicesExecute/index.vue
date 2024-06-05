@@ -1,5 +1,5 @@
 <template>
-  <div class="dataServicesContent">
+  <div class="dataServicesContainer">
     <div class="tap-bar">
       <Breadcrumb class="breadcrumb" separator="/">
         <BreadcrumbItem :to="{ name: 'Apiservices', query:{ workspaceId: $route.query.workspaceId }}">
@@ -10,35 +10,36 @@
         </BreadcrumbItem>
       </Breadcrumb>
     </div>
-    <div class="execute-content">
-      <Row class="content-top">
-        <i-col span="10">
-          <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
-          <Form ref="searchFrom" class="search-from" :label-width="100" :model="conditionResult">
-            <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="[{
-              required: item.required,
-              message: $t('message.apiServices.placeholder.emter'),
-              trigger: 'blur'
-            }]">
-              <div class="label-class" :title="item.displayName || item.name" slot="label">
-                {{ `${item.displayName || item.name}:` }}
-                <div :title="item.details || ''" class="details-tip"><Icon type="md-help-circle" /></div>
-              </div>
-              <Input class="input-bar" :class="{ verificationValue: tip[item.name] }" @on-blur="verificationValue(item)" :type="inputType(item.type)" v-model="item.defaultValue" :placeholder="item.description || $t('message.apiServices.placeholder.emter')">
-              </Input>
-            </FormItem>
-            <Button class="execute-button" type="primary" @click="search">{{buttonText}}</Button>
-          </Form>
-        </i-col>
-        <i-col span="10">
-          <template v-if="apiData && apiData.comment">
-            <h3 class="title">{{$t('message.apiServices.query.comment')}}</h3>
-            <Alert class="alert-bar" show-icon>{{ apiData.comment }}</Alert>
-          </template>
-        </i-col>
-      </Row>
-      <results ref="currentConsole" getResultUrl="dss/apiservice" :work="apiData" :dispatch="dispatch" :height="height" @executRun="executRun"></results>
+    <div ref="tab-list-scroll" class="workbench-tab work-list-tab">
+      <div
+        v-for="(item, index) in tabslist" :key="item.taskID"
+        :class="{ active: item.taskID == currentTaskId }"
+        class="workbench-tab-item"
+        ref="work_item"
+      >
+        <we-title
+          :index="index"
+          :work="item"
+          @on-choose="onChooseWork"
+          @on-remove="onRemove"
+        />
+      </div>
     </div>
+    <div class="execute-content" v-for="(item, index) in tabslist" :key="item.filename" v-show="item.taskID == currentTaskId">
+      <ExecuteResult
+        :ref="'executeResult'+ item.taskID"
+        :key="item.filename"
+        :workInfo="item"
+        :conditionList="conditionList"
+        :selectCondition="selectCondition"
+        :showConditionList="showConditionList"
+        :historyList="historyList"
+        :isHistory="index !== 0"
+        :triggerSearchFn="triggerSearchFn"
+        @viewHistory="viewHistory"
+        @updateHistory="updateHistory"/>
+    </div>
+    <div />
     <Modal :title="$t('message.apiServices.apiTestInfo.params')" v-model="conditionShow" @on-ok="confirmSelect">
       <CheckboxGroup v-model="selectCondition">
         <Checkbox v-for="item in conditionList" :key="item.id" :label="item.id" :disabled="!!item.required">
@@ -49,11 +50,13 @@
   </div>
 </template>
 <script>
-import results from '@dataspherestudio/shared/components/consoleComponent';
+import ExecuteResult from './result.vue';
 import api from '@dataspherestudio/shared/common/service/api';
+import title from "./title.vue";
 export default {
   components: {
-    results
+    ExecuteResult,
+    "we-title": title,
   },
   data() {
     return {
@@ -64,57 +67,65 @@ export default {
       apiData: null,
       excuteLoading: false,
       tip: {},
-      height: 500
+      height: 500,
+      tabslist: [],
+      currentTaskId: '',
+      historyList: []
     }
   },
   created() {
     this.getExecutePath();
   },
-  computed: {
-    buttonText() {
-      return this.excuteLoading ? this.$t('message.apiServices.query.stop') : this.$t('message.apiServices.query.buttonText')
-    },
-    // iview动态表单组件需要的是object
-    conditionResult() {
-      return {items: this.showConditionList}
-    }
-  },
-  mounted() {
-    this.height = this.$el.clientHeight - 325
-  },
   methods: {
-    // 验证发布和更新的默认值是否满足条件
-    verificationValue (row) {
-      let flag;
-      if(row.defaultValue.length > 1024 && Number(row.type) !== 4) {
-        this.$Message.error({ content: this.$t('message.apiServices.more1024') });
-        flag = true;
-      } else if(row.type == 4 && row.defaultValue.split('\n').length > 5000) {
-        this.$Message.error({ content: this.$t('message.apiServices.moreline') });
-        flag = true;
-      } else {
-        flag = false
+    // 获取历史记录列表
+    async getHistoryList() {
+      let homeTabItem = {
+        ...this.apiData,
+        filename: this.apiData.aliasName || this.apiData.name,
+        noClose: true,
+        taskID: ''
       }
-      this.$set(this.tip, row.name, flag)
-    },
-    // 参数默认值输入框类型
-    inputType(typeNumer) {
-      typeNumer = Number(typeNumer);
-      if (typeNumer === 1) {
-        return 'text';
-      } else if (typeNumer === 2) {
-        return 'number';
-      } else if (typeNumer === 3) {
-        return 'text';
-      } else if (typeNumer === 4) {
-        return 'textarea';
+      const result = await api.fetch('/dss/apiservice/getApiHistory', {
+        apiId: this.apiData.id,
+        apiVersionId: this.apiData.latestVersionId
+      }, 'get')
+      this.historyList = (result.data || []).map(item => ({ execID: item.strongerExecId, ...item }))
+      if (this.historyList[0] && ['Inited','Scheduled', 'Running'].includes(this.historyList[0].status)) {
+        homeTabItem = {
+          ...homeTabItem,
+          ...this.historyList[0],
+          shouldRuning: true
+        }
+        this.currentTaskId = this.historyList[0].taskID
       }
+      this.tabslist.push(homeTabItem)
     },
-    executRun(val) {
-      this.excuteLoading = val;
+    updateHistory(params) {
+      const data = {
+        ...this.historyList[0],
+        fileName: this.apiData.aliasName || this.apiData.name,
+        ...params
+      }
+      if (params.runningTime) {
+        data.costTime = params.runningTime
+      }
+      this.historyList.splice(0, 1, data)
     },
-    goBack() {
-      this.$router.go(-1)
+    // 获取api相关数据
+    getExecutePath() {
+      api.fetch('/dss/apiservice/queryById', {
+        id: this.$route.query.id
+      }, 'get').then((rst) => {
+        if (rst.result) {
+          this.apiData = rst.result;
+          // 更改网页title
+          document.title = rst.result.aliasName || rst.result.name;
+          this.initApiParamInfo()
+          this.getHistoryList()
+        }
+      }).catch((err) => {
+        console.error(err)
+      });
     },
     initApiParamInfo() {
       api.fetch('/dss/apiservice/apiParamQuery', {
@@ -132,101 +143,60 @@ export default {
         }
       })
     },
-    // 获取api相关数据
-    getExecutePath() {
-      api.fetch('/dss/apiservice/queryById', {
-        id: this.$route.query.id
-      }, 'get').then((rst) => {
-        if (rst.result) {
-          this.apiData = rst.result;
-          // 更改网页title
-          document.title = rst.result.aliasName || rst.result.name;
-          this.initApiParamInfo()
-        }
-      }).catch((err) => {
-        console.error(err)
-      });
-    },
-    // 关闭页面，停止状态接口的轮询
-    beforeDestroy() {
-      this.$refs.currentConsole.killExecute(false);
-    },
-    moreConditionAction() {
-      this.conditionShow = true;
-    },
     // 过滤出勾选的参数
     confirmSelect() {
       this.showConditionList = this.conditionList.filter((item) => this.selectCondition.includes(item.id));
     },
-    search() {
-      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: this.$t('message.apiServices.outlimit') });
-      // 后续的执行逻辑
-      if (this.excuteLoading) { // 停止执行
-        if(!(this.apiData && this.apiData.execID)) return this.$Message.error({ content: this.$t('message.apiServices.uninittask') });
-        api.fetch(`/entrance/${this.apiData.execID}/kill`, {taskID: this.apiData.taskID}, 'get').then(() => {
-          // kill成功后，去查kill后的状态
-          this.$refs.currentConsole.killExecute(true);
-          const name = this.apiData.name;
-          this.$Notice.close(name);
-          this.$Notice.warning({
-            title: this.$t('message.apiServices.kill.title'),
-            desc: `${this.$t('message.apiServices.kill.desc')} ${name} ！`,
-            name: name,
-            duration: 3,
-          });
-        }).catch(() => {
-          this.$refs.currentConsole.killExecute(false);
+    onChooseWork(params) {
+      if (params.taskID === this.currentTaskId) {
+        this.$Notice.info({
+          desc: `当前任务【${params.taskID}】已在当前tab页打开，可切换进度/结果/日志栏目查看！`,
+          duration: 3,
         });
-      } else {
-        if (this.showConditionList.length > 0) {
-          this.$refs.searchFrom.validate(valid => {
-            if (valid) {
-              this.executAction();
-            } else {
-              console.log(this.showConditionList)
-            }
-          })
-        } else {
-          this.executAction();
+        return
+      }
+      this.currentTaskId = params.taskID
+    },
+    triggerSearchFn(params) {
+      this.historyList.unshift({
+        costTime: '',
+        createdTime: Date.now(),
+        status: '',
+        taskID: params.taskID,
+        execID: params.execID,
+        id: params.taskID
+      })
+      this.tabslist[0].taskID = params.taskID;
+      this.tabslist[0].execID = params.execID;
+      this.onChooseWork(params)
+    },
+    viewHistory(params) {
+      if (this.tabslist.findIndex((item => item.taskID == params.taskID)) === -1) {
+        this.tabslist.push(params)
+      }
+      this.onChooseWork(params)
+    },
+    onRemove(params) {
+      const removeIndex = this.tabslist.findIndex((item => item.taskID === params.taskID))
+      if (removeIndex !== -1) {
+        this.tabslist.splice(removeIndex, 1)
+        if (this.currentTaskId === params.taskID) {
+          this.onChooseWork(this.tabslist[removeIndex - 1])
         }
       }
-    },
-    executAction() {
-      if (!this.apiData) return;
-      this.excuteLoading = true;
-      let params = {}
-      this.showConditionList.forEach((item) => {
-        params[item.name] = item.defaultValue || '';
-      })
-      params.ApiServiceToken = this.apiData.userToken;
-      // apiservice
-      let url = this.apiData.path.startsWith("/")?'/dss/apiservice/execute' + this.apiData.path:'/dss/apiservice/execute/' + this.apiData.path;
-      // 这里接口定义不同请求，参数体不一样
-      api.fetch(url, {
-        moduleName: 'dss-web',
-        params: params,
-      }, this.apiData.method.toLowerCase()).then((rst) => {
-        // 行内改版会返回execID和taskID
-        this.apiData.taskID = rst.taskId;
-        this.apiData.execID = rst.execId;
-        this.$nextTick(() => {
-          // 调用控制台的初始化实例方法
-          this.$refs.currentConsole.checkFromCache();
-        })
-      }).catch(() => {
-        this.excuteLoading = false;
-      });
-    },
+    }
   }
 }
 </script>
 <style lang="scss" scoped>
 @import '@dataspherestudio/shared/common/style/variables.scss';
-  .dataServicesContent {
+  .dataServicesContainer {
     height: 100%;
+    // display: flex;
+    // flex-direction: column;
     .tap-bar {
       @include bg-color($light-base-color, $dark-base-color);
-      margin-bottom: $padding-25;
+      // margin-bottom: $padding-25;
       border-bottom: $border-width-base $border-style-base #dcdcdc;
       @include border-color($border-color-base, $dark-menu-base-color);
       .breadcrumb {
@@ -235,110 +205,21 @@ export default {
       }
       .ivu-breadcrumb {
         font-size: 16px;
-        /deep/.ivu-breadcrumb-item-separator {
+        ::v-deep.ivu-breadcrumb-item-separator {
           @include font-color(rgba(0, 0, 0, 0.65), $dark-text-color);
         }
       }
     }
-    .verificationValue {
-      .ivu-input {
-        color: red!important;
-        border-color: red;
-      }
-    }
-    .none {
-    display: none !important;
-    }
-    .back {
-      margin-right: $margin;
-      padding-right: $padding;
-      font-size: 1.5rem;
-      position: relative;
-      color: $subsidiary-color;
-      cursor: pointer;
-      font-weight: 700;
-      &::after {
-        content: "";
-        position: absolute;
-        border-right: $border-width-base $border-style-base $border-color-base;
-        height: 60%;
-        top: 50%;
-        right: 0;
-        transform: translateY(-50%);
-        width: 0;
-      }
-    }
-  }
-  .title {
-      font-size: $font-size-large;
-      font-weight: bold;
-      padding-left: 12px;
-      border-left: 3px solid #2d8cf0;
-      @include font-color(rgba(0, 0, 0, 0.85), $dark-text-color);
-      line-height: 17px;
-      margin-bottom: 15px;
-  }
-  .search-from {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    .input-bar {
-      width: 200px;
-      position: relative;
-      margin-right: 20px;
-    }
-    /deep/.ivu-form-item-label {
-      padding-right: 20px;
-      position: relative;
-      line-height: 1.2;
-      display: flex;
-    }
-    .label-class {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .more-condition {
-      color: $primary-color;
-      margin-right: 20px;
-      padding: 6px;
-      cursor: pointer;
-    }
-    .execute-button {
-      margin-left: 15px;
-      margin-Bottom: 24px;
-    }
-    /deep/.ivu-input-group-prepend {
-      padding: 0!important;
-
-    }
-  }
-  .details-tip {
-    position: absolute;
-    color: $primary-color;
-    right: 0;
-    top: 0;
-    font-size: $font-size-large;
-    height: $percent-all;
-    width: 20px;
-    display: flex;
-    align-items: $align-center;
-    justify-content: $align-center;
-    box-sizing: border-box;
-    vertical-align: middle;
-    font-weight: 700;
-    &:hover {
-      color: $success-color;
-    }
   }
   .execute-content {
+    flex: 1;
     border: $border-width-base $border-style-base  #dcdcdc;
     @include border-color($border-color-base, $dark-menu-base-color);
     border-radius: 2px;
     overflow: hidden;
     @include bg-color($light-base-color, $dark-base-color);
     margin: 0 25px;
+    height: calc(100% - 110px);
     .content-top {
       padding: 25px;
       .alert-bar {
@@ -348,6 +229,67 @@ export default {
     .log-panel {
       margin-top: 0px;
       border-top: none;
+    }
+  }
+  .workbench-tab {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    height: 45px;
+    @include bg-color($light-base-color, $dark-base-color);
+    width: calc(100% - 45px);
+    overflow: hidden;
+    &.work-list-tab {
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-left: 16px;
+      &::-webkit-scrollbar {
+        height: 6px;
+      }
+      &::-webkit-scrollbar-thumb {
+        box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+        background-color: #787d8b;
+      }
+      &::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+      }
+      .list-group > span {
+        white-space: nowrap;
+        display: block;
+        height: 0;
+      }
+    }
+    .workbench-tab-item {
+      text-align: center;
+      border-top: none;
+      display: inline-block;
+      height: 24px;
+      line-height: 24px;
+      @include bg-color(#e1e5ea, $dark-workspace-body-bg-color);
+      @include font-color(
+        $workspace-title-color,
+        $dark-workspace-title-color
+      );
+      cursor: pointer;
+      min-width: 100px;
+      max-width: 200px;
+      overflow: hidden;
+      margin-right: 8px;
+      border-radius: 12px;
+      &.active {
+        margin-top: 1px;
+        @include bg-color(#e8eef4, $dark-workspace-body-bg-color);
+        color: $primary-color;
+        @include font-color($primary-color, $dark-primary-color);
+      }
+
+      &:hover {
+        @include bg-color(#d1d7dd, $dark-workspace-body-bg-color);
+      }
     }
   }
 </style>

@@ -58,7 +58,7 @@ class Eventbus {
     */
   off(name, fn) {
     if (this.storage[name]) {
-      let i = this.findIndex(this.storage[name], fn);
+      let i = this.storage[name].findIndex((item) => item === fn) // this.findIndex(this.storage[name], fn);
       if (i !== -1) this.storage[name].splice(i, 1);
     }
   }

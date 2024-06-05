@@ -473,7 +473,6 @@ export default {
               }
             }
             .pro-item-txt {
-              flex: 1;
               display: block;
               font-size: 14px;
               line-height: 20px;
@@ -488,6 +487,7 @@ export default {
               border-radius: 50%;
               background: url(../../assets/images/icon-nav-star.png) no-repeat;
               background-size: contain;
+              margin-left: 10px;
               &.favorited {
                 opacity: 1;
                 background: url(../../assets/images/icon-nav-stard.png) no-repeat;

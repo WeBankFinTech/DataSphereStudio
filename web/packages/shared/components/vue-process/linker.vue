@@ -36,7 +36,7 @@ export default {
     },
     linkType: {
       type: String,
-      default: 'straight'
+      default: ''
     },
     borderWidth: {
       type: [Number],
@@ -198,12 +198,16 @@ export default {
     this.$watch('endY', () => {
       this.calculate();
     });
+    this.$watch('linkType', () => {
+      this.calculate();
+    });
     this.$watch('state.mapMode', function(){
       this.calculate();
     });
   },
   methods: {
     calculate() {
+      const linkType = this.linkType || this.state.linkType;
       // this.nodes表示从起点到终点折线（直线）所需要的关键点
       // 如果终点和起点太近的话，连线会出现错乱的bug，此时没必要
       if (Math.abs(this.endY - this.beginY) < 5 && Math.abs(this.endX - this.beginX) < 5) {
@@ -212,7 +216,7 @@ export default {
       // 每次重新算
       this.nodes = [];
       let {beginX, beginY, endX, endY} = this;
-      if (this.linkType === 'curve') {
+      if (linkType === 'curve') {
         this.nodes = [{
           x: beginX,
           y: beginY
@@ -220,7 +224,7 @@ export default {
           x: endX,
           y: endY
         }]
-      } else if (this.linkType === 'bezier') {
+      } else if (linkType === 'bezier') {
         let adjust = {x: 50, y: -50}
         if (beginX < endX) { //
           adjust.y = -50
@@ -277,19 +281,21 @@ export default {
           y: endY
         });
       }
-      this.emitChange()
+      this.emitChange(linkType)
     },
-    emitChange() {
+    emitChange(linkType) {
       this.$emit('after-calculate', {
         key: this.k,
         nodes: this.nodes,
         stroke: this.currentBorderColor,
         fill: this.currentBorderColor,
         lineWidth: this.lineWidth,
-        linkType: this.linkType
+        linkType
       });
     },
     keyPoints(beginNodeArrow, endNodeArrow) {
+      const linkType = this.linkType || this.state.linkType;
+
       let {beginX, beginY, endX, endY} = this;
       let border = this.extWidth;
       let _beginY = beginY;
@@ -618,7 +624,7 @@ export default {
       if (beginNodeArrow == 'bottom' && endNodeArrow == 'top') {
         // 现在是只有从 父节点bottom 到 子节点top 或者 父节点top 到 子节点bottom时会进行直线和斜线的转换
         // 连线的类型，straight：直线（直角折线），要执行以下逻辑；curve：斜线，不用执行以下逻辑
-        if (this.state.linkType === 'straight') {
+        if (linkType === 'straight') {
           if (endY >= beginY) {
             if (beginX !== endX) {
               beginY = Math.round((beginY + endY) / 2);
@@ -1197,7 +1203,7 @@ export default {
       // ok
       if (beginNodeArrow == 'top' && endNodeArrow == 'bottom') {
         // 连线的类型，straight：直线（直角折线），要执行以下逻辑；curve：斜线，不用执行以下逻辑
-        if (this.state.linkType === 'straight') {
+        if (linkType === 'straight') {
           if (endY <= beginY) {
             beginY = (endY + beginY) / 2;
             this.nodes.push({

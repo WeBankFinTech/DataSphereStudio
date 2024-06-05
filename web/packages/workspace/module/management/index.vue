@@ -62,15 +62,13 @@ export default {
       //   path: 'dataSourceAdministration',
       //   children: [],
       // },
-    ];
-    if (this.$APP_CONF && this.$APP_CONF.has_engineinfo !== false) {
-      manageMenus.push({
+      {
         icon: 'engineinfo',
         name: i18n.t('message.workspaceManagement.engineInfo'),
         path: 'engineinfo',
         children: [
           {
-            icon: 'engineHis',
+            icon: 'engineHistory',
             name: i18n.t('message.workspaceManagement.engineSearch'),
             path: 'enginelist',
             children: [],
@@ -88,8 +86,14 @@ export default {
             children: [],
           }
         ],
-      })
-    }
+      },
+      {
+        icon: 'resTemplateManage',
+        name: i18n.t('message.workspaceManagement.resTemplateManage'),
+        path: 'resTemplate',
+        children: [],
+      },
+    ];
     return {
       mode: '',
       activeName: '',

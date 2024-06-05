@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isApiPublish && showScriptsType && work.filepath">
+  <div v-if="isApiPublish && showScriptsType && work.filepath" class="workbench-body-navbar-item">
     <div
       v-if="!script.readOnly && isSupport">
       <Icon type="ios-hammer" />
@@ -43,7 +43,7 @@
         :model="addApiData"
         :rules="ruleValidate"
         :label-width="90" >
-        <div v-if="step === 1">
+        <div v-show="step === 1">
           <FormItem
             prop="apiName"
             :label="$t('message.scripts.apiPublish.addApiModal.apiName')">
@@ -90,6 +90,11 @@
             </Select>
           </FormItem>
           <FormItem
+            prop="proxyUser"
+            :label="$t('message.scripts.apiPublish.addApiModal.proxyUser')">
+            <Input v-model="addApiData.proxyUser"/>
+          </FormItem>
+          <FormItem
             prop="describe"
             :rules="[{ message: $t('message.scripts.apiPublish.rule.contentLengthLimitTwo'), max: 200 }]"
             :label="$t('message.scripts.apiPublish.addApiModal.describe')">
@@ -102,42 +107,23 @@
             <Input v-model="addApiData.comment" show-word-limit type="textarea"/>
           </FormItem>
         </div>
-        <div v-if="step === 2">
+        <div v-show="step === 2">
           <Table :columns="paramInfoColumns" :data="addApiData.paramList">
             <template slot-scope="{row, index}" slot="defaultValue">
               <Input :class="{ verificationValue: tip[row.paramName] }" :title="addApiData.paramList[index].defaultValue" @on-blur="verificationValue(row)" :type="inputType(row.paramType)" v-model="addApiData.paramList[index].defaultValue"/>
             </template>
           </Table>
         </div>
-        <div v-if="step === 3">
-          <FormItem
-            prop="approvalName"
-            :label="$t('message.scripts.apiPublish.addApiModal.approvalName')">
-            <Input v-model="addApiData.approvalName"/>
-          </FormItem>
-          <FormItem
-            prop="applyUser"
-            :label="$t('message.scripts.apiPublish.addApiModal.applyUser')">
-            <Select v-model="addApiData.applyUser" multiple filterable placeholder="Select your user">
-              <Option v-for="item in applyUserList" :key="item.name" :value="item.name">{{item.name}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem
-            prop="proxyUser"
-            :label="$t('message.scripts.apiPublish.addApiModal.proxyUser')">
-            <Input v-model="addApiData.proxyUser"/>
-          </FormItem>
-        </div>
       </Form>
       <div slot="footer">
         <!-- 取消按钮 -->
         <Button :disabled="saveLoading" @click="cancel">{{$t('message.scripts.apiPublish.addApiModal.cancel')}}</Button>
         <!-- 上一步按钮 -->
-        <Button v-if="step === 2 || step === 3" :disabled="saveLoading" @click="backStep">{{$t('message.scripts.apiPublish.addApiModal.back')}}</Button>
+        <Button v-if="step === 2" :disabled="saveLoading" @click="backStep">{{$t('message.scripts.apiPublish.addApiModal.back')}}</Button>
         <!-- 下一步按钮 -->
-        <Button v-if="step === 1 || step === 2" @click="nextStep(step)">{{$t('message.scripts.apiPublish.addApiModal.nextStep')}}</Button>
+        <Button v-if="step === 1" @click="nextStep(step)">{{$t('message.scripts.apiPublish.addApiModal.nextStep')}}</Button>
         <!-- 保存提交按钮 -->
-        <Button v-if="step === 3" type="primary" :loading="saveLoading" @click="saveApiOk">
+        <Button v-if="step === 2" type="primary" :loading="saveLoading" @click="saveApiOk">
           <span v-if="saveLoading">{{$t('message.scripts.publishing')}}</span>
           <span v-else>{{$t('message.scripts.apiPublish.addApiModal.confirm')}}</span>
         </Button>
@@ -157,75 +143,46 @@
         :model="updateApiData"
         :label-width="120"
       >
-        <template v-if="step === 1">
-          <FormItem
-            prop="id"
-            label="请选择服务API:"
-            :rules="[
-              {
-                required: true,
-                message: 'Please select the API'
-              }
-            ]">
-            <Select v-model="updateApiData.id" placeholder="Select your api">
-              <Option v-for="item in apiList" :key="item.id" :value="item.id">{{item.name}}</Option>
-            </Select>
-          </FormItem>
-          {{$t('message.scripts.apiPublish.updateApiModal.paramConfirm')}}
-          <Table :columns="paramInfoColumns" :data="updateApiData.paramList">
-            <template slot-scope="{row, index}" slot="defaultValue">
-              <Input :class="{ verificationValue: tip[row.paramName] }" @on-blur="verificationValue(row)" :title="updateApiData.paramList[index].defaultValue" :type="inputType(row.paramType)" v-model="updateApiData.paramList[index].defaultValue"/>
-            </template>
-          </Table>
-        </template>
-        <template v-if="step === 2">
-          <FormItem
-            prop="approvalName"
-            :label="$t('message.scripts.apiPublish.addApiModal.approvalName')"
-            :rules="[{ required: true, message: 'The name cannot be empty', trigger: 'blur' }]"
-          >
-            <Input v-model="updateApiData.approvalName"/>
-          </FormItem>
-          <FormItem
-            prop="applyUser"
-            :label="$t('message.scripts.apiPublish.addApiModal.applyUser')"
-            :rules="[
-              { required: true, message: 'Please select the user', type: 'array' }
-            ]"
-          >
-            <Select v-model="updateApiData.applyUser" multiple filterable placeholder="Select your user">
-              <Option v-for="item in applyUserList" :key="item.name" :value="item.name">{{item.name}}</Option>
-            </Select>
-          </FormItem>
-          <FormItem
-            prop="proxyUser"
-            :label="$t('message.scripts.apiPublish.addApiModal.proxyUser')"
-            :rules="[
-              { required: false }
-            ]">
-            <Input v-model="updateApiData.proxyUser"/>
-          </FormItem>
-          <FormItem
-            prop="describe"
-            :rules="[{ message: $t('message.scripts.apiPublish.rule.contentLengthLimitTwo'), max: 200 }]"
-            :label="$t('message.scripts.apiPublish.addApiModal.describe')">
-            <Input v-model="updateApiData.describe" show-word-limit type="textarea"/>
-          </FormItem>
-          <FormItem
-            prop="comment"
-            :rules="[{ message: $t('message.scripts.apiPublish.rule.contentLengthLimitMax'), max:1024 }]"
-            :label="$t('message.scripts.apiPublish.addApiModal.comment')">
-            <Input v-model="updateApiData.comment" show-word-limit type="textarea"/>
-          </FormItem>
-        </template>
+        <FormItem
+          prop="id"
+          label="请选择服务API:"
+          :rules="[
+            {
+              required: true,
+              message: 'Please select the API'
+            }
+          ]">
+          <Select v-model="updateApiData.id" placeholder="Select your api">
+            <Option v-for="item in apiList" :key="item.id" :value="item.id">{{item.name}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem
+          prop="proxyUser"
+          :label="$t('message.scripts.apiPublish.addApiModal.proxyUser')">
+          <Input v-model="updateApiData.proxyUser"/>
+        </FormItem>
+        <FormItem
+          prop="describe"
+          :rules="[{ message: $t('message.scripts.apiPublish.rule.contentLengthLimitTwo'), max: 200 }]"
+          :label="$t('message.scripts.apiPublish.addApiModal.describe')">
+          <Input v-model="updateApiData.describe" show-word-limit type="textarea"/>
+        </FormItem>
+        <FormItem
+          prop="comment"
+          :rules="[{ message: $t('message.scripts.apiPublish.rule.contentLengthLimitMax'), max:1024 }]"
+          :label="$t('message.scripts.apiPublish.addApiModal.comment')">
+          <Input v-model="updateApiData.comment" show-word-limit type="textarea"/>
+        </FormItem>
+        {{$t('message.scripts.apiPublish.updateApiModal.paramConfirm')}}
+        <Table :columns="paramInfoColumns" :data="updateApiData.paramList">
+          <template slot-scope="{row, index}" slot="defaultValue">
+            <Input :class="{ verificationValue: tip[row.paramName] }" @on-blur="verificationValue(row)" :title="updateApiData.paramList[index].defaultValue" :type="inputType(row.paramType)" v-model="updateApiData.paramList[index].defaultValue"/>
+          </template>
+        </Table>
       </Form>
       <div slot="footer">
         <Button :disabled="saveLoading" @click="updateApiCancel">{{$t('message.scripts.apiPublish.addApiModal.cancel')}}</Button>
-        <!-- 上一步按钮 -->
-        <Button v-if="step === 2" :disabled="saveLoading" @click="backStep">{{$t('message.scripts.apiPublish.addApiModal.back')}}</Button>
-        <Button v-if="step === 1" @click="updateNextStep(step)">{{$t('message.scripts.apiPublish.addApiModal.nextStep')}}</Button>
         <Button
-          v-if="step === 2"
           type="primary"
           :loading="saveLoading"
           @click="updateApiOk">
@@ -278,9 +235,6 @@ export default {
       saveLoading: false,
       addApiModalWidth: 450,
       ruleValidate: {
-        approvalName: [
-          { required: true, message: this.$t('message.scripts.apiPublish.rule.approvalName'), trigger: 'blur' }
-        ],
         apiName: [
           {
             required: true,
@@ -322,13 +276,7 @@ export default {
             validator: this.checkApiPath,
             trigger: 'blur'
           }
-        ],
-        applyUser: [
-          { required: true, message: 'Please select the user' }
-        ],
-        gender: [
-          { required: true, message: 'Please select gender', trigger: 'change' }
-        ],
+        ]
       },
       paramTypeList: [
         {
@@ -580,7 +528,6 @@ export default {
         visible: 'grantView',
         describe: '',
         approvalName: 'default',
-        applyUser: [],
         proxyUser: '',
         paramList: [
 
@@ -600,7 +547,6 @@ export default {
         describe: '',
         latestVersionId: '',
         approvalName: 'default',
-        applyUser: [],
         proxyUser: '',
         paramList: [],
         comment: ''
@@ -620,7 +566,7 @@ export default {
     },
     // 判断是否符合脚本类型
     showScriptsType() {
-      return [ 'spark', 'hive' ].includes(this.script.scriptType)
+      return [ 'spark', 'hive', 'hql' ].includes(this.script.scriptType)
     }
   },
   watch: {
@@ -644,11 +590,11 @@ export default {
     apiDataFill(id) {
       const currentApi = this.apiList.find((item) => item.id == id);
       if (currentApi) {
-        this.updateApiData.approvalName = currentApi.approvalVo.approvalName;
         // 如果之前绑定的用户被删除，需要清掉
-        this.updateApiData.applyUser = currentApi.approvalVo.applyUser.split(',').filter((item) => this.applyUserList.some((i) => i.name === item));
-        this.updateApiData.proxyUser = currentApi.approvalVo.executeUser;
+        console.log('currentApi: ', currentApi);
+        this.updateApiData.proxyUser = currentApi.executeUser || '';
         this.updateApiData.comment = currentApi.comment || '';
+        this.updateApiData.describe = currentApi.description || '';
       }
     },
     // 验证发布和更新的默认值是否满足条件
@@ -680,6 +626,7 @@ export default {
     // 获取当前工作空间当前用户的api列表
     getApiList() {
       api.fetch('/dss/apiservice/getUserServices', {
+        type: this.script.application,
         workspaceId: this.$route.query.workspaceId
       }, {
         method: 'get',
@@ -760,8 +707,6 @@ export default {
               describe: rst.result.description,
               resourceId: rst.result.resourceId,
               latestVersionId: rst.result.latestVersionId,
-              approvalName: 'default',
-              applyUser: [],
               proxyUser: '',
               comment: ''
             }
@@ -895,7 +840,6 @@ export default {
               details: item.details
             })
           })
-
           this.saveLoading = true;
           api.fetch('/dss/apiservice/api', {
             comment: this.addApiData.comment,
@@ -906,6 +850,7 @@ export default {
             method: this.addApiData.requestType,
             scope: this.addApiData.visible,
             description: this.addApiData.describe,
+            executeUser: this.addApiData.proxyUser,
             type: this.script.application,
             runType: this.script.runType, //
             tag: this.addApiData.tagArr.join(','),
@@ -913,13 +858,7 @@ export default {
             content: this.script.data,
             scriptPath: this.work.filepath,
             workspaceId: this.$route.query.workspaceId,
-            metadata: this.convertMetadata(this.script.params),
-            approvalVo: {
-              approvalName: this.addApiData.approvalName,
-              applyUser: this.addApiData.applyUser.join(','),
-              executeUser: this.addApiData.proxyUser,
-              creator: this.getUserName()
-            }
+            metadata: this.convertMetadata(this.script.params)
           }, 'post').then(() => {
             this.addApiModalShow = false;
             this.saveLoading = false;
@@ -945,6 +884,7 @@ export default {
       this.$emit('on-save');
 
       this.$refs['updateApi'].validate((valid) => {
+        console.log('this.updateApiData: ', this.updateApiData);
         if (valid) {
           var params = []
           this.updateApiData.paramList.forEach(function (item) {
@@ -969,6 +909,7 @@ export default {
             method: this.updateApiData.requestType,
             scope: this.updateApiData.visible,
             description: this.updateApiData.describe,
+            executeUser: this.updateApiData.proxyUser,
             type: this.script.application,
             runType: this.script.runType,
             tag: this.updateApiData.tagArr.join(','),
@@ -977,13 +918,7 @@ export default {
             scriptPath: this.work.filepath,
             metadata: this.convertMetadata(this.script.params),
             workspaceId: this.$route.query.workspaceId,
-            comment: this.updateApiData.comment,
-            approvalVo: {
-              approvalName: this.updateApiData.approvalName,
-              applyUser: this.updateApiData.applyUser.join(','),
-              executeUser: this.updateApiData.proxyUser,
-              creator: this.getUserName()
-            }
+            comment: this.updateApiData.comment
           }, 'put').then(() => {
             this.updateApiModalShow = false
             this.saveLoading = false;

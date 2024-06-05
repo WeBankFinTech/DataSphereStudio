@@ -72,7 +72,9 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.*;
+import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import org.apache.commons.collections.CollectionUtils;
@@ -117,6 +119,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     private OrchestratorPluginService orchestratorPluginService;
     @Autowired
     private LockMapper lockMapper;
+    @Autowired
+    private FlowMapper flowMapper;
 
     private static final int VALID_FLAG = 1;
 
@@ -438,6 +442,11 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
         if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
             try {
+                DSSFlow dssFlow = flowMapper.selectFlowByID(dssOrchestratorVersion.getAppId());
+                if (!dssFlow.getName().equals(dssOrchestratorInfo.getName())) {
+                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                    return ;
+                }
                 Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
                 //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
                 if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
@@ -452,7 +461,6 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                     GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), "system");
                     GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
                     lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), dssOrchestratorVersion.getAppId());
-                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
                 }
                 lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
             } catch (Exception e) {

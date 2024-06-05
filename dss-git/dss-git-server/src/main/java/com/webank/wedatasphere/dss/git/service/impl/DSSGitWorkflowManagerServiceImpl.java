@@ -106,9 +106,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId);
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName(), workspaceId);
                 FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
+                String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + entry.getKey();
+                paths.add(metaConfPath);
             }
-            String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + request.getProjectName();
-            paths.add(metaConfPath);
             paths.remove(GitConstant.GIT_SERVER_META_PATH );
             // 提交
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();

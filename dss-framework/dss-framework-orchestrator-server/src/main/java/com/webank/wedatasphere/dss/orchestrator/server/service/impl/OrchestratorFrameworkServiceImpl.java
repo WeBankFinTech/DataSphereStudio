@@ -466,26 +466,22 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         GitHistoryResponse historyResponse = null;
         // 当前未有版本发布
-        if (versionByOrchestratorId.size() == 1 || versionByOrchestratorId.get(1).getCommitId() == null) {
-            GitHistoryRequest historyRequest = new GitHistoryRequest(workspaceId, projectName, workflowName);
-            historyResponse = RpcAskUtils.processAskException(sender.ask(historyRequest), GitHistoryResponse.class, GitHistoryRequest.class);
-        } else {
-            GitCommitInfoBetweenRequest commitInfoBetweenRequest = new GitCommitInfoBetweenRequest();
-            String newCommitId = versionByOrchestratorId.get(0).getCommitId();
-            commitInfoBetweenRequest.setNewCommitId(newCommitId);
-            String oldCommitId = null;
-            for (DSSOrchestratorVersion version : versionByOrchestratorId) {
-                if (version.getCommitId()!= null && !version.getCommitId().equals(newCommitId)) {
-                    oldCommitId = version.getCommitId();
-                    break;
-                }
+        GitCommitInfoBetweenRequest commitInfoBetweenRequest = new GitCommitInfoBetweenRequest();
+        String newCommitId = versionByOrchestratorId.get(0).getCommitId();
+        commitInfoBetweenRequest.setNewCommitId(newCommitId);
+        String oldCommitId = null;
+        for (DSSOrchestratorVersion version : versionByOrchestratorId) {
+            if (version.getCommitId()!= null && !version.getCommitId().equals(newCommitId)) {
+                oldCommitId = version.getCommitId();
+                break;
             }
-            commitInfoBetweenRequest.setOldCommitId(oldCommitId);
-            commitInfoBetweenRequest.setProjectName(projectName);
-            commitInfoBetweenRequest.setDirName(workflowName);
-            commitInfoBetweenRequest.setWorkspaceId(workspaceId);
-            historyResponse = RpcAskUtils.processAskException(sender.ask(commitInfoBetweenRequest), GitHistoryResponse.class, GitCommitInfoBetweenRequest.class);
         }
+        commitInfoBetweenRequest.setOldCommitId(oldCommitId);
+        commitInfoBetweenRequest.setProjectName(projectName);
+        commitInfoBetweenRequest.setDirName(workflowName);
+        commitInfoBetweenRequest.setWorkspaceId(workspaceId);
+        historyResponse = RpcAskUtils.processAskException(sender.ask(commitInfoBetweenRequest), GitHistoryResponse.class, GitCommitInfoBetweenRequest.class);
+
         return historyResponse;
     }
 

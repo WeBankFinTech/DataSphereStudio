@@ -37,7 +37,8 @@ public class EventCheckSender extends AbstractEventCheck {
             PreparedStatement pstmt = null;
             Connection msgConn = null;
             String sendTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
-            String sqlForSendMsg = "INSERT INTO event_queue (sender,send_time,topic,msg_name,msg,send_ip) VALUES(?,?,?,?,?,?)";
+            String runDate = props.getProperty("run_date");
+            String sqlForSendMsg = "INSERT INTO event_queue (sender,send_time,topic,msg_name,msg,send_ip,run_date) VALUES(?,?,?,?,?,?,?)";
             try {
                 String vIP = getLinuxLocalIp(log);
                 msgConn = getEventCheckerConnection(props,log);
@@ -49,6 +50,7 @@ public class EventCheckSender extends AbstractEventCheck {
                 pstmt.setString(4, msgName);
                 pstmt.setString(5, msg);
                 pstmt.setString(6, vIP);
+                pstmt.setString(7, runDate);
                 int rs = pstmt.executeUpdate();
                 if (rs == 1) {
                     result = true;

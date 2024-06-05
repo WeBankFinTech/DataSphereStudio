@@ -17,21 +17,40 @@
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
 
+import com.webank.wedatasphere.dss.common.entity.PageInfo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 
 import java.util.List;
-import java.util.Map;
 
 
 public interface DSSWorkspaceUserService {
+    /**
+     * 在工作空间内添加用户
+     * @param roleIds 角色
+     * @param workspaceId 空间id
+     * @param userName 用户名
+     * @param creater 添加人
+     * @param userId
+     */
 
-    void updateWorkspaceUser(List<Integer> roles, int workspaceId, String userName, String creator);
+    void addWorkspaceUser(List<Integer> roleIds, long workspaceId, String userName, String creater, String userId);
+
+    /**
+     * 更新用户在某个工作空间的角色。采用的方法是删除所有旧角色，再重新添加新角色。
+     * @param roles 新角色列表
+     * @param workspaceId 工作空间id
+     * @param userName 用户名
+     * @param creator 操作者
+     */
+    void updateWorkspaceUser(List<Integer> roles, long workspaceId, String userName, String creator);
 
     void deleteWorkspaceUser(String userName, int workspaceId);
 
     List<StaffInfoVO> listAllDSSUsers();
 
-    List<String> getAllWorkspaceUsers(int workspaceId);
+    List<String> getAllWorkspaceUsers(long workspaceId);
+    PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize);
 
     List<Integer> getUserWorkspaceIds(String userName);
 
@@ -40,8 +59,11 @@ public interface DSSWorkspaceUserService {
     List<String> getWorkspaceReleaseUsers(int workspaceId);
 
     Long getCountByUsername(String username,int workspaceId);
+    Long getUserCount(long workspaceId);
 
-    List<Map<String,Object>> getUserRoleByUserName(String userName);
+    List<DSSWorkspaceRoleVO> getUserRoleByUserName(String userName);
 
-    boolean clearUserByUserName(String userName);
+    void clearUserByUserName(String userName);
+
+    void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds);
 }

@@ -23,6 +23,14 @@ const routes = [
     },
     component: () => import('./view/servicesExecute/index.vue')
   },
+  {
+    path: '/ServicesSubmit',
+    name: 'ServicesSubmit',
+    meta: {
+      publicPage: true
+    },
+    component: () => import('./view/servicesSubmit/index.vue')
+  },
 ]
 
 export default routes;

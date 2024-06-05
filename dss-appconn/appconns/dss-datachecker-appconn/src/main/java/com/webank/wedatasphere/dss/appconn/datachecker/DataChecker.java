@@ -64,7 +64,6 @@ public class DataChecker {
             if (!p.containsKey(DATA_OBJECT)) {
                 logger.info("Properties " + DATA_OBJECT + " value is Null !");
             }
-            begineCheck(dataCheckerAction);
         }catch (Exception ex){
             dataCheckerAction.setState(RefExecutionState.Failed);
             throw new  RuntimeException("get DataChecker result failed", ex);

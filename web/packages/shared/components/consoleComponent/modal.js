@@ -48,5 +48,6 @@ export class Script {
     this.status = option.status ? option.status : 'Inited';
     // script视图状态
     this.scriptViewState = {};
+    this.runType = option.runType;
   }
 }

@@ -309,6 +309,7 @@ export default {
       }
       return {
         filter: canFilter,
+
         export:
           this.baseinfo.exportResEnable !== false &&
           isScriptis &&

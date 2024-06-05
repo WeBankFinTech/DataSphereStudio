@@ -170,11 +170,11 @@ public class FlowRestfulApi {
      * @return
      */
     @RequestMapping(value = "getReleaseStatus", method = RequestMethod.GET)
-    public Message getReleaseStatus(@NotNull(message = "查询的发布id不能为空") @RequestParam(required = false, name = "releaseTaskId") Long releaseTaskId) {
+    public Message getReleaseStatus(@NotNull(message = "查询的发布id不能为空") @RequestParam(required = false, name = "releaseTaskId") String releaseTaskId) {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Message message;
         try {
-            ResponseConvertOrchestrator response = publishService.getStatus(username, releaseTaskId.toString());
+            ResponseConvertOrchestrator response = publishService.getStatus(username, releaseTaskId);
             if (null != response.getResponse()) {
                 String status = response.getResponse().getJobStatus().toString();
                 status = StringUtils.isNotBlank(status) ? status.toLowerCase() : status;

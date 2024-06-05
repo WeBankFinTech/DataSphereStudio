@@ -625,7 +625,6 @@ export default {
             condition = this.poinToLink(condition)
           }
         }
-
         let Fn = Function
         let fn = condition.replace(/\${([^}]+)}/g, function (a, b) {
           return `__node__data.${b}`

@@ -32,10 +32,15 @@ class DolphinSchedulerJobBuilder(jobProps: JMap[String, String]) extends Builder
 
   override protected def fillLinkisJobInfo(linkisJob: LinkisJob): Unit = {
     val jobParams = jobProps.get(LinkisJobTypeConf.JOB_PARAMS)
-    val paramsMap = JsonUtils.jackson.readValue(jobParams, classOf[util.Map[String, Object]])
-    linkisJob.setConfiguration(getConfiguration(paramsMap))
-    linkisJob.setVariables(getVariables(paramsMap))
-    linkisJob.getVariables.put("run_date", jobProps.get(LinkisJobTypeConf.RUN_DATE))
+    if(StringUtils.isNotBlank(jobParams)){
+      val paramsMap = JsonUtils.jackson.readValue(jobParams, classOf[util.Map[String, Object]])
+      linkisJob.setConfiguration(getConfiguration(paramsMap))
+      linkisJob.setVariables(getVariables(paramsMap))
+    }
+    val runDate = new util.HashMap[String, Object]
+    runDate.put("run_date", jobProps.get(LinkisJobTypeConf.RUN_DATE))
+    linkisJob.setVariables(runDate)
+
     val source = getSource
     linkisJob.setSource(source)
     linkisJob.getRuntimeParams.put("nodeName", source.get("nodeName"))
@@ -45,7 +50,10 @@ class DolphinSchedulerJobBuilder(jobProps: JMap[String, String]) extends Builder
   override protected def getContextID(job: Job): String = jobProps.get(LinkisJobExecutionConfiguration.FLOW_CONTEXTID)
 
   override protected def fillCommonLinkisJobInfo(commonLinkisJob: CommonLinkisJob): Unit = {
-    commonLinkisJob.setJobResourceList(LinkisJobExecutionUtils.getResourceListByJson(jobProps.get(LinkisJobTypeConf.JOB_RESOURCES)))
+    val jobResources = jobProps.get(LinkisJobTypeConf.JOB_RESOURCES)
+    if(StringUtils.isNotBlank(jobResources)){
+      commonLinkisJob.setJobResourceList(LinkisJobExecutionUtils.getResourceListByJson(jobResources))
+    }
     val flowNameAndResources = new util.HashMap[String, util.List[BMLResource]]
     if(jobProps.containsKey(LinkisJobTypeConf.FLOW_RESOURCES)) {
       flowNameAndResources.put(getSource.get("flowName") + LinkisJobExecutionConfiguration.RESOURCES_NAME,

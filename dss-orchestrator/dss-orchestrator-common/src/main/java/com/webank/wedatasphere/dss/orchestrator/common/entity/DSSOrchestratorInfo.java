@@ -86,6 +86,11 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
      */
     private Date updateTime;
 
+    /**
+     * 是否默认引用资源参数模板
+     */
+    private String isDefaultReference;
+
     public DSSOrchestratorInfo() {
 
     }
@@ -275,6 +280,14 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getIsDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setIsDefaultReference(String isDefaultReference) {
+        this.isDefaultReference = isDefaultReference;
     }
 
     @Override

@@ -411,6 +411,19 @@ export default {
         pan,
         zoom: this.zoomSize
       })
+
+      // 设置禁用的样式
+      const nodeThemeColor = getThemeColorConsants()
+      cy.style().selector('.disabled-node').style({
+        'background-color': nodeThemeColor.nodeDisabledBg,
+        'color': nodeThemeColor.nodeDisabledColor
+      })
+      data.nodes.forEach(function(nodeItem) {
+        var node = cy.getElementById(nodeItem.data.id);
+        if (nodeItem.disabled) {
+          node.addClass('disabled-node');
+        }
+      });
     },
     updataNodeStatuStyle() {
       if (!this.$refs.nodestaus || !this.instance) return
@@ -556,6 +569,9 @@ export default {
       this.instance.cy.style().selector('node[name]').style({
         'background-color': themeColor.nodeBg,
         'color': themeColor.nodeColor
+      }).selector('.disabled-node').style({
+        'background-color': themeColor.nodeDisabledBg,
+        'color': themeColor.nodeDisabledColor
       }).update()
     },
     nodeScroolIntoView(id) {

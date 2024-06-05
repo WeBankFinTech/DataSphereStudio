@@ -69,11 +69,13 @@ export default {
       });
 
       // 快到某条公告生效或者失效时间
-      if (nextEnd > 0 || nextStart > 0) {
+      const time = Math.min(nextStart, nextEnd) > 0 ? Math.min(nextStart, nextEnd) : Math.max(nextStart, nextEnd)
+      if (time > 0 && time < 10 * 60 * 1000) {
         this.timer = setTimeout(() => {
           this.init(true)
-        }, Math.min(nextStart, nextEnd) > 0 ? Math.min(nextStart, nextEnd) : Math.max(nextStart, nextEnd));
+        }, time);
       }
+
 
       if (needShow.length && (!this.hasClosed || show)) {
         this.updateShow(needShow);

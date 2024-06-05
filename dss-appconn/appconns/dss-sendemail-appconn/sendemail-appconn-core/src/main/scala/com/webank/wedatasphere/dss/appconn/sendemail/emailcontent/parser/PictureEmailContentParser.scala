@@ -21,7 +21,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream}
 import java.util
 import java.util.{Base64, Iterator, UUID}
 
-import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, MultiContentEmail, PdfAttachment, PngAttachment}
+import com.webank.wedatasphere.dss.appconn.sendemail.email.domain.{AbstractEmail, ExcelAttachment, MultiContentEmail, PdfAttachment, PngAttachment}
 import com.webank.wedatasphere.dss.appconn.sendemail.emailcontent.domain.PictureEmailContent
 import org.apache.linkis.common.conf.Configuration
 import javax.imageio.{ImageIO, ImageReader}
@@ -36,7 +36,7 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
 
   override protected def parseEmailContent(emailContent: PictureEmailContent,
                                            multiContentEmail: MultiContentEmail): Unit = {
-    getFirstLineRecord(emailContent).foreach { imageStr =>
+    getLineRecord(emailContent).foreach { imageStr =>
       emailContent.getFileType match {
         case "checkData" =>
           //对于邮件校验数据不进行处理
@@ -46,6 +46,12 @@ object PictureEmailContentParser extends AbstractEmailContentParser[PictureEmail
           val decoder = Base64.getDecoder
           val byteArr = decoder.decode(imageStr)
           multiContentEmail.addAttachment(new PdfAttachment(pdfName, Base64.getEncoder.encodeToString(byteArr)))
+        case "excel" =>
+          //val excelUUID: String = UUID.randomUUID.toString
+          val excelName = emailContent.getFileName + ".xlsx"
+          val decoder = Base64.getDecoder
+          val byteArr = decoder.decode(imageStr)
+          multiContentEmail.addAttachment(new ExcelAttachment(excelName, Base64.getEncoder.encodeToString(byteArr)))
         case _ =>
           var inputStream: ByteArrayInputStream = null
           Utils.tryFinally({

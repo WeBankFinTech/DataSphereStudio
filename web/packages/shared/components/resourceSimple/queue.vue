@@ -38,7 +38,18 @@
             suffixe="GB"
             width="120px"
             height="120px"
-            :title="$t('message.common.resourceSimple.NC')"></v-circle>
+            :title="$t('message.common.resourceSimple.NC')"
+            class="queue-manager-circle"></v-circle>
+          <v-circle
+            :percent="infos.queueInfo.activeAppsPercent"
+            :used="infos.queueInfo.numActiveApps.toString()"
+            :max="infos.queueInfo.maxApps.toString()"
+            width="120px"
+            height="120px"
+            title="Applications"></v-circle>
+        </div>
+        <div class="queue-manager-footer">
+          <span>Num Pending Applications:</span>{{ infos.queueInfo.numPendingApps }}
         </div>
       </div>
       <div class="queue-manager-top">
@@ -94,7 +105,7 @@ export default {
     };
   },
   methods: {
-    getQueueList() {
+    getQueueList(type) {
       this.loading = true;
       // 获取队列资源使用状态
       api.fetch('/linkisManager/rm/queues').then((res) => {
@@ -110,6 +121,10 @@ export default {
             this.queueList.push(obj)
           })
         });
+        if (type === 'current' && this.current) {
+          this.getQueueInfo(this.current);
+          return;
+        }
         this.current = this.queueList[0] ? this.queueList[0].text : '';
         this.getQueueInfo(this.queueList[0].text);
       }).catch(() => {
@@ -130,6 +145,10 @@ export default {
       }).then((res) => {
         this.loading = false;
         this.infos = res;
+        this.infos.queueInfo.activeAppsPercent = 0;
+        if(this.infos.queueInfo.numActiveApps && this.infos.queueInfo.maxApps) {
+          this.infos.queueInfo.activeAppsPercent = this.infos.queueInfo.numActiveApps / this.infos.queueInfo.maxApps;
+        }
       }).catch(() => {
         this.loading = false;
       });

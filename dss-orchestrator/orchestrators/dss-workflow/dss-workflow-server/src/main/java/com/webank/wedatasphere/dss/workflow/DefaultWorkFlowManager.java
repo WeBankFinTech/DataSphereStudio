@@ -185,8 +185,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         if (dssFlow.getCreator().equals(userName)) {
             flowService.batchDeleteFlow(Collections.singletonList(flowId));
         } else {
-            throw new DSSErrorException(100088, "Workflow can not be deleted unless the owner.");
-        }
+            throw new DSSErrorException(100088, "Workflow can not be deleted unless the owner.(工作流不允许被其拥有者之外的用户删除！)");        }
         logger.info("delete workflow success. flowId:{}",flowId);
     }
 

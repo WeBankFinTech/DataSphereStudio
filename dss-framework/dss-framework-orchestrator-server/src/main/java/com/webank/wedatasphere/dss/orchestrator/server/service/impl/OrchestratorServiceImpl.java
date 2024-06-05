@@ -452,6 +452,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                     GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), "system");
                     GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
                     lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), dssOrchestratorVersion.getAppId());
+                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
                 }
                 lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
             } catch (Exception e) {

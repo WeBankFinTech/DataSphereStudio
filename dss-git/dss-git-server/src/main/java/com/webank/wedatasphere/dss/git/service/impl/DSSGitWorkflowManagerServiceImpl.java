@@ -260,7 +260,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
             // 处理文件路径 /data/GitInstall/testGit/test/.sql -> testGit/test/.sql
             if (file.startsWith(workTree + File.separator)) {
-                file = file.substring(gitPathPre.length() + File.separator.length());
+                file = file.substring(workTree.length() + File.separator.length());
             }
 
             result.add(new GitSearchResult(file, keyLines));

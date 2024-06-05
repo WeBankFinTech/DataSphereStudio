@@ -43,7 +43,7 @@
         :end-node="link.endNode"
         :end-node-arrow="link.endNodeArrow"
         :line-width="link.lineWidth"
-        :link-type="link.linkType || state.linkType"
+        :link-type="link.linkType"
         :border-width="link.borderWidth"
         :ext-width="link.extWidth"
         :label="link.label"
@@ -135,10 +135,7 @@ export default {
     });
 
     this.$nextTick(this.initView)
-    // this.autoFormat({
-    //   nodeWidth: 200,
-    //   linkType: 'straight'
-    // })
+
   },
   updated() {
     // 在mounted里this.state.nodes.length为0，所以要在updated里写，注意要判断 别死循环
@@ -591,6 +588,9 @@ export default {
         node.parentNodes = []
         // 给每个节点加上linkType属性，用于在最初进行判断，如果更改了连线类型，那新增节点也应该用新类型进行连接，虽然现在每个节点的连接方式都是一样的，但以后可能会不一样，所以就设置成每个节点的属性了
         node.linkType = this.state.linkType
+      })
+      this.state.links.forEach((link) => {
+        link.linkType = data.linkType
       })
       this.updateAllNodes(this.state.nodes)
     },
@@ -1436,8 +1436,9 @@ export default {
     showLinkerMenu(e, k) {
       let arr = [{ icon: 'shanchu', text: this.$t('message.workflow.vueProcess.delete'), value: 'delete' }]
       let { beforeShowMenu } = this.designer.myMenuOptions;
+      const line = this.state.links.find(it => it.key === k)
       if (typeof beforeShowMenu === 'function') {
-        arr = beforeShowMenu(this.k, arr, 'link');
+        arr = beforeShowMenu(line, arr, 'link');
         if (Array.isArray(arr)) {
           arr = arr.map((it) => {
             let menuItem = {
@@ -1702,7 +1703,7 @@ export default {
       let dis = 10;
       let linkKey;
       Object.keys(this.calcLinks).forEach(key => {
-        let { nodes, lineWidth } = this.calcLinks[key];
+        let { nodes } = this.calcLinks[key];
         for (let i = 0; i < nodes.length - 1; i++) {
           let p0 = nodes[i];
           let p1 = nodes[i + 1];
@@ -1711,28 +1712,30 @@ export default {
           let inY = (y <= p1.y && y >= p0.y) || (y >= p1.y && y <= p0.y)
           if (inX || inY) {
             let pdis = this.disToLine(p0, p1, p)
-            if (pdis < lineWidth * 10) {
-              if (pdis < dis) {
-                dis = pdis;
-                linkKey = key;
-              }
+            if (pdis < dis) {
+              dis = pdis;
+              linkKey = key;
             }
           }
         }
       })
       return linkKey;
     },
+    /**
+     * 点到直线距离
+     */
     disToLine(p0, p1, p) {
       let dis;
-      if (p1.x === p0.x) {
-        dis = Math.abs(p1.x - p.x)
-      } else if (p1.y === p0.y) {
-        dis = Math.abs(p1.y - p.y)
-      } else {
-        let k = (p0.y - p1.y) / (p0.x - p1.x);
-        let b = (p0.y * p1.x - p1.y * p0.x) / (p1.x - p0.x);
-        dis = Math.abs(k * p.x + b - p.y);
-      }
+      //三角形三个边长
+      let A= Math.abs(Math.sqrt(Math.pow((p.x - p0.x), 2) + Math.pow((p.y - p0.y), 2)));
+      let B= Math.abs(Math.sqrt(Math.pow((p.x - p1.x), 2) + Math.pow((p.y - p1.y), 2)));
+      let C= Math.abs(Math.sqrt(Math.pow((p0.x - p1.x), 2) + Math.pow((p0.y - p1.y), 2)));
+      //利用海伦公式计算三角形面积
+      //周长的一半
+      let P = (A + B + C) / 2;
+      let allArea = Math.abs(Math.sqrt(P*(P-A)*(P-B)*(P-C)));
+      //普通公式计算三角形面积反推点到线的垂直距离
+      dis = (2 * allArea) / C;
       return dis;
     },
     getMaxXY() {

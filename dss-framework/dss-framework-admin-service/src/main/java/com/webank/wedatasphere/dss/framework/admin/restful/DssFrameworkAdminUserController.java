@@ -1,6 +1,9 @@
 package com.webank.wedatasphere.dss.framework.admin.restful;
 
 
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.admin.common.constant.UserConstants;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.Message;
 import com.webank.wedatasphere.dss.framework.admin.common.domain.PasswordResult;
@@ -17,6 +20,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnExce
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.apache.linkis.server.utils.ModuleUserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.webank.wedatasphere.dss.framework.common.conf.TokenConf.HPMS_USER_TOKEN;
 
 @RequestMapping(path = "/dss/framework/admin/user", produces = {"application/json"})
 @RestController
@@ -130,6 +136,27 @@ public class DssFrameworkAdminUserController extends BaseController {
         }
         LOGGER.info("Modify user {} info", user.getUserName());
         return Message.ok().data("修改用户成功。", dssAdminUserService.updateUser(user, getWorkspace(req)));
+    }
+
+    @GetMapping("/getAllUserName")
+    public Message getAllUsername(){
+        return Message.ok().data("userNames", dssAdminUserService.getAllUsername());
+    }
+
+    @PostMapping("/deleteUser/{userName}")
+    public Message deleteUser(HttpServletRequest httpServletRequest, @PathVariable String userName){
+        String token = ModuleUserUtils.getToken(httpServletRequest);
+        if (StringUtils.isNotBlank(token)) {
+            if(!token.equals(HPMS_USER_TOKEN)){
+                return Message.error().message("Token:" + token + " has no permission to revoke userRole.");
+            }
+        }else {
+            return Message.error().message("User:" + userName + " has no permission to revoke userRole.");
+        }
+        dssAdminUserService.deleteUser(userName);
+        AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.USER_DEPT,null,
+                "deleteUser", OperateTypeEnum.DELETE,null);
+        return Message.ok();
     }
 
 }

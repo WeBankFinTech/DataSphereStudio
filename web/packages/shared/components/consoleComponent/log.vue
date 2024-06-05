@@ -101,15 +101,15 @@ export default {
   },
   watch: {
     logLine(val) {
-      if (this.$refs.logEditor.editor) {
+      if (this.$refs.logEditor && this.$refs.logEditor.editor) {
         this.$refs.logEditor.editor.revealLine(val);
       }
     },
     logs() {
-      if (this.$refs.logEditor.editor && this.logs.all) {
+      if (this.$refs.logEditor && this.$refs.logEditor.editor && this.logs.all) {
         const firstError = this.logs.all.split('\n').findIndex(line => line.indexOf('ERROR') > -1)
         setTimeout(() => {
-          if (this.$refs.logEditor.editor) {
+          if (this.$refs.logEditor && this.$refs.logEditor.editor) {
             this.$refs.logEditor.editor.revealLine(firstError > 0 ? firstError + 1 : 1);
           }
         }, 1200);

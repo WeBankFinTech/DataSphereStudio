@@ -31,10 +31,11 @@ class PictureEmailContent extends ArrayEmailContent with FsPathStoreEmailContent
     setFsPath(filePath)
   }
 
-  def this(filePath: FsPath, fileType: String) = {
+  def this(filePath: FsPath, fileType: String, fileName:String) = {
     this()
     setFsPath(filePath)
     setFileType(fileType)
+    setFileName(fileName)
   }
 
 }

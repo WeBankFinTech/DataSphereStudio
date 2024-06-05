@@ -56,6 +56,11 @@
         <span>{{ $t('message.scripts.constants.upload') }}</span>
       </we-menu-item>
       <we-menu-item
+        v-if="currentNode.isLeaf"
+        @select="handleMove">
+        <span>{{ $t('message.scripts.contextMenu.move') }}</span>
+      </we-menu-item>
+      <we-menu-item
         v-if="currentNode._level!=1"
         @select="handleEditBefore">
         <span>{{ $t('message.scripts.constants.rename') }}</span>
@@ -140,6 +145,15 @@
       ref="delete"
       :loading="loading"
       @delete="handleDelete"/>
+    <move
+      ref="moveFile"
+      :node="newDialog.node"
+      :is-leaf="newDialog.isLeaf"
+      :default-path="newDialog.defaultPath"
+      :tree="filterTree"
+      :load-data-fn="loadDataFn"
+      :filter-node="filterNode"
+      @update="handleMoveUpdate" />
   </div>
 </template>
 <script>
@@ -155,7 +169,12 @@ import showDialog from '@dataspherestudio/shared/components/directoryDialog/show
 import weImportToHive from '@/scriptis/components/importToHive';
 import deleteDialog from '@dataspherestudio/shared/components/deleteDialog';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
+import plugin from '@dataspherestudio/shared/common/util/plugin'
 import module from './index';
+import move from './move';
+import {
+  Notice
+} from 'iview';
 const PREFIX = 'file://';
 export default {
   name: 'WorkSidebar',
@@ -167,6 +186,7 @@ export default {
     showDialog,
     weImportToHive,
     deleteDialog,
+    move
   },
   mixins: [mixin],
   props: {
@@ -232,9 +252,46 @@ export default {
     },
   },
   mounted() {
+    this.initListenerCopilotEvent()
     this.initData();
   },
+  beforeDestroy() {
+    this.destroyCopilotEvent()
+  },
   methods: {
+    destroyCopilotEvent() {
+      plugin.clear('copilot_web_listener_create')
+    },
+    initListenerCopilotEvent() {
+      plugin.on('copilot_web_listener_create', (regs) => {
+        this.getRootPath(status => {
+          if (status) {
+            const name = 'copilot_' + Date.now() + '.hql'
+            let path = this.rootPath
+            if (this.currentNode.data) {
+              const { isLeaf, path: filePath, parentPath } = this.currentNode.data
+              path = isLeaf ? parentPath : filePath
+            }
+            const node = {
+              name,
+              path: `${path}/${name}`,
+              businessType: "",
+              description: "",
+              isLeaf: true,
+              copy: false,
+              type: "脚本文件",
+            };
+            this.handleCreate(node, (_, isOpen) => {
+              if (isOpen) {
+                setTimeout(() => {
+                  plugin.emit('copilot_web_listener_inster', regs)
+                }, 500);
+              }
+            });
+          }
+        })
+      })
+    },
     initData() {
       // 取indexedDB缓存
       this.dispatch('IndexedDB:getTree', {
@@ -267,6 +324,16 @@ export default {
     changeTreeByType(type) {
       if (type === 'share') {
         this.filterTree = cloneDeep(this.fileTree);
+        this.filterTree[0].children = this.filterTree[0].children.filter( function (node) {
+          if (!node.isLeaf) return true;
+          const tabSuffix = node.name.substr(
+            node.name.lastIndexOf('.'),
+            node.name.length
+          );
+          const reg = ['.xlsx', '.xls', '.csv', '.txt'];
+          const isVaild = indexOf(reg, tabSuffix) !== -1;
+          return isVaild;
+        })
         this.hiveDataLoadFn = this.loadDataFn;
       } else if (type === 'hdfs') {
         this.getHdfsTree().then(({ hdfsTree, loadDataFn }) => {
@@ -330,15 +397,31 @@ export default {
         this.openToTABAction(node.data);
       }
     },
-    openToTABAction(node) {
+    validFileName(input) {
+      var pattern = /^[\u4E00-\u9FA5a-zA-Z0-9_.]+$/;
+      const msg = '当前脚本名称不符合规范（仅支持中文、大小写字母、数字和下划线），可能会影响脚本的执行，请修改脚本名称!';
+      if (!pattern.test(input)) {
+        Notice.error({
+          name: 'validFileName' + input,
+          duration: 6,
+          closable: true,
+          title: this.$t('message.common.errTitle'),
+          desc: msg,
+        });
+      }
+    },
+    openToTABAction(node, openCallBack) {
       const openNode = node || this.currentNode.data;
+      if (openNode && openNode.name) {
+        this.validFileName(openNode.name)
+      }
       const path = openNode.path;
       const source = openNode.copy ? this.path : '';
       this.dispatch('Workbench:openFile', {
         source,
         path,
         filename: openNode.name,
-      }, () => {});
+      }, openCallBack || (() => {}));
     },
     copyPathAction() {
       util.executeCopy(this.currentNode.data.path);
@@ -429,19 +512,24 @@ export default {
         type: result[0] || PREFIX,
       });
     },
-    handleCreate(node) {
-      this.handleCreating(node, (flag) => {
-        if (flag) {
-          if (node.isLeaf) {
-            this.openToTABAction(node);
+    handleCreate(node, openCallBack) {
+      return new Promise((resolve, reject) => {
+        this.handleCreating(node, (flag) => {
+          if (flag) {
+            if (node.isLeaf) {
+              this.openToTABAction(node, openCallBack);
+            }
+            let text = node.copy ? this.$t('message.scripts.constants.success.stick') : this.$t('message.scripts.constants.success.add')
+            this.$Message.success(text);
+            setTimeout(() => {
+              this.refresh('new', node.path);
+              resolve(flag)
+            }, 500);
+          } else {
+            reject(flag)
           }
-          let text = node.copy ? this.$t('message.scripts.constants.success.stick') : this.$t('message.scripts.constants.success.add')
-          this.$Message.success(text);
-          setTimeout(() => {
-            this.refresh('new', node.path);
-          }, 500);
-        }
-      });
+        });
+      })
     },
     handleCreating(node, cb) {
       const url = node.isLeaf
@@ -468,6 +556,47 @@ export default {
     handleEditBefore() {
       this.currentNode.changeEditState(true);
       this.currentNode.isEditState = true;
+    },
+    handleMove() {
+      if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.data'));
+      let node = isArray(this.currentNode.data) ? this.currentNode.data[0] : this.currentNode.data;
+      this.dispatch('Workbench:isOpenTab', {
+        oldDest: node.path,
+      }, (isOpenTab) => {
+        if (isOpenTab) {
+          return this.$Message.error(this.$t('message.scripts.hasopen'));
+        } else {
+          this.filterTree = cloneDeep(this.fileTree);
+          this.fsType = 'share';
+          this.newDialog = {
+            type: this.$t('message.scripts.deleteType.script'),
+            isNew: true,
+            node,
+            isLeaf: true,
+            scriptType: this.getSupportModes().filter((item) => item.isCanBeNew),
+            defaultPath: node.parentPath,
+          };
+          if (this.$refs.moveFile) {
+            this.$refs.moveFile.open();
+          }
+        }
+      })
+    },
+    handleMoveUpdate(params) {
+      api.fetch('/filesystem/rename', params).then(() => {
+        if (params.cb) {
+          params.cb()
+          this.refresh('move', params.newDest)
+          if (this.currentNode.parent.data.path !== this.rootPath) {
+            this.currentNode.parent.data.expanded = false
+          }
+          this.currentNode.parent.data.children = this.currentNode.parent.data.children.filter(it => it.path !== this.currentNode.data.path)
+          // 删除本地缓存
+          this.dispatch('Workbench:deleteDirOrFile', this.currentNode.data.path)
+        }
+        this.$Message.success(this.$t("message.scripts.move.success"))
+      }).catch(() => {
+      });
     },
     beforeChange(args, cb) {
       let path = args.node.path;
@@ -552,10 +681,10 @@ export default {
           }).then(() => {
             this.loading = false;
             this.$Message.success(this.$t('message.scripts.constants.success.delete'));
+            const parent = { ...this.currentNode.parent, data: {...this.currentNode.parent.data } }
             this.refresh('delete');
             this.currentNode.remove();
-            this.currentNode = { ...this.$refs.weFileTree.$refs.tree.root };
-            this.currentNode.data = { ...this.currentNode.data[0] };
+            this.currentNode = parent
           }).catch(() => {
             this.loading = false;
           });
@@ -644,11 +773,14 @@ export default {
         if (this.treeLoading) return this.$Message.warning(this.$t('message.scripts.constants.warning.data'));
         if (isEmpty(this.fileTree)) return this.initData();
         this.treeLoading = true;
-        // const root = this.rootPath.slice(this.rootPath.indexOf('/') + 2, this.rootPath.length - 1);
-        // 这里不能传''，后台没有传空的逻辑，如果为空时传根目录
+
         let nodePath = isEmpty(this.currentNode) ? this.rootPath : this.currentNode.data.path;
-        if (this.currentNode.isLeaf || type === 'edit' || type === 'delete') {
-          // 如果是文件、编辑或删除的时候，要请求上一级文件夹的数据
+        if (type === 'move') {
+          nodePath = path.slice(0, path.lastIndexOf('/'));
+        } else if (type === 'delete') {
+          nodePath = this.currentNode.data.parentPath || nodePath;
+        } else if (this.currentNode.isLeaf || type === 'edit') {
+          // 如果是文件、编辑的时候，要请求上一级文件夹的数据
           nodePath = this.currentNode.data.parentPath;
         } else if (type === 'new' && path) {
           nodePath = path.slice(0, path.lastIndexOf('/'));
@@ -720,6 +852,7 @@ export default {
                   this.loadHdfsDataFn = f.loadDataFn;
                   // 树结构存储到indexedDB
                   this.dispatch('IndexedDB:appendTree', { treeId: 'hdfsTree', value: this.hdfsTree });
+                  this.filterHdfsTreeData();
                   resolve({
                     hdfsTree: this.hdfsTree,
                     loadDataFn: this.loadHdfsDataFn,
@@ -730,6 +863,18 @@ export default {
           });
         });
       });
+    },
+    filterHdfsTreeData() {
+      this.hdfsTree[0].children = this.hdfsTree[0].children.filter( function (node) {
+        if (!node.isLeaf) return true;
+        const tabSuffix = node.name.substr(
+          node.name.lastIndexOf('.'),
+          node.name.length
+        );
+        const reg = ['.xlsx', '.xls', '.csv', '.txt'];
+        const isVaild = indexOf(reg, tabSuffix) !== -1;
+        return isVaild;
+      })
     },
     importToHdfs(node) {
       const name = `new_stor_${Date.now()}.out`;
@@ -941,12 +1086,18 @@ export default {
         escapeQuotes = true;
         quote = option.quote;
       }
-      const url = `/filesystem/formate?path=${option.exportPath}&encoding=${encoding}&fieldDelimiter=${fieldDelimiter}&hasHeader=${option.isHasHeader}&escapeQuotes=${escapeQuotes}&quote=${quote}`;
+      const pathSuffix = option.exportPath.substr(option.exportPath.lastIndexOf('.'), option.exportPath.length);
+      const apiName = pathSuffix === '.txt' ? 'formate' : 'getSheetInfo';
+      const url = `/filesystem/${apiName}?path=${option.exportPath}&encoding=${encoding}&fieldDelimiter=${fieldDelimiter}&hasHeader=${option.isHasHeader}&escapeQuotes=${escapeQuotes}&quote=${quote}`;
       api.fetch(url, {}, {
         method: 'get',
         timeout: '600000',
       }).then((rst) => {
-        cb(rst.formate);
+        if(pathSuffix === '.txt') {
+          cb(rst.formate);
+        } else {
+          cb(rst.sheetInfo);
+        }
       }).catch(() => {
         cb(false);
       });

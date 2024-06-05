@@ -24,7 +24,8 @@
         </slot>
       </div>
       <slot>
-        <div class="desc">{{ desc }}</div>
+        <div class="desc" :title="desc">描述：{{ desc ? desc : '--' }}</div>
+        <div class="version" v-if="title.versionVos">当前运行中版本：{{title.versionVos && title.versionVos[0] && title.versionVos[0].version ? title.versionVos[0].version : '--'}} <Tag  v-if="title.existNewerVersion" color="red">有新版本</Tag></div>
       </slot>
       <slot name="floor">
         <div class="floor">
@@ -159,16 +160,42 @@ export default {
     }
   }
   .desc {
-    text-indent: 2em;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    width: 100%;
+    // font-size: 0.65rem;
+    // margin: 8px 0;
+    // word-break: break-all; /* 单词内部也可断行 */
+    // word-wrap: break-word; /* 允许单词内部断行，并自动溢出，即换行 */
+    // text-indent: 2em;
+
+    // 最多两行 多的在第二行最后显示...
+    // white-space: nowrap;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
+    // display: -webkit-box;
+    // -webkit-line-clamp: 2;
+    // -webkit-box-orient: vertical;
+
     display: -webkit-box;
-    // margin-bottom: 10px;
-    line-height: 1.5;
-    font-size: 0.8rem;
-    height: 2.4rem;
-    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    margin-bottom: 4px;
+    margin-top: 4px;
+    height: 36px;
+    word-wrap: break-word;   /* 在需要时断开字符 */
+    word-break: break-all;  /* 在需要时断开单词 */
+  }
+  .version {
+    font-size: 0.65rem;
+    padding: 0px 0 8px 0;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    word-break: break-all; /* 单词内部也可断行 */
+    word-wrap: break-word; /* 允许单词内部断行，并自动溢出，即换行 */
   }
   .floor {
     text-align: center;
@@ -182,7 +209,7 @@ export default {
       right: 0;
       z-index: $zindex-select;
       transform: translateY(-50%);
-      /deep/.ivu-select-dropdown {
+      ::v-deep.ivu-select-dropdown {
         max-width: none;
       }
     }

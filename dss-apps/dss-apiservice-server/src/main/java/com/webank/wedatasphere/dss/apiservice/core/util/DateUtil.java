@@ -133,8 +133,7 @@ public class DateUtil {
         try {
             return df.parse(strDate);
         } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

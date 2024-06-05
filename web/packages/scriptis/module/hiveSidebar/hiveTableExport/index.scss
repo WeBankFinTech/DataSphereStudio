@@ -14,7 +14,13 @@
  * limitations under the License.
  *
  */
-
+.full-btn {
+    float: right;
+    margin-right: 30px;
+    padding-top: 5px;
+    cursor: pointer;
+    color: #2d8cf0
+};
 .we-table-export-minus {
     float: right;
     font-size: 24px;
@@ -30,7 +36,7 @@
     position: relative;
 
     .we-table-export-step {
-        margin-left: 20px;
+        // margin-left: 20px;
     }
 
     .v-step-progress {
@@ -51,7 +57,8 @@
         overflow-y: auto;
 
         .item-width {
-            width: 360px;
+            width: 96%;
+            // width: 360px;
         }
     }
 }

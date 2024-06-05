@@ -14,6 +14,7 @@
           <div class="project-nav-tree-top-t">
             <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
             <div class="project-nav-tree-top-t-icon">
+              <SvgIcon class="icon sort-icon" icon-class="xinzeng" style="display: inline-flex;margin-top: 4px;" @click="createProject" />
               <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
                 <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
                 <DropdownMenu slot="list">
@@ -44,7 +45,7 @@
               <SvgIcon
                 icon-class="dev_center_flod"
                 class="icon"
-                style="opacity: 0.65"
+                style="opacity: 0.65;margin-top: 2px;"
                 @click="handleTreeToggle"
               />
             </div>
@@ -129,7 +130,7 @@
             :query="item.query"
             @updateWorkflowList="updateWorkflowList"
             @isChange="isChange(index, arguments)"
-            @close="onTabRemove(item.tabId)"
+            @close="onTabRemove(item.tabId, false)"
             @open="reopen(item)"
             @release="(p)=>{openItemAction({...p, name: `${item.name}(${$t('message.workflow.historicalVersion')})`})}"
           ></process>
@@ -193,6 +194,7 @@
 </template>
 <script>
 import qs from 'qs';
+import { debounce } from 'lodash';
 import Workflow from '@/workflows/module/workflow';
 import WorkflowModal from '@/workflows/module/workflow/module/workflowModal.vue';
 import Process from '@/workflows/module/process';
@@ -356,6 +358,10 @@ export default {
       this.updateBread();
       this.tryOpenWorkFlow();
     });
+    // 获取该用户下可编辑的project展示tree
+    this.getAllProjects(res => {
+      this.rawUserProjects = res;
+    }, { filterProject: true })
     if (this.$route.query.projectID) {
       this.currentTreeId = +this.$route.query.projectID;
       this.openNode = {
@@ -393,7 +399,7 @@ export default {
         devProcessList: [],
         releaseUsers: [],
       };
-      this.$refs.projectForm.showProject(this.currentProjectData)
+      this.$refs.projectForm.showProject(this.currentProjectData, 'add')
     },
     handleTreeToggle() {
       this.treeFold = !this.treeFold;
@@ -478,13 +484,14 @@ export default {
         })
     },
     // 获取所有project展示tree
-    getAllProjects(callback) {
+    getAllProjects(callback, params) {
       this.loadingTree = true;
       api
         .fetch(
           `${this.$API_PATH.PROJECT_PATH}getAllProjects`,
           {
             workspaceId: +this.$route.query.workspaceId,
+            ...(params || {})
           },
           "post"
         )
@@ -521,9 +528,12 @@ export default {
           resolve(flow);
         });
     },
-    importSended(target){
+    importSended(target, orchestratorId){
       this.getFlow({id: target.id, name: target.name}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
+        this.tabList = this.tabList.filter(item => {
+          return item.query.orchestratorId !== orchestratorId
+        }) 
       })
     },
     handleTreeModal(project) {
@@ -651,9 +661,9 @@ export default {
     async onConfigProject(project) {
       if (project.id !== this.currentProjectData.id) {
         const data = await this.fetchProjectDataById(project.id)
-        this.$refs.projectForm.showProject(data)
+        this.$refs.projectForm.showProject(data, 'edit')
       } else {
-        this.$refs.projectForm.showProject(this.currentProjectData)
+        this.$refs.projectForm.showProject(this.currentProjectData, 'edit')
       }
       this.actionType = "modify";
     },
@@ -1104,7 +1114,7 @@ export default {
         this.tabList.push(this.current);
       }
     },
-    onTabRemove(tabId) {
+    onTabRemove(tabId, del) {
       let index = "";
       const removeData = this.tabList.filter((item, i) => {
         if (item.tabId === tabId) {
@@ -1129,7 +1139,7 @@ export default {
           }
         }
         this.tabList.splice(index, 1);
-        this.deleteEditLock(removeData.query.appId);
+        if (del !== false) this.deleteEditLock(removeData.query.appId);
         let workspaceId = this.$route.query.workspaceId;
         let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
         workFlowLists = workFlowLists.filter(it=>it.tabId !== tabId);
@@ -1231,7 +1241,7 @@ export default {
           e.stopPropagation()
         }}>
           <div class="tree-info">
-            <SvgIcon icon-class="more_more" />
+            <SvgIcon style="font-size:16px;margin-top: 6px;display: inline-block;" icon-class="more-more" />
           </div>
           <DropdownMenu slot="list">
             <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
@@ -1257,7 +1267,7 @@ export default {
           e.stopPropagation()
         }}>
           <div class="tree-info">
-            <SvgIcon icon-class="more_more" />
+            <SvgIcon style="font-size:16px;margin-top: 6px;display: inline-block;" icon-class="more-more" />
           </div>
           <DropdownMenu slot="list">
             {item.editable && <DropdownItem name="config_flow" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_flow', item)}}>{this.$t('message.workflow.Configuration') }</DropdownItem>}
@@ -1372,13 +1382,13 @@ export default {
           break;
         case "copy_flow":
           this.showCopyForm = true
-          this.$refs.copyForm.init(node, this.rawProjects)
+          this.$refs.copyForm.init(node, this.rawUserProjects)
           break;
       }
     },
-    resize() {
+    resize: debounce(function() {
       this.height = this.$el.clientHeight
-    },
+    }, 300),
     setVirtualRolesForProj(res) {
       if (this.modeOfKey == "streamis_prod") {
         this.projectsTree = res.projects

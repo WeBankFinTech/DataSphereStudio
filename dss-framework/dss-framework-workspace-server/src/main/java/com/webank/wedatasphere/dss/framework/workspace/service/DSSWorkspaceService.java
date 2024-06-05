@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service;
 
+import com.github.pagehelper.PageInfo;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserRoleComponentPriv;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceAssociateDepartments;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
@@ -39,7 +41,6 @@ public interface DSSWorkspaceService {
 
     int createWorkspace(String workspaceName, String tags, String userName, String description, String department, String productName,String workspaceType) throws ErrorException;
 
-    void addWorkspaceUser(List<Integer> roleIds, Workspace workspace, String userName, String creater, String userId);
 
     List<DSSWorkspace> getWorkspaces(String userName);
 
@@ -109,4 +110,5 @@ public interface DSSWorkspaceService {
 
     boolean checkAdminByWorkspace(String username, int workspaceId);
 
+    PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize);
 }

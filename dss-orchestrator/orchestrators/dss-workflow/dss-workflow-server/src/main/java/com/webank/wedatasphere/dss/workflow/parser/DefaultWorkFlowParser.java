@@ -50,6 +50,19 @@ public class DefaultWorkFlowParser implements WorkFlowParser {
     }
 
     @Override
+    public List<String> getParamConfTemplate(String workFlowJson) {
+        List<DSSNode> nodes = getWorkFlowNodes(workFlowJson);
+        return nodes.stream()
+                .filter(e ->e.getParams()!=null&& e.getParams().containsKey("configuration")
+                        &&((Map<String,Object>)e.getParams().get("configuration")).containsKey("startup"))
+                .map(e -> (Map<String,Object>) ((Map<String,Object>)e.getParams().get("configuration")).get("startup"))
+                .filter(e -> e.containsKey("ec.conf.templateId"))
+                .map(e -> (String) e.get("ec.conf.templateId"))
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<DSSNode> getWorkFlowNodes(String workFlowJson) {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();

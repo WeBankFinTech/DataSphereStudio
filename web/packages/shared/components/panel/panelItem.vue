@@ -22,6 +22,7 @@ export default {
       type: [Number, String],
     },
     index: Number,
+    disable: Boolean,
   },
   data() {
     return {

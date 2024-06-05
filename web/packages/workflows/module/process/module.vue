@@ -239,6 +239,7 @@
       </Form>
       <div slot="footer">
         <Button
+          v-if="$APP_CONF && $APP_CONF.showVersionDiff !== false"
           @click="showDiff">{{$t('message.workflow.showVersionDiff')}}</Button>
         <Button
           type="primary"
@@ -2425,7 +2426,7 @@ export default {
       }
       this.timer = setTimeout(() => {
         timeoutValue += 2000;
-        getPublishStatus(+id, this.getCurrentDsslabels()).then((res) => {
+        getPublishStatus(id, this.getCurrentDsslabels()).then((res) => {
           if (timeoutValue <= (10 * 60 * 1000)) {
             if (res.status === 'init' || res.status === 'running') {
               clearTimeout(this.timer);

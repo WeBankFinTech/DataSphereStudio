@@ -170,9 +170,7 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
                                      ApiServiceToken tokenDetail,
                                      String loginUser) {
         // 根据path查询resourceId和version
-
         // 得到metadata
-
         // 执行查询
         //path 必须唯一
         ApiServiceVo apiServiceVo = apiServiceDao.queryByPath(path);
@@ -247,10 +245,6 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
                 }
             });
 
-
-//            AssertUtil.isTrue(MapUtils.isNotEmpty((Map) collect.getKey()), "数据源不能为空");
-
-
             ApiServiceExecuteJob job = new DefaultApiServiceJob();
             //sql代码封装成scala执行
             job.setCode(ExecuteCodeHelper.packageCodeToExecute(executeCode, maxApiVersionVo.getMetadataInfo()));
@@ -276,7 +270,6 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
             apiAccessVo.setAccessTime(DateUtil.getNow());
             apiServiceAccessDao.addAccessRecord(apiAccessVo);
 
-
             JobExecuteResult jobExecuteResult = LinkisJobSubmit.execute(job,ujesClient);
 
             //记录执行任务用户和代理用户关系，没有代理用户的统一设置为登录用户
@@ -286,16 +279,12 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
             apiServiceJob.setJobExecuteResult(jobExecuteResult);
             runJobs.put(jobExecuteResult.getTaskID(),apiServiceJob);
 
-
             LinkisExecuteResult linkisExecuteResult = new LinkisExecuteResult(jobExecuteResult.getTaskID(), jobExecuteResult.getExecID());
             return linkisExecuteResult;
         } catch (IOException e) {
             throw new ApiServiceRuntimeException(e.getMessage(), e);
         }
     }
-
-
-
 
     @Override
     public ApiServiceVo queryByVersionId(String userName,Long versionId) throws ApiServiceQueryException {
@@ -331,9 +320,7 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
 
         AssertUtil.notNull(targetApiVersionVo, "目标参数版本不存在，path=" + scriptPath+",version:"+versionId);
 
-        // todo~！
         List<ParamVo> paramVoList = apiServiceParamDao.queryByVersionId(targetApiVersionVo.getId());
-
 
         List<QueryParamVo> queryParamVoList = new ArrayList<>();
 
@@ -396,15 +383,15 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
 
                     InputStream inputStream = resource.inputStream();
 
-                    try (FileSource fileSource = FileSource$.MODULE$.create(new FsPath(scriptPath), inputStream)) {
+                    try (FileSource fileSource = FileSource.create(new FsPath(scriptPath), inputStream)) {
                         //todo   数组取了第一个
-                        collect = fileSource.collect()[0];
+                        Pair<Object, List<String[]>> sourcePair = fileSource.collect()[0];
+                        collect = new Pair<>(sourcePair.getKey(), new ArrayList<>(sourcePair.getValue()));
                         bmlCache.put(key, collect);
                     }
                 }
             }
         }
-
 
         return collect;
     }
@@ -430,60 +417,6 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
 
         return collect;
     }
-
-
-
-
-//    private Tuple3 getDatasourceInfo(final Map<String, Object> datasourceMap) {
-//        Tuple3 tuple3 = datasourceCache.getIfPresent(datasourceMap);
-//
-//        if (tuple3 == null) {
-//            synchronized (this) {
-//                tuple3 = datasourceCache.getIfPresent(datasourceMap);
-//                if (tuple3 == null) {
-//                    tuple3 = JdbcUtil.getDatasourceInfo(datasourceMap);
-//                    datasourceCache.put(datasourceMap, tuple3);
-//                }
-//            }
-//        }
-//
-//        return tuple3;
-//    }
-
-//    private List<Map<String, Object>> executeJob(String executeCode,
-//                                                 Object datasourceMap, Map<String, Object> params) {
-//
-////        Tuple3 tuple3 = getDatasourceInfo((Map<String, Object>) datasourceMap);
-////        final String jdbcUrl = tuple3._1().toString();
-////        final String username = tuple3._2().toString();
-////        final String password = tuple3._3().toString();
-//
-////        NamedParameterJdbcTemplate namedParameterJdbcTemplate = datasourceService.getNamedParameterJdbcTemplate(jdbcUrl, username, password);
-//
-//        String namedSql = genNamedSql(executeCode, params);
-//
-////        return namedParameterJdbcTemplate.query(namedSql, new MapSqlParameterSource(params), new ColumnAliasMapRowMapper());
-//
-//    }
-
-    private static String genNamedSql(String executeCode, Map<String, Object> params) {
-        // 没有参数，无需生成namedSql
-        if (MapUtils.isEmpty(params)) {
-            return executeCode;
-        }
-
-        for (String paramName : params.keySet()) {
-            for (String $name : new String[]{"'${" + paramName + "}'", "${" + paramName + "}", "\"${" + paramName + "}\""}) {
-                if (executeCode.contains($name)) {
-                    executeCode = StringUtils.replace(executeCode, $name, ":" + paramName);
-                    break;
-                }
-            }
-        }
-
-        return executeCode;
-    }
-
 
     public static class ColumnAliasMapRowMapper implements RowMapper<Map<String, Object>> {
         @Override
@@ -526,8 +459,7 @@ public class ApiServiceQueryServiceImpl implements ApiServiceQueryService {
 
     @Override
     public ApiServiceJob getJobByTaskId(String taskId){
-        ApiServiceJob apiServiceJob=runJobs.get(taskId);
-        return apiServiceJob;
+        return runJobs.get(taskId);
     }
 
 

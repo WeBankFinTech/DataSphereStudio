@@ -745,7 +745,7 @@ export default {
                 // 如果是导出成功需要下载文件
                 if (type === 'export' && res.info.msg) {
                   const url =
-                    `http://${window.location.host}/api/rest_j/v1/` +
+                    `${location.protocol}//${window.location.host}/api/rest_j/v1/` +
                     'dss/downloadFile/' +
                     res.info.msg
                   const link = document.createElement('a')

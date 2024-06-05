@@ -161,7 +161,7 @@ status()
 }
 
 function setServerName(){
-	elif [[ $PROJECT_NAME == *"dss-server"* ]]; then
+	if [[ $PROJECT_NAME == *"dss-server"* ]]; then
 		SERVER_NAME=dss-server
 	elif [[ $PROJECT_NAME == *"apps"* ]]; then
 		SERVER_NAME=dss-apps-server

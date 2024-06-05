@@ -28,26 +28,12 @@ import java.util.Properties;
 public class DataChecker {
     public final static String SOURCE_TYPE = "source.type";
     public final static String DATA_OBJECT = "check.object";
-    /**
-     * 检查对象在节点中的序号
-     */
-    public final static String DATA_OBJECT_NUM = "check.sn.object.num";
     public final static String WAIT_TIME = "max.check.hours";
     public final static String QUERY_FREQUENCY = "query.frequency";
     public final static String TIME_SCAPE = "time.scape";
     public final static String MASK_URL = "bdp.mask.url";
     public final static String MASK_APP_ID = "bdp.mask.app.id";
     public final static String MASK_APP_TOKEN = "bdp.mask.app.token";
-    public final static String CONTEXTID_USER = "contextId.user";
-    public final static String CONTEXTID_PROJECT_NAME = "contextId.projectName";
-    public final static String CONTEXTID_FLOW_NAME = "contextId.flowName";
-    public final static String NAME_NAME = "nodeName";
-
-    public final static String QUALITIS_CHECK = "qualitis.check";
-    public final static String QUALITIS_SWITCH = "job.eventchecker.qualitis.switch";
-    public final static String QUALITIS_CHECK_DEFAULT = "qualitis.check.default";
-
-
 
     private Properties p;
     private static final Logger logger = LoggerFactory.getLogger(DataChecker.class);;
@@ -80,23 +66,23 @@ public class DataChecker {
             }
         }catch (Exception ex){
             dataCheckerAction.setState(RefExecutionState.Failed);
-            throw ex;
+            throw new  RuntimeException("get DataChecker result failed", ex);
         }
 
     }
 
-    public void begineCheck(DataCheckerExecutionAction action){
+    public void begineCheck(RefExecutionAction action){
         boolean success=false;
         try {
             success= wbDao.validateTableStatusFunction(p, logger,action);
         }catch (Exception ex){
             dataCheckerAction.setState(RefExecutionState.Failed);
             logger.error("datacheck error",ex);
-            throw  ex;
+            throw new  RuntimeException("get DataChecker result failed", ex);
         }
         if(success) {
             dataCheckerAction.setState(RefExecutionState.Success);
-        } else if (dataCheckerAction.getState() != RefExecutionState.Failed) {
+        }else {
             dataCheckerAction.setState(RefExecutionState.Running);
         }
     }

@@ -9,7 +9,7 @@ VALUES ('dolphinscheduler', 0, 1, 1, 1, NULL, 'com.webank.wedatasphere.dss.appco
 select @dolphinscheduler_appconnId:=id from `dss_appconn` where `appconn_name` = 'dolphinscheduler';
 
 insert into `dss_appconn_instance` (`appconn_id`, `label`, `url`, `enhance_json`, `homepage_uri`)
-values(@dolphinscheduler_appconnId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','','dolphinscheduler');
+values(@dolphinscheduler_appconnId,'DEV','http://APPCONN_INSTALL_IP:APPCONN_INSTALL_PORT/','{"reqUri":"dolphinscheduler/projects/analysis/define-user-count"}','dolphinscheduler');
 
 -- 看appconn组件是要归属于哪个菜单
 select @dolphinscheduler_menuId:=id from dss_workspace_menu where name = "生产运维";
@@ -20,6 +20,7 @@ VALUES(@dolphinscheduler_appconnId, @dolphinscheduler_menuId,'dolphinscheduler',
 
 delete from dss_workspace_dictionary where dic_key = "pom_work_flow_ds";
 delete from dss_workspace_dictionary where dic_key = "pom_work_flow_ds_DAG";
+delete from dss_workspace_dictionary where dic_key = "pdp_scheduler_center";
 insert  into `dss_workspace_dictionary`(`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (0,'p_orchestrator_mode','DS工作流','Workflow_DS','pom_work_flow_ds','radio',NULL,NULL,NULL,NULL,0,'gongzuoliu-icon',1,'工程编排模式-DS工作流','SYSTEM','2022-03-21 14:25:35',NULL,'2022-03-21 14:25:35');
 insert  into `dss_workspace_dictionary`(`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (0,'pom_work_flow_ds','DAG','DAG','pom_work_flow_ds_DAG',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-DS工作流-DAG','SYSTEM','2022-03-21 14:25:35',NULL,'2022-03-21 14:25:35');
 

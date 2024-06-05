@@ -17,10 +17,9 @@
 package com.webank.wedatasphere.dss.appconn.datachecker
 
 
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils
-
 import java.util
 import java.util.{Properties, UUID}
+
 import com.webank.wedatasphere.dss.standard.app.development.listener.common._
 import com.webank.wedatasphere.dss.standard.app.development.listener.core.{Killable, LongTermRefExecutionOperation, Procedure}
 import com.webank.wedatasphere.dss.standard.app.development.listener.ref.ExecutionResponseRef.ExecutionResponseRefBuilder
@@ -43,22 +42,11 @@ class DataCheckerRefExecutionOperation
     val nodeAction = new DataCheckerExecutionAction()
     nodeAction.setId(UUID.randomUUID().toString)
     import scala.collection.JavaConversions.mapAsScalaMap
-    // appconn里的配置
     val InstanceConfig = this.service.getAppInstance.getConfig
-    // 节点上的配置
     val runTimeParams = requestRef.getExecutionRequestRefContext.getRuntimeMap
-    // 自定义变量
     val variableParams: mutable.Map[String, Object]= requestRef.getRefJobContent.get("variable"). asInstanceOf[java.util.Map[String,Object]]
     val inputParams = runTimeParams ++ variableParams
     val properties = new Properties()
-    // 解析contextId数据
-    val contextID = DSSCommonUtils.COMMON_GSON.fromJson(runTimeParams.get("contextID").toString, classOf[util.Map[String, String]])
-    // 去掉左右两侧花括号 以及字符的引号
-    val value = contextID.get("value").drop(1).dropRight(1).replaceAll("\"", "")
-    val info = value.split(",").map(_.split(":")).map(arr => (arr(0), arr(1))).toMap
-    properties.put(DataChecker.CONTEXTID_USER, info("user"))
-    properties.put(DataChecker.CONTEXTID_PROJECT_NAME, info("project"))
-    properties.put(DataChecker.CONTEXTID_FLOW_NAME, info("flow"))
     InstanceConfig.foreach {
       case (key: String, value: Object) =>
         //避免密码被打印
@@ -104,7 +92,6 @@ class DataCheckerRefExecutionOperation
         }
       }
     }
-    logger.info("datachecker properties :{}", properties)
     Utils.tryCatch({
       val dc = new DataChecker(properties, nodeAction)
       dc.run()

@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.NoticeContent;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorkspaceRequest;
@@ -31,6 +32,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverv
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
+import com.webank.wedatasphere.dss.framework.workspace.service.NoticeService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceUtils;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -71,6 +73,9 @@ public class DSSWorkspaceRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private HttpServletResponse httpServletResponse;
+
+    @Autowired
+    private NoticeService noticeService;
 
     @RequestMapping(path = "createWorkspace", method = RequestMethod.POST)
     public Message createWorkspace(@RequestBody CreateWorkspaceRequest createWorkspaceRequest) throws ErrorException {
@@ -346,6 +351,11 @@ public class DSSWorkspaceRestful {
         return Message.ok().data("favoriteId", favoriteId);
     }
 
+    @GetMapping("getNotice")
+    public Message getNotice(){
+        List<NoticeContent> noticeContent= noticeService.getNoticeContent();
+        return Message.ok("公告获取成功").data("notices", noticeContent);
+    }
 
 }
 

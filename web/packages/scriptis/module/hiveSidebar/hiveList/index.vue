@@ -264,7 +264,7 @@ export default {
     toggleShow(e) {
       const item = e.target.innerText
       const overDb = e.target.className.indexOf('fi-hivedb') > -1
-      if ( overDb && !this.dbnameDesc[item] ) {
+      if ( overDb && !this.dbnameDesc[item] && this.$APP_CONF && !this.$APP_CONF.hide_view_db_detail) {
         // mouseover 在数据库项上且未获取描述信息
         clearTimeout(this.fetchDbInfo)
         this.fetchDbInfo = setTimeout(() => {

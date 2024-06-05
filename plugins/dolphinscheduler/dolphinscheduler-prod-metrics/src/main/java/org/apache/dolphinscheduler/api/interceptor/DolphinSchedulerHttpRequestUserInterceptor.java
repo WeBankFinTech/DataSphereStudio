@@ -46,7 +46,8 @@ public class DolphinSchedulerHttpRequestUserInterceptor implements HttpRequestUs
         }
         String sessionId = sessionService.createSession(userObj, BaseController.getClientIpAddress(req));
         Cookie cookie = new Cookie(Constants.SESSION_ID, sessionId);
-        cookie.setHttpOnly(true);
+//        cookie.setHttpOnly(true);
+        cookie.setPath("/");
         logger.info("added a new session.id {} for DSS user {}.", sessionId, user);
         return new HttpServletRequestWrapper(req) {
             @Override

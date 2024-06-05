@@ -162,6 +162,7 @@ export default {
         flag = true;
       } else {
         flag = false;
+
       }
       console.warn(row)
       this.$set(this.tip, row.name, flag)
@@ -217,6 +218,7 @@ export default {
                   return;
                 }
               }
+
               this.executAction();
             } else {
               console.log(this.showConditionList)

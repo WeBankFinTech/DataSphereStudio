@@ -63,17 +63,19 @@ public class DefaultOrchestratorLoader implements OrchestratorLoader {
         appConnList.stream().filter(relation.isLinkedAppConn()).forEach(dssOrchestrator::addLinkedAppConn);
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn(relation.getBindingAppConnName());
         dssOrchestrator.setAppConn(appConn);
-        List<SchedulerAppConn> schedulerAppConns = AppConnManager.getAppConnManager().listAppConns(SchedulerAppConn.class);
-        SchedulerAppConn schedulerAppConn;
-        if(StringUtils.isBlank(relation.getBindingSchedulerAppConnName())) {
-            schedulerAppConn = schedulerAppConns.get(0);
-        } else {
-            schedulerAppConn = schedulerAppConns.stream().filter(appConn1 -> appConn1.getAppDesc().getAppName().equals(relation.getBindingSchedulerAppConnName()))
-                    .findAny().orElseThrow(() -> new ExternalOperationFailedException(50032, "cannot find the matched SchedulerAppConn with name " + relation.getBindingSchedulerAppConnName()));
+        if (appConnList.stream().anyMatch(t -> t instanceof SchedulerAppConn)) {
+            List<SchedulerAppConn> schedulerAppConns = AppConnManager.getAppConnManager().listAppConns(SchedulerAppConn.class);
+            SchedulerAppConn schedulerAppConn;
+            if (StringUtils.isBlank(relation.getBindingSchedulerAppConnName())) {
+                schedulerAppConn = schedulerAppConns.get(0);
+            } else {
+                schedulerAppConn = schedulerAppConns.stream().filter(appConn1 -> appConn1.getAppDesc().getAppName().equals(relation.getBindingSchedulerAppConnName()))
+                        .findAny().orElseThrow(() -> new ExternalOperationFailedException(50032, "cannot find the matched SchedulerAppConn with name " + relation.getBindingSchedulerAppConnName()));
+            }
+            dssOrchestrator.setSchedulerAppConn(schedulerAppConn);
+            LOGGER.info("Load dss orchestrator: {}, with the binding AppConn: {} and binding SchedulerAppConn {}.",
+                    typeName, relation.getBindingAppConnName(), schedulerAppConn.getAppDesc().getAppName());
         }
-        dssOrchestrator.setSchedulerAppConn(schedulerAppConn);
-        LOGGER.info("Load dss orchestrator: {}, with the binding AppConn: {} and binding SchedulerAppConn {}.",
-                typeName, relation.getBindingAppConnName(), schedulerAppConn.getAppDesc().getAppName());
         dssLabels.forEach(dssOrchestrator::addLinkedDssLabels);
         return dssOrchestrator;
     }

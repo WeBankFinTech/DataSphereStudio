@@ -51,6 +51,6 @@ jobs:
       - name: Build frontend by node.js
         run: |
           cd web
-          npm install lerna -g
+          npm install lerna@4.0.0 -g
           lerna bootstrap
           npm run build

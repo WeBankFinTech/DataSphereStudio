@@ -450,7 +450,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                     orchestratorPluginService.submitWorkflowToBML(submitRequest, userName, workspace);
                 } else {
                     GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), "system");
-                    RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
+                    GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
+                    lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), dssOrchestratorVersion.getAppId());
                 }
                 lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
             } catch (Exception e) {

@@ -491,7 +491,7 @@ public class ApiServiceImpl implements ApiService {
             List<Variable> variableList=null;
            if(metadata.entrySet().size() >0) {
                Variable[] v = VariableParser.getVariables(metadata);
-               variableList = Arrays.stream(v).filter(var -> !StringUtils.isEmpty(var.value())).collect(Collectors.toList());
+               variableList = Arrays.stream(v).filter(var -> !StringUtils.isEmpty(var.getValue())).collect(Collectors.toList());
 
            }
            if(variableList!=null) {
@@ -520,7 +520,7 @@ public class ApiServiceImpl implements ApiService {
         try {
             ScriptFsWriter writer = StorageScriptFsWriter.getScriptFsWriter(new FsPath(scriptPath), Consts.UTF_8.toString(), null);
             Variable[] v = VariableParser.getVariables(metadata);
-            List<Variable> variableList = Arrays.stream(v).filter(var -> !StringUtils.isEmpty(var.value())).collect(Collectors.toList());
+            List<Variable> variableList = Arrays.stream(v).filter(var -> !StringUtils.isEmpty(var.getValue())).collect(Collectors.toList());
             writer.addMetaData(new ScriptMetaData(variableList.toArray(new Variable[0])));
             writer.addRecord(new ScriptRecord(scriptContent));
             InputStream inputStream = writer.getInputStream();

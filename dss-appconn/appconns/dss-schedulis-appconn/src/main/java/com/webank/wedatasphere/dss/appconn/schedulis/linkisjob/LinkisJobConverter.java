@@ -70,6 +70,7 @@ public class LinkisJobConverter implements NodeConverter {
         map.put(WorkflowConstant.PROXY_USER,job.getProxyUser());
         map.put(AzkabanConstant.JOB_COMMAND,job.getCommand());
         map.put(AzkabanConstant.JOB_COMMENT,job.getComment());
+        map.put(AzkabanConstant.AUTO_DISABLED,job.getAutoDisabled());
         Map<String, Object> labels = new HashMap<>(1);
         labels.put("route", SchedulerConf.JOB_LABEL.getValue());
         map.put(AzkabanConstant.JOB_LABELS, DSSCommonUtils.COMMON_GSON.toJson(labels));
@@ -114,7 +115,8 @@ public class LinkisJobConverter implements NodeConverter {
             configuration.forEach((k,v)-> {
                 if(null!=v) {
                     v.forEach((k2, v2) -> {
-                        if(null !=v2) {job.getConf().put(confprefix + k + "." + k2, v2.toString());}
+                        if(AzkabanConstant.AUTO_DISABLED.equals(k2) && null !=v2){job.setAutoDisabled(v2.toString());}
+                        else if(null !=v2) {job.getConf().put(confprefix + k + "." + k2, v2.toString());}
                     });
                 }
             });

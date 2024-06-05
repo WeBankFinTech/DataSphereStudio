@@ -1,7 +1,7 @@
 <template>
   <div class="layout-body" :class="{'hide-header': ismicroModule}">
     <layout-header
-      v-if="!ismicroModule"
+      v-if="!ismicroModule && !$route.query.noHeader"
       @clear-session="clearSession"/>
     <router-view/>
     <layout-footer/>

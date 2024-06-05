@@ -30,6 +30,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestImportWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseImportWorkflow;
 import org.apache.linkis.rpc.Sender;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -52,14 +53,16 @@ public class WorkflowRefImportOperation
         ResponseImportWorkflow responseImportWorkflow = RpcAskUtils.processAskException(sender.ask(requestImportWorkflow),
                 ResponseImportWorkflow.class, RequestImportWorkflow.class);
         if(responseImportWorkflow.getStatus() == JobStatus.Success) {
-            if(MapUtils.isEmpty(responseImportWorkflow.getWorkflows())) {
+            if(CollectionUtils.isEmpty(responseImportWorkflow.getWorkflows())) {
                 return RefJobContentResponseRef.newBuilder()
                         .error("Empty workflow returned from workflow server, please ask admin for help!");
             }
             Map<String, Object> refMap = new HashMap<>(2);
-            responseImportWorkflow.getWorkflows().forEach((key, value) -> {
-                refMap.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, key);
-                refMap.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, value);
+            responseImportWorkflow.getWorkflows().forEach(flow -> {
+                refMap.put(OrchestratorRefConstant.ORCHESTRATION_ID_KEY, flow.getId());
+                refMap.put(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY, flow.getFlowJson());
+                refMap.put(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY, flow.getFlowIdParamConfTemplateIdTuples());
+
             });
             return RefJobContentResponseRef.newBuilder().setRefJobContent(refMap).success();
         } else {

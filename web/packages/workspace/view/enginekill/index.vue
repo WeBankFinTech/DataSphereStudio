@@ -16,25 +16,43 @@
         <Input v-model="searchBar.name" @on-enter="doQuery" />
       </FormItem>
       <FormItem
+        prop="crossCluster"
+        :label="$t('message.enginelist.crossCluster')"
+        :label-width="120"
+      >
+        <Select
+          style="width:150px"
+          v-model="searchBar.crossCluster"
+          :placeholder="$t('message.enginelist.ruleform.plsselect')"
+          clearable
+          @on-change="handleCrossCluster($event, 'search')"
+        >
+          <Option :label="$t('message.enginelist.yes')" value="true" />
+          <Option :label="$t('message.enginelist.no')" value="false" />
+        </Select>
+      </FormItem>
+      <FormItem
         prop="yarnQueue"
         :label="$t('message.enginelist.queue')"
         :label-width="50"
       >
-        <Select
-          style="width:150px"
-          v-model="searchBar.yarnQueue"
-          filterable
-          clearable
-          @on-change="doQuery"
-        >
-          <Option
-            v-for="(item) in queues"
-            :label="item"
-            :title="item"
-            :value="item"
-            :key="item"
-          />
-        </Select>
+        <div @click="handleQueueFocus(searchBar.crossCluster)">
+          <Select
+            style="width:150px"
+            v-model="searchBar.yarnQueue"
+            filterable
+            clearable
+            @on-change="doQuery"
+          >
+            <Option
+              v-for="(item) in searchQueues"
+              :label="item"
+              :title="item"
+              :value="item"
+              :key="item"
+            />
+          </Select>
+        </div>
       </FormItem>
       <FormItem
         prop="status"
@@ -99,6 +117,9 @@
         <div class="row-item">
           {{ $t('message.enginelist.ruleform.queue')}}：{{ item.queue }}
         </div>
+        <div class="row-item">
+          {{ $t('message.enginelist.crossCluster')}}：{{ item.crossCluster ? $t('message.enginelist.yes') : $t('message.enginelist.no') }}
+        </div>
         <div>
           <div class="row-item inline-block">
             {{ $t('message.enginelist.ruleform.trigger')}}：{{ formatConditions(item.triggerConditionConf.conditions) }}
@@ -150,14 +171,14 @@
     />
     <Modal
       v-model="showModal"
-      :width="600"
+      :width="640"
       :title="isEdit ? $t('message.enginelist.ruleform.edittitle') : $t('message.enginelist.ruleform.addtitle')"
     >
       <Form
         ref="ruleForm"
-        label-position="left"
+        label-position="right"
         class="engine_kill_rule_form"
-        :label-width="80"
+        :label-width="120"
         :model="formData"
         :rules="formValid"
       >
@@ -180,24 +201,41 @@
           />
         </FormItem>
         <FormItem
+          :label="$t('message.enginelist.crossCluster')"
+          prop="crossCluster"
+        >
+          <Select
+            v-model="formData.crossCluster"
+            style="width:150px"
+            :disabled="isEdit"
+            :placeholder="$t('message.enginelist.ruleform.plsselect')"
+            @on-change="handleCrossCluster"
+          >
+            <Option :label="$t('message.enginelist.yes')" value="true" />
+            <Option :label="$t('message.enginelist.no')" value="false" />
+          </Select>
+        </FormItem>
+        <FormItem
           :label="$t('message.enginelist.ruleform.queue')"
           prop="queue"
         >
-          <Select
-            v-model="formData.queue"
-            style="width:150px"
-            filterable
-            :disabled="isEdit"
-            :placeholder="$t('message.enginelist.ruleform.selectqueue')"
-          >
-            <Option
-              v-for="(item) in queues"
-              :label="item"
-              :value="item"
-              :title="item"
-              :key="item"
-            />
-          </Select>
+          <div @click="handleQueueFocus(formData.crossCluster)">
+            <Select
+              v-model="formData.queue"
+              style="width:150px"
+              filterable
+              :disabled="isEdit"
+              :placeholder="$t('message.enginelist.ruleform.selectqueue')"
+            >
+              <Option
+                v-for="(item) in queues"
+                :label="item"
+                :value="item"
+                :title="item"
+                :key="item"
+              />
+            </Select>
+          </div>
         </FormItem>
         <!-- 触发条件 -->
         <FormItem
@@ -380,7 +418,8 @@ export default {
       searchBar: {
         status: '',
         name: '',
-        yarnQueue: ''
+        yarnQueue: '',
+        crossCluster: ''
       },
       showModal: false,
       list: [],
@@ -388,6 +427,7 @@ export default {
         strategyId: '',
         name: '',
         description: '',
+        crossCluster: '',
         triggerConditionConf: {
           relation: "or",
           conditions: [{
@@ -421,6 +461,7 @@ export default {
         }
       },
       queues: [],
+      searchQueues: [],
       levels: ['MINOR', 'WARNING'],
       durations: [
         { value: '1', label: "1min" },
@@ -508,6 +549,13 @@ export default {
         description: [
           { message: `${this.$t("message.enginelist.ruleform.rulelength")}128`, max: 128 },
         ],
+        crossCluster: [
+          {
+            required: true,
+            message: this.$t("message.enginelist.ruleform.plsselectCross"),
+            trigger: "change",
+          },
+        ],
         queue: [
           {
             required: true,
@@ -570,7 +618,6 @@ export default {
   filters,
   mounted() {
     this.doQuery()
-    this.getQueueList()
   },
   methods: {
     doQuery() {
@@ -585,6 +632,9 @@ export default {
           if (this.searchBar.status) {
             resItem = item.status == this.searchBar.status
           }
+          if (this.searchBar.crossCluster) {
+            resItem = resItem && this.searchBar.crossCluster === String(!!item.crossCluster);
+          }
           if (this.searchBar.yarnQueue && this.searchBar.yarnQueue.trim()) {
             resItem = resItem && this.searchBar.yarnQueue.trim() === item.queue
           }
@@ -595,22 +645,45 @@ export default {
         })
       })
     },
-    getQueueList() {
+    handleCrossCluster(crossCluster, type, queue) {
+      if (type === 'search') {
+        this.searchBar.yarnQueue = '';
+        this.searchQueues = [];
+        this.doQuery();
+      } else {
+        this.formData.queue = '';
+        this.queues = [];
+      }
+      if (!crossCluster) return;
       const params = {
         workspaceId: this.$route.query.workspaceId,
+        crossCluster
       }
       api.fetch(`${this.$API_PATH.WORKSPACE_PATH}getQueueList`, params, 'get').then((res) => {
-        this.queues = res.queueList || []
+        if(type === 'search') {
+          this.searchQueues = res.queueList || [];
+        } else {
+          this.queues = res.queueList || [];
+          if (queue && !this.queues.includes(queue)) {
+            this.queues.push(queue)
+          }
+        }
       })
+    },
+    handleQueueFocus(val) {
+      if (!val) {
+        this.$Message.warning(this.$t("message.enginelist.ruleform.plsselectCross"));
+      }
     },
     add() {
       this.isEdit = false
       this.getUserList()
-      this.getQueueList()
+      this.queues = []
       this.formData = {
         strategyId: '',
         name: '',
         description: '',
+        crossCluster: '',
         triggerConditionConf: {
           relation: "or",
           conditions: [{
@@ -659,6 +732,7 @@ export default {
         strategyId: this.formData.strategyId,
         name: this.formData.name,
         description: this.formData.description,
+        crossCluster: this.formData.crossCluster === 'true' ? true : false,
         triggerConditionConf: {
           relation: this.formData.triggerConditionConf.relation,
           conditions: [...this.formData.triggerConditionConf.conditions]
@@ -733,16 +807,19 @@ export default {
     },
     edit(item) {
       item = JSON.parse(JSON.stringify(item))
+      item.crossCluster = String(!!item.crossCluster);
       this.getUserList()
+      this.handleCrossCluster(item.crossCluster, 'edit', item.queue);
       if (item.status) {
         return this.$Message.warning(this.$t("message.enginelist.disableReq"))
       }
       this.isEdit = true;
-      this.ruleItemValid = ''
+      this.ruleItemValid = '';
       const data = {
         strategyId: item.strategyId,
         name: item.name,
         description: item.description,
+        crossCluster: item.crossCluster,
         triggerConditionConf: {
           relation: item.triggerConditionConf.relation,
           conditions: [...item.triggerConditionConf.conditions]
@@ -916,7 +993,7 @@ export default {
   margin-top: 20px;
 }
 .condition-row {
-  margin-left: 80px;
+  margin-left: 110px;
   @include bg-color(#eee, #000a17);
   padding: 20px;
   margin-bottom: 10px;

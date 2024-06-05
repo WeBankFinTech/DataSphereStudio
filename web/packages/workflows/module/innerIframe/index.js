@@ -11,7 +11,7 @@ export default {
   // 规范模块的动作，由外部调用或者自己执行
   methods: {},
   data: {
-    API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `http://${window.location.host}/api/rest_j/v1/`,
+    API_PATH: process.env.VUE_APP_MN_CONFIG_PREFIX || `${location.protocol}//${window.location.host}/api/rest_j/v1/`,
   },
   component: () => import('./index.vue'),
 };

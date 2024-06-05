@@ -35,6 +35,6 @@ public class DolphinSchedulerTokenRestfulApi {
                 .getOptionalService(appInstance).getOptionalOperation("getToken");
         ResponseRef responseRef = optionalOperation.apply(new StructureRequestRefImpl().setUserName(userName));
         return Message.ok().data("token", responseRef.getValue("token"))
-                .data("expire_time", Long.valueOf(responseRef.getValue("expireTime").toString()));
+                .data("expire_time", responseRef.getValue("expireTime"));
     }
 }

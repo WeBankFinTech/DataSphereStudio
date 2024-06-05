@@ -985,17 +985,20 @@ export default {
         });
         // 只有hive或者spark引擎类型才会调用代码关联审查 置于末尾，不影响其余事件
         if ((this.script.application === 'spark' && this.script.runType === 'sql') || (this.script.application === 'hive' && this.script.runType === 'hql')) {
-          var formData = new FormData();
           const variable = isEmpty(this.script.params.variable) ? {} : util.convertArrayToObject(this.script.params.variable);
           let params = {
             'variable': variable,
             'configuration': {}
           };
-          formData.append('params', JSON.stringify(params));
-          formData.append('code', this.script.executionCode);
-          formData.append('engineType', this.script.application);
-          formData.append('type', 'union');
-          const codePrecheckRes = await api.fetch('/validator/code-precheck',formData,'post');
+          const codePrecheckRes = await api.fetch('/validator/code-precheck', {
+            params: JSON.stringify(params),
+            code: this.script.executionCode,
+            engineType: this.script.application,
+            type: 'union'
+          }, {
+            method: 'post',
+            useFormQuery: true,
+          });
           // 如果拿到代码审查结果时，代码已运行完成，则不进行操作
           if (this.$refs.progressTab && (!this.script.progress || !this.script.progress.costTime)) {
             this.script.codePrecheckRes = codePrecheckRes;
@@ -1253,6 +1256,7 @@ export default {
         const url = '/filesystem/openFile';
         api.fetch(url, {
           path: resultPath,
+          enableLimit: true,
           pageSize,
         }, 'get')
           .then((ret) => {
@@ -1267,14 +1271,18 @@ export default {
                 hugeData: true,
                 tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
               };
-            } else if (ret.metadata && ret.metadata.length >= 500) {
+            } else if (ret.column_limit_display) {
               result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+                'headRows': ret.metadata,
+                'bodyRows': ret.fileContent,
+                // 如果totalLine是null，就显示为0
+                'total': ret.totalLine ? ret.totalLine : 0,
+                // 如果内容为null,就显示暂无数据
+                'type': ret.fileContent ? ret.type : 0,
                 'path': resultPath,
-                hugeData: true
+                'current': 1,
+                'size': 20,
               };
             } else {
               result = {
@@ -1419,6 +1427,7 @@ export default {
           api.fetch(url2, {
             path: currentResultPath,
             page: 1,
+            enableLimit: true,
             pageSize: 5000,
           }, 'get').then((ret) => {
             let tmpResult
@@ -1432,14 +1441,14 @@ export default {
                 hugeData: true,
                 tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
               };
-            } else if (ret.metadata && ret.metadata.length >= 500) {
+            } else if (ret.column_limit_display) {
               tmpResult = {
-                'headRows': [],
-                'bodyRows': [],
+                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+                'headRows': ret.metadata,
+                'bodyRows': ret.fileContent,
                 'total': ret.totalLine,
                 'type': ret.type,
                 'path': currentResultPath,
-                hugeData: true
               };
             } else {
               tmpResult = {

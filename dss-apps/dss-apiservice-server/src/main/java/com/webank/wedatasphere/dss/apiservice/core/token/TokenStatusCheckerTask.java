@@ -38,7 +38,7 @@ public class TokenStatusCheckerTask {
     @Autowired
     ApiServiceTokenManagerDao atmd;
 
-    @Scheduled(cron = "0 0/5 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void doTokenStatusCheckTask() {
         // 查询启用状态的token
         List<TokenManagerVo> tokenManagerVos = atmd.queryTokenByStatus(1);

@@ -533,12 +533,14 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         File repoDir = new File(gitPath);
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
             // 同步删除对应节点 eg: /data/GitInstall/224/testGit/flowGitOld -> /data/GitInstall/224/testGit/flowGitNew
-            String projectPath = generateProjectPath(request.getWorkspaceId(), request.getProjectName());
-            String olfFilePath = projectPath + File.separator + FileUtils.normalizePath(request.getOldName());
-            String filePath = projectPath + File.separator + FileUtils.normalizePath(request.getName());
+            String projectPath = generateProjectPath(request.getWorkspaceId(), request.getProjectName()) + File.separator;
+            String olfFilePath = projectPath + FileUtils.normalizePath(request.getOldName());
+            String filePath = projectPath + FileUtils.normalizePath(request.getName());
             // 同步删除对应节点 eg: /data/GitInstall/224/testGit/.metaConf/flowGitOld -> /data/GitInstall/224/testGit/.metaConf/flowGitNew
-            String oldFileMetaPath = projectPath + File.separator + FileUtils.normalizePath(GitConstant.GIT_SERVER_META_PATH) + File.separator + FileUtils.normalizePath(request.getOldName());
-            String fileMetaPath = projectPath + File.separator + FileUtils.normalizePath(GitConstant.GIT_SERVER_META_PATH) + File.separator + FileUtils.normalizePath(request.getName());
+            String metaPath = FileUtils.normalizePath(GitConstant.GIT_SERVER_META_PATH) + File.separator + FileUtils.normalizePath(request.getOldName());
+            String oldFileMetaPath = projectPath  + metaPath;
+            String oldMetaPath = FileUtils.normalizePath(GitConstant.GIT_SERVER_META_PATH) + File.separator + FileUtils.normalizePath(request.getName());
+            String fileMetaPath = projectPath + oldMetaPath;
             List<String> fileList = new ArrayList<>();
             fileList.add(oldFileMetaPath);
             fileList.add(olfFilePath);
@@ -551,11 +553,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             List<String> paths = new ArrayList<>();
-            paths.add(olfFilePath);
-            paths.add(oldFileMetaPath);
+            paths.add(FileUtils.normalizePath(request.getOldName()));
+            paths.add(FileUtils.normalizePath(request.getName()));
 
-            paths.add(filePath);
-            paths.add(fileMetaPath);
+            paths.add(metaPath);
+            paths.add(oldMetaPath);
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);

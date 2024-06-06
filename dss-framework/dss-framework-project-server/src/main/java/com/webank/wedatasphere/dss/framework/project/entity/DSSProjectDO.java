@@ -16,10 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -108,6 +105,8 @@ public class DSSProjectDO implements Serializable {
      * 1-接入git 0-不接入（默认）
      */
     private Boolean associateGit;
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String dataSourceListJson;
 
     public Long getId() {
         return id;
@@ -323,6 +322,14 @@ public class DSSProjectDO implements Serializable {
 
     public void setVisible(Integer visible) {
         this.visible = visible;
+    }
+
+    public String getDataSourceListJson() {
+        return dataSourceListJson;
+    }
+
+    public void setDataSourceListJson(String dataSourceListJson) {
+        this.dataSourceListJson = dataSourceListJson;
     }
 
     @Override

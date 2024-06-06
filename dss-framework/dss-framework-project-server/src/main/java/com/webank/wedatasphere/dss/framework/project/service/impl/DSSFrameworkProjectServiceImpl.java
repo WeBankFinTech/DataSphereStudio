@@ -40,10 +40,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectContentRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectPrivilege;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.*;
 import com.webank.wedatasphere.dss.standard.app.structure.utils.StructureOperationUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -265,6 +262,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             addedPrivilege = getPrivilege.apply(true);
             removedPrivilege = getPrivilege.apply(false);
         }
+        List<DSSProjectDataSource> dataSourceList = projectModifyRequest.getDataSourceList();
         Map<AppInstance, Long> appInstanceToRefProjectId = new HashMap<>(10);
         tryProjectOperation((appConn, appInstance) -> {
                 Long refProjectId = dssProjectService.getAppConnProjectId(appInstance.getId(), dbProject.getId());
@@ -277,7 +275,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     return true;
                 }
             }, workspace, projectService -> projectService.getProjectUpdateOperation(),
-            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setUserName(dbProject.getUpdateBy()).setWorkspace(workspace),
+            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setDSSProjectDataSources(dataSourceList).setUserName(dbProject.getUpdateBy()).setWorkspace(workspace),
             (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setRefProjectId(appInstanceToRefProjectId.get(appInstance)),
             (structureOperation, structureRequestRef) -> {
                 ProjectUpdateRequestRef projectUpdateRequestRef = (ProjectUpdateRequestRef) structureRequestRef;
@@ -317,10 +315,11 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         DSSProjectPrivilege privilege = DSSProjectPrivilege.newBuilder().setAccessUsers(dssProjectCreateRequest.getAccessUsers())
                 .setEditUsers(dssProjectCreateRequest.getEditUsers())
                 .setReleaseUsers(dssProjectCreateRequest.getReleaseUsers()).build();
+        List<DSSProjectDataSource> dataSourceList = dssProjectCreateRequest.getDataSourceList();
         try {
             tryProjectOperation(null, workspace, ProjectService::getProjectCreationOperation,
                     dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject)
-                            .setDSSProjectPrivilege(privilege).setUserName(username), null,
+                            .setDSSProjectPrivilege(privilege).setDSSProjectDataSources(dataSourceList).setUserName(username), null,
                     (structureOperation, structureRequestRef) -> ((ProjectCreationOperation) structureOperation).createProject((DSSProjectContentRequestRef) structureRequestRef),
                     (pair, projectResponseRef) -> {
                         projectMap.put(pair.right, projectResponseRef.getRefProjectId());

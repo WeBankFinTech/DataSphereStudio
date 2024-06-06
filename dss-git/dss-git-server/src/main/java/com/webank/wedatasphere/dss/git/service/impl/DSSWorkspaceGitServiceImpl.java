@@ -67,7 +67,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         if (oldGitUserDo == null) {
             // 工作空间--git用户 为一一对应关系
             if (gitUserEntity != null) {
-                throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户");
+                return new GitUserUpdateResponse(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
             }
             gitUser.setCreateBy(userName);
             gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
@@ -77,12 +77,12 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
                 throw new DSSErrorException(800001, "用户名不得修改");
             }
             if (gitUserEntity != null && (!gitUserEntity.getWorkspaceId().equals(gitUser.getWorkspaceId()) || !gitUserEntity.getType().equals(gitUser.getType()))) {
-                throw new DSSErrorException(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户");
+                return new GitUserUpdateResponse(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
             }
             workspaceGitMapper.update(gitUser);
         }
 
-        return new GitUserUpdateResponse();
+        return new GitUserUpdateResponse(0,"", null);
     }
 
 

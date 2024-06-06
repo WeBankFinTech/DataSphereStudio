@@ -239,7 +239,7 @@ public class DSSGitUtils {
             logger.info("Changes pushed to remote repository.");
         } catch (GitAPIException e) {
             reset(repository, projectName);
-            throw new GitErrorException(80001, "git push failed, the reason is: ", e);
+            throw new GitErrorException(80001, "提交失败，请重试或检查token是否过期", e);
         }
     }
 
@@ -274,6 +274,7 @@ public class DSSGitUtils {
             logger.info("File " + repoDir.getAbsolutePath() + " has been rolled back to the version at commit: " + commitId);
 
         } catch (GitAPIException e) {
+            reset(repository, request.getProjectName());
             throw new GitErrorException(80001, "git check out failed, the reason is: ", e);
         }
     }
@@ -302,32 +303,32 @@ public class DSSGitUtils {
 
         List<String> projectNames = new ArrayList<>();
         do {
-        String gitLabUrl = UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/api/v4/projects?per_page=100&page=" + page; // 修改为你的GitLab实例的URL
-        // 创建HttpClient实例
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            // 创建HttpGet请求
-            HttpGet request = new HttpGet(gitLabUrl);
-            // 添加认证头部
-            request.addHeader("PRIVATE-TOKEN", gitUserDO.getGitToken());
-
-            // 执行请求
-            try (CloseableHttpResponse response = httpClient.execute(request)) {
-                // 获取响应实体
-                HttpEntity entity = response.getEntity();
-                // 将响应实体转换为字符串
-                String result = EntityUtils.toString(entity);
-                // 解析项目名称
-                projectNames = parseProjectNames(result);
-                // 打印项目名称
-                logger.info("projectNames is: {}", projectNames.toString());
-                // 添加到总项目列表中
-                allProjectNames.addAll(projectNames);
+            // 修改为GitLab实例的URL
+            String gitLabUrl = UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/api/v4/projects?per_page=100&page=" + page;
+            // 创建HttpClient实例
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                // 创建HttpGet请求
+                HttpGet request = new HttpGet(gitLabUrl);
+                // 添加认证头部
+                request.addHeader("PRIVATE-TOKEN", gitUserDO.getGitToken());
+                // 执行请求
+                try (CloseableHttpResponse response = httpClient.execute(request)) {
+                    // 获取响应实体
+                    HttpEntity entity = response.getEntity();
+                    // 将响应实体转换为字符串
+                    String result = EntityUtils.toString(entity);
+                    // 解析项目名称
+                    projectNames = parseProjectNames(result);
+                    // 打印项目名称
+                    logger.info("projectNames is: {}", projectNames.toString());
+                    // 添加到总项目列表中
+                    allProjectNames.addAll(projectNames);
+                }
+            } catch (IOException e) {
+                throw new GitErrorException(80001, "检查项目名称失败，请检查工作空间token是否过期", e);
+            } catch (Exception e) {
+                throw new GitErrorException(80001, "检查项目名称时解析JSON失败，请确认git当前是否可访问 ", e);
             }
-        } catch (IOException e) {
-            throw new GitErrorException(80001, "getProjectsName failed, the reason is ", e);
-        } catch (Exception e) {
-            throw new GitErrorException(80001, "getProjectsName failed, the reason is JSON: ", e);
-        }
             page++;
         } while (projectNames.size() > 0);
 
@@ -409,7 +410,7 @@ public class DSSGitUtils {
             logger.info(response.toString());
 
         } catch (Exception e) {
-            throw new GitErrorException(80001, "git archive failed, the reason is : ", e);
+            throw new GitErrorException(80001, "归档失败，请检查当前token是否过期 ", e);
         }
     }
 

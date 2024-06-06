@@ -290,7 +290,7 @@ public class DSSGitUtils {
             } catch (DSSErrorException e) {
                 logger.info("getAllProjectName failed, try again");
                 if (retry >= 3) {
-                    throw new GitErrorException(80001, "getAllProjectName failed, the reason is: ", e);
+                    throw new GitErrorException(80001, "检查项目名称失败，请检查工作空间token是否过期或git服务是否可以正常访问 ", e);
                 }
             }
         }

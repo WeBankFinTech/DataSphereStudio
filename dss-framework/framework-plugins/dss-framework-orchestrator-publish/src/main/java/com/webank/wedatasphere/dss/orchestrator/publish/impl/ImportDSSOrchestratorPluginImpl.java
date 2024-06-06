@@ -107,6 +107,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         //2、导入Info信息(导入冲突处理)
         DSSOrchestratorInfo importDssOrchestratorInfo = metaInputService.importOrchestratorNew(flowMetaPath);
         importDssOrchestratorInfo.setProjectId(projectId);
+        importDssOrchestratorInfo.setWorkspaceId(workspace.getWorkspaceId());
         //复制工程，直接使用新的UUID和复制后的工程ID
         if (requestImportOrchestrator.getCopyProjectId() != null
                 && StringUtils.isNotBlank(requestImportOrchestrator.getCopyProjectName())) {
@@ -236,6 +237,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         List<DSSOrchestratorInfo> dssOrchestratorInfos = metaInputService.importOrchestrator(inputPath);
         DSSOrchestratorInfo importDssOrchestratorInfo = dssOrchestratorInfos.get(0);
         importDssOrchestratorInfo.setProjectId(projectId);
+        importDssOrchestratorInfo.setWorkspaceId(workspace.getWorkspaceId());
         //复制工程，直接使用新的UUID和复制后的工程ID
         if (requestImportOrchestrator.getCopyProjectId() != null
                 && StringUtils.isNotBlank(requestImportOrchestrator.getCopyProjectName())) {

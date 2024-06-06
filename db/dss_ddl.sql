@@ -51,6 +51,7 @@ CREATE TABLE `dss_orchestrator_info` (
    `orchestrator_level` varchar(32) DEFAULT NULL COMMENT '工作流级别',
    `update_user` varchar(100) DEFAULT NULL COMMENT '更新人',
    `update_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+   `status` VARCHAR(64),
    PRIMARY KEY (`id`) USING BTREE,
    UNIQUE KEY `unique_idx_uuid` (`uuid`)
  ) ENGINE=InnoDB AUTO_INCREMENT=326 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
@@ -70,6 +71,7 @@ CREATE TABLE `dss_orchestrator_version_info` (
   `content` varchar(255) DEFAULT NULL,
   `context_id` varchar(200) DEFAULT NULL COMMENT '上下文ID',
   `valid_flag` INT(1) DEFAULT '1' COMMENT '版本有效标示，0:无效；1：有效',
+  `commit_id` varchar(64),
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=422 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
@@ -116,6 +118,7 @@ CREATE TABLE `dss_project` (
   `dev_process` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '开发流程，多个以英文逗号分隔，取得的值是dss_workspace_dictionary中的dic_key(parent_key=p_develop_process)',
   `orchestrator_mode` varchar(200) COLLATE utf8_bin DEFAULT NULL COMMENT '编排模式，多个以英文逗号分隔，取得的值是dss_workspace_dictionary中的dic_key(parent_key=p_arrangement_mode或下面一级)',
   `visible` tinyint(4) DEFAULT '1' COMMENT '0:已删除；1：未删除(默认)',
+  `associate_git` TINYINT DEFAULT '0' COMMENT '0:未接入git，1:已接入git',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=313 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=COMPACT;
 
@@ -638,4 +641,33 @@ PRIMARY KEY (`id`),
 key `idx_limit_name` (`limit_name`)
 ) ENGINE = InnoDB
 DEFAULT CHARSET = utf8mb4 COLLATE=utf8mb4_bin COMMENT ='dss用户限制表';
+
+DROP TABLE IF EXISTS `dss_workspace_associate_git`;
+CREATE TABLE `dss_workspace_associate_git` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+   `workspace_id` bigint(20) DEFAULT NULL,
+   `git_user`  varchar(64)  DEFAULT NULL COMMENT  'git登录用户名',
+   `git_password`  VARCHAR(255)  DEFAULT NULL COMMENT  'git登录密码，用于跳转',
+   `git_token`  varchar(255) COMMENT  '用户配置的git token',
+   `git_url` varchar(255),
+   `create_time` datetime DEFAULT NULL,
+   `update_time` datetime DEFAULT NULL,
+   `create_by` varchar(128) DEFAULT NULL,
+   `update_by` varchar(128) DEFAULT NULL,
+   `type` varchar(32) DEFAULT NULL,
+   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='工作空间绑定的git信息';
+
+
+DROP TABLE IF EXISTS `dss_orchestrator_submit_job_info`;
+CREATE TABLE `dss_orchestrator_submit_job_info` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `orchestrator_id` bigint(20) NOT NULL,
+    `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
+    `instance_name` varchar(128) DEFAULT NULL COMMENT '提交任务的实例',
+    `status` varchar(128) DEFAULT NULL COMMENT '提交任务状态',
+    `error_msg` varchar(2048) DEFAULT NULL COMMENT '提交任务异常信息',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='dss_orchestrator_submit_job_info表';
 

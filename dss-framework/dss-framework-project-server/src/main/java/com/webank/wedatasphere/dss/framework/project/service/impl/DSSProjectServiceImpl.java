@@ -62,6 +62,7 @@ import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectDataSource;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -134,6 +135,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         //开发流程，编排模式组拼接 前后进行英文逗号接口
         project.setDevProcess(ProjectStringUtils.getModeStr(projectCreateRequest.getDevProcessList()));
         project.setOrchestratorMode(ProjectStringUtils.getModeStr(projectCreateRequest.getOrchestratorModeList()));
+        List<DSSProjectDataSource> dataSourceList = projectCreateRequest.getDataSourceList();
+        if (dataSourceList != null && !dataSourceList.isEmpty()) {
+            project.setDataSourceListJson(DSSCommonUtils.COMMON_GSON.toJson(dataSourceList));
+        }
         projectMapper.insert(project);
         return project;
     }
@@ -156,7 +161,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setBusiness(projectModifyRequest.getBusiness());
         project.setProduct(projectModifyRequest.getProduct());
         project.setAssociateGit(projectModifyRequest.getAssociateGit());
-
+        List<DSSProjectDataSource> dataSourceList = projectModifyRequest.getDataSourceList();
+        if (dataSourceList != null && !dataSourceList.isEmpty()) {
+            project.setDataSourceListJson(DSSCommonUtils.COMMON_GSON.toJson(dataSourceList));
+        }
         UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", projectModifyRequest.getId());
         updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());

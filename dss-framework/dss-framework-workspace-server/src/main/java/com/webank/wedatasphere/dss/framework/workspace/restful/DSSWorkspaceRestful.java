@@ -368,7 +368,13 @@ public class DSSWorkspaceRestful {
         gitUserUpdateRequest.setGitUser(gitUser);
         gitUserUpdateRequest.setUsername(username);
         GitUserUpdateResponse response = RpcAskUtils.processAskException(gitSender.ask(gitUserUpdateRequest), GitUserUpdateResponse.class, GitUserUpdateRequest.class);
-        return Message.ok();
+        if (0 == response.getStatus()) {
+            return Message.ok();
+        } else {
+            String errorMessage = response.getMsg();
+            String workspaceName = dssWorkspaceService.getWorkspaceName(response.getWorkspaceId());
+            return Message.error(errorMessage + " 工作空间名称为：" + workspaceName);
+        }
     }
 
     @RequestMapping(path = "git", method = RequestMethod.GET)

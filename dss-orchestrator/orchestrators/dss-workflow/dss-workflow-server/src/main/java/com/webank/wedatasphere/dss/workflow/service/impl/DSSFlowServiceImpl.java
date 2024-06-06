@@ -336,13 +336,32 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             //仅对接入Git的项目 更新状态为 保存
             if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
-                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(flowID)),
-                        OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
-                lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                Long rootFlowId = getRootFlowId(flowID);
+                if (rootFlowId != null) {
+                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                            OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                    lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                }
             }
         } catch (DSSErrorException e) {
             logger.error("getProjectInfo failed by:", e);
             throw new DSSRuntimeException(e.getErrCode(),"更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+        }
+    }
+
+    private Long getRootFlowId(Long flowId) {
+        if (flowId == null) {
+            return null;
+        }
+        DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
+        if (dssFlow == null) {
+            return null;
+        }
+        if (dssFlow.getRootFlow()) {
+            return dssFlow.getId();
+        } else {
+            Long parentFlowID = flowMapper.getParentFlowID(flowId);
+            return getRootFlowId(parentFlowID);
         }
     }
 

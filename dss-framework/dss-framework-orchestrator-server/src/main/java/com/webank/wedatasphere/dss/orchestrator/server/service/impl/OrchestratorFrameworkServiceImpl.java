@@ -297,7 +297,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
             DSSOrchestratorVersion versionById = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorInfo.getId());
             if (versionById != null) {
-                lockMapper.updateOrchestratorVersionCommitId(commitResponse.getCommitId(), versionById.getOrchestratorId());
+                lockMapper.updateOrchestratorVersionCommitId(commitResponse.getCommitId(), versionById.getAppId());
             }
         } catch (Exception e) {
             LOGGER.error("git remove failed, the reason is: ", e);

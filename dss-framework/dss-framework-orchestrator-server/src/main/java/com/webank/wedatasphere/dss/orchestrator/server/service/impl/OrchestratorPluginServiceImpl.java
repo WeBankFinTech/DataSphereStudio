@@ -259,6 +259,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
         //5. 返回文件列表
         lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
+        // 更新commitId
+        lockMapper.updateOrchestratorVersionCommitId(commit.getCommitId(), flowRequest.getFlowId());
         return commit;
     }
 

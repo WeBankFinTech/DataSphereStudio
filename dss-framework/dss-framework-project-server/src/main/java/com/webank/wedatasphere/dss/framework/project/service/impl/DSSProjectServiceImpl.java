@@ -22,8 +22,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
@@ -40,10 +38,8 @@ import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
-import com.webank.wedatasphere.dss.framework.project.entity.OrchestratorBatchImportInfo;
 import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo;
 import com.webank.wedatasphere.dss.framework.project.entity.request.*;
-import com.webank.wedatasphere.dss.framework.project.entity.response.BatchExportResult;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
@@ -53,9 +49,7 @@ import com.webank.wedatasphere.dss.framework.project.service.ExportService;
 import com.webank.wedatasphere.dss.framework.project.service.ImportService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitCreateProjectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -66,11 +60,9 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectDataSource;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,7 +130,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setOrchestratorMode(ProjectStringUtils.getModeStr(projectCreateRequest.getOrchestratorModeList()));
         List<DSSProjectDataSource> dataSourceList = projectCreateRequest.getDataSourceList();
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
-            project.setDataSourceListJson(DSSCommonUtils.COMMON_GSON.toJson(dataSourceList));
+            project.setDataSourceListJson(new Gson().toJson(dataSourceList));
         }
         projectMapper.insert(project);
         return project;
@@ -164,7 +156,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setAssociateGit(projectModifyRequest.getAssociateGit());
         List<DSSProjectDataSource> dataSourceList = projectModifyRequest.getDataSourceList();
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
-            project.setDataSourceListJson(DSSCommonUtils.COMMON_GSON.toJson(dataSourceList));
+            project.setDataSourceListJson(new Gson().toJson(dataSourceList));
         }
         UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", projectModifyRequest.getId());
@@ -247,7 +239,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
             if(projectVo.getDataSourceListJson()!=null){
-                List<DSSProjectDataSource> dataSourceList = DSSCommonUtils.COMMON_GSON.fromJson(projectVo.getDataSourceListJson(),
+                List<DSSProjectDataSource> dataSourceList = new Gson().fromJson(projectVo.getDataSourceListJson(),
                         new TypeToken<List<DSSProjectDataSource>>() {
                         }.getType());
                 projectResponse.setDataSourceList(dataSourceList);
@@ -427,7 +419,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
             if(projectVo.getDataSourceListJson()!=null){
-                List<DSSProjectDataSource> dataSourceList = DSSCommonUtils.COMMON_GSON.fromJson(projectVo.getDataSourceListJson(),
+                List<DSSProjectDataSource> dataSourceList = new Gson().fromJson(projectVo.getDataSourceListJson(),
                         new TypeToken<List<DSSProjectDataSource>>() {
                         }.getType());
                 projectResponse.setDataSourceList(dataSourceList);

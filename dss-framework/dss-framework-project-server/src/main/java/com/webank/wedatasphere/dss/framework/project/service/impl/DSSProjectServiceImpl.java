@@ -341,8 +341,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         if(!dssProjectDO.getUsername().equalsIgnoreCase(username)){
             throw new DSSErrorException(600002, "刪除工程失敗，沒有删除权限!" );
         }
-        // 对于DSS项目进行归档
-        archiveGitProject(username, projectDeleteRequest, workspace, dssProjectDO);
         if(projectDeleteRequest.isIfDelOtherSys()) {
             LOGGER.warn("User {} requires to delete all projects with name {} in third-party AppConns.", username, dssProjectDO.getName());
             Map<AppInstance, Long> appInstanceToRefProjectId = new HashMap<>(10);
@@ -364,6 +362,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                 null, "delete refProject " + dssProjectDO.getName());
         }
         projectMapper.deleteProject(projectDeleteRequest.getId());
+        // 对于DSS项目进行归档
+        archiveGitProject(username, projectDeleteRequest, workspace, dssProjectDO);
         LOGGER.warn("User {} deleted project {}.", username, dssProjectDO.getName());
     }
 

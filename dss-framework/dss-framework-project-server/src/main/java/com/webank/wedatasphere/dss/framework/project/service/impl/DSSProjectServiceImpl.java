@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
@@ -245,6 +246,12 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setAssociateGit(projectVo.getAssociateGit());
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
+            if(projectVo.getDataSourceListJson()!=null){
+                List<DSSProjectDataSource> dataSourceList = DSSCommonUtils.COMMON_GSON.fromJson(projectVo.getDataSourceListJson(),
+                        new TypeToken<List<DSSProjectDataSource>>() {
+                        }.getType());
+                projectResponse.setDataSourceList(dataSourceList);
+            }
             projectResponseList.add(projectResponse);
 
             String pusername = projectVo.getPusername();
@@ -419,6 +426,12 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setUpdateTime(projectVo.getUpdateTime());
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
+            if(projectVo.getDataSourceListJson()!=null){
+                List<DSSProjectDataSource> dataSourceList = DSSCommonUtils.COMMON_GSON.fromJson(projectVo.getDataSourceListJson(),
+                        new TypeToken<List<DSSProjectDataSource>>() {
+                        }.getType());
+                projectResponse.setDataSourceList(dataSourceList);
+            }
             projectResponseList.add(projectResponse);
             /**
              * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，

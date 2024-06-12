@@ -17,7 +17,7 @@
 package com.webank.wedatasphere.dss.git.receiver
 
 import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitBaseRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
-import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService, DSSWorkspaceGitService}
+import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
 
 import javax.annotation.PostConstruct
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
@@ -34,13 +34,10 @@ class DSSGitChooser extends ReceiverChooser {
   @Autowired
   var gitWorkflowManagerService: DSSGitWorkflowManagerService = _
 
-  @Autowired
-  var workspaceGitService: DSSWorkspaceGitService = _
-
   var receiver: Option[DSSGitReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new DSSGitReceiver(gitProjectManagerService, gitWorkflowManagerService, workspaceGitService))
+  def init(): Unit = receiver = Some(new DSSGitReceiver(gitProjectManagerService, gitWorkflowManagerService))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: GitCreateProjectRequest => receiver

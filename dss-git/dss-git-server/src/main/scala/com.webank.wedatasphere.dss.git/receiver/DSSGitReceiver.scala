@@ -17,7 +17,8 @@
 package com.webank.wedatasphere.dss.git.receiver
 
 import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
-import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService, DSSWorkspaceGitService}
+import com.webank.wedatasphere.dss.git.manage.GitProjectManager
+import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.slf4j.{Logger, LoggerFactory}
 import org.springframework.stereotype.Component
@@ -25,8 +26,7 @@ import org.springframework.stereotype.Component
 import java.util
 import scala.concurrent.duration.Duration
 
-class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitWorkflowManagerService: DSSGitWorkflowManagerService,
-                     workspaceGitService: DSSWorkspaceGitService) extends Receiver {
+class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitWorkflowManagerService: DSSGitWorkflowManagerService) extends Receiver {
 
   override def receive(message: Any, sender: Sender): Unit = {}
 
@@ -52,9 +52,9 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
     case gitCommitInfoBetweenRequest: GitCommitInfoBetweenRequest =>
       gitWorkflowManagerService.getHistory(gitCommitInfoBetweenRequest)
     case gitUserUpdateRequest: GitUserUpdateRequest =>
-      workspaceGitService.associateGit(gitUserUpdateRequest)
+      GitProjectManager.associateGit(gitUserUpdateRequest)
     case gitUserInfoRequest: GitUserInfoRequest =>
-      workspaceGitService.selectGitUserInfo(gitUserInfoRequest)
+      GitProjectManager.selectGitUserInfo(gitUserInfoRequest)
     case gitCurrentCommitRequest: GitCurrentCommitRequest =>
       gitWorkflowManagerService.getCurrentCommit(gitCurrentCommitRequest)
     case gitRevertRequest: GitRevertRequest =>
@@ -64,9 +64,9 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
     case gitRenameRequest: GitRenameRequest =>
       gitWorkflowManagerService.rename(gitRenameRequest)
     case gitConnectTestRequest: GitConnectRequest =>
-      workspaceGitService.gitTokenTest(gitConnectTestRequest)
+      GitProjectManager.gitTokenTest(gitConnectTestRequest)
     case gitUserInfoByTypeRequest: GitUserInfoByRequest =>
-      workspaceGitService.getGitUserByType(gitUserInfoByTypeRequest)
+      GitProjectManager.getGitUserByType(gitUserInfoByTypeRequest)
     case _ => None
   }
 

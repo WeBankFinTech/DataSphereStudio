@@ -18,4 +18,6 @@ public interface DSSWorkspaceGitMapper {
     GitUserEntity selectByUser(@Param("gitUser") String gitUser);
 
     List<GitUserEntity> selectGitUser(@Param("workspaceId") Long workspaceId, @Param("type") String type, @Param("gitUser") String gitUser);
+
+    List<Long> getAllWorkspaceId();
 }

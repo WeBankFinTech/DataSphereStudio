@@ -7,16 +7,15 @@ import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -276,5 +275,24 @@ public class FileUtils {
         } else {
             logger.error("Folder does not exist.");
         }
+    }
+
+    public static List<String> getLocalProjectName(Long workspaceId) throws IOException {
+        String path = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator;
+        Path dir = Paths.get(path);
+        List<String> localProjectList = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+            for (Path entry : stream) {
+                // 获取基本文件属性
+                BasicFileAttributes attrs = Files.readAttributes(entry, BasicFileAttributes.class);
+                if (attrs.isDirectory()) {
+                    localProjectList.add(entry.getFileName().toString());
+                }
+            }
+        } catch (IOException | DirectoryIteratorException e) {
+            logger.error("get Local Project Failed", e);
+            throw e;
+        }
+        return localProjectList;
     }
 }

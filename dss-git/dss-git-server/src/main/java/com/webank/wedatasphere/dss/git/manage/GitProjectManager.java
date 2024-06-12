@@ -1,4 +1,5 @@
-package com.webank.wedatasphere.dss.git.service.impl;
+package com.webank.wedatasphere.dss.git.manage;
+
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
@@ -6,15 +7,16 @@ import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitConnectRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoByRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserUpdateRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitConnectResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoListResponse;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.git.dao.DSSWorkspaceGitMapper;
-import com.webank.wedatasphere.dss.git.service.DSSWorkspaceGitService;
+import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
+import com.webank.wedatasphere.dss.git.utils.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -22,28 +24,75 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.linkis.DataWorkCloudApplication;
+import org.apache.linkis.common.utils.Utils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-@Service
-public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+public class GitProjectManager {
 
-    @Autowired
-    private DSSWorkspaceGitMapper workspaceGitMapper;
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitProjectManager.class);
+
+    private volatile static boolean isInit;
+
+    private static DSSWorkspaceGitMapper workspaceGitMapper;
 
 
-    @Override
-    public GitUserUpdateResponse associateGit(GitUserUpdateRequest gitUserCreateRequest) throws DSSErrorException {
+    protected GitProjectManager() {
+    }
+
+    static {
+        LOGGER.info("已归档项目移除定时线程开启...");
+        init();
+        Utils.defaultScheduler().scheduleAtFixedRate(() -> {
+            try {
+                List<Long> allWorkspaceId = workspaceGitMapper.getAllWorkspaceId();
+                for (Long workspaceId : allWorkspaceId) {
+                    GitUserEntity gitUser = selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+                    if (gitUser == null) {
+                        break;
+                    }
+                    List<String> allGitProjectName = DSSGitUtils.getAllProjectName(gitUser);
+                    List<String> localProjectName = FileUtils.getLocalProjectName(workspaceId);
+                    LOGGER.info("localProjectName is : {}", localProjectName.toString());
+                    localProjectName.removeAll(allGitProjectName);
+                    if (localProjectName.size() > 0) {
+                        LOGGER.info("Project to delete : {}", localProjectName.toString());
+                        for (String projectName : localProjectName) {
+                            // 删除本地项目
+                            DSSGitUtils.archiveLocal(projectName, workspaceId);
+                        }
+                    } else {
+                        LOGGER.info("Nothing need to delete");
+                    }
+
+                }
+            } catch (Exception e) {
+                LOGGER.error("定时清理归档项目错误", e);
+            }
+        }, 0,1, TimeUnit.DAYS);
+    }
+
+    public static void init() {
+        if (!isInit) {
+            synchronized (GitProjectManager.class) {
+                if (!isInit) {
+                    workspaceGitMapper = DataWorkCloudApplication.getApplicationContext().getBean(DSSWorkspaceGitMapper.class);
+                    isInit = true;
+                }
+            }
+        }
+    }
+
+    public static GitUserUpdateResponse associateGit(GitUserUpdateRequest gitUserCreateRequest) throws DSSErrorException {
         if (gitUserCreateRequest == null) {
             throw new DSSErrorException(010101, "gitUserCreateRequest is null");
         }
@@ -85,9 +134,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         return new GitUserUpdateResponse(0,"", null);
     }
 
-
-    @Override
-    public GitUserInfoResponse selectGitUserInfo(GitUserInfoRequest gitUserInfoRequest) throws DSSErrorException {
+    public static GitUserInfoResponse selectGitUserInfo(GitUserInfoRequest gitUserInfoRequest) throws DSSErrorException {
         if (gitUserInfoRequest == null) {
             throw  new DSSErrorException(010101, "gitUserCreateRequest is null");
         }
@@ -101,8 +148,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         return gitUserInfoResponse;
     }
 
-    @Override
-    public GitUserEntity selectGit(Long workspaceId, String type, Boolean decrypt) {
+    public static GitUserEntity selectGit(Long workspaceId, String type, Boolean decrypt) {
         try {
             GitUserEntity gitUserEntity = workspaceGitMapper.selectByWorkspaceId(workspaceId, type);
             if (gitUserEntity == null) {
@@ -123,7 +169,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         }
     }
 
-    private String generateKeys(String password, int mode) throws DSSErrorException{
+    private static String generateKeys(String password, int mode) throws DSSErrorException{
         // 定义一个字符串作为密钥源
         String keyString = GitServerConfig.LINKIS_MYSQL_PRI_KEY.getValue();
         if (keyString.length() < 16) {
@@ -152,8 +198,7 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
         }
     }
 
-    @Override
-    public GitConnectResponse gitTokenTest(GitConnectRequest connectTestRequest)throws DSSErrorException {
+    public static GitConnectResponse gitTokenTest(GitConnectRequest connectTestRequest)throws DSSErrorException {
         // GitLab 令牌
         String token = connectTestRequest.getToken();
         // 期望匹配的用户名
@@ -174,24 +219,22 @@ public class DSSWorkspaceGitServiceImpl implements DSSWorkspaceGitService {
             String actualUsername = userData.getString("username");
 
             if (response.getStatusLine().getStatusCode() == 200 && actualUsername.equals(expectedUsername)) {
-                logger.info("Token is valid and matches the username: " + actualUsername);
+                LOGGER.info("Token is valid and matches the username: " + actualUsername);
                 return new GitConnectResponse(true);
             } else {
-                logger.info("Token is invalid or does not match the expected username.");
+                LOGGER.info("Token is invalid or does not match the expected username.");
                 return new GitConnectResponse(false);
             }
         } catch (Exception e) {
-            logger.info("Error verifying token: " + e.getMessage());
+            LOGGER.info("Error verifying token: " + e.getMessage());
             throw new DSSErrorException(800001, "verifying token failed, the reason is:" + e);
         }
     }
 
-    @Override
-    public GitUserInfoListResponse getGitUserByType(GitUserInfoByRequest infoByRequest) {
+    public static GitUserInfoListResponse getGitUserByType(GitUserInfoByRequest infoByRequest) {
         List<GitUserEntity> gitUserEntities = workspaceGitMapper.selectGitUser(infoByRequest.getWorkspaceId(), infoByRequest.getType(), infoByRequest.getGitUserName());
         GitUserInfoListResponse gitUserInfoListResponse = new GitUserInfoListResponse();
         gitUserInfoListResponse.setGitUserEntities(gitUserEntities);
         return gitUserInfoListResponse;
     }
-
 }

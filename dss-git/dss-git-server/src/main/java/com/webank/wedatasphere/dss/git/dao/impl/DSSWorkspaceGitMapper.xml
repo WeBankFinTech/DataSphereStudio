@@ -65,4 +65,8 @@
             and git_user = #{gitUser}
         </if>
     </select>
+
+    <select id="getAllWorkspaceId" resultType="java.lang.Long">
+        select distinct workspace_id from dss_workspace_associate_git
+    </select>
 </mapper>

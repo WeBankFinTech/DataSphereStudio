@@ -255,9 +255,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                     if (colonIndexSec != -1 && colonIndexSec + 1 < resultLine.length()) {
                         Integer num = Integer.valueOf(resultLine.substring(0, colonIndexSec));
                         String line = resultLine.substring(colonIndexSec + 1);
-                        // 只添加符合要求的结果
-                        GitSearchLine searchLine = new GitSearchLine(num, line);
-                        keyLines.add(searchLine);
+                        if (!StringUtils.isEmpty(line)) {
+                            // 只添加符合要求的结果
+                            GitSearchLine searchLine = new GitSearchLine(num, line);
+                            keyLines.add(searchLine);
+                        }
                     }
                 }
             }

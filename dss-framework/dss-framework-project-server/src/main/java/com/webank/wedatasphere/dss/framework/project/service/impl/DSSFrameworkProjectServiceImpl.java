@@ -201,20 +201,15 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
         // 同步项目配置元数据到git
         if (projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
+            ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
+            exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
+            exportAllOrchestratorsReqest.setComment("test");
+            exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
+
+            BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
             if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
-                ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
-                exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
-                exportAllOrchestratorsReqest.setComment("test");
-                exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
-                BmlResource bmlResource = dssProjectService.exportProject(exportAllOrchestratorsReqest, username, "", workspace);
                 createGitProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
             } else {
-                ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
-                exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
-                exportAllOrchestratorsReqest.setComment("update Project");
-                exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
-
-                BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
                 updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
             }
         }

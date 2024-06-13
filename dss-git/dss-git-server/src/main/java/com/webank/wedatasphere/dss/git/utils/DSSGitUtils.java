@@ -4,7 +4,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitBaseRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
@@ -16,6 +15,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -42,41 +43,29 @@ import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import java.util.*;
 
 public class DSSGitUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
     public static void init(String projectName, GitUserEntity gitUserDO) throws Exception, GitErrorException{
-        if (!checkProjectName(projectName, gitUserDO)) {
-            try {
-                URL url = new URL(UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/" +GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue());
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("PRIVATE-TOKEN", gitUserDO.getGitToken());
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setDoOutput(true);
-
+        String projectPath = gitUserDO.getGitUser() + "/" + projectName;
+        if (!checkIfProjectExists(gitUserDO, projectPath)) {
+            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                HttpPost post = new HttpPost();
+                post.addHeader("PRIVATE-TOKEN", gitUserDO.getGitToken());
+                post.addHeader("Content-Type", "application/json");
                 String jsonInputString = String.format("{\"name\": \"%s\", \"description\": \"%s\"}", projectName, projectName);
+                post.setEntity(new StringEntity(jsonInputString));
 
-                try (OutputStream os = connection.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
-                    os.write(input, 0, input.length);
+                try (CloseableHttpResponse response = httpClient.execute(post)) {
+                    int statusCode = response.getStatusLine().getStatusCode();
+                    if (statusCode == 200) {
+                        logger.info("init success");
+                    } else {
+                        throw new GitErrorException(80001, "创建Git项目失败，请检查工作空间token是否过期");
+                    }
                 }
-
-                int responseCode = connection.getResponseCode();
-                logger.info("Response Code : " + responseCode);
-
-                connection.disconnect();
-                logger.info("init success");
-            } catch (Exception e) {
-               throw new GitErrorException(80001, "git init failed, the reason is: ", e);
             }
         } else {
             throw new GitErrorException(80001, "git init failed, the reason is: projectName " + projectName +" already exists");
@@ -279,22 +268,28 @@ public class DSSGitUtils {
         }
     }
 
-    public static boolean checkProjectName(String name, GitUserEntity gitUser) throws DSSErrorException {
-        int retry = 0;
-        List<String> allProjectName = new ArrayList<>();
-        while (true) {
-            retry += 1;
-            try {
-                allProjectName = getAllProjectName(gitUser);
-                return allProjectName.contains(name);
-            } catch (DSSErrorException e) {
-                logger.info("getAllProjectName failed, try again");
-                if (retry >= 3) {
-                    throw new GitErrorException(80001, "检查项目名称失败，请检查工作空间token是否过期或git服务是否可以正常访问 ", e);
+    public static boolean checkIfProjectExists(GitUserEntity gitUser, String projectPath) throws GitErrorException {
+        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/projects/" + projectPath.replace("/", "%2F");
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet request = new HttpGet(url);
+            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode == 200) {
+                    return true;
+                } else if (statusCode == 404) {
+                    return false;
+                } else {
+                    String responseBody = EntityUtils.toString(response.getEntity());
+                    logger.info("Unexpected response status: " + statusCode);
+                    logger.info("Response body: " + responseBody);
+                    return false;
                 }
             }
+        } catch (Exception e) {
+            throw new GitErrorException(80001, "检查项目名称失败，请检查工作空间token是否过期", e);
         }
-
     }
 
     public static List<String> getAllProjectName(GitUserEntity gitUserDO) throws DSSErrorException {

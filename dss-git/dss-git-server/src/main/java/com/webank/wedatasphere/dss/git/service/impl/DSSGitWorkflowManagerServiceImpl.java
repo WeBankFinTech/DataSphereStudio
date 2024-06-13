@@ -505,15 +505,19 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            List<String> paths = new ArrayList<>();
             // 同步删除对应节点
             for (String path : request.getPath()) {
                 FileUtils.removeFlowNode(path, request.getProjectName(), request.getWorkspaceId());
+                String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + path;
+                paths.add(metaConfPath);
+                paths.add(path);
             }
             // 提交
             String comment = "delete workflowNode " + request.getPath().toString() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, request.getPath());
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
 

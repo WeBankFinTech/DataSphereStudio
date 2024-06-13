@@ -450,19 +450,13 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
                 //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
                 if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
-                    OrchestratorSubmitRequest submitRequest = new OrchestratorSubmitRequest();
-                    submitRequest.setFlowId(dssOrchestratorVersion.getAppId());
-                    submitRequest.setOrchestratorId(dssOrchestratorVersion.getOrchestratorId());
-                    submitRequest.setProjectName(projectName);
-                    submitRequest.setLabels(labels);
-                    submitRequest.setComment("rollback workflow: " + dssOrchestratorInfo.getName());
-                    orchestratorPluginService.submitWorkflowToBML(submitRequest, "system", workspace);
+                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
                 } else {
                     GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), "system");
                     GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
                     lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), dssOrchestratorVersion.getAppId());
+                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
                 }
-                lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
             } catch (Exception e) {
                 lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
                 throw e;

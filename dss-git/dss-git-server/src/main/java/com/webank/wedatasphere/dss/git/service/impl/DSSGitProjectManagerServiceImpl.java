@@ -93,7 +93,8 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
         }
-        boolean b = DSSGitUtils.checkProjectName(request.getProjectName(), gitUser);
+        String projectPath = gitUser.getGitUser() + "/" + request.getProjectName();
+        boolean b = DSSGitUtils.checkIfProjectExists(gitUser, projectPath);
         logger.info("checkProjectName result is : {}", b);
         return new GitCheckProjectResponse(request.getProjectName(), b);
     }

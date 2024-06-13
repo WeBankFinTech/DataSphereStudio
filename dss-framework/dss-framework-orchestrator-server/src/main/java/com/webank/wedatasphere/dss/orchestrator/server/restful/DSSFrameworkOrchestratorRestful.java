@@ -427,8 +427,6 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
-        List<String> type = Arrays.asList("sql","hql","jdbc", "py", "python", "scala", "sh");
-
-        return Message.ok().data("type", type);
+        return Message.ok().data("type", GitConstant.GIT_SERVER_SEARCH_TYPE);
     }
 }

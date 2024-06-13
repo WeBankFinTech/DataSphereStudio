@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
@@ -158,6 +159,7 @@ public class FileUtils {
             Files.createDirectories(Paths.get(importFile).getParent());
             //下载压缩包
             bmlService.downloadToLocalPath(username, bmlResource.getResourceId(), bmlResource.getVersion(), importFile);
+            bmlService.deleteBmlResource(username, bmlResource.getResourceId());
         }catch (Exception e){
             logger.error("download failed, the reason is :", e);
             throw new DSSRuntimeException("upload file format error(导入包格式错误)");
@@ -166,11 +168,11 @@ public class FileUtils {
 
     public static void unzipBMLResource(String path, Long workspaceId) throws DSSErrorException {
         //下载到本地处理
-        String dirPath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue());
-        String importFile= dirPath + File.separator + workspaceId + File.separator +  path + ".zip";
+        String dirPath = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator +  path;
+        String importFile= dirPath + ".zip";
         //解压
-        String unzipImportFile= FileUtils.unzipFile(importFile);
-        logger.info("import unziped file locate at {}",unzipImportFile);
+        ZipHelper.unzipFile(importFile, dirPath, true);
+        logger.info("import unzip file locate at {}",importFile);
     }
 
     private static String readImportZipProjectName(String zipFilePath) throws IOException {

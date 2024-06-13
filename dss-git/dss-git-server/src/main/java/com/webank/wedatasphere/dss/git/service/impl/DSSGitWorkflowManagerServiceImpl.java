@@ -122,6 +122,22 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitSearchResponse search(GitSearchRequest request) {
+        Long workspaceId = request.getWorkspaceId();
+        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+        if (gitUser == null) {
+            logger.error("the workspace : {} don't associate with git", workspaceId);
+            return null;
+        }
+        // 拼接.git路径
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        // 获取git仓库
+        File repoDir = new File(gitPath);
+        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+            // 本地保持最新状态
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+        } catch (Exception e) {
+            logger.error("pull failed, the reason is ",e);
+        }
         if (request == null) {
             return new GitSearchResponse();
         }
@@ -362,6 +378,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String fullpath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + FileUtils.normalizePath(request.getFilePath());
             File file = new File(fullpath);
             String fileName = file.getName();
+            // todo 透传
             BmlResource bmlResource = FileUtils.uploadResourceToBML(bmlService, gitUser.getGitUser(), content, fileName, request.getProjectName());
             logger.info("upload success, the fileName is : {}", request.getFilePath());
             contentResponse.setBmlResource(bmlResource);
@@ -598,6 +615,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             if (StringUtils.isEmpty(request.getOldCommitId())) {
+                // 去掉上线
                 List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getDirName(), 100);
                 if (CollectionUtils.isEmpty(latestCommit)) {
                     logger.error("get Commit failed, the reason is null");

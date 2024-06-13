@@ -214,20 +214,28 @@ public class GitProjectManager {
 
             HttpResponse response = client.execute(request);
             String jsonResponse = EntityUtils.toString(response.getEntity());
-            JSONObject userData = new JSONObject(jsonResponse);
 
-            String actualUsername = userData.getString("username");
 
-            if (response.getStatusLine().getStatusCode() == 200 && actualUsername.equals(expectedUsername)) {
-                LOGGER.info("Token is valid and matches the username: " + actualUsername);
-                return new GitConnectResponse(true);
-            } else {
-                LOGGER.info("Token is invalid or does not match the expected username.");
-                return new GitConnectResponse(false);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                JSONObject userData = new JSONObject(jsonResponse);
+
+                String actualUsername = userData.getString("username");
+                if (actualUsername.equals(expectedUsername)) {
+                    LOGGER.info("Token is valid and matches the username: " + actualUsername);
+                    return new GitConnectResponse(true);
+                }else {
+                    LOGGER.info("Token is invalid or does not match the expected username.");
+                    return new GitConnectResponse(false);
+                }
+            } else if (response.getStatusLine().getStatusCode() == 401){
+                throw new DSSErrorException(800001, "请检查token是否正确");
             }
-        } catch (Exception e) {
+            return new GitConnectResponse(false);
+        } catch (DSSErrorException e) {
             LOGGER.info("Error verifying token: " + e.getMessage());
-            throw new DSSErrorException(800001, "verifying token failed, the reason is:" + e);
+            throw new DSSErrorException(800001, "请检查token是否正确");
+        }catch (Exception e) {
+            throw new DSSErrorException(800001, "校验token失败，请确认当前环境git是否可以正常访问" + e);
         }
     }
 

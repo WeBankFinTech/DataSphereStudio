@@ -159,7 +159,6 @@ public class FileUtils {
             Files.createDirectories(Paths.get(importFile).getParent());
             //下载压缩包
             bmlService.downloadToLocalPath(username, bmlResource.getResourceId(), bmlResource.getVersion(), importFile);
-            bmlService.deleteBmlResource(username, bmlResource.getResourceId());
         }catch (Exception e){
             logger.error("download failed, the reason is :", e);
             throw new DSSRuntimeException("upload file format error(导入包格式错误)");

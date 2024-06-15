@@ -51,8 +51,9 @@ public class DSSGitUtils {
     public static void init(String projectName, GitUserEntity gitUserDO) throws Exception, GitErrorException{
         String projectPath = gitUserDO.getGitUser() + "/" + projectName;
         if (!checkIfProjectExists(gitUserDO, projectPath)) {
+            String url = UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/" + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue();
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                HttpPost post = new HttpPost();
+                HttpPost post = new HttpPost(url);
                 post.addHeader("PRIVATE-TOKEN", gitUserDO.getGitToken());
                 post.addHeader("Content-Type", "application/json");
                 String jsonInputString = String.format("{\"name\": \"%s\", \"description\": \"%s\"}", projectName, projectName);

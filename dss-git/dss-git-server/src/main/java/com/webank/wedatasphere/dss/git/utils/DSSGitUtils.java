@@ -61,7 +61,7 @@ public class DSSGitUtils {
 
                 try (CloseableHttpResponse response = httpClient.execute(post)) {
                     int statusCode = response.getStatusLine().getStatusCode();
-                    if (statusCode == 200) {
+                    if (statusCode == 201) {
                         logger.info("init success");
                     } else {
                         throw new GitErrorException(80001, "创建Git项目失败，请检查工作空间token是否过期");

@@ -269,7 +269,7 @@ public class DSSGitUtils {
     }
 
     public static boolean checkIfProjectExists(GitUserEntity gitUser, String projectPath) throws GitErrorException {
-        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/projects/" + projectPath.replace("/", "%2F");
+        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectPath.replace("/", "%2F");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(url);
             request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());

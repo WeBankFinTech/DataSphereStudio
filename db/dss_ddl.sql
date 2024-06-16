@@ -655,6 +655,7 @@ CREATE TABLE `dss_workspace_associate_git` (
    `create_by` varchar(128) DEFAULT NULL,
    `update_by` varchar(128) DEFAULT NULL,
    `type` varchar(32) DEFAULT NULL,
+   `git_user_id` varchar(32) DEFAULT NULL,
    PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='工作空间绑定的git信息';
 

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.Key;
 import java.util.Base64;
 import java.util.List;
@@ -92,16 +93,20 @@ public class GitProjectManager {
         }
     }
 
-    public static GitUserUpdateResponse associateGit(GitUserUpdateRequest gitUserCreateRequest) throws DSSErrorException {
+    public static GitUserUpdateResponse associateGit(GitUserUpdateRequest gitUserCreateRequest) throws DSSErrorException, IOException {
         if (gitUserCreateRequest == null) {
             throw new DSSErrorException(010101, "gitUserCreateRequest is null");
         }
         GitUserEntity gitUser = gitUserCreateRequest.getGitUser();
         String userName = gitUserCreateRequest.getUsername();
+        if (gitUser == null) {
+            throw new DSSErrorException(010101, "gitUser is null");
+        }
+        String type = gitUser.getType();
 
 
         // 不存在则更新，存在则新增
-        GitUserEntity oldGitUserDo = selectGit(gitUser.getWorkspaceId(), gitUser.getType(), true);
+        GitUserEntity oldGitUserDo = selectGit(gitUser.getWorkspaceId(), type, true);
         gitUser.setUpdateBy(userName);
         // 密码 token 加密处理
         if (!StringUtils.isEmpty(gitUser.getGitPassword())) {
@@ -116,22 +121,42 @@ public class GitProjectManager {
         if (oldGitUserDo == null) {
             // 工作空间--git用户 为一一对应关系
             if (gitUserEntity != null) {
-                return new GitUserUpdateResponse(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
+                return new GitUserUpdateResponse(80001, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
             }
             gitUser.setCreateBy(userName);
             gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
+            GitUserUpdateResponse userIdFromGit = getUserIdFromGit(gitUser, type);
+            if (userIdFromGit != null) {
+                return userIdFromGit;
+            }
             workspaceGitMapper.insert(gitUser);
         }else {
-            if (GitConstant.GIT_ACCESS_WRITE_TYPE.equals(gitUser.getType()) && !oldGitUserDo.getGitUser().equals(gitUser.getGitUser())) {
+            if (GitConstant.GIT_ACCESS_WRITE_TYPE.equals(type) && !oldGitUserDo.getGitUser().equals(gitUser.getGitUser())) {
                 throw new DSSErrorException(800001, "用户名不得修改");
             }
-            if (gitUserEntity != null && (!gitUserEntity.getWorkspaceId().equals(gitUser.getWorkspaceId()) || !gitUserEntity.getType().equals(gitUser.getType()))) {
+            if (gitUserEntity != null && (!gitUserEntity.getWorkspaceId().equals(gitUser.getWorkspaceId()) || !gitUserEntity.getType().equals(type))) {
                 return new GitUserUpdateResponse(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
+            }
+            GitUserUpdateResponse userIdFromGit = getUserIdFromGit(gitUser, type);
+            if (userIdFromGit != null) {
+                return userIdFromGit;
             }
             workspaceGitMapper.update(gitUser);
         }
 
         return new GitUserUpdateResponse(0,"", null);
+    }
+
+    private static GitUserUpdateResponse getUserIdFromGit(GitUserEntity gitUser, String type) throws IOException, com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException {
+        if (GitConstant.GIT_ACCESS_READ_TYPE.equals(type)) {
+            GitUserEntity writeGitUser = selectGit(gitUser.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+            if (writeGitUser == null) {
+                return new GitUserUpdateResponse(80001, "配置只读用户前需首先完成该工作空间编辑用户的配置", gitUser.getWorkspaceId());
+            }
+            String userGitId = DSSGitUtils.getUserIdByUsername(writeGitUser, gitUser.getGitUser());
+            gitUser.setGitUserId(userGitId);
+        }
+        return null;
     }
 
     public static GitUserInfoResponse selectGitUserInfo(GitUserInfoRequest gitUserInfoRequest) throws DSSErrorException {

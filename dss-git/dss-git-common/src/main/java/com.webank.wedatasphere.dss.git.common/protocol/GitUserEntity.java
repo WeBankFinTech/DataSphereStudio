@@ -18,6 +18,10 @@ public class GitUserEntity {
      */
     private String type;
     private String gitUrl;
+    /**
+     * 只读用户需存储git对应userId，用于设置只读权限
+     */
+    private String gitUserId;
 
     public GitUserEntity() {
     }
@@ -108,5 +112,13 @@ public class GitUserEntity {
 
     public void setGitUrl(String gitUrl) {
         this.gitUrl = gitUrl;
+    }
+
+    public String getGitUserId() {
+        return gitUserId;
+    }
+
+    public void setGitUserId(String gitUserId) {
+        this.gitUserId = gitUserId;
     }
 }

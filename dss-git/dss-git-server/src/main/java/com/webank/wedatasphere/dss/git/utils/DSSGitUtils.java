@@ -1,5 +1,9 @@
 package com.webank.wedatasphere.dss.git.utils;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonElement;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
@@ -290,6 +294,118 @@ public class DSSGitUtils {
             }
         } catch (Exception e) {
             throw new GitErrorException(80001, "检查项目名称失败，请检查工作空间token是否过期", e);
+        }
+    }
+
+    public static String getUserIdByUsername(GitUserEntity gitUser, String username) throws GitErrorException, IOException {
+        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/users?username=" + username;
+        BufferedReader in = null;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet request = new HttpGet(url);
+            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode == 200) {
+                    in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                    String inputLine;
+                    StringBuilder content = new StringBuilder();
+
+                    while ((inputLine = in.readLine()) != null) {
+                        content.append(inputLine);
+                    }
+
+                    String responseBody = content.toString();
+                    logger.info("Response Body: " + responseBody);
+
+                    JsonArray jsonArray = JsonParser.parseString(responseBody).getAsJsonArray();
+
+                    if (jsonArray.size() > 0) {
+                        JsonObject userObject = jsonArray.get(0).getAsJsonObject();
+                        return userObject.get("id").toString();
+                    } else {
+                        throw new GitErrorException(80001, "获取userId失败，请检查该用户是否为git用户并激活");
+                    }
+                } else {
+                    throw new GitErrorException(80001, "获取userId失败，请检查编辑用户token是否过期或git服务是否正常");
+                }
+            }
+        } catch (Exception e) {
+            throw new GitErrorException(80001, "获取该git用户Id失败，原因为", e);
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
+
+    public static String getProjectIdByName(GitUserEntity gitUser, String projectName) throws GitErrorException{
+        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects?search=" + projectName;
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet request = new HttpGet(urlString);
+            request.setHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+
+            CloseableHttpResponse response = httpClient.execute(request);
+            System.out.println("Response Status Line: " + response.getStatusLine());
+
+            int responseCode = response.getStatusLine().getStatusCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                String inputLine;
+                StringBuilder content = new StringBuilder();
+
+                while ((inputLine = in.readLine()) != null) {
+                    content.append(inputLine);
+                }
+
+                in.close();
+
+                String responseBody = content.toString();
+                logger.info("Response Body: " + responseBody);
+
+                JsonArray jsonArray = JsonParser.parseString(responseBody).getAsJsonArray();
+
+                if (jsonArray.size() > 0) {
+                    for (JsonElement element : jsonArray) {
+                        JsonObject projectObject = element.getAsJsonObject();
+                        if (projectObject.get("name").getAsString().equals(projectName)) {
+                            return projectObject.get("id").toString();
+                        }
+                    }
+                } else {
+                    throw new GitErrorException(80001, "项目创建失败，请稍后重试");
+                }
+            } else {
+                throw new GitErrorException(80001, "请检查编辑用户token是否过期或git服务是否正常");
+            }
+        } catch (Exception e) {
+            throw new GitErrorException(80001, "获取该项目git Id 失败，原因为", e);
+        }
+        return null;
+    }
+
+    public static boolean addProjectMember(GitUserEntity gitUser, String userId, String projectId, int accessLevel) throws GitErrorException, IOException {
+        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members";
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost request = new HttpPost(url);
+            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.addHeader("Content-Type", "application/json");
+
+            String json = String.format("{\"user_id\": \"%s\", \"access_level\": \"%d\"}", userId, accessLevel);
+            request.setEntity(new StringEntity(json));
+
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                String responseBody = EntityUtils.toString(response.getEntity());
+                if (statusCode == 201) {
+                    return true;
+                } else {
+                    throw new GitErrorException(80001, "添加用户失败，请检查只读用户是否存在或编辑用户token是否过期");
+                }
+            }
+        } catch (Exception e) {
+            throw new GitErrorException(80001, "添加用户失败，请检查编辑用户token是否过期或git服务是否正常");
         }
     }
 

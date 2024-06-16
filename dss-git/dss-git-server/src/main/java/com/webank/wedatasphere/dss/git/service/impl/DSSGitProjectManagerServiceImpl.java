@@ -61,6 +61,11 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 首次创建提交项目整体
             List<String> paths = Arrays.asList(".");
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
+            // 获取工作空间只读用户
+            GitUserEntity readGitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_READ_TYPE, true);
+            // 获取项目ProjectId
+            String projectIdByName = DSSGitUtils.getProjectIdByName(gitUser, request.getProjectName());
+            DSSGitUtils.addProjectMember(gitUser, readGitUser.getGitUserId(), projectIdByName, 20);
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);

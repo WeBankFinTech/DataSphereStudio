@@ -26,7 +26,7 @@
     </sql>
 
     <sql id="orchestrator_version">
-        id,`orchestrator_id`,`app_id`,`source`,`version`,`comment`,`update_time`,`updater`,`project_id`,`content`,`context_id`,`valid_flag`
+        id,`orchestrator_id`,`app_id`,`source`,`version`,`comment`,`update_time`,`updater`,`project_id`,`content`,`context_id`,`valid_flag`, `commit_id`
     </sql>
 
     <sql id="orchestrator_ref_orchestration">
@@ -86,7 +86,7 @@
             parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         INSERT INTO dss_orchestrator_version_info (<include refid="orchestrator_version"/>)
         VALUES
-        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},#{updateTime},#{updater},#{projectId},#{content},#{contextId},#{validFlag})
+        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},#{updateTime},#{updater},#{projectId},#{content},#{contextId},#{validFlag}, #{commitId})
     </insert>
 
 
@@ -121,7 +121,7 @@
     <select id="getLatestOrchestratorVersionByIdAndValidFlag"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT
-        <include refid="orchestrator_version"/>,`commit_id`
+        <include refid="orchestrator_version"/>
         FROM
         `dss_orchestrator_version_info`
         WHERE
@@ -189,6 +189,7 @@
         <result column="updater" property="updater" jdbcType="LONGVARCHAR"/>
         <result column="project_id" property="projectId" jdbcType="BIGINT"/>
         <result column="content" property="content" jdbcType="LONGVARCHAR"/>
+        <result column="commit_id" property="commitId" jdbcType="LONGVARCHAR"/>
     </resultMap>
 
     <select id="getOrchestratorVersions" resultMap="orchestrator_version_info_result_map">

@@ -491,7 +491,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.checkoutTargetCommit(repository, request);
             // push
             List<String> paths = Arrays.asList(request.getPath());
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, "revert by : " + request.getUsername(), paths);
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, "revert "+ DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername(), paths);
 
             List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getPath(), 1);
             if (CollectionUtils.isEmpty(latestCommit)) {

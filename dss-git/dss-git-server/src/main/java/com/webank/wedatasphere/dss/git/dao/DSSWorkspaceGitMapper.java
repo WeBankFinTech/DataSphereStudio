@@ -2,6 +2,7 @@ package com.webank.wedatasphere.dss.git.dao;
 
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 
+import com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,4 +21,8 @@ public interface DSSWorkspaceGitMapper {
     List<GitUserEntity> selectGitUser(@Param("workspaceId") Long workspaceId, @Param("type") String type, @Param("gitUser") String gitUser);
 
     List<Long> getAllWorkspaceId();
+
+    List<GitProjectGitInfo> getProjectIdListByWorkspaceId(@Param ("workspaceId") Long workspaceId);
+
+    void insertProjectInfo(GitProjectGitInfo projectGitInfo);
 }

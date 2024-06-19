@@ -15,6 +15,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoRespo
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserUpdateResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.git.dao.DSSWorkspaceGitMapper;
+import com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
 import com.webank.wedatasphere.dss.git.utils.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -118,14 +119,14 @@ public class GitProjectManager {
             gitUser.setGitToken(encryptToken);
         }
         GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
+        gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
         if (oldGitUserDo == null) {
             // 工作空间--git用户 为一一对应关系
             if (gitUserEntity != null) {
                 return new GitUserUpdateResponse(80001, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
             }
             gitUser.setCreateBy(userName);
-            gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
-            GitUserUpdateResponse userIdFromGit = getUserIdFromGit(gitUser, type);
+            GitUserUpdateResponse userIdFromGit = getUserIdFromGit(gitUser, type, false, oldGitUserDo);
             if (userIdFromGit != null) {
                 return userIdFromGit;
             }
@@ -137,7 +138,7 @@ public class GitProjectManager {
             if (gitUserEntity != null && (!gitUserEntity.getWorkspaceId().equals(gitUser.getWorkspaceId()) || !gitUserEntity.getType().equals(type))) {
                 return new GitUserUpdateResponse(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
             }
-            GitUserUpdateResponse userIdFromGit = getUserIdFromGit(gitUser, type);
+            GitUserUpdateResponse userIdFromGit = getUserIdFromGit(gitUser, type, true, oldGitUserDo);
             if (userIdFromGit != null) {
                 return userIdFromGit;
             }
@@ -147,7 +148,7 @@ public class GitProjectManager {
         return new GitUserUpdateResponse(0,"", null);
     }
 
-    private static GitUserUpdateResponse getUserIdFromGit(GitUserEntity gitUser, String type) throws IOException, com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException {
+    private static GitUserUpdateResponse getUserIdFromGit(GitUserEntity gitUser, String type, Boolean update, GitUserEntity oldGitUser) throws IOException, com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException {
         if (GitConstant.GIT_ACCESS_READ_TYPE.equals(type)) {
             GitUserEntity writeGitUser = selectGit(gitUser.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
             if (writeGitUser == null) {
@@ -155,8 +156,25 @@ public class GitProjectManager {
             }
             String userGitId = DSSGitUtils.getUserIdByUsername(writeGitUser, gitUser.getGitUser());
             gitUser.setGitUserId(userGitId);
+            if (update) {
+                List<GitProjectGitInfo> projectGitInfos = workspaceGitMapper.getProjectIdListByWorkspaceId(gitUser.getWorkspaceId());
+                for (GitProjectGitInfo projectGitInfo : projectGitInfos) {
+                    // 删除权限
+                    LOGGER.info("删除用户" + oldGitUser.getGitUser() + "在" + projectGitInfo.getProjectName() + "项目的只读权限");
+                    DSSGitUtils.removeProjectMember(writeGitUser, oldGitUser.getGitUserId(), projectGitInfo.getGitProjectId());
+                    LOGGER.info("删除成功");
+                    // 增加权限
+                    LOGGER.info("增加用户" + gitUser.getGitUser() + "在" + projectGitInfo.getProjectName() + "项目的只读权限");
+                    DSSGitUtils.addProjectMember(writeGitUser, userGitId, projectGitInfo.getGitProjectId(), 20);
+                    LOGGER.info("增加成功");
+                }
+            }
         }
         return null;
+    }
+
+    public static void insert (GitProjectGitInfo projectGitInfo) {
+        workspaceGitMapper.insertProjectInfo(projectGitInfo);
     }
 
     public static GitUserInfoResponse selectGitUserInfo(GitUserInfoRequest gitUserInfoRequest) throws DSSErrorException {

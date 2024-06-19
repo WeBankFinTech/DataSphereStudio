@@ -8,6 +8,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorExcepti
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
+import com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo;
 import com.webank.wedatasphere.dss.git.manage.GitProjectManager;
 import com.webank.wedatasphere.dss.git.service.DSSGitProjectManagerService;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
@@ -66,6 +67,12 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 获取项目ProjectId
             String projectIdByName = DSSGitUtils.getProjectIdByName(gitUser, request.getProjectName());
             DSSGitUtils.addProjectMember(gitUser, readGitUser.getGitUserId(), projectIdByName, 20);
+            // 存储projectId
+            GitProjectGitInfo projectGitInfo = new GitProjectGitInfo();
+            projectGitInfo.setGitProjectId(projectIdByName);
+            projectGitInfo.setProjectName(request.getProjectName());
+            projectGitInfo.setWorkspaceId(workspaceId);
+            GitProjectManager.insert(projectGitInfo);
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);

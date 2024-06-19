@@ -422,7 +422,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 //        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
 
         OrchestratorRollBackGitVo rollBackGitVo =new OrchestratorRollBackGitVo();
-        rollBackGitVo.setOldOrcVersion(oldOrcVersion);
+        rollBackGitVo.setOldOrcVersion(dbOrcVersion);
         rollBackGitVo.setDssOrchestratorInfo(dssOrchestratorInfo);
         rollBackGitVo.setDssOrchestratorVersion(dssOrchestratorVersion);
         rollBackGitVo.setVersion(dssOrchestratorVersion.getVersion());

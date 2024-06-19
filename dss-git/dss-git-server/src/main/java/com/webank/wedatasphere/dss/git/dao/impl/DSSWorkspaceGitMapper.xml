@@ -24,7 +24,7 @@
 
     <insert id="insertProjectInfo" parameterType="com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo">
         insert into dss_project_associate_git (workspace_id, git_project_id, project_name)
-        values (#(workspaceId), #{gitProjectId}, #{projectName})
+        values (#{workspaceId}, #{gitProjectId}, #{projectName})
     </insert>
 
 

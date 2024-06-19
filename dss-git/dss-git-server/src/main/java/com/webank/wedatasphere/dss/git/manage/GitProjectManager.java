@@ -237,7 +237,7 @@ public class GitProjectManager {
                 return new String(encrypted);
             }
         } catch (Exception e) {
-            throw new DSSErrorException(800001, "加密失败");
+            throw new DSSErrorException(800001, "加密失败,原因为" + e);
         }
     }
 
@@ -276,7 +276,7 @@ public class GitProjectManager {
             return new GitConnectResponse(false);
         } catch (DSSErrorException e) {
             LOGGER.info("Error verifying token: " + e.getMessage());
-            throw new DSSErrorException(800001, "请检查token是否正确");
+            throw new DSSErrorException(800001, "校验失败" + e.getMessage());
         }catch (Exception e) {
             throw new DSSErrorException(800001, "校验token失败，请确认当前环境git是否可以正常访问" + e);
         }

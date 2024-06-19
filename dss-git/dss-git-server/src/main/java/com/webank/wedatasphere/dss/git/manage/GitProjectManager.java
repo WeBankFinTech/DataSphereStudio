@@ -267,8 +267,8 @@ public class GitProjectManager {
                     LOGGER.info("Token is valid and matches the username: " + actualUsername);
                     return new GitConnectResponse(true);
                 }else {
-                    LOGGER.info("Token is invalid or does not match the expected username.");
-                    return new GitConnectResponse(false);
+                    LOGGER.info("当前token与用户名" + actualUsername + "匹配，与当前用户名" + expectedUsername + "不匹配");
+                    throw new DSSErrorException(800001, "当前用户名 token 不匹配，请检查");
                 }
             } else if (response.getStatusLine().getStatusCode() == 401){
                 throw new DSSErrorException(800001, "请检查token是否正确");

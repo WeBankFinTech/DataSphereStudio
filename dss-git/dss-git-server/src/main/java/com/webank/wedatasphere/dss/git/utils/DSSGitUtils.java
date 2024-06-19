@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import org.apache.http.client.methods.HttpDelete;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
@@ -406,6 +407,25 @@ public class DSSGitUtils {
             }
         } catch (Exception e) {
             throw new GitErrorException(80001, "添加用户失败，请检查编辑用户token是否过期或git服务是否正常");
+        }
+    }
+
+    public static boolean removeProjectMember(GitUserEntity gitUser, String userId, String projectId) throws GitErrorException {
+        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members/" + userId;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpDelete request = new HttpDelete(urlString);
+            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                int responseCode = response.getStatusLine().getStatusCode();
+                if (responseCode == 204) {
+                    return true;
+                } else {
+                    throw new GitErrorException(80001, "请检查工作空间Git只读用户是否存在");
+                }
+            }
+        } catch (IOException e) {
+            throw new GitErrorException(80001, "更新用户权限失败", e);
         }
     }
 

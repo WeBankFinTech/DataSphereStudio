@@ -400,7 +400,7 @@ public class DSSMigrateRestful {
             // 解压后工程文件夹路径
             String flowBasePath = pathRoot + File.separator + projectName;
             // 删除 .metaconf文件夹
-            String flowMetaPath = flowBasePath + ".metaConf";
+            String flowMetaPath = flowBasePath + File.separator + ".metaConf";
             File metaFile = new File(flowMetaPath);
             if (metaFile.exists()) {
                 FileUtils.deleteDirectory(metaFile);

@@ -392,9 +392,9 @@ public class DSSMigrateRestful {
         }
         if (null != exportResponse) {
             // 获取本地路径
-            String pathRoot = IoUtils.generateIOPath(userName, "project", "");
+            String pathRoot = IoUtils.generateIOPath(userName, projectName, "");
             // 下载编排文件到本地
-            String zipFilePath = bmlService.downloadToLocalPath(userName, exportResponse.resourceId(), exportResponse.version(), pathRoot + "project.zip");
+            String zipFilePath = bmlService.downloadToLocalPath(userName, exportResponse.resourceId(), exportResponse.version(), pathRoot + ".zip");
             // 解压下载文件
 //            ZipHelper.unzip(zipFilePath);
             // 解压后工程文件夹路径

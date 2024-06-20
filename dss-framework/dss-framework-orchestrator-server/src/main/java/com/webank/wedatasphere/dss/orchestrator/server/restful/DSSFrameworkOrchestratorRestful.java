@@ -333,7 +333,12 @@ public class DSSFrameworkOrchestratorRestful {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
         Long orchestratorId = submitFlowRequest.getOrchestratorId();
-        checkWorkspace(orchestratorId, workspace);
+        try {
+            checkWorkspace(orchestratorId, workspace);
+        } catch (Exception e) {
+            LOGGER.error("check failed, the reason is: ", e);
+            return Message.error("提交失败，原因为：" + e.getMessage());
+        }
 
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
@@ -413,7 +418,12 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
-        checkWorkspace(orchestratorId, workspace);
+        try {
+            checkWorkspace(orchestratorId, workspace);
+        } catch (Exception e) {
+            LOGGER.error("check failed, the reason is: ", e);
+            return Message.error("提交失败，原因为：" + e.getMessage());
+        }
 
         OrchestratorSubmitJob orchestratorSubmitJob = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
         // 未提交
@@ -432,7 +442,12 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
-        checkWorkspace(orchestratorId, workspace);
+        try {
+            checkWorkspace(orchestratorId, workspace);
+        } catch (Exception e) {
+            LOGGER.error("check failed, the reason is: ", e);
+            return Message.error("提交失败，原因为：" + e.getMessage());
+        }
 
         GitHistoryResponse history = orchestratorFrameworkService.getHistory(workspace.getWorkspaceId(), orchestratorId, projectName);
 

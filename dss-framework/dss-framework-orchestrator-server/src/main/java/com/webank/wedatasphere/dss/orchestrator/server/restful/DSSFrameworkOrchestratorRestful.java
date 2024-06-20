@@ -19,10 +19,14 @@ package com.webank.wedatasphere.dss.orchestrator.server.restful;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
@@ -155,6 +159,12 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         if (orchestratorFrameworkService.getOrchestratorCopyStatus(deleteRequest.getId())) {
             return Message.error("当前工作流正在被复制，不允许删除");
+        }
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(deleteRequest.getProjectId());
+        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+        if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+            DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
         }
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
@@ -322,6 +332,9 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
+        Long orchestratorId = submitFlowRequest.getOrchestratorId();
+        checkWorkspace(orchestratorId, workspace);
+
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
 
@@ -400,6 +413,8 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
+        checkWorkspace(orchestratorId, workspace);
+
         OrchestratorSubmitJob orchestratorSubmitJob = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
         // 未提交
         if (orchestratorSubmitJob == null) {
@@ -417,9 +432,25 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
+        checkWorkspace(orchestratorId, workspace);
+
         GitHistoryResponse history = orchestratorFrameworkService.getHistory(workspace.getWorkspaceId(), orchestratorId, projectName);
 
         return Message.ok().data("history", history);
+    }
+
+    private void checkWorkspace(Long orchestratorId, Workspace workspace) throws DSSErrorException{
+        OrchestratorVo orchestratorVoById = orchestratorService.getOrchestratorVoById(orchestratorId);
+        if (orchestratorVoById == null) {
+            DSSExceptionUtils.dealErrorException(80001, "编排不存在", DSSErrorException.class);
+        }
+        long projectId = orchestratorVoById.getDssOrchestratorInfo().getProjectId();
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(projectId);
+        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+        if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+            DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
+        }
     }
 
     @RequestMapping(value = "allType", method = RequestMethod.GET)

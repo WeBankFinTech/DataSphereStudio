@@ -150,4 +150,6 @@ public interface OrchestratorService {
 
     OrchestratorVo getOrchestratorByAppId(Long appId);
 
+    List<DSSOrchestratorInfo> getOrchestratorInfoByLabel(OrchestratorRequest orchestratorRequest);
+
 }

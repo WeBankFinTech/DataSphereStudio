@@ -37,6 +37,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfoList;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
@@ -517,11 +518,16 @@ public class OrchestratorServiceImpl implements OrchestratorService {
      */
     @Override
     public List<OrchestratorBaseInfo> getOrchestratorInfos(OrchestratorRequest orchestratorRequest, String username) {
-        List<DSSOrchestratorInfo> list = orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{
-            put("workspace_id", orchestratorRequest.getWorkspaceId());
-            put("project_id", orchestratorRequest.getProjectId());
-            put("orchestrator_mode", orchestratorRequest.getOrchestratorMode());
-        }});
+        LabelRouteVO labels = orchestratorRequest.getLabels();
+        List<DSSOrchestratorInfo> list = new ArrayList<>();
+        if ("dev".equals(labels.getRoute())) {
+            list = getOrchestratorInfoByLabel(orchestratorRequest);
+        } else {
+            List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labels.getRoute()));
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabelList);
+            DSSOrchestratorInfoList orchestratorInfoList = RpcAskUtils.processAskException(sender.ask(orchestratorRequest), DSSOrchestratorInfoList.class, OrchestratorRequest.class);
+            list = orchestratorInfoList.getOrchestratorInfos();
+        }
         List<OrchestratorBaseInfo> retList = new ArrayList<>(list.size());
         if (!CollectionUtils.isEmpty(list)) {
             //todo Is used in front-end?
@@ -554,6 +560,14 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         return retList;
     }
 
+    @Override
+    public List<DSSOrchestratorInfo> getOrchestratorInfoByLabel(OrchestratorRequest orchestratorRequest) {
+        return orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{
+            put("workspace_id", orchestratorRequest.getWorkspaceId());
+            put("project_id", orchestratorRequest.getProjectId());
+            put("orchestrator_mode", orchestratorRequest.getOrchestratorMode());
+        }});
+    }
     @Override
     public ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos) {
         List<DSSOrchestratorInfo> orchestratorInfos = orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{

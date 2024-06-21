@@ -23,11 +23,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerService {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     @Qualifier("projectBmlService")
@@ -60,10 +61,13 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 提交
             String comment = "init project: " + request.getProjectName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 首次创建提交项目整体
-            List<String> paths = Arrays.asList(".");
+            List<String> paths = Collections.singletonList(".");
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
             // 获取工作空间只读用户
             GitUserEntity readGitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_READ_TYPE, true);
+            if (readGitUser == null) {
+                throw new DSSErrorException(80001, "只读用户不能为空，需完成工作空间制度用户设置");
+            }
             // 获取项目ProjectId
             String projectIdByName = DSSGitUtils.getProjectIdByName(gitUser, request.getProjectName());
             DSSGitUtils.addProjectMember(gitUser, readGitUser.getGitUserId(), projectIdByName, 20);
@@ -76,7 +80,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);
-            throw new DSSErrorException(010001, "create project failed, the reason is: " + e);
+            throw new DSSErrorException(80001, "create project failed, the reason is: " + e);
         } finally {
             if (repository != null) {
                 repository.close();

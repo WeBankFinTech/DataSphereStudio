@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerService {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     @Qualifier("workflowBmlService")
@@ -114,8 +114,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
-            throw new DSSErrorException(010001, "commit workflow failed, the reason is: " + e);
+            logger.error("commit failed, the reason is ",e);
+            throw new DSSErrorException(8001, "commit workflow failed, the reason is: " + e);
         }
         return commitResponse;
     }
@@ -137,8 +137,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
-        }
-        if (request == null) {
             return new GitSearchResponse();
         }
         if (CollectionUtils.isEmpty(request.getTypeList())) {
@@ -316,7 +314,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         } catch (IOException | InterruptedException e) {
             logger.error("grep failed ,the reason is :", e);
         } finally {
-            process.destroy();
+            if (process != null) {
+                process.destroy();
+            }
         }
         return result;
     }
@@ -353,7 +353,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.push(repository, request.getProjectName(), gitUser,"delete " + request.getDeleteFileList(), request.getDeleteFileList());
         } catch (Exception e) {
             logger.error("delete failed, the reason is ",e);
-            throw new DSSErrorException(010001, "delete workflow failed, the reason is: " + e);
+            throw new DSSErrorException(80001, "delete workflow failed, the reason is: " + e);
         }
         return null;
     }
@@ -365,7 +365,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
             return null;
         }
-        GitFileContentResponse contentResponse = null;
+        GitFileContentResponse contentResponse = new GitFileContentResponse();
         // 拼接.git路径
         String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
         // 获取git仓库
@@ -384,7 +384,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             contentResponse.setBmlResource(bmlResource);
             return contentResponse;
         } catch (Exception e) {
-            throw new DSSErrorException(010001, "getFileContent failed, the reason is: " + e);
+            throw new DSSErrorException(80001, "getFileContent failed, the reason is: " + e);
         }
     }
 
@@ -406,7 +406,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
-            List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilePath(), 100);
+            List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilePath(), null);
             if (CollectionUtils.isEmpty(latestCommit)) {
                 logger.error("get Commit failed, the reason is null");
             }else {
@@ -414,7 +414,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
 
         } catch (Exception e) {
-            throw new DSSErrorException(010001, "getHistory failed, the reason is: " + e);
+            throw new DSSErrorException(80001, "getHistory failed, the reason is: " + e);
         }
         return response;
     }
@@ -436,7 +436,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             }
         } catch (Exception e) {
             logger.info("get repository failed, the reason is: ", e);
-            throw new DSSErrorException(010001, "get repository failed, the reason is: " + e);
+            throw new DSSErrorException(80001, "get repository failed, the reason is: " + e);
         }
         return repository;
     }
@@ -467,7 +467,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
         } catch (Exception e) {
             logger.error("getCurrentCommit, the reason is ",e);
-            throw new DSSErrorException(010001, "getCurrentCommit failed, the reason is: " + e);
+            throw new DSSErrorException(80001, "getCurrentCommit failed, the reason is: " + e);
         }
         return null;
     }
@@ -490,7 +490,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 回滚
             DSSGitUtils.checkoutTargetCommit(repository, request);
             // push
-            List<String> paths = Arrays.asList(request.getPath());
+            List<String> paths = Collections.singletonList(request.getPath());
             DSSGitUtils.push(repository, request.getProjectName(), gitUser, "revert "+ DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername(), paths);
 
             List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getPath(), 1);
@@ -502,7 +502,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
         } catch (Exception e) {
             logger.error("checkOut failed, the reason is ",e);
-            throw new DSSErrorException(010001, "checkOut failed, the reason is: " + e);
+            throw new DSSErrorException(80001, "checkOut failed, the reason is: " + e);
         }
         return null;
     }
@@ -539,8 +539,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
 
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
-            throw new DSSErrorException(010001, "removeFile failed, the reason is: " + e);
+            logger.error("removeFile failed, the reason is ",e);
+            throw new DSSErrorException(80001, "removeFile failed, the reason is: " + e);
         }
         return commitResponse;
     }
@@ -567,9 +567,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String oldFileMetaPath = projectPath  + metaPath;
             String oldMetaPath = FileUtils.normalizePath(GitConstant.GIT_SERVER_META_PATH) + File.separator + FileUtils.normalizePath(request.getName());
             String fileMetaPath = projectPath + oldMetaPath;
-            List<String> fileList = new ArrayList<>();
-            fileList.add(oldFileMetaPath);
-            fileList.add(olfFilePath);
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             FileUtils.renameFile(olfFilePath, filePath);
@@ -590,7 +587,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
         } catch (Exception e) {
             logger.error("rename failed, the reason is ",e);
-            throw new DSSErrorException(010001, "rename failed, the reason is: " + e);
+            throw new DSSErrorException(80001, "rename failed, the reason is: " + e);
         }
         return commitResponse;
     }
@@ -616,7 +613,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
             if (StringUtils.isEmpty(request.getOldCommitId())) {
                 // 去掉上线
-                List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getDirName(), 100);
+                List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getDirName(), null);
                 if (CollectionUtils.isEmpty(latestCommit)) {
                     logger.error("get Commit failed, the reason is null");
                 }else {
@@ -626,8 +623,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 response = DSSGitUtils.listCommitsBetween(repository, request.getOldCommitId(), request.getNewCommitId(), request.getDirName());
             }
         } catch (Exception e) {
-            logger.error("pull failed, the reason is ",e);
-            throw new DSSErrorException(010001, "getHistory failed, the reason is: " + e);
+            logger.error("getHistory failed, the reason is ",e);
+            throw new DSSErrorException(80001, "getHistory failed, the reason is: " + e);
         }
         return response;
     }

@@ -74,7 +74,7 @@ public class DSSGitUtils {
                 }
             }
         } else {
-            throw new GitErrorException(80001, "git init failed, the reason is: projectName " + projectName +" already exists");
+            throw new GitErrorException(80101, "git init failed, the reason is: projectName " + projectName +" already exists");
         }
     }
 
@@ -92,9 +92,9 @@ public class DSSGitUtils {
 
             logger.info("remote success");
         } catch (URISyntaxException e) {
-            throw new GitErrorException(80001, "connect Uri " + remoteUrl +" failed, the reason is: ", e);
+            throw new GitErrorException(80102, "connect Uri " + remoteUrl +" failed, the reason is: ", e);
         } catch (GitAPIException  e) {
-            throw new GitErrorException(80001, "remote git failed, the reason is: ", e);
+            throw new GitErrorException(80102, "remote git failed, the reason is: ", e);
         }
 
     }
@@ -115,7 +115,7 @@ public class DSSGitUtils {
 
                 git.close(); // 不再需要时关闭Git对象
             } catch (GitAPIException e) {
-                throw new GitErrorException(80001, "git Create failed, the reason is: ", e);
+                throw new GitErrorException(80103, "git Create failed, the reason is: ", e);
             }
         } else {
             logger.info(respo + " already exists");
@@ -146,7 +146,7 @@ public class DSSGitUtils {
                         reset(repository, projectName);
                     }
                 }else {
-                    throw new GitErrorException(80001, "git pull failed");
+                    throw new GitErrorException(80104, "git pull failed");
                 }
             }
         } catch (Exception e) {
@@ -234,7 +234,7 @@ public class DSSGitUtils {
             logger.info("Changes pushed to remote repository.");
         } catch (GitAPIException e) {
             reset(repository, projectName);
-            throw new GitErrorException(80001, "提交失败，请重试或检查token是否过期", e);
+            throw new GitErrorException(80105, "提交失败，请重试或检查token是否过期", e);
         }
     }
 
@@ -249,7 +249,7 @@ public class DSSGitUtils {
 
             logger.info("git reset success : " + projectName);
         } catch (GitAPIException e) {
-            throw new GitErrorException(80001, "git reset failed, the reason is: ", e);
+            throw new GitErrorException(80106, "git reset failed, the reason is: ", e);
         }
     }
 
@@ -270,7 +270,7 @@ public class DSSGitUtils {
 
         } catch (GitAPIException e) {
             reset(repository, request.getProjectName());
-            throw new GitErrorException(80001, "git check out failed, the reason is: ", e);
+            throw new GitErrorException(80107, "git check out failed, the reason is: ", e);
         }
     }
 
@@ -294,7 +294,7 @@ public class DSSGitUtils {
                 }
             }
         } catch (Exception e) {
-            throw new GitErrorException(80001, "检查项目名称失败，请检查工作空间token是否过期", e);
+            throw new GitErrorException(80108, "检查项目名称失败，请检查工作空间token是否过期", e);
         }
     }
 
@@ -325,14 +325,14 @@ public class DSSGitUtils {
                         JsonObject userObject = jsonArray.get(0).getAsJsonObject();
                         return userObject.get("id").toString();
                     } else {
-                        throw new GitErrorException(80001, "获取userId失败，请检查该用户是否为git用户并激活");
+                        throw new GitErrorException(80109, "获取userId失败，请检查该用户是否为git用户并激活");
                     }
                 } else {
-                    throw new GitErrorException(80001, "获取userId失败，请检查编辑用户token是否过期或git服务是否正常");
+                    throw new GitErrorException(80109, "获取userId失败，请检查编辑用户token是否过期或git服务是否正常");
                 }
             }
         } catch (Exception e) {
-            throw new GitErrorException(80001, "获取该git用户Id失败，原因为", e);
+            throw new GitErrorException(80109, "获取该git用户Id失败，原因为", e);
         } finally {
             if (in != null) {
                 in.close();
@@ -375,13 +375,13 @@ public class DSSGitUtils {
                         }
                     }
                 } else {
-                    throw new GitErrorException(80001, "项目创建失败，请稍后重试");
+                    throw new GitErrorException(80110, "项目创建失败，请稍后重试");
                 }
             } else {
-                throw new GitErrorException(80001, "请检查编辑用户token是否过期或git服务是否正常");
+                throw new GitErrorException(80110, "请检查编辑用户token是否过期或git服务是否正常");
             }
         } catch (Exception e) {
-            throw new GitErrorException(80001, "获取该项目git Id 失败，原因为", e);
+            throw new GitErrorException(80110, "获取该项目git Id 失败，原因为", e);
         }
         return null;
     }
@@ -402,11 +402,11 @@ public class DSSGitUtils {
                 if (statusCode == 201) {
                     return true;
                 } else {
-                    throw new GitErrorException(80001, "添加用户失败，请检查只读用户是否存在或编辑用户token是否过期");
+                    throw new GitErrorException(80111, "添加用户失败，请检查只读用户是否存在或编辑用户token是否过期");
                 }
             }
         } catch (Exception e) {
-            throw new GitErrorException(80001, "添加用户失败，请检查编辑用户token是否过期或git服务是否正常");
+            throw new GitErrorException(80111, "添加用户失败，请检查编辑用户token是否过期或git服务是否正常");
         }
     }
 
@@ -421,11 +421,11 @@ public class DSSGitUtils {
                 if (responseCode == 204) {
                     return true;
                 } else {
-                    throw new GitErrorException(80001, "请检查工作空间Git只读用户是否存在");
+                    throw new GitErrorException(80112, "请检查工作空间Git只读用户是否存在");
                 }
             }
         } catch (IOException e) {
-            throw new GitErrorException(80001, "更新用户权限失败", e);
+            throw new GitErrorException(80112, "更新用户权限失败", e);
         }
     }
 
@@ -457,9 +457,9 @@ public class DSSGitUtils {
                     allProjectNames.addAll(projectNames);
                 }
             } catch (IOException e) {
-                throw new GitErrorException(80001, "检查项目名称失败，请检查工作空间token是否过期", e);
+                throw new GitErrorException(80113, "检查项目名称失败，请检查工作空间token是否过期", e);
             } catch (Exception e) {
-                throw new GitErrorException(80001, "检查项目名称时解析JSON失败，请确认git当前是否可访问 ", e);
+                throw new GitErrorException(80113, "检查项目名称时解析JSON失败，请确认git当前是否可访问 ", e);
             }
             page++;
         } while (projectNames.size() > 0);
@@ -514,7 +514,7 @@ public class DSSGitUtils {
 
             return tree;
         } catch (IOException | GitAPIException e) {
-            throw new GitErrorException(80001, "git status failed, the reason is : ", e);
+            throw new GitErrorException(80114, "git status failed, the reason is : ", e);
         }
     }
 
@@ -542,7 +542,7 @@ public class DSSGitUtils {
             logger.info(response.toString());
 
         } catch (Exception e) {
-            throw new GitErrorException(80001, "归档失败，请检查当前token是否过期 ", e);
+            throw new GitErrorException(80115, "归档失败，请检查当前token是否过期 ", e);
         }
     }
 
@@ -560,9 +560,9 @@ public class DSSGitUtils {
             FileUtils.removeDirectory(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  projectName);
             logger.info("Remote 'origin' removed successfully.");
         } catch (GitAPIException e) {
-            throw new GitErrorException(80001, "git archive failed, the reason is : ", e);
+            throw new GitErrorException(80116, "git archive failed, the reason is : ", e);
         } catch (IOException e) {
-            throw new GitErrorException(80001, "archive failed, the reason is : ", e);
+            throw new GitErrorException(80116, "archive failed, the reason is : ", e);
         }
     }
 
@@ -598,7 +598,7 @@ public class DSSGitUtils {
                 revWalk.dispose();
             }
         } catch (IOException e) {
-            throw new GitErrorException(80001, "getFileContent failed, the reason is : ", e);
+            throw new GitErrorException(80117, "getFileContent failed, the reason is : ", e);
         }
         return content;
     }
@@ -625,7 +625,7 @@ public class DSSGitUtils {
                 logger.info("Commit Author: " + commitAuthor);
             }
         } catch (Exception e) {
-            throw new GitErrorException(80001, "git log failed, the reason is : ", e);
+            throw new GitErrorException(80118, "git log failed, the reason is : ", e);
         }
     }
 
@@ -648,7 +648,7 @@ public class DSSGitUtils {
                 return commitResponse;
             }
         } catch (IOException e) {
-            throw new GitErrorException(80001, "get current commit failed, the reason is : ", e);
+            throw new GitErrorException(80119, "get current commit failed, the reason is : ", e);
         }
     }
 
@@ -675,7 +675,12 @@ public class DSSGitUtils {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try (Git git = new Git(repository)) {
-            Iterable<RevCommit> commits = git.log().addPath(filePath).setMaxCount(num).call();
+            Iterable<RevCommit> commits = null;
+            if (num == null) {
+                commits = git.log().addPath(filePath).call();
+            } else {
+                commits = git.log().addPath(filePath).setMaxCount(num).call();
+            }
             for (RevCommit commit : commits) {
                 GitCommitResponse commitResponse = new GitCommitResponse();
                 commitResponse.setCommitId(commit.getId().getName());
@@ -688,7 +693,7 @@ public class DSSGitUtils {
 
             return commitResponseList;
         } catch (GitAPIException e) {
-            throw new GitErrorException(80001, "get latestCommitId failed, the reason is : ", e);
+            throw new GitErrorException(80120, "get latestCommitId failed, the reason is : ", e);
         }
     }
 
@@ -726,7 +731,7 @@ public class DSSGitUtils {
                 logger.info("Author: " + authorIdent.getName() + " <" + authorIdent.getEmailAddress() + ">"); // 提交人
             }
         } catch (Exception e) {
-            throw new GitErrorException(80001, "get log between " + oldCommitId + " and " + newCommitId + "failed, the reason is : ", e);
+            throw new GitErrorException(80121, "get log between " + oldCommitId + " and " + newCommitId + "failed, the reason is : ", e);
         }
         GitHistoryResponse historyResponse = new GitHistoryResponse();
         historyResponse.setResponses(gitCommitResponseList);

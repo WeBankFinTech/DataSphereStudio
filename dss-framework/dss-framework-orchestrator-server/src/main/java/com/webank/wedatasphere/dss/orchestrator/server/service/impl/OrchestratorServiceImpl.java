@@ -520,7 +520,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     public List<OrchestratorBaseInfo> getOrchestratorInfos(OrchestratorRequest orchestratorRequest, String username) {
         LabelRouteVO labels = orchestratorRequest.getLabels();
         List<DSSOrchestratorInfo> list = new ArrayList<>();
-        if ("dev".equals(labels.getRoute())) {
+        if (labels == null || "dev".equals(labels.getRoute())) {
             list = getOrchestratorInfoByLabel(orchestratorRequest);
         } else {
             List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labels.getRoute()));

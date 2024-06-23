@@ -458,9 +458,11 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                                      String username, String proxyUser, Workspace workspace) throws Exception {
         Long projectId=exportAllOrchestratorsReqest.getProjectId();
         EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
-        List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(
-                new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId())
-                , exportAllOrchestratorsReqest.getLabels());
+        OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), batchExportOrchestratorsRequest.getProjectId());
+        LabelRouteVO labelRouteVO = new LabelRouteVO();
+        labelRouteVO.setRoute(exportAllOrchestratorsReqest.getLabels());
+        orchestratorRequest.setLabels(labelRouteVO);
+        List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(orchestratorRequest, username);
         DSSProjectDO projectDO=projectService.getProjectById(projectId);
         String projectName = projectDO.getName();
         String projectPath = exportService.batchExport(username, projectId, orchestrators, projectName, envLabel, workspace);
@@ -544,9 +546,11 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                                          String username, String proxyUser, Workspace workspace) throws Exception {
         Long projectId=exportAllOrchestratorsReqest.getProjectId();
         EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
-        List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(
-                new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId())
-                , exportAllOrchestratorsReqest.getLabels());
+        OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), batchExportOrchestratorsRequest.getProjectId());
+        LabelRouteVO labelRouteVO = new LabelRouteVO();
+        labelRouteVO.setRoute(exportAllOrchestratorsReqest.getLabels());
+        orchestratorRequest.setLabels(labelRouteVO);
+        List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(orchestratorRequest, username);
         DSSProjectDO projectDO=projectService.getProjectById(projectId);
         String projectName = projectDO.getName();
         String exportSaveBasePath = IoUtils.generateTempIOPath(username);

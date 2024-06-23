@@ -30,6 +30,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
@@ -458,7 +459,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                                      String username, String proxyUser, Workspace workspace) throws Exception {
         Long projectId=exportAllOrchestratorsReqest.getProjectId();
         EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
-        OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), batchExportOrchestratorsRequest.getProjectId());
+        OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId());
         LabelRouteVO labelRouteVO = new LabelRouteVO();
         labelRouteVO.setRoute(exportAllOrchestratorsReqest.getLabels());
         orchestratorRequest.setLabels(labelRouteVO);
@@ -546,7 +547,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                                          String username, String proxyUser, Workspace workspace) throws Exception {
         Long projectId=exportAllOrchestratorsReqest.getProjectId();
         EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
-        OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), batchExportOrchestratorsRequest.getProjectId());
+        OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId());
         LabelRouteVO labelRouteVO = new LabelRouteVO();
         labelRouteVO.setRoute(exportAllOrchestratorsReqest.getLabels());
         orchestratorRequest.setLabels(labelRouteVO);

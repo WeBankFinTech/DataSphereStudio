@@ -562,11 +562,14 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
     @Override
     public List<DSSOrchestratorInfo> getOrchestratorInfoByLabel(OrchestratorRequest orchestratorRequest) {
-        return orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{
+        List<DSSOrchestratorInfo> dssOrchestratorInfos = orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{
             put("workspace_id", orchestratorRequest.getWorkspaceId());
             put("project_id", orchestratorRequest.getProjectId());
             put("orchestrator_mode", orchestratorRequest.getOrchestratorMode());
         }});
+        if (dssOrchestratorInfos == null)
+            return new ArrayList<>();
+        return dssOrchestratorInfos;
     }
     @Override
     public ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos) {

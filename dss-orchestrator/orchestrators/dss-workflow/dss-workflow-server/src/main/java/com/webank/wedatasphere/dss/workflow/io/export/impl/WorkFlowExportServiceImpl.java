@@ -103,9 +103,6 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     @Autowired
     private DSSFlowService flowService;
 
-    protected Sender getOrchestratorSender() {
-        return DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
-    }
 
 
     @Override
@@ -127,7 +124,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         for (DSSFlow dssFlow : dssFlowList) {
             if (dssFlow.getRootFlow()) {
                 // 生成rootflow orchestrator信息
-                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
+                Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabels);
+                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
                         OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
                 DSSOrchestratorInfo dssOrchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
                 String flowMetaPath = IoUtils.generateFlowMetaIOPath(projectPath, dssOrchestratorInfo.getName());

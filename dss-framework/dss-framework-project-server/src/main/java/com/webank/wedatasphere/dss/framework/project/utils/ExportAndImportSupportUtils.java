@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.framework.project.utils;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +55,8 @@ public class ExportAndImportSupportUtils {
                 copyDirectory(workflowDir, newWorkflowDir + File.separator + workflow);
                 workFlowProjectPaths.put(workflow, Paths.get(newWorkflowDir));
             } catch (IOException e) {
-                LOGGER.error("Error while copying workflow " + workflow + ": " + e);
-                throw new DSSErrorException(70001, "复制工作流失败，原因为:" + e);
+                LOGGER.error("Error while copying workflow directory " , e);
+                throw new DSSRuntimeException(70001, "导入多个工作流时分离工作流失败，原因为:" + e.getMessage(),e);
             }
 
 
@@ -80,7 +81,7 @@ public class ExportAndImportSupportUtils {
                             Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw new RuntimeException(e);
                     }
                 });
     }

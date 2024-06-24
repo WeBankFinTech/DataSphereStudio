@@ -1,5 +1,8 @@
 package com.webank.wedatasphere.dss.framework.project.utils;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +18,7 @@ import java.util.Map;
  * Date: 2024/4/19
  */
 public class ExportAndImportSupportUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExportAndImportSupportUtils.class);
     private static final String EXTERNAL_RESOURCES = ".external-resources";
     private static final String META_CONF = ".metaConf";
 
@@ -50,8 +54,8 @@ public class ExportAndImportSupportUtils {
                 copyDirectory(workflowDir, newWorkflowDir + File.separator + workflow);
                 workFlowProjectPaths.put(workflow, Paths.get(newWorkflowDir));
             } catch (IOException e) {
-                System.err.println("Error while copying workflow " + workflow + ": " + e.getMessage());
-                e.printStackTrace();
+                LOGGER.error("Error while copying workflow " + workflow + ": " + e);
+                throw new DSSErrorException(70001, "复制工作流失败，原因为:" + e);
             }
 
 
@@ -62,6 +66,10 @@ public class ExportAndImportSupportUtils {
 
     // 复制整个目录
     private static void copyDirectory(String sourceDirectory, String destinationDirectory) throws IOException {
+        File file = new File(sourceDirectory);
+        if (!file.exists()) {
+            return ;
+        }
         Files.walk(Paths.get(sourceDirectory))
                 .forEach(source -> {
                     Path destination = Paths.get(destinationDirectory, source.toString().substring(sourceDirectory.length()));

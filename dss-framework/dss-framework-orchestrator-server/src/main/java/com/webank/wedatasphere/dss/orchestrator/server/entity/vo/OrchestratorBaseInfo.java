@@ -282,7 +282,7 @@ public class OrchestratorBaseInfo {
         OrchestratorBaseInfo baseInfo = new OrchestratorBaseInfo();
 
         // 直接对应的属性
-        baseInfo.setId(dssInfo.getId());
+        baseInfo.setOrchestratorVersionId(dssInfo.getId());
         baseInfo.setProjectId(dssInfo.getProjectId());
         baseInfo.setWorkspaceId(dssInfo.getWorkspaceId());
         baseInfo.setOrchestratorName(dssInfo.getName());

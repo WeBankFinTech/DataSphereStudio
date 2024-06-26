@@ -474,8 +474,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         String newCommitId = versionByOrchestratorId.get(0).getCommitId();
         commitInfoBetweenRequest.setNewCommitId(newCommitId);
         String oldCommitId = null;
+        int i = 0;
         for (DSSOrchestratorVersion version : versionByOrchestratorId) {
-            if (version.getCommitId()!= null && !version.getCommitId().equals(newCommitId)) {
+            if (version.getCommitId()!= null && i++ != 0) {
                 oldCommitId = version.getCommitId();
                 break;
             }

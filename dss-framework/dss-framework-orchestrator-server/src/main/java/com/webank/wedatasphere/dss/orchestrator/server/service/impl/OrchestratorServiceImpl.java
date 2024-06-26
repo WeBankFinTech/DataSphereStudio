@@ -442,26 +442,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         DSSOrchestratorVersion dssOrchestratorVersion = rollBackGitVo.getDssOrchestratorVersion();
         DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
         if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
-            try {
-                DSSFlow dssFlow = flowMapper.selectFlowByID(dssOrchestratorVersion.getAppId());
-                if (!dssFlow.getName().equals(dssOrchestratorInfo.getName())) {
-                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
-                    return ;
-                }
-                Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-                //若之前版本未进行git回滚，则自动提交回滚后的工作流至git
-                if (StringUtils.isEmpty(oldOrcVersion.getCommitId())) {
-                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
-                } else {
-                    GitRevertRequest gitRevertRequest = new GitRevertRequest(workspace.getWorkspaceId(), projectName, oldOrcVersion.getCommitId(), dssOrchestratorInfo.getName(), "system");
-                    GitCommitResponse gitCommitResponse = RpcAskUtils.processAskException(sender.ask(gitRevertRequest), GitCommitResponse.class, GitRevertRequest.class);
-                    lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), dssOrchestratorVersion.getAppId());
-                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
-                }
-            } catch (Exception e) {
-                lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
-                throw e;
-            }
+            DSSFlow dssFlow = flowMapper.selectFlowByID(dssOrchestratorVersion.getAppId());
+            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
         }
 
     }

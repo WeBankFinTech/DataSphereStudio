@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import org.apache.http.client.methods.HttpDelete;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
@@ -699,8 +700,9 @@ public class DSSGitUtils {
 
     public static GitHistoryResponse listCommitsBetween(Repository repository, String oldCommitId, String newCommitId, String path) throws Exception {
         List<GitCommitResponse> gitCommitResponseList = new ArrayList<>();
+        Set<String> commitIdSet = new HashSet<>();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         try (RevWalk walk = new RevWalk(repository)) {
             Git git = new Git(repository);
             ObjectId commitIdNow = null;
@@ -710,17 +712,32 @@ public class DSSGitUtils {
             } else {
                 commitIdNow = repository.resolve(newCommitId);
             }
+            // 代码改动
+            gitLogHistory(git, repository, oldCommitId, commitIdNow, path, gitCommitResponseList, commitIdSet);
+            // 元数据改动
+            gitLogHistory(git, repository, oldCommitId, commitIdNow, GitConstant.GIT_SERVER_META_PATH + File.separator + path, gitCommitResponseList, commitIdSet);
+        } catch (Exception e) {
+            throw new GitErrorException(80121, "get log between " + oldCommitId + " and " + newCommitId + "failed, the reason is : ", e);
+        }
+        GitHistoryResponse historyResponse = new GitHistoryResponse();
+        historyResponse.setResponses(gitCommitResponseList);
+        return historyResponse;
+    }
 
+    private static void gitLogHistory(Git git, Repository repository, String oldCommitId, ObjectId commitIdNow, String path, List<GitCommitResponse> gitCommitResponseList, Set<String> commitIdSet) throws IOException, GitAPIException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Iterable<RevCommit> commits = git.log()
+                .addRange(repository.resolve(oldCommitId), commitIdNow)
+                .addPath(path)
+                .call();
 
-            Iterable<RevCommit> commits = git.log()
-                    .addRange(repository.resolve(oldCommitId), commitIdNow)
-                    .addPath(path)
-                    .call();
-
-            for (RevCommit commit : commits) {
-                PersonIdent authorIdent = commit.getAuthorIdent(); // 获取提交人信息
-                GitCommitResponse commitResponse = new GitCommitResponse();
-                commitResponse.setCommitId(commit.getId().getName());
+        for (RevCommit commit : commits) {
+            PersonIdent authorIdent = commit.getAuthorIdent(); // 获取提交人信息
+            GitCommitResponse commitResponse = new GitCommitResponse();
+            String commitId = commit.getId().getName();
+            if (!commitIdSet.contains(commitId)) {
+                commitIdSet.add(commitId);
+                commitResponse.setCommitId(commitId);
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
                 String shortMessage = commit.getShortMessage();
                 getUserName(shortMessage, commitResponse, commit);
@@ -730,13 +747,10 @@ public class DSSGitUtils {
                 logger.info("Commit Message: " + commit.getFullMessage()); // 提交信息
                 logger.info("Author: " + authorIdent.getName() + " <" + authorIdent.getEmailAddress() + ">"); // 提交人
             }
-        } catch (Exception e) {
-            throw new GitErrorException(80121, "get log between " + oldCommitId + " and " + newCommitId + "failed, the reason is : ", e);
         }
-        GitHistoryResponse historyResponse = new GitHistoryResponse();
-        historyResponse.setResponses(gitCommitResponseList);
-        return historyResponse;
     }
+
+
 
     public static String generateGitPath(String projectName, Long workspaceId) {
         // eg ： /data/GitInstall/224/testGit/.git

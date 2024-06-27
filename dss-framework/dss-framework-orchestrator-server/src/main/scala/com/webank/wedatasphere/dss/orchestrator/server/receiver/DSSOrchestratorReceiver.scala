@@ -18,11 +18,12 @@ package com.webank.wedatasphere.dss.orchestrator.server.receiver
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol.{ResponseExportOrchestrator, ResponseImportOrchestrator}
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo
+import com.webank.wedatasphere.dss.orchestrator.common.entity.{DSSOrchestratorInfoList, OrchestratorVo}
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult
 import com.webank.wedatasphere.dss.orchestrator.publish.{ExportDSSOrchestratorPlugin, ImportDSSOrchestratorPlugin}
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.{OrchestratorRequest, OrchestratorSubmitRequest}
 import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.slf4j.{Logger, LoggerFactory}
@@ -40,7 +41,7 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
   override def receiveAndReply(message: Any, sender: Sender): Any = message match {
 
     case reqExportOrchestrator: RequestExportOrchestrator =>
-      val dssExportOrcResource: OrchestratorExportResult = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestrator(
+      val dssExportOrcResource: OrchestratorExportResult = orchestratorContext.getDSSOrchestratorPlugin(classOf[ExportDSSOrchestratorPlugin]).exportOrchestratorNew(
         reqExportOrchestrator.getUserName,
         reqExportOrchestrator.getOrchestratorId,
         reqExportOrchestrator.getOrcVersionId,
@@ -53,7 +54,7 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
       )
 
     case requestImportOrchestrator: RequestImportOrchestrator =>
-      val dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestrator(requestImportOrchestrator)
+      val dssOrchestratorVersion = orchestratorContext.getDSSOrchestratorPlugin(classOf[ImportDSSOrchestratorPlugin]).importOrchestratorNew(requestImportOrchestrator)
       ResponseImportOrchestrator(dssOrchestratorVersion.getOrchestratorId,dssOrchestratorVersion.getVersion)
 
     case addVersionAfterPublish: RequestAddVersionAfterPublish =>
@@ -90,12 +91,29 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
     case requestQueryByIdOrchestrator: RequestQueryByIdOrchestrator => {
       val orcVersionId = requestQueryByIdOrchestrator.getOrcVersionId
       val orchestratorId = requestQueryByIdOrchestrator.getOrchestratorId
-      if (orchestratorId != null) {
+      if (orcVersionId != null) {
         orchestratorService.getOrchestratorVoByIdAndOrcVersionId(orchestratorId, orcVersionId)
       } else {
         orchestratorService.getOrchestratorVoById(orchestratorId)
       }
     }
+
+    case requestQuertByAppIdOrchestrator: RequestQuertByAppIdOrchestrator =>
+      orchestratorService.getOrchestratorByAppId(requestQuertByAppIdOrchestrator.getAppId)
+    case requestSubmitOrchestratorSync: RequestSubmitOrchestratorSync =>
+      val request = new OrchestratorSubmitRequest()
+      request.setOrchestratorId(requestSubmitOrchestratorSync.getOrchestratorId)
+      request.setProjectName(requestSubmitOrchestratorSync.getProjectName)
+      request.setFlowId(requestSubmitOrchestratorSync.getFlowId)
+      request.setLabels(requestSubmitOrchestratorSync.getLabels)
+      request.setComment(requestSubmitOrchestratorSync.getComment)
+      val username = requestSubmitOrchestratorSync.getUsername
+      val workspace = requestSubmitOrchestratorSync.getWorkspace
+      orchestratorPluginService.submitWorkflowToBML(request, username, workspace)
+
+    case orchestratorRequest: OrchestratorRequest =>
+      val list = orchestratorService.getOrchestratorInfoByLabel(orchestratorRequest)
+      new DSSOrchestratorInfoList(list)
 
     case _ => throw new DSSErrorException(90000, "Not support message type " + message)
   }

@@ -40,6 +40,11 @@ public class DSSProject implements Project {
 
     private Boolean editable;
 
+    /**
+     * 1-接入git 0-不接入（默认）
+     */
+    private Boolean associateGit;
+
 
     @Override
     public Long getId() {
@@ -169,6 +174,15 @@ public class DSSProject implements Project {
                 ", workspaceId=" + workspaceId +
                 ", workspaceName='" + workspaceName + '\'' +
                 ", editable=" + editable +
+                ", associateGit=" + associateGit +
                 '}';
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

@@ -29,6 +29,8 @@ public class DSSSenderServiceImpl implements DSSSenderService {
     private final Sender workflowSender = Sender.getSender(DSSSenderServiceConf.DSS_WORKFLOW_APPLICATION_NAME_DEV.getValue());
 
     private final Sender projectSender = Sender.getSender(DSSSenderServiceConf.PROJECT_SERVER_NAME.getValue());
+
+    private final Sender gitSender = Sender.getSender(DSSSenderServiceConf.GIT_SERVER_NAME.getValue());
     @Override
     public Sender getOrcSender() {
         return orcSender;
@@ -62,6 +64,11 @@ public class DSSSenderServiceImpl implements DSSSenderService {
     @Override
     public Sender getProjectServerSender() {
         return projectSender;
+    }
+
+    @Override
+    public Sender getGitSender() {
+        return gitSender;
     }
 
 }

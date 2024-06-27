@@ -7,7 +7,7 @@ class SnapToGrid {
   constructor (cy, params) {
     this.cy = cy
     let defaults = {
-      stackOrder: -1,
+      stackOrder: 0,
       gridSpacing: 35,
       strokeStyle: '#eeeeee',
       lineWidth: 1.0,

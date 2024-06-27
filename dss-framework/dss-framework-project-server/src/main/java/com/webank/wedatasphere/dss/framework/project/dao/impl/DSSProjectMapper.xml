@@ -23,14 +23,6 @@
         , `user_id`, `create_by_str`, `update_by_str`
     </sql>
 
-    <insert id="addProject" useGeneratedKeys="true" keyProperty="id"
-            parameterType="com.webank.wedatasphere.dss.framework.project.entity.po.DSSProjectPo">
-        INSERT INTO dss_project (<include refid="project_main"/>)
-        VALUES
-        (#{id},#{name},#{source}, #{workspaceId}, #{description},#{orgID},#{visibility},#{isTransfer},#{initialOrgID},
-        #{username},#{createTime},#{createBy},#{product},#{applicationArea},#{business},
-        #{userID},#{createByStr},#{updateByStr})
-    </insert>
 
     <select id="getListByParam"
             parameterType="com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest"
@@ -40,6 +32,8 @@
         b.product,b.source,b.isArchive,b.create_time createTime,b.update_time updateTime,
         b.dev_process devProcess,b.orchestrator_mode orchestratorMode,
         b.visible visible,
+        b.associate_git associateGit,
+        b.data_source_list_json dataSourceListJson,
         GROUP_CONCAT(CONCAT(a.project_id,'-',a.priv,'-',a.username)) pusername
         FROM dss_project_user a
         LEFT JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id
@@ -80,6 +74,8 @@
         b.product,b.source,b.isArchive,b.create_time createTime,b.update_time updateTime,
         b.dev_process devProcess,b.orchestrator_mode orchestratorMode,
         b.visible visible,
+        b.associate_git associateGit,
+        b.data_source_list_json dataSourceListJson,
         GROUP_CONCAT(CONCAT(a.project_id,'-',a.priv,'-',a.username)) pusername
         FROM dss_project_user a
         LEFT JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id
@@ -99,6 +95,7 @@
         b.product,b.source,b.isArchive,b.create_time createTime,b.update_time updateTime,
         b.dev_process devProcess,b.orchestrator_mode orchestratorMode,
         b.visible visible,
+        b.data_source_list_json dataSourceListJson,
         GROUP_CONCAT(CONCAT(a.project_id,'-',a.priv,'-',a.username)) pusername
         FROM dss_project_user a
         LEFT JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id

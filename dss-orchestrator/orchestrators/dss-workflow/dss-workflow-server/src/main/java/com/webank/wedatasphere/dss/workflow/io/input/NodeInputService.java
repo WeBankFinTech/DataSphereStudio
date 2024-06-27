@@ -29,8 +29,13 @@ public interface NodeInputService {
 
     String uploadResourceToBml(String userName, String nodeJson, String inputResourcePath, String projectName) throws IOException;
 
+    String uploadResourceToBmlNew(String userName, String nodeJson, String nodePath, String projectName) throws IOException;
+
     String uploadAppConnResource(String userName, String projectName, DSSFlow dssFlow,
                                  String nodeJson, String flowContextId, String appConnResourcePath,
+                                 Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException,IOException;
+    String uploadAppConnResourceNew(String userName, String projectName, DSSFlow dssFlow,
+                                 String nodeJson, String flowContextId, String nodePath,
                                  Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException,IOException;
 
     String updateNodeSubflowID(String nodeJson, long subflowID) throws IOException;

@@ -36,5 +36,7 @@ public interface DSSSenderService {
 
     Sender getProjectServerSender();
 
+    Sender getGitSender();
+
 }
 

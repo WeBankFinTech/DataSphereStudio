@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.request;
 
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectDataSource;
+
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -77,6 +79,12 @@ public class ProjectModifyRequest {
      * 编排模式 code list
      */
     private List<String> orchestratorModeList;
+    private List<DSSProjectDataSource> dataSourceList;
+
+    /**
+     * 1-接入git 0-不接入（默认）
+     */
+    private Boolean associateGit;
 
     public String getName() {
         return name;
@@ -174,6 +182,15 @@ public class ProjectModifyRequest {
         this.orchestratorModeList = orchestratorModeList;
     }
 
+
+    public List<DSSProjectDataSource> getDataSourceList() {
+        return dataSourceList;
+    }
+
+    public void setDataSourceList(List<DSSProjectDataSource> dataSourceList) {
+        this.dataSourceList = dataSourceList;
+    }
+
     @Override
     public String toString() {
         return "ProjectModifyRequest{" +
@@ -189,6 +206,15 @@ public class ProjectModifyRequest {
                 ", workspaceId=" + workspaceId +
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
+                ", associateGit=" + associateGit +
                 '}';
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

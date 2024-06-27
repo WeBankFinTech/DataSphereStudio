@@ -523,7 +523,7 @@ export default {
       }
     },
     'Workbench:removeTab'() {
-      // fix ***REMOVED***
+      // fix http://dpms.weoa.com/#/product/100199/bug/detail/199545
       if (this.node) {
         this.resizePanel()
       }

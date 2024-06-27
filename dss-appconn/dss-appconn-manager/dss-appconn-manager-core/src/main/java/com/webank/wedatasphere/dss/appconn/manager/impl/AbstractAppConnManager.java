@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -52,7 +53,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAppConnManager.class);
     private final AppConnLoader appConnLoader = AppConnLoaderFactory.getAppConnLoader();
 
-    private final Map<String, AppConn> appConns = new HashMap<>();
+    private final Map<String, AppConn> appConns = new ConcurrentHashMap<>();
     private volatile boolean isLoaded = false;
     private List<AppConn> appConnList = null;
     AppConnInfoService appConnInfoService;
@@ -60,6 +61,8 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     private AppConnRefreshThread appConnRefreshThread;
 
     private static volatile AppConnManager appConnManager;
+
+    private static volatile boolean appConnManagerInited = false;
     private static boolean lazyLoad = false;
 
     public static void setLazyLoad() {
@@ -67,11 +70,11 @@ public abstract class AbstractAppConnManager implements AppConnManager {
     }
 
     public static AppConnManager getAppConnManager() {
-        if (appConnManager != null) {
+        if (appConnManagerInited) {
             return appConnManager;
         }
         synchronized (AbstractAppConnManager.class) {
-            if (appConnManager == null) {
+            if (!appConnManagerInited) {
                 //appconn-manager-core包无法引入manager-client包，会有maven循环依赖，这里通过反射获取client的实现类
                 //ismanager=false时，获取client端的AppConnManager实现类，ismanager=true时，获取appconn-framework端的AppConnManager实现类。
                 if (Objects.equals(AppConnManagerCoreConf.IS_APPCONN_MANAGER.getValue(), AppConnManagerCoreConf.hostname)
@@ -87,6 +90,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
                 LOGGER.info("The instance of AppConnManager is {}.", appConnManager.getClass().getName());
                 appConnManager.init();
             }
+            appConnManagerInited = true;
             return appConnManager;
         }
     }
@@ -101,6 +105,7 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             loadAppConns();
             isLoaded = true;
         }
+        LOGGER.info("AppConnManager init successfully");
     }
 
     protected abstract AppConnInfoService createAppConnInfoService();
@@ -117,9 +122,6 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             LOGGER.warn("No AppConnInfos returned, ignore it.");
             return;
         }
-        long refreshInterval = AppInstanceConstants.APP_CONN_REFRESH_INTERVAL.getValue().toLong();
-        appConnRefreshThread = new AppConnRefreshThread(this, appConnInfos);
-        Utils.defaultScheduler().scheduleAtFixedRate(appConnRefreshThread, refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
         Map<String, AppConn> appConns = new HashMap<>();
         Consumer<AppConnInfo> loadAndAdd = DSSExceptionUtils.handling(appConnInfo -> {
             AppConn appConn = loadAppConn(appConnInfo);
@@ -150,6 +152,9 @@ public abstract class AbstractAppConnManager implements AppConnManager {
             appConnList = Collections.unmodifiableList(new ArrayList<>(appConns.values()));
         }
         LOGGER.info("Inited all AppConns, the AppConn list are {}.", this.appConns.keySet());
+        long refreshInterval = AppInstanceConstants.APP_CONN_REFRESH_INTERVAL.getValue().toLong();
+        appConnRefreshThread = new AppConnRefreshThread(this, appConnInfos);
+        Utils.defaultScheduler().scheduleAtFixedRate(appConnRefreshThread, refreshInterval, refreshInterval, TimeUnit.MILLISECONDS);
     }
 
     protected AppConn loadAppConn(AppConnInfo appConnInfo) throws Exception {

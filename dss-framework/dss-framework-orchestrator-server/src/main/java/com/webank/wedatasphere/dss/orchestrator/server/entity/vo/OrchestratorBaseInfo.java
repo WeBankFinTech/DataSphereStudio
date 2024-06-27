@@ -16,6 +16,9 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.entity.vo;
 
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +37,10 @@ public class OrchestratorBaseInfo {
      * 工程id
      */
     private Long projectId;
+    /**
+     * 工作流的唯一id，不同环境里，同一个工作流保持一致，用来判断是否是同一个工作流。
+     */
+    private String uuid;
 
     /**
      * 编排模式id（工作流,调用orchestrator服务返回的orchestratorId）
@@ -94,6 +101,8 @@ public class OrchestratorBaseInfo {
 
     private String orchestratorLevel;
 
+    private String isDefaultReference;
+
     private boolean flowEditLockExist = false;
 
     public Boolean getEditable() {
@@ -123,6 +132,7 @@ public class OrchestratorBaseInfo {
      */
     private Boolean releasable;
 
+    private String status;
 
     public Long getId() {
         return id;
@@ -146,6 +156,14 @@ public class OrchestratorBaseInfo {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public Long getOrchestratorId() {
@@ -250,5 +268,77 @@ public class OrchestratorBaseInfo {
 
     public void setOrchestratorLevel(String orchestratorLevel) {
         this.orchestratorLevel = orchestratorLevel;
+    }
+
+    public String getIsDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setIsDefaultReference(String isDefaultReference) {
+        this.isDefaultReference = isDefaultReference;
+    }
+
+    public static OrchestratorBaseInfo convertFrom(DSSOrchestratorInfo dssInfo){
+        OrchestratorBaseInfo baseInfo = new OrchestratorBaseInfo();
+
+        // 直接对应的属性
+        baseInfo.setOrchestratorVersionId(dssInfo.getId());
+        baseInfo.setProjectId(dssInfo.getProjectId());
+        baseInfo.setWorkspaceId(dssInfo.getWorkspaceId());
+        baseInfo.setOrchestratorName(dssInfo.getName());
+        baseInfo.setDescription(dssInfo.getDesc());
+        baseInfo.setUses(dssInfo.getUses());
+        baseInfo.setCreateUser(dssInfo.getCreator());
+        baseInfo.setCreateTime(dssInfo.getCreateTime());
+        baseInfo.setUpdateUser(dssInfo.getUpdateUser());
+        baseInfo.setUpdateTime(dssInfo.getUpdateTime());
+
+        // 可能需要根据实际情况调整的属性
+        baseInfo.setOrchestratorMode(dssInfo.getOrchestratorMode());
+        baseInfo.setOrchestratorLevel(dssInfo.getOrchestratorLevel());
+
+        // DSSOrchestratorInfo中的orchestratorWay可能需要映射到OrchestratorBaseInfo的orchestratorWays列表中
+        List<String> orchestratorWays = new ArrayList<>();
+        orchestratorWays.add(dssInfo.getOrchestratorWay());
+        baseInfo.setOrchestratorWays(orchestratorWays);
+        return baseInfo;
+    }
+
+    public DSSOrchestratorInfo convertToDSSOrchestratorInfo() {
+        OrchestratorBaseInfo baseInfo=this;
+        DSSOrchestratorInfo dssInfo = new DSSOrchestratorInfo();
+
+        // 直接对应的属性
+        dssInfo.setId(baseInfo.getId());
+        dssInfo.setProjectId(baseInfo.getProjectId());
+        dssInfo.setWorkspaceId(baseInfo.getWorkspaceId());
+        dssInfo.setName(baseInfo.getOrchestratorName());
+        dssInfo.setDesc(baseInfo.getDescription());
+        dssInfo.setUses(baseInfo.getUses());
+        dssInfo.setCreator(baseInfo.getCreateUser());
+        dssInfo.setCreateTime(baseInfo.getCreateTime());
+        dssInfo.setUpdateUser(baseInfo.getUpdateUser());
+        dssInfo.setUpdateTime(baseInfo.getUpdateTime());
+        dssInfo.setUUID(baseInfo.getUuid());
+
+        // 可能需要根据实际情况调整的属性
+        dssInfo.setOrchestratorMode(baseInfo.getOrchestratorMode());
+        dssInfo.setOrchestratorLevel(baseInfo.getOrchestratorLevel());
+
+        // 处理没有直接对应的字段
+        if (baseInfo.getOrchestratorWays() != null && !baseInfo.getOrchestratorWays().isEmpty()) {
+            // 取第一个作为orchestratorWay，这需要根据实际情况来决定是否合适
+            dssInfo.setOrchestratorWay(baseInfo.getOrchestratorWays().get(0));
+        }
+
+        return dssInfo;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

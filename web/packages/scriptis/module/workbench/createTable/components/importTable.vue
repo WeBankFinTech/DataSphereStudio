@@ -116,6 +116,8 @@ export default {
         separator = '%5Ct';
       } else if (option.separator === '%20') {
         separator = ' ';
+      } else if (option.separator === '|') {
+        separator = '%5C%7C';
       }
       const encoding = this.source.importType === 'xlsx' ? '' : option.chartset;
       const fieldDelimiter = this.source.importType === 'xlsx' ? '' : separator;

@@ -171,7 +171,7 @@ class FlowEntranceJob(persistManager:PersistenceManager) extends EntranceExecuti
 
   }
 
-
-
+   override def clear(): Unit = {
+   }
 
 }

@@ -17,12 +17,12 @@
 package com.webank.wedatasphere.dss.flow.execution.entrance.execution
 
 import java.util.concurrent.{Executors, LinkedBlockingQueue, TimeUnit}
-
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.{NodeExecutionState, NodeRunner}
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils
 import org.apache.linkis.common.utils.Logging
+import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.springframework.stereotype.Service
 
 import scala.collection.JavaConversions._
@@ -35,7 +35,8 @@ class DefaultFlowExecution extends FlowExecution with Logging {
 
   private val nodeRunnerQueue: LinkedBlockingQueue[NodeRunner] = new LinkedBlockingQueue[NodeRunner]()
 
-  private val scheduledThreadPool = Executors.newScheduledThreadPool(FlowExecutionEntranceConfiguration.FLOW_EXECUTION_SCHEDULER_POOL_SIZE.getValue)
+  private val scheduledThreadPool = Executors.newScheduledThreadPool(FlowExecutionEntranceConfiguration.FLOW_EXECUTION_SCHEDULER_POOL_SIZE.getValue,
+    new ThreadFactoryBuilder().setNameFormat("Dss-Node-Execute-Status-Poll-Thread-%d").build)
 
   private var pollerCount = 0
 

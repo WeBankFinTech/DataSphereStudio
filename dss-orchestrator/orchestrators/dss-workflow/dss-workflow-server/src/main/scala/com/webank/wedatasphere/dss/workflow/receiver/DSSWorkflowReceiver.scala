@@ -56,16 +56,17 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       new ResponseDeleteWorkflow(JobStatus.Success)
 
     case reqUnlockWorkflow: RequestUnlockWorkflow =>
-      workflowManager.unlockWorkflow(reqUnlockWorkflow.getUsername, reqUnlockWorkflow.getFlowId, reqUnlockWorkflow.getConfirmDelete)
+      workflowManager.unlockWorkflow(reqUnlockWorkflow.getUsername, reqUnlockWorkflow.getFlowId, reqUnlockWorkflow.getConfirmDelete, reqUnlockWorkflow.getWorkspace)
 
     case reqExportFlow: RequestExportWorkflow =>
-      val dssExportFlowResource: BmlResource = workflowManager.exportWorkflow(
+      val dssExportFlowResource: BmlResource = workflowManager.exportWorkflowNew(
         reqExportFlow.userName,
         reqExportFlow.flowID,
         reqExportFlow.projectId,
         reqExportFlow.projectName,
         DSSCommonUtils.COMMON_GSON.fromJson(reqExportFlow.workspaceStr, classOf[Workspace]),
-        reqExportFlow.dssLabelList)
+        reqExportFlow.dssLabelList,
+        reqExportFlow.exportExternalNodeAppConnResource)
       ResponseExportWorkflow(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
         reqExportFlow.flowID)
 
@@ -77,7 +78,7 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       dssFlowImportParam.setOrcVersion(requestImportWorkflow.getOrcVersion)
       dssFlowImportParam.setWorkspace(requestImportWorkflow.getWorkspace)
       dssFlowImportParam.setContextId(requestImportWorkflow.getContextId)
-      val dssFlows = workflowManager.importWorkflow(requestImportWorkflow.getUserName,
+      val dssFlows = workflowManager.importWorkflowNew(requestImportWorkflow.getUserName,
         requestImportWorkflow.getResourceId,
         requestImportWorkflow.getBmlVersion,
         dssFlowImportParam, requestImportWorkflow.getDssLabels)

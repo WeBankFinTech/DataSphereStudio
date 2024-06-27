@@ -42,6 +42,9 @@ public class QueryProjectVo implements Serializable {
 
     private Integer visible;
 
+    private Boolean associateGit;
+    private String dataSourceListJson;
+
 
     public Long getId() {
         return id;
@@ -161,5 +164,21 @@ public class QueryProjectVo implements Serializable {
 
     public void setVisible(Integer visible) {
         this.visible = visible;
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
+    }
+
+    public String getDataSourceListJson() {
+        return dataSourceListJson;
+    }
+
+    public void setDataSourceListJson(String dataSourceListJson) {
+        this.dataSourceListJson = dataSourceListJson;
     }
 }

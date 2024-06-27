@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -70,6 +71,14 @@ public class DefaultNodeParser implements NodeParser {
         return nodeJsonMap.get(key).toString();
 
     }
+
+
+    @Override
+    public Map<String, Object> getNodeJobContent(String nodeJson) throws IOException {
+        Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
+        return  (LinkedHashMap<String, Object>) nodeJsonMap.get("jobContent");
+    }
+
 
     @Override
     public List<Resource> getNodeResource(String nodeJson) {

@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.admin.conf.AdminConf;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkWarnException;
@@ -45,6 +46,11 @@ import com.webank.wedatasphere.dss.framework.workspace.util.CommonRoleEnum;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoByRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoListResponse;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
@@ -53,7 +59,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.linkis.common.exception.ErrorException;
-import org.apache.linkis.protocol.util.ImmutablePair;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,6 +149,18 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public List<DSSWorkspace> getWorkspaces(String userName) {
         List<DSSWorkspace> workspaces = dssWorkspaceMapper.getWorkspaces(userName);
+        GitUserInfoByRequest typeRequest = new GitUserInfoByRequest();
+        typeRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitUserInfoListResponse userInfoListResponse = RpcAskUtils.processAskException(gitSender.ask(typeRequest), GitUserInfoListResponse.class, GitUserInfoByRequest.class);
+        if (userInfoListResponse.getGitUserEntities() != null) {
+            List<GitUserEntity> gitUserEntities = userInfoListResponse.getGitUserEntities();
+            Set<Long> collect = gitUserEntities.stream().map(GitUserEntity::getWorkspaceId).collect(Collectors.toSet());
+            for (DSSWorkspace workspace : workspaces) {
+                long workspaceId = workspace.getId();
+                workspace.setAssociateGit(collect.contains(workspaceId));
+            }
+        }
         //用于展示demo的工作空间是不应该返回的,除非用户是管理员
         if (dssWorkspaceUserMapper.isAdmin(userName) == 1) {
             return workspaces;
@@ -434,6 +452,13 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public List<String> getAllDepartmentWithOffices() {
         List<String> allDepartments = staffInfoGetter.getAllDepartments();
+        return allDepartments;
+    }
+
+    @Override
+    public List<String> getAllDepartments() {
+        List<String> allDepartments = staffInfoGetter.getAllDepartments().stream()
+                .map(department->department.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0]).distinct().collect(Collectors.toList());
         return allDepartments;
     }
 

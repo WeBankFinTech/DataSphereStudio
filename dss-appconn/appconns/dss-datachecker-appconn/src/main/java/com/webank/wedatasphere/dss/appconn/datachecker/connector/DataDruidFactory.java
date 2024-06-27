@@ -25,7 +25,9 @@ import java.util.Properties;
 
 public class DataDruidFactory {
 	private static volatile DruidDataSource jobInstance;
-    private static volatile DruidDataSource bdpInstance;
+
+    private static volatile DruidDataSource dopsInstance;
+
     private static volatile DruidDataSource msgInstance;
 
     public static DruidDataSource getJobInstance(Properties props, Logger log) {
@@ -42,6 +44,7 @@ public class DataDruidFactory {
         }
         return jobInstance;
     }
+
     public static DruidDataSource getBDPInstance(Properties props, Logger log) {
         if (bdpInstance == null ) {
             synchronized (DataDruidFactory.class) {

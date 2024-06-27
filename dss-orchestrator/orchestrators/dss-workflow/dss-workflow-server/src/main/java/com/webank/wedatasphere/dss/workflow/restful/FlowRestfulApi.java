@@ -29,6 +29,7 @@ import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
@@ -331,9 +332,10 @@ public class FlowRestfulApi {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
+
         version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
-        AuditLogUtils.printLog( username,workspace.getWorkspaceId(), workspaceName,TargetTypeEnum.WORKFLOW,
-                flowID,dssFlow.getName(),OperateTypeEnum.UPDATE,saveFlowRequest);
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspaceName, TargetTypeEnum.WORKFLOW,
+                flowID, dssFlow.getName(), OperateTypeEnum.UPDATE, saveFlowRequest);
         return Message.ok().data("flowVersion", version);
     }
 
@@ -362,7 +364,9 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "/deleteFlowEditLock/{flowEditLock}", method = RequestMethod.POST)
     public Message deleteFlowEditLock(HttpServletRequest req, @PathVariable("flowEditLock") String flowEditLock) throws DSSErrorException {
-        DSSFlowEditLockManager.deleteLock(flowEditLock);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        DSSFlowEditLockManager.deleteLock(flowEditLock, workspace);
         return Message.ok();
     }
 

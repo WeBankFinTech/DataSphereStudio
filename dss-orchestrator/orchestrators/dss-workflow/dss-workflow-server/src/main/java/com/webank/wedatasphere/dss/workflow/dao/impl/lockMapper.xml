@@ -73,4 +73,42 @@
         delete from dss_workflow_edit_lock
     </delete>
 
+
+    <delete id="deleteExpectAfterSave">
+        delete from dss_workflow_edit_lock where flow_id not in
+        <foreach collection="list" item="index" separator="," open="(" close=")">
+            #{index}
+        </foreach>
+    </delete>
+
+    <insert id="insertFlowStatus">
+        INSERT INTO dss_workflow_status (`flow_id`, `status`, `create_time`, `update_time`)
+        VALUES
+        (#{flowID}, #{status}, NOW(), NOW())
+    </insert>
+
+    <update id="updateOrchestratorStatus">
+        update dss_orchestrator_info
+        <set>
+            `status` = #{status}
+        </set>
+        where `id` = #{id}
+    </update>
+
+    <select id="selectOrchestratorStatus" resultType="java.lang.String">
+        select `status` from dss_orchestrator_info where `id` = #{id}
+    </select>
+
+    <select id="selectOrchestratorByStatus" resultType="java.lang.Long">
+        select id from dss_orchestrator_info where `status` = #{status}
+    </select>
+
+    <update id="updateOrchestratorVersionCommitId">
+        update dss_orchestrator_version_info
+        <set>
+            `commit_id` = #{commitId}
+        </set>
+        where `app_id` = #{flowID}
+    </update>
+
 </mapper>

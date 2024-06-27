@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.workflow.receiver
 import com.webank.wedatasphere.dss.common.protocol.{RequestDeleteWorkflow, RequestExportWorkflow, RequestQueryWorkFlow, RequestUpdateWorkflow}
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager
-import com.webank.wedatasphere.dss.workflow.common.protocol.{RequestCopyWorkflow, RequestCreateWorkflow, RequestDeleteBmlSource, RequestImportWorkflow, RequestSubFlowContextIds, RequestUnlockWorkflow}
+import com.webank.wedatasphere.dss.workflow.common.protocol.{RequestCopyWorkflow, RequestCreateWorkflow, RequestDeleteBmlSource, RequestImportWorkflow, RequestLockWorkflow, RequestSubFlowContextIds, RequestUnlockWorkflow}
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
 
 import javax.annotation.PostConstruct

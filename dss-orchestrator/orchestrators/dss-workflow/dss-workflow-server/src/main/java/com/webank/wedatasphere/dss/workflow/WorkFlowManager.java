@@ -25,15 +25,12 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestConvertOr
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOperateOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUnlockWorkflow;
+import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
 import org.apache.linkis.common.exception.ErrorException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 public interface WorkFlowManager {
 
@@ -95,8 +92,26 @@ public interface WorkFlowManager {
     void deleteWorkflow(String userName,
                         Long flowID) throws DSSErrorException;
 
-    ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete) throws DSSErrorException;
-
+    ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete, Workspace workspace) throws DSSErrorException;
+    /**
+     * 导出工作流
+     * @param userName
+     * @param flowID
+     * @param dssProjectId
+     * @param projectName
+     * @param workspace
+     * @param dssLabels
+     * @param exportExternalNodeAppConnResource 是否导出第三方节点的物料
+     * @return 导出的工作流，以Bml资源的形式返回
+     * @throws Exception
+     */
+    BmlResource exportWorkflowNew(String userName,
+                                  Long flowID,
+                                  Long dssProjectId,
+                                  String projectName,
+                                  Workspace workspace,
+                                  List<DSSLabel> dssLabels,
+            boolean exportExternalNodeAppConnResource) throws Exception;
     /**
      * 导出工作流
      * @param userName
@@ -115,6 +130,11 @@ public interface WorkFlowManager {
                                Workspace workspace,
                                List<DSSLabel> dssLabels) throws Exception;
 
+    List<DSSFlow> importWorkflowNew(String userName,
+                                    String resourceId,
+                                    String bmlVersion,
+                                    DSSFlowImportParam dssFlowImportParam,
+                                    List<DSSLabel> dssLabels) throws Exception;
     List<DSSFlow> importWorkflow(String userName,
                                  String resourceId,
                                  String bmlVersion,
@@ -138,5 +158,6 @@ public interface WorkFlowManager {
      * @return
      */
     ResponseSubFlowContextIds getSubFlowContextIdsByFlowIds(RequestSubFlowContextIds requestSubFlowContextIds) throws ErrorException;
+
 
 }

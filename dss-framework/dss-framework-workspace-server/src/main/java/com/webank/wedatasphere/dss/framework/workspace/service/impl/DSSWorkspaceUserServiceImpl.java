@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
 import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserTreeVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
@@ -39,6 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -60,6 +63,12 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     @Autowired
     private DSSWorkspaceAddUserHook dssWorkspaceAddUserHook;
 
+    private static final String NODE_TYPE_DEPARTMENT = "department";
+
+    private static final String NODE_TYPE_OFFICE = "office";
+
+    private static final String NODE_TYPE_USER = "user";
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addWorkspaceUser(List<Integer> roleIds, long workspaceId, String userName, String creator, String userId) {
@@ -68,7 +77,7 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         for (Integer roleId : roleIds) {
             dssWorkspaceUserMapper.insertUserRoleInWorkspace((int) workspaceId, roleId, new Date(), userName, creator, userId == null ? null : Long.parseLong(userId), creator);
         }
-        dssWorkspaceAddUserHook.afterAdd(userName,workspaceId);
+        dssWorkspaceAddUserHook.afterAdd(userName, workspaceId);
     }
 
     @Override
@@ -77,7 +86,7 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         //获取用户创建时间
         DSSWorkspaceUser workspaceUsers = dssWorkspaceUserMapper.getWorkspaceUsers(String.valueOf(workspaceId), userName, null).stream().findFirst().get();
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
-        roles.forEach(role ->{
+        roles.forEach(role -> {
             dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId, role, workspaceUsers.getJoinTime(), userName, workspaceUsers.getCreator(), 0L, creator);
         });
     }
@@ -95,16 +104,16 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         return staffInfos.stream().map(this::staffToDSSUser).collect(Collectors.toList());
     }
 
-    private StaffInfoVO staffToDSSUser(StaffInfo staffInfo){
+    private StaffInfoVO staffToDSSUser(StaffInfo staffInfo) {
         StaffInfoVO staffInfoVO = new StaffInfoVO();
         String orgFullName = staffInfo.getOrgFullName();
-        if (StringUtils.isNotEmpty(orgFullName)){
-            try{
+        if (StringUtils.isNotEmpty(orgFullName)) {
+            try {
                 String departmentName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0];
                 String officeName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[1];
                 staffInfoVO.setDepartment(departmentName);
                 staffInfoVO.setOffice(officeName);
-            }catch(Exception e){
+            } catch (Exception e) {
                 //LOGGER.warn("fail to get department and office {} ", e.getMessage());
                 staffInfoVO.setDepartment(WorkspaceServerConstant.DEFAULT_DEPARTMENT);
                 staffInfoVO.setOffice(WorkspaceServerConstant.DEFAULT_OFFICE);
@@ -121,10 +130,27 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<DepartmentUserVo> getAllWorkspaceUsersDepartment(long workspaceId) {
-        return dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId).stream().map(
-                        workspaceUser -> changeToUserVO(workspaceUser))
+    public List<DepartmentUserTreeVo> getAllWorkspaceUsersDepartment(long workspaceId) {
+        List<DepartmentUserVo> userList = dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId).stream().map(
+                        this::changeToUserVO)
                 .collect(Collectors.toList());
+        return structureVo2Tree(userList);
+    }
+
+    private List<DepartmentUserTreeVo> structureVo2Tree(List<DepartmentUserVo> userList) {
+        AtomicReference<Integer> id = new AtomicReference<>(0);
+        Map<String, Map<String, List<DepartmentUserTreeVo>>> userMap = userList.stream().collect(Collectors.groupingBy(DepartmentUserVo::getDepartment,
+                Collectors.groupingBy(DepartmentUserVo::getOffice, Collectors.mapping(user ->
+                        new DepartmentUserTreeVo(id.getAndSet(id.get() + 1), user.getName(), NODE_TYPE_USER, null), Collectors.toList()))));
+        return userMap.keySet().stream().map(key ->
+                new DepartmentUserTreeVo(id.getAndSet(id.get() + 1), key, NODE_TYPE_DEPARTMENT, buildTree4Office(userMap.get(key), id))
+        ).collect(Collectors.toList());
+    }
+
+    private List<DepartmentUserTreeVo> buildTree4Office(Map<String, List<DepartmentUserTreeVo>> officeMap, AtomicReference<Integer> id) {
+        return officeMap.keySet().stream().map(key ->
+                new DepartmentUserTreeVo(id.getAndSet(id.get() + 1), key, NODE_TYPE_OFFICE, officeMap.get(key))
+        ).collect(Collectors.toList());
     }
 
     private DepartmentUserVo changeToUserVO(String userName) {
@@ -148,8 +174,8 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
 
     @Override
     public PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize) {
-        PageHelper.startPage(pageNow,pageSize);
-        List<String> dos= dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
+        PageHelper.startPage(pageNow, pageSize);
+        List<String> dos = dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
         com.github.pagehelper.PageInfo<String> doPage = new com.github.pagehelper.PageInfo<>(dos);
         return new PageInfo<>(doPage.getList(), doPage.getTotal());
     }
@@ -171,8 +197,8 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public Long getCountByUsername(String username,int workspaceId){
-        return dssWorkspaceUserMapper.getCountByUsername(username,workspaceId);
+    public Long getCountByUsername(String username, int workspaceId) {
+        return dssWorkspaceUserMapper.getCountByUsername(username, workspaceId);
     }
 
     @Override

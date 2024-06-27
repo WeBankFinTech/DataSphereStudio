@@ -44,4 +44,9 @@ public class DSSServerSenderServiceImpl implements DSSSenderService {
     public Sender getProjectServerSender() {
         return dssServerSender;
     }
+
+    @Override
+    public Sender getGitSender() {
+        return dssServerSender;
+    }
 }

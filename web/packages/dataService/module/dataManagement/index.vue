@@ -9,7 +9,7 @@
   </div>
 </template>
 <script>
-import navMenu from "../common/navMenu.vue";
+import navMenu from '../common/navMenu.vue'
 export default {
   components: {
     navMenu,
@@ -17,17 +17,17 @@ export default {
   data() {
     return {
       menuFold: false,
-    };
+    }
   },
   methods: {
     handleMenuToggle() {
-      this.menuFold = !this.menuFold;
+      this.menuFold = !this.menuFold
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
-@import "@dataspherestudio/shared/common/style/variables.scss";
+@import '@dataspherestudio/shared/common/style/variables.scss';
 .ds-main-content {
   z-index: 1;
   height: 100%;
@@ -50,4 +50,3 @@ export default {
   }
 }
 </style>
-

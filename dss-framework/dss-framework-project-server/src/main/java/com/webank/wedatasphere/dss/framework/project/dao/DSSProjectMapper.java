@@ -32,8 +32,6 @@ import java.util.List;
 @Mapper
 public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
-    void addProject(DSSProjectPo dssProjectPo);
-
     @Select("select id from dss_project where `name` = #{projectName}")
     Long getProjectIdByName(@Param("projectName") String projectName);
 

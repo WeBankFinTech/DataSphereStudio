@@ -17,21 +17,26 @@
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
 
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 
 public interface OrchestratorService {
@@ -137,18 +142,26 @@ public interface OrchestratorService {
 
     List<DSSOrchestratorVersion> getOrchestratorVersions(String username, Long projectId, Long orchestratorId);
 
-    String rollbackOrchestrator(String username, Long projectId, String projectName,
-                                Long orchestratorId, String version, DSSLabel dssLabel, Workspace workspace) throws Exception;
+    OrchestratorRollBackGitVo rollbackOrchestrator(String username, Long projectId, String projectName,
+                                                   Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception;
 
+    void rollbackOrchestratorGit(OrchestratorRollBackGitVo rollBackGitVo, String userName, Long projectId, String projectName,
+                                 Long orchestratorId, LabelRouteVO labels, Workspace workspace) throws Exception;
     //**** new method
     void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String orchestratorName) throws DSSFrameworkErrorException;
 
-    Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest) throws DSSFrameworkErrorException;
+    Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest, DSSProject dssProject, String username) throws DSSFrameworkErrorException;
 
-    List<OrchestratorBaseInfo> getListByPage(OrchestratorRequest orchestratorRequest, String username);
+    List<OrchestratorBaseInfo> getOrchestratorInfos(OrchestratorRequest orchestratorRequest, String username);
 
     ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos);
 
     void batchClearContextId();
+
+    String getAuthenToken(String gitUrl, String gitUsername, String gitPassword) throws ExecutionException;
+
+    OrchestratorVo getOrchestratorByAppId(Long appId);
+
+    List<DSSOrchestratorInfo> getOrchestratorInfoByLabel(OrchestratorRequest orchestratorRequest);
 
 }

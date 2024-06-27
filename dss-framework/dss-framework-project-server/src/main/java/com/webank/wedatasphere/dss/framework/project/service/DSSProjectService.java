@@ -17,16 +17,14 @@
 package com.webank.wedatasphere.dss.framework.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectImportOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
@@ -39,7 +37,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
     DSSProjectDO createProject(String username, ProjectCreateRequest projectCreateRequest);
 
 
-    void modifyProject(String username, ProjectModifyRequest modifyRequest) throws DSSProjectErrorException;
+    DSSProjectDO modifyProject(String username, ProjectModifyRequest modifyRequest) throws DSSProjectErrorException;
 
     /**
      * 旧工程导入到新环境的，修改新环境工程相关字段
@@ -80,5 +78,26 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
      */
     List<ProjectResponse> getDeletedProjects(ProjectQueryRequest projectRequest);
 
+    /**
+     * 批量导出工程内的所有编排
+     */
+    BmlResource exportProject(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest, String username, String proxyUser, Workspace workspace) throws Exception;
+
+    /**
+     * 批量导入编排到指定工程
+     * @param  projectInfo 要导入的目标工程
+     * @param importResource 导入的编排资源
+     * @param username 导入人
+     * @param checkCode  校验码
+     * @param packageInfo 导入包路径或者文件名
+     * @param envLabel 环境标签
+     * @param workspace 导入工作空间
+
+     */
+    void importProject(ProjectInfoVo projectInfo, BmlResource importResource, String username,
+                       String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception;
+
+    BmlResource exportOnlyProjectMeta(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
+                                  String username, String proxyUser, Workspace workspace) throws Exception;
 
 }

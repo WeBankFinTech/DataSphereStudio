@@ -21,4 +21,5 @@ public class DSSOrchestratorConstant {
 
     //每次提交linkis清理数量控制在10个以下，超了接口就会返回超时
     public static final int MAX_CLEAR_SIZE = 10;
+    public static final String CHROME_DRIVER_PATH = "chromedriver";
 }

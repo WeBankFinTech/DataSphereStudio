@@ -41,11 +41,11 @@
   </div>
 </template>
 <script>
-import ManageMenu from "./manageMenu.vue";
-import TreeMenu from "./treeMenu.vue";
+import ManageMenu from './manageMenu.vue'
+import TreeMenu from './treeMenu.vue'
 
 export default {
-  name: "navMenu",
+  name: 'navMenu',
   components: {
     ManageMenu,
     TreeMenu,
@@ -66,7 +66,7 @@ export default {
       projectsTree: [],
       searchValue: 123,
       originDatas: [],
-    };
+    }
   },
   mounted() {},
   methods: {
@@ -75,35 +75,35 @@ export default {
         this.$route.path == `/${tab}` ||
         this.$route.path.startsWith(`/${tab}`)
       ) {
-        this.$emit("on-menu-toggle");
+        this.$emit('on-menu-toggle')
       } else {
         this.$router.push({
           name: tab,
           query: this.$route.query,
-        });
+        })
       }
     },
 
     showModal(pyload) {
-      this.$emit("showModal", pyload);
+      this.$emit('showModal', pyload)
     },
     handleApiChoosed(pyload) {
-      this.$emit("handleApiChoosed", pyload);
+      this.$emit('handleApiChoosed', pyload)
     },
 
     treeMethod(name, payload = {}) {
-      if (name === "getApi") {
-        this.$refs.treeMenu.getAllApi("update", payload);
+      if (name === 'getApi') {
+        this.$refs.treeMenu.getAllApi('update', payload)
       } else {
-        const { id, data } = payload;
-        this.$refs.treeMenu.addApi(id, data);
+        const { id, data } = payload
+        this.$refs.treeMenu.addApi(id, data)
       }
     },
   },
-};
+}
 </script>
 <style lang="scss" scoped>
-@import "@dataspherestudio/shared/common/style/variables.scss";
+@import '@dataspherestudio/shared/common/style/variables.scss';
 .ds-nav-menu-wrap {
   z-index: 2;
   display: flex;

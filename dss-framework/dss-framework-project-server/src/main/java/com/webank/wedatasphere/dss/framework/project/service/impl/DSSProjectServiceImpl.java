@@ -19,11 +19,20 @@ package com.webank.wedatasphere.dss.framework.project.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
@@ -31,29 +40,44 @@ import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.po.ProjectRelationPo;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
-import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
+import com.webank.wedatasphere.dss.framework.project.service.ExportService;
+import com.webank.wedatasphere.dss.framework.project.service.ImportService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitSearchRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitSearchResponse;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectDeletionOperation;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ProjectService;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectDataSource;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.project.utils.ProjectOperationUtils.tryProjectOperation;
@@ -63,13 +87,32 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     @Autowired
     private DSSProjectMapper projectMapper;
     @Autowired
-    private DSSProjectUserService projectUserService;
+    private ExportService exportService;
     @Autowired
     private DSSProjectUserMapper projectUserMapper;
+    @Autowired
+    private OrchestratorService orchestratorService;
+    @Autowired
+    private DSSProjectService projectService;
+    @Autowired
+    private ImportService importService;
+    @Autowired
+    @Qualifier("projectBmlService")
+    private BMLService bmlService;
+
+
+
 
     public static final String MODE_SPLIT = ",";
     public static final String KEY_SPLIT = "-";
+    public static final String PROJECT_META_FILE_NAME = ".projectmeta";
     private final String SUPPORT_ABILITY = ProjectConf.SUPPORT_ABILITY.getValue();
+    private final ThreadFactory projectOperateThreadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("dss-project-operate-thread-%d")
+            .setDaemon(false)
+            .build();
+    private final ExecutorService projectOperateThreadPool = new ThreadPoolExecutor(5, 200, 0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(1024), projectOperateThreadFactory, new ThreadPoolExecutor.AbortPolicy());
 
     @Override
     public DSSProjectDO createProject(String username, ProjectCreateRequest projectCreateRequest) {
@@ -84,16 +127,21 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setUpdateTime(new Date());
         project.setDescription(projectCreateRequest.getDescription());
         project.setApplicationArea(projectCreateRequest.getApplicationArea());
+        project.setAssociateGit(projectCreateRequest.getAssociateGit());
         //开发流程，编排模式组拼接 前后进行英文逗号接口
         project.setDevProcess(ProjectStringUtils.getModeStr(projectCreateRequest.getDevProcessList()));
         project.setOrchestratorMode(ProjectStringUtils.getModeStr(projectCreateRequest.getOrchestratorModeList()));
+        List<DSSProjectDataSource> dataSourceList = projectCreateRequest.getDataSourceList();
+        if (dataSourceList != null && !dataSourceList.isEmpty()) {
+            project.setDataSourceListJson(new Gson().toJson(dataSourceList));
+        }
         projectMapper.insert(project);
         return project;
     }
 
     //修改dss_project工程字段
     @Override
-    public void modifyProject(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException {
+    public DSSProjectDO modifyProject(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException {
         //校验当前登录用户是否含有修改权限
 //        projectUserService.isEditProjectAuth(projectModifyRequest.getId(), username);
         DSSProjectDO project = new DSSProjectDO();
@@ -108,11 +156,17 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setOrchestratorMode(ProjectStringUtils.getModeStr(projectModifyRequest.getOrchestratorModeList()));
         project.setBusiness(projectModifyRequest.getBusiness());
         project.setProduct(projectModifyRequest.getProduct());
-
+        project.setAssociateGit(projectModifyRequest.getAssociateGit());
+        List<DSSProjectDataSource> dataSourceList = projectModifyRequest.getDataSourceList();
+        if (dataSourceList != null && !dataSourceList.isEmpty()) {
+            project.setDataSourceListJson(new Gson().toJson(dataSourceList));
+        }
         UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", projectModifyRequest.getId());
         updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());
         projectMapper.update(project, updateWrapper);
+
+        return project;
     }
 
     /**
@@ -184,8 +238,15 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setArchive(projectVo.getArchive());
             projectResponse.setCreateTime(projectVo.getCreateTime());
             projectResponse.setUpdateTime(projectVo.getUpdateTime());
+            projectResponse.setAssociateGit(projectVo.getAssociateGit());
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
+            if(projectVo.getDataSourceListJson()!=null){
+                List<DSSProjectDataSource> dataSourceList = new Gson().fromJson(projectVo.getDataSourceListJson(),
+                        new TypeToken<List<DSSProjectDataSource>>() {
+                        }.getType());
+                projectResponse.setDataSourceList(dataSourceList);
+            }
             projectResponseList.add(projectResponse);
 
             String pusername = projectVo.getPusername();
@@ -296,7 +357,22 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                 null, "delete refProject " + dssProjectDO.getName());
         }
         projectMapper.deleteProject(projectDeleteRequest.getId());
+        // 对于DSS项目进行归档
+        archiveGitProject(username, projectDeleteRequest, workspace, dssProjectDO);
         LOGGER.warn("User {} deleted project {}.", username, dssProjectDO.getName());
+    }
+
+    private void archiveGitProject(String username, ProjectDeleteRequest projectDeleteRequest, Workspace workspace, DSSProjectDO dssProjectDO) {
+        if ( dssProjectDO.getAssociateGit() != null && dssProjectDO.getAssociateGit()) {
+            Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            Map<String, BmlResource> file = new HashMap<>();
+            // 测试数据 key表示项目名、value为项目BmlResource资源
+            GitArchiveProjectRequest request1 = new GitArchiveProjectRequest(workspace.getWorkspaceId(), dssProjectDO.getName(), username);
+            LOGGER.info("-------=======================begin to archive project: {}=======================-------", dssProjectDO.getName());
+            Object ask = gitSender.ask(request1);
+            GitArchivePorjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitArchivePorjectResponse.class, GitArchiveProjectRequest.class);
+            LOGGER.info("-------=======================End to archive project: {}=======================-------: {}", dssProjectDO.getName(), responseWorkflowValidNode);
+        }
     }
 
     @Override
@@ -345,6 +421,12 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setUpdateTime(projectVo.getUpdateTime());
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
+            if(projectVo.getDataSourceListJson()!=null){
+                List<DSSProjectDataSource> dataSourceList = new Gson().fromJson(projectVo.getDataSourceListJson(),
+                        new TypeToken<List<DSSProjectDataSource>>() {
+                        }.getType());
+                projectResponse.setDataSourceList(dataSourceList);
+            }
             projectResponseList.add(projectResponse);
             /**
              * 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
@@ -371,6 +453,120 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setReleaseUsers(CollectionUtils.isEmpty(releaseUsers) ? new ArrayList<>() : releaseUsers.stream().distinct().collect(Collectors.toList()));
         }
         return projectResponseList;
+    }
+    @Override
+    public BmlResource exportProject(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
+                                     String username, String proxyUser, Workspace workspace) throws Exception {
+        Long projectId=exportAllOrchestratorsReqest.getProjectId();
+        EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
+        OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId());
+        LabelRouteVO labelRouteVO = new LabelRouteVO();
+        labelRouteVO.setRoute(exportAllOrchestratorsReqest.getLabels());
+        orchestratorRequest.setLabels(labelRouteVO);
+        List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(orchestratorRequest, username);
+        DSSProjectDO projectDO=projectService.getProjectById(projectId);
+        String projectName = projectDO.getName();
+        String projectPath = exportService.batchExport(username, projectId, orchestrators, projectName, envLabel, workspace);
+        exportProjectMeta(projectDO, projectPath);
+        String zipFile = ZipHelper.zip(projectPath,true);
+        LOGGER.info("export project file locate at {}",zipFile);
+        //先上传
+        InputStream inputStream = bmlService.readLocalResourceFile(username, zipFile);
+        BmlResource bmlResource= bmlService.upload(username, inputStream, projectName + ".OrcsExport", projectName);
+
+        LOGGER.info("export zip file upload to bmlResourceId:{} bmlResourceVersion:{}",
+                bmlResource.getResourceId(),bmlResource.getVersion());
+        FileUtils.deleteQuietly(new File(zipFile));
+        return bmlResource;
+
+    }
+
+    @Override
+    public void importProject(ProjectInfoVo projectInfo, BmlResource importResource, String username,
+                              String checkCode, String packageInfo, EnvDSSLabel envLabel, Workspace workspace) throws Exception {
+        String projectName = projectInfo.getProjectName();
+        //下载到本地处理
+        String importSaveBasePath = IoUtils.generateTempIOPath(username);
+        String importFile=importSaveBasePath+File.separator+projectName+".zip";
+        LOGGER.info("import zip file locate at {}",importFile);
+        //下载压缩包
+        bmlService.downloadToLocalPath(username, importResource.getResourceId(), importResource.getVersion(), importFile);
+        try{
+            String  originProjectName=ZipHelper.readImportZipProjectName(importFile);
+            if(!projectName.equals(originProjectName)){
+                String msg=String.format("target project name must be same with origin project name.origin project name:%s,target project name:%s(导入的目标工程名必须与导出时源工程名保持一致。源工程名：%s，目标工程名：%s)"
+                        ,originProjectName,projectName,originProjectName,projectName);
+                throw new DSSRuntimeException(msg);
+            }
+        }catch (IOException e){
+            throw new DSSRuntimeException("upload file format error(导入包格式错误)");
+        }
+        //解压
+        ZipHelper.unzipFile(importFile,importSaveBasePath,true);
+        String projectPath = IoUtils.addFileSeparator(importSaveBasePath, projectName);
+        importService.batchImportOrc(username, projectInfo.getId(),
+                        projectInfo.getProjectName(), projectPath, checkCode, envLabel, workspace);
+
+
+
+
+    }
+
+    /**
+     * 导出项目元数据
+     * @param projectDO 项目元数据
+     * @param projectPath 项目目录
+     * @throws IOException
+     */
+    private  void exportProjectMeta(DSSProjectDO projectDO, String projectPath) throws Exception {
+        String path = projectPath + File.separator + PROJECT_META_FILE_NAME;
+        File projectMetaFile = new File(path);
+        if (!projectMetaFile.exists()) {
+            try {
+                Path filePath = Paths.get(path);
+                // 确保父级路径存在
+                Files.createDirectories(filePath.getParent());
+                // 创建文件
+                Files.createFile(filePath);
+                LOGGER.info("create success");
+            } catch (Exception e) {
+                LOGGER.error("create File {} failed, the reason is : {}", path, e);
+                throw new Exception("create File failed");
+            }
+        }
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        // 文件不存在，直接创建并写入orchestratorInfo信息
+        try (FileWriter writer = new FileWriter(projectMetaFile)) {
+            gson.toJson(projectDO, writer);
+        }
+
+    }
+
+    @Override
+    public BmlResource exportOnlyProjectMeta(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
+                                         String username, String proxyUser, Workspace workspace) throws Exception {
+        Long projectId=exportAllOrchestratorsReqest.getProjectId();
+        EnvDSSLabel envLabel = new EnvDSSLabel(exportAllOrchestratorsReqest.getLabels());
+        OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), exportAllOrchestratorsReqest.getProjectId());
+        LabelRouteVO labelRouteVO = new LabelRouteVO();
+        labelRouteVO.setRoute(exportAllOrchestratorsReqest.getLabels());
+        orchestratorRequest.setLabels(labelRouteVO);
+        List<OrchestratorBaseInfo> orchestrators = orchestratorService.getOrchestratorInfos(orchestratorRequest, username);
+        DSSProjectDO projectDO=projectService.getProjectById(projectId);
+        String projectName = projectDO.getName();
+        String exportSaveBasePath = IoUtils.generateTempIOPath(username);
+        String projectPath = IoUtils.addFileSeparator(exportSaveBasePath, projectName);
+        exportProjectMeta(projectDO, projectPath);
+        String zipFile = ZipHelper.zip(projectPath,true);
+        LOGGER.info("export project file locate at {}",zipFile);
+        //先上传
+        InputStream inputStream = bmlService.readLocalResourceFile(username, zipFile);
+        BmlResource bmlResource= bmlService.upload(username, inputStream, projectName + ".OrcsExport", projectName);
+
+        LOGGER.info("export zip file upload to bmlResourceId:{} bmlResourceVersion:{}",
+                bmlResource.getResourceId(),bmlResource.getVersion());
+        FileUtils.deleteQuietly(new File(zipFile));
+        return bmlResource;
     }
 
 }

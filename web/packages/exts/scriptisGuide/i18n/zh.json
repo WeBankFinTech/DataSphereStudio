@@ -3,7 +3,7 @@
     "ext": {
       "scriptisGuide": {
         "uninitTitle": "用户初始化未完成",
-        "uninitContent": ***REMOVED***
+        "uninitContent": "请前往数据地图（***REMOVED***）提交相关服务单申请。<br>若您已提交申请，请确保您的审批单状态为已完成。",
         "gotit": "我知道了",
         "viewGuide": "查看申请指引",
         "setParams": "设置参数",

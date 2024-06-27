@@ -3,7 +3,7 @@
     "ext": {
       "scriptisGuide": {
         "uninitTitle": "User initialization not completed",
-        "uninitContent": "Please go to the data map ***REMOVED*** to submit the relevant service ticket application.<br>If you have already submitted the application, please make sure that your approval ticket status is completed.",
+        "uninitContent": "Please go to the data map (***REMOVED***) to submit the relevant service ticket application.<br>If you have already submitted the application, please make sure that your approval ticket status is completed.",
         "gotit": "I got it",
         "viewGuide": "View Application Guide",
         "setParams": "Set parameters",

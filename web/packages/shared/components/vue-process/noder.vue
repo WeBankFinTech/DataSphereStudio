@@ -3,7 +3,7 @@
     :style="getNodeStyle"
     :title="title"
     class="node-box"
-    :class="{'node-selected': isChoose}"
+    :class="{'node-disabled': isDisabled, 'node-selected': isChoose}"
     @click="click"
     @dblclick="dblclick"
     @mousedown.stop="mousedown"
@@ -112,6 +112,14 @@ export default {
       type: Boolean,
       default: false
     },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    disabledBorderColor: {
+      type: String,
+      default: '#6a85a766'
+    },
     nodeAnchors: {
       type: Array,
       dafault: () => []
@@ -121,10 +129,13 @@ export default {
     return {
       component: null,
       currentBorderColor: this.borderColor,
-      isChoose: this.selected
+      isChoose: this.selected,
     };
   },
   computed: {
+    isDisabled() {
+      return this.disabled;
+    },
     getNodeStyle() {
       let styelObj
       if (this.state.mapMode && this.nodeType !== 'canvas') {
@@ -263,7 +274,7 @@ export default {
       let ctx = this.canvasCtx;
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
       ctx.lineWidth = this.borderWidth * this.state.baseOptions.pageSize;
-      ctx.strokeStyle = this.currentBorderColor;
+      ctx.strokeStyle = this.isDisabled ? this.disabledBorderColor : this.currentBorderColor;
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
       this.roundedRect(

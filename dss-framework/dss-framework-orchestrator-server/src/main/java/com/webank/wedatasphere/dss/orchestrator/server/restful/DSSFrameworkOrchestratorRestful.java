@@ -19,34 +19,61 @@ package com.webank.wedatasphere.dss.orchestrator.server.restful;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
+import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
+import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.dss.workflow.common.protocol.RequestLockWorkflow;
+import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseLockWorkflow;
+import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import org.apache.commons.math3.util.Pair;
+import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import scala.tools.nsc.typechecker.Implicits;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RequestMapping(path = "/dss/framework/orchestrator", produces = {"application/json"})
 @RestController
@@ -59,12 +86,11 @@ public class DSSFrameworkOrchestratorRestful {
     @Autowired
     private OrchestratorService orchestratorService;
     @Autowired
+    private OrchestratorPluginService orchestratorPluginService;
+    @Autowired
     private HttpServletRequest httpServletRequest;
-
-    @PostConstruct
-    public void init() {
-        AppConnManagerUtils.autoLoadAppConnManager();
-    }
+    @Autowired
+    private LockMapper lockMapper;
 
     /**
      * 创建编排模式
@@ -95,7 +121,7 @@ public class DSSFrameworkOrchestratorRestful {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
             LOGGER.info("user {} begin to geyAllOrchestrator, requestBody:{}", username, orchestratorRequest);
-            return Message.ok("获取编排模式成功").data("page", orchestratorService.getListByPage(orchestratorRequest, username));
+            return Message.ok("获取编排模式成功").data("page", orchestratorService.getOrchestratorInfos(orchestratorRequest, username));
         } catch (Exception e) {
             LOGGER.error("getAllOrchestratorError ", e);
             return Message.error("获取编排模式失败:" + e.getMessage());
@@ -133,6 +159,12 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         if (orchestratorFrameworkService.getOrchestratorCopyStatus(deleteRequest.getId())) {
             return Message.error("当前工作流正在被复制，不允许删除");
+        }
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(deleteRequest.getProjectId());
+        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+        if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+            DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
         }
         CommonOrchestratorVo orchestratorVo = orchestratorFrameworkService.deleteOrchestrator(username, deleteRequest, workspace);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
@@ -229,11 +261,16 @@ public class DSSFrameworkOrchestratorRestful {
         Long projectId = rollbackOrchestratorRequest.getProjectId();
         String projectName = rollbackOrchestratorRequest.getProjectName();
         Workspace workspace = SSOHelper.getWorkspace(request);
-        DSSLabel envDSSLabel = new EnvDSSLabel(rollbackOrchestratorRequest.getLabels().getRoute());
+        LabelRouteVO labels = rollbackOrchestratorRequest.getLabels();
         try {
             LOGGER.info("user {} begin to rollbackOrchestrator, params:{}", username, rollbackOrchestratorRequest);
-            String newVersion = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, envDSSLabel, workspace);
-            Message message = Message.ok("回滚版本成功").data("newVersion", newVersion);
+            OrchestratorRollBackGitVo rollbackOrchestrator = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, labels, workspace);
+            try {
+                orchestratorService.rollbackOrchestratorGit(rollbackOrchestrator, username, projectId, projectName, orchestratorId, labels, workspace);
+            } catch (Exception e) {
+                return Message.ok("回滚版本成功,git回滚失败，请重新保存并提交工作流").data("newVersion", rollbackOrchestrator.getVersion());
+            }
+            Message message = Message.ok("回滚版本成功").data("newVersion", rollbackOrchestrator.getVersion());
             return message;
         } catch (final Throwable t) {
             LOGGER.error("Failed to rollback orchestrator for user {} orchestratorId {}, projectId {} version {}",
@@ -271,5 +308,171 @@ public class DSSFrameworkOrchestratorRestful {
     public Message getVersionByOrchestratorId(@RequestBody QueryOrchestratorVersion queryOrchestratorVersion) throws Exception {
         List list = orchestratorService.getVersionByOrchestratorId(queryOrchestratorVersion.getOrchestratorId());
         return Message.ok().data("list", list);
+    }
+
+    @RequestMapping(value = "diffFlow", method = RequestMethod.POST)
+    public Message diff(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
+
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
+        GitTree gitTree = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
+        return Message.ok().data("tree", gitTree.getChildren());
+    }
+
+    @RequestMapping(value = "submitFlow", method = RequestMethod.POST)
+    public Message submitFlow(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        Long orchestratorId = submitFlowRequest.getOrchestratorId();
+        try {
+            checkWorkspace(orchestratorId, workspace);
+        } catch (Exception e) {
+            LOGGER.error("check failed, the reason is: ", e);
+            return Message.error("提交失败，原因为：" + e.getMessage());
+        }
+
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
+
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
+        try {
+            orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
+        } catch (Exception e) {
+            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
+        }
+
+
+        return Message.ok();
+    }
+
+    @RequestMapping(path = "gitUrl", method = RequestMethod.GET)
+    public Message gitUrl(@RequestParam(required = true, name = "projectName") String projectName,
+                          @RequestParam(required = false, name = "workflowName") String workflowName,
+                          @RequestParam(required = false, name = "workflowNodeName") String workflowNodeName,
+                          HttpServletResponse response) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
+        gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
+        gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_READ_TYPE);
+        // 跳转git需解密处理
+        gitUserInfoRequest.setDecrypt(true);
+        GitUserInfoResponse readInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
+        String gitUsername = readInfoResponse.getGitUser().getGitUser();
+        String gitPassword = readInfoResponse.getGitUser().getGitPassword();
+        String gitUrlPre = UrlUtils.normalizeIp(readInfoResponse.getGitUser().getGitUrl());
+        String authenToken = "";
+        try {
+            authenToken = orchestratorService.getAuthenToken(gitUrlPre, gitUsername, gitPassword);
+        } catch (ExecutionException e) {
+            LOGGER.error("git登陆失败，原因为: ", e);
+            return Message.error("git登陆失败，请检查git节点配置的用户名/密码/url");
+        }
+        // 获取顶级域名 eg: http://git.bdp.weoa.com -> weoa.com
+        String domainIp = UrlUtils.normalizeIp(gitUrlPre);
+        int lastDotIndex = domainIp.lastIndexOf(".");
+        String topDomain = "";
+        if (lastDotIndex != -1) {
+            int secondToLastIndexOf = domainIp.substring(0, lastDotIndex).lastIndexOf(".");
+            if (secondToLastIndexOf != -1) {
+                topDomain = domainIp.substring(secondToLastIndexOf);
+            }
+        }
+        String cookie = "_gitlab_session=" + authenToken + ";path=/; Domain="+ topDomain +"; HttpOnly; +";
+        LOGGER.info("Cookie is {}", cookie);
+        response.setHeader("Access-Control-Allow-Origin", topDomain);
+        response.addHeader("Set-Cookie", cookie);
+        // 获取命名空间
+        GitUserInfoRequest gitWriteUserRequest = new GitUserInfoRequest();
+        gitWriteUserRequest.setWorkspaceId(workspace.getWorkspaceId());
+        gitWriteUserRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserInfoResponse writeInfoResponse = RpcAskUtils.processAskException(sender.ask(gitWriteUserRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
+        String namespace = writeInfoResponse.getGitUser().getGitUser();
+        // 拼接跳转的url
+        String gitUrlProject = gitUrlPre + "/" + namespace + "/" + projectName;
+        if (!StringUtils.isEmpty(workflowName)) {
+            gitUrlProject +=  "/tree/master/" + workflowName;
+        }
+        return Message.ok().data("gitUrl", UrlUtils.normalizeIp(gitUrlProject));
+
+    }
+
+    @RequestMapping(value = "submitFlow/status", method = RequestMethod.GET)
+    public Message submitFlow(@RequestParam Long orchestratorId) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        try {
+            checkWorkspace(orchestratorId, workspace);
+        } catch (Exception e) {
+            LOGGER.error("check failed, the reason is: ", e);
+            return Message.error("提交失败，原因为：" + e.getMessage());
+        }
+
+        OrchestratorSubmitJob orchestratorSubmitJob = orchestratorFrameworkService.getOrchestratorStatus(orchestratorId);
+        // 未提交
+        if (orchestratorSubmitJob == null) {
+            return Message.error("该编排未开始提交");
+        }
+        String status = orchestratorSubmitJob.getStatus();
+        if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equals(status)) {
+            return Message.error("提交失败，原因为：" + orchestratorSubmitJob.getErrorMsg());
+        }
+        return Message.ok().data("status", status);
+    }
+
+    @RequestMapping(value = "publish/history", method = RequestMethod.GET)
+    public Message getHistory(@RequestParam Long orchestratorId, @RequestParam String projectName) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        try {
+            checkWorkspace(orchestratorId, workspace);
+        } catch (Exception e) {
+            LOGGER.error("check failed, the reason is: ", e);
+            return Message.error("提交失败，原因为：" + e.getMessage());
+        }
+
+        GitHistoryResponse history = orchestratorFrameworkService.getHistory(workspace.getWorkspaceId(), orchestratorId, projectName);
+
+        return Message.ok().data("history", history);
+    }
+
+    private void checkWorkspace(Long orchestratorId, Workspace workspace) throws DSSErrorException{
+        OrchestratorVo orchestratorVoById = orchestratorService.getOrchestratorVoById(orchestratorId);
+        if (orchestratorVoById == null) {
+            DSSExceptionUtils.dealErrorException(80001, "编排不存在", DSSErrorException.class);
+        }
+        long projectId = orchestratorVoById.getDssOrchestratorInfo().getProjectId();
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(projectId);
+        DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+        if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+            DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
+        }
+    }
+
+    @RequestMapping(value = "allType", method = RequestMethod.GET)
+    public Message allType(HttpServletRequest req) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        return Message.ok().data("type", GitConstant.GIT_SERVER_SEARCH_TYPE);
     }
 }

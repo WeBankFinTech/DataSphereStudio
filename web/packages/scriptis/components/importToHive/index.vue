@@ -431,6 +431,7 @@ export default {
           { label: this.$t('message.scripts.importToHive.FH'), value: ';' },
           { label: this.$t('message.scripts.importToHive.ZBF'), value: '\\t' },
           { label: this.$t('message.scripts.importToHive.KG'), value: '%20' },
+          { label: this.$t('message.scripts.hiveTableExport.SX'), value: '|' },
         ],
         chartset: [
           { label: 'utf-8', value: 'utf-8' },

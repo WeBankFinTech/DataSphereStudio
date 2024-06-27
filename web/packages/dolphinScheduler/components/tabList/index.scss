@@ -1,4 +1,4 @@
-@import "@dataspherestudio/shared/common/style/variables.scss";
+@import '@dataspherestudio/shared/common/style/variables.scss';
 .workflowTabContainer {
   margin-left: 250px;
   transition: margin-left 0.3s;
@@ -48,43 +48,53 @@
           font-size: 14px;
         }
         .bottomTapList {
-            padding: 0px $padding-25;
-            border-bottom: $border-width-base $border-style-base $border-color-base;
-            @include border-color($background-color-base, $dark-workspace-body-bg-color);
-            @include font-color($workspace-title-color, $dark-workspace-title-color);
-            margin-top: 12px;
+          padding: 0px $padding-25;
+          border-bottom: $border-width-base $border-style-base
+            $border-color-base;
+          @include border-color(
+            $background-color-base,
+            $dark-workspace-body-bg-color
+          );
+          @include font-color(
+            $workspace-title-color,
+            $dark-workspace-title-color
+          );
+          margin-top: 12px;
+          flex: none;
+          display: flex;
+          align-items: center;
+          font-size: $font-size-large;
+          .bottomLeftText {
+            cursor: pointer;
             flex: none;
-            display: flex;
-            align-items: center;
             font-size: $font-size-large;
-            .bottomLeftText {
-                cursor: pointer;
-                flex: none;
-                font-size: $font-size-large;
-                padding: 0 15px;
-                margin-bottom: -1px;
-                line-height: 40px;
-                position: relative;
-                &::after {
-                    content: "";
-                    border-left: 1px solid #DEE4EC;
-                    @include border-color($border-color-base, $dark-border-color-base);
-                    width: 0;
-                    position: absolute;
-                    right: -15px;
-                    top: 12px;
-                    height: 16px;
-                    margin: 0 15px;
-                }
+            padding: 0 15px;
+            margin-bottom: -1px;
+            line-height: 40px;
+            position: relative;
+            &::after {
+              content: '';
+              border-left: 1px solid #dee4ec;
+              @include border-color(
+                $border-color-base,
+                $dark-border-color-base
+              );
+              width: 0;
+              position: absolute;
+              right: -15px;
+              top: 12px;
+              height: 16px;
+              margin: 0 15px;
             }
-            .active {
-                border-bottom: 2px solid $primary-color;
-                @include border-color($primary-color, $dark-primary-color);
-            }
-            .bottomRightContainer {
-                flex: 1;
-                height: 40px;
-            }
+          }
+          .active {
+            border-bottom: 2px solid $primary-color;
+            @include border-color($primary-color, $dark-primary-color);
+          }
+          .bottomRightContainer {
+            flex: 1;
+            height: 40px;
+          }
         }
       }
     }
@@ -109,7 +119,7 @@
         line-height: 40px;
         position: relative;
         &::after {
-          content: "";
+          content: '';
           border-left: 1px solid #dee4ec;
           @include border-color($border-color-base, $dark-border-color-base);
           width: 0;
@@ -149,13 +159,13 @@
   padding: 0 10px;
   overflow: hidden;
   margin-right: 8px;
-  @include bg-color( #E1E5EA, $dark-workspace-body-bg-color);
+  @include bg-color(#e1e5ea, $dark-workspace-body-bg-color);
   border-radius: 12px;
   &.active {
     height: 24px;
     @include font-color($primary-color, $dark-primary-color);
     line-height: 24px;
-    @include bg-color(#E8EEF4, $dark-workspace-body-bg-color);
+    @include bg-color(#e8eef4, $dark-workspace-body-bg-color);
     border-radius: 12px;
   }
   &:hover {
@@ -163,7 +173,7 @@
     @include font-color($primary-color, $dark-primary-color);
     line-height: 24px;
     border-radius: 12px;
-    @include bg-color(#D1D7DD, $dark-workspace-body-bg-color);
+    @include bg-color(#d1d7dd, $dark-workspace-body-bg-color);
   }
 }
 

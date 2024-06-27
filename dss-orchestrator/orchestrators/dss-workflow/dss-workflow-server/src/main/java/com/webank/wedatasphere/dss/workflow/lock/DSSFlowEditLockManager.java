@@ -16,23 +16,39 @@
 
 package com.webank.wedatasphere.dss.workflow.lock;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestSubmitOrchestratorSync;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import org.apache.linkis.DataWorkCloudApplication;
 import org.apache.linkis.common.utils.Utils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.poi.util.StringUtil;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +65,8 @@ public class DSSFlowEditLockManager {
 
     private static LockMapper lockMapper;
 
+    private static FlowMapper flowMapper;
+
 
     private static final DelayQueue<UnLockEvent> unLockEvents = new DelayQueue<>();
     private static final ThreadLocal<SimpleDateFormat> sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -60,8 +78,14 @@ public class DSSFlowEditLockManager {
         LOGGER.info("unLockEvents移除定时线程开启...");
         LOGGER.info("编辑锁超时时间为：{} ms", DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue());
         init();
-        //程序重启时，删除所有编辑锁
-        lockMapper.deleteALL();
+        // 对于工作流状态为已保存的，不自动解锁，该工作流的锁永不过期
+        List<String> saveList = lockMapper.selectOrchestratorByStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
+        if (!CollectionUtils.isEmpty(saveList)) {
+            lockMapper.deleteExpectAfterSave(saveList);
+        }else {
+            //程序重启时，删除所有编辑锁
+            lockMapper.deleteALL();
+        }
         Utils.defaultScheduler().scheduleAtFixedRate(() -> {
             try {
                 UnLockEvent pop = unLockEvents.poll();
@@ -168,12 +192,25 @@ public class DSSFlowEditLockManager {
         }
     }
 
-    public static void deleteLock(String flowEditLock) throws DSSErrorException {
+    public static void deleteLock(String flowEditLock, Workspace workspace) throws DSSErrorException {
         try {
             if (StringUtils.isNotBlank(flowEditLock)) {
                 DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
                 if (dssFlowEditLock != null) {
-                    lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), dssFlowEditLock.getFlowID());
+                    Long flowID = dssFlowEditLock.getFlowID();
+                    // 获取当前项目信息
+                    DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
+                    DSSProject projectInfo = getProjectInfo(dssFlow.getProjectId());
+                    // 对于接入Git的项目，工作流解锁加入额外处理
+                    if (projectInfo.getAssociateGit()) {
+                        OrchestratorVo orchestratorVo = getOrchestratorInfo(flowID);
+                        DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
+                        String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
+                        if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
+                            submitOrchestrator(orchestratorInfo.getId(), flowID, workspace, projectInfo.getName());
+                        }
+                    }
+                    lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowID);
                 }
             }
         } catch (Exception e) {
@@ -181,6 +218,46 @@ public class DSSFlowEditLockManager {
             throw new DSSErrorException(60059, "工作流编辑锁主动释放失败，flowId:" + flowEditLock + "");
         }
     }
+
+    public static DSSProject getProjectInfo(Long projectId) throws DSSErrorException {
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(projectId);
+        DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
+        if (dssProject == null) {
+            throw new DSSErrorException(90001, "工程不存在");
+        }
+        return dssProject;
+    }
+
+    public static OrchestratorVo getOrchestratorInfo(Long flowID) throws  DSSErrorException{
+        Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(flowID)),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+        if (orchestratorVo == null) {
+            throw new DSSErrorException(800001, "编排不存在");
+        }
+        return orchestratorVo;
+    }
+
+    public static void submitOrchestrator(Long orchestratorId, Long flowId, Workspace workspace, String projectName) {
+        LOGGER.info("-------=======================begin to add testGit1=======================-------");
+        Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+        // 同步提交编排至BML以及push到git
+        RequestSubmitOrchestratorSync submitOrchestratorSync = new RequestSubmitOrchestratorSync();
+        submitOrchestratorSync.setOrchestratorId(orchestratorId);
+        submitOrchestratorSync.setFlowId(flowId);
+        submitOrchestratorSync.setComment("force unlock");
+        submitOrchestratorSync.setProjectName(projectName);
+        LabelRouteVO labelRouteVO = new LabelRouteVO();
+        labelRouteVO.setRoute("dev");
+        submitOrchestratorSync.setLabels(labelRouteVO);
+        submitOrchestratorSync.setUsername("system");
+        submitOrchestratorSync.setWorkspace(workspace);
+        GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(orcSender.ask(submitOrchestratorSync), GitCommitResponse.class, RequestSubmitOrchestratorSync.class);
+        LOGGER.info("-------=======================End to add submit=======================-------: {}", responseWorkflowValidNode);
+    }
+
 
     public static String updateLock(String lock) throws DSSErrorException {
         if (StringUtils.isBlank(lock)) {
@@ -205,7 +282,13 @@ public class DSSFlowEditLockManager {
         }
     }
 
-    public static boolean isLockExpire(DSSFlowEditLock flowEditLock) {
+    public static boolean isLockExpire(DSSFlowEditLock flowEditLock) throws DSSErrorException{
+        OrchestratorVo orchestratorVo = getOrchestratorInfo(flowEditLock.getFlowID());
+        DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
+        String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
+        if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
+            return false;
+        }
         return System.currentTimeMillis() - flowEditLock.getUpdateTime().getTime() >= DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue();
     }
 
@@ -214,6 +297,7 @@ public class DSSFlowEditLockManager {
             synchronized (DSSFlowEditLockManager.class) {
                 if (!isInit) {
                     lockMapper = DataWorkCloudApplication.getApplicationContext().getBean(LockMapper.class);
+                    flowMapper = DataWorkCloudApplication.getApplicationContext().getBean(FlowMapper.class);
                     isInit = true;
                 }
             }

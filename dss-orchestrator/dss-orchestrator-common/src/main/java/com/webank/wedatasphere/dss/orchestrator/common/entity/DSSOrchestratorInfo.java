@@ -91,6 +91,11 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
      */
     private String isDefaultReference;
 
+    /**
+     * 工作流状态：save-已保存 push-已提交 publish-已发布
+     */
+    private String status;
+
     public DSSOrchestratorInfo() {
 
     }
@@ -306,6 +311,15 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
                 ", secondaryType='" + secondaryType + '\'' +
                 ", linkedAppConnNames=" + linkedAppConnNames +
                 ", comment='" + comment + '\'' +
+                ", status='" + status + '\'' +
                 '}';
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

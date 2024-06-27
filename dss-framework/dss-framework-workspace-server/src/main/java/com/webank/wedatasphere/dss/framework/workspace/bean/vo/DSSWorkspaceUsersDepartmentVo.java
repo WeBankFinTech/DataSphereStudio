@@ -1,38 +1,19 @@
 package com.webank.wedatasphere.dss.framework.workspace.bean.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
-
+import java.util.Map;
+@Data
 public class DSSWorkspaceUsersDepartmentVo implements Serializable {
 
     private static final long serialVersionUID=1L;
-    private List<DepartmentUserVo> editUsers;
+    private List<DepartmentUserTreeVo> editUsers;
 
-    private List<DepartmentUserVo> accessUsers;
+    private List<DepartmentUserTreeVo> accessUsers;
 
-    private List<DepartmentUserVo> releaseUsers;
+    private List<DepartmentUserTreeVo> releaseUsers;
 
-    public void setAccessUsers(List<DepartmentUserVo> accessUsers) {
-        this.accessUsers = accessUsers;
-    }
 
-    public void setReleaseUsers(List<DepartmentUserVo> releaseUsers) {
-        this.releaseUsers = releaseUsers;
-    }
-
-    public void setEditUsers(List<DepartmentUserVo> editUsers) {
-        this.editUsers = editUsers;
-    }
-
-    public List<DepartmentUserVo> getEditUsers() {
-        return editUsers;
-    }
-
-    public List<DepartmentUserVo> getAccessUsers() {
-        return accessUsers;
-    }
-
-    public List<DepartmentUserVo> getReleaseUsers() {
-        return releaseUsers;
-    }
 }

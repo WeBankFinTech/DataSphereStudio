@@ -18,12 +18,14 @@ package com.webank.wedatasphere.dss.framework.project.service.impl;
 
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyStructureAppConn;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ExportAllOrchestratorsReqest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
@@ -32,12 +34,13 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
+import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.request.*;
+import com.webank.wedatasphere.dss.git.common.protocol.response.*;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectContentRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectPrivilege;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.ProjectUpdateRequestRef;
-import com.webank.wedatasphere.dss.standard.app.structure.project.ref.RefProjectContentRequestRef;
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.*;
 import com.webank.wedatasphere.dss.standard.app.structure.utils.StructureOperationUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
@@ -47,6 +50,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.exception.WarnException;
 import org.apache.linkis.protocol.util.ImmutablePair;
+import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -97,11 +101,23 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             DSSExceptionUtils.dealErrorException(60021,"project bussiness is too long. the length must be less than " + MAX_PROJECT_BUSSINESS_SIZE, DSSProjectErrorException.class);
         }
 
-        this.checkProjectName(projectCreateRequest.getName(), workspace, username);
+        // 对于接入git的项目校验项目名称
+        if(projectCreateRequest.getAssociateGit() != null && projectCreateRequest.getAssociateGit()) {
+            checkGitName(projectCreateRequest.getName(), workspace, username);
+        }
 
         Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace, username);
         //3.保存dss_project
         DSSProjectDO project = dssProjectService.createProject(username, projectCreateRequest);
+        // 同步项目信息至git
+        if(projectCreateRequest.getAssociateGit() != null && projectCreateRequest.getAssociateGit()) {
+            ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
+            exportAllOrchestratorsReqest.setProjectId(project.getId());
+            exportAllOrchestratorsReqest.setComment("test");
+            exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
+            BmlResource bmlResource = dssProjectService.exportProject(exportAllOrchestratorsReqest, username, "", workspace);
+            createGitProject(workspace.getWorkspaceId(), project.getName(), bmlResource, username);
+        }
         //4.保存dss_project_user 工程与用户关系
         projectUserService.saveProjectUser(project.getId(), username, projectCreateRequest, workspace);
         //5.保存dss工程与其他工程的对应关系,应该都是以id来作为标识
@@ -113,6 +129,15 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         dssProjectVo.setId(project.getId());
         dssProjectVo.setName(project.getName());
         return dssProjectVo;
+    }
+
+    private void createGitProject(Long workspaceId, String projectName, BmlResource bmlResource, String username) {
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitCreateProjectRequest request1 = new GitCreateProjectRequest(workspaceId, projectName, bmlResource, username);
+        LOGGER.info("-------=======================begin to create project: {}=======================-------", projectName);
+        Object ask = gitSender.ask(request1);
+        GitCreateProjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitCreateProjectResponse.class, GitCreateProjectResponse.class);
+        LOGGER.info("-------=======================End to create project: {}=======================-------: {}", projectName, responseWorkflowValidNode);
     }
 
 
@@ -153,6 +178,12 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         if (!dbProject.getName().equalsIgnoreCase(projectModifyRequest.getName())) {
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
         }
+
+        // 校验接入git
+        if (projectModifyRequest.getAssociateGit() != null) {
+            checkAssociateGit(projectModifyRequest, dbProject, username, workspace);
+        }
+
         //调用第三方的工程修改接口
         dbProject.setUsername(username);
         dbProject.setApplicationArea(Integer.valueOf(projectModifyRequest.getApplicationArea()));
@@ -166,7 +197,33 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
 
         //3.修改dss_project DSS基本工程信息
-        dssProjectService.modifyProject(username, projectModifyRequest);
+        DSSProjectDO dssProjectDO = dssProjectService.modifyProject(username, projectModifyRequest);
+
+        // 同步项目配置元数据到git
+        if (projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
+            ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
+            exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
+            exportAllOrchestratorsReqest.setComment("test");
+            exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
+
+            BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
+            if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
+                createGitProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
+            } else {
+                updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
+            }
+        }
+    }
+
+    private void updateProject(Long workspaceId, String projectName,BmlResource bmlResource, String username ) {
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        Map<String, BmlResource> file = new HashMap<>();
+        // 测试数据 key表示项目名、value为项目BmlResource资源
+        file.put(".projectmeta", bmlResource);
+        GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, "update Project", username);
+        LOGGER.info("-------=======================begin to update project: {}=======================-------", projectName);
+        GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
+        LOGGER.info("-------=======================End to update project: {}=======================-------: {}", projectName, responseWorkflowValidNode);
     }
 
     /**
@@ -200,6 +257,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             addedPrivilege = getPrivilege.apply(true);
             removedPrivilege = getPrivilege.apply(false);
         }
+        List<DSSProjectDataSource> dataSourceList = projectModifyRequest.getDataSourceList();
         Map<AppInstance, Long> appInstanceToRefProjectId = new HashMap<>(10);
         tryProjectOperation((appConn, appInstance) -> {
                 Long refProjectId = dssProjectService.getAppConnProjectId(appInstance.getId(), dbProject.getId());
@@ -212,7 +270,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     return true;
                 }
             }, workspace, projectService -> projectService.getProjectUpdateOperation(),
-            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setUserName(dbProject.getUpdateBy()).setWorkspace(workspace),
+            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setDSSProjectDataSources(dataSourceList).setUserName(dbProject.getUpdateBy()).setWorkspace(workspace),
             (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setRefProjectId(appInstanceToRefProjectId.get(appInstance)),
             (structureOperation, structureRequestRef) -> {
                 ProjectUpdateRequestRef projectUpdateRequestRef = (ProjectUpdateRequestRef) structureRequestRef;
@@ -252,10 +310,11 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         DSSProjectPrivilege privilege = DSSProjectPrivilege.newBuilder().setAccessUsers(dssProjectCreateRequest.getAccessUsers())
                 .setEditUsers(dssProjectCreateRequest.getEditUsers())
                 .setReleaseUsers(dssProjectCreateRequest.getReleaseUsers()).build();
+        List<DSSProjectDataSource> dataSourceList = dssProjectCreateRequest.getDataSourceList();
         try {
             tryProjectOperation(null, workspace, ProjectService::getProjectCreationOperation,
                     dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject)
-                            .setDSSProjectPrivilege(privilege).setUserName(username), null,
+                            .setDSSProjectPrivilege(privilege).setDSSProjectDataSources(dataSourceList).setUserName(username), null,
                     (structureOperation, structureRequestRef) -> ((ProjectCreationOperation) structureOperation).createProject((DSSProjectContentRequestRef) structureRequestRef),
                     (pair, projectResponseRef) -> {
                         projectMap.put(pair.right, projectResponseRef.getRefProjectId());
@@ -297,5 +356,53 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
         return projectMap;
     }
+
+    private void checkGitName(String name, Workspace workspace, String username) throws DSSProjectErrorException {
+        // 校验工作空间是否完成Git账号配置
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
+        gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
+        gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
+        GitUserInfoResponse writeInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
+        if (writeInfoResponse.getGitUser() == null) {
+            DSSExceptionUtils.dealErrorException(60021,"工作空间管理员未完成Git账号配置", DSSProjectErrorException.class);
+        }
+        // 校验Git名称
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitCheckProjectRequest request1 = new GitCheckProjectRequest(workspace.getWorkspaceId(), name, username);
+        LOGGER.info("-------=======================begin to check project: {}=======================-------", name);
+        Object ask = gitSender.ask(request1);
+        GitCheckProjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitCheckProjectResponse.class, GitCheckProjectRequest.class);
+        LOGGER.info("-------=======================End to check project: {}=======================-------: {}", name, responseWorkflowValidNode);
+        if (responseWorkflowValidNode == null) {
+            throw new DSSProjectErrorException(71000, "向Git发起检查工程名是否重复失败，请稍后重试 ");
+        } else if (responseWorkflowValidNode.getRepeat()) {
+            throw new DSSProjectErrorException(71000,  "git 已存在相同项目名称，请重新命名!");
+        }
+    }
+
+    private void initGitProject(Long workspaceId, String projectName, String resource, String version, String username) {
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        Map<String, BmlResource> file = new HashMap<>();
+        // 测试数据 key表示项目名、value为项目BmlResource资源
+        GitCreateProjectRequest request1 = new GitCreateProjectRequest(workspaceId, projectName, new BmlResource(resource, version), username);
+        LOGGER.info("-------=======================begin to create project: {}=======================-------", projectName);
+        Object ask = gitSender.ask(request1);
+        GitCreateProjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitCreateProjectResponse.class, GitCreateProjectRequest.class);
+        LOGGER.info("-------=======================End to create project: {}=======================-------: {}", projectName, responseWorkflowValidNode);
+    }
+
+    private void checkAssociateGit(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws DSSProjectErrorException {
+        // 对于已经接入git的项目不允许进行取消
+        if (dbProject.getAssociateGit()!=null && dbProject.getAssociateGit() && !projectModifyRequest.getAssociateGit()) {
+            throw new DSSProjectErrorException(71000, "项目接入git后无法取消");
+        }
+        // 对于首次接入git的项目需要校验项目名称
+        if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
+            checkGitName(projectModifyRequest.getName(), workspace, username);
+        }
+    }
+
+
 
 }

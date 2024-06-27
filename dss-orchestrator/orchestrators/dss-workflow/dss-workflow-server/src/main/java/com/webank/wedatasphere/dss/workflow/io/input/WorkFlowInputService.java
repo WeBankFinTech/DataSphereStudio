@@ -28,6 +28,10 @@ import java.util.List;
 
 public interface WorkFlowInputService {
 
+    void inputWorkFlowNew(String userName, DSSFlow dssFlow, String projectName,
+                          String flowCodePath, String flowMetaPath, Long parentFlowId, Workspace workspace,
+                          String orcVersion, String contextId, List<DSSLabel> dssLabels) throws DSSErrorException,IOException;
+
     /**
      *
      * @param userName

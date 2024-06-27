@@ -7,6 +7,10 @@ package com.webank.wedatasphere.dss.orchestrator.common.ref;
  */
 public interface OrchestratorRefConstant {
 
+    String ORCHESTRATOR_ID_LIST_KEY = "orchestratorIdList";
+    String ORCHESTRATOR_VERSION_ID_KEY = "orchestratorVersionId";
+    String ORCHESTRATOR_ADD_VERSION_FLAG_KEY = "addOrcVersionFlag";
+
     String DSS_ORCHESTRATOR_INFO_KEY = "dssOrchestratorInfo";
 
     /*************************************************************/
@@ -34,5 +38,19 @@ public interface OrchestratorRefConstant {
 
     //workflow node suffix input by the user during workflow replication.
     String ORCHESTRATION_NODE_SUFFIX = "nodeSuffix";
+    /**
+     * 工作流状态：save-已发布 push-已提交 publish-已保存
+     */
+    public static final String FLOW_STATUS_SAVE = "save";
+
+    public static final String FLOW_STATUS_PUSHING = "running";
+
+    public static final String FLOW_STATUS_PUSH_FAILED = "failed";
+
+    public static final String FLOW_STATUS_PUSH_SUCCESS = "success";
+
+    public static final String FLOW_STATUS_PUSH = "push";
+
+    public static final String FLOW_STATUS_PUBLISH = "publish";
 
 }

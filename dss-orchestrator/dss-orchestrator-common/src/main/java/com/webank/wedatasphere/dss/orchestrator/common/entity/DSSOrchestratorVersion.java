@@ -72,6 +72,10 @@ public class DSSOrchestratorVersion {
      * 有效标示 0:无效；1：有效，默认是有效
      */
     private Integer validFlag;
+    /**
+     * 项目发布当前版本的commitId
+     */
+    private String commitId;
 
 
     public Long getId() {
@@ -205,6 +209,15 @@ public class DSSOrchestratorVersion {
                 ", content='" + content + '\'' +
                 ", contextId='" + contextId + '\'' +
                 ", validFlag='" + validFlag + '\'' +
+                ", commitId='" + commitId + '\'' +
                 '}';
+    }
+
+    public String getCommitId() {
+        return commitId;
+    }
+
+    public void setCommitId(String commitId) {
+        this.commitId = commitId;
     }
 }

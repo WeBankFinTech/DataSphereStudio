@@ -16,8 +16,13 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 
 public interface OrchestratorPluginService {
@@ -29,4 +34,9 @@ public interface OrchestratorPluginService {
 
     ResponseConvertOrchestrator getConvertOrchestrationStatus(String id);
 
+    GitTree diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+
+    void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
+
+    GitCommitResponse submitWorkflowToBML(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 }

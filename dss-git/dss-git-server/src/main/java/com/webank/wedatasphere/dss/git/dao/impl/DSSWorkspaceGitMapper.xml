@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.webank.wedatasphere.dss.git.dao.DSSWorkspaceGitMapper">
+    <insert id="insert" parameterType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
+        insert into dss_workspace_associate_git (workspace_id, git_user, git_password, git_token, git_url, create_time, update_time, create_by, update_by, type, git_user_id)
+        VALUES (#{workspaceId}, #{gitUser}, #{gitPassword}, #{gitToken}, #{gitUrl}, now(), now(), #{createBy}, #{updateBy}, #{type}, #{gitUserId})
+    </insert>
+
+    <insert id="insertProjectInfo" parameterType="com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo">
+        insert into dss_project_associate_git (workspace_id, git_project_id, project_name)
+        values (#{workspaceId}, #{gitProjectId}, #{projectName})
+    </insert>
+
+
+    <select id="getProjectIdListByWorkspaceId" resultType="com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo">
+        select id, workspace_id, git_project_id, project_name from dss_project_associate_git where workspace_id = #{workspaceId}
+    </select>
+
+    <update id="update" parameterType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
+        update dss_workspace_associate_git
+        <set>
+            <if test="gitUser != null">
+                git_user = #{gitUser},
+            </if>
+            <if test="gitPassword != null">
+                git_password = #{gitPassword},
+            </if>
+            <if test="gitToken != null">
+                git_token = #{gitToken},
+            </if>
+            <if test="gitUserId != null">
+                git_user_id = #{gitUserId},
+            </if>
+            update_by = #{updateBy},
+        </set>
+        where workspace_id = #{workspaceId} and type = #{type}
+    </update>
+
+    <select id="selectByWorkspaceId" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
+        select id, workspace_id, git_user, git_token, git_password, git_url, create_time, update_time, create_by, update_by, type, git_user_id
+        from dss_workspace_associate_git
+        where workspace_id = #{workspaceId} and `type` = #{type} limit 1
+    </select>
+
+    <select id="selectByUser" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
+        select id, workspace_id, git_user, git_token, git_password, git_url, create_time, update_time, create_by, update_by, type, git_user_id
+        from dss_workspace_associate_git
+        where git_user = #{gitUser} limit 1
+    </select>
+
+    <select id="selectGitUser" resultType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">
+        select id, workspace_id, git_user, git_token, git_password, git_url, create_time, update_time, create_by, update_by, type, git_user_id
+        from dss_workspace_associate_git
+        where 1=1
+        <if test="workspaceId != null">
+            and workspace_id = #{workspaceId}
+        </if>
+        <if test="type != null" >
+            and `type` = #{type}
+        </if>
+        <if test="gitUser != null" >
+            and git_user = #{gitUser}
+        </if>
+    </select>
+
+    <select id="getAllWorkspaceId" resultType="java.lang.Long">
+        select distinct workspace_id from dss_workspace_associate_git
+    </select>
+</mapper>

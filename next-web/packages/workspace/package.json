@@ -1,0 +1,9 @@
+{
+  "name": "@dataspherestudio/workspace",
+  "version": "0.0.1",
+  "dependencies": {
+    "@dataspherestudio/shared": "^0.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {}
+}

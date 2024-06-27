@@ -61,10 +61,13 @@ class ContextMenu {
     this._listeners.eventCyTap = (event) => {
       this.renderedPos = event.renderedPosition || event.cyRenderedPosition
       let left = this.renderedPos.x
+      if (this._options.editorOptions.dragAddNodes) {
+        left += 200
+      }
       let top = this.renderedPos.y
       utils.css(this.ctxmenu, {
         top: top + 'px',
-        left: (left + 200) + 'px'
+        left: left + 'px'
       })
       this.show(event)
     }

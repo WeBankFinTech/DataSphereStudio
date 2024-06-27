@@ -47,6 +47,8 @@ public class OrchestratorModifyRequest extends OrchestratorRequest {
 
     private List<String> dssLabels;
 
+    private String isDefaultReference;
+
     public Long getId() {
         return id;
     }
@@ -116,5 +118,13 @@ public class OrchestratorModifyRequest extends OrchestratorRequest {
 
     public void setOrchestratorLevel(String orchestratorLevel) {
         this.orchestratorLevel = orchestratorLevel;
+    }
+
+    public String getIsDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setIsDefaultReference(String isDefaultReference) {
+        this.isDefaultReference = isDefaultReference;
     }
 }

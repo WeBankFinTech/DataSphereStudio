@@ -27,16 +27,24 @@ import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.entity.node.Node;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
+import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
@@ -47,12 +55,14 @@ import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
@@ -65,6 +75,7 @@ import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
+import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +100,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Autowired
     private FlowMapper flowMapper;
     @Autowired
+    private LockMapper lockMapper;
+    @Autowired
     private NodeInfoMapper nodeInfoMapper;
     @Autowired
     private NodeInputService nodeInputService;
@@ -108,9 +121,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Autowired
     private SaveFlowHook saveFlowHook;
 
+    @Autowired
+    private WorkFlowManager workFlowManager;
+
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
     private static final String TOKEN = CommonVars.apply("wds.dss.workspace.token", "BML-AUTH").getValue();
+
+    protected Sender getOrchestratorSender() {
+        return DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+    }
 
     @Override
     public DSSFlow getFlowByID(Long id) {
@@ -263,7 +283,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                            String comment,
                            String userName,
                            String workspaceName,
-                           String projectName) throws IOException{
+                           String projectName) throws IOException {
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -304,7 +324,45 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
         String version = bmlReturnMap.get("version").toString();
+        // 对子工作流,需更新父工作流状态，以便提交
+        Long updateFlowId = parentFlowID == null? dssFlow.getId():parentFlowID;
+        updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId);
+
         return version;
+    }
+
+    private void updateTOSaveStatus(Long projectId, Long flowID) {
+        try {
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
+            //仅对接入Git的项目 更新状态为 保存
+            if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
+                Long rootFlowId = getRootFlowId(flowID);
+                if (rootFlowId != null) {
+                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                            OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                    lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                }
+            }
+        } catch (DSSErrorException e) {
+            logger.error("getProjectInfo failed by:", e);
+            throw new DSSRuntimeException(e.getErrCode(),"更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+        }
+    }
+
+    private Long getRootFlowId(Long flowId) {
+        if (flowId == null) {
+            return null;
+        }
+        DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
+        if (dssFlow == null) {
+            return null;
+        }
+        if (dssFlow.getRootFlow()) {
+            return dssFlow.getId();
+        } else {
+            Long parentFlowID = flowMapper.getParentFlowID(flowId);
+            return getRootFlowId(parentFlowID);
+        }
     }
 
     /**

@@ -600,14 +600,12 @@ export default {
     // 验证发布和更新的默认值是否满足条件
     verificationValue (row) {
       let flag;
-      if(row.defaultValue.length > 1024) {
-        this.$Message.error({ content: this.$t('message.ext.opensource.longer1024') });
-        flag = true;
-      } else if(row.paramType === 4 && row.defaultValue.split('\n').length > 1000) {
-        this.$Message.error({ content: this.$t('message.ext.opensource.rowlimit') });
+      const method = this.updateApiData.id ? this.updateApiData.requestType : this.addApiData.requestType;
+      if (method.toUpperCase() === 'GET' && row.defaultValue.length > 500) {
+        this.$Message.error({ content: '不能超过500字符' });
         flag = true;
       } else {
-        flag = false
+        flag = false;
       }
       this.$set(this.tip, row.paramName, flag)
     },
@@ -825,6 +823,7 @@ export default {
     },
     saveApiOk() {
       if (this.saveLoading) return;
+      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: this.$t('message.apiServices.outlimit') });
       this.$emit('on-save');
       this.$refs['addApi'].validate((valid) => {
         if (valid) {
@@ -881,6 +880,7 @@ export default {
     },
     updateApiOk() {
       if (this.saveLoading) return;
+      if(Object.values(this.tip).some(i => i)) return this.$Message.error({ content: this.$t('message.apiServices.outlimit') });
       this.$emit('on-save');
 
       this.$refs['updateApi'].validate((valid) => {

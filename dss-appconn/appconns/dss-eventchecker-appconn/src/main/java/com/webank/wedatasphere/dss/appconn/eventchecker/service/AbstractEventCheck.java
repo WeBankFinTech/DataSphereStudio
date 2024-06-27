@@ -70,7 +70,7 @@ public abstract class AbstractEventCheck implements EventCheckAdapter {
         runDate = props.getProperty("run_date");
         userTime = props.getProperty(EventChecker.USER_TIME);
         waitTime = props.getProperty(EventChecker.WAIT_TIME, "1");
-        query_frequency = props.getProperty(EventChecker.QUERY_FREQUENCY, "30000");
+        query_frequency = props.getProperty(EventChecker.QUERY_FREQUENCY, "60000");
         afterSend = props.getProperty(EventChecker.AFTERSEND);
     }
 

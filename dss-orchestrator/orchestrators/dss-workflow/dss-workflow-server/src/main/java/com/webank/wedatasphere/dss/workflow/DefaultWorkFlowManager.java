@@ -43,9 +43,7 @@ import com.webank.wedatasphere.dss.standard.common.utils.RequestRefUtils;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
-import com.webank.wedatasphere.dss.workflow.common.protocol.RequestSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseSubFlowContextIds;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUnlockWorkflow;
+import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
@@ -68,15 +66,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static com.webank.wedatasphere.dss.common.utils.IoUtils.FLOW_META_DIRECTORY_NAME;
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.DEFAULT_SCHEDULER_APP_CONN;
 
 @Component
@@ -190,17 +188,27 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     @Override
-    public ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete) throws DSSErrorException {
+    public ResponseUnlockWorkflow unlockWorkflow(String userName, Long flowId, Boolean confirmDelete, Workspace workspace) throws DSSErrorException {
         DSSFlowEditLock editLock = lockMapper.getFlowEditLockByID(flowId);
         if (editLock == null) {
             return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NONEED_UNLOCK, null);
         } else if (!Boolean.TRUE.equals(confirmDelete)) {
             return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.NEED_SECOND_CONFIRM, editLock.getUsername());
         }
-        DSSFlowEditLockManager.deleteLock(editLock.getLockContent());
+        DSSFlowEditLockManager.deleteLock(editLock.getLockContent(), workspace);
         return new ResponseUnlockWorkflow(ResponseUnlockWorkflow.UNLOCK_SUCCESS, null);
     }
-
+    @Override
+    public BmlResource exportWorkflowNew(String userName, Long flowId, Long dssProjectId,
+                                         String projectName, Workspace workspace,
+                                         List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+        DSSFlow dssFlow = flowService.getFlowByID(flowId);
+        String exportPath = workFlowExportService.exportFlowInfoNew(dssProjectId, projectName, flowId, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
+        InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
+        BmlResource bmlResource = bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
+        logger.info("export workflow success.  flowId:{},bmlResource:{} .",flowId,bmlResource);
+        return  bmlResource;
+    }
     @Override
     public BmlResource exportWorkflow(String userName, Long flowId, Long dssProjectId,
                                       String projectName, Workspace workspace,
@@ -211,6 +219,59 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         BmlResource bmlResource = bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
         logger.info("export workflow success. flowId:{},bmlResource:{} .",flowId,bmlResource);
         return bmlResource;
+    }
+    @Override
+    public List<DSSFlow> importWorkflowNew(String userName,
+                                           String resourceId,
+                                           String bmlVersion,
+                                           DSSFlowImportParam dssFlowImportParam,
+                                           List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
+
+        //todo download workflow bml file contains flowInfo and flowRelationInfo
+        String projectName = dssFlowImportParam.getProjectName();
+        // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu
+        String tempPath = IoUtils.generateTempIOPath(userName);
+        // /appcom/tmp/dss/yyyyMMddHHmmssSSS/arionliu/projectxxx.zip
+        String inputZipPath = IoUtils.addFileSeparator(tempPath, projectName + ".zip");
+        bmlService.downloadToLocalPath(userName, resourceId, bmlVersion, inputZipPath);
+        try{
+            String  originProjectName=readImportZipProjectName(inputZipPath);
+            if(!projectName.equals(originProjectName)){
+                String msg=String.format("target project name must be same with origin project name.origin project name:%s,target project name:%s(导入的目标工程名必须与导出时源工程名保持一致。源工程名：%s，目标工程名：%s)"
+                        ,originProjectName,projectName,originProjectName,projectName);
+                throw new DSSRuntimeException(msg);
+            }
+        }catch (IOException e){
+            throw new DSSRuntimeException("upload file format error(导入包格式错误)");
+        }
+        String projectPath = ZipHelper.unzip(inputZipPath,true);
+        String flowName = IoUtils.getSubdirectoriesNames(projectPath).stream().filter(name -> !name.startsWith("."))
+                .findFirst().orElseThrow(() -> new DSSRuntimeException("import package has no flow（未导入任何工作流，请检查导入包格式）"));
+        String flowMetaPath=IoUtils.addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME, flowName);
+        ImmutablePair<List<DSSFlow>,List<DSSFlowRelation>> meta= metaInputService.inputFlowNew(flowMetaPath);
+        //导入工作流数据库信息
+        List<DSSFlow> dssFlows = meta.getKey();
+        //导入工作流关系信息
+        List<DSSFlowRelation> dwsFlowRelations = meta.getValue();
+
+        List<DSSFlow> dwsFlowRelationList = workFlowInputService.persistenceFlow(dssFlowImportParam.getProjectID(),
+                dssFlowImportParam.getUserName(),
+                dssFlows,
+                dwsFlowRelations);
+        //这里其实只会有1个元素
+        List<DSSFlow> rootFlows = dwsFlowRelationList.stream().filter(DSSFlow::getRootFlow).collect(Collectors.toList());
+        for (DSSFlow rootFlow : rootFlows) {
+            String flowCodePath0=IoUtils.addFileSeparator(projectPath,  flowName);
+            String flowMetaPath0=IoUtils.addFileSeparator(projectPath, FLOW_META_DIRECTORY_NAME, flowName);
+            workFlowInputService.inputWorkFlowNew(dssFlowImportParam.getUserName(),
+                    rootFlow,
+                    projectName,
+                    flowCodePath0,
+                    flowMetaPath0,null, dssFlowImportParam.getWorkspace(), dssFlowImportParam.getOrcVersion(),
+                    dssFlowImportParam.getContextId(), dssLabels);
+        }
+        logger.info("import workflow success.orcVersion:{},context Id:{}", dssFlowImportParam.getOrcVersion(), dssFlowImportParam.getContextId());
+        return  rootFlows;
     }
 
     @Override
@@ -358,11 +419,11 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     }
 
     private String readImportZipProjectName(String zipFilePath) throws IOException {
-        try(ZipFile zipFile =new ZipFile(zipFilePath)){
-            Enumeration<? extends ZipEntry> entries =zipFile.entries();
-            if(entries.hasMoreElements()){
-                String name=entries.nextElement().getName();
-                if(name.endsWith("\\")||name.endsWith("/")){
+        try (ZipFile zipFile = new ZipFile(zipFilePath)) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            if (entries.hasMoreElements()) {
+                String name = entries.nextElement().getName();
+                if (name.endsWith("\\") || name.endsWith("/")) {
                     name = name.substring(0, name.length() - 1);
                 }
                 return name;

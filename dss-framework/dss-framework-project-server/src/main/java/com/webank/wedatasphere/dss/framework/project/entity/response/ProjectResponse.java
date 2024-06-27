@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.response;
 
+import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectDataSource;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +46,7 @@ public class ProjectResponse implements Serializable {
     private Date createTime;
     //工程修改时间
     private Date updateTime;
+    private List<DSSProjectDataSource> dataSourceList;
 
     public Boolean getEditable() {
         return editable;
@@ -79,6 +82,8 @@ public class ProjectResponse implements Serializable {
      * 编码模式 list
      */
     private List<String> orchestratorModeList;
+
+    private Boolean associateGit;
 
     public Date getCreateTime() {
         return createTime;
@@ -208,6 +213,14 @@ public class ProjectResponse implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public List<DSSProjectDataSource> getDataSourceList() {
+        return dataSourceList;
+    }
+
+    public void setDataSourceList(List<DSSProjectDataSource> dataSourceList) {
+        this.dataSourceList = dataSourceList;
+    }
+
     @Override
     public String toString() {
         return "ResponseProjectVo{" +
@@ -228,6 +241,15 @@ public class ProjectResponse implements Serializable {
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
                 ", editable=" + editable +
+                ", associateGit=" + associateGit +
                 '}';
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

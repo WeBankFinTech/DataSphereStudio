@@ -57,6 +57,13 @@ export class Work {
     this.specialSetting = option.specialSetting;
     this.nodeName = option.nodeName || null; // 在工作流操作时记录名称
     if (option.url) this.url = option.url; // option.type=iframe， src
+    //数据源数据 选中
+    if (option.dataSetValue) {
+      this.dataSetValue = option.dataSetValue
+    }
+    if (option.dataSetList) {
+      this.dataSetList = option.dataSetList
+    }
   }
 
   /**

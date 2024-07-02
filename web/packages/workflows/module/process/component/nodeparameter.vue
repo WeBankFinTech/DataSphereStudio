@@ -153,7 +153,6 @@ export default {
   },
   data() {
     return {
-      test: [],
       currentNode: {
       },
       resources: [],
@@ -182,6 +181,7 @@ export default {
           }
         })
       }
+      this.resources = []
       // 在节点没有保存参数时，需要设置默认值的值,先判断保存的值应该存在哪里starup或者runtime或者是node下
       let jobParams = {};
       this.curNodeParamsList.map((item) => {

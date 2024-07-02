@@ -63,6 +63,7 @@
         @copy="copyProject"
         @addProject="addProject"
         @delete="deleteProject"
+        @gotoGit="gotoGit"
       ></project-content-item>
     </template>
     <ProjectForm
@@ -374,7 +375,9 @@ export default {
           product: projectData.product,
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
-          orchestratorModeList: projectData.orchestratorModeList
+          orchestratorModeList: projectData.orchestratorModeList,
+          associateGit: projectData.associateGit,
+          dataSourceList: projectData.dataSourceList
         }
         api
           .fetch(
@@ -470,7 +473,8 @@ export default {
         editUsers: [],
         accessUsers: [],
         releaseUsers: [],
-        devProcessList: []
+        devProcessList: [],
+        createBy: this.getUserName()
       }
     },
     // 修改工程
@@ -549,9 +553,24 @@ export default {
     copyProject(classifyId, project) {
       this.init()
       this.currentForm = 'copyForm'
-      this.currentProjectData = project
+      const workspaceData = storage.get("currentWorkspace");
+      this.currentProjectData = { ...project, associateGit: workspaceData.associateGit };
       this.commonTitle = this.$t('message.common.projectDetail.projectCopy')
       this.projectModelShow = true
+    },
+    async gotoGit(data) {
+      const workspaceData = storage.get("currentWorkspace");
+      try {
+        let res = await api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}gitUrl`, {
+          projectName: data.name,
+          workspaceName: workspaceData.name,
+        }, 'get');
+        if (res && res.gitUrl) {
+          window.open(res.gitUrl, '_blank');
+        }
+      } catch (error) {
+        //
+      }
     },
     projectExport(classifyId, project) {
       this.init()

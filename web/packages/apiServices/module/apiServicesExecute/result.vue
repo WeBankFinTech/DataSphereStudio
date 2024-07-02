@@ -4,11 +4,21 @@
       <i-col span="10">
         <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
         <Form ref="searchFrom" class="search-from" :label-width="100" :disabled="isHistory" :model="conditionResult">
-          <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="[{
-            required: item.required,
-            message: $t('message.apiServices.placeholder.emter'),
-            trigger: 'blur'
-          }]">
+          <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="item.maxLength && !isHistory ? [
+            {
+              required: item.required,
+              message: $t('message.apiServices.placeholder.emter'),
+              trigger: 'blur'
+            },{
+              max: item.maxLength,
+              message: $t('message.apiServices.placeholder.limitStrLength', { maxLength: item.maxLength })
+            }]:[
+            {
+              required: item.required,
+              message: $t('message.apiServices.placeholder.emter'),
+              trigger: 'blur'
+            }
+          ]">
             <div class="label-class" :title="item.displayName || item.name" slot="label">
               {{ `${item.displayName || item.name}:` }}
               <div :title="item.details || ''" class="details-tip"><Icon type="md-help-circle" /></div>
@@ -155,10 +165,8 @@ export default {
     },
     // 验证发布和更新的默认值是否满足条件
     verificationValue (row) {
-      const method = this.workInfo.method || '';
       let flag;
-      if (method.toUpperCase() === 'GET' && row.defaultValue.length > 500) {
-        this.$Message.error({ content: '不能超过500字符' });
+      if (row.maxLength && (row.defaultValue || '').length > row.maxLength) {
         flag = true;
       } else {
         flag = false;
@@ -209,14 +217,6 @@ export default {
         if (this.showConditionList.length > 0) {
           this.$refs.searchFrom.validate(valid => {
             if (valid) {
-              const method = this.workInfo.method || '';
-              if (method.toUpperCase() === 'GET') {
-                const conditionStr = this.showConditionList.map(item => item.defaultValue).filter(item => item).join('');
-                if (conditionStr.length > 3000) {
-                  this.$Message.error({ content: '输入内容总长度不能超过3000字符' });
-                  return;
-                }
-              }
               this.executAction();
             } else {
               console.log(this.showConditionList)
@@ -344,6 +344,7 @@ export default {
     .content-top {
       padding: 25px;
       max-height: 600px;
+      min-height: 120px;
       overflow-y: auto;
       .alert-bar {
         margin-left: 15px;
@@ -355,5 +356,4 @@ export default {
     }
   }
 </style>
-  
-  
+

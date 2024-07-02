@@ -24,7 +24,7 @@ import {
   Message,
   Notice
 } from 'iview';
-import cache from './apiCache';
+import cacheReq, { cache } from './apiCache';
 import qs from './querystring'
 import storage from "./storage"
 import i18n from '../i18n'
@@ -77,6 +77,9 @@ instance.interceptors.request.use((config) => {
   config.headers['Content-language'] = localStorage.getItem('locale') || 'zh-CN';
   config.metadata = {
     startTime: Date.now()
+  }
+  if (/\/user\/login/.test(config.url)) {
+    cache.reset();
   }
   if (/\/application\//.test(config.url)) {
     config.url = `http://${window.location.host}` + config.url
@@ -362,7 +365,7 @@ const param = function (url, data, option) {
   }
   // cacheOptions接口数据缓存 {time} time为0则请求之后缓存在内存里的数据不清理
   if (option.cacheOptions) {
-    option.adapter = cache(option.cacheOptions)
+    option.adapter = cacheReq(option.cacheOptions)
   }
   option.url = url;
 

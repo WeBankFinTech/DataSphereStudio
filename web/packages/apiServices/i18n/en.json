@@ -55,7 +55,8 @@
         "emter": "Enter",
         "startDate": "Please choose the start date",
         "dateAndTime": "Select Date And Time",
-        "inputSubmitter": "Input Submitter"
+        "inputSubmitter": "Input Submitter",
+        "limitStrLength": "The length is limited to {maxLength} characters"
       },
       "label": {
         "apiName": "API Name：",
@@ -158,7 +159,9 @@
         },
         "defaultValue": "Default Value",
         "displayName": "Display Name",
-        "describe": "Describe"
+        "describe": "Describe",
+        "setLength": "Length setting",
+        "setLengthTips": "The actual maximum length of the parameter can be entered depending on the browser version, request protocol, and data type. It may occur that the actual maximum input length of the field is less than the set maximum length"
       },
       "rule": {
         "nameRule": "Please input api name!",

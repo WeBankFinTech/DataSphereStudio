@@ -68,6 +68,7 @@
               :render="renderNode"
               :open="openNode"
               :height="height - 30"
+              :computeStyle="computeStyle"
               @we-open-node="openNodeChange"
               @we-click="handleTreeClick" />
             <Spin v-show="loadingTree" size="large" fix />
@@ -97,6 +98,7 @@
           :bottomTapList="tabList"
           :modeName="modeName"
           :currentTab="current"
+          :associateGit="currentProjectData.associateGit"
           @bandleTapTab="onTabClick"
           @handleTabRemove="onTabRemove"
           @handleChangeButton="handleChangeButton"
@@ -140,7 +142,8 @@
                 v-else-if="item.orchestratorMode.startsWith(ORCHESTRATORMODES.WORKFLOW) && item.tabId === current.tabId"
                 :key="item.tabId"
                 :query="item.query"
-                @updateWorkflowList="updateWorkflowList"
+                :associateGit="currentProjectData.associateGit"
+                @updateWorkflowList="updateWorkflowList(item)"
                 @isChange="isChange(index, arguments)"
                 @close="onTabRemove(item.tabId, false)"
                 @open="reopen(item)"
@@ -204,6 +207,8 @@
     <CopyModal v-model="showCopyForm" ref="copyForm" @finish="copySended" />
     <!-- 导入工作流 -->
     <ImportFlow v-model="importModal" ref="import" @finish="importSended" />
+    <!-- 查找代码 -->
+    <CodeSearchDrawer v-model="showCodeDrawer" :currentMode="currentMode" />
   </div>
 </template>
 <script>
@@ -215,6 +220,7 @@ import Process from '@/workflows/module/process';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import VirtualTree from '@dataspherestudio/shared/components/virtualTree';
 import WorkflowTabList from '@/workflows/module/common/tabList/index.vue';
+import CodeSearchDrawer from './codeSearchDrawer/index.vue';
 import ProjectForm from '@dataspherestudio/shared/components/projectForm/index.js';
 import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
 import api from '@dataspherestudio/shared/common/service/api';
@@ -240,7 +246,8 @@ export default {
     ProjectForm,
     Streamis: Streamis.component,
     CopyModal,
-    ImportFlow
+    ImportFlow,
+    CodeSearchDrawer
   },
   data() {
     return {
@@ -262,6 +269,7 @@ export default {
         devProcessList: [],
         orchestratorModeList: [],
         releaseUsers: [],
+        associateGit: false,
       },
       selectOrchestratorList: [],
       devProcessBase: [],
@@ -319,7 +327,9 @@ export default {
       panelWidth: 250,
       minPanelWidth: 250,
       maxPanelWidth: 375,
-      currentPanelWidth: 250
+      currentPanelWidth: 250,
+      showCodeDrawer: false,
+      unLockQueue: [],
     }
   },
   filters,
@@ -354,6 +364,7 @@ export default {
     this.getDicSecondList();
   },
   mounted() {
+    this.unLockQueue = [];
     // 获取所有project展示tree
     this.getAllProjects((res) => {
       if (this.$route.query.projectID) {
@@ -404,6 +415,30 @@ export default {
     }
   },
   methods: {
+    converStatus(item) {
+      if (!item.associateGit) return '';
+      switch (item.status) {
+        case 'save':
+          return '\n状态：工作流有修改，未提交';
+        case 'push':
+          return '\n状态：工作流已提交，未发布';
+        case 'publish':
+          return '\n状态：工作流未修改';
+        default:
+          return '';
+      }
+    },
+    computeStyle(item) {
+      if (!item.associateGit) return {};
+      switch (item.status) {
+        case 'save':
+          return {color: 'red'};
+        case 'push':
+          return {color: 'green'};
+        default:
+          return {};
+      }
+    },
     createProject() {
       this.actionType = "add";
       this.currentProjectData = {
@@ -416,6 +451,7 @@ export default {
         accessUsers: [],
         devProcessList: [],
         releaseUsers: [],
+        createBy: this.getUserName()
       };
       this.$refs.projectForm.showProject(this.currentProjectData, 'add')
     },
@@ -556,6 +592,7 @@ export default {
               name: f.orchestratorName,
               projectId: param.id || f.projectId,
               projectName: param.name,
+              associateGit: param.associateGit,
               type: "flow",
             };
           });
@@ -599,6 +636,7 @@ export default {
               projectId: param.id || f.projectId,
               // 补充projectName，点击工作流切换project时使用
               projectName: param.name || p.name,
+              associateGit: p.associateGit,
               type: "flow",
             };
           });
@@ -796,6 +834,11 @@ export default {
       this.$refs.workflow.versionDetail(project.id, project);
     },
     unlockFlow(params, confirmDelete = false) {
+      if (this.unLockQueue.includes(params.orchestratorId)) {
+        this.$Message.warning('解锁中，请稍后');
+        return;
+      }
+      this.unLockQueue.push(params.orchestratorId);
       const workspaceData = storage.get("currentWorkspace");
       api
         .fetch(
@@ -827,6 +870,8 @@ export default {
           } else {
             this.$t('message.workflow.unlocksuccess')
           }
+        }).finally(() => {
+          this.unLockQueue = this.unLockQueue.filter(id => id !== params.orchestratorId);
         })
     },
     exportWorkflow(node) {
@@ -979,6 +1024,7 @@ export default {
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
+          associateGit: projectData.associateGit
         };
         api
           .fetch(
@@ -1015,6 +1061,8 @@ export default {
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
+          associateGit: projectData.associateGit,
+          dataSourceList: projectData.dataSourceList
         };
         api
           .fetch(
@@ -1047,7 +1095,6 @@ export default {
      * parama 为打开工作流基本信息
      */
     async openWorkflow(params) {
-
       if (params.lastedNode) {
         const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
         this.getFlow(cur, (flows) => {
@@ -1086,6 +1133,7 @@ export default {
                 params.version = params.orchestratorVersionId =
                   openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
                 params.isDefaultReference = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.isDefaultReference;
+                params.flowStatus = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.status;
                 this.openItemAction(params);
               } else {
                 return this.$Message.warning(
@@ -1150,7 +1198,9 @@ export default {
         isChange: false,
         orchestratorMode: params.orchestratorMode, // 后面根据具体的编排模式确认类型字段
         type: DEVPROCESS.DEVELOPMENTCENTER,
-        isDefaultReference: params.isDefaultReference
+        isDefaultReference: params.isDefaultReference,
+        flowStatus: params.flowStatus, // 工作流状态
+        associateGit: params.associateGit
       };
       const hasInIndex = this.tabList.findIndex(it=>it.tabId === this.current.tabId)
       if(hasInIndex !== -1) {
@@ -1206,8 +1256,12 @@ export default {
         removeAction();
       }
     },
-    // 切换开发流程
+    // 切换开发流程 or 点击查找
     handleChangeButton(item) {
+      if (item === 'find') {
+        this.showCodeDrawer = true;
+        return;
+      }
       if ( item.dicValue ==  this.modeOfKey ) {
         return
       }
@@ -1257,8 +1311,34 @@ export default {
       this.currentTreeId = currenTab.id
       this.current = currenTab;
     },
-    updateWorkflowList() {
+    updateCurrentWorkflowStatus(params) {
+      const workspaceData = storage.get("currentWorkspace");
+      api
+        .fetch(
+          `${this.$API_PATH.ORCHESTRATOR_PATH}openOrchestrator`,
+          {
+            orchestratorId: params.query.orchestratorId,
+            labels: { route: this.modeOfKey },
+            workspaceName: workspaceData.name,
+          },
+          "post"
+        )
+        .then((openOrchestrator) => {
+          if (openOrchestrator) {
+            const temp = { ...params.query };
+            temp.flowStatus = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.status;
+            params.query = temp;
+            params.flowStatus = temp.flowStatus;
+            const hasInIndex = this.tabList.findIndex(it=>it.tabId === params.tabId)
+            if(hasInIndex !== -1) {
+              this.tabList.splice(hasInIndex, 1, {...params});
+            }
+          }
+        });
+    },
+    updateWorkflowList(item) {
       this.$refs.workflow.fetchFlowData();
+      this.updateCurrentWorkflowStatus(item);
     },
     isChange(index, val) {
       if (this.tabList[index]) {
@@ -1292,11 +1372,20 @@ export default {
           <div class="tree-info">
             <SvgIcon style="font-size:16px;margin-top: 6px;display: inline-block;" icon-class="more-more" />
           </div>
-          <DropdownMenu slot="list">
+          {
+            item.associateGit ? (<DropdownMenu slot="list">
+            <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
+            <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
+            <DropdownItem name="findin_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'findin_project', item)}}>{ this.$t('message.workflow.Find') }</DropdownItem>
+            <DropdownItem name="viewgit" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'viewgit', item)}}>{ this.$t('message.workflow.viewgit') }</DropdownItem>
+            <DropdownItem name="import" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'import', item)}}>{ this.$t('message.workflow.importflow') }</DropdownItem>
+          </DropdownMenu>) : (<DropdownMenu slot="list">
             <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
             <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
             <DropdownItem name="import" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'import', item)}}>{ this.$t('message.workflow.importflow') }</DropdownItem>
           </DropdownMenu>
+          )
+          }
         </Dropdown>
       )
       const projectAdd = (
@@ -1378,7 +1467,7 @@ export default {
               overflow: 'hidden'
             },
             attrs: {
-              title: `名称：${item.name}\n描述：${item.description||''}`
+              title: `名称：${item.name}\n描述：${item.description||''}${this.converStatus(item)}`
             }
           },
           item.name
@@ -1396,6 +1485,20 @@ export default {
             color: isActive ? 'rgb(45, 140, 240)' : ''
           }
         }, [item.name])
+      }
+    },
+    async gotoGit(node) {
+      const workspaceData = storage.get("currentWorkspace");
+      try {
+        let res = await api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}gitUrl`, {
+          projectName: node.name,
+          workspaceName: workspaceData.name,
+        }, 'get');
+        if (res && res.gitUrl) {
+          window.open(res.gitUrl, '_blank');
+        }
+      } catch (error) {
+        //
       }
     },
     handleFlowDropDown(e, name, node) {
@@ -1425,6 +1528,12 @@ export default {
         case "import":
           this.importModal = true;
           this.$refs.import.init(node)
+          break;
+        case "findin_project":
+          this.showCodeDrawer = true;
+          break;
+        case "viewgit":
+          this.gotoGit(node);
           break;
         case "export":
           this.exportWorkflow(node);
@@ -1470,7 +1579,8 @@ export default {
             type: "project",
             canWrite: n.canWrite(),
             canPublish: n.canPublish(),
-            children: n.children || []
+            children: n.children || [],
+            associateGit: n.associateGit,
           };
         });
       }

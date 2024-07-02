@@ -52,6 +52,33 @@
             <Icon type="ios-build" />
             <span class="navbar-item-name">{{ $t('message.scripts.editorDetail.navBar.config') }}</span>
           </div>
+          <!-- 数据源按钮 -->
+          <div
+            class="workbench-body-navbar-item"
+            v-if="
+              $route.name == 'Home' &&
+              !script.readOnly &&
+                !isHdfs &&
+                isSupport &&
+                (script.application == 'jdbc' || script.application == 'ck')
+            "
+          >
+            <Select
+              placeholder="切换数据源"
+              @on-change="dataSetSelect"
+              class="dataSetSelect"
+              clearable
+              v-model="dataSetValue"
+              style="width: 250px; margin-left: 3px"
+            >
+              <Option
+                v-for="item in dataSetList"
+                :value="item.dataSourceName"
+                :key="item.id"
+              >{{ item.dataSourceName }}</Option
+              >
+            </Select>
+          </div>
           <div
             class="workbench-body-navbar-item"
             @click="topFullScreen">
@@ -146,6 +173,10 @@ export default {
       showConfig: false,
       loading: false,
       isParseSuccess: true,
+      dataSetValue: this.work.dataSetValue,
+      scriptUnsave: false,
+      oldDataSetValue: null,
+      dataSetList: this.work.dataSetList || [],
       extComponents
     };
   },
@@ -155,7 +186,7 @@ export default {
     },
     isSupport() {
       return this.script.executable;
-    }
+    },
   },
   watch: {
     'work.unsave'(val) {
@@ -170,8 +201,39 @@ export default {
   },
   mounted() {
     elementResizeEvent.bind(this.$el, this.layout);
+    if (this.work.dataSetList) {
+      this.dataSetList = this.work.dataSetList
+    }
+    if (
+      this.work.data &&
+      this.work.data.params &&
+      this.work.data.params.configuration &&
+      this.work.data.params.configuration.runtime &&
+      this.work.data.params.configuration.runtime[
+        'wds.linkis.engine.runtime.datasource'
+      ]
+    ) {
+      this.dataSetValue =
+        this.work.data.params.configuration.runtime[
+          'wds.linkis.engine.runtime.datasource'
+        ]
+
+      this.oldDataSetValue = this.dataSetValue
+    }
   },
   methods: {
+    dataSetSelect(v) {
+      // 模拟未保存状态 旧数据源为初始化时的或保存后的数据源，新数据源双向绑定的dataSetValue
+      // 当新旧数据源不同时，用scriptUnsave暂存此时保存状态（可能为true或false），然后切换保存状态为未保存
+      // 当切换新旧数据源相同时，切换保存状态为scriptUnsave
+      this.work.dataSetValue = v
+      if (this.dataSetValue === this.oldDataSetValue) {
+        this.work.unsave = this.scriptUnsave
+      } else {
+        this.scriptUnsave = this.work.unsave
+        this.work.unsave = true
+      }
+    },
     'Workbench:insertValue'(args) {
       if (args.id === this.script.id) {
         this.$refs.editor.insertValueIntoEditor(args.value);
@@ -209,6 +271,7 @@ export default {
         this.$emit('on-run', {
           code: selectCode,
           id: this.script.id,
+          dataSetValue: this.dataSetValue,
         }, (status) => {
           // status是start表示已经开始执行
           let list = ['execute', 'error', 'start', 'downgrade'];
@@ -230,7 +293,9 @@ export default {
         let valid = await this.validateRepeat();
         if (!valid) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
         this.$refs.editor.save();
-        this.$emit('on-save');
+        this.$emit('on-save', '', this.dataSetValue)
+        this.oldDataSetValue = this.dataSetValue
+        this.scriptUnsave = this.work.unsave
       } else {
         this.$Message.warning(this.$t('message.scripts.editorDetail.warning.unchange'));
       }

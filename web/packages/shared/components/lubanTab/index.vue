@@ -75,6 +75,8 @@ export default {
     line-height: 24px;
     @include bg-color(#e8eef4, $dark-workspace-body-bg-color);
     border-radius: 12px;
+    max-width: none;
+    border:1px solid #2E92F7
   }
   &:hover {
     height: 24px;

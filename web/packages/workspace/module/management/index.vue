@@ -93,6 +93,12 @@ export default {
         path: 'resTemplate',
         children: [],
       },
+      {
+        icon: 'gongzuoliu-icon',
+        name: 'Git管理',
+        path: 'gitManagement',
+        children: [],
+      },
     ];
     return {
       mode: '',

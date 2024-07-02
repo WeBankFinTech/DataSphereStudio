@@ -164,6 +164,10 @@ export default {
           }
         },
         {
+          title: this.$t('message.apiServices.paramTable.setLength'),
+          key: 'maxLength'
+        },
+        {
           title: this.$t('message.apiServices.paramTable.describe'),
           key: 'description'
         }
@@ -289,6 +293,7 @@ export default {
     width: $percent-all;
     height: $percent-all;
     padding: 25px 40px;
+    overflow-y: auto;
     .back {
       margin-right: $margin;
       padding-right: $padding;

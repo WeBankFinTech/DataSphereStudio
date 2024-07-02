@@ -141,7 +141,8 @@ import weProgress from '@dataspherestudio/shared/components/consoleComponent/pro
 import mixin from '@dataspherestudio/shared/common/service/mixin';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 
-const extComponents = plugin.emitHook('script_console_tabs') || []
+// const extComponents = plugin.emitHook('script_console_tabs') || []
+const extComponents = []
 
 export default {
   name: 'editor-script',
@@ -552,6 +553,21 @@ export default {
       } else {
         params = this.convertSettingParams(this.script.params)
       }
+      if (params.configuration && option.dataSetValue) {
+        if (params.configuration.runtime) {
+          params.configuration.runtime = {
+            ...params.configuration.runtime,
+            'wds.linkis.engine.runtime.datasource': option.dataSetValue,
+          }
+        } else {
+          params.configuration = {
+            ...params.configuration,
+            runtime: {
+              'wds.linkis.engine.runtime.datasource': option.dataSetValue,
+            },
+          }
+        }
+      }
       let initData = {
         method: '/api/rest_j/v1/entrance/execute',
         websocketTag: this.work.id,
@@ -624,7 +640,7 @@ export default {
             duration: 3,
           });
         } else {
-          this.save();
+          this.save('', option.dataSetValue);
         }
         this.execute.once('sendStart', (code) => {
           const name = this.work.filepath || this.work.filename;
@@ -1131,7 +1147,7 @@ export default {
           this.work.unsave = true;
         });
     },
-    async save(auto) {
+    async save(auto, dataSetValue) {
       if (this.node && Object.keys(this.node).length > 0) {
         this.nodeSave();
       } else {
@@ -1140,6 +1156,33 @@ export default {
           scriptContent: this.script.data,
           params: this.convertSettingParams(this.script.params),
         };
+        if (dataSetValue) {
+          this.work.dataSetValue = dataSetValue;
+          if (isEmpty(params.params.configuration)) {
+            params.params.configuration.runtime = {
+              'wds.linkis.engine.runtime.datasource': dataSetValue,
+            }
+          } else {
+            params.params.configuration.runtime = {
+              ...params.params.configuration.runtime,
+              'wds.linkis.engine.runtime.datasource': dataSetValue,
+            }
+          }
+          if (this.work.data.params.configuration && this.work.data.params.configuration.runtime) {
+            this.work.data.params.configuration.runtime[
+              'wds.linkis.engine.runtime.datasource'
+            ] = dataSetValue;
+          } else { 
+            this.work.data.params.configuration.runtime = {
+              'wds.linkis.engine.runtime.datasource': dataSetValue
+            }
+          }
+          this.work.data.params.configuration.runtime[
+            'wds.linkis.engine.runtime.datasource'
+          ] = dataSetValue;
+        } else if(!this.work.dataSetValue && params.params.configuration && params.params.configuration.runtime) {
+          delete params.params.configuration.runtime['wds.linkis.engine.runtime.datasource']
+        }
           // this.work.code = this.script.data;
         const isHdfs = this.work.filepath.indexOf('hdfs') === 0;
         if (this.script.data) {

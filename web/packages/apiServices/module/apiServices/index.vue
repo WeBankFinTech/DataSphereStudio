@@ -465,6 +465,7 @@ export default {
       let dropdownList = [
         {id: 1, title: this.$t('message.apiServices.apiTable.operation.manager')},
         {id: 2, title: this.$t('message.apiServices.apiTable.operation.enable')},
+        {id: 4, title: this.$t('message.apiServices.delete')}
       ];
       if(e.status === 1) {
         // 当状态为1时为开启状态，文本显示禁用
@@ -472,8 +473,6 @@ export default {
       } else {
         dropdownList[1].title = this.$t('message.apiServices.apiTable.operation.enable')
       }
-      // 判断是否显示删除按钮
-      if(e.creator === storage.get('userInfo')) dropdownList.push({id: 4, title: this.$t('message.apiServices.delete')});
       return dropdownList
     },
     // 加工状态的显示文本和颜色

@@ -229,6 +229,7 @@
         "ShuttingDown": "Shutting Down",
         "LX": "By category",
         "AZT": "By status",
+        "AYY": "By Creator",
         "DDJK": "Waiting for API response!",
         "QDYQWFJS": "Cannot shut down an engine with starting status!",
         "WXZYQ": "No engine selected!",

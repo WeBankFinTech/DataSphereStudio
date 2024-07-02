@@ -19,7 +19,7 @@
       @on-ctx-menu="onContextMenu"
       @search-node-path="showSearchPath"
       @link-delete="linkDelete"
-      @changeViewMode="handleClickToolbar"
+      @changeViewMode="handleSwitchViewMode"
       @link-add="linkAdd">
       <DesignToolbar
         viewMode="vueprocess"
@@ -27,10 +27,15 @@
         :workflowIsExecutor="workflowIsExecutor"
         :needReRun="needReRun"
         :isFlowPubulish="isFlowPubulish"
+        :isFlowSubmit="isFlowSubmit"
         :isLatest="isLatest"
         :publish="publish"
         :product="product"
         :flowId="flowId"
+        :flowStatus="flowStatus"
+        :associateGit="associateGit"
+        :isFlowSubmited="isFlowSubmited"
+        :isMainFlow="isMainFlow"
         :type="type"
         @click-itembar="handleClickToolbar"
       />
@@ -43,10 +48,15 @@
           :workflowIsExecutor="workflowIsExecutor"
           :needReRun="needReRun"
           :isFlowPubulish="isFlowPubulish"
+          :isFlowSubmit="isFlowSubmit"
           :isLatest="isLatest"
           :publish="publish"
           :product="product"
           :flowId="flowId"
+          :flowStatus="flowStatus"
+          :associateGit="associateGit"
+          :isFlowSubmited="isFlowSubmited"
+          :isMainFlow="isMainFlow"
           :type="type"
           @click-itembar="handleClickToolbar"
         />
@@ -71,7 +81,7 @@
         @on-ctx-menu="onContextMenu"
         @link-add="linkAdd"
         @search-node-path="showSearchPath"
-        @changeViewMode="handleClickToolbar"
+        @changeViewMode="handleSwitchViewMode"
       />
       <template v-if="viewMode === 'table'">
         <iframe class="iframeClass" id="iframe" ref="ifr" style="padding-top:36px" :src="tableViewUrl" frameborder="0" width="100%" height="100%" />
@@ -223,11 +233,11 @@
     </Modal>
     <!-- 发布弹窗 -->
     <Modal
+      :width="800"
       :title="$t('message.workflow.publishingWorkflow')"
       v-model="pubulishShow">
       <Form
-        :label-width="100"
-        label-position="left">
+        label-position="top">
         <FormItem
           :label="$t('message.workflow.desc')">
           <Input
@@ -235,6 +245,11 @@
             type="textarea"
             v-model="pubulishFlowComment"
             :placeholder="$root.$t('message.workflow.publish.inputDesc')"></Input>
+        </FormItem>
+        <FormItem
+          v-if="associateGit"
+          label="提交记录">
+          <Table border :columns="publishFlowColumns" :data="publishFlowData" :height="300"></Table>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -245,6 +260,22 @@
           :loading="saveingComment"
           :disabled="saveingComment"
           @click="workflowPublish">{{$t('message.workflow.ok')}}</Button>
+      </div>
+    </Modal>
+    <!-- 提交弹窗 -->
+    <Modal
+      title="提交工作流"
+      v-model="showSubmit">
+        <Input
+          :rows="2"
+          type="textarea"
+          v-model="submitDesc"
+          :placeholder="$root.$t('message.workflow.publish.submitDesc')"></Input>
+      <div slot="footer">
+        <Button
+          type="primary"
+          :disabled="!submitDesc"
+          @click="submitGit">{{$t('message.workflow.ok')}}</Button>
       </div>
     </Modal>
     <!-- 导出弹窗 -->
@@ -433,11 +464,27 @@ export default {
     newTipVisible: {
       type: Boolean,
       default: false
+    },
+    flowStatus: {
+      type: String,
+      default: ''
+    },
+    associateGit: {
+      type: Boolean,
+      default: false
+    },
+    isMainFlow: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
     const username = this.getUserName()
     return {
+      // 提交
+      showSubmit: false,
+      submitDesc: '',
+      isFlowSubmit: false,
       // 发布前保存
       saveingComment: false,
       // 是否为父工作流
@@ -501,6 +548,29 @@ export default {
       contextID: '',
       pubulishFlowComment: '',
       pubulishShow: false,
+      publishFlowColumns:  [
+          {
+              title: '提交ID',
+              key: 'commitId',
+              minWidth: 220
+          },
+          {
+              title: '提交时间',
+              key: 'commitTime',
+              minWidth: 160
+          },
+          {
+              title: '提交人',
+              key: 'commitUser',
+              minWidth: 120
+          },
+          {
+              title: '注释',
+              key: 'comment',
+              minWidth: 260
+          }
+      ],
+      publishFlowData: [],
       flowVersion: '',
       isFlowPubulish: false,
       workflowExportShow: false,
@@ -630,6 +700,9 @@ export default {
     },
     tableViewUrl() {
       return `/next-web/#/workspace/workflow?workspaceId=${this.$route.query.workspaceId}&projectId=${this.$route.query.projectID}&flowId=${this.flowId}&labels=${this.getCurrentDsslabels()}`
+    },
+    isFlowSubmited() {
+      return (this.associateGit && ['push', 'publish'].includes(this.flowStatus)) || !this.associateGit;
     }
   },
   created() {
@@ -664,6 +737,7 @@ export default {
     eventbus.on('workflow.copying', this.onCopying);
     window.addEventListener('message', this.msgEvent, false);
     window.addEventListener('resize', this.resizeConsole, false);
+    this.checkSubmitStatus('init');
   },
   beforeDestroy() {
     if (this.timer) {
@@ -2369,30 +2443,47 @@ export default {
       this.pubulishShow = true;
       this.saveingComment = false;
       this.pubulishFlowComment = ''
+      this.publishFlowData = [];
+      // 未关联Git的不用查询
+      if (this.associateGit) {
+        api.fetch('/dss/framework/orchestrator/publish/history',
+          {
+            projectName: this.$route.query.projectName,
+            orchestratorId: this.orchestratorId,
+            workspaceId: this.$route.query.workspaceId
+          }, 
+          'get').then((rst) => {
+              this.publishFlowData = rst.history.responses || [];
+          });
+        }
     },
     showDiff() {
       this.pubulishShow = false;
       this.$refs.bottomTab.showPanel('version');
     },
     async workflowPublish() {
-      if (this.saveingComment) {
-        return
+      // 只有未接入Git的项目发布前需求保存
+      if (!this.associateGit) {
+        if (this.saveingComment) {
+            return
+        }
+        this.saveingComment = true
+        // 发布之前先保存
+        let a
+        try {
+          a = await this.autoSave(this.$t('message.workflow.Publishwork'), false);
+        } catch (e) {
+          this.pubulishShow = false;
+          this.isFlowPubulish = false;
+        }
+        if (!a) {
+          this.pubulishShow = false;
+          this.isFlowPubulish = false;
+          this.saveingComment = false;
+          return;
+        }  
       }
-      this.saveingComment = true
-      // 发布之前先保存
-      let a
-      try {
-        a = await this.autoSave(this.$t('message.workflow.Publishwork'), false);
-      } catch (e) {
-        this.pubulishShow = false;
-        this.isFlowPubulish = false;
-      }
-      if (!a) {
-        this.pubulishShow = false;
-        this.isFlowPubulish = false;
-        this.saveingComment = false;
-        return;
-      }      // 调用发布接口
+      // 调用发布接口
       const params = {
         orchestratorId: this.orchestratorId,
         orchestratorVersionId: this.orchestratorVersionId,
@@ -2476,6 +2567,57 @@ export default {
         });
       }, 2000);
     },
+    // 提交
+    submitGit() {
+      if (this.isFlowSubmit) return
+      const params = {
+        orchestratorId: this.orchestratorId,
+        flowId: Number(this.flowId),
+        labels: {route: this.getCurrentDsslabels()},
+        projectName: this.$route.query.projectName,	
+        comment: this.submitDesc,
+      };
+      this.showSubmit = false;
+      this.isFlowSubmit = true;
+      this.setTaskId(this.orchestratorId, 'submit');
+      api.fetch('/dss/framework/orchestrator/submitFlow', params, 'post').then(res => {
+        this.submitDesc = '';
+        this.checkSubmitStatus('submit');
+      }).catch(() => {
+        this.isFlowSubmit = false;
+        this.removeTaskId('submit');
+      });
+    },
+    // 检查提交状态
+    checkSubmitStatus(flag) {
+      const typeName = this.$t('message.workflow.process.submitgit');
+      const publishTaskId = this.getTaskId('submit')
+      if (publishTaskId && this.orchestratorId == publishTaskId) {
+        api.fetch('/dss/framework/orchestrator/submitFlow/status', {orchestratorId: this.orchestratorId,}, 'get').then(res => {
+          if (res.status == 'running') {
+            this.isFlowSubmit = true;
+            setTimeout(() => {
+              this.checkSubmitStatus(flag);
+            }, 2000)
+          } else if (res.status == 'success') {
+            this.removeTaskId('submit');
+            this.isFlowSubmit = false;
+            this.$emit('updateWorkflowList');
+            if (flag === 'submit') {
+              this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
+            }
+          } else if(res.status == 'failed') {
+            this.removeTaskId('submit');
+            this.isFlowSubmit = false;
+            if (flag === 'submit') {
+              this.$Message.warning(this.$t('message.workflow.workflowFail', { name: typeName }));
+            }
+          }
+        }).catch(() => {
+          this.isFlowSubmit = false;
+        });
+      }
+    },
     refreshOpen() {
       this.$emit('close')
       this.$emit('open')
@@ -2556,21 +2698,21 @@ export default {
       const workspaceData = storage.get("currentWorkspace");
       return workspaceData ? workspaceData.name : ''
     },
-    getTaskKey(){
+    getTaskKey(type = 'taskId'){
       const username = this.getUserName();
-      const key = `${username}-workflow-${this.orchestratorId}-taskId`;
+      const key = `${username}-workflow-${this.orchestratorId}-${type}`;
       return key
     },
-    setTaskId(taskId) {
-      const key = this.getTaskKey();
+    setTaskId(taskId, type) {
+      const key = this.getTaskKey(type);
       storage.set(key, taskId);
     },
-    getTaskId(){
-      const key = this.getTaskKey();
+    getTaskId(type){
+      const key = this.getTaskKey(type);
       return storage.get(key);
     },
-    removeTaskId() {
-      const key = this.getTaskKey();
+    removeTaskId(type) {
+      const key = this.getTaskKey(type);
       storage.remove(key);
     },
     onKeyUp(e) {
@@ -2611,7 +2753,7 @@ export default {
     showSearchPath() {
       this.showNodePathPanel = true
     },
-    changeViewMode(mode) {
+    changeViewMode(mode, isSave = false) {
       if (this.viewMode === mode) return
       if (this.jsonChange) {
         return this.message({
@@ -2661,10 +2803,20 @@ export default {
           }
         }
         this.originalData = this.json;
+        // 切换模式后保存数据，确保模式也被更新
+		    if (isSave) {
+          this.autoSave(this.$t('message.workflow.Save'), false);
+        }
       }
     },
     screenSizeChange(fullScreen) {
       this.isfullScreen = fullScreen
+    },
+    showSubmitGit() {
+      this.showSubmit = true;
+    },
+    handleSwitchViewMode(action, arg) {
+      this[action](arg, true)
     },
     handleClickToolbar(action, arg) {
       this[action](arg)

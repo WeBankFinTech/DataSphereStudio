@@ -207,13 +207,13 @@
         </Form>
         <div slot="footer">
           <Button v-if="!saveTransing" type="text" size="large" @click="showTransferForm = false">{{
-            $t("message.workspaceManagement.cancel")
+            $t("message.scripts.cancel")
           }}</Button>
           <Button v-if="!saveTransing" type="text" size="large" @click="prevStep">{{
             $t("message.common.dss.prevstep")
           }}</Button>
           <Button type="primary" size="large" @click="saveTransfer" :loading="saveTransing">{{
-            $t("message.workspaceManagement.ok")
+            $t("message.scripts.ok")
           }}</Button>
         </div>
       </Modal>
@@ -232,7 +232,7 @@
         </div>
         <div slot="footer">
           <Button type="text" size="large" @click="renameClose">{{
-            $t("message.workspaceManagement.cancel")
+            $t("message.scripts.cancel")
           }}</Button>
           <Button v-if="!renameScript" type="primary" size="large" @click="handleRename('next')">{{
             $t("message.scripts.createTable.next")
@@ -303,13 +303,13 @@ export default {
     return {
       columns: [
         { title: this.$t('message.scripts.tablename'), key: 'tableName', width: '20%'},
-        { title: this.$t('message.scripts.tbalias'), key: 'tableAlias', width: '10%'},
+        // { title: this.$t('message.scripts.tbalias'), key: 'tableAlias', width: '10%'},
         { title: this.$t('message.scripts.createtime'), key: 'createTime', width: '10%'},
         { title: this.$t('message.scripts.tablesize'), key: 'tableSize', width: '8%'},
         { title: this.$t('message.scripts.tbowner'), key: 'tableOwner', width: '8%'},
         { title: this.$t('message.scripts.ispartition'), key: 'partitioned', type: 'booleanString', width: '8%'},
         { title: this.$t('message.scripts.iscompress'), key: 'compressed', type: 'boolean', width: '8%'},
-        { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat', width: '8%'},
+        // { title: this.$t('message.scripts.compressformat'), key: 'compressedFormat', width: '8%'},
         { title: this.$t('message.scripts.lastaccess'), key: 'viewTime', width: '10%'},
         { title: this.$t('message.scripts.lastupdate'), key: 'modifyTime', width: '10%'},
       ],
@@ -535,7 +535,8 @@ export default {
       }
     },
     saveTransfer() {
-      const tbs = this.selectedItems.filter(it => it.selected).map(item => item.tableName)
+      const selectedList = this.selectedItems.filter(it => it.selected)
+      const tbs = selectedList.map(item => item.tableName)
       const params = {
         approvalTitle: this.formState.title,
         dbName: this.dbName,
@@ -543,6 +544,9 @@ export default {
         newOwner: this.formState.owner,
         dataGovernanceAdmin: this.formState.admin,
         description: this.formState.desc
+      }
+      if (this.isAdminMode) {
+        params.oldOwner = selectedList[0].tableOwner || ''
       }
       if (this.saveTransing) return
       this.$refs.transferForm.validate((valid) => {

@@ -372,6 +372,10 @@
             flex-basis: 62px;
             font-size: 16px;
             margin-right: 20px;
+            display: inline-block;
+            width: 62px;
+            overflow: hidden;
+            text-overflow: ellipsis;
             @include font-color($light-text-color, $dark-text-color);
         }
         .engine-ul {

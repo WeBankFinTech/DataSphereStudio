@@ -11,6 +11,9 @@
         @contextmenu.prevent.stop="headerContextMenu"
         @dblclick="headDblclick"
       >
+      <!-- scrollTop:{{this.scrollTop}} -->
+      <!-- scrollLeft:{{this.scrollLeft}} -->
+      <!-- positionMemoryKey:{{this.positionMemoryKey}} -->
         <table
           id="topTable"
           cellpadding="0"
@@ -129,9 +132,15 @@
 </template>
 
 <script>
+import { debounce } from 'lodash';
 export default {
   name: "WbTable",
   props: {
+    // 若需记忆滚动条位置，可传入此参数，需全局唯一
+    positionMemoryKey: {
+      type: String,
+      default: '',
+    },
     loadNum: {
       //默认加载行数
       type: [Number, String],
@@ -187,6 +196,7 @@ export default {
   },
   data() {
     return {
+      initFlag: true,
       showHeaderMenu: false,
       showLoad: false,
       showTableList: [], //实际显示的表格数据
@@ -194,6 +204,7 @@ export default {
       dataTotal: 0, //总数据条数
       dataTop: 0, //渲染数据顶部的高度
       scrollTop: 0, //滚动上下的距离
+      scrollLeft: 0,
       scrollHeight: 0, //数据滚动的高度
       handleScroll: null,
       selectIndex: -1, //选择的行
@@ -303,14 +314,28 @@ export default {
         this.scrollTop = bottomScroll.scrollTop;
       }
     },
+    // 重置初始化信号量
+    handleInitFlag(e) {
+      this.initFlag = e;
+    },
+    // 翻页、页面大小改变、滚动时都会触发,但初始化时不触发
+    handleSaveTablePosition: debounce((that) => {
+     if (that.positionMemoryKey && !that.initFlag) {
+        that.$emit("on-table-scroll-change", that.positionMemoryKey,that.scrollTop, that.scrollLeft);
+      }
+    }, 300),
     //滚动处理
     scrollProcessing() {
       const bottomScroll = this.$el.querySelector("#bottomDiv");
+      const topScroll = this.$el.querySelector("#topDiv");
       const direction = bottomScroll.scrollTop >= this.scrollTop; //滚动方向
       //记录上一次向下滚动的位置
       this.scrollTop = bottomScroll.scrollTop;
+      this.scrollLeft = topScroll.scrollLeft;
       direction ? this.handleScrollBottom() : this.handleScrollTop();
       this.showLoad = false;
+      this.handleSaveTablePosition(this)
+      this.initFlag = false;
     },
     //滚动条向上滚动
     handleScrollTop() {
@@ -383,6 +408,8 @@ export default {
     handleScrollLeft(topScroll, bottomScroll) {
       //顶部表头跟随底部滚动
       topScroll.scrollTo(bottomScroll.scrollLeft, topScroll.pageYOffset);
+      this.scrollLeft = bottomScroll.scrollLeft;
+      this.handleSaveTablePosition(this)
     },
     //上下滚动时数据处理
     dataProcessing(topNum, bottomNum, type) {
@@ -556,6 +583,14 @@ export default {
     // 判断是否出现竖直滚动条
     scrollBarWidthCalc() {
       let bottomDiv = this.$el.querySelector("#bottomDiv");
+      let topScroll = this.$el.querySelector("#topDiv");
+      if (this.positionMemoryKey && sessionStorage.getItem('table_position_'+this.positionMemoryKey)) {
+        let curTablePositionData = JSON.parse(sessionStorage.getItem('table_position_'+this.positionMemoryKey))
+        console.log('getItem', curTablePositionData)
+        // 初始化滚动条位置
+        bottomDiv.scrollTo(Number(curTablePositionData.scrollLeft),Number(curTablePositionData.scrollTop))
+        topScroll.scrollTo(Number(curTablePositionData.scrollLeft), topScroll.pageYOffset);
+      }
       return  bottomDiv && bottomDiv.scrollHeight > bottomDiv.clientHeight && this.isOffset ? this.scrollBarWidth : 0
     },
     mousedown(e) {

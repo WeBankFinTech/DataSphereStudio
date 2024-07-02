@@ -44,6 +44,15 @@ export const apiServicesRoutes = [
         import('./module/management/module/resTemplate.vue'),
     },
     {
+      path: 'gitManagement',
+      name: 'gitManagement',
+      meta: {
+        publicPage: true
+      },
+      component: () =>
+        import('./module/management/module/gitManagement.vue'),
+    },
+    {
       path: 'jurisdiction',
       name: 'jurisdiction',
       meta: {

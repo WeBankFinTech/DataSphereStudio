@@ -4,6 +4,7 @@
     :style="style"
     class="we-table">
     <div class="we-table-outflow">
+      <!-- {{this.positionMemoryKey}} -->
       <div
         class="we-table-header">
         <template-header
@@ -21,6 +22,7 @@
         ref="tableBody"
         class="we-table-body">
         <template-list
+          id="bottomDiv"
           ref="bodyCom"
           :cache="cache"
           :is-listen-scroll="true"
@@ -39,6 +41,7 @@
 <script>
 import templateList from './list.vue';
 import templateHeader from './header.vue';
+import { debounce } from 'lodash';
 
 const prefixCls = 'we-table';
 export default {
@@ -50,7 +53,11 @@ export default {
   props: {
     data: Object,
     width: Number,
-    height: [Number, String]
+    height: [Number, String],
+    positionMemoryKey: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -62,7 +69,10 @@ export default {
         start: 0,
       },
       bodyRows: [],
-      headRows: []
+      headRows: [],
+      scrollTop: 0,
+      initFlag: true,
+      initScrollLeft: true,
     };
   },
   computed: {
@@ -84,6 +94,24 @@ export default {
         this.resize();
         this.headRows = val.headRows;
         this.bodyRows = this.revert(val.bodyRows);
+        if (this.positionMemoryKey && sessionStorage.getItem('table_position_'+this.positionMemoryKey) && this.initFlag) {
+          let curTablePositionData = JSON.parse(sessionStorage.getItem('table_position_'+this.positionMemoryKey))
+          this.$nextTick(() => {
+            if(this.$refs.headerCom && this.$refs.headerCom.$refs.list) {
+              // 设置表头横向滚动条
+              this.$refs.headerCom.$refs.list.scrollLeft = curTablePositionData.scrollLeft;
+              this.initScrollLeft = true;
+              this.$refs.headerCom.handleScroll(curTablePositionData, curTablePositionData);
+            }
+            if(this.$refs.bodyCom) {
+              // 设置表格内容横向竖向滚动条
+              this.$refs.bodyCom.setScroll(curTablePositionData.scrollTop, curTablePositionData.scrollLeft);   
+            }
+          })
+          this.initFlag = false;
+        } else if(!this.initFlag) {
+          this.handleSaveTablePosition(this)
+        }
       },
       immediate: true,
       deep: true
@@ -93,9 +121,25 @@ export default {
   mounted() {
   },
   methods: {
+     // 翻页、页面大小改变、滚动时都会触发,但初始化时不触发
+    handleSaveTablePosition: debounce((that) => {
+     if (that.positionMemoryKey) {
+        that.$emit("on-table-scroll-change", that.positionMemoryKey,that.scrollTop, that.$refs.headerCom.$refs.list.scrollLeft);
+      }
+    }, 300),
+    // 重置初始化信号量
+    handleInitFlag(e) {
+      this.initFlag = e;
+    },
     changeScrollLeft({ v, h }) {
+      this.scrollTop=v.scrollTop;
       this.$refs.headerCom.$refs.list.scrollLeft = h.scrollLeft;
       this.$refs.headerCom.handleScroll(v, h);
+      if(!this.initScrollLeft) {
+        this.handleSaveTablePosition(this)
+      } else {
+        this.initScrollLeft = false;
+      }
     },
     itemSizeGetter(item, i) {
       let div = document.createElement('div');

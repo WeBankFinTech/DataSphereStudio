@@ -1,5 +1,9 @@
 <template>
   <div ref="view" class="we-result-view">
+    <!-- resultPath:{{result.path}} -->
+    <!-- resultType:{{resultType}}
+    tableData.type:{{tableData.type}}
+    result.hugeData:{{result.hugeData}} -->
     <we-toolbar
       ref="toolbar"
       :current-path="result.path"
@@ -48,6 +52,7 @@
     >
       <template v-if="tableData.type === 'normal' && !result.hugeData">
         <wb-table
+          ref="resultTable"
           border
           highlight-row
           outer-sort
@@ -55,6 +60,8 @@
           :columns="data.headRows"
           :tableList="data.bodyRows"
           :adjust="true"
+          :positionMemoryKey="result.path || ''"
+          @on-table-scroll-change="tableScrollChange"
           @on-current-change="onRowClick"
           @on-head-dblclick="copyLabel"
           @on-sort-change="sortChange"
@@ -70,6 +77,8 @@
           :width="tableData.width"
           :height="resultHeight"
           :size="tableData.size"
+          :positionMemoryKey="result.path || ''"
+          @on-table-scroll-change="tableScrollChange"
           @dbl-click="copyLabel"
           @on-click="onWeTableRowClick"
           @on-sort-change="sortChange"
@@ -317,6 +326,11 @@ export default {
           }
         )
       }
+      if (this.result.path && sessionStorage.getItem('table_position_' + this.result.path)) {
+         let curTablePositionData = JSON.parse(sessionStorage.getItem('table_position_' + this.result.path))
+          this.page.current = curTablePositionData.currentPage
+          this.page.size = curTablePositionData.pageSize
+      }
       this.change(this.page.current)
     },
     sortByCol(col) {
@@ -498,7 +512,7 @@ export default {
        * PICTURE_TYPE: '4'
        * HTML_TYPE: '5'
        */
-      this.checkedFields = storage.get(this.result.path) || []
+      this.checkedFields = storage.get('column_show_'+this.result.path) || []
       if (this.result.type === '2') {
         this.tableData.type =
           this.result.headRows.length > 50 ? 'virtual' : 'normal'
@@ -648,6 +662,9 @@ export default {
       this.pageingData()
     },
     changeSet(set) {
+      if(this.$refs.resultTable && this.$refs.resultTable.handleInitFlag) {
+        this.$refs.resultTable.handleInitFlag(true);
+      }
       this.isLoading = true
       this.page.current = 1
       this.hightLightRow = null
@@ -661,6 +678,12 @@ export default {
           this.isLoading = false
         }
       )
+      if (this.result.path && sessionStorage.getItem('table_position_'+this.result.path)) {
+         let curTablePositionData = JSON.parse(sessionStorage.getItem('table_position_'+this.result.path))
+          this.page.current = curTablePositionData.currentPage
+          this.page.size = curTablePositionData.pageSize
+          this.change(this.page.current)
+      }
     },
     copyLabel(head) {
       util.executeCopy(head.content || head.title)
@@ -677,6 +700,16 @@ export default {
       this.$nextTick(() => {
         document.all.iframeName.contentWindow.location.reload()
       })
+    },
+    tableScrollChange(positionMemoryKey,scrollTop,scrollLeft) {
+      const cacheTablePositionData = {
+        scrollLeft: scrollLeft,
+        scrollTop: scrollTop,
+        currentPage: this.page.current,
+        pageSize: this.page.size,
+      }
+      console.log('setItem', cacheTablePositionData)
+      sessionStorage.setItem('table_position_' + positionMemoryKey, JSON.stringify(cacheTablePositionData));
     },
     onRowClick(currentRow) {
       // 通过列命名去查找当前的类型
@@ -764,7 +797,7 @@ export default {
       this.pageingData()
       this.isFilterViewShow = false
       this.checkedFields = Object.keys(checked)
-      storage.set(this.result.path, this.checkedFields)
+      storage.set('column_show_'+this.result.path, this.checkedFields)
     },
     changeViewType(type) {
       if (type !== this.visualShow) {

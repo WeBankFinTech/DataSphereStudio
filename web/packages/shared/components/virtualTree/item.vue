@@ -2,6 +2,7 @@
   <li
     class="node-item v-ellipsis"
     :class="{[`level-${item.level}`]: true}"
+    :style="item.status&&computeStyle? computeStyle(item) : ''"
   >
     <template v-if="render">
       <render-node
@@ -22,7 +23,8 @@ export default {
   },
   props: {
     item: Object,
-    render: Function
+    render: Function,
+    computeStyle: Function
   }
 }
 </script>

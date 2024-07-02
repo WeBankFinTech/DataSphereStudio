@@ -11,6 +11,9 @@ export const cache = {
   },
   clear(key) {
     delete this.data[key]
+  },
+  reset() {
+    this.data = {}
   }
 }
 

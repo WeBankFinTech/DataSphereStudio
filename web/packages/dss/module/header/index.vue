@@ -101,6 +101,14 @@
       >
         {{ $t("message.common.home") }}
       </li>
+      <!-- <li
+        v-if="isAdmin"
+        class="menu-item"
+        @click="goAppConnlist"
+        :class="isConsolePage ? 'header-actived' : '' "
+      >
+        AppConn管理台
+      </li> -->
       <li
         class="menu-item"
         v-if="$route.query.workspaceId"
@@ -597,6 +605,9 @@ export default {
           url
         }
       });
+    },
+    goAppConnlist() {
+      location.href = '/next-web/#/appconn'
     },
     goCollectedUrl(app) {
       this.isHomePage = false;

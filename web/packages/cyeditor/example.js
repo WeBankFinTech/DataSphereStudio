@@ -278,9 +278,6 @@ editor.on('addnode', ({ target }) => {
   console.log('node-add', {
     ...target,
   })
-
-  const data = editor.json()
-  console.log(data)
 })
 
 editor.on('addlink', ({ target }) => {
@@ -302,101 +299,7 @@ editor.on('dblclick', (e) => {
 // 方法API
 editor.json({
   boxSelectionEnabled: true,
-  elements: {
-    "nodes": [
-        {
-            "data": {
-                "type": "rect",
-                "name": "矩形1",
-                "bg": "#fff",
-                "width": 150,
-                "height": 40,
-                "image": "/img/vite.8e3a10e1.svg",
-                "id": "9158b849-d468-48ef-b59c-440ccd0c1009"
-            },
-            "position": {
-                "x": 262.5,
-                "y": 122.5
-            },
-            "group": "nodes",
-            "removed": false,
-            "selected": false,
-            "selectable": true,
-            "locked": false,
-            "grabbable": true,
-            "pannable": false,
-            "classes": "eh-preview-active"
-        },
-        {
-            "data": {
-                "type": "rect",
-                "name": "矩形1",
-                "bg": "#fff",
-                "width": 150,
-                "height": 40,
-                "image": "/img/vite.8e3a10e1.svg",
-                "id": "18be7b5d-4925-408f-b99b-6829038489ae"
-            },
-            "position": {
-                "x": 192.5,
-                "y": 262.5
-            },
-            "group": "nodes",
-            "removed": false,
-            "selected": false,
-            "selectable": true,
-            "locked": false,
-            "grabbable": true,
-            "pannable": false,
-            "classes": "eh-preview-active"
-        },
-        {
-            "data": {
-                "type": "rect",
-                "name": "矩形1",
-                "bg": "#fff",
-                "width": 150,
-                "height": 40,
-                "image": "/img/vite.8e3a10e1.svg",
-                "id": "86b161a5-2cac-4047-a1bd-f02514a13032"
-            },
-            "position": {
-                "x": 157.5,
-                "y": 332.5
-            },
-            "group": "nodes",
-            "removed": false,
-            "selected": false,
-            "selectable": true,
-            "locked": false,
-            "grabbable": true,
-            "pannable": false,
-            "classes": ""
-        }
-    ],
-    "edges": [
-        {
-            "data": {
-                "source": "9158b849-d468-48ef-b59c-440ccd0c1009",
-                "target": "18be7b5d-4925-408f-b99b-6829038489ae",
-                "lineType": "bezier",
-                "id": "85b93f50-0469-4c79-bb9d-e5e3c99c25cf"
-            },
-            "position": {
-                "x": 17.5,
-                "y": 17.5
-            },
-            "group": "edges",
-            "removed": false,
-            "selected": false,
-            "selectable": true,
-            "locked": false,
-            "grabbable": true,
-            "pannable": true,
-            "classes": ""
-        }
-    ]
-  },
+  elements: [],
   pan: { x: 0, y: 0 },
   panningEnabled: true,
   userPanningEnabled: true,

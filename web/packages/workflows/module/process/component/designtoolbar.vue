@@ -13,22 +13,6 @@
             <SvgIcon class="icon" icon-class="canshu" style="opacity: 0.65" />
             <span>{{ $t('message.workflow.process.params') }}</span>
           </div>
-          <!-- <div
-          <div class="devider" />
-            class="button"
-            :class="{active: viewOptions.linkType == 'straight'}"
-            style="padding-right: 8px"
-            @click.stop="changeLinkType('straight')">
-            <SvgIcon class="icon" icon-class="straight" title="折线" style="opacity: 0.65"/>
-            <span>折线</span>
-          </div>
-          <div
-            class="button"
-            :class="{active: viewOptions.linkType == 'curve'}"
-            @click.stop="changeLinkType('curve')">
-            <SvgIcon class="icon" icon-class="curve" title="直线" style="opacity: 0.65"/>
-            <span>直线</span>
-          </div> -->
           <div class="devider" />
           <div
             class="button"
@@ -91,19 +75,35 @@
             <SvgIcon class="icon" icon-class="baocun" style="opacity: 0.65" />
             <span>{{ $t('message.workflow.process.save') }}</span>
           </div>
-          <div v-if="type === 'flow'" class="devider" />
+          <div v-if="flowType === 'flow' && isMainFlow" class="devider" />
+          <div
+            v-if="associateGit && flowType === 'flow' && isMainFlow"
+            :title="$t('message.workflow.process.submitgit')"
+            class="button"
+            @click="handleClick('handleSubmitGit')"
+          >
+            <SvgIcon v-if="!isFlowSubmit" class="icon" icon-class="commit" style="opacity: 0.65" />
+            <Icon
+                v-else
+                type="ios-loading"
+                size="18"
+                class="public-splin-load"
+              ></Icon>
+            <span>{{ $t('message.workflow.process.submitgit') }}</span>
+          </div>
+          <div v-if="associateGit && flowType === 'flow' && isMainFlow" class="devider" />
         </div>
         <!-- 预留运维发布的区别-->
         <div v-if="publish">
           <div
-            v-if="type === 'flow'"
-            :title="$t('message.workflow.process.publish')"
-            class="button"
+            v-if="flowType === 'flow' && isMainFlow"
+            :title="isFlowSubmited ? $t('message.workflow.process.publish') : '请先提交代码后再发布'"
+            :class="['button', isFlowSubmited ? '' : 'toolbar-diabled-item']"
             @click="handleClick('workflowPublishIsShow')"
           >
             <template v-if="!isFlowPubulish">
               <SvgIcon class="icon" icon-class="fabu" style="opacity: 0.65" />
-              <span>{{ $t('message.workflow.process.publish') }}</span>
+              <span class="icon-label">{{ $t('message.workflow.process.publish') }}</span>
             </template>
             <Spin v-else class="public_loading">
               <Icon
@@ -188,6 +188,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    isFlowSubmit: {
+      type: Boolean,
+      default: false,
+    },
     publish: {
       type: Boolean,
       default: false,
@@ -209,10 +213,32 @@ export default {
       type: [Boolean],
       default: false,
     },
+    flowStatus: {
+      type: String,
+      default: ''
+    },
+    associateGit: {
+      type: Boolean,
+      default: false,
+    },
+    isFlowSubmited: {
+      type: Boolean,
+      default: false,
+    },
+    isMainFlow: {
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     return {
       extraToolbar: [],
+      flowType: 'flow'
+    }
+  },
+  watch: {
+    type(v) {
+      this.flowType = v;
     }
   },
   mounted() {
@@ -254,10 +280,15 @@ export default {
           this.$emit('click-itembar', 'reRun')
           break
         case 'workflowPublishIsShow':
-          this.$emit('click-itembar', 'workflowPublishIsShow')
+          if(this.isFlowSubmited) {
+            this.$emit('click-itembar', 'workflowPublishIsShow')
+          }
           break
         case 'changeViewMode':
           this.$emit('click-itembar', 'changeViewMode', arg)
+          break
+        case 'handleSubmitGit':
+          this.$emit('click-itembar', 'showSubmitGit', arg)
           break
         default:
           break
@@ -278,3 +309,11 @@ export default {
   },
 }
 </script>
+<style lang="less" scoped>
+.designer .designer-toolbar .toolbar-diabled-item {
+  color: #d2d3d5;
+  .icon-label {
+    color: #d2d3d5;
+  }
+}
+</style>

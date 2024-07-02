@@ -487,6 +487,7 @@ export default {
                   id: work.data.id,
                   filename: work.filename,
                   filepath: work.filepath,
+                  dataSetValue: work.dataSetValue,
                   code: work.data.data,
                   type: work.type,
                   data: work.data,
@@ -571,6 +572,39 @@ export default {
         })
       }
       let work = null
+      let dataSet = []
+      api
+        .fetch(
+          'data-source-manager/info',
+          {
+            //获取数据源数据
+            pageSize: 300,
+            currentPage: 1,
+          },
+          {
+            method: 'get',
+            cacheOptions: { time: 60000 }
+          }
+        )
+        .then((rst) => {
+          if (rst && rst.queryList) {
+            for (let i = 0; i < rst.queryList.length; i++) {
+              // expire 为false
+              // versionId 大于0
+              // publishedVersionId 存在此字段（未发布的数据源不含有此字段），且大于0
+              // 满足这三个条件的为有效数据源，需要在列表中被筛选
+              if (
+                rst.queryList[i].expire === false &&
+                rst.queryList[i].versionId > 0 &&
+                rst.queryList[i].publishedVersionId
+              ) {
+                dataSet.push(rst.queryList[i])
+              }
+            }
+          }
+        })
+        .catch(() => {})
+      option.dataSetList = dataSet
       if (option.type !== "backgroundScript") {
         // 如果已经在tabs中，则打开
         let repeatWork = find(this.worklist, (work) => work.id == option.id)
@@ -1345,6 +1379,8 @@ export default {
           @include bg-color(#e8eef4, $dark-workspace-body-bg-color);
           color: $primary-color;
           @include font-color($primary-color, $dark-primary-color);
+          border: 1px solid #2E92F7;
+          max-width: none;
         }
 
         &:hover {

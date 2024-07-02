@@ -60,6 +60,9 @@
             :orchestratorId="item.data.orchestratorId"
             :orchestratorVersionId="item.data.orchestratorVersionId"
             :newTipVisible="newTipVisible"
+            :flowStatus="item.data.flowStatus"
+            :associateGit="associateGit"
+            :isMainFlow="query.appId === item.data.appId"
             @node-dblclick="dblclickNode(index, arguments)"
             @isChange="isChange(index, arguments)"
             @save-node="saveNode"
@@ -114,9 +117,20 @@ export default {
     query: {
       type: Object,
       default: () => {}
+    },
+    associateGit: {
+      type: Boolean,
+      default: false
     }
   },
-  computed: {},
+  watch: {
+    query : {
+      immediate: true,
+      handler: function(cur) {
+        this.tabs[0].data = {...cur}
+      }
+    }
+  },
   data() {
     return {
       defaultNodeIcon,

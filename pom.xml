@@ -42,7 +42,7 @@
 
     <properties>
         <dss.version>1.7.0-SNAPSHOT</dss.version>
-        <linkis.version>1.4.0</linkis.version>
+        <linkis.version>1.3.0-wds-SNAPSHOT</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>

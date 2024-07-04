@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -112,8 +113,8 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
 //            }
 
             // 拷贝编辑用户和发布用户信息
-            List<String> editUser = projectModifyRequest.getEditUsers().stream().collect(Collectors.toList());
-            List<String> releaseUser = projectModifyRequest.getReleaseUsers().stream().collect(Collectors.toList());
+            List<String> editUser = new ArrayList<>(projectModifyRequest.getEditUsers());
+            List<String> releaseUser = new ArrayList<>(projectModifyRequest.getReleaseUsers());
 
             ProjectResponse projectResponse = projectResponseList.get(0);
             // 判断编辑用户信息否包含代理用户

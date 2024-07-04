@@ -73,8 +73,7 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
     @Override
     public Message beforeCreateProject(HttpServletRequest request, ProjectCreateRequest projectCreateRequest) {
         return doProxyUserFunction(request, proxyUser -> {
-            if(CollectionUtils.isNotEmpty(projectCreateRequest.getAccessUsers()) ||
-                    CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
+            if(CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
                 return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
             }
             String userName= SecurityFilter.getLoginUsername(request);
@@ -102,8 +101,8 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
             if(CollectionUtils.isEmpty(projectResponseList)) {
                 return Message.error("You have no permission to modify this project.");
             } else if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers()) ||
-                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers()) ||
-                    CollectionUtils.isNotEmpty(projectModifyRequest.getAccessUsers())) {
+                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers())
+                    ) {
                 return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
             }
             return null;

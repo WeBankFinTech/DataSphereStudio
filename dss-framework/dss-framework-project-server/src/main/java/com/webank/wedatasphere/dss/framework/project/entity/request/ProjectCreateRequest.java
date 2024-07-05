@@ -75,7 +75,7 @@ public class ProjectCreateRequest {
     /**
      * 标签
      */
-    private String label;
+    private String creatorLabel;
 
     public String getName() {
         return name;
@@ -208,11 +208,11 @@ public class ProjectCreateRequest {
         this.associateGit = associateGit;
     }
 
-    public String getLabel() {
-        return label;
+    public String getCreatorLabel() {
+        return creatorLabel;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setCreatorLabel(String creatorLabel) {
+        this.creatorLabel = creatorLabel;
     }
 }

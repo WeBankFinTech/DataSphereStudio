@@ -176,7 +176,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }else if (!StringUtils.isEmpty(fileName)) {
             if (!CollectionUtils.isEmpty(typeList)) {
                 for (String type : typeList) {
-                    path.add("*" + fileName + "*/." + type);
+                    path.add("*" + fileName + "*/*." + type);
                 }
             }else {
                 path.add("*" + fileName + "*");

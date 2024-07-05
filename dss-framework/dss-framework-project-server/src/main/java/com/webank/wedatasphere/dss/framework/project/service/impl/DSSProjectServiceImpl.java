@@ -50,9 +50,7 @@ import com.webank.wedatasphere.dss.framework.project.service.ExportService;
 import com.webank.wedatasphere.dss.framework.project.service.ImportService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitSearchRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitSearchResponse;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -135,8 +133,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
             project.setDataSourceListJson(new Gson().toJson(dataSourceList));
         }
-        if(projectCreateRequest.getLabel()!=null){
-            project.setLabel(projectCreateRequest.getLabel());
+        if(projectCreateRequest.getCreatorLabel()!=null){
+            project.setLabel(projectCreateRequest.getCreatorLabel());
         }
         projectMapper.insert(project);
         return project;

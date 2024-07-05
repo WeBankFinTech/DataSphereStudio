@@ -72,6 +72,10 @@ public class ProjectCreateRequest {
      */
     private Boolean associateGit;
 
+    /**
+     * 标签
+     */
+    private String label;
 
     public String getName() {
         return name;
@@ -202,5 +206,13 @@ public class ProjectCreateRequest {
 
     public void setAssociateGit(Boolean associateGit) {
         this.associateGit = associateGit;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

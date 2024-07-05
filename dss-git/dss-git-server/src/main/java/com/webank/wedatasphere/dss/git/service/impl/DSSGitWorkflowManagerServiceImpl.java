@@ -158,7 +158,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 if (!CollectionUtils.isEmpty(typeList)) {
                     for (String workflow : workflowNode) {
                         for (String type : typeList) {
-                            path.add(workflow + "." + type);
+                            path.add(workflow + "/*." + type);
                         }
                     }
                 }

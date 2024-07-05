@@ -135,6 +135,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
             project.setDataSourceListJson(new Gson().toJson(dataSourceList));
         }
+        if(projectCreateRequest.getLabel()!=null){
+            project.setLabel(projectCreateRequest.getLabel());
+        }
         projectMapper.insert(project);
         return project;
     }
@@ -260,7 +263,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             String[] tempstrArr = pusername.split(MODE_SPLIT);
 
              // 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
-             // 从而得到：查看权限用户、编辑权限用户、发布权限用户
+             // 从而得到：查看权限用户、编辑权限用户、发布权限用a
             for (String s : tempstrArr) {
                 String[] strArr = s.split(KEY_SPLIT);
                 if(strArr.length >= 3) {

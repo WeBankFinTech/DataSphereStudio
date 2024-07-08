@@ -34,6 +34,10 @@ public class ProjectQueryRequest implements Serializable {
     private String username;
 
     private boolean filterProject;
+    /**
+     * 标签
+     */
+    private String creatorLabel;
 
     public boolean getFilterProject() {
         return filterProject;
@@ -41,6 +45,14 @@ public class ProjectQueryRequest implements Serializable {
 
     public void setFilterProject(boolean filterProject) {
         this.filterProject = filterProject;
+    }
+
+    public String getCreatorLabel() {
+        return creatorLabel;
+    }
+
+    public void setCreatorLabel(String creatorLabel) {
+        this.creatorLabel = creatorLabel;
     }
 
     public Long getId() {

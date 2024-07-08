@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -73,9 +74,8 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
     @Override
     public Message beforeCreateProject(HttpServletRequest request, ProjectCreateRequest projectCreateRequest) {
         return doProxyUserFunction(request, proxyUser -> {
-            if(CollectionUtils.isNotEmpty(projectCreateRequest.getAccessUsers()) ||
-                    CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
-                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
+            if(CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
+                return Message.error("This environment is not allowed to set editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
             }
             String userName= SecurityFilter.getLoginUsername(request);
             if(userName.equals(proxyUser)
@@ -99,13 +99,41 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
             projectQueryRequest.setUsername(proxyUser);
             projectQueryRequest.setWorkspaceId(workspace.getWorkspaceId());
             List<ProjectResponse> projectResponseList = dssProjectService.getListByParam(projectQueryRequest);
+
+
+
             if(CollectionUtils.isEmpty(projectResponseList)) {
                 return Message.error("You have no permission to modify this project.");
-            } else if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers()) ||
-                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers()) ||
-                    CollectionUtils.isNotEmpty(projectModifyRequest.getAccessUsers())) {
-                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
             }
+
+//            else if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers()) ||
+//                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers())
+//                    ) {
+//                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限和查看权限，请删除相关权限后再重试).");
+//            }
+
+            // 拷贝编辑用户和发布用户信息
+            List<String> editUser = new ArrayList<>(projectModifyRequest.getEditUsers());
+            List<String> releaseUser = new ArrayList<>(projectModifyRequest.getReleaseUsers());
+
+            ProjectResponse projectResponse = projectResponseList.get(0);
+            // 判断编辑用户信息否包含代理用户
+            if(projectResponse.getEditUsers().contains(proxyUser) && !editUser.contains(proxyUser)){
+                editUser.add(proxyUser);
+            }
+            // 判断发布用户信息否包含代理用户
+            if(projectResponse.getReleaseUsers().contains(proxyUser) && !releaseUser.contains(proxyUser)){
+                releaseUser.add(proxyUser);
+            }
+
+            //  发布用户和编辑用户信息有改动 则抛错
+            if(!CollectionUtils.isEqualCollection(editUser, projectResponse.getEditUsers()) ||
+                    !CollectionUtils.isEqualCollection(releaseUser, projectResponse.getReleaseUsers())
+            ) {
+                return Message.error("This environment is not allowed to set editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
+            }
+
+
             return null;
         });
     }

@@ -283,11 +283,15 @@ public class DSSFlowEditLockManager {
     }
 
     public static boolean isLockExpire(DSSFlowEditLock flowEditLock) throws DSSErrorException{
-        OrchestratorVo orchestratorVo = getOrchestratorInfo(flowEditLock.getFlowID());
-        DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
-        String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
-        if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
-            return false;
+        try {
+            OrchestratorVo orchestratorVo = getOrchestratorInfo(flowEditLock.getFlowID());
+            DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
+            String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
+            if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
+                return false;
+            }
+        }catch (Exception e) {
+            return true;
         }
         return System.currentTimeMillis() - flowEditLock.getUpdateTime().getTime() >= DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue();
     }

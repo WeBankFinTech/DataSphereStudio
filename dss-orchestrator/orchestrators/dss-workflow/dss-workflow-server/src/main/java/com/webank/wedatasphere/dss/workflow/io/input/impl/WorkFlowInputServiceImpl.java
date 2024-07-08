@@ -280,13 +280,14 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 String nodeName = nodeParser.getNodeValue("title", nodeJson);
                 String nodePath = IoUtils.addFileSeparator(flowCodePath, nodeName);
                 //上传节点资源到bml，实现节点资源导入，返回新的节点json
-                String updateNodeJson = nodeInputService.uploadResourceToBmlNew(userName, nodeJson, nodePath, projectName);
+                String updateNodeJson = nodeInputService.uploadResourceToBmlNew(userName, nodeJson, nodePath,
+                        nodeName, projectName);
                 //导入第三方节点
                 updateNodeJson = nodeInputService.uploadAppConnResourceNew(userName, projectName,
                         dssFlow, updateNodeJson, updateContextId, nodePath,
                         workspace, orcVersion, dssLabels);
                 Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
-                String nodeParamsJson = readNodeParam(userName, nodePath);
+                String nodeParamsJson = readNodeParam(userName, nodePath,nodeName);
 
                 //更新subflowID
                 String nodeType = nodeJsonMap.get("jobType").toString();
@@ -319,8 +320,9 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
     }
 
-    private String readNodeParam(String userName,String nodePath){
-        String paramsFilePath = IoUtils.addFileSeparator(nodePath, NODE_PARAMS_FILE_NAME);
+    private String readNodeParam(String userName,String nodePath,String nodeName){
+        String propertiesName = nodeName + NODE_PARAMS_FILE_NAME;
+        String paramsFilePath = IoUtils.addFileSeparator(nodePath, propertiesName);
         return bmlService.readLocalTextFile(userName, paramsFilePath);
     }
 

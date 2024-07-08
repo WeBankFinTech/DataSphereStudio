@@ -42,8 +42,8 @@
             AND b.id = #{id}
         </if>
           <choose>
-              <when test="label!=null">
-                  AND b.label=#{label}
+              <when test="creatorLabel!=null">
+                  AND b.label=#{creatorLabel}
           </when>
           <otherwise>
                 AND b.label is null;

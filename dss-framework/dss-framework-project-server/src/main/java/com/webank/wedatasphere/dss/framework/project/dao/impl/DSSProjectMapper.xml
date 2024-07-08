@@ -46,7 +46,7 @@
                   AND b.label=#{creatorLabel}
           </when>
           <otherwise>
-                AND b.label is null;
+                AND b.label is null
           </otherwise>
           </choose>
         GROUP BY b.id ) c where c.pusername like concat('%',#{username},'%') order by updateTime desc

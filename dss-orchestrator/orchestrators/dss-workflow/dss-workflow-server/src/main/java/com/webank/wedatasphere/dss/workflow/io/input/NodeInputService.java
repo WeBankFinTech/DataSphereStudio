@@ -29,7 +29,7 @@ public interface NodeInputService {
 
     String uploadResourceToBml(String userName, String nodeJson, String inputResourcePath, String projectName) throws IOException;
 
-    String uploadResourceToBmlNew(String userName, String nodeJson, String nodePath, String projectName) throws IOException;
+    String uploadResourceToBmlNew(String userName, String nodeJson, String nodePath, String nodeName,String projectName) throws IOException;
 
     String uploadAppConnResource(String userName, String projectName, DSSFlow dssFlow,
                                  String nodeJson, String flowContextId, String appConnResourcePath,

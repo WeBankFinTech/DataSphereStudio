@@ -27,6 +27,7 @@ import org.apache.linkis.common.utils.JsonUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DSSCommonUtils {
@@ -90,6 +91,15 @@ public class DSSCommonUtils {
         List<DSSNodeDefault> dwsNodes = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray, new TypeToken<List<DSSNodeDefault>>() {
         }.getType());
         return dwsNodes;
+    }
+
+    public static List<Map<String, Object>> getFlowAttribute(String workFlowJson, String attribute) {
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(workFlowJson).getAsJsonObject();
+        JsonArray nodeJsonArray = jsonObject.getAsJsonArray(attribute);
+        List<Map<String, Object>> mapList = DSSCommonUtils.COMMON_GSON.fromJson(nodeJsonArray, new TypeToken<List<Map<String, Object>>>() {
+        }.getType());
+        return mapList;
     }
 
     public static List<String> getWorkFlowNodesJson(String workFlowJson) {

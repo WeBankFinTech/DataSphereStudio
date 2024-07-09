@@ -33,7 +33,7 @@ public class DSSNodeDefault implements DSSNode {
     private List<Resource> resources;
     private String title;
     private String desc;
-    private String createTime;
+    private Long createTime;
     private String userProxy;
     private String modifyUser;
     private Long modifyTime;
@@ -168,10 +168,61 @@ public class DSSNodeDefault implements DSSNode {
         return "dwsNode{" +
                 "layout=" + layout +
                 ", id='" + id + '\'' +
+                ", key='" + key + '\'' +
                 ", jobType='" + jobType + '\'' +
                 ", lastUpdateTime=" + lastUpdateTime +
                 ", params=" + params +
                 ", resources=" + resources +
+                ", jobType=" + jobType +
+                ", title=" + title +
+                ", createTime=" + createTime +
+                ", modifyTime=" + modifyTime +
+                ", modifyUser=" + modifyUser +
+                ", desc='" + desc + '\'' +
                 '}';
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getJobType() {
+        return jobType;
+    }
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    public void setModifyUser(String modifyUser) {
+        this.modifyUser = modifyUser;
+    }
+
+    public void setModifyTime(Long modifyTime) {
+        this.modifyTime = modifyTime;
     }
 }

@@ -50,9 +50,7 @@ import com.webank.wedatasphere.dss.framework.project.service.ExportService;
 import com.webank.wedatasphere.dss.framework.project.service.ImportService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitSearchRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitSearchResponse;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -134,6 +132,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         List<DSSProjectDataSource> dataSourceList = projectCreateRequest.getDataSourceList();
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
             project.setDataSourceListJson(new Gson().toJson(dataSourceList));
+        }
+        if(projectCreateRequest.getCreatorLabel()!=null){
+            project.setLabel(projectCreateRequest.getCreatorLabel());
         }
         projectMapper.insert(project);
         return project;
@@ -260,7 +261,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             String[] tempstrArr = pusername.split(MODE_SPLIT);
 
              // 拆分有projectId +"-" + priv + "-" + username的拼接而成的字段，
-             // 从而得到：查看权限用户、编辑权限用户、发布权限用户
+             // 从而得到：查看权限用户、编辑权限用户、发布权限用a
             for (String s : tempstrArr) {
                 String[] strArr = s.split(KEY_SPLIT);
                 if(strArr.length >= 3) {

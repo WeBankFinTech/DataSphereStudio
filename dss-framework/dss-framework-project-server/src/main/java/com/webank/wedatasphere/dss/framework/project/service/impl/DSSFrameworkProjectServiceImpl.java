@@ -166,12 +166,15 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     @Override
     public void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception {
-       //如果不是工程的创建人，则校验是否管理员
+        //如果不是工程的创建人，则校验是否管理员或发布者权限
         if (!username.equalsIgnoreCase(dbProject.getCreateBy())) {
+            //获取发布者权限用户
+            List<String> projectUsers = projectUserService.getProjectPriv(projectModifyRequest.getId()).stream()
+                    .filter(projectUser->projectUser.getPriv()==3).map(DSSProjectUser::getUsername).collect(Collectors.toList());
             boolean isAdmin = projectUserService.isAdminByUsername(projectModifyRequest.getWorkspaceId(), username);
-            //非管理员
-            if (!isAdmin) {
-                DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_IS_NOT_ADMIN.getCode(), ProjectServerResponse.PROJECT_IS_NOT_ADMIN.getMsg(), DSSProjectErrorException.class);
+            //非管理员非发布者权限
+            if (!isAdmin&&!projectUsers.contains(username)) {
+                DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_IS_NOT_ADMIN_OR_RELEASE.getCode(), ProjectServerResponse.PROJECT_IS_NOT_ADMIN_OR_RELEASE.getMsg(), DSSProjectErrorException.class);
             }
         }
         //不允许修改工程名称

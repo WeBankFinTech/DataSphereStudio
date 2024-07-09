@@ -158,14 +158,14 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 if (!CollectionUtils.isEmpty(typeList)) {
                     for (String workflow : workflowNode) {
                         for (String type : typeList) {
-                            path.add(workflow + "." + type);
+                            path.add(workflow + "/*" + type);
                         }
                     }
                 }
             }else if (!CollectionUtils.isEmpty(typeList)) {
                 for (String workflow : workflowNode) {
                     for (String type : typeList) {
-                        path.add(workflow + "/**/*." + type);
+                        path.add(workflow + "/**/*" + type);
                     }
                 }
             }
@@ -176,14 +176,14 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }else if (!StringUtils.isEmpty(fileName)) {
             if (!CollectionUtils.isEmpty(typeList)) {
                 for (String type : typeList) {
-                    path.add("*" + fileName + "*/." + type);
+                    path.add("*" + fileName + "*/*" + type);
                 }
             }else {
                 path.add("*" + fileName + "*");
             }
         }else if (!CollectionUtils.isEmpty(typeList)) {
             for (String type : typeList) {
-                path.add("*." + type);
+                path.add("*" + type);
             }
         }
 

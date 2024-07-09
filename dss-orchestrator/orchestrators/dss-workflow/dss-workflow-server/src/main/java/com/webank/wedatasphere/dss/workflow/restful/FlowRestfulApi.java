@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
@@ -313,6 +314,7 @@ public class FlowRestfulApi {
         DSSFlow dssFlow = flowService.getFlowByID(flowID);
         String workspaceName = saveFlowRequest.getWorkspaceName();
         String projectName = saveFlowRequest.getProjectName();
+        LabelRouteVO labels = saveFlowRequest.getLabels();
         // 判断工作流中是否存在命名相同的节点
         if (flowService.checkIsExistSameFlow(jsonFlow)) {
             return Message.error("It exists same flow.(存在相同的节点)");
@@ -333,7 +335,7 @@ public class FlowRestfulApi {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
 
-        version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName);
+        version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName, labels);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspaceName, TargetTypeEnum.WORKFLOW,
                 flowID, dssFlow.getName(), OperateTypeEnum.UPDATE, saveFlowRequest);
         return Message.ok().data("flowVersion", version);

@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.workflow.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
@@ -53,7 +54,8 @@ public interface DSSFlowService {
                     String comment,
                     String userName,
                     String workspaceName,
-                    String projectName
+                    String projectName,
+                    LabelRouteVO labels
     ) throws IOException;
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,

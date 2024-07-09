@@ -31,6 +31,8 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
@@ -54,9 +56,10 @@ import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
 import com.webank.wedatasphere.dss.workflow.core.json2flow.JsonToFlowParser;
-import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
-import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
-import com.webank.wedatasphere.dss.workflow.dao.NodeInfoMapper;
+import com.webank.wedatasphere.dss.workflow.dao.*;
+import com.webank.wedatasphere.dss.workflow.dto.NodeContentDO;
+import com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO;
+import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
@@ -89,6 +92,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -123,6 +127,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Autowired
     private WorkFlowManager workFlowManager;
+    @Autowired
+    private NodeContentMapper nodeContentMapper;
+    @Autowired
+    private NodeContentUIMapper nodeContentUIMapper;
+    @Autowired
+    private NodeMetaMapper nodeMetaMapper;
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
@@ -283,7 +293,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                            String comment,
                            String userName,
                            String workspaceName,
-                           String projectName) throws IOException {
+                           String projectName,
+                           LabelRouteVO labels) throws IOException {
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -291,6 +302,95 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             userName = creator;
         }
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
+        // 解析 jsonflow
+        // 解析 proxyUser
+        List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
+        String proxyUser = null;
+        for (Map<String, Object> prop : props) {
+            if (prop.containsKey("user.to.proxy")) {
+                proxyUser = prop.get("user.to.proxy").toString();
+                break;
+            }
+        }
+        // 解析 resources
+        List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(jsonFlow, "resources");
+        String resourceToString = "";
+        for (Map<String, Object> resource : resources) {
+            resourceToString += resource.values().toString();
+            resourceToString += ";";
+        }
+
+        List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);
+        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labels.getRoute()));
+        Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabelList);
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(flowID)),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+        Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
+        NodeMetaDO nodeMetaByOrchestratorId = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorId);
+
+        if (nodeMetaByOrchestratorId == null) {
+            nodeMetaMapper.insertNodeMeta(new NodeMetaDO(orchestratorId, proxyUser, resourceToString));
+        } else {
+            nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString));
+        }
+
+        List<Long> contentIdListByOrchestratorId = nodeContentMapper.getContentIdListByOrchestratorId(orchestratorId);
+
+        logger.info("workFlowNodes:{}", workFlowNodes);
+        List<NodeContentUIDO> nodeContentUIDOS = new ArrayList<>();
+        for (DSSNodeDefault nodeDefault : workFlowNodes) {
+            String key = nodeDefault.getKey();
+            String id = nodeDefault.getId();
+            String jobType = nodeDefault.getJobType();
+            Long createTime = nodeDefault.getCreateTime();
+            Long modifyTime = nodeDefault.getModifyTime();
+            Date createDate = new Date(createTime);
+            Date modifyDate = new Date(modifyTime);
+            String modifyUser = nodeDefault.getModifyUser();
+            NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, createDate, modifyDate, modifyUser);
+            NodeContentDO nodeContentByKey = nodeContentMapper.getNodeContentByKey(key);
+
+            if (nodeContentByKey == null) {
+                nodeContentMapper.insert(contentDO);
+                nodeContentByKey = nodeContentMapper.getNodeContentByKey(key);
+            } else {
+                contentDO.setId(nodeContentByKey.getId());
+                nodeContentMapper.update(contentDO);
+            }
+            Long contentByKeyId = nodeContentByKey.getId();
+            String title = nodeDefault.getTitle();
+            if (title != null) {
+                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title));
+            }
+            String desc = nodeDefault.getDesc();
+            if (desc != null) {
+                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc));
+            }
+            Map<String, Object> params = nodeDefault.getParams();
+            if (params != null) {
+                Map<String, Map<String, Object>> mapParams = (Map<String, Map<String, Object>>)params.get("configuration");
+                if (mapParams != null) {
+                    for (Map.Entry<String, Map<String, Object>> entry : mapParams.entrySet()) {
+                        // special runtime startup
+                        String paramKey = entry.getKey();
+                        Map<String, Object> paramValue = entry.getValue();
+                        for (Map.Entry<String, Object> paramEntry : paramValue.entrySet()) {
+                            String paramName = paramEntry.getKey();
+                            String paramVal = paramEntry.getValue().toString();
+                            logger.info("{}:{}", paramName, paramVal);
+                            nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, paramName, paramVal));
+                        }
+                    }
+                }
+                logger.info(mapParams.toString());
+            }
+
+        }
+        // 先删后增
+        nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
+        nodeContentUIMapper.batchInsertNodeContentUI(nodeContentUIDOS);
+
+
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
             logger.info("saveFlow is not change");
             return dssFlow.getBmlVersion();

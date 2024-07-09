@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2019 WeBank
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  ~
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<mapper namespace="com.webank.wedatasphere.dss.workflow.dao.NodeMetaMapper">
+    <resultMap id="nodeMetaResultMap" type="com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO">
+        <id property="id" column="id"/>
+        <result property="orchestratorId" column="orchestrator_id"/>
+        <result property="proxyUser" column="proxy_user"/>
+        <result property="resource" column="resource"/>
+    </resultMap>
+
+    <sql id="baseColumns">
+        id, orchestrator_id, proxy_user, resource
+    </sql>
+
+    <insert id="insertNodeMeta" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO">
+        INSERT INTO dss_workflow_node_meta(id, orchestrator_id, proxy_user, resource)
+        VALUES (#{id}, #{orchestratorId}, #{proxyUser}, #{resource})
+    </insert>
+
+    <update id="updateNodeMeta" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO">
+        UPDATE dss_workflow_node_meta
+        SET orchestrator_id = #{orchestratorId},
+        proxy_user = #{proxyUser},
+        resource = #{resource}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getNodeMetaByOrchestratorId" parameterType="int" resultMap="nodeMetaResultMap">
+        SELECT (<include refid="baseColumns"/>) FROM dss_workflow_node_meta WHERE orchestrator_id = #{orchestratorId}>
+    </select>
+
+</mapper>

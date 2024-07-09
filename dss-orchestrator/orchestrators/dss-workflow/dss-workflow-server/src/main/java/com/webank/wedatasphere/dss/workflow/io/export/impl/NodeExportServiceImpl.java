@@ -70,7 +70,8 @@ public class NodeExportServiceImpl implements NodeExportService {
                     // 如果是scriptis节点，且资源名和jobContent中的script相同，则下载后的文件名为script名的后缀，如.sql。 否则说明是用户自定义文件，直接用filename
                     String resourceName = x.getFileName();
                     if(resourceName.equals(scriptName)){
-                        resourceName = resourceName.substring(resourceName.lastIndexOf('.'));
+                        String extensionName=  resourceName.substring(resourceName.lastIndexOf('.'));
+                        resourceName =  Optional.ofNullable(dwsNode.getName()).orElse("") + extensionName;
                     }
                     String nodeResourcePath = nodePath + File.separator + resourceName;
                     bmlService.downloadToLocalPath(userName, x.getResourceId(), x.getVersion(), nodeResourcePath);

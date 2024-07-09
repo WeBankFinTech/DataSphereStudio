@@ -306,18 +306,25 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 解析 proxyUser
         List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
         String proxyUser = null;
+        StringBuilder globalVar = new StringBuilder();
         for (Map<String, Object> prop : props) {
             if (prop.containsKey("user.to.proxy")) {
                 proxyUser = prop.get("user.to.proxy").toString();
-                break;
+            }else {
+                for (Map.Entry<String, Object> map : prop.entrySet()) {
+                    if (map.getValue() != null) {
+                        globalVar.append(map.getKey() + "=" + map.getValue().toString());
+                        globalVar.append(";");
+                    }
+                }
             }
         }
         // 解析 resources
         List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(jsonFlow, "resources");
-        String resourceToString = "";
+        StringBuilder resourceToString = new StringBuilder();
         for (Map<String, Object> resource : resources) {
-            resourceToString += resource.values().toString();
-            resourceToString += ";";
+            resourceToString.append(resource.values().toString());
+            resourceToString.append(";");
         }
 
         List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);
@@ -329,9 +336,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         NodeMetaDO nodeMetaByOrchestratorId = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorId);
 
         if (nodeMetaByOrchestratorId == null) {
-            nodeMetaMapper.insertNodeMeta(new NodeMetaDO(orchestratorId, proxyUser, resourceToString));
+            nodeMetaMapper.insertNodeMeta(new NodeMetaDO(orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
         } else {
-            nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString));
+            nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
         }
 
         List<Long> contentIdListByOrchestratorId = nodeContentMapper.getContentIdListByOrchestratorId(orchestratorId);
@@ -376,9 +383,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         Map<String, Object> paramValue = entry.getValue();
                         for (Map.Entry<String, Object> paramEntry : paramValue.entrySet()) {
                             String paramName = paramEntry.getKey();
-                            String paramVal = paramEntry.getValue().toString();
-                            logger.info("{}:{}", paramName, paramVal);
-                            nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, paramName, paramVal));
+                            if (paramEntry.getValue() != null) {
+                                String paramVal = paramEntry.getValue().toString();
+                                logger.info("{}:{}", paramName, paramVal);
+                                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, paramName, paramVal));
+                            }
+
                         }
                     }
                 }

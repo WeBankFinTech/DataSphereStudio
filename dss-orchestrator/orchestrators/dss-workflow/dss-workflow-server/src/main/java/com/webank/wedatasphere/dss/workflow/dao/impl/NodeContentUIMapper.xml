@@ -28,15 +28,15 @@
     </resultMap>
 
     <sql id="baseColumns">
-        id, content_id, key, value
+        `id`, `content_id`, `key`, `value`
     </sql>
 
     <insert id="insertNodeContentUI" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO">
-        INSERT INTO dss_workflow_node_content_to_ui(content_id, key, value) VAlUES (#{contentId}, #{key}, #{value})
+        INSERT INTO dss_workflow_node_content_to_ui(`content_id`, `key`, `value`) VAlUES (#{contentId}, #{key}, #{value})
     </insert>
 
     <insert id="batchInsertNodeContentUI" parameterType="java.util.List">
-        INSERT INTO dss_workflow_node_content_to_ui(content_id, key, value) VALUES
+        INSERT INTO dss_workflow_node_content_to_ui(`content_id`, `key`, `value`) VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.contentId}, #{item.key}, #{item.value})
         </foreach>
@@ -44,23 +44,23 @@
 
     <update id="updateNodeContentUI" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO">
         UPDATE dss_workflow_node_content_to_ui
-        SET key = #{key}, value = #{value} WHERE key = #{key}
+        SET `value` = #{value} WHERE `key` = #{key}
     </update>
 
     <update id="batchUpdateNodeContentUI" parameterType="java.util.List">
         UPDAtE dss_workflow_node_content_to_ui
         <foreach collection="list" item="item" index="index" separator=",">
-            SET key = #{item.key}, value = #{item.value} WHERE key = #{item.key}
+            SET `value` = #{item.value} WHERE `key` = #{item.key}
         </foreach>
     </update>
 
-    <select id="getNodeContentUI" resultMap="nodeContentUiResultMap" parameterType="int">
-        SELECT (<include refid="baseColumns"/>) FROM dss_workflow_node_content_to_ui
-        WHERE content_id = #{contentId}
+    <select id="getNodeContentUI" resultMap="nodeContentUiResultMap" parameterType="java.lang.Long">
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content_to_ui
+        WHERE `content_id` = #{contentId}
     </select>
 
     <delete id="deleteNodeContentUIByContentList" parameterType="java.util.List">
-        DELETE FROM dss_workflow_node_content_to_ui WHERE content_id IN
+        DELETE FROM dss_workflow_node_content_to_ui WHERE `content_id` IN
         <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
                 #{item}
         </foreach>

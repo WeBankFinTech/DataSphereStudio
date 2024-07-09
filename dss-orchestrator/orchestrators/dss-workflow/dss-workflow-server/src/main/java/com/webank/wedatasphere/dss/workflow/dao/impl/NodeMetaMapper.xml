@@ -41,7 +41,7 @@
         UPDATE dss_workflow_node_meta
         SET `orchestrator_id` = #{orchestratorId},
         `proxy_user` = #{proxyUser},
-        `resource` = #{resource}
+        `resource` = #{resource},
         `global_var` = #{globalVar}
         WHERE `id` = #{id}
     </update>

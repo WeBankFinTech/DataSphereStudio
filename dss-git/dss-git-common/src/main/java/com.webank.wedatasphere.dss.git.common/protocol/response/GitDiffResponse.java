@@ -3,21 +3,20 @@ package com.webank.wedatasphere.dss.git.common.protocol.response;
 
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 
-public class GitDiffResponse {
-    private GitTree tree;
+import java.util.List;
 
-    public GitDiffResponse(GitTree tree) {
+public class GitDiffResponse {
+    private List<GitTree> tree;
+
+    public GitDiffResponse(List<GitTree> tree) {
         this.tree = tree;
     }
 
-    public GitDiffResponse() {
-    }
-
-    public GitTree getTree() {
+    public List<GitTree> getTree() {
         return tree;
     }
 
-    public void setTree(GitTree tree) {
+    public void setTree(List<GitTree> tree) {
         this.tree = tree;
     }
 }

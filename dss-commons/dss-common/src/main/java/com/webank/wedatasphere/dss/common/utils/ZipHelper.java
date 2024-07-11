@@ -243,7 +243,7 @@ public class ZipHelper {
         throw new IOException();
     }
 
-    private static boolean deleteDir(File dir) {
+    public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
             if (children != null && children.length > 0){

@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
 import com.webank.wedatasphere.dss.common.protocol.RequestExportWorkflow;
+import com.webank.wedatasphere.dss.common.protocol.RequestReadWorkflowNode;
 import com.webank.wedatasphere.dss.common.protocol.ResponseExportWorkflow;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -307,6 +308,29 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return bmlResource;
     }
 
+    private String readWorkflowNode(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace, DSSOrchestratorInfo orchestrator, String filePath) {
+        // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
+        long flowId = flowRequest.getFlowId();
+
+        Long projectId = orchestrator.getProjectId();
+        String projectName = flowRequest.getProjectName();
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(flowRequest.getLabels().getRoute()));
+        RequestReadWorkflowNode requestExportWorkflow = new RequestReadWorkflowNode(username,
+                flowId,
+                projectId,
+                projectName,
+                DSSCommonUtils.COMMON_GSON.toJson(workspace),
+                dssLabelList,
+                false,
+                filePath);
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
+        String st = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
+                String.class, RequestExportWorkflow.class);
+
+        return st;
+    }
+
     @Override
     public List<GitTree> diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
@@ -326,22 +350,20 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     @Override
     public GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
-        BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
-        Map<String, BmlResource> file = new HashMap<>();
-        file.put(orchestrator.getName(), bmlResource);
+        String s = readWorkflowNode(flowRequest, username, workspace, orchestrator, flowRequest.getFileName());
 
 
         GitFileContentRequest fileContentRequest = new GitFileContentRequest();
         fileContentRequest.setFilePath(flowRequest.getFileName());
         fileContentRequest.setProjectName(flowRequest.getProjectName());
         fileContentRequest.setWorkspaceId(workspace.getWorkspaceId());
-        fileContentRequest.setBmlResourceMap(file);
         fileContentRequest.setUsername(username);
         fileContentRequest.setPublish(false);
 
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         GitFileContentResponse contentResponse = RpcAskUtils.processAskException(gitSender.ask(fileContentRequest), GitFileContentResponse.class, GitFileContentRequest.class);
 
+        contentResponse.setAfter(s);
         return contentResponse;
     }
 

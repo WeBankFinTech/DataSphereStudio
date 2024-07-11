@@ -12,11 +12,6 @@ public class GitFileContentRequest extends GitBaseRequest{
      */
     private String filePath;
 
-    /**
-     * 待修改的文件（key：文件相对路径，value：文件对应BML）
-     */
-    private Map<String, BmlResource> bmlResourceMap;
-
     private String username;
 
     private Boolean publish;
@@ -28,19 +23,17 @@ public class GitFileContentRequest extends GitBaseRequest{
         super(workspaceId, projectName);
     }
 
-    public GitFileContentRequest(String commitId, String filePath, Map<String, BmlResource> bmlResourceMap, String username, Boolean publish) {
+    public GitFileContentRequest(String commitId, String filePath, String username, Boolean publish) {
         this.commitId = commitId;
         this.filePath = filePath;
-        this.bmlResourceMap = bmlResourceMap;
         this.username = username;
         this.publish = publish;
     }
 
-    public GitFileContentRequest(Long workspaceId, String projectName, String commitId, String filePath, Map<String, BmlResource> bmlResourceMap, String username, Boolean publish) {
+    public GitFileContentRequest(Long workspaceId, String projectName, String commitId, String filePath, String username, Boolean publish) {
         super(workspaceId, projectName);
         this.commitId = commitId;
         this.filePath = filePath;
-        this.bmlResourceMap = bmlResourceMap;
         this.username = username;
         this.publish = publish;
     }
@@ -68,14 +61,6 @@ public class GitFileContentRequest extends GitBaseRequest{
 
     public void setPublish(Boolean publish) {
         this.publish = publish;
-    }
-
-    public Map<String, BmlResource> getBmlResourceMap() {
-        return bmlResourceMap;
-    }
-
-    public void setBmlResourceMap(Map<String, BmlResource> bmlResourceMap) {
-        this.bmlResourceMap = bmlResourceMap;
     }
 
     public String getUsername() {

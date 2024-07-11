@@ -70,6 +70,19 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       ResponseExportWorkflow(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
         reqExportFlow.flowID)
 
+    case reqReadFlow: RequestReadWorkflowNode =>
+      val workflowNode: String = workflowManager.readWorkflowNew(
+        reqReadFlow.userName,
+        reqReadFlow.flowID,
+        reqReadFlow.projectId,
+        reqReadFlow.projectName,
+        DSSCommonUtils.COMMON_GSON.fromJson(reqReadFlow.workspaceStr, classOf[Workspace]),
+        reqReadFlow.dssLabelList,
+        reqReadFlow.exportExternalNodeAppConnResource,
+        reqReadFlow.filePath
+      )
+      workflowNode
+
     case requestImportWorkflow: RequestImportWorkflow =>
       val dssFlowImportParam: DSSFlowImportParam = new DSSFlowImportParam()
       dssFlowImportParam.setProjectID(requestImportWorkflow.getProjectId)

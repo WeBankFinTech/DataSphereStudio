@@ -45,6 +45,16 @@ case class RequestExportWorkflow(userName: String,
                                  exportExternalNodeAppConnResource: Boolean
                                  )
 
+case class RequestReadWorkflowNode(userName: String,
+                                   flowID: Long,
+                                   projectId: Long,
+                                   projectName: String,
+                                   workspaceStr: String,
+                                   dssLabelList: java.util.List[DSSLabel],
+                                   exportExternalNodeAppConnResource: Boolean,
+                                   filePath: String
+                                  )
+
 case class ResponseExportWorkflow(resourceId: String, version: String, flowID: Long)
 
 case class RequestQueryWorkFlow(userName: String, rootFlowId: Long)

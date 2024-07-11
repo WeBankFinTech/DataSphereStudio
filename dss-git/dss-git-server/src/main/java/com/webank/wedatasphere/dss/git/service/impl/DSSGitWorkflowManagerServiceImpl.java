@@ -383,23 +383,6 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             if (request.getPublish()) {
                 // 获取当前提交前的文件内容
                 before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
-                // 解压BML文件到本地
-                Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
-                List<String> fileList = new ArrayList<>(bmlResourceMap.keySet());
-                for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
-                    fileList.add(entry.getKey());
-                    // 解压BML文件到本地
-                    FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId);
-                    FileUtils.removeFlowNode(entry.getKey(), projectName, workspaceId);
-                    FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
-                    String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + entry.getKey();
-                    fileList.add(metaConfPath);
-                }
-                // 获取当前提交后的文件内容
-                after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
-                // 还原本地
-                DSSGitUtils.reset(repository, projectName);
-
             } else {
                 before = DSSGitUtils.getTargetCommitFileContent(repository, projectName, request.getCommitId(), request.getFilePath());
                 after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);

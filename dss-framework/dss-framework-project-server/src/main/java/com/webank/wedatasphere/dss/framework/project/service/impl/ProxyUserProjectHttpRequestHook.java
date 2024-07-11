@@ -101,14 +101,35 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
             List<ProjectResponse> projectResponseList = dssProjectService.getListByParam(projectQueryRequest);
 
 
-
             if(CollectionUtils.isEmpty(projectResponseList)) {
                 return Message.error("You have no permission to modify this project.");
-            } else if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers()) ||
-                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers())
-                    ) {
-                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
             }
+
+//            else if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers()) ||
+//                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers())
+//                    ) {
+//                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
+//            }
+
+            // 拷贝编辑用户和发布用户信息
+            ProjectResponse projectResponse = projectResponseList.get(0);
+
+            // 判断编辑用户信息否包含代理用户
+            if(projectResponse.getEditUsers().contains(proxyUser) && !projectModifyRequest.getEditUsers().contains(proxyUser)){
+                projectModifyRequest.getEditUsers().add(proxyUser);
+            }
+            // 判断发布用户信息否包含代理用户
+            if(projectResponse.getReleaseUsers().contains(proxyUser) && !projectModifyRequest.getReleaseUsers().contains(proxyUser)){
+                projectModifyRequest.getReleaseUsers().add(proxyUser);
+            }
+
+            //  发布用户和编辑用户信息有改动 则抛错
+            if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponse.getEditUsers()) ||
+                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponse.getReleaseUsers())
+            ) {
+                return Message.error("This environment is not allowed to set editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
+            }
+
 
             return null;
         });

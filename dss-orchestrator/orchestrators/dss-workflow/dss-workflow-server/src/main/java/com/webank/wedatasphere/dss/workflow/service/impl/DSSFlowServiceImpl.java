@@ -17,6 +17,8 @@
 package com.webank.wedatasphere.dss.workflow.service.impl;
 
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -52,6 +54,7 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.constant.WorkFlowStatusEnum;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
@@ -62,6 +65,7 @@ import com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO;
 import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.OrchestratorMeta;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -916,4 +920,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
     }
 
+    @Override
+    public List<OrchestratorMeta> getOrchestratorMeta(int pageNow, int pageSize, List<Long> total) {
+        PageHelper.startPage(pageNow, pageSize);
+        List<OrchestratorMeta>  orchestratorMetaList =  nodeMetaMapper.getOrchestratorMeta();
+        PageInfo<OrchestratorMeta> pageInfo = new PageInfo<>(orchestratorMetaList);
+        total.add(pageInfo.getTotal());
+        for(OrchestratorMeta orchestratorMeta:orchestratorMetaList ){
+            orchestratorMeta.setStatusName(WorkFlowStatusEnum.getEnum(orchestratorMeta.getStatus()).getName());
+        }
+        return orchestratorMetaList;
+    }
 }

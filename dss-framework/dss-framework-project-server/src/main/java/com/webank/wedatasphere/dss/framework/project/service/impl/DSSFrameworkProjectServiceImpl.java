@@ -406,6 +406,57 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
     }
 
+    @Override
+    public void modifyProjectMeta(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception {
+
+        //如果不是工程的创建人，则校验是否管理员或发布者权限
+        if (!username.equalsIgnoreCase(dbProject.getCreateBy())) {
+            //获取发布者权限用户
+            List<String> projectUsers = projectUserService.getProjectPriv(projectModifyRequest.getId()).stream()
+                    .filter(projectUser->projectUser.getPriv()==3).map(DSSProjectUser::getUsername).collect(Collectors.toList());
+            boolean isAdmin = projectUserService.isAdminByUsername(projectModifyRequest.getWorkspaceId(), username);
+            //非管理员非发布者权限
+            if (!isAdmin&&!projectUsers.contains(username)) {
+                DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_IS_NOT_ADMIN_OR_RELEASE.getCode(), ProjectServerResponse.PROJECT_IS_NOT_ADMIN_OR_RELEASE.getMsg(), DSSProjectErrorException.class);
+            }
+        }
+
+        //不允许修改工程名称
+        if (!dbProject.getName().equalsIgnoreCase(projectModifyRequest.getName())) {
+            DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
+        }
+
+        // 校验是否介入git
+        if(dbProject.getAssociateGit() != null && dbProject.getAssociateGit()){
+            checkAssociateGit(projectModifyRequest, dbProject, username, workspace);
+        }
+
+        //调用第三方的工程修改接口
+        dbProject.setDescription(projectModifyRequest.getDescription());
+        dbProject.setUsername(username);
+        modifyThirdProject(projectModifyRequest, dbProject, workspace);
+
+        //1.统一修改各个接入的第三方的系统的工程状态信息
+        //2.修改dss_project_user 工程与用户关系
+        projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
+
+        //3.修改dss_project DSS基本工程信息
+        dssProjectService.modifyProjectMeta(username, projectModifyRequest);
+
+        // 同步项目配置元数据到git
+        if (dbProject.getAssociateGit() != null && dbProject.getAssociateGit() ) {
+            ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
+            exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
+            exportAllOrchestratorsReqest.setComment("test");
+            exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
+
+            BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
+
+            updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
+        }
+
+    }
+
 
 
 }

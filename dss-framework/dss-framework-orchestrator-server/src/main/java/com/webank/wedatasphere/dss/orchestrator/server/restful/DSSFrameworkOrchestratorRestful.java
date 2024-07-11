@@ -32,6 +32,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
@@ -323,8 +324,25 @@ public class DSSFrameworkOrchestratorRestful {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
-        GitTree gitTree = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
-        return Message.ok().data("tree", gitTree.getChildren());
+        List<GitTree> gitTree = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
+        return Message.ok().data("tree", gitTree);
+    }
+
+    @RequestMapping(value = "diffFlowContent", method = RequestMethod.POST)
+    public Message diffFlowContent(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
+
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
+        GitFileContentResponse contentResponse = orchestratorPluginService.diffFlowContent(submitFlowRequest, userName, workspace);
+        return Message.ok().data("content", contentResponse);
     }
 
     @RequestMapping(value = "submitFlow", method = RequestMethod.POST)

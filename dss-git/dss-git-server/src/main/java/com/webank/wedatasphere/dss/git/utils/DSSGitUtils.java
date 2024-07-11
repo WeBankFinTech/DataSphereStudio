@@ -48,6 +48,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -563,7 +565,7 @@ public class DSSGitUtils {
     }
 
     public static void archiveLocal(String projectName, Long workspaceId) throws GitErrorException{
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName + File.separator + ".git");
+        File repoDir = new File(DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + ".git");
         if (!repoDir.exists()) {
             logger.info("file {} not exists", repoDir.getAbsolutePath());
             return ;
@@ -580,6 +582,11 @@ public class DSSGitUtils {
         } catch (IOException e) {
             throw new GitErrorException(80116, "archive failed, the reason is : ", e);
         }
+    }
+
+    public static String getFileContent(String path, String projectName, Long workspaceId) throws IOException {
+        String filePath = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + path;
+        return new String(Files.readAllBytes(Paths.get(filePath)));
     }
 
     public static String getTargetCommitFileContent(Repository repository, String projectName, String commitId, String filePath) throws GitErrorException {

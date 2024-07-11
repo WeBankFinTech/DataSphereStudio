@@ -56,7 +56,6 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.request.Orchestrat
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import org.apache.commons.collections.CollectionUtils;
@@ -350,11 +349,11 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     @Override
     public GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
-        String s = readWorkflowNode(flowRequest, username, workspace, orchestrator, flowRequest.getFileName());
+        String s = readWorkflowNode(flowRequest, username, workspace, orchestrator, flowRequest.getFilePath());
 
 
         GitFileContentRequest fileContentRequest = new GitFileContentRequest();
-        fileContentRequest.setFilePath(flowRequest.getFileName());
+        fileContentRequest.setFilePath(flowRequest.getFilePath());
         fileContentRequest.setProjectName(flowRequest.getProjectName());
         fileContentRequest.setWorkspaceId(workspace.getWorkspaceId());
         fileContentRequest.setUsername(username);

@@ -210,6 +210,16 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         return  bmlResource;
     }
     @Override
+    public String readWorkflowNew(String userName, Long flowId, Long dssProjectId,
+                                         String projectName, Workspace workspace,
+                                         List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource, String filePath) throws Exception {
+        DSSFlow dssFlow = flowService.getFlowByID(flowId);
+        String exportPath = workFlowExportService.exportFlowInfoNew(dssProjectId, projectName, flowId, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
+        InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
+        logger.info("export workflow success.  flowId:{},inputStream:{} .",flowId,inputStream);
+        return  "bmlResource";
+    }
+    @Override
     public BmlResource exportWorkflow(String userName, Long flowId, Long dssProjectId,
                                       String projectName, Workspace workspace,
                                       List<DSSLabel> dssLabels) throws Exception {

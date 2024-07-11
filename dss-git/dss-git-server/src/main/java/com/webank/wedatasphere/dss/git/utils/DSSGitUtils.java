@@ -201,8 +201,10 @@ public class DSSGitUtils {
             for (String statu : entry.getValue()) {
                 if (statu.startsWith(GitConstant.GIT_SERVER_META_PATH)) {
                     rootMeta.addChild(statu, entry.getKey());
+                } else {
+                    root.addChild(statu, entry.getKey());
                 }
-                root.addChild(statu, entry.getKey());
+
             }
         }
         resultTree.add(root);

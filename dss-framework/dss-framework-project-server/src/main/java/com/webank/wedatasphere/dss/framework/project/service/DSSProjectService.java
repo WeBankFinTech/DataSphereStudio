@@ -100,4 +100,6 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
     BmlResource exportOnlyProjectMeta(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
                                   String username, String proxyUser, Workspace workspace) throws Exception;
 
+    DSSProjectDO modifyProjectMeta(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException;
+
 }

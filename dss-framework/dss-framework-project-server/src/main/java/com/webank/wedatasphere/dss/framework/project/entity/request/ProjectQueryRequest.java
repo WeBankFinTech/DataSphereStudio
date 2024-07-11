@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.List;
 
 
 @XmlRootElement
@@ -38,6 +39,34 @@ public class ProjectQueryRequest implements Serializable {
      * 标签
      */
     private String creatorLabel;
+
+    /**
+     * 项目名称列表
+     * **/
+    private List<String> projectNames;
+
+
+    /**
+     * 项目创建人
+     * **/
+    private  List<String> createUsers;
+
+    /**
+     * 发布权限用户
+     * **/
+    private List<String> releaseUsers;
+
+    /**
+     * 编辑权限用户
+     * **/
+    private List<String> editUsers;
+
+    /**
+     * 查看权限用户
+     * **/
+    private List<String> accessUsers;
+
+
 
     public boolean getFilterProject() {
         return filterProject;
@@ -77,5 +106,49 @@ public class ProjectQueryRequest implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public boolean isFilterProject() {
+        return filterProject;
+    }
+
+    public List<String> getProjectNames() {
+        return projectNames;
+    }
+
+    public void setProjectNames(List<String> projectNames) {
+        this.projectNames = projectNames;
+    }
+
+    public List<String> getCreateUsers() {
+        return createUsers;
+    }
+
+    public void setCreateUsers(List<String> createUsers) {
+        this.createUsers = createUsers;
+    }
+
+    public List<String> getReleaseUsers() {
+        return releaseUsers;
+    }
+
+    public void setReleaseUsers(List<String> releaseUsers) {
+        this.releaseUsers = releaseUsers;
+    }
+
+    public List<String> getEditUsers() {
+        return editUsers;
+    }
+
+    public void setEditUsers(List<String> editUsers) {
+        this.editUsers = editUsers;
+    }
+
+    public List<String> getAccessUsers() {
+        return accessUsers;
+    }
+
+    public void setAccessUsers(List<String> accessUsers) {
+        this.accessUsers = accessUsers;
     }
 }

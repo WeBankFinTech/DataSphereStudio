@@ -570,4 +570,22 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         return bmlResource;
     }
 
+
+    @Override
+    public DSSProjectDO modifyProjectMeta(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException {
+
+        DSSProjectDO project = new DSSProjectDO();
+        //修改的字段
+        project.setDescription(projectModifyRequest.getDescription());
+        project.setUpdateTime(new Date());
+        project.setUpdateByStr(username);
+
+        UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", projectModifyRequest.getId());
+        updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());
+        projectMapper.update(project, updateWrapper);
+
+        return project;
+    }
+
 }

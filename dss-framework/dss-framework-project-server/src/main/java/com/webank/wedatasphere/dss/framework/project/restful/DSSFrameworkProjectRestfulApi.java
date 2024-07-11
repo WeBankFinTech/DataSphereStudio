@@ -81,7 +81,7 @@ public class DSSFrameworkProjectRestfulApi {
     private Message executePreHook(Function<ProjectHttpRequestHook, Message> function) {
         String errorMsg = projectHttpRequestHooks.stream().map(function).filter(Objects::nonNull).map(Message::getMessage)
                 .collect(Collectors.joining(", "));
-        if(StringUtils.isNotBlank(errorMsg)) {
+        if (StringUtils.isNotBlank(errorMsg)) {
             return Message.error(errorMsg);
         } else {
             return null;
@@ -113,13 +113,46 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
         Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetAllProjects(request, projectRequest));
-        if(message != null) {
+        if (message != null) {
             return message;
         }
         LOGGER.info("user {} begin to getAllProjects, projectId: {}.", username, projectRequest.getId());
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
-        if(!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()){
-            dssProjectVos = dssProjectVos.stream().filter(item->
+
+
+        if (!CollectionUtils.isEmpty(dssProjectVos)) {
+
+            dssProjectVos = dssProjectVos.stream().filter(item -> {
+                boolean flag = true;
+                // 项目名称过滤
+                if (!CollectionUtils.isEmpty(projectRequest.getProjectNames())) {
+                    flag = projectRequest.getProjectNames().contains(item.getName());
+                }
+                // 项目创建者过滤
+                if (!CollectionUtils.isEmpty(projectRequest.getCreateUsers()) && flag) {
+                    flag = projectRequest.getCreateUsers().contains(item.getCreateBy());
+                }
+                // 发布权限用户过滤
+                if (!CollectionUtils.isEmpty(projectRequest.getReleaseUsers()) && flag) {
+                    flag = CollectionUtils.containsAny(projectRequest.getReleaseUsers(), item.getReleaseUsers());
+                }
+                //  编辑权限用户过滤
+                if (!CollectionUtils.isEmpty(projectRequest.getEditUsers()) && flag) {
+                    flag = CollectionUtils.containsAny(projectRequest.getEditUsers(), item.getEditUsers());
+                }
+                // 查看权限用户过滤
+                if (!CollectionUtils.isEmpty(projectRequest.getAccessUsers()) && flag) {
+                    flag = CollectionUtils.containsAny(projectRequest.getAccessUsers(), item.getAccessUsers());
+                }
+
+                return flag;
+
+            }).collect(Collectors.toList());
+        }
+
+
+        if (!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()) {
+            dssProjectVos = dssProjectVos.stream().filter(item ->
                     (item.getEditUsers().contains(username) || item.getReleaseUsers().contains(username))
                             && item.getEditable()).collect(Collectors.toList());
         }
@@ -134,14 +167,14 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("user {} begin to createProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectCreateRequest);
-        if(projectCreateRequest.getEditUsers() == null) {
+        if (projectCreateRequest.getEditUsers() == null) {
             projectCreateRequest.setEditUsers(new ArrayList<>());
         }
-        if(projectCreateRequest.getReleaseUsers() == null) {
+        if (projectCreateRequest.getReleaseUsers() == null) {
             projectCreateRequest.setReleaseUsers(new ArrayList<>());
         }
         Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeCreateProject(request, projectCreateRequest));
-        if(message != null) {
+        if (message != null) {
             return message;
         }
         //將创建人默认为发布权限和編輯权限
@@ -154,12 +187,12 @@ public class DSSFrameworkProjectRestfulApi {
         return DSSExceptionUtils.getMessage(() -> {
                     DSSProjectVo dssProjectVo = dssFrameworkProjectService.createProject(projectCreateRequest, username, workspace);
                     AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
-                            dssProjectVo.getId(),dssProjectVo.getName(), OperateTypeEnum.CREATE,projectCreateRequest);
+                            dssProjectVo.getId(), dssProjectVo.getName(), OperateTypeEnum.CREATE, projectCreateRequest);
                     return dssProjectVo;
                 },
                 dssProjectVo ->
-                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterCreateProject(request, projectCreateRequest, dssProjectVo),
-                            () -> Message.ok("创建工程成功.").data("project", dssProjectVo)),
+                        executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterCreateProject(request, projectCreateRequest, dssProjectVo),
+                                () -> Message.ok("创建工程成功.").data("project", dssProjectVo)),
                 String.format("用户 %s 创建工程 %s 失败. ", username, projectCreateRequest.getName()));
     }
 
@@ -173,21 +206,22 @@ public class DSSFrameworkProjectRestfulApi {
     }
 
     @RequestMapping(path = "getProjectInfo", method = RequestMethod.GET)
-    public Message getProjectInfoByName(@RequestParam(name = "projectName") String projectName){
+    public Message getProjectInfoByName(@RequestParam(name = "projectName") String projectName) {
         DSSProjectDO dbProject = dssProjectService.getProjectByName(projectName);
         Message message;
-        if(dbProject==null){
+        if (dbProject == null) {
             String msg = String.format("project %s does not exist.", projectName);
             message = Message.error(msg);
-        }else{
+        } else {
             DSSProjectVo dssProjectVo = new DSSProjectVo();
             dssProjectVo.setDescription(dbProject.getDescription());
             dssProjectVo.setId(dbProject.getId());
             dssProjectVo.setName(dbProject.getName());
             message = Message.ok().data("project", dssProjectVo);
         }
-        return  message;
+        return message;
     }
+
     /**
      * 编辑工程
      *
@@ -204,13 +238,13 @@ public class DSSFrameworkProjectRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(request);
         LOGGER.info("user {} begin to modifyProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectModifyRequest);
         Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeModifyProject(request, projectModifyRequest));
-        if(message != null) {
+        if (message != null) {
             return message;
         }
         if (projectModifyRequest.getDescription().length() > MAX_DESC_LENGTH) {
             return Message.error("The project description information is too long, exceeding the maximum length:" + MAX_DESC_LENGTH);
         }
-        if(org.apache.commons.lang.StringUtils.isNotEmpty(projectModifyRequest.getBusiness()) && projectModifyRequest.getBusiness().length() > MAX_BUSSINESS_SIZE){
+        if (org.apache.commons.lang.StringUtils.isNotEmpty(projectModifyRequest.getBusiness()) && projectModifyRequest.getBusiness().length() > MAX_BUSSINESS_SIZE) {
             return Message.error("The project bussiness is too long, exceeding the maximum length:" + MAX_BUSSINESS_SIZE);
         }
         DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
@@ -235,11 +269,11 @@ public class DSSFrameworkProjectRestfulApi {
         return DSSExceptionUtils.getMessage(() -> {
                     dssFrameworkProjectService.modifyProject(projectModifyRequest, dbProject, username, workspace);
                     AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
-                            projectModifyRequest.getId(),projectModifyRequest.getName(), OperateTypeEnum.UPDATE,projectModifyRequest);
-                    },
+                            projectModifyRequest.getId(), projectModifyRequest.getName(), OperateTypeEnum.UPDATE, projectModifyRequest);
+                },
                 () ->
-                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterModifyProject(request, projectModifyRequest),
-                            () -> Message.ok("修改工程成功.")),
+                        executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterModifyProject(request, projectModifyRequest),
+                                () -> Message.ok("修改工程成功.")),
                 String.format("用户 %s 修改工程 %s 失败. ", username, projectModifyRequest.getName()));
     }
 
@@ -255,20 +289,21 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
         Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeDeleteProject(request, projectDeleteRequest));
-        if(message != null) {
+        if (message != null) {
             return message;
         }
         LOGGER.info("user {} begin to deleteProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectDeleteRequest);
         return DSSExceptionUtils.getMessage(() -> {
                     // 检查是否具有删除项目权限
                     projectService.isDeleteProjectAuth(projectDeleteRequest.getId(), username);
-                    DSSProjectDO dssProjectDO= projectService.getProjectById(projectDeleteRequest.getId());
-                    projectService.deleteProject(username, projectDeleteRequest, workspace,dssProjectDO);
+                    DSSProjectDO dssProjectDO = projectService.getProjectById(projectDeleteRequest.getId());
+                    projectService.deleteProject(username, projectDeleteRequest, workspace, dssProjectDO);
                     AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
-                            dssProjectDO.getId(),dssProjectDO.getName(), OperateTypeEnum.DELETE,projectDeleteRequest);                },
+                            dssProjectDO.getId(), dssProjectDO.getName(), OperateTypeEnum.DELETE, projectDeleteRequest);
+                },
                 () ->
-                    executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterDeleteProject(request, projectDeleteRequest),
-                            () -> Message.ok("删除工程成功.")),
+                        executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterDeleteProject(request, projectDeleteRequest),
+                                () -> Message.ok("删除工程成功.")),
                 String.format("用户 %s 删除工程失败. ", username));
     }
 
@@ -309,7 +344,7 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
         Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetDeletedProject(request, projectRequest));
-        if(message != null) {
+        if (message != null) {
             return message;
         }
         List<ProjectResponse> dssProjectVos = projectService.getDeletedProjects(projectRequest);
@@ -323,6 +358,73 @@ public class DSSFrameworkProjectRestfulApi {
         GitSearchResponse gitSearchResponse = RpcAskUtils.processAskException(sender.ask(searchRequest), GitSearchResponse.class, GitSearchRequest.class);
 
         return Message.ok().data("data", gitSearchResponse);
+    }
+
+    @RequestMapping(path = "modifyProjectMeta", method = RequestMethod.POST)
+    public Message modifyProjectMeta(HttpServletRequest request, @RequestBody ProjectModifyRequest projectModifyRequest) {
+
+        if (projectModifyRequest.getId() == null || projectModifyRequest.getId() < 0) {
+            return Message.error("project id is null, cannot modify it.");
+        }
+
+        String username = SecurityFilter.getLoginUsername(request);
+        Workspace workspace = SSOHelper.getWorkspace(request);
+
+        if (projectModifyRequest.getDescription().length() > MAX_DESC_LENGTH) {
+            return Message.error("The project description information is too long, exceeding the maximum length:" + MAX_DESC_LENGTH);
+        }
+
+        DSSProjectDO dbProject = dssProjectService.getProjectById(projectModifyRequest.getId());
+        //工程不存在
+        if (dbProject == null) {
+            LOGGER.error("project {} is not exists.", projectModifyRequest.getName());
+            return Message.error(String.format("project %s is not exists.", projectModifyRequest.getName()));
+        }
+
+        String createUsername = dbProject.getUsername();
+        //將创建人默认为发布权限和编辑权限
+        if (!projectModifyRequest.getEditUsers().contains(createUsername)) {
+            projectModifyRequest.getEditUsers().add(createUsername);
+        }
+
+        if (!projectModifyRequest.getReleaseUsers().contains(createUsername)) {
+            projectModifyRequest.getReleaseUsers().add(createUsername);
+        }
+
+        return DSSExceptionUtils.getMessage(() -> {
+                    dssFrameworkProjectService.modifyProjectMeta(projectModifyRequest, dbProject, username, workspace);
+                    AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
+                            projectModifyRequest.getId(), projectModifyRequest.getName(), OperateTypeEnum.UPDATE, projectModifyRequest);
+                },
+                () -> executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterModifyProject(request, projectModifyRequest),
+                        () -> Message.ok("修改工程成功.")),
+                String.format("用户 %s 修改工程 %s 失败. ", username, projectModifyRequest.getName()));
+    }
+
+
+    @RequestMapping(path = "listAllProjectName", method = RequestMethod.POST)
+    public Message listAllProjectName(HttpServletRequest request, @RequestBody ProjectQueryRequest projectRequest) {
+
+        String username = SecurityFilter.getLoginUsername(request);
+        projectRequest.setUsername(username);
+
+        LOGGER.info("user {} begin to listAllProjectName, projectId: {}.", username, projectRequest.getId());
+        List<ProjectResponse> projectResponses = projectService.getListByParam(projectRequest);
+
+        List<DSSProjectVo> dssProjectVos = new ArrayList<>();
+
+        if (!CollectionUtils.isEmpty(projectResponses)) {
+
+            for (ProjectResponse project : projectResponses) {
+                DSSProjectVo dssProjectVo = new DSSProjectVo();
+                dssProjectVo.setName(project.getName());
+                dssProjectVo.setId(project.getId());
+                dssProjectVo.setDescription(project.getDescription());
+                dssProjectVos.add(dssProjectVo);
+            }
+        }
+
+        return Message.ok().data("data", dssProjectVos);
     }
 
 

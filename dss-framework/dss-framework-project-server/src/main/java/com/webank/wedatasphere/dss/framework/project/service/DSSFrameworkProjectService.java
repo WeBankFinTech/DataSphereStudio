@@ -41,4 +41,6 @@ public interface DSSFrameworkProjectService {
     void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
 
     void checkProjectName(String name, Workspace workspace,String username) throws DSSProjectErrorException;
+
+    void modifyProjectMeta(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
 }

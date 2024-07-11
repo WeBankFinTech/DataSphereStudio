@@ -1,6 +1,5 @@
 package com.webank.wedatasphere.dss.orchestrator.server.entity.request;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 
 public class OrchestratorSubmitRequest {
@@ -9,6 +8,7 @@ public class OrchestratorSubmitRequest {
     private String projectName;
     private String comment;
     private Long orchestratorId;
+    private String fileName;
 
     public Long getFlowId() {
         return flowId;
@@ -48,5 +48,13 @@ public class OrchestratorSubmitRequest {
 
     public void setOrchestratorId(Long orchestratorId) {
         this.orchestratorId = orchestratorId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }

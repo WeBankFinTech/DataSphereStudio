@@ -32,8 +32,10 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitFileContentRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
@@ -53,6 +55,8 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.request.Orchestrat
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -87,6 +91,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Autowired
     private LockMapper lockMapper;
+
+    @Autowired
+    private FlowMapper flowMapper;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
 
@@ -301,7 +308,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public GitTree diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+    public List<GitTree> diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
         BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
 
@@ -314,6 +321,28 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
         //4. 返回文件列表
         return diff.getTree();
+    }
+
+    @Override
+    public GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+        BmlResource bmlResource = uploadWorkflowToGit(flowRequest, username, workspace, orchestrator);
+        Map<String, BmlResource> file = new HashMap<>();
+        file.put(orchestrator.getName(), bmlResource);
+
+
+        GitFileContentRequest fileContentRequest = new GitFileContentRequest();
+        fileContentRequest.setFilePath(flowRequest.getFileName());
+        fileContentRequest.setProjectName(flowRequest.getProjectName());
+        fileContentRequest.setWorkspaceId(workspace.getWorkspaceId());
+        fileContentRequest.setBmlResourceMap(file);
+        fileContentRequest.setUsername(username);
+        fileContentRequest.setPublish(false);
+
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitFileContentResponse contentResponse = RpcAskUtils.processAskException(gitSender.ask(fileContentRequest), GitFileContentResponse.class, GitFileContentRequest.class);
+
+        return contentResponse;
     }
 
     private GitDiffResponse diff(String path, BmlResource bmlResource, String username, Long workspaceId, String projectName) {

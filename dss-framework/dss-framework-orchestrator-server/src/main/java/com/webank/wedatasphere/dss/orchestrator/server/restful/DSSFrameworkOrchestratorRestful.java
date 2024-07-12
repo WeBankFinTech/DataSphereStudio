@@ -356,45 +356,39 @@ public class DSSFrameworkOrchestratorRestful {
         }
 
         for (OrchestratorSubmitRequest submitFlowRequest: submitRequestList) {
-            Long orchestratorId = submitFlowRequest.getOrchestratorId();
             try {
-                checkWorkspace(orchestratorId, workspace);
+                checkAndSubmit(submitFlowRequest, workspace, userName);
             } catch (Exception e) {
-                LOGGER.error("check failed, the reason is: ", e);
-                return Message.error("提交失败，原因为：" + e.getMessage());
+                return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
             }
-
-            List<DSSLabel> dssLabelList = new ArrayList<>();
-            dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
-
-            String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
-                    .findFirst().map(Cookie::getValue).get();
-            DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
-            if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
-                return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
-            }
-        }
-
-        try {
-            orchestratorPluginService.batchSubmitFlow(submitRequestList, userName, workspace);
-        } catch (Exception e) {
-            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
         }
 
         return Message.ok();
     }
+
 
     @RequestMapping(value = "submitFlow", method = RequestMethod.POST)
     public Message submitFlow(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
+        try {
+            checkAndSubmit(submitFlowRequest, workspace, userName);
+        } catch (Exception e) {
+            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
+        }
+
+
+        return Message.ok();
+    }
+
+    private void checkAndSubmit(OrchestratorSubmitRequest submitFlowRequest, Workspace workspace, String userName) throws DSSErrorException{
         Long orchestratorId = submitFlowRequest.getOrchestratorId();
         try {
             checkWorkspace(orchestratorId, workspace);
         } catch (Exception e) {
             LOGGER.error("check failed, the reason is: ", e);
-            return Message.error("提交失败，原因为：" + e.getMessage());
+            throw new DSSErrorException(80001, "提交失败，原因为：" + e.getMessage());
         }
 
         List<DSSLabel> dssLabelList = new ArrayList<>();
@@ -404,16 +398,13 @@ public class DSSFrameworkOrchestratorRestful {
                 .findFirst().map(Cookie::getValue).get();
         DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
-            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+            throw new DSSErrorException(80001,"当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
         try {
             orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
         } catch (Exception e) {
-            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
+            throw new DSSErrorException(80001,"提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
         }
-
-
-        return Message.ok();
     }
 
     @RequestMapping(path = "gitUrl", method = RequestMethod.GET)

@@ -109,6 +109,31 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
                 return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
             }
 
+
+
+           List<String> editUsers = projectResponseList.get(0).getEditUsers().stream().filter(user ->{
+                return  !StringUtils.startsWithIgnoreCase(user,"WTSS_") && !StringUtils.startsWithIgnoreCase(user,"hduser");
+            }).collect(Collectors.toList());
+
+           List<String> releaseUsers =  projectResponseList.get(0).getReleaseUsers().stream().filter(user ->{
+               return  !StringUtils.startsWithIgnoreCase(user,"WTSS_") && !StringUtils.startsWithIgnoreCase(user,"hduser");
+           }).collect(Collectors.toList());
+
+
+            if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers())
+               && !CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), editUsers)
+            ){
+                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置编辑权限，请删除相关权限后再重试).");
+
+            }
+
+            if(!CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers())
+               && !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), releaseUsers)
+            ){
+                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限，请删除相关权限后再重试).");
+            }
+
+
             return null;
         });
     }

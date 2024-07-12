@@ -151,7 +151,7 @@ public class FileUtils {
     public static void downloadBMLResource(BMLService bmlService, String path,  BmlResource bmlResource, String username, Long workspaceId) {
         //下载到本地处理
         String dirPath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue());
-        String importFile = dirPath + File.separator + workspaceId + File.separator +  path + ".zip";
+        String importFile = dirPath + File.separator + workspaceId + File.separator +  path + System.currentTimeMillis() +".zip";
         logger.info("import zip file locate at {}",importFile);
 
         try{

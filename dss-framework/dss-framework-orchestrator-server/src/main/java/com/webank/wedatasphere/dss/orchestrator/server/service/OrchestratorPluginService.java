@@ -43,5 +43,7 @@ public interface OrchestratorPluginService {
 
     void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
 
+    void batchSubmitFlow(List<OrchestratorSubmitRequest> flowRequestList, String username, Workspace workspace) throws DSSErrorException;
+
     GitCommitResponse submitWorkflowToBML(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 }

@@ -66,6 +66,7 @@ import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
 import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.OrchestratorMeta;
+import com.webank.wedatasphere.dss.workflow.entity.request.OrchestratorMetaRequest;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -921,9 +922,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public List<OrchestratorMeta> getOrchestratorMeta(int pageNow, int pageSize, List<Long> total) {
-        PageHelper.startPage(pageNow, pageSize);
-        List<OrchestratorMeta>  orchestratorMetaList =  nodeMetaMapper.getOrchestratorMeta();
+    public List<OrchestratorMeta> getOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total) {
+        PageHelper.startPage(orchestratorMetaRequest.getPageNow(), orchestratorMetaRequest.getPageSize());
+        List<OrchestratorMeta>  orchestratorMetaList =  nodeMetaMapper.getOrchestratorMeta(orchestratorMetaRequest);
         PageInfo<OrchestratorMeta> pageInfo = new PageInfo<>(orchestratorMetaList);
         total.add(pageInfo.getTotal());
         for(OrchestratorMeta orchestratorMeta:orchestratorMetaList ){

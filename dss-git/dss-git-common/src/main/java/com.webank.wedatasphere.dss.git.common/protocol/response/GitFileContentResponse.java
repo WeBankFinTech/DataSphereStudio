@@ -4,20 +4,33 @@ package com.webank.wedatasphere.dss.git.common.protocol.response;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 
 public class GitFileContentResponse{
-    private BmlResource bmlResource;
+    // 提交前 发布前 文件内容
+    private String before;
+    // 提交后 发布后 文件内容
+    private String after;
 
-    public GitFileContentResponse(BmlResource bmlResource) {
-        this.bmlResource = bmlResource;
+    public GitFileContentResponse(String before, String after) {
+        this.before = before;
+        this.after = after;
     }
 
     public GitFileContentResponse() {
     }
 
-    public BmlResource getBmlResource() {
-        return bmlResource;
+
+    public String getBefore() {
+        return before;
     }
 
-    public void setBmlResource(BmlResource bmlResource) {
-        this.bmlResource = bmlResource;
+    public void setBefore(String before) {
+        this.before = before;
+    }
+
+    public String getAfter() {
+        return after;
+    }
+
+    public void setAfter(String after) {
+        this.after = after;
     }
 }

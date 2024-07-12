@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
+import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
@@ -246,7 +247,8 @@ public class FlowRestfulApi {
 
     @RequestMapping(value = "get", method = RequestMethod.GET)
     public Message get(@RequestParam(required = false, name = "flowId") Long flowID,
-                       @RequestParam(required = false, name = "isNotHaveLock") Boolean isNotHaveLock) throws DSSErrorException {
+                       @RequestParam(required = false, name = "isNotHaveLock") Boolean isNotHaveLock,
+                       @RequestParam(required = false, name = "labels") String labels) throws DSSErrorException {
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         LOGGER.info("User {} start to open workflow {}", username, flowID);
         DSSFlow dssFlow;
@@ -255,7 +257,7 @@ public class FlowRestfulApi {
         } catch (NullPointerException e) {
             return Message.error("The workflow is not exists, please check to delete. (打开了不存在的工作流，请确保是否已删除.)");
         }
-        if (isNotHaveLock != null && isNotHaveLock) {
+        if ((isNotHaveLock != null && isNotHaveLock) || (StringUtils.isNotEmpty(labels) && DSSCommonUtils.ENV_LABEL_VALUE_PROD.equals(labels))) {
             return Message.ok().data("flow", dssFlow);
         }
         Cookie[] cookies = httpServletRequest.getCookies();

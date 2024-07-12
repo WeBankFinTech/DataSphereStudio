@@ -8,6 +8,7 @@ public class OrchestratorSubmitRequest {
     private String projectName;
     private String comment;
     private Long orchestratorId;
+    private String filePath;
 
     public Long getFlowId() {
         return flowId;
@@ -47,5 +48,13 @@ public class OrchestratorSubmitRequest {
 
     public void setOrchestratorId(Long orchestratorId) {
         this.orchestratorId = orchestratorId;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

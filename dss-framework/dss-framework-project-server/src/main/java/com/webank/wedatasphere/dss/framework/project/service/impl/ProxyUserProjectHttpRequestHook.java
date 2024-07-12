@@ -128,6 +128,13 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
                 return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限，请删除相关权限后再重试).");
             }
 
+            if(CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), editUsers)){
+                projectModifyRequest.setEditUsers(projectResponseList.get(0).getEditUsers());
+            }
+
+            if(CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), releaseUsers)){
+                projectModifyRequest.setReleaseUsers(projectResponseList.get(0).getReleaseUsers());
+            }
 
             return null;
         });

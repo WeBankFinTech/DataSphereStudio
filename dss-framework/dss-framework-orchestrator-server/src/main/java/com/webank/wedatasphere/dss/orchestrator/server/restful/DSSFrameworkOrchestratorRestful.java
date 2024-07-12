@@ -52,11 +52,13 @@ import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorServi
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.RequestLockWorkflow;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseLockWorkflow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
@@ -64,6 +66,7 @@ import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,10 +74,9 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @RequestMapping(path = "/dss/framework/orchestrator", produces = {"application/json"})
 @RestController
@@ -92,6 +94,8 @@ public class DSSFrameworkOrchestratorRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private LockMapper lockMapper;
+    @Autowired
+    private DSSFlowService flowService;
 
     /**
      * 创建编排模式
@@ -315,8 +319,6 @@ public class DSSFrameworkOrchestratorRestful {
     public Message diff(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
-        List<DSSLabel> dssLabelList = new ArrayList<>();
-        dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
 
         String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
                 .findFirst().map(Cookie::getValue).get();
@@ -332,8 +334,7 @@ public class DSSFrameworkOrchestratorRestful {
     public Message diffFlowContent(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
-        List<DSSLabel> dssLabelList = new ArrayList<>();
-        dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
+        
 
         String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
                 .findFirst().map(Cookie::getValue).get();
@@ -343,6 +344,44 @@ public class DSSFrameworkOrchestratorRestful {
         }
         GitFileContentResponse contentResponse = orchestratorPluginService.diffFlowContent(submitFlowRequest, userName, workspace);
         return Message.ok().data("content", contentResponse);
+    }
+
+    @RequestMapping(value = "batchSubmitFlow", method = RequestMethod.POST)
+    public Message batchSubmitFlow(@RequestBody List<OrchestratorSubmitRequest> submitRequestList) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        if (CollectionUtils.isEmpty(submitRequestList)) {
+            return Message.error("至少需要选择一项工作流进行提交");
+        }
+
+        for (OrchestratorSubmitRequest submitFlowRequest: submitRequestList) {
+            Long orchestratorId = submitFlowRequest.getOrchestratorId();
+            try {
+                checkWorkspace(orchestratorId, workspace);
+            } catch (Exception e) {
+                LOGGER.error("check failed, the reason is: ", e);
+                return Message.error("提交失败，原因为：" + e.getMessage());
+            }
+
+            List<DSSLabel> dssLabelList = new ArrayList<>();
+            dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
+
+            String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                    .findFirst().map(Cookie::getValue).get();
+            DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+            if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+                return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+            }
+        }
+
+        try {
+            orchestratorPluginService.batchSubmitFlow(submitRequestList, userName, workspace);
+        } catch (Exception e) {
+            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
+        }
+
+        return Message.ok();
     }
 
     @RequestMapping(value = "submitFlow", method = RequestMethod.POST)

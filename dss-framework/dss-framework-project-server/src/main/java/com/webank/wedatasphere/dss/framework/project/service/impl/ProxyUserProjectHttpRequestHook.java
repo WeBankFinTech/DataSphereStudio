@@ -136,6 +136,7 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
                 projectModifyRequest.setReleaseUsers(projectResponseList.get(0).getReleaseUsers());
             }
 
+
             return null;
         });
     }

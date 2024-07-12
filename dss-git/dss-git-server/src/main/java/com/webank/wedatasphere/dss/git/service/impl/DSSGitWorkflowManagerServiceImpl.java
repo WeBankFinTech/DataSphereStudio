@@ -66,6 +66,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId);
                 FileUtils.removeFlowNode(entry.getKey(), request.getProjectName(), workspaceId);
                 FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
+                String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + entry.getKey();
+                fileList.add(metaConfPath);
             }
             diff = DSSGitUtils.diff(request.getProjectName(), fileList, workspaceId);
             // 重置本地
@@ -360,28 +362,35 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitFileContentResponse getFileContent(GitFileContentRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+        Long workspaceId = request.getWorkspaceId();
+        String projectName = request.getProjectName();
+        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
         if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+            logger.error("the workspace : {} don't associate with git", workspaceId);
             return null;
         }
         GitFileContentResponse contentResponse = new GitFileContentResponse();
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, gitUser)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser);
+            String before = null;
+            String after = null;
 
-            String content = DSSGitUtils.getTargetCommitFileContent(repository, request.getProjectName(), request.getCommitId(), request.getFilePath());
-            String fullpath = File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + FileUtils.normalizePath(request.getFilePath());
-            File file = new File(fullpath);
-            String fileName = file.getName();
-            // todo 透传
-            BmlResource bmlResource = FileUtils.uploadResourceToBML(bmlService, gitUser.getGitUser(), content, fileName, request.getProjectName());
-            logger.info("upload success, the fileName is : {}", request.getFilePath());
-            contentResponse.setBmlResource(bmlResource);
+            if (!request.getPublish()) {
+                // 获取当前提交前的文件内容
+                before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
+            } else {
+                before = DSSGitUtils.getTargetCommitFileContent(repository, projectName, request.getCommitId(), request.getFilePath());
+                after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
+
+            }
+            contentResponse.setAfter(after);
+            contentResponse.setBefore(before);
+
             return contentResponse;
         } catch (Exception e) {
             throw new DSSErrorException(80001, "getFileContent failed, the reason is: " + e);

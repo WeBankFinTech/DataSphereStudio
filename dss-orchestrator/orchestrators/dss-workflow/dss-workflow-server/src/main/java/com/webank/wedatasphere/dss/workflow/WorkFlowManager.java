@@ -112,6 +112,10 @@ public interface WorkFlowManager {
                                   Workspace workspace,
                                   List<DSSLabel> dssLabels,
             boolean exportExternalNodeAppConnResource) throws Exception;
+
+    String readWorkflowNew(String userName, Long flowId, Long dssProjectId,
+                           String projectName, Workspace workspace,
+                           List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource,String filePath) throws Exception;
     /**
      * 导出工作流
      * @param userName

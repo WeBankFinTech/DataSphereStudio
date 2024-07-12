@@ -158,8 +158,8 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         if (dssFlows.isEmpty()) {
             throw new DSSErrorException(90037, "该工程没有可以导出的工作流,请检查工作流是否都为空");
         }
-        //打包导出工程
-        return ZipHelper.zip(projectPath);
+
+        return projectPath;
     }
     @Override
     public String exportFlowInfo(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {

@@ -48,6 +48,8 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -188,14 +190,29 @@ public class DSSGitUtils {
 
     public static GitDiffResponse diff(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException{
 
-        Set<String> status = status(projectName, fileList, workspaceId);
-        GitTree root = new GitTree("");
-        for (String statu : status) {
-            root.addChild(statu);
+        Map<String, Set<String>> status = status(projectName, fileList, workspaceId);
+        List<GitTree> resultTree = new ArrayList<>();
+        if (status.isEmpty()) {
+            return new GitDiffResponse(resultTree);
         }
+        GitTree root = new GitTree("", false);
+        GitTree rootMeta = new GitTree("", true);
+        for (Map.Entry<String, Set<String>> entry : status.entrySet()) {
+            for (String statu : entry.getValue()) {
+                if (statu.startsWith(GitConstant.GIT_SERVER_META_PATH)) {
+                    rootMeta.addChild(statu, entry.getKey(), statu);
+                } else {
+                    root.addChild(statu, entry.getKey(), statu);
+                }
+
+            }
+        }
+        resultTree.add(root);
+        resultTree.add(rootMeta);
         // 打印树形结构
         printTree("", root);
-        return new GitDiffResponse(root);
+        printTree("", rootMeta);
+        return new GitDiffResponse(resultTree);
     }
 
     // 打印树结构
@@ -480,7 +497,7 @@ public class DSSGitUtils {
         return projectNames;
     }
 
-    public static Set<String> status(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException {
+    public static Map<String, Set<String>> status(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException {
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName + File.separator +".git"); // 修改为你的仓库路径
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build()) {
@@ -503,17 +520,19 @@ public class DSSGitUtils {
                     status.getMissing().toString(),
                     status.getConflicting().toString()
                     );
+            // 仅关注 修改、删除、新增并且未暂存的文件
+            Map<String, Set<String>> fileMap = new HashMap<>();
+            if (!CollectionUtils.isEmpty(status.getModified())) {
+                fileMap.put(DSSGitConstant.GIT_DIFF_STATUS_MODIFIED, status.getModified());
+            }
+            if (!CollectionUtils.isEmpty(status.getMissing())) {
+                fileMap.put(DSSGitConstant.GIT_DIFF_STATUS_Missing, status.getMissing());
+            }
+            if (!CollectionUtils.isEmpty(status.getUntracked())) {
+                fileMap.put(DSSGitConstant.GIT_DIFF_STATUS_UNTRACKED, status.getUntracked());
+            }
 
-            Set<String> tree = new HashSet<>();
-            tree.addAll(status.getModified());
-            tree.addAll(status.getUntracked());
-            tree.addAll(status.getAdded());
-            tree.addAll(status.getChanged());
-            tree.addAll(status.getRemoved());
-            tree.addAll(status.getMissing());
-            tree.addAll(status.getConflicting());
-
-            return tree;
+            return fileMap;
         } catch (IOException | GitAPIException e) {
             throw new GitErrorException(80114, "git status failed, the reason is : ", e);
         }
@@ -548,7 +567,7 @@ public class DSSGitUtils {
     }
 
     public static void archiveLocal(String projectName, Long workspaceId) throws GitErrorException{
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName + File.separator + ".git");
+        File repoDir = new File(DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + ".git");
         if (!repoDir.exists()) {
             logger.info("file {} not exists", repoDir.getAbsolutePath());
             return ;
@@ -565,6 +584,11 @@ public class DSSGitUtils {
         } catch (IOException e) {
             throw new GitErrorException(80116, "archive failed, the reason is : ", e);
         }
+    }
+
+    public static String getFileContent(String path, String projectName, Long workspaceId) throws IOException {
+        String filePath = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + path;
+        return new String(Files.readAllBytes(Paths.get(filePath)));
     }
 
     public static String getTargetCommitFileContent(Repository repository, String projectName, String commitId, String filePath) throws GitErrorException {

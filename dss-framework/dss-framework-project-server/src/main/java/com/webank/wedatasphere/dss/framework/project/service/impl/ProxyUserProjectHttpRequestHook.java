@@ -37,14 +37,14 @@ import org.slf4j.Logger;
  */
 @Component
 public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
-    private static final Logger LOGGER= LoggerFactory.getLogger(ProxyUserProjectHttpRequestHook.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProxyUserProjectHttpRequestHook.class);
     @Autowired
     private DSSProjectService dssProjectService;
     @Autowired
     private DssProxyUserService dssProxyUserService;
 
     private Message doProxyUserFunction(HttpServletRequest request, Function<String, Message> function) {
-        if(!ProxyUserConfiguration.isProxyUserEnable()) {
+        if (!ProxyUserConfiguration.isProxyUserEnable()) {
             return null;
         }
         String proxyUser;
@@ -52,8 +52,8 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
             proxyUser = dssProxyUserService.getProxyUser(request);
         } catch (DSSProxyUserErrorException e) {
             LOGGER.error("getProxyUser Failed,cookie is :{}", Arrays.stream(request.getCookies())
-                    .map(cookie->String.format("%s=%s",cookie.getName(),cookie.getValue())).collect(Collectors.joining(",")));
-            LOGGER.error("getProxyUser failed.",e);
+                    .map(cookie -> String.format("%s=%s", cookie.getName(), cookie.getValue())).collect(Collectors.joining(",")));
+            LOGGER.error("getProxyUser failed.", e);
             return Message.error(e.getMessage());
         }
         return function.apply(proxyUser);
@@ -74,13 +74,13 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
     @Override
     public Message beforeCreateProject(HttpServletRequest request, ProjectCreateRequest projectCreateRequest) {
         return doProxyUserFunction(request, proxyUser -> {
-            if(CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
+            if (CollectionUtils.isNotEmpty(projectCreateRequest.getEditUsers()) || CollectionUtils.isNotEmpty(projectCreateRequest.getReleaseUsers())) {
                 return Message.error("This environment is not allowed to set editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
             }
-            String userName= SecurityFilter.getLoginUsername(request);
-            if(userName.equals(proxyUser)
-                    &&!StringUtils.startsWithIgnoreCase(proxyUser,"WTSS_")
-                    &&!StringUtils.startsWithIgnoreCase(proxyUser,"hduser")){
+            String userName = SecurityFilter.getLoginUsername(request);
+            if (userName.equals(proxyUser)
+                    && !StringUtils.startsWithIgnoreCase(proxyUser, "WTSS_")
+                    && !StringUtils.startsWithIgnoreCase(proxyUser, "hduser")) {
                 return Message.error("only ops proxy user can create project(只允许代理用户创建工程).");
             }
             projectCreateRequest.getEditUsers().add(proxyUser);
@@ -101,30 +101,30 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
             List<ProjectResponse> projectResponseList = dssProjectService.getListByParam(projectQueryRequest);
 
 
-            if(CollectionUtils.isEmpty(projectResponseList)) {
+            if (CollectionUtils.isEmpty(projectResponseList)) {
                 return Message.error("You have no permission to modify this project.");
             }
 
 
-           List<String> editUsers = projectResponseList.get(0).getEditUsers().stream().filter(user ->{
-                return  !StringUtils.startsWithIgnoreCase(user,"WTSS_") && !StringUtils.startsWithIgnoreCase(user,"hduser");
+            List<String> editUsers = projectResponseList.get(0).getEditUsers().stream().filter(user -> {
+                return !StringUtils.startsWithIgnoreCase(user, "WTSS_") && !StringUtils.startsWithIgnoreCase(user, "hduser");
             }).collect(Collectors.toList());
 
-           List<String> releaseUsers =  projectResponseList.get(0).getReleaseUsers().stream().filter(user ->{
-               return  !StringUtils.startsWithIgnoreCase(user,"WTSS_") && !StringUtils.startsWithIgnoreCase(user,"hduser");
-           }).collect(Collectors.toList());
+            List<String> releaseUsers = projectResponseList.get(0).getReleaseUsers().stream().filter(user -> {
+                return !StringUtils.startsWithIgnoreCase(user, "WTSS_") && !StringUtils.startsWithIgnoreCase(user, "hduser");
+            }).collect(Collectors.toList());
 
 
-            if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers())
-               && !CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), editUsers)
-            ){
+            if (!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers())
+                    && !CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), editUsers)
+            ) {
                 return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置编辑权限，请删除相关权限后再重试).");
 
             }
 
-            if(!CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers())
-               && !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), releaseUsers)
-            ){
+            if (!CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers())
+                    && !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), releaseUsers)
+            ) {
                 return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限，请删除相关权限后再重试).");
             }
 

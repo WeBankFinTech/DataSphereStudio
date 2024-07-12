@@ -103,12 +103,7 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
 
             if(CollectionUtils.isEmpty(projectResponseList)) {
                 return Message.error("You have no permission to modify this project.");
-            } else if(!CollectionUtils.isEqualCollection(projectModifyRequest.getEditUsers(), projectResponseList.get(0).getEditUsers()) ||
-                    !CollectionUtils.isEqualCollection(projectModifyRequest.getReleaseUsers(), projectResponseList.get(0).getReleaseUsers())
-                    ) {
-                return Message.error("This environment is not allowed to set accessUsers, editUsers or ReleaseUsers(本环境不允许设置发布权限、编辑权限，请删除相关权限后再重试).");
             }
-
 
 
            List<String> editUsers = projectResponseList.get(0).getEditUsers().stream().filter(user ->{

@@ -27,7 +27,7 @@ import java.util.Map;
 public interface PublishService {
 
 
-    String submitPublish(String publishUser, DSSFlow dssFlow,
+    String submitPublish(String publishUser, Long workFlowId,
         Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception;
 
     String batchSubmit(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String publishUser)throws DSSErrorException;

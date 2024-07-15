@@ -405,13 +405,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String before = null;
             String after = null;
 
-            if (!request.getPublish()) {
-                // 获取当前提交前的文件内容
-                before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
-            } else {
+            if (request.getPublish()) {
                 before = DSSGitUtils.getTargetCommitFileContent(repository, projectName, request.getCommitId(), request.getFilePath());
                 after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
-
+            } else {
+                // 获取当前提交前的文件内容
+                before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
             }
             contentResponse.setAfter(after);
             contentResponse.setBefore(before);

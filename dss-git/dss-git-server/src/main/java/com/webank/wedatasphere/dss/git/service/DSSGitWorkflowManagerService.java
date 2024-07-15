@@ -30,4 +30,6 @@ public interface DSSGitWorkflowManagerService {
     GitCommitResponse rename(GitRenameRequest request) throws DSSErrorException;
 
     GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) throws DSSErrorException;
+
+    GitDiffResponse diffGit(GitDiffTargetCommitRequest request);
 }

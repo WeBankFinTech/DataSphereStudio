@@ -330,6 +330,15 @@ public class DSSFrameworkOrchestratorRestful {
         return Message.ok().data("tree", gitTree);
     }
 
+    @RequestMapping(value = "diffOrchestratorPublish", method = RequestMethod.POST)
+    public Message diffOrchestratorPublish(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        List<GitTree> gitTree = orchestratorPluginService.diffPublish(submitFlowRequest, userName, workspace);
+        return Message.ok().data("tree", gitTree);
+    }
+
     @RequestMapping(value = "diffFlowContent", method = RequestMethod.POST)
     public Message diffFlowContent(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);

@@ -29,6 +29,10 @@ import org.apache.http.util.EntityUtils;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
@@ -36,8 +40,11 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.OrTreeFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -190,21 +197,19 @@ public class DSSGitUtils {
 
     public static GitDiffResponse diff(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException{
 
-        Map<String, Set<String>> status = status(projectName, fileList, workspaceId);
+        Set<String> status = status(projectName, fileList, workspaceId);
         List<GitTree> resultTree = new ArrayList<>();
         if (status.isEmpty()) {
             return new GitDiffResponse(resultTree);
         }
         GitTree root = new GitTree("", false);
         GitTree rootMeta = new GitTree("", true);
-        for (Map.Entry<String, Set<String>> entry : status.entrySet()) {
-            for (String statu : entry.getValue()) {
-                if (statu.startsWith(GitConstant.GIT_SERVER_META_PATH)) {
-                    rootMeta.addChild(statu, entry.getKey(), statu);
-                } else {
-                    root.addChild(statu, entry.getKey(), statu);
-                }
-
+        for (String statu : status) {
+            if (statu.startsWith(GitConstant.GIT_SERVER_META_PATH)) {
+                rootMeta.setAbsolutePath(statu);
+                rootMeta.addChild(statu);
+            } else {
+                root.addChild(statu);
             }
         }
         resultTree.add(root);
@@ -215,8 +220,103 @@ public class DSSGitUtils {
         return new GitDiffResponse(resultTree);
     }
 
+    public static GitDiffResponse diffGit(Repository repository, String commitId, String filePath) {
+        List<GitTree> resultTree = new ArrayList<>();
+        try (Git git = new Git(repository)) {
+            ObjectId commitObjectId = ObjectId.fromString(commitId);
+            try (RevWalk revWalk = new RevWalk(repository)) {
+                RevCommit commit = revWalk.parseCommit(commitObjectId);
+
+                // Get the tree of the specified commit
+                ObjectId commitTree = commit.getTree().getId();
+
+                // Get the tree of the current working directory
+                ObjectId workTree = repository.resolve("HEAD^{tree}");
+
+                // Prepare the tree iterators for the diff
+                CanonicalTreeParser commitTreeParser = new CanonicalTreeParser();
+                CanonicalTreeParser workTreeParser = new CanonicalTreeParser();
+
+                try (ObjectReader reader = repository.newObjectReader()) {
+                    commitTreeParser.reset(reader, commitTree);
+                    workTreeParser.reset(reader, workTree);
+                }
+
+                List<String> paths = new ArrayList<>();
+                paths.add(filePath);
+                paths.add(GitConstant.GIT_SERVER_META_PATH + File.separator + filePath);
+
+                String[] array = paths.toArray(new String[paths.size()]);
+                TreeFilter pathFilter = createPathFilter(array);
+
+                // Perform the diff
+                List<DiffEntry> diffs = git.diff()
+                        .setOldTree(commitTreeParser)
+                        .setNewTree(workTreeParser)
+                        .setPathFilter(pathFilter)
+                        .call();
+
+                GitTree root = new GitTree("", false);
+                GitTree rootMeta = new GitTree("", true);
+                // Filter the diffs by the specified file path
+                for (DiffEntry entry : diffs) {
+                    // 获取变更类型和文件路径
+                    DiffEntry.ChangeType changeType = entry.getChangeType();
+                    String oldPath = entry.getOldPath();
+                    String newPath = entry.getNewPath();
+
+                    if (changeType.equals(DiffEntry.ChangeType.RENAME)) {
+                        addChild(root, rootMeta, newPath, changeType, oldPath);
+                    } else {
+                        if (oldPath != null) {
+                            addChild(root, rootMeta, oldPath, changeType, null);
+                        }
+                        if (newPath != null) {
+                            addChild(root, rootMeta, newPath, changeType, null);
+                        }
+                    }
+                }
+                resultTree.add(root);
+                resultTree.add(rootMeta);
+                // 打印树形结构
+                printTree("", root);
+                printTree("", rootMeta);
+            } catch (GitAPIException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new GitDiffResponse(resultTree);
+    }
+
+    private static TreeFilter createPathFilter(String[] paths) {
+        TreeFilter[] filters = new TreeFilter[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            filters[i] = PathFilter.create(paths[i]);
+        }
+        return OrTreeFilter.create(filters);
+    }
+
+    private static void addChild(GitTree root, GitTree rootMeta, String path, DiffEntry.ChangeType status, String oldFilePath) {
+        if (path == null) {
+            return;
+        }
+        String pathName = path;
+        // 处理重命名文件
+        if (status.equals(DiffEntry.ChangeType.RENAME)) {
+            String oldFileName = oldFilePath.substring(oldFilePath.lastIndexOf("/") + 1);
+            pathName = path + "--(" + oldFileName + ")--";
+        }
+        if (path.startsWith(GitConstant.GIT_SERVER_META_PATH)) {
+            root.setAbsolutePath(path);
+            root.addChild(pathName);
+        } else {
+            rootMeta.setAbsolutePath(path);
+            rootMeta.addChild(pathName);
+        }
+    }
+
     // 打印树结构
-    static void printTree(String prefix, GitTree tree) {
+    private static void printTree(String prefix, GitTree tree) {
         logger.info(prefix + tree.getName());
         for (GitTree child : tree.getChildren().values()) {
             printTree(prefix + "  ", child);
@@ -497,7 +597,7 @@ public class DSSGitUtils {
         return projectNames;
     }
 
-    public static Map<String, Set<String>> status(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException {
+    public static Set<String> status(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException {
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName + File.separator +".git"); // 修改为你的仓库路径
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build()) {
@@ -521,18 +621,18 @@ public class DSSGitUtils {
                     status.getConflicting().toString()
                     );
             // 仅关注 修改、删除、新增并且未暂存的文件
-            Map<String, Set<String>> fileMap = new HashMap<>();
+            Set<String> fileSet = new HashSet<>();
             if (!CollectionUtils.isEmpty(status.getModified())) {
-                fileMap.put(DSSGitConstant.GIT_DIFF_STATUS_MODIFIED, status.getModified());
+                fileSet.addAll(status.getModified());
             }
             if (!CollectionUtils.isEmpty(status.getMissing())) {
-                fileMap.put(DSSGitConstant.GIT_DIFF_STATUS_Missing, status.getMissing());
+                fileSet.addAll(status.getMissing());
             }
             if (!CollectionUtils.isEmpty(status.getUntracked())) {
-                fileMap.put(DSSGitConstant.GIT_DIFF_STATUS_UNTRACKED, status.getUntracked());
+                fileSet.addAll(status.getUntracked());
             }
 
-            return fileMap;
+            return fileSet;
         } catch (IOException | GitAPIException e) {
             throw new GitErrorException(80114, "git status failed, the reason is : ", e);
         }

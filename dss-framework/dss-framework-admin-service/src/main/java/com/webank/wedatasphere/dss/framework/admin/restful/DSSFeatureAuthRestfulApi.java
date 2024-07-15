@@ -18,7 +18,7 @@ public class DSSFeatureAuthRestfulApi {
 
     @RequestMapping(value = "/globalLimits",method = RequestMethod.GET)
     public Message globalLimits() {
-        return Message.ok().data("globalLimits", GlobalLimitsUtils.getAllGlobalLimits());
+        return Message.ok().data("globalLimits", GlobalLimitsUtils.getAllGlobalLimits(null));
     }
 
     @RequestMapping(value = "/globalLimits/{globalLimitName}",method = RequestMethod.GET)

@@ -37,6 +37,12 @@ public class DSSCommonConf {
 
     public static final CommonVars<String> GLOBAL_LIMIT_PREFIX = CommonVars.apply("wds.dss.global.limit.prefix", "wds.dss.global.limit.");
 
+    public static final CommonVars<String> GLOBAL_COPILOT_WHITELIST = CommonVars.apply("wds.dss.global.limits.copilot.whitelist", "hadoop");
+
+    public static final String DELIMITER_COMMA = ",";
+
+    public static final String COPILOT_ENABLE_KEY = "copilotEnable";
+
     /**
      * deploy DSS instance numbers
      */

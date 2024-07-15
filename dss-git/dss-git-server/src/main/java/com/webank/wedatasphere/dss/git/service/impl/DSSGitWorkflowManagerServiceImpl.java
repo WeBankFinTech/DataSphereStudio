@@ -80,6 +80,31 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
+    public GitDiffResponse diffGit(GitDiffTargetCommitRequest request) {
+        Long workspaceId = request.getWorkspaceId();
+        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+        if (gitUser == null) {
+            logger.error("the workspace : {} don't associate with git", workspaceId);
+            return null;
+        }
+        GitDiffResponse diff = null;
+        // 拼接.git路径
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        // 获取git仓库
+        File repoDir = new File(gitPath);
+        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+            // 本地保持最新状态
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+
+            diff = DSSGitUtils.diffGit(repository, request.getCommitId(), request.getFilePath());
+        } catch (Exception e) {
+            logger.error("pull failed, the reason is ",e);
+        }
+        return diff;
+
+    }
+
+    @Override
     public GitCommitResponse commit(GitCommitRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);

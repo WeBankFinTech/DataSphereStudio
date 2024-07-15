@@ -9,6 +9,8 @@ public class OrchestratorSubmitRequest {
     private String comment;
     private Long orchestratorId;
     private String filePath;
+    // 是否获取发布前后文件内容 true-发布 false-提交
+    private Boolean publish;
 
     public Long getFlowId() {
         return flowId;
@@ -56,5 +58,13 @@ public class OrchestratorSubmitRequest {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public Boolean getPublish() {
+        return publish;
+    }
+
+    public void setPublish(Boolean publish) {
+        this.publish = publish;
     }
 }

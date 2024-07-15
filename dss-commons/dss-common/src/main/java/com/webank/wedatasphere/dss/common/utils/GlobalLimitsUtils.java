@@ -23,11 +23,11 @@ public class GlobalLimitsUtils {
     private static volatile Map<String, Object> globalLimits;
     private static final Map<String, Map<String, Object>> globalLimitContents = new HashMap<>();
 
-    public static Map<String, Object> getAllGlobalLimits() {
+    public static Map<String, Object> getAllGlobalLimits(String username) {
         if(globalLimits == null) {
             synchronized (GlobalLimitsUtils.class) {
                 if(globalLimits == null) {
-                    globalLimits = MapUtils.unmodifiableMap(getMap(DSSCommonConf.ALL_GLOBAL_LIMITS_PREFIX.acquireNew()));
+                    globalLimits = MapUtils.unmodifiableMap(getMap(DSSCommonConf.ALL_GLOBAL_LIMITS_PREFIX.acquireNew(), username));
                     logger.info("loaded global limits is {}.", globalLimits);
                 }
             }
@@ -41,7 +41,7 @@ public class GlobalLimitsUtils {
         }
         synchronized (globalLimitContents) {
             if(!globalLimitContents.containsKey(globalLimitName)) {
-                Map<String, Object> globalLimitContent = getMap(DSSCommonConf.GLOBAL_LIMIT_PREFIX.acquireNew() + globalLimitName + ".");
+                Map<String, Object> globalLimitContent = getMap(DSSCommonConf.GLOBAL_LIMIT_PREFIX.acquireNew() + globalLimitName + ".", null);
                 logger.info("loaded global limit {}, the contents are {}.", globalLimitName, globalLimitContent);
                 globalLimitContents.put(globalLimitName, MapUtils.unmodifiableMap(globalLimitContent));
             }
@@ -49,8 +49,8 @@ public class GlobalLimitsUtils {
         return globalLimitContents.get(globalLimitName);
     }
 
-    private static Map<String, Object> getMap(String prefix) {
-        return BDPConfiguration.properties().entrySet().stream()
+    private static Map<String, Object> getMap(String prefix, String username) {
+        Map<String, Object> resultMap = BDPConfiguration.properties().entrySet().stream()
                 .filter(entry -> entry.getKey().toString().startsWith(prefix) && entry.getValue() != null && StringUtils.isNotBlank(entry.getValue().toString()))
                 .map(entry -> {
                     String key = ((String) entry.getKey()).substring(prefix.length());
@@ -61,6 +61,14 @@ public class GlobalLimitsUtils {
                     }
                 }).collect(HashMap::new, (map, pair) -> map.put(pair.getKey(), pair.getValue()),
                         HashMap::putAll);
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(DSSCommonConf.GLOBAL_COPILOT_WHITELIST.getValue())) {
+            for (String name : DSSCommonConf.GLOBAL_COPILOT_WHITELIST.getValue().split(DSSCommonConf.DELIMITER_COMMA)) {
+                if (username.equalsIgnoreCase(name)) {
+                    resultMap.put(DSSCommonConf.COPILOT_ENABLE_KEY, true);
+                }
+            }
+        }
+        return resultMap;
     }
 
 }

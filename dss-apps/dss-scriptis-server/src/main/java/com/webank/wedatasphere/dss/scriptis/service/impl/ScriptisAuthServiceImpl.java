@@ -18,7 +18,7 @@ public class ScriptisAuthServiceImpl implements ScriptisAuthService {
 
     @Override
     public Map<String, Object> getGlobalLimits(String username) {
-        return GlobalLimitsUtils.getAllGlobalLimits();
+        return GlobalLimitsUtils.getAllGlobalLimits(username);
     }
 
     public Map<String, Object> getUserLimits(String username, String limitName) {

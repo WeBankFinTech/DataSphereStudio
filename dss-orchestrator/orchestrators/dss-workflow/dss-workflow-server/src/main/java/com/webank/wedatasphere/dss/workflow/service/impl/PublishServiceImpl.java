@@ -79,12 +79,18 @@ public class PublishServiceImpl implements PublishService {
     }
 
     @Override
-    public String submitPublish(String convertUser, DSSFlow dssFlow,
+    public String submitPublish(String convertUser, Long workflowId,
                                 Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception {
-        LOGGER.info("User {} begins to convert workflow {}.", convertUser, dssFlow.getId());
+        LOGGER.info("User {} begins to convert workflow {}.", convertUser, workflowId);
         //1 获取对应的orcId 和 orcVersionId
         //2.进行提交
+        DSSFlow dssFlow = null;
         try {
+            dssFlow = dssFlowService.getFlow(workflowId);
+            if (dssFlow == null) {
+                DSSExceptionUtils.dealErrorException(63325, "workflow " + workflowId + " is not exists.", DSSErrorException.class);
+                return null;
+            }
             LOGGER.info("User {} begins to convert workflow {}.", convertUser, dssFlow.getName());
             ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
             projectInfoRequest.setProjectId(dssFlow.getProjectId());
@@ -97,7 +103,7 @@ public class PublishServiceImpl implements PublishService {
             OrchestratorVo orchestratorVo = null;
             Long orchestratorId = null;
             if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
-                orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
+                orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(workflowId)),
                         OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
                 if (orchestratorVo == null) {
                     throw new DSSErrorException(800001, "编排不存在");
@@ -125,7 +131,7 @@ public class PublishServiceImpl implements PublishService {
             SchedulerAppConn schedulerAppConn = (SchedulerAppConn) AppConnManager.getAppConnManager().getAppConn(schedulerAppConnName);
             // 只是为了获取是否需要发布所有Orc，这里直接拿第一个AppInstance即可。
             AppInstance appInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
-            ResponseConvertOrchestrator response = requestConvertOrchestration(comment, dssFlow.getId(), convertUser,
+            ResponseConvertOrchestrator response = requestConvertOrchestration(comment, workflowId, convertUser,
                     workspace, schedulerAppConn, dssLabel, appInstance);
             if (response.getResponse().isFailed()) {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
@@ -135,7 +141,7 @@ public class PublishServiceImpl implements PublishService {
         } catch (DSSErrorException e) {
             throw e;
         } catch (final Exception t) {
-            Object str = dssFlow.getName();
+            Object str = dssFlow == null ? workflowId : dssFlow.getName();
             LOGGER.error("User {} failed to submit publish {}.", convertUser, str, t);
             DSSExceptionUtils.dealErrorException(63325, "Failed to submit publish " + str, t, DSSErrorException.class);
         }
@@ -165,7 +171,7 @@ public class PublishServiceImpl implements PublishService {
         for (DSSFlow dssFlow : dssFlowList) {
             String taskId = null;
             try {
-                taskId = submitPublish(publishUser, dssFlow, labels, workspace, comment);
+                taskId = submitPublish(publishUser, dssFlow.getId(), labels, workspace, comment);
             } catch (Exception e) {
                 emptyTaskIdList.add(dssFlow.getName());
             }

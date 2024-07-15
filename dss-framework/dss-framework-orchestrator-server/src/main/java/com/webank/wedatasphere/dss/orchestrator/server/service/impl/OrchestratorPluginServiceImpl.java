@@ -33,6 +33,7 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffTargetCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitFileContentRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
@@ -54,6 +55,7 @@ import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
@@ -94,6 +96,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Autowired
     private FlowMapper flowMapper;
+
+    @Autowired
+    private OrchestratorService orchestratorService;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
 
@@ -374,6 +379,23 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
+    public List<GitTree> diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(flowRequest.getOrchestratorId());
+        DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+        String commitId = dssOrchestratorVersion.getCommitId();
+
+        GitDiffResponse diff = diffPublish(orchestratorInfo.getName(), commitId, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
+        if (diff == null) {
+            LOGGER.info("change is empty");
+            return null;
+        }
+
+        //4. 返回文件列表
+        return diff.getTree();
+    }
+
+    @Override
     public GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
         String s = readWorkflowNode(flowRequest, username, workspace, orchestrator, flowRequest.getFilePath());
@@ -401,6 +423,13 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         LOGGER.info("-------=======================begin to diff {}=======================-------", request1.getProjectName());
         GitDiffResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitDiffResponse.class, GitDiffRequest.class);
         LOGGER.info("-------=======================End to diff testGit1=======================-------: {}", responseWorkflowValidNode);
+        return responseWorkflowValidNode;
+    }
+
+    private GitDiffResponse diffPublish(String path, String commitId, String username, Long workspaceId, String projectName) {
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitDiffTargetCommitRequest targetCommitRequest = new GitDiffTargetCommitRequest(workspaceId, projectName, commitId, username, path);
+        GitDiffResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(targetCommitRequest), GitDiffResponse.class, GitDiffTargetCommitRequest.class);
         return responseWorkflowValidNode;
     }
 

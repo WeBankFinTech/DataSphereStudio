@@ -39,6 +39,8 @@ public interface OrchestratorPluginService {
 
     List<GitTree> diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 
+    List<GitTree> diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+
     GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 
     void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;

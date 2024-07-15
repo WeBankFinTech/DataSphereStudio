@@ -16,14 +16,11 @@
 
 package com.webank.wedatasphere.dss.git.receiver
 
-import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
+import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitDiffTargetCommitRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
 import com.webank.wedatasphere.dss.git.manage.GitProjectManager
 import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
 import org.apache.linkis.rpc.{Receiver, Sender}
-import org.slf4j.{Logger, LoggerFactory}
-import org.springframework.stereotype.Component
 
-import java.util
 import scala.concurrent.duration.Duration
 
 class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitWorkflowManagerService: DSSGitWorkflowManagerService) extends Receiver {
@@ -67,6 +64,8 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       GitProjectManager.gitTokenTest(gitConnectTestRequest)
     case gitUserInfoByTypeRequest: GitUserInfoByRequest =>
       GitProjectManager.getGitUserByType(gitUserInfoByTypeRequest)
+    case gitDiffTargetCommitRequest: GitDiffTargetCommitRequest =>
+      gitWorkflowManagerService.diffGit(gitDiffTargetCommitRequest)
     case _ => None
   }
 

@@ -179,12 +179,16 @@ public class FlowRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String publishUser = SecurityFilter.getLoginUsername(httpServletRequest);
 
-        String errMsg = publishService.batchSubmit(publishWorkflowRequest, workspace, publishUser);
+        try {
+            String errMsg = publishService.batchSubmit(publishWorkflowRequest, workspace, publishUser);
 
-        if (StringUtils.isEmpty(errMsg)) {
-            return Message.ok("所选工作流发布成功");
-        } else {
-            return Message.error(errMsg);
+            if (StringUtils.isEmpty(errMsg)) {
+                return Message.ok("所选工作流发布成功");
+            } else {
+                return Message.error(errMsg);
+            }
+        } catch (Exception e) {
+            return Message.error("批量发布失败，原因为：" + e.getMessage());
         }
 
     }

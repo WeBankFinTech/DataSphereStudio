@@ -152,12 +152,8 @@ public class FlowRestfulApi {
         String comment = publishWorkflowRequest.getComment();
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String publishUser = SecurityFilter.getLoginUsername(httpServletRequest);
-        DSSFlow dssFlowById = dssFlowService.getFlowByID(workflowId);
-        if (dssFlowById == null) {
-            DSSExceptionUtils.dealErrorException(63325, "workflow " + workflowId + " is not exists.", DSSErrorException.class);
-            return Message.error("workflow " + workflowId + " is not exists.");
-        }
-        return DSSExceptionUtils.getMessage(() -> publishService.submitPublish(publishUser, dssFlowById, labels, workspace, comment),
+
+        return DSSExceptionUtils.getMessage(() -> publishService.submitPublish(publishUser, workflowId, labels, workspace, comment),
                 taskId -> {
                 if (DSSWorkFlowConstant.PUBLISHING_ERROR_CODE.equals(taskId)) {
                     return Message.error("发布工程已经含有工作流，正在发布中，请稍后再试");

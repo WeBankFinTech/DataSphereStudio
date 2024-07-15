@@ -18,9 +18,13 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
+import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCurrentCommitRequest;
@@ -35,6 +39,7 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.entity.request.BatchPublishWorkflowRequest;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
 import org.apache.commons.lang.StringUtils;
@@ -42,8 +47,9 @@ import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
-import java.util.Map;
+import java.util.*;
 
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.*;
 
@@ -55,6 +61,8 @@ public class PublishServiceImpl implements PublishService {
     private WorkFlowParser workFlowParser;
     @Autowired
     private LockMapper lockMapper;
+    @Autowired
+    private DSSFlowService flowService;
 
     public void setDssFlowService(DSSFlowService dssFlowService) {
         this.dssFlowService = dssFlowService;
@@ -71,18 +79,13 @@ public class PublishServiceImpl implements PublishService {
     }
 
     @Override
-    public String submitPublish(String convertUser, Long workflowId,
+    public String submitPublish(String convertUser, DSSFlow dssFlow,
                                 Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception {
-        LOGGER.info("User {} begins to convert workflow {}.", convertUser, workflowId);
+        LOGGER.info("User {} begins to convert workflow {}.", convertUser, dssFlow.getId());
         //1 获取对应的orcId 和 orcVersionId
         //2.进行提交
-        DSSFlow dssFlow = null;
         try {
-            dssFlow = dssFlowService.getFlow(workflowId);
-            if (dssFlow == null) {
-                DSSExceptionUtils.dealErrorException(63325, "workflow " + workflowId + " is not exists.", DSSErrorException.class);
-                return null;
-            }
+            LOGGER.info("User {} begins to convert workflow {}.", convertUser, dssFlow.getName());
             ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
             projectInfoRequest.setProjectId(dssFlow.getProjectId());
             DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
@@ -94,7 +97,7 @@ public class PublishServiceImpl implements PublishService {
             OrchestratorVo orchestratorVo = null;
             Long orchestratorId = null;
             if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
-                orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(workflowId)),
+                orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
                         OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
                 if (orchestratorVo == null) {
                     throw new DSSErrorException(800001, "编排不存在");
@@ -122,7 +125,7 @@ public class PublishServiceImpl implements PublishService {
             SchedulerAppConn schedulerAppConn = (SchedulerAppConn) AppConnManager.getAppConnManager().getAppConn(schedulerAppConnName);
             // 只是为了获取是否需要发布所有Orc，这里直接拿第一个AppInstance即可。
             AppInstance appInstance = schedulerAppConn.getAppDesc().getAppInstances().get(0);
-            ResponseConvertOrchestrator response = requestConvertOrchestration(comment, workflowId, convertUser,
+            ResponseConvertOrchestrator response = requestConvertOrchestration(comment, dssFlow.getId(), convertUser,
                     workspace, schedulerAppConn, dssLabel, appInstance);
             if (response.getResponse().isFailed()) {
                 throw new DSSErrorException(50311, response.getResponse().getMessage());
@@ -132,11 +135,63 @@ public class PublishServiceImpl implements PublishService {
         } catch (DSSErrorException e) {
             throw e;
         } catch (final Exception t) {
-            Object str = dssFlow == null ? workflowId : dssFlow.getName();
+            Object str = dssFlow.getName();
             LOGGER.error("User {} failed to submit publish {}.", convertUser, str, t);
             DSSExceptionUtils.dealErrorException(63325, "Failed to submit publish " + str, t, DSSErrorException.class);
         }
         return null;
+    }
+
+    @Override
+    public String batchSubmit(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String publishUser) {
+        List<Long> workflowIdList = publishWorkflowRequest.getWorkflowIdList();
+        Map<String, Object> labels = new HashMap<>();
+        labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, publishWorkflowRequest.getLabels().getRoute());
+        String comment = publishWorkflowRequest.getComment();
+
+        List<DSSFlow> dssFlowList = new ArrayList<>();
+        for (Long flowId : workflowIdList) {
+            DSSFlow dssFlowById = dssFlowService.getFlowByID(flowId);
+            if (dssFlowById == null) {
+                DSSExceptionUtils.dealErrorException(63325, "workflow " + flowId + " is not exists.", DSSErrorException.class);
+            }
+            dssFlowList.add(dssFlowById);
+        }
+
+        Set<String> errorTaskIdList = new HashSet<>();
+        Set<String> emptyTaskIdList = new HashSet<>();
+        Set<String> successTaskIdList = new HashSet<>();
+
+        for (DSSFlow dssFlow : dssFlowList) {
+            String taskId = null;
+            try {
+                taskId = submitPublish(publishUser, dssFlow, labels, workspace, comment);
+            } catch (Exception e) {
+                emptyTaskIdList.add(dssFlow.getName());
+            }
+            if (DSSWorkFlowConstant.PUBLISHING_ERROR_CODE.equals(taskId)) {
+                errorTaskIdList.add(dssFlow.getName());
+            } else if (StringUtils.isEmpty(taskId)) {
+                emptyTaskIdList.add(dssFlow.getName());
+            } else {
+                successTaskIdList.add(dssFlow.getName());
+                AuditLogUtils.printLog(publishUser,workspace.getWorkspaceId(), workspace.getWorkspaceName(),
+                        TargetTypeEnum.WORKFLOW,dssFlow.getId(), dssFlow.getName(), OperateTypeEnum.PUBLISH, publishWorkflowRequest);
+            }
+        }
+
+        if (successTaskIdList.size() == dssFlowList.size()) {
+            return "";
+        }
+        StringBuilder errMsg = new StringBuilder();
+        if (!CollectionUtils.isEmpty(errorTaskIdList)) {
+            errMsg.append("发布工程已经含有工作流:" + errorTaskIdList + "，正在发布中，请稍后再试;");
+        }
+        if (!CollectionUtils.isEmpty(emptyTaskIdList)) {
+            errMsg.append("工作流：" + emptyTaskIdList + "， 发布失败;");
+        }
+
+        return new String(errMsg);
     }
 
     /**

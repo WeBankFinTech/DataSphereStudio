@@ -2,7 +2,9 @@ package com.webank.wedatasphere.dss.scriptis.restful;
 
 import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.utils.GlobalLimitsUtils;
+import com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration;
 import com.webank.wedatasphere.dss.scriptis.service.ScriptisAuthService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.conf.BDPConfiguration;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
@@ -38,6 +40,9 @@ public class ScriptisAuthRestfulApi {
     public Message globalLimits(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
         Map<String,Object> globalLimits = scriptisAuthService.getGlobalLimits(username);
+        if (DSSScriptisConfiguration.isInCopilotWhiteList(username)) {
+            globalLimits.put(DSSScriptisConfiguration.COPILOT_ENABLE_KEY, true);
+        }
         return Message.ok().data("globalLimits", globalLimits);
     }
 

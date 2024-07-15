@@ -88,6 +88,8 @@ public class FlowRestfulApi {
     private LockMapper lockMapper;
     @Autowired
     private HttpServletRequest httpServletRequest;
+    @Autowired
+    private DSSFlowService dssFlowService;
 
 
     /**
@@ -150,7 +152,12 @@ public class FlowRestfulApi {
         String comment = publishWorkflowRequest.getComment();
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String publishUser = SecurityFilter.getLoginUsername(httpServletRequest);
-        return DSSExceptionUtils.getMessage(() -> publishService.submitPublish(publishUser, workflowId, labels, workspace, comment),
+        DSSFlow dssFlowById = dssFlowService.getFlowByID(workflowId);
+        if (dssFlowById == null) {
+            DSSExceptionUtils.dealErrorException(63325, "workflow " + workflowId + " is not exists.", DSSErrorException.class);
+            return Message.error("workflow " + workflowId + " is not exists.");
+        }
+        return DSSExceptionUtils.getMessage(() -> publishService.submitPublish(publishUser, dssFlowById, labels, workspace, comment),
                 taskId -> {
                 if (DSSWorkFlowConstant.PUBLISHING_ERROR_CODE.equals(taskId)) {
                     return Message.error("发布工程已经含有工作流，正在发布中，请稍后再试");
@@ -165,6 +172,21 @@ public class FlowRestfulApi {
                     return Message.error("发布工作流失败");
                 }},
                 String.format("用户 %s 发布工作流 %s 失败.", publishUser, workflowId));
+    }
+
+    @RequestMapping(value = "batchPublishWorkflow", method = RequestMethod.POST)
+    public Message batchPublishWorkflow(@RequestBody BatchPublishWorkflowRequest publishWorkflowRequest) throws Exception {
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String publishUser = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        String errMsg = publishService.batchSubmit(publishWorkflowRequest, workspace, publishUser);
+
+        if (StringUtils.isEmpty(errMsg)) {
+            return Message.ok("所选工作流发布成功");
+        } else {
+            return Message.error(errMsg);
+        }
+
     }
 
     /**

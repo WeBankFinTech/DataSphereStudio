@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.service;
 
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
@@ -29,7 +30,7 @@ public interface PublishService {
     String submitPublish(String publishUser, DSSFlow dssFlow,
         Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception;
 
-    String batchSubmit(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String publishUser);
+    String batchSubmit(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String publishUser)throws DSSErrorException;
 
     ResponseConvertOrchestrator getStatus(String username, String taskId) throws Exception;
 

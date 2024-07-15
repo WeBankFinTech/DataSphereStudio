@@ -143,7 +143,7 @@ public class PublishServiceImpl implements PublishService {
     }
 
     @Override
-    public String batchSubmit(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String publishUser) {
+    public String batchSubmit(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String publishUser) throws  DSSErrorException{
         List<Long> workflowIdList = publishWorkflowRequest.getWorkflowIdList();
         Map<String, Object> labels = new HashMap<>();
         labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, publishWorkflowRequest.getLabels().getRoute());

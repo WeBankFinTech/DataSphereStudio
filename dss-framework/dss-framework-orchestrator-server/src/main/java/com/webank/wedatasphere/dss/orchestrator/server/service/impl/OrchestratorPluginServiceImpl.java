@@ -406,11 +406,13 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         fileContentRequest.setProjectName(flowRequest.getProjectName());
         fileContentRequest.setWorkspaceId(workspace.getWorkspaceId());
         fileContentRequest.setUsername(username);
-        fileContentRequest.setPublish(false);
+        fileContentRequest.setPublish(flowRequest.getPublish());
 
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         GitFileContentResponse contentResponse = RpcAskUtils.processAskException(gitSender.ask(fileContentRequest), GitFileContentResponse.class, GitFileContentRequest.class);
-
+        if (flowRequest.getPublish()) {
+            return contentResponse;
+        }
         contentResponse.setAfter(s);
         return contentResponse;
     }

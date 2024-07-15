@@ -4,7 +4,6 @@ import com.webank.wedatasphere.dss.common.conf.DSSCommonConf;
 import com.webank.wedatasphere.dss.common.utils.GlobalLimitsUtils;
 import com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration;
 import com.webank.wedatasphere.dss.scriptis.service.ScriptisAuthService;
-import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.conf.BDPConfiguration;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;

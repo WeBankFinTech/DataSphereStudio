@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitSearchLine;
 import com.webank.wedatasphere.dss.git.common.protocol.GitSearchResult;
+import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
@@ -30,9 +31,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerService {
@@ -96,12 +101,48 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
 
-            diff = DSSGitUtils.diffGit(repository, request.getCommitId(), request.getFilePath());
+            if (StringUtils.isEmpty(request.getCommitId())) {
+                String path = DSSGitConstant.GIT_PATH_PRE + request.getProjectName() + File.separator + request.getFilePath();
+                String metaPath = DSSGitConstant.GIT_PATH_PRE + request.getProjectName() + File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + request.getFilePath();
+                GitTree fileTree = getFileTree(path);
+                GitTree metaFileTree = getFileTree(metaPath);
+
+                List<GitTree> tree = new ArrayList<>();
+                tree.add(fileTree);
+                tree.add(metaFileTree);
+                diff = new GitDiffResponse(tree);
+            } else {
+                diff = DSSGitUtils.diffGit(repository, request.getCommitId(), request.getFilePath());
+            }
+
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
         }
         return diff;
 
+    }
+
+    private GitTree getFileTree(String path) throws GitErrorException {
+        Path currentDir = Paths.get(path);
+
+        GitTree root = new GitTree("");
+
+        try (Stream<Path> paths = Files.walk(currentDir)) {
+            paths
+                    .filter(Files::isRegularFile) // 只过滤出文件
+                    .forEach(file -> {
+                        // 获取相对路径
+                        Path relativePath = currentDir.relativize(file);
+                        String fullPath = path + File.separator + relativePath.toString();
+                        root.setAbsolutePath(fullPath);
+                        root.addChild(fullPath);
+                    });
+        } catch (IOException e) {
+           logger.error("get failed, the reason is ", e);
+           throw new GitErrorException(800001, "get failed, the reason is " + e.getMessage());
+        }
+
+        return root;
     }
 
     @Override
@@ -406,7 +447,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String after = null;
 
             if (request.getPublish()) {
-                before = DSSGitUtils.getTargetCommitFileContent(repository, projectName, request.getCommitId(), request.getFilePath());
+                if (StringUtils.isNotEmpty(request.getCommitId())) {
+                    before = DSSGitUtils.getTargetCommitFileContent(repository, request.getCommitId(), request.getFilePath());
+                }
                 after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
             } else {
                 // 获取当前提交前的文件内容

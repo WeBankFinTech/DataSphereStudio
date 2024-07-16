@@ -26,12 +26,10 @@ public class GitTree {
         String restPart = parts.length > 1 ? parts[1] : null;
 
         GitTree gitTree = new GitTree(currentPart);
-        // 标识当前文件相对路径
-        if (restPart == null) {
-            gitTree.setAbsolutePath(this.absolutePath);
-        }
+
         children.putIfAbsent(currentPart, gitTree);
         GitTree child = children.get(currentPart);
+        child.setAbsolutePath(this.getAbsolutePath());
 
         if (restPart != null) {
             child.addChild(restPart);

@@ -356,9 +356,11 @@ public class DSSFrameworkOrchestratorRestful {
     }
 
     @RequestMapping(value = "batchSubmitFlow", method = RequestMethod.POST)
-    public Message batchSubmitFlow(@RequestBody List<OrchestratorSubmitRequest> submitRequestList) {
+    public Message batchSubmitFlow(@RequestBody OrchestratorBatchSubmitRequest batchSubmitRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        List<OrchestratorSubmitRequest> submitRequestList = batchSubmitRequest.getSubmitRequestList();
 
         if (CollectionUtils.isEmpty(submitRequestList)) {
             return Message.error("至少需要选择一项工作流进行提交");
@@ -366,7 +368,7 @@ public class DSSFrameworkOrchestratorRestful {
 
         for (OrchestratorSubmitRequest submitFlowRequest: submitRequestList) {
             try {
-                checkAndSubmit(submitFlowRequest, workspace, userName);
+                checkSubmitWorkflow(submitFlowRequest, workspace, userName);
             } catch (Exception e) {
                 return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
             }
@@ -382,7 +384,8 @@ public class DSSFrameworkOrchestratorRestful {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
         try {
-            checkAndSubmit(submitFlowRequest, workspace, userName);
+            checkSubmitWorkflow(submitFlowRequest, workspace, userName);
+            orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
         } catch (Exception e) {
             return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
         }
@@ -391,7 +394,7 @@ public class DSSFrameworkOrchestratorRestful {
         return Message.ok();
     }
 
-    private void checkAndSubmit(OrchestratorSubmitRequest submitFlowRequest, Workspace workspace, String userName) throws DSSErrorException{
+    private void checkSubmitWorkflow(OrchestratorSubmitRequest submitFlowRequest, Workspace workspace, String userName) throws DSSErrorException{
         Long orchestratorId = submitFlowRequest.getOrchestratorId();
         try {
             checkWorkspace(orchestratorId, workspace);
@@ -409,11 +412,7 @@ public class DSSFrameworkOrchestratorRestful {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             throw new DSSErrorException(80001,"当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
-        try {
-            orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
-        } catch (Exception e) {
-            throw new DSSErrorException(80001,"提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
-        }
+
     }
 
     @RequestMapping(path = "gitUrl", method = RequestMethod.GET)

@@ -377,12 +377,11 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Override
     public List<GitTree> diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
-        OrchestratorVo orchestratorVo = orchestratorService.getOrchestratorVoById(flowRequest.getOrchestratorId());
-        DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
-        String commitId = dssOrchestratorVersion.getCommitId();
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+        String commitId = getLastPublishCommitId(orchestrator);
 
-        GitDiffResponse diff = diffPublish(orchestratorInfo.getName(), commitId, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
+
+        GitDiffResponse diff = diffPublish(orchestrator.getName(), commitId, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
         if (diff == null) {
             LOGGER.info("change is empty");
             return null;
@@ -390,6 +389,24 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
         //4. 返回文件列表
         return diff.getTree();
+    }
+
+    private String getLastPublishCommitId(DSSOrchestratorInfo orchestrator) {
+        List<DSSOrchestratorVersion> orchestratorVersions = orchestratorMapper.getOrchestratorVersions(orchestrator.getProjectId(), orchestrator.getId());
+        String commitId = null;
+        if (CollectionUtils.isNotEmpty(orchestratorVersions)) {
+            String commitIdNow = orchestratorVersions.get(0).getCommitId();
+            if (commitIdNow != null) {
+                int i = 0;
+                for (DSSOrchestratorVersion version : orchestratorVersions) {
+                    if (StringUtils.isNotEmpty(version.getCommitId()) && i++ != 0) {
+                        commitId = version.getCommitId();
+                        break;
+                    }
+                }
+            }
+        }
+        return commitId;
     }
 
     @Override
@@ -404,6 +421,11 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         fileContentRequest.setWorkspaceId(workspace.getWorkspaceId());
         fileContentRequest.setUsername(username);
         fileContentRequest.setPublish(flowRequest.getPublish());
+
+        if (flowRequest.getPublish()) {
+            String commitId = getLastPublishCommitId(orchestrator);
+            fileContentRequest.setCommitId(commitId);
+        }
 
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         GitFileContentResponse contentResponse = RpcAskUtils.processAskException(gitSender.ask(fileContentRequest), GitFileContentResponse.class, GitFileContentRequest.class);

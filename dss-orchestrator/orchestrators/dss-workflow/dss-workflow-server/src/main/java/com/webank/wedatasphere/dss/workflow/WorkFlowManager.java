@@ -113,6 +113,19 @@ public interface WorkFlowManager {
                                   List<DSSLabel> dssLabels,
             boolean exportExternalNodeAppConnResource) throws Exception;
 
+    /**
+     * 读取当前最新BML存储的指定文件内容，若文件不存在，则返回空字符串
+     * @param userName
+     * @param flowId
+     * @param dssProjectId
+     * @param projectName
+     * @param workspace
+     * @param dssLabels
+     * @param exportExternalNodeAppConnResource
+     * @param filePath：文件路径
+     * @return
+     * @throws Exception
+     */
     String readWorkflowNew(String userName, Long flowId, Long dssProjectId,
                            String projectName, Workspace workspace,
                            List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource,String filePath) throws Exception;

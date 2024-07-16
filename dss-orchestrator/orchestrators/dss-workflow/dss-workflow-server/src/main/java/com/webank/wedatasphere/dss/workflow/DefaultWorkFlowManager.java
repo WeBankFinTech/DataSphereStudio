@@ -72,6 +72,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -220,12 +221,18 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                                          List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource, String filePath) throws Exception {
         DSSFlow dssFlow = flowService.getFlowByID(flowId);
         String projectPath = null;
+        String fileContent = null;
         try {
             projectPath = workFlowExportService.exportFlowInfoNew(dssProjectId, projectName, flowId, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
+            String fullPath = projectPath + File.separator + filePath;
+            logger.info("export workflow success.  flowId:{},fullPath:{} .",flowId,fullPath);
+            File file = new File(fullPath);
+            if (file.exists()) {
+                fileContent = new String(Files.readAllBytes(Paths.get(fullPath)));
+            }
         } catch (Exception e) {
             logger.error("exportFlowInfoNew failed , the reason is:", e);
             throw new DSSErrorException(100098, "工作流导出失败，原因为" + e.getMessage());
-
         } finally {
             //删掉整个目录
             if (StringUtils.isNotEmpty(projectPath)) {
@@ -237,9 +244,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
                 }
             }
         }
-        String fullPath = projectPath + File.separator + filePath;
-        logger.info("export workflow success.  flowId:{},fullPath:{} .",flowId,fullPath);
-        return new String(Files.readAllBytes(Paths.get(fullPath)));
+        return fileContent;
     }
     @Override
     public BmlResource exportWorkflow(String userName, Long flowId, Long dssProjectId,

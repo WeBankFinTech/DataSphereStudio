@@ -22,10 +22,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.protocol.JobStatus;
-import com.webank.wedatasphere.dss.common.protocol.RequestExportWorkflow;
-import com.webank.wedatasphere.dss.common.protocol.RequestReadWorkflowNode;
-import com.webank.wedatasphere.dss.common.protocol.ResponseExportWorkflow;
+import com.webank.wedatasphere.dss.common.protocol.*;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -353,10 +350,10 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 false,
                 filePath);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
-        String st = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
-                String.class, RequestExportWorkflow.class);
+        ResponseReadWorkflow responseReadWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
+                ResponseReadWorkflow.class, RequestExportWorkflow.class);
 
-        return st;
+        return responseReadWorkflow.fileContent();
     }
 
     @Override

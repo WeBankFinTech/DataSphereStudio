@@ -81,7 +81,7 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
         reqReadFlow.exportExternalNodeAppConnResource,
         reqReadFlow.filePath
       )
-      workflowNode
+      ResponseReadWorkflow(workflowNode)
 
     case requestImportWorkflow: RequestImportWorkflow =>
       val dssFlowImportParam: DSSFlowImportParam = new DSSFlowImportParam()

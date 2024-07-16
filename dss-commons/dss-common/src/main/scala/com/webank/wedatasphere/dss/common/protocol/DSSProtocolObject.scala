@@ -57,6 +57,8 @@ case class RequestReadWorkflowNode(userName: String,
 
 case class ResponseExportWorkflow(resourceId: String, version: String, flowID: Long)
 
+case class ResponseReadWorkflow(fileContent: String)
+
 case class RequestQueryWorkFlow(userName: String, rootFlowId: Long)
 
 case class ProxyUserCheckRequest(userName: String, proxyUser: String)

@@ -209,6 +209,7 @@ public class DSSGitUtils {
                 rootMeta.setAbsolutePath(statu);
                 rootMeta.addChild(statu);
             } else {
+                root.setAbsolutePath(statu);
                 root.addChild(statu);
             }
         }
@@ -691,7 +692,7 @@ public class DSSGitUtils {
         return new String(Files.readAllBytes(Paths.get(filePath)));
     }
 
-    public static String getTargetCommitFileContent(Repository repository, String projectName, String commitId, String filePath) throws GitErrorException {
+    public static String getTargetCommitFileContent(Repository repository, String commitId, String filePath) throws GitErrorException {
         String content = "";
         try {
             // 获取最新的commitId
@@ -707,7 +708,8 @@ public class DSSGitUtils {
                     treeWalk.setRecursive(true);
                     treeWalk.setFilter(PathFilter.create(filePath));
                     if (!treeWalk.next()) {
-                        throw new IllegalStateException("Did not find expected file '" + filePath + "'");
+                        logger.warn("Did not find expected file '" + filePath + "'，忽略");
+                        return null;
                     }
 
                     ObjectId objectId = treeWalk.getObjectId(0);

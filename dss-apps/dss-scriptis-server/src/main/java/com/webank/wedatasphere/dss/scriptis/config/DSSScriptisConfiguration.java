@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.scriptis.config;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.common.conf.CommonVars;
 
 
@@ -30,4 +31,20 @@ public class DSSScriptisConfiguration {
     public final static String GLOBAL_LIMIT_PREFIX = "wds.dss.scriptis.global.limit.";
 
 
+    public static final String DELIMITER_COMMA = ",";
+
+    public static final String[] GLOBAL_COPILOT_WHITELIST = CommonVars.apply("wds.dss.scriptis.copilot.whitelist", "hadoop").getValue().split(DELIMITER_COMMA);
+
+    public static final String COPILOT_ENABLE_KEY = "copilotEnable";
+
+    public static boolean isInCopilotWhiteList(String username) {
+        if (StringUtils.isNotBlank(username)) {
+            for (String name : GLOBAL_COPILOT_WHITELIST) {
+                if (username.equalsIgnoreCase(name)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

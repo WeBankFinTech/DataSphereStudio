@@ -327,6 +327,28 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
         ResponseExportWorkflow responseExportWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
                 ResponseExportWorkflow.class, RequestExportWorkflow.class);
+
+        BmlResource bmlResource = new BmlResource(responseExportWorkflow.resourceId(), responseExportWorkflow.version());
+
+        return bmlResource;
+    }
+
+    @Override
+    public BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long orchestratorId) {
+        // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
+        List<DSSLabel> dssLabelList = new ArrayList<>();
+        dssLabelList.add(new EnvDSSLabel(label));
+        RequestExportWorkflowList requestExportWorkflow = new RequestExportWorkflowList(username,
+                flowIdList,
+                orchestrator.getProjectId(),
+                projectName,
+                DSSCommonUtils.COMMON_GSON.toJson(workspace),
+                dssLabelList,
+                false);
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
+        ResponseExportWorkflowList responseExportWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
+                ResponseExportWorkflowList.class, RequestExportWorkflowList.class);
         Map<String, Object> resourceMap = new HashMap<>(2);
         BmlResource bmlResource = new BmlResource(responseExportWorkflow.resourceId(), responseExportWorkflow.version());
 

@@ -28,6 +28,13 @@
         SELECT * FROM `dss_workflow` WHERE id = #{id}
     </select>
 
+    <select id="selectFlowListByID" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
+        SELECT * FROM `dss_workflow` WHERE id IN
+        <foreach collection="list" index="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <insert id="insertFlow" useGeneratedKeys="true" keyProperty="id" parameterType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
         INSERT INTO dss_workflow (<include refid = "flow_main" />)
         VALUES

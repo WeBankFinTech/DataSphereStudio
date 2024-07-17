@@ -30,7 +30,7 @@
 
     <select id="selectFlowListByID" resultType="com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow">
         SELECT * FROM `dss_workflow` WHERE id IN
-        <foreach collection="list" index="item" separator="," open="(" close=")">
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
             #{item}
         </foreach>
     </select>

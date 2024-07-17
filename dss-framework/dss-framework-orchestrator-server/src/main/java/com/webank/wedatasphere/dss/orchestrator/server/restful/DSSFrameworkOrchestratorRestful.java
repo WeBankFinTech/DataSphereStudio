@@ -36,9 +36,12 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentRe
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
+import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
@@ -96,6 +99,8 @@ public class DSSFrameworkOrchestratorRestful {
     private LockMapper lockMapper;
     @Autowired
     private DSSFlowService flowService;
+    @Autowired
+    private OrchestratorMapper orchestratorMapper;
 
     /**
      * 创建编排模式
@@ -366,12 +371,35 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("至少需要选择一项工作流进行提交");
         }
 
+        Map<String, List<Long>> map = new HashMap<>();
+        Map<String, Long> projectMap = new HashMap<>();
         for (OrchestratorSubmitRequest submitFlowRequest: submitRequestList) {
             try {
                 checkSubmitWorkflow(submitFlowRequest, workspace, userName);
+                boolean b = map.containsKey(submitFlowRequest.getProjectName());
+                if (b) {
+                    List<Long> flowIdList = map.get(submitFlowRequest.getProjectName());
+                    flowIdList.add(submitFlowRequest.getFlowId());
+                } else {
+                    List<Long> flowIdList = new ArrayList<>();
+                    flowIdList.add(submitFlowRequest.getFlowId());
+                    DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(submitFlowRequest.getOrchestratorId());
+                    long projectId = orchestrator.getProjectId();
+                    projectMap.put(submitFlowRequest.getProjectName(), projectId);
+                    map.put(submitFlowRequest.getProjectName(), flowIdList);
+                }
             } catch (Exception e) {
                 return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
             }
+
+        }
+
+        String label = batchSubmitRequest.getSubmitRequestList().get(0).getLabels().getRoute();
+
+        for (Map.Entry<String, List<Long>> entry : map.entrySet()) {
+            List<Long> flowIdList = entry.getValue();
+            Long projectId = projectMap.get(entry.getKey());
+            orchestratorPluginService.uploadWorkflowListToGit(flowIdList, entry.getKey(), label, userName, workspace, projectId);
         }
 
         return Message.ok();
@@ -412,6 +440,7 @@ public class DSSFrameworkOrchestratorRestful {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             throw new DSSErrorException(80001,"当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
+
 
     }
 

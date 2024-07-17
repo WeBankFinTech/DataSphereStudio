@@ -45,6 +45,7 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowImportParam;
@@ -105,6 +106,8 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
     private WorkFlowParser workFlowParser;
     @Autowired
     private LockMapper lockMapper;
+    @Autowired
+    private FlowMapper flowMapper;
 
     @Override
     public DSSFlow createWorkflow(String userName,
@@ -213,6 +216,19 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
         BmlResource bmlResource = bmlService.upload(userName, inputStream, dssFlow.getName() + ".export", projectName);
         logger.info("export workflow success.  flowId:{},bmlResource:{} .",flowId,bmlResource);
+        return  bmlResource;
+    }
+
+    @Override
+    public BmlResource exportWorkflowListNew(String userName, List<Long> flowIdList, Long dssProjectId,
+                                         String projectName, Workspace workspace,
+                                         List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+        List<DSSFlow> dssFlowList = flowMapper.selectFlowListByID(flowIdList);
+        String projectPath = workFlowExportService.exportFlowListNew(dssProjectId, projectName, flowIdList, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
+        String exportPath = ZipHelper.zip(projectPath);
+        InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
+        BmlResource bmlResource = bmlService.upload(userName, inputStream, projectName + ".export", projectName);
+        logger.info("export workflow success.  flowId:{},bmlResource:{} .",flowIdList,bmlResource);
         return  bmlResource;
     }
     @Override

@@ -161,6 +161,64 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
         return projectPath;
     }
+
+    @Override
+    public String exportFlowListNew(Long dssProjectId, String projectName, List<Long> rootFlowIdList, String userName,
+                                    Workspace workspace, List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+        //获取rootFlow,和所有子Flow
+        List<DSSFlow> rootFlowList = flowMapper.selectFlowListByID(rootFlowIdList);
+        //生成rootflow及所有子flow
+        List<DSSFlow> dssFlowList = new ArrayList<>();
+        dssFlowList.addAll(rootFlowList);
+        for (DSSFlow rootFlow : rootFlowList) {
+            getAllDssFlowsByRootflowId(rootFlow, dssFlowList);
+        }
+        //生成rootflow及所有子flow的Relations
+        List<Long> flowIds = dssFlowList.stream().map(DSSFlow::getId).collect(Collectors.toList());
+        List<DSSFlowRelation> flowRelations = flowIds.isEmpty() ? new ArrayList<>() : flowMapper.listFlowRelation(flowIds);
+        // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx
+        String projectPath = IoUtils.generateProjectIOPath(userName, projectName);
+        // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx/.flowmeta/flow_all_type_node/
+        List<DSSFlow> dssFlows = new ArrayList<>();
+        for (DSSFlow dssFlow : dssFlowList) {
+            if (dssFlow.getRootFlow()) {
+                // 生成rootflow orchestrator信息
+                Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabels);
+                OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
+                        OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                DSSOrchestratorInfo dssOrchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
+                String flowMetaPath = IoUtils.generateFlowMetaIOPath(projectPath, dssOrchestratorInfo.getName());
+                metaExportService.exportFlowBaseInfoNew(orchestratorVo, dssFlowList, flowRelations, flowMetaPath);
+                logger.info(userName + "-开始导出Flow：" + dssOrchestratorInfo.getName());
+                String flowMetaFilePath = IoUtils.addFileSeparator(flowMetaPath, FLOW_FILE_NAME);
+                //导出工作流json文件
+                String flowJson = bmlService.readTextFromBML(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion());
+                if (!dssFlow.getHasSaved()) {
+                    logger.info("工作流{}从未保存过，忽略", dssOrchestratorInfo.getName());
+                } else if (StringUtils.isNotBlank(flowJson)) {
+                    // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx/flow_all_type_node/
+                    String flowCodePath = IoUtils.generateFlowCodeIOPath(projectPath, dssOrchestratorInfo.getName());
+                    exportFlowResourcesNew(userName, dssProjectId, projectName, flowCodePath, flowJson, dssOrchestratorInfo.getName(), workspace, dssLabels,exportExternalNodeAppConnResource);
+                    exportAllSubFlowsNew(userName, dssFlow, dssProjectId, projectName, flowCodePath,flowMetaPath, workspace, dssLabels,exportExternalNodeAppConnResource);
+                    String flowJsonWithoutParams = extractAndExportParams(flowJson, flowCodePath);
+                    try (
+                            OutputStream outputStream = IoUtils.generateExportOutputStream(flowMetaFilePath )
+                    ) {
+                        org.apache.commons.io.IOUtils.write(flowJsonWithoutParams,outputStream,"UTF-8");
+                    }
+                    dssFlows.add(dssFlow);
+                } else {
+                    String warnMsg = String.format(DSSWorkFlowConstant.PUBLISH_FLOW_REPORT_FORMATE, dssFlow.getName(), dssFlow.getBmlVersion());
+                    logger.info(warnMsg);
+                    throw new DSSErrorException(90033, warnMsg);
+                }
+            }
+        }
+        if (dssFlows.isEmpty()) {
+            throw new DSSErrorException(90037, "该工程没有可以导出的工作流,请检查工作流是否都为空");
+        }
+        return projectPath;
+    }
     @Override
     public String exportFlowInfo(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
         //获取rootFlow,和所有子Flow

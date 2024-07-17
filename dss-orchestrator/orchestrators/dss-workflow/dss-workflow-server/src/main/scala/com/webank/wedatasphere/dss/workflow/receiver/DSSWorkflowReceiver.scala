@@ -70,6 +70,17 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       ResponseExportWorkflow(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
         reqExportFlow.flowID)
 
+    case requestExportWorkflowList: RequestExportWorkflowList =>
+      val dssExportFlowResource : BmlResource = workflowManager.exportWorkflowListNew(requestExportWorkflowList.userName,
+        requestExportWorkflowList.flowIDList,
+        requestExportWorkflowList.projectId,
+        requestExportWorkflowList.projectName,
+        DSSCommonUtils.COMMON_GSON.fromJson(requestExportWorkflowList.workspaceStr, classOf[Workspace]),
+        requestExportWorkflowList.dssLabelList,
+        requestExportWorkflowList.exportExternalNodeAppConnResource)
+      ResponseExportWorkflowList(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
+        requestExportWorkflowList.flowIDList)
+
     case reqReadFlow: RequestReadWorkflowNode =>
       val workflowNode: String = workflowManager.readWorkflowNew(
         reqReadFlow.userName,

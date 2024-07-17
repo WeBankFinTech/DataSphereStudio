@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
@@ -36,11 +37,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitRenameRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfoList;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestProjectUpdateOrcVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseOrchestratorInfos;
@@ -79,6 +76,7 @@ import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
 import org.apache.linkis.rpc.Sender;
@@ -92,7 +90,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -282,7 +279,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorInfoId, VALID_FLAG);
         LOGGER.info("user {} try to unlock the project {} 's orchestration(such as DSS workflow) {} of orchestrator {} in version {}.",
                 userName, projectName, dssOrchestratorVersion.getAppId(), dssOrchestratorInfo.getName(), dssOrchestratorVersion.getVersion());
-        RequestUnlockWorkflow requestUnlockWorkflow = new RequestUnlockWorkflow(userName, dssOrchestratorVersion.getAppId(), confirmDelete,  workspace);
+        RequestUnlockWorkflow requestUnlockWorkflow = new RequestUnlockWorkflow(userName, dssOrchestratorVersion.getAppId(), confirmDelete, workspace);
         ResponseUnlockWorkflow responseUnlockWorkflow = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
                 .getWorkflowSender(dssLabels).ask(requestUnlockWorkflow), ResponseUnlockWorkflow.class, RequestUnlockWorkflow.class);
         switch (responseUnlockWorkflow.getUnlockStatus()) {
@@ -373,11 +370,11 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public OrchestratorRollBackGitVo rollbackOrchestrator(String userName, Long projectId, String projectName,
-                                       Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception {
+                                                          Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception {
         //1.新建一个版本
         //2.然后将version的版本内容进行去workflow进行cp
         //3.然后把生产的内容进行update到数据库
-        DSSOrchestratorVersion oldOrcVersion=orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
+        DSSOrchestratorVersion oldOrcVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
         String latestVersion = oldOrcVersion.getVersion();
         DSSLabel envDSSLabel = new EnvDSSLabel(labels.getRoute());
         DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
@@ -414,15 +411,15 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 }, "copy");
         dssOrchestratorVersion.setAppId((Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY));
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
-        List<String[]> paramConfTemplateIds=(List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
+        List<String[]> paramConfTemplateIds = (List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
         dssOrchestratorVersion.setFormatContextId(contextId);
         //update appConn node contextId
         addOrchestratorVersionHook.beforeAdd(oldOrcVersion, Collections.emptyMap());
         orchestratorMapper.addOrchestratorVersion(dssOrchestratorVersion);
-        addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
+        addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY, paramConfTemplateIds));
 //        synProjectOrchestratorVersionId(dssOrchestratorVersion, labels);
 
-        OrchestratorRollBackGitVo rollBackGitVo =new OrchestratorRollBackGitVo();
+        OrchestratorRollBackGitVo rollBackGitVo = new OrchestratorRollBackGitVo();
         rollBackGitVo.setOldOrcVersion(dbOrcVersion);
         rollBackGitVo.setDssOrchestratorInfo(dssOrchestratorInfo);
         rollBackGitVo.setDssOrchestratorVersion(dssOrchestratorVersion);
@@ -433,7 +430,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
     @Override
     public void rollbackOrchestratorGit(OrchestratorRollBackGitVo rollBackGitVo, String userName, Long projectId, String projectName,
-                                        Long orchestratorId, LabelRouteVO labels, Workspace workspace) throws Exception{
+                                        Long orchestratorId, LabelRouteVO labels, Workspace workspace) throws Exception {
         if (rollBackGitVo == null) {
             return;
         }
@@ -553,6 +550,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             return new ArrayList<>();
         return dssOrchestratorInfos;
     }
+
     @Override
     public ResponseOrchestratorInfos queryOrchestratorInfos(RequestOrchestratorInfos requestOrchestratorInfos) {
         List<DSSOrchestratorInfo> orchestratorInfos = orchestratorMapper.queryOrchestratorInfos(new HashMap<String, Object>() {{
@@ -571,8 +569,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             // 1、先去查询dss_orchestrator_version_info表，筛选出发布过n次及以上的编排，并获取老的发布记录。
             //为了不影响正常使用，需要频繁下载工作流bml文件，每次只拿50条工作流进行清理
             List<DSSOrchestratorVersion> historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
-            while (historyOrcVersionList.size()>0) {
-                LOGGER.info("Clear historyOrcVersionList size is "+ historyOrcVersionList.size());
+            while (historyOrcVersionList.size() > 0) {
+                LOGGER.info("Clear historyOrcVersionList size is " + historyOrcVersionList.size());
                 if (historyOrcVersionList == null || historyOrcVersionList.isEmpty()) {
                     LOGGER.info("--------------------{} end clear old contextId------------------------", LocalDateTime.now());
                     return;
@@ -591,7 +589,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                         contextIdList.addAll(response.getContextIdList());
                     }
                 }
-                LOGGER.info("Clear contextIdList size is "+ contextIdList.size());
+                LOGGER.info("Clear contextIdList size is " + contextIdList.size());
                 // 3、调用linkis接口批量删除contextId
                 ContextClient contextClient = ContextClientFactory.getOrCreateContextClient();
                 // 每次处理1000条数据
@@ -613,7 +611,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
                 orchestratorMapper.batchUpdateOrcInfo(historyOrcVersionList);
                 Thread.sleep(5000);
-                historyOrcVersionList=orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
+                historyOrcVersionList = orchestratorMapper.getHistoryOrcVersion(OrchestratorConf.DSS_PUBLISH_MAX_VERSION.getValue());
             }
 
         } catch (Exception e) {
@@ -642,9 +640,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             LOGGER.info("for user getting... " + UrlUtils.normalizeIp(gitUrlPre));
             Set<Cookie> cookies = driver.manage().getCookies();
             LOGGER.info("cookies： {}", cookies.toString());
-            for (Cookie cookie:cookies) {
-                if (cookie.getName().equals("_gitlab_session"))
-                {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("_gitlab_session")) {
                     token = cookie.getValue();
                     break;
                 }
@@ -684,7 +681,6 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         options.addArguments("remote-debugging-port=9012");
 
 
-
         return new ChromeDriver(options);
     }
 
@@ -695,6 +691,40 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             return null;
         }
         return getOrchestratorVoById(orcInfoByAppId.getOrchestratorId());
+    }
+
+
+    @Override
+    public OrchestratorMeta getOrchestratorMetaInfo(OrchestratorMeta orchestratorMeta, DSSProject dssProject, String username) throws DSSFrameworkErrorException {
+
+        OrchestratorMeta orchestratorInfo = orchestratorMapper.getOrchestratorMeta(orchestratorMeta.getOrchestratorId());
+
+        if (orchestratorInfo == null) {
+            DSSFrameworkErrorException.dealErrorException(60000, "编排模式ID=" + orchestratorMeta.getOrchestratorId() + "不存在");
+        }
+
+        //若修改了编排名称，检查是否存在相同的编排名称
+        if (!orchestratorMeta.getOrchestratorName().equals(orchestratorInfo.getOrchestratorName())) {
+            isExistSameNameBeforeCreate(orchestratorMeta.getWorkspaceId(), orchestratorMeta.getProjectId(), orchestratorMeta.getOrchestratorName());
+
+            if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
+                Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+                GitRenameRequest renameRequest = new GitRenameRequest(orchestratorMeta.getWorkspaceId(), dssProject.getName(),
+                        orchestratorMeta.getOrchestratorName(), orchestratorMeta.getOrchestratorName(), username);
+                RpcAskUtils.processAskException(sender.ask(renameRequest), GitCommitResponse.class, GitRenameRequest.class);
+            }
+        }
+
+        // 修改前端传入的信息, 默认模板调用saveTemplateRef接口进行保存
+        orchestratorInfo.setOrchestratorName(orchestratorMeta.getOrchestratorName());
+        orchestratorInfo.setDescription(orchestratorMeta.getDescription());
+        orchestratorInfo.setIsDefaultReference(orchestratorMeta.getIsDefaultReference());
+        orchestratorInfo.setProxyUser(orchestratorMeta.getProxyUser());
+        orchestratorInfo.setUpdateUser(username);
+        orchestratorInfo.setUpdateTime(new Date(System.currentTimeMillis()));
+
+        return orchestratorInfo;
+
     }
 
 }

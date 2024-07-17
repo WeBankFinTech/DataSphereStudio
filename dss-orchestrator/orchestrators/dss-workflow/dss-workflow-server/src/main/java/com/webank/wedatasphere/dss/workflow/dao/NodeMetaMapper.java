@@ -1,8 +1,6 @@
 package com.webank.wedatasphere.dss.workflow.dao;
 
 import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
-import com.webank.wedatasphere.dss.workflow.entity.OrchestratorMeta;
-import com.webank.wedatasphere.dss.workflow.entity.request.OrchestratorMetaRequest;
 import feign.Param;
 import org.mapstruct.Mapper;
 
@@ -16,6 +14,4 @@ public interface NodeMetaMapper {
 
     NodeMetaDO getNodeMetaByOrchestratorId(@Param ("orchestratorId") Long orchestratorId);
 
-
-    List<OrchestratorMeta> getOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest);
 }

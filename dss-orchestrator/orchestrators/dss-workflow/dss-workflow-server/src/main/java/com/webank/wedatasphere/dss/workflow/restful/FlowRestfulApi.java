@@ -40,7 +40,6 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
-import com.webank.wedatasphere.dss.workflow.entity.OrchestratorMeta;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
@@ -395,29 +394,6 @@ public class FlowRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         DSSFlowEditLockManager.deleteLock(flowEditLock, workspace);
         return Message.ok();
-    }
-
-    @RequestMapping(value = "getAllOrchestratorMeta",method = RequestMethod.POST)
-    public Message getAllOrchestratorMeta(HttpServletRequest httpServletRequest,@RequestBody OrchestratorMetaRequest orchestratorMetaRequest){
-
-        if (orchestratorMetaRequest.getPageNow() == null) {
-            orchestratorMetaRequest.setPageNow(1);
-        }
-
-        if (orchestratorMetaRequest.getPageSize() == null) {
-            orchestratorMetaRequest.setPageSize(10);
-        }
-
-        if(orchestratorMetaRequest.getWorkspaceId() == null){
-            Long workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
-            orchestratorMetaRequest.setWorkspaceId(workspaceId);
-        }
-
-        List<Long> totals = new ArrayList<>();
-
-        List<OrchestratorMeta> orchestratorMetaList = flowService.getOrchestratorMeta(orchestratorMetaRequest,totals);
-
-        return Message.ok().data("data",orchestratorMetaList).data("total", totals.get(0));
     }
 
 }

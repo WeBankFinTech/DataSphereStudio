@@ -133,4 +133,8 @@ public interface OrchestratorMapper {
 
     OrchestratorSubmitJob selectSubmitJobStatus(@Param("orchestratorId") Long orchestratorId);
 
+    List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest);
+
+    OrchestratorMeta getOrchestratorMeta(@Param("orchestratorId") Long orchestratorId);
+
 }

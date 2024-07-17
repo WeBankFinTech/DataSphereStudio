@@ -36,10 +36,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentRe
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
@@ -560,4 +557,55 @@ public class DSSFrameworkOrchestratorRestful {
 
         return Message.ok().data("type", GitConstant.GIT_SERVER_SEARCH_TYPE);
     }
+
+
+    @RequestMapping(value = "/getAllOrchestratorMeta", method = RequestMethod.POST)
+    public Message getAllOrchestratorMeta(HttpServletRequest httpServletRequest, @RequestBody OrchestratorMetaRequest orchestratorMetaRequest) {
+
+        if (orchestratorMetaRequest.getPageNow() == null) {
+            orchestratorMetaRequest.setPageNow(1);
+        }
+
+        if (orchestratorMetaRequest.getPageSize() == null) {
+            orchestratorMetaRequest.setPageSize(10);
+        }
+
+        if (orchestratorMetaRequest.getWorkspaceId() == null) {
+            Long workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+            orchestratorMetaRequest.setWorkspaceId(workspaceId);
+        }
+
+        List<Long> totals = new ArrayList<>();
+
+        List<OrchestratorMeta> orchestratorMetaList = orchestratorFrameworkService.getAllOrchestratorMeta(orchestratorMetaRequest, totals);
+
+        return Message.ok().data("data", orchestratorMetaList).data("total", totals.get(0));
+    }
+
+
+    @RequestMapping(value = "/modifyOrchestratorMeta", method = RequestMethod.POST)
+    public Message modifyOrchestratorMeta(HttpServletRequest httpServletRequest, @RequestBody OrchestratorMeta orchestratorMeta) {
+
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(orchestratorMeta.getOrchestratorId())) {
+            return Message.error("当前工作流正在被复制，不允许编辑");
+        }
+
+        if (StringUtils.isEmpty(orchestratorMeta.getWorkspaceId())) {
+            orchestratorMeta.setWorkspaceId(workspace.getWorkspaceId());
+            orchestratorMeta.setWorkspaceName(workspace.getWorkspaceName());
+        }
+
+        try {
+            orchestratorFrameworkService.modifyOrchestratorMeta(username, orchestratorMeta, workspace);
+        } catch (Exception e) {
+            LOGGER.error(String.format("%s modify OrchestratorMeta fail", orchestratorMeta.getOrchestratorName()));
+            e.printStackTrace();
+            return Message.error(String.format("%s 工作流信息编辑失败", orchestratorMeta.getOrchestratorName()), e);
+        }
+
+        return Message.ok(String.format("%s工作流信息编辑成功"));
+    }
+
 }

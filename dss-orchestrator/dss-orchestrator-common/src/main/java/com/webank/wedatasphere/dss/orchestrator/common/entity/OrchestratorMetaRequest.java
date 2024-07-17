@@ -1,4 +1,4 @@
-package com.webank.wedatasphere.dss.workflow.entity.request;
+package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
 import java.util.List;
 
@@ -10,22 +10,13 @@ public class OrchestratorMetaRequest {
 
     private List<String> projectList;
 
-    private String workflowName;
+    private String orchestratorName;
 
     private String status;
 
     private Long  workspaceId;
 
     public OrchestratorMetaRequest() {
-    }
-
-    public OrchestratorMetaRequest(Integer pageNow, Integer pageSize, List<String> projectList, String workflowName, String status,Long workspaceId) {
-        this.pageNow = pageNow;
-        this.pageSize = pageSize;
-        this.projectList = projectList;
-        this.workflowName = workflowName;
-        this.status = status;
-        this.workspaceId = workspaceId;
     }
 
     public Long getWorkspaceId() {
@@ -60,12 +51,12 @@ public class OrchestratorMetaRequest {
         this.projectList = projectList;
     }
 
-    public String getWorkflowName() {
-        return workflowName;
+    public String getOrchestratorName() {
+        return orchestratorName;
     }
 
-    public void setWorkflowName(String workflowName) {
-        this.workflowName = workflowName;
+    public void setOrchestratorName(String orchestratorName) {
+        this.orchestratorName = orchestratorName;
     }
 
     public String getStatus() {

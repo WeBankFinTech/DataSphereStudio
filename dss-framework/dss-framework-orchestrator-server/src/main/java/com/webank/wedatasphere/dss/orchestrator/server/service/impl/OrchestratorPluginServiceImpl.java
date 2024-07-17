@@ -334,14 +334,13 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long orchestratorId) {
+    public BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId) {
         // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
-        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(label));
         RequestExportWorkflowList requestExportWorkflow = new RequestExportWorkflowList(username,
                 flowIdList,
-                orchestrator.getProjectId(),
+                projectId,
                 projectName,
                 DSSCommonUtils.COMMON_GSON.toJson(workspace),
                 dssLabelList,

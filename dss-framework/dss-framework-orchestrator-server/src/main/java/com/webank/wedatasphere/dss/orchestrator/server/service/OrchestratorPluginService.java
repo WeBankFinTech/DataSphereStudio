@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
@@ -48,4 +49,6 @@ public interface OrchestratorPluginService {
     void batchSubmitFlow(List<OrchestratorSubmitRequest> flowRequestList, String username, Workspace workspace) throws DSSErrorException;
 
     GitCommitResponse submitWorkflowToBML(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+
+    BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long orchestratorId);
 }

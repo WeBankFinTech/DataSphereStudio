@@ -21,8 +21,6 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-import com.webank.wedatasphere.dss.workflow.entity.OrchestratorMeta;
-import com.webank.wedatasphere.dss.workflow.entity.request.OrchestratorMetaRequest;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import org.apache.linkis.common.exception.ErrorException;
 
@@ -76,6 +74,4 @@ public interface DSSFlowService {
     boolean checkIsExistSameFlow(String jsonFlow);
 
     List<String> checkIsSave(Long parentFlowID, String jsonFlow);
-
-    List<OrchestratorMeta> getOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total);
 }

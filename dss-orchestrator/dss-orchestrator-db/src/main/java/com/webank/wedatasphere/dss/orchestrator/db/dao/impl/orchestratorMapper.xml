@@ -310,4 +310,91 @@
     </select>
 
 
+    <select id="getAllOrchestratorMeta" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMetaRequest"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMeta">
+        select * from
+        (select t1.id as id
+        ,t1.orchestrator_id as orchestratorId
+        ,t1.global_var      as globalVar
+        ,t1.resource        as resource
+        ,t1.proxy_user      as proxyUser
+        ,t2.project_name    as projectName
+        ,t2.name            as orchestratorName
+        ,t2.desc            as description
+        ,t2.uuid            as uuid
+        ,t2.status          as status
+        ,t2.is_default_reference as isDefaultReference
+        ,t3.version         as version
+        ,t3.update_time     as updateTime
+        ,t4.template_name   as templateName
+        from dss_workflow_node_meta t1
+        join
+        (select a.name,a.desc,a.uuid,a.status
+        ,a.project_id,b.workspace_id
+        ,b.name as project_name
+        ,a.is_default_reference
+        from  dss_orchestrator_info  a
+        join  dss_project b  on a.project_id  = b.id and b.workspace_id = #{workspaceId}
+        ) t2 on t1.orchestrator_id = t2.id
+        join
+        (select orchestrator_id
+        ,substring_index(group_concat(version order by update_time desc),',',1) as version
+        ,substring_index(group_concat(update_time ORDER BY update_time desc), ',', 1)  as update_time
+        from dss_orchestrator_version_info
+        where valid_flag  = 1
+        group by orchestrator_id
+        ) t3 on t1.orchestrator_id  = t3.orchestrator_id
+        left join
+        (select  a.orchestrator_id ,group_concat(b.name) as template_name from dss_workflow_default_template  a
+        join dss_ec_config_template  b on a.template_id  = b.template_id
+        group by orchestrator_id
+        ) t4 on t1.orchestrator_id = t4.orchestrator_id
+        ) A
+        where 1 = 1
+        <if test="status != null and status != ''">
+            and status = #{status}
+        </if>
+
+        <if test="projectList!=null and projectList.size() > 0">
+            and projectName in
+            <foreach collection="projectList" item="project" open="(" separator="," close=")">
+                projectName in (#{projectName})
+            </foreach>
+        </if>
+
+        <if test="orchestratorName!= null and orchestratorName != ''">
+            and orchestratorName like concat('%',#{orchestratorName},'%')
+        </if>
+
+    </select>
+
+
+    <select id="getOrchestratorMeta" parameterType="java.lang.Long"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMeta">
+        select t1.id as id
+        ,t1.orchestrator_id as orchestratorId
+        ,t1.global_var      as globalVar
+        ,t1.resource        as resource
+        ,t1.proxy_user      as proxyUser
+        ,t2.name            as orchestratorName
+        ,t2.type            as type
+        ,t2.desc            as description
+        ,t2.creator         as creator
+        ,t2.project_id      as projectId
+        ,t2.uses            as uses
+        ,t2.appconn_name    as appconnName
+        ,t2.secondary_type  as secondaryType
+        ,t2.workspace_id    as workspaceId
+        ,t2.orchestrator_mode  as orchestratorMode
+        ,t2.orchestrator_way  as orchestratorWay
+        ,t2.orchestrator_level as orchestratorLevel
+        ,t2.project_name    as projectName
+        ,t2.uuid            as uuid
+        ,t2.status          as status
+        ,t2.is_default_reference as isDefaultReference
+        from dss_workflow_node_meta t1
+        join dss_orchestrator_info t2
+        where t1.orchestrator_id = #{orchestratorId}
+    </select>
+
 </mapper>

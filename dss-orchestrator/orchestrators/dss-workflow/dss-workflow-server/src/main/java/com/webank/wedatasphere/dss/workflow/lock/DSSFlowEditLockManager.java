@@ -79,7 +79,7 @@ public class DSSFlowEditLockManager {
         LOGGER.info("编辑锁超时时间为：{} ms", DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue());
         init();
         // 对于工作流状态为已保存的，不自动解锁，该工作流的锁永不过期
-        List<String> saveList = lockMapper.selectOrchestratorByStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
+        List<Long> saveList = lockMapper.selectOrchestratorByStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
         if (!CollectionUtils.isEmpty(saveList)) {
             lockMapper.deleteExpectAfterSave(saveList);
         }else {

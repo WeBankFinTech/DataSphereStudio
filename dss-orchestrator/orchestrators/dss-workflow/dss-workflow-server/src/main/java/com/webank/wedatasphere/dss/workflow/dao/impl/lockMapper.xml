@@ -95,6 +95,17 @@
         where `id` = #{id}
     </update>
 
+    <update id="batchUpdateOrchestratorStatus">
+        update dss_orchestrator_info
+        <set>
+            `status` = #{status}
+        </set>
+        where `id` IN
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
     <select id="selectOrchestratorStatus" resultType="java.lang.String">
         select `status` from dss_orchestrator_info where `id` = #{id}
     </select>
@@ -109,6 +120,17 @@
             `commit_id` = #{commitId}
         </set>
         where `app_id` = #{flowID}
+    </update>
+
+    <update id="batchUpdateOrchestratorVersionCommitId">
+        update dss_orchestrator_version_info
+        <set>
+            `commit_id` = #{commitId}
+        </set>
+        where `app_id` IN
+        <foreach collection="list" open="(" close=")" separator="," index="index" item="item">
+            #{item}
+        </foreach>
     </update>
 
 </mapper>

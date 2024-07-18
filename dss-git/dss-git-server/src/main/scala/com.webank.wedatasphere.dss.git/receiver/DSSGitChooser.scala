@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.git.receiver
 
-import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitBaseRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitDiffTargetCommitRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
+import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitBaseRequest, GitBatchCommitRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitDiffTargetCommitRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
 import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
 
 import javax.annotation.PostConstruct
@@ -59,6 +59,7 @@ class DSSGitChooser extends ReceiverChooser {
     case _: GitConnectRequest => receiver
     case _: GitUserInfoByRequest => receiver
     case _: GitDiffTargetCommitRequest => receiver
+    case _: GitBatchCommitRequest => receiver
     case _ => None
   }
 }

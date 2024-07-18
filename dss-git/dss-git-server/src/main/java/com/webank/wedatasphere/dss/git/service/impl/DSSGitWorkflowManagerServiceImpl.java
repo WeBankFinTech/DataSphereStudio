@@ -189,6 +189,52 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
+    public GitCommitResponse batchCommit(GitBatchCommitRequest request) throws DSSErrorException {
+        Long workspaceId = request.getWorkspaceId();
+        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
+        if (gitUser == null) {
+            logger.error("the workspace : {} don't associate with git", workspaceId);
+            return null;
+        }
+        GitCommitResponse commitResponse = null;
+        // 拼接.git路径
+        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        // 获取git仓库
+        File repoDir = new File(gitPath);
+
+        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+            // 解压BML文件到本地
+            BmlResource bmlResource = request.getBmlResource();
+            List<String> paths = request.getFilePath();
+            String fileName = request.getProjectName() + bmlResource.getResourceId();
+            // 本地保持最新状态
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            // 解压BML文件到本地
+            FileUtils.downloadBMLResource(bmlService, fileName, bmlResource, request.getUsername(), workspaceId);
+            for (String path : paths) {
+                FileUtils.removeFlowNode(path, request.getProjectName(), workspaceId);
+                String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + path;
+                paths.add(metaConfPath);
+            }
+            FileUtils.unzipBMLResource(fileName, workspaceId);
+
+
+
+            // 提交
+            String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
+            // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
+            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
+
+            commitResponse = DSSGitUtils.getCurrentCommit(repository);
+        } catch (Exception e) {
+            logger.error("commit failed, the reason is ",e);
+            throw new DSSErrorException(8001, "commit workflow failed, the reason is: " + e);
+        }
+        return commitResponse;
+    }
+
+    @Override
     public GitSearchResponse search(GitSearchRequest request) {
         Long workspaceId = request.getWorkspaceId();
         GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);

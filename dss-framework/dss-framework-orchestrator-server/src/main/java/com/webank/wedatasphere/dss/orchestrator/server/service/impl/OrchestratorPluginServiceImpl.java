@@ -28,10 +28,7 @@ import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitDiffTargetCommitRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitFileContentRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitDiffResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
@@ -51,6 +48,7 @@ import com.webank.wedatasphere.dss.orchestrator.publish.job.CommonUpdateConvertJ
 import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRelationVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -70,6 +68,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 
 public class OrchestratorPluginServiceImpl implements OrchestratorPluginService {
@@ -96,6 +95,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Autowired
     private OrchestratorService orchestratorService;
+
+    @Autowired
+    private OrchestratorPluginService orchestratorPluginService;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
 
@@ -242,28 +244,38 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         });
     }
 
-    public void batchSubmitFlow(List<OrchestratorSubmitRequest> flowRequestList, String username, Workspace workspace) throws DSSErrorException {
-        if (CollectionUtils.isEmpty(flowRequestList)) {
+    @Override
+    public void batchSubmitFlow(Map<String, List<OrchestratorRelationVo>> map, Map<String, Long> projectMap, String username, Workspace workspace, String label, String comment) throws DSSErrorException {
+        if (map == null) {
             throw new DSSErrorException(80001, "批量提交的工作流不能为空");
         }
 
-        for (OrchestratorSubmitRequest flowRequest : flowRequestList) {
-            Long orchestratorId = flowRequest.getOrchestratorId();
-            String status = lockMapper.selectOrchestratorStatus(orchestratorId);
-            if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
-                throw new DSSErrorException(800001, "工作流无改动或改动未提交，请确认改动并保存再进行提交");
+        for (Map.Entry<String, List<OrchestratorRelationVo>> entry : map.entrySet()) {
+            List<OrchestratorRelationVo> orchestratorRelationVos = entry.getValue();
+            String projectName = entry.getKey();
+            Long projectId = projectMap.get(projectName);
+            List<Long> orchestratorIdList = new ArrayList<>();
+            for (OrchestratorRelationVo relationVo : orchestratorRelationVos) {
+                Long orchestratorId = relationVo.getOrchestratorId();
+                orchestratorIdList.add(orchestratorId);
+                String status = lockMapper.selectOrchestratorStatus(orchestratorId);
+                if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
+                    throw new DSSErrorException(800001, "工作流无改动或改动未提交，请确认改动并保存再进行提交");
+                }
             }
             releaseThreadPool.submit(() ->{
                 //1. 异步提交，更新提交状态
                 try {
-                    submitWorkflowToBML(flowRequest, username, workspace);
+                    batchSubmitWorkflowToBML(orchestratorRelationVos, username, workspace, projectName, label, projectId, comment);
                 }  catch (Exception e) {
                     LOGGER.error("push failed, the reason is : ", e);
-                    orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
+                    orchestratorMapper.batchUpdateOrchestratorSubmitJobStatus(orchestratorIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, "batchSubmit error: " + e.toString());
                 }
             });
         }
     }
+
+
 
 
     @Override
@@ -299,6 +311,37 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return commit;
     }
 
+    public GitCommitResponse batchSubmitWorkflowToBML(List<OrchestratorRelationVo> relationVos, String username, Workspace workspace, String projectName, String label, Long projectId, String comment) {
+
+        for (OrchestratorRelationVo relationVo : relationVos) {
+            Long orchestratorId = relationVo.getOrchestratorId();
+            OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
+            if (orchestratorSubmitJob == null) {
+                OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
+                submitJob.setOrchestratorId(orchestratorId);
+                submitJob.setInstanceName(Sender.getThisInstance());
+                submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+                orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+            } else {
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSHING, "");
+            }
+        }
+        List<Long> flowIdList = relationVos.stream().map(OrchestratorRelationVo::getFlowId).collect(Collectors.toList());
+        BmlResource bmlResource = orchestratorPluginService.uploadWorkflowListToGit(flowIdList, projectName, label, username, workspace, projectId);
+        List<Long> orchestratorIdList = relationVos.stream().map(OrchestratorRelationVo::getOrchestratorId).collect(Collectors.toList());
+        List<String> orchestratorName = orchestratorMapper.getOrchestratorName(orchestratorIdList);
+        //4. 调用git服务上传
+        GitCommitResponse commit = batchPush(orchestratorName, bmlResource, username, workspace.getWorkspaceId(), projectName, comment);
+        if (commit == null) {
+            LOGGER.info("change is empty");
+        }
+        orchestratorMapper.batchUpdateOrchestratorSubmitJobStatus(orchestratorIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
+        //5. 返回文件列表
+        lockMapper.batchUpdateOrchestratorStatus(orchestratorIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH);
+        // 更新commitId
+        lockMapper.batchUpdateOrchestratorVersionCommitId(commit.getCommitId(), flowIdList);
+        return commit;
+    }
 
     private GitCommitResponse push (String path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
         LOGGER.info("-------=======================begin to add testGit1=======================-------");
@@ -306,6 +349,15 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         Map<String, BmlResource> file = new HashMap<>();
         file.put(path, bmlResource);
         GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, comment, username);
+        GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
+        LOGGER.info("-------=======================End to add testGit1=======================-------: {}", responseWorkflowValidNode);
+        return responseWorkflowValidNode;
+    }
+
+    private GitCommitResponse batchPush (List<String> path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
+        LOGGER.info("-------=======================begin to add testGit1=======================-------");
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitBatchCommitRequest request1 = new GitBatchCommitRequest(workspaceId, projectName, comment, username, path, bmlResource);
         GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
         LOGGER.info("-------=======================End to add testGit1=======================-------: {}", responseWorkflowValidNode);
         return responseWorkflowValidNode;

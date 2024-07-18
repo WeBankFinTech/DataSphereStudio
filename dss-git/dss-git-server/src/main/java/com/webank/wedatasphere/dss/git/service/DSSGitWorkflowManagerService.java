@@ -32,4 +32,6 @@ public interface DSSGitWorkflowManagerService {
     GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) throws DSSErrorException;
 
     GitDiffResponse diffGit(GitDiffTargetCommitRequest request);
+
+    GitCommitResponse batchCommit(GitBatchCommitRequest request) throws DSSErrorException;
 }

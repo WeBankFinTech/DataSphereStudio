@@ -42,10 +42,7 @@ import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorLevelEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.*;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -368,22 +365,22 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("至少需要选择一项工作流进行提交");
         }
 
-        Map<String, List<Long>> map = new HashMap<>();
+        Map<String, List<OrchestratorRelationVo>> map = new HashMap<>();
         Map<String, Long> projectMap = new HashMap<>();
         for (OrchestratorSubmitRequest submitFlowRequest: submitRequestList) {
             try {
                 checkSubmitWorkflow(submitFlowRequest, workspace, userName);
                 boolean b = map.containsKey(submitFlowRequest.getProjectName());
                 if (b) {
-                    List<Long> flowIdList = map.get(submitFlowRequest.getProjectName());
-                    flowIdList.add(submitFlowRequest.getFlowId());
+                    List<OrchestratorRelationVo> orchestratorRelationVos = map.get(submitFlowRequest.getProjectName());
+                    orchestratorRelationVos.add(new OrchestratorRelationVo(submitFlowRequest.getFlowId(), submitFlowRequest.getOrchestratorId()));
                 } else {
-                    List<Long> flowIdList = new ArrayList<>();
-                    flowIdList.add(submitFlowRequest.getFlowId());
+                    List<OrchestratorRelationVo> orchestratorRelationVos = new ArrayList<>();
+                    orchestratorRelationVos.add(new OrchestratorRelationVo(submitFlowRequest.getFlowId(), submitFlowRequest.getOrchestratorId()));
                     DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(submitFlowRequest.getOrchestratorId());
                     long projectId = orchestrator.getProjectId();
                     projectMap.put(submitFlowRequest.getProjectName(), projectId);
-                    map.put(submitFlowRequest.getProjectName(), flowIdList);
+                    map.put(submitFlowRequest.getProjectName(), orchestratorRelationVos);
                 }
             } catch (Exception e) {
                 return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
@@ -391,13 +388,9 @@ public class DSSFrameworkOrchestratorRestful {
 
         }
 
-        String label = batchSubmitRequest.getSubmitRequestList().get(0).getLabels().getRoute();
-
-        for (Map.Entry<String, List<Long>> entry : map.entrySet()) {
-            List<Long> flowIdList = entry.getValue();
-            Long projectId = projectMap.get(entry.getKey());
-            orchestratorPluginService.uploadWorkflowListToGit(flowIdList, entry.getKey(), label, userName, workspace, projectId);
-        }
+        String label = batchSubmitRequest.getLabels().getRoute();
+        String comment = batchSubmitRequest.getComment();
+        orchestratorPluginService.batchSubmitFlow(map, projectMap, userName, workspace, label, comment);
 
         return Message.ok();
     }

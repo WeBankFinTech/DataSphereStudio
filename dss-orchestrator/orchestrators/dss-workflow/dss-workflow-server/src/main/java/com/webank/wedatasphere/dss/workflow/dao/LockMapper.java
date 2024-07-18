@@ -52,16 +52,20 @@ public interface LockMapper {
     void deleteALL();
 
 
-    void deleteExpectAfterSave(@Param("list") List<String> list);
+    void deleteExpectAfterSave(@Param("list") List<Long> list);
 
 
     void insertFlowStatus(@Param("flowID") Long flowID, @Param("status") String status);
 
     void updateOrchestratorStatus(@Param("id") Long id, @Param("status") String status);
 
-    List<String> selectOrchestratorByStatus( @Param("status") String status);
+    void batchUpdateOrchestratorStatus(@Param("list") List<Long> list, @Param("status") String status);
+
+    List<Long> selectOrchestratorByStatus( @Param("status") String status);
 
     String selectOrchestratorStatus(@Param("id") Long id);
 
     void updateOrchestratorVersionCommitId(@Param("commitId")String commitId, @Param("flowID")Long flowID);
+
+    void batchUpdateOrchestratorVersionCommitId(@Param("commitId")String commitId, @Param("list")List<Long> list);
 }

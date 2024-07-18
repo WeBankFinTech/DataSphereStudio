@@ -24,9 +24,11 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentRe
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRelationVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface OrchestratorPluginService {
@@ -46,7 +48,7 @@ public interface OrchestratorPluginService {
 
     void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
 
-    void batchSubmitFlow(List<OrchestratorSubmitRequest> flowRequestList, String username, Workspace workspace) throws DSSErrorException;
+    void batchSubmitFlow(Map<String, List<OrchestratorRelationVo>> map, Map<String, Long> projectMap, String username, Workspace workspace, String label, String comment) throws DSSErrorException;
 
     GitCommitResponse submitWorkflowToBML(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 

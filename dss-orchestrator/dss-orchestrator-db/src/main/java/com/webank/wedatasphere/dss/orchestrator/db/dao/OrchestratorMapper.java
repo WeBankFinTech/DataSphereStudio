@@ -129,6 +129,8 @@ public interface OrchestratorMapper {
 
     void updateOrchestratorSubmitJobStatus(@Param("orchestratorId") Long orchestratorId, @Param("status") String status, @Param("errMsg") String errMsg);
 
+    void batchUpdateOrchestratorSubmitJobStatus(@Param("list") List<Long> list, @Param("status") String status, @Param("errMsg") String errMsg);
+
     void insertOrchestratorSubmitJob(OrchestratorSubmitJob orchestratorSubmitJob);
 
     OrchestratorSubmitJob selectSubmitJobStatus(@Param("orchestratorId") Long orchestratorId);
@@ -136,5 +138,7 @@ public interface OrchestratorMapper {
     List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest);
 
     OrchestratorMeta getOrchestratorMeta(@Param("orchestratorId") Long orchestratorId);
+
+    List<String> getOrchestratorName(List<Long> list);
 
 }

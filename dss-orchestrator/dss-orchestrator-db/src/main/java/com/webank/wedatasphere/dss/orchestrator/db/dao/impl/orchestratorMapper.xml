@@ -304,6 +304,17 @@
         where `orchestrator_id` = #{orchestratorId}
     </update>
 
+    <update id="batchUpdateOrchestratorSubmitJobStatus">
+        update dss_orchestrator_submit_job_info
+        <set>
+            `error_msg` = #{errMsg} ,`update_time` = Now() , `status` = #{status}
+        </set>
+        where `orchestrator_id` IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
     <select id="selectSubmitJobStatus" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
         select `id`, `orchestrator_id`, `create_time`, `update_time`, instance_name, status, error_msg from dss_orchestrator_submit_job_info
         where orchestrator_id = #{orchestratorId}
@@ -395,6 +406,13 @@
         from dss_workflow_node_meta t1
         join dss_orchestrator_info t2
         where t1.orchestrator_id = #{orchestratorId}
+    </select>
+
+    <select id="getOrchestratorName" resultType="java.lang.String">
+        SELECT name from dss_orchestrator_info where id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 
 </mapper>

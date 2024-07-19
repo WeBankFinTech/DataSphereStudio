@@ -111,6 +111,7 @@ import java.util.concurrent.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkService {
@@ -155,6 +156,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     private final ExecutorService orchestratorCopyThreadPool = new ThreadPoolExecutor(0, 200, 60L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(1024), orchestratorCopyThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+
+    protected Sender getOrchestratorSender() {
+        return DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+    }
 
     /**
      * 1.拿到的dss orchestrator的appconn
@@ -581,26 +586,99 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
     @Override
     public List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total) {
-        PageHelper.startPage(orchestratorMetaRequest.getPageNow(), orchestratorMetaRequest.getPageSize());
         List<OrchestratorMeta> orchestratorMetaList = orchestratorMapper.getAllOrchestratorMeta(orchestratorMetaRequest);
-        PageInfo<OrchestratorMeta> pageInfo = new PageInfo<>(orchestratorMetaList);
-        total.add(pageInfo.getTotal());
-        for (OrchestratorMeta orchestratorMeta : orchestratorMetaList) {
-            orchestratorMeta.setStatusName(WorkFlowStatusEnum.getEnum(orchestratorMeta.getStatus()).getName());
+        List<OrchestratorMeta> orchestratorMetaInfo = new ArrayList<>();
+        if (CollectionUtils.isEmpty(orchestratorMetaList)) {
+            total.add(0L);
+            return orchestratorMetaInfo;
         }
-        return orchestratorMetaList;
+
+        List<Long> orchestratorIdList = orchestratorMetaList.stream().map(OrchestratorMeta::getOrchestratorId).collect(Collectors.toList());
+        List<OrchestratorReleaseVersionInfo> releaseVersionInfos = orchestratorMapper.getOrchestratorReleaseVersionInfo(orchestratorIdList);
+        List<OrchestratorReleaseVersionInfo> releaseVersionList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(releaseVersionInfos)) {
+            // 分组排序 获取编排最新的第一条记录信息
+            releaseVersionList = releaseVersionInfos.stream()
+                    .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId)).values()
+                    .stream()
+                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getId)).get()))
+                    .collect(Collectors.toList());
+        }
+        // 获取模板名称
+        List<OrchestratorTemplateInfo> templateInfos = orchestratorMapper.getOrchestratorDefaultTemplateInfo(orchestratorIdList);
+        Map<Long, String> templateMap = new HashMap<>();
+        if(!CollectionUtils.isEmpty(templateInfos)){
+            // 分组 拼接模板名称
+            templateMap = templateInfos.stream().collect(Collectors.groupingBy(OrchestratorTemplateInfo::getOrchestratorId,
+                    Collectors.mapping(OrchestratorTemplateInfo::getTemplateName, Collectors.joining(","))));
+        }
+
+
+        for (OrchestratorMeta orchestratorMeta : orchestratorMetaList) {
+            /*
+             * 对于接入git的项目下，并且当前状态为save的编排
+             * 去dss_release_task这边获取当前提交状态是否为running 或 failed，
+             * 若为上述状态，则将status置为ruuning或failed，failed需带上错误原因
+             * **/
+            if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()
+                    && orchestratorMeta.getStatus().equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
+
+                OrchestratorReleaseVersionInfo releaseVersion = releaseVersionList.stream().filter(releaseVersionInfo ->
+                                releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))
+                        .findFirst().orElse(new OrchestratorReleaseVersionInfo());
+
+                if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
+                    orchestratorMeta.setStatus(releaseVersion.getStatus());
+                }
+
+                if (WorkFlowStatusEnum.FAILED.getStatus().equalsIgnoreCase(releaseVersion.getStatus())) {
+                    orchestratorMeta.setStatus(releaseVersion.getStatus());
+                    orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
+                }
+            }
+
+            if(templateMap.containsKey(orchestratorMeta.getOrchestratorId())){
+                orchestratorMeta.setTemplateName(templateMap.get(orchestratorMeta.getOrchestratorId()));
+            }
+
+        }
+
+        if (!StringUtils.isBlank(orchestratorMetaRequest.getStatus())) {
+            // 状态过滤
+            orchestratorMetaList = orchestratorMetaList.stream().filter(orchestratorMeta ->
+                    orchestratorMeta.getStatus().equalsIgnoreCase(orchestratorMetaRequest.getStatus())).collect(Collectors.toList());
+        }
+
+        total.add((long) orchestratorMetaList.size());
+        // 分页处理
+        Integer page = orchestratorMetaRequest.getPageNow() - 1;
+        Integer pageSize = orchestratorMetaRequest.getPageSize();
+        if (page * pageSize > orchestratorMetaList.size()) {
+            return orchestratorMetaInfo;
+        }
+
+        for (int i = page * pageSize; i < orchestratorMetaList.size(); i++) {
+            OrchestratorMeta orchestratorMeta = orchestratorMetaList.get(i);
+            orchestratorMeta.setStatusName(WorkFlowStatusEnum.getEnum(orchestratorMeta.getStatus()).getName());
+            orchestratorMetaInfo.add(orchestratorMeta);
+        }
+
+        return orchestratorMetaInfo;
     }
 
 
     public void updateBmlResource(OrchestratorMeta orchestratorMeta, String username) {
 
         DSSOrchestratorVersion orchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorMeta.getOrchestratorId(), 1);
+        // 查询dss工作流信息
         DSSFlow dssFlow = flowMapper.selectFlowByID(orchestratorVersion.getAppId());
         if (StringUtils.isEmpty(dssFlow.getCreator())) {
             dssFlow.setCreator(username);
         }
         String creator = dssFlow.getCreator();
+        // 从Bml中获取json信息
         String flowJsonOld = getFlowJson(creator, orchestratorMeta.getProjectName(), dssFlow);
+        // 更新user.to.proxy用户和proxyuser用户 信息
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = jsonParser.parse(flowJsonOld).getAsJsonObject();
         JsonArray props = jsonObject.getAsJsonArray("props");
@@ -613,10 +691,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             scheduleParams.addProperty("proxyuser", orchestratorMeta.getProxyUser());
         }
 
-        NodeMetaDO nodeMetaByOrchestrator = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorMeta.getOrchestratorId());
-        nodeMetaByOrchestrator.setProxyUser(orchestratorMeta.getProxyUser());
-        nodeMetaMapper.updateNodeMeta(nodeMetaByOrchestrator);
-
         String jsonFlow = jsonObject.toString();
         String resourceId = dssFlow.getResourceId();
         Long parentFlowID = flowMapper.getParentFlowID(dssFlow.getId());
@@ -625,12 +699,16 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 orchestratorMeta.getWorkspaceName(), orchestratorMeta.getProjectName(), dssFlow.getName(), creator, false);
         saveFlowHook.beforeSave(jsonFlow,dssFlow,parentFlowID);
         Map<String, Object> bmlReturnMap = bmlService.update(creator, resourceId, jsonFlow);
-
         dssFlow.setHasSaved(true);
         dssFlow.setResourceId(bmlReturnMap.get("resourceId").toString());
         dssFlow.setBmlVersion(bmlReturnMap.get("version").toString());
 
-        //todo 数据库增加版本更新
+        // 更新NodeMeta代理用户信息
+        NodeMetaDO nodeMetaByOrchestrator = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorMeta.getOrchestratorId());
+        nodeMetaByOrchestrator.setProxyUser(orchestratorMeta.getProxyUser());
+        nodeMetaMapper.updateNodeMeta(nodeMetaByOrchestrator);
+
+        // 数据库增加版本更新
         flowMapper.updateFlowInputInfo(dssFlow);
 
         try {
@@ -641,6 +719,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
         saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
 
+        String version = bmlReturnMap.get("version").toString();
+        // 对子工作流,需更新父工作流状态，以便提交
+        Long updateFlowId = parentFlowID == null? dssFlow.getId():parentFlowID;
+        updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId);
 
     }
 
@@ -649,6 +731,41 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         String savePath = flowExportSaveBasePath + File.separator + dssFlow.getName() + File.separator + dssFlow.getName() + ".json";
         String flowJson = bmlService.downloadAndGetText(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion(), savePath);
         return flowJson;
+    }
+
+
+    private void updateTOSaveStatus(Long projectId, Long flowID) {
+        try {
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
+            //仅对接入Git的项目 更新状态为 保存
+            if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
+                Long rootFlowId = getRootFlowId(flowID);
+                if (rootFlowId != null) {
+                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                            OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                    lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                }
+            }
+        } catch (DSSErrorException e) {
+            LOGGER.error("getProjectInfo failed by:", e);
+            throw new DSSRuntimeException(e.getErrCode(),"更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+        }
+    }
+
+    private Long getRootFlowId(Long flowId) {
+        if (flowId == null) {
+            return null;
+        }
+        DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
+        if (dssFlow == null) {
+            return null;
+        }
+        if (dssFlow.getRootFlow()) {
+            return dssFlow.getId();
+        } else {
+            Long parentFlowID = flowMapper.getParentFlowID(flowId);
+            return getRootFlowId(parentFlowID);
+        }
     }
 
 

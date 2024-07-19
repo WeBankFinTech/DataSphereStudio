@@ -12,6 +12,12 @@ public class OrchestratorMeta {
     //项目名称
     private String projectName;
 
+    // 项目是否关联git
+    private Boolean associateGit;
+
+    // 发布的错误消息
+    private String errorMsg;
+
     // 项目ID
     private Long projectId;
 
@@ -76,10 +82,36 @@ public class OrchestratorMeta {
     private String isDefaultReference;
 
 
+    // 模板名称
+    private String templateName;
+
+    public String getTemplateName() {
+        return templateName;
+    }
+
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
+    }
 
     public OrchestratorMeta() {
     }
 
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
+    }
 
     public Long getOrchestratorId() {
         return orchestratorId;

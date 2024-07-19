@@ -248,7 +248,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                         }.getType());
                 projectResponse.setDataSourceList(dataSourceList);
             }
-            projectResponseList.add(projectResponse);
 
             String pusername = projectVo.getPusername();
             String editPriv = projectVo.getId() + KEY_SPLIT + ProjectUserPrivEnum.PRIV_EDIT.getRank()
@@ -292,6 +291,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             } else {
                 projectResponse.setEditable(false);
             }
+
+            projectResponseList.add(projectResponse);
         }
         return projectResponseList;
     }

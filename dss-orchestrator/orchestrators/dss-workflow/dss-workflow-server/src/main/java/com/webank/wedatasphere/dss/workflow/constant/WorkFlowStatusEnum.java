@@ -7,8 +7,11 @@ public enum WorkFlowStatusEnum {
     PUSH(OrchestratorRefConstant.FLOW_STATUS_PUSH,"待发布"),
     PUBLISH(OrchestratorRefConstant.FLOW_STATUS_PUBLISH,"已发布"),
     RUNNING(OrchestratorRefConstant.FLOW_STATUS_PUSHING,"提交中"),
+    // 暂时不需要
     PUBLISHING(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING,"发布中"),
-    STATELESS(OrchestratorRefConstant.FLOW_STATUS_STATELESS,"--");
+    STATELESS(OrchestratorRefConstant.FLOW_STATUS_STATELESS,"--"),
+
+    FAILED("Failed","发布错误");
 
 
     private String status;

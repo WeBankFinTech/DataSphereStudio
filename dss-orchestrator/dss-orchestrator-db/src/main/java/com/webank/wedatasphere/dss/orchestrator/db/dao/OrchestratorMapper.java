@@ -141,4 +141,10 @@ public interface OrchestratorMapper {
 
     List<String> getOrchestratorName(List<Long> list);
 
+    List<OrchestratorReleaseVersionInfo> getOrchestratorReleaseVersionInfo(@Param("orchestratorIdList") List<Long> orchestratorIdList);
+
+    List<OrchestratorTemplateInfo> getOrchestratorDefaultTemplateInfo(@Param("orchestratorIdList")List<Long> orchestratorIdList);
+
+
+
 }

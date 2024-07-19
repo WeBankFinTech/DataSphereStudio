@@ -134,11 +134,8 @@ public class FileUtils {
         // 删除node节点
         String flowNodePathPre =  FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  projectName ;
         String flowNodePath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + path;
-        String flowNodeMetaPath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + FileUtils.normalizePath(GitConstant.GIT_SERVER_META_PATH) + File.separator + path;
-        // 1.删除工作流节点代码
+        // 1.删除对应文件代码
         removeDirectory(flowNodePath);
-        // 2. 删除工作流节点对应.metaConf文件
-        removeDirectory(flowNodeMetaPath);
     }
 
     public static void removeProject(String path, Long workspaceId) {

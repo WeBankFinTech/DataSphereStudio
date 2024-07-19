@@ -390,7 +390,11 @@ public class DSSFrameworkOrchestratorRestful {
 
         String label = batchSubmitRequest.getLabels().getRoute();
         String comment = batchSubmitRequest.getComment();
-        orchestratorPluginService.batchSubmitFlow(map, projectMap, userName, workspace, label, comment);
+        try {
+            orchestratorPluginService.batchSubmitFlow(map, projectMap, userName, workspace, label, comment);
+        } catch (Exception e) {
+            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
+        }
 
         return Message.ok();
     }

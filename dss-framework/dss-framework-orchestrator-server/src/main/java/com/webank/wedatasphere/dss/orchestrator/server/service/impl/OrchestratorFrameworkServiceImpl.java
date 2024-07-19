@@ -100,6 +100,7 @@ import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -134,6 +135,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private LockMapper lockMapper;
 
     @Autowired
+    @Qualifier("workflowBmlService")
     private BMLService bmlService;
     @Autowired
     private FlowMapper flowMapper;

@@ -132,8 +132,7 @@ public class FileUtils {
 
     public static void removeFlowNode(String path, String projectName, Long workspaceId) {
         // 删除node节点
-        String flowNodePathPre =  FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  projectName ;
-        String flowNodePath = File.separator + FileUtils.normalizePath(flowNodePathPre) + File.separator + path;
+        String flowNodePath = DSSGitConstant.GIT_PATH_PRE + path;
         // 1.删除对应文件代码
         removeDirectory(flowNodePath);
     }

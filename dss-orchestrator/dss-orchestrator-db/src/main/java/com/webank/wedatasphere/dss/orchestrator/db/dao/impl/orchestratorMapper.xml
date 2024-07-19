@@ -324,47 +324,23 @@
     <select id="getAllOrchestratorMeta" parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMetaRequest"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMeta">
         select * from
-        (select t1.id as id
-        ,t1.orchestrator_id as orchestratorId
-        ,t1.global_var      as globalVar
-        ,t1.resource        as resource
-        ,t1.proxy_user      as proxyUser
+        (select t1.id              as orchestratorId
+        ,t1.name            as orchestratorName
+        ,t1.desc            as description
+        ,t1.uuid            as uuid
+        ,t1.status          as status
+        ,t1.is_default_reference as isDefaultReference
+        ,t1.project_id      as projectId
         ,t2.project_name    as projectName
-        ,t2.name            as orchestratorName
-        ,t2.desc            as description
-        ,t2.uuid            as uuid
-        ,t2.status          as status
-        ,t2.is_default_reference as isDefaultReference
-        ,t3.version         as version
-        ,t3.update_time     as updateTime
-        ,t4.template_name   as templateName
-        from dss_workflow_node_meta t1
-        join
-        (select a.name,a.desc,a.uuid,a.status
-        ,a.project_id,b.workspace_id
-        ,b.name as project_name
-        ,a.is_default_reference
-        from  dss_orchestrator_info  a
-        join  dss_project b  on a.project_id  = b.id and b.workspace_id = #{workspaceId}
-        ) t2 on t1.orchestrator_id = t2.id
-        join
-        (select orchestrator_id
-        ,substring_index(group_concat(version order by update_time desc),',',1) as version
-        ,substring_index(group_concat(update_time ORDER BY update_time desc), ',', 1)  as update_time
-        from dss_orchestrator_version_info
-        where valid_flag  = 1
-        group by orchestrator_id
-        ) t3 on t1.orchestrator_id  = t3.orchestrator_id
-        left join
-        (select  a.orchestrator_id ,group_concat(b.name) as template_name from dss_workflow_default_template  a
-        join dss_ec_config_template  b on a.template_id  = b.template_id
-        group by orchestrator_id
-        ) t4 on t1.orchestrator_id = t4.orchestrator_id
+        ,t2.associate_git   as associateGit
+        ,t3.global_var      as globalVar
+        ,t3.resource        as resource
+        ,t3.proxy_user      as proxyUser
+        from dss_orchestrator_info t1
+        join dss_project t2  on t1.project_id  = t2.id and t2.workspace_id = #{workspaceId}
+        left join dss_workflow_node_meta t3 on t1.id = t3.orchestrator_id
         ) A
         where 1 = 1
-        <if test="status != null and status != ''">
-            and status = #{status}
-        </if>
 
         <if test="projectList!=null and projectList.size() > 0">
             and projectName in
@@ -412,6 +388,36 @@
         SELECT name from dss_orchestrator_info where id IN
         <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
             #{item}
+        </foreach>
+    </select>
+
+    <select id="getOrchestratorReleaseVersionInfo" parameterType="java.util.List"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseVersionInfo">
+        select  a.id               as id
+        ,a.orchestrator_id  as orchestratorId
+        ,a.version          as version
+        ,a.update_time      as updateTime
+        ,b.status           as status
+        ,b.error_msg        as errorMsg
+        from dss_orchestrator_version_info a
+        left join dss_release_task b on a.orchestrator_id = b.orchestrator_id and a.id = b.orchestrator_version_id
+        where a.valid_flag  = 1  and a.orchestrator_id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
+
+    </select>
+
+
+    <select id="getOrchestratorDefaultTemplateInfo"
+            resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorTemplateInfo">
+        select  a.orchestrator_id as orchestratorId
+        ,b.template_name   as templateName
+        from dss_workflow_default_template  a
+        join dss_ec_config_template  b on a.template_id  = b.template_id
+        where a.orchestrator_id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
         </foreach>
     </select>
 

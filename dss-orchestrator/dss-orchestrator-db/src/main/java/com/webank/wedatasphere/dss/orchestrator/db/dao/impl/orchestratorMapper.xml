@@ -397,6 +397,7 @@
         ,a.orchestrator_id  as orchestratorId
         ,a.version          as version
         ,a.update_time      as updateTime
+        ,a.updater          as updater
         ,b.status           as status
         ,b.error_msg        as errorMsg
         from dss_orchestrator_version_info a

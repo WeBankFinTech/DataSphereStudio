@@ -331,7 +331,7 @@
         ,t1.status          as status
         ,t1.is_default_reference as isDefaultReference
         ,t1.project_id      as projectId
-        ,t2.project_name    as projectName
+        ,t2.name    as projectName
         ,t2.associate_git   as associateGit
         ,t3.global_var      as globalVar
         ,t3.resource        as resource

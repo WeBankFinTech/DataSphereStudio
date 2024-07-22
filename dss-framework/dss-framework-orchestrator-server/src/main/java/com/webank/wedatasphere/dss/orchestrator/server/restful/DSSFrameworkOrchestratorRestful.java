@@ -589,10 +589,8 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("当前工作流正在被复制，不允许编辑");
         }
 
-        if (StringUtils.isEmpty(orchestratorMeta.getWorkspaceId())) {
-            orchestratorMeta.setWorkspaceId(workspace.getWorkspaceId());
-            orchestratorMeta.setWorkspaceName(workspace.getWorkspaceName());
-        }
+        orchestratorMeta.setWorkspaceId(workspace.getWorkspaceId());
+        orchestratorMeta.setWorkspaceName(workspace.getWorkspaceName());
 
         try {
             orchestratorFrameworkService.modifyOrchestratorMeta(username, orchestratorMeta, workspace);

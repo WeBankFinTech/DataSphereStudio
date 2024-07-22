@@ -616,7 +616,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         for (OrchestratorMeta orchestratorMeta : orchestratorMetaList) {
 
-
             OrchestratorReleaseVersionInfo releaseVersion = releaseVersionList.stream().filter(releaseVersionInfo ->
                             releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))
                     .findFirst().orElse(new OrchestratorReleaseVersionInfo());
@@ -645,6 +644,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
             if(templateMap.containsKey(orchestratorMeta.getOrchestratorId())){
                 orchestratorMeta.setTemplateName(templateMap.get(orchestratorMeta.getOrchestratorId()));
+            }
+
+            // 若状态为NULL, 则置为 无状态
+            if(StringUtils.isBlank(orchestratorMeta.getStatus())){
+                orchestratorMeta.setStatus(WorkFlowStatusEnum.STATELESS.getStatus());
             }
 
         }

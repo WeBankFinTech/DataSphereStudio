@@ -412,7 +412,7 @@
     <select id="getOrchestratorDefaultTemplateInfo"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorTemplateInfo">
         select  a.orchestrator_id as orchestratorId
-        ,b.template_name   as templateName
+        ,b.name   as templateName
         from dss_workflow_default_template  a
         join dss_ec_config_template  b on a.template_id  = b.template_id
         where a.orchestrator_id in

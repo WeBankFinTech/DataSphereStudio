@@ -615,6 +615,16 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
 
         for (OrchestratorMeta orchestratorMeta : orchestratorMetaList) {
+
+
+            OrchestratorReleaseVersionInfo releaseVersion = releaseVersionList.stream().filter(releaseVersionInfo ->
+                            releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))
+                    .findFirst().orElse(new OrchestratorReleaseVersionInfo());
+
+            orchestratorMeta.setVersion(releaseVersion.getVersion());
+            orchestratorMeta.setUpdateTime(releaseVersion.getUpdateTime());
+            orchestratorMeta.setUpdateUser(releaseVersion.getUpdater());
+
             /*
              * 对于接入git的项目下，并且当前状态为save的编排
              * 去dss_release_task这边获取当前提交状态是否为running 或 failed，
@@ -622,10 +632,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
              * **/
             if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()
                     && OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorMeta.getStatus())) {
-
-                OrchestratorReleaseVersionInfo releaseVersion = releaseVersionList.stream().filter(releaseVersionInfo ->
-                                releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))
-                        .findFirst().orElse(new OrchestratorReleaseVersionInfo());
 
                 if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
                     orchestratorMeta.setStatus(releaseVersion.getStatus());
@@ -651,13 +657,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         total.add((long) orchestratorMetaList.size());
         // 分页处理
-        Integer page = orchestratorMetaRequest.getPageNow() - 1;
-        Integer pageSize = orchestratorMetaRequest.getPageSize();
-        if (page * pageSize > orchestratorMetaList.size()) {
-            return orchestratorMetaInfo;
-        }
+        Integer page = orchestratorMetaRequest.getPageNow() >=1 ? orchestratorMetaRequest.getPageNow() : 1;
+        Integer pageSize = orchestratorMetaRequest.getPageSize() >=1 ? orchestratorMetaRequest.getPageSize() : 10;
+        Integer start = (page - 1) * pageSize;
+        Integer end = page * pageSize > orchestratorMetaList.size() ? orchestratorMetaList.size() : page * pageSize;
 
-        for (int i = page * pageSize; i < orchestratorMetaList.size(); i++) {
+        for (int i = start; i < end; i++) {
             OrchestratorMeta orchestratorMeta = orchestratorMetaList.get(i);
             orchestratorMeta.setStatusName(WorkFlowStatusEnum.getEnum(orchestratorMeta.getStatus()).getName());
             orchestratorMetaInfo.add(orchestratorMeta);

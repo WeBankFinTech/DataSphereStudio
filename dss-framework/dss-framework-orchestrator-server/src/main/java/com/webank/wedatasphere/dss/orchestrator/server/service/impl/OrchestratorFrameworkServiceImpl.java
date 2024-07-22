@@ -621,7 +621,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
              * 若为上述状态，则将status置为ruuning或failed，failed需带上错误原因
              * **/
             if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()
-                    && orchestratorMeta.getStatus().equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
+                    && OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorMeta.getStatus())) {
 
                 OrchestratorReleaseVersionInfo releaseVersion = releaseVersionList.stream().filter(releaseVersionInfo ->
                                 releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))

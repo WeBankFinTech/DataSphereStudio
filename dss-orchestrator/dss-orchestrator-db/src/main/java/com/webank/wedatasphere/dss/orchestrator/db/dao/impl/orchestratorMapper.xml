@@ -345,7 +345,7 @@
         <if test="projectList!=null and projectList.size() > 0">
             and projectName in
             <foreach collection="projectList" item="project" open="(" separator="," close=")">
-                projectName in (#{projectName})
+                #{projectName}
             </foreach>
         </if>
 

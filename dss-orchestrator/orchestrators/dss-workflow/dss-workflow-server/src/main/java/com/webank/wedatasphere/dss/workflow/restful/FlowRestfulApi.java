@@ -173,18 +173,14 @@ public class FlowRestfulApi {
     public Message batchPublishWorkflow(@RequestBody BatchPublishWorkflowRequest publishWorkflowRequest) throws Exception {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String publishUser = SecurityFilter.getLoginUsername(httpServletRequest);
-
+        Map<String, Object> labels = new HashMap<>();
+        labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, publishWorkflowRequest.getLabels().getRoute());
         try {
-            String errMsg = publishService.batchSubmit(publishWorkflowRequest, workspace, publishUser);
-
-            if (StringUtils.isEmpty(errMsg)) {
-                return Message.ok("所选工作流发布成功");
-            } else {
-                return Message.error(errMsg);
-            }
+            publishService.batchSubmit(publishWorkflowRequest, workspace, publishUser, labels);
         } catch (Exception e) {
             return Message.error("批量发布失败，原因为：" + e.getMessage());
         }
+        return Message.ok("批量发布提交成功");
 
     }
 

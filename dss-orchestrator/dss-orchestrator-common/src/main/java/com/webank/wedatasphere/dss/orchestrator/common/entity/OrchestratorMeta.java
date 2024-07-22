@@ -1,5 +1,7 @@
 package com.webank.wedatasphere.dss.orchestrator.common.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.util.Date;
 
 public class OrchestratorMeta {
@@ -41,10 +43,8 @@ public class OrchestratorMeta {
     private  String version;
 
     // 当前版本更新时间
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private  Date updateTime;
-
-    // 当前版本发布者
-    private String releaseUser;
 
     // 工作流ID
     private String uuid;
@@ -231,14 +231,6 @@ public class OrchestratorMeta {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
-    }
-
-    public String getReleaseUser() {
-        return releaseUser;
-    }
-
-    public void setReleaseUser(String releaseUser) {
-        this.releaseUser = releaseUser;
     }
 
     public String getUuid() {

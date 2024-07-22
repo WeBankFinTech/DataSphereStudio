@@ -424,6 +424,10 @@ public class DSSFrameworkProjectRestfulApi {
 
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
+        if (projectRequest.getWorkspaceId() == null) {
+            Workspace workspace = SSOHelper.getWorkspace(request);
+            projectRequest.setWorkspaceId(workspace.getWorkspaceId());
+        }
 
         LOGGER.info("user {} begin to listAllProjectName, projectId: {}.", username, projectRequest.getId());
         List<ProjectResponse> projectResponses = projectService.getListByParam(projectRequest);

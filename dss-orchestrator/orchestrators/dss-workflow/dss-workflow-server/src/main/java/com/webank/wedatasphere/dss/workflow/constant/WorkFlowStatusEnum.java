@@ -11,7 +11,7 @@ public enum WorkFlowStatusEnum {
     PUBLISHING(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING,"发布中"),
     STATELESS(OrchestratorRefConstant.FLOW_STATUS_STATELESS,"--"),
 
-    FAILED("Failed","发布错误");
+    FAILED("Failed","发布失败");
 
 
     private String status;

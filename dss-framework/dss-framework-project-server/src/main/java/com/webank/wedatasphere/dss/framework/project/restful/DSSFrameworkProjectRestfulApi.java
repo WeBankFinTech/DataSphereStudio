@@ -150,13 +150,30 @@ public class DSSFrameworkProjectRestfulApi {
             }).collect(Collectors.toList());
         }
 
+        // 分页
+        Integer total = dssProjectVos.size();
+        if(projectRequest.getPageNow() != null && projectRequest.getPageSize()!=null){
+            int page = projectRequest.getPageNow() >= 1 ? projectRequest.getPageNow() : 1;
+            int pageSize = projectRequest.getPageSize() >= 1 ? projectRequest.getPageSize() : 10;
+            List<ProjectResponse>  dssProjectList = new ArrayList<>();
+            Integer maxCount = page * pageSize > total ? total : page * pageSize;
+            Integer minCount = (page - 1) * pageSize;
+            for(int i = minCount; i < maxCount; i ++){
+                dssProjectList.add(dssProjectVos.get(i));
+            }
+
+            dssProjectVos = new ArrayList<>(dssProjectList);
+        }
+
 
         if (!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()) {
             dssProjectVos = dssProjectVos.stream().filter(item ->
                     (item.getEditUsers().contains(username) || item.getReleaseUsers().contains(username))
                             && item.getEditable()).collect(Collectors.toList());
         }
-        return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
+
+        return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos).data("total",total);
+
     }
 
     /**

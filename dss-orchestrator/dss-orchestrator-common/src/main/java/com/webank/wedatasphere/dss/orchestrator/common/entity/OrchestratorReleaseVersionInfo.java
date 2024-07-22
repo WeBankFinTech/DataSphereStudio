@@ -21,13 +21,17 @@ public class OrchestratorReleaseVersionInfo {
     // 发布状态fail时的错误信息
     private String errorMsg;
 
-    public OrchestratorReleaseVersionInfo(Long id, Long orchestratorId, String version, Date updateTime, String status, String errorMsg) {
+    // 更新人
+    private String updater;
+
+    public OrchestratorReleaseVersionInfo(Long id, Long orchestratorId, String version, Date updateTime, String status, String errorMsg, String updater) {
         this.id = id;
         this.orchestratorId = orchestratorId;
         this.version = version;
         this.updateTime = updateTime;
         this.status = status;
         this.errorMsg = errorMsg;
+        this.updater = updater;
     }
 
     public OrchestratorReleaseVersionInfo() {
@@ -39,6 +43,15 @@ public class OrchestratorReleaseVersionInfo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+
+    public String getUpdater() {
+        return updater;
+    }
+
+    public void setUpdater(String updater) {
+        this.updater = updater;
     }
 
     public Long getOrchestratorId() {

@@ -529,19 +529,19 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
 
     @Override
-    public void modifyOrchestratorMeta(String username, OrchestratorMeta orchestratorMeta, Workspace workspace) throws Exception {
+    public void modifyOrchestratorMeta(String username, ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, Workspace workspace) throws Exception {
 
         //检查desc字段长度
-        if (orchestratorMeta.getDescription().length() > MAX_DESC_LENGTH) {
+        if (modifyOrchestratorMetaRequest.getDescription().length() > MAX_DESC_LENGTH) {
             DSSFrameworkErrorException.dealErrorException(60000, "描述字段过长，请限制在" + MAX_DESC_LENGTH + "以内");
         }
-        if (orchestratorMeta.getOrchestratorName().length() > MAX_NAME_LENGTH) {
+        if (modifyOrchestratorMetaRequest.getOrchestratorName().length() > MAX_NAME_LENGTH) {
             DSSFrameworkErrorException.dealErrorException(60000, "编排名称过长，请限制在" + MAX_NAME_LENGTH + "以内");
         }
         //判断工程是否存在,并且取出工程名称和空间名称
-        DSSProject dssProject = validateOperation(orchestratorMeta.getProjectId(), username);
+        DSSProject dssProject = validateOperation(modifyOrchestratorMetaRequest.getProjectId(), username);
         
-        OrchestratorMeta orchestratorMetaInfo = orchestratorService.getOrchestratorMetaInfo(orchestratorMeta, dssProject, username);
+        OrchestratorMeta orchestratorMetaInfo = orchestratorService.getOrchestratorMetaInfo(modifyOrchestratorMetaRequest, dssProject, username);
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorMetaInfo.getOrchestratorMode());
 
         DSSOrchestratorInfo dssOrchestratorInfo = getDssOrchestratorInfo(orchestratorMetaInfo, dssOrchestratorRelation);

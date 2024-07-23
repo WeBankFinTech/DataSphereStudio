@@ -106,7 +106,6 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             checkGitName(projectCreateRequest.getName(), workspace, username);
         }
 
-        Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace, username);
         //3.保存dss_project
         DSSProjectDO project = dssProjectService.createProject(username, projectCreateRequest);
         // 同步项目信息至git
@@ -121,6 +120,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         //4.保存dss_project_user 工程与用户关系
         projectUserService.saveProjectUser(project.getId(), username, projectCreateRequest, workspace);
         //5.保存dss工程与其他工程的对应关系,应该都是以id来作为标识
+        Map<AppInstance, Long> projectMap = createAppConnProject(projectCreateRequest, workspace, username);
         if (projectMap.size() > 0) {
             dssProjectService.saveProjectRelation(project, projectMap);
         }

@@ -600,7 +600,7 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error(String.format("%s 工作流信息编辑失败", orchestratorMeta.getOrchestratorName()), e);
         }
 
-        return Message.ok(String.format("%s工作流信息编辑成功"));
+        return Message.ok(String.format("%s工作流信息编辑成功",orchestratorMeta.getOrchestratorName()));
     }
 
 }

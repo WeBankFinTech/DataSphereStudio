@@ -358,30 +358,31 @@
 
     <select id="getOrchestratorMeta" parameterType="java.lang.Long"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMeta">
-        select t1.id as id
-        ,t1.orchestrator_id as orchestratorId
-        ,t1.global_var      as globalVar
-        ,t1.resource        as resource
-        ,t1.proxy_user      as proxyUser
-        ,t2.name            as orchestratorName
-        ,t2.type            as type
-        ,t2.desc            as description
-        ,t2.creator         as creator
-        ,t2.project_id      as projectId
-        ,t2.uses            as uses
-        ,t2.appconn_name    as appconnName
-        ,t2.secondary_type  as secondaryType
-        ,t2.workspace_id    as workspaceId
-        ,t2.orchestrator_mode  as orchestratorMode
-        ,t2.orchestrator_way  as orchestratorWay
-        ,t2.orchestrator_level as orchestratorLevel
-        ,t2.project_name    as projectName
-        ,t2.uuid            as uuid
-        ,t2.status          as status
-        ,t2.is_default_reference as isDefaultReference
-        from dss_workflow_node_meta t1
-        join dss_orchestrator_info t2
-        where t1.orchestrator_id = #{orchestratorId}
+        select
+         t1.id as id
+        ,t2.id as orchestratorId
+        ,t2.global_var      as globalVar
+        ,t2.resource        as resource
+        ,t2.proxy_user      as proxyUser
+        ,t1.name            as orchestratorName
+        ,t1.type            as type
+        ,t1.desc            as description
+        ,t1.creator         as creator
+        ,t1.project_id      as projectId
+        ,t1.uses            as uses
+        ,t1.appconn_name    as appconnName
+        ,t1.secondary_type  as secondaryType
+        ,t1.workspace_id    as workspaceId
+        ,t1.orchestrator_mode  as orchestratorMode
+        ,t1.orchestrator_way  as orchestratorWay
+        ,t1.orchestrator_level as orchestratorLevel
+        ,t1.project_id      as projectId
+        ,t1.uuid            as uuid
+        ,t1.status          as status
+        ,t1.is_default_reference as isDefaultReference
+        from dss_orchestrator_info t1
+        left join dss_workflow_node_meta t2 on t1.id = t2.orchestrator_id
+        where t1.id = #{orchestratorId}
     </select>
 
     <select id="getOrchestratorName" resultType="java.lang.String">

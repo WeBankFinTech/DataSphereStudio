@@ -581,26 +581,26 @@ public class DSSFrameworkOrchestratorRestful {
 
 
     @RequestMapping(value = "/modifyOrchestratorMeta", method = RequestMethod.POST)
-    public Message modifyOrchestratorMeta(HttpServletRequest httpServletRequest, @RequestBody OrchestratorMeta orchestratorMeta) {
+    public Message modifyOrchestratorMeta(HttpServletRequest httpServletRequest, @RequestBody ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest) {
 
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        if (orchestratorFrameworkService.getOrchestratorCopyStatus(orchestratorMeta.getOrchestratorId())) {
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(modifyOrchestratorMetaRequest.getOrchestratorId())) {
             return Message.error("当前工作流正在被复制，不允许编辑");
         }
 
-        orchestratorMeta.setWorkspaceId(workspace.getWorkspaceId());
-        orchestratorMeta.setWorkspaceName(workspace.getWorkspaceName());
+        modifyOrchestratorMetaRequest.setWorkspaceId(workspace.getWorkspaceId());
+        modifyOrchestratorMetaRequest.setWorkspaceName(workspace.getWorkspaceName());
 
         try {
-            orchestratorFrameworkService.modifyOrchestratorMeta(username, orchestratorMeta, workspace);
+            orchestratorFrameworkService.modifyOrchestratorMeta(username, modifyOrchestratorMetaRequest, workspace);
         } catch (Exception e) {
-            LOGGER.error(String.format("%s modify OrchestratorMeta fail", orchestratorMeta.getOrchestratorName()));
+            LOGGER.error(String.format("%s modify OrchestratorMeta fail", modifyOrchestratorMetaRequest.getOrchestratorName()));
             e.printStackTrace();
-            return Message.error(String.format("%s 工作流信息编辑失败", orchestratorMeta.getOrchestratorName()), e);
+            return Message.error(String.format("%s 工作流信息编辑失败", modifyOrchestratorMetaRequest.getOrchestratorName()), e);
         }
 
-        return Message.ok(String.format("%s工作流信息编辑成功",orchestratorMeta.getOrchestratorName()));
+        return Message.ok(String.format("%s工作流信息编辑成功",modifyOrchestratorMetaRequest.getOrchestratorName()));
     }
 
 }

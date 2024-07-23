@@ -398,6 +398,10 @@ public class DSSFrameworkProjectRestfulApi {
             return Message.error(String.format("project %s is not exists.", projectModifyRequest.getName()));
         }
 
+        if(projectModifyRequest.getWorkspaceId() == null){
+            projectModifyRequest.setWorkspaceId(workspace.getWorkspaceId());
+        }
+
         String createUsername = dbProject.getUsername();
         //將创建人默认为发布权限和编辑权限
         if (!projectModifyRequest.getEditUsers().contains(createUsername)) {

@@ -58,7 +58,7 @@ public interface OrchestratorFrameworkService {
     GitHistoryResponse getHistory(Long workspaceId, Long orchestratorId, String projectName);
 
 
-    void modifyOrchestratorMeta(String username, OrchestratorMeta orchestratorMeta,Workspace workspace) throws Exception;
+    void modifyOrchestratorMeta(String username,ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest,Workspace workspace) throws Exception;
 
     List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total);
 

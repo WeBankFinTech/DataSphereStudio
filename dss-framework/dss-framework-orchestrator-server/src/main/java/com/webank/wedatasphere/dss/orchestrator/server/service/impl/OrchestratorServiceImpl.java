@@ -51,6 +51,7 @@ import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
 import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.ModifyOrchestratorMetaRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
@@ -695,31 +696,31 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
 
     @Override
-    public OrchestratorMeta getOrchestratorMetaInfo(OrchestratorMeta orchestratorMeta, DSSProject dssProject, String username) throws DSSFrameworkErrorException {
+    public OrchestratorMeta getOrchestratorMetaInfo(ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, DSSProject dssProject, String username) throws DSSFrameworkErrorException {
 
-        OrchestratorMeta orchestratorInfo = orchestratorMapper.getOrchestratorMeta(orchestratorMeta.getOrchestratorId());
+        OrchestratorMeta orchestratorInfo = orchestratorMapper.getOrchestratorMeta(modifyOrchestratorMetaRequest.getOrchestratorId());
 
         if (orchestratorInfo == null) {
-            DSSFrameworkErrorException.dealErrorException(60000, "编排模式ID=" + orchestratorMeta.getOrchestratorId() + "不存在");
+            DSSFrameworkErrorException.dealErrorException(60000, "编排模式ID=" + modifyOrchestratorMetaRequest.getOrchestratorId() + "不存在");
         }
 
         //若修改了编排名称，检查是否存在相同的编排名称
-        if (!orchestratorMeta.getOrchestratorName().equals(orchestratorInfo.getOrchestratorName())) {
-            isExistSameNameBeforeCreate(orchestratorMeta.getWorkspaceId(), orchestratorMeta.getProjectId(), orchestratorMeta.getOrchestratorName());
+        if (!modifyOrchestratorMetaRequest.getOrchestratorName().equals(orchestratorInfo.getOrchestratorName())) {
+            isExistSameNameBeforeCreate(modifyOrchestratorMetaRequest.getWorkspaceId(), modifyOrchestratorMetaRequest.getProjectId(), modifyOrchestratorMetaRequest.getOrchestratorName());
 
             if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
                 Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-                GitRenameRequest renameRequest = new GitRenameRequest(orchestratorMeta.getWorkspaceId(), dssProject.getName(),
-                        orchestratorMeta.getOrchestratorName(), orchestratorMeta.getOrchestratorName(), username);
+                GitRenameRequest renameRequest = new GitRenameRequest(modifyOrchestratorMetaRequest.getWorkspaceId(), dssProject.getName(),
+                        modifyOrchestratorMetaRequest.getOrchestratorName(), modifyOrchestratorMetaRequest.getOrchestratorName(), username);
                 RpcAskUtils.processAskException(sender.ask(renameRequest), GitCommitResponse.class, GitRenameRequest.class);
             }
         }
 
         // 修改前端传入的信息, 默认模板调用saveTemplateRef接口进行保存
-        orchestratorInfo.setOrchestratorName(orchestratorMeta.getOrchestratorName());
-        orchestratorInfo.setDescription(orchestratorMeta.getDescription());
-        orchestratorInfo.setIsDefaultReference(orchestratorMeta.getIsDefaultReference());
-        orchestratorInfo.setProxyUser(orchestratorMeta.getProxyUser());
+        orchestratorInfo.setOrchestratorName(modifyOrchestratorMetaRequest.getOrchestratorName());
+        orchestratorInfo.setDescription(modifyOrchestratorMetaRequest.getDescription());
+        orchestratorInfo.setIsDefaultReference(modifyOrchestratorMetaRequest.getIsDefaultReference());
+        orchestratorInfo.setProxyUser(modifyOrchestratorMetaRequest.getProxyUser());
         orchestratorInfo.setUpdateUser(username);
         orchestratorInfo.setUpdateTime(new Date(System.currentTimeMillis()));
 

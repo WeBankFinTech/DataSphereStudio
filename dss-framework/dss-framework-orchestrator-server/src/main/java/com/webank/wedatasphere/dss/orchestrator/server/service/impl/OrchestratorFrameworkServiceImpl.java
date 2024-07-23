@@ -540,15 +540,26 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorMeta.getProjectId(), username);
-        if (!orchestratorMeta.getWorkspaceId().equals(dssProject.getWorkspaceId())) {
-            LOGGER.error(String.format("%s项目命名空间id: %s, 当前命名空间id：%s", dssProject.getWorkspaceId(), orchestratorMeta.getWorkspaceId()));
-            DSSFrameworkErrorException.dealErrorException(60000, String.format("%s命名空间下没有%s项目信息",
-                    workspace.getWorkspaceName(), dssProject.getName()));
-        }
-
+        
         OrchestratorMeta orchestratorMetaInfo = orchestratorService.getOrchestratorMetaInfo(orchestratorMeta, dssProject, username);
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorMetaInfo.getOrchestratorMode());
 
+        DSSOrchestratorInfo dssOrchestratorInfo = getDssOrchestratorInfo(orchestratorMetaInfo, dssOrchestratorRelation);
+
+        List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV));
+        //1.如果调度系统要求同步创建工作流，向调度系统发送更新工作流的请求
+        tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, dssOrchestratorInfo,
+                OrchestrationService::getOrchestrationUpdateOperation,
+                (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
+                        .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
+
+        updateBmlResource(orchestratorMetaInfo, username);
+
+        orchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
+
+    }
+
+    private static DSSOrchestratorInfo getDssOrchestratorInfo(OrchestratorMeta orchestratorMetaInfo, DSSOrchestratorRelation dssOrchestratorRelation) {
         DSSOrchestratorInfo dssOrchestratorInfo = new DSSOrchestratorInfo();
         dssOrchestratorInfo.setId(orchestratorMetaInfo.getOrchestratorId());
         dssOrchestratorInfo.setName(orchestratorMetaInfo.getOrchestratorName());
@@ -566,19 +577,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setOrchestratorWay(orchestratorMetaInfo.getOrchestratorWay());
         dssOrchestratorInfo.setOrchestratorLevel(orchestratorMetaInfo.getOrchestratorLevel());
         dssOrchestratorInfo.setUses(orchestratorMetaInfo.getUses());
-
-
-        List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_DEV));
-        //1.如果调度系统要求同步创建工作流，向调度系统发送更新工作流的请求
-        tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, dssOrchestratorInfo,
-                OrchestrationService::getOrchestrationUpdateOperation,
-                (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
-                        .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
-
-        updateBmlResource(orchestratorMetaInfo, username);
-
-        orchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
-
+        return dssOrchestratorInfo;
     }
 
 

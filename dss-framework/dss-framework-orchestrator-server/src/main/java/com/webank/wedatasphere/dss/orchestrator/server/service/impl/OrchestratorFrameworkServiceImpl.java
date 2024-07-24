@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.*;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
@@ -685,17 +686,34 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         String creator = dssFlow.getCreator();
         // 从Bml中获取json信息
         String flowJsonOld = getFlowJson(creator, orchestratorMeta.getProjectName(), dssFlow);
-        // 更新user.to.proxy用户和proxyuser用户 信息
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = jsonParser.parse(flowJsonOld).getAsJsonObject();
-        JsonArray props = jsonObject.getAsJsonArray("props");
-        for (JsonElement prop : props) {
-            prop.getAsJsonObject().addProperty("user.to.proxy", orchestratorMeta.getProxyUser());
-        }
+        // 判断代理用户是否为NULL, 否则影响saveFlow获取取代理用户信息
+        if(!StringUtils.isEmpty(orchestratorMeta.getProxyUser())){
+            // 更新user.to.proxy用户和proxyuser用户 信息
+            JsonArray props = jsonObject.getAsJsonArray("props");
+            // JsonArray 转list，是否包含 user.to.proxy key
+            List<Map<String, Object>> propList =DSSCommonUtils.COMMON_GSON.fromJson(props,
+                    new TypeToken<List<Map<String, Object>>>() {}.getType());
+            int size = propList.stream().filter(map -> map.containsKey("user.to.proxy")).collect(Collectors.toList()).size();
+            if(size == 0){
+                JsonObject element = new JsonObject();
+                element.addProperty("user.to.proxy", orchestratorMeta.getProxyUser());
+                props.add(element);
+            }else{
+                for (JsonElement prop : props) {
+                    if(prop.getAsJsonObject().keySet().contains("user.to.proxy")){
+                        prop.getAsJsonObject().addProperty("user.to.proxy", orchestratorMeta.getProxyUser());
+                    }
+                }
+            }
 
-        JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
-        if (scheduleParams != null) {
-            scheduleParams.addProperty("proxyuser", orchestratorMeta.getProxyUser());
+            JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
+
+            if (scheduleParams != null) {
+                scheduleParams.addProperty("proxyuser", orchestratorMeta.getProxyUser());
+            }
+
         }
 
         String jsonFlow = jsonObject.toString();

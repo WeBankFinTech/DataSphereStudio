@@ -360,7 +360,7 @@
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMeta">
         select
          t1.id as id
-        ,t2.id as orchestratorId
+        ,t1.id as orchestratorId
         ,t2.global_var      as globalVar
         ,t2.resource        as resource
         ,t2.proxy_user      as proxyUser

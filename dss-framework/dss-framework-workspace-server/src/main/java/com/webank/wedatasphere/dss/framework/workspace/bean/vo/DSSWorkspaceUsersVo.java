@@ -11,6 +11,8 @@ public class DSSWorkspaceUsersVo {
 
     private List<String> releaseUsers;
 
+    private List<String> createUsers;
+
     public void setAccessUsers(List<String> accessUsers) {
         this.accessUsers = accessUsers;
     }
@@ -33,5 +35,14 @@ public class DSSWorkspaceUsersVo {
 
     public List<String> getReleaseUsers() {
         return releaseUsers;
+    }
+
+
+    public List<String> getCreateUsers() {
+        return createUsers;
+    }
+
+    public void setCreateUsers(List<String> createUsers) {
+        this.createUsers = createUsers;
     }
 }

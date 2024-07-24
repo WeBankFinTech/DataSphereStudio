@@ -70,4 +70,6 @@ public interface DSSWorkspaceUserService {
     void clearUserByUserName(String userName);
 
     void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds);
+
+    List<String> getWorkspaceUserByRoleId(Long workSpaceId,Integer roleId);
 }

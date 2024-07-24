@@ -704,6 +704,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
         jsonFlow = contextService.checkAndCreateContextID(jsonFlow, dssFlow.getBmlVersion(),
                 orchestratorMeta.getWorkspaceName(), orchestratorMeta.getProjectName(), dssFlow.getName(), creator, false);
+
+
+        if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
+            LOGGER.info("saveFlow is not change");
+            return;
+        }
+
         saveFlowHook.beforeSave(jsonFlow,dssFlow,parentFlowID);
         Map<String, Object> bmlReturnMap = bmlService.update(creator, resourceId, jsonFlow);
         dssFlow.setHasSaved(true);
@@ -759,7 +766,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
     }
 
-    private Long getRootFlowId(Long flowId) {
+    public Long getRootFlowId(Long flowId) {
         if (flowId == null) {
             return null;
         }
@@ -773,6 +780,21 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             Long parentFlowID = flowMapper.getParentFlowID(flowId);
             return getRootFlowId(parentFlowID);
         }
+    }
+
+    public boolean isEqualTwoJson(String oldJsonNode, String newJsonNode) {
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonObject jsonObject = parser.parse(oldJsonNode).getAsJsonObject();
+        jsonObject.remove("updateTime");
+        jsonObject.remove("comment");
+        String tempOldJson = gson.toJson(jsonObject);
+
+        JsonObject jsonObject2 = parser.parse(newJsonNode).getAsJsonObject();
+        jsonObject2.remove("updateTime");
+        jsonObject2.remove("comment");
+        String tempNewJson = gson.toJson(jsonObject2);
+        return tempOldJson.equals(tempNewJson);
     }
 
 }

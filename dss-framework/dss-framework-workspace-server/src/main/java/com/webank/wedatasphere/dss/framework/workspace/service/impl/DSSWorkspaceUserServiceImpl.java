@@ -226,4 +226,9 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     public void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds) {
         dssWorkspaceUserMapper.deleteUserRoles(userName, workspaceIds, roleIds);
     }
+
+    @Override
+    public List<String> getWorkspaceUserByRoleId(Long workSpaceId, Integer roleId) {
+        return dssWorkspaceUserMapper.getWorkspaceUserByRoleId(workSpaceId, roleId);
+    }
 }

@@ -98,11 +98,13 @@ public class DSSWorkspaceUserRestful {
         DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
         // workspaceId改为从cookie取
         int workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
-        dssWorkspaceUsersVo.setAccessUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
+        List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
+        dssWorkspaceUsersVo.setAccessUsers(users);
 //        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));
 //        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getWorkspaceReleaseUsers(workspaceId));
-        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
-        dssWorkspaceUsersVo.setReleaseUsers(dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId));
+        dssWorkspaceUsersVo.setEditUsers(users);
+        dssWorkspaceUsersVo.setReleaseUsers(users);
+        dssWorkspaceUsersVo.setCreateUsers(users);
         return Message.ok().data("users", dssWorkspaceUsersVo);
     }
 
@@ -266,6 +268,20 @@ public class DSSWorkspaceUserRestful {
         AuditLogUtils.printLog(userName,null, null, TargetTypeEnum.WORKSPACE_ROLE,null,
                 "revokeUserRole", OperateTypeEnum.DELETE,revokeUserRole);
         return Message.ok("回收成功");
+
+    }
+
+
+    /**
+     * 根据角色获取工作空间用户信息
+     */
+    @RequestMapping(path = "/getWorkspaceUserByRole", method = RequestMethod.GET)
+    public Message getWorkspaceUserByRole(@RequestParam(value = WORKSPACE_ID_STR) Long workSpaceId,
+                                          @RequestParam(value = "roleId", required = false, defaultValue = "1") Integer roleId) {
+
+        List<String> userList = dssWorkspaceUserService.getWorkspaceUserByRoleId(workSpaceId, roleId);
+
+        return Message.ok().data("data", userList);
 
     }
 }

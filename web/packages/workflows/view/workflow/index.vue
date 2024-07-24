@@ -208,7 +208,7 @@
     <!-- 导入工作流 -->
     <ImportFlow v-model="importModal" ref="import" @finish="importSended" />
     <!-- 查找代码 -->
-    <CodeSearchDrawer v-model="showCodeDrawer" :currentMode="currentMode" />
+    <CodeSearchDrawer v-model="showCodeDrawer" :currentMode="currentMode" @openFlowNode="openFlowNode" />
   </div>
 </template>
 <script>
@@ -606,6 +606,45 @@ export default {
           return item.query.orchestratorId !== orchestratorId
         }) 
       })
+    },
+    openFlowNode(evt, item, code) {
+      let linenum = 0
+      if (code) {
+        linenum = code.number;
+      } else {
+        linenum = item.keyLines[0].number;
+      }
+      // 当前查找只能在同工程下查找
+      // 根据参数找到对应node
+      const cur = this.projectsTree.filter(item => item.id == this.$route.query.projectID)[0];
+      if (cur) {
+        this.getFlow(cur, (flows) => {
+          const node = flows.find(it => it.name == item.flowName);
+          const query = {
+            workspaceId: this.$route.query.workspaceId,
+            projectID: this.$route.query.projectID,
+            projectName: this.$route.query.projectName,
+            flowId: node.orchestratorId,
+            tiemstamp: new Date().getTime()
+          }
+          if (node) {
+             storage.set('revealline', linenum);
+             storage.set('openflownode', `${node.orchestratorId}_flowidname_${item.nodeName}`);
+             if (node.orchestratorId == this.$route.query.flowId || node.orchestratorId == this.current.id) {
+              this.showCodeDrawer = false;
+              // 存储flow
+              storage.set("clickFlowInTree", node);
+              this.$router.push({
+                //name: "Workflow",
+                query,
+              });
+              this.updateBread();
+            } else {
+              window.open(`/#/workflow?${qs.stringify(query)}`, '_blank');
+            }
+          }
+        });
+      }      
     },
     handleTreeModal(project) {
       this.treeModalShow = true;
@@ -1189,12 +1228,17 @@ export default {
       })
     },
     openItemAction(params) {
-      this.current = {
+      const tabId = `${params.id}${params.version}` // 相同编排的不同版本
+      const hasInIndex = this.tabList.findIndex(it=>it.tabId === tabId)
+      if (hasInIndex !== -1) {
+        this.tabList.splice(hasInIndex, 1);
+      }
+      let current = {
         version: params.version, // 编排版本
         id: params.id, // 编排id
         name: params.name, // 用于tab显示
         query: params,
-        tabId: `${params.id}${params.version}`, // 相同编排的不同版本
+        tabId,
         isChange: false,
         orchestratorMode: params.orchestratorMode, // 后面根据具体的编排模式确认类型字段
         type: DEVPROCESS.DEVELOPMENTCENTER,
@@ -1202,16 +1246,8 @@ export default {
         flowStatus: params.flowStatus, // 工作流状态
         associateGit: params.associateGit
       };
-      const hasInIndex = this.tabList.findIndex(it=>it.tabId === this.current.tabId)
-      if(hasInIndex !== -1) {
-        this.tabList.splice(hasInIndex,1);
-      }
-      this.tabList.push(this.current);
-      // 下述写法，工作流数据未及时更新
-      //  const hasIn = this.tabList.find(it=>it.tabId === this.current.tabId)
-      // if(!hasIn){
-      //   this.tabList.push(this.current);
-      // }
+      this.tabList.push(current);
+      this.current = current;
     },
     onTabRemove(tabId, del) {
       let index = "";
@@ -1729,7 +1765,9 @@ export default {
     next();
   },
   beforeDestroy() {
-    clearTimeout(this.checkStatusTimer)
+    clearTimeout(this.checkStatusTimer);
+    storage.remove('revealline');
+    storage.remove('openflownode');
     window.removeEventListener('resize', this.resize);
   }
 };

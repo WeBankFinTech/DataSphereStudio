@@ -433,23 +433,17 @@ public class DSSFrameworkProjectRestfulApi {
             projectRequest.setWorkspaceId(workspace.getWorkspaceId());
         }
 
-        LOGGER.info("user {} begin to listAllProjectName, projectId: {}.", username, projectRequest.getId());
+        LOGGER.info("user {} begin to listAllProjectName, workspaceId: {}.", username, projectRequest.getWorkspaceId());
         List<ProjectResponse> projectResponses = projectService.getListByParam(projectRequest);
 
-        List<DSSProjectVo> dssProjectVos = new ArrayList<>();
+        List<String> projectNames = new ArrayList<>();
 
         if (!CollectionUtils.isEmpty(projectResponses)) {
 
-            for (ProjectResponse project : projectResponses) {
-                DSSProjectVo dssProjectVo = new DSSProjectVo();
-                dssProjectVo.setName(project.getName());
-                dssProjectVo.setId(project.getId());
-                dssProjectVo.setDescription(project.getDescription());
-                dssProjectVos.add(dssProjectVo);
-            }
+            projectNames = projectResponses.stream().map(ProjectResponse::getName).collect(Collectors.toList());
         }
 
-        return Message.ok().data("data", dssProjectVos);
+        return Message.ok().data("data", projectNames);
     }
 
 

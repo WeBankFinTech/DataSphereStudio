@@ -290,9 +290,15 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path = "/getWorkspaceProxyUsers",method = RequestMethod.GET)
-    public Message getWorkspaceProxyUsers() {
+    public Message getWorkspaceProxyUsers(@RequestParam(value = WORKSPACE_ID_STR, required = false) Long workspaceId) {
 
-        int workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+
+        if (workspaceId == null) {
+            workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+        }
+
+        LOGGER.info("getWorkspaceProxyUsers workspaceId is {}", workspaceId);
+
         List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
 
         return Message.ok().data("users", users);

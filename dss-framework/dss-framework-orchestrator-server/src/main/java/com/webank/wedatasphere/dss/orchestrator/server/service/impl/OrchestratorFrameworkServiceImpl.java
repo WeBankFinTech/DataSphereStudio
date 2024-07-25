@@ -64,6 +64,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
+import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorStatusEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
@@ -82,7 +83,7 @@ import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
-import com.webank.wedatasphere.dss.workflow.constant.WorkFlowStatusEnum;
+
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.dao.NodeMetaMapper;
@@ -635,7 +636,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     orchestratorMeta.setStatus(releaseVersion.getStatus());
                 }
 
-                if (WorkFlowStatusEnum.FAILED.getStatus().equalsIgnoreCase(releaseVersion.getStatus())) {
+                if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())) {
                     orchestratorMeta.setStatus(releaseVersion.getStatus());
                     orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
                 }
@@ -647,7 +648,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
             // 若状态为NULL, 则置为 无状态
             if(StringUtils.isBlank(orchestratorMeta.getStatus())){
-                orchestratorMeta.setStatus(WorkFlowStatusEnum.STATELESS.getStatus());
+                orchestratorMeta.setStatus(OrchestratorStatusEnum.STATELESS.getStatus());
             }
 
         }
@@ -667,7 +668,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         for (int i = start; i < end; i++) {
             OrchestratorMeta orchestratorMeta = orchestratorMetaList.get(i);
-            orchestratorMeta.setStatusName(WorkFlowStatusEnum.getEnum(orchestratorMeta.getStatus()).getName());
+            orchestratorMeta.setStatusName(OrchestratorStatusEnum.getEnum(orchestratorMeta.getStatus()).getName());
             orchestratorMetaInfo.add(orchestratorMeta);
         }
 

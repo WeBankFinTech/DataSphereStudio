@@ -290,7 +290,7 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(req);
         List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(openOrchestratorRequest.getLabels().getRoute()));
         Long orchestratorId = openOrchestratorRequest.getOrchestratorId();
-        if (orchestratorFrameworkService.getOrchestratorCopyStatus(orchestratorId)){
+        if (orchestratorFrameworkService.getOrchestratorCopyStatus(orchestratorId)) {
             return Message.error("当前工作流正在被复制，不允许被打开，请稍后");
         }
         LOGGER.info("user {} try to openOrchestrator, params:{}", userName, openOrchestratorRequest);
@@ -342,7 +342,7 @@ public class DSSFrameworkOrchestratorRestful {
     public Message diffFlowContent(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
-        
+
 
         String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
                 .findFirst().map(Cookie::getValue).get();
@@ -367,7 +367,7 @@ public class DSSFrameworkOrchestratorRestful {
 
         Map<String, List<OrchestratorRelationVo>> map = new HashMap<>();
         Map<String, Long> projectMap = new HashMap<>();
-        for (OrchestratorSubmitRequest submitFlowRequest: submitRequestList) {
+        for (OrchestratorSubmitRequest submitFlowRequest : submitRequestList) {
             try {
                 checkSubmitWorkflow(submitFlowRequest, workspace, userName);
                 boolean b = map.containsKey(submitFlowRequest.getProjectName());
@@ -383,7 +383,7 @@ public class DSSFrameworkOrchestratorRestful {
                     map.put(submitFlowRequest.getProjectName(), orchestratorRelationVos);
                 }
             } catch (Exception e) {
-                return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
+                return Message.error("提交工作流失败，请保存工作流重试，原因为：" + e.getMessage());
             }
 
         }
@@ -393,7 +393,7 @@ public class DSSFrameworkOrchestratorRestful {
         try {
             orchestratorPluginService.batchSubmitFlow(map, projectMap, userName, workspace, label, comment);
         } catch (Exception e) {
-            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
+            return Message.error("提交工作流失败，请保存工作流重试，原因为：" + e.getMessage());
         }
 
         return Message.ok();
@@ -409,14 +409,14 @@ public class DSSFrameworkOrchestratorRestful {
             checkSubmitWorkflow(submitFlowRequest, workspace, userName);
             orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
         } catch (Exception e) {
-            return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
+            return Message.error("提交工作流失败，请保存工作流重试，原因为：" + e.getMessage());
         }
 
 
         return Message.ok();
     }
 
-    private void checkSubmitWorkflow(OrchestratorSubmitRequest submitFlowRequest, Workspace workspace, String userName) throws DSSErrorException{
+    private void checkSubmitWorkflow(OrchestratorSubmitRequest submitFlowRequest, Workspace workspace, String userName) throws DSSErrorException {
         Long orchestratorId = submitFlowRequest.getOrchestratorId();
         try {
             checkWorkspace(orchestratorId, workspace);
@@ -432,7 +432,7 @@ public class DSSFrameworkOrchestratorRestful {
                 .findFirst().map(Cookie::getValue).get();
         DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
-            throw new DSSErrorException(80001,"当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+            throw new DSSErrorException(80001, "当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
 
 
@@ -473,7 +473,7 @@ public class DSSFrameworkOrchestratorRestful {
                 topDomain = domainIp.substring(secondToLastIndexOf);
             }
         }
-        String cookie = "_gitlab_session=" + authenToken + ";path=/; Domain="+ topDomain +"; HttpOnly; +";
+        String cookie = "_gitlab_session=" + authenToken + ";path=/; Domain=" + topDomain + "; HttpOnly; +";
         LOGGER.info("Cookie is {}", cookie);
         response.setHeader("Access-Control-Allow-Origin", topDomain);
         response.addHeader("Set-Cookie", cookie);
@@ -486,7 +486,7 @@ public class DSSFrameworkOrchestratorRestful {
         // 拼接跳转的url
         String gitUrlProject = gitUrlPre + "/" + namespace + "/" + projectName;
         if (!StringUtils.isEmpty(workflowName)) {
-            gitUrlProject +=  "/tree/master/" + workflowName;
+            gitUrlProject += "/tree/master/" + workflowName;
         }
         return Message.ok().data("gitUrl", UrlUtils.normalizeIp(gitUrlProject));
 
@@ -533,7 +533,7 @@ public class DSSFrameworkOrchestratorRestful {
         return Message.ok().data("history", history);
     }
 
-    private void checkWorkspace(Long orchestratorId, Workspace workspace) throws DSSErrorException{
+    private void checkWorkspace(Long orchestratorId, Workspace workspace) throws DSSErrorException {
         OrchestratorVo orchestratorVoById = orchestratorService.getOrchestratorVoById(orchestratorId);
         if (orchestratorVoById == null) {
             DSSExceptionUtils.dealErrorException(80001, "编排不存在", DSSErrorException.class);
@@ -600,7 +600,32 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error(String.format("%s 工作流信息编辑失败", modifyOrchestratorMetaRequest.getOrchestratorName()), e);
         }
 
-        return Message.ok(String.format("%s工作流信息编辑成功",modifyOrchestratorMetaRequest.getOrchestratorName()));
+        return Message.ok(String.format("%s工作流信息编辑成功", modifyOrchestratorMetaRequest.getOrchestratorName()));
+    }
+
+
+    /**
+     * 获取编排状态
+     **/
+    @RequestMapping(value = "/getOrchestratorGitStatus", method = RequestMethod.GET)
+    public Message getOrchestratorGitStatus() {
+
+        return Message.ok().data("status", orchestratorService.getOrchestratorGitStatus());
+    }
+
+
+    /**
+     * 获取编排名称
+     * **/
+    @RequestMapping(value = "/getAllOrchestratorName", method = RequestMethod.GET)
+    public Message getAllOrchestratorName(HttpServletRequest httpServletRequest,
+                                       @RequestParam(value = "workspaceId", required = false) Long workspaceId) {
+
+        if (workspaceId == null) {
+            workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+        }
+        LOGGER.info(String.format("getAllOrchestratorName workspaceId is %s", workspaceId));
+        return Message.ok().data("data", orchestratorService.getAllOrchestratorName(workspaceId));
     }
 
 }

@@ -51,7 +51,6 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
-import com.webank.wedatasphere.dss.workflow.constant.WorkFlowStatusEnum;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;

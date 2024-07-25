@@ -432,7 +432,7 @@
         and t2.workspace_id = #{workspaceId}
         and t2.visible = 1
         <if test="projectName != null and projectName !=''">
-            and t2.projectName = #{projectName}
+            and t2.project_name = #{projectName}
         </if>
     </select>
 

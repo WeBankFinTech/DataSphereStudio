@@ -380,6 +380,18 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<DSSFlow> subflowInfos = flowMapper.getSubflowInfoByParentId(flowId);
         List<String> subflowTitleList = new ArrayList<>();
         for (String nodeJson : nodeJsonList) {
+            List<Resource> resources = nodeParser.getNodeResource(nodeJson);
+            if(resources!=null){
+                Set<String> fileNames = new HashSet<>();
+                for (Resource resource : resources) {
+                    String fileName = resource.getFileName();
+                    if(fileNames.contains(fileName)){
+                        String nodeName=nodeParser.getNodeValue("title",nodeJson);
+                        throw new DSSRuntimeException("节点" + nodeName + "存在同名的resource，为脏数据，为不影响跑批，请删除该节点后重新创建");
+                    }
+                    fileNames.add(fileName);
+                }
+            }
             Map<String, Object> nodeMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
             String nodeType = nodeMap.get(JOBTYPE_KEY).toString();
             if ("workflow.subflow".equals(nodeType)) {

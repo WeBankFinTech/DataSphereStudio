@@ -738,8 +738,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    public List<String> getAllOrchestratorName(Long workspaceId) {
-        return orchestratorMapper.getAllOrchestratorName(workspaceId);
+    public List<String> getAllOrchestratorName(Long workspaceId,String projectName) {
+        return orchestratorMapper.getAllOrchestratorName(workspaceId,projectName);
     }
 
 }

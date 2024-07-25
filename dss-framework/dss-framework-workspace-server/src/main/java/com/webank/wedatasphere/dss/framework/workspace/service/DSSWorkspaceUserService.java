@@ -71,5 +71,5 @@ public interface DSSWorkspaceUserService {
 
     void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds);
 
-    List<String> getWorkspaceUserByRoleId(Long workSpaceId,Integer roleId);
+    List<String> getWorkspaceUserByRoleId(Long workspaceId,Integer roleId);
 }

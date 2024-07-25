@@ -228,7 +228,7 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public List<String> getWorkspaceUserByRoleId(Long workSpaceId, Integer roleId) {
-        return dssWorkspaceUserMapper.getWorkspaceUserByRoleId(workSpaceId, roleId);
+    public List<String> getWorkspaceUserByRoleId(Long workspaceId, Integer roleId) {
+        return dssWorkspaceUserMapper.getWorkspaceUserByRoleId(workspaceId, roleId);
     }
 }

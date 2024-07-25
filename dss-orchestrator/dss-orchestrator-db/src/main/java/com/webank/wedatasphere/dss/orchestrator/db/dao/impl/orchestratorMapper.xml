@@ -425,9 +425,15 @@
 
 
     <select id="getAllOrchestratorName" resultType="java.lang.String">
-        select t1.name
+        select distinct t1.name
         from dss_orchestrator_info t1
-        join dss_project t2  on t1.project_id  = t2.id and t2.workspace_id = #{workspaceId} and t2.visible = 1
+        join dss_project t2
+        on t1.project_id  = t2.id
+        and t2.workspace_id = #{workspaceId}
+        and t2.visible = 1
+        <if test="projectName != null and projectName !=''">
+            and t2.projectName = #{projectName}
+        </if>
     </select>
 
 </mapper>

@@ -155,6 +155,6 @@ public interface OrchestratorService {
 
     List<OrchestratorStatusVo> getOrchestratorGitStatus();
 
-    List<String> getAllOrchestratorName(Long workspaceId);
+    List<String> getAllOrchestratorName(Long workspaceId,String projectName);
 
 }

@@ -616,16 +616,17 @@ public class DSSFrameworkOrchestratorRestful {
 
     /**
      * 获取编排名称
-     * **/
+     **/
     @RequestMapping(value = "/getAllOrchestratorName", method = RequestMethod.GET)
     public Message getAllOrchestratorName(HttpServletRequest httpServletRequest,
-                                       @RequestParam(value = "workspaceId", required = false) Long workspaceId) {
+                                          @RequestParam(value = "workspaceId", required = false) Long workspaceId,
+                                          @RequestParam(value = "projectName",required = false) String projectName) {
 
         if (workspaceId == null) {
             workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
         }
         LOGGER.info(String.format("getAllOrchestratorName workspaceId is %s", workspaceId));
-        return Message.ok().data("data", orchestratorService.getAllOrchestratorName(workspaceId));
+        return Message.ok().data("data", orchestratorService.getAllOrchestratorName(workspaceId,projectName));
     }
 
 }

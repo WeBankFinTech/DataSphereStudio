@@ -146,5 +146,8 @@ public interface OrchestratorMapper {
     List<OrchestratorTemplateInfo> getOrchestratorDefaultTemplateInfo(@Param("orchestratorIdList")List<Long> orchestratorIdList);
 
 
+    List<String> getAllOrchestratorName(@Param("workspaceId") Long workspaceId);
+
+
 
 }

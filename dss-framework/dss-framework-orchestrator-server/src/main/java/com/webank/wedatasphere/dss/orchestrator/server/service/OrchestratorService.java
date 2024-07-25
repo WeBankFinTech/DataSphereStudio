@@ -30,6 +30,7 @@ import com.webank.wedatasphere.dss.orchestrator.server.entity.request.Orchestrat
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorStatusVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
@@ -151,5 +152,9 @@ public interface OrchestratorService {
     List<DSSOrchestratorInfo> getOrchestratorInfoByLabel(OrchestratorRequest orchestratorRequest);
 
     OrchestratorMeta getOrchestratorMetaInfo(ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, DSSProject dssProject, String username) throws DSSFrameworkErrorException;
+
+    List<OrchestratorStatusVo> getOrchestratorGitStatus();
+
+    List<String> getAllOrchestratorName(Long workspaceId);
 
 }

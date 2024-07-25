@@ -337,7 +337,7 @@
         ,t3.resource        as resource
         ,case when t3.proxy_user is null then t1.creator else t3.proxy_user end as proxyUser
         from dss_orchestrator_info t1
-        join dss_project t2  on t1.project_id  = t2.id and t2.workspace_id = #{workspaceId}
+        join dss_project t2  on t1.project_id  = t2.id and t2.workspace_id = #{workspaceId} and t2.visible = 1
         left join dss_workflow_node_meta t3 on t1.id = t3.orchestrator_id
         ) A
         where 1 = 1
@@ -421,6 +421,13 @@
         <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
             #{orchestratorId}
         </foreach>
+    </select>
+
+
+    <select id="getAllOrchestratorName" resultType="java.lang.String">
+        select t1.name
+        from dss_orchestrator_info t1
+        join dss_project t2  on t1.project_id  = t2.id and t2.workspace_id = #{workspaceId} and t2.visible = 1
     </select>
 
 </mapper>

@@ -51,12 +51,14 @@ import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.utils.OrchestrationDevelopmentOperationUtils;
 import com.webank.wedatasphere.dss.orchestrator.server.conf.OrchestratorConf;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
+import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorStatusEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.ModifyOrchestratorMetaRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorModifyRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRollBackGitVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorStatusVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorUnlockVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -101,6 +103,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class OrchestratorServiceImpl implements OrchestratorService {
@@ -726,6 +729,17 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
         return orchestratorInfo;
 
+    }
+
+    @Override
+    public List<OrchestratorStatusVo> getOrchestratorGitStatus() {
+
+        return OrchestratorStatusEnum.getOrchestratorGitStatus();
+    }
+
+    @Override
+    public List<String> getAllOrchestratorName(Long workspaceId) {
+        return orchestratorMapper.getAllOrchestratorName(workspaceId);
     }
 
 }

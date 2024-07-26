@@ -48,10 +48,11 @@
                                 <span class="panel-header__prefix">
                                     <Icon type="ios-arrow-down"></Icon>
                                 </span>
-                                <span class="panel-header__title" :title="item.path">{{ item.path }}</span>
+                                <span class="panel-header__title" :title="item.path" @dblclick="gotoFile($event, item)">{{ item.path
+                                }}</span>
                                 <span class="panel-header__icon">
                                     <SvgIcon style="font-size: 14px;" color="#444444" icon-class="fi-workflow1" />
-                                    <span class="icon-text" :title="item.project">{{ item.project }}</span>
+                                    <span class="icon-text" :title="item.flowName">{{ item.flowName }}</span>
                                 </span>
                                 <span class="panel-header__icon">
                                     {{ item.fileType }}
@@ -64,7 +65,9 @@
                         </div>
                         <div class="panel-content" v-if="item.keyLines.length <= 30">
                             <ul class="content-item" v-for="(code, index) in item.keyLines.slice(0, item.end)"
-                                :key="code.number">
+                                :key="code.number"
+                                @dblclick="gotoFile($event, item, code)"
+                                >
                                 <li class="content-item__num">{{ code.number }}</li>
                                 <li class="content-item__code" v-html="code.lineText"></li>
                             </ul>
@@ -88,11 +91,12 @@
                     :page-size="pageData.pageSize" :page-size-opts="pageData.opts" @on-change="pageChange"
                     @on-page-size-change="pageSizeChange"></Page>
             </div>
-            <div v-else>
+            <div v-else-if="!loading">
                 <div class="code-empty">暂无匹配数据</div>
             </div>
+            <div v-else-if="loading" class="code-empty">加载中...</div>
             <!-- 查看更多 -->
-            <ViewMore v-model="showMore" :current="currentItem" />
+            <ViewMore v-model="showMore" :current="currentItem" @gotoFile="gotoFile"/>
         </div>
     </Drawer>
 </template>
@@ -136,6 +140,7 @@ export default {
             showMore: false, // 查看更多
             currentItem: {},
             flowList: [],
+            loading: false
         }
     },
     computed: {
@@ -184,6 +189,7 @@ export default {
             if (!this.searchForm.searchContent) {
                 return this.$Message.warning('查找内容不能为空');
             }
+            this.loading = true;
             const params = {
                 projectName: this.$route.query.projectName,
                 workspaceId: this.$route.query.workspaceId,
@@ -195,16 +201,20 @@ export default {
                 pageNow: this.pageData.currentPage
             }
             api.fetch(`/dss/framework/project/searchGit`, params, 'post').then((rst) => {
+                this.loading = false;
                 this.codeResults = (rst.data.result || []).map(item => {
                     (item.keyLines || []).forEach(code => {
                         code.lineText = this.setHighlightText(code.line);
                     })
                     item.fileType = (item.path.match(/(?<=.+?\.)[^.]+$/g) || [])[0];
-                    item.project = item.path.split('/')[0];
+                    item.flowName = item.path.split('/')[0];
+                    item.nodeName = item.path.split('/')[1];
                     item.end = 10;
                     return item;
                 });
                 this.pageData.total = rst.data.total;
+            }).catch(() =>{
+                this.loading = false;
             })
         },
         pageInit() {
@@ -239,6 +249,13 @@ export default {
         clickShowMore(item) {
             this.currentItem = item;
             this.showMore = true;
+        },
+        gotoFile(ev, item, code) {
+            const paths = (item.path || '').split('/');
+            if (paths.length > 3) {
+                return this.$Message.warning("暂不支持进入子工作流节点详情");
+            }
+            this.$emit('openFlowNode', ev, item, code)
         },
         handleClick(item, line) {
             item.end = line;
@@ -346,6 +363,7 @@ export default {
                 &__left {
                     display: flex;
                     align-items: center;
+                    cursor: pointer;
                     width: calc(100% - 75px);
                 }
 
@@ -466,4 +484,5 @@ export default {
     .ivu-drawer-content {
         top: 55px;
     }
-}</style>
+}
+</style>

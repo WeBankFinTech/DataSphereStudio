@@ -531,7 +531,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
 
     @Override
-    public void modifyOrchestratorMeta(String username, ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, Workspace workspace) throws Exception {
+    public void modifyOrchestratorMeta(String username, ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, Workspace workspace,DSSOrchestratorVersion orchestratorVersion) throws Exception {
 
         //检查desc字段长度
         if (modifyOrchestratorMetaRequest.getDescription().length() > MAX_DESC_LENGTH) {
@@ -555,7 +555,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
                         .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
 
-        updateBmlResource(orchestratorMetaInfo, username);
+        updateBmlResource(orchestratorMetaInfo, username,orchestratorVersion);
 
         orchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
 
@@ -676,9 +676,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
 
-    public void updateBmlResource(OrchestratorMeta orchestratorMeta, String username) {
-
-        DSSOrchestratorVersion orchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorMeta.getOrchestratorId(), 1);
+    public void updateBmlResource(OrchestratorMeta orchestratorMeta, String username,DSSOrchestratorVersion orchestratorVersion) {
         // 查询dss工作流信息
         DSSFlow dssFlow = flowMapper.selectFlowByID(orchestratorVersion.getAppId());
         if (StringUtils.isEmpty(dssFlow.getCreator())) {

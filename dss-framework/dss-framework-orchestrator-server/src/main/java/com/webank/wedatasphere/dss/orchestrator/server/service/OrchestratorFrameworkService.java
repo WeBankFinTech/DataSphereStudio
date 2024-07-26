@@ -19,10 +19,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.service;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMeta;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorMetaRequest;
-import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorCopyHistory;
@@ -58,7 +55,7 @@ public interface OrchestratorFrameworkService {
     GitHistoryResponse getHistory(Long workspaceId, Long orchestratorId, String projectName);
 
 
-    void modifyOrchestratorMeta(String username,ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest,Workspace workspace) throws Exception;
+    void modifyOrchestratorMeta(String username, ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, Workspace workspace, DSSOrchestratorVersion orchestratorVersion) throws Exception;
 
     List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total);
 

@@ -689,16 +689,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         String flowJsonOld = getFlowJson(creator, orchestratorMeta.getProjectName(), dssFlow);
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = jsonParser.parse(flowJsonOld).getAsJsonObject();
-        JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
         String proxyUser = orchestratorMeta.getProxyUser();
-        // 判断代理用户是否为NULL
-        if(StringUtils.isEmpty(proxyUser)){
-            proxyUser = dssFlow.getCreator();
-            scheduleParams.remove("proxyuser");
-        }else{
-            scheduleParams.addProperty("proxyuser", proxyUser);
-        }
+
         // 更新user.to.proxy用户和proxyuser用户 信息
+        JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
+        scheduleParams.addProperty("proxyuser", proxyUser);
+
         JsonArray props = jsonObject.getAsJsonArray("props");
         // JsonArray 转list，是否包含 user.to.proxy key
         List<Map<String, Object>> propList =DSSCommonUtils.COMMON_GSON.fromJson(props,
@@ -724,7 +720,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 orchestratorMeta.getWorkspaceName(), orchestratorMeta.getProjectName(), dssFlow.getName(), creator, false);
 
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
-            LOGGER.info("saveFlow is not change");
+            LOGGER.info("modifyOrchestratorMeta is not change");
             return;
         }
 

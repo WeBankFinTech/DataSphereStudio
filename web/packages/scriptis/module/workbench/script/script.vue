@@ -335,12 +335,6 @@ export default {
         }
       });
     }
-    this.dispatch('IndexedDB:getHistory', {
-      tabId: this.script.id,
-      cb: (historyList) => {
-        this.script.history = dropRight(values(historyList));
-      }
-    });
     let cacheWork = await this.getCacheWork(this.work);
     this._running_scripts_key = 'running_scripts_' + this.userName;
     if (cacheWork) { // 点击运行后脚本正在执行中未关掉Tab刷新页面时执行进度恢复
@@ -352,6 +346,7 @@ export default {
         // cacheWork.taskID && .execID && cacheWork.data && cacheWork.data.running
       if (taskID && execID && data && data.running) {
         let dbProgress = JSON.parse(JSON.stringify(this.script.progress));
+        delete cacheWork.data.history;
         this.script = cacheWork.data;
         this.script.progress = dbProgress;
         this.run({
@@ -383,6 +378,12 @@ export default {
         this.script.status = 'Inited';
       }
     }
+    this.dispatch('IndexedDB:getHistory', {
+      tabId: this.script.id,
+      cb: (historyList) => {
+        this.script.history = dropRight(values(historyList));
+      }
+    });
     // 加入用户名来区分不同账户下的tab
     this.dispatch('IndexedDB:recordTab', { ...this.work, userName: this.userName });
   },
@@ -1129,6 +1130,7 @@ export default {
 
           }, false);
           this.work.unsave = false;
+          this.work.data.data = this.script.data;
           // 提交最新的内容，更新script.data和script.oldData
           this.script.oldData = this.script.data;
           // 保存时更新下缓存。

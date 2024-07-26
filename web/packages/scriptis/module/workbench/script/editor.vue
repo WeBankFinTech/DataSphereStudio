@@ -57,7 +57,7 @@
             class="workbench-body-navbar-item"
             v-if="
               $route.name == 'Home' &&
-              !script.readOnly &&
+                !script.readOnly &&
                 !isHdfs &&
                 isSupport &&
                 (script.application == 'jdbc' || script.application == 'ck')
@@ -68,6 +68,7 @@
               @on-change="dataSetSelect"
               class="dataSetSelect"
               clearable
+              filterable
               v-model="dataSetValue"
               style="width: 250px; margin-left: 3px"
             >
@@ -138,6 +139,7 @@ import api from '@dataspherestudio/shared/common/service/api';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 import { throttle } from 'lodash';
 import elementResizeEvent from '@dataspherestudio/shared/common/helper/elementResizeEvent';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 
 const extComponents = plugin.emitHook('script_editor_top_tools') || []
 
@@ -220,6 +222,15 @@ export default {
 
       this.oldDataSetValue = this.dataSetValue
     }
+    setTimeout(() => {
+      let linenum = storage.get("revealline") || 0
+      if (linenum && this.$refs.editor && this.$refs.editor.editor) {
+        this.$refs.editor.editor.setPosition({lineNumber: linenum, column: 1});
+        this.$refs.editor.editor.focus();
+        this.$refs.editor.editor.revealLine(linenum);
+        storage.remove("revealline")
+      }
+    },50)
   },
   methods: {
     dataSetSelect(v) {

@@ -960,6 +960,17 @@ export default {
       }
       this.$nextTick(() => {
         this.loading = false;
+        const openflownode = storage.get('openflownode');
+        if (openflownode) {
+          storage.remove('openflownode');
+          const [ flowid, nodename ] = openflownode.split('_flowidname_')
+          const node = this.originalData.nodes.find(node => {
+            return node.title === nodename
+          })
+          if (flowid == this.$route.query.flowId && node) {
+            this.dblclick(node)
+          }
+        }
       });
       this.pollUpdateLock();
     },

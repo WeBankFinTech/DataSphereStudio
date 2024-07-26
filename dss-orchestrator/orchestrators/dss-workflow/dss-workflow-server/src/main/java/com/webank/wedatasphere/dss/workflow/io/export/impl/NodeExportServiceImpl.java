@@ -63,15 +63,22 @@ public class NodeExportServiceImpl implements NodeExportService {
         String scriptName = Optional.ofNullable(dwsNode.getJobContent()).map(jobContent -> jobContent.get("script"))
                 .map(Object::toString).orElse(null);
         if (resources != null) {
-            resources.forEach(x -> {
+            boolean hasScriptSaved=false;
+            for (Resource x : resources) {
                 // TODO: 2020/6/9 防止前台传的 resources：{{}],后期要去掉
                 if (x.getResourceId() != null && x.getFileName() != null && x.getVersion() != null) {
                     String nodePath = flowCodePath + File.separator + dwsNode.getName();
                     // 如果是scriptis节点，且资源名和jobContent中的script相同，则下载后的文件名为script名的后缀，如.sql。 否则说明是用户自定义文件，直接用filename
                     String resourceName = x.getFileName();
-                    if(resourceName.equals(scriptName)){
-                        String extensionName=  resourceName.substring(resourceName.lastIndexOf('.'));
+                    int index = resourceName.lastIndexOf('.');
+                    String extensionName=  resourceName.substring(index);
+                    String shortName = resourceName.substring(0, index);
+                    if(resourceName.equals(scriptName) && !hasScriptSaved){
                         resourceName =  Optional.ofNullable(dwsNode.getName()).orElse("") + extensionName;
+                        hasScriptSaved = true;
+                    }else if(shortName.equals(dwsNode.getName())){
+                        //其他与节点名同名的资源，直接跳过不要导出。相当于被节点自身的代码覆盖掉了
+                        return;
                     }
                     String nodeResourcePath = nodePath + File.separator + resourceName;
                     bmlService.downloadToLocalPath(userName, x.getResourceId(), x.getVersion(), nodeResourcePath);
@@ -79,7 +86,7 @@ public class NodeExportServiceImpl implements NodeExportService {
                     LOGGER.warn("Illegal resource information");
                     LOGGER.warn("username:{},nodeId:{},nodeName:{},fileName:{},version:{},resourceId:{}", userName, dwsNode.getId(), dwsNode.getName(), x.getFileName(), x.getVersion(), x.getResourceId());
                 }
-            });
+            };
         }
     }
 

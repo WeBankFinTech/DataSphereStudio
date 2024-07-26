@@ -387,7 +387,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     String fileName = resource.getFileName();
                     if(fileNames.contains(fileName)){
                         String nodeName=nodeParser.getNodeValue("title",nodeJson);
-                        throw new DSSRuntimeException("节点" + nodeName + "存在同名的resource，为脏数据，为不影响跑批，请删除该节点后重新创建");
+                        throw new DSSRuntimeException("节点" + nodeName + "存在历史发布同名风险，为不影响跑批，请删除该节点后重新创建");
                     }
                     fileNames.add(fileName);
                 }

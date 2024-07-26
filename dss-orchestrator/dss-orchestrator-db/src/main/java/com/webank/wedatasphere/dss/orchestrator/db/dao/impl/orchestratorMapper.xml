@@ -331,11 +331,11 @@
         ,t1.status          as status
         ,t1.is_default_reference as isDefaultReference
         ,t1.project_id      as projectId
-        ,t2.name    as projectName
+        ,t2.name            as projectName
         ,t2.associate_git   as associateGit
         ,t3.global_var      as globalVar
         ,t3.resource        as resource
-        ,case when t3.proxy_user is null then t1.creator else t3.proxy_user end as proxyUser
+        ,t3.proxy_user      as proxyUser
         from dss_orchestrator_info t1
         join dss_project t2  on t1.project_id  = t2.id and t2.workspace_id = #{workspaceId} and t2.visible = 1
         left join dss_workflow_node_meta t3 on t1.id = t3.orchestrator_id

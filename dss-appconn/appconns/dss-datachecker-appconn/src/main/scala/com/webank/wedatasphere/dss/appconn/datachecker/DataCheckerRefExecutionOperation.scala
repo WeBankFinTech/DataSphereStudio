@@ -89,19 +89,25 @@ class DataCheckerRefExecutionOperation
           }
         }
     )
+    val tmp: util.HashMap[String, Any] = new util.HashMap[String, Any]()
+    inputParams.foreach(x=>
+      if(x._1.equalsIgnoreCase(VariableUtils.RUN_DATE)
+        ||x._1.equalsIgnoreCase(VariableUtils.RUN_TODAY_H)
+        ||x._1.equalsIgnoreCase("run_today_hour")
+        ||x._1.equalsIgnoreCase("run_today_h_std")
+        ||x._1.equalsIgnoreCase("run_today_hour_std")
+      ){
+        tmp.put(x._1, x._2)
+      }
+    )
     tmpProperties.foreach { record =>
       logger.info("request params key : " + record._1 + ",value : " + record._2)
       if (null == record._2) {
         properties.put(record._1, "")
-      }
-      else {
-        if (inputParams.exists(x => x._1.equalsIgnoreCase(VariableUtils.RUN_DATE))) {
-          val tmp: util.HashMap[String, Any] = new util.HashMap[String, Any]()
-          tmp.put(VariableUtils.RUN_DATE, inputParams.getOrElse(VariableUtils.RUN_DATE, null))
-          properties.put(record._1, VariableUtils.replace(record._2.toString, tmp))
-        } else {
-          properties.put(record._1, VariableUtils.replace(record._2.toString))
-        }
+      } else if(tmp.isEmpty){
+        properties.put(record._1, VariableUtils.replace(record._2.toString))
+      } else {
+        properties.put(record._1, VariableUtils.replace(record._2.toString, tmp))
       }
     }
     logger.info("datachecker properties :{}", properties)

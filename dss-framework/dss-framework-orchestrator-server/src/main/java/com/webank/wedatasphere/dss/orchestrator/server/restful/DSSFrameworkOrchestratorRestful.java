@@ -589,11 +589,25 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("当前工作流正在被复制，不允许编辑");
         }
 
+        DSSOrchestratorVersion orchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(modifyOrchestratorMetaRequest.getOrchestratorId(),1);
+
+        if(orchestratorVersion == null){
+            return Message.error(String.format("%s工作流不存在或已被删除，请重新查询后进行编辑",modifyOrchestratorMetaRequest.getOrchestratorName()));
+        }
+
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(orchestratorVersion.getAppId());
+        //若工作流已经被其他用户抢锁，则当前用户不能再保存成功
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+            return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+        }
+
         modifyOrchestratorMetaRequest.setWorkspaceId(workspace.getWorkspaceId());
         modifyOrchestratorMetaRequest.setWorkspaceName(workspace.getWorkspaceName());
 
         try {
-            orchestratorFrameworkService.modifyOrchestratorMeta(username, modifyOrchestratorMetaRequest, workspace);
+            orchestratorFrameworkService.modifyOrchestratorMeta(username, modifyOrchestratorMetaRequest, workspace,orchestratorVersion);
         } catch (Exception e) {
             LOGGER.error(String.format("%s modify OrchestratorMeta fail", modifyOrchestratorMetaRequest.getOrchestratorName()));
             e.printStackTrace();

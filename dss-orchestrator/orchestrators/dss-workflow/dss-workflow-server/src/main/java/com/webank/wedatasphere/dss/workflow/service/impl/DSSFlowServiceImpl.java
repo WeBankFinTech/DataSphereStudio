@@ -306,7 +306,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String proxyUser = null;
         StringBuilder globalVar = new StringBuilder();
         for (Map<String, Object> prop : props) {
-            if (prop.containsKey("user.to.proxy")) {
+            if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
                 proxyUser = prop.get("user.to.proxy").toString();
             }else {
                 for (Map.Entry<String, Object> map : prop.entrySet()) {

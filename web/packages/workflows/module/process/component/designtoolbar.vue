@@ -96,7 +96,7 @@
         <!-- 预留运维发布的区别-->
         <div v-if="publish">
           <div
-            v-if="flowType === 'flow' && isMainFlow"
+            v-if="flowType === 'flow' && isMainFlow && !readonly"
             :title="isFlowSubmited ? $t('message.workflow.process.publish') : '请先提交代码后再发布'"
             :class="['button', isFlowSubmited ? '' : 'toolbar-diabled-item']"
             @click="handleClick('workflowPublishIsShow')"
@@ -242,6 +242,7 @@ export default {
     }
   },
   mounted() {
+    console.log(this, this.readonly, this.flowType, this.isMainFlow)
     if (!this.readonly) {
       this.getToolbarsConfig()
     }

@@ -3,7 +3,7 @@
         <div class="code-modal-panel">
             <div class="panel-header">
                 <div class="panel-header__left">
-                    <span class="panel-header__title" :title="current.path">{{ current.path }}</span>
+                    <span class="panel-header__title" :title="current.path" @dblclick="gotoFile($event, current)">{{ current.path }}</span>
                     <span class="panel-header__icon">
                         <SvgIcon style="font-size: 14px;" color="#444444" icon-class="fi-workflow1" />
                         <span class="icon-text" :title="current.project">{{  current.project }}</span>
@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="panel-content" v-if="current.keyLines">
-                <ul class="content-item" v-for="code in current.keyLines" :key="code.number">
+                <ul class="content-item" v-for="code in current.keyLines" :key="code.number" @dblclick="gotoFile($event, current, code)">
                     <li class="content-item__num">{{ code.number }}</li>
                     <li class="content-item__code" v-html="code.lineText"></li>
                 </ul>
@@ -55,6 +55,10 @@ export default {
         }
     },
     methods: {
+        gotoFile(ev, item, code) {
+            this.$emit('gotoFile', ev, item, code);
+            this.showModal = false;
+        },
     },
 }
 </script>

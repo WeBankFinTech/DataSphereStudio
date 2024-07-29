@@ -118,7 +118,7 @@
         prop="datasource"
         placeholder="请选择数据源"
       >
-        <Select v-model="projectDataCurrent.datasource" multiple
+        <Select v-model="projectDataCurrent.datasource" multiple filterable
           clearable :disabled="projectDataCurrent.createBy != getUserName() && mode == 'edit'">
           <OptionGroup v-for="item in dataSourceList" :key="item.label" :label="item.label">
               <Option v-for="sourceIt in item.children" :value="sourceIt.id" :key="sourceIt.id">{{ sourceIt.dataSourceName }}</Option>

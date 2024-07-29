@@ -596,7 +596,8 @@ export default {
               if (
                 rst.queryList[i].expire === false &&
                 rst.queryList[i].versionId > 0 &&
-                rst.queryList[i].publishedVersionId
+                rst.queryList[i].publishedVersionId &&
+                !['tdsql', 'mysql'].includes(rst.queryList[i].dataSourceType.name)
               ) {
                 dataSet.push(rst.queryList[i])
               }

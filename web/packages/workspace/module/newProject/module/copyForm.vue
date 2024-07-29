@@ -13,17 +13,17 @@
         :placeholder="$t('message.common.projectDetail.inputProjectName')"></Input>
     </FormItem>
     <FormItem
-      label="是否接入Git"
-      prop="associateGit"
-    >
-      <RadioGroup v-model="copyProjectData.associateGit">
-        <Radio label="true" :disabled="!isIncludesDev">是</Radio>
-        <Radio label="false">否</Radio>
-      </RadioGroup>
-      <div v-if="!currentProjectData.associateGit" style="color: red;">
-        工作空间管理员未完成Git账号的配置，项目暂无法接入Git
-      </div>
-    </FormItem>
+        label="是否接入Git"
+        prop="associateGit"
+      >
+        <RadioGroup v-model="copyProjectData.associateGit">
+            <Radio label="true" :disabled="!isIncludesDev">是</Radio>
+            <Radio label="false">否</Radio>
+        </RadioGroup>
+        <div v-if="!currentProjectData.associateGit" style="color: red;">
+          工作空间管理员未完成Git账号的配置，项目暂无法接入Git
+        </div>
+      </FormItem>
   </Form>
 </template>
 <script>

@@ -147,7 +147,7 @@ public class ProxyUserProjectHttpRequestHook implements ProjectHttpRequestHook {
                 .filter(projectUser -> Objects.equals(priv, projectUser.getPriv()))
                 .map(DSSProjectUser::getUsername).collect(Collectors.toList());
 
-        // 过滤代理用户信息，取实名编辑用户
+        // 过滤代理用户信息，取实名用户
         List<String> realUsers = projectUsers.stream().filter(
                 user -> !StringUtils.startsWithIgnoreCase(user, "WTSS_")
                         && !StringUtils.startsWithIgnoreCase(user, "hduser")

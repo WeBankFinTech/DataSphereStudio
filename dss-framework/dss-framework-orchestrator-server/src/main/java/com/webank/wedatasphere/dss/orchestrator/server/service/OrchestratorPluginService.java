@@ -40,17 +40,21 @@ public interface OrchestratorPluginService {
 
     ResponseConvertOrchestrator getConvertOrchestrationStatus(String id);
 
-    List<GitTree> diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+    Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 
     List<GitTree> diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 
-    GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+    GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
 
     void submitFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
 
     void batchSubmitFlow(Map<String, List<OrchestratorRelationVo>> map, Map<String, Long> projectMap, String username, Workspace workspace, String label, String comment) throws DSSErrorException;
 
-    GitCommitResponse submitWorkflowToBML(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+    GitCommitResponse submitWorkflowSync(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
 
     BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId);
+
+    String diffStatus(Long taskId) throws DSSErrorException;
+
+    List<GitTree> diffContent(Long taskId);
 }

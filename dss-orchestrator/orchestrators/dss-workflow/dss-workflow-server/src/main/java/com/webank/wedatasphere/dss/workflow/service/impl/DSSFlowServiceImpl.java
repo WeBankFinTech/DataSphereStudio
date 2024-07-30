@@ -41,6 +41,7 @@ import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImp
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestUpdateOrchestratorBML;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
@@ -300,13 +301,92 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             userName = creator;
         }
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
+
+        // 解析并保存元数据
+        saveFlowMetaData(flowID, jsonFlow, labels);
+
+        if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
+            logger.info("saveFlow is not change");
+            return dssFlow.getBmlVersion();
+        } else {
+            logger.info("saveFlow is change");
+        }
+        checkSubflowDependencies(userName, flowID, jsonFlow);
+
+        String resourceId = dssFlow.getResourceId();
+        Long parentFlowID = flowMapper.getParentFlowID(flowID);
+        // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
+        jsonFlow = contextService.checkAndCreateContextID(jsonFlow, dssFlow.getBmlVersion(),
+                workspaceName, projectName, dssFlow.getName(), userName, false);
+        saveFlowHook.beforeSave(jsonFlow,dssFlow,parentFlowID);
+        Map<String, Object> bmlReturnMap = bmlService.update(userName, resourceId, jsonFlow);
+
+        dssFlow.setId(flowID);
+        dssFlow.setHasSaved(true);
+        dssFlow.setDescription(comment);
+        dssFlow.setResourceId(bmlReturnMap.get("resourceId").toString());
+        dssFlow.setBmlVersion(bmlReturnMap.get("version").toString());
+        updateMetrics(dssFlow, jsonFlow);
+        //todo 数据库增加版本更新
+        flowMapper.updateFlowInputInfo(dssFlow);
+
+        try {
+            contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
+        } catch (DSSErrorException e) {
+            logger.error("Failed to saveContext: ", e);
+            throw new DSSRuntimeException(e.getErrCode(),"保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+        }
+        saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
+        String version = bmlReturnMap.get("version").toString();
+        // 对子工作流,需更新父工作流状态，以便提交
+        Long updateFlowId = parentFlowID == null? dssFlow.getId():parentFlowID;
+        updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId);
+
+        return version;
+    }
+
+    private void updateTOSaveStatus(Long projectId, Long flowID) {
+        try {
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
+            //仅对接入Git的项目 更新状态为 保存
+            if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
+                Long rootFlowId = getRootFlowId(flowID);
+                if (rootFlowId != null) {
+                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestUpdateOrchestratorBML(rootFlowId, new BmlResource())),
+                            OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                    lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                }
+            }
+        } catch (DSSErrorException e) {
+            logger.error("getProjectInfo failed by:", e);
+            throw new DSSRuntimeException(e.getErrCode(),"更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+        }
+    }
+
+    private Long getRootFlowId(Long flowId) {
+        if (flowId == null) {
+            return null;
+        }
+        DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
+        if (dssFlow == null) {
+            return null;
+        }
+        if (dssFlow.getRootFlow()) {
+            return dssFlow.getId();
+        } else {
+            Long parentFlowID = flowMapper.getParentFlowID(flowId);
+            return getRootFlowId(parentFlowID);
+        }
+    }
+
+    private void saveFlowMetaData(Long flowID, String jsonFlow, LabelRouteVO labels) {
         // 解析 jsonflow
         // 解析 proxyUser
         List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
         String proxyUser = null;
         StringBuilder globalVar = new StringBuilder();
         for (Map<String, Object> prop : props) {
-            if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
+            if (prop.containsKey("user.to.proxy")) {
                 proxyUser = prop.get("user.to.proxy").toString();
             }else {
                 for (Map.Entry<String, Object> map : prop.entrySet()) {
@@ -397,80 +477,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 先删后增
         nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
         nodeContentUIMapper.batchInsertNodeContentUI(nodeContentUIDOS);
-
-
-        if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
-            logger.info("saveFlow is not change");
-            return dssFlow.getBmlVersion();
-        } else {
-            logger.info("saveFlow is change");
-        }
-        checkSubflowDependencies(userName, flowID, jsonFlow);
-
-        String resourceId = dssFlow.getResourceId();
-        Long parentFlowID = flowMapper.getParentFlowID(flowID);
-        // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
-        jsonFlow = contextService.checkAndCreateContextID(jsonFlow, dssFlow.getBmlVersion(),
-                workspaceName, projectName, dssFlow.getName(), userName, false);
-        saveFlowHook.beforeSave(jsonFlow,dssFlow,parentFlowID);
-        Map<String, Object> bmlReturnMap = bmlService.update(userName, resourceId, jsonFlow);
-
-        dssFlow.setId(flowID);
-        dssFlow.setHasSaved(true);
-        dssFlow.setDescription(comment);
-        dssFlow.setResourceId(bmlReturnMap.get("resourceId").toString());
-        dssFlow.setBmlVersion(bmlReturnMap.get("version").toString());
-        updateMetrics(dssFlow, jsonFlow);
-        //todo 数据库增加版本更新
-        flowMapper.updateFlowInputInfo(dssFlow);
-
-        try {
-            contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
-        } catch (DSSErrorException e) {
-            logger.error("Failed to saveContext: ", e);
-            throw new DSSRuntimeException(e.getErrCode(),"保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
-        }
-        saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
-        String version = bmlReturnMap.get("version").toString();
-        // 对子工作流,需更新父工作流状态，以便提交
-        Long updateFlowId = parentFlowID == null? dssFlow.getId():parentFlowID;
-        updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId);
-
-        return version;
-    }
-
-    private void updateTOSaveStatus(Long projectId, Long flowID) {
-        try {
-            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
-            //仅对接入Git的项目 更新状态为 保存
-            if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
-                Long rootFlowId = getRootFlowId(flowID);
-                if (rootFlowId != null) {
-                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
-                            OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
-                    lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
-                }
-            }
-        } catch (DSSErrorException e) {
-            logger.error("getProjectInfo failed by:", e);
-            throw new DSSRuntimeException(e.getErrCode(),"更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
-        }
-    }
-
-    private Long getRootFlowId(Long flowId) {
-        if (flowId == null) {
-            return null;
-        }
-        DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
-        if (dssFlow == null) {
-            return null;
-        }
-        if (dssFlow.getRootFlow()) {
-            return dssFlow.getId();
-        } else {
-            Long parentFlowID = flowMapper.getParentFlowID(flowId);
-            return getRootFlowId(parentFlowID);
-        }
     }
 
     /**
@@ -489,18 +495,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<DSSFlow> subflowInfos = flowMapper.getSubflowInfoByParentId(flowId);
         List<String> subflowTitleList = new ArrayList<>();
         for (String nodeJson : nodeJsonList) {
-            List<Resource> resources = nodeParser.getNodeResource(nodeJson);
-            if(resources!=null){
-                Set<String> fileNames = new HashSet<>();
-                for (Resource resource : resources) {
-                    String fileName = resource.getFileName();
-                    if(fileNames.contains(fileName)){
-                        String nodeName=nodeParser.getNodeValue("title",nodeJson);
-                        throw new DSSRuntimeException("节点" + nodeName + "存在历史发布同名风险，为不影响跑批，请删除该节点后重新创建");
-                    }
-                    fileNames.add(fileName);
-                }
-            }
             Map<String, Object> nodeMap = BDPJettyServerHelper.jacksonJson().readValue(nodeJson, Map.class);
             String nodeType = nodeMap.get(JOBTYPE_KEY).toString();
             if ("workflow.subflow".equals(nodeType)) {

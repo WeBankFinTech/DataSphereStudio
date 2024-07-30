@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -24,9 +26,8 @@ import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.*;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
@@ -65,7 +66,12 @@ import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.io.File;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
@@ -98,6 +104,10 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Autowired
     private OrchestratorPluginService orchestratorPluginService;
+
+    @Autowired
+    @Qualifier("workflowBmlService")
+    private BMLService bmlService;
 
     private ExecutorService releaseThreadPool = Utils.newCachedThreadPool(50, "Convert-Orchestration-Thread-", true);
 
@@ -233,13 +243,18 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
             throw new DSSErrorException(800001, "工作流无改动或改动未提交，请确认改动并保存再进行提交");
         }
+        OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
+        submitJob.setOrchestratorId(orchestratorId);
+        submitJob.setInstanceName(Sender.getThisInstance());
+        submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+        Long taskId = orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
         releaseThreadPool.submit(() ->{
             //1. 异步提交，更新提交状态
             try {
-                submitWorkflowToBML(flowRequest, username, workspace);
+                submitWorkflowToBML(taskId, flowRequest, username, workspace);
             }  catch (Exception e) {
             LOGGER.error("push failed, the reason is : ", e);
-            orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
+            orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
         }
         });
     }
@@ -275,35 +290,44 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         }
     }
 
-
-
-
     @Override
-    public GitCommitResponse submitWorkflowToBML(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+    public GitCommitResponse submitWorkflowSync(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException {
+        Long orchestratorId = flowRequest.getOrchestratorId();
+        OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
+        submitJob.setOrchestratorId(orchestratorId);
+        submitJob.setInstanceName(Sender.getThisInstance());
+        submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+        Long taskId = orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+        try {
+            GitCommitResponse gitCommitResponse = submitWorkflowToBML(taskId, flowRequest, username, workspace);
+            return gitCommitResponse;
+        }  catch (Exception e) {
+            LOGGER.error("push failed, the reason is : ", e);
+            orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
+            throw new DSSErrorException(80001, "push failed, the reason is : " + e.toString());
+        }
+    }
+
+
+    private GitCommitResponse submitWorkflowToBML(Long taskId, OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
         Long orchestratorId = flowRequest.getOrchestratorId();
         Long flowId = flowRequest.getFlowId();
         String projectName = flowRequest.getProjectName();
         String label = flowRequest.getLabels().getRoute();
-        OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
-        if (orchestratorSubmitJob == null) {
-            OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
-            submitJob.setOrchestratorId(orchestratorId);
-            submitJob.setInstanceName(Sender.getThisInstance());
-            submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-            orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
-        } else {
-            orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSHING, "");
-        }
         //2. 获取编排信息
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         //3. 获取上传工作流信息
-        BmlResource bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
+        BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
+        if (bmlResource == null) {
+            bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
+            orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
+        }
         //4. 调用git服务上传
         GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), projectName, flowRequest.getComment());
         if (commit == null) {
             LOGGER.info("change is empty");
         }
-        orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
+        orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
         //5. 返回文件列表
         lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
         // 更新commitId
@@ -313,18 +337,17 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     public GitCommitResponse batchSubmitWorkflowToBML(List<OrchestratorRelationVo> relationVos, String username, Workspace workspace, String projectName, String label, Long projectId, String comment) {
 
+        List<Long> taskIdList = new ArrayList<>();
         for (OrchestratorRelationVo relationVo : relationVos) {
             Long orchestratorId = relationVo.getOrchestratorId();
-            OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorId);
-            if (orchestratorSubmitJob == null) {
-                OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
-                submitJob.setOrchestratorId(orchestratorId);
-                submitJob.setInstanceName(Sender.getThisInstance());
-                submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-                orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
-            } else {
-                orchestratorMapper.updateOrchestratorSubmitJobStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSHING, "");
-            }
+
+            OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
+            submitJob.setOrchestratorId(orchestratorId);
+            submitJob.setInstanceName(Sender.getThisInstance());
+            submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+            Long taskId = orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+            taskIdList.add(taskId);
+
         }
         List<Long> flowIdList = relationVos.stream().map(OrchestratorRelationVo::getFlowId).collect(Collectors.toList());
         BmlResource bmlResource = orchestratorPluginService.uploadWorkflowListToGit(flowIdList, projectName, label, username, workspace, projectId);
@@ -335,7 +358,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         if (commit == null) {
             LOGGER.info("change is empty");
         }
-        orchestratorMapper.batchUpdateOrchestratorSubmitJobStatus(orchestratorIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
+        orchestratorMapper.batchUpdateOrchestratorSubmitJobStatus(taskIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
         //5. 返回文件列表
         lockMapper.batchUpdateOrchestratorStatus(orchestratorIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH);
         // 更新commitId
@@ -386,6 +409,31 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
+    public String diffStatus(Long taskId) throws DSSErrorException {
+        OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatusById(taskId);
+        if (orchestratorSubmitJob != null) {
+            String status = orchestratorSubmitJob.getStatus();
+            if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equals(status)) {
+                throw new DSSErrorException(80001, "获取工作流diff内容失败，原因为：" + orchestratorSubmitJob.getErrorMsg());
+            }
+            return status;
+        }
+        return null;
+    }
+
+    @Override
+    public List<GitTree> diffContent(Long taskId) {
+        String result = orchestratorMapper.selectResult(taskId);
+        if (StringUtils.isNotEmpty(result)) {
+            Type listType = new TypeToken<List<GitTree>>() {}.getType();
+            Gson gson = new Gson();
+            List<GitTree> gitTrees = gson.fromJson(result, listType);
+            return gitTrees;
+        }
+        return null;
+    }
+
+    @Override
     public BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId) {
         // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
         List<DSSLabel> dssLabelList = new ArrayList<>();
@@ -406,46 +454,77 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return bmlResource;
     }
 
-    private String readWorkflowNode(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace, DSSOrchestratorInfo orchestrator, String filePath) {
+    private String readWorkflowNode(BmlResource bmlResource, String username, String projectName, String orchestratorName) throws DSSErrorException {
         // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
-        long flowId = flowRequest.getFlowId();
+        String projectPath = IoUtils.generateProjectIOPath(username, projectName);
+        String fullPath = projectPath + File.separator + orchestratorName;
+        String zipFilePath = fullPath + ".zip";
+        String fileContent = null;
+        try {
+            bmlService.downloadToLocalPath(username, bmlResource.getResourceId(), bmlResource.getVersion(), zipFilePath);
+            ZipHelper.unzipFile(zipFilePath, projectPath, true);
 
-        Long projectId = orchestrator.getProjectId();
-        String projectName = flowRequest.getProjectName();
-        List<DSSLabel> dssLabelList = new ArrayList<>();
-        dssLabelList.add(new EnvDSSLabel(flowRequest.getLabels().getRoute()));
-        RequestReadWorkflowNode requestExportWorkflow = new RequestReadWorkflowNode(username,
-                flowId,
-                projectId,
-                projectName,
-                DSSCommonUtils.COMMON_GSON.toJson(workspace),
-                dssLabelList,
-                false,
-                filePath);
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(dssLabelList);
-        ResponseReadWorkflow responseReadWorkflow = RpcAskUtils.processAskException(sender.ask(requestExportWorkflow),
-                ResponseReadWorkflow.class, RequestExportWorkflow.class);
+            LOGGER.info("export workflow success.  orchestratorName:{},fullPath:{} .", orchestratorName, projectPath);
 
-        return responseReadWorkflow.fileContent();
+            File file = new File(fullPath);
+            if (file.exists()) {
+                fileContent = new String(Files.readAllBytes(Paths.get(fullPath)));
+            }
+        } catch (Exception e) {
+            LOGGER.error("exportFlowInfoNew failed , the reason is:", e);
+            throw new DSSErrorException(100098, "工作流导出失败，原因为" + e.getMessage());
+        } finally {
+            //删掉整个目录
+            if (StringUtils.isNotEmpty(projectPath)) {
+                File file = new File(projectPath);
+                if (ZipHelper.deleteDir(file)){
+                    LOGGER.info("结束删除目录 {} 成功", projectPath);
+                }else{
+                    LOGGER.info("删除目录 {} 失败", projectPath);
+                }
+            }
+        }
+        return fileContent;
     }
 
     @Override
-    public List<GitTree> diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
-        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+    public Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        Long orchestratorId = flowRequest.getOrchestratorId();
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         Long flowId = flowRequest.getFlowId();
         String projectName = flowRequest.getProjectName();
         String label = flowRequest.getLabels().getRoute();
-        BmlResource bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
 
-        // todo 3. diff（第一步补充后，使用去掉第三方节点的zip包上传到bml，替换下方的BML）
-        GitDiffResponse diff = diff(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
-        if (diff == null) {
-            LOGGER.info("change is empty");
-            return null;
-        }
+        OrchestratorSubmitJob diffJob = new OrchestratorSubmitJob();
+        diffJob.setOrchestratorId(orchestratorId);
+        diffJob.setInstanceName(Sender.getThisInstance());
+        diffJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+        Long taskId = orchestratorMapper.insertOrchestratorSubmitJob(diffJob);
+        releaseThreadPool.submit(() -> {
+            try {
+                BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
+                if (bmlResource == null) {
+                    bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
+                    orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
+                }
 
-        //4. 返回文件列表
-        return diff.getTree();
+                GitDiffResponse diff = diff(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
+                String result = "";
+                if (diff != null) {
+                    List<GitTree> tree = diff.getTree();
+                    Gson gson = new Gson();
+                    result = gson.toJson(tree);
+                } else {
+                    LOGGER.info("change is empty");
+                }
+                orchestratorMapper.updateOrchestratorSubmitResult(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, result);
+            }catch (Exception e) {
+                LOGGER.error("push failed, the reason is : ", e);
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
+            }
+        });
+
+        return taskId;
     }
 
     @Override
@@ -483,14 +562,23 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
-        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
-        String s = readWorkflowNode(flowRequest, username, workspace, orchestrator, flowRequest.getFilePath());
+    public GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException {
+        Long orchestratorId = flowRequest.getOrchestratorId();
+        Long flowId = flowRequest.getFlowId();
+        String projectName = flowRequest.getProjectName();
+        String label = flowRequest.getLabels().getRoute();
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
+        BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
+        if (bmlResource == null) {
+            bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
+            orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
+        }
+        String s = readWorkflowNode(bmlResource, username, projectName, orchestrator.getName());
 
 
         GitFileContentRequest fileContentRequest = new GitFileContentRequest();
         fileContentRequest.setFilePath(flowRequest.getFilePath());
-        fileContentRequest.setProjectName(flowRequest.getProjectName());
+        fileContentRequest.setProjectName(projectName);
         fileContentRequest.setWorkspaceId(workspace.getWorkspaceId());
         fileContentRequest.setUsername(username);
         fileContentRequest.setPublish(flowRequest.getPublish());

@@ -17,10 +17,12 @@
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestOrchestratorInfos;
@@ -156,5 +158,7 @@ public interface OrchestratorService {
     List<OrchestratorStatusVo> getOrchestratorGitStatus();
 
     List<String> getAllOrchestratorName(Long workspaceId,String projectName);
+
+    OrchestratorVo updateOrchestratorBML(Long orchestratorId, BmlResource bmlResource);
 
 }

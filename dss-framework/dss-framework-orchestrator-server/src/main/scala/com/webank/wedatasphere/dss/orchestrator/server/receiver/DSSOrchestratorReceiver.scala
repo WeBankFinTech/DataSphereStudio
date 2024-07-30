@@ -18,8 +18,9 @@ package com.webank.wedatasphere.dss.orchestrator.server.receiver
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException
 import com.webank.wedatasphere.dss.common.protocol.{ResponseExportOrchestrator, ResponseImportOrchestrator}
-import com.webank.wedatasphere.dss.orchestrator.common.entity.{DSSOrchestratorInfoList, OrchestratorVo}
+import com.webank.wedatasphere.dss.orchestrator.common.entity.{DSSOrchestratorInfoList, OrchestratorSubmitJob, OrchestratorVo}
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult
 import com.webank.wedatasphere.dss.orchestrator.publish.{ExportDSSOrchestratorPlugin, ImportDSSOrchestratorPlugin}
@@ -109,11 +110,15 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
       request.setComment(requestSubmitOrchestratorSync.getComment)
       val username = requestSubmitOrchestratorSync.getUsername
       val workspace = requestSubmitOrchestratorSync.getWorkspace
-      orchestratorPluginService.submitWorkflowToBML(request, username, workspace)
+      orchestratorPluginService.submitWorkflowSync(request, username, workspace)
 
     case orchestratorRequest: OrchestratorRequest =>
       val list = orchestratorService.getOrchestratorInfoByLabel(orchestratorRequest)
       new DSSOrchestratorInfoList(list)
+
+    case orchestratorUpdateBMLRequest: RequestUpdateOrchestratorBML =>
+      val orchestratorVo = orchestratorService.updateOrchestratorBML(orchestratorUpdateBMLRequest.getFlowId,orchestratorUpdateBMLRequest.getBmlResource)
+      orchestratorVo
 
     case _ => throw new DSSErrorException(90000, "Not support message type " + message)
   }

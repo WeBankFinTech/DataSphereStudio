@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.db.dao;
 
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
 import org.apache.ibatis.annotations.*;
 
@@ -32,6 +33,10 @@ public interface OrchestratorMapper {
     DSSOrchestratorInfo getOrchestratorByUUID(String uuid);
 
     void updateOrchestrator(DSSOrchestratorInfo dssOrchestratorInfo);
+
+    void updateOrchestratorBmlVersion(@Param("orchestratorId") Long orchestratorId, @Param("resourceId") String resourceId, @Param("bmlVersion") String bmlVersion);
+
+    BmlResource getOrchestratorBmlVersion(@Param("orchestratorId") Long orchestratorId);
 
     void deleteOrchestrator(Long id);
 
@@ -127,13 +132,19 @@ public interface OrchestratorMapper {
 
     void batchUpdateOrcInfo(@Param("list") List<DSSOrchestratorVersion> historyOrcVersion);
 
-    void updateOrchestratorSubmitJobStatus(@Param("orchestratorId") Long orchestratorId, @Param("status") String status, @Param("errMsg") String errMsg);
+    void updateOrchestratorSubmitJobStatus(@Param("id") Long id, @Param("status") String status, @Param("errMsg") String errMsg);
+
+    void updateOrchestratorSubmitResult(@Param("id") Long id, @Param("status") String status, @Param("result") String result);
 
     void batchUpdateOrchestratorSubmitJobStatus(@Param("list") List<Long> list, @Param("status") String status, @Param("errMsg") String errMsg);
 
-    void insertOrchestratorSubmitJob(OrchestratorSubmitJob orchestratorSubmitJob);
+    Long insertOrchestratorSubmitJob(OrchestratorSubmitJob orchestratorSubmitJob);
 
     OrchestratorSubmitJob selectSubmitJobStatus(@Param("orchestratorId") Long orchestratorId);
+
+    OrchestratorSubmitJob selectSubmitJobStatusById(@Param("id") Long id);
+
+    String selectResult(@Param("id") Long id);
 
     List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest);
 

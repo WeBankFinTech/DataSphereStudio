@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
+import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -103,7 +104,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class OrchestratorServiceImpl implements OrchestratorService {
@@ -731,7 +731,6 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
     }
 
-    @Override
     public List<OrchestratorStatusVo> getOrchestratorGitStatus() {
 
         return OrchestratorStatusEnum.getOrchestratorGitStatus();
@@ -739,7 +738,14 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
     @Override
     public List<String> getAllOrchestratorName(Long workspaceId,String projectName) {
-        return orchestratorMapper.getAllOrchestratorName(workspaceId,projectName);
+        return orchestratorMapper.getAllOrchestratorName(workspaceId, projectName);
+    }
+
+    @Override
+    public OrchestratorVo updateOrchestratorBML(Long flowId, BmlResource bmlResource) {
+        OrchestratorVo orchestratorByAppId = getOrchestratorByAppId(flowId);
+        orchestratorMapper.updateOrchestratorBmlVersion(orchestratorByAppId.getDssOrchestratorInfo().getId(), bmlResource.getResourceId(), bmlResource.getVersion());
+        return orchestratorByAppId;
     }
 
 }

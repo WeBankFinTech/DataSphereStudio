@@ -10,6 +10,7 @@ public class OrchestratorSubmitJob {
     private String instanceName;
     private String status;
     private String errorMsg;
+    private String result;
 
     public Long getId() {
         return id;
@@ -65,5 +66,13 @@ public class OrchestratorSubmitJob {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

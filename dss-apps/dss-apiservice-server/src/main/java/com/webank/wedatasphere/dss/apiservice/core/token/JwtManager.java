@@ -15,8 +15,7 @@
  */
 
 package com.webank.wedatasphere.dss.apiservice.core.token;
-
-import com.sun.jersey.core.util.Base64;
+import org.apache.commons.codec.binary.Base64;
 import com.webank.wedatasphere.dss.apiservice.core.config.ApiServiceConfiguration;
 import com.webank.wedatasphere.dss.apiservice.core.bo.ApiServiceToken;
 import org.apache.linkis.common.conf.CommonVars$;
@@ -68,7 +67,7 @@ public class JwtManager {
     }
 
     public static SecretKey generalKey() {
-        byte[] encodedKey = Base64.decode(JWT_SECERT);
+        byte[] encodedKey = Base64.decodeBase64(JWT_SECERT);
         SecretKey key = new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
         return key;
     }

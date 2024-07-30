@@ -64,6 +64,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.utils.OrchestratorUtils;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorCopyJobMapper;
 import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
+import com.webank.wedatasphere.dss.orchestrator.server.constant.DSSOrchestratorConstant;
 import com.webank.wedatasphere.dss.orchestrator.server.constant.OrchestratorStatusEnum;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.*;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.CommonOrchestratorVo;
@@ -660,6 +661,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
 
         total.add((long) orchestratorMetaList.size());
+
+        // 排序
+        if(DSSOrchestratorConstant.ASCEND.equalsIgnoreCase(orchestratorMetaRequest.getOrderBy())){
+            orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime)).collect(Collectors.toList());
+        }else{
+            orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime).reversed()).collect(Collectors.toList());
+        }
+
         // 分页处理
         Integer page = orchestratorMetaRequest.getPageNow() >=1 ? orchestratorMetaRequest.getPageNow() : 1;
         Integer pageSize = orchestratorMetaRequest.getPageSize() >=1 ? orchestratorMetaRequest.getPageSize() : 10;

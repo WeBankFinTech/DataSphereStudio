@@ -374,7 +374,7 @@
         <if test="projectList!=null and projectList.size() > 0">
             and projectName in
             <foreach collection="projectList" item="project" open="(" separator="," close=")">
-                #{projectName}
+                #{project}
             </foreach>
         </if>
 
@@ -460,7 +460,7 @@
         and t2.workspace_id = #{workspaceId}
         and t2.visible = 1
         <if test="projectName != null and projectName !=''">
-            and t2.project_name = #{projectName}
+            and t2.name = #{projectName}
         </if>
     </select>
 

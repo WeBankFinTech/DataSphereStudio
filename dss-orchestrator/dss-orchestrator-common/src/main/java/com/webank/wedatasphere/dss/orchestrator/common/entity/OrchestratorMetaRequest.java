@@ -16,6 +16,9 @@ public class OrchestratorMetaRequest {
 
     private Long  workspaceId;
 
+    private String orderBy;
+
+
     public OrchestratorMetaRequest() {
     }
 
@@ -65,5 +68,13 @@ public class OrchestratorMetaRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
     }
 }

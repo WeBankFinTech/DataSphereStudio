@@ -367,7 +367,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     private void checkAssociateGit(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws DSSProjectErrorException {
         // 对于已经接入git的项目不允许进行取消
-        if (dbProject.getAssociateGit()!=null && dbProject.getAssociateGit() && !projectModifyRequest.getAssociateGit()) {
+        if (dbProject.getAssociateGit()!=null && dbProject.getAssociateGit()
+                && projectModifyRequest.getAssociateGit()!= null && !projectModifyRequest.getAssociateGit()) {
             throw new DSSProjectErrorException(71000, "项目接入git后无法取消");
         }
         // 对于首次接入git的项目需要校验项目名称

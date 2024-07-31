@@ -34,9 +34,9 @@ public interface OrchestratorMapper {
 
     void updateOrchestrator(DSSOrchestratorInfo dssOrchestratorInfo);
 
-    void updateOrchestratorBmlVersion(@Param("orchestratorId") Long orchestratorId, @Param("resourceId") String resourceId, @Param("bmlVersion") String bmlVersion);
+    void updateOrchestratorBmlVersion(@Param("orchestratorId") Long id, @Param("resourceId") String resourceId, @Param("bmlVersion") String bmlVersion);
 
-    BmlResource getOrchestratorBmlVersion(@Param("orchestratorId") Long orchestratorId);
+    BmlResource getOrchestratorBmlVersion(@Param("orchestratorId") Long id);
 
     void deleteOrchestrator(Long id);
 

@@ -79,11 +79,11 @@
         <set>
             `bml_version` = #{bmlVersion}, `resource_id` = #{resourceId}
         </set>
-        where `orchestrator_id` = #{orchestratorId}
+        where `id` = #{id}
     </update>
 
     <select id="getOrchestratorBmlVersion" resultType="com.webank.wedatasphere.dss.common.entity.BmlResource">
-        SELECT `bml_version` as `version`, resource_id FROM dss_orchestrator_info WHERE `orchestrator_id` = #{orchestratorId}
+        SELECT `bml_version` as `version`, resource_id FROM dss_orchestrator_info WHERE `id` = #{id}
     </select>
 
 

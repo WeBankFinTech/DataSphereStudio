@@ -73,6 +73,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RequestMapping(path = "/dss/framework/orchestrator", produces = {"application/json"})
@@ -618,6 +619,12 @@ public class DSSFrameworkOrchestratorRestful {
 
         if(orchestratorVersion == null){
             return Message.error(String.format("%s工作流不存在或已被删除，请重新查询后进行编辑",modifyOrchestratorMetaRequest.getOrchestratorName()));
+        }
+
+        String proxyUser = modifyOrchestratorMetaRequest.getProxyUser();
+        // 添加代理用户验证是否合法
+        if(!StringUtils.isEmpty(proxyUser) && !Pattern.compile("^[a-zA-Z0-9_]+$").matcher(proxyUser).find()){
+            return Message.error(String.format("%s代理用名称输入不合法",proxyUser));
         }
 
         DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(orchestratorVersion.getAppId());

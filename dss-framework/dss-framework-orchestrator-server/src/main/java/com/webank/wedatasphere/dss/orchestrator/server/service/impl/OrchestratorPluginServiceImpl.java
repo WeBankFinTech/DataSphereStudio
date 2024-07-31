@@ -247,7 +247,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         submitJob.setOrchestratorId(orchestratorId);
         submitJob.setInstanceName(Sender.getThisInstance());
         submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-        Long taskId = orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+        orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+        Long taskId = submitJob.getId();
         releaseThreadPool.submit(() ->{
             //1. 异步提交，更新提交状态
             try {
@@ -297,7 +298,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         submitJob.setOrchestratorId(orchestratorId);
         submitJob.setInstanceName(Sender.getThisInstance());
         submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-        Long taskId = orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+        orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+        Long taskId = submitJob.getId();
         try {
             GitCommitResponse gitCommitResponse = submitWorkflowToBML(taskId, flowRequest, username, workspace);
             return gitCommitResponse;
@@ -345,7 +347,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             submitJob.setOrchestratorId(orchestratorId);
             submitJob.setInstanceName(Sender.getThisInstance());
             submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-            Long taskId = orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+            orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+            Long taskId = submitJob.getId();
             taskIdList.add(taskId);
 
         }
@@ -499,7 +502,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         diffJob.setOrchestratorId(orchestratorId);
         diffJob.setInstanceName(Sender.getThisInstance());
         diffJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-        Long taskId = orchestratorMapper.insertOrchestratorSubmitJob(diffJob);
+        orchestratorMapper.insertOrchestratorSubmitJob(diffJob);
+        Long taskId = diffJob.getId();
         releaseThreadPool.submit(() -> {
             try {
                 BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);

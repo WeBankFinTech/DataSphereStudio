@@ -131,4 +131,90 @@
         GROUP BY b.id ) c where c.pusername like concat('%',#{username},'%') order by updateTime desc
     </select>
 
+
+
+    <select id="queryAllProjects"
+            parameterType="com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest"
+            resultType="com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo">
+
+        select  *
+                ,group_concat(accessUser) as accessUsers
+                ,group_concat(editUser) as editUsers
+                ,group_concat(releaseUser) as releaseUsers
+        from
+        (
+        SELECT b.application_area applicationArea
+        ,b.id
+        ,b.business
+        ,b.create_by createBy
+        ,b.description
+        ,b.name
+        ,b.product
+        ,b.source
+        ,b.isArchive
+        ,b.create_time createTime
+        ,b.update_time updateTime
+        ,b.dev_process devProcess
+        ,b.orchestrator_mode orchestratorMode
+        ,b.visible visible
+        ,b.associate_git associateGit
+        ,b.data_source_list_json dataSourceListJson
+        ,a.workspace_id
+        ,a.username
+        ,case when a.priv = 1 then a.username end  as  accessUser
+        ,case when a.priv = 2 then a.username end  as  editUser
+        ,case when a.priv = 3 then a.username end  as  releaseUser
+        FROM dss_project_user a
+        JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id and b.visible = 1
+        WHERE a.priv >=1 and  a.workspace_id = #{workspaceId}
+        <if test="id!=null">
+            and a.project_id  = #{id}
+        </if>
+
+       ) c where  1 = 1
+
+        <if test="projectNames!=null and projectNames.size()> 0">
+            and name in
+            <foreach collection="projectNames" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="createUsers!=null and createUsers.size() > 0">
+            and createBy in
+            <foreach collection="createUsers" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="accessUsers!=null and accessUsers.size() > 0">
+            and accessUser in
+            <foreach collection="accessUsers" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="editUsers!=null and editUsers.size() > 0">
+            and editUser in
+            <foreach collection="editUsers" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="releaseUsers!=null and releaseUsers.size() > 0">
+            and releaseUser in
+            <foreach collection="releaseUsers" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+        group by id
+
+        <if test="queryUser !=null and queryUser!= ''">
+            having group_concat(username) like concat('%',#{queryUser},'%')
+        </if>
+
+
+    </select>
+
 </mapper>

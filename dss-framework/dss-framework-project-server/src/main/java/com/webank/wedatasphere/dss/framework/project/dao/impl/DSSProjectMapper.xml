@@ -49,7 +49,16 @@
                 AND b.label is null
           </otherwise>
           </choose>
-        GROUP BY b.id ) c where c.pusername like concat('%',#{username},'%') order by updateTime desc
+        GROUP BY b.id ) c
+        where c.pusername like concat('%',#{username},'%') and COALESCE(c.visible,1) = 1
+        <choose>
+            <when test="orderBySql != null and orderBySql != ''">
+                order by #{orderBySql}
+            </when>
+            <otherwise>
+                order by updateTime desc
+            </otherwise>
+        </choose>
     </select>
 
     <select id="getProjectInfoById" resultType="com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo">
@@ -91,8 +100,16 @@
         <if test="id!=null">
             AND b.id = #{id}
         </if>
-        GROUP BY b.id ) c
-        order by updateTime desc
+        GROUP BY b.id ) c  where COALESCE(c.visible,1) = 1
+        <choose>
+            <when test="orderBySql != null and orderBySql != ''">
+                order by #{orderBySql}
+            </when>
+            <otherwise>
+                order by updateTime desc
+            </otherwise>
+        </choose>
+
     </select>
 
     <select id="getDeletedProjects"

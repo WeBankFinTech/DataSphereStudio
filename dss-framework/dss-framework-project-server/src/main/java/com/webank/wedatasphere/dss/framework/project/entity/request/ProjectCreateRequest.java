@@ -197,6 +197,7 @@ public class ProjectCreateRequest {
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
                 ", associateGit=" + associateGit +
+                ", creatorLabel=" + creatorLabel +
                 '}';
     }
 

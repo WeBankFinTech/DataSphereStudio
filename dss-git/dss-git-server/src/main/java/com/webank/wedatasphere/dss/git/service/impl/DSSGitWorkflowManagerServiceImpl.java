@@ -13,6 +13,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
+import com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo;
 import com.webank.wedatasphere.dss.git.manage.GitProjectManager;
 import com.webank.wedatasphere.dss.git.service.DSSGitWorkflowManagerService;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
@@ -49,36 +50,41 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitDiffResponse diff(GitDiffRequest request) {
         Long workspaceId = request.getWorkspaceId();
-        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", workspaceId);
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitDiffResponse diff = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 解压BML文件到本地
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
             List<String> fileList = new ArrayList<>(bmlResourceMap.keySet());
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 fileList.add(entry.getKey());
                 // 解压BML文件到本地
-                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId);
-                FileUtils.removeFlowNode(entry.getKey(), request.getProjectName(), workspaceId);
+                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId, gitUser);
+                FileUtils.removeFlowNode(entry.getKey(), projectName, workspaceId, gitUser);
                 String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + entry.getKey();
                 fileList.add(metaConfPath);
-                FileUtils.removeFlowNode(metaConfPath, request.getProjectName(), workspaceId);
+                FileUtils.removeFlowNode(metaConfPath, projectName, workspaceId, gitUser);
                 FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
 
             }
-            diff = DSSGitUtils.diff(request.getProjectName(), fileList, workspaceId);
+            diff = DSSGitUtils.diff(projectName, fileList, workspaceId);
             // 重置本地
-            DSSGitUtils.reset(repository, request.getProjectName());
+            DSSGitUtils.reset(repository, projectName);
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
         }
@@ -89,23 +95,29 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitDiffResponse diffGit(GitDiffTargetCommitRequest request) {
         Long workspaceId = request.getWorkspaceId();
-        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", workspaceId);
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitDiffResponse diff = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
+        String gitPrePath = DSSGitUtils.generateGitPrePath(projectName, workspaceId, gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
 
             if (StringUtils.isEmpty(request.getCommitId())) {
-                String path = DSSGitConstant.GIT_PATH_PRE + request.getProjectName() + File.separator + request.getFilePath();
-                String metaPath = DSSGitConstant.GIT_PATH_PRE + request.getProjectName() + File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + request.getFilePath();
+                String path = gitPrePath + File.separator + request.getFilePath();
+                String metaPath = gitPrePath+ File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + request.getFilePath();
                 GitTree fileTree = getFileTree(path);
                 GitTree metaFileTree = getFileTree(metaPath);
 
@@ -150,38 +162,43 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitCommitResponse commit(GitCommitRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
-        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", workspaceId);
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
 
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 解压BML文件到本地
             Map<String, BmlResource> bmlResourceMap = request.getBmlResourceMap();
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             List<String> paths = new ArrayList<>();
             for (Map.Entry<String, BmlResource> entry : bmlResourceMap.entrySet()) {
                 paths.add(entry.getKey());
                 // 解压BML文件到本地
-                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId);
-                FileUtils.removeFlowNode(entry.getKey(), request.getProjectName(), workspaceId);
+                FileUtils.downloadBMLResource(bmlService, entry.getKey(), entry.getValue(), request.getUsername(), workspaceId, gitUser);
+                FileUtils.removeFlowNode(entry.getKey(), projectName, workspaceId, gitUser);
                 String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + entry.getKey();
                 paths.add(metaConfPath);
-                FileUtils.removeFlowNode(metaConfPath, request.getProjectName(), workspaceId);
+                FileUtils.removeFlowNode(metaConfPath, projectName, workspaceId, gitUser);
                 FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
             }
             // 提交
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
+            DSSGitUtils.push(repository, projectName, gitUser, gitToken, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
         } catch (Exception e) {
@@ -194,32 +211,37 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitCommitResponse batchCommit(GitBatchCommitRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
-        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", workspaceId);
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
 
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 解压BML文件到本地
             BmlResource bmlResource = request.getBmlResource();
             List<String> paths = new ArrayList<>();
             paths.addAll(request.getFilePath());
-            String fileName = request.getProjectName() + bmlResource.getResourceId();
+            String fileName = projectName + bmlResource.getResourceId();
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             // 解压BML文件到本地
-            FileUtils.downloadBMLResource(bmlService, fileName, bmlResource, request.getUsername(), workspaceId);
+            FileUtils.downloadBMLResource(bmlService, fileName, bmlResource, request.getUsername(), workspaceId, gitUser);
             for (String path : request.getFilePath()) {
-                FileUtils.removeFlowNode(path, request.getProjectName(), workspaceId);
+                FileUtils.removeFlowNode(path, projectName, workspaceId, gitUser);
                 String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + path;
                 paths.add(metaConfPath);
-                FileUtils.removeFlowNode(metaConfPath, request.getProjectName(), workspaceId);
+                FileUtils.removeFlowNode(metaConfPath, projectName, workspaceId, gitUser);
             }
             FileUtils.unzipBMLResource(fileName, workspaceId);
 
@@ -228,8 +250,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 提交
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
+            DSSGitUtils.push(repository, projectName, gitUser, gitToken, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
         } catch (Exception e) {
@@ -242,18 +264,23 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitSearchResponse search(GitSearchRequest request) {
         Long workspaceId = request.getWorkspaceId();
-        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", workspaceId);
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
         } catch (Exception e) {
             logger.error("pull failed, the reason is ",e);
             return new GitSearchResponse();
@@ -261,9 +288,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         if (CollectionUtils.isEmpty(request.getTypeList())) {
             request.setTypeList(GitConstant.GIT_SERVER_SEARCH_TYPE);
         }
-        String gitDir = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
+        String gitDir = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
         String gitPathPre = DSSGitConstant.GIT_PATH_PRE + request.getWorkspaceId() + File.separator;
-        String workTree = gitPathPre + request.getProjectName() ;
+        String workTree = gitPathPre + projectName;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-F", "-l", request.getSearchContent()
         ));
@@ -442,19 +469,25 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitDeleteResponse delete(GitDeleteRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+        Long workspaceId = request.getWorkspaceId();
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitDeleteResponse deleteResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
+        String gitPath = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             List<String> deleteFileList = request.getDeleteFileList();
             for (String path : deleteFileList) {
                 File file = new File(path);
@@ -467,9 +500,9 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 }
             }
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             // 提交
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser,"delete " + request.getDeleteFileList(), request.getDeleteFileList());
+            DSSGitUtils.push(repository, projectName, gitUser, gitToken, "delete " + request.getDeleteFileList(), request.getDeleteFileList());
         } catch (Exception e) {
             logger.error("delete failed, the reason is ",e);
             throw new DSSErrorException(80001, "delete workflow failed, the reason is: " + e);
@@ -481,19 +514,23 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     public GitFileContentResponse getFileContent(GitFileContentRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
-        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", workspaceId);
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitFileContentResponse contentResponse = new GitFileContentResponse();
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId);
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, projectName, gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, projectName, gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             String before = null;
             String after = null;
 
@@ -517,21 +554,27 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitHistoryResponse getHistory(GitHistoryRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+        Long workspaceId = request.getWorkspaceId();
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitHistoryResponse response = new GitHistoryResponse();
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
+        String gitPath = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
 
             List<String> fileList = Collections.singletonList(request.getFilePath());
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
 
             List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilePath(), null);
             if (CollectionUtils.isEmpty(latestCommit)) {
@@ -546,7 +589,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         return response;
     }
 
-    private Repository getRepository(File repoDir, String projectName, GitUserEntity gitUser) throws DSSErrorException {
+    private Repository getRepository(File repoDir, String projectName, Long workspaceId, String gitUser, String gitToken, String gitUrl) throws DSSErrorException {
         Repository repository = null;
         try {
             // 当前机器不存在就新建
@@ -554,12 +597,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
             } else {
                 // 本地创建Git项目
-                DSSGitUtils.create(projectName, gitUser, gitUser.getWorkspaceId());
+                DSSGitUtils.create(projectName, workspaceId, gitUser);
                 // 获取git项目
-                String gitPath = DSSGitUtils.generateGitPath(projectName, gitUser.getWorkspaceId());
                 repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
-                DSSGitUtils.remote(repository, projectName, gitUser);
-                DSSGitUtils.pull(repository, projectName, gitUser);
+                DSSGitUtils.remote(repository, projectName, gitUser, gitUrl);
+                DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             }
         } catch (Exception e) {
             logger.info("get repository failed, the reason is: ", e);
@@ -570,19 +612,25 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse getCurrentCommit(GitCurrentCommitRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+        Long workspaceId = request.getWorkspaceId();
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
+        String gitPath = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser);){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
 
             List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getFilepath(), 1);
             if (CollectionUtils.isEmpty(latestCommit)) {
@@ -601,24 +649,30 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse gitCheckOut(GitRevertRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+        Long workspaceId = request.getWorkspaceId();
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
+        String gitPath = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             // 回滚
             DSSGitUtils.checkoutTargetCommit(repository, request);
             // push
             List<String> paths = Collections.singletonList(request.getPath());
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, "revert "+ DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername(), paths);
+            DSSGitUtils.push(repository, projectName, gitUser, gitToken,"revert "+ DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername(), paths);
 
             List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getPath(), 1);
             if (CollectionUtils.isEmpty(latestCommit)) {
@@ -637,33 +691,38 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Override
     public GitCommitResponse removeFile(GitRemoveRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
-        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", workspaceId);
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             List<String> paths = new ArrayList<>();
             // 同步删除对应节点
             for (String path : request.getPath()) {
                 paths.add(path);
-                FileUtils.removeFlowNode(path, request.getProjectName(), workspaceId);
+                FileUtils.removeFlowNode(path, projectName, workspaceId, gitUser);
                 String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + path;
                 paths.add(metaConfPath);
-                FileUtils.removeFlowNode(metaConfPath, request.getProjectName(), workspaceId);
+                FileUtils.removeFlowNode(metaConfPath, projectName, workspaceId, gitUser);
             }
             // 提交
             String comment = "delete workflowNode " + request.getPath().toString() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
+            DSSGitUtils.push(repository, projectName, gitUser, gitToken, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
 
@@ -676,19 +735,26 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     @Override
     public GitCommitResponse rename(GitRenameRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+        Long workspaceId = request.getWorkspaceId();
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
+        
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
+        String gitPath = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 同步删除对应节点 eg: /data/GitInstall/224/testGit/flowGitOld -> /data/GitInstall/224/testGit/flowGitNew
-            String projectPath = generateProjectPath(request.getWorkspaceId(), request.getProjectName()) + File.separator;
+            String projectPath = DSSGitUtils.generateGitPrePath(projectName, workspaceId, gitUser) + File.separator;
             String olfFilePath = projectPath + FileUtils.normalizePath(request.getOldName());
             String filePath = projectPath + FileUtils.normalizePath(request.getName());
             // 同步删除对应节点 eg: /data/GitInstall/224/testGit/.metaConf/flowGitOld -> /data/GitInstall/224/testGit/.metaConf/flowGitNew
@@ -697,20 +763,20 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             String oldMetaPath = FileUtils.normalizePath(GitConstant.GIT_SERVER_META_PATH) + File.separator + FileUtils.normalizePath(request.getName());
             String fileMetaPath = projectPath + oldMetaPath;
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             FileUtils.renameFile(olfFilePath, filePath);
             FileUtils.renameFile(oldFileMetaPath, fileMetaPath);
             // 提交
             String comment = "rename workflowNode " + request.getName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 提交前再次pull， 降低多节点同时提交不同工作流任务导致冲突频率
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             List<String> paths = new ArrayList<>();
             paths.add(FileUtils.normalizePath(request.getOldName()));
             paths.add(FileUtils.normalizePath(request.getName()));
 
             paths.add(metaPath);
             paths.add(oldMetaPath);
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
+            DSSGitUtils.push(repository, projectName, gitUser, gitToken, comment, paths);
 
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
 
@@ -721,25 +787,27 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         return commitResponse;
     }
 
-    private String generateProjectPath(Long workspaceId, String projectName) {
-        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName;
-    }
-
     @Override
     public GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+        Long workspaceId = request.getWorkspaceId();
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
         GitHistoryResponse response = new GitHistoryResponse();
         // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), request.getWorkspaceId());
+        String gitPath = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
         // 获取git仓库
         File repoDir = new File(gitPath);
-        try (Repository repository = getRepository(repoDir, request.getProjectName(), gitUser)){
+        try (Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)){
             // 本地保持最新状态
-            DSSGitUtils.pull(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             if (StringUtils.isEmpty(request.getOldCommitId())) {
                 // 去掉上线
                 List<GitCommitResponse> latestCommit = DSSGitUtils.getLatestCommit(repository, request.getDirName(), null);

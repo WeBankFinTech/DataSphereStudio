@@ -320,6 +320,10 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
+        Long orchestratorId = submitFlowRequest.getOrchestratorId();
+        DSSOrchestratorVersion latestOrchestratorVersion = orchestratorFrameworkService.getLatestOrchestratorVersion(orchestratorId);
+        submitFlowRequest.setFlowId(latestOrchestratorVersion.getAppId());
+
         String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
                 .findFirst().map(Cookie::getValue).get();
         DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
@@ -364,7 +368,10 @@ public class DSSFrameworkOrchestratorRestful {
     public Message diffFlowContent(@RequestBody OrchestratorSubmitRequest submitFlowRequest) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
-        
+
+        Long orchestratorId = submitFlowRequest.getOrchestratorId();
+        DSSOrchestratorVersion latestOrchestratorVersion = orchestratorFrameworkService.getLatestOrchestratorVersion(orchestratorId);
+        submitFlowRequest.setFlowId(latestOrchestratorVersion.getAppId());
 
         String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
                 .findFirst().map(Cookie::getValue).get();
@@ -456,7 +463,10 @@ public class DSSFrameworkOrchestratorRestful {
 
         String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
                 .findFirst().map(Cookie::getValue).get();
-        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(submitFlowRequest.getFlowId());
+        DSSOrchestratorVersion latestOrchestratorVersion = orchestratorFrameworkService.getLatestOrchestratorVersion(orchestratorId);
+        Long flowId = latestOrchestratorVersion.getAppId();
+        DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowId);
+        submitFlowRequest.setFlowId(flowId);
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             throw new DSSErrorException(80001,"当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }

@@ -73,6 +73,12 @@ public class ProjectCreateRequest {
     private Boolean associateGit;
 
     /**
+     * 接入git的读写用户名及token
+     */
+    private String gitUser;
+    private String gitToken;
+
+    /**
      * 标签
      */
     private String creatorLabel;
@@ -197,6 +203,8 @@ public class ProjectCreateRequest {
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
                 ", associateGit=" + associateGit +
+                ", gitToken=" + gitToken +
+                ", gitUser=" + gitUser +
                 '}';
     }
 
@@ -214,5 +222,21 @@ public class ProjectCreateRequest {
 
     public void setCreatorLabel(String creatorLabel) {
         this.creatorLabel = creatorLabel;
+    }
+
+    public String getGitUser() {
+        return gitUser;
+    }
+
+    public void setGitUser(String gitUser) {
+        this.gitUser = gitUser;
+    }
+
+    public String getGitToken() {
+        return gitToken;
+    }
+
+    public void setGitToken(String gitToken) {
+        this.gitToken = gitToken;
     }
 }

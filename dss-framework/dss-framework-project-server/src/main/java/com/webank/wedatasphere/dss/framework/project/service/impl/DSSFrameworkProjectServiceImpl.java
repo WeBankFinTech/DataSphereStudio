@@ -103,7 +103,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
         // 对于接入git的项目校验项目名称
         if(projectCreateRequest.getAssociateGit() != null && projectCreateRequest.getAssociateGit()) {
-            checkGitName(projectCreateRequest.getName(), workspace, username);
+            // 校验gitUser gitToken合法性以及projectName是否重复
+            checkGitName(projectCreateRequest.getName(), workspace, username, projectCreateRequest.getGitUser(), projectCreateRequest.getGitToken());
         }
 
         //3.保存dss_project
@@ -112,7 +113,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         if(projectCreateRequest.getAssociateGit() != null && projectCreateRequest.getAssociateGit()) {
             ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
             exportAllOrchestratorsReqest.setProjectId(project.getId());
-            exportAllOrchestratorsReqest.setComment("test");
+            exportAllOrchestratorsReqest.setComment("create Project:" + projectCreateRequest.getName());
             exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
             BmlResource bmlResource = dssProjectService.exportProject(exportAllOrchestratorsReqest, username, "", workspace);
             createGitProject(workspace.getWorkspaceId(), project.getName(), bmlResource, username);
@@ -330,19 +331,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         return projectMap;
     }
 
-    private void checkGitName(String name, Workspace workspace, String username) throws DSSProjectErrorException {
-        // 校验工作空间是否完成Git账号配置
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
-        gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
-        gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
-        GitUserInfoResponse writeInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
-        if (writeInfoResponse.getGitUser() == null) {
-            DSSExceptionUtils.dealErrorException(60021,"工作空间管理员未完成Git账号配置", DSSProjectErrorException.class);
-        }
+    private void checkGitName(String name, Workspace workspace, String username, String gitUser, String gitToken) throws DSSProjectErrorException {
         // 校验Git名称
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        GitCheckProjectRequest request1 = new GitCheckProjectRequest(workspace.getWorkspaceId(), name, username);
+        GitCheckProjectRequest request1 = new GitCheckProjectRequest(workspace.getWorkspaceId(), name, username, gitUser, gitToken);
         LOGGER.info("-------=======================begin to check project: {}=======================-------", name);
         Object ask = gitSender.ask(request1);
         GitCheckProjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitCheckProjectResponse.class, GitCheckProjectRequest.class);
@@ -373,7 +365,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
         // 对于首次接入git的项目需要校验项目名称
         if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
-            checkGitName(projectModifyRequest.getName(), workspace, username);
+            // 校验gitUser gitToken合法性以及projectName是否重复
+            checkGitName(projectModifyRequest.getName(), workspace, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
         }
     }
 
@@ -419,7 +412,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
         }
 
-        // 校验是否介入git
+        // 校验是否接入git
         if (dbProject.getAssociateGit() != null && dbProject.getAssociateGit()) {
             checkAssociateGit(projectModifyRequest, dbProject, username, workspace);
         }

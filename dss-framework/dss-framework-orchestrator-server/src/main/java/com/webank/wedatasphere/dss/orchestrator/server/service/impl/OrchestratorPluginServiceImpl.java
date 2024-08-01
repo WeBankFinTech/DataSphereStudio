@@ -460,7 +460,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     private String readWorkflowNode(BmlResource bmlResource, String username, String projectName, String orchestratorName, String filePath) throws DSSErrorException {
         // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
         String projectPath = IoUtils.generateProjectIOPath(username, projectName);
-        String fullPath = projectPath + File.separator + filePath;
+        String fullPath = projectPath + File.separator + projectName + File.separator + filePath;
         String zipFilePath = projectPath + File.separator + orchestratorName + ".zip";
         String fileContent = null;
         try {
@@ -578,7 +578,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
         }
-        String s = readWorkflowNode(bmlResource, username, projectName, filePath, orchestrator.getName());
+        String s = readWorkflowNode(bmlResource, username, projectName, orchestrator.getName(), filePath);
 
 
         GitFileContentRequest fileContentRequest = new GitFileContentRequest();

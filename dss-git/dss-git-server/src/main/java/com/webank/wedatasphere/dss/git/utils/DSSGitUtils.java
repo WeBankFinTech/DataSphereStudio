@@ -63,34 +63,31 @@ import java.util.*;
 public class DSSGitUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
-    public static void init(String projectName, GitUserEntity gitUserDO) throws Exception, GitErrorException{
-        String projectPath = gitUserDO.getGitUser() + "/" + projectName;
-        if (!checkIfProjectExists(gitUserDO, projectPath)) {
-            String url = UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/" + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue();
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                HttpPost post = new HttpPost(url);
-                post.addHeader("PRIVATE-TOKEN", gitUserDO.getGitToken());
-                post.addHeader("Content-Type", "application/json");
-                String jsonInputString = String.format("{\"name\": \"%s\", \"description\": \"%s\"}", projectName, projectName);
-                post.setEntity(new StringEntity(jsonInputString));
+    public static void init(String projectName, String gitUser, String gitToken, String gitUrl) throws Exception, GitErrorException{
+        String projectPath = gitUser + "/" + projectName;
 
-                try (CloseableHttpResponse response = httpClient.execute(post)) {
-                    int statusCode = response.getStatusLine().getStatusCode();
-                    if (statusCode == 201) {
-                        logger.info("init success");
-                    } else {
-                        throw new GitErrorException(80001, "创建Git项目失败，请检查工作空间token是否过期");
-                    }
+        String url = gitUrl + "/" + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost post = new HttpPost(url);
+            post.addHeader("PRIVATE-TOKEN", gitToken);
+            post.addHeader("Content-Type", "application/json");
+            String jsonInputString = String.format("{\"name\": \"%s\", \"description\": \"%s\"}", projectName, projectName);
+            post.setEntity(new StringEntity(jsonInputString));
+
+            try (CloseableHttpResponse response = httpClient.execute(post)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode == 201) {
+                    logger.info("init success");
+                } else {
+                    throw new GitErrorException(80001, "创建Git项目失败，请检查工作空间token是否过期");
                 }
             }
-        } else {
-            throw new GitErrorException(80101, "git init failed, the reason is: projectName " + projectName +" already exists");
         }
     }
 
-    public static void remote(Repository repository, String projectName, GitUserEntity gitUser)throws GitErrorException {
+    public static void remote(Repository repository, String projectName, String gitUser, String gitUrl)throws GitErrorException {
         // 拼接git remote Url
-        String remoteUrl = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/" +gitUser.getGitUser() + File.separator + projectName + ".git";
+        String remoteUrl = gitUrl + "/" + gitUser + File.separator + projectName + ".git";
         try {
             Git git = new Git(repository);
 
@@ -110,10 +107,10 @@ public class DSSGitUtils {
     }
 
 
-    public static void create(String projectName, GitUserEntity gitUserDO, Long workspaceId) throws GitErrorException{
+    public static void create(String projectName, Long workspaceId, String gitUser) throws GitErrorException{
         logger.info("start success");
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName); // 指定仓库的目录
-        File respo = new File(generateGitPath(projectName, workspaceId));
+        File respo = new File(generateGitPath(projectName, workspaceId, gitUser));
         if (!respo.exists()) {
             try {
                 // 初始化仓库
@@ -132,7 +129,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static void pull(Repository repository, String projectName, GitUserEntity gitUser)throws GitErrorException {
+    public static void pull(Repository repository, String projectName, String gitUser, String gitToken)throws GitErrorException {
         try {
             Git git = new Git(repository);
 
@@ -140,7 +137,7 @@ public class DSSGitUtils {
             while (true) {
                 i += 1;
                 // 拉取远程仓库更新至本地
-                PullCommand pullCmd = git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser.getGitUser(), gitUser.getGitToken()));
+                PullCommand pullCmd = git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser, gitToken));
                 PullResult result = pullCmd.call();
 
                 // 成功直接返回，失败清空本地修改重试最多3次
@@ -326,7 +323,7 @@ public class DSSGitUtils {
 
 
 
-    public static void push(Repository repository, String projectName, GitUserEntity gitUser, String comment, List<String> paths) throws GitErrorException{
+    public static void push(Repository repository, String projectName, String gitUser, String gitToken, String comment, List<String> paths) throws GitErrorException{
 
         try {
             Git git = new Git(repository);
@@ -347,7 +344,7 @@ public class DSSGitUtils {
 
             // 推送到远程仓库
             git.push()
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser.getGitUser(), gitUser.getGitToken()))
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser, gitToken))
                     .call();
 
             logger.info("Changes pushed to remote repository.");
@@ -393,11 +390,11 @@ public class DSSGitUtils {
         }
     }
 
-    public static boolean checkIfProjectExists(GitUserEntity gitUser, String projectPath) throws GitErrorException {
-        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectPath.replace("/", "%2F");
+    public static boolean checkIfProjectExists(String gitToken, String projectPath) throws GitErrorException {
+        String url = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/projects/" + projectPath.replace("/", "%2F");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(url);
-            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.addHeader("PRIVATE-TOKEN", gitToken);
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
@@ -459,12 +456,12 @@ public class DSSGitUtils {
         }
     }
 
-    public static String getProjectIdByName(GitUserEntity gitUser, String projectName) throws GitErrorException{
-        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects?search=" + projectName;
+    public static String getProjectIdByName(String projectName, String gitUser, String gitToken, String gitUrl) throws GitErrorException{
+        String urlString = gitUrl + "/api/v4/projects?search=" + projectName;
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(urlString);
-            request.setHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.setHeader("PRIVATE-TOKEN", gitToken);
 
             CloseableHttpResponse response = httpClient.execute(request);
             System.out.println("Response Status Line: " + response.getStatusLine());
@@ -548,20 +545,20 @@ public class DSSGitUtils {
         }
     }
 
-    public static List<String> getAllProjectName(GitUserEntity gitUserDO) throws DSSErrorException {
+    public static List<String> getAllProjectName(String gitToken, String gitUrl) throws DSSErrorException {
         int page = 1;
         List<String> allProjectNames = new ArrayList<>();
 
         List<String> projectNames = new ArrayList<>();
         do {
             // 修改为GitLab实例的URL
-            String gitLabUrl = UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/api/v4/projects?per_page=100&page=" + page;
+            String gitLabUrl = gitUrl + "/api/v4/projects?per_page=100&page=" + page;
             // 创建HttpClient实例
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 // 创建HttpGet请求
                 HttpGet request = new HttpGet(gitLabUrl);
                 // 添加认证头部
-                request.addHeader("PRIVATE-TOKEN", gitUserDO.getGitToken());
+                request.addHeader("PRIVATE-TOKEN", gitToken);
                 // 执行请求
                 try (CloseableHttpResponse response = httpClient.execute(request)) {
                     // 获取响应实体
@@ -571,7 +568,7 @@ public class DSSGitUtils {
                     // 解析项目名称
                     projectNames = parseProjectNames(result);
                     // 打印项目名称
-                    logger.info("projectNames is: {}", projectNames.toString());
+                    logger.info("projectNames is: {}", projectNames);
                     // 添加到总项目列表中
                     allProjectNames.addAll(projectNames);
                 }
@@ -581,7 +578,7 @@ public class DSSGitUtils {
                 throw new GitErrorException(80113, "检查项目名称时解析JSON失败，请确认git当前是否可访问 ", e);
             }
             page++;
-        } while (projectNames.size() > 0);
+        } while (!projectNames.isEmpty());
 
         return allProjectNames;
     }
@@ -639,13 +636,13 @@ public class DSSGitUtils {
         }
     }
 
-    public static void archive(String projectName, GitUserEntity gitUserDO) throws GitErrorException {
+    public static void archive(String projectName, String gitUser, String gitToken, String gitUrl) throws GitErrorException {
         try {
-            String projectUrlEncoded = java.net.URLEncoder.encode(gitUserDO.getGitUser() + "/" + projectName, "UTF-8");
-            URL url = new URL(gitUserDO.getGitUrl() + "/api/v4/projects/" + projectUrlEncoded + "/archive");
+            String projectUrlEncoded = java.net.URLEncoder.encode(gitUser + "/" + projectName, "UTF-8");
+            URL url = new URL(gitUrl + "/api/v4/projects/" + projectUrlEncoded + "/archive");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("PRIVATE-TOKEN", gitUserDO.getGitToken());
+            conn.setRequestProperty("PRIVATE-TOKEN", gitToken);
 
             int responseCode = conn.getResponseCode();
             logger.info("Response Code: " + responseCode);
@@ -882,9 +879,14 @@ public class DSSGitUtils {
 
 
 
-    public static String generateGitPath(String projectName, Long workspaceId) {
+    public static String generateGitPath(String projectName, Long workspaceId, String gitUser) {
         // eg ： /data/GitInstall/224/testGit/.git
-        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + DSSGitConstant.GIT_PATH_SUFFIX;
+        return generateGitPrePath(projectName, workspaceId, gitUser) + File.separator + DSSGitConstant.GIT_PATH_SUFFIX;
+    }
+
+    public static String generateGitPrePath(String projectName, Long workspaceId, String gitUser) {
+        // eg ： /data/GitInstall/224/testGit
+        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName;
     }
 
 

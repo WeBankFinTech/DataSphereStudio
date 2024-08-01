@@ -86,6 +86,12 @@ public class ProjectModifyRequest {
      */
     private Boolean associateGit;
 
+    /**
+     * 接入git的读写用户名及token
+     */
+    private String gitUser;
+    private String gitToken;
+
     public String getName() {
         return name;
     }
@@ -207,6 +213,8 @@ public class ProjectModifyRequest {
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
                 ", associateGit=" + associateGit +
+                ", gitUser=" + gitUser +
+                ", gitToken=" + gitToken +
                 '}';
     }
 
@@ -216,5 +224,21 @@ public class ProjectModifyRequest {
 
     public void setAssociateGit(Boolean associateGit) {
         this.associateGit = associateGit;
+    }
+
+    public String getGitUser() {
+        return gitUser;
+    }
+
+    public void setGitUser(String gitUser) {
+        this.gitUser = gitUser;
+    }
+
+    public String getGitToken() {
+        return gitToken;
+    }
+
+    public void setGitToken(String gitToken) {
+        this.gitToken = gitToken;
     }
 }

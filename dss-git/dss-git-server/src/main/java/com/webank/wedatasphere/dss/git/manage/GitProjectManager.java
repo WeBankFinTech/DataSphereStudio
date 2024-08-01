@@ -27,6 +27,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.linkis.DataWorkCloudApplication;
 import org.apache.linkis.common.utils.Utils;
+import org.eclipse.jgit.api.Git;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +36,9 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.security.Key;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class GitProjectManager {
 
@@ -58,29 +59,50 @@ public class GitProjectManager {
             try {
                 List<Long> allWorkspaceId = workspaceGitMapper.getAllWorkspaceId();
                 for (Long workspaceId : allWorkspaceId) {
-                    GitUserEntity gitUser = selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-                    if (gitUser == null) {
-                        break;
-                    }
-                    List<String> allGitProjectName = DSSGitUtils.getAllProjectName(gitUser);
-                    List<String> localProjectName = FileUtils.getLocalProjectName(workspaceId);
-                    LOGGER.info("localProjectName is : {}", localProjectName.toString());
-                    localProjectName.removeAll(allGitProjectName);
-                    if (localProjectName.size() > 0) {
-                        LOGGER.info("Project to delete : {}", localProjectName.toString());
-                        for (String projectName : localProjectName) {
-                            // 删除本地项目
-                            DSSGitUtils.archiveLocal(projectName, workspaceId);
+                    List<GitProjectGitInfo> projectInfoByWorkspaceId = workspaceGitMapper.getProjectInfoByWorkspaceId(workspaceId);
+                    Map<String, Map<String, String>> map = getMap(projectInfoByWorkspaceId);
+                    for (Map.Entry<String, Map<String, String>> entry : map.entrySet()) {
+                        String gitUser = entry.getKey();
+                        Map<String, String> value = entry.getValue();
+                        for (Map.Entry<String, String> entry1 : value.entrySet()) {
+                            String gitUrl = entry1.getKey();
+                            String gitToken = entry1.getValue();
+                            List<String> allGitProjectName = DSSGitUtils.getAllProjectName(gitToken, gitUrl);
+                            List<String> localProjectName = FileUtils.getLocalProjectName(workspaceId, gitUser);
+                            LOGGER.info("localProjectName is : {}", localProjectName);
+                            localProjectName.removeAll(allGitProjectName);
+                            if (!localProjectName.isEmpty()) {
+                                LOGGER.info("Project to delete : {}", localProjectName.toString());
+                                for (String projectName : localProjectName) {
+                                    // 删除本地项目
+                                    DSSGitUtils.archiveLocal(projectName, workspaceId);
+                                }
+                            } else {
+                                LOGGER.info("Nothing need to delete");
+                            }
                         }
-                    } else {
-                        LOGGER.info("Nothing need to delete");
                     }
-
                 }
             } catch (Exception e) {
                 LOGGER.error("定时清理归档项目错误", e);
             }
         }, 0,1, TimeUnit.DAYS);
+    }
+
+    private static Map<String, Map<String, String>> getMap(List<GitProjectGitInfo> projectInfoByWorkspaceId) {
+        Map<String, Map<String, String>> map = new HashMap<>();
+        for (GitProjectGitInfo projectGitInfo : projectInfoByWorkspaceId) {
+            String gitUserName = projectGitInfo.getGitUser();
+            String gitToken = projectGitInfo.getGitToken();
+            String gitUrl = projectGitInfo.getGitUrl();
+            Map<String, String> tempMap = new HashMap<>();
+            if (map.containsKey(gitUserName)) {
+                tempMap = map.get(gitUserName);
+            }
+            tempMap.put(gitUrl, gitToken);
+            map.put(gitUserName, tempMap);
+        }
+        return map;
     }
 
     public static void init() {
@@ -94,58 +116,9 @@ public class GitProjectManager {
         }
     }
 
+
     public static GitUserUpdateResponse associateGit(GitUserUpdateRequest gitUserCreateRequest) throws DSSErrorException, IOException {
-        if (gitUserCreateRequest == null) {
-            throw new DSSErrorException(010101, "gitUserCreateRequest is null");
-        }
-        GitUserEntity gitUser = gitUserCreateRequest.getGitUser();
-        String userName = gitUserCreateRequest.getUsername();
-        if (gitUser == null) {
-            throw new DSSErrorException(010101, "gitUser is null");
-        }
-        String type = gitUser.getType();
-
-
-        // 不存在则更新，存在则新增
-        GitUserEntity oldGitUserDo = selectGit(gitUser.getWorkspaceId(), type, true);
-        gitUser.setUpdateBy(userName);
-        // 密码 token 加密处理
-        if (!StringUtils.isEmpty(gitUser.getGitPassword())) {
-            String encryptPassword = generateKeys(gitUser.getGitPassword(), Cipher.ENCRYPT_MODE);
-            gitUser.setGitPassword(encryptPassword);
-        }
-        if (!StringUtils.isEmpty(gitUser.getGitToken())) {
-            String encryptToken = generateKeys(gitUser.getGitToken(), Cipher.ENCRYPT_MODE);
-            gitUser.setGitToken(encryptToken);
-        }
-        GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(gitUser.getGitUser());
-        gitUser.setGitUrl(UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()));
-        if (oldGitUserDo == null) {
-            // 工作空间--git用户 为一一对应关系
-            if (gitUserEntity != null) {
-                return new GitUserUpdateResponse(80001, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
-            }
-            gitUser.setCreateBy(userName);
-            GitUserUpdateResponse userIdFromGit = getUserIdFromGit(gitUser, type, false, oldGitUserDo);
-            if (userIdFromGit != null) {
-                return userIdFromGit;
-            }
-            workspaceGitMapper.insert(gitUser);
-        }else {
-            if (GitConstant.GIT_ACCESS_WRITE_TYPE.equals(type) && !oldGitUserDo.getGitUser().equals(gitUser.getGitUser())) {
-                throw new DSSErrorException(800001, "用户名不得修改");
-            }
-            if (gitUserEntity != null && (!gitUserEntity.getWorkspaceId().equals(gitUser.getWorkspaceId()) || !gitUserEntity.getType().equals(type))) {
-                return new GitUserUpdateResponse(010101, "该用户已配置为" + gitUserEntity.getWorkspaceId() + "工作空间的读写或只读用户，请更换用户", gitUserEntity.getWorkspaceId());
-            }
-            GitUserUpdateResponse userIdFromGit = getUserIdFromGit(gitUser, type, true, oldGitUserDo);
-            if (userIdFromGit != null) {
-                return userIdFromGit;
-            }
-            workspaceGitMapper.update(gitUser);
-        }
-
-        return new GitUserUpdateResponse(0,"", null);
+        return new GitUserUpdateResponse(0, "", 0L);
     }
 
     private static GitUserUpdateResponse getUserIdFromGit(GitUserEntity gitUser, String type, Boolean update, GitUserEntity oldGitUser) throws IOException, com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException {
@@ -157,7 +130,7 @@ public class GitProjectManager {
             String userGitId = DSSGitUtils.getUserIdByUsername(writeGitUser, gitUser.getGitUser());
             gitUser.setGitUserId(userGitId);
             if (update) {
-                List<GitProjectGitInfo> projectGitInfos = workspaceGitMapper.getProjectIdListByWorkspaceId(gitUser.getWorkspaceId());
+                List<GitProjectGitInfo> projectGitInfos = workspaceGitMapper.getProjectInfoByWorkspaceId(gitUser.getWorkspaceId());
                 for (GitProjectGitInfo projectGitInfo : projectGitInfos) {
                     // 删除权限
                     LOGGER.info("删除用户" + oldGitUser.getGitUser() + "在" + projectGitInfo.getProjectName() + "项目的只读权限");
@@ -173,8 +146,28 @@ public class GitProjectManager {
         return null;
     }
 
-    public static void insert (GitProjectGitInfo projectGitInfo) {
-        workspaceGitMapper.insertProjectInfo(projectGitInfo);
+    public static void insert(GitProjectGitInfo projectGitInfo, Boolean isExist) throws DSSErrorException {
+        String projectName = projectGitInfo.getProjectName();
+        // 加密处理密码
+        String gitToken = projectGitInfo.getGitToken();
+        String encryptToken = generateKeys(gitToken, Cipher.ENCRYPT_MODE);
+        projectGitInfo.setGitToken(encryptToken);
+
+        if (isExist) {
+            workspaceGitMapper.updateProjectToken(projectName, encryptToken);
+        } else {
+            workspaceGitMapper.insertProjectInfo(projectGitInfo);
+        }
+    }
+
+    public static GitProjectGitInfo getProjectInfoByProjectName(String projectName) {
+        GitProjectGitInfo projectInfoByProjectName = workspaceGitMapper.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName != null) {
+            String gitToken = projectInfoByProjectName.getGitToken();
+            String token = generateKeys(gitToken, Cipher.DECRYPT_MODE);
+            projectInfoByProjectName.setGitToken(token);
+        }
+        return projectInfoByProjectName;
     }
 
     public static GitUserInfoResponse selectGitUserInfo(GitUserInfoRequest gitUserInfoRequest) throws DSSErrorException {
@@ -241,12 +234,7 @@ public class GitProjectManager {
         }
     }
 
-    public static GitConnectResponse gitTokenTest(GitConnectRequest connectTestRequest)throws DSSErrorException {
-        // GitLab 令牌
-        String token = connectTestRequest.getToken();
-        // 期望匹配的用户名
-        String expectedUsername = connectTestRequest.getUsername();
-        GitUserEntity gitUserEntity = workspaceGitMapper.selectByUser(expectedUsername);
+    public static Boolean gitTokenTest(String token, String expectedUsername)throws DSSErrorException {
         // GitLab API 用户信息接口
         String apiUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/user";
 
@@ -265,7 +253,7 @@ public class GitProjectManager {
                 String actualUsername = userData.getString("username");
                 if (actualUsername.equals(expectedUsername)) {
                     LOGGER.info("Token is valid and matches the username: " + actualUsername);
-                    return new GitConnectResponse(true);
+                    return true;
                 }else {
                     LOGGER.info("当前token与用户名" + actualUsername + "匹配，与当前用户名" + expectedUsername + "不匹配");
                     throw new DSSErrorException(800001, "当前用户名 token 不匹配，请检查");
@@ -273,13 +261,13 @@ public class GitProjectManager {
             } else if (response.getStatusLine().getStatusCode() == 401){
                 throw new DSSErrorException(800001, "请检查token是否正确");
             }
-            return new GitConnectResponse(false);
         } catch (DSSErrorException e) {
             LOGGER.info("Error verifying token: " + e.getMessage());
             throw new DSSErrorException(800001, "校验失败" + e.getMessage());
         }catch (Exception e) {
-            throw new DSSErrorException(800001, "校验token失败，请确认当前环境git是否可以正常访问" + e);
+            throw new DSSErrorException(800001, "校验token失败，请确认当前环境git是否可以正常访问" + e.getMessage());
         }
+        return false;
     }
 
     public static GitUserInfoListResponse getGitUserByType(GitUserInfoByRequest infoByRequest) {
@@ -287,5 +275,9 @@ public class GitProjectManager {
         GitUserInfoListResponse gitUserInfoListResponse = new GitUserInfoListResponse();
         gitUserInfoListResponse.setGitUserEntities(gitUserEntities);
         return gitUserInfoListResponse;
+    }
+
+    public static void updateGitProjectId(String projectName, String gitProjectId) {
+        workspaceGitMapper.updateProjectId(projectName, gitProjectId);
     }
 }

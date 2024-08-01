@@ -162,6 +162,11 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
             project.setDataSourceListJson(new Gson().toJson(dataSourceList));
         }
+
+        if(StringUtils.isNotEmpty(projectModifyRequest.getCreatorLabel())){
+            project.setLabel(projectModifyRequest.getCreatorLabel());
+        }
+
         UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", projectModifyRequest.getId());
         updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());

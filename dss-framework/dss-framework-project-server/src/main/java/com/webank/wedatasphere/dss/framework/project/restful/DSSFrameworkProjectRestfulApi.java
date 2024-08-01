@@ -478,6 +478,15 @@ public class DSSFrameworkProjectRestfulApi {
             }
             projectRequest.setOrderBySql(orderBySql);
         }
+
+        if(projectRequest.getPageNow() == null || projectRequest.getPageNow() <= 0){
+            projectRequest.setPageNow(1);
+        }
+
+        if(projectRequest.getPageSize() == null || projectRequest.getPageSize() <= 0 ){
+            projectRequest.setPageSize(10);
+        }
+
         List<Long> totals = new ArrayList<>();
         List<ProjectResponse> dssProjectVos = projectService.queryListByParam(projectRequest,totals);
 

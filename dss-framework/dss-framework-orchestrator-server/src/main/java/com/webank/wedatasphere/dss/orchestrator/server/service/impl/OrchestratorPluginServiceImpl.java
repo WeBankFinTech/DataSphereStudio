@@ -457,17 +457,17 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return bmlResource;
     }
 
-    private String readWorkflowNode(BmlResource bmlResource, String username, String projectName, String orchestratorName) throws DSSErrorException {
+    private String readWorkflowNode(BmlResource bmlResource, String username, String projectName, String orchestratorName, String filePath) throws DSSErrorException {
         // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
         String projectPath = IoUtils.generateProjectIOPath(username, projectName);
-        String fullPath = projectPath + File.separator + orchestratorName;
-        String zipFilePath = fullPath + ".zip";
+        String fullPath = projectPath + File.separator + filePath;
+        String zipFilePath = projectPath + File.separator + orchestratorName + ".zip";
         String fileContent = null;
         try {
             bmlService.downloadToLocalPath(username, bmlResource.getResourceId(), bmlResource.getVersion(), zipFilePath);
             ZipHelper.unzipFile(zipFilePath, projectPath, true);
 
-            LOGGER.info("export workflow success.  orchestratorName:{},fullPath:{} .", orchestratorName, projectPath);
+            LOGGER.info("export workflow success.  orchestratorName:{},fullPath:{} .", filePath, projectPath);
 
             File file = new File(fullPath);
             if (file.exists()) {
@@ -571,17 +571,18 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         Long flowId = flowRequest.getFlowId();
         String projectName = flowRequest.getProjectName();
         String label = flowRequest.getLabels().getRoute();
+        String filePath = flowRequest.getFilePath();
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
         if (bmlResource == null) {
             bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
         }
-        String s = readWorkflowNode(bmlResource, username, projectName, orchestrator.getName());
+        String s = readWorkflowNode(bmlResource, username, projectName, filePath, orchestrator.getName());
 
 
         GitFileContentRequest fileContentRequest = new GitFileContentRequest();
-        fileContentRequest.setFilePath(flowRequest.getFilePath());
+        fileContentRequest.setFilePath(filePath);
         fileContentRequest.setProjectName(projectName);
         fileContentRequest.setWorkspaceId(workspace.getWorkspaceId());
         fileContentRequest.setUsername(username);

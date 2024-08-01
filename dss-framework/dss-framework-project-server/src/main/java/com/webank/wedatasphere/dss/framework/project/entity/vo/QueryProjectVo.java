@@ -52,6 +52,15 @@ public class QueryProjectVo implements Serializable {
 
     private String releaseUsers;
 
+    private String workspaceName;
+
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
 
     public String getAccessUsers() {
         return accessUsers;

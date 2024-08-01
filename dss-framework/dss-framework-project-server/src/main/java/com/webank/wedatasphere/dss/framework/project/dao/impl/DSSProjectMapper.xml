@@ -164,14 +164,23 @@
         ,case when a.priv = 1 then a.username end  as  accessUser
         ,case when a.priv = 2 then a.username end  as  editUser
         ,case when a.priv = 3 then a.username end  as  releaseUser
+        ,d.name as workspaceName
         FROM dss_project_user a
-        JOIN dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id and b.visible = 1
+        left join dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id and b.visible = 1
+        left join dss_workspace d on a.workspace_id = d.workspace_id
         WHERE a.priv >=1 and  a.workspace_id = #{workspaceId}
         <if test="id!=null">
             and a.project_id  = #{id}
         </if>
 
        ) c where  1 = 1
+
+        <if test="projectIdList !=null and projectIdList.size() > 0">
+            and id in
+            <foreach collection="projectIdList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
 
         <if test="projectNames!=null and projectNames.size()> 0">
             and name in
@@ -192,27 +201,16 @@
             and group_concat(username) like concat('%',#{queryUser},'%')
         </if>
 
-        <if test="accessUsers!=null and accessUsers.size() > 0">
-            and group_concat(accessUser) REGEXP
-            <foreach collection="accessUsers" item="item" open="(" separator="|" close=")">
-                #{item}
-            </foreach>
-        </if>
 
-        <if test="editUsers!=null and editUsers.size() > 0">
-            and group_concat(editUser) REGEXP
-            <foreach collection="editUsers" item="item" open="(" separator="|" close=")">
-                #{item}
-            </foreach>
-        </if>
+    </select>
 
-        <if test="releaseUsers!=null and releaseUsers.size() > 0">
-            and group_concat(releaseUser) REGEXP
-            <foreach collection="releaseUsers" item="item" open="(" separator="|" close=")">
-                #{item}
-            </foreach>
-        </if>
 
+    <select id="getProjectIdByUser"  resultType="java.lang.Integer">
+        select  project_id  from dss_project_user
+        where priv = #{priv} and username in
+        <foreach collection="userList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
 
 </mapper>

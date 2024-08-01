@@ -472,7 +472,7 @@ public class DSSFrameworkProjectRestfulApi {
         LOGGER.info("user {} begin to queryAllProjects, projectId: {}.", username, projectRequest.getId());
         if(!StringUtils.isEmpty(projectRequest.getSortBy()) && !StringUtils.isEmpty(projectRequest.getOrderBy())){
             String orderBySql = DSSProjectConstant.concatOrderBySql(projectRequest.getSortBy(),projectRequest.getOrderBy());
-            LOGGER.info(String.format("getAllProjects sort orderBySql is %s", orderBySql));
+            LOGGER.info(String.format("queryAllProjects sort orderBySql is %s", orderBySql));
             if(orderBySql == null){
                 return Message.error("queryAllProjects sortBy or orderBy params input error");
             }

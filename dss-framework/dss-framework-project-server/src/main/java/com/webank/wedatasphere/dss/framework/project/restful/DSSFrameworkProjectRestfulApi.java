@@ -129,6 +129,8 @@ public class DSSFrameworkProjectRestfulApi {
 
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
 
+        Integer total = 0;
+
         if (!CollectionUtils.isEmpty(dssProjectVos)) {
 
             dssProjectVos = dssProjectVos.stream().filter(item -> {
@@ -159,7 +161,7 @@ public class DSSFrameworkProjectRestfulApi {
             }).collect(Collectors.toList());
 
             // 分页
-            Integer total = dssProjectVos.size();
+            total = dssProjectVos.size();
             if(projectRequest.getPageNow() != null && projectRequest.getPageSize()!=null){
                 int page = projectRequest.getPageNow() >= 1 ? projectRequest.getPageNow() : 1;
                 int pageSize = projectRequest.getPageSize() >= 1 ? projectRequest.getPageSize() : 10;

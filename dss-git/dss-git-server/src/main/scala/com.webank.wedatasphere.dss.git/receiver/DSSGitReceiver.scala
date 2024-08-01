@@ -60,8 +60,6 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       gitWorkflowManagerService.removeFile(gitRemoveRequest)
     case gitRenameRequest: GitRenameRequest =>
       gitWorkflowManagerService.rename(gitRenameRequest)
-    case gitConnectTestRequest: GitConnectRequest =>
-      GitProjectManager.gitTokenTest(gitConnectTestRequest)
     case gitUserInfoByTypeRequest: GitUserInfoByRequest =>
       GitProjectManager.getGitUserByType(gitUserInfoByTypeRequest)
     case gitDiffTargetCommitRequest: GitDiffTargetCommitRequest =>

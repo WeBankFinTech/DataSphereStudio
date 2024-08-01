@@ -22,7 +22,13 @@ public interface DSSWorkspaceGitMapper {
 
     List<Long> getAllWorkspaceId();
 
-    List<GitProjectGitInfo> getProjectIdListByWorkspaceId(@Param ("workspaceId") Long workspaceId);
+    List<GitProjectGitInfo> getProjectInfoByWorkspaceId(@Param ("workspaceId") Long workspaceId);
+
+    GitProjectGitInfo getProjectInfoByProjectName(@Param ("projectName") String projectName);
 
     void insertProjectInfo(GitProjectGitInfo projectGitInfo);
+
+    void updateProjectToken(@Param("projectName") String projectName, @Param("gitToken") String gitToken);
+
+    void updateProjectId(@Param("projectName") String projectName, @Param("gitProjectId") String gitProjectId);
 }

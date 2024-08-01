@@ -24,24 +24,6 @@ import java.util.zip.ZipFile;
 public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
-    public static void addFiles(String projectName, Long workspaceId) {
-
-        String filePath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + "/" + workspaceId + File.separator +  projectName +"/file1.txt";
-        List<String> lines = Arrays.asList("The first line", "The second line");
-
-        try {
-            removeFiles(filePath);
-
-            // 确保父目录存在
-            Files.createDirectories(Paths.get(filePath).getParent());
-
-            // 向文件写入内容
-            Files.write(Paths.get(filePath), lines, StandardOpenOption.CREATE);
-        } catch (Exception e) {
-            logger.error("add Files Failed, the reason is: ", e);
-        }
-    }
-
     public static void removeFiles (String filePath) {
         try {
             File file = new File(filePath);
@@ -50,23 +32,6 @@ public class FileUtils {
             }
         } catch (Exception e) {
             logger.error("remove Files Failed, the reason is: ", e);
-        }
-    }
-
-    public static void addDirectory (String directory, Long workspaceId) {
-        String filePath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + workspaceId + File.separator +  "/testGit1/file1.txt";
-        List<String> lines = Arrays.asList("The first line", "The second line");
-
-        try {
-            removeFiles(filePath);
-
-            // 确保父目录存在
-            Files.createDirectories(Paths.get(filePath).getParent());
-
-            // 向文件写入内容
-            Files.write(Paths.get(filePath), lines, StandardOpenOption.CREATE);
-        } catch (Exception e) {
-            logger.error("add Files Failed, the reason is: ", e);
         }
     }
 
@@ -95,60 +60,24 @@ public class FileUtils {
         }
     }
 
-    public static BmlResource uploadResourceToBML(BMLService bmlService, String userName, String content, String fileName, String projectName) {
-        Map<String, Object> bmlReturnMap = bmlService.upload(userName, content, fileName, projectName);
 
-        BmlResource bmlResource = new BmlResource();
-        bmlResource.setResourceId(bmlReturnMap.get("resourceId").toString());
-        bmlResource.setVersion(bmlReturnMap.get("version").toString());
-
-        return bmlResource;
-    }
-
-    public static String unzipFile(String zipFile) {
-        logger.info("-------=======================beginning to uznip testGit1=======================-------{}", zipFile);
-
-        String longZipFilePath = "";
-        try {
-            longZipFilePath = unzip(zipFile, true);
-        } catch (Exception e) {
-            logger.error("unzip failed, the reason is ");
-        }
-        return longZipFilePath;
-    }
-
-    public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
-    }
-
-    public static void removeFlowNode(String path, String projectName, Long workspaceId) {
+    public static void removeFlowNode(String path, String projectName, Long workspaceId, String gitUser) {
         // 删除node节点
-        String flowNodePathPre =  DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator +  projectName ;
-        String flowNodePath = flowNodePathPre + File.separator + path;
+        String flowNodePath = DSSGitUtils.generateGitPrePath(projectName, workspaceId, gitUser) + File.separator + path;
         // 1.删除对应文件代码
         removeDirectory(flowNodePath);
     }
 
-    public static void removeProject(String path, Long workspaceId) {
+    public static void removeProject(String path, Long workspaceId, String gitUser) {
         // 删除node节点
-        String projectPath =  File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  path ;
+        String projectPath =  DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + gitUser + File.separator +  path ;
         // 1.删除项目
         removeDirectory(projectPath);
     }
 
-    public static void downloadBMLResource(BMLService bmlService, String path,  BmlResource bmlResource, String username, Long workspaceId) {
+    public static void downloadBMLResource(BMLService bmlService, String path,  BmlResource bmlResource, String username, Long workspaceId, String gitUser) {
         //下载到本地处理
-        String dirPath = "/" + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue());
-        String importFile = dirPath + File.separator + workspaceId + File.separator +  path + ".zip";
+        String importFile = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + gitUser + File.separator + path + ".zip";
         logger.info("import zip file locate at {}",importFile);
 
         try{
@@ -275,8 +204,8 @@ public class FileUtils {
         }
     }
 
-    public static List<String> getLocalProjectName(Long workspaceId) throws IOException {
-        String path = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator;
+    public static List<String> getLocalProjectName(Long workspaceId, String gitUser) throws IOException {
+        String path = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + gitUser + File.separator;
         Path dir = Paths.get(path);
         List<String> localProjectList = new ArrayList<>();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {

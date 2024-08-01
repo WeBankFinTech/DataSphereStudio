@@ -59,4 +59,5 @@ public interface OrchestratorFrameworkService {
 
     List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total);
 
+    DSSOrchestratorVersion getLatestOrchestratorVersion(Long orchestratorId);
 }

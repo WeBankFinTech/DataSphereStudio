@@ -91,6 +91,16 @@ public class ProjectResponse implements Serializable {
 
     private Boolean associateGit;
 
+    private String workspaceName;
+
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
+
     public Date getCreateTime() {
         return createTime;
     }

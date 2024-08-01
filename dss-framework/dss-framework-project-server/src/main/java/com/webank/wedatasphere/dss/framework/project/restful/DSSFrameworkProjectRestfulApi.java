@@ -129,7 +129,7 @@ public class DSSFrameworkProjectRestfulApi {
 
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
 
-        Integer total = dssProjectVos.size();
+        Integer total = 0;
 
         if (!CollectionUtils.isEmpty(dssProjectVos)) {
 

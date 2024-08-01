@@ -596,20 +596,36 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectRequest.setQueryUser(projectRequest.getUsername());
         }
 
+        List<Integer> projectIdList = new ArrayList<>();
+        // 根据传入的查看用户获取 项目ID 取交集
+        if(CollectionUtils.isEmpty(projectRequest.getAccessUsers())){
+            intersectionProjectId(projectIdList,projectRequest.getAccessUsers(),ProjectUserPrivEnum.PRIV_ACCESS.getRank());
+        }
+        // 根据传入的编辑用户获取 项目ID 取交集
+        if (!CollectionUtils.isEmpty(projectRequest.getEditUsers())) {
+            intersectionProjectId(projectIdList,projectRequest.getEditUsers(),ProjectUserPrivEnum.PRIV_EDIT.getRank());
+        }
+        // 根据传入的发布用户获取项目ID 取交集
+        if (!CollectionUtils.isEmpty(projectRequest.getReleaseUsers())) {
+            intersectionProjectId(projectIdList,projectRequest.getReleaseUsers(),ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+        }
+        // 去重
+        projectIdList = projectIdList.stream().distinct().collect(Collectors.toList());
+
         //根据dss_project、dss_project_user查询出所在空间登录用户相关的工程
         if (StringUtils.isEmpty(projectRequest.getOrderBySql())) {
             projectRequest.setOrderBySql("updateTime desc");
         }
         LOGGER.info("queryListByParam order by sql is {} ", projectRequest.getOrderBySql());
         PageHelper.startPage(projectRequest.getPageNow(), projectRequest.getPageSize(), projectRequest.getOrderBySql());
-        List<QueryProjectVo> list = projectMapper.queryListByParam(projectRequest);
+        List<QueryProjectVo> list = projectMapper.queryListByParam(projectRequest,projectIdList);
 
         if (CollectionUtils.isEmpty(list)) {
             totals.add(0L);
             return new ArrayList<>();
         }
 
-        PageInfo<QueryProjectVo> pageInfo = new PageInfo<QueryProjectVo>();
+        PageInfo<QueryProjectVo> pageInfo = new PageInfo<QueryProjectVo>(list);
         totals.add(pageInfo.getTotal());
         List<ProjectResponse> projectResponseList = new ArrayList<>();
 
@@ -629,6 +645,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setUpdateTime(projectVo.getUpdateTime());
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
+            projectResponse.setWorkspaceName(projectVo.getWorkspaceName());
 
             if (projectVo.getDataSourceListJson() != null) {
                 List<DSSProjectDataSource> dataSourceList = new Gson().fromJson(projectVo.getDataSourceListJson(),
@@ -665,5 +682,23 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         return projectResponseList;
 
     }
+
+
+    public void intersectionProjectId(List<Integer> projectIdList,List<String> users,Integer rank){
+
+        List<Integer> projectIds = projectMapper.getProjectIdByUser(rank, users);
+
+        if(CollectionUtils.isEmpty(projectIds)){
+            return;
+        }
+
+        if(CollectionUtils.isEmpty(projectIdList)){
+            projectIdList.addAll(projectIds);
+        }else{
+            projectIdList.retainAll(projectIds);
+        }
+
+    }
+
 
 }

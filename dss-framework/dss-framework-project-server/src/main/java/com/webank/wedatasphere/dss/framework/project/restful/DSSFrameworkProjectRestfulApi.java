@@ -495,12 +495,6 @@ public class DSSFrameworkProjectRestfulApi {
         List<Long> totals = new ArrayList<>();
         List<ProjectResponse> dssProjectVos = projectService.queryListByParam(projectRequest,totals);
 
-        if (!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()) {
-            dssProjectVos = dssProjectVos.stream().filter(item ->
-                    (item.getEditUsers().contains(username) || item.getReleaseUsers().contains(username))
-                            && item.getEditable()).collect(Collectors.toList());
-        }
-
         return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos).data("total",totals.get(0));
 
     }

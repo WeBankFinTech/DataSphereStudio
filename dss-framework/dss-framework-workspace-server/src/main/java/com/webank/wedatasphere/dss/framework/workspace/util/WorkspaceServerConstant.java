@@ -21,5 +21,5 @@ public interface WorkspaceServerConstant {
     String DEFAULT_DEPARTMENT = "基础科技部";
     String DEFAULT_OFFICE = "大数据平台室";
     String DEFAULT_STAFF_SPLIT = "-";
-    String DEFAULT_STAFF_SPLIT_NEW = "/";
+    String DEFAULT_RESIGNED = "已离职";
 }

@@ -86,6 +86,11 @@ public class ProjectModifyRequest {
      */
     private Boolean associateGit;
 
+    /**
+     * 标签
+     */
+    private String creatorLabel;
+
     public String getName() {
         return name;
     }
@@ -207,6 +212,7 @@ public class ProjectModifyRequest {
                 ", devProcessList=" + devProcessList +
                 ", orchestratorModeList=" + orchestratorModeList +
                 ", associateGit=" + associateGit +
+                ", creatorLabel=" + creatorLabel +
                 '}';
     }
 
@@ -216,5 +222,13 @@ public class ProjectModifyRequest {
 
     public void setAssociateGit(Boolean associateGit) {
         this.associateGit = associateGit;
+    }
+
+    public String getCreatorLabel() {
+        return creatorLabel;
+    }
+
+    public void setCreatorLabel(String creatorLabel) {
+        this.creatorLabel = creatorLabel;
     }
 }

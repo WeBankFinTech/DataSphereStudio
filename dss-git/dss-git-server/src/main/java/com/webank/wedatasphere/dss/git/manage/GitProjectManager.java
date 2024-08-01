@@ -160,7 +160,7 @@ public class GitProjectManager {
         }
     }
 
-    public static GitProjectGitInfo getProjectInfoByProjectName(String projectName) {
+    public static GitProjectGitInfo getProjectInfoByProjectName(String projectName) throws DSSErrorException {
         GitProjectGitInfo projectInfoByProjectName = workspaceGitMapper.getProjectInfoByProjectName(projectName);
         if (projectInfoByProjectName != null) {
             String gitToken = projectInfoByProjectName.getGitToken();

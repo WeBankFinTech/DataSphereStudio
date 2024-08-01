@@ -3,10 +3,12 @@ package com.webank.wedatasphere.dss.git.service.impl;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
+import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
+import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.git.constant.DSSGitConstant;
 import com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo;
 import com.webank.wedatasphere.dss.git.manage.GitProjectManager;
@@ -37,46 +39,43 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
     @Override
     public GitCreateProjectResponse create(GitCreateProjectRequest request) throws DSSErrorException{
         Long workspaceId = request.getWorkspaceId();
-        GitUserEntity gitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", workspaceId);
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         Repository repository = null;
         try {
             // Http请求Git，创建project
-            DSSGitUtils.init(request.getProjectName(), gitUser);
+            DSSGitUtils.init(projectName, gitUser, gitToken, gitUrl);
             // 解压BML文件到本地
-            FileUtils.downloadBMLResource(bmlService, request.getProjectName(), request.getBmlResource(), request.getUsername(), workspaceId);
-            FileUtils.removeProject(request.getProjectName(), workspaceId);
-            FileUtils.unzipBMLResource(request.getProjectName(), workspaceId);
+            FileUtils.downloadBMLResource(bmlService, projectName, request.getBmlResource(), request.getUsername(), workspaceId, gitUser);
+            FileUtils.removeProject(projectName, workspaceId, gitUser);
+            FileUtils.unzipBMLResource(projectName, workspaceId);
             // 本地创建Git项目
-            DSSGitUtils.create(request.getProjectName(), gitUser, workspaceId);
+            DSSGitUtils.create(projectName, workspaceId, gitUser);
             // 获取git项目
-            String gitPath = DSSGitUtils.generateGitPath(request.getProjectName(), workspaceId);
+            String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
             File repoDir = new File(gitPath);
             repository = new FileRepositoryBuilder().setGitDir(repoDir).build();
             // 关联远端Git
-            DSSGitUtils.remote(repository, request.getProjectName(), gitUser);
+            DSSGitUtils.remote(repository, projectName, gitUser, gitUrl);
             // 提交
-            String comment = "init project: " + request.getProjectName() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
+            String comment = "init project: " + projectName + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
             // 首次创建提交项目整体
             List<String> paths = Collections.singletonList(".");
-            DSSGitUtils.push(repository, request.getProjectName(), gitUser, comment, paths);
-            // 获取工作空间只读用户
-            GitUserEntity readGitUser = GitProjectManager.selectGit(workspaceId, GitConstant.GIT_ACCESS_READ_TYPE, true);
-            if (readGitUser == null) {
-                throw new DSSErrorException(80001, "只读用户不能为空，需完成工作空间制度用户设置");
-            }
+            DSSGitUtils.push(repository, projectName, gitUser, gitToken, comment, paths);
+
             // 获取项目ProjectId
-            String projectIdByName = DSSGitUtils.getProjectIdByName(gitUser, request.getProjectName());
-            DSSGitUtils.addProjectMember(gitUser, readGitUser.getGitUserId(), projectIdByName, 20);
+            String projectIdByName = DSSGitUtils.getProjectIdByName(projectName, gitUser, gitToken, gitUrl);
+//            DSSGitUtils.addProjectMember(gitUser, readGitUser.getGitUserId(), projectIdByName, 20);
             // 存储projectId
-            GitProjectGitInfo projectGitInfo = new GitProjectGitInfo();
-            projectGitInfo.setGitProjectId(projectIdByName);
-            projectGitInfo.setProjectName(request.getProjectName());
-            projectGitInfo.setWorkspaceId(workspaceId);
-            GitProjectManager.insert(projectGitInfo);
+            GitProjectManager.updateGitProjectId(projectName, projectIdByName);
             return new GitCreateProjectResponse();
         } catch (Exception e) {
             logger.error("create project failed, the reason is: ", e);
@@ -90,29 +89,52 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
 
     @Override
     public GitArchivePorjectResponse archive(GitArchiveProjectRequest request) throws GitErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
+        String projectName = request.getProjectName();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("the projectName : {} don't associate with git", projectName);
             return null;
         }
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
         // 远程归档
-        DSSGitUtils.archive(request.getProjectName(), gitUser);
+        DSSGitUtils.archive(projectName, gitUser, gitUrl, gitToken);
         // 删除本地项目
-        DSSGitUtils.archiveLocal(request.getProjectName(), request.getWorkspaceId());
+        DSSGitUtils.archiveLocal(projectName, request.getWorkspaceId());
         return new GitArchivePorjectResponse();
     }
 
     @Override
     public GitCheckProjectResponse checkProject(GitCheckProjectRequest request) throws DSSErrorException {
-        GitUserEntity gitUser = GitProjectManager.selectGit(request.getWorkspaceId(), GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-        if (gitUser == null) {
-            logger.error("the workspace : {} don't associate with git", request.getWorkspaceId());
-            return null;
+        String gitUser = request.getGitUser();
+        String gitToken = request.getGitToken();
+        String projectName = request.getProjectName();
+        Long workspaceId = request.getWorkspaceId();
+        Boolean isExist = false;
+        GitProjectGitInfo projectGitInfo = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectGitInfo != null ) {
+            isExist = true;
+            if (!projectGitInfo.getGitUser().equals(gitUser)) {
+                throw new DSSErrorException(80001, "Git用户名不允许更换");
+            }
         }
-        String projectPath = gitUser.getGitUser() + "/" + request.getProjectName();
-        boolean b = DSSGitUtils.checkIfProjectExists(gitUser, projectPath);
-        logger.info("checkProjectName result is : {}", b);
-        return new GitCheckProjectResponse(request.getProjectName(), b);
+        // 检测token合法性 数据库中已存在的配置无需再次校验
+        Boolean tokenTest = isExist || GitProjectManager.gitTokenTest(gitToken, gitUser);
+        String gitUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
+        if (tokenTest) {
+            String projectPath = gitUser + "/" + projectName;
+            // 检测项目名称是否重复 数据库中已存在的配置无需再次校验
+            if (isExist || !DSSGitUtils.checkIfProjectExists(gitToken, projectPath)) {
+                GitProjectGitInfo gitProjectGitInfo = new GitProjectGitInfo(workspaceId, projectName, gitUser, gitToken, gitUrl);
+                GitProjectManager.insert(gitProjectGitInfo, isExist);
+            }
+        } else {
+            throw new GitErrorException(80101, "git init failed, the reason is: projectName " + projectName +" already exists");
+        }
+
+        return new GitCheckProjectResponse(projectName, false);
     }
 
 

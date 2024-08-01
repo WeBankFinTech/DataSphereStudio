@@ -16,7 +16,9 @@
 
 package com.webank.wedatasphere.dss.framework.project.entity.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.webank.wedatasphere.dss.standard.app.structure.project.ref.DSSProjectDataSource;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -43,8 +45,12 @@ public class ProjectResponse implements Serializable {
     private String product;
     private Boolean isArchive;
     //工程创建时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
     //工程修改时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
     private List<DSSProjectDataSource> dataSourceList;
 

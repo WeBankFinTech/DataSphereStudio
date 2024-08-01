@@ -70,6 +70,36 @@ public class ProjectQueryRequest implements Serializable {
 
     private Integer pageSize;
 
+    private String sortBy;
+
+    private String orderBy;
+
+    private String orderBySql;
+
+
+    public String getOrderBySql() {
+        return orderBySql;
+    }
+
+    public void setOrderBySql(String orderBySql) {
+        this.orderBySql = orderBySql;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
 
     public Integer getPageNow() {
         return pageNow;

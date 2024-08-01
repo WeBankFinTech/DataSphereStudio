@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
+import com.webank.wedatasphere.dss.framework.project.contant.DSSProjectConstant;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
@@ -117,8 +118,16 @@ public class DSSFrameworkProjectRestfulApi {
             return message;
         }
         LOGGER.info("user {} begin to getAllProjects, projectId: {}.", username, projectRequest.getId());
-        List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
+        if(!StringUtils.isEmpty(projectRequest.getSortBy()) && !StringUtils.isEmpty(projectRequest.getOrderBy())){
+            String orderBySql = DSSProjectConstant.concatOrderBySql(projectRequest.getSortBy(),projectRequest.getOrderBy());
+            LOGGER.info(String.format("getAllProjects sort orderBySql is %s", orderBySql));
+            if(orderBySql == null){
+                return Message.error("数据排序信息传入异常请检查");
+            }
+            projectRequest.setOrderBySql(orderBySql);
+        }
 
+        List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
 
         if (!CollectionUtils.isEmpty(dssProjectVos)) {
 
@@ -148,23 +157,23 @@ public class DSSFrameworkProjectRestfulApi {
                 return flag;
 
             }).collect(Collectors.toList());
-        }
 
-        // 分页
-        Integer total = dssProjectVos.size();
-        if(projectRequest.getPageNow() != null && projectRequest.getPageSize()!=null){
-            int page = projectRequest.getPageNow() >= 1 ? projectRequest.getPageNow() : 1;
-            int pageSize = projectRequest.getPageSize() >= 1 ? projectRequest.getPageSize() : 10;
-            List<ProjectResponse>  dssProjectList = new ArrayList<>();
-            Integer maxCount = page * pageSize > total ? total : page * pageSize;
-            Integer minCount = (page - 1) * pageSize;
-            for(int i = minCount; i < maxCount; i ++){
-                dssProjectList.add(dssProjectVos.get(i));
+            // 分页
+            Integer total = dssProjectVos.size();
+            if(projectRequest.getPageNow() != null && projectRequest.getPageSize()!=null){
+                int page = projectRequest.getPageNow() >= 1 ? projectRequest.getPageNow() : 1;
+                int pageSize = projectRequest.getPageSize() >= 1 ? projectRequest.getPageSize() : 10;
+                List<ProjectResponse>  dssProjectList = new ArrayList<>();
+                Integer maxSize = page * pageSize > total ? total : page * pageSize;
+                Integer minSize = (page - 1) * pageSize;
+                for(int i = minSize; i < maxSize; i ++){
+                    dssProjectList.add(dssProjectVos.get(i));
+                }
+
+                dssProjectVos = new ArrayList<>(dssProjectList);
             }
 
-            dssProjectVos = new ArrayList<>(dssProjectList);
         }
-
 
         if (!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()) {
             dssProjectVos = dssProjectVos.stream().filter(item ->

@@ -168,6 +168,9 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
                 vo.setDepartment(WorkspaceServerConstant.DEFAULT_DEPARTMENT);
                 vo.setOffice(WorkspaceServerConstant.DEFAULT_OFFICE);
             }
+        }else{
+            vo.setDepartment(WorkspaceServerConstant.DEFAULT_RESIGNED);
+            vo.setOffice(WorkspaceServerConstant.DEFAULT_RESIGNED);
         }
         return vo;
     }

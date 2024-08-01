@@ -76,6 +76,16 @@ public class ProjectQueryRequest implements Serializable {
 
     private String orderBySql;
 
+    private String queryUser;
+
+
+    public String getQueryUser() {
+        return queryUser;
+    }
+
+    public void setQueryUser(String queryUser) {
+        this.queryUser = queryUser;
+    }
 
     public String getOrderBySql() {
         return orderBySql;

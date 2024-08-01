@@ -117,6 +117,7 @@ public class DSSFrameworkProjectRestfulApi {
         if (message != null) {
             return message;
         }
+
         LOGGER.info("user {} begin to getAllProjects, projectId: {}.", username, projectRequest.getId());
         if(!StringUtils.isEmpty(projectRequest.getSortBy()) && !StringUtils.isEmpty(projectRequest.getOrderBy())){
             String orderBySql = DSSProjectConstant.concatOrderBySql(projectRequest.getSortBy(),projectRequest.getOrderBy());
@@ -457,5 +458,37 @@ public class DSSFrameworkProjectRestfulApi {
         return Message.ok().data("data", projectNames);
     }
 
+
+
+    @RequestMapping(path = "queryAllProjects", method = RequestMethod.POST)
+    public Message queryAllProject(HttpServletRequest request, @RequestBody ProjectQueryRequest projectRequest){
+
+        String username = SecurityFilter.getLoginUsername(request);
+        projectRequest.setUsername(username);
+        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetAllProjects(request, projectRequest));
+        if (message != null) {
+            return message;
+        }
+        LOGGER.info("user {} begin to queryAllProjects, projectId: {}.", username, projectRequest.getId());
+        if(!StringUtils.isEmpty(projectRequest.getSortBy()) && !StringUtils.isEmpty(projectRequest.getOrderBy())){
+            String orderBySql = DSSProjectConstant.concatOrderBySql(projectRequest.getSortBy(),projectRequest.getOrderBy());
+            LOGGER.info(String.format("getAllProjects sort orderBySql is %s", orderBySql));
+            if(orderBySql == null){
+                return Message.error("queryAllProjects sortBy or orderBy params input error");
+            }
+            projectRequest.setOrderBySql(orderBySql);
+        }
+        List<Long> totals = new ArrayList<>();
+        List<ProjectResponse> dssProjectVos = projectService.queryListByParam(projectRequest,totals);
+
+        if (!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()) {
+            dssProjectVos = dssProjectVos.stream().filter(item ->
+                    (item.getEditUsers().contains(username) || item.getReleaseUsers().contains(username))
+                            && item.getEditable()).collect(Collectors.toList());
+        }
+
+        return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos).data("total",totals.get(0));
+
+    }
 
 }

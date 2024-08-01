@@ -102,4 +102,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     DSSProjectDO modifyProjectMeta(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException;
 
+
+    List<ProjectResponse> queryListByParam(ProjectQueryRequest projectRequest,List<Long> totals);
+
 }

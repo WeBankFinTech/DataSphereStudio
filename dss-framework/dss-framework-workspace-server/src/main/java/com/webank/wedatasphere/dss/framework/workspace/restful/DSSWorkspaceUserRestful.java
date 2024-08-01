@@ -284,12 +284,12 @@ public class DSSWorkspaceUserRestful {
         }
         LOGGER.info(String.format("getWorkspaceUserByRole workspaceId is %s, roleId is %s", workspaceId, roleId));
         List<String> users = dssWorkspaceUserService.getWorkspaceUserByRoleId(workspaceId, roleId);
-
-        return Message.ok().data("users", users);
+        String workspaceName = dssWorkspaceService.getWorkspaceName(workspaceId);
+        return Message.ok().data("users", users).data("workspaceName", workspaceName);
 
     }
 
-    @RequestMapping(path = "/getWorkspaceProxyUsers",method = RequestMethod.GET)
+    @RequestMapping(path = "/getWorkspaceProxyUsers", method = RequestMethod.GET)
     public Message getWorkspaceProxyUsers(@RequestParam(value = WORKSPACE_ID_STR, required = false) Long workspaceId) {
 
 

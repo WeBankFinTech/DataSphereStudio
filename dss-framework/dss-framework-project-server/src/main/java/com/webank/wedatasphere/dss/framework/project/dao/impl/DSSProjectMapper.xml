@@ -187,33 +187,31 @@
             </foreach>
         </if>
 
+        group by id having 1 = 1
+        <if test="queryUser !=null and queryUser!= ''">
+            and group_concat(username) like concat('%',#{queryUser},'%')
+        </if>
+
         <if test="accessUsers!=null and accessUsers.size() > 0">
-            and accessUser in
-            <foreach collection="accessUsers" item="item" open="(" separator="," close=")">
+            and group_concat(accessUser) REGEXP
+            <foreach collection="accessUsers" item="item" open="(" separator="|" close=")">
                 #{item}
             </foreach>
         </if>
 
         <if test="editUsers!=null and editUsers.size() > 0">
-            and editUser in
-            <foreach collection="editUsers" item="item" open="(" separator="," close=")">
+            and group_concat(editUser) REGEXP
+            <foreach collection="editUsers" item="item" open="(" separator="|" close=")">
                 #{item}
             </foreach>
         </if>
 
         <if test="releaseUsers!=null and releaseUsers.size() > 0">
-            and releaseUser in
-            <foreach collection="releaseUsers" item="item" open="(" separator="," close=")">
+            and group_concat(releaseUser) REGEXP
+            <foreach collection="releaseUsers" item="item" open="(" separator="|" close=")">
                 #{item}
             </foreach>
         </if>
-
-        group by id
-
-        <if test="queryUser !=null and queryUser!= ''">
-            having group_concat(username) like concat('%',#{queryUser},'%')
-        </if>
-
 
     </select>
 

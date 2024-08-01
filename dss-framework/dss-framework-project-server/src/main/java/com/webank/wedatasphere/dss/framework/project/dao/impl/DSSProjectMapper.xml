@@ -133,7 +133,7 @@
 
 
 
-    <select id="queryAllProjects"
+    <select id="queryListByParam"
             parameterType="com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest"
             resultType="com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo">
 

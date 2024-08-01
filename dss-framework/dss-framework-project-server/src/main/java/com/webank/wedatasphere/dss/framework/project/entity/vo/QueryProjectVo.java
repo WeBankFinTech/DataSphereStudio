@@ -46,6 +46,37 @@ public class QueryProjectVo implements Serializable {
     private String dataSourceListJson;
 
 
+    private String accessUsers;
+
+    private String editUsers;
+
+    private String releaseUsers;
+
+
+    public String getAccessUsers() {
+        return accessUsers;
+    }
+
+    public void setAccessUsers(String accessUsers) {
+        this.accessUsers = accessUsers;
+    }
+
+    public String getEditUsers() {
+        return editUsers;
+    }
+
+    public void setEditUsers(String editUsers) {
+        this.editUsers = editUsers;
+    }
+
+    public String getReleaseUsers() {
+        return releaseUsers;
+    }
+
+    public void setReleaseUsers(String releaseUsers) {
+        this.releaseUsers = releaseUsers;
+    }
+
     public Long getId() {
         return id;
     }

@@ -48,7 +48,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     @Qualifier("workflowBmlService")
     private BMLService bmlService;
     @Override
-    public GitDiffResponse diff(GitDiffRequest request) {
+    public GitDiffResponse diff(GitDiffRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
 
@@ -93,7 +93,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
-    public GitDiffResponse diffGit(GitDiffTargetCommitRequest request) {
+    public GitDiffResponse diffGit(GitDiffTargetCommitRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
 
@@ -262,7 +262,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     }
 
     @Override
-    public GitSearchResponse search(GitSearchRequest request) {
+    public GitSearchResponse search(GitSearchRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
 

@@ -648,6 +648,17 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setEditUsers(editUsers.stream().distinct().collect(Collectors.toList()));
             projectResponse.setReleaseUsers(releaseUsers.stream().distinct().collect(Collectors.toList()));
 
+            // 用户是否具有编辑权限  编辑权限和创建者都有
+            if (editUsers.contains(projectRequest.getUsername())
+                    || projectVo.getCreateBy().equals(projectRequest.getUsername())
+                    || isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())
+                    || projectResponse.getReleaseUsers().contains(projectRequest.getUsername())
+            ) {
+                projectResponse.setEditable(true);
+            } else {
+                projectResponse.setEditable(false);
+            }
+
             projectResponseList.add(projectResponse);
         }
 

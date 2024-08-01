@@ -24,7 +24,7 @@ public class DSSProjectConstant {
         StringBuffer buffer = new StringBuffer();
         for (int i = 0; i < sortArray.length; i++) {
             buffer.append(sortArray[i]);
-            if (DESCEND.equalsIgnoreCase(orderArray[i])) {
+            if (ASCEND.equalsIgnoreCase(orderArray[i])) {
                 buffer.append(" asc");
             } else {
                 buffer.append(" desc");

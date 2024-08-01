@@ -31,7 +31,6 @@ import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref
 import com.webank.wedatasphere.dss.appconn.scheduler.structure.orchestration.ref.RefOrchestrationContentRequestRef;
 import com.webank.wedatasphere.dss.appconn.scheduler.utils.OrchestrationOperationUtils;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
-import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
@@ -48,7 +47,6 @@ import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImp
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCommitInfoBetweenRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitHistoryRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRemoveRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
@@ -90,7 +88,6 @@ import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.dao.NodeMetaMapper;
 import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
-import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.SaveFlowHook;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -368,6 +365,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorUnlockVo.setOrchestratorName(orchestratorInfo.getName());
         orchestratorUnlockVo.setOrchestratorId(orchestratorInfo.getId());
         return orchestratorUnlockVo;
+    }
+
+    @Override
+    public DSSOrchestratorVersion getLatestOrchestratorVersion(Long orchestratorId) {
+        return orchestratorMapper.getLatestOrchestratorVersionById(orchestratorId);
     }
 
     @Override

@@ -689,7 +689,11 @@ public class DSSGitUtils {
 
     public static String getFileContent(String path, String projectName, Long workspaceId) throws IOException {
         String filePath = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + path;
-        return new String(Files.readAllBytes(Paths.get(filePath)));
+        File file = new File(filePath);
+        if (file.exists()) {
+            return new String(Files.readAllBytes(Paths.get(filePath)));
+        }
+        return null;
     }
 
     public static String getTargetCommitFileContent(Repository repository, String commitId, String filePath) throws GitErrorException {

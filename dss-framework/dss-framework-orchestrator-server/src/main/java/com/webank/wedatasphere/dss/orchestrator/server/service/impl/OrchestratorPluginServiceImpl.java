@@ -578,7 +578,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
         }
-        String s = readWorkflowNode(bmlResource, username, projectName, filePath, orchestrator.getName());
+        String s = readWorkflowNode(bmlResource, username, projectName, orchestrator.getName(), filePath);
 
 
         GitFileContentRequest fileContentRequest = new GitFileContentRequest();

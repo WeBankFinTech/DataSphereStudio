@@ -479,6 +479,11 @@ public class DSSFrameworkProjectRestfulApi {
             projectRequest.setOrderBySql(orderBySql);
         }
 
+        if (projectRequest.getWorkspaceId() == null) {
+            Workspace workspace = SSOHelper.getWorkspace(request);
+            projectRequest.setWorkspaceId(workspace.getWorkspaceId());
+        }
+
         if(projectRequest.getPageNow() == null || projectRequest.getPageNow() <= 0){
             projectRequest.setPageNow(1);
         }

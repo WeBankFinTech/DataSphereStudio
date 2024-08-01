@@ -20,18 +20,26 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class StaffInfo {
-    @SerializedName(value = "EMPLID")
+    @SerializedName(value = "ID")
     private String id;
-    @SerializedName(value = "CHINESE_NAME")
+    @SerializedName(value = "StaffID")
+    private String staffId;
+    @SerializedName(value = "OID")
+    private String oId;
+    @SerializedName(value = "ChineseName")
     private String chineseName;
-    @SerializedName(value = "ENGLISH_NAME")
+    @SerializedName(value = "EnglishName")
     private String englishName;
-    @SerializedName(value = "FULL_NAME")
+    @SerializedName(value = "FullName")
     private String fullName;
-    @SerializedName(value = "FULL_DEPTNAME")
+    @SerializedName(value = "OrgName")
+    private String orgName;
+    @SerializedName(value = "OrgFullName")
     private String orgFullName;
-    @SerializedName(value = "HR_STATUS")
+    @SerializedName(value = "Status")
     private String status;
+    @SerializedName(value = "PersonGroup")
+    private String personGroup;
 
     public StaffInfo(){
     }
@@ -48,6 +56,22 @@ public class StaffInfo {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getStaffId() {
+        return staffId;
+    }
+
+    public void setStaffId(String staffId) {
+        this.staffId = staffId;
+    }
+
+    public String getoId() {
+        return oId;
+    }
+
+    public void setoId(String oId) {
+        this.oId = oId;
     }
 
     public String getChineseName() {
@@ -74,6 +98,14 @@ public class StaffInfo {
         this.fullName = fullName;
     }
 
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
     public String getOrgFullName() {
         return orgFullName;
     }
@@ -90,15 +122,27 @@ public class StaffInfo {
         this.status = status;
     }
 
+    public String getPersonGroup() {
+        return personGroup;
+    }
+
+    public void setPersonGroup(String personGroup) {
+        this.personGroup = personGroup;
+    }
+
     @Override
     public String toString() {
-        return "StaffInfoNew{" +
+        return "StaffInfo{" +
                 "id='" + id + '\'' +
+                ", staffId='" + staffId + '\'' +
+                ", oId='" + oId + '\'' +
                 ", chineseName='" + chineseName + '\'' +
                 ", englishName='" + englishName + '\'' +
                 ", fullName='" + fullName + '\'' +
+                ", orgName='" + orgName + '\'' +
                 ", orgFullName='" + orgFullName + '\'' +
                 ", status='" + status + '\'' +
+                ", personGroup='" + personGroup + '\'' +
                 '}';
     }
 }

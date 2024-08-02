@@ -14,4 +14,6 @@ public interface DSSGitProjectManagerService {
 
     GitCheckProjectResponse checkProject(GitCheckProjectRequest request) throws DSSErrorException;
 
+    GitUserByWorkspaceResponse getProjectGitUserInfo(GitUserByWorkspaceIdRequest request);
+
 }

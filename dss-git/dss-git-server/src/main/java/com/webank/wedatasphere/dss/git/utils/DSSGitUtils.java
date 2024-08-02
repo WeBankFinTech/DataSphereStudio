@@ -210,15 +210,15 @@ public class DSSGitUtils {
                 root.addChild(statu);
             }
         }
-        resultTree.add(root);
-        resultTree.add(rootMeta);
+        resultTree.add(root.getChildren().get(projectName));
+        resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         // 打印树形结构
-        printTree("", root);
-        printTree("", rootMeta);
+        printTree("", root.getChildren().get(projectName));
+        printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         return new GitDiffResponse(resultTree);
     }
 
-    public static GitDiffResponse diffGit(Repository repository, String commitId, String filePath) {
+    public static GitDiffResponse diffGit(Repository repository, String projectName, String commitId, String filePath) {
         List<GitTree> resultTree = new ArrayList<>();
         try (Git git = new Git(repository)) {
             ObjectId commitObjectId = ObjectId.fromString(commitId);
@@ -274,11 +274,11 @@ public class DSSGitUtils {
                         }
                     }
                 }
-                resultTree.add(root);
-                resultTree.add(rootMeta);
+                resultTree.add(root.getChildren().get(projectName));
+                resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
                 // 打印树形结构
-                printTree("", root);
-                printTree("", rootMeta);
+                printTree("", root.getChildren().get(projectName));
+                printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
             } catch (GitAPIException | IOException e) {
                 throw new RuntimeException(e);
             }

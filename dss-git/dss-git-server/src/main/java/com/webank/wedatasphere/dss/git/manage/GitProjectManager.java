@@ -66,7 +66,7 @@ public class GitProjectManager {
                         Map<String, String> value = entry.getValue();
                         for (Map.Entry<String, String> entry1 : value.entrySet()) {
                             String gitUrl = entry1.getKey();
-                            String gitToken = entry1.getValue();
+                            String gitToken = generateKeys(entry1.getValue(), Cipher.DECRYPT_MODE);
                             List<String> allGitProjectName = DSSGitUtils.getAllProjectName(gitToken, gitUrl);
                             List<String> localProjectName = FileUtils.getLocalProjectName(workspaceId, gitUser);
                             LOGGER.info("localProjectName is : {}", localProjectName);

@@ -5,6 +5,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorExcepti
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 public interface DSSGitProjectManagerService {
@@ -15,5 +16,7 @@ public interface DSSGitProjectManagerService {
     GitCheckProjectResponse checkProject(GitCheckProjectRequest request) throws DSSErrorException;
 
     GitUserByWorkspaceResponse getProjectGitUserInfo(GitUserByWorkspaceIdRequest request);
+
+    GitAddMemberResponse addMember(GitAddMemberRequest request) throws IOException;
 
 }

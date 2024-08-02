@@ -15,6 +15,7 @@ import com.webank.wedatasphere.dss.git.manage.GitProjectManager;
 import com.webank.wedatasphere.dss.git.service.DSSGitProjectManagerService;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
 import com.webank.wedatasphere.dss.git.utils.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -155,6 +157,26 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         }
 
         return new GitUserByWorkspaceResponse(map);
+    }
+
+    @Override
+    public GitAddMemberResponse addMember(GitAddMemberRequest request) throws IOException {
+        String projectName = request.getProjectName();
+        String username = request.getUsername();
+        String flowNodeName = request.getFlowNodeName();
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        String gitProjectId = projectInfoByProjectName.getGitProjectId();
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
+        String userIdByUsername = DSSGitUtils.getUserIdByUsername(gitUrl, gitToken, username);
+        DSSGitUtils.addProjectMember(gitUrl, gitToken, userIdByUsername, gitProjectId, 20);
+        String jumpUrl = gitUrl + "/" + gitUser + "/" + projectName;
+
+        if (StringUtils.isNotEmpty(flowNodeName)) {
+            jumpUrl += "/tree/master/" + flowNodeName;
+        }
+        return new GitAddMemberResponse(jumpUrl);
     }
 
 

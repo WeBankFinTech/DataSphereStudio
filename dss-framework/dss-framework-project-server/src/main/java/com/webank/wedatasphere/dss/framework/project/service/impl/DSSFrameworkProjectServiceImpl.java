@@ -28,6 +28,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectUser;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ExportAllOrchestratorsReqest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectTransferRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
@@ -177,7 +178,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         dbProject.setDescription(projectModifyRequest.getDescription());
         dbProject.setBusiness(projectModifyRequest.getBusiness());
         dbProject.setProduct(projectModifyRequest.getProduct());
-        modifyThirdProject(projectModifyRequest, dbProject, workspace);
+        modifyThirdProject(projectModifyRequest, dbProject, workspace, dbProject.getCreateBy());
 
         //2.修改dss_project_user 工程与用户关系
         projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
@@ -204,7 +205,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
      * 统一修改各个接入的第三方的系统的工程状态信息，修改 dss_project 调用。
      */
     private void modifyThirdProject(ProjectModifyRequest projectModifyRequest,
-                                    DSSProjectDO dbProject, Workspace workspace){
+                                    DSSProjectDO dbProject, Workspace workspace, String username){
         DSSProject dssProject = new DSSProject();
         BeanUtils.copyProperties(dbProject, dssProject);
         DSSProjectPrivilege privilege = DSSProjectPrivilege.newBuilder().setAccessUsers(projectModifyRequest.getAccessUsers())
@@ -244,7 +245,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                     return true;
                 }
             }, workspace, projectService -> projectService.getProjectUpdateOperation(),
-            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setDSSProjectDataSources(dataSourceList).setUserName(dbProject.getUpdateBy()).setWorkspace(workspace),
+            dssProjectContentRequestRef -> dssProjectContentRequestRef.setDSSProject(dssProject).setDSSProjectPrivilege(privilege).setDSSProjectDataSources(dataSourceList).setUserName(username).setWorkspace(workspace),
             (appInstance, refProjectContentRequestRef) -> refProjectContentRequestRef.setRefProjectId(appInstanceToRefProjectId.get(appInstance)),
             (structureOperation, structureRequestRef) -> {
                 ProjectUpdateRequestRef projectUpdateRequestRef = (ProjectUpdateRequestRef) structureRequestRef;
@@ -437,6 +438,52 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
     }
 
+    @Override
+    public void transferProject(ProjectTransferRequest projectTransferRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception {
+        ProjectModifyRequest projectModifyRequest = new ProjectModifyRequest();
 
+        BeanUtils.copyProperties(dbProject, projectModifyRequest);
+        initProjectModifyRequest(projectModifyRequest,projectTransferRequest, username);
+
+        dbProject.setCreateBy(projectTransferRequest.getTransferUserName());
+        dbProject.setUsername(projectTransferRequest.getTransferUserName());
+        // 1.统一修改各个接入的第三方的系统的工程状态信息
+        //调用第三方的工程修改接口
+        modifyThirdProject(projectModifyRequest, dbProject, workspace, username);
+
+        //2.修改dss_project_user 工程与用户关系
+        projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
+
+        //3.修改dss_project DSS基本工程信息
+        UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", dbProject.getId());
+        updateWrapper.eq("workspace_id", dbProject.getWorkspaceId());
+        projectMapper.update(dbProject, updateWrapper);
+
+        syncGitProject(projectModifyRequest, dbProject, username, workspace);
+    }
+
+    private void initProjectModifyRequest(ProjectModifyRequest projectModifyRequest,ProjectTransferRequest projectTransferRequest,String username){
+        List<DSSProjectUser> projectPriv = projectUserService.getProjectPriv(projectModifyRequest.getId());
+        List<String> releaseUsers = projectPriv.stream().filter(projectUser -> projectUser.getPriv() == 3).map(DSSProjectUser::getUsername).collect(Collectors.toList());
+        if(!releaseUsers.contains(projectTransferRequest.getTransferUserName())){
+            releaseUsers.add(projectTransferRequest.getTransferUserName());
+        }
+        if(releaseUsers.contains(username)){
+            releaseUsers.remove(username);
+        }
+        projectModifyRequest.setReleaseUsers(releaseUsers);
+
+        List<String> editUsers = projectPriv.stream().filter(projectUser -> projectUser.getPriv() == 2).map(DSSProjectUser::getUsername).collect(Collectors.toList());
+        if(!editUsers.contains(projectTransferRequest.getTransferUserName())){
+            editUsers.add(projectTransferRequest.getTransferUserName());
+        }
+        if(editUsers.contains(username)){
+            editUsers.remove(username);
+        }
+        projectModifyRequest.setEditUsers(editUsers);
+        List<String> accessUsers = projectPriv.stream().filter(projectUser -> projectUser.getPriv() == 1).map(DSSProjectUser::getUsername).collect(Collectors.toList());
+        projectModifyRequest.setAccessUsers(accessUsers);
+    }
 
 }

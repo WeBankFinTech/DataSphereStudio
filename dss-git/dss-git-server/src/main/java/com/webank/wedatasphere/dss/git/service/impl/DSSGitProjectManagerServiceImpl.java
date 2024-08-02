@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Cipher;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
@@ -115,9 +116,14 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         Boolean isExist = false;
         GitProjectGitInfo projectGitInfo = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectGitInfo != null ) {
-            isExist = true;
             if (!projectGitInfo.getGitUser().equals(gitUser)) {
                 throw new DSSErrorException(80001, "Git用户名不允许更换");
+            }
+            if (gitToken.equals(projectGitInfo.getGitToken())) {
+                isExist = true;
+            } else {
+                String decryptToken = GitProjectManager.generateKeys(projectGitInfo.getGitToken(), Cipher.DECRYPT_MODE);
+                gitToken = decryptToken;
             }
         }
         // 检测token合法性 数据库中已存在的配置无需再次校验

@@ -149,18 +149,6 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public List<DSSWorkspace> getWorkspaces(String userName) {
         List<DSSWorkspace> workspaces = dssWorkspaceMapper.getWorkspaces(userName);
-        GitUserInfoByRequest typeRequest = new GitUserInfoByRequest();
-        typeRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
-        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        GitUserInfoListResponse userInfoListResponse = RpcAskUtils.processAskException(gitSender.ask(typeRequest), GitUserInfoListResponse.class, GitUserInfoByRequest.class);
-        if (userInfoListResponse.getGitUserEntities() != null) {
-            List<GitUserEntity> gitUserEntities = userInfoListResponse.getGitUserEntities();
-            Set<Long> collect = gitUserEntities.stream().map(GitUserEntity::getWorkspaceId).collect(Collectors.toSet());
-            for (DSSWorkspace workspace : workspaces) {
-                long workspaceId = workspace.getId();
-                workspace.setAssociateGit(collect.contains(workspaceId));
-            }
-        }
         //用于展示demo的工作空间是不应该返回的,除非用户是管理员
         if (dssWorkspaceUserMapper.isAdmin(userName) == 1) {
             return workspaces;

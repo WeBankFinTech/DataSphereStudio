@@ -723,7 +723,9 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         orchestratorInfo.setOrchestratorName(modifyOrchestratorMetaRequest.getOrchestratorName());
         orchestratorInfo.setDescription(modifyOrchestratorMetaRequest.getDescription());
         orchestratorInfo.setIsDefaultReference(modifyOrchestratorMetaRequest.getIsDefaultReference());
-        orchestratorInfo.setProxyUser(modifyOrchestratorMetaRequest.getProxyUser());
+        if(!Objects.equals(orchestratorInfo.getProxyUser(),modifyOrchestratorMetaRequest.getProxyUser())){
+            orchestratorInfo.setProxyUser(modifyOrchestratorMetaRequest.getProxyUser());
+        }
         orchestratorInfo.setUpdateUser(username);
         orchestratorInfo.setUpdateTime(new Date(System.currentTimeMillis()));
 

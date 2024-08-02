@@ -548,7 +548,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     private String getLastPublishCommitId(DSSOrchestratorInfo orchestrator) {
-        List<DSSOrchestratorVersion> orchestratorVersions = orchestratorMapper.getOrchestratorVersions(orchestrator.getProjectId(), orchestrator.getId());
+        List<DSSOrchestratorVersion> orchestratorVersions = orchestratorMapper.getVersionByOrchestratorId(orchestrator.getId());
         String commitId = null;
         if (CollectionUtils.isNotEmpty(orchestratorVersions)) {
             String commitIdNow = orchestratorVersions.get(0).getCommitId();

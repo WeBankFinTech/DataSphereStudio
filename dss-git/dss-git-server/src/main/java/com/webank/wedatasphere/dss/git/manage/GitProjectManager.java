@@ -205,7 +205,7 @@ public class GitProjectManager {
         }
     }
 
-    private static String generateKeys(String password, int mode) throws DSSErrorException{
+    public static String generateKeys(String password, int mode) throws DSSErrorException{
         // 定义一个字符串作为密钥源
         String keyString = GitServerConfig.LINKIS_MYSQL_PRI_KEY.getValue();
         if (keyString.length() < 16) {

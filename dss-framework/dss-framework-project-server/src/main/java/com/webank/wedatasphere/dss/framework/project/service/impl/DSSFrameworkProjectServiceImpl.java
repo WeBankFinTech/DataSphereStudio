@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.project.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyStructureAppConn;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
@@ -45,6 +46,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.project.ref.*;
 import com.webank.wedatasphere.dss.standard.app.structure.utils.StructureOperationUtils;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
+import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -74,6 +76,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     private DSSProjectService dssProjectService;
     @Autowired
     private DSSProjectUserService projectUserService;
+    @Autowired
+    private DSSProjectMapper projectMapper;
 
 
     private static final boolean STRICT_PROJECT_CREATE_MODE = CommonVars.apply("wds.dss.project.strict.mode", false).getValue();
@@ -380,7 +384,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         //调用第三方的工程修改接口
         dbProject.setDescription(projectModifyRequest.getDescription());
         dbProject.setUsername(username);
-        modifyThirdProject(projectModifyRequest, dbProject, workspace);
+        modifyThirdProject(projectModifyRequest, dbProject, workspace, dbProject.getCreateBy());
 
         //2.修改dss_project_user 工程与用户关系
         projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);

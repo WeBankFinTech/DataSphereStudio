@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.framework.project.service;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectTransferRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
@@ -43,4 +44,6 @@ public interface DSSFrameworkProjectService {
     void checkProjectName(String name, Workspace workspace,String username) throws DSSProjectErrorException;
 
     void modifyProjectMeta(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
+
+    void transferProject(ProjectTransferRequest projectTransferRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
 }

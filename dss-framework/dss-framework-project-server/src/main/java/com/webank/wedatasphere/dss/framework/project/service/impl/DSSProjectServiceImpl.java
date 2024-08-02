@@ -162,6 +162,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         project.setBusiness(projectModifyRequest.getBusiness());
         project.setProduct(projectModifyRequest.getProduct());
         project.setAssociateGit(projectModifyRequest.getAssociateGit());
+        project.setCreateBy(projectModifyRequest);
         List<DSSProjectDataSource> dataSourceList = projectModifyRequest.getDataSourceList();
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
             project.setDataSourceListJson(new Gson().toJson(dataSourceList));

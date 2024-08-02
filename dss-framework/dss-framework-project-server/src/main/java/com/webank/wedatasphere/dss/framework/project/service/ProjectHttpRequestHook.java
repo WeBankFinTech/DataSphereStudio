@@ -81,4 +81,12 @@ public interface ProjectHttpRequestHook {
      * @return 前置操作失败，请返回 Message，否则返回 null
      */
     Message beforeGetDeletedProject(HttpServletRequest request, ProjectQueryRequest projectRequest);
+
+    /**
+     * 项目转移成功后的后置操作。
+     * @param request
+     * @param projectTransferRequest
+     */
+    default void afterTransferProject(HttpServletRequest request, ProjectTransferRequest projectTransferRequest){
+    }
 }

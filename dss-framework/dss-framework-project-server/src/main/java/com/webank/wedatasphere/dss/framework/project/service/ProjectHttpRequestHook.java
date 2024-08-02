@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.framework.project.service;
 
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import org.apache.linkis.server.Message;
 

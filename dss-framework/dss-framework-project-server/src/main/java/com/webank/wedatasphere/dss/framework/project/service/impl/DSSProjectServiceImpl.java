@@ -617,9 +617,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectRequest.setOrderBySql("updateTime desc");
         }
         LOGGER.info("queryListByParam order by sql is {} ", projectRequest.getOrderBySql());
+        projectRequest.setProjectIdList(projectIdList);
         PageHelper.startPage(projectRequest.getPageNow(), projectRequest.getPageSize(), projectRequest.getOrderBySql());
-        List<QueryProjectVo> list = projectMapper.queryListByParam(projectRequest,projectIdList);
-
+        List<QueryProjectVo> list = projectMapper.queryListByParam(projectRequest);
         if (CollectionUtils.isEmpty(list)) {
             totals.add(0L);
             return new ArrayList<>();

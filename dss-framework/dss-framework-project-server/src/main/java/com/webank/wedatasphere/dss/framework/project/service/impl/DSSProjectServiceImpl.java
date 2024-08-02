@@ -598,7 +598,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
         List<Integer> projectIdList = new ArrayList<>();
         // 根据传入的查看用户获取 项目ID 取交集
-        if(CollectionUtils.isEmpty(projectRequest.getAccessUsers())){
+        if(!CollectionUtils.isEmpty(projectRequest.getAccessUsers())){
             intersectionProjectId(projectIdList,projectRequest.getAccessUsers(),ProjectUserPrivEnum.PRIV_ACCESS.getRank());
         }
         // 根据传入的编辑用户获取 项目ID 取交集

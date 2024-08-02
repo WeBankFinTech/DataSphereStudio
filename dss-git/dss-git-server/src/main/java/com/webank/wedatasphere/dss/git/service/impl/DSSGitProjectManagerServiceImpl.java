@@ -120,9 +120,14 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
                 throw new DSSErrorException(80001, "Git用户名不允许更换");
             }
         }
-        // 检测token合法性 数据库中已存在的配置无需再次校验
-        Boolean tokenTest = isExist || GitProjectManager.gitTokenTest(gitToken, gitUser);
+        Boolean tokenTest;
         String gitUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
+        if (isExist && projectGitInfo.getGitToken().equals(gitToken)) {
+            tokenTest = true;
+        } else {
+            // 检测token合法性 数据库中已存在的配置无需再次校验
+            tokenTest = GitProjectManager.gitTokenTest(gitToken, gitUser);
+        }
         if (tokenTest) {
             String projectPath = gitUser + "/" + projectName;
             // 检测项目名称是否重复 数据库中已存在的配置无需再次校验

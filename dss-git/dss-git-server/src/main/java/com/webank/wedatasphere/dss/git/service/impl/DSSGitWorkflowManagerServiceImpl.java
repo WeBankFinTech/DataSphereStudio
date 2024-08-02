@@ -122,8 +122,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 GitTree metaFileTree = getFileTree(metaPath);
 
                 List<GitTree> tree = new ArrayList<>();
-                tree.add(fileTree);
-                tree.add(metaFileTree);
+                tree.add(fileTree.getChildren().get(projectName));
+                tree.add(metaFileTree.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
                 diff = new GitDiffResponse(tree);
             } else {
                 diff = DSSGitUtils.diffGit(repository, projectName, request.getCommitId(), request.getFilePath());

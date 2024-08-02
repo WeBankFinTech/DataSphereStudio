@@ -25,9 +25,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerService {
@@ -141,6 +139,22 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         }
 
         return new GitCheckProjectResponse(projectName, false);
+    }
+
+    @Override
+    public GitUserByWorkspaceResponse getProjectGitUserInfo(GitUserByWorkspaceIdRequest request) {
+        String username = request.getUsername();
+        Long workspaceId = request.getWorkspaceId();
+
+        List<GitProjectGitInfo> projectInfoByWorkspaceId = GitProjectManager.getProjectInfo(workspaceId);
+
+        Map<String, GitUserEntity> map = new HashMap<>();
+        for (GitProjectGitInfo gitInfo : projectInfoByWorkspaceId) {
+            GitUserEntity gitUserEntity = new GitUserEntity(gitInfo.getGitUser(), gitInfo.getGitToken());
+            map.put(gitInfo.getProjectName(), gitUserEntity);
+        }
+
+        return new GitUserByWorkspaceResponse(map);
     }
 
 

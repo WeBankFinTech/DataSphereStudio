@@ -24,18 +24,17 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.DSSProjectConstant;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
+import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.project.service.ProjectHttpRequestHook;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
 import com.webank.wedatasphere.dss.framework.proxy.exception.DSSProxyUserErrorException;
+import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitSearchRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitSearchResponse;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -78,6 +77,8 @@ public class DSSFrameworkProjectRestfulApi {
     private DSSProjectService dssProjectService;
     @Autowired
     private List<ProjectHttpRequestHook> projectHttpRequestHooks;
+    @Autowired
+    private StaffInfoGetter staffInfoGetter;
 
     private Message executePreHook(Function<ProjectHttpRequestHook, Message> function) {
         String errorMsg = projectHttpRequestHooks.stream().map(function).filter(Objects::nonNull).map(Message::getMessage)
@@ -458,6 +459,49 @@ public class DSSFrameworkProjectRestfulApi {
         return Message.ok().data("data", projectNames);
     }
 
+    /**
+     * 项目转移
+     */
+    @RequestMapping(path = "transferProject", method = RequestMethod.POST)
+    public Message transferProject(HttpServletRequest request, @RequestBody ProjectTransferRequest projectTransferRequest) throws Exception {
+        if (projectTransferRequest.getId() == null || projectTransferRequest.getId() < 0) {
+            return Message.error("project id is null, cannot modify it.");
+        }
+        String username = SecurityFilter.getLoginUsername(request);
+        Workspace workspace = SSOHelper.getWorkspace(request);
+        LOGGER.info("user {} begin to transferProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectTransferRequest);
+//        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeModifyProject(request, projectModifyRequest));
+//        if (message != null) {
+//            return message;
+//        }
+
+        DSSProjectDO dbProject = dssProjectService.getProjectById(projectTransferRequest.getId());
+        //工程不存在
+        if (dbProject == null) {
+            LOGGER.error("project {} is not exists.", projectTransferRequest.getName());
+            return Message.error(String.format("project %s is not exists.", projectTransferRequest.getName()));
+        }
+
+        if (!username.equals(dbProject.getCreateBy())) {
+            return Message.error("Only the project creator is allowed to transfer the project" );
+        }
+
+        List<String> staffInfos = staffInfoGetter.getAllUsers().stream().map(StaffInfo::getEnglishName).collect(Collectors.toList());
+        if(!staffInfos.contains(projectTransferRequest.getTransferUserName())){
+            return Message.error("Transfer user does not exist in workspace" );
+        }
+
+
+        return DSSExceptionUtils.getMessage(() -> {
+                    dssFrameworkProjectService.transferProject(projectTransferRequest, dbProject, username, workspace);
+                    AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.PROJECT,
+                            projectTransferRequest.getId(), projectTransferRequest.getName(), OperateTypeEnum.UPDATE, projectTransferRequest);
+                },
+                () ->
+                        executeAfterHook(projectHttpRequestHook -> projectHttpRequestHook.afterTransferProject(request, projectTransferRequest),
+                                () -> Message.ok("转移工程成功.")),
+                String.format("用户 %s 转移工程 %s 失败. ", username, projectTransferRequest.getName()));
+    }
 
 
     @RequestMapping(path = "queryAllProjects", method = RequestMethod.POST)

@@ -414,47 +414,47 @@ public class DSSGitUtils {
         }
     }
 
-//    public static String getUserIdByUsername(GitUserEntity gitUser, String username) throws GitErrorException, IOException {
-//        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/users?username=" + username;
-//        BufferedReader in = null;
-//        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-//            HttpGet request = new HttpGet(url);
-//            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
-//
-//            try (CloseableHttpResponse response = httpClient.execute(request)) {
-//                int statusCode = response.getStatusLine().getStatusCode();
-//                if (statusCode == 200) {
-//                    in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-//                    String inputLine;
-//                    StringBuilder content = new StringBuilder();
-//
-//                    while ((inputLine = in.readLine()) != null) {
-//                        content.append(inputLine);
-//                    }
-//
-//                    String responseBody = content.toString();
-//                    logger.info("Response Body: " + responseBody);
-//
-//                    JsonArray jsonArray = JsonParser.parseString(responseBody).getAsJsonArray();
-//
-//                    if (jsonArray.size() > 0) {
-//                        JsonObject userObject = jsonArray.get(0).getAsJsonObject();
-//                        return userObject.get("id").toString();
-//                    } else {
-//                        throw new GitErrorException(80109, "获取userId失败，请检查该用户是否为git用户并激活");
-//                    }
-//                } else {
-//                    throw new GitErrorException(80109, "获取userId失败，请检查编辑用户token是否过期或git服务是否正常");
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new GitErrorException(80109, "获取该git用户Id失败，原因为", e);
-//        } finally {
-//            if (in != null) {
-//                in.close();
-//            }
-//        }
-//    }
+    public static String getUserIdByUsername(String gitUrl, String gitToken, String username) throws GitErrorException, IOException {
+        String url = gitUrl + "/api/v4/users?username=" + username;
+        BufferedReader in = null;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet request = new HttpGet(url);
+            request.addHeader("PRIVATE-TOKEN", gitToken);
+
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode == 200) {
+                    in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+                    String inputLine;
+                    StringBuilder content = new StringBuilder();
+
+                    while ((inputLine = in.readLine()) != null) {
+                        content.append(inputLine);
+                    }
+
+                    String responseBody = content.toString();
+                    logger.info("Response Body: " + responseBody);
+
+                    JsonArray jsonArray = JsonParser.parseString(responseBody).getAsJsonArray();
+
+                    if (jsonArray.size() > 0) {
+                        JsonObject userObject = jsonArray.get(0).getAsJsonObject();
+                        return userObject.get("id").toString();
+                    } else {
+                        throw new GitErrorException(80109, "获取userId失败，请检查该用户是否为git用户并激活");
+                    }
+                } else {
+                    throw new GitErrorException(80109, "获取userId失败，请检查编辑用户token是否过期或git服务是否正常");
+                }
+            }
+        } catch (Exception e) {
+            throw new GitErrorException(80109, "获取该git用户Id失败，原因为", e);
+        } finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
 
     public static String getProjectIdByName(String projectName, String gitUser, String gitToken, String gitUrl) throws GitErrorException{
         String urlString = gitUrl + "/api/v4/projects?search=" + projectName;
@@ -502,29 +502,29 @@ public class DSSGitUtils {
         return null;
     }
 
-//    public static boolean addProjectMember(GitUserEntity gitUser, String userId, String projectId, int accessLevel) throws GitErrorException, IOException {
-//        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members";
-//        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-//            HttpPost request = new HttpPost(url);
-//            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
-//            request.addHeader("Content-Type", "application/json");
-//
-//            String json = String.format("{\"user_id\": \"%s\", \"access_level\": \"%d\"}", userId, accessLevel);
-//            request.setEntity(new StringEntity(json));
-//
-//            try (CloseableHttpResponse response = httpClient.execute(request)) {
-//                int statusCode = response.getStatusLine().getStatusCode();
-//                String responseBody = EntityUtils.toString(response.getEntity());
-//                if (statusCode == 201) {
-//                    return true;
-//                } else {
-//                    throw new GitErrorException(80111, "添加用户失败，请检查只读用户是否存在或编辑用户token是否过期");
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new GitErrorException(80111, "添加用户失败，请检查编辑用户token是否过期或git服务是否正常");
-//        }
-//    }
+    public static boolean addProjectMember(String gitUrl, String gitToken, String userId, String projectId, int accessLevel) throws GitErrorException, IOException {
+        String url = gitUrl + "/api/v4/projects/" + projectId + "/members";
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost request = new HttpPost(url);
+            request.addHeader("PRIVATE-TOKEN", gitToken);
+            request.addHeader("Content-Type", "application/json");
+
+            String json = String.format("{\"user_id\": \"%s\", \"access_level\": \"%d\"}", userId, accessLevel);
+            request.setEntity(new StringEntity(json));
+
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                String responseBody = EntityUtils.toString(response.getEntity());
+                if (statusCode == 201) {
+                    return true;
+                } else {
+                    throw new GitErrorException(80111, "添加用户失败，请检查只读用户是否存在或编辑用户token是否过期");
+                }
+            }
+        } catch (Exception e) {
+            throw new GitErrorException(80111, "添加用户失败，请检查编辑用户token是否过期或git服务是否正常");
+        }
+    }
 
 //    public static boolean removeProjectMember(GitUserEntity gitUser, String userId, String projectId) throws GitErrorException {
 //        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members/" + userId;

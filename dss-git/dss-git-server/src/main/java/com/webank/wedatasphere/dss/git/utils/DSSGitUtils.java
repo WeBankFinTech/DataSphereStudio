@@ -109,7 +109,7 @@ public class DSSGitUtils {
 
     public static void create(String projectName, Long workspaceId, String gitUser) throws GitErrorException{
         logger.info("start success");
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName); // 指定仓库的目录
+        File repoDir = new File(generateGitPrePath(projectName, workspaceId, gitUser)); // 指定仓库的目录
         File respo = new File(generateGitPath(projectName, workspaceId, gitUser));
         if (!respo.exists()) {
             try {
@@ -886,7 +886,7 @@ public class DSSGitUtils {
 
     public static String generateGitPrePath(String projectName, Long workspaceId, String gitUser) {
         // eg ： /data/GitInstall/224/testGit
-        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName;
+        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + gitUser + File.separator + projectName ;
     }
 
 

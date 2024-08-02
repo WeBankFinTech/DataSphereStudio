@@ -79,7 +79,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + entry.getKey();
                 fileList.add(metaConfPath);
                 FileUtils.removeFlowNode(metaConfPath, projectName, workspaceId, gitUser);
-                FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
+                FileUtils.unzipBMLResource(entry.getKey(), workspaceId, gitUser);
 
             }
             diff = DSSGitUtils.diff(projectName, fileList, workspaceId);
@@ -192,7 +192,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 String metaConfPath = GitConstant.GIT_SERVER_META_PATH + File.separator + entry.getKey();
                 paths.add(metaConfPath);
                 FileUtils.removeFlowNode(metaConfPath, projectName, workspaceId, gitUser);
-                FileUtils.unzipBMLResource(entry.getKey(), workspaceId);
+                FileUtils.unzipBMLResource(entry.getKey(), workspaceId, gitUser);
             }
             // 提交
             String comment = request.getComment() + DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername();
@@ -243,7 +243,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 paths.add(metaConfPath);
                 FileUtils.removeFlowNode(metaConfPath, projectName, workspaceId, gitUser);
             }
-            FileUtils.unzipBMLResource(fileName, workspaceId);
+            FileUtils.unzipBMLResource(fileName, workspaceId, gitUser);
 
 
 

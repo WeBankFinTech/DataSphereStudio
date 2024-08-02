@@ -94,10 +94,12 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path = "getAllWorkspaceUsers", method = RequestMethod.GET)
-    public Message getAllWorkspaceUsers() {
+    public Message getAllWorkspaceUsers(@RequestParam(value = WORKSPACE_ID_STR, required = false) Integer workspaceId) {
         DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
-        // workspaceId改为从cookie取
-        int workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+        if(workspaceId == null){
+            // workspaceId改为从cookie取
+            workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
+        }
         List<String> users = dssWorkspaceUserService.getAllWorkspaceUsers(workspaceId);
         dssWorkspaceUsersVo.setAccessUsers(users);
 //        dssWorkspaceUsersVo.setEditUsers(dssWorkspaceUserService.getWorkspaceEditUsers(workspaceId));

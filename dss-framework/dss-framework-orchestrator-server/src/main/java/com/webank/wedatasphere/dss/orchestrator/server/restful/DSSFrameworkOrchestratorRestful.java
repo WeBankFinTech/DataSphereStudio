@@ -31,7 +31,9 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitAddMemberRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitAddMemberResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoResponse;
@@ -477,54 +479,14 @@ public class DSSFrameworkOrchestratorRestful {
     @RequestMapping(path = "gitUrl", method = RequestMethod.GET)
     public Message gitUrl(@RequestParam(required = true, name = "projectName") String projectName,
                           @RequestParam(required = false, name = "workflowName") String workflowName,
-                          @RequestParam(required = false, name = "workflowNodeName") String workflowNodeName,
                           HttpServletResponse response) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
-//        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-//        GitUserInfoRequest gitUserInfoRequest = new GitUserInfoRequest();
-//        gitUserInfoRequest.setWorkspaceId(workspace.getWorkspaceId());
-//        gitUserInfoRequest.setType(GitConstant.GIT_ACCESS_READ_TYPE);
-//        // 跳转git需解密处理
-//        gitUserInfoRequest.setDecrypt(true);
-//        GitUserInfoResponse readInfoResponse = RpcAskUtils.processAskException(sender.ask(gitUserInfoRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
-//        String gitUsername = readInfoResponse.getGitUser().getGitUser();
-//        String gitPassword = readInfoResponse.getGitUser().getGitPassword();
-//        String gitUrlPre = UrlUtils.normalizeIp(readInfoResponse.getGitUser().getGitUrl());
-//        String authenToken = "";
-//        try {
-//            authenToken = orchestratorService.getAuthenToken(gitUrlPre, gitUsername, gitPassword);
-//        } catch (ExecutionException e) {
-//            LOGGER.error("git登陆失败，原因为: ", e);
-//            return Message.error("git登陆失败，请检查git节点配置的用户名/密码/url");
-//        }
-//        // 获取顶级域名 eg: ***REMOVED*** -> weoa.com
-//        String domainIp = UrlUtils.normalizeIp(gitUrlPre);
-//        int lastDotIndex = domainIp.lastIndexOf(".");
-//        String topDomain = "";
-//        if (lastDotIndex != -1) {
-//            int secondToLastIndexOf = domainIp.substring(0, lastDotIndex).lastIndexOf(".");
-//            if (secondToLastIndexOf != -1) {
-//                topDomain = domainIp.substring(secondToLastIndexOf);
-//            }
-//        }
-//        String cookie = "_gitlab_session=" + authenToken + ";path=/; Domain="+ topDomain +"; HttpOnly; +";
-//        LOGGER.info("Cookie is {}", cookie);
-//        response.setHeader("Access-Control-Allow-Origin", topDomain);
-//        response.addHeader("Set-Cookie", cookie);
-//        // 获取命名空间
-//        GitUserInfoRequest gitWriteUserRequest = new GitUserInfoRequest();
-//        gitWriteUserRequest.setWorkspaceId(workspace.getWorkspaceId());
-//        gitWriteUserRequest.setType(GitConstant.GIT_ACCESS_WRITE_TYPE);
-//        GitUserInfoResponse writeInfoResponse = RpcAskUtils.processAskException(sender.ask(gitWriteUserRequest), GitUserInfoResponse.class, GitUserInfoRequest.class);
-//        String namespace = writeInfoResponse.getGitUser().getGitUser();
-//        // 拼接跳转的url
-//        String gitUrlProject = gitUrlPre + "/" + namespace + "/" + projectName;
-//        if (!StringUtils.isEmpty(workflowName)) {
-//            gitUrlProject +=  "/tree/master/" + workflowName;
-//        }
-        return Message.ok().data("gitUrl", UrlUtils.normalizeIp("gitUrlProject"));
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, workflowName);
+        GitAddMemberResponse addMemberResponse = RpcAskUtils.processAskException(sender.ask(gitAddMemberRequest), GitAddMemberResponse.class, GitAddMemberRequest.class);
+        return Message.ok().data("gitUrl", addMemberResponse.getGitUrl());
 
     }
 

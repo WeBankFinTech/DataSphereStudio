@@ -91,9 +91,9 @@ public class FileUtils {
         }
     }
 
-    public static void unzipBMLResource(String path, Long workspaceId) throws DSSErrorException {
+    public static void unzipBMLResource(String path, Long workspaceId, String gitUser) throws DSSErrorException {
         //下载到本地处理
-        String dirPath = DSSGitConstant.GIT_PATH_PRE + workspaceId ;
+        String dirPath = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + gitUser ;
         String importFile= dirPath + File.separator +  path + ".zip";
         //解压
         ZipHelper.unzipFile(importFile, dirPath, true);

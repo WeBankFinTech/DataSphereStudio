@@ -109,7 +109,7 @@ public class DSSGitUtils {
 
     public static void create(String projectName, Long workspaceId, String gitUser) throws GitErrorException{
         logger.info("start success");
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName); // 指定仓库的目录
+        File repoDir = new File(generateGitPrePath(projectName, workspaceId, gitUser)); // 指定仓库的目录
         File respo = new File(generateGitPath(projectName, workspaceId, gitUser));
         if (!respo.exists()) {
             try {
@@ -210,15 +210,15 @@ public class DSSGitUtils {
                 root.addChild(statu);
             }
         }
-        resultTree.add(root);
-        resultTree.add(rootMeta);
+        resultTree.add(root.getChildren().get(projectName));
+        resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         // 打印树形结构
-        printTree("", root);
-        printTree("", rootMeta);
+        printTree("", root.getChildren().get(projectName));
+        printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         return new GitDiffResponse(resultTree);
     }
 
-    public static GitDiffResponse diffGit(Repository repository, String commitId, String filePath) {
+    public static GitDiffResponse diffGit(Repository repository, String projectName, String commitId, String filePath) {
         List<GitTree> resultTree = new ArrayList<>();
         try (Git git = new Git(repository)) {
             ObjectId commitObjectId = ObjectId.fromString(commitId);
@@ -274,11 +274,11 @@ public class DSSGitUtils {
                         }
                     }
                 }
-                resultTree.add(root);
-                resultTree.add(rootMeta);
+                resultTree.add(root.getChildren().get(projectName));
+                resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
                 // 打印树形结构
-                printTree("", root);
-                printTree("", rootMeta);
+                printTree("", root.getChildren().get(projectName));
+                printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
             } catch (GitAPIException | IOException e) {
                 throw new RuntimeException(e);
             }
@@ -886,7 +886,7 @@ public class DSSGitUtils {
 
     public static String generateGitPrePath(String projectName, Long workspaceId, String gitUser) {
         // eg ： /data/GitInstall/224/testGit
-        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName;
+        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + gitUser + File.separator + projectName ;
     }
 
 

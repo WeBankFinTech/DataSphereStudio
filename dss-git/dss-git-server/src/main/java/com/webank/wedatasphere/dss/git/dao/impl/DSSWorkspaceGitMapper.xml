@@ -28,7 +28,7 @@
     </insert>
 
     <insert id="insertProjectInfo" parameterType="com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo">
-        insert into dss_project_associate_git (workspace_id, git_project_id, project_name， git_user, git_token, git_url, create_time, update_time)
+        insert into dss_project_associate_git (workspace_id, git_project_id, project_name, git_user, git_token, git_url, create_time, update_time)
         values (#{workspaceId}, #{gitProjectId}, #{projectName}, #{gitUser}, #{gitToken}, #{gitUrl}, now(), now())
     </insert>
 

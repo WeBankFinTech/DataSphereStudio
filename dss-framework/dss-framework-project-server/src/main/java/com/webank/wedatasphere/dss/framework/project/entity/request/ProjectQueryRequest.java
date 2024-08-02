@@ -78,6 +78,15 @@ public class ProjectQueryRequest implements Serializable {
 
     private String queryUser;
 
+    private List<Integer> projectIdList;
+
+    public List<Integer> getProjectIdList() {
+        return projectIdList;
+    }
+
+    public void setProjectIdList(List<Integer> projectIdList) {
+        this.projectIdList = projectIdList;
+    }
 
     public String getQueryUser() {
         return queryUser;

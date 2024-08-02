@@ -63,6 +63,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
+
 @RequestMapping(path = "/dss/framework/project", produces = {"application/json"})
 @RestController
 public class DSSFrameworkProjectRestfulApi {

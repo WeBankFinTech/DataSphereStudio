@@ -19,7 +19,7 @@
 <mapper namespace="com.webank.wedatasphere.dss.git.dao.DSSWorkspaceGitMapper">
 
     <sql id="fields_query">
-        `id`, `workspace_id`, `git_project_id`, `project_name`, `git_user`, `git_token`, `create_time`, `update_time`
+        `id`, `workspace_id`, `git_project_id`, `project_name`, `git_user`, `git_token`, `git_url`, `create_time`, `update_time`
     </sql>
 
     <insert id="insert" parameterType="com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity">

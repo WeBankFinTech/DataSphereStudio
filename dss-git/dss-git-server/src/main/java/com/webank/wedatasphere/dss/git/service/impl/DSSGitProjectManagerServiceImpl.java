@@ -88,7 +88,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
     }
 
     @Override
-    public GitArchivePorjectResponse archive(GitArchiveProjectRequest request) throws GitErrorException {
+    public GitArchivePorjectResponse archive(GitArchiveProjectRequest request) throws GitErrorException, DSSErrorException {
         String projectName = request.getProjectName();
 
         GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);

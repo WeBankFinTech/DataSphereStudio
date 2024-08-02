@@ -447,6 +447,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
         dbProject.setCreateBy(projectTransferRequest.getTransferUserName());
         dbProject.setUsername(projectTransferRequest.getTransferUserName());
+        dbProject.setUpdateBy(username);
         // 1.统一修改各个接入的第三方的系统的工程状态信息
         //调用第三方的工程修改接口
         modifyThirdProject(projectModifyRequest, dbProject, workspace, username);

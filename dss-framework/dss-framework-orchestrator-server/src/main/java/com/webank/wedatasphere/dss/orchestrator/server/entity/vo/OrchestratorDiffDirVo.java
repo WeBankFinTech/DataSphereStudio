@@ -1,24 +1,22 @@
-package com.webank.wedatasphere.dss.git.common.protocol.response;
-
+package com.webank.wedatasphere.dss.orchestrator.server.entity.vo;
 
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 
 import java.util.List;
 
-public class GitDiffResponse {
+public class OrchestratorDiffDirVo {
     private List<GitTree> codeTree;
     private List<GitTree> metaTree;
     private String commitId;
 
-    public GitDiffResponse(List<GitTree> codeTree, List<GitTree> metaTree, String commitId) {
+    public OrchestratorDiffDirVo(List<GitTree> codeTree, List<GitTree> metaTree, String commitId) {
         this.codeTree = codeTree;
         this.metaTree = metaTree;
         this.commitId = commitId;
     }
 
-    public GitDiffResponse() {
+    public OrchestratorDiffDirVo() {
     }
-
 
     public List<GitTree> getCodeTree() {
         return codeTree;

@@ -82,7 +82,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 FileUtils.unzipBMLResource(entry.getKey(), workspaceId, gitUser);
 
             }
-            diff = DSSGitUtils.diff(projectName, fileList, gitUser, workspaceId);
+            diff = DSSGitUtils.diff(repository, projectName, fileList, gitUser, workspaceId);
             // 重置本地
             DSSGitUtils.reset(repository, projectName);
         } catch (Exception e) {
@@ -117,15 +117,21 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
 
             if (StringUtils.isEmpty(request.getCommitId())) {
+                List<GitTree> codeTree = new ArrayList<>();
+                List<GitTree> metaTree = new ArrayList<>();
                 String path = gitPrePath + File.separator + filePath;
                 String metaPath = gitPrePath+ File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + filePath;
                 GitTree fileTree = getFileTree(path);
                 GitTree metaFileTree = getFileTree(metaPath);
 
-                List<GitTree> tree = new ArrayList<>();
-                tree.add(fileTree.getChildren().get(projectName));
-                tree.add(metaFileTree.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
-                diff = new GitDiffResponse(tree);
+                for (Map.Entry<String, GitTree> entry : fileTree.getChildren().entrySet()) {
+                    codeTree.add(fileTree.getChildren().get(projectName));
+                    DSSGitUtils.printTree("", entry.getValue());
+                }
+
+                metaTree.add(metaFileTree.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
+                DSSGitUtils.printTree("", metaFileTree);
+                diff = new GitDiffResponse(codeTree, metaTree, null);
             } else {
                 diff = DSSGitUtils.diffGit(repository, projectName, request.getCommitId(), filePath);
             }

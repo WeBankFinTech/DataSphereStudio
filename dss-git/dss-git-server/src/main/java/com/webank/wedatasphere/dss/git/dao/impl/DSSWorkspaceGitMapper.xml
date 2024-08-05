@@ -54,6 +54,10 @@
         where workspace_id = #{workspaceId}
     </select>
 
+    <select id="getWorkspaceIdByUserName" resultType="java.lang.Long">
+        select workspace_id from dss_project_associate_git where gitUser = #{gitUser} limit 1
+    </select>
+
     <select id="getProjectInfoByProjectName" resultType="com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo">
         select <include refid="fields_query"/> from dss_project_associate_git
         where project_name = #{projectName}

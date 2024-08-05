@@ -218,9 +218,12 @@ public class DSSGitUtils {
             codeTree.add(entry.getValue());
             printTree("", entry.getValue());
         }
-        metaTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
-        // 打印树形结构
-        printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
+
+        for (Map.Entry<String, GitTree> entry : rootMeta.getChildren().entrySet()) {
+            metaTree.add(entry.getValue());
+            DSSGitUtils.printTree("", entry.getValue());
+        }
+
         return new GitDiffResponse(codeTree, metaTree, commitId);
     }
 
@@ -286,8 +289,11 @@ public class DSSGitUtils {
                     codeTree.add(entry.getValue());
                     printTree("", entry.getValue());
                 }
-                metaTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
-                printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
+                for (Map.Entry<String, GitTree> entry: rootMeta.getChildren().entrySet()) {
+                    metaTree.add(entry.getValue());
+                    printTree("", entry.getValue());
+                }
+
             } catch (GitAPIException | IOException e) {
                 throw new RuntimeException(e);
             }
@@ -308,17 +314,20 @@ public class DSSGitUtils {
             return;
         }
         String pathName = path;
+        if (pathName.contains("/dev/null")) {
+            return ;
+        }
         // 处理重命名文件
         if (status.equals(DiffEntry.ChangeType.RENAME)) {
             String oldFileName = oldFilePath.substring(oldFilePath.lastIndexOf("/") + 1);
             pathName = path + "--(" + oldFileName + ")--";
         }
         if (path.startsWith(GitConstant.GIT_SERVER_META_PATH)) {
-            root.setAbsolutePath(path);
-            root.addChild(pathName);
-        } else {
             rootMeta.setAbsolutePath(path);
             rootMeta.addChild(pathName);
+        } else {
+            root.setAbsolutePath(path);
+            root.addChild(pathName);
         }
     }
 

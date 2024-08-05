@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
@@ -29,6 +30,7 @@ import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitCurrentCommitRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
@@ -50,6 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.*;
 
@@ -155,10 +158,30 @@ public class PublishServiceImpl implements PublishService {
 
     @Override
     public void batchSubmit(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception{
-        List<Long> workflowIdList = publishWorkflowRequest.getWorkflowIdList();
+        List<Long> orcIds = publishWorkflowRequest.getOrchestratorList();
+        String labelStr = publishWorkflowRequest.getLabels().getRoute();
         Map<String, Object> labels = new HashMap<>();
-        labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, publishWorkflowRequest.getLabels().getRoute());
+        labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, labelStr);
         String comment = publishWorkflowRequest.getComment();
+
+        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labelStr));
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabelList);
+        RequestQueryOrchestrator queryRequest = new RequestQueryOrchestrator(orcIds);
+        List<Long> workflowIdList = new ArrayList<>();
+
+
+        try {
+            ResponseQueryOrchestrator queryResponse = RpcAskUtils.processAskException(sender.ask(queryRequest), ResponseQueryOrchestrator.class, RequestQueryOrchestrator.class);
+            if (queryResponse == null) {
+                LOGGER.error("query response is null, it is a fatal error");
+                throw new DSSErrorException(80001, "查询编排失败，请确认编排是否存在") ;
+            }
+            Set<DSSOrchestratorVersion> orchestratorVersions = queryResponse.getOrchestratorVoes().stream().map(OrchestratorVo::getDssOrchestratorVersion).collect(Collectors.toSet());
+            workflowIdList = orchestratorVersions.stream().map(DSSOrchestratorVersion::getOrchestratorId).collect(Collectors.toList());
+        } catch (Exception e) {
+            DSSExceptionUtils.dealErrorException(60015, "query orchestrator ref failed",
+                    DSSErrorException.class);
+        }
 
         List<DSSFlow> dssFlowList = new ArrayList<>();
         for (Long flowId : workflowIdList) {

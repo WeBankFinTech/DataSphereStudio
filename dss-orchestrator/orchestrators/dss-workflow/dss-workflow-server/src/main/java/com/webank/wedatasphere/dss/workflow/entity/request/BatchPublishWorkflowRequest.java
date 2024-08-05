@@ -5,14 +5,13 @@ import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import java.util.List;
 
 public class BatchPublishWorkflowRequest {
-    private List<Long> workflowIdList;
+    private List<Long> orchestratorList;
     private String comment;
     private LabelRouteVO labels;
 
     private String dssLabel;
 
-    public BatchPublishWorkflowRequest(List<Long> workflowIdList, String comment, LabelRouteVO labels, String dssLabel) {
-        this.workflowIdList = workflowIdList;
+    public BatchPublishWorkflowRequest(String comment, LabelRouteVO labels, String dssLabel) {
         this.comment = comment;
         this.labels = labels;
         this.dssLabel = dssLabel;
@@ -21,13 +20,13 @@ public class BatchPublishWorkflowRequest {
     public BatchPublishWorkflowRequest() {
     }
 
-    public List<Long> getWorkflowIdList() {
-        return workflowIdList;
+    public BatchPublishWorkflowRequest(List<Long> orchestratorList, String comment, LabelRouteVO labels, String dssLabel) {
+        this.orchestratorList = orchestratorList;
+        this.comment = comment;
+        this.labels = labels;
+        this.dssLabel = dssLabel;
     }
 
-    public void setWorkflowIdList(List<Long> workflowIdList) {
-        this.workflowIdList = workflowIdList;
-    }
 
     public String getComment() {
         return comment;
@@ -51,5 +50,13 @@ public class BatchPublishWorkflowRequest {
 
     public void setDssLabel(String dssLabel) {
         this.dssLabel = dssLabel;
+    }
+
+    public List<Long> getOrchestratorList() {
+        return orchestratorList;
+    }
+
+    public void setOrchestratorList(List<Long> orchestratorList) {
+        this.orchestratorList = orchestratorList;
     }
 }

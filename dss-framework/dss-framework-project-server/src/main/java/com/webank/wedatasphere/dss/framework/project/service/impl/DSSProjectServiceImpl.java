@@ -643,7 +643,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
         //根据dss_project、dss_project_user查询出所在空间登录用户相关的工程
         if (StringUtils.isEmpty(projectRequest.getOrderBySql())) {
-            projectRequest.setOrderBySql("updateTime desc");
+            projectRequest.setOrderBySql("createTime desc");
         }
         LOGGER.info("queryListByParam order by sql is {} ", projectRequest.getOrderBySql());
         projectRequest.setProjectIdList(projectIdList);

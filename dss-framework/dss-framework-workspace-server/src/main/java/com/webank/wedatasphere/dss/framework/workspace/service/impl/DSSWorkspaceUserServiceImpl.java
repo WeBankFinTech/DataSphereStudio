@@ -222,6 +222,7 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         dssWorkspaceUserMapper.deleteUserByUserName(userName);
         dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
         dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
+        dssWorkspaceUserMapper.deleteProjectUserByUserName(userName);
     }
 
     @Override

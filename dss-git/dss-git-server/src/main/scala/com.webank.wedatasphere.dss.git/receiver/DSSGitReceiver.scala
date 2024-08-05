@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.git.receiver
 
-import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitBatchCommitRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitDiffTargetCommitRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
+import com.webank.wedatasphere.dss.git.common.protocol.request.{GitArchiveProjectRequest, GitBatchCommitRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitDiffTargetCommitRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserByWorkspaceIdRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
 import com.webank.wedatasphere.dss.git.manage.GitProjectManager
 import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
 import org.apache.linkis.rpc.{Receiver, Sender}
@@ -50,8 +50,6 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       gitWorkflowManagerService.getHistory(gitCommitInfoBetweenRequest)
     case gitUserUpdateRequest: GitUserUpdateRequest =>
       GitProjectManager.associateGit(gitUserUpdateRequest)
-    case gitUserInfoRequest: GitUserInfoRequest =>
-      GitProjectManager.selectGitUserInfo(gitUserInfoRequest)
     case gitCurrentCommitRequest: GitCurrentCommitRequest =>
       gitWorkflowManagerService.getCurrentCommit(gitCurrentCommitRequest)
     case gitRevertRequest: GitRevertRequest =>
@@ -66,6 +64,8 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       gitWorkflowManagerService.diffGit(gitDiffTargetCommitRequest)
     case gitBatchCommitRequest: GitBatchCommitRequest =>
       gitWorkflowManagerService.batchCommit(gitBatchCommitRequest)
+    case gitUserByWorkspaceIdRequest: GitUserByWorkspaceIdRequest =>
+      gitProjectManagerService.getProjectGitUserInfo(gitUserByWorkspaceIdRequest)
     case _ => None
   }
 

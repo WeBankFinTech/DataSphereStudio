@@ -27,6 +27,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
@@ -34,10 +35,12 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.service.BMLService;
-import com.webank.wedatasphere.dss.common.utils.*;
+import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
+import com.webank.wedatasphere.dss.common.utils.IoUtils;
+import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.framework.project.conf.ProjectConf;
 import com.webank.wedatasphere.dss.framework.project.contant.ProjectServerResponse;
-import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectUserMapper;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
@@ -51,9 +54,11 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.ExportService;
 import com.webank.wedatasphere.dss.framework.project.service.ImportService;
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
-import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
+import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitArchiveProjectRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserByWorkspaceIdRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitArchivePorjectResponse;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserByWorkspaceResponse;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -73,7 +78,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -218,6 +226,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             return new ArrayList<>();
         }
 
+        Map<String, GitUserEntity> projectGitUserInfo = getProjectGitUserInfo(projectRequest.getUsername(), projectRequest.getWorkspaceId());
         List<ProjectResponse> projectResponseList = new ArrayList<>();
         ProjectResponse projectResponse;
         for (QueryProjectVo projectVo : list) {
@@ -237,6 +246,13 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setCreateTime(projectVo.getCreateTime());
             projectResponse.setUpdateTime(projectVo.getUpdateTime());
             projectResponse.setAssociateGit(projectVo.getAssociateGit());
+            if (projectVo.getAssociateGit()) {
+                GitUserEntity gitUserEntity = projectGitUserInfo.get(projectVo.getName());
+                if (gitUserEntity != null) {
+                    projectResponse.setGitUser(gitUserEntity.getGitUser());
+                    projectResponse.setGitToken(gitUserEntity.getGitToken());
+                }
+            }
             projectResponse.setDevProcessList(ProjectStringUtils.convertList(projectVo.getDevProcess()));
             projectResponse.setOrchestratorModeList(ProjectStringUtils.convertList(projectVo.getOrchestratorMode()));
             if (projectVo.getDataSourceListJson() != null) {
@@ -372,6 +388,19 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             GitArchivePorjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitArchivePorjectResponse.class, GitArchiveProjectRequest.class);
             LOGGER.info("-------=======================End to archive project: {}=======================-------: {}", dssProjectDO.getName(), responseWorkflowValidNode);
         }
+    }
+
+    private Map<String, GitUserEntity> getProjectGitUserInfo(String username, Long workspaceId) {
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        Map<String, BmlResource> file = new HashMap<>();
+        // 测试数据 key表示项目名、value为项目BmlResource资源
+        GitUserByWorkspaceIdRequest request1 = new GitUserByWorkspaceIdRequest();
+        request1.setWorkspaceId(workspaceId);
+        request1.setUsername(username);
+        Object ask = gitSender.ask(request1);
+        GitUserByWorkspaceResponse workspaceResponse = RpcAskUtils.processAskException(ask, GitUserByWorkspaceResponse.class, GitUserByWorkspaceIdRequest.class);
+
+        return workspaceResponse.getMap();
     }
 
     @Override

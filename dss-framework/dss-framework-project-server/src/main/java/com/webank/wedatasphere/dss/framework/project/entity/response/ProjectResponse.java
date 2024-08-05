@@ -91,6 +91,10 @@ public class ProjectResponse implements Serializable {
 
     private Boolean associateGit;
 
+    private String gitUser;
+
+    private String gitToken;
+
     private String workspaceName;
 
     public String getWorkspaceName() {
@@ -258,6 +262,8 @@ public class ProjectResponse implements Serializable {
                 ", orchestratorModeList=" + orchestratorModeList +
                 ", editable=" + editable +
                 ", associateGit=" + associateGit +
+                ", gitUser=" + gitUser +
+                ", gitToken=" + gitToken +
                 '}';
     }
 
@@ -267,5 +273,21 @@ public class ProjectResponse implements Serializable {
 
     public void setAssociateGit(Boolean associateGit) {
         this.associateGit = associateGit;
+    }
+
+    public String getGitUser() {
+        return gitUser;
+    }
+
+    public void setGitUser(String gitUser) {
+        this.gitUser = gitUser;
+    }
+
+    public String getGitToken() {
+        return gitToken;
+    }
+
+    public void setGitToken(String gitToken) {
+        this.gitToken = gitToken;
     }
 }

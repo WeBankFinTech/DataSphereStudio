@@ -210,10 +210,13 @@ public class DSSGitUtils {
                 root.addChild(statu);
             }
         }
-        resultTree.add(root.getChildren().get(projectName));
+        Map<String, GitTree> children = root.getChildren();
+        for (Map.Entry<String, GitTree> entry: children.entrySet()) {
+            resultTree.add(entry.getValue());
+            printTree("", entry.getValue());
+        }
         resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         // 打印树形结构
-        printTree("", root.getChildren().get(projectName));
         printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         return new GitDiffResponse(resultTree);
     }
@@ -274,10 +277,12 @@ public class DSSGitUtils {
                         }
                     }
                 }
-                resultTree.add(root.getChildren().get(projectName));
+                Map<String, GitTree> children = root.getChildren();
+                for (Map.Entry<String, GitTree> entry: children.entrySet()) {
+                    resultTree.add(entry.getValue());
+                    printTree("", entry.getValue());
+                }
                 resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
-                // 打印树形结构
-                printTree("", root.getChildren().get(projectName));
                 printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
             } catch (GitAPIException | IOException e) {
                 throw new RuntimeException(e);
@@ -414,12 +419,12 @@ public class DSSGitUtils {
         }
     }
 
-    public static String getUserIdByUsername(GitUserEntity gitUser, String username) throws GitErrorException, IOException {
-        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/users?username=" + username;
+    public static String getUserIdByUsername(String gitUrl, String gitToken, String username) throws GitErrorException, IOException {
+        String url = gitUrl + "/api/v4/users?username=" + username;
         BufferedReader in = null;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(url);
-            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.addHeader("PRIVATE-TOKEN", gitToken);
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
@@ -502,11 +507,11 @@ public class DSSGitUtils {
         return null;
     }
 
-    public static boolean addProjectMember(GitUserEntity gitUser, String userId, String projectId, int accessLevel) throws GitErrorException, IOException {
-        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members";
+    public static boolean addProjectMember(String gitUrl, String gitToken, String userId, String projectId, int accessLevel) throws GitErrorException, IOException {
+        String url = gitUrl + "/api/v4/projects/" + projectId + "/members";
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost request = new HttpPost(url);
-            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.addHeader("PRIVATE-TOKEN", gitToken);
             request.addHeader("Content-Type", "application/json");
 
             String json = String.format("{\"user_id\": \"%s\", \"access_level\": \"%d\"}", userId, accessLevel);
@@ -526,24 +531,24 @@ public class DSSGitUtils {
         }
     }
 
-    public static boolean removeProjectMember(GitUserEntity gitUser, String userId, String projectId) throws GitErrorException {
-        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members/" + userId;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpDelete request = new HttpDelete(urlString);
-            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
-
-            try (CloseableHttpResponse response = httpClient.execute(request)) {
-                int responseCode = response.getStatusLine().getStatusCode();
-                if (responseCode == 204) {
-                    return true;
-                } else {
-                    throw new GitErrorException(80112, "请检查工作空间Git只读用户是否存在");
-                }
-            }
-        } catch (IOException e) {
-            throw new GitErrorException(80112, "更新用户权限失败", e);
-        }
-    }
+//    public static boolean removeProjectMember(GitUserEntity gitUser, String userId, String projectId) throws GitErrorException {
+//        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members/" + userId;
+//        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+//            HttpDelete request = new HttpDelete(urlString);
+//            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+//
+//            try (CloseableHttpResponse response = httpClient.execute(request)) {
+//                int responseCode = response.getStatusLine().getStatusCode();
+//                if (responseCode == 204) {
+//                    return true;
+//                } else {
+//                    throw new GitErrorException(80112, "请检查工作空间Git只读用户是否存在");
+//                }
+//            }
+//        } catch (IOException e) {
+//            throw new GitErrorException(80112, "更新用户权限失败", e);
+//        }
+//    }
 
     public static List<String> getAllProjectName(String gitToken, String gitUrl) throws DSSErrorException {
         int page = 1;
@@ -684,8 +689,8 @@ public class DSSGitUtils {
         }
     }
 
-    public static String getFileContent(String path, String projectName, Long workspaceId) throws IOException {
-        String filePath = DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + path;
+    public static String getFileContent(String path, String projectName, String gitUser, Long workspaceId) throws IOException {
+        String filePath = generateGitPrePath(projectName, workspaceId, gitUser) + File.separator + path;
         File file = new File(filePath);
         if (file.exists()) {
             return new String(Files.readAllBytes(Paths.get(filePath)));

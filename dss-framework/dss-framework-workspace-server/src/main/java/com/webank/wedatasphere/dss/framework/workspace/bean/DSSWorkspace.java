@@ -33,7 +33,6 @@ public class DSSWorkspace {
     private String lastUpdateUser;
     private String workspaceType;
     private int adminPermission;
-    private Boolean associateGit;
 
     public int getAdminPermission() {
         return adminPermission;
@@ -137,14 +136,5 @@ public class DSSWorkspace {
 
     public void setLastUpdateUser(String lastUpdateUser) {
         this.lastUpdateUser = lastUpdateUser;
-    }
-
-
-    public Boolean getAssociateGit() {
-        return associateGit;
-    }
-
-    public void setAssociateGit(Boolean associateGit) {
-        this.associateGit = associateGit;
     }
 }

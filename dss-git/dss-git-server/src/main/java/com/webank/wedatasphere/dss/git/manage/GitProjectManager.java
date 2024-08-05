@@ -69,7 +69,7 @@ public class GitProjectManager {
                                 LOGGER.info("Project to delete : {}", localProjectName.toString());
                                 for (String projectName : localProjectName) {
                                     // 删除本地项目
-                                    DSSGitUtils.archiveLocal(projectName, workspaceId);
+                                    DSSGitUtils.archiveLocal(projectName, gitUser, workspaceId);
                                 }
                             } else {
                                 LOGGER.info("Nothing need to delete");

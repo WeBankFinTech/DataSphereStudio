@@ -210,10 +210,13 @@ public class DSSGitUtils {
                 root.addChild(statu);
             }
         }
-        resultTree.add(root.getChildren().get(projectName));
+        Map<String, GitTree> children = root.getChildren();
+        for (Map.Entry<String, GitTree> entry: children.entrySet()) {
+            resultTree.add(entry.getValue());
+            printTree("", entry.getValue());
+        }
         resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         // 打印树形结构
-        printTree("", root.getChildren().get(projectName));
         printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         return new GitDiffResponse(resultTree);
     }
@@ -274,10 +277,12 @@ public class DSSGitUtils {
                         }
                     }
                 }
-                resultTree.add(root.getChildren().get(projectName));
+                Map<String, GitTree> children = root.getChildren();
+                for (Map.Entry<String, GitTree> entry: children.entrySet()) {
+                    resultTree.add(entry.getValue());
+                    printTree("", entry.getValue());
+                }
                 resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
-                // 打印树形结构
-                printTree("", root.getChildren().get(projectName));
                 printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
             } catch (GitAPIException | IOException e) {
                 throw new RuntimeException(e);

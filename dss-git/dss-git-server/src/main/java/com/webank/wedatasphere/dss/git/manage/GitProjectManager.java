@@ -115,6 +115,10 @@ public class GitProjectManager {
         return new GitUserUpdateResponse(0, "", 0L);
     }
 
+    public static Long getWorkspaceIdByUser(String gitUser) {
+        return workspaceGitMapper.getWorkspaceIdByUserName(gitUser);
+    }
+
 //    private static GitUserUpdateResponse getUserIdFromGit(String type, Boolean update, Long workspaceId, String gitUser, String gitToken) throws IOException, com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException {
 //        if (GitConstant.GIT_ACCESS_READ_TYPE.equals(type)) {
 //            GitUserEntity writeGitUser = selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);

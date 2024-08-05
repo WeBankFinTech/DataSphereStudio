@@ -520,7 +520,7 @@ public class DSSGitUtils {
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
                 String responseBody = EntityUtils.toString(response.getEntity());
-                if (statusCode == 201) {
+                if (statusCode == 201 || (statusCode == 409 && responseBody.contains("Member already exists"))) {
                     return true;
                 } else {
                     throw new GitErrorException(80111, "添加用户失败，请检查只读用户是否存在或编辑用户token是否过期");

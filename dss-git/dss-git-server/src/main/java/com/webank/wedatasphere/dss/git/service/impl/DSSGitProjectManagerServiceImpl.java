@@ -103,7 +103,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         // 远程归档
         DSSGitUtils.archive(projectName, gitUser, gitUrl, gitToken);
         // 删除本地项目
-        DSSGitUtils.archiveLocal(projectName, request.getWorkspaceId());
+        DSSGitUtils.archiveLocal(projectName, gitUser, request.getWorkspaceId());
         return new GitArchivePorjectResponse();
     }
 

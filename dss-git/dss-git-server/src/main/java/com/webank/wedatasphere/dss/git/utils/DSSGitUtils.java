@@ -192,9 +192,9 @@ public class DSSGitUtils {
         }
     }
 
-    public static GitDiffResponse diff(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException{
+    public static GitDiffResponse diff(String projectName, List<String> fileList, String gitUser, Long workspaceId)throws GitErrorException{
 
-        Set<String> status = status(projectName, fileList, workspaceId);
+        Set<String> status = status(projectName, fileList, gitUser, workspaceId);
         List<GitTree> resultTree = new ArrayList<>();
         if (status.isEmpty()) {
             return new GitDiffResponse(resultTree);
@@ -374,8 +374,8 @@ public class DSSGitUtils {
         }
     }
 
-    public static void checkoutTargetCommit(Repository repository, GitRevertRequest request) throws GitAPIException, IOException, GitErrorException {
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + request.getProjectName()+ File.separator + ".git");
+    public static void checkoutTargetCommit(Repository repository, GitRevertRequest request, String gitUser) throws GitAPIException, IOException, GitErrorException {
+        File repoDir = new File(generateGitPath(request.getProjectName(), request.getWorkspaceId(), gitUser));
         String commitId = request.getCommitId(); // 替换为目标commit的完整哈希值
 
         try {
@@ -600,8 +600,8 @@ public class DSSGitUtils {
         return projectNames;
     }
 
-    public static Set<String> status(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException {
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName + File.separator +".git"); // 修改为你的仓库路径
+    public static Set<String> status(String projectName, List<String> fileList, String gitUser, Long workspaceId)throws GitErrorException {
+        File repoDir = new File(generateGitPath(projectName, workspaceId, gitUser)); // 修改为你的仓库路径
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build()) {
             Git git = new Git(repository);
@@ -669,8 +669,8 @@ public class DSSGitUtils {
         }
     }
 
-    public static void archiveLocal(String projectName, Long workspaceId) throws GitErrorException{
-        File repoDir = new File(DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + ".git");
+    public static void archiveLocal(String projectName, String gitUser, Long workspaceId) throws GitErrorException{
+        File repoDir = new File(generateGitPath(projectName, workspaceId, gitUser));
         if (!repoDir.exists()) {
             logger.info("file {} not exists", repoDir.getAbsolutePath());
             return ;
@@ -680,7 +680,7 @@ public class DSSGitUtils {
             // 删除名为"origin"的远程仓库配置
             git.remoteRemove().setRemoteName("origin").call();
             // 删除本地文件
-            FileUtils.removeDirectory(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  projectName);
+            FileUtils.removeDirectory(generateGitPrePath(projectName, workspaceId, gitUser));
             logger.info("Remote 'origin' removed successfully.");
         } catch (GitAPIException e) {
             throw new GitErrorException(80116, "git archive failed, the reason is : ", e);

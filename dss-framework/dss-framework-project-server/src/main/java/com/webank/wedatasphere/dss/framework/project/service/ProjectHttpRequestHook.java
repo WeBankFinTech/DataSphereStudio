@@ -1,9 +1,6 @@
 package com.webank.wedatasphere.dss.framework.project.service;
 
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectDeleteRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
-import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectQueryRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import org.apache.linkis.server.Message;
 
@@ -81,4 +78,12 @@ public interface ProjectHttpRequestHook {
      * @return 前置操作失败，请返回 Message，否则返回 null
      */
     Message beforeGetDeletedProject(HttpServletRequest request, ProjectQueryRequest projectRequest);
+
+    /**
+     * 项目转移成功后的后置操作。
+     * @param request
+     * @param projectTransferRequest
+     */
+    default void afterTransferProject(HttpServletRequest request, ProjectTransferRequest projectTransferRequest){
+    }
 }

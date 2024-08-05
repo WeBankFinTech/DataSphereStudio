@@ -96,6 +96,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     public GitDiffResponse diffGit(GitDiffTargetCommitRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
+        String filePath = request.getFilePath();
 
         GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectInfoByProjectName == null) {
@@ -116,17 +117,17 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
 
             if (StringUtils.isEmpty(request.getCommitId())) {
-                String path = gitPrePath + File.separator + request.getFilePath();
-                String metaPath = gitPrePath+ File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + request.getFilePath();
+                String path = gitPrePath + File.separator + filePath;
+                String metaPath = gitPrePath+ File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + filePath;
                 GitTree fileTree = getFileTree(path);
                 GitTree metaFileTree = getFileTree(metaPath);
 
                 List<GitTree> tree = new ArrayList<>();
-                tree.add(fileTree);
-                tree.add(metaFileTree);
+                tree.add(fileTree.getChildren().get(projectName));
+                tree.add(metaFileTree.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
                 diff = new GitDiffResponse(tree);
             } else {
-                diff = DSSGitUtils.diffGit(repository, projectName, request.getCommitId(), request.getFilePath());
+                diff = DSSGitUtils.diffGit(repository, projectName, request.getCommitId(), filePath);
             }
 
         } catch (Exception e) {
@@ -538,10 +539,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 if (StringUtils.isNotEmpty(request.getCommitId())) {
                     before = DSSGitUtils.getTargetCommitFileContent(repository, request.getCommitId(), request.getFilePath());
                 }
-                after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
+                after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, gitUser, workspaceId);
             } else {
                 // 获取当前提交前的文件内容
-                before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
+                before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, gitUser, workspaceId);
             }
             contentResponse.setAfter(after);
             contentResponse.setBefore(before);

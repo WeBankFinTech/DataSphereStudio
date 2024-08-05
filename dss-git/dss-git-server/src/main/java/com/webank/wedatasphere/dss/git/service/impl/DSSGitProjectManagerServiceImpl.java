@@ -15,6 +15,7 @@ import com.webank.wedatasphere.dss.git.manage.GitProjectManager;
 import com.webank.wedatasphere.dss.git.service.DSSGitProjectManagerService;
 import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
 import com.webank.wedatasphere.dss.git.utils.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.slf4j.Logger;
@@ -23,10 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.Cipher;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
 
 @Service
 public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerService {
@@ -115,9 +116,14 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         Boolean isExist = false;
         GitProjectGitInfo projectGitInfo = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectGitInfo != null ) {
-            isExist = true;
             if (!projectGitInfo.getGitUser().equals(gitUser)) {
                 throw new DSSErrorException(80001, "Git用户名不允许更换");
+            }
+            if (gitToken.equals(projectGitInfo.getGitToken())) {
+                isExist = true;
+            } else {
+                String decryptToken = GitProjectManager.generateKeys(projectGitInfo.getGitToken(), Cipher.DECRYPT_MODE);
+                gitToken = decryptToken;
             }
         }
         // 检测token合法性 数据库中已存在的配置无需再次校验
@@ -135,6 +141,42 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         }
 
         return new GitCheckProjectResponse(projectName, false);
+    }
+
+    @Override
+    public GitUserByWorkspaceResponse getProjectGitUserInfo(GitUserByWorkspaceIdRequest request) {
+        String username = request.getUsername();
+        Long workspaceId = request.getWorkspaceId();
+
+        List<GitProjectGitInfo> projectInfoByWorkspaceId = GitProjectManager.getProjectInfo(workspaceId);
+
+        Map<String, GitUserEntity> map = new HashMap<>();
+        for (GitProjectGitInfo gitInfo : projectInfoByWorkspaceId) {
+            GitUserEntity gitUserEntity = new GitUserEntity(gitInfo.getGitUser(), gitInfo.getGitToken());
+            map.put(gitInfo.getProjectName(), gitUserEntity);
+        }
+
+        return new GitUserByWorkspaceResponse(map);
+    }
+
+    @Override
+    public GitAddMemberResponse addMember(GitAddMemberRequest request) throws Exception {
+        String projectName = request.getProjectName();
+        String username = request.getUsername();
+        String flowNodeName = request.getFlowNodeName();
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        String gitProjectId = projectInfoByProjectName.getGitProjectId();
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
+        String userIdByUsername = DSSGitUtils.getUserIdByUsername(gitUrl, gitToken, username);
+        DSSGitUtils.addProjectMember(gitUrl, gitToken, userIdByUsername, gitProjectId, 20);
+        String jumpUrl = gitUrl + "/" + gitUser + "/" + projectName;
+
+        if (StringUtils.isNotEmpty(flowNodeName)) {
+            jumpUrl += "/tree/master/" + flowNodeName;
+        }
+        return new GitAddMemberResponse(jumpUrl);
     }
 
 

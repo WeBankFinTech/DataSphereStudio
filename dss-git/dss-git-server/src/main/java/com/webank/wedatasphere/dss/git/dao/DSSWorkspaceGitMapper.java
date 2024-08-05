@@ -24,6 +24,8 @@ public interface DSSWorkspaceGitMapper {
 
     List<GitProjectGitInfo> getProjectInfoByWorkspaceId(@Param ("workspaceId") Long workspaceId);
 
+    Long getWorkspaceIdByUserName(@Param("gitUser") String gitUser);
+
     GitProjectGitInfo getProjectInfoByProjectName(@Param ("projectName") String projectName);
 
     void insertProjectInfo(GitProjectGitInfo projectGitInfo);

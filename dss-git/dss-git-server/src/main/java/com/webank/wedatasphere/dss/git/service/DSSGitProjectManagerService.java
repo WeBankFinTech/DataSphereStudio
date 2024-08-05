@@ -17,6 +17,6 @@ public interface DSSGitProjectManagerService {
 
     GitUserByWorkspaceResponse getProjectGitUserInfo(GitUserByWorkspaceIdRequest request);
 
-    GitAddMemberResponse addMember(GitAddMemberRequest request) throws IOException;
+    GitAddMemberResponse addMember(GitAddMemberRequest request) throws Exception;
 
 }

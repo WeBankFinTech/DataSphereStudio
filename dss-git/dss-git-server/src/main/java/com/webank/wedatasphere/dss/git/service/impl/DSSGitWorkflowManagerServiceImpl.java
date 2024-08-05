@@ -96,6 +96,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     public GitDiffResponse diffGit(GitDiffTargetCommitRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
+        String filePath = request.getFilePath();
 
         GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectInfoByProjectName == null) {
@@ -116,8 +117,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
 
             if (StringUtils.isEmpty(request.getCommitId())) {
-                String path = gitPrePath + File.separator + request.getFilePath();
-                String metaPath = gitPrePath+ File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + request.getFilePath();
+                String path = gitPrePath + File.separator + filePath;
+                String metaPath = gitPrePath+ File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + filePath;
                 GitTree fileTree = getFileTree(path);
                 GitTree metaFileTree = getFileTree(metaPath);
 
@@ -126,7 +127,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 tree.add(metaFileTree.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
                 diff = new GitDiffResponse(tree);
             } else {
-                diff = DSSGitUtils.diffGit(repository, projectName, request.getCommitId(), request.getFilePath());
+                diff = DSSGitUtils.diffGit(repository, projectName, request.getCommitId(), filePath);
             }
 
         } catch (Exception e) {

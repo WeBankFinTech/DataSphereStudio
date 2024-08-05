@@ -690,7 +690,7 @@ public class DSSGitUtils {
     }
 
     public static String getFileContent(String path, String projectName, String gitUser, Long workspaceId) throws IOException {
-        String filePath = generateGitPath(projectName, workspaceId, gitUser) + File.separator + path;
+        String filePath = generateGitPrePath(projectName, workspaceId, gitUser) + File.separator + path;
         File file = new File(filePath);
         if (file.exists()) {
             return new String(Files.readAllBytes(Paths.get(filePath)));

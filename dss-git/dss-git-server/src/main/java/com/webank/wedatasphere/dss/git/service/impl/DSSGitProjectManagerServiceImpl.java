@@ -160,7 +160,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
     }
 
     @Override
-    public GitAddMemberResponse addMember(GitAddMemberRequest request) throws IOException {
+    public GitAddMemberResponse addMember(GitAddMemberRequest request) throws Exception {
         String projectName = request.getProjectName();
         String username = request.getUsername();
         String flowNodeName = request.getFlowNodeName();

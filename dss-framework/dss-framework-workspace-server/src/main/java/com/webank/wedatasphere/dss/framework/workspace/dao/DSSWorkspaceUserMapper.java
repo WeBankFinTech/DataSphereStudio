@@ -125,4 +125,6 @@ public interface DSSWorkspaceUserMapper {
     @Select("select distinct username from dss_workspace_user_role where workspace_id = #{workspaceId} and role_id = #{roleId} order by id desc")
     List<String> getWorkspaceUserByRoleId(@Param("workspaceId") Long workspaceId,@Param("roleId") Integer roleId);
 
+    @Delete("delete from dss_project_user where username = #{username} ")
+    void deleteProjectUserByUserName(String userName);
 }

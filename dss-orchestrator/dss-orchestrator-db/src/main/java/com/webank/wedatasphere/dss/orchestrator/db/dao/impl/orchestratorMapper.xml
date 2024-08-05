@@ -465,4 +465,21 @@
         </if>
     </select>
 
+
+
+    <select id="getOrchestratorVersionById" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorReleaseVersionInfo">
+        select  a.id               as id
+        ,a.orchestrator_id  as orchestratorId
+        ,a.version          as version
+        ,a.update_time      as updateTime
+        ,a.updater          as updater
+        ,b.status           as status
+        ,b.error_msg        as errorMsg
+        from dss_orchestrator_version_info a
+        left join dss_release_task b on a.orchestrator_id = b.orchestrator_id and a.id = b.orchestrator_version_id
+        where a.valid_flag  = 1  and a.orchestrator_id  = #{orchestratorId}
+        order by a.id desc  limit 1
+    </select>
+
+
 </mapper>

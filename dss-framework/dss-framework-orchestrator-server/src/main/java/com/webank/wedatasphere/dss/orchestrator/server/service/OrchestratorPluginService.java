@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentRe
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffDirVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRelationVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
@@ -42,7 +43,7 @@ public interface OrchestratorPluginService {
 
     Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 
-    List<GitTree> diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+    OrchestratorDiffDirVo diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 
     GitFileContentResponse diffFlowContent(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
 
@@ -56,5 +57,5 @@ public interface OrchestratorPluginService {
 
     String diffStatus(Long taskId) throws DSSErrorException;
 
-    List<GitTree> diffContent(Long taskId);
+    OrchestratorDiffDirVo diffContent(Long taskId);
 }

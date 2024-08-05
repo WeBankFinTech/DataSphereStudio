@@ -489,6 +489,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
         projectModifyRequest.setEditUsers(editUsers);
         List<String> accessUsers = projectPriv.stream().filter(projectUser -> projectUser.getPriv() == 1).map(DSSProjectUser::getUsername).collect(Collectors.toList());
+        if(accessUsers.contains(projectTransferRequest.getTransferUserName())){
+            accessUsers.remove(projectTransferRequest.getTransferUserName());
+        }
         projectModifyRequest.setAccessUsers(accessUsers);
     }
 

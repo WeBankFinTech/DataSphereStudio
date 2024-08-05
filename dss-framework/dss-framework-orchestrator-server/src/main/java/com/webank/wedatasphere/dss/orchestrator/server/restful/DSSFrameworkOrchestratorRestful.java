@@ -362,7 +362,7 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
-        List<GitTree> gitTree = orchestratorPluginService.diffPublish(submitFlowRequest, userName, workspace);
+        OrchestratorDiffDirVo gitTree = orchestratorPluginService.diffPublish(submitFlowRequest, userName, workspace);
         return Message.ok().data("tree", gitTree);
     }
 

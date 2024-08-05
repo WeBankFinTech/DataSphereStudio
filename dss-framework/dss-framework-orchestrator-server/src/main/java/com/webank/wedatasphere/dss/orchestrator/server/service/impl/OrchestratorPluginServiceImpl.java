@@ -49,6 +49,7 @@ import com.webank.wedatasphere.dss.orchestrator.publish.job.CommonUpdateConvertJ
 import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffDirVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRelationVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -425,12 +426,12 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public List<GitTree> diffContent(Long taskId) {
+    public OrchestratorDiffDirVo diffContent(Long taskId) {
         String result = orchestratorMapper.selectResult(taskId);
         if (StringUtils.isNotEmpty(result)) {
-            Type listType = new TypeToken<List<GitTree>>() {}.getType();
+            Type listType = new TypeToken<OrchestratorDiffDirVo>() {}.getType();
             Gson gson = new Gson();
-            List<GitTree> gitTrees = gson.fromJson(result, listType);
+            OrchestratorDiffDirVo gitTrees = gson.fromJson(result, listType);
             return gitTrees;
         }
         return null;
@@ -515,9 +516,12 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 GitDiffResponse diff = diff(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
                 String result = "";
                 if (diff != null) {
-                    List<GitTree> tree = diff.getTree();
+                    List<GitTree> codeTree = diff.getCodeTree();
+                    List<GitTree> metaTree = diff.getMetaTree();
+                    String commitId = diff.getCommitId();
+                    OrchestratorDiffDirVo diffDirVo = new OrchestratorDiffDirVo(codeTree, metaTree, commitId);
                     Gson gson = new Gson();
-                    result = gson.toJson(tree);
+                    result = gson.toJson(diffDirVo);
                 } else {
                     LOGGER.info("change is empty");
                 }
@@ -532,8 +536,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public List<GitTree> diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
-        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(flowRequest.getOrchestratorId());
+    public OrchestratorDiffDirVo diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        Long orchestratorId = flowRequest.getOrchestratorId();
+        DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         String commitId = getLastPublishCommitId(orchestrator);
 
 
@@ -542,9 +547,11 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             LOGGER.info("change is empty");
             return null;
         }
+        List<GitTree> codeTree = diff.getCodeTree();
+        List<GitTree> metaTree = diff.getMetaTree();
 
         //4. 返回文件列表
-        return diff.getTree();
+        return new OrchestratorDiffDirVo(codeTree, metaTree, commitId);
     }
 
     private String getLastPublishCommitId(DSSOrchestratorInfo orchestrator) {

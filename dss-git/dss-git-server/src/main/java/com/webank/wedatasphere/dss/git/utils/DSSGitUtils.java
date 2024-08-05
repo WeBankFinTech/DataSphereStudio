@@ -192,12 +192,15 @@ public class DSSGitUtils {
         }
     }
 
-    public static GitDiffResponse diff(String projectName, List<String> fileList, String gitUser, Long workspaceId)throws GitErrorException{
+    public static GitDiffResponse diff(Repository repository, String projectName, List<String> fileList, String gitUser, Long workspaceId)throws GitErrorException{
 
         Set<String> status = status(projectName, fileList, gitUser, workspaceId);
-        List<GitTree> resultTree = new ArrayList<>();
+        List<GitTree> codeTree = new ArrayList<>();
+        List<GitTree> metaTree = new ArrayList<>();
+        GitCommitResponse currentCommit = getCurrentCommit(repository);
+        String commitId = currentCommit.getCommitId();
         if (status.isEmpty()) {
-            return new GitDiffResponse(resultTree);
+            return new GitDiffResponse(codeTree, metaTree, commitId);
         }
         GitTree root = new GitTree("", false);
         GitTree rootMeta = new GitTree("", true);
@@ -212,17 +215,18 @@ public class DSSGitUtils {
         }
         Map<String, GitTree> children = root.getChildren();
         for (Map.Entry<String, GitTree> entry: children.entrySet()) {
-            resultTree.add(entry.getValue());
+            codeTree.add(entry.getValue());
             printTree("", entry.getValue());
         }
-        resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
+        metaTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
         // 打印树形结构
         printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
-        return new GitDiffResponse(resultTree);
+        return new GitDiffResponse(codeTree, metaTree, commitId);
     }
 
     public static GitDiffResponse diffGit(Repository repository, String projectName, String commitId, String filePath) {
-        List<GitTree> resultTree = new ArrayList<>();
+        List<GitTree> codeTree = new ArrayList<>();
+        List<GitTree> metaTree = new ArrayList<>();
         try (Git git = new Git(repository)) {
             ObjectId commitObjectId = ObjectId.fromString(commitId);
             try (RevWalk revWalk = new RevWalk(repository)) {
@@ -279,16 +283,16 @@ public class DSSGitUtils {
                 }
                 Map<String, GitTree> children = root.getChildren();
                 for (Map.Entry<String, GitTree> entry: children.entrySet()) {
-                    resultTree.add(entry.getValue());
+                    codeTree.add(entry.getValue());
                     printTree("", entry.getValue());
                 }
-                resultTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
+                metaTree.add(rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
                 printTree("", rootMeta.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
             } catch (GitAPIException | IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        return new GitDiffResponse(resultTree);
+        return new GitDiffResponse(codeTree, metaTree, null);
     }
 
     private static TreeFilter createPathFilter(String[] paths) {
@@ -319,7 +323,7 @@ public class DSSGitUtils {
     }
 
     // 打印树结构
-    private static void printTree(String prefix, GitTree tree) {
+    public static void printTree(String prefix, GitTree tree) {
         logger.info(prefix + tree.getName());
         for (GitTree child : tree.getChildren().values()) {
             printTree(prefix + "  ", child);

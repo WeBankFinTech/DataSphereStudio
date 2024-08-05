@@ -36,6 +36,8 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
+import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
@@ -78,6 +80,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     private DSSProjectUserService projectUserService;
     @Autowired
     private DSSProjectMapper projectMapper;
+    @Autowired
+    private DSSWorkspaceUserService dssWorkspaceUserService;
 
 
     private static final boolean STRICT_PROJECT_CREATE_MODE = CommonVars.apply("wds.dss.project.strict.mode", false).getValue();
@@ -337,6 +341,12 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     }
 
     private void checkGitName(String name, Workspace workspace, String username, String gitUser, String gitToken) throws DSSProjectErrorException {
+        // 校验是否为虚拟用户，此处禁止使用DSS实名用户接入Git
+        List<StaffInfoVO> all = dssWorkspaceUserService.listAllDSSUsers();
+        Set<String> allDSSUsers = all.stream().map(StaffInfoVO::getUsername).collect(Collectors.toSet());
+        if (allDSSUsers.contains(name)) {
+            throw new DSSProjectErrorException(71000, "Git读写账号用户名必须为虚拟用户，不能是DSS实名用户！");
+        }
         // 校验Git名称
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         GitCheckProjectRequest request1 = new GitCheckProjectRequest(workspace.getWorkspaceId(), name, username, gitUser, gitToken);
@@ -489,6 +499,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
         projectModifyRequest.setEditUsers(editUsers);
         List<String> accessUsers = projectPriv.stream().filter(projectUser -> projectUser.getPriv() == 1).map(DSSProjectUser::getUsername).collect(Collectors.toList());
+        if(accessUsers.contains(projectTransferRequest.getTransferUserName())){
+            accessUsers.remove(projectTransferRequest.getTransferUserName());
+        }
         projectModifyRequest.setAccessUsers(accessUsers);
     }
 

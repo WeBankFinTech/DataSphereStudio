@@ -82,7 +82,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 FileUtils.unzipBMLResource(entry.getKey(), workspaceId, gitUser);
 
             }
-            diff = DSSGitUtils.diff(projectName, fileList, workspaceId);
+            diff = DSSGitUtils.diff(projectName, fileList, gitUser, workspaceId);
             // 重置本地
             DSSGitUtils.reset(repository, projectName);
         } catch (Exception e) {
@@ -290,7 +290,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             request.setTypeList(GitConstant.GIT_SERVER_SEARCH_TYPE);
         }
         String gitDir = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
-        String gitPathPre = DSSGitConstant.GIT_PATH_PRE + request.getWorkspaceId() + File.separator;
+        String gitPathPre = DSSGitConstant.GIT_PATH_PRE + request.getWorkspaceId() + File.separator + gitUser + File.separator;
         String workTree = gitPathPre + projectName;
         List<String> gitCommands = new ArrayList<>(Arrays.asList(
                 "git", "--git-dir=" + gitDir, "--work-tree=" + workTree, "grep", "-F", "-l", request.getSearchContent()
@@ -670,7 +670,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             // 本地保持最新状态
             DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
             // 回滚
-            DSSGitUtils.checkoutTargetCommit(repository, request);
+            DSSGitUtils.checkoutTargetCommit(repository, request, gitUser);
             // push
             List<String> paths = Collections.singletonList(request.getPath());
             DSSGitUtils.push(repository, projectName, gitUser, gitToken,"revert "+ DSSGitConstant.GIT_USERNAME_FLAG + request.getUsername(), paths);

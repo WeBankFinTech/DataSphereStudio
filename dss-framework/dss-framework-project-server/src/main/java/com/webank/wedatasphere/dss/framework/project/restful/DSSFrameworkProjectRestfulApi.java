@@ -484,14 +484,14 @@ public class DSSFrameworkProjectRestfulApi {
             return Message.error(String.format("project %s is not exists.", projectTransferRequest.getName()));
         }
 
-        if (!username.equals(dbProject.getCreateBy())) {
-            return Message.error("Only the project creator is allowed to transfer the project" );
-        }
-
-        List<String> staffInfos = staffInfoGetter.getAllUsers().stream().map(StaffInfo::getEnglishName).collect(Collectors.toList());
-        if(!staffInfos.contains(projectTransferRequest.getTransferUserName())){
-            return Message.error("Transfer user does not exist in workspace" );
-        }
+//        if (!username.equals(dbProject.getCreateBy())) {
+//            return Message.error("Only the project creator is allowed to transfer the project" );
+//        }
+//
+//        List<String> staffInfos = staffInfoGetter.getAllUsers().stream().map(StaffInfo::getEnglishName).collect(Collectors.toList());
+//        if(!staffInfos.contains(projectTransferRequest.getTransferUserName())){
+//            return Message.error("Transfer user does not exist in workspace" );
+//        }
 
 
         return DSSExceptionUtils.getMessage(() -> {

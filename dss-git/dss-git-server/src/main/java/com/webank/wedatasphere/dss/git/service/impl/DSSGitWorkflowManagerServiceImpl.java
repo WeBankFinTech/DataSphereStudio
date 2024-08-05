@@ -539,10 +539,10 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 if (StringUtils.isNotEmpty(request.getCommitId())) {
                     before = DSSGitUtils.getTargetCommitFileContent(repository, request.getCommitId(), request.getFilePath());
                 }
-                after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
+                after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, gitUser, workspaceId);
             } else {
                 // 获取当前提交前的文件内容
-                before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, workspaceId);
+                before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, gitUser, workspaceId);
             }
             contentResponse.setAfter(after);
             contentResponse.setBefore(before);

@@ -129,8 +129,11 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                     DSSGitUtils.printTree("", entry.getValue());
                 }
 
-                metaTree.add(metaFileTree.getChildren().get(GitConstant.GIT_SERVER_META_PATH));
-                DSSGitUtils.printTree("", metaFileTree);
+                for (Map.Entry<String, GitTree> entry : metaFileTree.getChildren().entrySet()) {
+                    metaTree.add(fileTree.getChildren().get(projectName));
+                    DSSGitUtils.printTree("", entry.getValue());
+                }
+
                 diff = new GitDiffResponse(codeTree, metaTree, null);
             } else {
                 diff = DSSGitUtils.diffGit(repository, projectName, request.getCommitId(), filePath);

@@ -160,5 +160,8 @@ public interface OrchestratorMapper {
     List<String> getAllOrchestratorName(@Param("workspaceId") Long workspaceId,@Param("projectName") String projectName);
 
 
+    OrchestratorReleaseVersionInfo getOrchestratorVersionById(@Param("orchestratorId") Long orchestratorId);
+
+
 
 }

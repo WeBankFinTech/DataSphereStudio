@@ -707,6 +707,26 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             DSSFrameworkErrorException.dealErrorException(60000, "编排模式ID=" + modifyOrchestratorMetaRequest.getOrchestratorId() + "不存在");
         }
 
+
+        if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()
+                && OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorInfo.getStatus())) {
+
+            OrchestratorReleaseVersionInfo orchestratorVersion = orchestratorMapper.getOrchestratorVersionById(orchestratorInfo.getOrchestratorId());
+            if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorVersion.getStatus())) {
+                orchestratorInfo.setStatus(orchestratorVersion.getStatus());
+            }
+        }
+
+        // 发布中和提交中的工作流不允许进行更新
+        if(OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorInfo.getStatus())
+                || OrchestratorRefConstant.FLOW_STATUS_PUBLISHING.equalsIgnoreCase(orchestratorInfo.getStatus())){
+
+            DSSFrameworkErrorException.dealErrorException(60000,
+                    String.format("%s工作流正在提交中或发布中，不允许进行编辑,请稍后重试",modifyOrchestratorMetaRequest.getOrchestratorName()));
+
+        }
+
+
         //若修改了编排名称，检查是否存在相同的编排名称
         if (!modifyOrchestratorMetaRequest.getOrchestratorName().equals(orchestratorInfo.getOrchestratorName())) {
             isExistSameNameBeforeCreate(modifyOrchestratorMetaRequest.getWorkspaceId(), modifyOrchestratorMetaRequest.getProjectId(), modifyOrchestratorMetaRequest.getOrchestratorName());
@@ -723,7 +743,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         orchestratorInfo.setOrchestratorName(modifyOrchestratorMetaRequest.getOrchestratorName());
         orchestratorInfo.setDescription(modifyOrchestratorMetaRequest.getDescription());
         orchestratorInfo.setIsDefaultReference(modifyOrchestratorMetaRequest.getIsDefaultReference());
-        if(!Objects.equals(orchestratorInfo.getProxyUser(),modifyOrchestratorMetaRequest.getProxyUser())){
+        if (!Objects.equals(orchestratorInfo.getProxyUser(), modifyOrchestratorMetaRequest.getProxyUser())) {
             orchestratorInfo.setProxyUser(modifyOrchestratorMetaRequest.getProxyUser());
         }
         orchestratorInfo.setUpdateUser(username);
@@ -739,7 +759,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     }
 
     @Override
-    public List<String> getAllOrchestratorName(Long workspaceId,String projectName) {
+    public List<String> getAllOrchestratorName(Long workspaceId, String projectName) {
         return orchestratorMapper.getAllOrchestratorName(workspaceId, projectName);
     }
 

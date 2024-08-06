@@ -733,11 +733,13 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             }else{
                 // 取交集
                 projectId.retainAll(projectIds);
+                // 取完交集后为空，则直接返回
+                if(CollectionUtils.isEmpty(projectId)){
+                    return  new ArrayList<>();
+                }
             }
 
-            if(CollectionUtils.isEmpty(projectId)){
-                return  new ArrayList<>();
-            }
+
 
         }
 

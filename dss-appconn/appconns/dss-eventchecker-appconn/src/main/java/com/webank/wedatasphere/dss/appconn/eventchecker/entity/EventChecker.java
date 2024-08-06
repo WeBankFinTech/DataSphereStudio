@@ -47,6 +47,7 @@ public class EventChecker implements Runnable{
 	public final static String TODAY="only.receive.today";
 	public final static String USE_RUN_DATE ="msg.receive.use.rundate";
 	public final static String AFTERSEND="msg.after.send";
+	public final static String CHANNEL_TYPE="msg.channel.type";
 
 	private Properties p;
 	private String jobId;

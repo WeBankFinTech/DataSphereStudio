@@ -159,8 +159,12 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         String orgFullName = staffInfoGetter.getFullOrgNameByUsername(userName);
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(orgFullName)) {
             try {
-                String departmentName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0];
-                String officeName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[1];
+                String[] fullNameArray = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT);
+                String departmentName = fullNameArray[0];
+                String officeName = "";
+                if(fullNameArray.length>1){
+                    officeName = fullNameArray[1];
+                }
                 vo.setDepartment(departmentName);
                 vo.setOffice(officeName);
             } catch (Exception e) {

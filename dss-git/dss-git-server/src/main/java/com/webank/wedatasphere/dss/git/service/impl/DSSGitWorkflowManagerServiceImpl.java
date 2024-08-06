@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.git.utils.DSSGitUtils;
 import com.webank.wedatasphere.dss.git.utils.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -524,6 +525,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     public GitFileContentResponse getFileContent(GitFileContentRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
+        String filePath = request.getFilePath();
 
         GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectInfoByProjectName == null) {
@@ -546,12 +548,17 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
             if (request.getPublish()) {
                 if (StringUtils.isNotEmpty(request.getCommitId())) {
-                    before = DSSGitUtils.getTargetCommitFileContent(repository, request.getCommitId(), request.getFilePath());
+                    before = DSSGitUtils.getTargetCommitFileContent(repository, request.getCommitId(), filePath);
                 }
-                after = DSSGitUtils.getFileContent(request.getFilePath(), projectName, gitUser, workspaceId);
+                after = DSSGitUtils.getFileContent(filePath, projectName, gitUser, workspaceId);
+                RevCommit latestCommitInfo = DSSGitUtils.getLatestCommitInfo(repository, filePath, projectName, workspaceId, gitUser);
+                if (latestCommitInfo != null) {
+                    contentResponse.setAnnotate(latestCommitInfo.getShortMessage());
+                    contentResponse.setCommitId(latestCommitInfo.getId().getName());
+                }
             } else {
                 // 获取当前提交前的文件内容
-                before = DSSGitUtils.getFileContent(request.getFilePath(), projectName, gitUser, workspaceId);
+                before = DSSGitUtils.getFileContent(filePath, projectName, gitUser, workspaceId);
             }
             contentResponse.setAfter(after);
             contentResponse.setBefore(before);

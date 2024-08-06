@@ -117,78 +117,17 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
         Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeGetAllProjects(request, projectRequest));
-        if (message != null) {
+        if(message != null) {
             return message;
         }
-
         LOGGER.info("user {} begin to getAllProjects, projectId: {}.", username, projectRequest.getId());
-        if(!StringUtils.isEmpty(projectRequest.getSortBy()) && !StringUtils.isEmpty(projectRequest.getOrderBy())){
-            String orderBySql = DSSProjectConstant.concatOrderBySql(projectRequest.getSortBy(),projectRequest.getOrderBy());
-            LOGGER.info(String.format("getAllProjects sort orderBySql is %s", orderBySql));
-            if(orderBySql == null){
-                return Message.error("数据排序信息传入异常请检查");
-            }
-            projectRequest.setOrderBySql(orderBySql);
-        }
-
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
-
-        Integer total = 0;
-
-        if (!CollectionUtils.isEmpty(dssProjectVos)) {
-
-            dssProjectVos = dssProjectVos.stream().filter(item -> {
-                boolean flag = true;
-                // 项目名称过滤
-                if (!CollectionUtils.isEmpty(projectRequest.getProjectNames())) {
-                    flag = projectRequest.getProjectNames().contains(item.getName());
-                }
-                // 项目创建者过滤
-                if (!CollectionUtils.isEmpty(projectRequest.getCreateUsers()) && flag) {
-                    flag = projectRequest.getCreateUsers().contains(item.getCreateBy());
-                }
-                // 发布权限用户过滤
-                if (!CollectionUtils.isEmpty(projectRequest.getReleaseUsers()) && flag) {
-                    flag = CollectionUtils.containsAny(projectRequest.getReleaseUsers(), item.getReleaseUsers());
-                }
-                //  编辑权限用户过滤
-                if (!CollectionUtils.isEmpty(projectRequest.getEditUsers()) && flag) {
-                    flag = CollectionUtils.containsAny(projectRequest.getEditUsers(), item.getEditUsers());
-                }
-                // 查看权限用户过滤
-                if (!CollectionUtils.isEmpty(projectRequest.getAccessUsers()) && flag) {
-                    flag = CollectionUtils.containsAny(projectRequest.getAccessUsers(), item.getAccessUsers());
-                }
-
-                return flag;
-
-            }).collect(Collectors.toList());
-
-            // 分页
-            total = dssProjectVos.size();
-            if(projectRequest.getPageNow() != null && projectRequest.getPageSize()!=null){
-                int page = projectRequest.getPageNow() >= 1 ? projectRequest.getPageNow() : 1;
-                int pageSize = projectRequest.getPageSize() >= 1 ? projectRequest.getPageSize() : 10;
-                List<ProjectResponse>  dssProjectList = new ArrayList<>();
-                Integer maxSize = page * pageSize > total ? total : page * pageSize;
-                Integer minSize = (page - 1) * pageSize;
-                for(int i = minSize; i < maxSize; i ++){
-                    dssProjectList.add(dssProjectVos.get(i));
-                }
-
-                dssProjectVos = new ArrayList<>(dssProjectList);
-            }
-
-        }
-
-        if (!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()) {
-            dssProjectVos = dssProjectVos.stream().filter(item ->
+        if(!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()){
+            dssProjectVos = dssProjectVos.stream().filter(item->
                     (item.getEditUsers().contains(username) || item.getReleaseUsers().contains(username))
                             && item.getEditable()).collect(Collectors.toList());
         }
-
-        return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos).data("total",total);
-
+        return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
     }
 
     /**

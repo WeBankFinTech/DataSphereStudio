@@ -157,7 +157,7 @@ public class PublishServiceImpl implements PublishService {
     }
 
     @Override
-    public void batchSubmit(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception{
+    public void batchPublish(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception{
         List<Long> orcIds = publishWorkflowRequest.getOrchestratorList();
         String labelStr = publishWorkflowRequest.getLabels().getRoute();
         Map<String, Object> labels = new HashMap<>();
@@ -177,7 +177,7 @@ public class PublishServiceImpl implements PublishService {
                 throw new DSSErrorException(80001, "查询编排失败，请确认编排是否存在") ;
             }
             Set<DSSOrchestratorVersion> orchestratorVersions = queryResponse.getOrchestratorVoes().stream().map(OrchestratorVo::getDssOrchestratorVersion).collect(Collectors.toSet());
-            workflowIdList = orchestratorVersions.stream().map(DSSOrchestratorVersion::getOrchestratorId).collect(Collectors.toList());
+            workflowIdList = orchestratorVersions.stream().map(DSSOrchestratorVersion::getAppId).collect(Collectors.toList());
         } catch (Exception e) {
             DSSExceptionUtils.dealErrorException(60015, "query orchestrator ref failed",
                     DSSErrorException.class);

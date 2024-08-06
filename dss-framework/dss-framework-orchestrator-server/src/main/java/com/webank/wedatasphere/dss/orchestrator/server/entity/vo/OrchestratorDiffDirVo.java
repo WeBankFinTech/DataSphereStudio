@@ -9,10 +9,9 @@ public class OrchestratorDiffDirVo {
     private List<GitTree> metaTree;
     private String commitId;
 
-    public OrchestratorDiffDirVo(List<GitTree> codeTree, List<GitTree> metaTree, String commitId) {
+    public OrchestratorDiffDirVo(List<GitTree> codeTree, List<GitTree> metaTree) {
         this.codeTree = codeTree;
         this.metaTree = metaTree;
-        this.commitId = commitId;
     }
 
     public OrchestratorDiffDirVo() {

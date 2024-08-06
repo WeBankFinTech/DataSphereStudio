@@ -519,8 +519,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 if (diff != null) {
                     List<GitTree> codeTree = diff.getCodeTree();
                     List<GitTree> metaTree = diff.getMetaTree();
-                    String commitId = diff.getCommitId();
-                    OrchestratorDiffDirVo diffDirVo = new OrchestratorDiffDirVo(codeTree, metaTree, commitId);
+                    OrchestratorDiffDirVo diffDirVo = new OrchestratorDiffDirVo(codeTree, metaTree);
                     Gson gson = new Gson();
                     result = gson.toJson(diffDirVo);
                 } else {
@@ -552,7 +551,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         List<GitTree> metaTree = diff.getMetaTree();
 
         //4. 返回文件列表
-        return new OrchestratorDiffDirVo(codeTree, metaTree, commitId);
+        return new OrchestratorDiffDirVo(codeTree, metaTree);
     }
 
     private String getLastPublishCommitId(DSSOrchestratorInfo orchestrator) {

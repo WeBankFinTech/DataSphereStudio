@@ -749,6 +749,37 @@ public class DSSGitUtils {
         return content;
     }
 
+    public static RevCommit getLatestCommitInfo(Repository repository, String filePath, String projectName, Long workspaceId, String gitUser) throws GitErrorException {
+        try {
+            Git git = new Git(repository);
+            Iterable<RevCommit> commits = git.log().addPath(filePath).call();
+            String path = DSSGitUtils.generateGitPrePath(projectName, workspaceId, gitUser) + filePath;
+            File file = new File(path);
+            if (file.exists()) {
+                for (RevCommit commit : commits) {
+                    return commit;
+                }
+            } else {
+                RevCommit previousCommit = null;
+                for (RevCommit commit : commits) {
+                    if (commit != null) {
+                        try (TreeWalk treeWalk = TreeWalk.forPath(git.getRepository(), path, commit.getTree())) {
+                            if (treeWalk == null) {
+                                // The file does not exist in this commit, so this is the deletion commit
+                                return commit;
+                            }
+                        }
+                    }
+                    previousCommit = commit;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            throw new GitErrorException(80118, "getLatestCommitInfo failed, the reason is : ", e);
+        }
+    }
+
+
     public static void getCommitId(Repository repository, String projectName, int num, Long workspaceId)throws GitErrorException {
         // 获取当前CommitId，
         File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  projectName + File.separator +".git");

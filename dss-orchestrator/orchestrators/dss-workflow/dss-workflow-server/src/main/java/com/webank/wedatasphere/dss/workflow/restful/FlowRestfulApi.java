@@ -176,7 +176,7 @@ public class FlowRestfulApi {
         Map<String, Object> labels = new HashMap<>();
         labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, publishWorkflowRequest.getLabels().getRoute());
         try {
-            publishService.batchSubmit(publishWorkflowRequest, workspace, publishUser, labels);
+            publishService.batchPublish(publishWorkflowRequest, workspace, publishUser, labels);
         } catch (Exception e) {
             return Message.error("批量发布失败，原因为：" + e.getMessage());
         }

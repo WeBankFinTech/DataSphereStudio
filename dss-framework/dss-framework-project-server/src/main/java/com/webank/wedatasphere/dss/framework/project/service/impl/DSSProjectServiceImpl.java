@@ -724,6 +724,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
             List<Integer> projectIds = projectMapper.getProjectIdByUser(rank, map.get(rank));
 
+            if(CollectionUtils.isEmpty(projectIds)){
+                return  new ArrayList<>();
+            }
+
             if(CollectionUtils.isEmpty(projectId)){
                 projectId.addAll(projectIds);
             }else{

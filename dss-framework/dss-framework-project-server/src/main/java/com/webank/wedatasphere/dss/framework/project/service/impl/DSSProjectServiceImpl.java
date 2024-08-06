@@ -625,18 +625,13 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectRequest.setQueryUser(projectRequest.getUsername());
         }
 
-        List<Integer> projectIdList = new ArrayList<>();
-        // 根据传入的查看用户获取 项目ID 取交集
-        if(!CollectionUtils.isEmpty(projectRequest.getAccessUsers())){
-            intersectionProjectId(projectIdList,projectRequest.getAccessUsers(),ProjectUserPrivEnum.PRIV_ACCESS.getRank());
-        }
-        // 根据传入的编辑用户获取 项目ID 取交集
-        if (!CollectionUtils.isEmpty(projectRequest.getEditUsers())) {
-            intersectionProjectId(projectIdList,projectRequest.getEditUsers(),ProjectUserPrivEnum.PRIV_EDIT.getRank());
-        }
-        // 根据传入的发布用户获取项目ID 取交集
-        if (!CollectionUtils.isEmpty(projectRequest.getReleaseUsers())) {
-            intersectionProjectId(projectIdList,projectRequest.getReleaseUsers(),ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+        List<Integer> projectIdList = getProjectId(projectRequest);
+
+        if((!CollectionUtils.isEmpty(projectRequest.getAccessUsers()) || !CollectionUtils.isEmpty(projectRequest.getEditUsers())
+                || !CollectionUtils.isEmpty(projectRequest.getReleaseUsers()) )  && CollectionUtils.isEmpty(projectIdList)){
+
+            totals.add(0L);
+            return new ArrayList<>();
         }
         // 去重
         projectIdList = projectIdList.stream().distinct().collect(Collectors.toList());
@@ -713,20 +708,35 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
     }
 
 
-    public void intersectionProjectId(List<Integer> projectIdList,List<String> users,Integer rank){
+    public List<Integer> getProjectId(ProjectQueryRequest projectRequest){
+        List<Integer> projectId = new ArrayList<>();
 
-        List<Integer> projectIds = projectMapper.getProjectIdByUser(rank, users);
+        Map<Integer,List> map = new HashMap();
+        map.put(ProjectUserPrivEnum.PRIV_ACCESS.getRank(), projectRequest.getAccessUsers());
+        map.put(ProjectUserPrivEnum.PRIV_EDIT.getRank(), projectRequest.getEditUsers());
+        map.put(ProjectUserPrivEnum.PRIV_RELEASE.getRank(), projectRequest.getReleaseUsers());
 
-        if(CollectionUtils.isEmpty(projectIds)){
-            return;
+        for(Integer rank: map.keySet()){
+
+            if(CollectionUtils.isEmpty(map.get(rank))){
+                continue;
+            }
+
+            List<Integer> projectIds = projectMapper.getProjectIdByUser(rank, map.get(rank));
+
+            if(CollectionUtils.isEmpty(projectIds)){
+                return  new ArrayList<>();
+            }
+
+            if(CollectionUtils.isEmpty(projectId)){
+                projectId.addAll(projectIds);
+            }else{
+                // 取交集
+                projectId.retainAll(projectIds);
+            }
         }
 
-        if(CollectionUtils.isEmpty(projectIdList)){
-            projectIdList.addAll(projectIds);
-        }else{
-            projectIdList.retainAll(projectIds);
-        }
-
+        return  projectId;
     }
 
 

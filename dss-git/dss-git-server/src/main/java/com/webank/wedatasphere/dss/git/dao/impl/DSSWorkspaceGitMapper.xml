@@ -55,7 +55,7 @@
     </select>
 
     <select id="getWorkspaceIdByUserName" resultType="java.lang.Long">
-        select workspace_id from dss_project_associate_git where gitUser = #{gitUser} limit 1
+        select workspace_id from dss_project_associate_git where git_user = #{gitUser} limit 1
     </select>
 
     <select id="getProjectInfoByProjectName" resultType="com.webank.wedatasphere.dss.git.dto.GitProjectGitInfo">

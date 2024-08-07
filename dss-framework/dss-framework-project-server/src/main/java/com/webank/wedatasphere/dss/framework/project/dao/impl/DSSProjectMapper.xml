@@ -149,9 +149,9 @@
         ,case when a.priv = 3 then a.username end  as  releaseUser
         ,d.name as workspaceName
         FROM dss_project_user a
-        left join dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id and b.visible = 1
-        left join dss_workspace d on a.workspace_id = d.id
-        WHERE a.priv >=1 and  a.workspace_id = #{workspaceId}
+        join dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id and b.visible = 1
+        join dss_workspace d on a.workspace_id = d.id
+        WHERE a.priv >=1 and  a.workspace_id = #{workspaceId} and b.label is null
         <if test="id!=null">
             and a.project_id  = #{id}
         </if>

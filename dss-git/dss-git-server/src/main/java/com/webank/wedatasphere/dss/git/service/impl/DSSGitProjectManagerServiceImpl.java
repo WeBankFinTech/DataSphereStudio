@@ -114,7 +114,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         String projectName = request.getProjectName();
         Long workspaceId = request.getWorkspaceId();
         Long workspaceIdByUser = GitProjectManager.getWorkspaceIdByUser(gitUser);
-        if (workspaceIdByUser != workspaceId) {
+        if (workspaceIdByUser != null && workspaceIdByUser != workspaceId) {
             throw new DSSErrorException(80001, "该Git用户已在" + workspaceIdByUser + "配置，请更换Git用户重试");
         }
         Boolean isExist = false;

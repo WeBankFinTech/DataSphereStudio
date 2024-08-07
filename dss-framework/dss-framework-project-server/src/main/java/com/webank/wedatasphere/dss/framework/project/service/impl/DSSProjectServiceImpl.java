@@ -29,11 +29,13 @@ import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoListRequest;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
@@ -75,6 +77,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -744,6 +747,20 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         }
 
         return  projectId;
+    }
+
+    @Override
+    public List<DSSProject> getDSSProjectByName(List<String> name) {
+        QueryWrapper<DSSProjectDO> projectQueryWrapper = new QueryWrapper<>();
+        projectQueryWrapper.in("name", name);
+        List<DSSProjectDO> projectList = projectMapper.selectList(projectQueryWrapper);
+        List<DSSProject> projects = new ArrayList<>();
+        for (DSSProjectDO projectDO : projectList) {
+            DSSProject dssProject = new DSSProject();
+            BeanUtils.copyProperties(projectDO, dssProject);
+            projects.add(dssProject);
+        }
+        return projects;
     }
 
 

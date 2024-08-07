@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
@@ -105,4 +106,5 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     List<ProjectResponse> queryListByParam(ProjectQueryRequest projectRequest,List<Long> totals);
 
+    List<DSSProject> getDSSProjectByName(List<String> name);
 }

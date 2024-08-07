@@ -551,14 +551,14 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                     before = DSSGitUtils.getTargetCommitFileContent(repository, request.getCommitId(), filePath);
                 }
                 after = DSSGitUtils.getFileContent(filePath, projectName, gitUser, workspaceId);
-                RevCommit latestCommitInfo = DSSGitUtils.getLatestCommitInfo(repository, filePath, projectName, workspaceId, gitUser);
-                if (latestCommitInfo != null) {
-                    contentResponse.setAnnotate(latestCommitInfo.getShortMessage());
-                    contentResponse.setCommitId(latestCommitInfo.getId().getName());
-                }
             } else {
                 // 获取当前提交前的文件内容
                 before = DSSGitUtils.getFileContent(filePath, projectName, gitUser, workspaceId);
+            }
+            RevCommit latestCommitInfo = DSSGitUtils.getLatestCommitInfo(repository, filePath, projectName, workspaceId, gitUser);
+            if (latestCommitInfo != null) {
+                contentResponse.setAnnotate(latestCommitInfo.getShortMessage());
+                contentResponse.setCommitId(latestCommitInfo.getId().getName());
             }
             contentResponse.setAfter(after);
             contentResponse.setBefore(before);

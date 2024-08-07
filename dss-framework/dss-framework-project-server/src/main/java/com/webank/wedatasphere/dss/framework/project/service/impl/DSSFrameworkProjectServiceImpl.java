@@ -344,7 +344,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         // 校验是否为虚拟用户，此处禁止使用DSS实名用户接入Git
         List<StaffInfoVO> all = dssWorkspaceUserService.listAllDSSUsers();
         Set<String> allDSSUsers = all.stream().map(StaffInfoVO::getUsername).collect(Collectors.toSet());
-        if (allDSSUsers.contains(username)) {
+        if (allDSSUsers.contains(gitUser)) {
             throw new DSSProjectErrorException(71000, "Git读写账号用户名必须为虚拟用户，不能是DSS实名用户！");
         }
         // 校验Git名称

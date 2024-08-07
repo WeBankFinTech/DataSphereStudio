@@ -32,6 +32,11 @@ public class ProjectTransferRequest {
     @NotNull(message = "工程名称不能为空")
     private String name;
 
+    @NotNull(message = "工作空间id不能为空")
+    private String workspaceId;
+    @NotNull(message = "工作空间名称不能为空")
+    private String workspaceName;
+
 
     public String getTransferUserName() {
         return transferUserName;
@@ -55,5 +60,32 @@ public class ProjectTransferRequest {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(String workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
+
+    @Override
+    public String toString() {
+        return "ProjectTransferRequest{" +
+                "transferUserName='" + transferUserName + '\'' +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", workspaceId='" + workspaceId + '\'' +
+                ", workspaceName='" + workspaceName + '\'' +
+                '}';
     }
 }

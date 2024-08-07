@@ -408,15 +408,23 @@ public class DSSFrameworkProjectRestfulApi {
         if (projectTransferRequest.getId() == null || projectTransferRequest.getId() < 0) {
             return Message.error("project id is null, cannot modify it.");
         }
-        String username = SecurityFilter.getLoginUsername(request);
-        Workspace workspace = SSOHelper.getWorkspace(request);
-        LOGGER.info("user {} begin to transferProject, workspace {}, project entity: {}.", username, workspace.getWorkspaceName(), projectTransferRequest);
+        Workspace workspace = new Workspace();
+        workspace.setWorkspaceName(projectTransferRequest.getWorkspaceName());
+        workspace.setWorkspaceId(Long.parseLong(projectTransferRequest.getWorkspaceId()));
+
+        LOGGER.info("begin to transferProject, workspace {}, project entity: {}.", workspace.getWorkspaceName(), projectTransferRequest);
 //        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeModifyProject(request, projectModifyRequest));
 //        if (message != null) {
 //            return message;
 //        }
-
         DSSProjectDO dbProject = dssProjectService.getProjectById(projectTransferRequest.getId());
+        //工程不存在
+        if (dbProject == null) {
+            LOGGER.error("project {} is not exists.", projectTransferRequest.getName());
+            return Message.error(String.format("project %s is not exists.", projectTransferRequest.getName()));
+        }
+
+        String username = dbProject.getCreateBy();
         //工程不存在
         if (dbProject == null) {
             LOGGER.error("project {} is not exists.", projectTransferRequest.getName());

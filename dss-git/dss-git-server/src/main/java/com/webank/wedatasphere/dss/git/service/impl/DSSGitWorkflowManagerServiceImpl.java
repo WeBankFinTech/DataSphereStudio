@@ -126,12 +126,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 GitTree metaFileTree = getFileTree(metaPath);
 
                 for (Map.Entry<String, GitTree> entry : fileTree.getChildren().entrySet()) {
-                    codeTree.add(fileTree.getChildren().get(projectName));
+                    codeTree.add(entry.getValue());
                     DSSGitUtils.printTree("", entry.getValue());
                 }
 
                 for (Map.Entry<String, GitTree> entry : metaFileTree.getChildren().entrySet()) {
-                    metaTree.add(fileTree.getChildren().get(projectName));
+                    metaTree.add(entry.getValue());
                     DSSGitUtils.printTree("", entry.getValue());
                 }
 
@@ -150,6 +150,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     private GitTree getFileTree(String path) throws GitErrorException {
         Path currentDir = Paths.get(path);
 
+        String substring = path.substring(path.lastIndexOf("/") + 1);
+
         GitTree root = new GitTree("");
 
         try (Stream<Path> paths = Files.walk(currentDir)) {
@@ -158,7 +160,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                     .forEach(file -> {
                         // 获取相对路径
                         Path relativePath = currentDir.relativize(file);
-                        String fullPath = path + File.separator + relativePath.toString();
+                        String fullPath = substring + File.separator + relativePath.toString();
                         root.setAbsolutePath(fullPath);
                         root.addChild(fullPath);
                     });

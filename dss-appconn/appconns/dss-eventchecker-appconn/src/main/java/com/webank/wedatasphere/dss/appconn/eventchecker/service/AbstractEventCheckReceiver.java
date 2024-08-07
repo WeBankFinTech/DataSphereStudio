@@ -26,10 +26,29 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 
-public class AbstractEventCheckReceiver extends AbstractEventCheck{
+public abstract class AbstractEventCheckReceiver extends AbstractEventCheck{
+    String todayStartTime;
+    String todayEndTime;
+    String allStartTime;
+    String allEndTime;
+    String nowStartTime;
+
+    public AbstractEventCheckReceiver(Properties props) {
+        initECParams(props);
+        initReceiverTimes();
+    }
+
+    void initReceiverTimes(){
+        todayStartTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd 00:00:00");
+        todayEndTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd 23:59:59");
+        allStartTime = DateFormatUtils.format(new Date(), "10000-01-01  00:00:00");
+        allEndTime = DateFormatUtils.format(new Date(), "9999-12-31  23:59:59");
+        nowStartTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    }
     /**
      * Fill the result into the source
      */
@@ -39,14 +58,14 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
             if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){
                 vNewMsgID = consumedMsgInfo[0];
                 String vMsgName = consumedMsgInfo[1];
-                String vSender = consumedMsgInfo[2];
+                String vReceiver = consumedMsgInfo[2];
                 String vMsg = consumedMsgInfo[3];
                 if (null == vMsg) {
                     props.put(EventChecker.MSG, "NULL");
                 } else {
                     props.put(EventChecker.MSG, vMsg);
                 }
-                log.info("Received message : messageID: " + vNewMsgID + ", messageName: " + vMsgName + ", receiver: " + vSender
+                log.info("Received message : messageID: " + vNewMsgID + ", messageName: " + vMsgName + ", receiver: " + vReceiver
                         + ", messageBody: " + vMsg);
             }
         }catch (Exception e) {
@@ -133,70 +152,54 @@ public class AbstractEventCheckReceiver extends AbstractEventCheck{
         log.info("The last record id was " + lastMsgId);
         return lastMsgId;
     }
-
-    /**
-     * Consistent entrance to consumer message
-     */
-    String[] getMsg(Properties props, Logger log,String ... params){
-        boolean useRunDate=Boolean.parseBoolean(params[3]);
-        String sqlForReadTMsg;
-        if(useRunDate){
-            sqlForReadTMsg ="SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >?  AND run_date =?ORDER BY msg_id ASC LIMIT 1";
-        } else{
-            sqlForReadTMsg="SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >? ORDER BY msg_id ASC LIMIT 1";
-        }
-
-        PreparedStatement pstmt = null;
-        Connection msgConn = null;
-        ResultSet rs = null;
-        String[] consumedMsgInfo = null;
-        try {
-            msgConn = getEventCheckerConnection(props,log);
-            pstmt = msgConn.prepareCall(sqlForReadTMsg);
-            pstmt.setString(1, topic);
-            pstmt.setString(2, msgName);
-            pstmt.setString(3, params[0]);
-            pstmt.setString(4, params[1]);
-            pstmt.setString(5, params[2]);
-            if(useRunDate){
-                log.info("use run_date, run_date:{}", params[4]);
-                pstmt.setString(6,params[4]);
+   @Override
+    public boolean reciveMsg(int jobId, Properties props, Logger log)  {
+        boolean result = false;
+        try{
+            String lastMsgId = getOffset(jobId,props,log);
+            String[] executeType = createExecuteType(jobId,props,log,lastMsgId);
+            log.info("event receiver executeType[]:{},{},{},{},{}",executeType[0],executeType[1],executeType[2],executeType[3],executeType[4]);
+            if(executeType!=null && executeType.length ==5){
+                String[] consumedMsgInfo = getMsg(props, log,executeType);
+                if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){
+                    result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId);
+                }
+            }else{
+                log.error("executeType error {} " + Arrays.toString(executeType));
+                return result;
             }
-            log.info("param {} StartTime: " + params[0] + ", EndTime: " + params[1]
-                    + ", Topic: " + topic + ", MessageName: " + msgName + ", LastMessageID: " + params[2]);
-            rs = pstmt.executeQuery();
+        }catch (Exception e){
+            log.error("EventChecker failed to receive the message {}" + e);
+            throw e;
+        }
+        return result;
+    }
 
-            while (rs.next()) {
-                consumedMsgInfo = new String[4];
-                String[] msgKey = new String[]{"msg_id", "msg_name", "sender", "msg"};
-                for (int i = 0; i < msgKey.length; i++) {
-                    try {
-                        consumedMsgInfo[i] = rs.getString(msgKey[i]);
-                    } catch (SQLException e) {
-                        throw new RuntimeException("Error while reading data from ResultSet", e);
-                    }
+
+    private String[] createExecuteType(int jobId, Properties props, Logger log,String lastMsgId){
+        boolean receiveTodayFlag = (null != receiveToday && "true".equals(receiveToday.trim().toLowerCase()));
+        boolean afterSendFlag = (null != afterSend && "true".equals(afterSend.trim().toLowerCase()));
+        //只有receiveTodayFlag为true时，useRunDateFlag才有意义。
+        Boolean useRunDateFlag = receiveTodayFlag && (null == useRunDate || "true".equalsIgnoreCase(useRunDate.trim()));
+        String[] executeType = null;
+        try {
+            if (receiveTodayFlag && !useRunDateFlag) {
+                if (afterSendFlag) {
+                    executeType = new String[]{nowStartTime, todayEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
+                } else {
+                    executeType = new String[]{todayStartTime, todayEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
+                }
+            } else {
+                if (afterSendFlag) {
+                    executeType = new String[]{nowStartTime, allEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
+                } else {
+                    executeType = new String[]{allStartTime, allEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
                 }
             }
-
-//            if(rs.last()){
-//                consumedMsgInfo = new String[4];
-//                String[] msgKey = new String[]{"msg_id","msg_name","sender","msg"};
-//                for (int i = 0;i <= 3;i++) {
-//                    consumedMsgInfo[i] = rs.getString(msgKey[i]);
-//                }
-//            }
-        } catch (SQLException e) {
-            throw new RuntimeException("EventChecker failed to receive message" + e);
-        } finally {
-            closeQueryStmt(pstmt, log);
-            closeConnection(msgConn, log);
-            closeQueryRef(rs, log);
+        }catch(Exception e){
+            log.error("create executeType failed {}" + e);
         }
-        return consumedMsgInfo;
+        return executeType;
     }
-
-    @Override
-    public boolean reciveMsg(int jobId, Properties props, Logger log) {
-        return super.reciveMsg(jobId, props, log);
-    }
+    public abstract String[] getMsg(Properties props, Logger log,String ... params) ;
 }

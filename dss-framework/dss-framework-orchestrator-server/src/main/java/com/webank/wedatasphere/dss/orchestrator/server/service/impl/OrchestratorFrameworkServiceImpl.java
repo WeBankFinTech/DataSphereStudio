@@ -534,7 +534,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
 
     @Override
-    public void modifyOrchestratorMeta(String username, ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, Workspace workspace,DSSOrchestratorVersion orchestratorVersion) throws Exception {
+    public void modifyOrchestratorMeta(String username, ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, Workspace workspace, DSSOrchestratorVersion orchestratorVersion) throws Exception {
 
         //检查desc字段长度
         if (modifyOrchestratorMetaRequest.getDescription().length() > MAX_DESC_LENGTH) {
@@ -545,7 +545,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(modifyOrchestratorMetaRequest.getProjectId(), username);
-        
+
         OrchestratorMeta orchestratorMetaInfo = orchestratorService.getOrchestratorMetaInfo(modifyOrchestratorMetaRequest, dssProject, username);
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorMetaInfo.getOrchestratorMode());
 
@@ -558,7 +558,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 (structureOperation, structureRequestRef) -> ((OrchestrationUpdateOperation) structureOperation)
                         .updateOrchestration((OrchestrationUpdateRequestRef) structureRequestRef), "update");
 
-        updateBmlResource(orchestratorMetaInfo, username,orchestratorVersion);
+        updateBmlResource(orchestratorMetaInfo, username, orchestratorVersion);
 
         orchestratorService.updateOrchestrator(username, workspace, dssOrchestratorInfo, dssLabels);
 
@@ -609,12 +609,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         // 获取模板名称
         List<OrchestratorTemplateInfo> templateInfos = orchestratorMapper.getOrchestratorDefaultTemplateInfo(orchestratorIdList);
         Map<Long, String> templateMap = new HashMap<>();
-        if(!CollectionUtils.isEmpty(templateInfos)){
+        if (!CollectionUtils.isEmpty(templateInfos)) {
             // 分组 拼接模板名称
             templateMap = templateInfos.stream().collect(Collectors.groupingBy(OrchestratorTemplateInfo::getOrchestratorId,
                     Collectors.mapping(OrchestratorTemplateInfo::getTemplateName, Collectors.joining(","))));
         }
-
 
 
         for (OrchestratorMeta orchestratorMeta : orchestratorMetaList) {
@@ -628,29 +627,50 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             orchestratorMeta.setUpdateUser(releaseVersion.getUpdater());
 
             /*
-             * 对于接入git的项目下，并且当前状态为save的编排
-             * 去dss_release_task这边获取当前提交状态是否为running 或 failed，
-             * 若为上述状态，则将status置为ruuning或failed，failed需带上错误原因
+             * 对于接入git的项目下，并且当前状态为save的编排，dss_orchestrator_submit_job_info根据编排Id获取最新的提交记录，
+             * 如果之前提交失败，就把原因返回到前端展示，状态-待提交
              * **/
             if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()
                     && OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorMeta.getStatus())) {
 
-                if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
-                    orchestratorMeta.setStatus(releaseVersion.getStatus());
+                OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorMeta.getOrchestratorId());
+
+                if(orchestratorSubmitJob !=null){
+
+                    if(OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(orchestratorSubmitJob.getStatus())){
+
+                        orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                        orchestratorMeta.setErrorMsg(orchestratorSubmitJob.getErrorMsg());
+
+                    }else if(OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorSubmitJob.getStatus())){
+                        // 提交中
+                        orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+                    }
+
                 }
 
+            } else if (StringUtils.isBlank(orchestratorMeta.getStatus())
+                    || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorMeta.getStatus())) {
+
+                // 对于当前状态为push或者为空的，查询 dss_release_task，根据编排Id获取，状态-待发布
                 if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())) {
-                    orchestratorMeta.setStatus(releaseVersion.getStatus());
+                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH);
                     orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
+
+                } else if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
+                    // 发布中状态
+                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
                 }
+
             }
 
-            if(templateMap.containsKey(orchestratorMeta.getOrchestratorId())){
+
+            if (templateMap.containsKey(orchestratorMeta.getOrchestratorId())) {
                 orchestratorMeta.setTemplateName(templateMap.get(orchestratorMeta.getOrchestratorId()));
             }
 
             // 若状态为NULL, 则置为 无状态
-            if(StringUtils.isBlank(orchestratorMeta.getStatus())){
+            if (StringUtils.isBlank(orchestratorMeta.getStatus())) {
                 orchestratorMeta.setStatus(OrchestratorStatusEnum.STATELESS.getStatus());
             }
 
@@ -665,15 +685,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         total.add((long) orchestratorMetaList.size());
 
         // 排序
-        if(DSSOrchestratorConstant.ASCEND.equalsIgnoreCase(orchestratorMetaRequest.getOrderBy())){
+        if (DSSOrchestratorConstant.ASCEND.equalsIgnoreCase(orchestratorMetaRequest.getOrderBy())) {
             orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime)).collect(Collectors.toList());
-        }else{
+        } else {
             orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime).reversed()).collect(Collectors.toList());
         }
 
         // 分页处理
-        Integer page = orchestratorMetaRequest.getPageNow() >=1 ? orchestratorMetaRequest.getPageNow() : 1;
-        Integer pageSize = orchestratorMetaRequest.getPageSize() >=1 ? orchestratorMetaRequest.getPageSize() : 10;
+        Integer page = orchestratorMetaRequest.getPageNow() >= 1 ? orchestratorMetaRequest.getPageNow() : 1;
+        Integer pageSize = orchestratorMetaRequest.getPageSize() >= 1 ? orchestratorMetaRequest.getPageSize() : 10;
         Integer start = (page - 1) * pageSize;
         Integer end = page * pageSize > orchestratorMetaList.size() ? orchestratorMetaList.size() : page * pageSize;
 
@@ -687,7 +707,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
 
-    public void updateBmlResource(OrchestratorMeta orchestratorMeta, String username,DSSOrchestratorVersion orchestratorVersion) {
+    public void updateBmlResource(OrchestratorMeta orchestratorMeta, String username, DSSOrchestratorVersion orchestratorVersion) {
         // 查询dss工作流信息
         DSSFlow dssFlow = flowMapper.selectFlowByID(orchestratorVersion.getAppId());
         if (StringUtils.isEmpty(dssFlow.getCreator())) {
@@ -700,23 +720,24 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         JsonObject jsonObject = jsonParser.parse(flowJsonOld).getAsJsonObject();
         String proxyUser = orchestratorMeta.getProxyUser();
         // 传入的代理用户和数据库的代理用户不为NULL，才更新代理用户信息
-        if(!StringUtils.isEmpty(proxyUser)){
+        if (!StringUtils.isEmpty(proxyUser)) {
             // 更新user.to.proxy用户和proxyuser用户 信息
             JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
             scheduleParams.addProperty("proxyuser", proxyUser);
 
             JsonArray props = jsonObject.getAsJsonArray("props");
             // JsonArray 转list，是否包含 user.to.proxy key
-            List<Map<String, Object>> propList =DSSCommonUtils.COMMON_GSON.fromJson(props,
-                    new TypeToken<List<Map<String, Object>>>() {}.getType());
+            List<Map<String, Object>> propList = DSSCommonUtils.COMMON_GSON.fromJson(props,
+                    new TypeToken<List<Map<String, Object>>>() {
+                    }.getType());
             int size = propList.stream().filter(map -> map.containsKey("user.to.proxy")).collect(Collectors.toList()).size();
-            if(size == 0){
+            if (size == 0) {
                 JsonObject element = new JsonObject();
                 element.addProperty("user.to.proxy", proxyUser);
                 props.add(element);
-            }else{
+            } else {
                 for (JsonElement prop : props) {
-                    if(prop.getAsJsonObject().keySet().contains("user.to.proxy")){
+                    if (prop.getAsJsonObject().keySet().contains("user.to.proxy")) {
                         prop.getAsJsonObject().addProperty("user.to.proxy", proxyUser);
                     }
                 }
@@ -736,7 +757,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             return;
         }
 
-        saveFlowHook.beforeSave(jsonFlow,dssFlow,parentFlowID);
+        saveFlowHook.beforeSave(jsonFlow, dssFlow, parentFlowID);
         Map<String, Object> bmlReturnMap = bmlService.update(creator, resourceId, jsonFlow);
         dssFlow.setHasSaved(true);
         dssFlow.setResourceId(bmlReturnMap.get("resourceId").toString());
@@ -754,13 +775,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
         } catch (DSSErrorException e) {
             LOGGER.error("Failed to saveContext: ", e);
-            throw new DSSRuntimeException(e.getErrCode(),"保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+            throw new DSSRuntimeException(e.getErrCode(), "保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
-        saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
+        saveFlowHook.afterSave(jsonFlow, dssFlow, parentFlowID);
 
         String version = bmlReturnMap.get("version").toString();
         // 对子工作流,需更新父工作流状态，以便提交
-        Long updateFlowId = parentFlowID == null? dssFlow.getId():parentFlowID;
+        Long updateFlowId = parentFlowID == null ? dssFlow.getId() : parentFlowID;
         updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId);
 
     }
@@ -787,7 +808,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             }
         } catch (DSSErrorException e) {
             LOGGER.error("getProjectInfo failed by:", e);
-            throw new DSSRuntimeException(e.getErrCode(),"更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+            throw new DSSRuntimeException(e.getErrCode(), "更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
     }
 

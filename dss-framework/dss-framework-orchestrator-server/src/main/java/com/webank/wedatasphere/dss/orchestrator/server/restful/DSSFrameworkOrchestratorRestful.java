@@ -24,6 +24,8 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoListRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoListResponse;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
@@ -62,6 +64,7 @@ import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
+import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -398,6 +401,20 @@ public class DSSFrameworkOrchestratorRestful {
 
         if (CollectionUtils.isEmpty(submitRequestList)) {
             return Message.error("至少需要选择一项工作流进行提交");
+        }
+
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
+        Set<String> collect = submitRequestList.stream().map(OrchestratorSubmitRequest::getProjectName).collect(Collectors.toSet());
+        ProjectInfoListRequest listRequest = new ProjectInfoListRequest();
+        listRequest.setProjectNames((List<String>) collect);
+        ProjectInfoListResponse projectInfoListResponse = RpcAskUtils.processAskException(sender.ask(listRequest), ProjectInfoListResponse.class, ProjectInfoListRequest.class);
+        if (projectInfoListResponse == null) {
+            return Message.error("项目不存在");
+        }
+        List<DSSProject> filterProjects = projectInfoListResponse.getDssProjects().stream().filter(t -> !t.getAssociateGit()).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(filterProjects)) {
+            List<String> projectNames = filterProjects.stream().map(DSSProject::getName).collect(Collectors.toList());
+            return Message.error(projectNames + "项目未接入Git，请检查后重新提交");
         }
 
         Map<String, List<OrchestratorRelationVo>> map = new HashMap<>();

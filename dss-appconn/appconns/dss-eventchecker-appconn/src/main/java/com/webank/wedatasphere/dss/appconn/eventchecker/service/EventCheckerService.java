@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
+import com.webank.wedatasphere.dss.appconn.eventchecker.entity.EventChecker;
 import org.slf4j.Logger;
 
 import java.util.Properties;
@@ -36,7 +37,15 @@ public class EventCheckerService {
 
     public boolean sendMsg(int jobId, Properties props, Logger log) {
         if (props != null) {
-            return new EventCheckSender(props).sendMsg(jobId, props, log);
+            String channelType = props.contains(EventChecker.CHANNEL_TYPE) ? props.getProperty(EventChecker.CHANNEL_TYPE)
+                    : "DSS";
+            AbstractEventCheck eventCheck;
+            if("DSS".equalsIgnoreCase(channelType)) {
+                eventCheck = new EventCheckSender(props);
+            }else {
+                eventCheck = new HttpEventCheckSender(props);
+            }
+            return eventCheck.sendMsg(jobId, props, log);
         } else {
             log.error("create EventCheckSender failed {}");
             return false;
@@ -52,7 +61,15 @@ public class EventCheckerService {
      */
     public boolean reciveMsg(int jobId, Properties props, Logger log) {
         if (props != null) {
-            return new DefaultEventcheckReceiver(props).reciveMsg(jobId, props, log);
+            String channelType = props.contains(EventChecker.CHANNEL_TYPE) ? props.getProperty(EventChecker.CHANNEL_TYPE)
+                    : "DSS";
+            AbstractEventCheck eventCheck;
+            if("DSS".equalsIgnoreCase(channelType)){
+                eventCheck= new DefaultEventcheckReceiver(props);
+            }else{
+                eventCheck = new HttpEventcheckerReceiver(props);
+            }
+            return eventCheck.reciveMsg(jobId, props, log);
         } else {
             log.error("create EventCheckSender failed {}");
             return false;

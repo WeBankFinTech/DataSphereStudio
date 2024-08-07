@@ -18,113 +18,73 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
 
 
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.slf4j.Logger;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
+import org.slf4j.Logger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Properties;
 
 public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
-    String todayStartTime;
-    String todayEndTime;
-    String allStartTime;
-    String allEndTime;
-    String nowStartTime;
 
     public DefaultEventcheckReceiver(Properties props) {
-        initECParams(props);
-        initReceiverTimes();
+       super(props);
     }
-
-    private void initReceiverTimes(){
-        todayStartTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd 00:00:00");
-        todayEndTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd 23:59:59");
-        allStartTime = DateFormatUtils.format(new Date(), "10000-01-01  00:00:00");
-        allEndTime = DateFormatUtils.format(new Date(), "9999-12-31  23:59:59");
-        nowStartTime = DateFormatUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss");
-    }
-
+    /**
+     * Consistent entrance to consumer message
+     */
     @Override
-    public boolean reciveMsg(int jobId, Properties props, Logger log) {
-        boolean result = false;
-        try{
-            String lastMsgId = getOffset(jobId,props,log);
-            String[] executeType = createExecuteType(jobId,props,log,lastMsgId);
-            log.info("event receiver executeType[]:{},{},{},{},{}",executeType[0],executeType[1],executeType[2],executeType[3],executeType[4]);
-            if(executeType!=null && executeType.length ==5){
-                String[] consumedMsgInfo = getMsg(props, log,executeType);
-                if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){
-                    result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId);
-                }
-            }else{
-                log.error("executeType error {} " + Arrays.toString(executeType));
-                return result;
-            }
-        }catch (Exception e){
-            log.error("EventChecker failed to receive the message {}" + e);
-            return result;
+    public String[] getMsg(Properties props, Logger log,String ... params){
+        boolean useRunDate=Boolean.parseBoolean(params[3]);
+        String sqlForReadTMsg;
+        if(useRunDate){
+            sqlForReadTMsg ="SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >?  AND run_date =?ORDER BY msg_id ASC LIMIT 1";
+        } else{
+            sqlForReadTMsg="SELECT * FROM event_queue WHERE topic=? AND msg_name=? AND send_time >=? AND send_time <=? AND msg_id >? ORDER BY msg_id ASC LIMIT 1";
         }
-        return result;
-    }
 
-    private String[] createExecuteType(int jobId, Properties props, Logger log,String lastMsgId){
-        boolean receiveTodayFlag = (null != receiveToday && "true".equals(receiveToday.trim().toLowerCase()));
-        boolean afterSendFlag = (null != afterSend && "true".equals(afterSend.trim().toLowerCase()));
-        //只有receiveTodayFlag为true时，useRunDateFlag才有意义。
-        Boolean useRunDateFlag = receiveTodayFlag && (null == useRunDate || "true".equalsIgnoreCase(useRunDate.trim()));
-        String[] executeType = null;
+        PreparedStatement pstmt = null;
+        Connection msgConn = null;
+        ResultSet rs = null;
+        String[] consumedMsgInfo = null;
         try {
-            if (receiveTodayFlag && !useRunDateFlag) {
-                if (afterSendFlag) {
-                    executeType = new String[]{nowStartTime, todayEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
-                } else {
-                    executeType = new String[]{todayStartTime, todayEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
-                }
-            } else {
-                if (afterSendFlag) {
-                    executeType = new String[]{nowStartTime, allEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
-                } else {
-                    executeType = new String[]{allStartTime, allEndTime, lastMsgId, useRunDateFlag.toString(), runDate};
-                }
+            msgConn = getEventCheckerConnection(props,log);
+            pstmt = msgConn.prepareCall(sqlForReadTMsg);
+            pstmt.setString(1, topic);
+            pstmt.setString(2, msgName);
+            pstmt.setString(3, params[0]);
+            pstmt.setString(4, params[1]);
+            pstmt.setString(5, params[2]);
+            if(useRunDate){
+                log.info("use run_date, run_date:{}", params[4]);
+                pstmt.setString(6,params[4]);
             }
-        }catch(Exception e){
-            log.error("create executeType failed {}" + e);
-        }
-        return executeType;
-    }
+            log.info("param {} StartTime: " + params[0] + ", EndTime: " + params[1]
+                    + ", Topic: " + topic + ", MessageName: " + msgName + ", LastMessageID: " + params[2]);
+            rs = pstmt.executeQuery();
 
-    private void waitForTime(Logger log,Long waitTime){
-        String waitForTime = wait_for_time;
-        String formatWaitForTime = DateFormatUtils.format(new Date(),"yyyy-MM-dd " + waitForTime + ":00");
-        DateFormat fmt =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date targetWaitTime = new Date();
-        try {
-            targetWaitTime = fmt.parse(formatWaitForTime);
-        } catch (ParseException e) {
-            log.error("parse date failed {}" + e);
-        }
-
-        log.info("It will success at a specified time: " + targetWaitTime);
-        long wt = targetWaitTime.getTime() - System.currentTimeMillis();
-        if(wt > 0){
-            //wt must less than wait.time
-            if(wt <= waitTime){
-                log.info("EventChecker will wait "+ wt + " milliseconds before starting execution");
-                try {
-                    Thread.sleep(wt);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException("EventChecker throws an exception during the waiting time {}"+e);
+            while (rs.next()) {
+                consumedMsgInfo = new String[4];
+                String[] msgKey = new String[]{"msg_id", "msg_name", "sender", "msg"};
+                for (int i = 0; i < msgKey.length; i++) {
+                    try {
+                        consumedMsgInfo[i] = rs.getString(msgKey[i]);
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Error while reading data from ResultSet", e);
+                    }
                 }
-            }else{
-                throw new RuntimeException("The waiting time from Job starttime to wait.for.time"+ wt +"(ms) greater than wait.time , unreasonable setting！");
+                consumedMsgInfo[2] = receiver;
             }
-        }else{
-            log.info("EventChecker has reached the specified time");
+        } catch (SQLException e) {
+            log.error("EventChecker failed to receive message",e);
+            throw new RuntimeException(e);
+        } finally {
+            closeQueryStmt(pstmt, log);
+            closeConnection(msgConn, log);
+            closeQueryRef(rs, log);
         }
+        return consumedMsgInfo;
     }
 
 }

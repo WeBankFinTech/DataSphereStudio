@@ -198,18 +198,6 @@ public class DSSFlowEditLockManager {
                 DSSFlowEditLock dssFlowEditLock = lockMapper.getFlowEditLockByLockContent(flowEditLock);
                 if (dssFlowEditLock != null) {
                     Long flowID = dssFlowEditLock.getFlowID();
-                    // 获取当前项目信息
-                    DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
-                    DSSProject projectInfo = getProjectInfo(dssFlow.getProjectId());
-                    // 对于接入Git的项目，工作流解锁加入额外处理
-                    if (projectInfo.getAssociateGit()) {
-                        OrchestratorVo orchestratorVo = getOrchestratorInfo(flowID);
-                        DSSOrchestratorInfo orchestratorInfo = orchestratorVo.getDssOrchestratorInfo();
-                        String status = lockMapper.selectOrchestratorStatus(orchestratorInfo.getId());
-                        if (!StringUtils.isEmpty(status) && OrchestratorRefConstant.FLOW_STATUS_SAVE.equals(status)) {
-                            submitOrchestrator(orchestratorInfo.getId(), flowID, workspace, projectInfo.getName());
-                        }
-                    }
                     lockMapper.clearExpire(sdf.get().format(new Date(System.currentTimeMillis() - DSSWorkFlowConstant.DSS_FLOW_EDIT_LOCK_TIMEOUT.getValue())), flowID);
                 }
             }

@@ -708,21 +708,52 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         }
 
 
-        if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()
+        /*
+         * 对于接入git的项目下，并且当前状态为save的编排，dss_orchestrator_submit_job_info根据编排Id获取最新的提交记录，
+         * 如果之前提交失败，就把原因返回到前端展示，状态-待提交
+         * **/
+        if (orchestratorInfo.getAssociateGit() != null && orchestratorInfo.getAssociateGit()
                 && OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorInfo.getStatus())) {
 
-            OrchestratorReleaseVersionInfo orchestratorVersion = orchestratorMapper.getOrchestratorVersionById(orchestratorInfo.getOrchestratorId());
-            if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorVersion.getStatus())) {
-                orchestratorInfo.setStatus(orchestratorVersion.getStatus());
+            OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorInfo.getOrchestratorId());
+
+            if (orchestratorSubmitJob != null) {
+
+                if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(orchestratorSubmitJob.getStatus())) {
+
+                    orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                    orchestratorInfo.setErrorMsg(orchestratorSubmitJob.getErrorMsg());
+
+                } else if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorSubmitJob.getStatus())) {
+                    // 提交中
+                    orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+                }
+
+            }
+
+        } else if (StringUtils.isBlank(orchestratorInfo.getStatus())
+                || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorInfo.getStatus())) {
+            // 对于当前状态为push或者为空的，查询 dss_release_task，根据编排Id获取，状态-待发布
+            OrchestratorReleaseVersionInfo releaseVersion = orchestratorMapper.getOrchestratorVersionById(orchestratorInfo.getOrchestratorId());
+            if (releaseVersion != null) {
+
+                if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())) {
+                    orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH);
+                    orchestratorInfo.setErrorMsg(releaseVersion.getErrorMsg());
+
+                } else if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
+                    // 发布中状态
+                    orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
+                }
             }
         }
 
         // 发布中和提交中的工作流不允许进行更新
-        if(OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorInfo.getStatus())
-                || OrchestratorRefConstant.FLOW_STATUS_PUBLISHING.equalsIgnoreCase(orchestratorInfo.getStatus())){
+        if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorInfo.getStatus())
+                || OrchestratorRefConstant.FLOW_STATUS_PUBLISHING.equalsIgnoreCase(orchestratorInfo.getStatus())) {
 
             DSSFrameworkErrorException.dealErrorException(60000,
-                    String.format("%s工作流正在提交中或发布中，不允许进行编辑,请稍后重试",modifyOrchestratorMetaRequest.getOrchestratorName()));
+                    String.format("%s工作流正在提交中或发布中，不允许进行编辑,请稍后重试", modifyOrchestratorMetaRequest.getOrchestratorName()));
 
         }
 

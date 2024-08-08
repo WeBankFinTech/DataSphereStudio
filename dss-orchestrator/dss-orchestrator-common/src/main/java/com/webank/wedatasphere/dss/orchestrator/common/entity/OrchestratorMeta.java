@@ -85,6 +85,16 @@ public class OrchestratorMeta {
     // 模板名称
     private String templateName;
 
+    private Boolean editable;
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
     public String getTemplateName() {
         return templateName;
     }

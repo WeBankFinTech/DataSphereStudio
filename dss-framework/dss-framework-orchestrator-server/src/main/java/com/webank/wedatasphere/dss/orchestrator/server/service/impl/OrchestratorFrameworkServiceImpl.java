@@ -587,7 +587,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
 
     @Override
-    public List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total) {
+    public List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total,String username) {
         List<OrchestratorMeta> orchestratorMetaList = orchestratorMapper.getAllOrchestratorMeta(orchestratorMetaRequest);
         List<OrchestratorMeta> orchestratorMetaInfo = new ArrayList<>();
         if (CollectionUtils.isEmpty(orchestratorMetaList)) {
@@ -696,10 +696,27 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         Integer pageSize = orchestratorMetaRequest.getPageSize() >= 1 ? orchestratorMetaRequest.getPageSize() : 10;
         Integer start = (page - 1) * pageSize;
         Integer end = page * pageSize > orchestratorMetaList.size() ? orchestratorMetaList.size() : page * pageSize;
-
+        Map<Long,Boolean> map = new HashMap<>();
         for (int i = start; i < end; i++) {
             OrchestratorMeta orchestratorMeta = orchestratorMetaList.get(i);
             orchestratorMeta.setStatusName(OrchestratorStatusEnum.getEnum(orchestratorMeta.getStatus()).getName());
+
+            if(!map.containsKey(orchestratorMeta.getProjectId())){
+
+                ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                                .getProjectServerSender().ask(new ProjectUserAuthRequest(orchestratorMeta.getProjectId(), username)),
+                        ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+                boolean isEditable = projectUserAuthResponse.getProjectOwner().equals(username);
+                if (!isEditable && !CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+                    isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank())
+                            || projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+                }
+
+                map.put(orchestratorMeta.getProjectId(),isEditable);
+            }
+
+            orchestratorMeta.setEditable(map.get(orchestratorMeta.getProjectId()));
+
             orchestratorMetaInfo.add(orchestratorMeta);
         }
 

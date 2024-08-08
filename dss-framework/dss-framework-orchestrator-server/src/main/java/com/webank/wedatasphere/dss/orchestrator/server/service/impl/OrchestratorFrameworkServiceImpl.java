@@ -712,8 +712,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                         ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
                 boolean isEditable = projectUserAuthResponse.getProjectOwner().equals(username);
                 if (!isEditable && !CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
-                    isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank())
-                            || projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+                    isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
                 }
 
                 map.put(orchestratorMeta.getProjectId(),isEditable);

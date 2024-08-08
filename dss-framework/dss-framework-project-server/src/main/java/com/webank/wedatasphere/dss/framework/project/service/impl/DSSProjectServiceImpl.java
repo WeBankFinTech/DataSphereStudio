@@ -374,9 +374,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
                     (structureOperation, structureRequestRef) -> ((ProjectDeletionOperation) structureOperation).deleteProject((RefProjectContentRequestRef) structureRequestRef),
                     null, "delete refProject " + dssProjectDO.getName());
         }
-        projectMapper.deleteProject(projectDeleteRequest.getId());
         // 对于DSS项目进行归档
         archiveGitProject(username, projectDeleteRequest, workspace, dssProjectDO);
+        projectMapper.deleteProject(projectDeleteRequest.getId());
         LOGGER.warn("User {} deleted project {}.", username, dssProjectDO.getName());
     }
 

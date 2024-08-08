@@ -159,6 +159,7 @@ public class DSSGitUtils {
         } catch (Exception e) {
             // 丢失本地修改，处理冲突
             reset(repository, projectName);
+            throw new GitErrorException(80001, "拉取git最新代码失败，原因为:" + e.getMessage());
         }
     }
 

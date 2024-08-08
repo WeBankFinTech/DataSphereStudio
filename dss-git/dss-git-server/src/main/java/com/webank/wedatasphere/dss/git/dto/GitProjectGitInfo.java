@@ -12,6 +12,7 @@ public class GitProjectGitInfo {
     private String gitUrl;
     private Date createTime;
     private Date updateTime;
+    private String gitTokenEncrypt;
 
     public GitProjectGitInfo() {
     }
@@ -115,5 +116,13 @@ public class GitProjectGitInfo {
 
     public void setGitUrl(String gitUrl) {
         this.gitUrl = gitUrl;
+    }
+
+    public String getGitTokenEncrypt() {
+        return gitTokenEncrypt;
+    }
+
+    public void setGitTokenEncrypt(String gitTokenEncrypt) {
+        this.gitTokenEncrypt = gitTokenEncrypt;
     }
 }

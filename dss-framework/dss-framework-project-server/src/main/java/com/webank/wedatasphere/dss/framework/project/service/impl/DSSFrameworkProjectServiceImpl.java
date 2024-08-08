@@ -125,7 +125,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             exportAllOrchestratorsReqest.setComment("create Project:" + projectCreateRequest.getName());
             exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
             BmlResource bmlResource = dssProjectService.exportProject(exportAllOrchestratorsReqest, username, "", workspace);
-            createGitProject(workspace.getWorkspaceId(), project.getName(), bmlResource, username);
+            createGitProject(workspace.getWorkspaceId(), project.getName(), bmlResource, username, projectCreateRequest.getGitUser(), projectCreateRequest.getGitToken());
         }
         //4.保存dss_project_user 工程与用户关系
         projectUserService.saveProjectUser(project.getId(), username, projectCreateRequest, workspace);
@@ -141,9 +141,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         return dssProjectVo;
     }
 
-    private void createGitProject(Long workspaceId, String projectName, BmlResource bmlResource, String username) {
+    private void createGitProject(Long workspaceId, String projectName, BmlResource bmlResource, String username, String gitUser, String gitToken) {
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        GitCreateProjectRequest request1 = new GitCreateProjectRequest(workspaceId, projectName, bmlResource, username);
+        GitCreateProjectRequest request1 = new GitCreateProjectRequest(workspaceId, projectName, bmlResource, username, gitUser, gitToken);
         LOGGER.info("-------=======================begin to create project: {}=======================-------", projectName);
         Object ask = gitSender.ask(request1);
         GitCreateProjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitCreateProjectResponse.class, GitCreateProjectResponse.class);
@@ -176,6 +176,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     @Override
     public void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception {
+        Boolean associateGit = dbProject.getAssociateGit();
         // 校验参数正确性
         checkProjectRight(projectModifyRequest, dbProject, username, workspace);
 
@@ -195,7 +196,17 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         DSSProjectDO dssProjectDO = dssProjectService.modifyProject(username, projectModifyRequest);
 
         // 同步项目配置元数据到git
-        syncGitProject(projectModifyRequest, dbProject, username, workspace);
+        try {
+            syncGitProject(projectModifyRequest, dbProject, username, workspace);
+        }catch (Exception e) {
+            DSSProjectDO project = new DSSProjectDO();
+            project.setAssociateGit(associateGit);
+            UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("id", projectModifyRequest.getId());
+            updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());
+            projectMapper.update(project, updateWrapper);
+            throw new DSSProjectErrorException(71000, "修改项目接入Git失败，原因为：" + e.getMessage());
+        }
     }
 
     private void updateProject(Long workspaceId, String projectName,BmlResource bmlResource, String username, String gitUser, String gitToken) {
@@ -361,11 +372,11 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
     }
 
-    private void initGitProject(Long workspaceId, String projectName, String resource, String version, String username) {
+    private void initGitProject(Long workspaceId, String projectName, String resource, String version, String username, String gitUser, String gitToken) {
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         Map<String, BmlResource> file = new HashMap<>();
         // 测试数据 key表示项目名、value为项目BmlResource资源
-        GitCreateProjectRequest request1 = new GitCreateProjectRequest(workspaceId, projectName, new BmlResource(resource, version), username);
+        GitCreateProjectRequest request1 = new GitCreateProjectRequest(workspaceId, projectName, new BmlResource(resource, version), username, gitUser, gitToken);
         LOGGER.info("-------=======================begin to create project: {}=======================-------", projectName);
         Object ask = gitSender.ask(request1);
         GitCreateProjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitCreateProjectResponse.class, GitCreateProjectRequest.class);
@@ -428,7 +439,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         }
 
         // 校验是否接入git
-        if (dbProject.getAssociateGit() != null && dbProject.getAssociateGit()) {
+        if (projectModifyRequest.getAssociateGit() != null) {
             checkAssociateGit(projectModifyRequest, dbProject, username, workspace);
         }
 
@@ -445,7 +456,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
             BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
             if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
-                createGitProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
+                createGitProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
             } else {
                 updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
             }

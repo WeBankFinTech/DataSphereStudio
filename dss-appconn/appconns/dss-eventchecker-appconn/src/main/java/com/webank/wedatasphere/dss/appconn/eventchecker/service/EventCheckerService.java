@@ -37,13 +37,15 @@ public class EventCheckerService {
 
     public boolean sendMsg(int jobId, Properties props, Logger log) {
         if (props != null) {
-            String channelType = props.contains(EventChecker.CHANNEL_TYPE) ? props.getProperty(EventChecker.CHANNEL_TYPE)
+            String channelType = props.containsKey(EventChecker.CHANNEL_TYPE) ? props.getProperty(EventChecker.CHANNEL_TYPE)
                     : "DSS";
             AbstractEventCheck eventCheck;
             if("DSS".equalsIgnoreCase(channelType)) {
                 eventCheck = new EventCheckSender(props);
+                log.info("this is dss send task");
             }else {
                 eventCheck = new HttpEventCheckSender(props);
+                log.info("this is kgas receive task");
             }
             return eventCheck.sendMsg(jobId, props, log);
         } else {
@@ -61,13 +63,15 @@ public class EventCheckerService {
      */
     public boolean reciveMsg(int jobId, Properties props, Logger log) {
         if (props != null) {
-            String channelType = props.contains(EventChecker.CHANNEL_TYPE) ? props.getProperty(EventChecker.CHANNEL_TYPE)
+            String channelType = props.containsKey(EventChecker.CHANNEL_TYPE) ? props.getProperty(EventChecker.CHANNEL_TYPE)
                     : "DSS";
             AbstractEventCheck eventCheck;
             if("DSS".equalsIgnoreCase(channelType)){
                 eventCheck= new DefaultEventcheckReceiver(props);
+                log.info("this is dss receive task");
             }else{
                 eventCheck = new HttpEventcheckerReceiver(props);
+                log.info("this is kgas receive task");
             }
             return eventCheck.reciveMsg(jobId, props, log);
         } else {

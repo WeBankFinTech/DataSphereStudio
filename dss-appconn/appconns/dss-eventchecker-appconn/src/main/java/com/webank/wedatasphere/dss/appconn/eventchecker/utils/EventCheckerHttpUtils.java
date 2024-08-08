@@ -18,11 +18,13 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.utils;
 
 
 import cn.hutool.crypto.digest.DigestUtil;
+import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgReceiveRequest;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -63,8 +65,8 @@ public class EventCheckerHttpUtils {
      * @param jsonBody json body，可以为null
      * @return 请求结果
      */
-    public static Response request(String method, String url, @Nullable Map<String, String> headerMap,
-                                   @Nullable  Map<String, String> params, @Nullable  String jsonBody) throws IOException {
+    public static Response request(String method, String url,  Map<String, String> headerMap,
+                                     Map<String, String> params,   String jsonBody) throws IOException {
 
         if (method == null) {
             throw new RuntimeException("请求方法不能为空");
@@ -97,32 +99,10 @@ public class EventCheckerHttpUtils {
                 .readTimeout(20, TimeUnit.SECONDS)
                 .build();
         Response response = client.newCall(request).execute();
-        logger.info("eventChecker send http successfully,url：{},retCode:{}", url, response.code());
+        logger.info("eventChecker http request successfully,url：{},retCode:{}", url, response.code());
         return response;
     }
 
-    /**
-     * 发送post请求（json格式）
-     *
-     * @param url  url
-     * @param json json字符串
-     * @return 请求结果
-     */
-    public static String postJson(String url, String json) {
-
-        Request request = new Request.Builder()
-                .url(url)
-                .post(RequestBody.Companion.create(json, MediaType.Companion.parse("application/json")))
-                .build();
-
-        try {
-            OkHttpClient client = new OkHttpClient();
-            Response response = client.newCall(request).execute();
-            return response.body().string();
-        } catch (IOException e) {
-            return null;
-        }
-    }
 
 
     /**
@@ -145,6 +125,32 @@ public class EventCheckerHttpUtils {
 
         // 计算签名
         return DigestUtil.sha256Hex(key + timestamp);
+    }
+    public static String requestToString(String url, String method, Map<String, String> headerMap,
+                                         Map<String, String> params,
+                                         String jsonBody){
+        HttpUrl.Builder httpBuilder = HttpUrl.parse(url).newBuilder();
+
+        if (params != null) {
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                httpBuilder.addQueryParameter(param.getKey(), param.getValue());
+            }
+        }
+        Headers headers = setHeaderParams(headerMap);
+        RequestBody body = jsonBody == null ? null : RequestBody.Companion.create(jsonBody,
+                MediaType.Companion.parse("application/json"));
+        Request request = new Request.Builder()
+                .url(httpBuilder.build())
+                .method(method, body)
+                .headers(headers)
+                .build();
+
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Request: ").append(request.method()).append(" ").append(request.url()).append("\n");
+        sb.append("Headers: ").append(request.headers()).append("\n");
+        sb.append("Body: ").append(jsonBody);
+        return sb.toString();
     }
 
     public static void main(String[] args) throws IOException {

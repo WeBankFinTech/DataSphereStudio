@@ -19,22 +19,28 @@ public class GitCommitRequest extends GitBaseRequest{
      * 下载BMLReource使用的用户名
      */
     private String username;
+    private String gitUser;
+    private String gitToken;
 
 
     public GitCommitRequest() {
     }
 
-    public GitCommitRequest(Map<String, BmlResource> bmlResourceMap, String comment, String username) {
+    public GitCommitRequest(Map<String, BmlResource> bmlResourceMap, String comment, String username, String gitUser, String gitToken) {
         this.bmlResourceMap = bmlResourceMap;
         this.comment = comment;
         this.username = username;
+        this.gitUser = gitUser;
+        this.gitToken = gitToken;
     }
 
-    public GitCommitRequest(Long workspaceId, String projectName, Map<String, BmlResource> bmlResourceMap, String comment, String username) {
+    public GitCommitRequest(Long workspaceId, String projectName, Map<String, BmlResource> bmlResourceMap, String comment, String username, String gitUser, String gitToken) {
         super(workspaceId, projectName);
         this.bmlResourceMap = bmlResourceMap;
         this.comment = comment;
         this.username = username;
+        this.gitUser = gitUser;
+        this.gitToken = gitToken;
     }
 
 
@@ -60,5 +66,21 @@ public class GitCommitRequest extends GitBaseRequest{
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getGitUser() {
+        return gitUser;
+    }
+
+    public void setGitUser(String gitUser) {
+        this.gitUser = gitUser;
+    }
+
+    public String getGitToken() {
+        return gitToken;
+    }
+
+    public void setGitToken(String gitToken) {
+        this.gitToken = gitToken;
     }
 }

@@ -4,7 +4,6 @@ package com.webank.wedatasphere.dss.git.manage;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
-import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
@@ -21,7 +20,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.linkis.DataWorkCloudApplication;
 import org.apache.linkis.common.utils.Utils;
-import org.eclipse.jgit.api.Git;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +30,6 @@ import java.io.IOException;
 import java.security.Key;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class GitProjectManager {
 
@@ -119,32 +116,8 @@ public class GitProjectManager {
         return workspaceGitMapper.getWorkspaceIdByUserName(gitUser);
     }
 
-//    private static GitUserUpdateResponse getUserIdFromGit(String type, Boolean update, Long workspaceId, String gitUser, String gitToken) throws IOException, com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException {
-//        if (GitConstant.GIT_ACCESS_READ_TYPE.equals(type)) {
-//            GitUserEntity writeGitUser = selectGit(workspaceId, GitConstant.GIT_ACCESS_WRITE_TYPE, true);
-//            if (writeGitUser == null) {
-//                return new GitUserUpdateResponse(80001, "配置只读用户前需首先完成该工作空间编辑用户的配置", workspaceId);
-//            }
-//            String userGitId = DSSGitUtils.getUserIdByUsername(writeGitUser, gitUser);
-//            gitUser.setGitUserId(userGitId);
-//            if (update) {
-//                List<GitProjectGitInfo> projectGitInfos = workspaceGitMapper.getProjectInfoByWorkspaceId(workspaceId);
-//                for (GitProjectGitInfo projectGitInfo : projectGitInfos) {
-//                    // 删除权限
-//                    LOGGER.info("删除用户" + oldGitUser.getGitUser() + "在" + projectGitInfo.getProjectName() + "项目的只读权限");
-//                    DSSGitUtils.removeProjectMember(writeGitUser, oldGitUser.getGitUserId(), projectGitInfo.getGitProjectId());
-//                    LOGGER.info("删除成功");
-//                    // 增加权限
-//                    LOGGER.info("增加用户" + gitUser.getGitUser() + "在" + projectGitInfo.getProjectName() + "项目的只读权限");
-//                    DSSGitUtils.addProjectMember(writeGitUser, userGitId, projectGitInfo.getGitProjectId(), 20);
-//                    LOGGER.info("增加成功");
-//                }
-//            }
-//        }
-//        return null;
-//    }
 
-    public static void insert(GitProjectGitInfo projectGitInfo, Boolean isExist) throws DSSErrorException {
+    public static void updateProjectInfo(GitProjectGitInfo projectGitInfo, Boolean isExist) throws DSSErrorException {
         String projectName = projectGitInfo.getProjectName();
         // 加密处理密码
         String gitToken = projectGitInfo.getGitToken();
@@ -171,41 +144,6 @@ public class GitProjectManager {
     public static List<GitProjectGitInfo> getProjectInfo(Long workspaceId) {
         return workspaceGitMapper.getProjectInfoByWorkspaceId(workspaceId);
     }
-
-//    public static GitUserInfoResponse selectGitUserInfo(GitUserInfoRequest gitUserInfoRequest) throws DSSErrorException {
-//        if (gitUserInfoRequest == null) {
-//            throw  new DSSErrorException(010101, "gitUserCreateRequest is null");
-//        }
-//        Long workspaceId = gitUserInfoRequest.getWorkspaceId();
-//        String type = gitUserInfoRequest.getType();
-//        GitUserEntity gitUserEntity = selectGit(workspaceId, type, gitUserInfoRequest.getDecrypt());
-//
-//
-//        GitUserInfoResponse gitUserInfoResponse = new GitUserInfoResponse();
-//        gitUserInfoResponse.setGitUser(gitUserEntity);
-//        return gitUserInfoResponse;
-//    }
-
-//    public static GitUserEntity selectGit(Long workspaceId, String type, Boolean decrypt) {
-//        try {
-//            GitUserEntity gitUserEntity = workspaceGitMapper.selectByWorkspaceId(workspaceId, type);
-//            if (gitUserEntity == null) {
-//                return null;
-//            }
-//            // 密码 token 解密处理
-//            if (!StringUtils.isEmpty(gitUserEntity.getGitPassword())) {
-//                String encryptPassword = generateKeys(gitUserEntity.getGitPassword(), Cipher.DECRYPT_MODE);
-//                gitUserEntity.setGitPassword(encryptPassword);
-//            }
-//            if (!StringUtils.isEmpty(gitUserEntity.getGitToken())) {
-//                String encryptToken = generateKeys(gitUserEntity.getGitToken(), Cipher.DECRYPT_MODE);
-//                gitUserEntity.setGitToken(encryptToken);
-//            }
-//            return gitUserEntity;
-//        } catch (Exception e) {
-//            return null;
-//        }
-//    }
 
     public static String generateKeys(String password, int mode) throws DSSErrorException{
         // 定义一个字符串作为密钥源

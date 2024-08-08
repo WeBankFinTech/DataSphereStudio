@@ -4,7 +4,6 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
-import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -138,7 +136,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             // 检测项目名称是否重复 数据库中已存在的配置无需再次校验
             if (isExist || !DSSGitUtils.checkIfProjectExists(gitToken, projectPath)) {
                 GitProjectGitInfo gitProjectGitInfo = new GitProjectGitInfo(workspaceId, projectName, gitUser, gitToken, gitUrl);
-                GitProjectManager.insert(gitProjectGitInfo, isExist);
+                GitProjectManager.updateProjectInfo(gitProjectGitInfo, isExist);
             }
         } else {
             throw new GitErrorException(80101, "git init failed, the reason is: projectName " + projectName +" already exists");

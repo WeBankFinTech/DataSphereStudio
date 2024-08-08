@@ -475,7 +475,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         }
         // 先删后增
-        nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
+        if (CollectionUtils.isNotEmpty(contentIdListByOrchestratorId)) {
+            nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
+        }
         nodeContentUIMapper.batchInsertNodeContentUI(nodeContentUIDOS);
     }
 

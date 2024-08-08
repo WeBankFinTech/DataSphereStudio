@@ -403,20 +403,6 @@ public class DSSFrameworkOrchestratorRestful {
             return Message.error("至少需要选择一项工作流进行提交");
         }
 
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender();
-        Set<String> collect = submitRequestList.stream().map(OrchestratorSubmitRequest::getProjectName).collect(Collectors.toSet());
-        ProjectInfoListRequest listRequest = new ProjectInfoListRequest();
-        listRequest.setProjectNames((List<String>) collect);
-        ProjectInfoListResponse projectInfoListResponse = RpcAskUtils.processAskException(sender.ask(listRequest), ProjectInfoListResponse.class, ProjectInfoListRequest.class);
-        if (projectInfoListResponse == null) {
-            return Message.error("项目不存在");
-        }
-        List<DSSProject> filterProjects = projectInfoListResponse.getDssProjects().stream().filter(t -> !t.getAssociateGit()).collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(filterProjects)) {
-            List<String> projectNames = filterProjects.stream().map(DSSProject::getName).collect(Collectors.toList());
-            return Message.error(projectNames + "项目未接入Git，请检查后重新提交");
-        }
-
         Map<String, List<OrchestratorRelationVo>> map = new HashMap<>();
         Map<String, Long> projectMap = new HashMap<>();
         for (OrchestratorSubmitRequest submitFlowRequest: submitRequestList) {

@@ -276,6 +276,10 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 Long orchestratorId = relationVo.getOrchestratorId();
                 orchestratorIdList.add(orchestratorId);
                 String status = lockMapper.selectOrchestratorStatus(orchestratorId);
+                if (StringUtils.isEmpty(status)) {
+                    DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
+                    throw new DSSErrorException(800001, projectName + "项目未接入git，批量提交失败");
+                }
                 if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
                     DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
                     throw new DSSErrorException(800001, orchestrator.getName() + "工作流无改动或改动未提交，请确认改动并保存再进行提交");

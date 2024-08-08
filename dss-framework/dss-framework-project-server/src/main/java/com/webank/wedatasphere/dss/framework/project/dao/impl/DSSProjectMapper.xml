@@ -197,4 +197,8 @@
         </foreach>
     </select>
 
+    <select id="getProjectByName" resultType="com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO">
+        select where project_name = #{projectName}
+    </select>
+
 </mapper>

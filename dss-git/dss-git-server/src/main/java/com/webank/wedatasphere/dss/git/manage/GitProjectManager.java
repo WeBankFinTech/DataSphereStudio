@@ -136,7 +136,7 @@ public class GitProjectManager {
         if (projectInfoByProjectName != null) {
             String gitToken = projectInfoByProjectName.getGitToken();
             String token = generateKeys(gitToken, Cipher.DECRYPT_MODE);
-            projectInfoByProjectName.setGitToken(token);
+            projectInfoByProjectName.setGitTokenEncrypt(gitToken);
         }
         return projectInfoByProjectName;
     }

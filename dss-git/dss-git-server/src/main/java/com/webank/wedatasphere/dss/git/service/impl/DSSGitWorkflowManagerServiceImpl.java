@@ -177,6 +177,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
     public GitCommitResponse commit(GitCommitRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
+        String requestGitToken = request.getGitToken();
 
         GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectInfoByProjectName == null) {
@@ -185,18 +186,19 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
         String gitUser = projectInfoByProjectName.getGitUser();
         String gitToken = projectInfoByProjectName.getGitToken();
+        String gitTokenEncrypt = projectInfoByProjectName.getGitTokenEncrypt();
         String gitUrl = projectInfoByProjectName.getGitUrl();
 
         if (request.getGitUser() != null && !gitUser.equals(request.getGitUser())) {
             throw new DSSErrorException(80001, "Git用户名不允许更换");
         }
 
-        if (request.getGitToken() != null && !gitToken.equals(request.getGitToken())) {
-            Boolean tokenTest = GitProjectManager.gitTokenTest(gitToken, gitUser);
+        if (requestGitToken != null && !gitTokenEncrypt.equals(requestGitToken)) {
+            Boolean tokenTest = GitProjectManager.gitTokenTest(requestGitToken, gitUser);
             if (tokenTest) {
                 GitProjectGitInfo projectGitInfo = new GitProjectGitInfo();
                 projectGitInfo.setProjectName(projectName);
-                projectGitInfo.setGitToken(request.getGitToken());
+                projectGitInfo.setGitToken(requestGitToken);
                 // 仅更新token
                 GitProjectManager.updateProjectInfo(projectGitInfo, true);
             }
@@ -233,7 +235,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             commitResponse = DSSGitUtils.getCurrentCommit(repository);
         } catch (Exception e) {
             logger.error("commit failed, the reason is ",e);
-            throw new DSSErrorException(8001, "commit workflow failed, the reason is: " + e);
+            throw new DSSErrorException(8001, "commit workflow failed, the reason is: " + e.getMessage());
         }
         return commitResponse;
     }

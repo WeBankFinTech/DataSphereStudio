@@ -39,6 +39,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
     public GitCreateProjectResponse create(GitCreateProjectRequest request) throws DSSErrorException{
         Long workspaceId = request.getWorkspaceId();
         String projectName = request.getProjectName();
+        String requestGitToken = request.getGitToken();
 
         GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectInfoByProjectName == null) {
@@ -47,7 +48,24 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         }
         String gitUser = projectInfoByProjectName.getGitUser();
         String gitToken = projectInfoByProjectName.getGitToken();
+        String gitTokenEncrypt = projectInfoByProjectName.getGitTokenEncrypt();
         String gitUrl = projectInfoByProjectName.getGitUrl();
+
+        if (request.getGitUser() != null && !gitUser.equals(request.getGitUser())) {
+            throw new DSSErrorException(80001, "Git用户名不允许更换");
+        }
+
+        if (requestGitToken != null && !gitToken.equals(requestGitToken) && !gitTokenEncrypt.equals(requestGitToken)) {
+            Boolean tokenTest = GitProjectManager.gitTokenTest(requestGitToken, gitUser);
+            if (tokenTest) {
+                GitProjectGitInfo projectGitInfo = new GitProjectGitInfo();
+                projectGitInfo.setProjectName(projectName);
+                projectGitInfo.setGitToken(requestGitToken);
+                // 仅更新token
+                GitProjectManager.updateProjectInfo(projectGitInfo, true);
+            }
+        }
+
         Repository repository = null;
         try {
             // Http请求Git，创建project

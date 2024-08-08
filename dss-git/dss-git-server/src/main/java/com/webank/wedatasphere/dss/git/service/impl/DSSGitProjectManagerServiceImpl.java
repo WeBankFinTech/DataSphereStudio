@@ -48,14 +48,13 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         }
         String gitUser = projectInfoByProjectName.getGitUser();
         String gitToken = projectInfoByProjectName.getGitToken();
-        String gitTokenEncrypt = projectInfoByProjectName.getGitTokenEncrypt();
         String gitUrl = projectInfoByProjectName.getGitUrl();
 
         if (request.getGitUser() != null && !gitUser.equals(request.getGitUser())) {
             throw new DSSErrorException(80001, "Git用户名不允许更换");
         }
 
-        if (requestGitToken != null && !gitToken.equals(requestGitToken) && !gitTokenEncrypt.equals(requestGitToken)) {
+        if (requestGitToken != null && !gitToken.equals(requestGitToken)) {
             Boolean tokenTest = GitProjectManager.gitTokenTest(requestGitToken, gitUser);
             if (tokenTest) {
                 GitProjectGitInfo projectGitInfo = new GitProjectGitInfo();
@@ -139,15 +138,10 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             if (!projectGitInfo.getGitUser().equals(gitUser)) {
                 throw new DSSErrorException(80001, "Git用户名不允许更换");
             }
-            if (gitToken.equals(projectGitInfo.getGitToken())) {
-                isExist = true;
-            } else {
-                String decryptToken = GitProjectManager.generateKeys(projectGitInfo.getGitToken(), Cipher.DECRYPT_MODE);
-                gitToken = decryptToken;
-            }
+            isExist = true;
         }
         // 检测token合法性 数据库中已存在的配置无需再次校验
-        Boolean tokenTest = isExist || GitProjectManager.gitTokenTest(gitToken, gitUser);
+        Boolean tokenTest = GitProjectManager.gitTokenTest(gitToken, gitUser);
         String gitUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
         if (tokenTest) {
             String projectPath = gitUser + "/" + projectName;

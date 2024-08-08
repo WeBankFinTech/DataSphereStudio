@@ -744,6 +744,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if (!StringUtils.isEmpty(proxyUser)) {
             // 更新user.to.proxy用户和proxyuser用户 信息
             JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
+            if(scheduleParams == null){
+                scheduleParams = new JsonObject();
+            }
             scheduleParams.addProperty("proxyuser", proxyUser);
 
             JsonArray props = jsonObject.getAsJsonArray("props");

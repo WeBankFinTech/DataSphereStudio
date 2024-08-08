@@ -303,7 +303,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
 
         // 解析并保存元数据
-        saveFlowMetaData(flowID, jsonFlow, labels);
+        if (dssFlow.getRootFlow()) {
+            saveFlowMetaData(flowID, jsonFlow, labels);
+        }
 
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
             logger.info("saveFlow is not change");

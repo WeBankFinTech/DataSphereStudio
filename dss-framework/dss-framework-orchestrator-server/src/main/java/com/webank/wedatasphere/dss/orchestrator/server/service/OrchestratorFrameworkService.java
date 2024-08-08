@@ -57,7 +57,7 @@ public interface OrchestratorFrameworkService {
 
     void modifyOrchestratorMeta(String username, ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, Workspace workspace, DSSOrchestratorVersion orchestratorVersion) throws Exception;
 
-    List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total);
+    List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total,String username);
 
     DSSOrchestratorVersion getLatestOrchestratorVersion(Long orchestratorId);
 }

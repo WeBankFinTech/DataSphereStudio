@@ -573,9 +573,10 @@ public class DSSFrameworkOrchestratorRestful {
             orchestratorMetaRequest.setWorkspaceId(workspaceId);
         }
 
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         List<Long> totals = new ArrayList<>();
 
-        List<OrchestratorMeta> orchestratorMetaList = orchestratorFrameworkService.getAllOrchestratorMeta(orchestratorMetaRequest, totals);
+        List<OrchestratorMeta> orchestratorMetaList = orchestratorFrameworkService.getAllOrchestratorMeta(orchestratorMetaRequest, totals,userName);
 
         return Message.ok().data("data", orchestratorMetaList).data("total", totals.get(0));
     }

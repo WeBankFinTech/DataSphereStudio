@@ -43,6 +43,19 @@ public class GitCommitRequest extends GitBaseRequest{
         this.gitToken = gitToken;
     }
 
+    public GitCommitRequest(Long workspaceId, String projectName, Map<String, BmlResource> bmlResourceMap, String comment, String username) {
+        super(workspaceId, projectName);
+        this.bmlResourceMap = bmlResourceMap;
+        this.comment = comment;
+        this.username = username;
+    }
+
+    public GitCommitRequest(Map<String, BmlResource> bmlResourceMap, String comment, String username) {
+        this.bmlResourceMap = bmlResourceMap;
+        this.comment = comment;
+        this.username = username;
+    }
+
 
     public Map<String, BmlResource> getBmlResourceMap() {
         return bmlResourceMap;

@@ -213,6 +213,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 dssOrchestratorInfo.getProjectId(), dssOrchestratorInfo.getDesc(), dssOrchestratorInfo, dssLabels);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
         Long orchestratorVersionId = orchestratorVo.getDssOrchestratorVersion().getId();
+        // 初始化置为已提交
+        if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
+            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
+        }
         LOGGER.info("created orchestration {} with orchestratorId is {}, and versionId is {}.", orchestratorCreateRequest.getOrchestratorName(), orchestratorId, orchestratorVersionId);
         //4.将工程和orchestrator的关系存储到的数据库中
         if (orchestrationResponseRef != null) {

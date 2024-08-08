@@ -18,19 +18,16 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgSendRequest;
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgSendResponse;
 import com.webank.wedatasphere.dss.appconn.eventchecker.utils.EventCheckerHttpUtils;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -59,24 +56,39 @@ public class HttpEventCheckSender extends AbstractEventCheck {
         int secondsSinceEpoch = (int) (currentTimeMillis / 1000);
         String msgId = String.valueOf(secondsSinceEpoch);
         if (StringUtils.isNoneBlank(msg)) {
-            msgBody = gson.fromJson(msg, Map.class);
+            try {
+                msgBody = gson.fromJson(msg, Map.class);
+            }catch (JsonSyntaxException jsonSyntaxException){
+                throw new RuntimeException("msg.body格式有误，请输入标准的json格式", jsonSyntaxException);
+            }
         }
         HttpMsgSendRequest message = new HttpMsgSendRequest(sender, topic, msgName, runDate, msgId, msgBody);
-        try (Response response = EventCheckerHttpUtils.post(url, header, null, gson.toJson(message))) {
-            HttpMsgSendResponse msgSendResponse = gson.fromJson(response.body().charStream(),
+        ResponseBody responseBody = null;
+        String messageJson = gson.toJson(message);
+        try (Response response = EventCheckerHttpUtils.post(url, header, null, messageJson)) {
+            responseBody = response.body();
+            HttpMsgSendResponse msgSendResponse = gson.fromJson(responseBody.charStream(),
                     HttpMsgSendResponse.class);
             int reCode = msgSendResponse.getRetCode();
             if (reCode == 0) {
                 result = true;
-
+                log.info("send successfully.jobId:{}",jobId);
             } else {
+                String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
+                log.info(requestStr);
                 String errorMsg = response.body().string();
                 log.error("send failed,response:{}", errorMsg);
                 throw new RuntimeException(errorMsg);
             }
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            String errorMsg = "";
+            try {
+                errorMsg = responseBody != null ? responseBody.string() : "";
+            }catch (IOException ioException){
+                e = ioException;
+            }
+            throw new RuntimeException(errorMsg,e);
         }
 
         return result;

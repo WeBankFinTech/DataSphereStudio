@@ -35,7 +35,7 @@ public class DefaultEventcheckReceiver extends AbstractEventCheckReceiver {
      * Consistent entrance to consumer message
      */
     @Override
-    public String[] getMsg(Properties props, Logger log,String ... params){
+    public String[] getMsg(int jobId,Properties props, Logger log,String ... params){
         boolean useRunDate=Boolean.parseBoolean(params[3]);
         String sqlForReadTMsg;
         if(useRunDate){

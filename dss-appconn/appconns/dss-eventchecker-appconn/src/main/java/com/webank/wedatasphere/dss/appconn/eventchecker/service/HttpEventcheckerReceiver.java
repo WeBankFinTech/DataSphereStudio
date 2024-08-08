@@ -1,16 +1,13 @@
 package com.webank.wedatasphere.dss.appconn.eventchecker.service;
 
 
-import cn.hutool.crypto.digest.DigestUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgReceiveRequest;
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgReceiveResponse;
-import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgSendResponse;
 import com.webank.wedatasphere.dss.appconn.eventchecker.utils.EventCheckerHttpUtils;
-import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import okhttp3.Response;
-import org.apache.commons.lang3.StringUtils;
+import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -33,7 +30,7 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
     }
 
     @Override
-    public String[] getMsg(Properties props, Logger log, String... params) {
+    public String[] getMsg(int jobId,Properties props, Logger log, String... params) {
         String url=props.getProperty(HTTP_EVENT_KGAS_RECEIVE_URL);
         String key=props.getProperty(HTTP_EVENT_SIGN_KEY);
         String timestamp=String.valueOf( System.currentTimeMillis());
@@ -48,29 +45,46 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
         boolean receiveTodayFlag = (null != receiveToday && "true".equalsIgnoreCase(receiveToday.trim()));
         HttpMsgReceiveRequest message = new HttpMsgReceiveRequest(receiver, topic, msgName, runDate, receiveTodayFlag, useRunDate);
         String[] consumedMsgInfo = null;
-        try (Response response = EventCheckerHttpUtils.post(url, header, null, gson.toJson(message))) {
-            HttpMsgReceiveResponse msgReceiveResponse = gson.fromJson(response.body().charStream(),
+        ResponseBody responseBody = null;
+        String messageJson = gson.toJson(message);
+        try (Response response = EventCheckerHttpUtils.post(url, header, null, messageJson)) {
+            responseBody = response.body();
+            HttpMsgReceiveResponse msgReceiveResponse = gson.fromJson(responseBody.charStream(),
                     HttpMsgReceiveResponse.class);
             int reCode = msgReceiveResponse.getRetCode();
             if (reCode == 0 ) {
+                log.info("receive request successfully.jobId:{}",jobId);
                 if("success".equals(msgReceiveResponse.getStatus())) {
+                    log.info("receive  successfully,now try to parse message.jobId:{}",jobId);
                     String msgBodyJson = gson.toJson(msgReceiveResponse.getMsgBody());
                     String msgId = String.valueOf(msgReceiveResponse.getMsgId());
                     //{"msg_id", "msg_name", "receiver", "msg"};
                     consumedMsgInfo = new String[]{msgId, msgName, receiver, msgBodyJson};
+                }else if ("fail".equals(msgReceiveResponse.getStatus())){
+                    String errorMsg = response.body().string();
+                    log.error("receive failed,response:{}", errorMsg);
+                    throw new RuntimeException(errorMsg);
                 }else{
                     consumedMsgInfo = null;
                 }
             } else if (reCode == 9998) {
                 consumedMsgInfo = null;
             } else {
+                String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
+                log.info(requestStr);
                 String errorMsg = response.body().string();
                 log.error("receive failed,response:{}", errorMsg);
                 throw new RuntimeException(errorMsg);
             }
             return consumedMsgInfo;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            String errorMsg = "";
+            try {
+                errorMsg = responseBody != null ? responseBody.string() : "";
+            }catch (IOException ioException){
+                e = ioException;
+            }
+            throw new RuntimeException(errorMsg,e);
         }
     }
 

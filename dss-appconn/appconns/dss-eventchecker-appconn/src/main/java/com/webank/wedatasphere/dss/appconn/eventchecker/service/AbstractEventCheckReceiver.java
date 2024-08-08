@@ -160,7 +160,7 @@ public abstract class AbstractEventCheckReceiver extends AbstractEventCheck{
             String[] executeType = createExecuteType(jobId,props,log,lastMsgId);
             log.info("event receiver executeType[]:{},{},{},{},{}",executeType[0],executeType[1],executeType[2],executeType[3],executeType[4]);
             if(executeType!=null && executeType.length ==5){
-                String[] consumedMsgInfo = getMsg(props, log,executeType);
+                String[] consumedMsgInfo = getMsg(jobId, props, log,executeType);
                 if(consumedMsgInfo!=null && consumedMsgInfo.length == 4){
                     result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId);
                 }
@@ -201,5 +201,5 @@ public abstract class AbstractEventCheckReceiver extends AbstractEventCheck{
         }
         return executeType;
     }
-    public abstract String[] getMsg(Properties props, Logger log,String ... params) ;
+    public abstract String[] getMsg(int jobId,Properties props, Logger log,String ... params) ;
 }

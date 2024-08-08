@@ -62,8 +62,9 @@ public enum OrchestratorStatusEnum {
         return Stream.of(
                 new OrchestratorStatusVo(PUSH.getStatus(), PUSH.getName()),
                 new OrchestratorStatusVo(SAVE.getStatus(), SAVE.getName()),
-                new OrchestratorStatusVo(PUBLISH.getStatus(), PUBLISH.getName()),
-                new OrchestratorStatusVo(RUNNING.getStatus(), RUNNING.getName())
+                new OrchestratorStatusVo(PUBLISHING.getStatus(), PUBLISHING.getName()),
+                new OrchestratorStatusVo(RUNNING.getStatus(), RUNNING.getName()),
+                new OrchestratorStatusVo(STATELESS.getStatus(), STATELESS.getName())
         ).collect(Collectors.toList());
     }
 

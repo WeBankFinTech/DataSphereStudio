@@ -408,9 +408,8 @@ public class DSSFrameworkProjectRestfulApi {
         if (projectTransferRequest.getId() == null || projectTransferRequest.getId() < 0) {
             return Message.error("project id is null, cannot modify it.");
         }
-        Workspace workspace = new Workspace();
-        workspace.setWorkspaceName(projectTransferRequest.getWorkspaceName());
-        workspace.setWorkspaceId(Long.parseLong(projectTransferRequest.getWorkspaceId()));
+        
+        Workspace workspace = SSOHelper.getWorkspace(request);
 
         LOGGER.info("begin to transferProject, workspace {}, project entity: {}.", workspace.getWorkspaceName(), projectTransferRequest);
 //        Message message = executePreHook(projectHttpRequestHook -> projectHttpRequestHook.beforeModifyProject(request, projectModifyRequest));

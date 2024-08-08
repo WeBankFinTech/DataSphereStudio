@@ -198,12 +198,12 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         syncGitProject(projectModifyRequest, dbProject, username, workspace);
     }
 
-    private void updateProject(Long workspaceId, String projectName,BmlResource bmlResource, String username ) {
+    private void updateProject(Long workspaceId, String projectName,BmlResource bmlResource, String username, String gitUser, String gitToken) {
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         Map<String, BmlResource> file = new HashMap<>();
         // 测试数据 key表示项目名、value为项目BmlResource资源
         file.put(".projectmeta", bmlResource);
-        GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, "update Project", username);
+        GitCommitRequest request1 = new GitCommitRequest(workspaceId, projectName, file, "update Project", username, gitUser, gitToken);
         LOGGER.info("-------=======================begin to update project: {}=======================-------", projectName);
         GitCommitResponse responseWorkflowValidNode = RpcAskUtils.processAskException(gitSender.ask(request1), GitCommitResponse.class, GitCommitRequest.class);
         LOGGER.info("-------=======================End to update project: {}=======================-------: {}", projectName, responseWorkflowValidNode);
@@ -440,14 +440,14 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         if (projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
             ExportAllOrchestratorsReqest exportAllOrchestratorsReqest = new ExportAllOrchestratorsReqest();
             exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
-            exportAllOrchestratorsReqest.setComment("test");
+            exportAllOrchestratorsReqest.setComment("modify Project");
             exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
 
             BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
             if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
                 createGitProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
             } else {
-                updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username);
+                updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
             }
         }
     }

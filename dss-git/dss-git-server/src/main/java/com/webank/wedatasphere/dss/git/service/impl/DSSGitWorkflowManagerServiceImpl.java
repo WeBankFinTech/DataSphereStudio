@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.crypto.Cipher;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -185,6 +186,22 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         String gitUser = projectInfoByProjectName.getGitUser();
         String gitToken = projectInfoByProjectName.getGitToken();
         String gitUrl = projectInfoByProjectName.getGitUrl();
+
+        if (request.getGitUser() != null && !gitUser.equals(request.getGitUser())) {
+            throw new DSSErrorException(80001, "Git用户名不允许更换");
+        }
+
+        if (request.getGitToken() != null && !gitToken.equals(request.getGitToken())) {
+            Boolean tokenTest = GitProjectManager.gitTokenTest(gitToken, gitUser);
+            if (tokenTest) {
+                GitProjectGitInfo projectGitInfo = new GitProjectGitInfo();
+                projectGitInfo.setProjectName(projectName);
+                projectGitInfo.setGitToken(request.getGitToken());
+                // 仅更新token
+                GitProjectManager.updateProjectInfo(projectGitInfo, true);
+            }
+        }
+
         GitCommitResponse commitResponse = null;
         // 拼接.git路径
         String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);

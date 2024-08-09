@@ -743,11 +743,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         // 传入的代理用户和数据库的代理用户不为NULL，才更新代理用户信息
         if (!StringUtils.isEmpty(proxyUser)) {
             // 更新user.to.proxy用户和proxyuser用户 信息
-            JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
-            if(scheduleParams == null){
-                scheduleParams = new JsonObject();
+            if(!jsonObject.keySet().contains("scheduleParams")){
+                jsonObject.add("scheduleParams",new JsonObject());
             }
+            JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
             scheduleParams.addProperty("proxyuser", proxyUser);
+
+            if(!jsonObject.keySet().contains("props")){
+                jsonObject.add("props",new JsonArray());
+            }
 
             JsonArray props = jsonObject.getAsJsonArray("props");
             // JsonArray 转list，是否包含 user.to.proxy key

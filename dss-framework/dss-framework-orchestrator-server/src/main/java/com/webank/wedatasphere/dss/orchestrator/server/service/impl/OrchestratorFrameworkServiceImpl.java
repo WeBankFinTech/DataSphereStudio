@@ -740,34 +740,36 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = jsonParser.parse(flowJsonOld).getAsJsonObject();
         String proxyUser = orchestratorMeta.getProxyUser();
-        // 传入的代理用户和数据库的代理用户不为NULL，才更新代理用户信息
-        if (!StringUtils.isEmpty(proxyUser)) {
-            // 更新user.to.proxy用户和proxyuser用户 信息
-            if(!jsonObject.keySet().contains("scheduleParams")){
-                jsonObject.add("scheduleParams",new JsonObject());
-            }
-            JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
-            scheduleParams.addProperty("proxyuser", proxyUser);
 
-            if(!jsonObject.keySet().contains("props")){
-                jsonObject.add("props",new JsonArray());
-            }
+        if(!jsonObject.keySet().contains("nodes")){
+            jsonObject.add("nodes", new JsonArray());
+        }
 
-            JsonArray props = jsonObject.getAsJsonArray("props");
-            // JsonArray 转list，是否包含 user.to.proxy key
-            List<Map<String, Object>> propList = DSSCommonUtils.COMMON_GSON.fromJson(props,
-                    new TypeToken<List<Map<String, Object>>>() {
-                    }.getType());
-            int size = propList.stream().filter(map -> map.containsKey("user.to.proxy")).collect(Collectors.toList()).size();
-            if (size == 0) {
-                JsonObject element = new JsonObject();
-                element.addProperty("user.to.proxy", proxyUser);
-                props.add(element);
-            } else {
-                for (JsonElement prop : props) {
-                    if (prop.getAsJsonObject().keySet().contains("user.to.proxy")) {
-                        prop.getAsJsonObject().addProperty("user.to.proxy", proxyUser);
-                    }
+        // 更新user.to.proxy用户和proxyuser用户 信息
+        if(!jsonObject.keySet().contains("scheduleParams")){
+            jsonObject.add("scheduleParams",new JsonObject());
+        }
+        JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
+        scheduleParams.addProperty("proxyuser", proxyUser);
+
+        if(!jsonObject.keySet().contains("props")){
+            jsonObject.add("props",new JsonArray());
+        }
+
+        JsonArray props = jsonObject.getAsJsonArray("props");
+        // JsonArray 转list，是否包含 user.to.proxy key
+        List<Map<String, Object>> propList = DSSCommonUtils.COMMON_GSON.fromJson(props,
+                new TypeToken<List<Map<String, Object>>>() {
+                }.getType());
+        int size = propList.stream().filter(map -> map.containsKey("user.to.proxy")).collect(Collectors.toList()).size();
+        if (size == 0) {
+            JsonObject element = new JsonObject();
+            element.addProperty("user.to.proxy", proxyUser);
+            props.add(element);
+        } else {
+            for (JsonElement prop : props) {
+                if (prop.getAsJsonObject().keySet().contains("user.to.proxy")) {
+                    prop.getAsJsonObject().addProperty("user.to.proxy", proxyUser);
                 }
             }
         }
@@ -793,9 +795,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         // 更新NodeMeta代理用户信息
         NodeMetaDO nodeMetaByOrchestrator = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorMeta.getOrchestratorId());
-        nodeMetaByOrchestrator.setProxyUser(orchestratorMeta.getProxyUser());
-        nodeMetaMapper.updateNodeMeta(nodeMetaByOrchestrator);
-
+        if(nodeMetaByOrchestrator != null){
+            nodeMetaByOrchestrator.setProxyUser(orchestratorMeta.getProxyUser());
+            nodeMetaMapper.updateNodeMeta(nodeMetaByOrchestrator);
+        }
         // 数据库增加版本更新
         flowMapper.updateFlowInputInfo(dssFlow);
 

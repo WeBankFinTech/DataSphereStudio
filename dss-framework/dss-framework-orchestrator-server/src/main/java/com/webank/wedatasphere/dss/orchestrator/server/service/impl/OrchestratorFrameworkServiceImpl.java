@@ -745,6 +745,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             jsonObject.add("nodes", new JsonArray());
         }
 
+        if(!jsonObject.keySet().contains("edges")){
+            jsonObject.add("edges", new JsonArray());
+        }
+
+        if(!jsonObject.keySet().contains("resources")){
+            jsonObject.add("resources",new JsonArray());
+        }
+
         if(!jsonObject.keySet().contains("scheduleParams")){
             jsonObject.add("scheduleParams",new JsonObject());
         }

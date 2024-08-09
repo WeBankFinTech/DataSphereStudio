@@ -745,7 +745,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             jsonObject.add("nodes", new JsonArray());
         }
 
-        // 更新user.to.proxy用户和proxyuser用户 信息
         if(!jsonObject.keySet().contains("scheduleParams")){
             jsonObject.add("scheduleParams",new JsonObject());
         }
@@ -755,7 +754,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if(!jsonObject.keySet().contains("props")){
             jsonObject.add("props",new JsonArray());
         }
-
+        // 更新user.to.proxy用户和proxyuser用户 信息
         JsonArray props = jsonObject.getAsJsonArray("props");
         // JsonArray 转list，是否包含 user.to.proxy key
         List<Map<String, Object>> propList = DSSCommonUtils.COMMON_GSON.fromJson(props,

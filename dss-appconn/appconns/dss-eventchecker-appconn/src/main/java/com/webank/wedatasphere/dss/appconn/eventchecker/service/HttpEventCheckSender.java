@@ -23,7 +23,6 @@ import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgSendReques
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgSendResponse;
 import com.webank.wedatasphere.dss.appconn.eventchecker.utils.EventCheckerHttpUtils;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
@@ -63,12 +62,18 @@ public class HttpEventCheckSender extends AbstractEventCheck {
             }
         }
         HttpMsgSendRequest message = new HttpMsgSendRequest(sender, topic, msgName, runDate, msgId, msgBody);
-        ResponseBody responseBody = null;
+        String responseBody = null;
         String messageJson = gson.toJson(message);
         try (Response response = EventCheckerHttpUtils.post(url, header, null, messageJson)) {
-            responseBody = response.body();
-            HttpMsgSendResponse msgSendResponse = gson.fromJson(responseBody.charStream(),
-                    HttpMsgSendResponse.class);
+            HttpMsgSendResponse msgSendResponse;
+            try {
+                responseBody = response.body().string();
+                msgSendResponse = gson.fromJson(responseBody,
+                        HttpMsgSendResponse.class);
+            } catch (Exception e){
+                throw new RuntimeException("请求KGAS失败，详情：" + responseBody);
+            }
+
             int reCode = msgSendResponse.getRetCode();
             if (reCode == 0) {
                 result = true;
@@ -82,12 +87,8 @@ public class HttpEventCheckSender extends AbstractEventCheck {
             }
 
         } catch (IOException e) {
-            String errorMsg = "";
-            try {
-                errorMsg = responseBody != null ? responseBody.string() : "";
-            }catch (IOException ioException){
-                e = ioException;
-            }
+            String errorMsg = responseBody != null ? responseBody : "";
+
             throw new RuntimeException(errorMsg,e);
         }
 

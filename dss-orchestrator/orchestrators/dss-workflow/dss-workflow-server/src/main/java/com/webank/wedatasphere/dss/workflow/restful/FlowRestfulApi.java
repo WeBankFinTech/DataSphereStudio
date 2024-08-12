@@ -356,8 +356,11 @@ public class FlowRestfulApi {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
-
-        version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName, labels);
+        try {
+            version = flowService.saveFlow(flowID, jsonFlow, null, userName, workspaceName, projectName, labels);
+        }catch (Exception e) {
+            return Message.error("保存失败，原因为：" + e.getMessage());
+        }
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspaceName, TargetTypeEnum.WORKFLOW,
                 flowID, dssFlow.getName(), OperateTypeEnum.UPDATE, saveFlowRequest);
         return Message.ok().data("flowVersion", version);

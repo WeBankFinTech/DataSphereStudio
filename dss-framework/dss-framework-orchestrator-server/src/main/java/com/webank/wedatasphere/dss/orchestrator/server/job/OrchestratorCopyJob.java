@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorCopyInfo;
@@ -139,13 +140,15 @@ public class OrchestratorCopyJob implements Runnable {
         dssOrchestratorVersion.setOrchestratorId(dssOrchestratorInfo.getId());
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestratorVersion(dssOrchestratorVersion);
         orchestratorCopyEnv.getAddOrchestratorVersionHook().afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
-        // 更新flowJson
-        DSSFlow flowByID = orchestratorCopyEnv.getFlowService().getFlowByID(flowId);
-        if (flowByID != null && flowByID.getRootFlow()) {
-            orchestratorCopyEnv.getFlowService().saveFlowMetaData(flowId, flowByID.getFlowJson(), dssLabels);
-        }
-        if (targetProject != null && targetProject.getAssociateGit() && flowByID != null) {
-            orchestratorCopyEnv.getFlowService().updateTOSaveStatus(targetProject.getId(), flowByID.getId());
+        // 更新flowJson\
+        if (dssLabels.get(0).getValue().get(EnvDSSLabel.DSS_ENV_LABEL_KEY).equals("dev")) {
+            DSSFlow flowByID = orchestratorCopyEnv.getFlowService().getFlowByID(flowId);
+            if (flowByID != null && flowByID.getRootFlow()) {
+                orchestratorCopyEnv.getFlowService().saveFlowMetaData(flowId, flowByID.getFlowJson(), dssLabels);
+            }
+            if (targetProject != null && targetProject.getAssociateGit() && flowByID != null) {
+                orchestratorCopyEnv.getFlowService().updateTOSaveStatus(targetProject.getId(), flowByID.getId());
+            }
         }
     }
 

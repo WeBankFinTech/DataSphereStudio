@@ -51,6 +51,7 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
+import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUpdateWorkflow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
@@ -89,6 +90,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.xml.ws.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -356,8 +358,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
                 Long rootFlowId = getRootFlowId(flowID);
                 if (rootFlowId != null) {
-                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestUpdateOrchestratorBML(rootFlowId, new BmlResource())),
-                            OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+                    // 工作流变更时，清空BML
+                    BmlResource bmlResource = new BmlResource();
+                    bmlResource.setResourceId(null);
+                    bmlResource.setVersion(null);
+                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestUpdateOrchestratorBML(rootFlowId, bmlResource)),
+                            OrchestratorVo.class, RequestUpdateOrchestratorBML.class);
                     lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
                 }
             }

@@ -304,7 +304,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         // 解析并保存元数据
         if (dssFlow.getRootFlow()) {
-            saveFlowMetaData(flowID, jsonFlow, labels);
+            List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labels.getRoute()));
+            saveFlowMetaData(flowID, jsonFlow, dssLabelList);
         }
 
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
@@ -381,7 +382,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
     }
 
-    private void saveFlowMetaData(Long flowID, String jsonFlow, LabelRouteVO labels) {
+    @Override
+    public void saveFlowMetaData(Long flowID, String jsonFlow, List<DSSLabel> dssLabelList) {
         // 解析 jsonflow
         // 解析 proxyUser
         List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
@@ -408,7 +410,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);
-        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labels.getRoute()));
         Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabelList);
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(flowID)),
                 OrchestratorVo.class, RequestQueryByIdOrchestrator.class);

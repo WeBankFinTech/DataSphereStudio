@@ -58,6 +58,8 @@ public interface DSSFlowService {
                     LabelRouteVO labels
     ) throws IOException;
 
+    void saveFlowMetaData(Long flowID, String jsonFlow, List<DSSLabel> dssLabels);
+
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,
                          String description, List<DSSLabel> dssLabels,String nodeSuffix,

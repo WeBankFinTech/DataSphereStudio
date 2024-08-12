@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.orchestrator.publish.impl;
 
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -46,6 +47,7 @@ import com.webank.wedatasphere.dss.standard.app.development.service.RefImportSer
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,6 +226,10 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         DSSFlow flowByID = dssFlowService.getFlowByID(appId);
         if (flowByID != null && flowByID.getRootFlow()) {
             dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), dssLabels);
+        }
+        DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
+        if (projectInfo.getAssociateGit()) {
+            dssFlowService.updateTOSaveStatus(projectInfo.getId(), appId);
         }
         return dssOrchestratorVersion;
     }

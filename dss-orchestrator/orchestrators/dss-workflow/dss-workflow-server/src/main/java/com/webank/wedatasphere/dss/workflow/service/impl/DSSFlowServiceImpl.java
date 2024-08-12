@@ -293,7 +293,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                            String userName,
                            String workspaceName,
                            String projectName,
-                           LabelRouteVO labels) throws IOException {
+                           LabelRouteVO labels) throws Exception {
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -348,7 +348,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return version;
     }
 
-    private void updateTOSaveStatus(Long projectId, Long flowID) {
+    @Override
+    public void updateTOSaveStatus(Long projectId, Long flowID) throws Exception{
         try {
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             //仅对接入Git的项目 更新状态为 保存

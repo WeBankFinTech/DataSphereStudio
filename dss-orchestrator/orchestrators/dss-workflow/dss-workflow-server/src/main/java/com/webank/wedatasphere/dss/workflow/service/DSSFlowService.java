@@ -56,7 +56,9 @@ public interface DSSFlowService {
                     String workspaceName,
                     String projectName,
                     LabelRouteVO labels
-    ) throws IOException;
+    ) throws Exception;
+
+    void updateTOSaveStatus(Long projectId, Long flowID) throws Exception;
 
     void saveFlowMetaData(Long flowID, String jsonFlow, List<DSSLabel> dssLabels);
 

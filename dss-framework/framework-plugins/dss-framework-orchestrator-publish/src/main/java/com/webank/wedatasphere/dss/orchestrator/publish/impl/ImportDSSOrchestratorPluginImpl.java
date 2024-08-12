@@ -45,6 +45,8 @@ import com.webank.wedatasphere.dss.standard.app.development.ref.RefJobContentRes
 import com.webank.wedatasphere.dss.standard.app.development.service.RefImportService;
 import com.webank.wedatasphere.dss.standard.app.development.standard.DevelopmentIntegrationStandard;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -78,6 +80,8 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
     private ContextService contextService;
     @Autowired
     private OrchestratorManager orchestratorManager;
+    @Autowired
+    private DSSFlowService dssFlowService;
 
     @Autowired
     private AddOrchestratorVersionHook addOrchestratorVersionHook;
@@ -215,6 +219,12 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         addOrchestratorVersionHook.afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
         LOGGER.info("import orchestrator success,orcId:{},appId:{}",importDssOrchestratorInfo.getId(),orchestrationId);
 
+        // 更新flowJson
+        Long appId = dssOrchestratorVersion.getAppId();
+        DSSFlow flowByID = dssFlowService.getFlowByID(appId);
+        if (flowByID != null && flowByID.getRootFlow()) {
+            dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), dssLabels);
+        }
         return dssOrchestratorVersion;
     }
 

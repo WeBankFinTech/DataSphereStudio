@@ -79,6 +79,7 @@ import com.webank.wedatasphere.dss.workflow.common.protocol.*;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.cs.client.ContextClient;
@@ -123,6 +124,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     private LockMapper lockMapper;
     @Autowired
     private FlowMapper flowMapper;
+    @Autowired
+    private DSSFlowService flowService;
 
     private static final int VALID_FLAG = 1;
 
@@ -428,6 +431,13 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         rollBackGitVo.setDssOrchestratorInfo(dssOrchestratorInfo);
         rollBackGitVo.setDssOrchestratorVersion(dssOrchestratorVersion);
         rollBackGitVo.setVersion(dssOrchestratorVersion.getVersion());
+
+        // 同步更新flowJson
+        DSSFlow flowByID = flowService.getFlowByID(dssOrchestratorVersion.getAppId());
+        if (flowByID.getRootFlow()) {
+            flowService.saveFlowMetaData(flowByID.getId(), flowByID.getFlowJson(), Collections.singletonList(envDSSLabel));
+        }
+
 
         return rollBackGitVo;
     }

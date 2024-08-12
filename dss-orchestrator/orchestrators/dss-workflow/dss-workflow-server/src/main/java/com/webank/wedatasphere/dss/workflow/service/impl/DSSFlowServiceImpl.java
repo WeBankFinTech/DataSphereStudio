@@ -405,8 +405,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(jsonFlow, "resources");
         StringBuilder resourceToString = new StringBuilder();
         for (Map<String, Object> resource : resources) {
-            resourceToString.append(resource.values());
-            resourceToString.append(";");
+            if (resource.containsKey("fileName")) {
+                resourceToString.append(resource.get("fileName"));
+                resourceToString.append(";");
+            }
+
         }
 
         List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);

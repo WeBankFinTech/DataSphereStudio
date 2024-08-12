@@ -7,7 +7,6 @@ import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgReceiveReq
 import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgReceiveResponse;
 import com.webank.wedatasphere.dss.appconn.eventchecker.utils.EventCheckerHttpUtils;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -45,12 +44,17 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
         boolean receiveTodayFlag = (null != receiveToday && "true".equalsIgnoreCase(receiveToday.trim()));
         HttpMsgReceiveRequest message = new HttpMsgReceiveRequest(receiver, topic, msgName, runDate, receiveTodayFlag, useRunDate);
         String[] consumedMsgInfo = null;
-        ResponseBody responseBody = null;
+        String responseBody = null;
         String messageJson = gson.toJson(message);
         try (Response response = EventCheckerHttpUtils.post(url, header, null, messageJson)) {
-            responseBody = response.body();
-            HttpMsgReceiveResponse msgReceiveResponse = gson.fromJson(responseBody.charStream(),
-                    HttpMsgReceiveResponse.class);
+            HttpMsgReceiveResponse msgReceiveResponse;
+            try {
+                responseBody = response.body().string();
+                msgReceiveResponse = gson.fromJson(responseBody,
+                        HttpMsgReceiveResponse.class);
+            }catch (Exception e){
+                throw new RuntimeException("请求KGAS失败，详情：" + responseBody);
+            }
             int reCode = msgReceiveResponse.getRetCode();
             if (reCode == 0 ) {
                 log.info("receive request successfully.jobId:{}",jobId);
@@ -78,12 +82,7 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
             }
             return consumedMsgInfo;
         } catch (IOException e) {
-            String errorMsg = "";
-            try {
-                errorMsg = responseBody != null ? responseBody.string() : "";
-            }catch (IOException ioException){
-                e = ioException;
-            }
+            String errorMsg = responseBody != null ? responseBody: "";
             throw new RuntimeException(errorMsg,e);
         }
     }

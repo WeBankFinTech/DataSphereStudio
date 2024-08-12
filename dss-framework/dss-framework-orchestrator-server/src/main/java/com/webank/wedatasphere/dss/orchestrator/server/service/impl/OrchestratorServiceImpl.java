@@ -432,14 +432,6 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         rollBackGitVo.setDssOrchestratorVersion(dssOrchestratorVersion);
         rollBackGitVo.setVersion(dssOrchestratorVersion.getVersion());
 
-        // 同步更新flowJson
-        if (labels.getRoute().equals("dev")) {
-            DSSFlow flowByID = flowService.getFlowByID(dssOrchestratorVersion.getAppId());
-            if (flowByID.getRootFlow()) {
-                flowService.saveFlowMetaData(flowByID.getId(), flowByID.getFlowJson(), Collections.singletonList(envDSSLabel));
-            }
-        }
-
         return rollBackGitVo;
     }
 
@@ -449,13 +441,17 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         if (rollBackGitVo == null) {
             return;
         }
-        DSSOrchestratorVersion oldOrcVersion = rollBackGitVo.getOldOrcVersion();
-        DSSOrchestratorInfo dssOrchestratorInfo = rollBackGitVo.getDssOrchestratorInfo();
         DSSOrchestratorVersion dssOrchestratorVersion = rollBackGitVo.getDssOrchestratorVersion();
         DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
         if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
             DSSFlow dssFlow = flowMapper.selectFlowByID(dssOrchestratorVersion.getAppId());
             lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
+            // 回滚清空存量BML
+            orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
+            if (dssFlow.getRootFlow() && labels.getRoute().equals("dev")) {
+                DSSLabel envDSSLabel = new EnvDSSLabel(labels.getRoute());
+                flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), Collections.singletonList(envDSSLabel));
+            }
         }
 
     }

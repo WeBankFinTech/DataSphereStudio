@@ -433,11 +433,12 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         rollBackGitVo.setVersion(dssOrchestratorVersion.getVersion());
 
         // 同步更新flowJson
-        DSSFlow flowByID = flowService.getFlowByID(dssOrchestratorVersion.getAppId());
-        if (flowByID.getRootFlow()) {
-            flowService.saveFlowMetaData(flowByID.getId(), flowByID.getFlowJson(), Collections.singletonList(envDSSLabel));
+        if (labels.getRoute().equals("dev")) {
+            DSSFlow flowByID = flowService.getFlowByID(dssOrchestratorVersion.getAppId());
+            if (flowByID.getRootFlow()) {
+                flowService.saveFlowMetaData(flowByID.getId(), flowByID.getFlowJson(), Collections.singletonList(envDSSLabel));
+            }
         }
-
 
         return rollBackGitVo;
     }

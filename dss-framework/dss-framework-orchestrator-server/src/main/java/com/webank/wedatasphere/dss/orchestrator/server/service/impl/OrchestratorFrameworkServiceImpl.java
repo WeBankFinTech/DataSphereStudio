@@ -83,9 +83,7 @@ import com.webank.wedatasphere.dss.standard.common.entity.ref.ResponseRef;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationWarnException;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 
-import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
-import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
-import com.webank.wedatasphere.dss.workflow.dao.NodeMetaMapper;
+import com.webank.wedatasphere.dss.workflow.dao.*;
 import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.SaveFlowHook;
@@ -142,6 +140,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     private NodeMetaMapper nodeMetaMapper;
     @Autowired
     private SaveFlowHook saveFlowHook;
+    @Autowired
+    private NodeContentMapper nodeContentMapper;
+    @Autowired
+    private NodeContentUIMapper nodeContentUIMapper;
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
     private static final int MAX_DESC_LENGTH = 250;
@@ -329,6 +331,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     (structureOperation, structureRequestRef) -> ((OrchestrationDeletionOperation) structureOperation)
                             .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
         }
+        Long orchestratorInfoId = orchestratorInfo.getId();
         if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
             try {
                 // git删除成功之后再删除库表记录
@@ -338,7 +341,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 GitRemoveRequest removeRequest = new GitRemoveRequest(workspace.getWorkspaceId(), dssProject.getName(), path, username);
                 GitCommitResponse commitResponse = RpcAskUtils.processAskException(sender.ask(removeRequest), GitCommitResponse.class, GitRemoveRequest.class);
                 lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
-                DSSOrchestratorVersion versionById = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorInfo.getId());
+                DSSOrchestratorVersion versionById = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorInfoId);
                 if (versionById != null) {
                     lockMapper.updateOrchestratorVersionCommitId(commitResponse.getCommitId(), versionById.getAppId());
                 }
@@ -348,12 +351,19 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 throw new GitErrorException(800001, e.getMessage());
             }
         }
-        orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfo.getId(), dssLabels);
-        orchestratorOperateService.deleteTemplateOperate(orchestratorInfo.getId());
+        orchestratorService.deleteOrchestrator(username, workspace, dssProject.getName(), orchestratorInfoId, dssLabels);
+        orchestratorOperateService.deleteTemplateOperate(orchestratorInfoId);
         LOGGER.info("delete orchestrator {} by orchestrator framework succeed.", orchestratorInfo.getName());
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         orchestratorVo.setOrchestratorName(orchestratorInfo.getName());
-        orchestratorVo.setOrchestratorId(orchestratorInfo.getId());
+        orchestratorVo.setOrchestratorId(orchestratorInfoId);
+
+        // 同步更新flowJson
+        List<Long> contentIdList = nodeContentMapper.getContentIdListByOrchestratorId(orchestratorInfoId);
+        nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorInfoId);
+        if (CollectionUtils.isNotEmpty(contentIdList)) {
+            nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
+        }
         return orchestratorVo;
     }
 

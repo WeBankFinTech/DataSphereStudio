@@ -22,6 +22,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
+import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
@@ -222,15 +223,18 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         LOGGER.info("import orchestrator success,orcId:{},appId:{}",importDssOrchestratorInfo.getId(),orchestrationId);
 
         // 更新flowJson
-        Long appId = dssOrchestratorVersion.getAppId();
-        DSSFlow flowByID = dssFlowService.getFlowByID(appId);
-        if (flowByID != null && flowByID.getRootFlow()) {
-            dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), dssLabels);
+        if (dssLabels.get(0).getValue().get(EnvDSSLabel.DSS_ENV_LABEL_KEY).equals("dev")) {
+            Long appId = dssOrchestratorVersion.getAppId();
+            DSSFlow flowByID = dssFlowService.getFlowByID(appId);
+            if (flowByID != null && flowByID.getRootFlow()) {
+                dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), dssLabels);
+            }
+            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
+            if (projectInfo.getAssociateGit()) {
+                dssFlowService.updateTOSaveStatus(projectInfo.getId(), appId);
+            }
         }
-        DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
-        if (projectInfo.getAssociateGit()) {
-            dssFlowService.updateTOSaveStatus(projectInfo.getId(), appId);
-        }
+
         return dssOrchestratorVersion;
     }
 

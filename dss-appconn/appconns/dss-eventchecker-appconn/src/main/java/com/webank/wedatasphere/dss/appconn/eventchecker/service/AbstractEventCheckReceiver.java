@@ -165,11 +165,11 @@ public abstract class AbstractEventCheckReceiver extends AbstractEventCheck{
                     result = updateMsgOffset(jobId,props,log,consumedMsgInfo,lastMsgId);
                 }
             }else{
-                log.error("executeType error {} " + Arrays.toString(executeType));
+                log.error("executeType error {} " , Arrays.toString(executeType));
                 return result;
             }
         }catch (Exception e){
-            log.error("EventChecker failed to receive the message {}" + e);
+            log.error("EventChecker failed to receive the message" , e);
             throw e;
         }
         return result;

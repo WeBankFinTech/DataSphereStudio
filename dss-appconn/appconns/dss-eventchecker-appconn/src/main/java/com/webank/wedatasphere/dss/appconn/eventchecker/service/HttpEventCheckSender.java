@@ -59,7 +59,7 @@ public class HttpEventCheckSender extends AbstractEventCheck {
             try {
                 msgBody = gson.fromJson(msg, Map.class);
             }catch (JsonSyntaxException jsonSyntaxException){
-                throw new RuntimeException("msg.body格式有误，请输入标准的json格式", jsonSyntaxException);
+                throw new RuntimeException("msg.body格式有误，请输入标准的json格式"+ jsonSyntaxException.getMessage());
             }
         }
         HttpMsgSendRequest message = new HttpMsgSendRequest(sender, topic, msgName, runDate, msgId, msgBody);

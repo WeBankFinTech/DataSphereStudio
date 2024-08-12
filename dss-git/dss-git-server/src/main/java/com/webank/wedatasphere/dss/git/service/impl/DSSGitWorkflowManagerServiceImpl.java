@@ -569,20 +569,26 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
             if (request.getPublish()) {
                 if (StringUtils.isNotEmpty(request.getCommitId())) {
-                    before = DSSGitUtils.getTargetCommitFileContent(repository, request.getCommitId(), filePath);
+                    // 获取 before commit以及content
+                    DSSGitUtils.getTargetCommitFileContent(repository, request.getCommitId(), filePath, contentResponse);
                 }
                 after = DSSGitUtils.getFileContent(filePath, projectName, gitUser, workspaceId);
+                GitCommitResponse currentCommit = DSSGitUtils.getCurrentCommit(repository);
+                if (currentCommit.getCommitId() != null) {
+                    contentResponse.setAfterCommitId(currentCommit.getCommitId());
+                    contentResponse.setAfterAnnotate(currentCommit.getComment());
+                }
+                contentResponse.setAfter(after);
             } else {
                 // 获取当前提交前的文件内容
                 before = DSSGitUtils.getFileContent(filePath, projectName, gitUser, workspaceId);
+                RevCommit latestCommitInfo = DSSGitUtils.getLatestCommitInfo(repository, filePath, projectName, workspaceId, gitUser);
+                if (latestCommitInfo != null) {
+                    contentResponse.setBeforeAnnotate(latestCommitInfo.getShortMessage());
+                    contentResponse.setBeforeCommitId(latestCommitInfo.getId().getName());
+                }
+                contentResponse.setBefore(before);
             }
-            RevCommit latestCommitInfo = DSSGitUtils.getLatestCommitInfo(repository, filePath, projectName, workspaceId, gitUser);
-            if (latestCommitInfo != null) {
-                contentResponse.setAnnotate(latestCommitInfo.getShortMessage());
-                contentResponse.setCommitId(latestCommitInfo.getId().getName());
-            }
-            contentResponse.setAfter(after);
-            contentResponse.setBefore(before);
 
             return contentResponse;
         } catch (Exception e) {

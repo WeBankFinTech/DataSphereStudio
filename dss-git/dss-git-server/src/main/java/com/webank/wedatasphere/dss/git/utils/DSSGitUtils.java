@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
 import org.apache.http.client.methods.HttpDelete;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
@@ -712,7 +713,7 @@ public class DSSGitUtils {
         return null;
     }
 
-    public static String getTargetCommitFileContent(Repository repository, String commitId, String filePath) throws GitErrorException {
+    public static void getTargetCommitFileContent(Repository repository, String commitId, String filePath, GitFileContentResponse contentResponse) throws GitErrorException {
         String content = "";
         try {
             // 获取最新的commitId
@@ -720,16 +721,20 @@ public class DSSGitUtils {
             // 获取提交记录
             try (RevWalk revWalk = new RevWalk(repository)) {
                 RevCommit commit = revWalk.parseCommit(lastCommitId);
+                if (commit != null) {
+                    contentResponse.setBeforeAnnotate(commit.getShortMessage());
+                    contentResponse.setBeforeCommitId(commit.getId().getName());
+                }
                 RevTree tree = commit.getTree();
-                logger.info("Having tree: " + tree);
+                logger.info("Having tree: {}", tree);
                 // 遍历获取最近提交记录
                 try (TreeWalk treeWalk = new TreeWalk(repository)) {
                     treeWalk.addTree(tree);
                     treeWalk.setRecursive(true);
                     treeWalk.setFilter(PathFilter.create(filePath));
                     if (!treeWalk.next()) {
-                        logger.warn("Did not find expected file '" + filePath + "'，忽略");
-                        return null;
+                        logger.warn("Did not find expected file '{}'，忽略", filePath);
+                        contentResponse.setBefore(null);
                     }
 
                     ObjectId objectId = treeWalk.getObjectId(0);
@@ -747,7 +752,7 @@ public class DSSGitUtils {
         } catch (IOException e) {
             throw new GitErrorException(80117, "getFileContent failed, the reason is : ", e);
         }
-        return content;
+        contentResponse.setBefore(content);
     }
 
     public static RevCommit getLatestCommitInfo(Repository repository, String filePath, String projectName, Long workspaceId, String gitUser) throws GitErrorException {
@@ -777,6 +782,18 @@ public class DSSGitUtils {
             return null;
         } catch (Exception e) {
             throw new GitErrorException(80118, "getLatestCommitInfo failed, the reason is : ", e);
+        }
+    }
+
+    public static RevCommit getTargetCommitInfo(Repository repository, String commitId) throws GitErrorException {
+        try {
+            Git git = new Git(repository);
+            ObjectId commitIdInfo = ObjectId.fromString("commitId");
+            RevWalk walk = new RevWalk(repository);
+            RevCommit commit = walk.parseCommit(commitIdInfo);
+            return commit;
+        } catch (Exception e) {
+            throw new GitErrorException(80118, "getTargetCommitInfo failed, the reason is : ", e);
         }
     }
 

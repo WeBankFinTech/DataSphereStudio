@@ -225,7 +225,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         // 更新flowJson
         if (dssLabels.get(0).getValue().get(EnvDSSLabel.DSS_ENV_LABEL_KEY).equals("dev")) {
             Long appId = dssOrchestratorVersion.getAppId();
-            DSSFlow flowByID = dssFlowService.getFlowByID(appId);
+            DSSFlow flowByID = dssFlowService.getFlow(appId);
             if (flowByID != null && flowByID.getRootFlow()) {
                 dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), dssLabels);
             }

@@ -6,19 +6,25 @@ public class GitFileContentResponse{
     // 提交后 发布后 文件内容
     private String after;
     // 反显注释内容 --仅发布时diff需要
-    private String annotate;
+    private String beforeAnnotate;
     // 反显CommitId --仅发布时diff需要
-    private String commitId;
+    private String beforeCommitId;
+    // 反显注释内容 --仅发布时diff需要
+    private String AfterAnnotate;
+    // 反显CommitId --仅发布时diff需要
+    private String AfterCommitId;
 
 
     public GitFileContentResponse() {
     }
 
-    public GitFileContentResponse(String before, String after, String annotate, String commitId) {
+    public GitFileContentResponse(String before, String after, String beforeAnnotate, String beforeCommitId, String afterAnnotate, String afterCommitId) {
         this.before = before;
         this.after = after;
-        this.annotate = annotate;
-        this.commitId = commitId;
+        this.beforeAnnotate = beforeAnnotate;
+        this.beforeCommitId = beforeCommitId;
+        AfterAnnotate = afterAnnotate;
+        AfterCommitId = afterCommitId;
     }
 
 
@@ -38,19 +44,35 @@ public class GitFileContentResponse{
         this.after = after;
     }
 
-    public String getAnnotate() {
-        return annotate;
+    public String getBeforeAnnotate() {
+        return beforeAnnotate;
     }
 
-    public void setAnnotate(String annotate) {
-        this.annotate = annotate;
+    public void setBeforeAnnotate(String beforeAnnotate) {
+        this.beforeAnnotate = beforeAnnotate;
     }
 
-    public String getCommitId() {
-        return commitId;
+    public String getBeforeCommitId() {
+        return beforeCommitId;
     }
 
-    public void setCommitId(String commitId) {
-        this.commitId = commitId;
+    public void setBeforeCommitId(String beforeCommitId) {
+        this.beforeCommitId = beforeCommitId;
+    }
+
+    public String getAfterAnnotate() {
+        return AfterAnnotate;
+    }
+
+    public void setAfterAnnotate(String afterAnnotate) {
+        AfterAnnotate = afterAnnotate;
+    }
+
+    public String getAfterCommitId() {
+        return AfterCommitId;
+    }
+
+    public void setAfterCommitId(String afterCommitId) {
+        AfterCommitId = afterCommitId;
     }
 }

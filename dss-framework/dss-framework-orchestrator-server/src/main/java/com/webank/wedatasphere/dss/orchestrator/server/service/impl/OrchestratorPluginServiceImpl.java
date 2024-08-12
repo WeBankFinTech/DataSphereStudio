@@ -343,7 +343,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return commit;
     }
 
-    public GitCommitResponse batchSubmitWorkflowToBML(List<OrchestratorRelationVo> relationVos, String username, Workspace workspace, String projectName, String label, Long projectId, String comment) {
+    public GitCommitResponse batchSubmitWorkflowToBML(List<OrchestratorRelationVo> relationVos, String username, Workspace workspace, String projectName, String label, Long projectId, String comment) throws Exception {
 
         List<Long> taskIdList = new ArrayList<>();
         for (OrchestratorRelationVo relationVo : relationVos) {
@@ -443,7 +443,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId) {
+    public BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId) throws Exception{
         // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(label));

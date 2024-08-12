@@ -59,6 +59,7 @@ import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseLockWorkflow
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowEditLock;
+import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.rpc.Sender;
@@ -405,9 +406,11 @@ public class DSSFrameworkOrchestratorRestful {
 
         Map<String, List<OrchestratorRelationVo>> map = new HashMap<>();
         Map<String, Long> projectMap = new HashMap<>();
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
         for (OrchestratorSubmitRequest submitFlowRequest: submitRequestList) {
             try {
-                checkSubmitWorkflow(submitFlowRequest, workspace, userName);
+                checkSubmitWorkflow(ticketId, submitFlowRequest, workspace, userName);
                 boolean b = map.containsKey(submitFlowRequest.getProjectName());
                 if (b) {
                     List<OrchestratorRelationVo> orchestratorRelationVos = map.get(submitFlowRequest.getProjectName());
@@ -443,8 +446,11 @@ public class DSSFrameworkOrchestratorRestful {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+
         try {
-            checkSubmitWorkflow(submitFlowRequest, workspace, userName);
+            checkSubmitWorkflow(ticketId, submitFlowRequest, workspace, userName);
             orchestratorPluginService.submitFlow(submitFlowRequest, userName, workspace);
         } catch (Exception e) {
             return Message.error("提交工作流失败，请保存工作流重试，原因为："+  e.getMessage());
@@ -454,7 +460,7 @@ public class DSSFrameworkOrchestratorRestful {
         return Message.ok();
     }
 
-    private void checkSubmitWorkflow(OrchestratorSubmitRequest submitFlowRequest, Workspace workspace, String userName) throws DSSErrorException{
+    private void checkSubmitWorkflow(String ticketId, OrchestratorSubmitRequest submitFlowRequest, Workspace workspace, String userName) throws DSSErrorException{
         Long orchestratorId = submitFlowRequest.getOrchestratorId();
         try {
             checkWorkspace(orchestratorId, workspace);
@@ -466,8 +472,6 @@ public class DSSFrameworkOrchestratorRestful {
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(submitFlowRequest.getLabels().getRoute()));
 
-        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
-                .findFirst().map(Cookie::getValue).get();
         DSSOrchestratorVersion latestOrchestratorVersion = orchestratorFrameworkService.getLatestOrchestratorVersion(orchestratorId);
         Long flowId = latestOrchestratorVersion.getAppId();
         DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowId);
@@ -475,8 +479,27 @@ public class DSSFrameworkOrchestratorRestful {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             throw new DSSErrorException(80001,"当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
+        lockFlow(flowId, userName, ticketId);
 
 
+    }
+
+    private void lockFlow(Long flowID, String username, String ticketId) throws DSSErrorException {
+        DSSFlow dssFlow = flowService.getFlowByID(flowID);
+        // 尝试获取工作流编辑锁
+        try {
+            //只有父工作流才有锁，子工作流复用父工作流的锁
+            if(dssFlow.getRootFlow()) {
+                String flowEditLock = DSSFlowEditLockManager.tryAcquireLock(dssFlow, username, ticketId);
+                dssFlow.setFlowEditLock(flowEditLock);
+            }
+        } catch (DSSErrorException e) {
+            if (DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
+                DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowID);
+                throw new DSSErrorException(60056,"用户已锁定编辑错误码，editLockInfo:" + flowEditLock);
+            }
+            throw e;
+        }
     }
 
     @RequestMapping(path = "gitUrl", method = RequestMethod.GET)

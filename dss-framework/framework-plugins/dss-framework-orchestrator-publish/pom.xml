@@ -31,6 +31,12 @@
     <dependencies>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>
+            <artifactId>dss-workflow-server</artifactId>
+            <version>${dss.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-orchestrator-core</artifactId>
             <version>${dss.version}</version>
             <scope>compile</scope>

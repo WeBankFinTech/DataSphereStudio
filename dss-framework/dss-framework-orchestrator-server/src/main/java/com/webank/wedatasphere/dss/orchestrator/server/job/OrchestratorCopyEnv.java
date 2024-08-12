@@ -9,6 +9,9 @@ import com.webank.wedatasphere.dss.orchestrator.loader.OrchestratorManager;
 import com.webank.wedatasphere.dss.orchestrator.publish.ExportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.publish.ImportDSSOrchestratorPlugin;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorFrameworkService;
+import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
+import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -40,6 +43,12 @@ public class OrchestratorCopyEnv {
 
     @Autowired
     AddOrchestratorVersionHook addOrchestratorVersionHook;
+
+    @Autowired
+    private DSSFlowService flowService;
+
+    @Autowired
+    private LockMapper lockMapper;
 
     public ContextService getContextService() {
         return contextService;
@@ -115,5 +124,21 @@ public class OrchestratorCopyEnv {
 
     public void setImportDSSOrchestratorPlugin(ImportDSSOrchestratorPlugin importDSSOrchestratorPlugin) {
         this.importDSSOrchestratorPlugin = importDSSOrchestratorPlugin;
+    }
+
+    public DSSFlowService getFlowService() {
+        return flowService;
+    }
+
+    public void setFlowService(DSSFlowService flowService) {
+        this.flowService = flowService;
+    }
+
+    public LockMapper getLockMapper() {
+        return lockMapper;
+    }
+
+    public void setLockMapper(LockMapper lockMapper) {
+        this.lockMapper = lockMapper;
     }
 }

@@ -175,8 +175,10 @@ public class FlowRestfulApi {
         String publishUser = SecurityFilter.getLoginUsername(httpServletRequest);
         Map<String, Object> labels = new HashMap<>();
         labels.put(EnvDSSLabel.DSS_ENV_LABEL_KEY, publishWorkflowRequest.getLabels().getRoute());
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
         try {
-            publishService.batchPublish(publishWorkflowRequest, workspace, publishUser, labels);
+            publishService.batchPublish(ticketId, publishWorkflowRequest, workspace, publishUser, labels);
         } catch (Exception e) {
             return Message.error("批量发布失败，原因为：" + e.getMessage());
         }

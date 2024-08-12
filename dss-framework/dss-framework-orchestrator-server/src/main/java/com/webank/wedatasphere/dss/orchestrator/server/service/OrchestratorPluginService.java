@@ -53,7 +53,7 @@ public interface OrchestratorPluginService {
 
     GitCommitResponse submitWorkflowSync(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws DSSErrorException;
 
-    BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId);
+    BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId) throws Exception;
 
     String diffStatus(Long taskId) throws DSSErrorException;
 

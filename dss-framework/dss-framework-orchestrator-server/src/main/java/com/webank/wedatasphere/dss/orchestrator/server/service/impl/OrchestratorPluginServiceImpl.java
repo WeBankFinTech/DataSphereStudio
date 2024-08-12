@@ -285,13 +285,26 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                     throw new DSSErrorException(800001, orchestrator.getName() + "工作流无改动或改动未提交，请确认改动并保存再进行提交");
                 }
             }
+            List<Long> taskIdList = new ArrayList<>();
+            for (OrchestratorRelationVo relationVo : orchestratorRelationVos) {
+                Long orchestratorId = relationVo.getOrchestratorId();
+
+                OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
+                submitJob.setOrchestratorId(orchestratorId);
+                submitJob.setInstanceName(Sender.getThisInstance());
+                submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+                orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
+                Long taskId = submitJob.getId();
+                taskIdList.add(taskId);
+
+            }
             releaseThreadPool.submit(() ->{
                 //1. 异步提交，更新提交状态
                 try {
-                    batchSubmitWorkflowToBML(orchestratorRelationVos, username, workspace, projectName, label, projectId, comment);
+                    batchSubmitWorkflowToBML(taskIdList, orchestratorRelationVos, username, workspace, projectName, label, projectId, comment);
                 }  catch (Exception e) {
                     LOGGER.error("push failed, the reason is : ", e);
-                    orchestratorMapper.batchUpdateOrchestratorSubmitJobStatus(orchestratorIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, "batchSubmit error: " + e.toString());
+                    orchestratorMapper.batchUpdateOrchestratorSubmitJobStatus(taskIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, "batchSubmit error: " + e.toString());
                 }
             });
         }
@@ -343,21 +356,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return commit;
     }
 
-    public GitCommitResponse batchSubmitWorkflowToBML(List<OrchestratorRelationVo> relationVos, String username, Workspace workspace, String projectName, String label, Long projectId, String comment) throws Exception {
+    public GitCommitResponse batchSubmitWorkflowToBML(List<Long> taskIdList, List<OrchestratorRelationVo> relationVos, String username, Workspace workspace, String projectName, String label, Long projectId, String comment) throws Exception {
 
-        List<Long> taskIdList = new ArrayList<>();
-        for (OrchestratorRelationVo relationVo : relationVos) {
-            Long orchestratorId = relationVo.getOrchestratorId();
-
-            OrchestratorSubmitJob submitJob = new OrchestratorSubmitJob();
-            submitJob.setOrchestratorId(orchestratorId);
-            submitJob.setInstanceName(Sender.getThisInstance());
-            submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-            orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
-            Long taskId = submitJob.getId();
-            taskIdList.add(taskId);
-
-        }
         List<Long> flowIdList = relationVos.stream().map(OrchestratorRelationVo::getFlowId).collect(Collectors.toList());
         BmlResource bmlResource = orchestratorPluginService.uploadWorkflowListToGit(flowIdList, projectName, label, username, workspace, projectId);
         List<Long> orchestratorIdList = relationVos.stream().map(OrchestratorRelationVo::getOrchestratorId).collect(Collectors.toList());

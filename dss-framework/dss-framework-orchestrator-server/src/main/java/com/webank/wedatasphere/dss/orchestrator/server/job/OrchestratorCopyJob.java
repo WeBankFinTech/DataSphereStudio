@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.job;
 
 import com.google.common.collect.Lists;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
@@ -32,6 +33,8 @@ public class OrchestratorCopyJob implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrchestratorCopyJob.class);
 
     private OrchestratorCopyVo orchestratorCopyVo;
+
+    private DSSProject targetProject;
 
     protected OrchestratorCopyEnv orchestratorCopyEnv;
 
@@ -99,7 +102,7 @@ public class OrchestratorCopyJob implements Runnable {
                                     Workspace workspace,
                                     DSSOrchestratorInfo dssOrchestratorInfo,
                                     String projectName,
-                                    List<DSSLabel> dssLabels, Long appId) throws DSSErrorException {
+                                    List<DSSLabel> dssLabels, Long appId) throws Exception {
         String copyInitVersion = OrchestratorUtils.generateNewCopyVersion(orchestratorCopyVo.getWorkflowNodeSuffix());
         String contextId = orchestratorCopyEnv.getContextService().createContextID(workspace.getWorkspaceName(), projectName, dssOrchestratorInfo.getName(), copyInitVersion, userName);
         DSSOrchestratorVersion dssOrchestratorVersion = new DSSOrchestratorVersion();
@@ -141,6 +144,9 @@ public class OrchestratorCopyJob implements Runnable {
         if (flowByID != null && flowByID.getRootFlow()) {
             orchestratorCopyEnv.getFlowService().saveFlowMetaData(flowId, flowByID.getFlowJson(), dssLabels);
         }
+        if (targetProject != null && targetProject.getAssociateGit() && flowByID != null) {
+            orchestratorCopyEnv.getFlowService().updateTOSaveStatus(targetProject.getId(), flowByID.getId());
+        }
     }
 
 
@@ -166,5 +172,13 @@ public class OrchestratorCopyJob implements Runnable {
 
     public void setOrchestratorCopyInfo(DSSOrchestratorCopyInfo orchestratorCopyInfo) {
         this.orchestratorCopyInfo = orchestratorCopyInfo;
+    }
+
+    public DSSProject getTargetProject() {
+        return targetProject;
+    }
+
+    public void setTargetProject(DSSProject targetProject) {
+        this.targetProject = targetProject;
     }
 }

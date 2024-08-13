@@ -6,6 +6,7 @@ public class GitCommitResponse{
     private String commitTime;
     private String commitUser;
     private String comment;
+    private String commentFull;
 
     public GitCommitResponse(String commitId, String commitTime, String commitUser, String comment) {
         this.commitId = commitId;
@@ -47,5 +48,13 @@ public class GitCommitResponse{
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getCommentFull() {
+        return commentFull;
+    }
+
+    public void setCommentFull(String commentFull) {
+        this.commentFull = commentFull;
     }
 }

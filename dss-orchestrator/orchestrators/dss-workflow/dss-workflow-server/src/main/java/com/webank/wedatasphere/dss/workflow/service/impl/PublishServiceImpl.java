@@ -160,7 +160,7 @@ public class PublishServiceImpl implements PublishService {
     }
 
     @Override
-    public void batchPublish(String ticketId, BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception{
+    public void batchPublish(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception{
         List<Long> orcIds = publishWorkflowRequest.getOrchestratorList();
         String labelStr = publishWorkflowRequest.getLabels().getRoute();
         Map<String, Object> labels = new HashMap<>();
@@ -189,20 +189,6 @@ public class PublishServiceImpl implements PublishService {
         List<DSSFlow> dssFlowList = new ArrayList<>();
         for (Long flowId : workflowIdList) {
             DSSFlow dssFlow = checkFlowBeforeSubmit(flowId, convertUser, workspace);
-            // 尝试获取工作流编辑锁
-            try {
-                //只有父工作流才有锁，子工作流复用父工作流的锁
-                if(dssFlow.getRootFlow()) {
-                    String flowEditLock = DSSFlowEditLockManager.tryAcquireLock(dssFlow, convertUser, ticketId);
-                    dssFlow.setFlowEditLock(flowEditLock);
-                }
-            } catch (DSSErrorException e) {
-                if (DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
-                    DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowId);
-                    throw new DSSErrorException(60056,"用户已锁定编辑错误码，editLockInfo:" + flowEditLock);
-                }
-                throw e;
-            }
             dssFlowList.add(dssFlow);
         }
 

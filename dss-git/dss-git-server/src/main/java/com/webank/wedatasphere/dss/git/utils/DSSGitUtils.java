@@ -849,7 +849,7 @@ public class DSSGitUtils {
                 commitResponse.setCommitId(commit.getId().getName());
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
                 String shortMessage = commit.getShortMessage();
-
+                commitResponse.setCommentFull(shortMessage);
                 getUserName(shortMessage, commitResponse, commit);
                 // 返回commitId字符串
                 return commitResponse;

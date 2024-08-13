@@ -143,7 +143,7 @@ public class OrchestratorCopyJob implements Runnable {
         // 更新flowJson\
         if (dssLabels.get(0).getValue().get(EnvDSSLabel.DSS_ENV_LABEL_KEY).equals("dev")) {
             DSSFlow flowByID = orchestratorCopyEnv.getFlowService().getFlow(flowId);
-            if (flowByID != null && flowByID.getRootFlow()) {
+            if (flowByID != null) {
                 orchestratorCopyEnv.getFlowService().saveFlowMetaData(flowId, flowByID.getFlowJson(), dssLabels);
             }
             if (targetProject != null && targetProject.getAssociateGit() && flowByID != null) {

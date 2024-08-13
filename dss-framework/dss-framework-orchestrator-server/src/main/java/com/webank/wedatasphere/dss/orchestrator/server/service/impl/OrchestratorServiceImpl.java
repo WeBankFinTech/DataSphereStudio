@@ -448,7 +448,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
             // 回滚清空存量BML
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
-            if (dssFlow.getRootFlow() && labels.getRoute().equals("dev")) {
+            if (labels.getRoute().equals("dev")) {
                 DSSLabel envDSSLabel = new EnvDSSLabel(labels.getRoute());
                 flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), Collections.singletonList(envDSSLabel));
             }

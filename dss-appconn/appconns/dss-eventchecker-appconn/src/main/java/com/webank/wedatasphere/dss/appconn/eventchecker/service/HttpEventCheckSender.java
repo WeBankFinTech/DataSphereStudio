@@ -64,6 +64,8 @@ public class HttpEventCheckSender extends AbstractEventCheck {
         HttpMsgSendRequest message = new HttpMsgSendRequest(sender, topic, msgName, runDate, msgId, msgBody);
         String responseBody = null;
         String messageJson = gson.toJson(message);
+        String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
+        log.info(requestStr);
         try (Response response = EventCheckerHttpUtils.post(url, header, null, messageJson)) {
             HttpMsgSendResponse msgSendResponse;
             try {
@@ -79,9 +81,7 @@ public class HttpEventCheckSender extends AbstractEventCheck {
                 result = true;
                 log.info("send successfully.jobId:{}",jobId);
             } else {
-                String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
-                log.info(requestStr);
-                String errorMsg = response.body().string();
+                String errorMsg ="信号发送失败，详情："+ responseBody;
                 log.error("send failed,response:{}", errorMsg);
                 throw new RuntimeException(errorMsg);
             }

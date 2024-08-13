@@ -211,8 +211,15 @@ public class DSSGitUtils {
                 rootMeta.setAbsolutePath(statu);
                 rootMeta.addChild(statu);
             } else {
-                root.setAbsolutePath(statu);
-                root.addChild(statu);
+                List<String> typeList = GitConstant.GIT_SERVER_SEARCH_TYPE;
+                for (String type : typeList) {
+                    if (statu.endsWith(type)) {
+                        root.setAbsolutePath(statu);
+                        root.addChild(statu);
+                        break;
+                    }
+                }
+
             }
         }
         Map<String, GitTree> children = root.getChildren();

@@ -60,6 +60,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DSSGitUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
@@ -919,6 +920,8 @@ public class DSSGitUtils {
             gitLogHistory(git, repository, oldCommitId, commitIdNow, path, gitCommitResponseList, commitIdSet);
             // 元数据改动
             gitLogHistory(git, repository, oldCommitId, commitIdNow, GitConstant.GIT_SERVER_META_PATH + File.separator + path, gitCommitResponseList, commitIdSet);
+
+            gitCommitResponseList = gitCommitResponseList.stream().sorted(Comparator.comparing(GitCommitResponse::getCommitTime).reversed()).collect(Collectors.toList());
         } catch (Exception e) {
             throw new GitErrorException(80121, "get log between " + oldCommitId + " and " + newCommitId + "failed, the reason is : ", e);
         }

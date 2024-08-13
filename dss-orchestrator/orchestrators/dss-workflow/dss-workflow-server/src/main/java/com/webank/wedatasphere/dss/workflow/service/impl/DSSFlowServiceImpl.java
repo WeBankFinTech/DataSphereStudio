@@ -305,10 +305,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
 
         // 解析并保存元数据
-        if (dssFlow.getRootFlow()) {
-            List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labels.getRoute()));
-            saveFlowMetaData(flowID, jsonFlow, dssLabelList);
-        }
+        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labels.getRoute()));
+        saveFlowMetaData(flowID, jsonFlow, dssLabelList);
+
 
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
             logger.info("saveFlow is not change");
@@ -421,7 +420,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);
         Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabelList);
-        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(flowID)),
+        Long rootFlowId = getRootFlowId(flowID);
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
                 OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
         NodeMetaDO nodeMetaByOrchestratorId = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorId);

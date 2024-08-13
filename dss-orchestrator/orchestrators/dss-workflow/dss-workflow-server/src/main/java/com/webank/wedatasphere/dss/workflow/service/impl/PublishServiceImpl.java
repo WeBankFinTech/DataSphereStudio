@@ -131,17 +131,21 @@ public class PublishServiceImpl implements PublishService {
         Long projectId = dssFlow.getProjectId();
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
+        // 校验发布权限
         ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
                         .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, convertUser)),
                 ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
-        boolean isEditable = false;
+        boolean isReleasable = false;
         if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
-            isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
+            isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
         }
-        isEditable = isEditable || projectUserAuthResponse.getProjectOwner().equals(convertUser);
+        isReleasable = isReleasable || projectUserAuthResponse.getProjectOwner().equals(convertUser);
+
+
+
         DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
-        if (!isEditable) {
-            DSSExceptionUtils.dealErrorException(63335, "用户" + convertUser + "没有项目" + dssProject.getName() + "编辑权限，请检查后重新提交", DSSErrorException.class);
+        if (!isReleasable) {
+            throw new DSSErrorException(800001, "用户" + convertUser + "没有项目" + dssProject.getName() + "发布权限，请检查后重新发布");
         }
 
         if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {

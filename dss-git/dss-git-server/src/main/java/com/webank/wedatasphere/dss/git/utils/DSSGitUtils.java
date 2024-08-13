@@ -211,15 +211,7 @@ public class DSSGitUtils {
                 rootMeta.setAbsolutePath(statu);
                 rootMeta.addChild(statu);
             } else {
-                List<String> typeList = GitConstant.GIT_SERVER_SEARCH_TYPE;
-                for (String type : typeList) {
-                    if (statu.endsWith(type)) {
-                        root.setAbsolutePath(statu);
-                        root.addChild(statu);
-                        break;
-                    }
-                }
-
+                filterRoot(statu, root);
             }
         }
         Map<String, GitTree> children = root.getChildren();
@@ -335,8 +327,18 @@ public class DSSGitUtils {
             rootMeta.setAbsolutePath(path);
             rootMeta.addChild(pathName);
         } else {
-            root.setAbsolutePath(path);
-            root.addChild(pathName);
+            filterRoot(path, root);
+        }
+    }
+
+    private static void filterRoot(String path, GitTree root) {
+        List<String> typeList = GitConstant.GIT_SERVER_SEARCH_TYPE;
+        for (String type : typeList) {
+            if (path.endsWith(type)) {
+                root.setAbsolutePath(path);
+                root.addChild(path);
+                break;
+            }
         }
     }
 

@@ -305,7 +305,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             throw new DSSErrorException(80001, "编排不存在，请刷新页面重新保存");
         }
         DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
-        if (dssOrchestratorVersion!= null && dssOrchestratorVersion.getAppId().equals(rootFlowId)) {
+        if (dssOrchestratorVersion!= null && !dssOrchestratorVersion.getAppId().equals(rootFlowId)) {
             throw new DSSErrorException(80001, "编排该版本已发布，不允许进行修改，请刷新页面重新保存");
         }
 

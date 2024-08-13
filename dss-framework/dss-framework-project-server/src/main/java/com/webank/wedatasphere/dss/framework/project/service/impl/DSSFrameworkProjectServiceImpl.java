@@ -41,6 +41,12 @@ import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserS
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
+import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
+import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
+import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.structure.project.*;
@@ -49,6 +55,7 @@ import com.webank.wedatasphere.dss.standard.app.structure.utils.StructureOperati
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalOperationFailedException;
 import com.webank.wedatasphere.dss.framework.project.dao.DSSProjectMapper;
+import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -82,6 +89,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     private DSSProjectMapper projectMapper;
     @Autowired
     private DSSWorkspaceUserService dssWorkspaceUserService;
+    @Autowired
+    private OrchestratorService orchestratorService;
+    @Autowired
+    private LockMapper lockMapper;
 
 
     private static final boolean STRICT_PROJECT_CREATE_MODE = CommonVars.apply("wds.dss.project.strict.mode", false).getValue();
@@ -457,6 +468,13 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
             if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
                 createGitProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
+                OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), projectModifyRequest.getId());
+                List<DSSOrchestratorInfo> orchestratorInfoByLabel = orchestratorService.getOrchestratorInfoByLabel(orchestratorRequest);
+                if (CollectionUtils.isNotEmpty(orchestratorInfoByLabel)) {
+                    List<Long> orchestratorIdList = orchestratorInfoByLabel.stream().map(DSSOrchestratorInfo::getId).collect(Collectors.toList());
+                    lockMapper.batchUpdateOrchestratorStatus(orchestratorIdList, OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                }
+
             } else {
                 updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
             }

@@ -65,19 +65,29 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
                     //{"msg_id", "msg_name", "receiver", "msg"};
                     consumedMsgInfo = new String[]{msgId, msgName, receiver, msgBodyJson};
                 }else if ("fail".equals(msgReceiveResponse.getStatus())){
-                    String errorMsg = response.body().string();
-                    log.error("receive failed,response:{}", errorMsg);
+                    log.error("receive failed,response:{}", responseBody);
+                    String errorMsg = "信号接收失败。详情："+responseBody;
                     throw new RuntimeException(errorMsg);
                 }else{
+                    log.info("receive failed,will try again later ,retCode:{},status:{},message:{}",
+                     msgReceiveResponse.getRetCode()
+                    ,msgReceiveResponse.getStatus()
+                    ,msgReceiveResponse.getMessage()
+                    );
                     consumedMsgInfo = null;
                 }
             } else if (reCode == 9998) {
+                log.info("message has not send to third system,will try again later ,retCode:{},status:{},message:{}",
+                        msgReceiveResponse.getRetCode()
+                        ,msgReceiveResponse.getStatus()
+                        ,msgReceiveResponse.getMessage()
+                );
                 consumedMsgInfo = null;
             } else {
                 String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
                 log.info(requestStr);
-                String errorMsg = response.body().string();
-                log.error("receive failed,response:{}", errorMsg);
+                log.error("receive failed,response:{}", responseBody);
+                String errorMsg = "信号接收失败。详情："+responseBody;
                 throw new RuntimeException(errorMsg);
             }
             return consumedMsgInfo;

@@ -276,18 +276,18 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             Long projectId = projectMap.get(projectName);
 
             List<Long> orchestratorIdList = new ArrayList<>();
-            // 校验发布权限
+
             ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
                             .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username)),
                     ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
-            boolean isReleasable = false;
+            boolean isEditable = false;
             if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
-                isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+                isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
             }
-            isReleasable = isReleasable || projectUserAuthResponse.getProjectOwner().equals(username);
+            isEditable = isEditable || projectUserAuthResponse.getProjectOwner().equals(username);
 
-            if (!isReleasable) {
-                throw new DSSErrorException(800001, "用户" + username + "没有项目" + projectName + "发布权限，请检查后重新发布");
+            if (!isEditable) {
+                DSSExceptionUtils.dealErrorException(63335, "用户" + username + "没有项目" + projectName + "编辑权限，请检查后重新提交", DSSErrorException.class);
             }
 
             for (OrchestratorRelationVo relationVo : orchestratorRelationVos) {

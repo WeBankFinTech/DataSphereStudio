@@ -160,6 +160,12 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     private GitTree getFileTree(String path, Boolean meta) throws GitErrorException {
         Path currentDir = Paths.get(path);
+        GitTree root = new GitTree("");
+
+        File tempfile =new File(path);
+        if (!tempfile.exists()) {
+            return root;
+        }
 
         String substring = path.substring(path.lastIndexOf("/") + 1);
 
@@ -170,7 +176,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
             result = substring;
         }
 
-        GitTree root = new GitTree("");
+
 
         try (Stream<Path> paths = Files.walk(currentDir)) {
             paths

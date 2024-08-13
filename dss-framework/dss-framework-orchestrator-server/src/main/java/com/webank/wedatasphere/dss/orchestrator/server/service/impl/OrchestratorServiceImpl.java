@@ -441,16 +441,17 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         if (rollBackGitVo == null) {
             return;
         }
+
         DSSOrchestratorVersion dssOrchestratorVersion = rollBackGitVo.getDssOrchestratorVersion();
         DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
+        DSSFlow dssFlow = flowMapper.selectFlowByID(dssOrchestratorVersion.getAppId());
         if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
-            DSSFlow dssFlow = flowMapper.selectFlowByID(dssOrchestratorVersion.getAppId());
             lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
             // 回滚清空存量BML
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
-            if (labels.getRoute().equals("dev")) {
-                flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
-            }
+        }
+        if (labels.getRoute().equals("dev")) {
+            flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
         }
 
     }

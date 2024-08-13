@@ -58,13 +58,13 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
             int reCode = msgReceiveResponse.getRetCode();
             if (reCode == 0 ) {
                 log.info("receive request successfully.jobId:{}",jobId);
-                if("success".equals(msgReceiveResponse.getStatus())) {
+                if("SUCCESS".equalsIgnoreCase(msgReceiveResponse.getStatus())) {
                     log.info("receive  successfully,now try to parse message.jobId:{}",jobId);
                     String msgBodyJson = gson.toJson(msgReceiveResponse.getMsgBody());
                     String msgId = String.valueOf(msgReceiveResponse.getMsgId());
                     //{"msg_id", "msg_name", "receiver", "msg"};
                     consumedMsgInfo = new String[]{msgId, msgName, receiver, msgBodyJson};
-                }else if ("fail".equals(msgReceiveResponse.getStatus())){
+                }else if ("FAILED".equalsIgnoreCase(msgReceiveResponse.getStatus())){
                     log.error("receive failed,response:{}", responseBody);
                     String errorMsg = "信号接收失败。详情："+responseBody;
                     throw new RuntimeException(errorMsg);

@@ -30,7 +30,7 @@ public interface PublishService {
     String submitPublish(String publishUser, Long workFlowId,
         Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception;
 
-    void batchPublish(String ticketId,BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception;
+    void batchPublish(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception;
 
     ResponseConvertOrchestrator getStatus(String username, String taskId) throws Exception;
 

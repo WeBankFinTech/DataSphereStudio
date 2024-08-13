@@ -333,7 +333,8 @@ public class DSSGitUtils {
     }
 
     private static void filterRoot(String path, GitTree root) {
-        List<String> typeList = GitConstant.GIT_SERVER_SEARCH_TYPE;
+        List<String> typeList = new ArrayList<>();
+        typeList.addAll(GitConstant.GIT_SERVER_SEARCH_TYPE);
         typeList.add(".properties");
         for (String type : typeList) {
             if (path.endsWith(type)) {

@@ -123,8 +123,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 List<GitTree> metaTree = new ArrayList<>();
                 String path = gitPrePath + File.separator + filePath;
                 String metaPath = gitPrePath+ File.separator + GitConstant.GIT_SERVER_META_PATH + File.separator + filePath;
-                GitTree fileTree = getFileTree(path);
-                GitTree metaFileTree = getFileTree(metaPath);
+                GitTree fileTree = getFileTree(path, false);
+                GitTree metaFileTree = getFileTree(metaPath, true);
 
                 for (Map.Entry<String, GitTree> entry : fileTree.getChildren().entrySet()) {
                     codeTree.add(entry.getValue());
@@ -148,10 +148,17 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
 
     }
 
-    private GitTree getFileTree(String path) throws GitErrorException {
+    private GitTree getFileTree(String path, Boolean meta) throws GitErrorException {
         Path currentDir = Paths.get(path);
 
         String substring = path.substring(path.lastIndexOf("/") + 1);
+
+        String result;
+        if (meta) {
+            result = GitConstant.GIT_SERVER_META_PATH + File.separator + substring;
+        }else {
+            result = substring;
+        }
 
         GitTree root = new GitTree("");
 
@@ -161,7 +168,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                     .forEach(file -> {
                         // 获取相对路径
                         Path relativePath = currentDir.relativize(file);
-                        String fullPath = substring + File.separator + relativePath.toString();
+                        String fullPath = result + File.separator + relativePath.toString();
                         root.setAbsolutePath(fullPath);
                         root.addChild(fullPath);
                     });

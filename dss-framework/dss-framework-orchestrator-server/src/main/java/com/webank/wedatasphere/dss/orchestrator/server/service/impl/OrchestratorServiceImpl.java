@@ -482,9 +482,10 @@ public class OrchestratorServiceImpl implements OrchestratorService {
     //是否存在相同的编排名称,如果不存在相同的编排名称則返回编排id
     @Override
     public Long isExistSameNameBeforeUpdate(OrchestratorModifyRequest orchestratorModifRequest, DSSProject dssProject, String username) throws DSSFrameworkErrorException {
-        DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorModifRequest.getId());
+        Long orchestratorId = orchestratorModifRequest.getId();
+        DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorId);
         if (orchestratorInfo == null) {
-            DSSFrameworkErrorException.dealErrorException(60000, "编排模式ID=" + orchestratorModifRequest.getId() + "不存在");
+            DSSFrameworkErrorException.dealErrorException(60000, "编排模式ID=" + orchestratorId + "不存在");
         }
         //若修改了编排名称，检查是否存在相同的编排名称
         if (!orchestratorModifRequest.getOrchestratorName().equals(orchestratorInfo.getName())) {
@@ -493,6 +494,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
                 GitRenameRequest renameRequest = new GitRenameRequest(orchestratorInfo.getWorkspaceId(), dssProject.getName(), orchestratorInfo.getName(), orchestratorModifRequest.getOrchestratorName(), username);
                 RpcAskUtils.processAskException(sender.ask(renameRequest), GitCommitResponse.class, GitRenameRequest.class);
+                lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
             }
         }
         return orchestratorInfo.getId();

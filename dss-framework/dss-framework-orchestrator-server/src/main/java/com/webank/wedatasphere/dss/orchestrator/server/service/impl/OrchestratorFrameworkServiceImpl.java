@@ -315,6 +315,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //3.将工程和orchestrator的关系存储到的数据库中
         CommonOrchestratorVo orchestratorVo = new CommonOrchestratorVo();
         orchestratorVo.setOrchestratorId(orchestratorId);
+        // 清空BML
+        orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
         return orchestratorVo;
     }
 

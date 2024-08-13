@@ -38,6 +38,7 @@ import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
+import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
@@ -296,6 +297,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                            String workspaceName,
                            String projectName,
                            LabelRouteVO labels) throws Exception {
+        //判断该工作流对应编排是否已发布，若已发布则不允许修改
+        Long rootFlowId = getRootFlowId(flowID);
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                OrchestratorVo.class, RequestQuertByAppIdOrchestrator.class);
+        if (orchestratorVo == null) {
+            throw new DSSErrorException(80001, "编排不存在，请刷新页面重新保存");
+        }
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+        if (dssOrchestratorVersion!= null && dssOrchestratorVersion.getAppId().equals(rootFlowId)) {
+            throw new DSSErrorException(80001, "编排该版本已发布，不允许进行修改，请刷新页面重新保存");
+        }
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -305,9 +317,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
 
         // 解析并保存元数据
-        List<DSSLabel> dssLabelList = Arrays.asList(new EnvDSSLabel(labels.getRoute()));
-        saveFlowMetaData(flowID, jsonFlow, dssLabelList);
-
+        Long orchestratorId = dssOrchestratorVersion.getOrchestratorId();
+        saveFlowMetaData(flowID, jsonFlow, orchestratorId);
 
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
             logger.info("saveFlow is not change");
@@ -344,13 +355,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String version = bmlReturnMap.get("version").toString();
         // 对子工作流,需更新父工作流状态，以便提交
         Long updateFlowId = parentFlowID == null? dssFlow.getId():parentFlowID;
-        updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId);
+        updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId, orchestratorId);
 
         return version;
     }
 
     @Override
-    public void updateTOSaveStatus(Long projectId, Long flowID) throws Exception{
+    public void updateTOSaveStatus(Long projectId, Long flowID, Long orchestratorId) throws Exception{
         try {
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             //仅对接入Git的项目 更新状态为 保存
@@ -361,9 +372,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     BmlResource bmlResource = new BmlResource();
                     bmlResource.setResourceId(null);
                     bmlResource.setVersion(null);
-                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestUpdateOrchestratorBML(rootFlowId, bmlResource)),
+                    RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestUpdateOrchestratorBML(rootFlowId, bmlResource)),
                             OrchestratorVo.class, RequestUpdateOrchestratorBML.class);
-                    lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                    lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
                 }
             }
         } catch (DSSErrorException e) {
@@ -389,7 +400,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public void saveFlowMetaData(Long flowID, String jsonFlow, List<DSSLabel> dssLabelList) {
+    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
         // 解析 jsonflow
         // 解析 proxyUser
         List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
@@ -419,11 +430,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);
-        Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabelList);
-        Long rootFlowId = getRootFlowId(flowID);
-        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
-                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
-        Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
+
         NodeMetaDO nodeMetaByOrchestratorId = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorId);
 
         if (nodeMetaByOrchestratorId == null) {

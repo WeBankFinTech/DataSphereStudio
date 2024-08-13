@@ -137,17 +137,18 @@ public class OrchestratorCopyJob implements Runnable {
         dssOrchestratorVersion.setContent((String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_CONTENT_KEY));
         List<String[]> paramConfTemplateIds=(List<String[]>) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY);
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestrator(dssOrchestratorInfo);
-        dssOrchestratorVersion.setOrchestratorId(dssOrchestratorInfo.getId());
+        Long orchestratorId = dssOrchestratorInfo.getId();
+        dssOrchestratorVersion.setOrchestratorId(orchestratorId);
         orchestratorCopyEnv.getOrchestratorMapper().addOrchestratorVersion(dssOrchestratorVersion);
         orchestratorCopyEnv.getAddOrchestratorVersionHook().afterAdd(dssOrchestratorVersion, Collections.singletonMap(OrchestratorRefConstant.ORCHESTRATION_FLOWID_PARAMCONF_TEMPLATEID_TUPLES_KEY,paramConfTemplateIds));
         // 更新flowJson\
         if (dssLabels.get(0).getValue().get(EnvDSSLabel.DSS_ENV_LABEL_KEY).equals("dev")) {
             DSSFlow flowByID = orchestratorCopyEnv.getFlowService().getFlow(flowId);
             if (flowByID != null) {
-                orchestratorCopyEnv.getFlowService().saveFlowMetaData(flowId, flowByID.getFlowJson(), dssLabels);
+                orchestratorCopyEnv.getFlowService().saveFlowMetaData(flowId, flowByID.getFlowJson(), orchestratorId);
             }
             if (targetProject != null && targetProject.getAssociateGit() && flowByID != null) {
-                orchestratorCopyEnv.getFlowService().updateTOSaveStatus(targetProject.getId(), flowByID.getId());
+                orchestratorCopyEnv.getFlowService().updateTOSaveStatus(targetProject.getId(), flowByID.getId(), orchestratorId);
             }
         }
     }

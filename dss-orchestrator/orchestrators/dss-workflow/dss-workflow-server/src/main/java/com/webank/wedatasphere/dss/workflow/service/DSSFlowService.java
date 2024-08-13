@@ -58,9 +58,9 @@ public interface DSSFlowService {
                     LabelRouteVO labels
     ) throws Exception;
 
-    void updateTOSaveStatus(Long projectId, Long flowID) throws Exception;
+    void updateTOSaveStatus(Long projectId, Long flowID, Long orchestratorId) throws Exception;
 
-    void saveFlowMetaData(Long flowID, String jsonFlow, List<DSSLabel> dssLabels);
+    void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId);
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,

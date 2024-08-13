@@ -20,11 +20,14 @@ import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.scheduler.SchedulerAppConn;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
@@ -46,13 +49,13 @@ import com.webank.wedatasphere.dss.workflow.entity.request.BatchPublishWorkflowR
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.PublishService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -125,9 +128,22 @@ public class PublishServiceImpl implements PublishService {
             return null;
         }
         LOGGER.info("User {} begins to convert workflow {}.", convertUser, dssFlow.getName());
+        Long projectId = dssFlow.getProjectId();
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
-        projectInfoRequest.setProjectId(dssFlow.getProjectId());
+        projectInfoRequest.setProjectId(projectId);
+        ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                        .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, convertUser)),
+                ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+        boolean isEditable = false;
+        if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+            isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
+        }
+        isEditable = isEditable || projectUserAuthResponse.getProjectOwner().equals(convertUser);
         DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+        if (!isEditable) {
+            DSSExceptionUtils.dealErrorException(63335, "用户" + convertUser + "没有项目" + dssProject.getName() + "编辑权限，请检查后重新提交", DSSErrorException.class);
+        }
+
         if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
             DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
         }

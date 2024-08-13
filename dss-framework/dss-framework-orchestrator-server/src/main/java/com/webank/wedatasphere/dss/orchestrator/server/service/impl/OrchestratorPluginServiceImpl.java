@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -26,6 +27,8 @@ import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.protocol.*;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
@@ -271,7 +274,22 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             List<OrchestratorRelationVo> orchestratorRelationVos = entry.getValue();
             String projectName = entry.getKey();
             Long projectId = projectMap.get(projectName);
+
             List<Long> orchestratorIdList = new ArrayList<>();
+            // 校验发布权限
+            ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                            .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, username)),
+                    ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+            boolean isReleasable = false;
+            if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+                isReleasable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+            }
+            isReleasable = isReleasable || projectUserAuthResponse.getProjectOwner().equals(username);
+
+            if (!isReleasable) {
+                throw new DSSErrorException(800001, "用户" + username + "没有项目" + projectName + "发布权限，请检查后重新发布");
+            }
+
             for (OrchestratorRelationVo relationVo : orchestratorRelationVos) {
                 Long orchestratorId = relationVo.getOrchestratorId();
                 orchestratorIdList.add(orchestratorId);

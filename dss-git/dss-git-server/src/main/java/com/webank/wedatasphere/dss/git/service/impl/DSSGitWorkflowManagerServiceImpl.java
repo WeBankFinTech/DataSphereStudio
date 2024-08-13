@@ -611,7 +611,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 GitCommitResponse currentCommit = DSSGitUtils.getCurrentCommit(repository);
                 if (currentCommit.getCommitId() != null) {
                     contentResponse.setAfterCommitId(currentCommit.getCommitId());
-                    contentResponse.setAfterAnnotate(currentCommit.getComment());
+                    contentResponse.setAfterAnnotate(currentCommit.getCommentFull());
                 }
                 contentResponse.setAfter(after);
             } else {

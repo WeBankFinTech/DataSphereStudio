@@ -670,8 +670,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorMeta.getStatus())
                     || OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorMeta.getStatus()) ) {
 
-                // 对于当前状态为push或者为空的，查询 dss_release_task，根据编排Id获取，状态-待发布
+                // 对于当前状态为push、publish或者为空的，查询 dss_release_task，根据编排Id获取
                 if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())) {
+                    // 发布失败
                     orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
                     orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
 

@@ -226,6 +226,15 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         List<DSSFlow> dssFlowList = flowMapper.selectFlowListByID(flowIdList);
         String projectPath = workFlowExportService.exportFlowListNew(dssProjectId, projectName, flowIdList, userName, workspace, dssLabels,exportExternalNodeAppConnResource);
         String exportPath = ZipHelper.zip(projectPath);
+        File file = new File(exportPath);
+        if (file.exists() && file.isFile()) {
+            String limitValue = DSSWorkFlowConstant.DEFAULT_ZIP_FILE_LIMIT.getValue();
+            // GB
+            Long limits = Long.parseLong(limitValue) * 1024 * 1024 * 1024;
+            if (file.length() > limits) {
+                throw new DSSErrorException(100098, "工作流导出失败，原因为本次导出总大小超过" + limitValue + "GB");
+            }
+        }
         InputStream inputStream = bmlService.readLocalResourceFile(userName, exportPath);
         BmlResource bmlResource = bmlService.upload(userName, inputStream, projectName + ".export", projectName);
         logger.info("export workflow success.  flowId:{},bmlResource:{} .",flowIdList,bmlResource);

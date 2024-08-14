@@ -153,8 +153,6 @@ public interface OrchestratorService {
 
     List<DSSOrchestratorInfo> getOrchestratorInfoByLabel(OrchestratorRequest orchestratorRequest);
 
-    OrchestratorMeta getOrchestratorMetaInfo(ModifyOrchestratorMetaRequest modifyOrchestratorMetaRequest, DSSProject dssProject, String username) throws DSSFrameworkErrorException;
-
     List<OrchestratorStatusVo> getOrchestratorGitStatus();
 
     List<String> getAllOrchestratorName(Long workspaceId,String projectName);

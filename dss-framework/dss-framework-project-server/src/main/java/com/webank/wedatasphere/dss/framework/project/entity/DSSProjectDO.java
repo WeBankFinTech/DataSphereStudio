@@ -111,7 +111,6 @@ public class DSSProjectDO implements Serializable {
     /**
      * 标签
      */
-    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String label;
 
     public Long getId() {

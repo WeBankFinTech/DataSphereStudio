@@ -623,7 +623,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             releaseVersionList = releaseVersionInfos.stream()
                     .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId)).values()
                     .stream()
-                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getReleaseTime)).get()))
+                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getId)).get()))
                     .collect(Collectors.toList());
         }
         // 获取模板名称
@@ -957,22 +957,18 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         if (orchestratorInfo.getAssociateGit() != null && orchestratorInfo.getAssociateGit()) {
             //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-            if(orchestratorSubmitJob != null && releaseVersion != null && releaseVersion.getReleaseTime() != null ){
-                // 根据updateTime判断优先状态获取
-                if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getReleaseTime()) > 0){
-                    getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorInfo);
-                }else {
-                    getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);
-                }
 
-            }else if (orchestratorSubmitJob == null){
-                // 提交为NULL 获取发布
-                getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);
-            }else if (releaseVersion == null){
-                // 发布为NULL 获取提交
+            if(OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorInfo.getStatus()) && orchestratorSubmitJob!= null){
+
                 getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorInfo);
-            }else {
-                // 默认 待提交状态
+
+            }else if (StringUtils.isBlank(orchestratorInfo.getStatus())
+                    || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorInfo.getStatus())
+                    || OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorInfo.getStatus())) {
+
+                getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);
+
+            }else{
                 orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
             }
 
@@ -981,6 +977,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
                 // 发布中
                 orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
+
+            }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())){
+                // 发布失败 -> 无状态
+                orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
+                orchestratorInfo.setErrorMsg(releaseVersion.getErrorMsg());
             }else{
                 // 无状态
                 orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);

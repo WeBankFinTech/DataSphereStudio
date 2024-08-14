@@ -205,6 +205,7 @@ public class ProjectCreateRequest {
                 ", associateGit=" + associateGit +
                 ", gitToken=" + gitToken +
                 ", gitUser=" + gitUser +
+                ", creatorLabel=" + creatorLabel +
                 '}';
     }
 

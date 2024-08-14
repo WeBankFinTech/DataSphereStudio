@@ -132,6 +132,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         if (workspaceIdByUser != null && !workspaceIdByUser.equals(workspaceId)) {
             throw new DSSErrorException(80001, "该Git用户已在" + workspaceIdByUser + "配置，请更换Git用户重试");
         }
+        // 数据库是否存在标志
         Boolean isExist = false;
         GitProjectGitInfo projectGitInfo = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectGitInfo != null ) {
@@ -146,9 +147,19 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         if (tokenTest) {
             String projectPath = gitUser + "/" + projectName;
             // 检测项目名称是否重复 数据库中已存在的配置无需再次校验
-            if (isExist || !DSSGitUtils.checkIfProjectExists(gitToken, projectPath)) {
+            if (isExist) {
+                // 存在说明项目已创建，本次为更新
                 GitProjectGitInfo gitProjectGitInfo = new GitProjectGitInfo(workspaceId, projectName, gitUser, gitToken, gitUrl);
-                GitProjectManager.updateProjectInfo(gitProjectGitInfo, isExist);
+                GitProjectManager.updateProjectInfo(gitProjectGitInfo, true);
+            } else {
+                // 否则需要检测Git是否已有同名项目，若没有才可以新增
+                boolean projectExists = DSSGitUtils.checkIfProjectExists(gitToken, projectPath);
+                if (!projectExists) {
+                    GitProjectGitInfo gitProjectGitInfo = new GitProjectGitInfo(workspaceId, projectName, gitUser, gitToken, gitUrl);
+                    GitProjectManager.updateProjectInfo(gitProjectGitInfo, false);
+                } else {
+                    throw new GitErrorException(80101, "git账号: "+ gitUser+ "下已存在同名项目"+ projectName +"，请更换git账号或项目名称");
+                }
             }
         } else {
             throw new GitErrorException(80101, "git init failed, the reason is: projectName " + projectName +" already exists");

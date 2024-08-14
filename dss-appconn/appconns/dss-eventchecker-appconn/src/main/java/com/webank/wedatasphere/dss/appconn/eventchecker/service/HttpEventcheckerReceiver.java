@@ -39,6 +39,7 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
         header.put("timestamp", timestamp);
         //params = new String[]{nowStartTime, todayEndTime, lastMsgId, useRunDateFlag.toString(), runDate}
         boolean useRunDate=Boolean.parseBoolean(params[3]);
+        Long lastMsgId = Long.valueOf(params[2]);
         String runDate=params[4];
         Gson gson = new GsonBuilder().create();
         boolean receiveTodayFlag = (null != receiveToday && "true".equalsIgnoreCase(receiveToday.trim()));
@@ -61,9 +62,12 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
                 if("SUCCESS".equalsIgnoreCase(msgReceiveResponse.getStatus())) {
                     log.info("receive  successfully,now try to parse message.jobId:{}",jobId);
                     String msgBodyJson = gson.toJson(msgReceiveResponse.getMsgBody());
-                    String msgId = String.valueOf(msgReceiveResponse.getMsgId());
-                    //{"msg_id", "msg_name", "receiver", "msg"};
-                    consumedMsgInfo = new String[]{msgId, msgName, receiver, msgBodyJson};
+                    Long msgId = msgReceiveResponse.getMsgId();
+                    if (msgId > lastMsgId) {
+                        log.info("receive  new message successfully.jobId:{}", jobId);
+                        //{"msg_id", "msg_name", "receiver", "msg"};
+                        consumedMsgInfo = new String[]{msgId.toString(), msgName, receiver, msgBodyJson};
+                    }
                 }else if ("FAILED".equalsIgnoreCase(msgReceiveResponse.getStatus())){
                     log.error("receive failed,response:{}", responseBody);
                     String errorMsg = "信号接收失败。详情："+responseBody;

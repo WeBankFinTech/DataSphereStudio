@@ -686,6 +686,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
                     // 发布中
                     orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
+
+                }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())){
+                    // 发布失败 -> 无状态
+                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
+                    orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
+
                 }else{
                     // 无状态
                     orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);

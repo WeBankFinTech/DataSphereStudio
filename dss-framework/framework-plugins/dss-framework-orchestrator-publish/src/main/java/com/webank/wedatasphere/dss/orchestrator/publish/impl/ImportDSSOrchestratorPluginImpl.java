@@ -225,13 +225,14 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         // 更新flowJson
         if (dssLabels.get(0).getValue().get(EnvDSSLabel.DSS_ENV_LABEL_KEY).equals("dev")) {
             Long appId = dssOrchestratorVersion.getAppId();
+            Long versionOrchestratorId = dssOrchestratorVersion.getOrchestratorId();
             DSSFlow flowByID = dssFlowService.getFlow(appId);
             if (flowByID != null) {
-                dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), orchestrationId);
+                dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), versionOrchestratorId);
             }
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             if (projectInfo.getAssociateGit()) {
-                dssFlowService.updateTOSaveStatus(projectInfo.getId(), appId, orchestrationId);
+                dssFlowService.updateTOSaveStatus(projectInfo.getId(), appId, versionOrchestratorId);
             }
         }
 

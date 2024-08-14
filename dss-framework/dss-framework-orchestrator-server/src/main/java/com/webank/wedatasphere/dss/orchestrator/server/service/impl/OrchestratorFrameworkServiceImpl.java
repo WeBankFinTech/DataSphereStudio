@@ -664,7 +664,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
                 if(orchestratorSubmitJob != null && releaseVersion.getOrchestratorId() != null){
                     // 根据updateTime判断优先状态获取
-                    if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getUpdateTime()) > 0){
+                    if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getReleaseTime()) > 0){
                         getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
                     }else {
                         getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
@@ -962,7 +962,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
             if(orchestratorSubmitJob != null && releaseVersion != null){
                 // 根据updateTime判断优先状态获取
-                if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getUpdateTime()) > 0){
+                if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getReleaseTime()) > 0){
                     getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorInfo);
                 }else {
                     getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);

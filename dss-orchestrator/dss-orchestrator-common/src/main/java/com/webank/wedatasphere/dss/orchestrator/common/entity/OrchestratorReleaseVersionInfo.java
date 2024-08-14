@@ -24,6 +24,8 @@ public class OrchestratorReleaseVersionInfo {
     // 更新人
     private String updater;
 
+    private Date releaseTime;
+
     public OrchestratorReleaseVersionInfo(Long id, Long orchestratorId, String version, Date updateTime, String status, String errorMsg, String updater) {
         this.id = id;
         this.orchestratorId = orchestratorId;
@@ -32,6 +34,14 @@ public class OrchestratorReleaseVersionInfo {
         this.status = status;
         this.errorMsg = errorMsg;
         this.updater = updater;
+    }
+
+    public Date getReleaseTime() {
+        return releaseTime;
+    }
+
+    public void setReleaseTime(Date releaseTime) {
+        this.releaseTime = releaseTime;
     }
 
     public OrchestratorReleaseVersionInfo() {

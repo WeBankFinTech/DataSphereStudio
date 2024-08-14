@@ -662,24 +662,21 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
             if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()) {
                 //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-                if(orchestratorSubmitJob != null && releaseVersion.getReleaseTime() != null){
-                    // 根据updateTime判断优先状态获取
-                    if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getReleaseTime()) > 0){
-                        getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
-                    }else {
-                        getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
-                    }
 
-                }else if (orchestratorSubmitJob == null){
-                    // 提交为NULL 获取发布
-                    getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
-                }else if (releaseVersion.getReleaseTime() == null){
-                    // 发布为NULL 获取提交
+                if(OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorMeta.getStatus()) && orchestratorSubmitJob!= null){
+
                     getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
-                }else {
-                    // 默认 待提交状态
+
+                }else if (StringUtils.isBlank(orchestratorMeta.getStatus())
+                        || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorMeta.getStatus())
+                        || OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorMeta.getStatus())) {
+
+                    getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
+
+                }else{
                     orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
                 }
+
 
             }else {
                 // 非git项目的工作流只有：发布中、无状态

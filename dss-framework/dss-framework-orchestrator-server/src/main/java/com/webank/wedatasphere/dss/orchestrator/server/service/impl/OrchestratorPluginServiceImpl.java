@@ -295,7 +295,6 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 orchestratorIdList.add(orchestratorId);
                 String status = lockMapper.selectOrchestratorStatus(orchestratorId);
                 if (StringUtils.isEmpty(status)) {
-                    DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
                     throw new DSSErrorException(800001, projectName + "项目未接入git，批量提交失败");
                 }
                 if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {

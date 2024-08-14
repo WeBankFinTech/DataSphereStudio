@@ -476,6 +476,7 @@
         ,a.updater          as updater
         ,b.status           as status
         ,b.error_msg        as errorMsg
+        ,b.update_time      as release_time
         from dss_orchestrator_version_info a
         left join dss_release_task b on a.orchestrator_id = b.orchestrator_id and a.id = b.orchestrator_version_id
         where a.valid_flag  = 1  and a.orchestrator_id  = #{orchestratorId}

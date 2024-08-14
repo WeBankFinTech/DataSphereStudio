@@ -92,6 +92,11 @@ public class ProjectModifyRequest {
     private String gitUser;
     private String gitToken;
 
+    /**
+     * 标签
+     */
+    private String creatorLabel;
+
     public String getName() {
         return name;
     }
@@ -215,6 +220,7 @@ public class ProjectModifyRequest {
                 ", associateGit=" + associateGit +
                 ", gitUser=" + gitUser +
                 ", gitToken=" + gitToken +
+                ", creatorLabel=" + creatorLabel +
                 '}';
     }
 
@@ -240,5 +246,13 @@ public class ProjectModifyRequest {
 
     public void setGitToken(String gitToken) {
         this.gitToken = gitToken;
+    }
+
+    public String getCreatorLabel() {
+        return creatorLabel;
+    }
+
+    public void setCreatorLabel(String creatorLabel) {
+        this.creatorLabel = creatorLabel;
     }
 }

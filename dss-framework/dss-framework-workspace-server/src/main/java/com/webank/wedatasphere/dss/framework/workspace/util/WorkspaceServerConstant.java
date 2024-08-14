@@ -18,7 +18,7 @@ package com.webank.wedatasphere.dss.framework.workspace.util;
 
 
 public interface WorkspaceServerConstant {
-    String DEFAULT_DEPARTMENT = "基础科技部";
+    String DEFAULT_DEPARTMENT = "基础科技产品部";
     String DEFAULT_OFFICE = "大数据平台室";
     String DEFAULT_STAFF_SPLIT = "-";
     String DEFAULT_RESIGNED = "已离职";

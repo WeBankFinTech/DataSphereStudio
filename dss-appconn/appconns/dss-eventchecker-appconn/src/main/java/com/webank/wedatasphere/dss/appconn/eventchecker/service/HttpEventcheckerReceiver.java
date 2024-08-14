@@ -85,7 +85,7 @@ public class HttpEventcheckerReceiver extends AbstractEventCheckReceiver{
                 consumedMsgInfo = null;
             } else {
                 String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
-                log.info(requestStr);
+                log.error("receive failed,request:{}", requestStr);
                 log.error("receive failed,response:{}", responseBody);
                 String errorMsg = "信号接收失败。详情："+responseBody;
                 throw new RuntimeException(errorMsg);

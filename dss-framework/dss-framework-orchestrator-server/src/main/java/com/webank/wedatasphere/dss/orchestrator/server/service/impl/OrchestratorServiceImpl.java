@@ -743,11 +743,12 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         } else if (StringUtils.isBlank(orchestratorInfo.getStatus())
                 || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorInfo.getStatus())
                 || OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorInfo.getStatus())) {
-            // 对于当前状态为push或者为空的，查询 dss_release_task，根据编排Id获取，状态-待发布
+            // 对于当前状态为push、publish或者为空的，查询 dss_release_task，根据编排Id获取
             OrchestratorReleaseVersionInfo releaseVersion = orchestratorMapper.getOrchestratorVersionById(orchestratorInfo.getOrchestratorId());
             if (releaseVersion != null) {
 
                 if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())) {
+                    // 发布失败
                     orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED);
                     orchestratorInfo.setErrorMsg(releaseVersion.getErrorMsg());
 

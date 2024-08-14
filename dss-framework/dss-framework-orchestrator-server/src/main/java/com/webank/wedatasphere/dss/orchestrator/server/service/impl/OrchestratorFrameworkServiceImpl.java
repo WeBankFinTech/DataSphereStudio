@@ -675,7 +675,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
                 }else if (releaseVersion.getOrchestratorId() == null){
                     // 发布为NULL 获取提交
-                    getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
+                    getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
                 }else {
                     // 默认 待提交状态
                     orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
@@ -967,7 +967,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);
             }else if (releaseVersion == null){
                 // 发布为NULL 获取提交
-                getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);
+                getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorInfo);
             }else {
                 // 默认 待提交状态
                 orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);

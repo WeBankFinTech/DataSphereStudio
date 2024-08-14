@@ -662,7 +662,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
             if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()) {
                 //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-                if(orchestratorSubmitJob != null && releaseVersion.getOrchestratorId() != null){
+                if(orchestratorSubmitJob != null && releaseVersion.getReleaseTime() != null){
                     // 根据updateTime判断优先状态获取
                     if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getReleaseTime()) > 0){
                         getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
@@ -673,7 +673,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 }else if (orchestratorSubmitJob == null){
                     // 提交为NULL 获取发布
                     getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
-                }else if (releaseVersion.getOrchestratorId() == null){
+                }else if (releaseVersion.getReleaseTime() == null){
                     // 发布为NULL 获取提交
                     getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
                 }else {
@@ -960,7 +960,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         if (orchestratorInfo.getAssociateGit() != null && orchestratorInfo.getAssociateGit()) {
             //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-            if(orchestratorSubmitJob != null && releaseVersion != null){
+            if(orchestratorSubmitJob != null && releaseVersion != null && releaseVersion.getReleaseTime() != null ){
                 // 根据updateTime判断优先状态获取
                 if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getReleaseTime()) > 0){
                     getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorInfo);

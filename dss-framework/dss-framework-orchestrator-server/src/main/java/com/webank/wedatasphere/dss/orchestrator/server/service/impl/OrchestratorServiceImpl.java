@@ -757,7 +757,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
                 }
             }
         }
-        }
+
 
         // 发布中和提交中的工作流不允许进行更新
         if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorInfo.getStatus())

@@ -954,7 +954,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         if (orchestratorInfo.getAssociateGit() != null && orchestratorInfo.getAssociateGit()) {
             //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-            if(orchestratorSubmitJob != null && releaseVersion.getOrchestratorId() != null){
+            if(orchestratorSubmitJob != null && releaseVersion != null){
                 // 根据updateTime判断优先状态获取
                 if (orchestratorSubmitJob.getUpdateTime().compareTo(releaseVersion.getUpdateTime()) > 0){
                     getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorInfo);
@@ -965,7 +965,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             }else if (orchestratorSubmitJob == null){
                 // 提交为NULL 获取发布
                 getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);
-            }else if (releaseVersion.getOrchestratorId() == null){
+            }else if (releaseVersion == null){
                 // 发布为NULL 获取提交
                 getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);
             }else {

@@ -319,7 +319,7 @@
     <update id="updateOrchestratorSubmitResult">
         update dss_orchestrator_submit_job_info
         <set>
-            `result` = #{result},`update_time` = Now() , `status` = #{status}
+            `submit_result` = #{result},`update_time` = Now() , `status` = #{status}
         </set>
         where `id` = #{id}
     </update>
@@ -347,7 +347,7 @@
     </select>
 
     <select id="selectResult" resultType="java.lang.String">
-        SELECT result FROM dss_orchestrator_submit_job_info WHERE id = #{id}
+        SELECT submit_result FROM dss_orchestrator_submit_job_info WHERE id = #{id}
     </select>
 
 

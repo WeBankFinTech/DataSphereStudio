@@ -336,8 +336,13 @@ public class DSSFrameworkOrchestratorRestful {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
-        Long taskId = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
-        return Message.ok().data("taskId", taskId);
+        try {
+            Long taskId = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
+            return Message.ok().data("taskId", taskId);
+        } catch (Exception e) {
+            return Message.error("获取对比内容失败，原因为：" + e.getMessage());
+        }
+
     }
 
     @RequestMapping(value = "diffStatus", method = RequestMethod.GET)

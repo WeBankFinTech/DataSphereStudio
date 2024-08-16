@@ -514,8 +514,12 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+    public Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws Exception{
         Long orchestratorId = flowRequest.getOrchestratorId();
+        String status = lockMapper.selectOrchestratorStatus(orchestratorId);
+        if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
+            throw new DSSErrorException(800001, "工作流无改动或改动未提交，请确认改动并保存再进行提交");
+        }
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         Long flowId = flowRequest.getFlowId();
         String projectName = flowRequest.getProjectName();

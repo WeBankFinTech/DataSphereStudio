@@ -65,7 +65,7 @@ public class HttpEventCheckSender extends AbstractEventCheck {
         String responseBody = null;
         String messageJson = gson.toJson(message);
         String requestStr = EventCheckerHttpUtils.requestToString(url, "POST", header, null, messageJson);
-        log.info("try to send http message,request",requestStr);
+        log.info("try to send http message,request{}",requestStr);
         try (Response response = EventCheckerHttpUtils.post(url, header, null, messageJson)) {
             HttpMsgSendResponse msgSendResponse;
             try {

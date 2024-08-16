@@ -18,13 +18,10 @@ package com.webank.wedatasphere.dss.appconn.eventchecker.utils;
 
 
 import cn.hutool.crypto.digest.DigestUtil;
-import com.google.gson.Gson;
-import com.webank.wedatasphere.dss.appconn.eventchecker.entity.HttpMsgReceiveRequest;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 

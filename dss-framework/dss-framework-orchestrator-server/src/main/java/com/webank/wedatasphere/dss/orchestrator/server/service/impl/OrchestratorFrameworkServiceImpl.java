@@ -564,8 +564,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(modifyOrchestratorMetaRequest.getProjectId(), username);
 
-        OrchestratorMeta orchestratorMetaInfo = getOrchestratorMetaInfo(modifyOrchestratorMetaRequest, dssProject, username);
+        OrchestratorModifyRequest orchestratorModifyRequest = new OrchestratorModifyRequest();
+        orchestratorModifyRequest.setOrchestratorName(modifyOrchestratorMetaRequest.getOrchestratorName());
+        orchestratorModifyRequest.setProjectId(modifyOrchestratorMetaRequest.getProjectId());
+        orchestratorModifyRequest.setId(modifyOrchestratorMetaRequest.getOrchestratorId());
+        orchestratorModifyRequest.setWorkspaceId(workspace.getWorkspaceId());
 
+        orchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest, dssProject, username);
+
+        OrchestratorMeta orchestratorMetaInfo = getOrchestratorMetaInfo(modifyOrchestratorMetaRequest, dssProject, username);
 
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorMetaInfo.getOrchestratorMode());
 

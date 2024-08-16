@@ -108,6 +108,10 @@
             <version>${linkis.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
                 </exclusion>

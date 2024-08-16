@@ -107,4 +107,6 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
     List<ProjectResponse> queryListByParam(ProjectQueryRequest projectRequest,List<Long> totals);
 
     List<DSSProject> getDSSProjectByName(List<String> name);
+
+    List<String> queryProjectName(ProjectQueryRequest projectRequest);
 }

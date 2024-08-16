@@ -388,14 +388,8 @@ public class DSSFrameworkProjectRestfulApi {
         }
 
         LOGGER.info("user {} begin to listAllProjectName, workspaceId: {}.", username, projectRequest.getWorkspaceId());
-        List<ProjectResponse> projectResponses = projectService.getListByParam(projectRequest);
 
-        List<String> projectNames = new ArrayList<>();
-
-        if (!CollectionUtils.isEmpty(projectResponses)) {
-
-            projectNames = projectResponses.stream().map(ProjectResponse::getName).collect(Collectors.toList());
-        }
+        List<String> projectNames = projectService.queryProjectName(projectRequest);
 
         return Message.ok().data("data", projectNames);
     }

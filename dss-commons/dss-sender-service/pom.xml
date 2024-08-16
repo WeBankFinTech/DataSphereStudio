@@ -56,6 +56,12 @@
             <groupId>com.webank.wedatasphere.dss</groupId>
             <artifactId>dss-development-process-standard</artifactId>
             <version>${dss.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.webank.wedatasphere.dss</groupId>

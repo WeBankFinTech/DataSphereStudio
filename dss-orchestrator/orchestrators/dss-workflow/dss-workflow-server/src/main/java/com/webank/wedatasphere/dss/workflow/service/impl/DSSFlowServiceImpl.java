@@ -82,6 +82,7 @@ import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -297,6 +298,19 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                            String workspaceName,
                            String projectName,
                            LabelRouteVO labels) throws Exception {
+
+        // 判断工作流中是否存在命名相同的节点
+        if (checkIsExistSameFlow(jsonFlow)) {
+            throw  new DSSErrorException(80001,"It exists same flow.(存在相同的节点)");
+        }
+
+        // 判断工作流中是否有子工作流未被保存
+        List<String> unSaveNodes = checkIsSave(flowID, jsonFlow);
+
+        if (CollectionUtils.isNotEmpty(unSaveNodes)) {
+            throw  new DSSErrorException(80001,"工作流中存在子工作流未被保存，请先保存子工作流：" + unSaveNodes);
+        }
+
         //判断该工作流对应编排是否已发布，若已发布则不允许修改
         Long rootFlowId = getRootFlowId(flowID);
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
@@ -563,6 +577,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return tempOldJson.equals(tempNewJson);
     }
 
+    @Override
     public String getFlowJson(String userName, String projectName, DSSFlow dssFlow) {
         String flowExportSaveBasePath = IoUtils.generateIOPath(userName, projectName, "");
         String savePath = flowExportSaveBasePath + File.separator + dssFlow.getName() + File.separator + dssFlow.getName() + ".json";

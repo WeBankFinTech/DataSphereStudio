@@ -483,5 +483,13 @@
         order by a.id desc  limit 1
     </select>
 
+    <select id="getSubmitJobStatus" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        select `id`, `orchestrator_id`, `create_time`, `update_time`, instance_name, status, error_msg from dss_orchestrator_submit_job_info
+        where orchestrator_id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
+    </select>
+
 
 </mapper>

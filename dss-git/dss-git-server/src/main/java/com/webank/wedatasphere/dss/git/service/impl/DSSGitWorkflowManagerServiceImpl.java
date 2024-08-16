@@ -205,7 +205,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
         if (projectInfoByProjectName == null) {
             logger.error("the projectName : {} don't associate with git", projectName);
-            return null;
+            throw new DSSErrorException(80001, "DSS项目:" + projectName +" 未关联git");
         }
         String gitUser = projectInfoByProjectName.getGitUser();
         String gitToken = projectInfoByProjectName.getGitToken();
@@ -224,6 +224,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                 projectGitInfo.setGitToken(requestGitToken);
                 // 仅更新token
                 GitProjectManager.updateProjectInfo(projectGitInfo, true);
+                gitToken = requestGitToken;
             }
         }
 

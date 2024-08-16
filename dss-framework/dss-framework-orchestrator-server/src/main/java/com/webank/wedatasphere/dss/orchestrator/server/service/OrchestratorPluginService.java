@@ -41,7 +41,7 @@ public interface OrchestratorPluginService {
 
     ResponseConvertOrchestrator getConvertOrchestrationStatus(String id);
 
-    Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
+    Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws Exception;
 
     OrchestratorDiffDirVo diffPublish(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace);
 

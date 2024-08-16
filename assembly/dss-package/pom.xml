@@ -78,6 +78,10 @@
             <artifactId>dss-sender-service</artifactId>
             <version>${dss.version}</version>
             <exclusions>
+                <exclusion>
+                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -106,6 +110,10 @@
                 <exclusion>
                     <artifactId>netty</artifactId>
                     <groupId>io.netty</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>javax.servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

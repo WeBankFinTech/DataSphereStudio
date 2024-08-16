@@ -787,6 +787,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         String proxyUser = orchestratorMeta.getProxyUser();
 
         if(!jsonObject.keySet().contains("nodes")){
+            LOGGER.error("flowJson not contains nodes, json is {}",flowJsonOld);
             throw new DSSRuntimeException(6005, orchestratorMeta.getOrchestratorName()+ " 工作流未进行保存,请保存后在重新编辑！！！");
         }
 

@@ -42,7 +42,7 @@
 
     <properties>
         <dss.version>1.7.0-SNAPSHOT</dss.version>
-        <linkis.version>1.6.0-wds-SNAPSHOT</linkis.version>
+        <linkis.version>1.6.1-wds</linkis.version>
         <scala.version>2.11.12</scala.version>
         <jdk.compile.version>1.8</jdk.compile.version>
         <maven.version>3.3.3</maven.version>
@@ -53,7 +53,7 @@
         <httpmime.version>4.5.13</httpmime.version>
         <beanutils.version>1.9.4</beanutils.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>5.3.27</spring.version>
+        <spring.version>5.3.34</spring.version>
         <mybatis.spring.boot.version>2.1.2</mybatis.spring.boot.version>
         <spring.boot.version>2.7.11</spring.boot.version>
         <spring.cloud.version>2021.0.8</spring.cloud.version>

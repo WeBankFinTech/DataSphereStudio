@@ -336,8 +336,13 @@ public class DSSFrameworkOrchestratorRestful {
         if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
             return Message.error("当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
         }
-        Long taskId = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
-        return Message.ok().data("taskId", taskId);
+        try {
+            Long taskId = orchestratorPluginService.diffFlow(submitFlowRequest, userName, workspace);
+            return Message.ok().data("taskId", taskId);
+        } catch (Exception e) {
+            return Message.error("获取对比内容失败，原因为：" + e.getMessage());
+        }
+
     }
 
     @RequestMapping(value = "diffStatus", method = RequestMethod.GET)
@@ -641,9 +646,12 @@ public class DSSFrameworkOrchestratorRestful {
             orchestratorFrameworkService.modifyOrchestratorMeta(username, modifyOrchestratorMetaRequest, workspace,orchestratorVersion);
         } catch (Exception e) {
             LOGGER.error(String.format("%s modify OrchestratorMeta fail", modifyOrchestratorMetaRequest.getOrchestratorName()));
-            e.printStackTrace();
-            return Message.error(String.format("%s 工作流信息编辑失败", modifyOrchestratorMetaRequest.getOrchestratorName()), e);
+            LOGGER.error(e.getMessage());
+            return Message.error(String.format("%s 工作流信息编辑失败,原因为 %s", modifyOrchestratorMetaRequest.getOrchestratorName()), e);
         }
+
+        AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,
+                modifyOrchestratorMetaRequest.getOrchestratorId(), modifyOrchestratorMetaRequest.getOrchestratorName(), OperateTypeEnum.UPDATE, modifyOrchestratorMetaRequest);
 
         return Message.ok(String.format("%s工作流信息编辑成功", modifyOrchestratorMetaRequest.getOrchestratorName()));
     }

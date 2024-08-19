@@ -163,5 +163,8 @@ public interface OrchestratorMapper {
     OrchestratorReleaseVersionInfo getOrchestratorVersionById(@Param("orchestratorId") Long orchestratorId);
 
 
+    List<OrchestratorSubmitJob> getSubmitJobStatus(@Param("orchestratorIdList") List<Long> orchestratorIdList);
+
+
 
 }

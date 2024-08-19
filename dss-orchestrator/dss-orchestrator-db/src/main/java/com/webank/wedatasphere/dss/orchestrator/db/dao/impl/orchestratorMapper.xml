@@ -319,7 +319,7 @@
     <update id="updateOrchestratorSubmitResult">
         update dss_orchestrator_submit_job_info
         <set>
-            `result` = #{result},`update_time` = Now() , `status` = #{status}
+            `submit_result` = #{result},`update_time` = Now() , `status` = #{status}
         </set>
         where `id` = #{id}
     </update>
@@ -347,7 +347,7 @@
     </select>
 
     <select id="selectResult" resultType="java.lang.String">
-        SELECT result FROM dss_orchestrator_submit_job_info WHERE id = #{id}
+        SELECT submit_result FROM dss_orchestrator_submit_job_info WHERE id = #{id}
     </select>
 
 
@@ -431,6 +431,7 @@
         ,a.updater          as updater
         ,b.status           as status
         ,b.error_msg        as errorMsg
+        ,b.update_time      as releaseTime
         from dss_orchestrator_version_info a
         left join dss_release_task b on a.orchestrator_id = b.orchestrator_id and a.id = b.orchestrator_version_id
         where a.valid_flag  = 1  and a.orchestrator_id in
@@ -475,10 +476,19 @@
         ,a.updater          as updater
         ,b.status           as status
         ,b.error_msg        as errorMsg
+        ,b.update_time      as release_time
         from dss_orchestrator_version_info a
         left join dss_release_task b on a.orchestrator_id = b.orchestrator_id and a.id = b.orchestrator_version_id
         where a.valid_flag  = 1  and a.orchestrator_id  = #{orchestratorId}
         order by a.id desc  limit 1
+    </select>
+
+    <select id="getSubmitJobStatus" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        select `id`, `orchestrator_id`, `create_time`, `update_time`, instance_name, status, error_msg from dss_orchestrator_submit_job_info
+        where orchestrator_id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
     </select>
 
 

@@ -50,4 +50,8 @@
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_meta WHERE orchestrator_id = #{orchestratorId}
     </select>
 
+    <delete id="deleteNodeMetaByOrchestratorId" parameterType="java.lang.Long">
+        Delete from dss_workflow_node_meta where orchestrator_id = #{orchestratorId}
+    </delete>
+
 </mapper>

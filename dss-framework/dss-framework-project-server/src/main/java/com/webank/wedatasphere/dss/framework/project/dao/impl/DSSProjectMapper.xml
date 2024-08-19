@@ -91,6 +91,14 @@
         <if test="id!=null">
             AND b.id = #{id}
         </if>
+        <choose>
+            <when test="creatorLabel!=null">
+                AND b.label=#{creatorLabel}
+            </when>
+            <otherwise>
+                AND b.label is null
+            </otherwise>
+        </choose>
         GROUP BY b.id ) c
         order by updateTime desc
     </select>
@@ -206,6 +214,20 @@
 
     <select id="getProjectByName" resultType="com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO">
         select where project_name = #{projectName}
+    </select>
+
+    <select id="queryProjectName"  resultType="java.lang.String">
+        select name from
+        (
+        select b.id,a.username,b.name
+        FROM dss_project_user a
+        join dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id and b.visible = 1
+        WHERE a.priv >=1 and  a.workspace_id = #{workspaceId} and b.label is null
+        ) c
+        group by id having 1 = 1
+        <if test="queryUser !=null and queryUser!= ''">
+            and group_concat(username) like concat('%',#{queryUser},'%')
+        </if>
     </select>
 
 </mapper>

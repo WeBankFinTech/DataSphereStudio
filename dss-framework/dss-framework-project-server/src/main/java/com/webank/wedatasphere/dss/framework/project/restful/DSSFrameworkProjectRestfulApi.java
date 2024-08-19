@@ -34,6 +34,7 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserServi
 import com.webank.wedatasphere.dss.framework.project.service.ProjectHttpRequestHook;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
 import com.webank.wedatasphere.dss.framework.proxy.exception.DSSProxyUserErrorException;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitSearchRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitSearchResponse;
@@ -81,6 +82,9 @@ public class DSSFrameworkProjectRestfulApi {
     private List<ProjectHttpRequestHook> projectHttpRequestHooks;
     @Autowired
     private StaffInfoGetter staffInfoGetter;
+
+    @Autowired
+    private DSSWorkspaceRoleService dssWorkspaceRoleService;
 
     private Message executePreHook(Function<ProjectHttpRequestHook, Message> function) {
         String errorMsg = projectHttpRequestHooks.stream().map(function).filter(Objects::nonNull).map(Message::getMessage)
@@ -387,15 +391,15 @@ public class DSSFrameworkProjectRestfulApi {
             projectRequest.setWorkspaceId(workspace.getWorkspaceId());
         }
 
-        LOGGER.info("user {} begin to listAllProjectName, workspaceId: {}.", username, projectRequest.getWorkspaceId());
-        List<ProjectResponse> projectResponses = projectService.getListByParam(projectRequest);
-
-        List<String> projectNames = new ArrayList<>();
-
-        if (!CollectionUtils.isEmpty(projectResponses)) {
-
-            projectNames = projectResponses.stream().map(ProjectResponse::getName).collect(Collectors.toList());
+        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
+        if (roles == null || roles.isEmpty()) {
+            LOGGER.error("username {}, in workspace {} roles are null or empty", username, projectRequest.getWorkspaceId());
+            return Message.error("can not get roles information");
         }
+
+        LOGGER.info("user {} begin to listAllProjectName, workspaceId: {}.", username, projectRequest.getWorkspaceId());
+
+        List<String> projectNames = projectService.queryProjectName(projectRequest);
 
         return Message.ok().data("data", projectNames);
     }
@@ -474,6 +478,12 @@ public class DSSFrameworkProjectRestfulApi {
         if (projectRequest.getWorkspaceId() == null) {
             Workspace workspace = SSOHelper.getWorkspace(request);
             projectRequest.setWorkspaceId(workspace.getWorkspaceId());
+        }
+
+        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
+        if (roles == null || roles.isEmpty()) {
+            LOGGER.error("username {}, in workspace {} roles are null or empty", username, projectRequest.getWorkspaceId());
+            return Message.error("can not get roles information");
         }
 
         if(projectRequest.getPageNow() == null || projectRequest.getPageNow() <= 0){

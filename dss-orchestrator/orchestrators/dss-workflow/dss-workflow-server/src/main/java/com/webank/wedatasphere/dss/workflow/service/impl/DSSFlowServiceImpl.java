@@ -332,7 +332,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         // 解析并保存元数据
         Long orchestratorId = dssOrchestratorVersion.getOrchestratorId();
-        saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+        try {
+            saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
 
         if (isEqualTwoJson(flowJsonOld, jsonFlow)) {
             logger.info("saveFlow is not change");
@@ -505,9 +509,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Set<NodeContentDO> difference2 = new HashSet<>(nodeContentDOS);
         difference2.removeAll(nodeContentByKeyList);
 
-        nodeContentMapper.batchInsert(new ArrayList<>(difference2));
-        nodeContentMapper.batchUpdate(new ArrayList<>(intersection));
-        nodeContentMapper.batchDelete(new ArrayList<>(difference1));
+        if (CollectionUtils.isNotEmpty(difference2)) {
+            nodeContentMapper.batchInsert(new ArrayList<>(difference2));
+        }
+
+        if (CollectionUtils.isNotEmpty(intersection)) {
+            nodeContentMapper.batchUpdate(new ArrayList<>(intersection));
+        }
+
+        if (CollectionUtils.isNotEmpty(difference1)) {
+            nodeContentMapper.batchDelete(new ArrayList<>(difference1));
+        }
 
         List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList);
 
@@ -542,7 +554,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (CollectionUtils.isNotEmpty(contentIdListByOrchestratorId)) {
             nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
         }
-        nodeContentUIMapper.batchInsertNodeContentUI(nodeContentUIDOS);
+        if (CollectionUtils.isNotEmpty(nodeContentUIDOS)) {
+            nodeContentUIMapper.batchInsertNodeContentUI(nodeContentUIDOS);
+        }
     }
 
     /**

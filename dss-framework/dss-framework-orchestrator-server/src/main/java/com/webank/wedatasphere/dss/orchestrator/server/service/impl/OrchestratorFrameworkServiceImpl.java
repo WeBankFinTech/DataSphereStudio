@@ -186,6 +186,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorCreateRequest.getProjectId(), username);
+        if(dssProject.getWorkspaceId() == null || !dssProject.getWorkspaceId().equals(workspace.getWorkspaceId())){
+            LOGGER.error("createOrchestrator projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(),workspace.getWorkspaceId());
+            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间创建工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
+        }
         //1.创建编排实体bean
         DSSOrchestratorRelation dssOrchestratorRelation = DSSOrchestratorRelationManager.getDSSOrchestratorRelationByMode(orchestratorCreateRequest.getOrchestratorMode());
         DSSOrchestratorInfo dssOrchestratorInfo = new DSSOrchestratorInfo();
@@ -286,6 +290,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
+        if(dssProject.getWorkspaceId() == null || !dssProject.getWorkspaceId().equals(workspace.getWorkspaceId())){
+            LOGGER.error("modifyOrchestrator projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(),workspace.getWorkspaceId());
+            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间修改工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
+        }
         workspace.setWorkspaceName(dssProject.getWorkspaceName());
         //是否存在相同的编排名称 //todo 返回orchestratorInfo而不是id
         Long orchestratorId = orchestratorService.isExistSameNameBeforeUpdate(orchestratorModifyRequest, dssProject, username);
@@ -567,6 +575,13 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(modifyOrchestratorMetaRequest.getProjectId(), username);
 
+        if(dssProject.getWorkspaceId() == null || !dssProject.getWorkspaceId().equals(workspace.getWorkspaceId())){
+            LOGGER.error("modifyOrchestratorMeta projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(),workspace.getWorkspaceId());
+            DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间修改工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
+        }
+
+        workspace.setWorkspaceName(dssProject.getWorkspaceName());
+
         OrchestratorModifyRequest orchestratorModifyRequest = new OrchestratorModifyRequest();
         orchestratorModifyRequest.setOrchestratorName(modifyOrchestratorMetaRequest.getOrchestratorName());
         orchestratorModifyRequest.setProjectId(modifyOrchestratorMetaRequest.getProjectId());
@@ -820,63 +835,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 ,dssFlow.getDescription(),username
                 ,dssProject.getWorkspaceName(),dssProject.getName(),null);
 
-    }
-
-    public String getFlowJson(String userName, String projectName, DSSFlow dssFlow) {
-        String flowExportSaveBasePath = IoUtils.generateIOPath(userName, projectName, "");
-        String savePath = flowExportSaveBasePath + File.separator + dssFlow.getName() + File.separator + dssFlow.getName() + ".json";
-        String flowJson = bmlService.downloadAndGetText(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion(), savePath);
-        return flowJson;
-    }
-
-
-    private void updateTOSaveStatus(Long projectId, Long flowID) {
-        try {
-            DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
-            //仅对接入Git的项目 更新状态为 保存
-            if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
-                Long rootFlowId = getRootFlowId(flowID);
-                if (rootFlowId != null) {
-                    OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
-                            OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
-                    lockMapper.updateOrchestratorStatus(orchestratorVo.getDssOrchestratorInfo().getId(), OrchestratorRefConstant.FLOW_STATUS_SAVE);
-                }
-            }
-        } catch (DSSErrorException e) {
-            LOGGER.error("getProjectInfo failed by:", e);
-            throw new DSSRuntimeException(e.getErrCode(), "更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
-        }
-    }
-
-    public Long getRootFlowId(Long flowId) {
-        if (flowId == null) {
-            return null;
-        }
-        DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
-        if (dssFlow == null) {
-            return null;
-        }
-        if (dssFlow.getRootFlow()) {
-            return dssFlow.getId();
-        } else {
-            Long parentFlowID = flowMapper.getParentFlowID(flowId);
-            return getRootFlowId(parentFlowID);
-        }
-    }
-
-    public boolean isEqualTwoJson(String oldJsonNode, String newJsonNode) {
-        Gson gson = new Gson();
-        JsonParser parser = new JsonParser();
-        JsonObject jsonObject = parser.parse(oldJsonNode).getAsJsonObject();
-        jsonObject.remove("updateTime");
-        jsonObject.remove("comment");
-        String tempOldJson = gson.toJson(jsonObject);
-
-        JsonObject jsonObject2 = parser.parse(newJsonNode).getAsJsonObject();
-        jsonObject2.remove("updateTime");
-        jsonObject2.remove("comment");
-        String tempNewJson = gson.toJson(jsonObject2);
-        return tempOldJson.equals(tempNewJson);
     }
 
 

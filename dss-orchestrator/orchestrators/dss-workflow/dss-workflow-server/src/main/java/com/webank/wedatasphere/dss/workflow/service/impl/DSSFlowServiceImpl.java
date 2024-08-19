@@ -530,6 +530,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             String nodeKey = nodeContentDO.getNodeKey();
             Long contentByKeyId = nodeContentDO.getId();
             DSSNodeDefault nodeDefault = map.get(nodeKey);
+            String title = nodeDefault.getTitle();
+            if (StringUtils.isNotEmpty(title)) {
+                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title));
+            }
+            String desc = nodeDefault.getDesc();
+            if (StringUtils.isNotEmpty(desc)) {
+                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc));
+            }
 
             Map<String, Object> params = nodeDefault.getParams();
             if (params != null) {

@@ -58,7 +58,7 @@
     <insert id="batchUpdate" parameterType="java.util.List">
         <foreach collection="list" item="item" index="index" separator=";">
             UPDATE dss_workflow_node_content
-            SET `node_key` = #{item.nodeKey}, `node_id` = #{item.nodeId}, `job_type` = #{item.jobType}, `orchestrator_id` = #{item.orchestratorId}, `modify_time` = #{item.modifyTime}, `modify_user` = #{item.modifyUser}
+            SET `node_id` = #{item.nodeId}, `job_type` = #{item.jobType}, `orchestrator_id` = #{item.orchestratorId}, `modify_time` = #{item.modifyTime}, `modify_user` = #{item.modifyUser}
             WHERE `node_key` = #{item.nodeKey}
         </foreach>
     </insert>

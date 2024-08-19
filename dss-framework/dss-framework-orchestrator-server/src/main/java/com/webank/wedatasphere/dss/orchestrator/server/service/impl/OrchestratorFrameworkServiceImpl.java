@@ -377,6 +377,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         if (CollectionUtils.isNotEmpty(contentIdList)) {
             nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
         }
+        nodeMetaMapper.deleteNodeMetaByOrchestratorId(orchestratorInfoId);
         return orchestratorVo;
     }
 

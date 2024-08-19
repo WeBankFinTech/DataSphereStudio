@@ -55,13 +55,11 @@
         WHERE `id` = #{id}
     </update>
 
-    <insert id="batchUpdate" parameterType="java.util.List">
-        <foreach collection="list" item="item" index="index" separator=";">
+    <update id="updateByKey" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentDO">
             UPDATE dss_workflow_node_content
-            SET `node_id` = #{item.nodeId}, `job_type` = #{item.jobType}, `orchestrator_id` = #{item.orchestratorId}, `modify_time` = #{item.modifyTime}, `modify_user` = #{item.modifyUser}
+            SET `node_id` = #{nodeId}, `job_type` = #{jobType}, `orchestrator_id` = #{orchestratorId}, `modify_time` = #{modifyTime}, `modify_user` = #{modifyUser}
             WHERE `node_key` = #{item.nodeKey}
-        </foreach>
-    </insert>
+    </update>
 
     <select id="getNodeContentByKey" parameterType="java.lang.String" resultMap="nodeContentResultMap">
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey}

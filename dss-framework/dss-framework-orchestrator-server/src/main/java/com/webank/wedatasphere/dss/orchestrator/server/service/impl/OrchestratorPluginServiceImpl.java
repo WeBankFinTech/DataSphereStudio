@@ -259,7 +259,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 submitWorkflowToBML(taskId, flowRequest, username, workspace);
             }  catch (Exception e) {
             LOGGER.error("push failed, the reason is : ", e);
-            orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
+            orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.getMessage());
         }
         });
     }
@@ -356,7 +356,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         //3. 获取上传工作流信息
         BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
-        if (bmlResource == null) {
+        if (bmlResource == null || bmlResource.getResourceId() == null || bmlResource.getVersion() == null) {
             bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
         }
@@ -518,44 +518,47 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         Long orchestratorId = flowRequest.getOrchestratorId();
         String status = lockMapper.selectOrchestratorStatus(orchestratorId);
         if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
-            throw new DSSErrorException(800001, "工作流无改动或改动未提交，请确认改动并保存再进行提交");
+            throw new DSSErrorException(800001, "工作流无改动，请确认改动并保存再进行提交");
         }
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         Long flowId = flowRequest.getFlowId();
         String projectName = flowRequest.getProjectName();
         String label = flowRequest.getLabels().getRoute();
 
-        OrchestratorSubmitJob diffJob = new OrchestratorSubmitJob();
-        diffJob.setOrchestratorId(orchestratorId);
-        diffJob.setInstanceName(Sender.getThisInstance());
-        diffJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
-        orchestratorMapper.insertOrchestratorSubmitJob(diffJob);
-        Long taskId = diffJob.getId();
-        releaseThreadPool.submit(() -> {
-            try {
-                BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
-                if (bmlResource == null) {
-                    bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
-                    orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
+        BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
+        Long taskId;
+        if (bmlResource == null || bmlResource.getResourceId() == null || bmlResource.getVersion() == null) {
+            OrchestratorSubmitJob diffJob = new OrchestratorSubmitJob();
+            diffJob.setOrchestratorId(orchestratorId);
+            diffJob.setInstanceName(Sender.getThisInstance());
+            diffJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
+            orchestratorMapper.insertOrchestratorSubmitJob(diffJob);
+            taskId = diffJob.getId();
+            releaseThreadPool.submit(() -> {
+                try {
+                    BmlResource uploadBmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
+                    orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, uploadBmlResource.getResourceId(), uploadBmlResource.getVersion());
+                    GitDiffResponse diff = diff(orchestrator.getName(), uploadBmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
+                    String result = "";
+                    if (diff != null) {
+                        List<GitTree> codeTree = diff.getCodeTree();
+                        List<GitTree> metaTree = diff.getMetaTree();
+                        OrchestratorDiffDirVo diffDirVo = new OrchestratorDiffDirVo(codeTree, metaTree);
+                        Gson gson = new Gson();
+                        result = gson.toJson(diffDirVo);
+                    } else {
+                        LOGGER.info("change is empty");
+                    }
+                    orchestratorMapper.updateOrchestratorSubmitResult(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, result);
+                } catch (Exception e) {
+                    LOGGER.error("push failed, the reason is : ", e);
+                    orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
+                    orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
                 }
-
-                GitDiffResponse diff = diff(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), flowRequest.getProjectName());
-                String result = "";
-                if (diff != null) {
-                    List<GitTree> codeTree = diff.getCodeTree();
-                    List<GitTree> metaTree = diff.getMetaTree();
-                    OrchestratorDiffDirVo diffDirVo = new OrchestratorDiffDirVo(codeTree, metaTree);
-                    Gson gson = new Gson();
-                    result = gson.toJson(diffDirVo);
-                } else {
-                    LOGGER.info("change is empty");
-                }
-                orchestratorMapper.updateOrchestratorSubmitResult(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, result);
-            }catch (Exception e) {
-                LOGGER.error("push failed, the reason is : ", e);
-                orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
-            }
-        });
+            });
+        } else {
+            taskId = orchestratorMapper.getLatestOrchestratorSubmitJobId(orchestratorId);
+        }
 
         return taskId;
     }
@@ -606,7 +609,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         String filePath = flowRequest.getFilePath();
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
-        if (bmlResource == null) {
+        if (bmlResource == null || bmlResource.getVersion() == null || bmlResource.getResourceId() == null) {
             bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
         }

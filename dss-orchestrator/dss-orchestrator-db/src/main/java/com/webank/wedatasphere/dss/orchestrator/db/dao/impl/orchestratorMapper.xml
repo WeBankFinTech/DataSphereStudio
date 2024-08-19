@@ -316,6 +316,11 @@
         where `id` = #{id}
     </update>
 
+    <select id="getLatestOrchestratorSubmitJobId" resultType="long">
+        select `id` from dss_orchestrator_submit_job_info where `orchestrator_id` = #{orchestratorId}
+        order by update_time desc limit 1
+    </select>
+
     <update id="updateOrchestratorSubmitResult">
         update dss_orchestrator_submit_job_info
         <set>

@@ -5,7 +5,7 @@ import java.util.Date;
 
 public class NodeContentDO {
     private Long id;
-    private String key;
+    private String nodeKey;
     private String nodeId;
     private String jobType;
     private Long orchestratorId;
@@ -16,9 +16,9 @@ public class NodeContentDO {
     public NodeContentDO() {
     }
 
-    public NodeContentDO(Long id, String key, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
+    public NodeContentDO(Long id, String nodeKey, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
         this.id = id;
-        this.key = key;
+        this.nodeKey = nodeKey;
         this.nodeId = nodeId;
         this.jobType = jobType;
         this.orchestratorId = orchestratorId;
@@ -27,8 +27,8 @@ public class NodeContentDO {
         this.modifyUser = modifyUser;
     }
 
-    public NodeContentDO(String key, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
-        this.key = key;
+    public NodeContentDO(String nodeKey, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
+        this.nodeKey = nodeKey;
         this.nodeId = nodeId;
         this.jobType = jobType;
         this.orchestratorId = orchestratorId;
@@ -45,12 +45,12 @@ public class NodeContentDO {
         this.id = id;
     }
 
-    public String getKey() {
-        return key;
+    public String getNodeKey() {
+        return nodeKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setNodeKey(String nodeKey) {
+        this.nodeKey = nodeKey;
     }
 
     public String getNodeId() {

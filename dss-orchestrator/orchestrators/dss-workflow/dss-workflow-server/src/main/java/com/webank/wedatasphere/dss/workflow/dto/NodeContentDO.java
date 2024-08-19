@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.workflow.dto;
 
 
+import com.google.common.base.Objects;
+
 import java.util.Date;
 
 public class NodeContentDO {
@@ -35,6 +37,37 @@ public class NodeContentDO {
         this.createTime = createTime;
         this.modifyTime = modifyTime;
         this.modifyUser = modifyUser;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        NodeContentDO that = (NodeContentDO) o;
+        return Objects.equal(nodeKey, that.nodeKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(nodeKey);
+    }
+
+    @Override
+    public String toString() {
+        return "NodeContentDO{" +
+                "id=" + id +
+                ", nodeKey='" + nodeKey + '\'' +
+                ", nodeId='" + nodeId + '\'' +
+                ", jobType='" + jobType + '\'' +
+                ", orchestratorId='" + orchestratorId + '\'' +
+                ", createTime='" + createTime + '\'' +
+                ", modifyTime='" + modifyTime + '\'' +
+                ", modifyUser='" + modifyUser + '\'' +
+                '}';
     }
 
     public Long getId() {

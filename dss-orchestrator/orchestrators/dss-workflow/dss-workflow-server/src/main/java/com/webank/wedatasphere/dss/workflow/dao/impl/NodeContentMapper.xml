@@ -58,7 +58,7 @@
     <update id="updateByKey" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentDO">
             UPDATE dss_workflow_node_content
             SET `node_id` = #{nodeId}, `job_type` = #{jobType}, `orchestrator_id` = #{orchestratorId}, `modify_time` = #{modifyTime}, `modify_user` = #{modifyUser}
-            WHERE `node_key` = #{item.nodeKey}
+            WHERE `node_key` = #{nodeKey}
     </update>
 
     <select id="getNodeContentByKey" parameterType="java.lang.String" resultMap="nodeContentResultMap">

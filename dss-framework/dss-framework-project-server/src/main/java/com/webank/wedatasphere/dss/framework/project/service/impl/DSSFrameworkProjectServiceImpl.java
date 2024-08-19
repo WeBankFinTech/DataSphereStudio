@@ -498,14 +498,18 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         projectUserService.modifyProjectUser(dbProject, projectModifyRequest, username, workspace);
 
         //3.修改dss_project DSS基本工程信息
+        updateProject4Transfer(dbProject, username);
+
+        syncGitProject(projectModifyRequest, dbProject, username, workspace);
+    }
+
+    private void updateProject4Transfer(DSSProjectDO dbProject,String username){
         dbProject.setUpdateByStr(username);
         dbProject.setUpdateTime(new Date());
         UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("id", dbProject.getId());
         updateWrapper.eq("workspace_id", dbProject.getWorkspaceId());
         projectMapper.update(dbProject, updateWrapper);
-
-        syncGitProject(projectModifyRequest, dbProject, username, workspace);
     }
 
     private void initProjectModifyRequest(ProjectModifyRequest projectModifyRequest,ProjectTransferRequest projectTransferRequest,String username){

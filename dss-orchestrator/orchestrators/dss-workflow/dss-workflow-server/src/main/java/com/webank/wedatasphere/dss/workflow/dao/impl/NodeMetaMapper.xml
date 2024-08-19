@@ -24,24 +24,24 @@
         <id property="id" column="id"/>
         <result property="orchestratorId" column="orchestrator_id"/>
         <result property="proxyUser" column="proxy_user"/>
-        <result property="resource" column="resource"/>
+        <result property="metaResource" column="meta_resource"/>
         <result property="globalVar" column="global_var"/>
     </resultMap>
 
     <sql id="baseColumns">
-        `id`, `orchestrator_id`, `proxy_user`, `resource`, `global_var`
+        `id`, `orchestrator_id`, `proxy_user`, `meta_resource`, `global_var`
     </sql>
 
     <insert id="insertNodeMeta" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO">
-        INSERT INTO dss_workflow_node_meta(`id`, `orchestrator_id`, `proxy_user`, `resource`, `global_var`)
-        VALUES (#{id}, #{orchestratorId}, #{proxyUser}, #{resource}, #{globalVar})
+        INSERT INTO dss_workflow_node_meta(`id`, `orchestrator_id`, `proxy_user`, `meta_resource`, `global_var`)
+        VALUES (#{id}, #{orchestratorId}, #{proxyUser}, #{metaResource}, #{globalVar})
     </insert>
 
     <update id="updateNodeMeta" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO">
         UPDATE dss_workflow_node_meta
         SET `orchestrator_id` = #{orchestratorId},
         `proxy_user` = #{proxyUser},
-        `resource` = #{resource},
+        `meta_resource` = #{metaResource},
         `global_var` = #{globalVar}
         WHERE `id` = #{id}
     </update>
@@ -49,5 +49,9 @@
     <select id="getNodeMetaByOrchestratorId" parameterType="java.lang.Long" resultMap="nodeMetaResultMap">
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_meta WHERE orchestrator_id = #{orchestratorId}
     </select>
+
+    <delete id="deleteNodeMetaByOrchestratorId" parameterType="java.lang.Long">
+        Delete from dss_workflow_node_meta where orchestrator_id = #{orchestratorId}
+    </delete>
 
 </mapper>

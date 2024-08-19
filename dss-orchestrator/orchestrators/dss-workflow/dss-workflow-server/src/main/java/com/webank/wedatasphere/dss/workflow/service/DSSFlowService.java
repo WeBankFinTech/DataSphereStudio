@@ -78,4 +78,6 @@ public interface DSSFlowService {
     boolean checkIsExistSameFlow(String jsonFlow);
 
     List<String> checkIsSave(Long parentFlowID, String jsonFlow);
+
+    String getFlowJson(String userName, String projectName, DSSFlow dssFlow);
 }

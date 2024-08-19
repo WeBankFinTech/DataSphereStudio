@@ -1,11 +1,13 @@
 package com.webank.wedatasphere.dss.workflow.dto;
 
 
+import com.google.common.base.Objects;
+
 import java.util.Date;
 
 public class NodeContentDO {
     private Long id;
-    private String key;
+    private String nodeKey;
     private String nodeId;
     private String jobType;
     private Long orchestratorId;
@@ -16,9 +18,9 @@ public class NodeContentDO {
     public NodeContentDO() {
     }
 
-    public NodeContentDO(Long id, String key, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
+    public NodeContentDO(Long id, String nodeKey, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
         this.id = id;
-        this.key = key;
+        this.nodeKey = nodeKey;
         this.nodeId = nodeId;
         this.jobType = jobType;
         this.orchestratorId = orchestratorId;
@@ -27,14 +29,45 @@ public class NodeContentDO {
         this.modifyUser = modifyUser;
     }
 
-    public NodeContentDO(String key, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
-        this.key = key;
+    public NodeContentDO(String nodeKey, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
+        this.nodeKey = nodeKey;
         this.nodeId = nodeId;
         this.jobType = jobType;
         this.orchestratorId = orchestratorId;
         this.createTime = createTime;
         this.modifyTime = modifyTime;
         this.modifyUser = modifyUser;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        NodeContentDO that = (NodeContentDO) o;
+        return Objects.equal(nodeKey, that.nodeKey);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(nodeKey);
+    }
+
+    @Override
+    public String toString() {
+        return "NodeContentDO{" +
+                "id=" + id +
+                ", nodeKey='" + nodeKey + '\'' +
+                ", nodeId='" + nodeId + '\'' +
+                ", jobType='" + jobType + '\'' +
+                ", orchestratorId='" + orchestratorId + '\'' +
+                ", createTime='" + createTime + '\'' +
+                ", modifyTime='" + modifyTime + '\'' +
+                ", modifyUser='" + modifyUser + '\'' +
+                '}';
     }
 
     public Long getId() {
@@ -45,12 +78,12 @@ public class NodeContentDO {
         this.id = id;
     }
 
-    public String getKey() {
-        return key;
+    public String getNodeKey() {
+        return nodeKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setNodeKey(String nodeKey) {
+        this.nodeKey = nodeKey;
     }
 
     public String getNodeId() {

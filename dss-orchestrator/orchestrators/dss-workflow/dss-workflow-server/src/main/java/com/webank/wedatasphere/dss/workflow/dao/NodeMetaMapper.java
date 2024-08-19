@@ -14,4 +14,5 @@ public interface NodeMetaMapper {
 
     NodeMetaDO getNodeMetaByOrchestratorId(@Param ("orchestratorId") Long orchestratorId);
 
+    void deleteNodeMetaByOrchestratorId(@Param ("orchestratorId") Long orchestratorId);
 }

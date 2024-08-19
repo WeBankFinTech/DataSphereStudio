@@ -77,4 +77,7 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
     List<Integer> getProjectIdByUser(@Param("priv") Integer priv,@Param("userList") List<String> userList);
 
     List<DSSProjectDO> getProjectByName(List<String> list);
+
+
+    List<String> queryProjectName(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
 }

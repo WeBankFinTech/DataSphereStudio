@@ -21,36 +21,35 @@
 
 <mapper namespace="com.webank.wedatasphere.dss.workflow.dao.NodeContentUIMapper">
     <resultMap id="nodeContentUiResultMap" type="com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO">
-        <id property="id" column="id"/>
         <result property="contentId" column="content_id"/>
-        <result property="key" column="key"/>
-        <result property="value" column="value"/>
+        <result property="nodeUIKey" column="node_ui_key"/>
+        <result property="nodeUIValue" column="node_ui_value"/>
     </resultMap>
 
     <sql id="baseColumns">
-        `id`, `content_id`, `key`, `value`
+        `content_id`, `node_ui_key`, `node_ui_value`
     </sql>
 
     <insert id="insertNodeContentUI" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO">
-        INSERT INTO dss_workflow_node_content_to_ui(`content_id`, `key`, `value`) VAlUES (#{contentId}, #{key}, #{value})
+        INSERT INTO dss_workflow_node_content_to_ui(`content_id`, `node_ui_key`, `node_ui_value`) VAlUES (#{contentId}, #{nodeUIKey}, #{nodeUIValue})
     </insert>
 
     <insert id="batchInsertNodeContentUI" parameterType="java.util.List">
-        INSERT INTO dss_workflow_node_content_to_ui(`content_id`, `key`, `value`) VALUES
+        INSERT INTO dss_workflow_node_content_to_ui(`content_id`, `node_ui_key`, `node_ui_value`) VALUES
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.contentId}, #{item.key}, #{item.value})
+            (#{item.contentId}, #{item.nodeUIKey}, #{item.nodeUIValue})
         </foreach>
     </insert>
 
     <update id="updateNodeContentUI" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO">
         UPDATE dss_workflow_node_content_to_ui
-        SET `value` = #{value} WHERE `key` = #{key}
+        SET `node_ui_value` = #{nodeUIValue} WHERE `node_ui_key` = #{nodeUIKey}
     </update>
 
     <update id="batchUpdateNodeContentUI" parameterType="java.util.List">
         UPDAtE dss_workflow_node_content_to_ui
         <foreach collection="list" item="item" index="index" separator=",">
-            SET `value` = #{item.value} WHERE `key` = #{item.key}
+            SET `node_ui_value` = #{item.nodeUIValue} WHERE `node_ui_key` = #{item.nodeUIKey}
         </foreach>
     </update>
 

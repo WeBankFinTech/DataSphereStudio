@@ -5,24 +5,24 @@ public class NodeMetaDO {
     private Long id;
     private Long orchestratorId;
     private String proxyUser;
-    private String resource;
+    private String metaResource;
     private String globalVar;
 
     public NodeMetaDO() {
     }
 
-    public NodeMetaDO(Long id, Long orchestratorId, String proxyUser, String resource, String globalVar) {
+    public NodeMetaDO(Long id, Long orchestratorId, String proxyUser, String metaResource, String globalVar) {
         this.id = id;
         this.orchestratorId = orchestratorId;
         this.proxyUser = proxyUser;
-        this.resource = resource;
+        this.metaResource = metaResource;
         this.globalVar = globalVar;
     }
 
-    public NodeMetaDO(Long orchestratorId, String proxyUser, String resource, String globalVar) {
+    public NodeMetaDO(Long orchestratorId, String proxyUser, String metaResource, String globalVar) {
         this.orchestratorId = orchestratorId;
         this.proxyUser = proxyUser;
-        this.resource = resource;
+        this.metaResource = metaResource;
         this.globalVar = globalVar;
     }
 
@@ -51,12 +51,12 @@ public class NodeMetaDO {
         this.proxyUser = proxyUser;
     }
 
-    public String getResource() {
-        return resource;
+    public String getMetaResource() {
+        return metaResource;
     }
 
-    public void setResource(String resource) {
-        this.resource = resource;
+    public void setMetaResource(String metaResource) {
+        this.metaResource = metaResource;
     }
 
     public String getGlobalVar() {

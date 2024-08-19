@@ -766,5 +766,18 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         return projects;
     }
 
+    @Override
+    public List<String> queryProjectName(ProjectQueryRequest projectRequest){
+        //判断工作空间是否设置了管理员能否查看该工作空间下所有项目的权限
+        Integer workspaceAdminPermission = projectUserMapper.getWorkspaceAdminPermission(projectRequest.getWorkspaceId());
+
+        String queryUser = null;
+        if (!isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) || workspaceAdminPermission != 1) {
+            queryUser = projectRequest.getUsername();
+        }
+
+        return projectMapper.queryProjectName(projectRequest.getWorkspaceId(),queryUser);
+
+    }
 
 }

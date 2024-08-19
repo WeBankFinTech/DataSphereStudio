@@ -134,6 +134,8 @@ public interface OrchestratorMapper {
 
     void updateOrchestratorSubmitJobStatus(@Param("id") Long id, @Param("status") String status, @Param("errMsg") String errMsg);
 
+    Long getLatestOrchestratorSubmitJobId(@Param("orchestratorId") Long orchestratorId);
+
     void updateOrchestratorSubmitResult(@Param("id") Long id, @Param("status") String status, @Param("result") String result);
 
     void batchUpdateOrchestratorSubmitJobStatus(@Param("list") List<Long> list, @Param("status") String status, @Param("errMsg") String errMsg);
@@ -161,6 +163,9 @@ public interface OrchestratorMapper {
 
 
     OrchestratorReleaseVersionInfo getOrchestratorVersionById(@Param("orchestratorId") Long orchestratorId);
+
+
+    List<OrchestratorSubmitJob> getSubmitJobStatus(@Param("orchestratorIdList") List<Long> orchestratorIdList);
 
 
 

@@ -316,6 +316,11 @@
         where `id` = #{id}
     </update>
 
+    <select id="getLatestOrchestratorSubmitJobId" resultType="long">
+        select `id` from dss_orchestrator_submit_job_info where `orchestrator_id` = #{orchestratorId}
+        order by update_time desc limit 1
+    </select>
+
     <update id="updateOrchestratorSubmitResult">
         update dss_orchestrator_submit_job_info
         <set>
@@ -364,7 +369,7 @@
         ,t2.name    as projectName
         ,t2.associate_git   as associateGit
         ,t3.global_var      as globalVar
-        ,t3.resource        as resource
+        ,t3.meta_resource        as metaResource
         ,t3.proxy_user      as proxyUser
         from dss_orchestrator_info t1
         join dss_project t2  on t1.project_id  = t2.id and t2.workspace_id = #{workspaceId}
@@ -392,7 +397,7 @@
          t1.id as id
         ,t1.id as orchestratorId
         ,t2.global_var      as globalVar
-        ,t2.resource        as resource
+        ,t2.meta_resource        as metaResource
         ,t2.proxy_user      as proxyUser
         ,t1.name            as orchestratorName
         ,t1.type            as type
@@ -481,6 +486,14 @@
         left join dss_release_task b on a.orchestrator_id = b.orchestrator_id and a.id = b.orchestrator_version_id
         where a.valid_flag  = 1  and a.orchestrator_id  = #{orchestratorId}
         order by a.id desc  limit 1
+    </select>
+
+    <select id="getSubmitJobStatus" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorSubmitJob">
+        select `id`, `orchestrator_id`, `create_time`, `update_time`, instance_name, status, error_msg from dss_orchestrator_submit_job_info
+        where orchestrator_id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
     </select>
 
 

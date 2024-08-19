@@ -259,7 +259,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 submitWorkflowToBML(taskId, flowRequest, username, workspace);
             }  catch (Exception e) {
             LOGGER.error("push failed, the reason is : ", e);
-            orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
+            orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.getMessage());
         }
         });
     }

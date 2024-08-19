@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.framework.project.restful;
 
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
@@ -35,6 +36,7 @@ import com.webank.wedatasphere.dss.framework.project.service.ProjectHttpRequestH
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
 import com.webank.wedatasphere.dss.framework.proxy.exception.DSSProxyUserErrorException;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitSearchRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitSearchResponse;
@@ -85,6 +87,9 @@ public class DSSFrameworkProjectRestfulApi {
 
     @Autowired
     private DSSWorkspaceRoleService dssWorkspaceRoleService;
+
+    @Autowired
+    private DSSWorkspaceService dssWorkspaceService;
 
     private Message executePreHook(Function<ProjectHttpRequestHook, Message> function) {
         String errorMsg = projectHttpRequestHooks.stream().map(function).filter(Objects::nonNull).map(Message::getMessage)
@@ -386,11 +391,18 @@ public class DSSFrameworkProjectRestfulApi {
 
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
+
         if (projectRequest.getWorkspaceId() == null) {
             Workspace workspace = SSOHelper.getWorkspace(request);
             projectRequest.setWorkspaceId(workspace.getWorkspaceId());
         }
 
+        try {
+            dssWorkspaceService.getWorkspacesById(projectRequest.getWorkspaceId(), username);
+        } catch (DSSErrorException e) {
+            LOGGER.error("User {} get workspace {} failed.", username, projectRequest.getWorkspaceId(), e);
+            return Message.error(e);
+        }
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
         if (roles == null || roles.isEmpty()) {
             LOGGER.error("username {}, in workspace {} roles are null or empty", username, projectRequest.getWorkspaceId());
@@ -465,6 +477,24 @@ public class DSSFrameworkProjectRestfulApi {
         if (message != null) {
             return message;
         }
+
+        if (projectRequest.getWorkspaceId() == null) {
+            Workspace workspace = SSOHelper.getWorkspace(request);
+            projectRequest.setWorkspaceId(workspace.getWorkspaceId());
+        }
+
+        try {
+            dssWorkspaceService.getWorkspacesById(projectRequest.getWorkspaceId(), username);
+        } catch (DSSErrorException e) {
+            LOGGER.error("User {} get workspace {} failed.", username, projectRequest.getWorkspaceId(), e);
+            return Message.error(e);
+        }
+        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
+        if (roles == null || roles.isEmpty()) {
+            LOGGER.error("username {}, in workspace {} roles are null or empty", username, projectRequest.getWorkspaceId());
+            return Message.error("can not get roles information");
+        }
+
         LOGGER.info("user {} begin to queryAllProjects, projectId: {}.", username, projectRequest.getId());
         if(!StringUtils.isEmpty(projectRequest.getSortBy()) && !StringUtils.isEmpty(projectRequest.getOrderBy())){
             String orderBySql = DSSProjectConstant.concatOrderBySql(projectRequest.getSortBy(),projectRequest.getOrderBy());
@@ -475,16 +505,8 @@ public class DSSFrameworkProjectRestfulApi {
             projectRequest.setOrderBySql(orderBySql);
         }
 
-        if (projectRequest.getWorkspaceId() == null) {
-            Workspace workspace = SSOHelper.getWorkspace(request);
-            projectRequest.setWorkspaceId(workspace.getWorkspaceId());
-        }
 
-        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
-        if (roles == null || roles.isEmpty()) {
-            LOGGER.error("username {}, in workspace {} roles are null or empty", username, projectRequest.getWorkspaceId());
-            return Message.error("can not get roles information");
-        }
+
 
         if(projectRequest.getPageNow() == null || projectRequest.getPageNow() <= 0){
             projectRequest.setPageNow(1);

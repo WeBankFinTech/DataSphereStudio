@@ -647,7 +647,7 @@ public class DSSFrameworkOrchestratorRestful {
         } catch (Exception e) {
             LOGGER.error(String.format("%s modify OrchestratorMeta fail", modifyOrchestratorMetaRequest.getOrchestratorName()));
             LOGGER.error(e.getMessage());
-            return Message.error(String.format("%s 工作流信息编辑失败,原因为 %s", modifyOrchestratorMetaRequest.getOrchestratorName()), e);
+            return Message.error(String.format("%s 工作流信息编辑失败,原因为 %s", modifyOrchestratorMetaRequest.getOrchestratorName(),e.getMessage()));
         }
 
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspace.getWorkspaceName(), TargetTypeEnum.ORCHESTRATOR,

@@ -8,7 +8,7 @@ public class OrchestratorMeta {
 
     private Long orchestratorId;
     private String proxyUser;
-    private String resource;
+    private String metaResource;
     private String globalVar;
     private String creator;
     //项目名称
@@ -139,12 +139,12 @@ public class OrchestratorMeta {
         this.proxyUser = proxyUser;
     }
 
-    public String getResource() {
-        return resource;
+    public String getMetaResource() {
+        return metaResource;
     }
 
-    public void setResource(String resource) {
-        this.resource = resource;
+    public void setMetaResource(String metaResource) {
+        this.metaResource = metaResource;
     }
 
     public String getGlobalVar() {

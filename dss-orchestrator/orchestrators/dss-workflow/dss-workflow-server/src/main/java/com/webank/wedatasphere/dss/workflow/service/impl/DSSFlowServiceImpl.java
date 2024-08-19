@@ -420,14 +420,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
         String proxyUser = null;
         StringBuilder globalVar = new StringBuilder();
-        for (Map<String, Object> prop : props) {
-            if (prop.containsKey("user.to.proxy")) {
-                proxyUser = prop.get("user.to.proxy").toString();
-            }else {
-                for (Map.Entry<String, Object> map : prop.entrySet()) {
-                    if (map.getValue() != null) {
-                        globalVar.append(map.getKey() + "=" + map.getValue().toString());
-                        globalVar.append(";");
+        if (CollectionUtils.isNotEmpty(props)) {
+            for (Map<String, Object> prop : props) {
+                if (prop.containsKey("user.to.proxy")) {
+                    proxyUser = prop.get("user.to.proxy").toString();
+                } else {
+                    for (Map.Entry<String, Object> map : prop.entrySet()) {
+                        if (map.getValue() != null) {
+                            globalVar.append(map.getKey() + "=" + map.getValue());
+                            globalVar.append(";");
+                        }
                     }
                 }
             }
@@ -435,15 +437,21 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 解析 resources
         List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(jsonFlow, "resources");
         StringBuilder resourceToString = new StringBuilder();
-        for (Map<String, Object> resource : resources) {
-            if (resource.containsKey("fileName")) {
-                resourceToString.append(resource.get("fileName"));
-                resourceToString.append(";");
-            }
+        if (CollectionUtils.isNotEmpty(resources)) {
+            for (Map<String, Object> resource : resources) {
+                if (resource.containsKey("fileName")) {
+                    resourceToString.append(resource.get("fileName"));
+                    resourceToString.append(";");
+                }
 
+            }
         }
 
         List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);
+
+        if (CollectionUtils.isEmpty(workFlowNodes)) {
+            return ;
+        }
 
         NodeMetaDO nodeMetaByOrchestratorId = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorId);
 
@@ -457,8 +465,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         logger.info("workFlowNodes:{}", workFlowNodes);
         List<NodeContentUIDO> nodeContentUIDOS = new ArrayList<>();
+        List<NodeContentDO> nodeContentDOS = new ArrayList<>();
+        List<String> keyList = new ArrayList<>();
+        Map<String, DSSNodeDefault> map = new HashMap<>();
         for (DSSNodeDefault nodeDefault : workFlowNodes) {
             String key = nodeDefault.getKey();
+            if (StringUtils.isNotEmpty(key)) {
+                keyList.add(key);
+                map.put(key, nodeDefault);
+            }
             String id = nodeDefault.getId();
             String jobType = nodeDefault.getJobType();
             Long createTime = nodeDefault.getCreateTime();
@@ -467,24 +482,40 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             Date modifyDate = new Date(modifyTime);
             String modifyUser = nodeDefault.getModifyUser();
             NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, createDate, modifyDate, modifyUser);
-            NodeContentDO nodeContentByKey = nodeContentMapper.getNodeContentByKey(key);
+            nodeContentDOS.add(contentDO);
+        }
 
-            if (nodeContentByKey == null) {
-                nodeContentMapper.insert(contentDO);
-                nodeContentByKey = nodeContentMapper.getNodeContentByKey(key);
-            } else {
-                contentDO.setId(nodeContentByKey.getId());
-                nodeContentMapper.update(contentDO);
-            }
-            Long contentByKeyId = nodeContentByKey.getId();
-            String title = nodeDefault.getTitle();
-            if (title != null) {
-                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title));
-            }
-            String desc = nodeDefault.getDesc();
-            if (desc != null) {
-                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc));
-            }
+        if (CollectionUtils.isEmpty(nodeContentDOS)) {
+            return ;
+        }
+
+        List<String> nodeKeyList = nodeContentDOS.stream().map(NodeContentDO::getNodeKey).collect(Collectors.toList());
+
+        List<NodeContentDO> nodeContentByKeyList = nodeContentMapper.getNodeContentByKeyList(nodeKeyList);
+
+        // 获取相同的部分（交集）
+        Set<NodeContentDO> intersection = new HashSet<>(nodeContentByKeyList);
+        intersection.retainAll(nodeContentDOS);
+
+        // 获取删除的部分（差集）
+        Set<NodeContentDO> difference1 = new HashSet<>(nodeContentByKeyList);
+        difference1.removeAll(nodeContentDOS);
+
+        // 获取新增的部分（差集）
+        Set<NodeContentDO> difference2 = new HashSet<>(nodeContentDOS);
+        difference2.removeAll(nodeContentByKeyList);
+
+        nodeContentMapper.batchInsert(new ArrayList<>(difference2));
+        nodeContentMapper.batchUpdate(new ArrayList<>(intersection));
+        nodeContentMapper.batchDelete(new ArrayList<>(difference1));
+
+        List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList);
+
+        for (NodeContentDO nodeContentDO : nodeContents) {
+            String nodeKey = nodeContentDO.getNodeKey();
+            Long contentByKeyId = nodeContentDO.getId();
+            DSSNodeDefault nodeDefault = map.get(nodeKey);
+
             Map<String, Object> params = nodeDefault.getParams();
             if (params != null) {
                 Map<String, Map<String, Object>> mapParams = (Map<String, Map<String, Object>>)params.get("configuration");
@@ -503,10 +534,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
                         }
                     }
+                    logger.info(mapParams.toString());
                 }
-                logger.info(mapParams.toString());
             }
-
         }
         // 先删后增
         if (CollectionUtils.isNotEmpty(contentIdListByOrchestratorId)) {

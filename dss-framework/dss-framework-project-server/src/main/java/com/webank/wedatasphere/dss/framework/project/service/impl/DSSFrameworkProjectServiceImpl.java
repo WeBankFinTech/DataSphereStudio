@@ -456,7 +456,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     }
 
-    public void syncGitProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception{
+    public void syncGitProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace, String projectCreator, Boolean permission) throws Exception{
 
         // 同步项目配置元数据到git
         if (projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
@@ -464,8 +464,19 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             exportAllOrchestratorsReqest.setProjectId(dbProject.getId());
             exportAllOrchestratorsReqest.setComment("modify Project");
             exportAllOrchestratorsReqest.setLabels(DSSCommonUtils.ENV_LABEL_VALUE_DEV);
-
-            BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, username, "", workspace);
+            //如果不是工程的创建人，则校验是否管理员或发布者权限
+            String uploadUserName = username;
+            if (!username.equalsIgnoreCase(dbProject.getCreateBy())) {
+                //获取发布者权限用户
+                List<String> projectUsers = projectUserService.getProjectPriv(projectModifyRequest.getId()).stream()
+                        .filter(projectUser -> projectUser.getPriv() == 3).map(DSSProjectUser::getUsername).collect(Collectors.toList());
+                boolean isAdmin = projectUserService.isAdminByUsername(projectModifyRequest.getWorkspaceId(), username);
+                //非管理员非发布者权限
+                if (!projectUsers.contains(username) && isAdmin) {
+                    uploadUserName = dbProject.getCreateBy();
+                }
+            }
+            BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, uploadUserName, "", workspace);
             if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
                 createGitProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
                 OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), projectModifyRequest.getId());

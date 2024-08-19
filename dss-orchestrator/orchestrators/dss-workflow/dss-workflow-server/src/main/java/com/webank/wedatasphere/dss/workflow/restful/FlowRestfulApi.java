@@ -332,19 +332,9 @@ public class FlowRestfulApi {
         Long flowID = saveFlowRequest.getId();
         String jsonFlow = saveFlowRequest.getJson();
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
-        DSSFlow dssFlow = flowService.getFlowByID(flowID);
         String workspaceName = saveFlowRequest.getWorkspaceName();
         String projectName = saveFlowRequest.getProjectName();
         LabelRouteVO labels = saveFlowRequest.getLabels();
-        // 判断工作流中是否存在命名相同的节点
-        if (flowService.checkIsExistSameFlow(jsonFlow)) {
-            return Message.error("It exists same flow.(存在相同的节点)");
-        }
-        // 判断工作流中是否有子工作流未被保存
-        List<String> unSaveNodes = flowService.checkIsSave(flowID, jsonFlow);
-        if (CollectionUtils.isNotEmpty(unSaveNodes)) {
-            return Message.error("工作流中存在子工作流未被保存，请先保存子工作流：" + unSaveNodes);
-        }
 
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         String version;
@@ -360,6 +350,7 @@ public class FlowRestfulApi {
         }catch (Exception e) {
             return Message.error("保存失败，原因为：" + e.getMessage());
         }
+        DSSFlow dssFlow = flowService.getFlowByID(flowID);
         AuditLogUtils.printLog(username, workspace.getWorkspaceId(), workspaceName, TargetTypeEnum.WORKFLOW,
                 flowID, dssFlow.getName(), OperateTypeEnum.UPDATE, saveFlowRequest);
         return Message.ok().data("flowVersion", version);

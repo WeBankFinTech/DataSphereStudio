@@ -300,10 +300,9 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             LOGGER.info("user:{} get project access users info, workspaceId:{}, projectId:{}, projectName:{}, accessUsers:{}, editUsers:{}, releaseUsers:{}",
                     projectRequest.getUsername(), projectRequest.getWorkspaceId(), projectVo.getId(), projectVo.getName(), accessUsers, editUsers, releaseUsers);
 
-            // 用户是否具有编辑权限  编辑权限和创建者都有
+            // 用户是否具有编辑权限  发布权限和创建者和空间管理员都有
             if (!StringUtils.isEmpty(pusername) &&
-                    (pusername.contains(editPriv) ||
-                            projectVo.getCreateBy().equals(projectRequest.getUsername()) ||
+                    (projectVo.getCreateBy().equals(projectRequest.getUsername()) ||
                             isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())) || projectResponse.getReleaseUsers().contains(projectRequest.getUsername())) {
                 projectResponse.setEditable(true);
             } else if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) ||
@@ -697,9 +696,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             projectResponse.setEditUsers(editUsers.stream().distinct().collect(Collectors.toList()));
             projectResponse.setReleaseUsers(releaseUsers.stream().distinct().collect(Collectors.toList()));
 
-            // 用户是否具有编辑权限  编辑权限和创建者都有
-            if (editUsers.contains(projectRequest.getUsername())
-                    || projectVo.getCreateBy().equals(projectRequest.getUsername())
+            // 用户是否具有编辑权限  发布者和创建者、管理员都有
+            if (projectVo.getCreateBy().equals(projectRequest.getUsername())
                     || isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())
                     || projectResponse.getReleaseUsers().contains(projectRequest.getUsername())
             ) {
@@ -768,5 +766,18 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         return projects;
     }
 
+    @Override
+    public List<String> queryProjectName(ProjectQueryRequest projectRequest){
+        //判断工作空间是否设置了管理员能否查看该工作空间下所有项目的权限
+        Integer workspaceAdminPermission = projectUserMapper.getWorkspaceAdminPermission(projectRequest.getWorkspaceId());
+
+        String queryUser = null;
+        if (!isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) || workspaceAdminPermission != 1) {
+            queryUser = projectRequest.getUsername();
+        }
+
+        return projectMapper.queryProjectName(projectRequest.getWorkspaceId(),queryUser);
+
+    }
 
 }

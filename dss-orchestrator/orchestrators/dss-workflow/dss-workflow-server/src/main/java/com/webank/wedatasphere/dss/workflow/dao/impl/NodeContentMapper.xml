@@ -23,7 +23,7 @@
 
     <resultMap id="nodeContentResultMap" type="com.webank.wedatasphere.dss.workflow.dto.NodeContentDO">
         <id property="id" column="id"/>
-        <result property="key" column="key"/>
+        <result property="nodeKey" column="node_key"/>
         <result property="nodeId" column="node_id"/>
         <result property="jobType" column="job_type"/>
         <result property="orchestratorId" column="orchestrator_id"/>
@@ -33,30 +33,30 @@
     </resultMap>
 
     <sql id="baseColumns">
-        `id`, `key`, `node_id`, `job_type`, `orchestrator_id`, `create_time`, `modify_time`, `modify_user`
+        `id`, `node_key`, `node_id`, `job_type`, `orchestrator_id`, `create_time`, `modify_time`, `modify_user`
     </sql>
 
     <insert id= "insert" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentDO">
-        INSERT INTO dss_workflow_node_content(`key`, `node_id`, `job_type`, `orchestrator_id`, `create_time`, `modify_time`, `modify_user`)
-        VAlUES(#{key}, #{nodeId}, #{jobType}, #{orchestratorId}, #{createTime}, NOW(), #{modifyUser})
+        INSERT INTO dss_workflow_node_content(`node_key`, `node_id`, `job_type`, `orchestrator_id`, `create_time`, `modify_time`, `modify_user`)
+        VAlUES(#{nodeKey}, #{nodeId}, #{jobType}, #{orchestratorId}, #{createTime}, NOW(), #{modifyUser})
     </insert>
 
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO dss_workflow_node_content(key, node_id, job_type, orchestrator_id, create_time, modify_time, modify_user)
+        INSERT INTO dss_workflow_node_content(node_key, node_id, job_type, orchestrator_id, create_time, modify_time, modify_user)
         VALUES
         <foreach collection="list" item="item" index="index" separator=",">
-                (#{item.key}, #{item.nodeId}, #{item.jobType}, #{item.orchestratorId}, #{createTime}, NOW(), #{item.modifyUser})
+                (#{item.nodeKey}, #{item.nodeId}, #{item.jobType}, #{item.orchestratorId}, #{createTime}, NOW(), #{item.modifyUser})
         </foreach>
     </insert>
 
     <update id= "update" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentDO">
         UPDATE dss_workflow_node_content
-        SET `key` = #{key}, `node_id` = #{nodeId}, `job_type` = #{jobType}, `orchestrator_id` = #{orchestratorId}, `modify_time` = NOW(), `modify_user` = #{modifyUser}
+        SET `node_key` = #{nodeKey}, `node_id` = #{nodeId}, `job_type` = #{jobType}, `orchestrator_id` = #{orchestratorId}, `modify_time` = NOW(), `modify_user` = #{modifyUser}
         WHERE `id` = #{id}
     </update>
 
     <select id="getNodeContentByKey" parameterType="java.lang.String" resultMap="nodeContentResultMap">
-        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `key` = #{key}
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey}
     </select>
 
     <select id="getNodeContentListByOrchestratorId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
@@ -69,7 +69,7 @@
 
 
     <delete id="deleteNodeContentByKey">
-            DELETE FROM dss_workflow_node_content WHERE `key` = #{key}
+            DELETE FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey}
     </delete>
     
     <delete id="deleteNodeContentByOrchestratorId">

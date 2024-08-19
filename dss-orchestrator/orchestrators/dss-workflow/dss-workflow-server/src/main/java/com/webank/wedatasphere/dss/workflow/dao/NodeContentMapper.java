@@ -14,7 +14,7 @@ public interface NodeContentMapper {
 
     void update(NodeContentDO nodeContentDO);
 
-    void batchUpdate(List<NodeContentDO> list);
+    void updateByKey(NodeContentDO nodeContentDO);
 
     NodeContentDO getNodeContentByKey(@Param("nodeKey") String nodeKey);
 

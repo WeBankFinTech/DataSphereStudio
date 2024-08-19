@@ -514,7 +514,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         if (CollectionUtils.isNotEmpty(intersection)) {
-            nodeContentMapper.batchUpdate(new ArrayList<>(intersection));
+            for (NodeContentDO nodeContentDO : intersection) {
+
+                nodeContentMapper.updateByKey(nodeContentDO);
+            }
         }
 
         if (CollectionUtils.isNotEmpty(difference1)) {

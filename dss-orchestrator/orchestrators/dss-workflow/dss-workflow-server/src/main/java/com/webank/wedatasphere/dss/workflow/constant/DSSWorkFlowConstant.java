@@ -63,6 +63,6 @@ public class DSSWorkFlowConstant {
     /**
      * 压缩文件大小限制，默认5GB
      */
-    public static final CommonVars<String> DEFAULT_ZIP_FILE_LIMIT = CommonVars.apply("wds.dss.workflow.export.default.zip.limit", "10");
+    public static final CommonVars<String> DEFAULT_ZIP_FILE_LIMIT = CommonVars.apply("wds.dss.workflow.export.default.zip.limit", "5");
 
 }

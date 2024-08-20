@@ -67,7 +67,7 @@
 
     <select id="getNodeContentByKeyList" parameterType="java.lang.String" resultMap="nodeContentResultMap">
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content
-        WHERE `orchestratorId` = #{orchestratorId} and `node_key` IN
+        WHERE `orchestrator_id` = #{orchestratorId} and `node_key` IN
         <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>
@@ -83,11 +83,11 @@
 
 
     <delete id="deleteNodeContentByKey">
-            DELETE FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey} and `orchestratorId` = #{orchestratorId}
+            DELETE FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey} and `orchestrator_id` = #{orchestratorId}
     </delete>
 
     <delete id="batchDelete">
-        DELETE FROM dss_workflow_node_content WHERE `orchestratorId` = #{orchestratorId} and `node_key` IN
+        DELETE FROM dss_workflow_node_content WHERE `orchestrator_id` = #{orchestratorId} and `node_key` IN
         <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
             #{item.nodeKey}
         </foreach>

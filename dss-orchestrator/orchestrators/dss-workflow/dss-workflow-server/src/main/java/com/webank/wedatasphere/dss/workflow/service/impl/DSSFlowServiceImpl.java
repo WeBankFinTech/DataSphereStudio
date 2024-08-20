@@ -495,7 +495,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<String> nodeKeyList = nodeContentDOS.stream().map(NodeContentDO::getNodeKey).collect(Collectors.toList());
 
-        List<NodeContentDO> nodeContentByKeyList = nodeContentMapper.getNodeContentByKeyList(nodeKeyList);
+        List<NodeContentDO> nodeContentByKeyList = nodeContentMapper.getNodeContentByKeyList(nodeKeyList, orchestratorId);
 
         // 获取相同的部分（交集）
         Set<NodeContentDO> intersection = new HashSet<>(nodeContentByKeyList);
@@ -521,10 +521,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         if (CollectionUtils.isNotEmpty(difference1)) {
-            nodeContentMapper.batchDelete(new ArrayList<>(difference1));
+            nodeContentMapper.batchDelete(new ArrayList<>(difference1), orchestratorId);
         }
 
-        List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList);
+        List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId);
 
         for (NodeContentDO nodeContentDO : nodeContents) {
             String nodeKey = nodeContentDO.getNodeKey();

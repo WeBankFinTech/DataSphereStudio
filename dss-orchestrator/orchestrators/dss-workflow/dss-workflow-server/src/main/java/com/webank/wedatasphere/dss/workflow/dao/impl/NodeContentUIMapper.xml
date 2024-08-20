@@ -43,13 +43,13 @@
 
     <update id="updateNodeContentUI" parameterType="com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO">
         UPDATE dss_workflow_node_content_to_ui
-        SET `node_ui_value` = #{nodeUIValue} WHERE `node_ui_key` = #{nodeUIKey}
+        SET `node_ui_value` = #{nodeUIValue} WHERE `node_ui_key` = #{nodeUIKey} and `content_id` = #{contentId}
     </update>
 
     <update id="batchUpdateNodeContentUI" parameterType="java.util.List">
         UPDAtE dss_workflow_node_content_to_ui
         <foreach collection="list" item="item" index="index" separator=",">
-            SET `node_ui_value` = #{item.nodeUIValue} WHERE `node_ui_key` = #{item.nodeUIKey}
+            SET `node_ui_value` = #{item.nodeUIValue} WHERE `node_ui_key` = #{item.nodeUIKey} and `content_id` = #{item.contentId}
         </foreach>
     </update>
 

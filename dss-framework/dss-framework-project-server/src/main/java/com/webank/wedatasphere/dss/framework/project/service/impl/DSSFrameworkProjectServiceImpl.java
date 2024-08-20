@@ -456,7 +456,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     }
 
-    public void syncGitProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace, String projectCreator, Boolean permission) throws Exception{
+    public void syncGitProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception{
 
         // 同步项目配置元数据到git
         if (projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
@@ -471,7 +471,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                 List<String> projectUsers = projectUserService.getProjectPriv(projectModifyRequest.getId()).stream()
                         .filter(projectUser -> projectUser.getPriv() == 3).map(DSSProjectUser::getUsername).collect(Collectors.toList());
                 boolean isAdmin = projectUserService.isAdminByUsername(projectModifyRequest.getWorkspaceId(), username);
-                //非管理员非发布者权限
+                // 管理员非发布者权限
                 if (!projectUsers.contains(username) && isAdmin) {
                     uploadUserName = dbProject.getCreateBy();
                 }

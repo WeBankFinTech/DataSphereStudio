@@ -186,8 +186,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorService.isExistSameNameBeforeCreate(orchestratorCreateRequest.getWorkspaceId(), orchestratorCreateRequest.getProjectId(), orchestratorCreateRequest.getOrchestratorName());
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorCreateRequest.getProjectId(), username);
-        if(dssProject.getWorkspaceId() == null || !String.valueOf(dssProject.getWorkspaceId()).equals(String.valueOf(workspace.getWorkspaceId()))){
-            LOGGER.error("createOrchestrator projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(),workspace.getWorkspaceId());
+        Integer dssProjectWorkspaceId = dssProject.getWorkspaceId();
+        long workspaceId = workspace.getWorkspaceId();
+        if(dssProjectWorkspaceId == null || !String.valueOf(dssProjectWorkspaceId).equals(String.valueOf(workspaceId))){
+            LOGGER.error("createOrchestrator projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(), workspaceId);
             DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间创建工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
         }
         //1.创建编排实体bean
@@ -204,7 +206,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setSecondaryType(orchestratorCreateRequest.getOrchestratorWays().toString());
         dssOrchestratorInfo.setUses(orchestratorCreateRequest.getUses());
         //new field
-        dssOrchestratorInfo.setWorkspaceId(workspace.getWorkspaceId());
+        dssOrchestratorInfo.setWorkspaceId(workspaceId);
         dssOrchestratorInfo.setOrchestratorWay(OrchestratorUtils.getModeStr(orchestratorCreateRequest.getOrchestratorWays()));
         dssOrchestratorInfo.setOrchestratorMode(orchestratorCreateRequest.getOrchestratorMode());
         dssOrchestratorInfo.setOrchestratorLevel(orchestratorCreateRequest.getOrchestratorLevel());
@@ -290,7 +292,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         }
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(orchestratorModifyRequest.getProjectId(), username);
-        if(dssProject.getWorkspaceId() == null || !String.valueOf(dssProject.getWorkspaceId()).equals(String.valueOf(workspace.getWorkspaceId()))){
+        if(dssProject.getWorkspaceId() == null || !dssProject.getWorkspaceId().equals(workspace.getWorkspaceId())){
             LOGGER.error("modifyOrchestrator projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(),workspace.getWorkspaceId());
             DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间修改工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
         }
@@ -575,7 +577,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         //判断工程是否存在,并且取出工程名称和空间名称
         DSSProject dssProject = validateOperation(modifyOrchestratorMetaRequest.getProjectId(), username);
 
-        if(dssProject.getWorkspaceId() == null || !String.valueOf(dssProject.getWorkspaceId()).equals(String.valueOf(workspace.getWorkspaceId()))){
+        if(dssProject.getWorkspaceId() == null || !dssProject.getWorkspaceId().equals(workspace.getWorkspaceId())){
             LOGGER.error("modifyOrchestratorMeta projectId is {},project workspaceId is {}, workspace params is {}",dssProject.getId(),dssProject.getName(),workspace.getWorkspaceId());
             DSSFrameworkErrorException.dealErrorException(60000, "无法在当前工作空间修改工作流,"+dssProject.getName()+"项目不属于"+workspace.getWorkspaceName()+"工作空间");
         }

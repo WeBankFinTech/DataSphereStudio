@@ -20,5 +20,5 @@ public interface NodeContentUIMapper {
 
     void batchUpdateNodeContentUI(NodeContentUIDO contentUIDO);
 
-    void deleteNodeContentUIByContentList(@Param("contentList") List<Long> list);
+    void deleteNodeContentUIByContentList(@Param("list") List<Long> list);
 }

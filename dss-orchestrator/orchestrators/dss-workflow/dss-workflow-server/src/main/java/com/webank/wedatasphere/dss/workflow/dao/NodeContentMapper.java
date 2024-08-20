@@ -18,15 +18,15 @@ public interface NodeContentMapper {
 
     NodeContentDO getNodeContentByKey(@Param("nodeKey") String nodeKey);
 
-    List<NodeContentDO> getNodeContentByKeyList(List<String> list);
+    List<NodeContentDO> getNodeContentByKeyList(@Param("list") List<String> list, @Param("orchestratorId") Long orchestratorId);
 
     List<NodeContentDO> getNodeContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
 
     List<Long> getContentIdListByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
 
-    void deleteNodeContentByKey(@Param("nodeKey") String nodeKey);
+    void deleteNodeContentByKey(@Param("nodeKey") String nodeKey, @Param("orchestratorId") Long orchestratorId);
 
-    void batchDelete(List<NodeContentDO> list);
+    void batchDelete(@Param("list") List<NodeContentDO> list, @Param("orchestratorId") Long orchestratorId);
 
     void deleteNodeContentByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
 }

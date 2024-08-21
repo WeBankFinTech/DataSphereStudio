@@ -31,7 +31,7 @@
         <div style="margin-bottom: 10px; margin-top: 2px; font-size: 14">
           {{$t("message.common.dss.selectedcol")}}({{ selectedList.length }})
         </div>
-        <div class="selected-list" :style="{ height: height - 53 + 'px' }">
+        <div class="selected-list" :style="{ height: height - 53 - 24 + 'px' }">
           <div v-if="selected.length < 1">
             {{$t("message.common.dss.colfiltertip")}}<br />
             {{$t("message.common.dss.colfiltertip_1")}}
@@ -49,18 +49,28 @@
         </div>
       </div>
     </div>
+    <!-- <div style="display: flex;">
+      <Page
+        style="display: inline-block;align-items: center;"
+        :total="page.total"
+        :current="page.current"
+        size="small"
+        @on-change="changePage"/>
+      <span>共 {{page.total}} 列</span> 
+    </div> -->
     <div class="buts-warp">
       <Checkbox v-model="checkAll" @on-change="(value) => changeCheckAll(value)"
       >{{ $t("message.common.selectAll") }}</Checkbox
       >
       <Button type="primary" @click="onCancel">{{ $t("message.common.clear") }}</Button>
-      <Button type="primary" @click="reset">{{ $t("message.common.reset") }}</Button>
+      <Button type="primary" @click="reset" title="点击还原全部列">{{ $t("message.common.reset") }}</Button>
       <Button type="primary" @click="changeHeads()">{{ $t("message.common.ok") }}</Button>
       <Button type="primary" @click="close">{{ $t("message.common.close") }}</Button>
     </div>
   </div>
 </template>
 <script>
+import { debounce } from 'lodash';
 import virtualList from '@dataspherestudio/shared/components/virtualList'
 export default {
   components: {
@@ -90,6 +100,11 @@ export default {
       searchName: '',
       selected: [],
       rowlist: [],
+      page: {
+        total: 0,
+        current: 1,
+        size: 10,
+      },
     }
   },
   computed: {
@@ -119,6 +134,9 @@ export default {
     this.selected = this.headRows.filter(it => this.checked.some(item => item === it.title))
   },
   methods: {
+    changePage() {
+
+    },
     hanlderCheck(e) {
       const item = e.target.dataset.item || e.target.parentNode.dataset.item
       if (item === undefined) return
@@ -133,7 +151,7 @@ export default {
         this.$Message.warning(this.$t('message.common.dss.maxcol'))
       }
     },
-    filterSearch() {
+    filterSearch: debounce(function () {
       this.checkAll = false
       if (!this.searchName) {
         this.rowlist = this.headRows
@@ -141,7 +159,7 @@ export default {
       this.rowlist = this.headRows
         .filter((it) => it.title.indexOf(this.searchName) > -1)
       this.layout()
-    },
+    }, 500),
     getItemprops(index) {
       return {
         key: index,

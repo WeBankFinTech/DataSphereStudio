@@ -359,6 +359,7 @@ export default {
         { rule: 'pipeLine', logo: 'fi-storage' },
         { rule: 'appconn', logo: 'fi-workflow' },
         { rule: 'pipeline', logo: 'fi-storage' },
+        { rule: 'nebula', logo: 'fi-nebula' },
       ];
       const color = this.supportColor(item.engineStatus);
       const support = supportTypes.filter((type) => type.rule === item.engineType);

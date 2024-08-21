@@ -21,8 +21,13 @@
           <div class="project-nav-tree">
             <div class="project-nav-tree-top">
               <div class="project-nav-tree-top-t">
-                <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
-                <div class="project-nav-tree-top-t-icon">
+                <Input
+                  class="searchbox"
+                  v-model="searchText"
+                  clearable
+                  placeholder="请输入项目名进行搜索"
+                />
+                <div class="project-nav-tree-top-t-icon" style="border-bottom: 1px solid #eee; margin-top: 7px;">
                   <SvgIcon class="icon sort-icon" icon-class="xinzeng" style="display: inline-flex;margin-top: 4px;" @click="createProject" />
                   <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
                     <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
@@ -64,7 +69,7 @@
               class="tree-container"
               keyText="id"
               :size="32"
-              :list="projectsTree"
+              :list="searchedProjectsTree"
               :render="renderNode"
               :open="openNode"
               :height="height - 30"
@@ -144,6 +149,7 @@
                 :query="item.query"
                 :associateGit="currentProjectData.associateGit"
                 @updateWorkflowList="updateWorkflowList(item)"
+                @updateFlowStatus="updateFlowStatus(item)"
                 @isChange="isChange(index, arguments)"
                 @close="onTabRemove(item.tabId, false)"
                 @open="reopen(item)"
@@ -213,7 +219,7 @@
 </template>
 <script>
 import qs from 'qs';
-import { debounce } from 'lodash';
+import { debounce, cloneDeep } from 'lodash';
 import Workflow from '@/workflows/module/workflow';
 import WorkflowModal from '@/workflows/module/workflow/module/workflowModal.vue';
 import Process from '@/workflows/module/process';
@@ -251,6 +257,7 @@ export default {
   },
   data() {
     return {
+      searchText: "",
       tabList: [],
       current: {},
       modeOfKey: "dev",
@@ -270,6 +277,8 @@ export default {
         orchestratorModeList: [],
         releaseUsers: [],
         associateGit: false,
+        gitUser: '',
+        gitToken: ''
       },
       selectOrchestratorList: [],
       devProcessBase: [],
@@ -278,6 +287,7 @@ export default {
       ORCHESTRATORMODES,
       loading: false,
       loadingTree: false,
+      searchedProjectsTree: [],
       projectsTree: [],
       treeFold: false,
       treeModalShow: false,
@@ -334,6 +344,16 @@ export default {
   },
   filters,
   watch: {
+    searchText: function(value) {
+      const copiedProjectsTree = _.cloneDeep(this.projectsTree);
+      this.searchedProjectsTree = this.filterTreeByKeyword(copiedProjectsTree, value);
+      // console.log('searchText-searched', this.searchedProjectsTree)
+    },
+    projectsTree:function(value) {
+      const copiedProjectsTree = _.cloneDeep(this.projectsTree);
+      this.searchedProjectsTree = this.filterTreeByKeyword(copiedProjectsTree, this.searchText);
+      // console.log('projectsTree-searched', this.searchedProjectsTree)
+    },
     tabList(val) {
       this.updateTabList(val)
     },
@@ -408,7 +428,7 @@ export default {
         this.projectsTree.forEach(item => {
           let name = item.name;
           let id = item.id + '';
-          res.push({name, id})
+          res.push({name, id, associateGit: item.associateGit})
         })
       }
       return res;
@@ -451,7 +471,10 @@ export default {
         accessUsers: [],
         devProcessList: [],
         releaseUsers: [],
-        createBy: this.getUserName()
+        createBy: this.getUserName(),
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       };
       this.$refs.projectForm.showProject(this.currentProjectData, 'add')
     },
@@ -600,7 +623,7 @@ export default {
         });
     },
     importSended(target, orchestratorId){
-      this.getFlow({id: target.id, name: target.name}, (flows) => {
+      this.getFlow({id: target.id, name: target.name, associateGit: target.associateGit}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
         this.tabList = this.tabList.filter(item => {
           return item.query.orchestratorId !== orchestratorId
@@ -630,7 +653,7 @@ export default {
           if (node) {
              storage.set('revealline', linenum);
              storage.set('openflownode', `${node.orchestratorId}_flowidname_${item.nodeName}`);
-             if (node.orchestratorId == this.$route.query.flowId || node.orchestratorId == this.current.id) {
+             if (node.orchestratorId == this.$route.query.flowId || node.orchestratorId == this.current.id || this.tabList.length < 1) {
               this.showCodeDrawer = false;
               // 存储flow
               storage.set("clickFlowInTree", node);
@@ -688,6 +711,8 @@ export default {
       this.openNode = {...v}
     },
     async handleTreeClick({item}) {
+      storage.remove('revealline');
+      storage.remove('openflownode');
       const node = item
       // 切换到开发模式
       this.modeOfKey =
@@ -848,6 +873,29 @@ export default {
     },
     onDeleteFlow(params) {
       this.$refs.workflow.deleteWorkflow(params);
+    },
+    filterTreeByKeyword(tree, keyword) {
+      return tree.filter(node => {
+        // 检查当前节点的 name 字段是否包含关键字
+        if (node.name.includes(keyword)) {
+          // 如果当前节点包含关键字，则递归地过滤其 children
+          node.children = node.children ? this.filterTreeByKeyword(node.children, keyword) : [];
+          return true;
+        }
+
+        // 如果当前节点不包含关键字，但有 children，则递归检查 children
+        if (node.children && node.children.length > 0) {
+          const filteredChildren = this.filterTreeByKeyword(node.children, keyword);
+          if (filteredChildren.length > 0) {
+            // 如果 children 中有匹配项，则保留当前节点，并更新 children
+            node.children = filteredChildren;
+            return true;
+          }
+        }
+
+        // 如果当前节点及其 children 都不符合条件，则不保留该节点
+        return false;
+      })
     },
     updateTabList(val = []) {
       let workspaceId = this.$route.query.workspaceId
@@ -1063,7 +1111,9 @@ export default {
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
-          associateGit: projectData.associateGit
+          associateGit: projectData.associateGit,
+          gitUser: projectData.gitUser,
+          gitToken: projectData.gitToken
         };
         api
           .fetch(
@@ -1101,7 +1151,9 @@ export default {
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
           associateGit: projectData.associateGit,
-          dataSourceList: projectData.dataSourceList
+          dataSourceList: projectData.dataSourceList,
+          gitUser: projectData.gitUser,
+          gitToken: projectData.gitToken
         };
         api
           .fetch(
@@ -1376,6 +1428,14 @@ export default {
       this.$refs.workflow.fetchFlowData();
       this.updateCurrentWorkflowStatus(item);
     },
+    updateFlowStatus(item) {
+      if(item.associateGit) {
+        const cur = this.projectsTree.filter(e => e.id == item.query.projectId)[0];
+        this.getFlow(cur, (flows) => {
+          this.reFreshTreeData(cur, flows)
+        });
+      }
+    },
     isChange(index, val) {
       if (this.tabList[index]) {
         this.tabList[index].isChange = val[0];
@@ -1625,6 +1685,9 @@ export default {
      * 排序+筛选
      */
     filerSort(name, type) {
+      if (type === 'filter') {
+        this.searchText = ''
+      }
       // 保存已经加载项目下工作流数据
       if (!this.flowData) {
         this.flowData = {}
@@ -1692,7 +1755,7 @@ export default {
      * 轮询进度是否复制完成
      */
     copySended({target, source, copyJobId}) {
-      this.getFlow({id: target.id, name: target.name}, (flows) => {
+      this.getFlow({id: target.id, name: target.name, associateGit: target.associateGit}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
         const targetFlow = flows.find(it => it.name === target.orchestratorName) || {}
         const sourceTarget = {
@@ -1776,6 +1839,21 @@ export default {
 @import "../../assets/styles/workflow.scss";
 @import "@dataspherestudio/shared/common/style/variables.scss";
 
+.searchbox{
+   flex: 1;
+   margin-top: 6px;
+   border-bottom: 1px solid #eee;
+   ::v-deep i.ivu-input-icon{
+     color: #808695;
+     font-weight: normal;
+   }
+   ::v-deep .ivu-input{
+     border: none;
+   }
+   ::v-deep .ivu-input:focus{
+     box-shadow: none;
+   }
+  }
 .prop-modal {
   .prop-item {
     padding: 5px;

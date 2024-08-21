@@ -79,7 +79,8 @@ export default {
 
     original(newValue) {
       if(this.editor) {
-        this.editor.originalEditor.setValue(newValue)
+        const editor = this.editor.getOriginalEditor();
+        editor && editor.setValue(newValue)
       }
     },
 

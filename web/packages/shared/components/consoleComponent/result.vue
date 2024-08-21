@@ -1,9 +1,5 @@
 <template>
   <div ref="view" class="we-result-view">
-    <!-- resultPath:{{result.path}} -->
-    <!-- resultType:{{resultType}}
-    tableData.type:{{tableData.type}}
-    result.hugeData:{{result.hugeData}} -->
     <we-toolbar
       ref="toolbar"
       :current-path="result.path"
@@ -182,6 +178,10 @@
   </div>
 </template>
 <script>
+import {
+  dropRight,
+  toArray,
+} from 'lodash';
 import util from '@dataspherestudio/shared/common/util'
 import Table from '@dataspherestudio/shared/components/virtualTable'
 import WbTable from '@dataspherestudio/shared/components/table'
@@ -191,6 +191,7 @@ import filter from './filter.vue'
 import mixin from '@dataspherestudio/shared/common/service/mixin'
 import storage from '@dataspherestudio/shared/common/helper/storage'
 import plugin from '@dataspherestudio/shared/common/util/plugin'
+import api from '@dataspherestudio/shared/common/service/api'
 
 const extComponents = plugin.emitHook('script_result_type_component') || []
 /**
@@ -250,26 +251,17 @@ export default {
       extComponents,
       baseinfo: {},
       checkedFields: [],
-    }
-  },
-  computed: {
-    result() {
-      let res = {
+      result: {
         headRows: [],
         bodyRows: [],
         type: 'EMPTY',
         total: 0,
         path: '',
         cache: {},
-      }
-      if (this.script.resultList && this.script.resultSet !== undefined) {
-        res = this.script.resultList[this.script.resultSet].result
-      }
-      if (!res && this.script.result) {
-        res = this.script.result
-      }
-      return res
-    },
+      },
+    }
+  },
+  computed: {
     htmlData() {
       return this.result.bodyRows[0] && this.result.bodyRows[0][0]
     },
@@ -302,17 +294,21 @@ export default {
         this.data.headRows = this.data.headRows.slice()
       }
     },
-    script: {
+    scriptViewState: {
       deep: true,
-      handler: function () {
-        this.updateData()
+      handler: function (n, o) {
+        if (n.columnPageNow != o.columnPageNow) {
+          storage.remove('column_show_'+ this.result.path)
+          this.isFilterViewShow = false;
+          this.checkedFields = [];
+          this.updateData('changeColumnPage')
+        }
       },
-    },
+    }
   },
   mounted() {
     this.baseinfo = storage.get('baseInfo', 'local') || {}
-    this.updateData()
-    this.initPage()
+    this.updateData('mounted')
   },
   beforeDestroy: function () {},
   methods: {
@@ -390,24 +386,20 @@ export default {
           list.reverse()
         }
       }
+      if (cb == 'sort') {
+        return list
+      }
       this.originRows = list
-      this.sortType = order
-      // 排序后的数据进行存储
       const tmpResult = this.getResult()
-      // 还原初始字段
-      tmpResult.sortBodyRows = this.originRows.map((items) => {
-        return Object.values(items)
-      })
-      tmpResult.sortType = this.sortType
+      tmpResult.sortType = order
+      tmpResult.sortKey = key
       tmpResult.current = this.page.current
       tmpResult.size = this.page.size
       const resultSet = this.script.resultSet || 0
       this.$set(this.script.resultList[resultSet], 'result', tmpResult)
-      this.dispatch('IndexedDB:updateResult', {
-        tabId: this.script.id,
+      this.updateCache({
         resultSet: resultSet,
         showPanel: this.scriptViewState.showPanel,
-        ...this.script.resultList,
       })
       this.pageingData()
       if (cb) {
@@ -503,33 +495,144 @@ export default {
       }
       return charA.localeCompare(charB)
     },
-    updateData() {
+    updateData(type) {
       /**
-       * result.type
-       * TEXT_TYPE: '1'
-       * TABLE_TYPE: '2'
-       * IO_TYPE: '3'
-       * PICTURE_TYPE: '4'
-       * HTML_TYPE: '5'
-       */
-      this.checkedFields = storage.get('column_show_'+this.result.path) || []
-      if (this.result.type === '2') {
+     * result.type
+     * TEXT_TYPE: '1'
+     * TABLE_TYPE: '2'
+     * IO_TYPE: '3'
+     * PICTURE_TYPE: '4'
+     * HTML_TYPE: '5'
+     */
+      let result = this.result
+      if (this.script.resultList && this.script.resultSet !== undefined) {
+        result = this.script.resultList[this.script.resultSet].result
+      }
+      if (!result && this.script.result) {
+        result = this.script.result
+      }
+      if (result.type !== '2') {
+        this.result = result
+        return
+      }
+      if ('dss/apiservice' == this.getResultUrl) {
+        // 数据服务
+        let columnPageNow = type == 'changeColumnPage' ? this.scriptViewState.columnPageNow : result.columnPageNow || 1;
+        this.getResultData(columnPageNow)
+      } else if (this.script.nodeId) {
+        // 工作流
+        this.dispatch('workflowIndexedDB:getNodeCache', {
+          tabId: this.script.nodeId,
+          cb: ({resultList, resultSet}) => {
+            if (resultList) {
+              this.script.resultList = resultList;
+              this.script.resultSet = resultSet;
+              let result = this.script.resultList[this.script.resultSet] 
+              let columnPageNow = type == 'changeColumnPage' ? this.scriptViewState.columnPageNow : result && result.result ? result.result.columnPageNow : 1;
+              this.getResultData(columnPageNow)
+            } else {
+              this.getResultData(1)
+            }
+          }
+        });
+      } else if(this.script.id) {
+        // scriptis
+        this.dispatch('IndexedDB:getResult', {
+          tabId: this.script.id,
+          cb: (resultList) => {
+            if (resultList) {
+              this.script.resultList = dropRight(toArray(resultList), 3);
+              this.script.resultSet = resultList.resultSet;
+              let result = this.script.resultList[this.script.resultSet] 
+              let columnPageNow = type == 'changeColumnPage' ? this.scriptViewState.columnPageNow : result && result.result ? result.result.columnPageNow : 1;
+              this.getResultData(columnPageNow)
+            } else {
+              this.getResultData(1)
+            }
+          }
+        });
+      }
+      
+    },
+    async getResultData(columnPageNow) {
+      let result = this.script.resultList[this.script.resultSet] || {}
+      this.checkedFields = storage.get('column_show_'+ result.path) || [];
+      this.scriptViewState.columnPageNow = columnPageNow
+      // 获取列分页数据
+      // 表格数据每次从接口拉取，不使用indexedDB的缓存
+      const url = `${this.getResultUrl}/openFile`;
+      const resultPath = result.path;
+      this.isLoading = true;
+      let ret = {};
+      let hasSorted = false;
+      if (result && result.result && result.result.sortType) {
+        hasSorted = {
+          sortType: result.result.sortType,
+          sortKey: result.result.sortKey,
+        };
+      }
+      const params = {
+        path: resultPath,
+        columnPage: columnPageNow || 1,
+        enableLimit: true,
+        pageSize: 5000,
+      }
+      if ('dss/apiservice' == this.getResultUrl) {
+        params.taskId = this.taskID
+      }
+      try {
+        ret = await api.fetch(url, params, 'get')
+      } catch (error) {
+      }
+      this.isLoading = false;
+    
+      if (ret.display_prohibited) {
+        result = {
+          'headRows': [],
+          'bodyRows': [],
+          'total': ret.totalLine,
+          'type': ret.type,
+          'path': resultPath,
+          hugeData: true,
+          tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
+        };
+      } else if (ret.column_limit_display) {
+        result = {
+          tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
+          'headRows': ret.metadata,
+          'bodyRows': ret.fileContent,
+          // 如果totalLine是null，就显示为0
+          'total': ret.totalLine ? ret.totalLine : 0,
+          // 如果内容为null,就显示暂无数据
+          'type': ret.fileContent ? ret.type : '0',
+          'totalColumn': ret.totalColumn,
+          'path': resultPath,
+          'current': 1,
+          'size': 20,
+        };
+      } else {
+        result = {
+          'headRows': ret.metadata,
+          'bodyRows': ret.fileContent,
+          // 如果totalLine是null，就显示为0
+          'total': ret.totalLine ? ret.totalLine : 0,
+          // 如果内容为null,就显示暂无数据
+          'type': ret.fileContent ? ret.type : '0',
+          'totalColumn': ret.totalColumn,
+          'path': resultPath,
+          'current': 1,
+          'size': 20,
+        };
+      }
+      this.result = result;
+      this.script.result = result;
+      this.originRows = result.bodyRows || []
+      if (result.type === '2') {
         this.tableData.type =
           this.result.headRows.length > 50 ? 'virtual' : 'normal'
         let headRows = this.result.headRows || []
         let heads = []
         let bodyRows = []
-        // 判断是否进行过排序
-        switch (this.result.sortType) {
-          case 'asc':
-          case 'desc':
-            this.originRows = this.result.sortBodyRows || []
-            this.sortType = this.result.sortType
-            break
-          default:
-            this.originRows = this.result.bodyRows || []
-            break
-        }
         this.tableData.total = this.result.total
         if (this.tableData.type === 'normal') {
           for (let item of headRows) {
@@ -603,8 +706,17 @@ export default {
           headRows: dataHeads,
           bodyRows,
         }
-        this.cols = cols
+        this.cols = cols;
+        if (hasSorted && hasSorted.sortType !== 'normal') {
+          const col = dataHeads.find(it => it.key === hasSorted.sortKey)
+          if (col) {
+            this.originRows = this.sortChange({
+              column: col, key: hasSorted.sortKey, order: hasSorted.sortType, cb: 'sort' 
+            })
+          }
+        }
         this.pageingData()
+        this.initPage()
       }
     },
     pageingData() {
@@ -628,20 +740,37 @@ export default {
     change(page = 1) {
       this.hightLightRow = null
       this.page.current = page
-      // 分页后的数据进行存储
+      // 行分页后的数据进行存储
       const tmpResult = this.getResult()
       tmpResult.current = this.page.current
       tmpResult.size = this.page.size
       const resultSet = this.script.resultSet || 0
-      if (this.script.resultList && this.script.resultList[resultSet])
+      if (this.script.resultList && this.script.resultList[resultSet]) {
         this.$set(this.script.resultList[resultSet], 'result', tmpResult)
-      this.dispatch('IndexedDB:updateResult', {
-        tabId: this.script.id || this.work.id,
+      }
+      this.updateCache({
         resultSet: resultSet,
         showPanel: this.scriptViewState.showPanel,
-        ...this.script.resultList,
       })
+      this.tableScrollChange(this.result.path)
       this.pageingData()
+    },
+    updateCache(params) {
+      if ('dss/apiservice' == this.getResultUrl) {
+        // this.script.resultList =
+      } else if (this.script.nodeId) {
+        params.resultList = this.script.resultList;
+        this.dispatch('workflowIndexedDB:updateNodeCache', {
+          nodeId: this.script.nodeId,
+          value: params,
+        })
+      } else if (this.script.id) {
+        this.dispatch('IndexedDB:updateResult', {
+          tabId: this.script.id || this.work.id,
+          ...this.script.resultList,
+          ...params
+        })
+      }
     },
     changeSize(size) {
       this.hightLightRow = null
@@ -653,11 +782,9 @@ export default {
       tmpResult.size = this.page.size
       const resultSet = this.script.resultSet || 0
       this.$set(this.script.resultList[resultSet], 'result', tmpResult)
-      this.dispatch('IndexedDB:updateResult', {
-        tabId: this.script.id,
+      this.updateCache({
         resultSet: resultSet,
         showPanel: this.scriptViewState.showPanel,
-        ...this.script.resultList,
       })
       this.pageingData()
     },
@@ -675,15 +802,9 @@ export default {
           currentSet: set,
         },
         () => {
-          this.isLoading = false
+          this.updateData('changeSet')
         }
       )
-      if (this.result.path && sessionStorage.getItem('table_position_'+this.result.path)) {
-         let curTablePositionData = JSON.parse(sessionStorage.getItem('table_position_'+this.result.path))
-          this.page.current = curTablePositionData.currentPage
-          this.page.size = curTablePositionData.pageSize
-          this.change(this.page.current)
-      }
     },
     copyLabel(head) {
       util.executeCopy(head.content || head.title)
@@ -693,6 +814,7 @@ export default {
         cache: {},
         current: this.page.current,
         size: this.page.size,
+        columnPageNow: this.scriptViewState.columnPageNow,
       })
       return result
     },
@@ -701,12 +823,21 @@ export default {
         document.all.iframeName.contentWindow.location.reload()
       })
     },
-    tableScrollChange(positionMemoryKey,scrollTop,scrollLeft) {
-      const cacheTablePositionData = {
-        scrollLeft: scrollLeft,
-        scrollTop: scrollTop,
+    tableScrollChange(positionMemoryKey, scrollTop, scrollLeft ) {
+      let cacheTablePositionData = {
         currentPage: this.page.current,
         pageSize: this.page.size,
+      }
+      if (scrollLeft !== undefined || scrollTop !== undefined) {
+        cacheTablePositionData.scrollLeft = scrollLeft
+        cacheTablePositionData.scrollTop = scrollTop
+      }
+      if (positionMemoryKey && sessionStorage.getItem('table_position_' + positionMemoryKey)) {
+        let data = JSON.parse(sessionStorage.getItem('table_position_' + positionMemoryKey))
+        cacheTablePositionData = {
+          ...data,
+          ...cacheTablePositionData,
+        }
       }
       console.log('setItem', cacheTablePositionData)
       sessionStorage.setItem('table_position_' + positionMemoryKey, JSON.stringify(cacheTablePositionData));

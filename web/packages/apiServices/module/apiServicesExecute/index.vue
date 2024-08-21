@@ -85,11 +85,7 @@ export default {
         noClose: true,
         taskID: ''
       }
-      const result = await api.fetch('/dss/apiservice/getApiHistory', {
-        apiId: this.apiData.id,
-        apiVersionId: this.apiData.latestVersionId
-      }, 'get')
-      this.historyList = (result.data || []).map(item => ({ execID: item.strongerExecId, ...item }))
+      await this.fetchHistory()
       if (this.historyList[0] && ['Inited','Scheduled', 'Running'].includes(this.historyList[0].status)) {
         homeTabItem = {
           ...homeTabItem,
@@ -100,16 +96,15 @@ export default {
       }
       this.tabslist.push(homeTabItem)
     },
+    async fetchHistory() {
+      const result = await api.fetch('/dss/apiservice/getApiHistory', {
+        apiId: this.apiData.id,
+        apiVersionId: this.apiData.latestVersionId
+      }, 'get')
+      this.historyList = (result.data || []).map(item => ({ execID: item.strongerExecId, ...item }))
+    },
     updateHistory(params) {
-      const data = {
-        ...this.historyList[0],
-        fileName: this.apiData.aliasName || this.apiData.name,
-        ...params
-      }
-      if (params.runningTime) {
-        data.costTime = params.runningTime
-      }
-      this.historyList.splice(0, 1, data)
+      this.fetchHistory()
     },
     // 获取api相关数据
     getExecutePath() {

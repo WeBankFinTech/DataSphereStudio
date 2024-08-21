@@ -91,7 +91,7 @@ export default {
             // 如果totalLine是null，就显示为0
             'total': ret.totalLine ? ret.totalLine : 0,
             // 如果内容为null,就显示暂无数据
-            'type': ret.fileContent ? ret.type : 0,
+            'type': ret.fileContent ? ret.type : '0',
             'path': resultPath,
             'current': 1,
             'size': 20,

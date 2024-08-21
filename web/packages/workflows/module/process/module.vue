@@ -232,10 +232,12 @@
       </div>
     </Modal>
     <!-- 发布弹窗 -->
-    <Modal
-      :width="800"
-      :title="$t('message.workflow.publishingWorkflow')"
-      v-model="pubulishShow">
+    <FlowDiffPublish
+      :visible.sync="pubulishShow"
+      :projectName="$route.query.projectName" 
+      :orchestratorId="orchestratorId"
+      :associateGit="associateGit"
+    >
       <Form
         label-position="top">
         <FormItem
@@ -252,32 +254,38 @@
           <Table border :columns="publishFlowColumns" :data="publishFlowData" :height="300"></Table>
         </FormItem>
       </Form>
-      <div slot="footer">
-        <Button
-          @click="showDiff">{{$t('message.workflow.showVersionDiff')}}</Button>
+      <template slot="footer">
         <Button
           type="primary"
           :loading="saveingComment"
           :disabled="saveingComment"
           @click="workflowPublish">{{$t('message.workflow.ok')}}</Button>
-      </div>
-    </Modal>
+        <Button
+          @click="showDiff">{{$t('message.workflow.showVersionDiff')}}</Button>
+        <Button
+          @click="pubulishShow = false">{{$t('message.workflow.cancel')}}</Button>
+      </template>
+    </FlowDiffPublish>
     <!-- 提交弹窗 -->
-    <Modal
-      title="提交工作流"
-      v-model="showSubmit">
-        <Input
-          :rows="2"
-          type="textarea"
-          v-model="submitDesc"
-          :placeholder="$root.$t('message.workflow.publish.submitDesc')"></Input>
-      <div slot="footer">
+    <FlowDiffSubmit
+      :visible.sync="showSubmit"
+      :projectName="$route.query.projectName" 
+      :orchestratorId="orchestratorId" 
+    >
+      <Input
+        :rows="2"
+        type="textarea"
+        v-model="submitDesc"
+        :placeholder="$root.$t('message.workflow.publish.submitDesc')"></Input>
+      <template slot="footer">
         <Button
           type="primary"
           :disabled="!submitDesc"
           @click="submitGit">{{$t('message.workflow.ok')}}</Button>
-      </div>
-    </Modal>
+        <Button
+          @click="showSubmit = false">{{$t('message.workflow.cancel')}}</Button>
+      </template>
+    </FlowDiffSubmit>
     <!-- 导出弹窗 -->
     <Modal
       v-model="workflowExportShow"
@@ -383,6 +391,8 @@ import module from './index';
 import nodeIcons from './nodeicon';
 import BottomTab from './component/bottomTab.vue';
 import NodePath from './component/nodePath.vue';
+import FlowDiffSubmit from './component/flowDiffSubmit.vue';
+import FlowDiffPublish from './component/flowDiffPublish.vue';
 import cyeditor from './cyeditor/index.vue'
 import DesignToolbar from './component/designtoolbar.vue';
 import { hasCycle } from './utils';
@@ -403,7 +413,9 @@ export default {
     BottomTab,
     NodePath,
     cyeditor,
-    DesignToolbar
+    DesignToolbar,
+    FlowDiffSubmit,
+    FlowDiffPublish
   },
   mixins: [mixin],
   directives: {
@@ -1371,6 +1383,9 @@ export default {
         this.jsonChange = false;
         // 保存成功后去更新tab的工作流数据
         this.$emit('updateWorkflowList');
+        if(!this.isFlowSubmit && !this.isFlowPubulish) {
+          this.$emit('updateFlowStatus');
+        }
         return res;
       }).catch(() => {
         this.loading = false;
@@ -1504,6 +1519,7 @@ export default {
       return true;
     },
     onPropsChange(value) {
+      this.jsonChange = true;
       this.props = value;
     },
     onScheduleChange(value) {
@@ -1538,6 +1554,10 @@ export default {
       this.jsonChange = true;
     },
     async nodeDelete(node) {
+      // 正在执行中的节点不能被删除
+      if (node && node.runState && node.runState.status === 1) {
+        return;
+      }
       node = this.bindNodeBasicInfo(node);
       if (node.type === NODETYPE.FLOW && node.jobContent && node.jobContent.embeddedFlowId) {
         const params = {
@@ -1620,6 +1640,20 @@ export default {
     },
     // 单击节点出来的右边的弹框的保存事件
     saveNode(node) { // 保存节点参数配置
+      const nodeItem = this.json.nodes.find(item => {
+        return item.id === node.id
+      })
+      if (nodeItem && nodeItem.params && nodeItem.params.configuration.startup && node.params && node.params.configuration.startup) {
+        let hasChange = false;
+        for (let key in nodeItem.params.configuration.startup) {
+          if (node.params.configuration.startup[key] !== nodeItem.params.configuration.startup[key]) {
+            hasChange = true;
+          }
+        }
+        if (hasChange) {
+          this.$Modal.confirm({ title: '提示', content: '请注意引擎参数有修改，Kill引擎后生效！' });
+        }
+      }
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonly'));
       this.saveNodeBaseInfo(node);
     },
@@ -1775,6 +1809,9 @@ export default {
           metadata: rst.metadata,
           projectName: this.$route.query.projectName || ''
         };
+        if (node.resources && node.resources[0]) {
+          params.resourceId = node.resources[0].resourceId;
+        }
         if (params.metadata && params.metadata.configuration) delete params.metadata.configuration.startup;
         api.fetch('/filesystem/saveScriptToBML', params, 'post')
           .then((res) => {
@@ -2535,6 +2572,7 @@ export default {
             } else if (res.status === 'success') {
               clearTimeout(this.timer);
               this.isFlowPubulish = false;
+              this.$emit('updateFlowStatus');
               // 如果是导出成功需要下载文件
               if (type === 'export' && res.msg) {
                 const url = module.data.API_PATH + 'dss/downloadFile/' + res.msg;
@@ -2614,6 +2652,7 @@ export default {
             this.removeTaskId('submit');
             this.isFlowSubmit = false;
             this.$emit('updateWorkflowList');
+            this.$emit('updateFlowStatus');
             if (flag === 'submit') {
               this.$Message.success(this.$t('message.workflow.workflowSuccess', { name: typeName }));
             }
@@ -2824,6 +2863,9 @@ export default {
       this.isfullScreen = fullScreen
     },
     showSubmitGit() {
+      if (this.jsonChange) {
+        this.autoSave(this.$t('message.workflow.Save'), false);
+      }
       this.showSubmit = true;
     },
     handleSwitchViewMode(action, arg) {

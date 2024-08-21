@@ -28,14 +28,14 @@
       <!-- 不同的编排类型显示不同的编排方式， 动态接口获取 -->
       <template v-if="workflowDataCurrent.orchestratorMode">
         <FormItem v-if="selectOrchestrator.dicValue === FORMITEMTYPE.RADIO" :label="$t('message.orchestratorModes.orchestratorMethod')" prop="orchestratorWayString"
-          :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]">
+          :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]" key="orchestratorWayString">
           <RadioGroup v-model="workflowDataCurrent.orchestratorWayString">
             <Radio v-for="item in orchestratorModeList.mapList[workflowDataCurrent.orchestratorMode]" :key="item.dicKey" :label="item.dicKey">
               <span>{{item.dicName}}</span>
             </Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')"
+        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" key="orchestratorWayString"
           v-if="selectOrchestrator.dicValue === FORMITEMTYPE.SELECT" prop="orchestratorWayString"
           :rules="[{ required: true, trigger: 'blur', message: $t('message.workflow.orchestratorWayString') }]">
           <Select v-model="workflowDataCurrent.orchestratorWayString">
@@ -44,7 +44,7 @@
             </Option>
           </Select>
         </FormItem>
-        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')"
+        <FormItem :label="$t('message.orchestratorModes.orchestratorMethod')" key="orchestratorWayArray"
           v-if="selectOrchestrator.dicValue === FORMITEMTYPE.CHECKBOX" prop="orchestratorWayArray"
           :rules="[{ required: true, trigger: 'blur', type: 'array', message: $t('message.workflow.orchestratorWayString') }]">
           <CheckboxGroup v-model="workflowDataCurrent.orchestratorWayArray">
@@ -56,14 +56,15 @@
       </template>
       <FormItem
         :label="$t('message.workflow.use')"
-        prop="uses">
+        prop="uses"
+        key="uses">
         <we-tag
           :new-label="$t('message.workflow.addUse')"
           :tag-list="workflowDataCurrent.uses"
           @add-tag="addTag"
           @delete-tag="deleteTag"></we-tag>
       </FormItem>
-      <FormItem :label="$t('message.orchestratorModes.level')">
+      <FormItem :label="$t('message.orchestratorModes.level')" key="orchestratorLevel">
         <Select v-model="workflowDataCurrent.orchestratorLevel">
           <Option v-for="item in levels" :key="item" :value="item">
             {{ item}}
@@ -72,7 +73,8 @@
       </FormItem>
       <FormItem
         :label="$t('message.workflow.workflowDesc')"
-        prop="description">
+        prop="description"
+        key="description">
         <Input
           v-model="workflowDataCurrent.description"
           type="textarea"
@@ -82,6 +84,7 @@
       <FormItem
         :label="$t('message.Project.defaultResTemplate')"
         prop="templateIds"
+        key="templateIds"
         v-if="!$APP_CONF.open_source"
       >
         <Select v-model="workflowDataCurrent.templateIds" @on-change="handleTemplateIdsChange" multiple>
@@ -93,6 +96,7 @@
       <FormItem
         :label="$t('message.Project.isQuoteTemplate')"
         prop="isDefaultReference"
+        key="isDefaultReference"
         v-if="!$APP_CONF.open_source && workflowDataCurrent.templateIds && workflowDataCurrent.templateIds.length > 0"
       >
         <RadioGroup v-model="workflowDataCurrent.isDefaultReference">

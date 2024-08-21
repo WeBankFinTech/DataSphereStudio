@@ -20,7 +20,9 @@ import storage from '@dataspherestudio/shared/common/helper/storage';
 import Vue from 'vue';
 import axios from 'axios';
 import { Message } from 'iview';
-import i18n from '@dataspherestudio/shared/common/i18n'
+import i18n from '@dataspherestudio/shared/common/i18n';
+import { EXECUTE_COMPLETE_TYPE } from '@dataspherestudio/shared/common/config/const';
+
 
 /**
  * 记录轮询接口请求日志
@@ -333,7 +335,7 @@ Execute.prototype.queryLog = function() {
   try {
     const fromLine = this.fromLine
     // dpms: /#/product/100199/bug/detail/222584
-    if ( this.openLog && ['Succeed', 'Failed', 'Cancelled', 'Timeout'].indexOf(this.status) !== -1) {
+    if ( this.openLog && EXECUTE_COMPLETE_TYPE.indexOf(this.status) !== -1) {
       if (this.resultsetInfo) {
         return api.fetch('/filesystem/openLog', {
           path: this.resultsetInfo.logPath

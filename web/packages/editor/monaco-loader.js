@@ -26,6 +26,7 @@ import pythonKeyword from './keyword/python';
 import shKeyword from './keyword/sh';
 
 import * as monaco from 'monaco-editor';
+import { sendLLMRequest } from '@dataspherestudio/shared/common/helper/aicompletion';
 
 const languagesList = monaco.languages.getLanguages();
 const findLang = find(languagesList, (lang) => {
@@ -46,6 +47,37 @@ if (!findLang && !uselsp) {
   hqlKeyword.register(monaco);
   pythonKeyword.register(monaco);
   shKeyword.register(monaco);
+  monaco.languages.registerInlineCompletionsProvider("hql", {
+    provideInlineCompletions: async function (model, position, context, token) {
+      let language = window.__scirpt_language || "sql";
+      delete window.__scirpt_language;
+      if (window.$APP_CONF && window.$APP_CONF.aisuggestion !== true ) {
+        return {
+          items: []
+        }
+      }
+      const value = model.getValue();
+      // 使用getOffsetAt()获取光标位置的绝对偏移量
+      const cursorOffset = model.getOffsetAt(position);
+      // 根据绝对偏移量分割内容
+      const prefix = value.substring(0, cursorOffset);
+      const suffix = value.substring(cursorOffset);
+      return sendLLMRequest({
+        language,
+        segments: {
+          prefix,
+          suffix,
+        }
+      }, position)
+    },
+    handleItemDidShow() {
+      // window.inlineCompletions = []
+      // console.log('handleItemDidShow')
+    },
+    freeInlineCompletions(arg) {
+      // console.log(arg, 'freeInlineCompletions')
+    }
+  });
 }
 
 export default monaco;

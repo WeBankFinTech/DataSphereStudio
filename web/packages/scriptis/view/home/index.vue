@@ -102,7 +102,7 @@ export default {
       navHeight: 0,
       showSetting: false,
       proxyUserName: '',
-      copilotEntryComponent: copilotWebComponent ? copilotWebComponent.copilotEntryComponent : null
+      copilotEntryComponent: null
     };
   },
   //组建内的守卫
@@ -157,7 +157,8 @@ export default {
     const globalRes = await this.getGlobalLimit()
     baseInfo = {
       ...baseInfo,
-      ...globalRes.globalLimits
+      ...globalRes.globalLimits,
+      copilotEnable: !!globalRes.globalLimits.copilotEnable
     }
     storage.set('baseInfo', baseInfo, 'local')
     // languageServerDefaultEnable = true 默认启用language server
@@ -190,15 +191,22 @@ export default {
         this.proxyUserName = baseInfo.proxyUserName
       }
       this.showSetting = !!baseInfo.proxyEnable;
-    }, 1500)
-    plugin.on('copilot_web_listener_createAndInster', (regs) => {
-      if (this.leftModule.key !== 2) {
-        this.chooseLeftModule(this.leftSideNavList[0])
+      this.copilotEntryComponent = null;
+      plugin.emitHook('copilot_web_listener_event_remove')
+      if (baseInfo.copilotEnable) {
+        this.copilotEntryComponent = copilotWebComponent ? copilotWebComponent.copilotEntryComponent : null;
+        if (this.copilotEntryComponent) {
+          plugin.on('copilot_web_listener_createAndInster', (regs) => {
+            if (this.leftModule.key !== 2) {
+              this.chooseLeftModule(this.leftSideNavList[0])
+            }
+            this.$nextTick(() => {
+              plugin.emit('copilot_web_listener_create', regs)
+            })
+          })
+        }
       }
-      this.$nextTick(() => {
-        plugin.emit('copilot_web_listener_create', regs)
-      })
-    })
+    }, 1500)
   },
   beforeDestroy() {
     // 监听窗口变化，获取浏览器宽高

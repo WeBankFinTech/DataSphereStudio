@@ -230,7 +230,7 @@ public class DefaultWorkFlowManager implements WorkFlowManager {
         if (file.exists() && file.isFile()) {
             String limitValue = DSSWorkFlowConstant.DEFAULT_ZIP_FILE_LIMIT.getValue();
             // GB
-            Long limits = Long.parseLong(limitValue) * 1024 * 1024 * 1024;
+            Long limits = Long.parseLong(limitValue) * * 1024 * 1024;
             if (file.length() > limits) {
                 throw new DSSErrorException(100098, "工作流导出失败，原因为本次导出总大小超过" + limitValue + "GB");
             }

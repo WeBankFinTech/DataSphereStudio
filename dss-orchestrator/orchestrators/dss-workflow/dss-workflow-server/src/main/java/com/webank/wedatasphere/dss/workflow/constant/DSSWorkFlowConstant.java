@@ -61,8 +61,8 @@ public class DSSWorkFlowConstant {
      */
     public static final CommonVars<String> DEFAULT_SCHEDULER_APP_CONN = CommonVars.apply("wds.dss.workflow.scheduler.default", "schedulis");
     /**
-     * 压缩文件大小限制，默认5GB
+     * 压缩文件大小限制，默认500MB
      */
-    public static final CommonVars<String> DEFAULT_ZIP_FILE_LIMIT = CommonVars.apply("wds.dss.workflow.export.default.zip.limit", "5");
+    public static final CommonVars<String> DEFAULT_ZIP_FILE_LIMIT = CommonVars.apply("wds.dss.workflow.export.default.zip.limit", "500");
 
 }

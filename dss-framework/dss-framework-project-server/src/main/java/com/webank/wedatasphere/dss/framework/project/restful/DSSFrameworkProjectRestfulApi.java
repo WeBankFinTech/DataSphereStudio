@@ -129,6 +129,19 @@ public class DSSFrameworkProjectRestfulApi {
         if(message != null) {
             return message;
         }
+
+        try {
+            dssWorkspaceService.getWorkspacesById(projectRequest.getWorkspaceId(), username);
+        } catch (DSSErrorException e) {
+            LOGGER.error("User {} get workspace {} failed.", username, projectRequest.getWorkspaceId(), e);
+            return Message.error(e);
+        }
+        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, projectRequest.getWorkspaceId().intValue());
+        if (roles == null || roles.isEmpty()) {
+            LOGGER.error("username {}, in workspace {} roles are null or empty", username, projectRequest.getWorkspaceId());
+            return Message.error("can not get roles information");
+        }
+
         LOGGER.info("user {} begin to getAllProjects, projectId: {}.", username, projectRequest.getId());
         List<ProjectResponse> dssProjectVos = projectService.getListByParam(projectRequest);
         if(!CollectionUtils.isEmpty(dssProjectVos) && projectRequest.getFilterProject()){
@@ -350,6 +363,13 @@ public class DSSFrameworkProjectRestfulApi {
         String username = SecurityFilter.getLoginUsername(request);
         Workspace workspace = SSOHelper.getWorkspace(request);
 
+        if(projectModifyRequest.getWorkspaceId() == null){
+            projectModifyRequest.setWorkspaceId(workspace.getWorkspaceId());
+
+        }else if(!projectModifyRequest.getWorkspaceId().equals(workspace.getWorkspaceId())){
+            return Message.error("命名空间信息和cookie中的命名空间不一致,请确认！！！");
+        }
+
         if (projectModifyRequest.getDescription().length() > MAX_DESC_LENGTH) {
             return Message.error("The project description information is too long, exceeding the maximum length:" + MAX_DESC_LENGTH);
         }
@@ -359,10 +379,6 @@ public class DSSFrameworkProjectRestfulApi {
         if (dbProject == null) {
             LOGGER.error("project {} is not exists.", projectModifyRequest.getName());
             return Message.error(String.format("project %s is not exists.", projectModifyRequest.getName()));
-        }
-
-        if(projectModifyRequest.getWorkspaceId() == null){
-            projectModifyRequest.setWorkspaceId(workspace.getWorkspaceId());
         }
 
         String createUsername = dbProject.getUsername();
@@ -504,8 +520,6 @@ public class DSSFrameworkProjectRestfulApi {
             }
             projectRequest.setOrderBySql(orderBySql);
         }
-
-
 
 
         if(projectRequest.getPageNow() == null || projectRequest.getPageNow() <= 0){

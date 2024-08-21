@@ -30,7 +30,8 @@ import util from '@dataspherestudio/shared/common/util';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import table from '@dataspherestudio/shared/components/virtualTable';
 import mixin from '@dataspherestudio/shared/common/service/mixin';
-const EXECUTE_COMPLETE_TYPE = ['Succeed', 'Failed', 'Cancelled', 'Timeout'];
+import { EXECUTE_COMPLETE_TYPE } from '@dataspherestudio/shared/common/config/const';
+
 export default {
   components: {
     historyTable: table.historyTable,

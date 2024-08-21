@@ -30,6 +30,8 @@ import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
@@ -103,6 +105,13 @@ public class DSSFrameworkOrchestratorRestful {
     @Autowired
     private OrchestratorMapper orchestratorMapper;
 
+    @Autowired
+    private DSSWorkspaceRoleService dssWorkspaceRoleService;
+
+    @Autowired
+    private DSSWorkspaceService dssWorkspaceService;
+
+
     /**
      * 创建编排模式
      *
@@ -131,6 +140,23 @@ public class DSSFrameworkOrchestratorRestful {
     public Message getAllOrchestrator(@RequestBody OrchestratorRequest orchestratorRequest) {
         try {
             String username = SecurityFilter.getLoginUsername(httpServletRequest);
+            if (orchestratorRequest.getWorkspaceId() == null) {
+                orchestratorRequest.setWorkspaceId(SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId());
+            }
+
+            try {
+                dssWorkspaceService.getWorkspacesById(orchestratorRequest.getWorkspaceId(), username);
+            } catch (DSSErrorException e) {
+                LOGGER.error("User {} get workspace {} failed.", username, orchestratorRequest.getWorkspaceId(), e);
+                return Message.error(e);
+            }
+
+            List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, orchestratorRequest.getWorkspaceId().intValue());
+            if (roles == null || roles.isEmpty()) {
+                LOGGER.error("username {}, in workspace {} roles are null or empty", username, orchestratorRequest.getWorkspaceId());
+                return Message.error("can not get roles information");
+            }
+
             LOGGER.info("user {} begin to geyAllOrchestrator, requestBody:{}", username, orchestratorRequest);
             return Message.ok("获取编排模式成功").data("page", orchestratorService.getOrchestratorInfos(orchestratorRequest, username));
         } catch (Exception e) {
@@ -602,6 +628,20 @@ public class DSSFrameworkOrchestratorRestful {
         }
 
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        try {
+            dssWorkspaceService.getWorkspacesById(orchestratorMetaRequest.getWorkspaceId(), userName);
+        } catch (DSSErrorException e) {
+            LOGGER.error("User {} get workspace {} failed.", userName, orchestratorMetaRequest.getWorkspaceId(), e);
+            return Message.error(e);
+        }
+
+        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(userName, orchestratorMetaRequest.getWorkspaceId().intValue());
+        if (roles == null || roles.isEmpty()) {
+            LOGGER.error("username {}, in workspace {} roles are null or empty", userName, orchestratorMetaRequest.getWorkspaceId());
+            return Message.error("can not get roles information");
+        }
+
         List<Long> totals = new ArrayList<>();
 
         List<OrchestratorMeta> orchestratorMetaList = orchestratorFrameworkService.getAllOrchestratorMeta(orchestratorMetaRequest, totals,userName);
@@ -678,6 +718,22 @@ public class DSSFrameworkOrchestratorRestful {
         if (workspaceId == null) {
             workspaceId = SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
         }
+
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        try {
+            dssWorkspaceService.getWorkspacesById(workspaceId, username);
+        } catch (DSSErrorException e) {
+            LOGGER.error("User {} get workspace {} failed.", username, workspaceId, e);
+            return Message.error(e);
+        }
+
+        List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, workspaceId.intValue());
+        if (roles == null || roles.isEmpty()) {
+            LOGGER.error("username {}, in workspace {} roles are null or empty", username,workspaceId);
+            return Message.error("can not get roles information");
+        }
+
         LOGGER.info(String.format("getAllOrchestratorName workspaceId is %s", workspaceId));
         return Message.ok().data("data", orchestratorService.getAllOrchestratorName(workspaceId,projectName));
     }

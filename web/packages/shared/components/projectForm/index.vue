@@ -25,6 +25,7 @@
           v-model="projectDataCurrent.name"
           :placeholder="$t('message.workflow.enterName')"
           :disabled="actionType === 'modify'"
+          @on-blur="checkName"
         ></Input>
       </FormItem>
       <FormItem
@@ -109,9 +110,30 @@
             <Radio label="true">是</Radio>
             <Radio label="false" :disabled="projectDataCurrent.associateGitDisabled">否</Radio>
         </RadioGroup>
-        <div v-if="!workspaceData.associateGit && projectDataCurrent.associateGit === 'true'" style="color: red;">
-          工作空间管理员未完成Git账号的配置，项目暂无法接入Git
-        </div>
+      </FormItem>
+      <FormItem
+        v-if="projectDataCurrent.associateGit === 'true'"
+        label="Git读写用户名"
+        prop="gitUser"
+      >
+        <Input
+          v-model="projectDataCurrent.gitUser"
+          placeholder="请输入Git读写用户名"
+          :disabled="projectDataCurrent.associateGitDisabled"
+        >
+        </Input>
+      </FormItem>
+      <FormItem
+        v-if="projectDataCurrent.associateGit === 'true'"
+        label="Token"
+        prop="gitToken"
+      >
+        <Input
+          v-model="projectDataCurrent.gitToken"
+          placeholder="请输入Token"
+          type="password"
+        >
+        </Input>
       </FormItem>
       <FormItem
         label="数据源"
@@ -202,7 +224,7 @@
       <Button
         type="primary"
         size="large"
-        :disabled="submiting"
+        :disabled="submiting || isRepeat"
         :loading="submiting"
         @click="Ok"
       >{{ $t("message.workflow.ok") }}</Button
@@ -280,31 +302,32 @@ export default {
       selectCompiling: [],
       projectDataCurrent: {},
       submiting: false,
+      isRepeat: false,
       workspaceData: {},
       datasourceListData: [],
     };
   },
   computed: {
     formValid() {
-      let validateName = async (rule, value, callback) => {
-        // 校验是否重名
-        let repeat = false
-        try {
-          if (this.actionType === 'add') {
-            const res = await CheckProjectNameRepeat(value)
-            repeat = res.repeat
-          }
-        } catch (error) {
-          //
-        }
-        if (repeat && this.actionType === 'add') {
-          callback(
-            new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
-          );
-        } else {
-          callback();
-        }
-      };
+      // let validateName = async (rule, value, callback) => {
+      //   // 校验是否重名
+      //   try {
+      //     if (this.actionType === 'add') {
+      //       const res = await CheckProjectNameRepeat(value)
+      //       this.isRepeat = res.repeat;
+      //     }
+      //   } catch (error) {
+      //     //
+      //       this.isRepeat = true;
+      //   }
+      //   if (this.isRepeat && this.actionType === 'add') {
+      //     callback(
+      //       new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
+      //     );
+      //   } else {
+      //     callback();
+      //   }
+      // };
       return {
         name: [
           {
@@ -319,7 +342,7 @@ export default {
             message: this.$t("message.workflow.validNameDesc"),
             trigger: "blur",
           },
-          { validator: validateName, trigger: "blur" },
+          // { validator: validateName, trigger: "blur" },
         ],
         description: [
           {
@@ -368,6 +391,20 @@ export default {
             trigger: "blur",
           },
         ],
+        gitUser: [
+          {
+            required: true,
+            message: '请输入gitUser',
+            trigger: "blur",
+          },
+        ],
+        gitToken: [
+          {
+            required: true,
+            message: '请输入gitToken',
+            trigger: "blur",
+          },
+        ]
       };
     },
     isIncludesDev() {
@@ -429,6 +466,19 @@ export default {
     },
   },
   methods: {
+    async checkName () {
+      try {
+          if (this.actionType === 'add') {
+            const res = await CheckProjectNameRepeat(this.projectDataCurrent.name)
+            this.isRepeat = res.repeat;
+          }
+        } catch (error) {
+            this.isRepeat = true;
+        }
+        if (this.isRepeat && this.actionType === 'add') {
+          new Error(this.$t("message.common.projectDetail.nameUnrepeatable"))
+        }
+    },
     convertSource(data) {
       const ids = [];
       (data.dataSourceList || []).forEach(it => {
@@ -501,6 +551,10 @@ export default {
           const params = { ...this.projectDataCurrent };
           params.dataSourceList = datasets;
           params.associateGit = params.associateGit === 'true';
+          if (!params.associateGit) {
+            delete params.gitUser;
+            delete params.gitToken;
+          }
           delete params.associateGitDisabled;
           delete params.createBy;
           delete params.datasource;
@@ -557,10 +611,10 @@ export default {
         this.projectDataCurrent.associateGitDisabled = false;
       }
       if (type === 'init') {
-        this.handleAssociateGit(this.projectDataCurrent.associateGit);
+        this.handleAssociateGit(this.projectDataCurrent.associateGit, 'init');
       }
     },
-    handleAssociateGit(val) {
+    handleAssociateGit(val, type) {
       const temps = [];
       this.devProcess.forEach((item) => {
         temps.push({
@@ -569,6 +623,10 @@ export default {
         })
       })
       this.devProcess = temps;
+      if (type !== 'init') {
+        this.projectDataCurrent.gitUser = '';
+        this.projectDataCurrent.gitToken = '';
+      }
     }
   },
 };

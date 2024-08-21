@@ -17,6 +17,7 @@
 
 import sqlFormatter from '../sqlFormatter/sqlFormatter';
 
+
 const richLanguageConfiguration = {
   comments: {
     lineComment: '--',
@@ -1300,7 +1301,12 @@ export default {
   config: richLanguageConfiguration,
   definition: langDefinition,
   register(monaco) {
-    monaco.languages.register({ id: 'hql' });
+    monaco.languages.register({
+      id: 'hql',
+      extensions: ['.sql', '.hql', '.psql', '.tsql', '.jdbc', '.qmlsql', '.fql', '.ngql'],
+      aliases: ['sql', 'hql', 'SQL', 'HQL'],
+      mimetypes: ["application/json"],
+    });
     monaco.languages.setLanguageConfiguration('hql', richLanguageConfiguration);
     monaco.languages.setMonarchTokensProvider('hql', langDefinition);
 

@@ -539,10 +539,13 @@ public class DSSFrameworkOrchestratorRestful {
                           HttpServletResponse response) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        try {
+            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+            GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, workflowName);
+            GitAddMemberResponse addMemberResponse = RpcAskUtils.processAskException(sender.ask(gitAddMemberRequest), GitAddMemberResponse.class, GitAddMemberRequest.class);
+        } catch (Exception e) {
 
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, workflowName);
-        GitAddMemberResponse addMemberResponse = RpcAskUtils.processAskException(sender.ask(gitAddMemberRequest), GitAddMemberResponse.class, GitAddMemberRequest.class);
+        }
         return Message.ok().data("gitUrl", addMemberResponse.getGitUrl());
 
     }

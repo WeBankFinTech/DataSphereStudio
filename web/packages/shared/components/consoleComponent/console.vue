@@ -34,6 +34,17 @@
             <span>{{ $t('message.common.tabs.history') }}</span>
           </div>
         </div>
+        <div v-if="script.result && scriptViewState.showPanel == 'result' && script.result.totalColumn <= 10000 && script.result.totalColumn > 500" class="column-pagination">
+          <span>共{{ script.result.totalColumn }}列</span>
+          <Page
+            :total="script.result.totalColumn"
+            :current="scriptViewState.columnPageNow || 1"
+            :page-size="500"
+            :simple="true"
+            size="small"
+            @on-change="onChangeColPage"
+          />
+        </div>
       </div>
       <div
         class="workbench-container">
@@ -47,7 +58,6 @@
         <result
           v-if="scriptViewState.showPanel == 'result'"
           ref="result"
-          :result="script.result"
           :script="script"
           :dispatch="dispatch"
           :getResultUrl="getResultUrl"
@@ -121,11 +131,11 @@ export default {
     return {
       execute: null,
       scriptViewState: {
-        showPanel: this.isHistory ? 'result' : 'progress',
+        showPanel: this.isHistory ? '' : 'progress',
         cacheLogScroll: 0,
+        columnPageNow: 1,
         bottomContentHeight: this.height || '250'
       },
-      isBottomPanelFull: false,
       isLogShow: false,
       localLog: {
         log: { all: '', error: '', warning: '', info: '' },
@@ -138,6 +148,7 @@ export default {
         log: { all: '', error: '', warning: '', info: '' },
         logLine: 1,
         resultList: null,
+        resultSet: 0,
         history: []
       },
     }
@@ -164,6 +175,9 @@ export default {
   mounted() {
   },
   methods: {
+    onChangeColPage(v) {
+      this.scriptViewState = {...this.scriptViewState, columnPageNow: v}
+    },
     viewHistory(...rest) {
       this.$emit('viewHistory', ...rest)
     },
@@ -241,12 +255,12 @@ export default {
         }
       });
       this.execute.on('result', (ret) => {
-        this.showPanelTab('result');
         const storeResult = {
           'headRows': ret.metadata,
           'bodyRows': ret.fileContent,
           'total': ret.totalLine,
           'type': ret.type,
+          'totalColumn': ret.totalColumn,
           'cache': {
             offsetX: 0,
             offsetY: 0,
@@ -268,6 +282,8 @@ export default {
         if (this.script.progress.current) {
           this.script.progress.current = 1;
         }
+        console.log('show result')
+        this.showPanelTab('result');
       });
       this.execute.on('progress', ({ progress, progressInfo, waitingSize }) => {
         // 这里progressInfo可能只是个空数组，或者数据第一个数据是一个空对象
@@ -378,7 +394,7 @@ export default {
       })
     },
     resetQuery() {
-      this.showPanelTab(this.isHistory ? 'result' : 'progress');
+      this.showPanelTab(this.isHistory ? '' : 'progress');
       this.isLogShow = false;
       this.localLog = {
         log: { all: '', error: '', warning: '', info: '' },
@@ -424,83 +440,8 @@ export default {
     },
     changeResultSet(data, cb) {
       const resultSet = isUndefined(data.currentSet) ? this.script.resultSet : data.currentSet;
-      const findResult = this.script.resultList[resultSet];
-      const resultPath = findResult && findResult.path;
-      const hasResult = Object.prototype.hasOwnProperty.call(this.script.resultList[resultSet], 'result');
-      if (!hasResult) {
-        const pageSize = 5000;
-        const url = `/${this.getResultUrl}/openFile`;
-        let params = {
-          path: resultPath,
-          pageSize,
-        }
-        // 如果是api执行需要带上taskId
-        if (this.getResultUrl !== 'filesystem') {
-          params.taskId = this.work.taskID
-        }
-        api.fetch(url, {
-          ...params
-        }, 'get')
-          .then((ret) => {
-            let result = {}
-            if (ret.display_prohibited) {
-              result = {
-                'headRows': [],
-                'bodyRows': [],
-                'total': ret.totalLine,
-                'type': ret.type,
-                'path': resultPath,
-                hugeData: true,
-                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg
-              };
-            } else if (ret.column_limit_display) {
-              result = {
-                tipMsg: localStorage.getItem("locale") === "en" ? ret.en_msg : ret.zh_msg,
-                'headRows': ret.metadata,
-                'bodyRows': ret.fileContent,
-                // 如果totalLine是null，就显示为0
-                'total': ret.totalLine ? ret.totalLine : 0,
-                // 如果内容为null,就显示暂无数据
-                'type': ret.fileContent ? ret.type : 0,
-                'cache': {
-                  offsetX: 0,
-                  offsetY: 0,
-                },
-                'path': resultPath,
-                'current': 1,
-                'size': 20,
-              };
-            } else {
-              result = {
-                'headRows': ret.metadata,
-                'bodyRows': ret.fileContent,
-                // 如果totalLine是null，就显示为0
-                'total': ret.totalLine ? ret.totalLine : 0,
-                // 如果内容为null,就显示暂无数据
-                'type': ret.fileContent ? ret.type : 0,
-                'cache': {
-                  offsetX: 0,
-                  offsetY: 0,
-                },
-                'path': resultPath,
-                'current': 1,
-                'size': 20,
-              };
-            }
-            this.$set(this.script.resultList[resultSet], 'result', result);
-            this.$set(this.script, 'resultSet', resultSet);
-            this.script.result = result;
-            this.script.resultSet = resultSet;
-            this.script.showPanel = 'result';
-            cb();
-          }).catch(() => {
-            cb();
-          });
-      } else {
-        this.script.result = this.script.resultList[resultSet].result;
-        this.$set(this.script, 'resultSet', resultSet);
-        this.script.resultSet = resultSet;
-        this.script.showPanel = 'result';
+      this.script.resultSet = resultSet;
+      if (cb) {
         cb();
       }
     },
@@ -661,6 +602,12 @@ export default {
                 margin-top: 8px;
                 cursor: pointer;
             }
+        }
+        .column-pagination {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding-right: 8px;
         }
       }
       .workbench-container {

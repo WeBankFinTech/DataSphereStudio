@@ -650,7 +650,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             releaseVersionList = releaseVersionInfos.stream()
                     .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId)).values()
                     .stream()
-                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getId)).get()))
+                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getReleaseTaskId)).get()))
                     .collect(Collectors.toList());
         }
         // 获取模板名称

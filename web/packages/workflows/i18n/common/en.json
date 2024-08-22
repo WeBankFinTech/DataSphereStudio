@@ -380,6 +380,7 @@
           "WJYCZ": "Duplicated file, please choose another file or directory!",
           "WJMCBHF": "Invalid file name. Only alphanumeric characters, Chinese characters, underscore, hyphen are allowed with suffix followed!",
           "SCBCG100": "Files to upload cannot exceed 100M!",
+          "SCBCG200": "Files to upload cannot exceed 200M!",
           "SCCG": "Successfully uploaded file {name}!",
           "WJCCXE": "File size exceeds limit!",
           "WJBSC": "Successfully deleted resource file {name}!"

@@ -650,27 +650,8 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             releaseVersionList = releaseVersionInfos.stream()
                     .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId)).values()
                     .stream()
-                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getReleaseTaskId)).get()))
+                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getId)).get()))
                     .collect(Collectors.toList());
-        }
-        // 获取模板名称
-        List<OrchestratorTemplateInfo> templateInfos = orchestratorMapper.getOrchestratorDefaultTemplateInfo(orchestratorIdList);
-        Map<Long, String> templateMap = new HashMap<>();
-        if (!CollectionUtils.isEmpty(templateInfos)) {
-            // 分组 拼接模板名称
-            templateMap = templateInfos.stream().collect(Collectors.groupingBy(OrchestratorTemplateInfo::getOrchestratorId,
-                    Collectors.mapping(OrchestratorTemplateInfo::getTemplateName, Collectors.joining(","))));
-        }
-
-        List<OrchestratorSubmitJob> orchestratorSubmitJobList = orchestratorMapper.getSubmitJobStatus(orchestratorIdList);
-        Map<Long,OrchestratorSubmitJob> submitJobMap = new HashMap<>();
-        if (!CollectionUtils.isEmpty(orchestratorSubmitJobList)) {
-            // 分组排序 获取编排最新的第一条记录信息
-            submitJobMap = orchestratorSubmitJobList.stream()
-                    .collect(Collectors.groupingBy(OrchestratorSubmitJob::getOrchestratorId)).values()
-                    .stream()
-                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorSubmitJob::getId)).get()))
-                    .collect(Collectors.toMap(OrchestratorSubmitJob::getOrchestratorId, orchestratorSubmitJob -> orchestratorSubmitJob));
 
 
             for(OrchestratorReleaseVersionInfo releaseTask: releaseVersionList){
@@ -704,6 +685,26 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 }
 
             }
+
+        }
+        // 获取模板名称
+        List<OrchestratorTemplateInfo> templateInfos = orchestratorMapper.getOrchestratorDefaultTemplateInfo(orchestratorIdList);
+        Map<Long, String> templateMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(templateInfos)) {
+            // 分组 拼接模板名称
+            templateMap = templateInfos.stream().collect(Collectors.groupingBy(OrchestratorTemplateInfo::getOrchestratorId,
+                    Collectors.mapping(OrchestratorTemplateInfo::getTemplateName, Collectors.joining(","))));
+        }
+
+        List<OrchestratorSubmitJob> orchestratorSubmitJobList = orchestratorMapper.getSubmitJobStatus(orchestratorIdList);
+        Map<Long,OrchestratorSubmitJob> submitJobMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(orchestratorSubmitJobList)) {
+            // 分组排序 获取编排最新的第一条记录信息
+            submitJobMap = orchestratorSubmitJobList.stream()
+                    .collect(Collectors.groupingBy(OrchestratorSubmitJob::getOrchestratorId)).values()
+                    .stream()
+                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorSubmitJob::getId)).get()))
+                    .collect(Collectors.toMap(OrchestratorSubmitJob::getOrchestratorId, orchestratorSubmitJob -> orchestratorSubmitJob));
 
         }
 

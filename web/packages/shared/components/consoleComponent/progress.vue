@@ -29,7 +29,7 @@
         <div class="button-container">
           <Icon type="md-alert" size="14"/>
           <span style="padding-left: 10px; flex:1">{{codePreCheckInfo.checkData[0].errorMessage}} </span>
-          <Button type="warning" size="small" @click="handleCompareDetail">{{ $t('message.common.progress.showCompareDetail') }}</Button>
+          <Button type="warning" size="small" @click="handleCompareDetail">{{$t('message.common.progress.showCompareDetail')}}</Button>
           <!-- <Button type="warning" size="small" @click="handleSolution">{{ $t('message.common.progress.showSolution') }}</Button> -->
         </div>
 

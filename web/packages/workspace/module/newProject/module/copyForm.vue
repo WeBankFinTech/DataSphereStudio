@@ -16,13 +16,33 @@
         label="是否接入Git"
         prop="associateGit"
       >
-        <RadioGroup v-model="copyProjectData.associateGit">
+        <RadioGroup v-model="copyProjectData.associateGit" @on-change="handleAssociateGit">
             <Radio label="true" :disabled="!isIncludesDev">是</Radio>
             <Radio label="false">否</Radio>
         </RadioGroup>
-        <div v-if="!currentProjectData.associateGit" style="color: red;">
-          工作空间管理员未完成Git账号的配置，项目暂无法接入Git
-        </div>
+      </FormItem>
+      <FormItem
+        v-if="copyProjectData.associateGit === 'true'"
+        label="Git读写用户名"
+        prop="gitUser"
+      >
+        <Input
+          v-model="copyProjectData.gitUser"
+          placeholder="请输入Git读写用户名"
+        >
+        </Input>
+      </FormItem>
+      <FormItem
+        v-if="copyProjectData.associateGit === 'true'"
+        label="Token"
+        prop="gitToken"
+      >
+        <Input
+          v-model="copyProjectData.gitToken"
+          placeholder="请输入Token"
+          type="password"
+        >
+        </Input>
       </FormItem>
   </Form>
 </template>
@@ -41,7 +61,9 @@ export default {
       copyProjectData: {
         id: '',
         name: '',
-        associateGit: 'false'
+        associateGit: 'false',
+        gitUser: '',
+        gitToken: ''
       },
       copyFormValid: {
         name: [
@@ -52,6 +74,12 @@ export default {
         associateGit: [
           { required: true, message: '请选择是否接入Git', trigger: 'blur' },
         ],
+        gitUser: [
+          { required: true, message: '请输入gitUser', trigger: "blur" },
+        ],
+        gitToken: [
+          { required: true, message: '请输入gitToken', trigger: "blur" },
+        ]
       },
     };
   },
@@ -70,16 +98,25 @@ export default {
     }
   },
   methods: {
+    handleAssociateGit() {
+      this.copyProjectData.gitUser = '';
+      this.copyProjectData.gitToken = '';
+    },
     ProjectCopy() {
       this.$refs.copyProjectForm.validate((valid) => {
         if (valid) {
           // 调用复制接口
-          api.fetch(`${this.$API_PATH.PROJECT_PATH}copyProject`, {
+          const param = {
             projectId: this.currentProjectData.id,
             copyProjectName: this.copyProjectData.name,
             workspaceId: +this.$route.query.workspaceId,
             associateGit: this.copyProjectData.associateGit === 'true',
-          }, 'post').then((res) => {
+          }
+          if (param.associateGit) {
+            param.gitUser = this.copyProjectData.gitUser;
+            param.gitToken = this.copyProjectData.gitToken;
+          }
+          api.fetch(`${this.$API_PATH.PROJECT_PATH}copyProject`, param, 'post').then((res) => {
             this.$Message.success(this.$t('message.workspace.CopySucc'))
             this.queryCopyStatus(res.projectId)
             this.copyProjectData.name = '';

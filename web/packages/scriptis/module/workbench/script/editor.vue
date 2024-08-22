@@ -57,7 +57,7 @@
             class="workbench-body-navbar-item"
             v-if="
               $route.name == 'Home' &&
-                !script.readOnly &&
+              !script.readOnly &&
                 !isHdfs &&
                 isSupport &&
                 (script.application == 'jdbc' || script.application == 'ck')
@@ -108,8 +108,10 @@
           :id="script.id"
           :read-only="script.readOnly"
           :script-type="scriptType"
+          :ext="script.ext"
           :file-path="work.filepath || script.id + work.filename"
           :application="script.application"
+          :is-scriptis="$route.name == 'Home'"
           type="code"
           @on-operator="heartBeat"
           @on-run="run"
@@ -134,6 +136,7 @@
   </div>
 </template>
 <script>
+import { debounce } from 'lodash';
 import setting from './setting.vue';
 import api from '@dataspherestudio/shared/common/service/api';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
@@ -231,8 +234,53 @@ export default {
         storage.remove("revealline")
       }
     },50)
+    this.handleConfigTip()
   },
   methods: {
+    handleConfigTip () {
+      if (this.script.params && this.script.params.variable && this.script.params.variable.length > 0) {
+        let curName = this.script.fileName
+        if (this.script.params.configuration && this.script.params.configuration.runtime && this.script.params.configuration.runtime.nodeName) {
+          curName = this.script.params.configuration.runtime.nodeName
+        }
+        this.showConfig = true;
+        const curTipKey =  'showConfigTip_' + curName + '_'+ this.script.id
+        let curTipData = null
+        if(sessionStorage.getItem(curTipKey)) {
+            curTipData = JSON.parse(sessionStorage.getItem(curTipKey))
+        }
+        let curTipNames = [];
+        if(sessionStorage.getItem('showConfigName')) {
+            curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+        }
+        // 当前展示提示数等于3条后，不再追加提示
+        // 初次打开，缓存数据为空，提示
+        // 没有关闭提示，关闭脚本后再次打开，不重复提示
+        // 关闭提示，再次打开，不提示
+        if (curTipNames.length <=2 && (curTipData === null ||  (curTipData.curShowStatus !== '1' && curTipData.showable === '1'))) {
+          const tipData = {
+            curShowStatus: '1',  // 1：当前正在展示，0：当前未展示
+            showable: '1', // 1：可以展示，0：不能展示
+          }
+          sessionStorage.setItem(curTipKey, JSON.stringify(tipData));
+          curTipNames.push(curTipKey);
+          sessionStorage.setItem('showConfigName', JSON.stringify(curTipNames));
+          this.$Notice.open({
+              desc: `${curName}脚本存在已配置的自定义参数，请知悉`,
+              duration: 0,
+              name: curTipKey,
+              onClose: (v) => {
+                tipData.curShowStatus = '0';
+                tipData.showable = '0';
+                sessionStorage.setItem(curTipKey, JSON.stringify(tipData));
+                curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+                const newArray = curTipNames.filter(item => item !== curTipKey);
+                sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
+              }
+          });
+        }
+      }
+    },
     dataSetSelect(v) {
       // 模拟未保存状态 旧数据源为初始化时的或保存后的数据源，新数据源双向绑定的dataSetValue
       // 当新旧数据源不同时，用scriptUnsave暂存此时保存状态（可能为true或false），然后切换保存状态为未保存
@@ -269,15 +317,26 @@ export default {
       this.$refs.editor.redo();
     },
     async run() {
+      if (this.loading || this.killing) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
       if (this.script.running) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.running'));
       let selectCode = this.$refs.editor.getValueInRange() || this.script.data;
-      let validRepeat = await this.validateRepeat();
-      this.$refs.editor.deltaDecorations(selectCode, () => {
-        if (!validRepeat) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
-        if (this.loading || this.killing) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
-        if (!selectCode) {
-          return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.emptyCode'));
+      if (!selectCode) {
+        return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.emptyCode'));
+      }
+      try {
+        this.loading = true;
+        let validRepeat = await this.validateRepeat();
+        if (!validRepeat) {
+          this.loading = false;
+          return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
         }
+      } catch (error) {
+      }
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        this.loading = false;
+      }, 5000);
+      this.$refs.editor.deltaDecorations(selectCode, () => {
         this.loading = true;
         this.$emit('on-run', {
           code: selectCode,
@@ -299,7 +358,7 @@ export default {
         this.killing = false;
       });
     },
-    async save() {
+    save: debounce(async function() {
       if (this.work && this.work.unsave) {
         let valid = await this.validateRepeat();
         if (!valid) return this.$Message.warning(this.$t('message.scripts.editorDetail.warning.invalidArgs'));
@@ -310,7 +369,7 @@ export default {
       } else {
         this.$Message.warning(this.$t('message.scripts.editorDetail.warning.unchange'));
       }
-    },
+    }, 500),
     config() {
       this.showConfig = !this.showConfig;
     },
@@ -359,6 +418,18 @@ export default {
     }
   },
   beforeDestroy: function() {
+    const curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+    if(this.$Notice && curTipNames && curTipNames.length > 0) {
+      curTipNames.forEach(name => {
+        this.$Notice.close(name);
+        const tipData = {
+          curShowStatus: '0',
+          showable: '1',
+        }
+        sessionStorage.setItem(name, JSON.stringify(tipData));
+      });
+        sessionStorage.setItem('showConfigName', JSON.stringify([]));
+    }
     elementResizeEvent.unbind(this.$el);
   },
 };

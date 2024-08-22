@@ -161,7 +161,10 @@ export default {
         editUsers: [],
         accessUsers: [],
         releaseUsers: [],
-        devProcessList: []
+        devProcessList: [],
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       },
       dataList: [
         {
@@ -216,6 +219,7 @@ export default {
     // 当切换工作空间之后，重新获取数据
     '$route.query.workspaceId'() {
       this.viewState = 'owner'
+      this.searchTxt = ''
     }
   },
   created() {
@@ -377,7 +381,9 @@ export default {
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
           associateGit: projectData.associateGit,
-          dataSourceList: projectData.dataSourceList
+          dataSourceList: projectData.dataSourceList,
+          gitUser: projectData.gitUser,
+          gitToken:  projectData.gitToken
         }
         api
           .fetch(
@@ -474,7 +480,10 @@ export default {
         accessUsers: [],
         releaseUsers: [],
         devProcessList: [],
-        createBy: this.getUserName()
+        createBy: this.getUserName(),
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       }
     },
     // 修改工程
@@ -553,8 +562,7 @@ export default {
     copyProject(classifyId, project) {
       this.init()
       this.currentForm = 'copyForm'
-      const workspaceData = storage.get("currentWorkspace");
-      this.currentProjectData = { ...project, associateGit: workspaceData.associateGit };
+      this.currentProjectData = { ...project };
       this.commonTitle = this.$t('message.common.projectDetail.projectCopy')
       this.projectModelShow = true
     },

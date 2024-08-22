@@ -70,6 +70,7 @@
             @deleteNode="deleteNode"
             @saveBaseInfo="saveBaseInfo"
             @updateWorkflowList="$emit('updateWorkflowList')"
+            @updateFlowStatus="$emit('updateFlowStatus')"
             @release="release"
             @open="$emit('open')"
             @close="$emit('close')"
@@ -434,7 +435,7 @@ export default {
       if (Object.keys(resource).length > 0) {
         if (
           node.resources.length > 0 &&
-          node.resources[0].resourceId === resource.resourceId
+          (node.resources[0].resourceId === resource.resourceId || node.resources[0].fileName === resource.fileName)
         ) {
           // 已保存过的直接替换，没有保存的首项追加
           node.resources[0] = resource;

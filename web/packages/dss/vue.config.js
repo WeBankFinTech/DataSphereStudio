@@ -300,5 +300,6 @@ module.exports = {
   },
   devServer: {
     disableHostCheck: true
-  }
+  },
+  transpileDependencies: ['vscode-uri']
 }

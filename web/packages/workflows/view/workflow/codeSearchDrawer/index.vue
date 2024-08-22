@@ -1,5 +1,5 @@
 <template>
-    <Drawer title="查找" v-model="showDrawer" width="80%" :mask-closable="false" class-name="code-search-drawer">
+    <Drawer title="查找" v-model="showDrawer" width="80%" :mask-closable="false" class-name="custom-drawer-style">
         <div class="code-search">
             <div class="code-form">
                 <Form ref="codeFormRef" inline>
@@ -329,12 +329,14 @@ export default {
             &.flow {
                 /deep/.ivu-select-prefix {
                     width: 62px;
+                    word-break: keep-all;
                 }
             }
 
             &.nodeType {
                 /deep/.ivu-select-prefix {
                     width: 84px;
+                    word-break: keep-all;
                 }
             }
         }
@@ -475,7 +477,8 @@ export default {
 }
 </style>
 <style lang="less">
-.code-search-drawer {
+.custom-drawer-style {
+    z-index: 1004 !important;
     .ivu-drawer-body {
         height: calc(100% - 100px);
         overflow: auto;

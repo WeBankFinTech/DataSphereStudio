@@ -5,19 +5,19 @@
         <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
         <Form ref="searchFrom" class="search-from" :label-width="100" :disabled="isHistory" :model="conditionResult">
           <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="item.maxLength && !isHistory ? [
-            {
-              required: item.required,
-              message: $t('message.apiServices.placeholder.emter'),
-              trigger: 'blur'
-            },{
-              max: item.maxLength,
-              message: $t('message.apiServices.placeholder.limitStrLength', { maxLength: item.maxLength })
-            }]:[
-            {
-              required: item.required,
-              message: $t('message.apiServices.placeholder.emter'),
-              trigger: 'blur'
-            }
+          {
+            required: item.required,
+            message: $t('message.apiServices.placeholder.emter'),
+            trigger: 'blur'
+          },{
+            max: item.maxLength, 
+            message: $t('message.apiServices.placeholder.limitStrLength', { maxLength: item.maxLength })
+          }]:[
+          {
+            required: item.required,
+            message: $t('message.apiServices.placeholder.emter'),
+            trigger: 'blur'
+          }
           ]">
             <div class="label-class" :title="item.displayName || item.name" slot="label">
               {{ `${item.displayName || item.name}:` }}
@@ -26,7 +26,7 @@
             <Input class="input-bar" :class="{ verificationValue: tip[item.name] }" :disabled="isHistory" @on-blur="verificationValue(item)" :type="inputType(item.type)" v-model="item.defaultValue" :placeholder="item.description || $t('message.apiServices.placeholder.emter')">
             </Input>
           </FormItem>
-          <Button class="execute-button" type="primary" :disabled="isHistory" @click="search">{{buttonText}}</Button>
+          <Button class="execute-button" type="primary" :loading="excuteLoading" :disabled="isHistory" @click="search">{{buttonText}}</Button>
         </Form>
       </i-col>
       <i-col span="10">
@@ -356,4 +356,5 @@ export default {
     }
   }
 </style>
-
+  
+  

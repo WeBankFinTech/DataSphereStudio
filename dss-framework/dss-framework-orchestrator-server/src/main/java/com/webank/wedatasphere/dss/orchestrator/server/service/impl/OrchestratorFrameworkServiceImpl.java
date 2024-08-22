@@ -671,6 +671,40 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     .stream()
                     .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorSubmitJob::getId)).get()))
                     .collect(Collectors.toMap(OrchestratorSubmitJob::getOrchestratorId, orchestratorSubmitJob -> orchestratorSubmitJob));
+
+
+            for(OrchestratorReleaseVersionInfo releaseTask: releaseVersionList){
+                // 状态不为NULL, 则跳过
+                if(!StringUtils.isEmpty(releaseTask.getStatus())){
+                    continue;
+                }
+                // 取出所有编排的版本信息
+                List<OrchestratorReleaseVersionInfo> taskList = releaseVersionInfos.stream()
+                        .filter(task -> task.getOrchestratorId().equals(releaseTask.getOrchestratorId())).collect(Collectors.toList());
+                if(taskList.size() == 1){
+                    continue;
+                }
+                // 获取所有状态不为NULL的版本
+                taskList = taskList.stream().filter(taskInfo -> !StringUtils.isEmpty(taskInfo.getStatus())).collect(Collectors.toList());
+
+                if(!taskList.isEmpty()){
+                    taskList.sort(new Comparator<OrchestratorReleaseVersionInfo>() {
+                        @Override
+                        public int compare(OrchestratorReleaseVersionInfo o1, OrchestratorReleaseVersionInfo o2) {
+                            return (int) (o1.getId() - o2.getId());
+                        }
+                    });
+                    // 最后拼接信息
+                    OrchestratorReleaseVersionInfo lastTaskInfo = taskList.get(taskList.size() - 1);
+                    if(lastTaskInfo != null){
+                        releaseTask.setErrorMsg(lastTaskInfo.getErrorMsg());
+                        releaseTask.setStatus(lastTaskInfo.getStatus());
+                        releaseTask.setReleaseTime(lastTaskInfo.getReleaseTime());
+                    }
+                }
+
+            }
+
         }
 
         for (OrchestratorMeta orchestratorMeta : orchestratorMetaList) {

@@ -444,7 +444,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
         DSSOrchestratorVersion dssOrchestratorVersion = rollBackGitVo.getDssOrchestratorVersion();
         DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
-        DSSFlow dssFlow = flowMapper.selectFlowByID(dssOrchestratorVersion.getAppId());
+        DSSFlow dssFlow = flowService.getFlow(dssOrchestratorVersion.getAppId());
         if (projectInfo.getAssociateGit() != null && projectInfo.getAssociateGit()) {
             lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_SAVE);
             // 回滚清空存量BML

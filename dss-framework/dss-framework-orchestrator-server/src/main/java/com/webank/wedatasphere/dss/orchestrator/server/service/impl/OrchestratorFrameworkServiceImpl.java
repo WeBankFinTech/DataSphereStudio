@@ -786,10 +786,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         total.add((long) orchestratorMetaList.size());
 
         // 排序
-        if (DSSOrchestratorConstant.ASCEND.equalsIgnoreCase(orchestratorMetaRequest.getOrderBy())) {
-            orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder()))).collect(Collectors.toList());
-        } else {
-            orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
+        try {
+            if (DSSOrchestratorConstant.ASCEND.equalsIgnoreCase(orchestratorMetaRequest.getOrderBy())) {
+                orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder()))).collect(Collectors.toList());
+            } else {
+                orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            LOGGER.error("排序失败， 原因为：", e);
         }
 
         // 分页处理

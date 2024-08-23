@@ -714,9 +714,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                             releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))
                     .findFirst().orElse(new OrchestratorReleaseVersionInfo());
 
-            if (releaseVersion.getVersion() == null || releaseVersion.getUpdateTime() == null || releaseVersion.getUpdater() == null) {
-                continue ;
-            }
             orchestratorMeta.setVersion(releaseVersion.getVersion());
             orchestratorMeta.setUpdateTime(releaseVersion.getUpdateTime());
             orchestratorMeta.setUpdateUser(releaseVersion.getUpdater());
@@ -790,9 +787,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         // 排序
         if (DSSOrchestratorConstant.ASCEND.equalsIgnoreCase(orchestratorMetaRequest.getOrderBy())) {
-            orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime)).collect(Collectors.toList());
+            orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder()))).collect(Collectors.toList());
         } else {
-            orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime).reversed()).collect(Collectors.toList());
+            orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
         }
 
         // 分页处理

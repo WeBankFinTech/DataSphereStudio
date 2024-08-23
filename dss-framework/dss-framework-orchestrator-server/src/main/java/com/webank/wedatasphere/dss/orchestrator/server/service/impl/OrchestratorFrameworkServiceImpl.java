@@ -650,7 +650,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             releaseVersionList = releaseVersionInfos.stream()
                     .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId)).values()
                     .stream()
-                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getId)).get()))
+                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getReleaseTaskId)).get()))
                     .collect(Collectors.toList());
 
 
@@ -672,7 +672,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     taskList.sort(new Comparator<OrchestratorReleaseVersionInfo>() {
                         @Override
                         public int compare(OrchestratorReleaseVersionInfo o1, OrchestratorReleaseVersionInfo o2) {
-                            return (int) (o1.getId() - o2.getId());
+                            return (int) (o1.getReleaseTaskId() - o2.getReleaseTaskId());
                         }
                     });
                     // 最后拼接信息

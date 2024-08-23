@@ -714,6 +714,9 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                             releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))
                     .findFirst().orElse(new OrchestratorReleaseVersionInfo());
 
+            if (releaseVersion.getVersion() == null || releaseVersion.getUpdateTime() == null || releaseVersion.getUpdater() == null) {
+                continue ;
+            }
             orchestratorMeta.setVersion(releaseVersion.getVersion());
             orchestratorMeta.setUpdateTime(releaseVersion.getUpdateTime());
             orchestratorMeta.setUpdateUser(releaseVersion.getUpdater());

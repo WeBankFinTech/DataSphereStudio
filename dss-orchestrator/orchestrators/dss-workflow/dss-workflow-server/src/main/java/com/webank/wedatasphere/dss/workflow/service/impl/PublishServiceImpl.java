@@ -167,14 +167,18 @@ public class PublishServiceImpl implements PublishService {
                 throw new DSSErrorException(800001, "发布前请先提交工作流");
             }
 
-            // 获取当前文件Commit
-            Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-            GitCurrentCommitRequest currentCommitRequest = new GitCurrentCommitRequest(workspace.getWorkspaceId(), dssProject.getName(), convertUser, dssFlow.getName());
-            gitCommitResponse = RpcAskUtils.processAskException(sender.ask(currentCommitRequest), GitCommitResponse.class, GitCurrentCommitRequest.class);
-            // 更新commitId
-            lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), orchestratorId);
-            // 更新工作流状态
-            lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
+            try {
+                // 获取当前文件Commit
+                Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+                GitCurrentCommitRequest currentCommitRequest = new GitCurrentCommitRequest(workspace.getWorkspaceId(), dssProject.getName(), convertUser, dssFlow.getName());
+                gitCommitResponse = RpcAskUtils.processAskException(sender.ask(currentCommitRequest), GitCommitResponse.class, GitCurrentCommitRequest.class);
+                // 更新commitId
+                lockMapper.updateOrchestratorVersionCommitId(gitCommitResponse.getCommitId(), orchestratorId);
+                // 更新工作流状态
+                lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUBLISH);
+            } catch (Exception e) {
+                throw new DSSErrorException(800001, "获取工作流CommitId失败，请检查工作流是否为空或git服务是否异常");
+            }
         }
         return dssFlow;
     }

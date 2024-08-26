@@ -319,9 +319,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             throw new DSSErrorException(80001, "编排不存在，请刷新页面重新保存");
         }
         DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
-        if (dssOrchestratorVersion!= null && !dssOrchestratorVersion.getAppId().equals(rootFlowId)) {
-            throw new DSSErrorException(80001, "编排该版本已发布，不允许进行修改，请刷新页面重新保存");
-        }
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -483,8 +480,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 String jobType = nodeDefault.getJobType();
                 Long createTime = nodeDefault.getCreateTime();
                 Long modifyTime = nodeDefault.getModifyTime();
-                Date createDate = new Date(createTime);
-                Date modifyDate = new Date(modifyTime);
+                Date createDate = null;
+                Date modifyDate = null;
+                if (createTime != null && modifyTime != null) {
+                    createDate = new Date(createTime);
+                }
+                if (modifyTime != null) {
+                    modifyDate = new Date(modifyTime);
+                }
                 String modifyUser = nodeDefault.getModifyUser();
                 NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, createDate, modifyDate, modifyUser);
                 nodeContentDOS.add(contentDO);

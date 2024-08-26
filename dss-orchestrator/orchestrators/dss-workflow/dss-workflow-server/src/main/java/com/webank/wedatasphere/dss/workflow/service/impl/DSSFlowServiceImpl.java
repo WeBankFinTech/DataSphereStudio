@@ -313,8 +313,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         //判断该工作流对应编排是否已发布，若已发布则不允许修改
         Long rootFlowId = getRootFlowId(flowID);
-        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
-                OrchestratorVo.class, RequestQuertByAppIdOrchestrator.class);
+        OrchestratorVo orchestratorVo = null;
+        try {
+            orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                    OrchestratorVo.class, RequestQuertByAppIdOrchestrator.class);
+        } catch (Exception e) {
+            logger.error("保存工作流时获取编排失败，原因为：", e);
+        }
+
         DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo!= null? orchestratorVo.getDssOrchestratorVersion() : null;
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);

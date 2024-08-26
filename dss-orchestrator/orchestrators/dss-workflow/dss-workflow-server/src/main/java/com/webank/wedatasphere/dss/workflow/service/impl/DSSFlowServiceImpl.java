@@ -315,10 +315,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Long rootFlowId = getRootFlowId(flowID);
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
                 OrchestratorVo.class, RequestQuertByAppIdOrchestrator.class);
-        if (orchestratorVo == null) {
-            throw new DSSErrorException(80001, "编排不存在，请刷新页面重新保存");
-        }
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo!= null? orchestratorVo.getDssOrchestratorVersion() : null;
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -328,9 +325,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
 
         // 解析并保存元数据
-        Long orchestratorId = dssOrchestratorVersion.getOrchestratorId();
+        Long orchestratorId = dssOrchestratorVersion!= null? dssOrchestratorVersion.getOrchestratorId(): null;
         try {
-            saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+            if (orchestratorId != null) {
+                saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }

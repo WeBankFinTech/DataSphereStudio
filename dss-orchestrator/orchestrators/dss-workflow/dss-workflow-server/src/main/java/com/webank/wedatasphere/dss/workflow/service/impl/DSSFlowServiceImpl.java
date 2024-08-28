@@ -313,15 +313,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         //判断该工作流对应编排是否已发布，若已发布则不允许修改
         Long rootFlowId = getRootFlowId(flowID);
-        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
-                OrchestratorVo.class, RequestQuertByAppIdOrchestrator.class);
-        if (orchestratorVo == null) {
-            throw new DSSErrorException(80001, "编排不存在，请刷新页面重新保存");
+        OrchestratorVo orchestratorVo = null;
+        try {
+            orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                    OrchestratorVo.class, RequestQuertByAppIdOrchestrator.class);
+        } catch (Exception e) {
+            logger.error("保存工作流时获取编排失败，原因为：", e);
         }
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
-        if (dssOrchestratorVersion!= null && !dssOrchestratorVersion.getAppId().equals(rootFlowId)) {
-            throw new DSSErrorException(80001, "编排该版本已发布，不允许进行修改，请刷新页面重新保存");
-        }
+
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo!= null? orchestratorVo.getDssOrchestratorVersion() : null;
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -331,9 +331,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
 
         // 解析并保存元数据
-        Long orchestratorId = dssOrchestratorVersion.getOrchestratorId();
+        Long orchestratorId = dssOrchestratorVersion!= null? dssOrchestratorVersion.getOrchestratorId(): null;
         try {
-            saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+            if (orchestratorId != null) {
+                saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
@@ -421,152 +423,162 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
         // 解析 jsonflow
         // 解析 proxyUser
-        List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
-        String proxyUser = null;
-        StringBuilder globalVar = new StringBuilder();
-        if (CollectionUtils.isNotEmpty(props)) {
-            for (Map<String, Object> prop : props) {
-                if (prop.containsKey("user.to.proxy")) {
-                    proxyUser = prop.get("user.to.proxy").toString();
-                } else {
-                    for (Map.Entry<String, Object> map : prop.entrySet()) {
-                        if (map.getValue() != null) {
-                            globalVar.append(map.getKey() + "=" + map.getValue());
-                            globalVar.append(";");
-                        }
-                    }
-                }
-            }
-        }
-        // 解析 resources
-        List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(jsonFlow, "resources");
-        StringBuilder resourceToString = new StringBuilder();
-        if (CollectionUtils.isNotEmpty(resources)) {
-            for (Map<String, Object> resource : resources) {
-                if (resource.containsKey("fileName")) {
-                    resourceToString.append(resource.get("fileName"));
-                    resourceToString.append(";");
-                }
-
-            }
-        }
-
-        List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);
-
-        if (CollectionUtils.isEmpty(workFlowNodes)) {
-            return ;
-        }
-
-        NodeMetaDO nodeMetaByOrchestratorId = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorId);
-
-        if (nodeMetaByOrchestratorId == null) {
-            nodeMetaMapper.insertNodeMeta(new NodeMetaDO(orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
-        } else {
-            nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
-        }
-
-        List<Long> contentIdListByOrchestratorId = nodeContentMapper.getContentIdListByOrchestratorId(orchestratorId);
-
-        logger.info("workFlowNodes:{}", workFlowNodes);
-        List<NodeContentUIDO> nodeContentUIDOS = new ArrayList<>();
-        List<NodeContentDO> nodeContentDOS = new ArrayList<>();
-        List<String> keyList = new ArrayList<>();
-        Map<String, DSSNodeDefault> map = new HashMap<>();
-        for (DSSNodeDefault nodeDefault : workFlowNodes) {
-            String key = nodeDefault.getKey();
-            if (StringUtils.isNotEmpty(key)) {
-                keyList.add(key);
-                map.put(key, nodeDefault);
-            }
-            String id = nodeDefault.getId();
-            String jobType = nodeDefault.getJobType();
-            Long createTime = nodeDefault.getCreateTime();
-            Long modifyTime = nodeDefault.getModifyTime();
-            Date createDate = new Date(createTime);
-            Date modifyDate = new Date(modifyTime);
-            String modifyUser = nodeDefault.getModifyUser();
-            NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, createDate, modifyDate, modifyUser);
-            nodeContentDOS.add(contentDO);
-        }
-
-        if (CollectionUtils.isEmpty(nodeContentDOS)) {
-            return ;
-        }
-
-        List<String> nodeKeyList = nodeContentDOS.stream().map(NodeContentDO::getNodeKey).collect(Collectors.toList());
-
-        List<NodeContentDO> nodeContentByKeyList = nodeContentMapper.getNodeContentByKeyList(nodeKeyList, orchestratorId);
-
-        // 获取相同的部分（交集）
-        Set<NodeContentDO> intersection = new HashSet<>(nodeContentByKeyList);
-        intersection.retainAll(nodeContentDOS);
-
-        // 获取删除的部分（差集）
-        Set<NodeContentDO> difference1 = new HashSet<>(nodeContentByKeyList);
-        difference1.removeAll(nodeContentDOS);
-
-        // 获取新增的部分（差集）
-        Set<NodeContentDO> difference2 = new HashSet<>(nodeContentDOS);
-        difference2.removeAll(nodeContentByKeyList);
-
-        if (CollectionUtils.isNotEmpty(difference2)) {
-            nodeContentMapper.batchInsert(new ArrayList<>(difference2));
-        }
-
-        if (CollectionUtils.isNotEmpty(intersection)) {
-            for (NodeContentDO nodeContentDO : intersection) {
-
-                nodeContentMapper.updateByKey(nodeContentDO);
-            }
-        }
-
-        if (CollectionUtils.isNotEmpty(difference1)) {
-            nodeContentMapper.batchDelete(new ArrayList<>(difference1), orchestratorId);
-        }
-
-        List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId);
-
-        for (NodeContentDO nodeContentDO : nodeContents) {
-            String nodeKey = nodeContentDO.getNodeKey();
-            Long contentByKeyId = nodeContentDO.getId();
-            DSSNodeDefault nodeDefault = map.get(nodeKey);
-            String title = nodeDefault.getTitle();
-            if (StringUtils.isNotEmpty(title)) {
-                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title));
-            }
-            String desc = nodeDefault.getDesc();
-            if (StringUtils.isNotEmpty(desc)) {
-                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc));
-            }
-
-            Map<String, Object> params = nodeDefault.getParams();
-            if (params != null) {
-                Map<String, Map<String, Object>> mapParams = (Map<String, Map<String, Object>>)params.get("configuration");
-                if (mapParams != null) {
-                    for (Map.Entry<String, Map<String, Object>> entry : mapParams.entrySet()) {
-                        // special runtime startup
-                        String paramKey = entry.getKey();
-                        Map<String, Object> paramValue = entry.getValue();
-                        for (Map.Entry<String, Object> paramEntry : paramValue.entrySet()) {
-                            String paramName = paramEntry.getKey();
-                            if (paramEntry.getValue() != null) {
-                                String paramVal = paramEntry.getValue().toString();
-                                logger.info("{}:{}", paramName, paramVal);
-                                nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, paramName, paramVal));
+        try {
+            List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
+            String proxyUser = null;
+            StringBuilder globalVar = new StringBuilder();
+            if (CollectionUtils.isNotEmpty(props)) {
+                for (Map<String, Object> prop : props) {
+                    if (prop.containsKey("user.to.proxy")) {
+                        proxyUser = prop.get("user.to.proxy").toString();
+                    } else {
+                        for (Map.Entry<String, Object> map : prop.entrySet()) {
+                            if (map.getValue() != null) {
+                                globalVar.append(map.getKey() + "=" + map.getValue());
+                                globalVar.append(";");
                             }
-
                         }
                     }
-                    logger.info(mapParams.toString());
                 }
             }
-        }
-        // 先删后增
-        if (CollectionUtils.isNotEmpty(contentIdListByOrchestratorId)) {
-            nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
-        }
-        if (CollectionUtils.isNotEmpty(nodeContentUIDOS)) {
-            nodeContentUIMapper.batchInsertNodeContentUI(nodeContentUIDOS);
+            // 解析 resources
+            List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(jsonFlow, "resources");
+            StringBuilder resourceToString = new StringBuilder();
+            if (CollectionUtils.isNotEmpty(resources)) {
+                for (Map<String, Object> resource : resources) {
+                    if (resource.containsKey("fileName")) {
+                        resourceToString.append(resource.get("fileName"));
+                        resourceToString.append(";");
+                    }
+
+                }
+            }
+
+            List<DSSNodeDefault> workFlowNodes = DSSCommonUtils.getWorkFlowNodes(jsonFlow);
+
+            if (CollectionUtils.isEmpty(workFlowNodes)) {
+                return;
+            }
+
+            NodeMetaDO nodeMetaByOrchestratorId = nodeMetaMapper.getNodeMetaByOrchestratorId(orchestratorId);
+
+            if (nodeMetaByOrchestratorId == null) {
+                nodeMetaMapper.insertNodeMeta(new NodeMetaDO(orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
+            } else {
+                nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
+            }
+
+            List<Long> contentIdListByOrchestratorId = nodeContentMapper.getContentIdListByOrchestratorId(orchestratorId);
+
+            logger.info("workFlowNodes:{}", workFlowNodes);
+            List<NodeContentUIDO> nodeContentUIDOS = new ArrayList<>();
+            List<NodeContentDO> nodeContentDOS = new ArrayList<>();
+            List<String> keyList = new ArrayList<>();
+            Map<String, DSSNodeDefault> map = new HashMap<>();
+            for (DSSNodeDefault nodeDefault : workFlowNodes) {
+                String key = nodeDefault.getKey();
+                if (StringUtils.isNotEmpty(key)) {
+                    keyList.add(key);
+                    map.put(key, nodeDefault);
+                }
+                String id = nodeDefault.getId();
+                String jobType = nodeDefault.getJobType();
+                Long createTime = nodeDefault.getCreateTime();
+                Long modifyTime = nodeDefault.getModifyTime();
+                Date createDate = null;
+                Date modifyDate = null;
+                if (createTime != null && modifyTime != null) {
+                    createDate = new Date(createTime);
+                }
+                if (modifyTime != null) {
+                    modifyDate = new Date(modifyTime);
+                }
+                String modifyUser = nodeDefault.getModifyUser();
+                NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, createDate, modifyDate, modifyUser);
+                nodeContentDOS.add(contentDO);
+            }
+
+            if (CollectionUtils.isEmpty(nodeContentDOS)) {
+                return;
+            }
+
+            List<String> nodeKeyList = nodeContentDOS.stream().map(NodeContentDO::getNodeKey).collect(Collectors.toList());
+
+            List<NodeContentDO> nodeContentByKeyList = nodeContentMapper.getNodeContentByKeyList(nodeKeyList, orchestratorId);
+
+            // 获取相同的部分（交集）
+            Set<NodeContentDO> intersection = new HashSet<>(nodeContentByKeyList);
+            intersection.retainAll(nodeContentDOS);
+
+            // 获取删除的部分（差集）
+            Set<NodeContentDO> difference1 = new HashSet<>(nodeContentByKeyList);
+            difference1.removeAll(nodeContentDOS);
+
+            // 获取新增的部分（差集）
+            Set<NodeContentDO> difference2 = new HashSet<>(nodeContentDOS);
+            difference2.removeAll(nodeContentByKeyList);
+
+            if (CollectionUtils.isNotEmpty(difference2)) {
+                nodeContentMapper.batchInsert(new ArrayList<>(difference2));
+            }
+
+            if (CollectionUtils.isNotEmpty(intersection)) {
+                for (NodeContentDO nodeContentDO : intersection) {
+
+                    nodeContentMapper.updateByKey(nodeContentDO);
+                }
+            }
+
+            if (CollectionUtils.isNotEmpty(difference1)) {
+                nodeContentMapper.batchDelete(new ArrayList<>(difference1), orchestratorId);
+            }
+
+            List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId);
+
+            for (NodeContentDO nodeContentDO : nodeContents) {
+                String nodeKey = nodeContentDO.getNodeKey();
+                Long contentByKeyId = nodeContentDO.getId();
+                DSSNodeDefault nodeDefault = map.get(nodeKey);
+                String title = nodeDefault.getTitle();
+                if (StringUtils.isNotEmpty(title)) {
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title));
+                }
+                String desc = nodeDefault.getDesc();
+                if (StringUtils.isNotEmpty(desc)) {
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc));
+                }
+
+                Map<String, Object> params = nodeDefault.getParams();
+                if (params != null) {
+                    Map<String, Map<String, Object>> mapParams = (Map<String, Map<String, Object>>) params.get("configuration");
+                    if (mapParams != null) {
+                        for (Map.Entry<String, Map<String, Object>> entry : mapParams.entrySet()) {
+                            // special runtime startup
+                            String paramKey = entry.getKey();
+                            Map<String, Object> paramValue = entry.getValue();
+                            for (Map.Entry<String, Object> paramEntry : paramValue.entrySet()) {
+                                String paramName = paramEntry.getKey();
+                                if (paramEntry.getValue() != null) {
+                                    String paramVal = paramEntry.getValue().toString();
+                                    logger.info("{}:{}", paramName, paramVal);
+                                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, paramName, paramVal));
+                                }
+
+                            }
+                        }
+                        logger.info(mapParams.toString());
+                    }
+                }
+            }
+            // 先删后增
+            if (CollectionUtils.isNotEmpty(contentIdListByOrchestratorId)) {
+                nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
+            }
+            if (CollectionUtils.isNotEmpty(nodeContentUIDOS)) {
+                nodeContentUIMapper.batchInsertNodeContentUI(nodeContentUIDOS);
+            }
+        } catch (Exception e) {
+            logger.error("saveFlowMeta error, the reason is: ", e);
         }
     }
 

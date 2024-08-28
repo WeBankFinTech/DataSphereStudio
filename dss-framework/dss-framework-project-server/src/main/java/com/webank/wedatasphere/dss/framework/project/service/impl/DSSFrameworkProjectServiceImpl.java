@@ -120,7 +120,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         } else if(StringUtils.isNotEmpty(projectCreateRequest.getBusiness()) && projectCreateRequest.getBusiness().length() > MAX_PROJECT_BUSSINESS_SIZE){
             DSSExceptionUtils.dealErrorException(60021,"project bussiness is too long. the length must be less than " + MAX_PROJECT_BUSSINESS_SIZE, DSSProjectErrorException.class);
         }
-
+        //校验项目名合法性
+        checkProjectName(projectCreateRequest.getName(), workspace, username);
         // 对于接入git的项目校验项目名称
         if(projectCreateRequest.getAssociateGit() != null && projectCreateRequest.getAssociateGit()) {
             // 校验gitUser gitToken合法性以及projectName是否重复

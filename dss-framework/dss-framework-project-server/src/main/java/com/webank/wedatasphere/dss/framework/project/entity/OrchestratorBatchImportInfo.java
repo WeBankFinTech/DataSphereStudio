@@ -1,5 +1,6 @@
 package com.webank.wedatasphere.dss.framework.project.entity;
 
+import com.webank.wedatasphere.dss.framework.project.entity.po.OrchestratorImportInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 
 import java.util.List;
@@ -17,12 +18,12 @@ public class OrchestratorBatchImportInfo {
     /**
      * 导入后的编排信息
      */
-    List<OrchestratorBaseInfo> to;
+    List<OrchestratorImportInfo> to;
 
     public OrchestratorBatchImportInfo() {
     }
 
-    public OrchestratorBatchImportInfo(List<OrchestratorBaseInfo> from, List<OrchestratorBaseInfo> to) {
+    public OrchestratorBatchImportInfo(List<OrchestratorBaseInfo> from, List<OrchestratorImportInfo> to) {
         this.from = from;
         this.to = to;
     }
@@ -35,11 +36,11 @@ public class OrchestratorBatchImportInfo {
         this.from = from;
     }
 
-    public List<OrchestratorBaseInfo> getTo() {
+    public List<OrchestratorImportInfo> getTo() {
         return to;
     }
 
-    public void setTo(List<OrchestratorBaseInfo> to) {
+    public void setTo(List<OrchestratorImportInfo> to) {
         this.to = to;
     }
 }

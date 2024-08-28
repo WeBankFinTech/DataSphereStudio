@@ -33,6 +33,7 @@ import com.webank.wedatasphere.dss.common.utils.ZipHelper;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.framework.project.entity.OrchestratorBatchImportInfo;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.framework.project.entity.po.OrchestratorImportInfo;
 import com.webank.wedatasphere.dss.framework.project.service.ImportService;
 import com.webank.wedatasphere.dss.framework.project.utils.ExportAndImportSupportUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
@@ -93,11 +94,11 @@ public class ImportServiceImpl implements ImportService {
 
     @Override
     @SuppressWarnings("ConstantConditions")
-    public OrchestratorBaseInfo importOrc(String orchestratorName, String releaseUser,Long projectId, String projectName,
-                                                   BmlResource bmlResource, DSSLabel dssLabel, String workspaceName, Workspace workspace) throws ErrorException {
+    public OrchestratorImportInfo importOrc(String orchestratorName, String releaseUser, Long projectId, String projectName,
+                                            BmlResource bmlResource, DSSLabel dssLabel, String workspaceName, Workspace workspace) throws ErrorException {
         //导入之后我们应该拿到的是导入之后的orchestrator的内容,这样我们在做同步到调度中心的时候才是同步的生产中心的内容
         LOGGER.info("Begin to import orc for project {} and orc resource is {}", projectName, bmlResource);
-        OrchestratorBaseInfo orchestratorReleaseInfo =null;
+        OrchestratorImportInfo orchestratorReleaseInfo =null;
         AppConn appConn = AppConnManager.getAppConnManager().getAppConn(ORC_FRAMEWORK_NAME);
         DevelopmentIntegrationStandard standard = ((OnlyDevelopmentAppConn)appConn).getOrCreateDevelopmentStandard();
         if (standard == null) {
@@ -124,9 +125,8 @@ public class ImportServiceImpl implements ImportService {
                 String orchestratorVersion=(String) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATOR_VERSION_KEY);
                 LOGGER.info("Succeed to get responseRef for projectInfo {}, refOrcId is {}.", projectName, refOrcId);
                 //从返回的的内容中搞到导入之后的orc的信息
-                orchestratorReleaseInfo=new OrchestratorBaseInfo();
-                orchestratorReleaseInfo.setOrchestratorId(refOrcId);
-                orchestratorReleaseInfo.setOrchestratorName(orchestratorName);
+                orchestratorReleaseInfo= OrchestratorImportInfo.newInstance(refOrcId,orchestratorName,
+                        orchestratorVersion);
             } catch (Exception e) {
                 DSSExceptionUtils.dealErrorException(60035, "Failed to import Ref for project: " + e.getMessage(), e, DSSFrameworkErrorException.class);
             }
@@ -158,7 +158,7 @@ public class ImportServiceImpl implements ImportService {
 
 
 
-        List<OrchestratorBaseInfo> importResultInfo = new ArrayList<>();
+        List<OrchestratorImportInfo> importResultInfo = new ArrayList<>();
         for (Path path : flowProjectPaths.values()) {
             String zipFilePath = ZipHelper.zip(path.toAbsolutePath().toString());
             File orcZipFile=new File(zipFilePath);
@@ -166,7 +166,7 @@ public class ImportServiceImpl implements ImportService {
             BmlResource uploadResult = bmlService.upload(userName, inputStream,
                     orcZipFile.getName() , projectName);
             String orcName = FilenameUtils.getBaseName(orcZipFile.getName());
-            OrchestratorBaseInfo importInfo = importOrc(orcName, userName, projectId, projectName, uploadResult, dssLabel, workspace.getWorkspaceName(), workspace);
+            OrchestratorImportInfo importInfo = importOrc(orcName, userName, projectId, projectName, uploadResult, dssLabel, workspace.getWorkspaceName(), workspace);
             importResultInfo.add(importInfo);
         }
         //清理文件

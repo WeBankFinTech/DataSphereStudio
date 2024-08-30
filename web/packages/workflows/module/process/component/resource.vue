@@ -92,7 +92,7 @@ export default {
     init() {
       this.updateUrl = `${module.data.API_PATH}bml/uploadShareResource`;
       this.uploadData = { system: 'WTSS', isExpire: true, projectName: this.$route.query.projectName || '' };
-      this.maxSize = 1024000;
+      this.maxSize = 204800;
       this.setData();
     },
     setData() {
@@ -112,7 +112,7 @@ export default {
     beforeUpload(file) {
       const isInFlag = this.uploadFiles.find((item) => item.name === file.name);
       const regLeaf = /^[-.\w\u4e00-\u9fa5]{1,200}\.[A-Za-z]+$/;
-      const sizeResult = file.size >= 100 * 1024 * 1024;
+      const sizeResult = file.size >= 200 * 1024 * 1024;
       if (this.isRipetition) {
         if (this.nodeType === NODETYPE.SPARKPY) {
           if (!(/\.zip$/i.test(file.name))) {
@@ -136,7 +136,7 @@ export default {
         this.$Message.warning(this.$t('message.workflow.process.resourceBar.WJMCBHF'));
         return false;
       } else if (sizeResult) {
-        this.$Message.warning(this.$t('message.workflow.process.resourceBar.SCBCG100'));
+        this.$Message.warning(this.$t('message.workflow.process.resourceBar.SCBCG200'));
         return false;
       }
     },
@@ -162,8 +162,8 @@ export default {
     },
     // 错误时的回调
     handleError(err, file) {
-      this.$Message.error(file.message);
       this.isUploading = false;
+      this.$Message.error(err ? err.message || '上传失败' : '上传失败');
     },
     // 上传文件过程中的回调
     handleProgress(event, file) {

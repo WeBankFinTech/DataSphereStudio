@@ -126,7 +126,6 @@
 <script>
 import ProjectForm from '@dataspherestudio/shared/components/projectForm/index.js'
 import copyForm from './module/copyForm.vue'
-import resource from './module/resource.vue'
 import storage from '@dataspherestudio/shared/common/helper/storage'
 import api from '@dataspherestudio/shared/common/service/api'
 import projectContentItem from './module/projectItem.vue'
@@ -143,7 +142,6 @@ export default {
     projectContentItem,
     ProjectForm,
     copyForm,
-    resource
   },
   data() {
     return {
@@ -178,8 +176,6 @@ export default {
       commonTitle: '',
       precentList: [],
       sortType: {},
-      showResourceView: false, // 是否展示资源文件上传
-      projectResources: [], // 工程级别资源文件
 
       // 个人工作流工程版本
       projectVersionId: '',
@@ -703,26 +699,6 @@ export default {
           })
         }
         return item
-      })
-    },
-    // 展示资源上传组件
-    showResourceViewAction(classifyId, project) {
-      this.showResourceView = true
-      /**
-       * 待确认问题
-       * 1.资源文件上传后存储位置
-       * 2.已上传的如何获取
-       */
-      this.projectResources = project.projectResources = []
-    },
-    // 资源上传后的回调
-    updateResources(res) {
-      this.projectResources = res.map(item => {
-        return {
-          fileName: item.fileName,
-          resourceId: item.resourceId,
-          version: item.version
-        }
       })
     },
     gotoScriptis() {

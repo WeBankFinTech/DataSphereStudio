@@ -57,7 +57,7 @@
             </template>
           </div>
           <div v-if="bottomTab.show_result && scriptResult.totalColumn <= 10000 && scriptResult.totalColumn > 500" class="column-pagination">
-            <span>共{{ scriptResult.totalColumn }}列</span>
+            <span>列分页：500列 / 页，共{{ scriptResult.totalColumn }}列</span>
             <Page
               :total="scriptResult.totalColumn"
               :current="scriptViewState.columnPageNow || 1"
@@ -652,6 +652,7 @@ export default {
           },
           logLine: 1,
         };
+        // code-preckcheck执行依赖progress页先展示，延时有关联影响
         setTimeout(()=>{
           this.showPanelTab('progress');
         }, 100)
@@ -1055,16 +1056,18 @@ export default {
             method: 'post',
             useFormQuery: true,
           });
-          // 如果拿到代码审查结果时，代码已运行完成，则不进行操作
-          if (this.$refs.progressTab && (!this.script.progress || !this.script.progress.costTime)) {
-            this.script.codePrecheckRes = codePrecheckRes;
-            this.$refs.progressTab.updateCodePreCheck(codePrecheckRes);
-            if (this.script.codePrecheckRes.checkData && this.script.codePrecheckRes.checkData.length > 0 && this.script.codePrecheckRes.checkData[0].detailTitle) {
-              this.codePrecheckTitle = this.script.codePrecheckRes.checkData[0].detailTitle
-            } else {
-              this.codePrecheckTitle = '字段数据类型不一致详情'
+          setTimeout(()=>{
+            // 如果拿到代码审查结果时，代码已运行完成，则不进行操作
+            if (this.$refs.progressTab && (!this.script.progress || !this.script.progress.costTime)) {
+              this.script.codePrecheckRes = codePrecheckRes;
+              this.$refs.progressTab.updateCodePreCheck(codePrecheckRes);
+              if (this.script.codePrecheckRes.checkData && this.script.codePrecheckRes.checkData.length > 0 && this.script.codePrecheckRes.checkData[0].detailTitle) {
+                this.codePrecheckTitle = this.script.codePrecheckRes.checkData[0].detailTitle
+              } else {
+                this.codePrecheckTitle = '字段数据类型不一致详情'
+              }
             }
-          }
+          }, 150)
         }
       }
     },

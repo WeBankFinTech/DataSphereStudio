@@ -35,7 +35,7 @@
           </div>
         </div>
         <div v-if="script.result && scriptViewState.showPanel == 'result' && script.result.totalColumn <= 10000 && script.result.totalColumn > 500" class="column-pagination">
-          <span>共{{ script.result.totalColumn }}列</span>
+          <span>列分页：500列 / 页，共{{ script.result.totalColumn }}列</span>
           <Page
             :total="script.result.totalColumn"
             :current="scriptViewState.columnPageNow || 1"

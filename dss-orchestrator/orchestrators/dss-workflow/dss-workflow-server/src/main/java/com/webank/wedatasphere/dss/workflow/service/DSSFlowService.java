@@ -90,7 +90,7 @@ public interface DSSFlowService {
 
     DataDevelopNodeResponse queryDataDevelopNodeList(String username, Workspace workspace, DataDevelopNodeRequest request);
 
-    Map<String,Object> getDataDevelopNodeContent(String nodeId, Long contentId);
+    Map<String,Object> getDataDevelopNodeContent(String nodeId, Long contentId) throws DSSErrorException;
 
     DataViewNodeResponse queryDataViewNode(String username, Workspace workspace, DataViewNodeRequest request);
 

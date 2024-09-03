@@ -79,11 +79,4 @@ public interface ProjectHttpRequestHook {
      */
     Message beforeGetDeletedProject(HttpServletRequest request, ProjectQueryRequest projectRequest);
 
-    /**
-     * 项目转移成功后的后置操作。
-     * @param request
-     * @param projectTransferRequest
-     */
-    default void afterTransferProject(HttpServletRequest request, ProjectTransferRequest projectTransferRequest){
-    }
 }

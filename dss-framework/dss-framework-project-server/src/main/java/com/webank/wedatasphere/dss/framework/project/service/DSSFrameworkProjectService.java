@@ -45,5 +45,15 @@ public interface DSSFrameworkProjectService {
 
     void modifyProjectMeta(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
 
-    void transferProject(ProjectTransferRequest projectTransferRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
+    /**
+     * 项目交接
+     * @param projectTransferRequest 交接请求
+     * @param dbProject 原始项目
+     * @param oldProjectOwner 原始项目owner
+     * @param workspace 工作空间
+     * @param operator 操作人
+     * @throws Exception
+     */
+    void transferProject(ProjectTransferRequest projectTransferRequest, DSSProjectDO dbProject,
+                         String oldProjectOwner, Workspace workspace,String operator) throws Exception;
 }

@@ -1178,14 +1178,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Map<String, Object> content = new HashMap<>();
         if (nodeContentDO == null) {
             logger.error("not find node info , id is {}, nodeId is {}", contentId, nodeId);
-            throw new DSSErrorException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
+            throw new DSSRuntimeException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
         }
 
         List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByContentId(contentId);
 
         if (CollectionUtils.isEmpty(nodeContentUIDOList)) {
             logger.error("not find node params info , content id is {}", contentId);
-            throw new DSSErrorException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
+            throw new DSSRuntimeException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
         }
 
         List<NodeUIInfo> nodeUIInfoList = nodeInfoMapper.getNodeUIInfoByNodeType(nodeContentDO.getJobType());

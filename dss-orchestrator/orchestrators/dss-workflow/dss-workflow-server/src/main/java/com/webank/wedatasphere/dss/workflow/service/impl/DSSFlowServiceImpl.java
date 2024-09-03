@@ -539,6 +539,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 String nodeKey = nodeContentDO.getNodeKey();
                 Long contentByKeyId = nodeContentDO.getId();
                 DSSNodeDefault nodeDefault = map.get(nodeKey);
+                if (nodeDefault.getJobType().contains("newVisualis")) {
+                    Map<String, Object> jobContent = nodeDefault.getJobContent();
+                    if (jobContent != null) {
+                        for (Map.Entry<String, Object> entry : jobContent.entrySet()) {
+                            String value = entry.getValue() != null ? entry.getValue().toString() : "";
+                            nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, entry.getKey(), value));
+                        }
+                    }
+                }
+
                 String title = nodeDefault.getTitle();
                 if (StringUtils.isNotEmpty(title)) {
                     nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title));
@@ -547,6 +557,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 if (StringUtils.isNotEmpty(desc)) {
                     nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc));
                 }
+                List<Resource> nodeDefaultResources = nodeDefault.getResources();
+                if (CollectionUtils.isNotEmpty(nodeDefaultResources)) {
+                    StringBuilder nodeResources = new StringBuilder();
+                    for (Resource resource : nodeDefaultResources) {
+                        nodeResources.append(resource.getFileName());
+                        nodeResources.append(";");
+                    }
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "resources", new String(nodeResources)));
+                }
+
 
                 Map<String, Object> params = nodeDefault.getParams();
                 if (params != null) {

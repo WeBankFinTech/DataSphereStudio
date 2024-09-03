@@ -21,6 +21,8 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowName;
+import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.request.DataDevelopNodeRequest;
 import com.webank.wedatasphere.dss.workflow.entity.request.DataViewNodeRequest;
 import com.webank.wedatasphere.dss.workflow.entity.response.DataDevelopNodeResponse;
@@ -91,4 +93,10 @@ public interface DSSFlowService {
     Map<String,Object> getDataDevelopNodeContent(String nodeId, Long contentId);
 
     DataViewNodeResponse queryDataViewNode(String username, Workspace workspace, DataViewNodeRequest request);
+
+    List<NodeInfo> getNodeInfoByGroupName(String groupNameEn);
+
+    DSSFlowName queryFlowNameList(String username, Workspace workspace, String groupNameEn);
+
+    List<String> queryViewId(Workspace workspace,String username);
 }

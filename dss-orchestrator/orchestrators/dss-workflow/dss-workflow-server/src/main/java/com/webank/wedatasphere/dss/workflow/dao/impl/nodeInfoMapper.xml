@@ -169,8 +169,9 @@
     </select>
 
 
-    <select id="getNodeTypeByGroupName" parameterType="java.lang.String" resultType="java.util.List">
-        select t3.node_type from dss_workflow_node_to_group  t1
+    <select id="getNodeTypeByGroupName" parameterType="java.lang.String" resultMap="workflowNode">
+        select t3.*
+        from dss_workflow_node_to_group  t1
         join dss_workflow_node_group t2 on t1.group_id  = t2.id and t2.name_en  = #{groupName}
         join dss_workflow_node t3 on t1.node_id  = t3.id
     </select>

@@ -96,4 +96,55 @@
     <delete id="deleteNodeContentByOrchestratorId">
         DELETE FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId}
     </delete>
+    
+    
+    <select id="queryFlowNodeInfo" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowNodeInfo"
+            parameterType="java.util.List">
+
+        select t1.node_id  as nodeId
+              ,t1.orchestrator_id as orchestratorId
+              ,t2.name as orchestratorName
+              ,t1.id as content_id
+              ,t1.job_type as jobType
+              ,t4.name as nodeTypeName
+              ,t2.project_id as projectId
+              ,t1.modify_time as modifyTime
+              ,t1.create_time as createTime
+        from dss_workflow_node_content t1
+        join (select * from dss_orchestrator_info
+              where project_id in
+              <foreach collection="projectIdList" item="item" open="(" separator="," close=")">
+                   #{item}
+              </foreach>
+             ) t2 on t1.orchestrator_id  = t2.id
+        left join dss_workflow_node t4 on t1.job_type  = t4.node_type
+        where t1.job_type in
+        <foreach collection="nodeTypeList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        order by create_time desc
+
+
+    </select>
+
+
+    <select id="queryFlowNodeTemplate" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowNodeTemplate"
+            parameterType="java.util.List">
+        select t1.template_id as templateId
+              ,t2.name  as templateName
+        from dss_ec_config_template_workflow t1
+        join dss_ec_config_template t2 on t1.template_id  = t2.template_id
+        where orchestrator_id  in
+        <foreach collection="orchestratorIdList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getNodeContentById" resultType="nodeContentResultMap"
+            parameterType="java.lang.Long">
+
+        select  <include refid="baseColumns"/> from dss_workflow_node_content where id = #{contentId} and node_id = #{nodeId}
+
+    </select>
+    
 </mapper>

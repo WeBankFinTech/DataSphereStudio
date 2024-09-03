@@ -64,4 +64,21 @@
                 #{item}
         </foreach>
     </delete>
+
+
+    <select id="queryNodeContentUIList" resultMap="nodeContentUiResultMap" parameterType="java.util.List">
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content_to_ui
+        WHERE `content_id` in
+        <foreach collection="contentIdList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getNodeContentUIByContentId" resultType="nodeContentUiResultMap" parameterType="java.lang.Long">
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content_to_ui
+        WHERE `content_id` = #{contentId}
+    </select>
+
+
+
 </mapper>

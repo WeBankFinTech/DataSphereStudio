@@ -139,4 +139,40 @@
         select * from `dss_workflow_node` where node_type=#{nodeType}
     </select>
 
+    <select id="queryNodeUIList" parameterType="java.util.List" resultType="com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo">
+        select t2.node_type
+              ,t2.name
+              ,t3.`position`
+              ,t3.`key`
+        from dss_workflow_node_to_ui t1
+        join dss_workflow_node t2 on t1.workflow_node_id  = t2.id
+        join dss_workflow_node_ui t3 on t1.ui_id  = t3.id
+        where  `position`  = 'startup'
+                and node_type in
+        <foreach collection="nodeTypeList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="getNodeUIInfoByNodeType" parameterType="java.lang.String" resultType="com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo">
+        select t2.node_type
+        ,t2.name
+        ,t3.`position`
+        ,t3.`key`
+        ,t3.defaultValue
+        from dss_workflow_node_to_ui t1
+        join (select * from dss_workflow_node where node_type = #{nodeType}) t2 on t1.workflow_node_id  = t2.id
+        join dss_workflow_node_ui t3 on t1.ui_id  = t3.id
+        where  `position`  = 'startup'
+
+    </select>
+
+
+    <select id="getNodeTypeByGroupName" parameterType="java.lang.String" resultType="java.util.List">
+        select t3.node_type from dss_workflow_node_to_group  t1
+        join dss_workflow_node_group t2 on t1.group_id  = t2.id and t2.name_en  = #{groupName}
+        join dss_workflow_node t3 on t1.node_id  = t3.id
+    </select>
+
 </mapper>

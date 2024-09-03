@@ -30,10 +30,9 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.cs.DSSCSHelper;
 import com.webank.wedatasphere.dss.workflow.entity.*;
-import com.webank.wedatasphere.dss.workflow.entity.request.AppConnNodeUrlRequest;
-import com.webank.wedatasphere.dss.workflow.entity.request.BatchDeleteAppConnNodeRequest;
-import com.webank.wedatasphere.dss.workflow.entity.request.CreateExternalNodeRequest;
-import com.webank.wedatasphere.dss.workflow.entity.request.UpdateExternalNodeRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.*;
+import com.webank.wedatasphere.dss.workflow.entity.response.DataDevelopNodeResponse;
+import com.webank.wedatasphere.dss.workflow.entity.response.DataViewNodeResponse;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeGroupVO;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeInfoVO;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeUiVO;
@@ -42,6 +41,7 @@ import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public class NodeRestfulApi {
     @Autowired
     private WorkFlowParser workFlowParser;
 
-    @RequestMapping(value = "/listNodeType",method = RequestMethod.GET)
+    @RequestMapping(value = "/listNodeType", method = RequestMethod.GET)
     public Message listNodeType(HttpServletRequest req) {
         Function<NodeGroup, String> supplier = internationalization(req, NodeGroup::getNameEn, NodeGroup::getName);
         List<NodeGroupVO> groupVos = new ArrayList<>();
@@ -128,7 +128,7 @@ public class NodeRestfulApi {
         Set<String> keySet = new HashSet<>(nodeInfo.getNodeUis().size());
         for (NodeUi nodeUi : nodeInfo.getNodeUis()) {
             //避免重复的ui key，因为第三方组件可能会重复配置。
-            if(keySet.contains(nodeUi.getKey())){
+            if (keySet.contains(nodeUi.getKey())) {
                 continue;
             }
             NodeUiVO nodeUiVO = new NodeUiVO();
@@ -145,7 +145,7 @@ public class NodeRestfulApi {
     }
 
 
-    @RequestMapping(path ="nodeIcon/{nodeType}", method = RequestMethod.GET)
+    @RequestMapping(path = "nodeIcon/{nodeType}", method = RequestMethod.GET)
     public void getIcon(HttpServletResponse response, @PathVariable("nodeType") String nodeType) throws IOException {
         byte[] icon = workflowNodeService.getNodeIcon(nodeType);
         response.setContentType("image/svg+xml");
@@ -154,7 +154,7 @@ public class NodeRestfulApi {
         response.getOutputStream().write(icon);
     }
 
-    @RequestMapping(value = "/createAppConnNode",method = RequestMethod.POST)
+    @RequestMapping(value = "/createAppConnNode", method = RequestMethod.POST)
     public Message createExternalNode(HttpServletRequest req, @RequestBody CreateExternalNodeRequest createExternalNodeRequest) throws DSSErrorException, IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
@@ -184,9 +184,9 @@ public class NodeRestfulApi {
         node.setParams(params);
         node.setJobContent(params);
         //补充json信息,方便appConn去解析获取响应的值
-        if(params.containsKey(DSSJobContentConstant.UP_STREAM_KEY)) {
+        if (params.containsKey(DSSJobContentConstant.UP_STREAM_KEY)) {
             List<DSSNode> dssNodes = null;
-            if(params.get(DSSJobContentConstant.UP_STREAM_KEY).equals("empty")) {
+            if (params.get(DSSJobContentConstant.UP_STREAM_KEY).equals("empty")) {
 //                dssNodes = workFlowParser.getWorkFlowNodes(flowContent);
                 params.remove(DSSJobContentConstant.UP_STREAM_KEY);
                 logger.info("Create a node that is not bound to an upstream node.");
@@ -194,7 +194,7 @@ public class NodeRestfulApi {
                 String[] upStreams = ((String) params.get(DSSJobContentConstant.UP_STREAM_KEY)).split(",");
                 dssNodes = workFlowParser.getWorkFlowNodes(flowContent).stream()
                         .filter(dssNode -> ArrayUtils.contains(upStreams, dssNode.getId())).collect(Collectors.toList());
-                if(dssNodes.isEmpty() && upStreams.length > 0) {
+                if (dssNodes.isEmpty() && upStreams.length > 0) {
                     return Message.error("Create node failed! Caused by: the banding up-stream nodes are not exists(绑定的上游节点不存在).");
                 }
                 params.put(DSSJobContentConstant.UP_STREAM_KEY, dssNodes);
@@ -205,7 +205,7 @@ public class NodeRestfulApi {
         return Message.ok().data("result", jobContent);
     }
 
-    @RequestMapping(value = "/updateAppConnNode",method = RequestMethod.POST)
+    @RequestMapping(value = "/updateAppConnNode", method = RequestMethod.POST)
     public Message updateExternalNode(HttpServletRequest req, @RequestBody UpdateExternalNodeRequest updateExternalNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
@@ -228,7 +228,7 @@ public class NodeRestfulApi {
         return Message.ok().data("result", node.getJobContent());
     }
 
-    @RequestMapping(value = "/deleteAppConnNode",method = RequestMethod.POST)
+    @RequestMapping(value = "/deleteAppConnNode", method = RequestMethod.POST)
     public Message deleteExternalNode(HttpServletRequest req, @RequestBody UpdateExternalNodeRequest updateExternalNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
@@ -251,12 +251,12 @@ public class NodeRestfulApi {
         return Message.ok().data("result", node.getJobContent());
     }
 
-    @RequestMapping(value = "/batchDeleteAppConnNode",method = RequestMethod.POST)
+    @RequestMapping(value = "/batchDeleteAppConnNode", method = RequestMethod.POST)
     public Message batchDeleteAppConnNode(HttpServletRequest req, @RequestBody BatchDeleteAppConnNodeRequest batchDeleteAppConnNodeRequest) throws IllegalAccessException, ExternalOperationFailedException, InstantiationException {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
-        List<Map<String,Object>>  jsonList = batchDeleteAppConnNodeRequest.getNodes();
-        jsonList.forEach(json ->{
+        List<Map<String, Object>> jsonList = batchDeleteAppConnNodeRequest.getNodes();
+        jsonList.forEach(json -> {
             Long projectId = Long.parseLong(json.get("projectID").toString());
             String nodeType = json.get("nodeType").toString();
             Long flowId = (Long) json.get("flowID");
@@ -275,10 +275,10 @@ public class NodeRestfulApi {
             workflowNodeService.deleteNode(userName, node);
         });
 
-        return Message.ok("success").data("result","success");
+        return Message.ok("success").data("result", "success");
     }
 
-    @RequestMapping(value = "/getAppConnNodeUrl",method = RequestMethod.POST)
+    @RequestMapping(value = "/getAppConnNodeUrl", method = RequestMethod.POST)
     public Message getAppConnNodeUrl(HttpServletRequest req, @RequestBody AppConnNodeUrlRequest appConnNodeUrlRequest) {
         String userName = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
@@ -299,5 +299,56 @@ public class NodeRestfulApi {
         String jumpUrl = workflowNodeService.getNodeJumpUrl(params, node, userName);
         return Message.ok().data("jumpUrl", jumpUrl);
     }
+
+
+    /**
+     * 查询数据节点信息
+     **/
+    @RequestMapping(value = "/queryDataDevelopNode", method = RequestMethod.POST)
+    public Message queryDataDevelopNode(HttpServletRequest req, @RequestBody DataDevelopNodeRequest dataDevelopNodeRequest) {
+
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+
+        DataDevelopNodeResponse dataDevelopNodeResponse = dssFlowService.queryDataDevelopNodeList(username, workspace, dataDevelopNodeRequest);
+
+        return Message.ok().data("data", dataDevelopNodeResponse.getDataDevelopNodeInfoList()).data("total", dataDevelopNodeResponse.getTotal());
+
+    }
+
+
+    /**
+     * 查询数据节点参数详情
+     **/
+    @RequestMapping(value = "/getDataDevelopNodeContent", method = RequestMethod.GET)
+    public Message getDataDevelopNodeContent(HttpServletRequest req,
+                                             @RequestParam("nodeId") String nodeId,
+                                             @RequestParam("contentId") Long contentId) {
+
+        if (StringUtils.isBlank(nodeId) || contentId == null) {
+            return Message.error("输入的参数为空，请检查参数信息");
+        }
+
+        Map<String, Object> data = dssFlowService.getDataDevelopNodeContent(nodeId, contentId);
+        return Message.ok().data("data", data);
+
+    }
+
+    /**
+     * 查询数据可视化节点
+     **/
+    @RequestMapping(value = "/queryDataViewNode", method = RequestMethod.POST)
+    public Message queryDataViewNode(HttpServletRequest req, @RequestBody DataViewNodeRequest dataViewNodeRequest) {
+
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+
+        DataViewNodeResponse dataViewNodeResponse = dssFlowService.queryDataViewNode(username, workspace, dataViewNodeRequest);
+
+        return Message.ok().data("data", dataViewNodeResponse.getDataDevelopNodeInfoList()).data("total", dataViewNodeResponse.getTotal());
+
+    }
+
+
 }
 

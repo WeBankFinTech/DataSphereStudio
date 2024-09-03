@@ -21,11 +21,16 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.entity.request.DataDevelopNodeRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.DataViewNodeRequest;
+import com.webank.wedatasphere.dss.workflow.entity.response.DataDevelopNodeResponse;
+import com.webank.wedatasphere.dss.workflow.entity.response.DataViewNodeResponse;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import org.apache.linkis.common.exception.ErrorException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface DSSFlowService {
     DSSFlow getFlowByID(Long id);
@@ -80,4 +85,10 @@ public interface DSSFlowService {
     List<String> checkIsSave(Long parentFlowID, String jsonFlow);
 
     String getFlowJson(String userName, String projectName, DSSFlow dssFlow);
+
+    DataDevelopNodeResponse queryDataDevelopNodeList(String username, Workspace workspace, DataDevelopNodeRequest request);
+
+    Map<String,Object> getDataDevelopNodeContent(String nodeId, Long contentId);
+
+    DataViewNodeResponse queryDataViewNode(String username, Workspace workspace, DataViewNodeRequest request);
 }

@@ -350,5 +350,46 @@ public class NodeRestfulApi {
     }
 
 
+    /**
+     * 节点类型
+     **/
+    @RequestMapping(value = "/queryNodeTypeNameList", method = RequestMethod.GET)
+    public Message queryNodeTypeName(@RequestParam("groupNameEn") String groupNameEn) {
+
+        List<NodeInfo> nodeInfoList = dssFlowService.getNodeInfoByGroupName(groupNameEn);
+
+        List<String> nodeTypeNameList = nodeInfoList.stream().map(NodeInfo::getName).collect(Collectors.toList());
+
+        return Message.ok().data("data", nodeTypeNameList);
+
+    }
+
+    @RequestMapping("/queryFlowNameList")
+    public Message queryNodeNameList(HttpServletRequest req, @RequestParam("groupNameEn") String groupNameEn) {
+
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+
+        DSSFlowName dssFlowName = dssFlowService.queryFlowNameList(username, workspace, groupNameEn);
+
+        return Message.ok().data("nodeNameList", dssFlowName.getNodeNameList())
+                .data("orchestratorNameList", dssFlowName.getOrchestratorNameList())
+                .data("templateNameList", dssFlowName.getTemplateNameList());
+
+    }
+
+
+    /*
+    * 视图ID
+    * **/
+    @RequestMapping("/queryViewId")
+    public Message queryViewId(HttpServletRequest req) {
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+        List<String> viewIdList = dssFlowService.queryViewId(workspace, username);
+        return Message.ok().data("viewId", viewIdList);
+    }
+
+
 }
 

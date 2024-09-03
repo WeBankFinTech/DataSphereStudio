@@ -36,6 +36,6 @@ public interface NodeInfoMapper {
 
     List<NodeUIInfo> getNodeUIInfoByNodeType(@Param("nodeType") String nodeType);
 
-    List<String> getNodeTypeByGroupName(@Param("groupName") String groupName);
+    List<NodeInfo> getNodeTypeByGroupName(@Param("groupName") String groupName);
 }
 

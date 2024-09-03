@@ -22,7 +22,9 @@ public interface NodeContentUIMapper {
 
     void deleteNodeContentUIByContentList(@Param("list") List<Long> list);
 
-    List<NodeContentUIDO> queryNodeContentUIList(@Param("contentId") List<Long> contentId);
+    List<NodeContentUIDO> queryNodeContentUIList(@Param("contentIdList") List<Long> contentIdList);
 
     List<NodeContentUIDO> getNodeContentUIByContentId(@Param("contentId") Long contentId);
+
+    List<NodeContentUIDO> getNodeContentUIByNodeUIKey(@Param("contentIdList") List<Long> contentIdList,@Param("nodeKey")String nodeKey);
 }

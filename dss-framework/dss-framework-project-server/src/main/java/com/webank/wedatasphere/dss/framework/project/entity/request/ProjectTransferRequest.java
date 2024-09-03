@@ -26,16 +26,8 @@ public class ProjectTransferRequest {
     @NotNull(message = "工程转移用户不能为空")
     private String transferUserName;
 
-    @NotNull(message = "工程id不能为空")
-    private Long id;
-
     @NotNull(message = "工程名称不能为空")
-    private String name;
-
-    @NotNull(message = "工作空间id不能为空")
-    private String workspaceId;
-    @NotNull(message = "工作空间名称不能为空")
-    private String workspaceName;
+    private String projectName;
 
 
     public String getTransferUserName() {
@@ -46,46 +38,22 @@ public class ProjectTransferRequest {
         this.transferUserName = transferUserName;
     }
 
-    public Long getId() {
-        return id;
+
+    public String getProjectName() {
+        return projectName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getWorkspaceId() {
-        return workspaceId;
-    }
-
-    public void setWorkspaceId(String workspaceId) {
-        this.workspaceId = workspaceId;
-    }
-
-    public String getWorkspaceName() {
-        return workspaceName;
-    }
-
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
-    }
 
     @Override
     public String toString() {
-        return "ProjectTransferRequest{" +
-                "transferUserName='" + transferUserName + '\'' +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", workspaceId='" + workspaceId + '\'' +
-                ", workspaceName='" + workspaceName + '\'' +
-                '}';
+        final StringBuffer sb = new StringBuffer("ProjectTransferRequest{");
+        sb.append("transferUserName='").append(transferUserName).append('\'');
+        sb.append(", projectName='").append(projectName).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

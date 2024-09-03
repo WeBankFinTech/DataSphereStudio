@@ -1070,7 +1070,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         Map<Long, DSSProject> dssProjectMap = projectListToMap(dssProjectList);
 
-        List<Long> projectIdList = dssProjectMap.keySet().stream().collect(Collectors.toList());
+        List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
 
         List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataDevelopment.getNameEn());
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
@@ -1083,11 +1083,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
-        List<Long> contentIdList = dssFlowNodeInfoMap.keySet().stream().collect(Collectors.toList());
+        List<Long> contentIdList = new ArrayList<>(dssFlowNodeInfoMap.keySet());
 
         // 查询节点保存的配置信息
         Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
-        if (nodeContentUIGroup.size() == 0) {
+        if (nodeContentUIGroup.isEmpty()) {
             logger.error("queryDataDevelopNodeList not find nodeUI info , example contextId is {}", contentIdList.get(0));
             return dataDevelopNodeResponse;
         }
@@ -1125,7 +1125,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     dataDevelopNodeInfo.setRefTemplate(Boolean.TRUE);
                     String templateId = templateMap.get(nodeMap.get("ec.conf.templateId"));
                     if (templateMap.containsKey(templateId)) {
-                        dataDevelopNodeInfo.setTemplateName(templateId);
+                        dataDevelopNodeInfo.setTemplateName(templateMap.get(templateId));
                     } else {
                         logger.error("queryDataDevelopNodeList not find template,contentId is {},template id is {}", contentId, templateId);
                     }
@@ -1157,10 +1157,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         dataDevelopNodeResponse.setTotal((long) dataDevelopNodeInfoList.size());
         // 分页处理
-        Integer page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
-        Integer pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
-        Integer start = (page - 1) * pageSize;
-        Integer end = page * pageSize > dataDevelopNodeInfoList.size() ? dataDevelopNodeInfoList.size() : page * pageSize;
+        int page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
+        int pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
+        int start = (page - 1) * pageSize;
+        int end = Math.min(page * pageSize, dataDevelopNodeInfoList.size());
 
         for (int i = start; i < end; i++) {
             DataDevelopNodeInfo dataDevelopNodeInfo = dataDevelopNodeInfoList.get(i);
@@ -1206,7 +1206,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             if (nodeMap.containsKey(nodeUIInfo.getKey())) {
                 content.put(nodeUIInfo.getKey(), nodeMap.get(nodeUIInfo.getKey()));
             } else {
-                content.put(nodeUIInfo.getKey(), nodeUIInfo.getDefaultValue());
+                content.put(nodeUIInfo.getKey(), "");
             }
 
         }
@@ -1230,7 +1230,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         Map<Long, DSSProject> dssProjectMap = projectListToMap(dssProjectList);
 
-        List<Long> projectIdList = dssProjectMap.keySet().stream().collect(Collectors.toList());
+        List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
         // 查询节点信息
         List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
@@ -1242,11 +1242,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
-        List<Long> contentIdList = dssFlowNodeInfoMap.keySet().stream().collect(Collectors.toList());
+        List<Long> contentIdList = new ArrayList<>(dssFlowNodeInfoMap.keySet());
 
         // 查询节点保存的配置信息
         Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
-        if (nodeContentUIGroup.size() == 0) {
+        if (nodeContentUIGroup.isEmpty()) {
             logger.error("queryDataViewNode not find nodeUI info , example contextId is {}", contentIdList.get(0));
             return dataDevelopNodeResponse;
         }
@@ -1290,10 +1290,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         dataDevelopNodeResponse.setTotal((long) dataViewNodeInfoList.size());
         // 分页处理
-        Integer page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
-        Integer pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
-        Integer start = (page - 1) * pageSize;
-        Integer end = page * pageSize > dataViewNodeInfoList.size() ? dataViewNodeInfoList.size() : page * pageSize;
+        int page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
+        int pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
+        int start = (page - 1) * pageSize;
+        int end = Math.min(page * pageSize, dataViewNodeInfoList.size());
 
         for (int i = start; i < end; i++) {
             DataViewNodeInfo dataViewNodeInfo = dataViewNodeInfoList.get(i);
@@ -1385,7 +1385,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return dataDevelopNodeInfoList.stream().filter(dataDevelopNodeInfo -> {
             boolean flag = true;
 
-            if (request.getRefTemplate() != null && flag) {
+            if (request.getRefTemplate() != null) {
                 // 是否引用模板
                 flag = dataDevelopNodeInfo.getRefTemplate().equals(request.getRefTemplate());
             }
@@ -1432,7 +1432,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return dataViewNodeInfoList.stream().filter(dataViewNodeInfo -> {
             boolean flag = true;
             // 工作流名称
-            if (!StringUtils.isBlank(request.getOrchestratorName()) && flag) {
+            if (!StringUtils.isBlank(request.getOrchestratorName())) {
                 flag = request.getOrchestratorName().equals(dataViewNodeInfo.getOrchestratorName());
             }
 
@@ -1519,8 +1519,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Override
     public List<String> queryViewId(Workspace workspace,String username){
-
-
+        
         List<String> viewIdList = new ArrayList<>();
         // 获取项目
         List<DSSProject> dssProjectList = getDSSProject(workspace, username);

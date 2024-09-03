@@ -364,7 +364,7 @@ public class NodeRestfulApi {
 
     }
 
-    @RequestMapping("/queryFlowNameList")
+    @RequestMapping(value = "/queryFlowNameList",method = RequestMethod.GET)
     public Message queryNodeNameList(HttpServletRequest req, @RequestParam("groupNameEn") String groupNameEn) {
 
         String username = SecurityFilter.getLoginUsername(req);
@@ -382,7 +382,7 @@ public class NodeRestfulApi {
     /*
     * 视图ID
     * **/
-    @RequestMapping("/queryViewId")
+    @RequestMapping(value = "/queryViewId",method = RequestMethod.GET)
     public Message queryViewId(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);

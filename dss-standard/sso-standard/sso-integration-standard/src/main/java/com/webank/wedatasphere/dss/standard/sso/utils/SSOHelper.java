@@ -37,8 +37,8 @@ import java.util.regex.Pattern;
 
 public class SSOHelper {
 
-    private static final String WORKSPACE_ID_COOKIE_KEY = "workspaceId";
-    private static final String WORKSPACE_NAME_COOKIE_KEY = "workspaceName";
+    public static final String WORKSPACE_ID_COOKIE_KEY = "workspaceId";
+    public static final String WORKSPACE_NAME_COOKIE_KEY = "workspaceName";
     private static SSOBuilderService ssoBuilderService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSOHelper.class);

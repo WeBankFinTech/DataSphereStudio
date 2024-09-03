@@ -147,6 +147,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
+    private static  final String nodeUITitleKey = "title";
+
+    private static  final String nodeUIViewIdKey = "viewId";
 
     protected Sender getOrchestratorSender() {
         return DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
@@ -1069,7 +1072,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<Long> projectIdList = dssProjectMap.keySet().stream().collect(Collectors.toList());
 
-        List<String> nodeTypeList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataDevelopment.getNameEn());
+        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataDevelopment.getNameEn());
+        List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         // 查询节点信息
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
@@ -1228,7 +1232,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<Long> projectIdList = dssProjectMap.keySet().stream().collect(Collectors.toList());
         // 查询节点信息
-        List<String> nodeTypeList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
         if (CollectionUtils.isEmpty(flowNodeInfoList)) {
@@ -1457,6 +1462,91 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     }
 
+
+    @Override
+    public List<NodeInfo> getNodeInfoByGroupName(String groupNameEn){
+
+        return  nodeInfoMapper.getNodeTypeByGroupName(groupNameEn);
+    }
+
+
+    @Override
+    public DSSFlowName queryFlowNameList(String username,Workspace workspace,String groupNameEn){
+
+        DSSFlowName dssFlowName = new DSSFlowName();
+
+        // 获取项目
+        List<DSSProject> dssProjectList = getDSSProject(workspace, username);
+
+        if (CollectionUtils.isEmpty(dssProjectList)) {
+            logger.error("queryNodeName find project is empty, workspaceId is {}, username is {}", workspace.getWorkspaceId(), username);
+            return dssFlowName;
+        }
+
+        List<Long> projectIdList = dssProjectList.stream().map(DSSProject::getId).collect(Collectors.toList());
+
+        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(groupNameEn);
+        List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
+        // 查询节点信息
+        List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
+
+        if (CollectionUtils.isEmpty(flowNodeInfoList)) {
+            logger.error("queryNodeName find node info is empty, example project id is {}", projectIdList.get(0));
+            return dssFlowName;
+        }
+
+        if(WorkflowNodeGroupEnum.DataDevelopment.getNameEn().equals(groupNameEn)){
+
+            List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).distinct().collect(Collectors.toList());
+            List<DSSFlowNodeTemplate> dssFlowNodeTemplateList = nodeContentMapper.queryFlowNodeTemplate(orchestratorIdList);
+            List<String> templateNameList =  dssFlowNodeTemplateList.stream().map(DSSFlowNodeTemplate::getTemplateName).collect(Collectors.toList());
+            dssFlowName.setTemplateNameList(templateNameList);
+        }
+
+
+        List<String> orchestratorNameList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorName).distinct().collect(Collectors.toList());
+        dssFlowName.setOrchestratorNameList(orchestratorNameList);
+
+        List<Long> contentIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getContentId).collect(Collectors.toList());
+        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList,nodeUITitleKey);
+        List<String> nodeNameList = nodeContentUIDOList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+        dssFlowName.setNodeNameList(nodeNameList);
+
+        return dssFlowName;
+
+    }
+
+
+    @Override
+    public List<String> queryViewId(Workspace workspace,String username){
+
+
+        List<String> viewIdList = new ArrayList<>();
+        // 获取项目
+        List<DSSProject> dssProjectList = getDSSProject(workspace, username);
+
+        if (CollectionUtils.isEmpty(dssProjectList)) {
+            logger.error("queryViewId find project is empty, workspaceId is {}, username is {}", workspace.getWorkspaceId(), username);
+            return viewIdList;
+        }
+
+        List<Long> projectIdList = dssProjectList.stream().map(DSSProject::getId).collect(Collectors.toList());
+
+        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
+        // 查询节点信息
+        List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
+
+        if (CollectionUtils.isEmpty(flowNodeInfoList)) {
+            logger.error("queryViewId find node info is empty, example project id is {}", projectIdList.get(0));
+            return viewIdList;
+        }
+
+        List<Long> contentIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getContentId).collect(Collectors.toList());
+        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList,nodeUIViewIdKey);
+        viewIdList =  nodeContentUIDOList.stream().distinct().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
+        return viewIdList;
+    }
 
 
 }

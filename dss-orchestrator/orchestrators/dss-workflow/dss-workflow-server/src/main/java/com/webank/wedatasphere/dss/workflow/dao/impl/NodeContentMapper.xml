@@ -140,7 +140,7 @@
         </foreach>
     </select>
 
-    <select id="getNodeContentById" resultType="nodeContentResultMap"
+    <select id="getNodeContentById" resultMap="nodeContentResultMap"
             parameterType="java.lang.Long">
 
         select  <include refid="baseColumns"/> from dss_workflow_node_content where id = #{contentId} and node_id = #{nodeId}

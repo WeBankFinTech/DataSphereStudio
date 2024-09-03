@@ -20,9 +20,11 @@ package com.webank.wedatasphere.dss.workflow.dao;
 import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface NodeInfoMapper {
@@ -30,6 +32,9 @@ public interface NodeInfoMapper {
     List<NodeGroup> listNodeGroups();
 
     NodeInfo getWorkflowNodeByType(String nodeType);
+
+    @MapKey("node_type")
+    Map<String, String> getWorkflowNodeNumberType();
 
 
     List<NodeUIInfo> queryNodeUIInfoList(@Param("nodeTypeList") List<String> nodeTypeList);

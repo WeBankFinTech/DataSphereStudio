@@ -1173,7 +1173,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId) throws DSSErrorException {
+    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId)   {
         NodeContentDO nodeContentDO = nodeContentMapper.getNodeContentById(contentId, nodeId);
         Map<String, Object> content = new HashMap<>();
         if (nodeContentDO == null) {

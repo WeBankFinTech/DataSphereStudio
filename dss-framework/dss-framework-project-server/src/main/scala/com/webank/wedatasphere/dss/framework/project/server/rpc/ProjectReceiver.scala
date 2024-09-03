@@ -80,6 +80,11 @@ class ProjectReceiver(projectService: DSSProjectService,
       case projectInfoListRequest: ProjectInfoListRequest =>
         val projects = projectService.getDSSProjectByName(projectInfoListRequest.getProjectNames)
         new ProjectInfoListResponse(projects)
+
+      case projectListQueryRequest: ProjectListQueryRequest =>
+        val projectList = projectService.queryProject(projectListQueryRequest)
+        new ProjectListQueryResponse(projectList)
+
     }
   }
 

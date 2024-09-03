@@ -2,6 +2,8 @@ package com.webank.wedatasphere.dss.workflow.dao;
 
 import com.webank.wedatasphere.dss.workflow.dto.NodeContentDO;
 
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowNodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowNodeTemplate;
 import org.apache.ibatis.annotations.Param;
 import org.mapstruct.Mapper;
 
@@ -30,4 +32,10 @@ public interface NodeContentMapper {
     void batchDelete(@Param("list") List<NodeContentDO> list, @Param("orchestratorId") Long orchestratorId);
 
     void deleteNodeContentByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
+
+    List<DSSFlowNodeInfo> queryFlowNodeInfo(@Param("projectIdList") List<Long> projectIdList,@Param("nodeTypeList") List<String> nodeTypeList);
+
+    List<DSSFlowNodeTemplate> queryFlowNodeTemplate(@Param("orchestratorIdList") List<Long> orchestratorIdList);
+
+    NodeContentDO getNodeContentById(@Param("contentId") Long contentId,String nodeId);
 }

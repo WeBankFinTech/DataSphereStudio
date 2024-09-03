@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.common.entity.project;
 
 import java.util.Date;
+import java.util.List;
 
 public class DSSProject implements Project {
 
@@ -45,6 +46,21 @@ public class DSSProject implements Project {
      */
     private Boolean associateGit;
 
+
+    /**
+     * 发布用户 list
+     */
+    private List<String> releaseUsers;
+
+    /**
+     * 编辑用户 list
+     */
+    private List<String> editUsers;
+
+    /**
+     * 查看用户 list
+     */
+    private List<String> accessUsers;
 
     @Override
     public Long getId() {
@@ -184,5 +200,37 @@ public class DSSProject implements Project {
 
     public void setAssociateGit(Boolean associateGit) {
         this.associateGit = associateGit;
+    }
+
+    public Boolean getEditable() {
+        return editable;
+    }
+
+    public void setEditable(Boolean editable) {
+        this.editable = editable;
+    }
+
+    public List<String> getReleaseUsers() {
+        return releaseUsers;
+    }
+
+    public void setReleaseUsers(List<String> releaseUsers) {
+        this.releaseUsers = releaseUsers;
+    }
+
+    public List<String> getEditUsers() {
+        return editUsers;
+    }
+
+    public void setEditUsers(List<String> editUsers) {
+        this.editUsers = editUsers;
+    }
+
+    public List<String> getAccessUsers() {
+        return accessUsers;
+    }
+
+    public void setAccessUsers(List<String> accessUsers) {
+        this.accessUsers = accessUsers;
     }
 }

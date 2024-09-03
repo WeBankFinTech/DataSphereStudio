@@ -80,4 +80,7 @@ public interface DSSProjectMapper extends BaseMapper<DSSProjectDO> {
 
 
     List<String> queryProjectName(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
+
+
+    List<QueryProjectVo> queryProjectList(@Param("workspaceId") Long workspaceId,@Param("queryUser") String queryUser);
 }

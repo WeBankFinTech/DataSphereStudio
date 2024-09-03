@@ -19,6 +19,9 @@ package com.webank.wedatasphere.dss.workflow.dao;
 
 import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 
@@ -28,5 +31,11 @@ public interface NodeInfoMapper {
 
     NodeInfo getWorkflowNodeByType(String nodeType);
 
+
+    List<NodeUIInfo> queryNodeUIInfoList(@Param("nodeTypeList") List<String> nodeTypeList);
+
+    List<NodeUIInfo> getNodeUIInfoByNodeType(@Param("nodeType") String nodeType);
+
+    List<String> getNodeTypeByGroupName(@Param("groupName") String groupName);
 }
 

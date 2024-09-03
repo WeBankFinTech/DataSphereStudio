@@ -36,6 +36,7 @@ import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoListRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
@@ -778,6 +779,67 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
         return projectMapper.queryProjectName(projectRequest.getWorkspaceId(),queryUser);
 
+    }
+
+    public List<DSSProject> queryProject(ProjectListQueryRequest projectListQueryRequest){
+
+        List<DSSProject> projectList = new ArrayList<>();
+
+        String queryUser  = projectListQueryRequest.getUsername();
+        Long workspaceId  = projectListQueryRequest.getWorkspaceId();
+        //判断工作空间是否设置了管理员能否查看该工作空间下所有项目的权限
+        Integer workspaceAdminPermission = projectUserMapper.getWorkspaceAdminPermission(workspaceId);
+        if(isWorkspaceAdmin(workspaceId,queryUser) && workspaceAdminPermission != 1){
+            queryUser = null;
+        }
+
+        List<QueryProjectVo> queryProjectVoList = projectMapper.queryProjectList(projectListQueryRequest.getWorkspaceId(),queryUser);
+
+        if(CollectionUtils.isEmpty(queryProjectVoList)){
+            return  projectList;
+        }
+
+
+        for (QueryProjectVo projectVo : queryProjectVoList) {
+
+            DSSProject dssProject = new DSSProject();
+            dssProject.setApplicationArea(projectVo.getApplicationArea());
+            dssProject.setId(projectVo.getId());
+            dssProject.setBusiness(projectVo.getBusiness());
+            dssProject.setCreateBy(projectVo.getCreateBy());
+            dssProject.setDescription(projectVo.getDescription());
+            dssProject.setName(projectVo.getName());
+            dssProject.setProduct(projectVo.getProduct());
+            dssProject.setCreateTime(projectVo.getCreateTime());
+            dssProject.setUpdateTime(projectVo.getUpdateTime());
+            dssProject.setWorkspaceName(projectVo.getWorkspaceName());
+
+            List<String> accessUsers = StringUtils.isBlank(projectVo.getAccessUsers()) ? new ArrayList<>()
+                    : Arrays.asList(projectVo.getAccessUsers().split(MODE_SPLIT));
+            List<String> editUsers = StringUtils.isBlank(projectVo.getEditUsers()) ? new ArrayList<>()
+                    : Arrays.asList(projectVo.getEditUsers().split(MODE_SPLIT));
+            List<String> releaseUsers = StringUtils.isBlank(projectVo.getReleaseUsers()) ? new ArrayList<>()
+                    : Arrays.asList(projectVo.getReleaseUsers().split(MODE_SPLIT));
+
+            dssProject.setAccessUsers(accessUsers.stream().distinct().collect(Collectors.toList()));
+            dssProject.setEditUsers(editUsers.stream().distinct().collect(Collectors.toList()));
+            dssProject.setReleaseUsers(releaseUsers.stream().distinct().collect(Collectors.toList()));
+
+            // 用户是否具有编辑权限  发布者和创建者、管理员都有
+            if (projectVo.getCreateBy().equals(projectListQueryRequest.getUsername())
+                    || isWorkspaceAdmin(projectListQueryRequest.getWorkspaceId(), projectListQueryRequest.getUsername())
+                    || dssProject.getReleaseUsers().contains(projectListQueryRequest.getUsername())
+            ) {
+                dssProject.setEditable(true);
+            } else {
+                dssProject.setEditable(false);
+            }
+
+            projectList.add(dssProject);
+        }
+
+
+        return projectList;
     }
 
 }

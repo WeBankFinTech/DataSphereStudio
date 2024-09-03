@@ -230,4 +230,47 @@
         </if>
     </select>
 
+
+    <select id="queryProjectList"  resultType="java.lang.String">
+        select  *
+        ,group_concat(accessUser) as accessUsers
+        ,group_concat(editUser) as editUsers
+        ,group_concat(releaseUser) as releaseUsers
+        from
+        (
+        SELECT b.application_area applicationArea
+        ,b.id
+        ,b.business
+        ,b.create_by createBy
+        ,b.description
+        ,b.name
+        ,b.product
+        ,b.source
+        ,b.isArchive
+        ,b.create_time createTime
+        ,b.update_time updateTime
+        ,b.dev_process devProcess
+        ,b.orchestrator_mode orchestratorMode
+        ,b.visible visible
+        ,b.associate_git associateGit
+        ,b.data_source_list_json dataSourceListJson
+        ,a.workspace_id
+        ,a.username
+        ,case when a.priv = 1 then a.username end  as  accessUser
+        ,case when a.priv = 2 then a.username end  as  editUser
+        ,case when a.priv = 3 then a.username end  as  releaseUser
+        ,d.name as workspaceName
+        FROM dss_project_user a
+        join dss_project b ON a.project_id = b.id AND a.workspace_id=b.workspace_id and b.visible = 1
+        join dss_workspace d on a.workspace_id = d.id
+        WHERE a.priv >=1 and  a.workspace_id = #{workspaceId} and b.label is null
+
+        ) c where  1 = 1
+
+        group by id having 1 = 1
+        <if test="queryUser !=null and queryUser!= ''">
+            and group_concat(username) like concat('%',#{queryUser},'%')
+        </if>
+    </select>
+
 </mapper>

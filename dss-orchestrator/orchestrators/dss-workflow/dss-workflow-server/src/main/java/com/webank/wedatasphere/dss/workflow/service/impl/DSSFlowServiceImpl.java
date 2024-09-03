@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.workflow.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -32,6 +33,8 @@ import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryResponse;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
@@ -54,6 +57,7 @@ import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUpdateWorkflow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.constant.WorkflowNodeGroupEnum;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowWithContextImpl;
@@ -62,8 +66,11 @@ import com.webank.wedatasphere.dss.workflow.dao.*;
 import com.webank.wedatasphere.dss.workflow.dto.NodeContentDO;
 import com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO;
 import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
-import com.webank.wedatasphere.dss.workflow.entity.CommonAppConnNode;
-import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.*;
+import com.webank.wedatasphere.dss.workflow.entity.request.DataDevelopNodeRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.DataViewNodeRequest;
+import com.webank.wedatasphere.dss.workflow.entity.response.DataDevelopNodeResponse;
+import com.webank.wedatasphere.dss.workflow.entity.response.DataViewNodeResponse;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -1043,5 +1050,414 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             flowMapper.insertFlowRelation(flowID, parentFlowID);
         }
     }
+
+
+    @Override
+    public DataDevelopNodeResponse queryDataDevelopNodeList(String username, Workspace workspace, DataDevelopNodeRequest request) {
+
+        DataDevelopNodeResponse dataDevelopNodeResponse = new DataDevelopNodeResponse();
+
+        // 获取项目
+        List<DSSProject> dssProjectList = getDSSProject(workspace, username);
+
+        if (CollectionUtils.isEmpty(dssProjectList)) {
+            logger.error("queryDataDevelopNodeList find project is empty, workspaceId is {}, username is {}", workspace.getWorkspaceId(), username);
+            return dataDevelopNodeResponse;
+        }
+
+        Map<Long, DSSProject> dssProjectMap = projectListToMap(dssProjectList);
+
+        List<Long> projectIdList = dssProjectMap.keySet().stream().collect(Collectors.toList());
+
+        List<String> nodeTypeList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataDevelopment.getNameEn());
+        // 查询节点信息
+        List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
+
+        if (CollectionUtils.isEmpty(flowNodeInfoList)) {
+            logger.error("queryDataDevelopNodeList find node info is empty, example project id is {}", projectIdList.get(0));
+            return dataDevelopNodeResponse;
+        }
+
+        Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
+        List<Long> contentIdList = dssFlowNodeInfoMap.keySet().stream().collect(Collectors.toList());
+
+        // 查询节点保存的配置信息
+        Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
+        if (nodeContentUIGroup.size() == 0) {
+            logger.error("queryDataDevelopNodeList not find nodeUI info , example contextId is {}", contentIdList.get(0));
+            return dataDevelopNodeResponse;
+        }
+
+        // 查询模板信息
+        List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).collect(Collectors.toList());
+        Map<String, String> templateMap = getTemplateMap(orchestratorIdList);
+
+
+        List<DataDevelopNodeInfo> dataDevelopNodeInfoList = new ArrayList<>();
+
+        for (Long contentId : nodeContentUIGroup.keySet()) {
+
+            try {
+                DataDevelopNodeInfo dataDevelopNodeInfo = new DataDevelopNodeInfo();
+                DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
+                List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
+                DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
+
+                List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
+                List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+
+                Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
+                dataDevelopNodeInfo.setNodeName(nodeMap.get("title"));
+                dataDevelopNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
+                dataDevelopNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
+                dataDevelopNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
+                dataDevelopNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
+                if (nodeMap.containsKey("resource")) {
+                    dataDevelopNodeInfo.setResource(nodeMap.get("resource"));
+                }
+
+                dataDevelopNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
+                if (nodeMap.containsKey("ec.conf.templateId")) {
+                    dataDevelopNodeInfo.setRefTemplate(Boolean.TRUE);
+                    String templateId = templateMap.get(nodeMap.get("ec.conf.templateId"));
+                    if (templateMap.containsKey(templateId)) {
+                        dataDevelopNodeInfo.setTemplateName(templateId);
+                    } else {
+                        logger.error("queryDataDevelopNodeList not find template,contentId is {},template id is {}", contentId, templateId);
+                    }
+
+                } else {
+                    dataDevelopNodeInfo.setRefTemplate(Boolean.FALSE);
+                }
+
+                if (nodeMap.containsKey("ReuseEngine")) {
+                    dataDevelopNodeInfo.setReuseEngine(Boolean.valueOf(nodeMap.get("ReuseEngine")));
+                } else {
+                    dataDevelopNodeInfo.setReuseEngine(Boolean.FALSE);
+                }
+
+                dataDevelopNodeInfo.setProjectName(dssProject.getName());
+                dataDevelopNodeInfo.setProjectId(dssProject.getId());
+                dataDevelopNodeInfo.setContentId(contentId);
+                dataDevelopNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
+                dataDevelopNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
+                dataDevelopNodeInfoList.add(dataDevelopNodeInfo);
+            } catch (Exception exception) {
+                logger.error("queryDataDevelopNodeList error content id is {}", contentId);
+                logger.error(exception.getMessage());
+            }
+        }
+
+        // 条件筛选、排序
+        dataDevelopNodeInfoList = dataDevelopNodeResultFilter(request, dataDevelopNodeInfoList);
+
+        dataDevelopNodeResponse.setTotal((long) dataDevelopNodeInfoList.size());
+        // 分页处理
+        Integer page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
+        Integer pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
+        Integer start = (page - 1) * pageSize;
+        Integer end = page * pageSize > dataDevelopNodeInfoList.size() ? dataDevelopNodeInfoList.size() : page * pageSize;
+
+        for (int i = start; i < end; i++) {
+            DataDevelopNodeInfo dataDevelopNodeInfo = dataDevelopNodeInfoList.get(i);
+            dataDevelopNodeResponse.getDataDevelopNodeInfoList().add(dataDevelopNodeInfo);
+        }
+
+        return dataDevelopNodeResponse;
+
+    }
+
+
+    @Override
+    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId) {
+        NodeContentDO nodeContentDO = nodeContentMapper.getNodeContentById(contentId, nodeId);
+        Map<String, Object> content = new HashMap<>();
+        if (nodeContentDO == null) {
+            logger.error("not find node info , id is {}, nodeId is {}", contentId, nodeId);
+            throw new DSSErrorException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
+        }
+
+        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByContentId(contentId);
+
+        if (CollectionUtils.isEmpty(nodeContentUIDOList)) {
+            logger.error("not find node params info , content id is {}", contentId);
+            throw new DSSErrorException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
+        }
+
+        List<NodeUIInfo> nodeUIInfoList = nodeInfoMapper.getNodeUIInfoByNodeType(nodeContentDO.getJobType());
+
+        if (CollectionUtils.isEmpty(nodeUIInfoList)) {
+            logger.error("node type not params content, node type is {}, content id is {}", nodeContentDO.getJobType(), contentId);
+            return content;
+        }
+
+
+        List<String> nodeKey = nodeContentUIDOList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
+        List<String> nodeValue = nodeContentUIDOList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+
+        Map<String, String> nodeMap = CollUtil.zip(nodeKey, nodeValue);
+
+        for (NodeUIInfo nodeUIInfo : nodeUIInfoList) {
+
+            if (nodeMap.containsKey(nodeUIInfo.getKey())) {
+                content.put(nodeUIInfo.getKey(), nodeMap.get(nodeUIInfo.getKey()));
+            } else {
+                content.put(nodeUIInfo.getKey(), nodeUIInfo.getDefaultValue());
+            }
+
+        }
+
+        return content;
+
+    }
+
+
+    @Override
+    public DataViewNodeResponse queryDataViewNode(String username, Workspace workspace, DataViewNodeRequest request) {
+
+        DataViewNodeResponse dataDevelopNodeResponse = new DataViewNodeResponse();
+
+        List<DSSProject> dssProjectList = getDSSProject(workspace, username);
+
+        if (CollectionUtils.isEmpty(dssProjectList)) {
+            logger.error("queryDataViewNode workspace is {}, username is {}", workspace, username);
+            return dataDevelopNodeResponse;
+        }
+
+        Map<Long, DSSProject> dssProjectMap = projectListToMap(dssProjectList);
+
+        List<Long> projectIdList = dssProjectMap.keySet().stream().collect(Collectors.toList());
+        // 查询节点信息
+        List<String> nodeTypeList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
+
+        if (CollectionUtils.isEmpty(flowNodeInfoList)) {
+            logger.error("queryDataViewNode not find node info , example projectId is {}", projectIdList.get(0));
+            return dataDevelopNodeResponse;
+        }
+
+        Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
+        List<Long> contentIdList = dssFlowNodeInfoMap.keySet().stream().collect(Collectors.toList());
+
+        // 查询节点保存的配置信息
+        Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
+        if (nodeContentUIGroup.size() == 0) {
+            logger.error("queryDataViewNode not find nodeUI info , example contextId is {}", contentIdList.get(0));
+            return dataDevelopNodeResponse;
+        }
+
+        List<DataViewNodeInfo> dataViewNodeInfoList = new ArrayList<>();
+
+        for (Long contentId : nodeContentUIGroup.keySet()) {
+
+            DataViewNodeInfo dataViewNodeInfo = new DataViewNodeInfo();
+            DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
+            List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
+            DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
+
+            List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
+            List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+            Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
+
+            dataViewNodeInfo.setNodeName(nodeMap.get("title"));
+            if (nodeMap.containsKey("desc")) {
+                dataViewNodeInfo.setNodeDesc(nodeMap.get("desc"));
+            }
+            if (nodeMap.containsKey("viewId")) {
+                dataViewNodeInfo.setViewId(nodeMap.get("viewId"));
+            }
+
+            dataViewNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
+            dataViewNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
+            dataViewNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
+            dataViewNodeInfo.setContentId(dssFlowNodeInfo.getContentId());
+            dataViewNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
+            dataViewNodeInfo.setProjectName(dssProject.getName());
+            dataViewNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
+            dataViewNodeInfo.setProjectId(dssProject.getId());
+            dataViewNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
+            dataViewNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
+            dataViewNodeInfoList.add(dataViewNodeInfo);
+
+        }
+
+        dataViewNodeInfoList = dataViewNodeResultFilter(request, dataViewNodeInfoList);
+
+        dataDevelopNodeResponse.setTotal((long) dataViewNodeInfoList.size());
+        // 分页处理
+        Integer page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
+        Integer pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
+        Integer start = (page - 1) * pageSize;
+        Integer end = page * pageSize > dataViewNodeInfoList.size() ? dataViewNodeInfoList.size() : page * pageSize;
+
+        for (int i = start; i < end; i++) {
+            DataViewNodeInfo dataViewNodeInfo = dataViewNodeInfoList.get(i);
+            dataDevelopNodeResponse.getDataDevelopNodeInfoList().add(dataViewNodeInfo);
+        }
+
+        return dataDevelopNodeResponse;
+
+    }
+
+
+    public List<DSSProject> getDSSProject(Workspace workspace, String username) {
+
+        ProjectListQueryResponse response = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                        .getProjectServerSender().ask(new ProjectListQueryRequest(workspace.getWorkspaceId(), username)),
+                ProjectListQueryResponse.class, ProjectListQueryRequest.class);
+
+
+        if (CollectionUtils.isEmpty(response.getProjectList())) {
+            response.setProjectList(new ArrayList<>());
+        }
+
+        return response.getProjectList().stream().filter(project -> {
+            // 过滤具有编辑工作流权限的项目
+            return project.getEditUsers().contains(username)
+                    || project.getReleaseUsers().contains(username)
+                    || project.getCreateBy().equals(username);
+        }).collect(Collectors.toList());
+
+    }
+
+
+    public Map<Long, DSSProject> projectListToMap(List<DSSProject> dssProjectList) {
+
+        Map<Long, DSSProject> dssProjectMap = new HashMap<>();
+
+        for (DSSProject project : dssProjectList) {
+
+            dssProjectMap.put(project.getId(), project);
+        }
+
+        return dssProjectMap;
+    }
+
+
+    public Map<String, String> getTemplateMap(List<Long> orchestratorIdList) {
+
+        // 查询模板信息
+        List<DSSFlowNodeTemplate> dssFlowNodeTemplateList = nodeContentMapper.queryFlowNodeTemplate(orchestratorIdList);
+
+        Map<String, String> templateMap = new HashMap<>();
+
+        if (!CollectionUtils.isEmpty(dssFlowNodeTemplateList)) {
+            List<String> templateIdList = dssFlowNodeTemplateList.stream().map(DSSFlowNodeTemplate::getTemplateId).collect(Collectors.toList());
+            List<String> templateNameList = dssFlowNodeTemplateList.stream().map(DSSFlowNodeTemplate::getTemplateName).collect(Collectors.toList());
+            templateMap = CollUtil.zip(templateIdList, templateNameList);
+        }
+
+        return templateMap;
+    }
+
+
+    public Map<Long, DSSFlowNodeInfo> flowNodeToMap(List<DSSFlowNodeInfo> flowNodeInfoList) {
+        Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = new HashMap<>();
+
+        for (DSSFlowNodeInfo dssFlowNodeInfo : flowNodeInfoList) {
+            dssFlowNodeInfoMap.put(dssFlowNodeInfo.getContentId(), dssFlowNodeInfo);
+        }
+
+        return dssFlowNodeInfoMap;
+    }
+
+
+    public Map<Long, List<NodeContentUIDO>> getNodeContentUIGroup(List<Long> contentIdList) {
+        Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = new HashMap<>();
+        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.queryNodeContentUIList(contentIdList);
+
+        if (CollectionUtils.isEmpty(nodeContentUIDOList)) {
+            return nodeContentUIGroup;
+        }
+
+        nodeContentUIGroup = nodeContentUIDOList.stream()
+                .collect(Collectors.groupingBy(NodeContentUIDO::getContentId));
+        return nodeContentUIGroup;
+    }
+
+
+    public List<DataDevelopNodeInfo> dataDevelopNodeResultFilter(DataDevelopNodeRequest request, List<DataDevelopNodeInfo> dataDevelopNodeInfoList) {
+        return dataDevelopNodeInfoList.stream().filter(dataDevelopNodeInfo -> {
+            boolean flag = true;
+
+            if (request.getRefTemplate() != null && flag) {
+                // 是否引用模板
+                flag = dataDevelopNodeInfo.getRefTemplate().equals(request.getRefTemplate());
+            }
+
+            if (request.getReuseEngine() != null && flag) {
+                // 是否引用引擎
+                flag = dataDevelopNodeInfo.getReuseEngine().equals(request.getReuseEngine());
+            }
+
+            if (!CollectionUtils.isEmpty(request.getNodeTypeNameList()) && flag) {
+                // 节点小类
+                flag = request.getNodeTypeNameList().contains(dataDevelopNodeInfo.getNodeTypeName());
+            }
+
+            if (!CollectionUtils.isEmpty(request.getNodeNameList()) && flag) {
+                // 节点名称
+                flag = request.getNodeNameList().contains(dataDevelopNodeInfo.getNodeName());
+            }
+
+            if (!CollectionUtils.isEmpty(request.getTemplateNameList()) && flag) {
+                // 模板名称
+                flag = request.getTemplateNameList().contains(dataDevelopNodeInfo.getTemplateName());
+            }
+
+
+            // 工作流名称
+            if (!StringUtils.isBlank(request.getOrchestratorName()) && flag) {
+                flag = request.getOrchestratorName().equals(dataDevelopNodeInfo.getOrchestratorName());
+            }
+
+            // 项目名称
+            if (!CollectionUtils.isEmpty(request.getProjectNameList()) && flag) {
+                flag = request.getProjectNameList().contains(dataDevelopNodeInfo.getProjectName());
+            }
+
+            return flag;
+        }).collect(Collectors.toList());
+
+    }
+
+
+    public List<DataViewNodeInfo> dataViewNodeResultFilter(DataViewNodeRequest request, List<DataViewNodeInfo> dataViewNodeInfoList) {
+
+        return dataViewNodeInfoList.stream().filter(dataViewNodeInfo -> {
+            boolean flag = true;
+            // 工作流名称
+            if (!StringUtils.isBlank(request.getOrchestratorName()) && flag) {
+                flag = request.getOrchestratorName().equals(dataViewNodeInfo.getOrchestratorName());
+            }
+
+            // 项目名称
+            if (!CollectionUtils.isEmpty(request.getProjectNameList()) && flag) {
+                flag = request.getProjectNameList().contains(dataViewNodeInfo.getProjectName());
+            }
+
+            // 节点类型
+            if (!CollectionUtils.isEmpty(request.getNodeTypeNameList()) && flag) {
+                flag = request.getNodeTypeNameList().contains(dataViewNodeInfo.getNodeTypeName());
+            }
+
+            // 节点名称
+            if (!CollectionUtils.isEmpty(request.getNodeNameList()) && flag) {
+                flag = request.getNodeNameList().contains(dataViewNodeInfo.getNodeName());
+            }
+
+            if (!StringUtils.isEmpty(request.getViewId()) && flag) {
+                flag = request.getViewId().equals(dataViewNodeInfo.getViewId());
+            }
+
+            return flag;
+
+        }).collect(Collectors.toList());
+
+
+    }
+
+}
+
 
 }

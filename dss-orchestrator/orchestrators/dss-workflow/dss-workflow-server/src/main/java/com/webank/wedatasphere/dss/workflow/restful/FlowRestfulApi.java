@@ -387,4 +387,19 @@ public class FlowRestfulApi {
         return Message.ok();
     }
 
+    @RequestMapping(value = "/batchEditFlow", method = RequestMethod.POST)
+    public Message batchEditFlow(HttpServletRequest req, @RequestBody BatchEditFlowRequest batchEditFlowRequest) {
+        String userName = SecurityFilter.getLoginUsername(httpServletRequest);
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        //若工作流已经被其他用户抢锁，则当前用户不能再保存成功
+        String ticketId = Arrays.stream(httpServletRequest.getCookies()).filter(cookie -> DSSWorkFlowConstant.BDP_USER_TICKET_ID.equals(cookie.getName()))
+                .findFirst().map(Cookie::getValue).get();
+        try {
+            dssFlowService.batchEditFlow(batchEditFlowRequest, ticketId, workspace, userName);
+        } catch (Exception e) {
+            return Message.error("批量编辑失败，原因为：" + e.getMessage());
+        }
+        return Message.ok("批量编辑成功");
+    }
+
 }

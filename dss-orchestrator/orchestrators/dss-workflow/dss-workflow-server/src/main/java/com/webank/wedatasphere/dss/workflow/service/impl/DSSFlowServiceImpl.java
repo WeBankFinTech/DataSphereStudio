@@ -544,28 +544,29 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId);
-
+            Map<String, String> workflowNodeNumberType = nodeInfoMapper.getWorkflowNodeNumberType();
             for (NodeContentDO nodeContentDO : nodeContents) {
                 String nodeKey = nodeContentDO.getNodeKey();
                 Long contentByKeyId = nodeContentDO.getId();
                 DSSNodeDefault nodeDefault = map.get(nodeKey);
-                if (nodeDefault.getJobType().contains("newVisualis")) {
+                String jobType = nodeDefault.getJobType();
+                if (jobType.contains("newVisualis")) {
                     Map<String, Object> jobContent = nodeDefault.getJobContent();
                     if (jobContent != null) {
                         for (Map.Entry<String, Object> entry : jobContent.entrySet()) {
                             String value = entry.getValue() != null ? entry.getValue().toString() : "";
-                            nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, entry.getKey(), value));
+                            nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, entry.getKey(), value, jobType, null));
                         }
                     }
                 }
 
                 String title = nodeDefault.getTitle();
                 if (StringUtils.isNotEmpty(title)) {
-                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title));
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title, jobType, null));
                 }
                 String desc = nodeDefault.getDesc();
                 if (StringUtils.isNotEmpty(desc)) {
-                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc));
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc, jobType, null));
                 }
                 List<Resource> nodeDefaultResources = nodeDefault.getResources();
                 if (CollectionUtils.isNotEmpty(nodeDefaultResources)) {
@@ -574,7 +575,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         nodeResources.append(resource.getFileName());
                         nodeResources.append(";");
                     }
-                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "resources", new String(nodeResources)));
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "resources", new String(nodeResources), jobType, null));
                 }
 
 
@@ -591,7 +592,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                 if (paramEntry.getValue() != null) {
                                     String paramVal = paramEntry.getValue().toString();
                                     logger.info("{}:{}", paramName, paramVal);
-                                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, paramName, paramVal));
+                                    String nodeContentType = null;
+                                    if (workflowNodeNumberType != null && workflowNodeNumberType.containsKey(jobType) && workflowNodeNumberType.get(jobType).equals(paramName)) {
+                                        nodeContentType = "NumInterval";
+                                    } else if (paramName.endsWith("memory")){
+                                        nodeContentType = "Memory";
+                                    }
+                                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, paramName, paramVal, jobType, nodeContentType));
                                 }
 
                             }
@@ -1173,19 +1180,19 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId) throws DSSErrorException {
+    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId)   {
         NodeContentDO nodeContentDO = nodeContentMapper.getNodeContentById(contentId, nodeId);
         Map<String, Object> content = new HashMap<>();
         if (nodeContentDO == null) {
             logger.error("not find node info , id is {}, nodeId is {}", contentId, nodeId);
-            throw new DSSErrorException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
+            throw new DSSRuntimeException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
         }
 
         List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByContentId(contentId);
 
         if (CollectionUtils.isEmpty(nodeContentUIDOList)) {
             logger.error("not find node params info , content id is {}", contentId);
-            throw new DSSErrorException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
+            throw new DSSRuntimeException(90004, "未找到" + nodeId + "节点信息，请查看节点是否被删除");
         }
 
         List<NodeUIInfo> nodeUIInfoList = nodeInfoMapper.getNodeUIInfoByNodeType(nodeContentDO.getJobType());

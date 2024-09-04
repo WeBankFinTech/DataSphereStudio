@@ -1623,7 +1623,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
     }
 
-    private DSSProject getProjectByProjectId(Long projectId) {
+    private DSSProject getProjectByProjectId(Long projectId) throws DSSErrorException{
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
         DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()

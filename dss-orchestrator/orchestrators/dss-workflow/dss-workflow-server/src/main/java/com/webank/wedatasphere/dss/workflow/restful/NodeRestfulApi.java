@@ -309,6 +309,14 @@ public class NodeRestfulApi {
         String username = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
 
+        if(dataDevelopNodeRequest.getPageNow() == null){
+            dataDevelopNodeRequest.setPageNow(1);
+        }
+
+        if(dataDevelopNodeRequest.getPageSize() == null){
+            dataDevelopNodeRequest.setPageSize(10);
+        }
+
         DataDevelopNodeResponse dataDevelopNodeResponse = dssFlowService.queryDataDevelopNodeList(username, workspace, dataDevelopNodeRequest);
 
         return Message.ok().data("data", dataDevelopNodeResponse.getDataDevelopNodeInfoList()).data("total", dataDevelopNodeResponse.getTotal());
@@ -322,7 +330,7 @@ public class NodeRestfulApi {
     @RequestMapping(value = "/getDataDevelopNodeContent", method = RequestMethod.GET)
     public Message getDataDevelopNodeContent(HttpServletRequest req,
                                              @RequestParam("nodeId") String nodeId,
-                                             @RequestParam("contentId") Long contentId) {
+                                             @RequestParam("contentId") Long contentId) throws DSSErrorException {
 
         if (StringUtils.isBlank(nodeId) || contentId == null) {
             return Message.error("输入的参数为空，请检查参数信息");
@@ -341,6 +349,14 @@ public class NodeRestfulApi {
 
         String username = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
+
+        if(dataViewNodeRequest.getPageNow() == null){
+            dataViewNodeRequest.setPageNow(1);
+        }
+
+        if(dataViewNodeRequest.getPageSize() == null){
+            dataViewNodeRequest.setPageSize(10);
+        }
 
         DataViewNodeResponse dataViewNodeResponse = dssFlowService.queryDataViewNode(username, workspace, dataViewNodeRequest);
 
@@ -399,6 +415,14 @@ public class NodeRestfulApi {
         String username = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
 
+        if(request.getPageNow() == null){
+            request.setPageNow(1);
+        }
+
+        if(request.getPageSize() == null){
+            request.setPageSize(10);
+        }
+
         DataCheckerNodeResponse dataCheckerNodeResponse = dssFlowService.queryDataCheckerNode(username, workspace, request);
 
         return Message.ok().data("data", dataCheckerNodeResponse.getDataCheckerNodeInfoList()).data("total", dataCheckerNodeResponse.getTotal());
@@ -411,6 +435,14 @@ public class NodeRestfulApi {
 
         String username = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
+
+        if(request.getPageNow() == null){
+            request.setPageNow(1);
+        }
+
+        if(request.getPageSize() == null){
+            request.setPageSize(10);
+        }
 
         EventSenderNodeResponse eventSenderNodeResponse = dssFlowService.queryEventSenderNode(username, workspace, request);
 
@@ -425,6 +457,14 @@ public class NodeRestfulApi {
 
         String username = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
+
+        if(request.getPageNow() == null){
+            request.setPageNow(1);
+        }
+
+        if(request.getPageSize() == null){
+            request.setPageSize(10);
+        }
 
         EventReceiveNodeResponse eventReceiveNodeResponse = dssFlowService.queryEventReceiveNode(username, workspace, request);
 

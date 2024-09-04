@@ -57,6 +57,7 @@ import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUpdateWorkflow;
 import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
+import com.webank.wedatasphere.dss.workflow.constant.SignalNodeConstant;
 import com.webank.wedatasphere.dss.workflow.constant.WorkflowNodeGroupEnum;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
@@ -67,10 +68,8 @@ import com.webank.wedatasphere.dss.workflow.dto.NodeContentDO;
 import com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO;
 import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
 import com.webank.wedatasphere.dss.workflow.entity.*;
-import com.webank.wedatasphere.dss.workflow.entity.request.DataDevelopNodeRequest;
-import com.webank.wedatasphere.dss.workflow.entity.request.DataViewNodeRequest;
-import com.webank.wedatasphere.dss.workflow.entity.response.DataDevelopNodeResponse;
-import com.webank.wedatasphere.dss.workflow.entity.response.DataViewNodeResponse;
+import com.webank.wedatasphere.dss.workflow.entity.request.*;
+import com.webank.wedatasphere.dss.workflow.entity.response.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -147,9 +146,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
-    private static  final String nodeUITitleKey = "title";
+    private static final String nodeUITitleKey = "title";
 
-    private static  final String nodeUIViewIdKey = "viewId";
+    private static final String nodeUIViewIdKey = "viewId";
 
     protected Sender getOrchestratorSender() {
         return DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
@@ -229,7 +228,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Transactional(rollbackFor = DSSErrorException.class)
     @Override
     public DSSFlow addSubFlow(DSSFlow dssFlow, Long parentFlowID, String contextIDStr, String orcVersion, String schedulerAppConn) throws DSSErrorException {
-        if (checkExistSameSubflow(parentFlowID, dssFlow.getName())){
+        if (checkExistSameSubflow(parentFlowID, dssFlow.getName())) {
             throw new DSSErrorException(90003, "子工作流名不能重复");
         }
         DSSFlow parentFlow = flowMapper.selectFlowByID(parentFlowID);
@@ -311,14 +310,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         // 判断工作流中是否存在命名相同的节点
         if (checkIsExistSameFlow(jsonFlow)) {
-            throw  new DSSErrorException(80001,"It exists same flow.(存在相同的节点)");
+            throw new DSSErrorException(80001, "It exists same flow.(存在相同的节点)");
         }
 
         // 判断工作流中是否有子工作流未被保存
         List<String> unSaveNodes = checkIsSave(flowID, jsonFlow);
 
         if (CollectionUtils.isNotEmpty(unSaveNodes)) {
-            throw  new DSSErrorException(80001,"工作流中存在子工作流未被保存，请先保存子工作流：" + unSaveNodes);
+            throw new DSSErrorException(80001, "工作流中存在子工作流未被保存，请先保存子工作流：" + unSaveNodes);
         }
 
         //判断该工作流对应编排是否已发布，若已发布则不允许修改
@@ -331,7 +330,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             logger.error("保存工作流时获取编排失败，原因为：", e);
         }
 
-        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo!= null? orchestratorVo.getDssOrchestratorVersion() : null;
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo != null ? orchestratorVo.getDssOrchestratorVersion() : null;
 
         DSSFlow dssFlow = flowMapper.selectFlowByID(flowID);
         String creator = dssFlow.getCreator();
@@ -341,7 +340,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String flowJsonOld = getFlowJson(userName, projectName, dssFlow);
 
         // 解析并保存元数据
-        Long orchestratorId = dssOrchestratorVersion!= null? dssOrchestratorVersion.getOrchestratorId(): null;
+        Long orchestratorId = dssOrchestratorVersion != null ? dssOrchestratorVersion.getOrchestratorId() : null;
         try {
             if (orchestratorId != null) {
                 saveFlowMetaData(flowID, jsonFlow, orchestratorId);
@@ -363,7 +362,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
         jsonFlow = contextService.checkAndCreateContextID(jsonFlow, dssFlow.getBmlVersion(),
                 workspaceName, projectName, dssFlow.getName(), userName, false);
-        saveFlowHook.beforeSave(jsonFlow,dssFlow,parentFlowID);
+        saveFlowHook.beforeSave(jsonFlow, dssFlow, parentFlowID);
         Map<String, Object> bmlReturnMap = bmlService.update(userName, resourceId, jsonFlow);
 
         dssFlow.setId(flowID);
@@ -379,19 +378,19 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             contextService.checkAndSaveContext(jsonFlow, String.valueOf(parentFlowID));
         } catch (DSSErrorException e) {
             logger.error("Failed to saveContext: ", e);
-            throw new DSSRuntimeException(e.getErrCode(),"保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+            throw new DSSRuntimeException(e.getErrCode(), "保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
-        saveFlowHook.afterSave(jsonFlow,dssFlow,parentFlowID);
+        saveFlowHook.afterSave(jsonFlow, dssFlow, parentFlowID);
         String version = bmlReturnMap.get("version").toString();
         // 对子工作流,需更新父工作流状态，以便提交
-        Long updateFlowId = parentFlowID == null? dssFlow.getId():parentFlowID;
+        Long updateFlowId = parentFlowID == null ? dssFlow.getId() : parentFlowID;
         updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId, orchestratorId);
 
         return version;
     }
 
     @Override
-    public void updateTOSaveStatus(Long projectId, Long flowID, Long orchestratorId) throws Exception{
+    public void updateTOSaveStatus(Long projectId, Long flowID, Long orchestratorId) throws Exception {
         try {
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             //仅对接入Git的项目 更新状态为 保存
@@ -409,7 +408,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
         } catch (DSSErrorException e) {
             logger.error("getProjectInfo failed by:", e);
-            throw new DSSRuntimeException(e.getErrCode(),"更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e),e);
+            throw new DSSRuntimeException(e.getErrCode(), "更新工作流状态失败，您可以尝试重新保存工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
     }
 
@@ -751,7 +750,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels, nodeSuffix);
-        DSSFlow copyFlow= flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
+        DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         copyFlow.setFlowIdParamConfTemplateIdTuples(rootFlowWithSubFlows.getFlowIdParamConfTemplateIdTuples());
         return copyFlow;
     }
@@ -867,7 +866,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         DSSFlow updateDssFlow = uploadFlowJsonToBml(userName, projectName, rootFlow, updateFlowJson);
         List<String> tempIds = workFlowParser.getParamConfTemplate(updateFlowJson);
         List<String[]> templateIdsInRoot = tempIds.stream()
-                .map(e->new String[]{updateDssFlow.getId().toString(),e})
+                .map(e -> new String[]{updateDssFlow.getId().toString(), e})
                 .collect(Collectors.toList());
         templateIds.addAll(templateIdsInRoot);
         rootFlow.setFlowIdParamConfTemplateIdTuples(templateIds);
@@ -1009,7 +1008,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
                 }
 //            } else if (nodeJsonMap.get("jobContent") != null && !((Map) nodeJsonMap.get("jobContent")).containsKey("script")) {
-            }else if(nodeInfo==null){
+            } else if (nodeInfo == null) {
                 String msg = String.format("%s note type not exist,please check appconn install successfully", nodeType);
                 logger.error(msg);
                 throw new DSSRuntimeException(msg);
@@ -1081,7 +1080,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
 
-        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataDevelopment.getNameEn());
+        List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(WorkflowNodeGroupEnum.DataDevelopment.getNameEn());
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         // 查询节点信息
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
@@ -1125,6 +1124,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 dataDevelopNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
                 dataDevelopNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
                 dataDevelopNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
+                dataDevelopNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
                 if (nodeMap.containsKey("resource")) {
                     dataDevelopNodeInfo.setResource(nodeMap.get("resource"));
                 }
@@ -1154,6 +1154,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 dataDevelopNodeInfo.setContentId(contentId);
                 dataDevelopNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
                 dataDevelopNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
+                dataDevelopNodeInfo.setNodeContent(nodeMap);
                 dataDevelopNodeInfoList.add(dataDevelopNodeInfo);
             } catch (Exception exception) {
                 logger.error("queryDataDevelopNodeList error content id is {}", contentId);
@@ -1241,7 +1242,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
         // 查询节点信息
-        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
@@ -1291,6 +1292,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             dataViewNodeInfo.setProjectId(dssProject.getId());
             dataViewNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
             dataViewNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
+            dataViewNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());;
             dataViewNodeInfoList.add(dataViewNodeInfo);
 
         }
@@ -1473,14 +1475,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public List<NodeInfo> getNodeInfoByGroupName(String groupNameEn){
+    public List<NodeInfo> getNodeInfoByGroupName(String groupNameEn) {
 
-        return  nodeInfoMapper.getNodeTypeByGroupName(groupNameEn);
+        return nodeInfoMapper.getNodeTypeByGroupName(groupNameEn, null);
     }
 
 
     @Override
-    public DSSFlowName queryFlowNameList(String username,Workspace workspace,String groupNameEn){
+    public DSSFlowName queryFlowNameList(String username, Workspace workspace, String groupNameEn, String nodeTypeName) {
 
         DSSFlowName dssFlowName = new DSSFlowName();
 
@@ -1494,7 +1496,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<Long> projectIdList = dssProjectList.stream().map(DSSProject::getId).collect(Collectors.toList());
 
-        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(groupNameEn);
+        List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(groupNameEn);
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         // 查询节点信息
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
@@ -1504,11 +1506,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return dssFlowName;
         }
 
-        if(WorkflowNodeGroupEnum.DataDevelopment.getNameEn().equals(groupNameEn)){
+        if (WorkflowNodeGroupEnum.DataDevelopment.getNameEn().equals(groupNameEn)) {
 
             List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).distinct().collect(Collectors.toList());
             List<DSSFlowNodeTemplate> dssFlowNodeTemplateList = nodeContentMapper.queryFlowNodeTemplate(orchestratorIdList);
-            List<String> templateNameList =  dssFlowNodeTemplateList.stream().map(DSSFlowNodeTemplate::getTemplateName).collect(Collectors.toList());
+            List<String> templateNameList = dssFlowNodeTemplateList.stream().map(DSSFlowNodeTemplate::getTemplateName).collect(Collectors.toList());
             dssFlowName.setTemplateNameList(templateNameList);
         }
 
@@ -1517,7 +1519,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         dssFlowName.setOrchestratorNameList(orchestratorNameList);
 
         List<Long> contentIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getContentId).collect(Collectors.toList());
-        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList,nodeUITitleKey);
+        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList, nodeUITitleKey);
         List<String> nodeNameList = nodeContentUIDOList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
         dssFlowName.setNodeNameList(nodeNameList);
 
@@ -1527,7 +1529,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public List<String> queryViewId(Workspace workspace,String username){
+    public List<String> queryViewId(Workspace workspace, String username) {
         
         List<String> viewIdList = new ArrayList<>();
         // 获取项目
@@ -1540,7 +1542,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<Long> projectIdList = dssProjectList.stream().map(DSSProject::getId).collect(Collectors.toList());
 
-        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         // 查询节点信息
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
@@ -1551,9 +1553,517 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         List<Long> contentIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getContentId).collect(Collectors.toList());
-        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList,nodeUIViewIdKey);
-        viewIdList =  nodeContentUIDOList.stream().distinct().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
+        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList, nodeUIViewIdKey);
+        viewIdList = nodeContentUIDOList.stream().distinct().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
         return viewIdList;
+    }
+
+
+    public DataCheckerNodeResponse queryDataCheckerNode(String username, Workspace workspace, DataCheckerNodeRequest request) {
+
+        DataCheckerNodeResponse dataCheckerNodeResponse = new DataCheckerNodeResponse();
+
+        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.SignalNode.getNameEn()
+                , SignalNodeConstant.dataCheckerNode);
+
+        if (nodeInfoList.isEmpty()) {
+            logger.error("queryDataCheckerNode not find dataChecker node info");
+            return dataCheckerNodeResponse;
+        }
+
+        List<DSSProject> dssProjectList = getDSSProject(workspace, username);
+
+        if (CollectionUtils.isEmpty(dssProjectList)) {
+            logger.error("queryDataCheckerNode workspace is {}, username is {}", workspace, username);
+            return dataCheckerNodeResponse;
+        }
+
+        Map<Long, DSSProject> dssProjectMap = projectListToMap(dssProjectList);
+
+        List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
+        List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
+        List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
+
+        if (CollectionUtils.isEmpty(flowNodeInfoList)) {
+            logger.error("queryDataCheckerNode query not find node info , example projectId is {}", projectIdList.get(0));
+            return dataCheckerNodeResponse;
+        }
+
+        Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
+        List<Long> contentIdList = new ArrayList<>(dssFlowNodeInfoMap.keySet());
+
+        // 查询节点保存的配置信息
+        Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
+        if (nodeContentUIGroup.isEmpty()) {
+            logger.error("queryDataCheckerNode query not find nodeUI info , example contextId is {}", contentIdList.get(0));
+            return dataCheckerNodeResponse;
+        }
+
+        List<DataCheckerNodeInfo> dataCheckerNodeInfoList = new ArrayList<>();
+
+        for (Long contentId : nodeContentUIGroup.keySet()) {
+
+            DataCheckerNodeInfo dataCheckerNodeInfo = new DataCheckerNodeInfo();
+
+            DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
+            List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
+            DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
+
+            List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
+            List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+            Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
+
+            dataCheckerNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
+            dataCheckerNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
+            dataCheckerNodeInfo.setNodeName(nodeMap.get("title"));
+            dataCheckerNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
+            dataCheckerNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
+            dataCheckerNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
+            if (nodeMap.containsKey("desc")) {
+                dataCheckerNodeInfo.setNodeDesc(nodeMap.get("desc"));
+            }
+
+            if (nodeMap.containsKey("check.object")) {
+                dataCheckerNodeInfo.setCheckObject(nodeMap.get("check.object"));
+            }
+
+            if (nodeMap.containsKey("job.desc")) {
+                dataCheckerNodeInfo.setJobDesc(nodeMap.get("job.desc"));
+            }
+
+            if (nodeMap.containsKey("max.check.hours")) {
+                dataCheckerNodeInfo.setMaxCheckHours(nodeMap.get("max.check.hours"));
+            }
+
+            if (nodeMap.containsKey("qualitis.check")) {
+                dataCheckerNodeInfo.setQualitisCheck(Boolean.valueOf(nodeMap.get("qualitis.check")));
+            }
+
+            if (nodeMap.containsKey("source.type")) {
+                dataCheckerNodeInfo.setSourceType(nodeMap.get("source.type"));
+            }
+
+            dataCheckerNodeInfo.setProjectName(dssProject.getName());
+            dataCheckerNodeInfo.setProjectId(dssProject.getId());
+            dataCheckerNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
+            dataCheckerNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
+            dataCheckerNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
+
+            dataCheckerNodeInfoList.add(dataCheckerNodeInfo);
+
+        }
+
+        dataCheckerNodeInfoList = dataCheckerNodeResultFilter(dataCheckerNodeInfoList,request);
+
+
+        dataCheckerNodeResponse.setTotal((long) dataCheckerNodeInfoList.size());
+        // 分页处理
+        int page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
+        int pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
+        int start = (page - 1) * pageSize;
+        int end = Math.min(page * pageSize, dataCheckerNodeInfoList.size());
+
+        for (int i = start; i < end; i++) {
+            DataCheckerNodeInfo dataCheckerNodeInfo = dataCheckerNodeInfoList.get(i);
+            dataCheckerNodeResponse.getDataCheckerNodeInfoList().add(dataCheckerNodeInfo);
+        }
+
+        return dataCheckerNodeResponse;
+    }
+
+
+    public List<DataCheckerNodeInfo> dataCheckerNodeResultFilter(List<DataCheckerNodeInfo> dataCheckerNodeInfoList,DataCheckerNodeRequest request){
+
+        return  dataCheckerNodeInfoList.stream().filter(dataCheckerNodeInfo -> {
+
+            boolean flag = true;
+
+            if(!CollectionUtils.isEmpty(request.getProjectNameList())){
+                flag = request.getProjectNameList().contains(dataCheckerNodeInfo.getProjectName());
+            }
+
+            if(!StringUtils.isEmpty(request.getOrchestratorName()) && flag){
+                flag = request.getOrchestratorName().equals(dataCheckerNodeInfo.getOrchestratorName());
+            }
+
+            if(!CollectionUtils.isEmpty(request.getNodeNameList()) && flag){
+                flag = request.getNodeNameList().contains(dataCheckerNodeInfo.getNodeName());
+            }
+
+            if(!StringUtils.isEmpty(request.getSourceType()) && flag){
+                flag = request.getSourceType().equals(dataCheckerNodeInfo.getSourceType());
+            }
+
+            if(!StringUtils.isEmpty(request.getCheckObject()) && flag){
+                flag = request.getCheckObject().equals(dataCheckerNodeInfo.getCheckObject());
+            }
+
+            if(!StringUtils.isEmpty(request.getJobDesc()) && flag ){
+                if(StringUtils.isEmpty(dataCheckerNodeInfo.getJobDesc())){
+                    flag =  false;
+                }else{
+                  List<String> arrays =  Arrays.asList(dataCheckerNodeInfo.getJobDesc().split("\n"));
+                  flag = arrays.contains(request.getJobDesc());
+                }
+            }
+
+            if(request.getQualitisCheck() != null && flag){
+                flag = request.getQualitisCheck().equals(dataCheckerNodeInfo.getQualitisCheck());
+            }
+
+            return  flag;
+
+        }).collect(Collectors.toList());
+
+    }
+
+
+    public EventSenderNodeResponse queryEventSenderNode(String username, Workspace workspace, EventSenderNodeRequest request){
+
+        EventSenderNodeResponse eventSenderNodeResponse = new EventSenderNodeResponse();
+
+        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.SignalNode.getNameEn()
+                , SignalNodeConstant.eventSenderNode);
+
+        if (nodeInfoList.isEmpty()) {
+            logger.error("queryEventSenderNode not find dataChecker node info");
+            return eventSenderNodeResponse;
+        }
+
+        List<DSSProject> dssProjectList = getDSSProject(workspace, username);
+
+        if (CollectionUtils.isEmpty(dssProjectList)) {
+            logger.error("queryEventSenderNode workspace is {}, username is {}", workspace, username);
+            return eventSenderNodeResponse;
+        }
+
+        Map<Long, DSSProject> dssProjectMap = projectListToMap(dssProjectList);
+
+        List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
+        List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
+        List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
+
+        if (CollectionUtils.isEmpty(flowNodeInfoList)) {
+            logger.error("queryEventSenderNode query not find node info , example projectId is {}", projectIdList.get(0));
+            return eventSenderNodeResponse;
+        }
+
+        Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
+        List<Long> contentIdList = new ArrayList<>(dssFlowNodeInfoMap.keySet());
+
+        // 查询节点保存的配置信息
+        Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
+        if (nodeContentUIGroup.isEmpty()) {
+            logger.error("queryEventSenderNode query not find nodeUI info , example contextId is {}", contentIdList.get(0));
+            return eventSenderNodeResponse;
+        }
+
+        List<EventSenderNodeInfo> eventSenderNodeInfoList = new ArrayList<>();
+
+        for (Long contentId : nodeContentUIGroup.keySet()) {
+
+            EventSenderNodeInfo eventSenderNodeInfo = new EventSenderNodeInfo();
+
+            DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
+            List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
+            DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
+
+            List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
+            List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+            Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
+
+            eventSenderNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
+            eventSenderNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
+            eventSenderNodeInfo.setNodeName(nodeMap.get("title"));
+            eventSenderNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
+            eventSenderNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
+            eventSenderNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
+            if (nodeMap.containsKey("desc")) {
+                eventSenderNodeInfo.setNodeDesc(nodeMap.get("desc"));
+            }
+
+            if (nodeMap.containsKey("msg.type")) {
+                eventSenderNodeInfo.setMsgType(nodeMap.get("msg.type"));
+            }
+
+            if (nodeMap.containsKey("msg.sender")) {
+                eventSenderNodeInfo.setMsgSender(nodeMap.get("msg.sender"));
+            }
+
+            if (nodeMap.containsKey("msg.body")) {
+                eventSenderNodeInfo.setMsgBody(nodeMap.get("msg.body"));
+            }
+
+            if (nodeMap.containsKey("msg.topic")) {
+                eventSenderNodeInfo.setMsgTopic(nodeMap.get("msg.topic"));
+            }
+
+            if (nodeMap.containsKey("msg.name")) {
+                eventSenderNodeInfo.setMsgName(nodeMap.get("msg.name"));
+            }
+
+            eventSenderNodeInfo.setProjectName(dssProject.getName());
+            eventSenderNodeInfo.setProjectId(dssProject.getId());
+            eventSenderNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
+            eventSenderNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
+            eventSenderNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
+
+            eventSenderNodeInfoList.add(eventSenderNodeInfo);
+
+        }
+
+        eventSenderNodeInfoList = eventSenderNodeResultFilter(eventSenderNodeInfoList,request);
+
+        eventSenderNodeResponse.setTotal((long) eventSenderNodeInfoList.size());
+        // 分页处理
+        int page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
+        int pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
+        int start = (page - 1) * pageSize;
+        int end = Math.min(page * pageSize, eventSenderNodeInfoList.size());
+
+        for (int i = start; i < end; i++) {
+            EventSenderNodeInfo eventSenderNodeInfo = eventSenderNodeInfoList.get(i);
+            eventSenderNodeResponse.getEventSenderNodeInfoList().add(eventSenderNodeInfo);
+        }
+
+        return eventSenderNodeResponse;
+    }
+
+
+
+    public List<EventSenderNodeInfo> eventSenderNodeResultFilter(List<EventSenderNodeInfo> eventSenderNodeInfoList,EventSenderNodeRequest request){
+
+
+
+        return  eventSenderNodeInfoList.stream().filter(eventSenderNodeInfo -> {
+
+            boolean flag = true;
+
+            if(!CollectionUtils.isEmpty(request.getProjectNameList())){
+                flag = request.getProjectNameList().contains(eventSenderNodeInfo.getProjectName());
+            }
+
+            if(!StringUtils.isEmpty(request.getOrchestratorName()) && flag){
+                flag = request.getOrchestratorName().equals(eventSenderNodeInfo.getOrchestratorName());
+            }
+
+            if(!CollectionUtils.isEmpty(request.getNodeNameList()) && flag){
+                flag = request.getNodeNameList().contains(eventSenderNodeInfo.getNodeName());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgSender()) && flag){
+                flag = request.getMsgSender().equals(eventSenderNodeInfo.getMsgSender());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgBody()) && flag){
+                flag = request.getMsgBody().equals(eventSenderNodeInfo.getMsgBody());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgTopic()) && flag ){
+                flag = request.getMsgTopic().equals(eventSenderNodeInfo.getMsgTopic());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgName()) && flag ){
+                flag = request.getMsgName().equals(eventSenderNodeInfo.getMsgName());
+            }
+
+            return  flag;
+
+        }).collect(Collectors.toList());
+
+    }
+
+
+
+    public EventReceiveNodeResponse queryEventReceiveNode(String username, Workspace workspace, EventReceiverNodeRequest request){
+
+        EventReceiveNodeResponse eventReceiveNodeResponse = new EventReceiveNodeResponse();
+
+        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.SignalNode.getNameEn()
+                , SignalNodeConstant.eventReceiverNode);
+
+        if (nodeInfoList.isEmpty()) {
+            logger.error("queryEventReceiveNode not find dataChecker node info");
+            return eventReceiveNodeResponse;
+        }
+
+        List<DSSProject> dssProjectList = getDSSProject(workspace, username);
+
+        if (CollectionUtils.isEmpty(dssProjectList)) {
+            logger.error("queryEventReceiveNode workspace is {}, username is {}", workspace, username);
+            return eventReceiveNodeResponse;
+        }
+
+        Map<Long, DSSProject> dssProjectMap = projectListToMap(dssProjectList);
+
+        List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
+        List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
+        List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
+
+        if (CollectionUtils.isEmpty(flowNodeInfoList)) {
+            logger.error("queryEventReceiveNode query not find node info , example projectId is {}", projectIdList.get(0));
+            return eventReceiveNodeResponse;
+        }
+
+        Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
+        List<Long> contentIdList = new ArrayList<>(dssFlowNodeInfoMap.keySet());
+
+        // 查询节点保存的配置信息
+        Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
+        if (nodeContentUIGroup.isEmpty()) {
+            logger.error("queryEventSenderNode query not find nodeUI info , example contextId is {}", contentIdList.get(0));
+            return eventReceiveNodeResponse;
+        }
+
+        List<EventReceiverNodeInfo> eventReceiverNodeInfoList = new ArrayList<>();
+
+        for (Long contentId : nodeContentUIGroup.keySet()) {
+
+            EventReceiverNodeInfo eventReceiverNodeInfo = new EventReceiverNodeInfo();
+
+            DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
+            List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
+            DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
+
+            List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
+            List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+            Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
+
+            eventReceiverNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
+            eventReceiverNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
+            eventReceiverNodeInfo.setNodeName(nodeMap.get("title"));
+            eventReceiverNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
+            eventReceiverNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
+            eventReceiverNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
+            if (nodeMap.containsKey("desc")) {
+                eventReceiverNodeInfo.setNodeDesc(nodeMap.get("desc"));
+            }
+
+            if (nodeMap.containsKey("msg.type")) {
+                eventReceiverNodeInfo.setMsgType(nodeMap.get("msg.type"));
+            }
+
+            if (nodeMap.containsKey("msg.receiver")) {
+                eventReceiverNodeInfo.setMsgReceiver(nodeMap.get("msg.receiver"));
+            }
+
+            if (nodeMap.containsKey("msg.body")) {
+                eventReceiverNodeInfo.setMsgBody(nodeMap.get("msg.body"));
+            }
+
+            if (nodeMap.containsKey("msg.topic")) {
+                eventReceiverNodeInfo.setMsgTopic(nodeMap.get("msg.topic"));
+            }
+
+            if (nodeMap.containsKey("msg.name")) {
+                eventReceiverNodeInfo.setMsgName(nodeMap.get("msg.name"));
+            }
+
+            if(nodeMap.containsKey("query.frequency")){
+                eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("query.frequency"));
+            }
+
+            if(nodeMap.containsKey("max.receive.hours")){
+                eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("max.receive.hours"));
+            }
+
+            if(nodeMap.containsKey("msg.savekey")){
+                eventReceiverNodeInfo.setMsgSaveKey(nodeMap.get("msg.savekey"));
+            }
+
+            if(nodeMap.containsKey("only.receive.today")){
+                eventReceiverNodeInfo.setOnlyReceiveToday(Boolean.valueOf(nodeMap.get("only.receive.today")));
+            }
+
+            if(nodeMap.containsKey("msg.receive.use.rundate")){
+                eventReceiverNodeInfo.setMsgReceiveUseRunDate(Boolean.valueOf(nodeMap.get("msg.receive.use.rundate")));
+            }
+
+            eventReceiverNodeInfo.setProjectName(dssProject.getName());
+            eventReceiverNodeInfo.setProjectId(dssProject.getId());
+            eventReceiverNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
+            eventReceiverNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
+            eventReceiverNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
+
+            eventReceiverNodeInfoList.add(eventReceiverNodeInfo);
+
+        }
+
+        eventReceiverNodeInfoList = eventReceiveNodeResultFilter(eventReceiverNodeInfoList,request);
+
+        eventReceiveNodeResponse.setTotal((long) eventReceiverNodeInfoList.size());
+        // 分页处理
+        int page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
+        int pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
+        int start = (page - 1) * pageSize;
+        int end = Math.min(page * pageSize, eventReceiverNodeInfoList.size());
+
+        for (int i = start; i < end; i++) {
+            EventReceiverNodeInfo eventReceiverNodeInfo = eventReceiverNodeInfoList.get(i);
+            eventReceiveNodeResponse.getEventReceiverNodeInfoList().add(eventReceiverNodeInfo);
+        }
+
+        return eventReceiveNodeResponse;
+
+    }
+
+
+
+    public  List<EventReceiverNodeInfo> eventReceiveNodeResultFilter(List<EventReceiverNodeInfo> eventReceiverNodeInfoList,
+                                                                     EventReceiverNodeRequest request){
+
+        return  eventReceiverNodeInfoList.stream().filter(eventReceiverNodeInfo -> {
+
+            boolean flag = true;
+
+            if(!CollectionUtils.isEmpty(request.getProjectNameList())){
+                flag = request.getProjectNameList().contains(eventReceiverNodeInfo.getProjectName());
+            }
+
+            if(!StringUtils.isEmpty(request.getOrchestratorName()) && flag){
+                flag = request.getOrchestratorName().equals(eventReceiverNodeInfo.getOrchestratorName());
+            }
+
+            if(!CollectionUtils.isEmpty(request.getNodeNameList()) && flag){
+                flag = request.getNodeNameList().contains(eventReceiverNodeInfo.getNodeName());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgReceiver()) && flag){
+                flag = request.getMsgReceiver().equals(eventReceiverNodeInfo.getMsgReceiver());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgBody()) && flag){
+                flag = request.getMsgBody().equals(eventReceiverNodeInfo.getMsgBody());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgTopic()) && flag ){
+                flag = request.getMsgTopic().equals(eventReceiverNodeInfo.getMsgTopic());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgName()) && flag ){
+                flag = request.getMsgName().equals(eventReceiverNodeInfo.getMsgName());
+            }
+
+            if(!StringUtils.isEmpty(request.getMaxReceiveHours()) && flag){
+                flag = request.getMaxReceiveHours().equals(eventReceiverNodeInfo.getMaxReceiveHours());
+            }
+
+            if(!StringUtils.isEmpty(request.getMsgSaveKey()) && flag){
+                flag = request.getMsgSaveKey().equals(eventReceiverNodeInfo.getMsgSaveKey());
+            }
+
+            if(request.getOnlyReceiveToday() != null && flag){
+                flag = request.getOnlyReceiveToday().equals(eventReceiverNodeInfo.getOnlyReceiveToday());
+            }
+
+            if(request.getMsgReceiveUseRunDate() != null && flag){
+                flag = request.getMsgReceiveUseRunDate().equals(eventReceiverNodeInfo.getMsgReceiveUseRunDate());
+            }
+
+            return  flag;
+
+        }).collect(Collectors.toList());
+
     }
 
 

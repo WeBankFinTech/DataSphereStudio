@@ -31,8 +31,7 @@ import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
 import com.webank.wedatasphere.dss.workflow.cs.DSSCSHelper;
 import com.webank.wedatasphere.dss.workflow.entity.*;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
-import com.webank.wedatasphere.dss.workflow.entity.response.DataDevelopNodeResponse;
-import com.webank.wedatasphere.dss.workflow.entity.response.DataViewNodeResponse;
+import com.webank.wedatasphere.dss.workflow.entity.response.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeGroupVO;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeInfoVO;
 import com.webank.wedatasphere.dss.workflow.entity.vo.NodeUiVO;
@@ -365,12 +364,14 @@ public class NodeRestfulApi {
     }
 
     @RequestMapping(value = "/queryFlowNameList",method = RequestMethod.GET)
-    public Message queryNodeNameList(HttpServletRequest req, @RequestParam("groupNameEn") String groupNameEn) {
+    public Message queryNodeNameList(HttpServletRequest req,
+                                     @RequestParam("groupNameEn") String groupNameEn,
+                                     @RequestParam(value = "nodeTypeName",required = false) String nodeTypeName) {
 
         String username = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
 
-        DSSFlowName dssFlowName = dssFlowService.queryFlowNameList(username, workspace, groupNameEn);
+        DSSFlowName dssFlowName = dssFlowService.queryFlowNameList(username, workspace, groupNameEn,nodeTypeName);
 
         return Message.ok().data("nodeNameList", dssFlowName.getNodeNameList())
                 .data("orchestratorNameList", dssFlowName.getOrchestratorNameList())
@@ -390,6 +391,46 @@ public class NodeRestfulApi {
         return Message.ok().data("viewId", viewIdList);
     }
 
+
+
+    @RequestMapping(value = "/queryDataCheckerNode",method = RequestMethod.POST)
+    public Message queryDataCheckerNode(HttpServletRequest req,@RequestBody DataCheckerNodeRequest request){
+
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+
+        DataCheckerNodeResponse dataCheckerNodeResponse = dssFlowService.queryDataCheckerNode(username, workspace, request);
+
+        return Message.ok().data("data", dataCheckerNodeResponse.getDataCheckerNodeInfoList()).data("total", dataCheckerNodeResponse.getTotal());
+
+    }
+
+
+    @RequestMapping(value = "/queryEventSenderNode",method = RequestMethod.POST)
+    public Message queryEventSenderNode(HttpServletRequest req,@RequestBody EventSenderNodeRequest request){
+
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+
+        EventSenderNodeResponse eventSenderNodeResponse = dssFlowService.queryEventSenderNode(username, workspace, request);
+
+        return Message.ok().data("data", eventSenderNodeResponse.getEventSenderNodeInfoList()).data("total", eventSenderNodeResponse.getTotal());
+
+    }
+
+
+
+    @RequestMapping(value = "/queryEventReceiveNode",method = RequestMethod.POST)
+    public Message queryEventReceiveNode(HttpServletRequest req,@RequestBody EventReceiverNodeRequest request){
+
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+
+        EventReceiveNodeResponse eventReceiveNodeResponse = dssFlowService.queryEventReceiveNode(username, workspace, request);
+
+        return Message.ok().data("data", eventReceiveNodeResponse.getEventReceiverNodeInfoList()).data("total", eventReceiveNodeResponse.getTotal());
+
+    }
 
 }
 

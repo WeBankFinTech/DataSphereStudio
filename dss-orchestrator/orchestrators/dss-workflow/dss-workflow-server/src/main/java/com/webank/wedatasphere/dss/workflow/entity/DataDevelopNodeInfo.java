@@ -48,6 +48,9 @@ public class DataDevelopNodeInfo {
 
     private Date createTime;
 
+    private String nodeKey;
+
+    private  Map<String,String> nodeContent;
     public String getProjectName() {
         return projectName;
     }
@@ -167,5 +170,21 @@ public class DataDevelopNodeInfo {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getNodeKey() {
+        return nodeKey;
+    }
+
+    public void setNodeKey(String nodeKey) {
+        this.nodeKey = nodeKey;
+    }
+
+    public Map<String, String> getNodeContent() {
+        return nodeContent;
+    }
+
+    public void setNodeContent(Map<String, String> nodeContent) {
+        this.nodeContent = nodeContent;
     }
 }

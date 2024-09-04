@@ -87,6 +87,13 @@ public class OrchestratorMeta {
 
     private Boolean editable;
 
+
+    // 最新状态
+    private String newStatus;
+
+    // 最新状态名称
+    private String newStatusName;
+
     public Boolean getEditable() {
         return editable;
     }
@@ -314,5 +321,22 @@ public class OrchestratorMeta {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+
+    public String getNewStatus() {
+        return newStatus;
+    }
+
+    public void setNewStatus(String newStatus) {
+        this.newStatus = newStatus;
+    }
+
+    public String getNewStatusName() {
+        return newStatusName;
+    }
+
+    public void setNewStatusName(String newStatusName) {
+        this.newStatusName = newStatusName;
     }
 }

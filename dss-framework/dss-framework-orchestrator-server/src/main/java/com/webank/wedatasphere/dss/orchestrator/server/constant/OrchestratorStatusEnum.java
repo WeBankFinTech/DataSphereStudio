@@ -14,7 +14,7 @@ public enum OrchestratorStatusEnum {
     RUNNING(OrchestratorRefConstant.FLOW_STATUS_PUSHING, "提交中"),
     PUBLISHING(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING, "发布中"),
     STATELESS(OrchestratorRefConstant.FLOW_STATUS_STATELESS, "--"),
-
+    SUCCESS(OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS,"发布成功"),
     FAILED(OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, "发布失败");
 
 

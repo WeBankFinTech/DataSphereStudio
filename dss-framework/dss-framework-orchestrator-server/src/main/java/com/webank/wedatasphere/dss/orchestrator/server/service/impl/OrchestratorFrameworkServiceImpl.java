@@ -759,8 +759,16 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     // 发布失败 -> 无状态
                     orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
                     orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
+                    orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
+                    orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
 
-                }else{
+                }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
+
+                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
+                    orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
+                    orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
+
+                } else{
                     // 无状态
                     orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
                 }
@@ -904,11 +912,20 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             // 发布失败 -> 待发布
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH);
             orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
+            orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
+            orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
 
         } else if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
             // 发布中状态
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
-        }else {
+
+        }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
+
+            orchestratorMeta.setStatus(OrchestratorStatusEnum.PUBLISH.getStatus());
+            orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
+            orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
+
+        } else{
             // 待发布
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH);
         }

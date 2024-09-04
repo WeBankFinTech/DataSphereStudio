@@ -555,18 +555,18 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     if (jobContent != null) {
                         for (Map.Entry<String, Object> entry : jobContent.entrySet()) {
                             String value = entry.getValue() != null ? entry.getValue().toString() : "";
-                            nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, entry.getKey(), value, jobType, null));
+                            nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, entry.getKey(), value, jobType, "String"));
                         }
                     }
                 }
 
                 String title = nodeDefault.getTitle();
                 if (StringUtils.isNotEmpty(title)) {
-                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title, jobType, null));
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "title", title, jobType, "String"));
                 }
                 String desc = nodeDefault.getDesc();
                 if (StringUtils.isNotEmpty(desc)) {
-                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc, jobType, null));
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc, jobType, "String"));
                 }
                 List<Resource> nodeDefaultResources = nodeDefault.getResources();
                 if (CollectionUtils.isNotEmpty(nodeDefaultResources)) {
@@ -575,7 +575,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         nodeResources.append(resource.getFileName());
                         nodeResources.append(";");
                     }
-                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "resources", new String(nodeResources), jobType, null));
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "resources", new String(nodeResources), jobType, "String"));
                 }
 
 
@@ -597,6 +597,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                         nodeContentType = "NumInterval";
                                     } else if (paramName.endsWith("memory")){
                                         nodeContentType = "Memory";
+                                    } else {
+                                        nodeContentType = "String";
                                     }
                                     nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, paramName, paramVal, jobType, nodeContentType));
                                 }

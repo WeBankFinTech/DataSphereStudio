@@ -63,6 +63,8 @@ public interface DSSFlowService {
                     LabelRouteVO labels
     ) throws Exception;
 
+    void batchEditFlow(BatchEditFlowRequest batchEditFlowRequest, String ticketId, Workspace workspace, String userName) throws Exception;
+
     void updateTOSaveStatus(Long projectId, Long flowID, Long orchestratorId) throws Exception;
 
     void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId);

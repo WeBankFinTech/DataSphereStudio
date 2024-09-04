@@ -9,7 +9,6 @@ public class EditFlowRequest {
     private Long orchestratorId;
     private String nodeKey;
     private String params;
-    private DSSFlow dssFlow;
 
     public Long getId() {
         return id;
@@ -43,11 +42,4 @@ public class EditFlowRequest {
         this.params = params;
     }
 
-    public DSSFlow getDssFlow() {
-        return dssFlow;
-    }
-
-    public void setDssFlow(DSSFlow dssFlow) {
-        this.dssFlow = dssFlow;
-    }
 }

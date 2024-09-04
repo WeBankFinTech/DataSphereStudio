@@ -61,6 +61,7 @@ import com.webank.wedatasphere.dss.workflow.dao.*;
 import com.webank.wedatasphere.dss.workflow.dto.NodeContentDO;
 import com.webank.wedatasphere.dss.workflow.dto.NodeContentUIDO;
 import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
+import com.webank.wedatasphere.dss.workflow.dto.NodeTypeDO;
 import com.webank.wedatasphere.dss.workflow.entity.*;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.response.*;
@@ -549,7 +550,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId);
-            Map<String, String> workflowNodeNumberType = nodeInfoMapper.getWorkflowNodeNumberType();
+            List<NodeTypeDO> workflowNodeNumberType = nodeInfoMapper.getWorkflowNodeNumberType();
+            Map<String, String> nodeNumberMap = new HashMap<>();
+            for (NodeTypeDO nodeTypeDO : workflowNodeNumberType) {
+                nodeNumberMap.put(nodeTypeDO.getNodeType(), nodeTypeDO.getKey());
+            }
             for (NodeContentDO nodeContentDO : nodeContents) {
                 String nodeKey = nodeContentDO.getNodeKey();
                 Long contentByKeyId = nodeContentDO.getId();
@@ -598,7 +603,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                     String paramVal = paramEntry.getValue().toString();
                                     logger.info("{}:{}", paramName, paramVal);
                                     String nodeContentType = null;
-                                    if (workflowNodeNumberType != null && workflowNodeNumberType.containsKey(jobType) && workflowNodeNumberType.get(jobType).equals(paramName)) {
+                                    if (nodeNumberMap.containsKey(jobType) && nodeNumberMap.get(jobType).equals(paramName)) {
                                         nodeContentType = "NumInterval";
                                     } else if (paramName.endsWith("memory")){
                                         nodeContentType = "Memory";

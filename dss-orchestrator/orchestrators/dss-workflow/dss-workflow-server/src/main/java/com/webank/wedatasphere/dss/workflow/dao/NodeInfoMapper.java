@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.workflow.dao;
 
 
+import com.webank.wedatasphere.dss.workflow.dto.NodeTypeDO;
 import com.webank.wedatasphere.dss.workflow.entity.NodeGroup;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
 import com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo;
@@ -33,9 +34,7 @@ public interface NodeInfoMapper {
 
     NodeInfo getWorkflowNodeByType(String nodeType);
 
-    @MapKey("node_type")
-    Map<String, String> getWorkflowNodeNumberType();
-
+    List<NodeTypeDO> getWorkflowNodeNumberType();
 
     List<NodeUIInfo> queryNodeUIInfoList(@Param("nodeTypeList") List<String> nodeTypeList);
 

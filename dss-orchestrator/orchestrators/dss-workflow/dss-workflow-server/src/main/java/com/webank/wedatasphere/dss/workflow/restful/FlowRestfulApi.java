@@ -387,7 +387,7 @@ public class FlowRestfulApi {
         return Message.ok();
     }
 
-    @RequestMapping(value = "/batchEditFlow", method = RequestMethod.POST)
+    @RequestMapping(value = "/batchEditFlowNode", method = RequestMethod.POST)
     public Message batchEditFlow(HttpServletRequest req, @RequestBody BatchEditFlowRequest batchEditFlowRequest) {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);

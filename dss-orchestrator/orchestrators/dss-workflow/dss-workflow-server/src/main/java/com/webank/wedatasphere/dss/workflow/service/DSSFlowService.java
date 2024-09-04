@@ -23,10 +23,8 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.entity.DSSFlowName;
 import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
-import com.webank.wedatasphere.dss.workflow.entity.request.DataDevelopNodeRequest;
-import com.webank.wedatasphere.dss.workflow.entity.request.DataViewNodeRequest;
-import com.webank.wedatasphere.dss.workflow.entity.response.DataDevelopNodeResponse;
-import com.webank.wedatasphere.dss.workflow.entity.response.DataViewNodeResponse;
+import com.webank.wedatasphere.dss.workflow.entity.request.*;
+import com.webank.wedatasphere.dss.workflow.entity.response.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import org.apache.linkis.common.exception.ErrorException;
 
@@ -96,7 +94,13 @@ public interface DSSFlowService {
 
     List<NodeInfo> getNodeInfoByGroupName(String groupNameEn);
 
-    DSSFlowName queryFlowNameList(String username, Workspace workspace, String groupNameEn);
+    DSSFlowName queryFlowNameList(String username, Workspace workspace, String groupNameEn,String nodeTypeName);
 
     List<String> queryViewId(Workspace workspace,String username);
+
+    DataCheckerNodeResponse queryDataCheckerNode(String username, Workspace workspace, DataCheckerNodeRequest request);
+
+    EventSenderNodeResponse queryEventSenderNode(String username, Workspace workspace, EventSenderNodeRequest request);
+
+    public EventReceiveNodeResponse queryEventReceiveNode(String username, Workspace workspace, EventReceiverNodeRequest request);
 }

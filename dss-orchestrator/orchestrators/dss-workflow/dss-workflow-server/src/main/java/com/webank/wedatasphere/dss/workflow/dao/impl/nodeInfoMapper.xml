@@ -191,6 +191,9 @@
         from dss_workflow_node_to_group  t1
         join dss_workflow_node_group t2 on t1.group_id  = t2.id and t2.name_en  = #{groupName}
         join dss_workflow_node t3 on t1.node_id  = t3.id
+        <if test="nodeTypeName != null and nodeTypeName != ''">
+            and t3.name = #{nodeTypeName}
+        </if>
     </select>
 
 </mapper>

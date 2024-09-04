@@ -7,6 +7,8 @@ public class DSSFlowNodeInfo {
     private String nodeId;
     private Long orchestratorId;
 
+    private String nodeKey;
+
     private String orchestratorName;
 
     private Long contentId;
@@ -96,5 +98,14 @@ public class DSSFlowNodeInfo {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+
+    public String getNodeKey() {
+        return nodeKey;
+    }
+
+    public void setNodeKey(String nodeKey) {
+        this.nodeKey = nodeKey;
     }
 }

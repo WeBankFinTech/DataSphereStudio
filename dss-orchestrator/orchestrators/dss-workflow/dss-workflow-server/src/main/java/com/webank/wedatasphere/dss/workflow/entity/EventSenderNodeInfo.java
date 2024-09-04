@@ -14,7 +14,7 @@ public class EventSenderNodeInfo {
 
     // 工作流ID
 
-    private Long OrchestratorId;
+    private Long orchestratorId;
 
     // 节点名称
     private String nodeName;
@@ -73,11 +73,11 @@ public class EventSenderNodeInfo {
     }
 
     public Long getOrchestratorId() {
-        return OrchestratorId;
+        return orchestratorId;
     }
 
     public void setOrchestratorId(Long orchestratorId) {
-        OrchestratorId = orchestratorId;
+        this.orchestratorId = orchestratorId;
     }
 
     public String getNodeName() {

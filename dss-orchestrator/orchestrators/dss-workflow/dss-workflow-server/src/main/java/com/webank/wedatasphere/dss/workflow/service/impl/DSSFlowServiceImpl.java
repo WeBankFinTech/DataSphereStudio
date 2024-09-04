@@ -2067,9 +2067,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 eventReceiverNodeInfo.setMsgReceiver(nodeMap.get("msg.receiver"));
             }
 
-            if (nodeMap.containsKey("msg.body")) {
-                eventReceiverNodeInfo.setMsgBody(nodeMap.get("msg.body"));
-            }
 
             if (nodeMap.containsKey("msg.topic")) {
                 eventReceiverNodeInfo.setMsgTopic(nodeMap.get("msg.topic"));
@@ -2150,10 +2147,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             if(!StringUtils.isEmpty(request.getMsgReceiver()) && flag){
                 flag = request.getMsgReceiver().equals(eventReceiverNodeInfo.getMsgReceiver());
-            }
-
-            if(!StringUtils.isEmpty(request.getMsgBody()) && flag){
-                flag = request.getMsgBody().equals(eventReceiverNodeInfo.getMsgBody());
             }
 
             if(!StringUtils.isEmpty(request.getMsgTopic()) && flag ){

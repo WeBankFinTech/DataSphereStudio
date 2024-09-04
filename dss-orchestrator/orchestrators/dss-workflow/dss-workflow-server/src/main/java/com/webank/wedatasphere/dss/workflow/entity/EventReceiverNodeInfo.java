@@ -14,7 +14,7 @@ public class EventReceiverNodeInfo {
 
     // 工作流ID
 
-    private Long OrchestratorId;
+    private Long orchestratorId;
 
     // 节点名称
     private String nodeName;
@@ -38,8 +38,6 @@ public class EventReceiverNodeInfo {
     private String msgType;
 
     private String msgReceiver;
-
-    private String msgBody;
 
     private String msgTopic;
 
@@ -82,12 +80,13 @@ public class EventReceiverNodeInfo {
         this.orchestratorName = orchestratorName;
     }
 
+
     public Long getOrchestratorId() {
-        return OrchestratorId;
+        return orchestratorId;
     }
 
     public void setOrchestratorId(Long orchestratorId) {
-        OrchestratorId = orchestratorId;
+        this.orchestratorId = orchestratorId;
     }
 
     public String getNodeName() {
@@ -160,14 +159,6 @@ public class EventReceiverNodeInfo {
 
     public void setMsgReceiver(String msgReceiver) {
         this.msgReceiver = msgReceiver;
-    }
-
-    public String getMsgBody() {
-        return msgBody;
-    }
-
-    public void setMsgBody(String msgBody) {
-        this.msgBody = msgBody;
     }
 
     public String getMsgTopic() {

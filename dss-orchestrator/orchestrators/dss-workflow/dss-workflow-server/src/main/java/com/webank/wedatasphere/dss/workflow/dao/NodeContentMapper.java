@@ -37,5 +37,5 @@ public interface NodeContentMapper {
 
     List<DSSFlowNodeTemplate> queryFlowNodeTemplate(@Param("orchestratorIdList") List<Long> orchestratorIdList);
 
-    NodeContentDO getNodeContentById(@Param("contentId") Long contentId,String nodeId);
+    NodeContentDO getNodeContentById(@Param("contentId") Long contentId,@Param("nodeId") String nodeId);
 }

@@ -231,7 +231,7 @@
     </select>
 
 
-    <select id="queryProjectList"  resultType="java.lang.String">
+    <select id="queryProjectList"  resultType="com.webank.wedatasphere.dss.framework.project.entity.vo.QueryProjectVo">
         select  *
         ,group_concat(accessUser) as accessUsers
         ,group_concat(editUser) as editUsers

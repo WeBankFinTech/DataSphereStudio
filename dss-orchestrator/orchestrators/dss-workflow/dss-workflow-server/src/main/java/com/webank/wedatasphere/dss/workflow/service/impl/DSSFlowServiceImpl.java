@@ -361,14 +361,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         } else {
             logger.info("saveFlow is change");
         }
-        String version = getVersionAfterSave(dssFlow, flowID, orchestratorId, jsonFlow, userName, workspaceName, projectName, comment);
 
-        return version;
-    }
-
-    private String getVersionAfterSave(DSSFlow dssFlow, Long flowID, Long orchestratorId,
-                                       String jsonFlow, String userName, String workspaceName,
-                                       String projectName, String comment) throws Exception {
         checkSubflowDependencies(userName, flowID, jsonFlow);
         String resourceId = dssFlow.getResourceId();
         Long parentFlowID = flowMapper.getParentFlowID(flowID);
@@ -394,10 +387,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             throw new DSSRuntimeException(e.getErrCode(), "保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
         saveFlowHook.afterSave(jsonFlow, dssFlow, parentFlowID);
+        String version = bmlReturnMap.get("version").toString();
         // 对子工作流,需更新父工作流状态，以便提交
         Long updateFlowId = parentFlowID == null ? dssFlow.getId() : parentFlowID;
         updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId, orchestratorId);
-        return  bmlReturnMap.get("version").toString();
+
+        return version;
     }
 
     @Override
@@ -1609,16 +1604,21 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 DSSFlow dssFlow = getFlow(flowId);
                 lockFlow(dssFlow, userName, ticketId);
                 List<EditFlowRequest> editFlowRequests = editFlowRequestMap.get(orchestratorId);
-                String modifyJson = dssFlow.getFlowJson();
+                StringBuilder modifyJson = new StringBuilder(dssFlow.getFlowJson());
                 for (EditFlowRequest editFlowRequest : editFlowRequests) {
                     String params = editFlowRequest.getParams();
                     String nodeKey = editFlowRequest.getNodeKey();
-                    modifyJson = modifyJson(modifyJson, nodeKey, params, modifyTime, userName);
+                    String json = modifyJson(String.valueOf(modifyJson), nodeKey, params, modifyTime, userName);
+                    modifyJson.setLength(0);
+                    modifyJson.append(json);
                 }
                 DSSProject project = getProjectByProjectId(dssFlow.getProjectId());
                 //批量修改属性
-                saveFlowMetaData(flowId, modifyJson, orchestratorId);
-                getVersionAfterSave(dssFlow, flowId, orchestratorId, modifyJson, userName, workspace.getWorkspaceName(), project.getName(), null);
+                String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
+                saveFlowMetaData(flowId, resultJson, orchestratorId);
+                saveFlow(flowId , String.valueOf(modifyJson)
+                        ,dssFlow.getDescription(),userName
+                        ,workspace.getWorkspaceName(),project.getName(),null);
             }
         }
     }
@@ -1632,6 +1632,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSExceptionUtils.dealErrorException(6003, "工程不存在", DSSErrorException.class);
         }
         return dssProject;
+    }
+
+    private String modifyFlowJsonTime(String flowJson, Long modifyTime, String userName) {
+        JsonObject jsonObject = JsonParser.parseString(flowJson).getAsJsonObject();
+
+        jsonObject.addProperty("updateTime", modifyTime);
+        jsonObject.addProperty("updateUser", userName);
+
+        return jsonObject.toString();
     }
 
     private String modifyJson(String flowJson, String nodeKey, String params, Long modifyTime, String username) {

@@ -135,6 +135,23 @@
         AND nutv.validate_id = nuv.id
     </select>
 
+    <select id="getWorkflowNodeNumberType" resultType="java.util.Map">
+        SELECT
+        distinct(node_type), `key`
+        FROM
+        dss_workflow_node n,
+        dss_workflow_node_to_ui ntu,
+        dss_workflow_node_ui nu,
+        dss_workflow_node_ui_to_validate nutv,
+        dss_workflow_node_ui_validate nuv
+        WHERE
+        n.id = ntu.workflow_node_id
+        AND ntu.ui_id = nu.id
+        AND nu.id = nutv.ui_id
+        AND nutv.validate_id = nuv.id
+        AND nuv.validate_type = 'NumInterval'
+    </select>
+
     <select id="getWorkflowNodeByType" parameterType="java.lang.String" resultMap="workflowNode">
         select * from `dss_workflow_node` where node_type=#{nodeType}
     </select>

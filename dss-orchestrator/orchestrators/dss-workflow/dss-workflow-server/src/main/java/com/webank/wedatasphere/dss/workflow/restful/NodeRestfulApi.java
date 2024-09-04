@@ -323,7 +323,7 @@ public class NodeRestfulApi {
     @RequestMapping(value = "/getDataDevelopNodeContent", method = RequestMethod.GET)
     public Message getDataDevelopNodeContent(HttpServletRequest req,
                                              @RequestParam("nodeId") String nodeId,
-                                             @RequestParam("contentId") Long contentId) throws DSSErrorException {
+                                             @RequestParam("contentId") Long contentId) {
 
         if (StringUtils.isBlank(nodeId) || contentId == null) {
             return Message.error("输入的参数为空，请检查参数信息");

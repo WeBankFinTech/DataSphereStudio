@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
-public class NodeUIInfo {
+import java.io.Serializable;
+
+public class NodeUIInfo implements Serializable {
 
     private String nodeType;
 

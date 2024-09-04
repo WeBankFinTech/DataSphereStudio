@@ -20,9 +20,6 @@ public class EventReceiverNodeRequest {
 
     private String msgReceiver;
 
-
-    private String msgBody;
-
     private String msgTopic;
 
     private String msgName;
@@ -82,14 +79,6 @@ public class EventReceiverNodeRequest {
 
     public void setMsgReceiver(String msgReceiver) {
         this.msgReceiver = msgReceiver;
-    }
-
-    public String getMsgBody() {
-        return msgBody;
-    }
-
-    public void setMsgBody(String msgBody) {
-        this.msgBody = msgBody;
     }
 
     public String getMsgTopic() {

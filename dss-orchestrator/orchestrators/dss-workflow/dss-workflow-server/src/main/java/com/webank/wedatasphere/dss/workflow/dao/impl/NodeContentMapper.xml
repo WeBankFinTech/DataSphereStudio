@@ -123,7 +123,7 @@
         <foreach collection="nodeTypeList" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
-        order by create_time desc
+        order by t1.create_time desc
 
 
     </select>
@@ -141,8 +141,7 @@
         </foreach>
     </select>
 
-    <select id="getNodeContentById" resultMap="nodeContentResultMap"
-            parameterType="java.lang.Long">
+    <select id="getNodeContentById" resultMap="nodeContentResultMap">
 
         select  <include refid="baseColumns"/> from dss_workflow_node_content where id = #{contentId} and node_id = #{nodeId}
 

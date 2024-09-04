@@ -135,7 +135,7 @@
         AND nutv.validate_id = nuv.id
     </select>
 
-    <select id="getWorkflowNodeNumberType" resultType="java.util.Map">
+    <select id="getWorkflowNodeNumberType" resultType="com.webank.wedatasphere.dss.workflow.dto.NodeTypeDO">
         SELECT
         distinct(node_type), `key`
         FROM

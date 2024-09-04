@@ -2,7 +2,7 @@ package com.webank.wedatasphere.dss.workflow.entity;
 
 import java.util.Date;
 
-public class DataViewNodeInfo {
+public class DataCheckerNodeInfo {
 
     // 项目名称
     private String projectName;
@@ -10,31 +10,42 @@ public class DataViewNodeInfo {
     // 工作流名称
     private String orchestratorName;
 
+    // 工作流ID
+
+    private Long OrchestratorId;
+
     // 节点名称
     private String nodeName;
 
     // 节点类型
-
     private String nodeType;
+
+    private String nodeKey;
 
     // 节点小类
     private String nodeTypeName;
 
+    // 节点ID
+    private String nodeId;
+
     // 节点描述
     private String nodeDesc;
 
-    // 视图ID
-    private String viewId;
+    // source.type
+    private String sourceType;
 
-    //节点ID
-    private String nodeId;
+    // check.object
+    private String checkObject;
 
-    //节点配置ID
-    private Long contentId;
+    // max.check.hours
+    private String maxCheckHours;
 
+    //job.desc
+    private String jobDesc;
 
-    // 工作流ID
-    private Long orchestratorId;
+    // qualities 校验
+    private Boolean qualitisCheck;
+
 
     private  Long projectId;
 
@@ -42,7 +53,6 @@ public class DataViewNodeInfo {
 
     private Date createTime;
 
-    private String nodeKey;
 
     public String getProjectName() {
         return projectName;
@@ -84,22 +94,6 @@ public class DataViewNodeInfo {
         this.nodeTypeName = nodeTypeName;
     }
 
-    public String getNodeDesc() {
-        return nodeDesc;
-    }
-
-    public void setNodeDesc(String nodeDesc) {
-        this.nodeDesc = nodeDesc;
-    }
-
-    public String getViewId() {
-        return viewId;
-    }
-
-    public void setViewId(String viewId) {
-        this.viewId = viewId;
-    }
-
     public String getNodeId() {
         return nodeId;
     }
@@ -108,22 +102,60 @@ public class DataViewNodeInfo {
         this.nodeId = nodeId;
     }
 
+    public String getNodeDesc() {
+        return nodeDesc;
+    }
 
+    public void setNodeDesc(String nodeDesc) {
+        this.nodeDesc = nodeDesc;
+    }
+
+    public String getSourceType() {
+        return sourceType;
+    }
+
+    public void setSourceType(String sourceType) {
+        this.sourceType = sourceType;
+    }
+
+    public String getCheckObject() {
+        return checkObject;
+    }
+
+    public void setCheckObject(String checkObject) {
+        this.checkObject = checkObject;
+    }
+
+    public String getMaxCheckHours() {
+        return maxCheckHours;
+    }
+
+    public void setMaxCheckHours(String maxCheckHours) {
+        this.maxCheckHours = maxCheckHours;
+    }
+
+    public String getJobDesc() {
+        return jobDesc;
+    }
+
+    public void setJobDesc(String jobDesc) {
+        this.jobDesc = jobDesc;
+    }
+
+    public Boolean getQualitisCheck() {
+        return qualitisCheck;
+    }
+
+    public void setQualitisCheck(Boolean qualitisCheck) {
+        this.qualitisCheck = qualitisCheck;
+    }
 
     public Long getOrchestratorId() {
-        return orchestratorId;
+        return OrchestratorId;
     }
 
     public void setOrchestratorId(Long orchestratorId) {
-        this.orchestratorId = orchestratorId;
-    }
-
-    public Long getContentId() {
-        return contentId;
-    }
-
-    public void setContentId(Long contentId) {
-        this.contentId = contentId;
+        OrchestratorId = orchestratorId;
     }
 
     public Long getProjectId() {

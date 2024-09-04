@@ -18,9 +18,7 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
@@ -33,19 +31,15 @@ import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryResponse;
-import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
-import com.webank.wedatasphere.dss.common.utils.IoUtils;
-import com.webank.wedatasphere.dss.common.utils.MapUtils;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
+import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.OrchestratorVo;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestUpdateOrchestratorBML;
+import com.webank.wedatasphere.dss.orchestrator.common.protocol.*;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
@@ -70,6 +64,12 @@ import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
 import com.webank.wedatasphere.dss.workflow.entity.*;
 import com.webank.wedatasphere.dss.workflow.entity.request.*;
 import com.webank.wedatasphere.dss.workflow.entity.response.*;
+import com.webank.wedatasphere.dss.workflow.entity.request.BatchEditFlowRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.DataDevelopNodeRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.DataViewNodeRequest;
+import com.webank.wedatasphere.dss.workflow.entity.request.EditFlowRequest;
+import com.webank.wedatasphere.dss.workflow.entity.response.DataDevelopNodeResponse;
+import com.webank.wedatasphere.dss.workflow.entity.response.DataViewNodeResponse;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import com.webank.wedatasphere.dss.workflow.io.export.NodeExportService;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
@@ -99,10 +99,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.xml.ws.Response;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -143,6 +147,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private NodeContentUIMapper nodeContentUIMapper;
     @Autowired
     private NodeMetaMapper nodeMetaMapper;
+
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
@@ -355,8 +361,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         } else {
             logger.info("saveFlow is change");
         }
-        checkSubflowDependencies(userName, flowID, jsonFlow);
+        String version = getVersionAfterSave(dssFlow, flowID, orchestratorId, jsonFlow, userName, workspaceName, projectName, comment);
 
+        return version;
+    }
+
+    private String getVersionAfterSave(DSSFlow dssFlow, Long flowID, Long orchestratorId,
+                                       String jsonFlow, String userName, String workspaceName,
+                                       String projectName, String comment) throws Exception {
+        checkSubflowDependencies(userName, flowID, jsonFlow);
         String resourceId = dssFlow.getResourceId();
         Long parentFlowID = flowMapper.getParentFlowID(flowID);
         // 这里不要检查ContextID具体版本等，只要存在就不创建 2020-0423
@@ -381,12 +394,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             throw new DSSRuntimeException(e.getErrCode(), "保存ContextId失败，您可以尝试重新发布工作流！原因：" + ExceptionUtils.getRootCauseMessage(e), e);
         }
         saveFlowHook.afterSave(jsonFlow, dssFlow, parentFlowID);
-        String version = bmlReturnMap.get("version").toString();
         // 对子工作流,需更新父工作流状态，以便提交
         Long updateFlowId = parentFlowID == null ? dssFlow.getId() : parentFlowID;
         updateTOSaveStatus(dssFlow.getProjectId(), updateFlowId, orchestratorId);
-
-        return version;
+        return  bmlReturnMap.get("version").toString();
     }
 
     @Override
@@ -698,7 +709,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public List<ExtraToolBarsVO> getExtraToolBars(long workspaceId, long projectId) {
         List<ExtraToolBarsVO> retList = new ArrayList<>();
-        retList.add(new ExtraToolBarsVO("前往调度中心", DSSWorkFlowConstant.GOTO_SCHEDULER_CENTER_URL.getValue() + "?workspaceId=" + workspaceId, "icon:null"));
+        retList.add(new ExtraToolBarsVO("前往调度中心", GOTO_SCHEDULER_CENTER_URL.getValue() + "?workspaceId=" + workspaceId, "icon:null"));
         return retList;
     }
 
@@ -1530,7 +1541,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Override
     public List<String> queryViewId(Workspace workspace, String username) {
-        
+
         List<String> viewIdList = new ArrayList<>();
         // 获取项目
         List<DSSProject> dssProjectList = getDSSProject(workspace, username);
@@ -1556,6 +1567,106 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList, nodeUIViewIdKey);
         viewIdList = nodeContentUIDOList.stream().distinct().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
         return viewIdList;
+    }
+
+    @Override
+    public void batchEditFlow(BatchEditFlowRequest batchEditFlowRequest, String ticketId, Workspace workspace, String userName) throws Exception {
+        if (batchEditFlowRequest == null) {
+            return ;
+        }
+        List<EditFlowRequest> editFlowRequestList = batchEditFlowRequest.getEditFlowRequestList();
+        Map<Long, List<EditFlowRequest>> editFlowRequestMap = new HashMap<>();
+
+        for (EditFlowRequest editFlowRequest : editFlowRequestList) {
+            Long orchestratorId = editFlowRequest.getOrchestratorId();
+            List<EditFlowRequest> editFlowRequests = editFlowRequestMap.containsKey(orchestratorId)?
+                                                    editFlowRequestMap.get(orchestratorId) : new ArrayList<>();
+            editFlowRequestMap.put(orchestratorId, editFlowRequests);
+        }
+
+        Set<Long> orchestratorIdList = editFlowRequestList.stream().map(EditFlowRequest::getOrchestratorId).collect(Collectors.toSet());
+        // 批量获取编辑锁
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();
+        RequestQueryOrchestrator requestQueryOrchestrator = new RequestQueryOrchestrator(new ArrayList<>(orchestratorIdList));
+        ResponseQueryOrchestrator responseQueryOrchestrator = RpcAskUtils.processAskException(sender.ask(requestQueryOrchestrator), ResponseQueryOrchestrator.class, RequestQueryOrchestrator.class);
+
+        if (responseQueryOrchestrator == null) {
+            throw new DSSErrorException(80001, "该工作流节点没有对应编排");
+        }
+        List<OrchestratorVo> orchestratorVoes = responseQueryOrchestrator.getOrchestratorVoes();
+
+        Long modifyTime = System.currentTimeMillis();
+
+        for (OrchestratorVo orchestratorVo : orchestratorVoes) {
+            DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+            if (dssOrchestratorVersion != null) {
+                Long orchestratorId = dssOrchestratorVersion.getOrchestratorId();
+                Long flowId = dssOrchestratorVersion.getAppId();
+                DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowId);
+                if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
+                    throw new DSSErrorException(80001,"当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+                }
+                DSSFlow dssFlow = getFlow(flowId);
+                lockFlow(dssFlow, userName, ticketId);
+                List<EditFlowRequest> editFlowRequests = editFlowRequestMap.get(orchestratorId);
+                String modifyJson = dssFlow.getFlowJson();
+                for (EditFlowRequest editFlowRequest : editFlowRequests) {
+                    String params = editFlowRequest.getParams();
+                    String nodeKey = editFlowRequest.getNodeKey();
+                    modifyJson = modifyJson(modifyJson, nodeKey, params, modifyTime, userName);
+                }
+                DSSProject project = getProjectByProjectId(dssFlow.getProjectId());
+                //批量修改属性
+                saveFlowMetaData(flowId, modifyJson, orchestratorId);
+                getVersionAfterSave(dssFlow, flowId, orchestratorId, modifyJson, userName, workspace.getWorkspaceName(), project.getName(), null);
+            }
+        }
+    }
+
+    private DSSProject getProjectByProjectId(Long projectId) {
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(projectId);
+        DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
+        if (dssProject == null) {
+            DSSExceptionUtils.dealErrorException(6003, "工程不存在", DSSErrorException.class);
+        }
+        return dssProject;
+    }
+
+    private String modifyJson(String flowJson, String nodeKey, String params, Long modifyTime, String username) {
+        JsonObject jsonObject = JsonParser.parseString(flowJson).getAsJsonObject();
+
+        JsonArray listArray = jsonObject.getAsJsonArray("nodes");
+
+        for (JsonElement element : listArray) {
+            JsonObject obj = element.getAsJsonObject();
+            if (obj.get("key").getAsString().equals(nodeKey)) {
+                obj.addProperty("params", params);
+                obj.addProperty("modifyTime", modifyTime);
+                obj.addProperty("modifyUser", username);
+            }
+        }
+        String modifyJson = jsonObject.toString();
+        return modifyJson;
+    }
+
+    private void lockFlow(DSSFlow dssFlow, String username, String ticketId) throws DSSErrorException {
+
+        // 尝试获取工作流编辑锁
+        try {
+            //只有父工作流才有锁，子工作流复用父工作流的锁
+            if(dssFlow.getRootFlow()) {
+                String flowEditLock = DSSFlowEditLockManager.tryAcquireLock(dssFlow, username, ticketId);
+                dssFlow.setFlowEditLock(flowEditLock);
+            }
+        } catch (DSSErrorException e) {
+            if (EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
+                DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(dssFlow.getId());
+                throw new DSSErrorException(60056,"用户已锁定编辑错误码，editLockInfo:" + flowEditLock);
+            }
+            throw e;
+        }
     }
 
 

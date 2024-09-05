@@ -56,6 +56,9 @@ public class DataCheckerNodeInfo {
 
     private Map<String,String> nodeContent;
 
+    // 节点配置ID
+    private Long contentId;
+
     public String getProjectName() {
         return projectName;
     }
@@ -198,5 +201,13 @@ public class DataCheckerNodeInfo {
 
     public void setNodeContent(Map<String, String> nodeContent) {
         this.nodeContent = nodeContent;
+    }
+
+    public Long getContentId() {
+        return contentId;
+    }
+
+    public void setContentId(Long contentId) {
+        this.contentId = contentId;
     }
 }

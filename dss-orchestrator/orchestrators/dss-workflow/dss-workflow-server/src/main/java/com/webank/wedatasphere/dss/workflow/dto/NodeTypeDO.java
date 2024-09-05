@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.workflow.dto;
 
-public class NodeTypeDO {
+import java.io.Serializable;
+
+public class NodeTypeDO implements Serializable {
     private String nodeType;
     private String key;
 

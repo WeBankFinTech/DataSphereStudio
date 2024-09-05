@@ -7,12 +7,13 @@ import org.apache.ibatis.annotations.Param;
 import org.mapstruct.Mapper;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface NodeContentUIMapper {
     void insertNodeContentUI(NodeContentUIDO contentUIDO);
 
-    void batchInsertNodeContentUI(List<NodeContentUIDO> list);
+    void batchInsertNodeContentUI(Set<NodeContentUIDO> list);
 
     void updateNodeContentUI(NodeContentUIDO contentUIDO);
 

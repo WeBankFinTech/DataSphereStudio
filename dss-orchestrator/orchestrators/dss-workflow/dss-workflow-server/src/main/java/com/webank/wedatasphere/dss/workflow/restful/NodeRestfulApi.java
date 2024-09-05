@@ -404,7 +404,7 @@ public class NodeRestfulApi {
         String username = SecurityFilter.getLoginUsername(req);
         Workspace workspace = SSOHelper.getWorkspace(req);
         List<String> viewIdList = dssFlowService.queryViewId(workspace, username);
-        return Message.ok().data("viewId", viewIdList);
+        return Message.ok().data("data", viewIdList);
     }
 
 
@@ -470,6 +470,27 @@ public class NodeRestfulApi {
 
         return Message.ok().data("data", eventReceiveNodeResponse.getEventReceiverNodeInfoList()).data("total", eventReceiveNodeResponse.getTotal());
 
+    }
+
+    /*
+     * 信号节点 sourceType
+     * **/
+    @RequestMapping(value = "/querySourceType",method = RequestMethod.GET)
+    public Message querySourceType(HttpServletRequest req) {
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+        return Message.ok().data("data", dssFlowService.querySourceType(workspace, username));
+    }
+
+
+    /*
+     * 信号节点 JobDesc
+     * **/
+    @RequestMapping(value = "/queryJobDesc",method = RequestMethod.GET)
+    public Message queryJobDesc(HttpServletRequest req) {
+        String username = SecurityFilter.getLoginUsername(req);
+        Workspace workspace = SSOHelper.getWorkspace(req);
+        return Message.ok().data("jobDesc",  dssFlowService.queryJobDesc(workspace, username));
     }
 
 }

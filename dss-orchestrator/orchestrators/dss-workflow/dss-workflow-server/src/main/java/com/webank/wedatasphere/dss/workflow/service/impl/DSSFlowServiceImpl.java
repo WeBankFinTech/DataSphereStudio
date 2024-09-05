@@ -1194,7 +1194,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId)   {
+    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId)  throws DSSErrorException  {
         NodeContentDO nodeContentDO = nodeContentMapper.getNodeContentById(contentId, nodeId);
         Map<String, Object> content = new HashMap<>();
         if (nodeContentDO == null) {
@@ -1224,11 +1224,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         for (NodeUIInfo nodeUIInfo : nodeUIInfoList) {
 
-            if (nodeMap.containsKey(nodeUIInfo.getKey())) {
-                content.put(nodeUIInfo.getKey(), nodeMap.get(nodeUIInfo.getKey()));
-            } else {
-                content.put(nodeUIInfo.getKey(), "");
-            }
+            content.put(nodeUIInfo.getKey(), nodeMap.getOrDefault(nodeUIInfo.getKey(), ""));
 
         }
 
@@ -1542,31 +1538,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public List<String> queryViewId(Workspace workspace, String username) {
 
-        List<String> viewIdList = new ArrayList<>();
-        // 获取项目
-        List<DSSProject> dssProjectList = getDSSProject(workspace, username);
-
-        if (CollectionUtils.isEmpty(dssProjectList)) {
-            logger.error("queryViewId find project is empty, workspaceId is {}, username is {}", workspace.getWorkspaceId(), username);
-            return viewIdList;
-        }
-
-        List<Long> projectIdList = dssProjectList.stream().map(DSSProject::getId).collect(Collectors.toList());
-
-        List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
-        List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
-        // 查询节点信息
-        List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
-
-        if (CollectionUtils.isEmpty(flowNodeInfoList)) {
-            logger.error("queryViewId find node info is empty, example project id is {}", projectIdList.get(0));
-            return viewIdList;
-        }
-
-        List<Long> contentIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getContentId).collect(Collectors.toList());
-        List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList, nodeUIViewIdKey);
-        viewIdList = nodeContentUIDOList.stream().distinct().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
-        return viewIdList;
+        return queryNodeUiValueByKey(workspace,username,nodeUIViewIdKey,WorkflowNodeGroupEnum.DataVisualization.getNameEn());
     }
 
     @Override
@@ -2181,6 +2153,78 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return  flag;
 
         }).collect(Collectors.toList());
+
+    }
+
+
+    public List<String> queryNodeUiValueByKey(Workspace workspace,String username, String nodeUiKey,String groupNameEn){
+
+        logger.info("nodeUiKey is {}",nodeUiKey);
+        List<String> nodeUIValue = new ArrayList<>();
+        try{
+
+
+            // 获取项目
+            List<DSSProject> dssProjectList = getDSSProject(workspace, username);
+
+            if (CollectionUtils.isEmpty(dssProjectList)) {
+                logger.error("queryNodeUiValueByKey find project is empty, workspaceId is {}, username is {}, nodeUikey is {}", workspace.getWorkspaceId(), username, nodeUiKey);
+                return nodeUIValue;
+            }
+
+            List<Long> projectIdList = dssProjectList.stream().map(DSSProject::getId).collect(Collectors.toList());
+
+            List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(groupNameEn);
+            if(CollectionUtils.isEmpty(nodeInfoList)){
+                logger.error("queryNodeUiValueByKey groupNameEn is {}",groupNameEn);
+                return  nodeUIValue;
+            }
+            List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
+            // 查询节点信息
+            List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
+
+            if (CollectionUtils.isEmpty(flowNodeInfoList)) {
+                logger.error("queryNodeUiValueByKey find node info is empty, example project id is {}, nodeUikey is {}", projectIdList.get(0), nodeUiKey);
+                return nodeUIValue;
+            }
+
+            List<Long> contentIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getContentId).collect(Collectors.toList());
+            List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList, nodeUiKey);
+            nodeUIValue = nodeContentUIDOList.stream().distinct().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
+
+        }catch (Exception e){
+            logger.error("queryNodeUiValueByKey error, workspaceId is {}, username is {}, nodeUikey is {}", workspace.getWorkspaceId(), username, nodeUiKey);
+            logger.error(e.getMessage());
+        }
+
+
+        return nodeUIValue;
+    }
+
+
+    @Override
+    public List<String> querySourceType(Workspace workspace, String username) {
+        String NodeUIkey = "source.type";
+        return queryNodeUiValueByKey(workspace,username,NodeUIkey,WorkflowNodeGroupEnum.SignalNode.getNameEn());
+    }
+
+
+    @Override
+    public List<String> queryJobDesc(Workspace workspace, String username) {
+        String NodeUIkey = "job.desc";
+
+        List<String> jobDescValue = queryNodeUiValueByKey(workspace,username,NodeUIkey,WorkflowNodeGroupEnum.SignalNode.getNameEn());
+
+        List<String> descValue = new ArrayList<>();
+        for(String value: jobDescValue){
+            if(StringUtils.isEmpty(value)){
+                continue;
+            }
+
+            descValue.addAll(Arrays.asList(value.split("\n")));
+        }
+
+        return  descValue.stream().filter(value -> {return !StringUtils.isEmpty(value.trim());}).distinct().collect(Collectors.toList());
 
     }
 

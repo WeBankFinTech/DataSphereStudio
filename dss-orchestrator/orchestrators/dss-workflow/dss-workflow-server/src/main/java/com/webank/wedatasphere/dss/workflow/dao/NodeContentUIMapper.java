@@ -26,5 +26,5 @@ public interface NodeContentUIMapper {
 
     List<NodeContentUIDO> getNodeContentUIByContentId(@Param("contentId") Long contentId);
 
-    List<NodeContentUIDO> getNodeContentUIByNodeUIKey(@Param("contentIdList") List<Long> contentIdList,@Param("nodeKey")String nodeKey);
+    List<NodeContentUIDO> getNodeContentUIByNodeUIKey(@Param("contentIdList") List<Long> contentIdList,@Param("nodeUIKey")String nodeKey);
 }

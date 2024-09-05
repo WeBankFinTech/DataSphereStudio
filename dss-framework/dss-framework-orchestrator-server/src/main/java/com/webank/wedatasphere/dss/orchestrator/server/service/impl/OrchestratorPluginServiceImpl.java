@@ -322,17 +322,18 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             }
         }
 
-        // 串行提交
-        for (OrchestratorSubmitRequest submitRequest : submitRequests) {
-            Long taskId = taskMap.get(submitRequest.getOrchestratorId());
-            //1. 异步提交，更新提交状态
-            try {
-                submitWorkflowToBML(taskId, submitRequest, username, workspace);
-            } catch (Exception e) {
-                LOGGER.error("push failed, the reason is : ", e);
-                orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.getMessage());
+        releaseThreadPool.submit(() -> {
+            // 串行提交
+            for (OrchestratorSubmitRequest submitRequest : submitRequests) {
+                Long taskId = taskMap.get(submitRequest.getOrchestratorId());
+                try {
+                    submitWorkflowToBML(taskId, submitRequest, username, workspace);
+                } catch (Exception e) {
+                    LOGGER.error("push failed, the reason is : ", e);
+                    orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.getMessage());
+                }
             }
-        }
+        });
     }
 
     @Override

@@ -595,7 +595,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                     String nodeContentType = null;
                                     if (nodeNumberMap.containsKey(jobType) && nodeNumberMap.get(jobType).equals(paramName)) {
                                         nodeContentType = "NumInterval";
-                                    } else if (paramName.endsWith("memory")){
+                                    } else if (paramName.endsWith("memory")) {
                                         nodeContentType = "Memory";
                                     } else {
                                         nodeContentType = "String";
@@ -1082,6 +1082,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
 
         List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(WorkflowNodeGroupEnum.DataDevelopment.getNameEn());
+
+        if (CollectionUtils.isEmpty(nodeInfoList)) {
+            logger.error("queryDataDevelopNodeList not find node type info");
+            return dataDevelopNodeResponse;
+        }
+
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         // 查询节点信息
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
@@ -1184,7 +1190,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     @Override
-    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId)  throws DSSErrorException  {
+    public Map<String, Object> getDataDevelopNodeContent(String nodeId, Long contentId) throws DSSErrorException {
         NodeContentDO nodeContentDO = nodeContentMapper.getNodeContentById(contentId, nodeId);
         Map<String, Object> content = new HashMap<>();
         if (nodeContentDO == null) {
@@ -1240,6 +1246,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<Long> projectIdList = new ArrayList<>(dssProjectMap.keySet());
         // 查询节点信息
         List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        if (CollectionUtils.isEmpty(nodeInfoList)) {
+            logger.error("queryDataViewNode not find node type info");
+            return dataDevelopNodeResponse;
+        }
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
@@ -1494,7 +1504,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<Long> projectIdList = dssProjectList.stream().map(DSSProject::getId).collect(Collectors.toList());
 
-        List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(groupNameEn);
+        List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(groupNameEn, nodeTypeName);
+
+        if (CollectionUtils.isEmpty(nodeInfoList)) {
+            logger.error("queryFlowNameList groupNameEn is {},nodeTypeName is {}", groupNameEn, nodeTypeName);
+            return dssFlowName;
+        }
+
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         // 查询节点信息
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
@@ -1529,21 +1545,21 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public List<String> queryViewId(Workspace workspace, String username) {
 
-        return queryNodeUiValueByKey(workspace,username,nodeUIViewIdKey,WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        return queryNodeUiValueByKey(workspace, username, nodeUIViewIdKey, WorkflowNodeGroupEnum.DataVisualization.getNameEn());
     }
 
     @Override
     public void batchEditFlow(BatchEditFlowRequest batchEditFlowRequest, String ticketId, Workspace workspace, String userName) throws Exception {
         if (batchEditFlowRequest == null) {
-            return ;
+            return;
         }
         List<EditFlowRequest> editFlowRequestList = batchEditFlowRequest.getEditNodeList();
         Map<Long, List<EditFlowRequest>> editFlowRequestMap = new HashMap<>();
 
         for (EditFlowRequest editFlowRequest : editFlowRequestList) {
             Long orchestratorId = editFlowRequest.getOrchestratorId();
-            List<EditFlowRequest> editFlowRequests = editFlowRequestMap.containsKey(orchestratorId)?
-                                                    editFlowRequestMap.get(orchestratorId) : new ArrayList<>();
+            List<EditFlowRequest> editFlowRequests = editFlowRequestMap.containsKey(orchestratorId) ?
+                    editFlowRequestMap.get(orchestratorId) : new ArrayList<>();
             editFlowRequests.add(editFlowRequest);
             editFlowRequestMap.put(orchestratorId, editFlowRequests);
         }
@@ -1568,7 +1584,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 Long flowId = dssOrchestratorVersion.getAppId();
                 DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowId);
                 if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
-                    throw new DSSErrorException(80001,"当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+                    throw new DSSErrorException(80001, "当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
                 }
                 DSSFlow dssFlow = getFlow(flowId);
                 lockFlow(dssFlow, userName, ticketId);
@@ -1584,14 +1600,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 DSSProject project = getProjectByProjectId(dssFlow.getProjectId());
                 //批量修改属性
                 String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
-                saveFlow(flowId , String.valueOf(resultJson)
-                        ,dssFlow.getDescription(),userName
-                        ,workspace.getWorkspaceName(),project.getName(),null);
+                saveFlow(flowId, String.valueOf(resultJson)
+                        , dssFlow.getDescription(), userName
+                        , workspace.getWorkspaceName(), project.getName(), null);
             }
         }
     }
 
-    private DSSProject getProjectByProjectId(Long projectId) throws DSSErrorException{
+    private DSSProject getProjectByProjectId(Long projectId) throws DSSErrorException {
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
         DSSProject dssProject = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
@@ -1635,14 +1651,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 尝试获取工作流编辑锁
         try {
             //只有父工作流才有锁，子工作流复用父工作流的锁
-            if(dssFlow.getRootFlow()) {
+            if (dssFlow.getRootFlow()) {
                 String flowEditLock = DSSFlowEditLockManager.tryAcquireLock(dssFlow, username, ticketId);
                 dssFlow.setFlowEditLock(flowEditLock);
             }
         } catch (DSSErrorException e) {
             if (EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
                 DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(dssFlow.getId());
-                throw new DSSErrorException(60056,"用户已锁定编辑错误码，editLockInfo:" + flowEditLock);
+                throw new DSSErrorException(60056, "用户已锁定编辑错误码，editLockInfo:" + flowEditLock);
             }
             throw e;
         }
@@ -1656,7 +1672,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.SignalNode.getNameEn()
                 , SignalNodeConstant.dataCheckerNode);
 
-        if (nodeInfoList.isEmpty()) {
+        if (CollectionUtils.isEmpty(nodeInfoList)) {
             logger.error("queryDataCheckerNode not find dataChecker node info");
             return dataCheckerNodeResponse;
         }
@@ -1744,7 +1760,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         }
 
-        dataCheckerNodeInfoList = dataCheckerNodeResultFilter(dataCheckerNodeInfoList,request);
+        dataCheckerNodeInfoList = dataCheckerNodeResultFilter(dataCheckerNodeInfoList, request);
 
 
         dataCheckerNodeResponse.setTotal((long) dataCheckerNodeInfoList.size());
@@ -1763,60 +1779,60 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
 
-    public List<DataCheckerNodeInfo> dataCheckerNodeResultFilter(List<DataCheckerNodeInfo> dataCheckerNodeInfoList,DataCheckerNodeRequest request){
+    public List<DataCheckerNodeInfo> dataCheckerNodeResultFilter(List<DataCheckerNodeInfo> dataCheckerNodeInfoList, DataCheckerNodeRequest request) {
 
-        return  dataCheckerNodeInfoList.stream().filter(dataCheckerNodeInfo -> {
+        return dataCheckerNodeInfoList.stream().filter(dataCheckerNodeInfo -> {
 
             boolean flag = true;
 
-            if(!CollectionUtils.isEmpty(request.getProjectNameList())){
+            if (!CollectionUtils.isEmpty(request.getProjectNameList())) {
                 flag = request.getProjectNameList().contains(dataCheckerNodeInfo.getProjectName());
             }
 
-            if(!StringUtils.isEmpty(request.getOrchestratorName()) && flag){
+            if (!StringUtils.isEmpty(request.getOrchestratorName()) && flag) {
                 flag = request.getOrchestratorName().equals(dataCheckerNodeInfo.getOrchestratorName());
             }
 
-            if(!CollectionUtils.isEmpty(request.getNodeNameList()) && flag){
+            if (!CollectionUtils.isEmpty(request.getNodeNameList()) && flag) {
                 flag = request.getNodeNameList().contains(dataCheckerNodeInfo.getNodeName());
             }
 
-            if(!StringUtils.isEmpty(request.getSourceType()) && flag){
+            if (!StringUtils.isEmpty(request.getSourceType()) && flag) {
                 flag = request.getSourceType().equals(dataCheckerNodeInfo.getSourceType());
             }
 
-            if(!StringUtils.isEmpty(request.getCheckObject()) && flag){
+            if (!StringUtils.isEmpty(request.getCheckObject()) && flag) {
                 flag = request.getCheckObject().equals(dataCheckerNodeInfo.getCheckObject());
             }
 
-            if(!StringUtils.isEmpty(request.getJobDesc()) && flag ){
-                if(StringUtils.isEmpty(dataCheckerNodeInfo.getJobDesc())){
-                    flag =  false;
-                }else{
-                  List<String> arrays =  Arrays.asList(dataCheckerNodeInfo.getJobDesc().split("\n"));
-                  flag = arrays.contains(request.getJobDesc());
+            if (!StringUtils.isEmpty(request.getJobDesc()) && flag) {
+                if (StringUtils.isEmpty(dataCheckerNodeInfo.getJobDesc())) {
+                    flag = false;
+                } else {
+                    List<String> arrays = Arrays.asList(dataCheckerNodeInfo.getJobDesc().split("\n"));
+                    flag = arrays.contains(request.getJobDesc());
                 }
             }
 
-            if(request.getQualitisCheck() != null && flag){
+            if (request.getQualitisCheck() != null && flag) {
                 flag = request.getQualitisCheck().equals(dataCheckerNodeInfo.getQualitisCheck());
             }
 
-            return  flag;
+            return flag;
 
         }).collect(Collectors.toList());
 
     }
 
 
-    public EventSenderNodeResponse queryEventSenderNode(String username, Workspace workspace, EventSenderNodeRequest request){
+    public EventSenderNodeResponse queryEventSenderNode(String username, Workspace workspace, EventSenderNodeRequest request) {
 
         EventSenderNodeResponse eventSenderNodeResponse = new EventSenderNodeResponse();
 
         List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.SignalNode.getNameEn()
                 , SignalNodeConstant.eventSenderNode);
 
-        if (nodeInfoList.isEmpty()) {
+        if (CollectionUtils.isEmpty(nodeInfoList)) {
             logger.error("queryEventSenderNode not find dataChecker node info");
             return eventSenderNodeResponse;
         }
@@ -1904,7 +1920,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         }
 
-        eventSenderNodeInfoList = eventSenderNodeResultFilter(eventSenderNodeInfoList,request);
+        eventSenderNodeInfoList = eventSenderNodeResultFilter(eventSenderNodeInfoList, request);
 
         eventSenderNodeResponse.setTotal((long) eventSenderNodeInfoList.size());
         // 分页处理
@@ -1922,59 +1938,56 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
 
-
-    public List<EventSenderNodeInfo> eventSenderNodeResultFilter(List<EventSenderNodeInfo> eventSenderNodeInfoList,EventSenderNodeRequest request){
-
+    public List<EventSenderNodeInfo> eventSenderNodeResultFilter(List<EventSenderNodeInfo> eventSenderNodeInfoList, EventSenderNodeRequest request) {
 
 
-        return  eventSenderNodeInfoList.stream().filter(eventSenderNodeInfo -> {
+        return eventSenderNodeInfoList.stream().filter(eventSenderNodeInfo -> {
 
             boolean flag = true;
 
-            if(!CollectionUtils.isEmpty(request.getProjectNameList())){
+            if (!CollectionUtils.isEmpty(request.getProjectNameList())) {
                 flag = request.getProjectNameList().contains(eventSenderNodeInfo.getProjectName());
             }
 
-            if(!StringUtils.isEmpty(request.getOrchestratorName()) && flag){
+            if (!StringUtils.isEmpty(request.getOrchestratorName()) && flag) {
                 flag = request.getOrchestratorName().equals(eventSenderNodeInfo.getOrchestratorName());
             }
 
-            if(!CollectionUtils.isEmpty(request.getNodeNameList()) && flag){
+            if (!CollectionUtils.isEmpty(request.getNodeNameList()) && flag) {
                 flag = request.getNodeNameList().contains(eventSenderNodeInfo.getNodeName());
             }
 
-            if(!StringUtils.isEmpty(request.getMsgSender()) && flag){
+            if (!StringUtils.isEmpty(request.getMsgSender()) && flag) {
                 flag = request.getMsgSender().equals(eventSenderNodeInfo.getMsgSender());
             }
 
-            if(!StringUtils.isEmpty(request.getMsgBody()) && flag){
+            if (!StringUtils.isEmpty(request.getMsgBody()) && flag) {
                 flag = request.getMsgBody().equals(eventSenderNodeInfo.getMsgBody());
             }
 
-            if(!StringUtils.isEmpty(request.getMsgTopic()) && flag ){
+            if (!StringUtils.isEmpty(request.getMsgTopic()) && flag) {
                 flag = request.getMsgTopic().equals(eventSenderNodeInfo.getMsgTopic());
             }
 
-            if(!StringUtils.isEmpty(request.getMsgName()) && flag ){
+            if (!StringUtils.isEmpty(request.getMsgName()) && flag) {
                 flag = request.getMsgName().equals(eventSenderNodeInfo.getMsgName());
             }
 
-            return  flag;
+            return flag;
 
         }).collect(Collectors.toList());
 
     }
 
 
-
-    public EventReceiveNodeResponse queryEventReceiveNode(String username, Workspace workspace, EventReceiverNodeRequest request){
+    public EventReceiveNodeResponse queryEventReceiveNode(String username, Workspace workspace, EventReceiverNodeRequest request) {
 
         EventReceiveNodeResponse eventReceiveNodeResponse = new EventReceiveNodeResponse();
 
         List<NodeInfo> nodeInfoList = nodeInfoMapper.getNodeTypeByGroupName(WorkflowNodeGroupEnum.SignalNode.getNameEn()
                 , SignalNodeConstant.eventReceiverNode);
 
-        if (nodeInfoList.isEmpty()) {
+        if (CollectionUtils.isEmpty(nodeInfoList)) {
             logger.error("queryEventReceiveNode not find dataChecker node info");
             return eventReceiveNodeResponse;
         }
@@ -2048,23 +2061,23 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 eventReceiverNodeInfo.setMsgName(nodeMap.get("msg.name"));
             }
 
-            if(nodeMap.containsKey("query.frequency")){
+            if (nodeMap.containsKey("query.frequency")) {
                 eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("query.frequency"));
             }
 
-            if(nodeMap.containsKey("max.receive.hours")){
+            if (nodeMap.containsKey("max.receive.hours")) {
                 eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("max.receive.hours"));
             }
 
-            if(nodeMap.containsKey("msg.savekey")){
+            if (nodeMap.containsKey("msg.savekey")) {
                 eventReceiverNodeInfo.setMsgSaveKey(nodeMap.get("msg.savekey"));
             }
 
-            if(nodeMap.containsKey("only.receive.today")){
+            if (nodeMap.containsKey("only.receive.today")) {
                 eventReceiverNodeInfo.setOnlyReceiveToday(Boolean.valueOf(nodeMap.get("only.receive.today")));
             }
 
-            if(nodeMap.containsKey("msg.receive.use.rundate")){
+            if (nodeMap.containsKey("msg.receive.use.rundate")) {
                 eventReceiverNodeInfo.setMsgReceiveUseRunDate(Boolean.valueOf(nodeMap.get("msg.receive.use.rundate")));
             }
 
@@ -2079,7 +2092,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         }
 
-        eventReceiverNodeInfoList = eventReceiveNodeResultFilter(eventReceiverNodeInfoList,request);
+        eventReceiverNodeInfoList = eventReceiveNodeResultFilter(eventReceiverNodeInfoList, request);
 
         eventReceiveNodeResponse.setTotal((long) eventReceiverNodeInfoList.size());
         // 分页处理
@@ -2098,66 +2111,65 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
 
+    public List<EventReceiverNodeInfo> eventReceiveNodeResultFilter(List<EventReceiverNodeInfo> eventReceiverNodeInfoList,
+                                                                    EventReceiverNodeRequest request) {
 
-    public  List<EventReceiverNodeInfo> eventReceiveNodeResultFilter(List<EventReceiverNodeInfo> eventReceiverNodeInfoList,
-                                                                     EventReceiverNodeRequest request){
-
-        return  eventReceiverNodeInfoList.stream().filter(eventReceiverNodeInfo -> {
+        return eventReceiverNodeInfoList.stream().filter(eventReceiverNodeInfo -> {
 
             boolean flag = true;
 
-            if(!CollectionUtils.isEmpty(request.getProjectNameList())){
+            if (!CollectionUtils.isEmpty(request.getProjectNameList())) {
                 flag = request.getProjectNameList().contains(eventReceiverNodeInfo.getProjectName());
             }
 
-            if(!StringUtils.isEmpty(request.getOrchestratorName()) && flag){
+            if (!StringUtils.isEmpty(request.getOrchestratorName()) && flag) {
                 flag = request.getOrchestratorName().equals(eventReceiverNodeInfo.getOrchestratorName());
             }
 
-            if(!CollectionUtils.isEmpty(request.getNodeNameList()) && flag){
+            if (!CollectionUtils.isEmpty(request.getNodeNameList()) && flag) {
                 flag = request.getNodeNameList().contains(eventReceiverNodeInfo.getNodeName());
             }
 
-            if(!StringUtils.isEmpty(request.getMsgReceiver()) && flag){
+            if (!StringUtils.isEmpty(request.getMsgReceiver()) && flag) {
                 flag = request.getMsgReceiver().equals(eventReceiverNodeInfo.getMsgReceiver());
             }
 
-            if(!StringUtils.isEmpty(request.getMsgTopic()) && flag ){
+            if (!StringUtils.isEmpty(request.getMsgTopic()) && flag) {
                 flag = request.getMsgTopic().equals(eventReceiverNodeInfo.getMsgTopic());
             }
 
-            if(!StringUtils.isEmpty(request.getMsgName()) && flag ){
+            if (!StringUtils.isEmpty(request.getMsgName()) && flag) {
                 flag = request.getMsgName().equals(eventReceiverNodeInfo.getMsgName());
             }
 
-            if(!StringUtils.isEmpty(request.getMaxReceiveHours()) && flag){
+            if (!StringUtils.isEmpty(request.getMaxReceiveHours()) && flag) {
                 flag = request.getMaxReceiveHours().equals(eventReceiverNodeInfo.getMaxReceiveHours());
             }
 
-            if(!StringUtils.isEmpty(request.getMsgSaveKey()) && flag){
+            if (!StringUtils.isEmpty(request.getMsgSaveKey()) && flag) {
                 flag = request.getMsgSaveKey().equals(eventReceiverNodeInfo.getMsgSaveKey());
             }
 
-            if(request.getOnlyReceiveToday() != null && flag){
+            if (request.getOnlyReceiveToday() != null && flag) {
                 flag = request.getOnlyReceiveToday().equals(eventReceiverNodeInfo.getOnlyReceiveToday());
             }
 
-            if(request.getMsgReceiveUseRunDate() != null && flag){
+            if (request.getMsgReceiveUseRunDate() != null && flag) {
                 flag = request.getMsgReceiveUseRunDate().equals(eventReceiverNodeInfo.getMsgReceiveUseRunDate());
             }
 
-            return  flag;
+            return flag;
 
         }).collect(Collectors.toList());
 
     }
 
 
-    public List<String> queryNodeUiValueByKey(Workspace workspace,String username, String nodeUiKey,String groupNameEn){
+    public List<String> queryNodeUiValueByKey(Workspace workspace, String username, String nodeUiKey, String groupNameEn) {
 
-        logger.info("nodeUiKey is {}",nodeUiKey);
+        logger.info("nodeUiKey is {}", nodeUiKey);
         List<String> nodeUIValue = new ArrayList<>();
-        try{
+        try {
 
 
             // 获取项目
@@ -2171,9 +2183,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<Long> projectIdList = dssProjectList.stream().map(DSSProject::getId).collect(Collectors.toList());
 
             List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(groupNameEn);
-            if(CollectionUtils.isEmpty(nodeInfoList)){
-                logger.error("queryNodeUiValueByKey groupNameEn is {}",groupNameEn);
-                return  nodeUIValue;
+            if (CollectionUtils.isEmpty(nodeInfoList)) {
+                logger.error("queryNodeUiValueByKey groupNameEn is {}", groupNameEn);
+                return nodeUIValue;
             }
             List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
             // 查询节点信息
@@ -2188,7 +2200,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList, nodeUiKey);
             nodeUIValue = nodeContentUIDOList.stream().distinct().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
 
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("queryNodeUiValueByKey error, workspaceId is {}, username is {}, nodeUikey is {}", workspace.getWorkspaceId(), username, nodeUiKey);
             logger.error(e.getMessage());
         }
@@ -2201,7 +2213,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public List<String> querySourceType(Workspace workspace, String username) {
         String NodeUIkey = "source.type";
-        return queryNodeUiValueByKey(workspace,username,NodeUIkey,WorkflowNodeGroupEnum.SignalNode.getNameEn());
+        return queryNodeUiValueByKey(workspace, username, NodeUIkey, WorkflowNodeGroupEnum.SignalNode.getNameEn());
     }
 
 
@@ -2209,18 +2221,20 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public List<String> queryJobDesc(Workspace workspace, String username) {
         String NodeUIkey = "job.desc";
 
-        List<String> jobDescValue = queryNodeUiValueByKey(workspace,username,NodeUIkey,WorkflowNodeGroupEnum.SignalNode.getNameEn());
+        List<String> jobDescValue = queryNodeUiValueByKey(workspace, username, NodeUIkey, WorkflowNodeGroupEnum.SignalNode.getNameEn());
 
         List<String> descValue = new ArrayList<>();
-        for(String value: jobDescValue){
-            if(StringUtils.isEmpty(value)){
+        for (String value : jobDescValue) {
+            if (StringUtils.isEmpty(value)) {
                 continue;
             }
 
             descValue.addAll(Arrays.asList(value.split("\n")));
         }
 
-        return  descValue.stream().filter(value -> {return !StringUtils.isEmpty(value.trim());}).distinct().collect(Collectors.toList());
+        return descValue.stream().filter(value -> {
+            return !StringUtils.isEmpty(value.trim());
+        }).distinct().collect(Collectors.toList());
 
     }
 

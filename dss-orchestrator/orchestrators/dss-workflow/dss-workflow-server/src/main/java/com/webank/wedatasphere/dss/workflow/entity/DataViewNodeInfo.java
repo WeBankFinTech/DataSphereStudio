@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
 import java.util.Date;
+import java.util.Map;
 
 public class DataViewNodeInfo {
 
@@ -44,6 +45,7 @@ public class DataViewNodeInfo {
 
     private String nodeKey;
 
+    private Map<String,String> nodeContent;
     public String getProjectName() {
         return projectName;
     }
@@ -156,5 +158,13 @@ public class DataViewNodeInfo {
 
     public void setNodeKey(String nodeKey) {
         this.nodeKey = nodeKey;
+    }
+
+    public Map<String, String> getNodeContent() {
+        return nodeContent;
+    }
+
+    public void setNodeContent(Map<String, String> nodeContent) {
+        this.nodeContent = nodeContent;
     }
 }

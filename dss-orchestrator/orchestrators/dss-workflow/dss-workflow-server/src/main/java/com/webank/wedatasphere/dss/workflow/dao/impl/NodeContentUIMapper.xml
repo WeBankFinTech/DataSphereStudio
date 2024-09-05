@@ -34,7 +34,7 @@
         INSERT INTO dss_workflow_node_content_to_ui(`content_id`, `node_ui_key`, `node_ui_value`,  `node_type`, `node_content_type`) VAlUES (#{contentId}, #{nodeUIKey}, #{nodeUIValue}, #{item.nodeType}, #{item.nodeContentType})
     </insert>
 
-    <insert id="batchInsertNodeContentUI" parameterType="java.util.List">
+    <insert id="batchInsertNodeContentUI" parameterType="java.util.Set">
         INSERT INTO dss_workflow_node_content_to_ui(`content_id`, `node_ui_key`, `node_ui_value`, `node_type`, `node_content_type`) VALUES
         <foreach collection="list" item="item" index="index" separator=",">
             (#{item.contentId}, #{item.nodeUIKey}, #{item.nodeUIValue}, #{item.nodeType}, #{item.nodeContentType})

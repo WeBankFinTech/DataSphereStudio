@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
+import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.RevokeUserRole;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
@@ -27,6 +28,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleCheckService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
+import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.exception.AppStandardWarnException;
@@ -68,6 +70,8 @@ public class DSSWorkspaceUserRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private DSSWorkspaceRoleCheckService roleCheckService;
+    @Autowired
+    private StaffInfoGetter staffInfoGetter;
 
     @RequestMapping(path = "getWorkspaceUsers", method = RequestMethod.GET)
     public Message getWorkspaceUsers(@RequestParam(WORKSPACE_ID_STR) String workspaceId,
@@ -208,6 +212,23 @@ public class DSSWorkspaceUserRestful {
     public Message listAllUsers() {
         List<StaffInfoVO> dssUsers = dssWorkspaceUserService.listAllDSSUsers();
         return Message.ok().data("users", dssUsers);
+    }
+
+    /**
+     * 判断username是否离职
+     * @param username
+     * @return 离职返回true，未离职false
+     */
+    @RequestMapping(path = "isDismissed", method = RequestMethod.GET)
+    public Message isDismissed(String username) {
+        boolean isDismissed;
+        if(username.startsWith("hduser")||username.startsWith("WTSS_")){
+            isDismissed = false;
+        }else{
+            StaffInfo staffInfo= staffInfoGetter.getStaffInfoByUsername(username);
+            isDismissed = staffInfo != null && "2".equals(staffInfo.getStatus());
+        }
+        return Message.ok().data("isDismissed", isDismissed);
     }
 
     @RequestMapping(path = "getWorkspaceIdByUserName", method = RequestMethod.GET)

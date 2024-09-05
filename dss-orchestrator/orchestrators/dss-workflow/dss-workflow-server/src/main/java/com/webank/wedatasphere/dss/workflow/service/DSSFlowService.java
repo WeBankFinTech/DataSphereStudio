@@ -105,4 +105,10 @@ public interface DSSFlowService {
     EventSenderNodeResponse queryEventSenderNode(String username, Workspace workspace, EventSenderNodeRequest request);
 
     EventReceiveNodeResponse queryEventReceiveNode(String username, Workspace workspace, EventReceiverNodeRequest request);
+
+    List<String> queryJobDesc(Workspace workspace, String username);
+
+    List<String> querySourceType(Workspace workspace, String username);
+
+
 }

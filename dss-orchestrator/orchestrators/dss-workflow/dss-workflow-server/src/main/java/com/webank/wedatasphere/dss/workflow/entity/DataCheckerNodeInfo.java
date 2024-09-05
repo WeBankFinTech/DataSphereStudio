@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
 import java.util.Date;
+import java.util.Map;
 
 public class DataCheckerNodeInfo {
 
@@ -53,6 +54,10 @@ public class DataCheckerNodeInfo {
 
     private Date createTime;
 
+    private Map<String,String> nodeContent;
+
+    // 节点配置ID
+    private Long contentId;
 
     public String getProjectName() {
         return projectName;
@@ -188,5 +193,21 @@ public class DataCheckerNodeInfo {
 
     public void setNodeKey(String nodeKey) {
         this.nodeKey = nodeKey;
+    }
+
+    public Map<String, String> getNodeContent() {
+        return nodeContent;
+    }
+
+    public void setNodeContent(Map<String, String> nodeContent) {
+        this.nodeContent = nodeContent;
+    }
+
+    public Long getContentId() {
+        return contentId;
+    }
+
+    public void setContentId(Long contentId) {
+        this.contentId = contentId;
     }
 }

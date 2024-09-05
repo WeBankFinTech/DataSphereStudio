@@ -1289,7 +1289,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             dataViewNodeInfo.setProjectId(dssProject.getId());
             dataViewNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
             dataViewNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
-            dataViewNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());;
+            dataViewNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
+            dataViewNodeInfo.setNodeContent(nodeMap);
             dataViewNodeInfoList.add(dataViewNodeInfo);
 
         }
@@ -1737,7 +1738,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             dataCheckerNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
             dataCheckerNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
             dataCheckerNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
-
+            dataCheckerNodeInfo.setNodeContent(nodeMap);
             dataCheckerNodeInfoList.add(dataCheckerNodeInfo);
 
         }
@@ -1896,7 +1897,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             eventSenderNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
             eventSenderNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
             eventSenderNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
-
+            eventSenderNodeInfo.setNodeContent(nodeMap);
             eventSenderNodeInfoList.add(eventSenderNodeInfo);
 
         }
@@ -2070,7 +2071,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             eventReceiverNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
             eventReceiverNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
             eventReceiverNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
-
+            eventReceiverNodeInfo.setNodeContent(nodeMap);
             eventReceiverNodeInfoList.add(eventReceiverNodeInfo);
 
         }

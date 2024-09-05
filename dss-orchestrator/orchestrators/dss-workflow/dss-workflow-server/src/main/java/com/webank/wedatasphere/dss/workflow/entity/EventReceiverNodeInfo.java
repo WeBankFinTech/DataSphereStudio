@@ -1,6 +1,7 @@
 package com.webank.wedatasphere.dss.workflow.entity;
 
 import java.util.Date;
+import java.util.Map;
 
 public class EventReceiverNodeInfo {
 
@@ -55,6 +56,8 @@ public class EventReceiverNodeInfo {
 
 
     private String nodeKey;
+
+    private Map<String,String> nodeContent;
 
     public String getProjectName() {
         return projectName;
@@ -224,5 +227,13 @@ public class EventReceiverNodeInfo {
 
     public void setNodeKey(String nodeKey) {
         this.nodeKey = nodeKey;
+    }
+
+    public Map<String, String> getNodeContent() {
+        return nodeContent;
+    }
+
+    public void setNodeContent(Map<String, String> nodeContent) {
+        this.nodeContent = nodeContent;
     }
 }

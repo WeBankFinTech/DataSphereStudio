@@ -3,14 +3,14 @@ package com.webank.wedatasphere.dss.workflow.entity.request;
 import java.util.List;
 
 public class BatchEditFlowRequest {
-    private List<EditFlowRequest> editFlowRequestList;
+    private List<EditFlowRequest> editNodeList;
 
 
-    public List<EditFlowRequest> getEditFlowRequestList() {
-        return editFlowRequestList;
+    public List<EditFlowRequest> getEditNodeList() {
+        return editNodeList;
     }
 
-    public void setEditFlowRequestList(List<EditFlowRequest> editFlowRequestList) {
-        this.editFlowRequestList = editFlowRequestList;
+    public void setEditNodeList(List<EditFlowRequest> editNodeList) {
+        this.editNodeList = editNodeList;
     }
 }

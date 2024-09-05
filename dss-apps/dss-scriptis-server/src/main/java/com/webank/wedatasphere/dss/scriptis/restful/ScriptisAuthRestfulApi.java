@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration.GLOBAL_LIMITS_PREFIX;

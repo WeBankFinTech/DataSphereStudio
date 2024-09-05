@@ -1591,9 +1591,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 List<EditFlowRequest> editFlowRequests = editFlowRequestMap.get(orchestratorId);
                 StringBuilder modifyJson = new StringBuilder(dssFlow.getFlowJson());
                 for (EditFlowRequest editFlowRequest : editFlowRequests) {
-                    String params = editFlowRequest.getParams();
-                    String nodeKey = editFlowRequest.getNodeKey();
-                    String json = modifyJson(String.valueOf(modifyJson), nodeKey, params, modifyTime, userName);
+                    String json = modifyJson(String.valueOf(modifyJson), editFlowRequest, modifyTime, userName);
                     modifyJson.setLength(0);
                     modifyJson.append(json);
                 }
@@ -1627,7 +1625,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return jsonObject.toString();
     }
 
-    private String modifyJson(String flowJson, String nodeKey, String params, Long modifyTime, String username) {
+    private String modifyJson(String flowJson, EditFlowRequest editFlowRequest, Long modifyTime, String username) {
+        String nodeKey = editFlowRequest.getNodeKey();
+        String params = editFlowRequest.getParams();
+        String title = editFlowRequest.getTitle();
+        String desc = editFlowRequest.getDesc();
+        String appTag = editFlowRequest.getAppTag();
+        String businessTag = editFlowRequest.getBusinessTag();
         JsonObject jsonObject = JsonParser.parseString(flowJson).getAsJsonObject();
 
         JsonArray listArray = jsonObject.getAsJsonArray("nodes");
@@ -1636,14 +1640,26 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             JsonObject obj = element.getAsJsonObject();
             if (obj.get("key").getAsString().equals(nodeKey)) {
                 JsonElement jsonElement = JsonParser.parseString(params);
-                obj.add("params", jsonElement);
+                if (StringUtils.isNotEmpty(params)) {
+                    obj.add("params", jsonElement);
+                }
                 obj.addProperty("modifyTime", modifyTime);
                 obj.addProperty("modifyUser", username);
+                flowJsonAddProperty(obj, "title", title);
+                flowJsonAddProperty(obj, "desc", desc);
+                flowJsonAddProperty(obj, "appTag", appTag);
+                flowJsonAddProperty(obj, "businessTag", businessTag);
                 break;
             }
         }
         String modifyJson = jsonObject.toString();
         return modifyJson;
+    }
+
+    private void flowJsonAddProperty(JsonObject obj, String contentName, String content) {
+        if (StringUtils.isNotEmpty(content)) {
+            obj.addProperty(contentName, content);
+        }
     }
 
     private void lockFlow(DSSFlow dssFlow, String username, String ticketId) throws DSSErrorException {

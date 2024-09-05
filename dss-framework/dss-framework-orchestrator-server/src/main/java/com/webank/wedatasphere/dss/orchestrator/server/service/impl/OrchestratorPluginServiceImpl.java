@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.DSSLabelUtil;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.*;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthRequest;
@@ -269,7 +270,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         if (map == null) {
             throw new DSSErrorException(80001, "批量提交的工作流不能为空");
         }
-
+        Map<Long, Long> taskMap = new HashMap<>();
+        List<OrchestratorSubmitRequest> submitRequests = new ArrayList<>();
         for (Map.Entry<String, List<OrchestratorRelationVo>> entry : map.entrySet()) {
             List<OrchestratorRelationVo> orchestratorRelationVos = entry.getValue();
             String projectName = entry.getKey();
@@ -297,12 +299,16 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 if (StringUtils.isEmpty(status)) {
                     throw new DSSErrorException(800001, projectName + "项目未接入git，批量提交失败");
                 }
+                DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
                 if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
-                    DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
                     throw new DSSErrorException(800001, orchestrator.getName() + "工作流无改动或改动未提交，请确认改动并保存再进行提交");
                 }
+                LabelRouteVO labelRouteVO = new LabelRouteVO();
+                labelRouteVO.setRoute(label);
+                OrchestratorSubmitRequest orchestratorSubmitRequest = new OrchestratorSubmitRequest(relationVo.getFlowId(), labelRouteVO, projectName, comment, orchestratorId, orchestrator.getName(), false);
+                submitRequests.add(orchestratorSubmitRequest);
             }
-            List<Long> taskIdList = new ArrayList<>();
+            // 批量提交更新状态
             for (OrchestratorRelationVo relationVo : orchestratorRelationVos) {
                 Long orchestratorId = relationVo.getOrchestratorId();
 
@@ -312,18 +318,20 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
                 orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
                 Long taskId = submitJob.getId();
-                taskIdList.add(taskId);
-
+                taskMap.put(orchestratorId, taskId);
             }
-            releaseThreadPool.submit(() ->{
-                //1. 异步提交，更新提交状态
-                try {
-                    batchSubmitWorkflowToBML(taskIdList, orchestratorRelationVos, username, workspace, projectName, label, projectId, comment);
-                }  catch (Exception e) {
-                    LOGGER.error("push failed, the reason is : ", e);
-                    orchestratorMapper.batchUpdateOrchestratorSubmitJobStatus(taskIdList, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, "batchSubmit error: " + e.toString());
-                }
-            });
+        }
+
+        // 串行提交
+        for (OrchestratorSubmitRequest submitRequest : submitRequests) {
+            Long taskId = taskMap.get(submitRequest.getOrchestratorId());
+            //1. 异步提交，更新提交状态
+            try {
+                submitWorkflowToBML(taskId, submitRequest, username, workspace);
+            } catch (Exception e) {
+                LOGGER.error("push failed, the reason is : ", e);
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.getMessage());
+            }
         }
     }
 

@@ -29,7 +29,6 @@ import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
-import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
@@ -49,8 +48,6 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
 import com.webank.wedatasphere.dss.workflow.common.parser.NodeParser;
 import com.webank.wedatasphere.dss.workflow.common.parser.WorkFlowParser;
-import com.webank.wedatasphere.dss.workflow.common.protocol.ResponseUpdateWorkflow;
-import com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant;
 import com.webank.wedatasphere.dss.workflow.constant.SignalNodeConstant;
 import com.webank.wedatasphere.dss.workflow.constant.WorkflowNodeGroupEnum;
 import com.webank.wedatasphere.dss.workflow.core.WorkflowFactory;
@@ -83,13 +80,11 @@ import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.common.exception.ErrorException;
 import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
-import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -99,14 +94,9 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.xml.ws.Response;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1546,13 +1536,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         if (batchEditFlowRequest == null) {
             return ;
         }
-        List<EditFlowRequest> editFlowRequestList = batchEditFlowRequest.getEditFlowRequestList();
+        List<EditFlowRequest> editFlowRequestList = batchEditFlowRequest.getEditNodeList();
         Map<Long, List<EditFlowRequest>> editFlowRequestMap = new HashMap<>();
 
         for (EditFlowRequest editFlowRequest : editFlowRequestList) {
             Long orchestratorId = editFlowRequest.getOrchestratorId();
             List<EditFlowRequest> editFlowRequests = editFlowRequestMap.containsKey(orchestratorId)?
                                                     editFlowRequestMap.get(orchestratorId) : new ArrayList<>();
+            editFlowRequests.add(editFlowRequest);
             editFlowRequestMap.put(orchestratorId, editFlowRequests);
         }
 
@@ -1592,8 +1583,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 DSSProject project = getProjectByProjectId(dssFlow.getProjectId());
                 //批量修改属性
                 String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
-                saveFlowMetaData(flowId, resultJson, orchestratorId);
-                saveFlow(flowId , String.valueOf(modifyJson)
+                saveFlow(flowId , String.valueOf(resultJson)
                         ,dssFlow.getDescription(),userName
                         ,workspace.getWorkspaceName(),project.getName(),null);
             }
@@ -1628,9 +1618,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         for (JsonElement element : listArray) {
             JsonObject obj = element.getAsJsonObject();
             if (obj.get("key").getAsString().equals(nodeKey)) {
-                obj.addProperty("params", params);
+                JsonElement jsonElement = JsonParser.parseString(params);
+                obj.add("params", jsonElement);
                 obj.addProperty("modifyTime", modifyTime);
                 obj.addProperty("modifyUser", username);
+                break;
             }
         }
         String modifyJson = jsonObject.toString();

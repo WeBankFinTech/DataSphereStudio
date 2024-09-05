@@ -8,6 +8,10 @@ public class EditFlowRequest {
     private Long id;
     private Long orchestratorId;
     private String nodeKey;
+    private String title;
+    private String desc;
+    private String businessTag;
+    private String appTag;
     private String params;
 
     public Long getId() {
@@ -42,4 +46,35 @@ public class EditFlowRequest {
         this.params = params;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getBusinessTag() {
+        return businessTag;
+    }
+
+    public void setBusinessTag(String businessTag) {
+        this.businessTag = businessTag;
+    }
+
+    public String getAppTag() {
+        return appTag;
+    }
+
+    public void setAppTag(String appTag) {
+        this.appTag = appTag;
+    }
 }

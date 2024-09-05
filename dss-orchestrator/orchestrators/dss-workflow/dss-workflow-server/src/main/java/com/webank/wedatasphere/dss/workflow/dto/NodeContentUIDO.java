@@ -1,6 +1,8 @@
 package com.webank.wedatasphere.dss.workflow.dto;
 
 
+import java.util.Objects;
+
 public class NodeContentUIDO {
     private Long contentId;
     private String nodeUIKey;
@@ -63,5 +65,34 @@ public class NodeContentUIDO {
 
     public void setNodeContentType(String nodeContentType) {
         this.nodeContentType = nodeContentType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        NodeContentUIDO that = (NodeContentUIDO) o;
+        return nodeUIKey.equals(that.nodeUIKey) &&
+                contentId.equals(that.contentId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodeUIKey, contentId);
+    }
+
+    @Override
+    public String toString() {
+        return "NodeContentUIDO{" +
+                "contentId='" + contentId + '\'' +
+                ", nodeUIKey='" + nodeUIKey + '\'' +
+                ", nodeUIValue='" + nodeUIValue + '\'' +
+                ", nodeType='" + nodeType + '\'' +
+                ", nodeContentType='" + nodeContentType + '\'' +
+                '}';
     }
 }

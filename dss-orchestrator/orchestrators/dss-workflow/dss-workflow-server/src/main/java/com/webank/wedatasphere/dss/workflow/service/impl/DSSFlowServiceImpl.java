@@ -477,7 +477,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<Long> contentIdListByOrchestratorId = nodeContentMapper.getContentIdListByOrchestratorId(orchestratorId);
 
             logger.info("workFlowNodes:{}", workFlowNodes);
-            List<NodeContentUIDO> nodeContentUIDOS = new ArrayList<>();
+            Set<NodeContentUIDO> nodeContentUIDOS = new HashSet<>();
             List<NodeContentDO> nodeContentDOS = new ArrayList<>();
             List<String> keyList = new ArrayList<>();
             Map<String, DSSNodeDefault> map = new HashMap<>();

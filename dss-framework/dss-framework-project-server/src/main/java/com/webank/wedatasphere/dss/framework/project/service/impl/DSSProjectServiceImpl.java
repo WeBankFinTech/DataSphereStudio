@@ -813,6 +813,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
             dssProject.setCreateTime(projectVo.getCreateTime());
             dssProject.setUpdateTime(projectVo.getUpdateTime());
             dssProject.setWorkspaceName(projectVo.getWorkspaceName());
+            dssProject.setAssociateGit(projectVo.getAssociateGit());
 
             List<String> accessUsers = StringUtils.isBlank(projectVo.getAccessUsers()) ? new ArrayList<>()
                     : Arrays.asList(projectVo.getAccessUsers().split(MODE_SPLIT));

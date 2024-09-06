@@ -1632,6 +1632,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         String desc = editFlowRequest.getDesc();
         String appTag = editFlowRequest.getAppTag();
         String businessTag = editFlowRequest.getBusinessTag();
+        String ecConfTemplateId = editFlowRequest.getEcConfTemplateId();
+        String ecConfTemplateName = editFlowRequest.getEcConfTemplateName();
         JsonObject jsonObject = JsonParser.parseString(flowJson).getAsJsonObject();
 
         JsonArray listArray = jsonObject.getAsJsonArray("nodes");
@@ -1649,6 +1651,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 flowJsonAddProperty(obj, "desc", desc);
                 flowJsonAddProperty(obj, "appTag", appTag);
                 flowJsonAddProperty(obj, "businessTag", businessTag);
+                flowJsonAddProperty(obj, "ecConfTemplateId", ecConfTemplateId);
+                flowJsonAddProperty(obj, "ecConfTemplateName", ecConfTemplateName);
                 break;
             }
         }

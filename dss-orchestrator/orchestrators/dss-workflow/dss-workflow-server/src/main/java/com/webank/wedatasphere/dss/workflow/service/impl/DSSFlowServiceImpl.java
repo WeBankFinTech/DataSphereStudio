@@ -614,7 +614,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
             }
             if (CollectionUtils.isNotEmpty(nodeContentUIDOS)) {
-                nodeContentUIMapper.batchInsertNodeContentUI(nodeContentUIDOS);
+                nodeContentUIMapper.batchInsertNodeContentUI(new ArrayList<>(nodeContentUIDOS));
             }
         } catch (Exception e) {
             logger.error("saveFlowMeta error, the reason is: ", e);

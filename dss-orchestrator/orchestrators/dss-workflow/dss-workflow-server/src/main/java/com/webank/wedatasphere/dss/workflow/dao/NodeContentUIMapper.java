@@ -13,7 +13,7 @@ import java.util.Set;
 public interface NodeContentUIMapper {
     void insertNodeContentUI(NodeContentUIDO contentUIDO);
 
-    void batchInsertNodeContentUI(Set<NodeContentUIDO> list);
+    void batchInsertNodeContentUI(List<NodeContentUIDO> list);
 
     void updateNodeContentUI(NodeContentUIDO contentUIDO);
 

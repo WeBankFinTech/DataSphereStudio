@@ -51,6 +51,12 @@ public class DataDevelopNodeInfo {
     private String nodeKey;
 
     private  Map<String,String> nodeContent;
+
+    /**
+     * 1-接入git 0-不接入（默认）
+     */
+    private Boolean associateGit;
+
     public String getProjectName() {
         return projectName;
     }
@@ -186,5 +192,13 @@ public class DataDevelopNodeInfo {
 
     public void setNodeContent(Map<String, String> nodeContent) {
         this.nodeContent = nodeContent;
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

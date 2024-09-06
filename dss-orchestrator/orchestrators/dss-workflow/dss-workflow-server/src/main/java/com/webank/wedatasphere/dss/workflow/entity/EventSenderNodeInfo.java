@@ -52,6 +52,11 @@ public class EventSenderNodeInfo {
 
     // 节点配置ID
     private Long contentId;
+
+    /**
+     * 1-接入git 0-不接入（默认）
+     */
+    private Boolean associateGit;
     public String getProjectName() {
         return projectName;
     }
@@ -202,5 +207,13 @@ public class EventSenderNodeInfo {
 
     public void setContentId(Long contentId) {
         this.contentId = contentId;
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

@@ -156,7 +156,7 @@
         select * from `dss_workflow_node` where node_type=#{nodeType}
     </select>
 
-    <select id="queryNodeUIList" parameterType="java.util.List" resultType="com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo">
+    <select id="queryNodeUIInfoList" parameterType="java.util.List" resultType="com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo">
         select t2.node_type
               ,t2.name
               ,t3.`position`
@@ -164,8 +164,7 @@
         from dss_workflow_node_to_ui t1
         join dss_workflow_node t2 on t1.workflow_node_id  = t2.id
         join dss_workflow_node_ui t3 on t1.ui_id  = t3.id
-        where  `position`  = 'startup'
-                and node_type in
+        where  node_type in
         <foreach collection="nodeTypeList" item="item" index="index" open="(" separator="," close=")">
             #{item}
         </foreach>

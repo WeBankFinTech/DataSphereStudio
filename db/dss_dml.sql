@@ -1,11 +1,11 @@
-DELETE FROM dss_appconn;
+DELETE FROM dss_appconn where 1=1;
 INSERT INTO `dss_appconn` (`id`, `appconn_name`, `is_user_need_init`, `level`, `if_iframe`, `is_external`, `reference`, `class_name`, `appconn_class_path`, `resource`)
 VALUES (1,'sso',0,1,0,0,NULL,"com.webank.wedatasphere.dss.appconn.sso.SSOAppConn",NULL,NULL),
 (2,'scriptis',0,1,0,0,"sso",NULL,NULL,NULL),
 (3,'workflow',0,1,1,0,NULL,'com.webank.wedatasphere.dss.appconn.workflow.WorkflowAppConn','/appcom/Install/dss/dss-appconns/workflow',NULL),
 (4,'apiservice',0,1,0,0,"sso",NULL,NULL,NULL);
 
-DELETE FROM dss_appconn_instance;
+DELETE FROM dss_appconn_instance where 1=1;
 select @scriptis_appconn_id:= id from dss_appconn where appconn_name="scriptis";
 select @workflow_appconn_id:= id from dss_appconn where appconn_name="workflow";
 select @apiservice_appconn_id:= id from dss_appconn where appconn_name="apiservice";
@@ -14,15 +14,15 @@ VALUES (2, @scriptis_appconn_id, 'DEV', '/home', '', ''),
 (3, @workflow_appconn_id,'DEV','/workspaceHome','',''),
 (4, @apiservice_appconn_id, 'DEV', '/apiservices', '', '');
 
-DELETE FROM dss_workspace;
+DELETE FROM dss_workspace where 1=1;
 insert into `dss_workspace`(`id`, `name`,`label`,`description`,`create_by`,`create_time`,`department`,`product`,`source`,`last_update_time`,`last_update_user`,`workspace_type`)
 values(224, 'bdapWorkspace','','bdapWorkspace','hadoop','2020-07-13 02:39:41','1','bdapWorkspace',NULL,'2020-07-13 02:39:41','hadoop','project');
 
-DELETE FROM dss_user;
+DELETE FROM dss_user where 1=1;
 INSERT INTO `dss_user` VALUES (100,'hadoop_test','hadoop_test',1,101,1,'','','','0',NULL,'2021-11-17 09:33:45','2021-11-17 09:51:55',NULL),
 (215,'hadoop','hadoop',1,101,1,'','','','0',NULL,'2021-11-17 09:43:41','2021-11-17 09:51:49',NULL);
 
-DELETE FROM dss_workspace_dictionary;
+DELETE FROM dss_workspace_dictionary where 1=1;
 insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`, checked) values (1,0,'0','空间开发流程','Space development process','w_develop_process',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'空间开发流程','SYSTEM','2020-12-28 17:32:34',NULL,'2021-02-22 17:46:40');
 insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`, checked) values (2,0,'w_develop_process','需求','Demand','wdp_demand','创建新的业务需求，并将需求指派给对应负责人。','Create new business requirements and assign them to the corresponding responsible person.','Demo案例','Demo case',NULL,0,'xuqiu',1,'空间开发流程-需求','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:07',0);
 insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`, checked) values (3,0,'w_develop_process','设计','Design','wdp_design','针对新的业务需求，进行数仓规划和库表设计。','According to the new business requirements, data warehouse planning and database table design are carried out.','Demo案例','Demo case',NULL,0,'sheji',1,'空间开发流程-设计','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-23 09:38:09',0);
@@ -40,11 +40,11 @@ insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_nam
 insert into `dss_workspace_dictionary`(`id`,`workspace_id`,`parent_key`,`dic_name`,`dic_name_en`,`dic_key`,`dic_value`,`dic_value_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`, checked) values (21,0,'pom_consist_orchestrator','Email','Email','pom_consist_orchestrator_email',NULL,NULL,NULL,NULL,NULL,0,NULL,1,'工程编排模式-组合编排-Email','SYSTEM','2020-12-28 17:32:35',NULL,'2021-02-22 17:51:22',0);
 insert into `dss_workspace_dictionary`(`workspace_id`, `parent_key`, `dic_name`, `dic_name_en`, `dic_key`, `dic_value`, `dic_value_en`, `title`, `title_en`, `url`, `url_type`, `icon`, `order_num`, `remark`, `create_user`, `create_time`, `update_user`, `update_time`, checked) values('0','0','工作空间默认部门','Space development name','w_workspace_department','10001-部门一;10002-部门二;10003-部门三',NULL,NULL,NULL,NULL,'0',NULL,'1','工作空间默认部门，前面是id后面是部门名称中间使用‘-’,横杆分隔，多个以英文分号分隔','SYSTEM','2020-12-28 17:32:34',NULL,'2021-02-22 17:46:40',0);
 
-DELETE FROM dss_sidebar;
+DELETE FROM dss_sidebar where 1=1;
 insert  into `dss_sidebar`(`id`,`workspace_id`,`name`,`name_en`,`title`,`title_en`,`type`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (2,0,'菜单','Menu','菜单','Menu',1,1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:45:50');
 --insert  into `dss_sidebar`(`id`,`workspace_id`,`name`,`name_en`,`title`,`title_en`,`type`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (3,0,'常见问题','Common problem','常见问题','Common problem',1,1,NULL,'SYSTEM','2020-12-15 13:21:06',NULL,'2021-02-23 09:46:18');
 
-DELETE FROM dss_sidebar_content;
+DELETE FROM dss_sidebar_content where 1=1;
 insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (3,0,2,NULL,NULL,'工作空间管理','Workspace management','/workspaceManagement/productsettings',0,'menuIcon',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:47:49');
 insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (4,0,2,NULL,NULL,'UDF管理','UDF management','dss/linkis/?noHeader=1&noFooter=1#/urm/udfManagement',1,'menuIcon',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:47:11');
 --insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (5,0,3,NULL,NULL,'资源配置说明',NULL,'http://127.0.0.1:8088/kn/d/38',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-01-12 17:16:52');
@@ -53,7 +53,7 @@ insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name
 --insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (8,0,3,NULL,NULL,'工作流使用介绍',NULL,'http://127.0.0.1:8088/kn/d/42',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-01-12 17:17:01');
 --insert  into `dss_sidebar_content`(`id`,`workspace_id`,`sidebar_id`,`name`,`name_en`,`title`,`title_en`,`url`,`url_type`,`icon`,`order_num`,`remark`,`create_user`,`create_time`,`update_user`,`update_time`) values (9,0,3,NULL,NULL,'数据服务使用介绍','Discussion on error code 22223','http://127.0.0.1:8088/kn/d/32',1,'fi-warn',1,NULL,'SYSTEM','2020-12-15 13:21:07',NULL,'2021-02-23 09:48:19');
 
-DELETE FROM dss_workspace_menu;
+DELETE FROM dss_workspace_menu where 1=1;
 INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('1','数据交换','data exchange','数据交换','数据交换描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('2','数据分析','data analysis','数据分析','数据分析描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) VALUES('3','生产运维','production operation','生产运维','生产运维描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
@@ -62,7 +62,7 @@ INSERT INTO `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `descrip
 insert into `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) values('6','数据应用','data application','数据应用','数据应用描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 insert into `dss_workspace_menu` (`id`, `name`, `title_en`, `title_cn`, `description`, `is_active`, `icon`, `order`, `create_by`, `create_time`, `last_update_time`, `last_update_user`) values('7','应用开发','application development','应用开发','应用开发描述','1',NULL,NULL,NULL,NULL,NULL,NULL);
 
-DELETE FROM dss_workspace_menu_appconn;
+DELETE FROM dss_workspace_menu_appconn where 1=1;
 INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
 VALUES (@scriptis_appconn_id, 2, 'Scriptis', 'Scriptis', 'Scriptis is a one-stop interactive data exploration analysis tool built by WeDataSphere, uses Linkis as the kernel.', 'Scriptis是微众银行微数域(WeDataSphere)打造的一站式交互式数据探索分析工具，以任意桥(Linkis)做为内核，提供多种计算存储引擎(如Spark、Hive、TiSpark等)、Hive数据库管理功能、资源(如Yarn资源、服务器资源)管理、应用管理和各种用户资源(如UDF、变量等)管理的能力。', 'scripts development,IDE', '脚本开发,IDE', 1, 'enter Scriptis', '进入Scriptis', 'user manual', '用户手册', 'http://127.0.0.1:8088/wiki/scriptis/manual/workspace_cn.html', 'shujukaifa-logo', null, null, null, null, null, 'shujukaifa-icon');
 INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn, desc_en, desc_cn, labels_en, labels_cn, is_active, access_button_en, access_button_cn, manual_button_en, manual_button_cn, manual_button_url, icon, `order`, create_by, create_time, last_update_time, last_update_user, image)
@@ -71,7 +71,7 @@ INSERT INTO dss_workspace_menu_appconn (appconn_id, menu_id, title_en, title_cn,
 VALUES (@apiservice_appconn_id, 7, 'dataService', '数据服务', '/dataService', '/dataService', null, null, 1, 'Enter dataService', '进入 数据服务', null, null, null, null, null, null, null, null, null, null);
 
 
-DELETE FROM dss_workspace_role;
+DELETE FROM dss_workspace_role where 1=1;
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('1','-1','admin','管理员','2020-07-13 02:43:35','通用角色管理员');
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('2','-1','maintenance','运维用户','2020-07-13 02:43:35','通用角色运维用户');
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('3','-1','developer','开发用户','2020-07-13 02:43:35','通用角色开发用户');
@@ -80,7 +80,7 @@ INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `u
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('6','-1','boss','领导','2020-07-13 02:43:36','通用角色领导');
 INSERT INTO `dss_workspace_role` (`id`, `workspace_id`, `name`, `front_name`, `update_time`, `description`) VALUES('7','-1','apiUser','数据服务用户','2020-08-21 11:35:02','通用角色数据服务用户');
 
-DELETE FROM dss_workspace_user_role;
+DELETE FROM dss_workspace_user_role where 1=1;
 select @defaultWorkspaceId:=id from dss_workspace where name='bdapWorkspace';
 insert  into `dss_workspace_user_role`(`workspace_id`,`username`,`role_id`,`create_time`,`created_by`,`user_id`) values
 (@defaultWorkspaceId,'hadoop',1,'2021-09-06 14:39:17','hadoop',0),(@defaultWorkspaceId,'hadoop',2,'2021-09-06 14:39:17','hadoop',0),
@@ -88,7 +88,7 @@ insert  into `dss_workspace_user_role`(`workspace_id`,`username`,`role_id`,`crea
 (@defaultWorkspaceId,'hadoop',5,'2021-09-06 14:39:17','hadoop',0),(@defaultWorkspaceId,'hadoop',6,'2021-09-06 14:39:17','hadoop',0),
 (@defaultWorkspaceId,'hadoop',7,'2021-09-06 14:39:17','hadoop',0);
 
-DELETE FROM dss_workflow_node;
+DELETE FROM dss_workflow_node where 1=1;
 insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('1','python','scriptis','linkis.python.python','2','1','1','1','0','svgs/python.svg');
 insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('2','pyspark','scriptis','linkis.spark.py','2','1','1','1','0','svgs/pyspark.svg');
 insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('3','sql','scriptis','linkis.spark.sql','2','1','1','1','0','svgs/sql.svg');
@@ -99,7 +99,7 @@ insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jum
 insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('10','connector','scriptis','linkis.control.empty','2','0','1','1','0','icons/connector.icon');
 insert into `dss_workflow_node` (`id`, `name`, `appconn_name`, `node_type`, `jump_type`, `support_jump`, `submit_to_scheduler`, `enable_copy`, `should_creation_before_node`, `icon_path`) values('12','subFlow','scriptis','workflow.subflow','2','1','1','0','1','svgs/subflow.svg');
 
-DELETE FROM dss_workflow_node_group;
+DELETE FROM dss_workflow_node_group where 1=1;
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (1,'数据交换','Data exchange',NULL,1);
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (2,'数据开发','Data development',NULL,2);
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (3,'数据质量','Data Governance',NULL,3);
@@ -109,7 +109,7 @@ insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`orde
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (7,'功能节点','Function node',NULL,7);
 insert  into `dss_workflow_node_group`(`id`,`name`,`name_en`,`description`,`order`) values (8,'机器学习','Machine Learning',NULL,5);
 
-DELETE FROM dss_workflow_node_to_group;
+DELETE FROM dss_workflow_node_to_group where 1=1;
 select @scriptis_node_groupId:=id from dss_workflow_node_group where name='数据开发';
 select @function_node_groupId:=id from dss_workflow_node_group where name='功能节点';
 insert  into `dss_workflow_node_to_group`(`node_id`,`group_id`) values (1, @scriptis_node_groupId);
@@ -122,7 +122,7 @@ insert  into `dss_workflow_node_to_group`(`node_id`,`group_id`) values (7, @scri
 insert  into `dss_workflow_node_to_group`(`node_id`,`group_id`) values (10, @function_node_groupId);
 insert  into `dss_workflow_node_to_group`(`node_id`,`group_id`) values (12, @function_node_groupId);
 
-DELETE FROM dss_workflow_node_ui;
+DELETE FROM dss_workflow_node_ui where 1=1;
 -- todo msg.topic在receiver和sender使用了重复key
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (1,'title','请填写节点名称','Please enter node name','节点名','Node name','Input',1,NULL,NULL,0,NULL,0,1,1,1,'node');
 insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (3,'desc','请填写节点描述','Please enter the node description','节点描述','Node description','Text',0,NULL,NULL,0,NULL,0,4,1,1,'node');
@@ -165,7 +165,7 @@ insert  into `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`l
 INSERT  INTO `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (45,'ReuseEngine','请选择是否复用引擎','Please choose to reuse engin or not','是否复用引擎','reuse-engine-or-not','Select',1,'[\"true\",\"false\"]','true',0,NULL,0,1,1,0,'startup');
 INSERT  INTO `dss_workflow_node_ui`(`id`,`key`,`description`,`description_en`,`lable_name`,`lable_name_en`,`ui_type`,`required`,`value`,`default_value`,`is_hidden`,`condition`,`is_advanced`,`order`,`node_menu_type`,`is_base_info`,`position`) values (46,'wds.linkis.engineconn.java.driver.memory','请填写引擎内存','please input driver memory','wds.linkis.engineconn.java.driver.memory','wds-linkis-engineconn.java.driver.memory','Input',0,NULL,'1G',0,NULL,0,1,1,0,'runtime');
 
-DELETE FROM dss_workflow_node_to_ui;
+DELETE FROM dss_workflow_node_to_ui where 1=1;
 select @workflow_node_sql:=id from dss_workflow_node where name='sql';
 select @workflow_node_python:=id from dss_workflow_node where name='python';
 select @workflow_node_pyspark:=id from dss_workflow_node where name='pyspark';
@@ -282,7 +282,7 @@ insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@work
 INSERT  INTO `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) VALUES (@workflow_node_subFlow,@node_ui_ReuseEngine);
 insert  into `dss_workflow_node_to_ui`(`workflow_node_id`,`ui_id`) values (@workflow_node_hql,@node_ui_DriverMemory);
 
-DELETE FROM dss_workflow_node_ui_validate;
+DELETE FROM dss_workflow_node_ui_validate where 1=1;
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('7','NumInterval','[1,15]','驱动器内存大小，默认值：2','Drive memory size, default value: 2','blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('8','NumInterval','[3,15]','执行器内存大小，默认值：3','Actuator memory size, default value: 3','blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('9','NumInterval','[1,10]','执行器核心个数，默认值：1','Number of cores per executor, default value : 1','blur');
@@ -316,7 +316,7 @@ insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_ra
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('62','Regex','^.{1,150}$','长度在1到150个字符','The length is between 1 and 150 characters','blur');
 insert into `dss_workflow_node_ui_validate` (`id`, `validate_type`, `validate_range`, `error_msg`, `error_msg_en`, `trigger`) values('63', 'Regex', '^([1-9]|10|[1-9])(g|G){0,1}$', '设置范围为[1,10],设置超出限制', 'hive memory limit 1,10', 'blur');
 
-DELETE FROM dss_workflow_node_ui_to_validate;
+DELETE FROM dss_workflow_node_ui_to_validate where 1=1;
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_source_type,31);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_source_type,55);
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_check_object,32);
@@ -396,7 +396,7 @@ insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@
 insert  into `dss_workflow_node_ui_to_validate`(`ui_id`,`validate_id`) values (@node_ui_DriverMemory,63);
 
 
-DELETE FROM dss_workspace_appconn_role;
+DELETE FROM dss_workspace_appconn_role where 1=1;
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'1','1',now(),'system');
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'2','1',now(),'system');
 INSERT INTO `dss_workspace_appconn_role` (`workspace_id`, `appconn_id`, `role_id`, `priv`, `update_time`, `updateby`) VALUES('-1',@scriptis_appconn_id,'3','1',now(),'system');

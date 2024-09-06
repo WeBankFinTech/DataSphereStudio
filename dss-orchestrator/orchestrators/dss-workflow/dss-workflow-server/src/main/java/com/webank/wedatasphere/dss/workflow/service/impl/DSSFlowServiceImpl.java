@@ -1113,7 +1113,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).collect(Collectors.toList());
         Map<String, String> templateMap = getTemplateMap(orchestratorIdList);
 
-
         List<DataDevelopNodeInfo> dataDevelopNodeInfoList = new ArrayList<>();
 
         for (Long contentId : nodeContentUIGroup.keySet()) {
@@ -1130,20 +1129,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
 
                 Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
-                dataDevelopNodeInfo.setNodeName(nodeMap.get("title"));
-                dataDevelopNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
-                dataDevelopNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
-                dataDevelopNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
-                dataDevelopNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
-                dataDevelopNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
-                if (nodeMap.containsKey("resource")) {
-                    dataDevelopNodeInfo.setResource(nodeMap.get("resource"));
-                }
+                NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
+                BeanUtils.copyProperties(nodeBaseInfo,dataDevelopNodeInfo);
 
-                dataDevelopNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
+                dataDevelopNodeInfo.setResource(nodeMap.get("resource"));
+
                 if (nodeMap.containsKey("ec.conf.templateId") && StringUtils.isNotEmpty(nodeMap.get("ec.conf.templateId"))) {
                     dataDevelopNodeInfo.setRefTemplate(Boolean.TRUE);
-                    String templateId = templateMap.get(nodeMap.get("ec.conf.templateId"));
+                    String templateId = nodeMap.get("ec.conf.templateId");
+                    dataDevelopNodeInfo.setTemplateId(templateId);
                     if (templateMap.containsKey(templateId)) {
                         dataDevelopNodeInfo.setTemplateName(templateMap.get(templateId));
                     } else {
@@ -1163,13 +1157,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     }
                 }
 
-                dataDevelopNodeInfo.setProjectName(dssProject.getName());
-                dataDevelopNodeInfo.setProjectId(dssProject.getId());
-                dataDevelopNodeInfo.setContentId(contentId);
-                dataDevelopNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
-                dataDevelopNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
-                dataDevelopNodeInfo.setNodeContent(nodeMap);
-                dataDevelopNodeInfo.setAssociateGit(dssProject.getAssociateGit());
                 dataDevelopNodeInfoList.add(dataDevelopNodeInfo);
             } catch (Exception exception) {
                 logger.error("queryDataDevelopNodeList error content id is {}", contentId);
@@ -1289,29 +1276,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            dataViewNodeInfo.setNodeName(nodeMap.get("title"));
-            if (nodeMap.containsKey("desc")) {
-                dataViewNodeInfo.setNodeDesc(nodeMap.get("desc"));
-            }
-            if (nodeMap.containsKey("viewId")) {
-                dataViewNodeInfo.setViewId(nodeMap.get("viewId"));
-            }
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
+            BeanUtils.copyProperties(nodeBaseInfo,dataViewNodeInfo);
 
-            dataViewNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
-            dataViewNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
-            dataViewNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
-            dataViewNodeInfo.setContentId(dssFlowNodeInfo.getContentId());
-            dataViewNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
-            dataViewNodeInfo.setProjectName(dssProject.getName());
-            dataViewNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
-            dataViewNodeInfo.setProjectId(dssProject.getId());
-            dataViewNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
-            dataViewNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
-            dataViewNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
-            dataViewNodeInfo.setNodeContent(nodeMap);
-            dataViewNodeInfo.setAssociateGit(dssProject.getAssociateGit());
+            dataViewNodeInfo.setNodeDesc(nodeMap.get("desc"));
+            dataViewNodeInfo.setViewId(nodeMap.get("viewId"));
+
             dataViewNodeInfoList.add(dataViewNodeInfo);
-
         }
 
         dataViewNodeInfoList = dataViewNodeResultFilter(request, dataViewNodeInfoList);
@@ -1543,7 +1514,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         List<Long> contentIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getContentId).collect(Collectors.toList());
         List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList, nodeUITitleKey);
-        List<String> nodeNameList = nodeContentUIDOList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
+        List<String> nodeNameList = nodeContentUIDOList.stream().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
         dssFlowName.setNodeNameList(nodeNameList);
 
         return dssFlowName;
@@ -1752,27 +1723,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            dataCheckerNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
-            dataCheckerNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
-            dataCheckerNodeInfo.setNodeName(nodeMap.get("title"));
-            dataCheckerNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
-            dataCheckerNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
-            dataCheckerNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
-            if (nodeMap.containsKey("desc")) {
-                dataCheckerNodeInfo.setNodeDesc(nodeMap.get("desc"));
-            }
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
+            BeanUtils.copyProperties(nodeBaseInfo,dataCheckerNodeInfo);
 
-            if (nodeMap.containsKey("check.object")) {
-                dataCheckerNodeInfo.setCheckObject(nodeMap.get("check.object"));
-            }
-
-            if (nodeMap.containsKey("job.desc")) {
-                dataCheckerNodeInfo.setJobDesc(nodeMap.get("job.desc"));
-            }
-
-            if (nodeMap.containsKey("max.check.hours")) {
-                dataCheckerNodeInfo.setMaxCheckHours(nodeMap.get("max.check.hours"));
-            }
+            dataCheckerNodeInfo.setMaxCheckHours(nodeMap.get("max.check.hours"));
+            dataCheckerNodeInfo.setJobDesc(nodeMap.get("job.desc"));
+            dataCheckerNodeInfo.setCheckObject(nodeMap.get("check.object"));
+            dataCheckerNodeInfo.setNodeDesc(nodeMap.get("desc"));
+            dataCheckerNodeInfo.setSourceType(nodeMap.get("source.type"));
 
             if (nodeMap.containsKey("qualitis.check")) {
                 dataCheckerNodeInfo.setQualitisCheck(Boolean.valueOf(nodeMap.get("qualitis.check")));
@@ -1784,18 +1742,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             }
 
-            if (nodeMap.containsKey("source.type")) {
-                dataCheckerNodeInfo.setSourceType(nodeMap.get("source.type"));
-            }
-
-            dataCheckerNodeInfo.setProjectName(dssProject.getName());
-            dataCheckerNodeInfo.setProjectId(dssProject.getId());
-            dataCheckerNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
-            dataCheckerNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
-            dataCheckerNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
-            dataCheckerNodeInfo.setNodeContent(nodeMap);
-            dataCheckerNodeInfo.setContentId(dssFlowNodeInfo.getContentId());
-            dataCheckerNodeInfo.setAssociateGit(dssProject.getAssociateGit());
             dataCheckerNodeInfoList.add(dataCheckerNodeInfo);
 
         }
@@ -1919,44 +1865,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            eventSenderNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
-            eventSenderNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
-            eventSenderNodeInfo.setNodeName(nodeMap.get("title"));
-            eventSenderNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
-            eventSenderNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
-            eventSenderNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
-            if (nodeMap.containsKey("desc")) {
-                eventSenderNodeInfo.setNodeDesc(nodeMap.get("desc"));
-            }
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
+            BeanUtils.copyProperties(nodeBaseInfo,eventSenderNodeInfo);
+            eventSenderNodeInfo.setNodeDesc(nodeMap.get("desc"));
+            eventSenderNodeInfo.setMsgType(nodeMap.get("msg.type"));
+            eventSenderNodeInfo.setMsgSender(nodeMap.get("msg.sender"));
+            eventSenderNodeInfo.setMsgBody(nodeMap.get("msg.body"));
+            eventSenderNodeInfo.setMsgTopic(nodeMap.get("msg.topic"));
+            eventSenderNodeInfo.setMsgName(nodeMap.get("msg.name"));
 
-            if (nodeMap.containsKey("msg.type")) {
-                eventSenderNodeInfo.setMsgType(nodeMap.get("msg.type"));
-            }
-
-            if (nodeMap.containsKey("msg.sender")) {
-                eventSenderNodeInfo.setMsgSender(nodeMap.get("msg.sender"));
-            }
-
-            if (nodeMap.containsKey("msg.body")) {
-                eventSenderNodeInfo.setMsgBody(nodeMap.get("msg.body"));
-            }
-
-            if (nodeMap.containsKey("msg.topic")) {
-                eventSenderNodeInfo.setMsgTopic(nodeMap.get("msg.topic"));
-            }
-
-            if (nodeMap.containsKey("msg.name")) {
-                eventSenderNodeInfo.setMsgName(nodeMap.get("msg.name"));
-            }
-
-            eventSenderNodeInfo.setProjectName(dssProject.getName());
-            eventSenderNodeInfo.setProjectId(dssProject.getId());
-            eventSenderNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
-            eventSenderNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
-            eventSenderNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
-            eventSenderNodeInfo.setNodeContent(nodeMap);
-            eventSenderNodeInfo.setContentId(dssFlowNodeInfo.getContentId());
-            eventSenderNodeInfo.setAssociateGit(dssProject.getAssociateGit());
             eventSenderNodeInfoList.add(eventSenderNodeInfo);
 
         }
@@ -2074,49 +1991,20 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
             Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
-
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            eventReceiverNodeInfo.setNodeId(dssFlowNodeInfo.getNodeId());
-            eventReceiverNodeInfo.setNodeType(dssFlowNodeInfo.getJobType());
-            eventReceiverNodeInfo.setNodeName(nodeMap.get("title"));
-            eventReceiverNodeInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
-            eventReceiverNodeInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
-            eventReceiverNodeInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
-            if (nodeMap.containsKey("desc")) {
-                eventReceiverNodeInfo.setNodeDesc(nodeMap.get("desc"));
-            }
-
-            if (nodeMap.containsKey("msg.type")) {
-                eventReceiverNodeInfo.setMsgType(nodeMap.get("msg.type"));
-            }
-
-            if (nodeMap.containsKey("msg.receiver")) {
-                eventReceiverNodeInfo.setMsgReceiver(nodeMap.get("msg.receiver"));
-            }
-
-
-            if (nodeMap.containsKey("msg.topic")) {
-                eventReceiverNodeInfo.setMsgTopic(nodeMap.get("msg.topic"));
-            }
-
-            if (nodeMap.containsKey("msg.name")) {
-                eventReceiverNodeInfo.setMsgName(nodeMap.get("msg.name"));
-            }
-
-            if (nodeMap.containsKey("query.frequency")) {
-                eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("query.frequency"));
-            }
-
-            if (nodeMap.containsKey("max.receive.hours")) {
-                eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("max.receive.hours"));
-            }
-
-            if (nodeMap.containsKey("msg.savekey")) {
-                eventReceiverNodeInfo.setMsgSaveKey(nodeMap.get("msg.savekey"));
-            }
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
+            BeanUtils.copyProperties(nodeBaseInfo,eventReceiverNodeInfo);
+            eventReceiverNodeInfo.setNodeDesc(nodeMap.get("desc"));
+            eventReceiverNodeInfo.setMsgType(nodeMap.get("msg.type"));
+            eventReceiverNodeInfo.setMsgReceiver(nodeMap.get("msg.receiver"));
+            eventReceiverNodeInfo.setMsgTopic(nodeMap.get("msg.topic"));
+            eventReceiverNodeInfo.setMsgName(nodeMap.get("msg.name"));
+            eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("query.frequency"));
+            eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("max.receive.hours"));
+            eventReceiverNodeInfo.setMsgSaveKey(nodeMap.get("msg.savekey"));
 
             if (nodeMap.containsKey("only.receive.today")) {
                 eventReceiverNodeInfo.setOnlyReceiveToday(Boolean.valueOf(nodeMap.get("only.receive.today")));
@@ -2134,16 +2022,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 }
             }
 
-            eventReceiverNodeInfo.setProjectName(dssProject.getName());
-            eventReceiverNodeInfo.setProjectId(dssProject.getId());
-            eventReceiverNodeInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
-            eventReceiverNodeInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
-            eventReceiverNodeInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
-            eventReceiverNodeInfo.setNodeContent(nodeMap);
-            eventReceiverNodeInfo.setContentId(dssFlowNodeInfo.getContentId());
-            eventReceiverNodeInfo.setAssociateGit(dssProject.getAssociateGit());
             eventReceiverNodeInfoList.add(eventReceiverNodeInfo);
-
         }
 
         eventReceiverNodeInfoList = eventReceiveNodeResultFilter(eventReceiverNodeInfoList, request);
@@ -2318,6 +2197,30 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         return nodeDefaultValue;
+
+    }
+
+
+    public NodeBaseInfo getNodeBaseInfo(DSSFlowNodeInfo  dssFlowNodeInfo,DSSProject dssProject,Map<String,String> nodeMap){
+
+        NodeBaseInfo nodeBaseInfo= new NodeBaseInfo();
+
+        nodeBaseInfo.setNodeName(nodeMap.get("title"));
+        nodeBaseInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
+        nodeBaseInfo.setNodeType(dssFlowNodeInfo.getJobType());
+        nodeBaseInfo.setNodeId(dssFlowNodeInfo.getNodeId());
+        nodeBaseInfo.setOrchestratorId(dssFlowNodeInfo.getOrchestratorId());
+        nodeBaseInfo.setNodeKey(dssFlowNodeInfo.getNodeKey());
+        nodeBaseInfo.setOrchestratorName(dssFlowNodeInfo.getOrchestratorName());
+        nodeBaseInfo.setProjectName(dssProject.getName());
+        nodeBaseInfo.setProjectId(dssProject.getId());
+        nodeBaseInfo.setContentId(dssFlowNodeInfo.getContentId());
+        nodeBaseInfo.setUpdateTime(dssFlowNodeInfo.getModifyTime());
+        nodeBaseInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
+        nodeBaseInfo.setNodeContent(nodeMap);
+        nodeBaseInfo.setAssociateGit(dssProject.getAssociateGit());
+
+        return  nodeBaseInfo;
 
     }
 

@@ -13,6 +13,8 @@ public class EditFlowRequest {
     private String businessTag;
     private String appTag;
     private String params;
+    private String ecConfTemplateId;
+    private String ecConfTemplateName;
 
     public Long getId() {
         return id;
@@ -76,5 +78,21 @@ public class EditFlowRequest {
 
     public void setAppTag(String appTag) {
         this.appTag = appTag;
+    }
+
+    public String getEcConfTemplateId() {
+        return ecConfTemplateId;
+    }
+
+    public void setEcConfTemplateId(String ecConfTemplateId) {
+        this.ecConfTemplateId = ecConfTemplateId;
+    }
+
+    public String getEcConfTemplateName() {
+        return ecConfTemplateName;
+    }
+
+    public void setEcConfTemplateName(String ecConfTemplateName) {
+        this.ecConfTemplateName = ecConfTemplateName;
     }
 }

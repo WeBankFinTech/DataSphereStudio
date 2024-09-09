@@ -15,6 +15,7 @@ public enum OrchestratorStatusEnum {
     PUBLISHING(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING, "发布中"),
     STATELESS(OrchestratorRefConstant.FLOW_STATUS_STATELESS, "--"),
     SUCCESS(OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS,"发布成功"),
+    UNPUBLISHED(OrchestratorRefConstant.FLOW_STATUS_UNPUBLISHED,"未发布"),
     FAILED(OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, "发布失败");
 
 

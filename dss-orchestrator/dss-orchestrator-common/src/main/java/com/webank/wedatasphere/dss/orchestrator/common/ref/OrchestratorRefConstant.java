@@ -57,4 +57,6 @@ public interface OrchestratorRefConstant {
 
     public static final String FLOW_STATUS_STATELESS = "stateless";
 
+    public static final String FLOW_STATUS_UNPUBLISHED = "unpublished";
+
 }

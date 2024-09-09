@@ -504,9 +504,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     }
 
     @Override
+    @Transactional
     public void transferProject(ProjectTransferRequest projectTransferRequest, DSSProjectDO dbProject,
                                 String oldProjectOwner,
-                                Workspace workspace,String operator) throws Exception {
+                                Workspace workspace,String operator){
         ProjectModifyRequest projectModifyRequest = new ProjectModifyRequest();
 
         BeanUtils.copyProperties(dbProject, projectModifyRequest);
@@ -531,7 +532,11 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         //3.修改dss_project owner信息
         updateProject4Transfer(dbProject, operator);
         //4.修改git权限
-        syncGitProject(projectModifyRequest, dbProject, newProjectOwner, workspace);
+        try {
+            syncGitProject(projectModifyRequest, dbProject, newProjectOwner, workspace);
+        }catch (Exception e){
+            LOGGER.error("transfer git failed",e);
+        }
     }
 
     private void updateProject4Transfer(DSSProjectDO dbProject,String operator){

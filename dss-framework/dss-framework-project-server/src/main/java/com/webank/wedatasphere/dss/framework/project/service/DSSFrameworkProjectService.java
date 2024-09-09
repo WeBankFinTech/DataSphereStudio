@@ -55,5 +55,5 @@ public interface DSSFrameworkProjectService {
      * @throws Exception
      */
     void transferProject(ProjectTransferRequest projectTransferRequest, DSSProjectDO dbProject,
-                         String oldProjectOwner, Workspace workspace,String operator) throws Exception;
+                         String oldProjectOwner, Workspace workspace,String operator);
 }

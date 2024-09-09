@@ -1144,8 +1144,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
 
                 Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
-                NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
-                BeanUtils.copyProperties(nodeBaseInfo,dataDevelopNodeInfo);
+                NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+                BeanUtils.copyProperties(nodeBaseInfo, dataDevelopNodeInfo);
 
                 dataDevelopNodeInfo.setResource(nodeMap.get("resource"));
 
@@ -1291,8 +1291,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
-            BeanUtils.copyProperties(nodeBaseInfo,dataViewNodeInfo);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+            BeanUtils.copyProperties(nodeBaseInfo, dataViewNodeInfo);
 
             dataViewNodeInfo.setNodeDesc(nodeMap.get("desc"));
             dataViewNodeInfo.setViewId(nodeMap.get("viewId"));
@@ -1466,7 +1466,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             if (!StringUtils.isEmpty(request.getViewId()) && flag) {
-                flag = request.getViewId().equals(dataViewNodeInfo.getViewId());
+                flag = StringUtils.isNotEmpty(dataViewNodeInfo.getViewId())
+                        && dataViewNodeInfo.getViewId().contains(request.getViewId());
             }
 
             return flag;
@@ -1738,8 +1739,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
-            BeanUtils.copyProperties(nodeBaseInfo,dataCheckerNodeInfo);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+            BeanUtils.copyProperties(nodeBaseInfo, dataCheckerNodeInfo);
 
             dataCheckerNodeInfo.setMaxCheckHours(nodeMap.get("max.check.hours"));
             dataCheckerNodeInfo.setJobDesc(nodeMap.get("job.desc"));
@@ -1803,16 +1804,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             if (!StringUtils.isEmpty(request.getCheckObject()) && flag) {
-                flag = request.getCheckObject().equals(dataCheckerNodeInfo.getCheckObject());
+                flag = StringUtils.isNotEmpty(dataCheckerNodeInfo.getCheckObject())
+                        && dataCheckerNodeInfo.getCheckObject().contains(request.getCheckObject());
             }
 
             if (!StringUtils.isEmpty(request.getJobDesc()) && flag) {
-                if (StringUtils.isEmpty(dataCheckerNodeInfo.getJobDesc())) {
-                    flag = false;
-                } else {
-                    List<String> arrays = Arrays.asList(dataCheckerNodeInfo.getJobDesc().split("\n"));
-                    flag = arrays.contains(request.getJobDesc());
-                }
+
+                flag = StringUtils.isNotEmpty(dataCheckerNodeInfo.getJobDesc())
+                        && dataCheckerNodeInfo.getJobDesc().contains(request.getJobDesc());
             }
 
             if (request.getQualitisCheck() != null && flag) {
@@ -1880,8 +1879,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
-            BeanUtils.copyProperties(nodeBaseInfo,eventSenderNodeInfo);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+            BeanUtils.copyProperties(nodeBaseInfo, eventSenderNodeInfo);
             eventSenderNodeInfo.setNodeDesc(nodeMap.get("desc"));
             eventSenderNodeInfo.setMsgType(nodeMap.get("msg.type"));
             eventSenderNodeInfo.setMsgSender(nodeMap.get("msg.sender"));
@@ -1931,19 +1930,24 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             if (!StringUtils.isEmpty(request.getMsgSender()) && flag) {
-                flag = request.getMsgSender().equals(eventSenderNodeInfo.getMsgSender());
+                flag = StringUtils.isNotEmpty(eventSenderNodeInfo.getMsgSender())
+                        && eventSenderNodeInfo.getMsgSender().contains(request.getMsgSender());
             }
 
             if (!StringUtils.isEmpty(request.getMsgBody()) && flag) {
-                flag = request.getMsgBody().equals(eventSenderNodeInfo.getMsgBody());
+
+                flag = StringUtils.isNotEmpty(eventSenderNodeInfo.getMsgBody())
+                        && eventSenderNodeInfo.getMsgBody().contains(request.getMsgBody());
             }
 
             if (!StringUtils.isEmpty(request.getMsgTopic()) && flag) {
-                flag = request.getMsgTopic().equals(eventSenderNodeInfo.getMsgTopic());
+                flag = StringUtils.isNotEmpty(eventSenderNodeInfo.getMsgTopic())
+                        && eventSenderNodeInfo.getMsgTopic().contains(request.getMsgTopic());
             }
 
             if (!StringUtils.isEmpty(request.getMsgName()) && flag) {
-                flag = request.getMsgName().equals(eventSenderNodeInfo.getMsgName());
+                flag = StringUtils.isNotEmpty(eventSenderNodeInfo.getMsgName())
+                        && eventSenderNodeInfo.getMsgName().contains(request.getMsgName());
             }
 
             return flag;
@@ -2010,8 +2014,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo,dssProject,nodeMap);
-            BeanUtils.copyProperties(nodeBaseInfo,eventReceiverNodeInfo);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+            BeanUtils.copyProperties(nodeBaseInfo, eventReceiverNodeInfo);
             eventReceiverNodeInfo.setNodeDesc(nodeMap.get("desc"));
             eventReceiverNodeInfo.setMsgType(nodeMap.get("msg.type"));
             eventReceiverNodeInfo.setMsgReceiver(nodeMap.get("msg.receiver"));
@@ -2023,7 +2027,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             if (nodeMap.containsKey("only.receive.today")) {
                 eventReceiverNodeInfo.setOnlyReceiveToday(Boolean.valueOf(nodeMap.get("only.receive.today")));
-            }else{
+            } else {
                 if (StringUtils.isNotEmpty(nodeDefaultValue.get("only.receive.today"))) {
                     eventReceiverNodeInfo.setOnlyReceiveToday(Boolean.valueOf(nodeDefaultValue.get("only.receive.today")));
                 }
@@ -2031,7 +2035,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             if (nodeMap.containsKey("msg.receive.use.rundate")) {
                 eventReceiverNodeInfo.setMsgReceiveUseRunDate(Boolean.valueOf(nodeMap.get("msg.receive.use.rundate")));
-            }else{
+            } else {
                 if (StringUtils.isNotEmpty(nodeDefaultValue.get("msg.receive.use.rundate"))) {
                     eventReceiverNodeInfo.setMsgReceiveUseRunDate(Boolean.valueOf(nodeDefaultValue.get("msg.receive.use.rundate")));
                 }
@@ -2079,23 +2083,31 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             if (!StringUtils.isEmpty(request.getMsgReceiver()) && flag) {
-                flag = request.getMsgReceiver().equals(eventReceiverNodeInfo.getMsgReceiver());
+
+                flag = StringUtils.isNotEmpty(eventReceiverNodeInfo.getMsgReceiver())
+                        && eventReceiverNodeInfo.getMsgReceiver().contains(request.getMsgReceiver());
             }
 
             if (!StringUtils.isEmpty(request.getMsgTopic()) && flag) {
-                flag = request.getMsgTopic().equals(eventReceiverNodeInfo.getMsgTopic());
+                flag = StringUtils.isNotEmpty(eventReceiverNodeInfo.getMsgTopic())
+                        && eventReceiverNodeInfo.getMsgTopic().contains(request.getMsgTopic());
             }
 
             if (!StringUtils.isEmpty(request.getMsgName()) && flag) {
-                flag = request.getMsgName().equals(eventReceiverNodeInfo.getMsgName());
+
+                flag = StringUtils.isNotEmpty(eventReceiverNodeInfo.getMsgName())
+                        && eventReceiverNodeInfo.getMsgName().contains(request.getMsgName());
             }
 
             if (!StringUtils.isEmpty(request.getMaxReceiveHours()) && flag) {
-                flag = request.getMaxReceiveHours().equals(eventReceiverNodeInfo.getMaxReceiveHours());
+//                flag = request.getMaxReceiveHours().equals(eventReceiverNodeInfo.getMaxReceiveHours());
+                flag = StringUtils.isNotEmpty(eventReceiverNodeInfo.getMaxReceiveHours())
+                        && eventReceiverNodeInfo.getMaxReceiveHours().contains(request.getMaxReceiveHours());
             }
 
             if (!StringUtils.isEmpty(request.getMsgSaveKey()) && flag) {
-                flag = request.getMsgSaveKey().equals(eventReceiverNodeInfo.getMsgSaveKey());
+                flag = StringUtils.isNotEmpty(eventReceiverNodeInfo.getMsgSaveKey())
+                        && eventReceiverNodeInfo.getMsgSaveKey().contains(request.getMsgSaveKey());
             }
 
             if (request.getOnlyReceiveToday() != null && flag) {
@@ -2177,13 +2189,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 continue;
             }
 
-            if (value.contains(";")) {
-                descValue.addAll(Arrays.asList(value.trim().split(";")));
-            } else if (value.contains("\n")) {
-                descValue.addAll(Arrays.asList(value.trim().split("\n")));
-            } else {
-                descValue.addAll(Arrays.asList(value.trim().split("")));
-            }
+            descValue.addAll(splitJobDesc(value));
         }
 
         return descValue.stream().filter(value -> {
@@ -2216,9 +2222,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
 
-    public NodeBaseInfo getNodeBaseInfo(DSSFlowNodeInfo  dssFlowNodeInfo,DSSProject dssProject,Map<String,String> nodeMap){
+    public NodeBaseInfo getNodeBaseInfo(DSSFlowNodeInfo dssFlowNodeInfo, DSSProject dssProject, Map<String, String> nodeMap) {
 
-        NodeBaseInfo nodeBaseInfo= new NodeBaseInfo();
+        NodeBaseInfo nodeBaseInfo = new NodeBaseInfo();
 
         nodeBaseInfo.setNodeName(nodeMap.get("title"));
         nodeBaseInfo.setNodeTypeName(dssFlowNodeInfo.getNodeTypeName());
@@ -2235,7 +2241,20 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         nodeBaseInfo.setNodeContent(nodeMap);
         nodeBaseInfo.setAssociateGit(dssProject.getAssociateGit());
 
-        return  nodeBaseInfo;
+        return nodeBaseInfo;
+
+    }
+
+
+    public List<String> splitJobDesc(String jobDesc) {
+
+        if (jobDesc.contains(";")) {
+            return Arrays.asList(jobDesc.trim().split(";"));
+        } else if (jobDesc.contains("\n")) {
+            return Arrays.asList(jobDesc.trim().split("\n"));
+        } else {
+            return Arrays.asList(jobDesc.trim().split(""));
+        }
 
     }
 

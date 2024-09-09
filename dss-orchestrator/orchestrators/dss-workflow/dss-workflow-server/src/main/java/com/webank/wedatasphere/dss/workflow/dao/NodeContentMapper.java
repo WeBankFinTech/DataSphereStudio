@@ -25,7 +25,7 @@ public interface NodeContentMapper {
 
     List<NodeContentDO> getNodeContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
 
-    List<Long> getContentIdListByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
+    List<NodeContentDO> getContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
 
     void deleteNodeContentByKey(@Param("nodeKey") String nodeKey, @Param("orchestratorId") Long orchestratorId);
 

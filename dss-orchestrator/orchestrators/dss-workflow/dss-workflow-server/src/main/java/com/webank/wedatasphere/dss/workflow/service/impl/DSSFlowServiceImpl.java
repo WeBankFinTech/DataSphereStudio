@@ -1656,7 +1656,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     private void flowJsonAddProperty(JsonObject obj, String contentName, String content) {
-        if (StringUtils.isNotEmpty(content)) {
+        if (content != null) {
             obj.addProperty(contentName, content);
         }
     }

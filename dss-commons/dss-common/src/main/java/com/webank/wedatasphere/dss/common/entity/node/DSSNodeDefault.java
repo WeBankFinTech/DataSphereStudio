@@ -37,6 +37,10 @@ public class DSSNodeDefault implements DSSNode {
     private String userProxy;
     private String modifyUser;
     private Long modifyTime;
+    private String appTag;
+    private String businessTag;
+    private String ecConfTemplateId;
+    private String ecConfTemplateName;
     /**
      * dependencys 是该Node的依赖节点
      */
@@ -224,5 +228,49 @@ public class DSSNodeDefault implements DSSNode {
 
     public void setModifyTime(Long modifyTime) {
         this.modifyTime = modifyTime;
+    }
+
+    public String getLastUpdateTime() {
+        return lastUpdateTime;
+    }
+
+    public void setLastUpdateTime(String lastUpdateTime) {
+        this.lastUpdateTime = lastUpdateTime;
+    }
+
+    public String getAppTag() {
+        return appTag;
+    }
+
+    public void setAppTag(String appTag) {
+        this.appTag = appTag;
+    }
+
+    public String getBusinessTag() {
+        return businessTag;
+    }
+
+    public void setBusinessTag(String businessTag) {
+        this.businessTag = businessTag;
+    }
+
+    public String getEcConfTemplateId() {
+        return ecConfTemplateId;
+    }
+
+    public void setEcConfTemplateId(String ecConfTemplateId) {
+        this.ecConfTemplateId = ecConfTemplateId;
+    }
+
+    public String getEcConfTemplateName() {
+        return ecConfTemplateName;
+    }
+
+    public void setEcConfTemplateName(String ecConfTemplateName) {
+        this.ecConfTemplateName = ecConfTemplateName;
+    }
+
+    public void setDependencys(List<String> dependencys) {
+        this.dependencys = dependencys;
     }
 }

@@ -472,7 +472,7 @@ public class DSSFrameworkProjectRestfulApi {
             String errorMsg = String.format("用户 %s 转移工程 %s 失败. ", operator,
                     projectTransferRequest.getProjectName());
             LOGGER.error(errorMsg, e);
-            return Message.error(errorMsg);
+            return Message.error(errorMsg + e.getMessage());
         }
         return Message.ok("转移工程成功.");
     }

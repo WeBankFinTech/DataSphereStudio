@@ -456,7 +456,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         resourceToString.append(resource.get("fileName"));
                         resourceToString.append(";");
                     }
-
                 }
             }
 
@@ -567,6 +566,22 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 String desc = nodeDefault.getDesc();
                 if (StringUtils.isNotEmpty(desc)) {
                     nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "desc", desc, jobType, "String"));
+                }
+                String businessTag = nodeDefault.getBusinessTag();
+                if (StringUtils.isNotEmpty(businessTag)) {
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "businessTag", businessTag, jobType, "String"));
+                }
+                String appTag = nodeDefault.getAppTag();
+                if (StringUtils.isNotEmpty(appTag)) {
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "appTag", appTag, jobType, "String"));
+                }
+                String ecConfTemplateName = nodeDefault.getEcConfTemplateName();
+                if (StringUtils.isNotEmpty(ecConfTemplateName)) {
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "ecConfTemplateName", ecConfTemplateName, jobType, "String"));
+                }
+                String ecConfTemplateId = nodeDefault.getEcConfTemplateId();
+                if (StringUtils.isNotEmpty(ecConfTemplateId)) {
+                    nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, "ecConfTemplateId", ecConfTemplateId, jobType, "String"));
                 }
                 List<Resource> nodeDefaultResources = nodeDefault.getResources();
                 if (CollectionUtils.isNotEmpty(nodeDefaultResources)) {

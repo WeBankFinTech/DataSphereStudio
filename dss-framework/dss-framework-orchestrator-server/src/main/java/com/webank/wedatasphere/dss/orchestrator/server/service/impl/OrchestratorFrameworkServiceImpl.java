@@ -644,47 +644,64 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         List<Long> orchestratorIdList = orchestratorMetaList.stream().map(OrchestratorMeta::getOrchestratorId).collect(Collectors.toList());
         List<OrchestratorReleaseVersionInfo> releaseVersionInfos = orchestratorMapper.getOrchestratorReleaseVersionInfo(orchestratorIdList);
-        List<OrchestratorReleaseVersionInfo> releaseVersionList = new ArrayList<>();
+//        List<OrchestratorReleaseVersionInfo> releaseVersionList = new ArrayList<>();
+        Map<Long,OrchestratorReleaseVersionInfo> versionMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(releaseVersionInfos)) {
-            // 分组排序 获取编排最新的第一条记录信息
-            releaseVersionList = releaseVersionInfos.stream()
-                    .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId)).values()
-                    .stream()
-                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getReleaseTaskId)).get()))
-                    .collect(Collectors.toList());
+            // 根据orchestratorId 分组
+            Map<Long,List<OrchestratorReleaseVersionInfo>>  map = releaseVersionInfos.stream()
+                    .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId));
+            // 取编排的第一条记录
+            for(Long orchestratorId: map.keySet()){
 
+                OrchestratorReleaseVersionInfo  orchestratorReleaseVersionInfo = map.get(orchestratorId).stream()
+                        .max(Comparator.comparing(OrchestratorReleaseVersionInfo::getReleaseTaskId)).orElse(null);
 
-            for(OrchestratorReleaseVersionInfo releaseTask: releaseVersionList){
-                // 状态不为NULL, 则跳过
-                if(!StringUtils.isEmpty(releaseTask.getStatus())){
+                if(orchestratorReleaseVersionInfo == null){
                     continue;
                 }
-                // 取出所有编排的版本信息
-                List<OrchestratorReleaseVersionInfo> taskList = releaseVersionInfos.stream()
-                        .filter(task -> task.getOrchestratorId().equals(releaseTask.getOrchestratorId())).collect(Collectors.toList());
-                if(taskList.size() == 1){
-                    continue;
-                }
-                // 获取所有状态不为NULL的版本
-                taskList = taskList.stream().filter(taskInfo -> !StringUtils.isEmpty(taskInfo.getStatus())).collect(Collectors.toList());
 
-                if(!taskList.isEmpty()){
-                    taskList.sort(new Comparator<OrchestratorReleaseVersionInfo>() {
-                        @Override
-                        public int compare(OrchestratorReleaseVersionInfo o1, OrchestratorReleaseVersionInfo o2) {
-                            return (int) (o1.getReleaseTaskId() - o2.getReleaseTaskId());
-                        }
-                    });
-                    // 最后拼接信息
-                    OrchestratorReleaseVersionInfo lastTaskInfo = taskList.get(taskList.size() - 1);
-                    if(lastTaskInfo != null){
-                        releaseTask.setErrorMsg(lastTaskInfo.getErrorMsg());
-                        releaseTask.setStatus(lastTaskInfo.getStatus());
-                        releaseTask.setReleaseTime(lastTaskInfo.getReleaseTime());
-                    }
-                }
-
+                versionMap.put(orchestratorId,orchestratorReleaseVersionInfo);
             }
+
+
+            // 分组排序 获取编排最新的第一条记录信息
+//            releaseVersionList = releaseVersionInfos.stream()
+//                    .collect(Collectors.groupingBy(OrchestratorReleaseVersionInfo::getOrchestratorId)).values()
+//                    .stream()
+//                    .flatMap(v -> Stream.of(v.stream().max(Comparator.comparing(OrchestratorReleaseVersionInfo::getReleaseTaskId)).get()))
+//                    .collect(Collectors.toList());
+
+//            for(OrchestratorReleaseVersionInfo releaseTask: releaseVersionList){
+//                // 状态不为NULL, 则跳过
+//                if(!StringUtils.isEmpty(releaseTask.getStatus())){
+//                    continue;
+//                }
+//                // 取出所有编排的版本信息
+//                List<OrchestratorReleaseVersionInfo> taskList = releaseVersionInfos.stream()
+//                        .filter(task -> task.getOrchestratorId().equals(releaseTask.getOrchestratorId())).collect(Collectors.toList());
+//                if(taskList.size() == 1){
+//                    continue;
+//                }
+//                // 获取所有状态不为NULL的版本
+//                taskList = taskList.stream().filter(taskInfo -> !StringUtils.isEmpty(taskInfo.getStatus())).collect(Collectors.toList());
+//
+//                if(!taskList.isEmpty()){
+//                    taskList.sort(new Comparator<OrchestratorReleaseVersionInfo>() {
+//                        @Override
+//                        public int compare(OrchestratorReleaseVersionInfo o1, OrchestratorReleaseVersionInfo o2) {
+//                            return (int) (o1.getReleaseTaskId() - o2.getReleaseTaskId());
+//                        }
+//                    });
+//                    // 最后拼接信息
+//                    OrchestratorReleaseVersionInfo lastTaskInfo = taskList.get(taskList.size() - 1);
+//                    if(lastTaskInfo != null){
+//                        releaseTask.setErrorMsg(lastTaskInfo.getErrorMsg());
+//                        releaseTask.setStatus(lastTaskInfo.getStatus());
+//                        releaseTask.setReleaseTime(lastTaskInfo.getReleaseTime());
+//                    }
+//                }
+//
+//            }
 
         }
         // 获取模板名称
@@ -710,12 +727,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         for (OrchestratorMeta orchestratorMeta : orchestratorMetaList) {
 
-            OrchestratorReleaseVersionInfo releaseVersion = releaseVersionList.stream().filter(releaseVersionInfo ->
-                            releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))
-                    .findFirst().orElse(new OrchestratorReleaseVersionInfo());
+//            OrchestratorReleaseVersionInfo releaseVersion = releaseVersionList.stream().filter(releaseVersionInfo ->
+//                            releaseVersionInfo.getOrchestratorId().equals(orchestratorMeta.getOrchestratorId()))
+//                    .findFirst().orElse(new OrchestratorReleaseVersionInfo());
+
+            OrchestratorReleaseVersionInfo releaseVersion = versionMap.getOrDefault(orchestratorMeta.getOrchestratorId(),
+                    new OrchestratorReleaseVersionInfo());
 
             orchestratorMeta.setVersion(releaseVersion.getVersion());
-            orchestratorMeta.setUpdateTime(releaseVersion.getUpdateTime());
+            orchestratorMeta.setUpdateTime(releaseVersion.getReleaseTime());
             orchestratorMeta.setUpdateUser(releaseVersion.getUpdater());
 
             /*
@@ -771,6 +791,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 } else{
                     // 无状态
                     orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
+                    // 未进行发布的工作流，为未发布状态
+                    if(StringUtils.isEmpty(releaseVersion.getStatus())){
+                        orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
+                        orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
+                    }
                 }
             }
 
@@ -798,17 +823,17 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             if (DSSOrchestratorConstant.ASCEND.equalsIgnoreCase(orchestratorMetaRequest.getOrderBy())) {
                 orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder()))).collect(Collectors.toList());
             } else {
-                orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsLast(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
+                orchestratorMetaList = orchestratorMetaList.stream().sorted(Comparator.comparing(OrchestratorMeta::getUpdateTime, Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
             }
         } catch (Exception e) {
             LOGGER.error("排序失败， 原因为：", e);
         }
 
         // 分页处理
-        Integer page = orchestratorMetaRequest.getPageNow() >= 1 ? orchestratorMetaRequest.getPageNow() : 1;
-        Integer pageSize = orchestratorMetaRequest.getPageSize() >= 1 ? orchestratorMetaRequest.getPageSize() : 10;
-        Integer start = (page - 1) * pageSize;
-        Integer end = page * pageSize > orchestratorMetaList.size() ? orchestratorMetaList.size() : page * pageSize;
+        int page = orchestratorMetaRequest.getPageNow() >= 1 ? orchestratorMetaRequest.getPageNow() : 1;
+        int pageSize = orchestratorMetaRequest.getPageSize() >= 1 ? orchestratorMetaRequest.getPageSize() : 10;
+        int start = (page - 1) * pageSize;
+        int end = Math.min(page * pageSize , orchestratorMetaList.size());
         Map<Long, Boolean> map = new HashMap<>();
         for (int i = start; i < end; i++) {
             OrchestratorMeta orchestratorMeta = orchestratorMetaList.get(i);
@@ -925,9 +950,15 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
             orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
 
-        } else{
+        }
+        else{
             // 待发布
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH);
+            // 提交后 未进行发布的工作流 是未发布状态
+            if(StringUtils.isEmpty(releaseVersion.getStatus())){
+                orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
+                orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
+            }
         }
     }
 

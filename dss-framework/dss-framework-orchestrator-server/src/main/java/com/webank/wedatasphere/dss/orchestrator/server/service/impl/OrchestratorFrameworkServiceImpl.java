@@ -85,6 +85,7 @@ import com.webank.wedatasphere.dss.standard.common.exception.operation.ExternalO
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 
 import com.webank.wedatasphere.dss.workflow.dao.*;
+import com.webank.wedatasphere.dss.workflow.dto.NodeContentDO;
 import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
@@ -374,7 +375,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorVo.setOrchestratorId(orchestratorInfoId);
 
         // 同步更新flowJson
-        List<Long> contentIdList = nodeContentMapper.getContentIdListByOrchestratorId(orchestratorInfoId);
+        List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorInfoId);
+        if (CollectionUtils.isEmpty(contentDOS)) {
+            return orchestratorVo;
+        }
+        List<Long> contentIdList = contentDOS.stream().map(NodeContentDO::getId).collect(Collectors.toList());
         nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorInfoId);
         if (CollectionUtils.isNotEmpty(contentIdList)) {
             nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);

@@ -451,21 +451,12 @@ public class DSSFrameworkProjectRestfulApi {
         String operator =SecurityFilter.getLoginUsername(request); ;
         String workspaceName = dssWorkspaceService.getWorkspaceName(dbProject.getWorkspaceId());
         Long workspaceId = dbProject.getWorkspaceId();
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(WORKSPACE_NAME_COOKIE_KEY)) {
-                    cookie.setValue(workspaceName);
-                    cookie.setPath("/");
-
-                } else if (cookie.getName().equals(WORKSPACE_ID_COOKIE_KEY)) {
-                    cookie.setValue(workspaceId.toString());
-                    cookie.setPath("/");
-
-                }
-            }
-        }
-        Workspace workspace = SSOHelper.getWorkspace(request);
+        Workspace workspace = new Workspace();
+        workspace.setWorkspaceId(workspaceId);
+        workspace.setWorkspaceName(workspaceName);
+        SSOHelper.addWorkspaceInfo(request, workspace);
+        workspace.addCookie(WORKSPACE_NAME_COOKIE_KEY, workspaceName);
+        workspace.addCookie(WORKSPACE_ID_COOKIE_KEY,workspaceId.toString());
 
         //1.把用户加到工作空间里。
         //2.，把operator加到查看、编辑、发布权限里。

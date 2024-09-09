@@ -77,8 +77,8 @@
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId}
     </select>
 
-    <select id="getContentIdListByOrchestratorId" parameterType="java.lang.Long" resultType="java.lang.Long">
-        SELECT id FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId}
+    <select id="getContentListByOrchestratorId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId}
     </select>
 
 

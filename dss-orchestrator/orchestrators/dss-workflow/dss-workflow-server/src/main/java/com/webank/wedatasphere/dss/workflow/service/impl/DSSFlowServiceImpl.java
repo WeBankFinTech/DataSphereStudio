@@ -473,7 +473,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
             }
 
-            List<Long> contentIdListByOrchestratorId = nodeContentMapper.getContentIdListByOrchestratorId(orchestratorId);
+            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorId);
 
             logger.info("workFlowNodes:{}", workFlowNodes);
             Set<NodeContentUIDO> nodeContentUIDOS = new HashSet<>();
@@ -507,21 +507,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 return;
             }
 
-            List<String> nodeKeyList = nodeContentDOS.stream().map(NodeContentDO::getNodeKey).collect(Collectors.toList());
-
-            List<NodeContentDO> nodeContentByKeyList = nodeContentMapper.getNodeContentByKeyList(nodeKeyList, orchestratorId);
-
             // 获取相同的部分（交集）
-            Set<NodeContentDO> intersection = new HashSet<>(nodeContentByKeyList);
+            Set<NodeContentDO> intersection = new HashSet<>(contentDOS);
             intersection.retainAll(nodeContentDOS);
 
             // 获取删除的部分（差集）
-            Set<NodeContentDO> difference1 = new HashSet<>(nodeContentByKeyList);
+            Set<NodeContentDO> difference1 = new HashSet<>(contentDOS);
             difference1.removeAll(nodeContentDOS);
 
             // 获取新增的部分（差集）
-            Set<NodeContentDO> difference2 = new HashSet<>(nodeContentDOS);
-            difference2.removeAll(nodeContentByKeyList);
+            Set<NodeContentDO> difference2 = new HashSet<>(contentDOS);
+            difference2.removeAll(nodeContentDOS);
 
             if (CollectionUtils.isNotEmpty(difference2)) {
                 nodeContentMapper.batchInsert(new ArrayList<>(difference2));
@@ -624,6 +620,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     }
                 }
             }
+            List<Long> contentIdListByOrchestratorId = contentDOS.stream().map(NodeContentDO::getId).collect(Collectors.toList());
             // 先删后增
             if (CollectionUtils.isNotEmpty(contentIdListByOrchestratorId)) {
                 nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);

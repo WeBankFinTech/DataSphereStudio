@@ -24,8 +24,7 @@ import com.webank.wedatasphere.dss.appconn.datachecker.common.CheckDataObject;
 import com.webank.wedatasphere.dss.appconn.datachecker.common.MaskCheckNotExistException;
 import com.webank.wedatasphere.dss.appconn.datachecker.utils.HttpUtils;
 import com.webank.wedatasphere.dss.appconn.datachecker.utils.QualitisUtil;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionAction;
-import com.webank.wedatasphere.dss.standard.app.development.listener.common.RefExecutionState;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import okhttp3.Response;
@@ -173,12 +172,9 @@ public class DataCheckerDao {
         }
         String objectNum = proObjectMap.get(DataChecker.DATA_OBJECT_NUM);
         CheckDataObject dataObject;
-        try {
+
             dataObject = parseDataObject(dataObjectStr);
-        } catch (SQLException e) {
-            log.error("parse dataObject failed", e);
-            return false;
-        }
+
         Predicate<Map<String, String>> hasDataSource = p -> {
             if (StringUtils.isEmpty(proObjectMap.get(DataChecker.SOURCE_TYPE))) {
                 return false;
@@ -248,9 +244,37 @@ public class DataCheckerDao {
     }
 
     private List<Map<String, String>> extractProperties(Properties p) {
-        return p.keySet().stream()
+        List<Map<String, String>> checkList = p.keySet().stream()
                 .map(key -> key2Map(key, p)).filter(x -> x.size() > 0)
                 .collect(Collectors.toList());
+        if (p.contains(DataChecker.EXPAND_SECOND_PARTITION) && "true".equalsIgnoreCase(p.getProperty(DataChecker.EXPAND_SECOND_PARTITION).trim())) {
+            List<Map<String, String>> expandCheckList = new ArrayList<>();
+            for (Map<String, String> proObjectMap : checkList) {
+                String dataObjectStr = proObjectMap.get(DataChecker.DATA_OBJECT) ;
+                CheckDataObject dataObject= parseDataObject(dataObjectStr);
+                if(dataObject.getType() == CheckDataObject.Type.PARTITION){
+                    for (int i = 0; i < 24; i++) {
+                        Map<String, String> itemMap = new HashMap<>(3);
+                        String formattedValue = String.format("%02d", i);
+                        String stKey = DataChecker.SOURCE_TYPE;
+                        if (proObjectMap.containsKey(stKey)) {
+                            itemMap.put(DataChecker.SOURCE_TYPE, proObjectMap.get(stKey));
+                        }
+                        String secondPartitionName = "ph=" + formattedValue;
+                        String nCheckObject = dataObject.forMat(secondPartitionName);
+                        itemMap.put(DataChecker.DATA_OBJECT,nCheckObject);
+                        String nObjectNum = proObjectMap.get(DataChecker.DATA_OBJECT_NUM) + formattedValue;
+                        itemMap.put(DataChecker.DATA_OBJECT_NUM, nObjectNum);
+                        expandCheckList.add(itemMap);
+                    }
+                }else{
+                    expandCheckList.add(proObjectMap);
+                }
+
+            }
+            checkList = expandCheckList;
+        }
+        return checkList;
     }
 
     private Map<String, String> key2Map(Object key, Properties p) {
@@ -335,10 +359,10 @@ public class DataCheckerDao {
      * @param dataObjectStr 字符串形式的对象
      * @return 发序列化后的对象
      */
-    private CheckDataObject parseDataObject(String dataObjectStr)throws SQLException{
+    private CheckDataObject parseDataObject(String dataObjectStr) {
         CheckDataObject dataObject;
         if(!dataObjectStr.contains(".")){
-            throw new SQLException("Error for  DataObject format!"+dataObjectStr);
+            throw new DSSRuntimeException("Error for  DataObject format!"+dataObjectStr);
         }
         String dbName = dataObjectStr.split("\\.")[0];
         String tableName = dataObjectStr.split("\\.")[1];

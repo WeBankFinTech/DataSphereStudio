@@ -1145,7 +1145,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
                 BeanUtils.copyProperties(nodeBaseInfo, dataDevelopNodeInfo);
 
-                dataDevelopNodeInfo.setResource(nodeMap.get("resource"));
+                dataDevelopNodeInfo.setResource(nodeMap.get("resources"));
 
                 if (nodeMap.containsKey("ec.conf.templateId") && StringUtils.isNotEmpty(nodeMap.get("ec.conf.templateId"))) {
                     dataDevelopNodeInfo.setRefTemplate(Boolean.TRUE);

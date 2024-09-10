@@ -252,7 +252,8 @@ public class DataCheckerDao {
             for (Map<String, String> proObjectMap : checkList) {
                 String dataObjectStr = proObjectMap.get(DataChecker.DATA_OBJECT) ;
                 CheckDataObject dataObject= parseDataObject(dataObjectStr);
-                if(dataObject.getType() == CheckDataObject.Type.PARTITION){
+                if(dataObject.getType() == CheckDataObject.Type.PARTITION
+                        && !dataObject.getPartitionName().contains("/")){
                     for (int i = 0; i < 24; i++) {
                         Map<String, String> itemMap = new HashMap<>(3);
                         String formattedValue = String.format("%02d", i);

@@ -247,7 +247,7 @@ public class DataCheckerDao {
         List<Map<String, String>> checkList = p.keySet().stream()
                 .map(key -> key2Map(key, p)).filter(x -> x.size() > 0)
                 .collect(Collectors.toList());
-        if (p.contains(DataChecker.EXPAND_SECOND_PARTITION) && "true".equalsIgnoreCase(p.getProperty(DataChecker.EXPAND_SECOND_PARTITION).trim())) {
+        if (p.containsKey(DataChecker.EXPAND_SECOND_PARTITION) && "true".equalsIgnoreCase(p.getProperty(DataChecker.EXPAND_SECOND_PARTITION).trim())) {
             List<Map<String, String>> expandCheckList = new ArrayList<>();
             for (Map<String, String> proObjectMap : checkList) {
                 String dataObjectStr = proObjectMap.get(DataChecker.DATA_OBJECT) ;

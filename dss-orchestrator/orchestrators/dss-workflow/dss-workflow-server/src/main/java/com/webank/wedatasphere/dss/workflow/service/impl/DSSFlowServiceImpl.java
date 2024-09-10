@@ -517,8 +517,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             difference1.removeAll(nodeContentDOS);
 
             // 获取新增的部分（差集）
-            Set<NodeContentDO> difference2 = new HashSet<>(contentDOS);
-            difference2.removeAll(nodeContentDOS);
+            Set<NodeContentDO> difference2 = new HashSet<>(nodeContentDOS);
+            difference2.removeAll(contentDOS);
 
             if (CollectionUtils.isNotEmpty(difference2)) {
                 nodeContentMapper.batchInsert(new ArrayList<>(difference2));

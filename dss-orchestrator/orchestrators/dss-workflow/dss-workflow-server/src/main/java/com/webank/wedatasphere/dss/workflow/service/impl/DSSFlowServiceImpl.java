@@ -1330,9 +1330,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         return response.getProjectList().stream().filter(project -> {
             // 过滤具有编辑工作流权限的项目
-            return project.getEditUsers().contains(username)
-                    || project.getReleaseUsers().contains(username)
-                    || project.getCreateBy().equals(username);
+            return (CollectionUtils.isNotEmpty(project.getEditUsers()) && project.getEditUsers().contains(username))
+                    || (CollectionUtils.isNotEmpty(project.getReleaseUsers()) && project.getReleaseUsers().contains(username))
+                    || (StringUtils.isNotEmpty(project.getCreateBy()) && project.getCreateBy().equals(username));
         }).collect(Collectors.toList());
 
     }

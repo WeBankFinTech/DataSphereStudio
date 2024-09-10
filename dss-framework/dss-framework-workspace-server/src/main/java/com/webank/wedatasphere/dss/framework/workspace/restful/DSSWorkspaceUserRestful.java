@@ -258,7 +258,7 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path = "/clearUser", method = RequestMethod.GET)
-    public Message clearUser(@RequestParam("userName") String userName) {
+    public Message clearUser(@RequestParam("userName") String userName,@RequestParam(name="handover_ename",required = false) String handover_ename) {
         String token = ModuleUserUtils.getToken(httpServletRequest);
         if (StringUtils.isNotBlank(token)) {
             if (!token.equals(HPMS_USER_TOKEN)) {

@@ -1145,13 +1145,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
                 BeanUtils.copyProperties(nodeBaseInfo, dataDevelopNodeInfo);
 
-                dataDevelopNodeInfo.setResource(nodeMap.get("resource"));
+                dataDevelopNodeInfo.setResource(nodeMap.get("resources"));
 
                 if (nodeMap.containsKey("ec.conf.templateId") && StringUtils.isNotEmpty(nodeMap.get("ec.conf.templateId"))) {
                     dataDevelopNodeInfo.setRefTemplate(Boolean.TRUE);
                     String templateId = nodeMap.get("ec.conf.templateId");
                     dataDevelopNodeInfo.setTemplateId(templateId);
-                    if (templateMap.containsKey(templateId)) {
+                    if(nodeMap.containsKey("ecConfTemplateName")){
+                        dataDevelopNodeInfo.setTemplateName(nodeMap.get("ecConfTemplateName"));
+                    } else if (nodeMap.containsKey("ec.conf.templateName")) {
+                        dataDevelopNodeInfo.setTemplateName(nodeMap.get("ec.conf.templateName"));
+                    } else if (templateMap.containsKey(templateId)) {
                         dataDevelopNodeInfo.setTemplateName(templateMap.get(templateId));
                     } else {
                         logger.error("queryDataDevelopNodeList not find template,contentId is {},template id is {}", contentId, templateId);
@@ -1399,12 +1403,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             if (request.getRefTemplate() != null) {
                 // 是否引用模板
-                flag = dataDevelopNodeInfo.getRefTemplate().equals(request.getRefTemplate());
+                flag = request.getRefTemplate().equals(dataDevelopNodeInfo.getRefTemplate());
             }
 
             if (request.getReuseEngine() != null && flag) {
                 // 是否引用引擎
-                flag = dataDevelopNodeInfo.getReuseEngine().equals(request.getReuseEngine());
+                flag = request.getReuseEngine().equals(dataDevelopNodeInfo.getReuseEngine());
             }
 
             if (!CollectionUtils.isEmpty(request.getNodeTypeNameList()) && flag) {
@@ -2156,30 +2160,30 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             List<Long> contentIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getContentId).collect(Collectors.toList());
             List<NodeContentUIDO> nodeContentUIDOList = nodeContentUIMapper.getNodeContentUIByNodeUIKey(contentIdList, nodeUiKey);
-            nodeUIValue = nodeContentUIDOList.stream().distinct().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
+            nodeUIValue = nodeContentUIDOList.stream().map(NodeContentUIDO::getNodeUIValue).distinct().collect(Collectors.toList());
 
         } catch (Exception e) {
             logger.error("queryNodeUiValueByKey error, workspaceId is {}, username is {}, nodeUikey is {}", workspace.getWorkspaceId(), username, nodeUiKey);
             logger.error(e.getMessage());
         }
 
-
-        return nodeUIValue;
+        // 过滤出不为空的信息
+        return nodeUIValue.stream().filter(StringUtils::isNotEmpty).collect(Collectors.toList());
     }
 
 
     @Override
     public List<String> querySourceType(Workspace workspace, String username) {
-        String NodeUIkey = "source.type";
-        return queryNodeUiValueByKey(workspace, username, NodeUIkey, WorkflowNodeGroupEnum.SignalNode.getNameEn());
+        String nodeUIkey = "source.type";
+        return queryNodeUiValueByKey(workspace, username, nodeUIkey, WorkflowNodeGroupEnum.SignalNode.getNameEn());
     }
 
 
     @Override
     public List<String> queryJobDesc(Workspace workspace, String username) {
-        String NodeUIkey = "job.desc";
+        String nodeUIkey = "job.desc";
 
-        List<String> jobDescValue = queryNodeUiValueByKey(workspace, username, NodeUIkey, WorkflowNodeGroupEnum.SignalNode.getNameEn());
+        List<String> jobDescValue = queryNodeUiValueByKey(workspace, username, nodeUIkey, WorkflowNodeGroupEnum.SignalNode.getNameEn());
 
         List<String> descValue = new ArrayList<>();
         for (String value : jobDescValue) {

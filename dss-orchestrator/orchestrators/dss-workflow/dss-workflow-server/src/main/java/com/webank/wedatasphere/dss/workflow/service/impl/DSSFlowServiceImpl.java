@@ -1151,7 +1151,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     dataDevelopNodeInfo.setRefTemplate(Boolean.TRUE);
                     String templateId = nodeMap.get("ec.conf.templateId");
                     dataDevelopNodeInfo.setTemplateId(templateId);
-                    if(nodeMap.containsKey("ecConfTemplateName")){
+                    if (nodeMap.containsKey("ecConfTemplateName")) {
                         dataDevelopNodeInfo.setTemplateName(nodeMap.get("ecConfTemplateName"));
                     } else if (nodeMap.containsKey("ec.conf.templateName")) {
                         dataDevelopNodeInfo.setTemplateName(nodeMap.get("ec.conf.templateName"));
@@ -1398,7 +1398,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
     public List<DataDevelopNodeInfo> dataDevelopNodeResultFilter(DataDevelopNodeRequest request, List<DataDevelopNodeInfo> dataDevelopNodeInfoList) {
-        return dataDevelopNodeInfoList.stream().filter(dataDevelopNodeInfo -> {
+
+        dataDevelopNodeInfoList = dataDevelopNodeInfoList.stream().filter(dataDevelopNodeInfo -> {
             boolean flag = true;
 
             if (request.getRefTemplate() != null) {
@@ -1440,12 +1441,18 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return flag;
         }).collect(Collectors.toList());
 
+        // 创建时间倒序排列
+        dataDevelopNodeInfoList = dataDevelopNodeInfoList.stream().sorted(Comparator.comparing(DataDevelopNodeInfo::getCreateTime,
+                Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
+
+        return dataDevelopNodeInfoList;
+
     }
 
 
     public List<DataViewNodeInfo> dataViewNodeResultFilter(DataViewNodeRequest request, List<DataViewNodeInfo> dataViewNodeInfoList) {
 
-        return dataViewNodeInfoList.stream().filter(dataViewNodeInfo -> {
+        dataViewNodeInfoList = dataViewNodeInfoList.stream().filter(dataViewNodeInfo -> {
             boolean flag = true;
             // 工作流名称
             if (!StringUtils.isBlank(request.getOrchestratorName())) {
@@ -1475,6 +1482,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return flag;
 
         }).collect(Collectors.toList());
+
+        // 创建时间倒序排列
+        dataViewNodeInfoList = dataViewNodeInfoList.stream().sorted(Comparator.comparing(DataViewNodeInfo::getCreateTime,
+                Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
+
+        return dataViewNodeInfoList;
 
 
     }
@@ -1785,7 +1798,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     public List<DataCheckerNodeInfo> dataCheckerNodeResultFilter(List<DataCheckerNodeInfo> dataCheckerNodeInfoList, DataCheckerNodeRequest request) {
 
-        return dataCheckerNodeInfoList.stream().filter(dataCheckerNodeInfo -> {
+
+        dataCheckerNodeInfoList = dataCheckerNodeInfoList.stream().filter(dataCheckerNodeInfo -> {
 
             boolean flag = true;
 
@@ -1823,6 +1837,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return flag;
 
         }).collect(Collectors.toList());
+
+
+        dataCheckerNodeInfoList = dataCheckerNodeInfoList.stream().sorted(Comparator.comparing(DataCheckerNodeInfo::getCreateTime,
+                Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
+
+
+        return dataCheckerNodeInfoList;
 
     }
 
@@ -1914,8 +1935,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     public List<EventSenderNodeInfo> eventSenderNodeResultFilter(List<EventSenderNodeInfo> eventSenderNodeInfoList, EventSenderNodeRequest request) {
 
-
-        return eventSenderNodeInfoList.stream().filter(eventSenderNodeInfo -> {
+        eventSenderNodeInfoList = eventSenderNodeInfoList.stream().filter(eventSenderNodeInfo -> {
 
             boolean flag = true;
 
@@ -1955,6 +1975,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return flag;
 
         }).collect(Collectors.toList());
+
+        eventSenderNodeInfoList = eventSenderNodeInfoList.stream().sorted(Comparator.comparing(EventSenderNodeInfo::getCreateTime,
+                Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
+
+        return eventSenderNodeInfoList;
 
     }
 
@@ -2068,7 +2093,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public List<EventReceiverNodeInfo> eventReceiveNodeResultFilter(List<EventReceiverNodeInfo> eventReceiverNodeInfoList,
                                                                     EventReceiverNodeRequest request) {
 
-        return eventReceiverNodeInfoList.stream().filter(eventReceiverNodeInfo -> {
+        eventReceiverNodeInfoList = eventReceiverNodeInfoList.stream().filter(eventReceiverNodeInfo -> {
 
             boolean flag = true;
 
@@ -2123,6 +2148,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return flag;
 
         }).collect(Collectors.toList());
+
+        eventReceiverNodeInfoList = eventReceiverNodeInfoList.stream().sorted(Comparator.comparing(EventReceiverNodeInfo::getCreateTime,
+                Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).collect(Collectors.toList());
+
+        return eventReceiverNodeInfoList;
 
     }
 

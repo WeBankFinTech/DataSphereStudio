@@ -98,7 +98,7 @@
             parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         INSERT INTO dss_orchestrator_version_info (<include refid="orchestrator_version"/>)
         VALUES
-        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},#{updateTime},#{updater},#{projectId},#{content},#{contextId},#{validFlag}, #{commitId})
+        (#{id},#{orchestratorId},#{appId},#{source},#{version},#{comment},NOW(),#{updater},#{projectId},#{content},#{contextId},#{validFlag}, #{commitId})
     </insert>
 
 

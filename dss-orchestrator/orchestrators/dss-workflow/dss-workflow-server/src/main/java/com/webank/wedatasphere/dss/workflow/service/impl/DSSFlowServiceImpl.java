@@ -1509,7 +1509,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<DSSProject> dssProjectList = getDSSProject(workspace, username);
 
         if (CollectionUtils.isEmpty(dssProjectList)) {
-            logger.error("queryNodeName find project is empty, workspaceId is {}, username is {}", workspace.getWorkspaceId(), username);
+            logger.error("queryFlowNameList find project is empty, workspaceId is {}, username is {}", workspace.getWorkspaceId(), username);
             return dssFlowName;
         }
 
@@ -1527,7 +1527,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
         if (CollectionUtils.isEmpty(flowNodeInfoList)) {
-            logger.error("queryNodeName find node info is empty, example project id is {}", projectIdList.get(0));
+            logger.error("queryFlowNameList find node info is empty, example project id is {}", projectIdList.get(0));
             return dssFlowName;
         }
 
@@ -2049,7 +2049,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             eventReceiverNodeInfo.setMsgTopic(nodeMap.get("msg.topic"));
             eventReceiverNodeInfo.setMsgName(nodeMap.get("msg.name"));
             eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("query.frequency"));
-            eventReceiverNodeInfo.setQueryFrequency(nodeMap.get("max.receive.hours"));
+            eventReceiverNodeInfo.setMaxReceiveHours(nodeMap.get("max.receive.hours"));
             eventReceiverNodeInfo.setMsgSaveKey(nodeMap.get("msg.savekey"));
 
             if (nodeMap.containsKey("only.receive.today")) {

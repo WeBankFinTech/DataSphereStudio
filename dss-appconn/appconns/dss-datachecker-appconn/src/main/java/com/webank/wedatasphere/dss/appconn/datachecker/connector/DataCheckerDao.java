@@ -363,7 +363,8 @@ public class DataCheckerDao {
     private CheckDataObject parseDataObject(String dataObjectStr) {
         CheckDataObject dataObject;
         if(!dataObjectStr.contains(".")){
-            throw new DSSRuntimeException("Error for  DataObject format!"+dataObjectStr);
+            throw new DSSRuntimeException("check object format error(校验对象配置格式错误，请按照dbname" +
+                    ".tablename{ds=partionname}格式配置)！ error content(错误内容）:"+dataObjectStr);
         }
         String dbName = dataObjectStr.split("\\.")[0];
         String tableName = dataObjectStr.split("\\.")[1];

@@ -32,7 +32,9 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProject
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.ProjectHttpRequestHook;
 import com.webank.wedatasphere.dss.framework.project.utils.ApplicationArea;
+import com.webank.wedatasphere.dss.framework.proxy.conf.ProxyUserConfiguration;
 import com.webank.wedatasphere.dss.framework.proxy.exception.DSSProxyUserErrorException;
+import com.webank.wedatasphere.dss.framework.proxy.service.DssProxyUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
@@ -62,6 +64,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -82,6 +85,8 @@ public class DSSFrameworkProjectRestfulApi {
     private DSSProjectService dssProjectService;
     @Autowired
     private List<ProjectHttpRequestHook> projectHttpRequestHooks;
+    @Autowired
+    private DssProxyUserService dssProxyUserService;
     @Autowired
     private StaffInfoGetter staffInfoGetter;
 
@@ -121,7 +126,7 @@ public class DSSFrameworkProjectRestfulApi {
      * @param projectRequest
      * @return
      */
-    @RequestMapping(path = "getAllProjects", method = RequestMethod.POST)
+    @RequestMapping(path = {"getAllProjects","getAllProdProjects"}, method = RequestMethod.POST)
     public Message getAllProjects(HttpServletRequest request, @RequestBody ProjectQueryRequest projectRequest) {
         String username = SecurityFilter.getLoginUsername(request);
         projectRequest.setUsername(username);
@@ -148,6 +153,22 @@ public class DSSFrameworkProjectRestfulApi {
             dssProjectVos = dssProjectVos.stream().filter(item->
                     (item.getEditUsers().contains(username) || item.getReleaseUsers().contains(username))
                             && item.getEditable()).collect(Collectors.toList());
+        }
+        //如果是生产中心请求，则靠考虑用户或者代理用户是否有发布权限
+        if(request.getServletPath().endsWith("getAllProdProjects")){
+            String proxyUser=username;
+            if(ProxyUserConfiguration.isProxyUserEnable()) {
+                try {
+                    proxyUser = dssProxyUserService.getProxyUser(request);
+                } catch (DSSProxyUserErrorException e) {
+                    //do nothing
+                }
+            }
+            final String finalProxyUsername = proxyUser;
+            dssProjectVos = dssProjectVos.stream().filter(
+                    item-> item.getReleaseUsers().contains(username)
+                    ||item.getReleaseUsers().contains(finalProxyUsername)
+            ).collect(Collectors.toList());
         }
         return Message.ok("获取工作空间的工程成功").data("projects", dssProjectVos);
     }

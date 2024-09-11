@@ -878,15 +878,19 @@ public class DSSGitUtils {
     }
 
     public static List<GitCommitResponse> getLatestCommit(Repository repository, String filePath, Integer num) throws GitErrorException{
-        List<GitCommitResponse> commitResponseList = new ArrayList<>();
+        Set<GitCommitResponse> commitResponseList = new HashSet<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String metaPath = GitConstant.GIT_SERVER_META_PATH + "/" + filePath;
 
         try (Git git = new Git(repository)) {
             Iterable<RevCommit> commits = null;
+            Iterable<RevCommit> metaConfCommits = null;
             if (num == null) {
                 commits = git.log().addPath(filePath).call();
+                metaConfCommits = git.log().addPath(metaPath).call();
             } else {
                 commits = git.log().addPath(filePath).setMaxCount(num).call();
+                metaConfCommits = git.log().addPath(metaPath).setMaxCount(num).call();
             }
             for (RevCommit commit : commits) {
                 GitCommitResponse commitResponse = new GitCommitResponse();
@@ -898,7 +902,17 @@ public class DSSGitUtils {
                 commitResponseList.add(commitResponse);
             }
 
-            return commitResponseList;
+            for (RevCommit commit : metaConfCommits) {
+                GitCommitResponse commitResponse = new GitCommitResponse();
+                commitResponse.setCommitId(commit.getId().getName());
+                commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
+                String shortMessage = commit.getShortMessage();
+                getUserName(shortMessage, commitResponse, commit);
+                logger.info("提交ID: " + commit.getId().getName());
+                commitResponseList.add(commitResponse);
+            }
+
+            return new ArrayList<>(commitResponseList);
         } catch (GitAPIException e) {
             throw new GitErrorException(80120, "get latestCommitId failed, the reason is : ", e);
         }

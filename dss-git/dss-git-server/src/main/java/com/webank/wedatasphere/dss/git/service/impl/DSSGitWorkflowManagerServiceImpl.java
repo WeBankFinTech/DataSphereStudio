@@ -675,7 +675,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         return response;
     }
 
-    private Repository getRepository(File repoDir, String projectName, Long workspaceId, String gitUser, String gitToken, String gitUrl) throws DSSErrorException {
+    @Override
+    public Repository getRepository(File repoDir, String projectName, Long workspaceId, String gitUser, String gitToken, String gitUrl) throws DSSErrorException {
         Repository repository = null;
         try {
             // 当前机器不存在就新建

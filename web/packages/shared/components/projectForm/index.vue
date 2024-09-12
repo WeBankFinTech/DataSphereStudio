@@ -331,6 +331,7 @@ export default {
       return {
         name: [
           {
+            type: "string",
             required: true,
             message: this.$t("message.workflow.enterName"),
             trigger: "blur",
@@ -346,6 +347,7 @@ export default {
         ],
         description: [
           {
+            type: "string",
             required: true,
             message: this.$t(
               "message.common.projectDetail.pleaseInputProjectDesc"
@@ -355,6 +357,7 @@ export default {
         ],
         product: [
           {
+            type: "string",
             required: true,
             message: this.$t("message.common.projectDetail.selectProduct"),
             trigger: "change",
@@ -396,6 +399,7 @@ export default {
             required: true,
             message: '请输入gitUser',
             trigger: "blur",
+            type: "string",
           },
         ],
         gitToken: [
@@ -403,6 +407,7 @@ export default {
             required: true,
             message: '请输入gitToken',
             trigger: "blur",
+            type: "string",
           },
         ]
       };
@@ -467,6 +472,9 @@ export default {
   },
   methods: {
     async checkName () {
+      if(!this.projectDataCurrent.name) {
+        return
+      }
       try {
           if (this.actionType === 'add') {
             const res = await CheckProjectNameRepeat(this.projectDataCurrent.name)
@@ -551,10 +559,10 @@ export default {
           const params = { ...this.projectDataCurrent };
           params.dataSourceList = datasets;
           params.associateGit = params.associateGit === 'true';
-          if (!params.associateGit) {
-            delete params.gitUser;
-            delete params.gitToken;
-          }
+          // if (!params.associateGit) {
+          //   delete params.gitUser;
+          //   delete params.gitToken;
+          // }
           delete params.associateGitDisabled;
           delete params.createBy;
           delete params.datasource;
@@ -574,6 +582,7 @@ export default {
     },
     Cancel() {
       this.ProjectShow = false;
+      this.isRepeat = false;
       this.$refs.projectForm.resetFields();
       this.projectDataCurrent.business = this.originBusiness;
     },

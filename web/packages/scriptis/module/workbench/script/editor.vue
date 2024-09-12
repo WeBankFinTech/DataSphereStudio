@@ -175,6 +175,7 @@ export default {
   },
   data() {
     return {
+      curTipKey: '',
       showConfig: false,
       loading: false,
       isParseSuccess: true,
@@ -244,10 +245,10 @@ export default {
           curName = this.script.params.configuration.runtime.nodeName
         }
         this.showConfig = true;
-        const curTipKey =  'showConfigTip_' + curName + '_'+ this.script.id
+        this.curTipKey =  'showConfigTip_' + curName + '_'+ this.script.id
         let curTipData = null
-        if(sessionStorage.getItem(curTipKey)) {
-            curTipData = JSON.parse(sessionStorage.getItem(curTipKey))
+        if(sessionStorage.getItem(this.curTipKey)) {
+            curTipData = JSON.parse(sessionStorage.getItem(this.curTipKey))
         }
         let curTipNames = [];
         if(sessionStorage.getItem('showConfigName')) {
@@ -262,19 +263,19 @@ export default {
             curShowStatus: '1',  // 1：当前正在展示，0：当前未展示
             showable: '1', // 1：可以展示，0：不能展示
           }
-          sessionStorage.setItem(curTipKey, JSON.stringify(tipData));
-          curTipNames.push(curTipKey);
+          sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
+          curTipNames.push(this.curTipKey);
           sessionStorage.setItem('showConfigName', JSON.stringify(curTipNames));
           this.$Notice.open({
               desc: `${curName}脚本存在已配置的自定义参数，请知悉`,
               duration: 0,
-              name: curTipKey,
+              name: this.curTipKey,
               onClose: (v) => {
                 tipData.curShowStatus = '0';
                 tipData.showable = '0';
-                sessionStorage.setItem(curTipKey, JSON.stringify(tipData));
+                sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
                 curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
-                const newArray = curTipNames.filter(item => item !== curTipKey);
+                const newArray = curTipNames.filter(item => item !== this.curTipKey);
                 sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
               }
           });
@@ -419,17 +420,28 @@ export default {
   },
   beforeDestroy: function() {
     const curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
-    if(this.$Notice && curTipNames && curTipNames.length > 0) {
-      curTipNames.forEach(name => {
-        this.$Notice.close(name);
+    const curTipData = JSON.parse(sessionStorage.getItem(this.curTipKey))
+    if(this.$Notice && this.curTipKey && curTipData && curTipData['curShowStatus'] === '1') {
+        this.$Notice.close(this.curTipKey);
         const tipData = {
           curShowStatus: '0',
           showable: '1',
         }
-        sessionStorage.setItem(name, JSON.stringify(tipData));
-      });
-        sessionStorage.setItem('showConfigName', JSON.stringify([]));
+        sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
+        const newArray = curTipNames.filter(item => item !== this.curTipKey);
+        sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
     }
+    // if(this.$Notice && curTipNames && curTipNames.length > 0) {
+    //   curTipNames.forEach(name => {
+    //     this.$Notice.close(name);
+    //     const tipData = {
+    //       curShowStatus: '0',
+    //       showable: '1',
+    //     }
+    //     sessionStorage.setItem(name, JSON.stringify(tipData));
+    //   });
+    //     sessionStorage.setItem('showConfigName', JSON.stringify([]));
+    // }
     elementResizeEvent.unbind(this.$el);
   },
 };

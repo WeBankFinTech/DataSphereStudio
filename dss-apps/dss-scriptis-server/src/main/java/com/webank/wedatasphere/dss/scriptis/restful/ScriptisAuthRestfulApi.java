@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.webank.wedatasphere.dss.scriptis.config.DSSScriptisConfiguration.GLOBAL_LIMITS_PREFIX;
@@ -39,10 +40,12 @@ public class ScriptisAuthRestfulApi {
     public Message globalLimits(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
         Map<String,Object> globalLimits = scriptisAuthService.getGlobalLimits(username);
+        Map<String, Object> newGlobalLimits = new HashMap<>();
+        newGlobalLimits.putAll(globalLimits);
         if (DSSScriptisConfiguration.isInCopilotWhiteList(username)) {
-            globalLimits.put(DSSScriptisConfiguration.COPILOT_ENABLE_KEY, true);
+            newGlobalLimits.put(DSSScriptisConfiguration.COPILOT_ENABLE_KEY, true);
         }
-        return Message.ok().data("globalLimits", globalLimits);
+        return Message.ok().data("globalLimits", newGlobalLimits);
     }
 
     @RequestMapping(value = "/globalLimits/{globalLimitName}",method = RequestMethod.GET)

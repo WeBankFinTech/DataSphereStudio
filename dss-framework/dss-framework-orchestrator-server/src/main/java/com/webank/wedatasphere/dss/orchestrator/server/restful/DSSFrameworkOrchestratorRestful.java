@@ -536,11 +536,13 @@ public class DSSFrameworkOrchestratorRestful {
     @RequestMapping(path = "gitUrl", method = RequestMethod.GET)
     public Message gitUrl(@RequestParam(required = true, name = "projectName") String projectName,
                           @RequestParam(required = false, name = "workflowName") String workflowName,
+                          @RequestParam(required = false, name = "workflowNodeName") String workflowNodeName,
                           HttpServletResponse response) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, workflowName);
+        String filePath = StringUtils.isEmpty(workflowNodeName) ? workflowName : workflowName + "/" +workflowNodeName;
+        GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, filePath);
         GitAddMemberResponse addMemberResponse = RpcAskUtils.processAskException(sender.ask(gitAddMemberRequest), GitAddMemberResponse.class, GitAddMemberRequest.class);
         return Message.ok().data("gitUrl", addMemberResponse.getGitUrl());
 

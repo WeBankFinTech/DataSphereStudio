@@ -1123,8 +1123,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
 
         // 查询模板信息
-        List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).collect(Collectors.toList());
-        Map<String, String> templateMap = getTemplateMap(orchestratorIdList);
+        //  List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).collect(Collectors.toList());
+        //  Map<String, String> templateMap = getTemplateMap(orchestratorIdList);
 
         List<DataDevelopNodeInfo> dataDevelopNodeInfoList = new ArrayList<>();
 
@@ -1136,7 +1136,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
                 DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
 
-                Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
+//                Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
                 List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
                 List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
@@ -1155,8 +1155,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                         dataDevelopNodeInfo.setTemplateName(nodeMap.get("ecConfTemplateName"));
                     } else if (nodeMap.containsKey("ec.conf.templateName")) {
                         dataDevelopNodeInfo.setTemplateName(nodeMap.get("ec.conf.templateName"));
-                    } else if (templateMap.containsKey(templateId)) {
-                        dataDevelopNodeInfo.setTemplateName(templateMap.get(templateId));
                     } else {
                         logger.error("queryDataDevelopNodeList not find template,contentId is {},template id is {}", contentId, templateId);
                     }
@@ -1165,13 +1163,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     dataDevelopNodeInfo.setRefTemplate(Boolean.FALSE);
                 }
 
-                if (nodeMap.containsKey("ReuseEngine")) {
+                if (nodeMap.containsKey("ReuseEngine") && StringUtils.isNotEmpty(nodeMap.get("ReuseEngine"))) {
                     dataDevelopNodeInfo.setReuseEngine(Boolean.valueOf(nodeMap.get("ReuseEngine")));
-                } else {
-
-                    if (StringUtils.isNotEmpty(nodeDefaultValue.get("ReuseEngine"))) {
-                        dataDevelopNodeInfo.setReuseEngine(Boolean.valueOf(nodeDefaultValue.get("ReuseEngine")));
-                    }
                 }
 
                 dataDevelopNodeInfoList.add(dataDevelopNodeInfo);
@@ -1748,7 +1741,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
 
-            Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
+//            Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
@@ -1763,14 +1756,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             dataCheckerNodeInfo.setNodeDesc(nodeMap.get("desc"));
             dataCheckerNodeInfo.setSourceType(nodeMap.get("source.type"));
 
-            if (nodeMap.containsKey("qualitis.check")) {
+            if (nodeMap.containsKey("qualitis.check") && StringUtils.isNotEmpty(nodeMap.get("qualitis.check"))) {
                 dataCheckerNodeInfo.setQualitisCheck(Boolean.valueOf(nodeMap.get("qualitis.check")));
-            } else {
-
-                if (StringUtils.isNotEmpty(nodeDefaultValue.get("qualitis.check"))) {
-                    dataCheckerNodeInfo.setQualitisCheck(Boolean.valueOf(nodeDefaultValue.get("qualitis.check")));
-                }
-
             }
 
             dataCheckerNodeInfoList.add(dataCheckerNodeInfo);
@@ -2035,7 +2022,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
+//            Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
@@ -2052,20 +2039,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             eventReceiverNodeInfo.setMaxReceiveHours(nodeMap.get("max.receive.hours"));
             eventReceiverNodeInfo.setMsgSaveKey(nodeMap.get("msg.savekey"));
 
-            if (nodeMap.containsKey("only.receive.today")) {
+            if (nodeMap.containsKey("only.receive.today") && StringUtils.isNotEmpty(nodeMap.get("only.receive.today"))) {
                 eventReceiverNodeInfo.setOnlyReceiveToday(Boolean.valueOf(nodeMap.get("only.receive.today")));
-            } else {
-                if (StringUtils.isNotEmpty(nodeDefaultValue.get("only.receive.today"))) {
-                    eventReceiverNodeInfo.setOnlyReceiveToday(Boolean.valueOf(nodeDefaultValue.get("only.receive.today")));
-                }
             }
 
-            if (nodeMap.containsKey("msg.receive.use.rundate")) {
+            if (nodeMap.containsKey("msg.receive.use.rundate") && StringUtils.isNotEmpty(nodeMap.get("msg.receive.use.rundate"))) {
                 eventReceiverNodeInfo.setMsgReceiveUseRunDate(Boolean.valueOf(nodeMap.get("msg.receive.use.rundate")));
-            } else {
-                if (StringUtils.isNotEmpty(nodeDefaultValue.get("msg.receive.use.rundate"))) {
-                    eventReceiverNodeInfo.setMsgReceiveUseRunDate(Boolean.valueOf(nodeDefaultValue.get("msg.receive.use.rundate")));
-                }
             }
 
             eventReceiverNodeInfoList.add(eventReceiverNodeInfo);

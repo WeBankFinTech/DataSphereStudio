@@ -874,29 +874,40 @@ export default {
     onDeleteFlow(params) {
       this.$refs.workflow.deleteWorkflow(params);
     },
-    filterTreeByKeyword(tree, keyword) {
+    // 仅针对项目做过滤
+     filterTreeByKeyword(tree, keyword) {
       return tree.filter(node => {
-        // 检查当前节点的 name 字段是否包含关键字
         if (node.name.includes(keyword)) {
-          // 如果当前节点包含关键字，则递归地过滤其 children
-          node.children = node.children ? this.filterTreeByKeyword(node.children, keyword) : [];
           return true;
         }
-
-        // 如果当前节点不包含关键字，但有 children，则递归检查 children
-        if (node.children && node.children.length > 0) {
-          const filteredChildren = this.filterTreeByKeyword(node.children, keyword);
-          if (filteredChildren.length > 0) {
-            // 如果 children 中有匹配项，则保留当前节点，并更新 children
-            node.children = filteredChildren;
-            return true;
-          }
-        }
-
-        // 如果当前节点及其 children 都不符合条件，则不保留该节点
         return false;
       })
     },
+    // 该过滤逻辑为项目+工作流，如果项目或工作流包含关键字，则保留该节点及其子节点
+    // filterTreeByKeyword(tree, keyword) {
+    //   console.log('filterTreeByKeyword', tree, keyword)
+    //   return tree.filter(node => {
+    //     // 检查当前节点的 name 字段是否包含关键字
+    //     if (node.name.includes(keyword)) {
+    //       // 如果当前节点包含关键字，则递归地过滤其 children
+    //       node.children = node.children ? this.filterTreeByKeyword(node.children, keyword) : [];
+    //       return true;
+    //     }
+
+    //     // 如果当前节点不包含关键字，但有 children，则递归检查 children
+    //     if (node.children && node.children.length > 0) {
+    //       const filteredChildren = this.filterTreeByKeyword(node.children, keyword);
+    //       if (filteredChildren.length > 0) {
+    //         // 如果 children 中有匹配项，则保留当前节点，并更新 children
+    //         node.children = filteredChildren;
+    //         return true;
+    //       }
+    //     }
+
+    //     // 如果当前节点及其 children 都不符合条件，则不保留该节点
+    //     return false;
+    //   })
+    // },
     updateTabList(val = []) {
       let workspaceId = this.$route.query.workspaceId
       let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
@@ -1112,8 +1123,8 @@ export default {
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
           associateGit: projectData.associateGit,
-          gitUser: projectData.gitUser,
-          gitToken: projectData.gitToken
+          gitUser: projectData.associateGit ? projectData.gitUser : '',
+          gitToken: projectData.associateGit ? projectData.gitToken : ''
         };
         api
           .fetch(
@@ -1152,8 +1163,8 @@ export default {
           orchestratorModeList: projectData.orchestratorModeList,
           associateGit: projectData.associateGit,
           dataSourceList: projectData.dataSourceList,
-          gitUser: projectData.gitUser,
-          gitToken: projectData.gitToken
+          gitUser: projectData.associateGit ? projectData.gitUser : '',
+          gitToken: projectData.associateGit ? projectData.gitToken : ''
         };
         api
           .fetch(

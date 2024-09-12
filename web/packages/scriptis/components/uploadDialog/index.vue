@@ -96,8 +96,8 @@ export default {
         this.msg = `(${this.$t('message.scripts.uploadDialog.LIMIT2M')})`;
         this.maxSize = 2048;
       } else {
-        this.msg = `(${this.$t('message.scripts.uploadDialog.LIMIT100M')})`;
-        this.maxSize = 102400;
+        this.msg = `(${this.$t('message.scripts.uploadDialog.LIMIT200M')})`;
+        this.maxSize = 204800;
       }
       this.updateUrl = `${data.apiPrefix}filesystem/upload`;
     },

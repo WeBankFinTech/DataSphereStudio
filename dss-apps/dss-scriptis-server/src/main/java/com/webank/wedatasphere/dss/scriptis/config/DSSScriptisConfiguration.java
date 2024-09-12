@@ -33,7 +33,7 @@ public class DSSScriptisConfiguration {
 
     public static final String DELIMITER_COMMA = ",";
 
-    public static final String[] GLOBAL_COPILOT_WHITELIST = CommonVars.apply("wds.dss.scriptis.copilot.whitelist", "hadoop").getValue().split(DELIMITER_COMMA);
+    public static final String[] GLOBAL_COPILOT_WHITELIST = CommonVars.apply("wds.dss.scriptis.copilot.whitelist", "").getValue().split(DELIMITER_COMMA);
 
     public static final String COPILOT_ENABLE_KEY = "copilotEnable";
 

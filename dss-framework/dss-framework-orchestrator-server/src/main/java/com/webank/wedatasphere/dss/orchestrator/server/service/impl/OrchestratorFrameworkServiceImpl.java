@@ -756,6 +756,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                     if(StringUtils.isEmpty(releaseVersion.getStatus())){
                         orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
                         orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
+                        orchestratorMeta.setVersion(null);
                     }
                 }
             }

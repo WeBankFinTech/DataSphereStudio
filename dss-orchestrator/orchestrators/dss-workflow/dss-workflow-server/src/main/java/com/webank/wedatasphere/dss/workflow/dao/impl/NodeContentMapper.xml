@@ -141,9 +141,17 @@
         </foreach>
     </select>
 
-    <select id="getNodeContentById" resultMap="nodeContentResultMap">
+    <select id="getNodeContentById" resultType="com.webank.wedatasphere.dss.workflow.dto.NodeContentDO">
 
-        select  <include refid="baseColumns"/> from dss_workflow_node_content where id = #{contentId} and node_id = #{nodeId}
+        select  node_key  as nodeKey
+               ,id        as id
+               ,node_id   as nodeId
+               ,job_type  as jobType
+               ,orchestrator_id as orchestratorId
+               ,create_time as createTime
+               ,modify_time as modifyTime
+               ,modify_user as modifyUser
+        from dss_workflow_node_content where id = #{contentId} and node_id = #{nodeId}
 
     </select>
     

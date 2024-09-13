@@ -905,14 +905,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             // 发布中状态
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
 
-        }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
+        }else if (OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorMeta.getStatus())
+                && OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
 
             orchestratorMeta.setStatus(OrchestratorStatusEnum.PUBLISH.getStatus());
             orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
             orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
 
-        }
-        else{
+        } else{
             // 待发布
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH);
             // 提交后 未进行发布的工作流 是未发布状态

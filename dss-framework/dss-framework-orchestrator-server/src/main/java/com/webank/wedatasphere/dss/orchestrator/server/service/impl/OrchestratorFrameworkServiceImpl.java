@@ -730,6 +730,29 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 }
 
 
+                // 获取最近一次的发布状态 |发布成功 or 发布失败 or 未发布
+                if(StringUtils.isEmpty(orchestratorMeta.getNewStatus())){
+
+                    // 未发布
+                    if(StringUtils.isEmpty(releaseVersion.getStatus())){
+                        orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
+                        orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
+                        orchestratorMeta.setVersion(null);
+
+                    }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())){
+
+                        orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
+                        orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
+
+                    } else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
+
+                        orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
+                        orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
+                    }
+
+                }
+
+
             }else {
                 // 非git项目的工作流只有：发布中、无状态
                 if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
@@ -916,11 +939,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         } else{
             // 待发布
             orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSH);
-            // 提交后 未进行发布的工作流 是未发布状态
-            if(StringUtils.isEmpty(releaseVersion.getStatus())){
-                orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
-                orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
-            }
         }
     }
 

@@ -1296,7 +1296,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getProjectId(),new DSSFlow());
+            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
@@ -1777,7 +1777,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getProjectId(),new DSSFlow());
+            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 
 //            Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
@@ -1929,7 +1929,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getProjectId(),new DSSFlow());
+            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
@@ -2076,7 +2076,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getProjectId(),new DSSFlow());
+            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 //            Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());

@@ -473,7 +473,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
             }
 
-            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorId);
+            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, flowID);
 
             logger.info("workFlowNodes:{}", workFlowNodes);
             Set<NodeContentUIDO> nodeContentUIDOS = new HashSet<>();
@@ -499,7 +499,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     modifyDate = new Date(modifyTime);
                 }
                 String modifyUser = nodeDefault.getModifyUser();
-                NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, createDate, modifyDate, modifyUser);
+                NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, flowID, createDate, modifyDate, modifyUser);
                 nodeContentDOS.add(contentDO);
             }
 
@@ -532,10 +532,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             if (CollectionUtils.isNotEmpty(difference1)) {
-                nodeContentMapper.batchDelete(new ArrayList<>(difference1), orchestratorId);
+                nodeContentMapper.batchDelete(new ArrayList<>(difference1), orchestratorId, flowID);
             }
 
-            List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId);
+            List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId, flowID);
             List<NodeTypeDO> workflowNodeNumberType = nodeInfoMapper.getWorkflowNodeNumberType();
             Map<String, String> nodeNumberMap = new HashMap<>();
             for (NodeTypeDO nodeTypeDO : workflowNodeNumberType) {

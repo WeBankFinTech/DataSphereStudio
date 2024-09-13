@@ -348,6 +348,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                             .deleteOrchestration((RefOrchestrationContentRequestRef) structureRequestRef), "delete");
         }
         Long orchestratorInfoId = orchestratorInfo.getId();
+        DSSOrchestratorVersion versionById = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorInfoId);
         if (dssProject.getAssociateGit() != null && dssProject.getAssociateGit()) {
             try {
                 // git删除成功之后再删除库表记录
@@ -357,7 +358,6 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 GitRemoveRequest removeRequest = new GitRemoveRequest(workspace.getWorkspaceId(), dssProject.getName(), path, username);
                 GitCommitResponse commitResponse = RpcAskUtils.processAskException(sender.ask(removeRequest), GitCommitResponse.class, GitRemoveRequest.class);
                 lockMapper.updateOrchestratorStatus(orchestratorDeleteRequest.getId(), OrchestratorRefConstant.FLOW_STATUS_PUSH);
-                DSSOrchestratorVersion versionById = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorInfoId);
                 if (versionById != null) {
                     lockMapper.updateOrchestratorVersionCommitId(commitResponse.getCommitId(), versionById.getAppId());
                 }
@@ -375,12 +375,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorVo.setOrchestratorId(orchestratorInfoId);
 
         // 同步更新flowJson
-        List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorInfoId);
+        List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorInfoId, versionById.getAppId());
         if (CollectionUtils.isEmpty(contentDOS)) {
             return orchestratorVo;
         }
         List<Long> contentIdList = contentDOS.stream().map(NodeContentDO::getId).collect(Collectors.toList());
-        nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorInfoId);
+        nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorInfoId, versionById.getAppId());
         if (CollectionUtils.isNotEmpty(contentIdList)) {
             nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
         }

@@ -743,6 +743,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
                         orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
                         orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
+                        orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
 
                     } else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
 

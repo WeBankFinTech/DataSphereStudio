@@ -104,7 +104,7 @@
         select t1.node_id  as nodeId
               ,t1.orchestrator_id as orchestratorId
               ,t2.name as orchestratorName
-              ,t1.id as content_id
+              ,t1.id as contentId
               ,t1.job_type as jobType
               ,t4.name as nodeTypeName
               ,t2.project_id as projectId
@@ -147,4 +147,5 @@
 
     </select>
     
+
 </mapper>

@@ -180,6 +180,7 @@
         from dss_workflow_node_to_ui t1
         join (select * from dss_workflow_node where node_type = #{nodeType}) t2 on t1.workflow_node_id  = t2.id
         join dss_workflow_node_ui t3 on t1.ui_id  = t3.id
+        join (select DISTINCT ui_id from dss_workflow_node_ui_to_validate) t4 on t1.ui_id = t4.ui_id
         where  `position`  = 'startup'
 
     </select>
@@ -194,5 +195,6 @@
             and t3.name = #{nodeTypeName}
         </if>
     </select>
+
 
 </mapper>

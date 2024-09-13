@@ -53,6 +53,8 @@ public class DSSFlow implements Flow {
      */
     private List<String[]> flowIdParamConfTemplateIdTuples;
 
+    private Long orchestratorId;
+
     public List<String[]> getFlowIdParamConfTemplateIdTuples() {
         return flowIdParamConfTemplateIdTuples;
     }
@@ -274,5 +276,13 @@ public class DSSFlow implements Flow {
                 ", bmlVersion='" + bmlVersion + '\'' +
                 ", flowJson='" + flowJson + '\'' +
                 '}';
+    }
+
+    public Long getOrchestratorId() {
+        return orchestratorId;
+    }
+
+    public void setOrchestratorId(Long orchestratorId) {
+        this.orchestratorId = orchestratorId;
     }
 }

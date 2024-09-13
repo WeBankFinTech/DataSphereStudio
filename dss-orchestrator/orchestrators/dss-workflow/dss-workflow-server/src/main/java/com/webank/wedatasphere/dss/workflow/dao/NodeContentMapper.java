@@ -21,17 +21,17 @@ public interface NodeContentMapper {
 
     NodeContentDO getNodeContentByKey(@Param("nodeKey") String nodeKey);
 
-    List<NodeContentDO> getNodeContentByKeyList(@Param("list") List<String> list, @Param("orchestratorId") Long orchestratorId);
+    List<NodeContentDO> getNodeContentByKeyList(@Param("list") List<String> list, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    List<NodeContentDO> getNodeContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
+    List<NodeContentDO> getNodeContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    List<NodeContentDO> getContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
+    List<NodeContentDO> getContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    void deleteNodeContentByKey(@Param("nodeKey") String nodeKey, @Param("orchestratorId") Long orchestratorId);
+    void deleteNodeContentByKey(@Param("nodeKey") String nodeKey, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    void batchDelete(@Param("list") List<NodeContentDO> list, @Param("orchestratorId") Long orchestratorId);
+    void batchDelete(@Param("list") List<NodeContentDO> list, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    void deleteNodeContentByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
+    void deleteNodeContentByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
     List<DSSFlowNodeInfo> queryFlowNodeInfo(@Param("projectIdList") List<Long> projectIdList,@Param("nodeTypeList") List<String> nodeTypeList);
 

@@ -790,7 +790,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         //判断工作空间是否设置了管理员能否查看该工作空间下所有项目的权限
         Integer workspaceAdminPermission = projectUserMapper.getWorkspaceAdminPermission(workspaceId);
         boolean isAdmin = isWorkspaceAdmin(workspaceId,projectListQueryRequest.getUsername());
-        if(isAdmin && workspaceAdminPermission != 1){
+        if(isAdmin && workspaceAdminPermission == 1){
             queryUser = null;
         }
 
@@ -799,7 +799,6 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         if(CollectionUtils.isEmpty(queryProjectVoList)){
             return  projectList;
         }
-
 
 
         for (QueryProjectVo projectVo : queryProjectVoList) {

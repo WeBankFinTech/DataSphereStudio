@@ -11,6 +11,7 @@ public class NodeContentDO {
     private String nodeId;
     private String jobType;
     private Long orchestratorId;
+    private Long flowId;
     private Date createTime;
     private Date modifyTime;
     private String modifyUser;
@@ -29,15 +30,17 @@ public class NodeContentDO {
         this.modifyUser = modifyUser;
     }
 
-    public NodeContentDO(String nodeKey, String nodeId, String jobType, Long orchestratorId, Date createTime, Date modifyTime, String modifyUser) {
+    public NodeContentDO(String nodeKey, String nodeId, String jobType, Long orchestratorId, Long flowId, Date createTime, Date modifyTime, String modifyUser) {
         this.nodeKey = nodeKey;
         this.nodeId = nodeId;
         this.jobType = jobType;
         this.orchestratorId = orchestratorId;
+        this.flowId = flowId;
         this.createTime = createTime;
         this.modifyTime = modifyTime;
         this.modifyUser = modifyUser;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -64,6 +67,7 @@ public class NodeContentDO {
                 ", nodeId='" + nodeId + '\'' +
                 ", jobType='" + jobType + '\'' +
                 ", orchestratorId='" + orchestratorId + '\'' +
+                ", flowId='" + flowId + '\'' +
                 ", createTime='" + createTime + '\'' +
                 ", modifyTime='" + modifyTime + '\'' +
                 ", modifyUser='" + modifyUser + '\'' +
@@ -132,5 +136,13 @@ public class NodeContentDO {
 
     public void setModifyUser(String modifyUser) {
         this.modifyUser = modifyUser;
+    }
+
+    public Long getFlowId() {
+        return flowId;
+    }
+
+    public void setFlowId(Long flowId) {
+        this.flowId = flowId;
     }
 }

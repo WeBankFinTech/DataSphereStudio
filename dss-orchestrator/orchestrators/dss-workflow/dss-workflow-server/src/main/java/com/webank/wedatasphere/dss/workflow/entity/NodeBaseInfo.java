@@ -48,6 +48,13 @@ public class NodeBaseInfo {
     private Boolean associateGit;
 
 
+    // 是否有编辑权限
+    private boolean editable;
+
+    // DSSFlow id
+
+    private Long flowId;
+
     public String getProjectName() {
         return projectName;
     }
@@ -160,4 +167,20 @@ public class NodeBaseInfo {
         this.associateGit = associateGit;
     }
 
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public void setEditable(boolean editable) {
+        this.editable = editable;
+    }
+
+    public Long getFlowId() {
+        return flowId;
+    }
+
+    public void setFlowId(Long flowId) {
+        this.flowId = flowId;
+    }
 }

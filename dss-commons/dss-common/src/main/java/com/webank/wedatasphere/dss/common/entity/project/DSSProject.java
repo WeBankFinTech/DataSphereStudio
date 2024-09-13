@@ -62,6 +62,9 @@ public class DSSProject implements Project {
      */
     private List<String> accessUsers;
 
+
+    private boolean isAdmin;
+
     @Override
     public Long getId() {
         return id;
@@ -232,5 +235,14 @@ public class DSSProject implements Project {
 
     public void setAccessUsers(List<String> accessUsers) {
         this.accessUsers = accessUsers;
+    }
+
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 }

@@ -9,7 +9,6 @@ import org.apache.linkis.entrance.interceptor.EntranceInterceptor;
 import org.apache.linkis.entrance.interceptor.impl.CommentInterceptor;
 import org.apache.linkis.entrance.interceptor.impl.LabelCheckInterceptor;
 import org.apache.linkis.entrance.interceptor.impl.LogPathCreateInterceptor;
-import org.apache.linkis.entrance.interceptor.impl.StorePathEntranceInterceptor;
 import org.apache.linkis.entrance.constant.ServiceNameConsts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ public class FlowEntranceSpringConfiguration  {
         return new EntranceInterceptor[] {
                 new LabelCheckInterceptor(),
                 new LogPathCreateInterceptor(),
-                new StorePathEntranceInterceptor(),
                 new CommentInterceptor(),
         };
     }

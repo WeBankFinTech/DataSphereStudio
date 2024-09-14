@@ -340,7 +340,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Long orchestratorId = dssOrchestratorVersion != null ? dssOrchestratorVersion.getOrchestratorId() : null;
         try {
             if (orchestratorId != null) {
-                saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+                saveFlowMetaData(flowID, jsonFlow, orchestratorId, null);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -426,7 +426,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
+    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId, Long oldFLowId) {
+        // flowId发生变化时，清空旧的flowId
+        if (oldFLowId != null) {
+            List<NodeContentDO> contentListByOrchestratorId = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, oldFLowId);
+            if (CollectionUtils.isNotEmpty(contentListByOrchestratorId)) {
+                List<Long> collect = contentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+                nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
+            }
+            nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId, oldFLowId);
+        }
         // 解析 jsonflow
         // 解析 proxyUser
         try {

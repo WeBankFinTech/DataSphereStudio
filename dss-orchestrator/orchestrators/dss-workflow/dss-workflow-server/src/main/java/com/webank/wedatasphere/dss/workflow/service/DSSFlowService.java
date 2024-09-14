@@ -67,7 +67,7 @@ public interface DSSFlowService {
 
     void updateTOSaveStatus(Long projectId, Long flowID, Long orchestratorId) throws Exception;
 
-    void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId);
+    void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId, Long oldFLowId);
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,

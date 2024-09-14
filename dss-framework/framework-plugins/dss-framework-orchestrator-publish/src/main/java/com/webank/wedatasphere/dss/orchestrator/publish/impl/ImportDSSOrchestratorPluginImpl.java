@@ -171,8 +171,10 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setValidFlag(valid);
 
         DSSOrchestratorVersion oldVersion  = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(importDssOrchestratorInfo.getId(), 1);
+        Long oldAppId = null;
         if (oldVersion!=null) {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.increaseVersion(oldVersion.getVersion()));
+            oldAppId = oldVersion.getAppId();
         } else {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.generateNewVersion());
         }
@@ -228,7 +230,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             Long versionOrchestratorId = dssOrchestratorVersion.getOrchestratorId();
             DSSFlow flowByID = dssFlowService.getFlow(appId);
             if (flowByID != null) {
-                dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), versionOrchestratorId);
+                dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), versionOrchestratorId, oldAppId);
             }
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             if (projectInfo.getAssociateGit()) {

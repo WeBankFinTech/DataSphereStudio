@@ -74,7 +74,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.linkis</groupId>
-            <artifactId>linkis-bml-client</artifactId>
+            <artifactId>linkis-pes-client</artifactId>
             <version>${linkis.version}</version>
             <exclusions>
                 <exclusion>

@@ -451,7 +451,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
         }
         if (labels.getRoute().equals("dev")) {
-            flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
+            DSSOrchestratorVersion oldOrcVersion = rollBackGitVo.getOldOrcVersion();
+            flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId, oldOrcVersion.getAppId());
         }
 
     }

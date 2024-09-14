@@ -153,7 +153,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.linkis</groupId>
-            <artifactId>linkis-pes-client</artifactId>
+            <artifactId>linkis-bml-client</artifactId>
             <version>${linkis.version}</version>
             <scope>provided</scope>
         </dependency>

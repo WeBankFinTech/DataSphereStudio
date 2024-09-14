@@ -53,7 +53,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <artifactId>linkis-pes-client</artifactId>
+            <artifactId>linkis-bml-client</artifactId>
             <exclusions>
                 <exclusion>
                     <artifactId>gson</artifactId>

@@ -626,7 +626,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         dssOrchestratorInfo.setCreator(orchestratorMetaInfo.getCreator());
         dssOrchestratorInfo.setProjectId(orchestratorMetaInfo.getProjectId());
         dssOrchestratorInfo.setComment(orchestratorMetaInfo.getDescription());
-        dssOrchestratorInfo.setIsDefaultReference(orchestratorMetaInfo.getIsDefaultReference());
+        if(StringUtils.isEmpty(orchestratorMetaInfo.getIsDefaultReference())){
+            dssOrchestratorInfo.setIsDefaultReference(null);
+        }else{
+            dssOrchestratorInfo.setIsDefaultReference(orchestratorMetaInfo.getIsDefaultReference());
+        }
         dssOrchestratorInfo.setType(dssOrchestratorRelation.getDSSOrchestratorName());
         dssOrchestratorInfo.setAppConnName(dssOrchestratorRelation.getBindingAppConnName());
         dssOrchestratorInfo.setSecondaryType(orchestratorMetaInfo.getOrchestratorWay());

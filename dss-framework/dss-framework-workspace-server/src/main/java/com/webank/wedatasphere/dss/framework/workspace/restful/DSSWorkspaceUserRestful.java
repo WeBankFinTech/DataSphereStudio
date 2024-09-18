@@ -218,7 +218,8 @@ public class DSSWorkspaceUserRestful {
      * @return 离职返回true，未离职false
      */
     @RequestMapping(path = "isDismissed", method = RequestMethod.POST)
-    public Message isDismissed(@RequestBody List<String> usernames) {
+    public Message isDismissed(@RequestBody Map<String, List<String>> body) {
+        List<String> usernames = body.get("usernames");
         List<Map<String, Boolean>> userStatus = new ArrayList<>(usernames.size());
         for (String username : usernames) {
             boolean isDismissed;

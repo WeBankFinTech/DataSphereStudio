@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
@@ -30,9 +31,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryResponse;
+import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
@@ -1628,6 +1627,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         List<EditFlowRequest> editFlowRequestList = batchEditFlowRequest.getEditNodeList();
         Map<Long, List<EditFlowRequest>> editFlowRequestMap = new HashMap<>();
+        Set<Long> flowIdList = new HashSet<>();
 
         for (EditFlowRequest editFlowRequest : editFlowRequestList) {
             Long orchestratorId = editFlowRequest.getOrchestratorId();
@@ -1635,6 +1635,24 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     editFlowRequestMap.get(orchestratorId) : new ArrayList<>();
             editFlowRequests.add(editFlowRequest);
             editFlowRequestMap.put(orchestratorId, editFlowRequests);
+            if (!flowIdList.contains(editFlowRequest.getId())) {
+                DSSFlow flow = getFlow(editFlowRequest.getId());
+                Long projectId = flow.getProjectId();
+                ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
+                                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, userName)),
+                        ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
+                boolean isEditable = false;
+                if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
+                    isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||
+                            projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
+                }
+                isEditable = isEditable || projectUserAuthResponse.getProjectOwner().equals(userName);
+
+                if (!isEditable) {
+                    DSSExceptionUtils.dealErrorException(63335, "用户" + userName + "没有工作流节点" + editFlowRequest.getTitle() + "编辑权限，请检查后重新提交", DSSErrorException.class);
+                }
+                flowIdList.add(editFlowRequest.getId());
+            }
         }
 
         Set<Long> orchestratorIdList = editFlowRequestList.stream().map(EditFlowRequest::getOrchestratorId).collect(Collectors.toSet());

@@ -284,7 +284,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                     ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
             boolean isEditable = false;
             if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
-                isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank());
+                isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank())
+                        || projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
             }
             isEditable = isEditable || projectUserAuthResponse.getProjectOwner().equals(username);
 

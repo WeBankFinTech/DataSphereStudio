@@ -301,9 +301,10 @@ public class DSSFrameworkOrchestratorRestful {
         LabelRouteVO labels = rollbackOrchestratorRequest.getLabels();
         try {
             LOGGER.info("user {} begin to rollbackOrchestrator, params:{}", username, rollbackOrchestratorRequest);
+            DSSOrchestratorVersion latestVersionById = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorId);
             OrchestratorRollBackGitVo rollbackOrchestrator = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, labels, workspace);
             try {
-                orchestratorService.rollbackOrchestratorGit(rollbackOrchestrator, username, projectId, projectName, orchestratorId, labels, workspace);
+                orchestratorService.rollbackOrchestratorGit(rollbackOrchestrator, username, projectId, projectName, orchestratorId, labels, workspace, latestVersionById.getAppId());
             } catch (Exception e) {
                 return Message.ok("回滚版本成功,git回滚失败，请重新保存并提交工作流").data("newVersion", rollbackOrchestrator.getVersion());
             }

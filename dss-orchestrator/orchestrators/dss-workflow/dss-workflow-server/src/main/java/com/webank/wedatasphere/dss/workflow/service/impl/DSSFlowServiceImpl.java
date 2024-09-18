@@ -340,7 +340,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Long orchestratorId = dssOrchestratorVersion != null ? dssOrchestratorVersion.getOrchestratorId() : null;
         try {
             if (orchestratorId != null) {
-                saveFlowMetaData(flowID, jsonFlow, orchestratorId, null);
+                saveFlowMetaData(flowID, jsonFlow, orchestratorId);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -426,16 +426,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId, Long oldFLowId) {
-        // flowId发生变化时，清空旧的flowId
-        if (oldFLowId != null) {
-            List<NodeContentDO> contentListByOrchestratorId = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, oldFLowId);
-            if (CollectionUtils.isNotEmpty(contentListByOrchestratorId)) {
-                List<Long> collect = contentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
-                nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
-            }
-            nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId, oldFLowId);
-        }
+    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
+//        // flowId发生变化时，清空旧的flowId
+//        if (oldFLowId != null) {
+//            List<NodeContentDO> contentListByOrchestratorId = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, oldFLowId);
+//            if (CollectionUtils.isNotEmpty(contentListByOrchestratorId)) {
+//                List<Long> collect = contentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+//                nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
+//            }
+//            nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId, oldFLowId);
+//        }
         // 解析 jsonflow
         // 解析 proxyUser
         try {
@@ -770,9 +770,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                 String description, List<DSSLabel> dssLabels, String nodeSuffix,
                                 String newFlowName, Long newProjectId) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
-        DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
+        Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabels);
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+        Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
+        DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId, orchestratorId, orcSender);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
-                contextIdStr, workspace, dssLabels, nodeSuffix);
+                contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         copyFlow.setFlowIdParamConfTemplateIdTuples(rootFlowWithSubFlows.getFlowIdParamConfTemplateIdTuples());
         return copyFlow;
@@ -821,7 +825,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
      * @return
      */
     private DSSFlow copyFlowAndSetSubFlowInDB(DSSFlow dssFlow, String userName, String description,
-                                              String subFlowNameSuffix, String newFlowName, Long newProjectId) {
+                                              String subFlowNameSuffix, String newFlowName, Long newProjectId,
+                                              Long orchestratorId, Sender orcSender) {
         DSSFlow cyFlow = new DSSFlow();
         BeanUtils.copyProperties(dssFlow, cyFlow, "children", "flowVersions");
         //封装flow信息
@@ -843,14 +848,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         cyFlow.setId(null);
         flowMapper.insertFlow(cyFlow);
-        nodeContentMapper.updateFlowId(cyFlow.getId(), dssFlow.getId());
+        //
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, null)),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+        nodeContentMapper.updateFlowId(cyFlow.getId(), orchestratorVo.getDssOrchestratorVersion().getAppId());
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(dssFlow.getId());
         for (Long subFlowID : subFlowIDs) {
             DSSFlow subDSSFlow = flowMapper.selectFlowByID(subFlowID);
             if (dssFlow.getChildren() == null) {
                 dssFlow.setChildren(new ArrayList<DSSFlow>());
             }
-            DSSFlow copySubFlow = copyFlowAndSetSubFlowInDB(subDSSFlow, userName, description, subFlowNameSuffix, null, newProjectId);
+            DSSFlow copySubFlow = copyFlowAndSetSubFlowInDB(subDSSFlow, userName, description, subFlowNameSuffix, null, newProjectId, orchestratorId, orcSender);
             persistenceFlowRelation(copySubFlow.getId(), cyFlow.getId());
             cyFlow.addChildren(copySubFlow);
         }
@@ -859,7 +867,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     private void updateFlowJson(String userName, String projectName, DSSFlow rootFlow,
                                 String version, Long parentFlowId, String contextIdStr,
-                                Workspace workspace, List<DSSLabel> dssLabels, String nodeSuffix) throws DSSErrorException, IOException {
+                                Workspace workspace, List<DSSLabel> dssLabels, String nodeSuffix,
+                                Long orchestratorId) throws DSSErrorException, IOException {
         String flowJson = bmlService.readTextFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
@@ -877,12 +886,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         //上传节点的资源或调用appconn的copyRef
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow,
                 version, workspace, dssLabels);
+        // 更新对应节点的FlowJson
+        saveFlowMetaData(rootFlow.getId(), updateFlowJson, orchestratorId);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
         List<String[]> templateIds = new ArrayList<>();
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
                 updateFlowJson(userName, projectName, subflow, version, rootFlow.getId(),
-                        contextIdStr, workspace, dssLabels, nodeSuffix);
+                        contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);
                 templateIds.addAll(subflow.getFlowIdParamConfTemplateIdTuples());
             }
         }

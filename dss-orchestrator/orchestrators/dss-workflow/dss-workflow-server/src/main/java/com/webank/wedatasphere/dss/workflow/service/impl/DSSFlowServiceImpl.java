@@ -774,7 +774,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
                 OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
-        DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId, orchestratorId, orcSender);
+        List<Long> flowIdList = new ArrayList<>();
+        getAllOldFlowId(rootFlowId, flowIdList);
+        nodeContentMapper.deleteNodeContentByFlowId(flowIdList);
+        DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
@@ -825,8 +828,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
      * @return
      */
     private DSSFlow copyFlowAndSetSubFlowInDB(DSSFlow dssFlow, String userName, String description,
-                                              String subFlowNameSuffix, String newFlowName, Long newProjectId,
-                                              Long orchestratorId, Sender orcSender) {
+                                              String subFlowNameSuffix, String newFlowName, Long newProjectId) {
         DSSFlow cyFlow = new DSSFlow();
         BeanUtils.copyProperties(dssFlow, cyFlow, "children", "flowVersions");
         //封装flow信息
@@ -848,21 +850,29 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         cyFlow.setId(null);
         flowMapper.insertFlow(cyFlow);
-        //
-        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQueryByIdOrchestrator(orchestratorId, null)),
-                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
-        nodeContentMapper.updateFlowId(cyFlow.getId(), orchestratorVo.getDssOrchestratorVersion().getAppId());
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(dssFlow.getId());
         for (Long subFlowID : subFlowIDs) {
             DSSFlow subDSSFlow = flowMapper.selectFlowByID(subFlowID);
             if (dssFlow.getChildren() == null) {
                 dssFlow.setChildren(new ArrayList<DSSFlow>());
             }
-            DSSFlow copySubFlow = copyFlowAndSetSubFlowInDB(subDSSFlow, userName, description, subFlowNameSuffix, null, newProjectId, orchestratorId, orcSender);
+            DSSFlow copySubFlow = copyFlowAndSetSubFlowInDB(subDSSFlow, userName, description, subFlowNameSuffix, null, newProjectId);
             persistenceFlowRelation(copySubFlow.getId(), cyFlow.getId());
             cyFlow.addChildren(copySubFlow);
         }
         return cyFlow;
+    }
+
+    private void getAllOldFlowId(Long flowId, List<Long> flowIdList) {
+        DSSFlow dssFlow = getFlow(flowId);
+        List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
+        for (Long subFlowID : subFlowIDs) {
+            DSSFlow subDSSFlow = flowMapper.selectFlowByID(subFlowID);
+            if (dssFlow.getChildren() == null) {
+                dssFlow.setChildren(new ArrayList<DSSFlow>());
+            }
+            getAllOldFlowId(flowId, flowIdList);
+        }
     }
 
     private void updateFlowJson(String userName, String projectName, DSSFlow rootFlow,

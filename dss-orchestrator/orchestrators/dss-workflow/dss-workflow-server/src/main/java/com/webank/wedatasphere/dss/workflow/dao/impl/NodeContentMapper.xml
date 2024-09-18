@@ -103,7 +103,10 @@
     </delete>
 
     <delete id="deleteNodeContentByFlowId">
-        DELETE FROM dss_workflow_node_content WHERE flow_id = #{flowId}
+        DELETE FROM dss_workflow_node_content WHERE flow_id IN
+        <foreach collection="list" item="list" index="index" separator="," open="(" close=")">
+            #{index}
+        </foreach>
     </delete>
 
     <update id="updateFlowId">

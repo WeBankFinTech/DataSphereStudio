@@ -1667,10 +1667,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 for (EditFlowRequest editFlowRequest : editFlowRequests) {
                     NodeContentDO nodeContentByContentId = nodeContentMapper.getNodeContentByContentId(editFlowRequest.getId());
                     Long targetFlowId = nodeContentByContentId.getFlowId();
-                    List<EditFlowRequest> editFlowRequestsList = editFlowRequestMap.containsKey(targetFlowId) ?
-                            editFlowRequestMap.get(targetFlowId) : new ArrayList<>();
+                    List<EditFlowRequest> editFlowRequestsList = editFlowRequestTOFlowIDMap.containsKey(targetFlowId) ?
+                            editFlowRequestTOFlowIDMap.get(targetFlowId) : new ArrayList<>();
                     editFlowRequestsList.add(editFlowRequest);
-                    editFlowRequestMap.put(targetFlowId, editFlowRequestsList);
+                    editFlowRequestTOFlowIDMap.put(targetFlowId, editFlowRequestsList);
                 }
             }
         }

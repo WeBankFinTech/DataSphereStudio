@@ -866,6 +866,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private void getAllOldFlowId(Long flowId, List<Long> flowIdList) {
         DSSFlow dssFlow = getFlow(flowId);
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
+        flowIdList.add(flowId);
         for (Long subFlowID : subFlowIDs) {
             DSSFlow subDSSFlow = flowMapper.selectFlowByID(subFlowID);
             if (dssFlow.getChildren() == null) {

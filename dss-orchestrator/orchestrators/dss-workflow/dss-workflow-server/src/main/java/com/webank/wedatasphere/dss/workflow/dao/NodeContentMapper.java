@@ -35,7 +35,7 @@ public interface NodeContentMapper {
 
     void deleteNodeContentByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    void updateFlowId(@Param("flowId") Long flowId, @Param("flowId") Long oldFlowId);
+    void updateFlowId(@Param("flowId") Long flowId, @Param("oldFlowId") Long oldFlowId);
 
     void deleteNodeContentByFlowId(@Param("flowId") Long flowId);
 

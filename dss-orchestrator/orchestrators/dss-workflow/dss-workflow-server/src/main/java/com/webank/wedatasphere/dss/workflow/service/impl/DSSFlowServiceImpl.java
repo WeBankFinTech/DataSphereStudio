@@ -871,7 +871,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             if (dssFlow.getChildren() == null) {
                 dssFlow.setChildren(new ArrayList<DSSFlow>());
             }
-            getAllOldFlowId(flowId, flowIdList);
+            getAllOldFlowId(subFlowID, flowIdList);
         }
     }
 

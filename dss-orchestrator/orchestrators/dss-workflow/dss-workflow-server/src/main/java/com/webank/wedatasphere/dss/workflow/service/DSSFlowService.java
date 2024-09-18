@@ -110,5 +110,7 @@ public interface DSSFlowService {
 
     List<String> querySourceType(Workspace workspace, String username);
 
+    void getAllOldFlowId(Long flowId, List<Long> flowIdList);
 
+    void deleteNodeContent(List<Long> flowIdList);
 }

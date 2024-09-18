@@ -776,7 +776,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
         List<Long> flowIdList = new ArrayList<>();
         getAllOldFlowId(rootFlowId, flowIdList);
-        nodeContentMapper.deleteNodeContentByFlowId(flowIdList);
+        deleteNodeContent(flowIdList);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);
@@ -863,7 +863,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return cyFlow;
     }
 
-    private void getAllOldFlowId(Long flowId, List<Long> flowIdList) {
+    @Override
+    public void getAllOldFlowId(Long flowId, List<Long> flowIdList) {
         DSSFlow dssFlow = getFlow(flowId);
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
         flowIdList.add(flowId);
@@ -874,6 +875,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
             getAllOldFlowId(subFlowID, flowIdList);
         }
+    }
+
+    @Override
+    public void deleteNodeContent(List<Long> flowIdList) {
+        if (CollectionUtils.isEmpty(flowIdList)) {
+            return;
+        }
+        nodeContentMapper.deleteNodeContentByFlowId(flowIdList);
     }
 
     private void updateFlowJson(String userName, String projectName, DSSFlow rootFlow,

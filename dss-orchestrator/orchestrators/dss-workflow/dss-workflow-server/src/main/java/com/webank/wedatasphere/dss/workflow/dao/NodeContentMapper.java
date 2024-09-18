@@ -37,7 +37,7 @@ public interface NodeContentMapper {
 
     void updateFlowId(@Param("flowId") Long flowId, @Param("oldFlowId") Long oldFlowId);
 
-    void deleteNodeContentByFlowId(@Param("flowId") Long flowId);
+    void deleteNodeContentByFlowId(List<Long> list);
 
     List<DSSFlowNodeInfo> queryFlowNodeInfo(@Param("projectIdList") List<Long> projectIdList,@Param("nodeTypeList") List<String> nodeTypeList);
 

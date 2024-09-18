@@ -843,7 +843,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         cyFlow.setId(null);
         flowMapper.insertFlow(cyFlow);
-        nodeContentMapper.updateFlowId(dssFlow.getId(), cyFlow.getId());
+        nodeContentMapper.updateFlowId(cyFlow.getId(), dssFlow.getId());
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(dssFlow.getId());
         for (Long subFlowID : subFlowIDs) {
             DSSFlow subDSSFlow = flowMapper.selectFlowByID(subFlowID);

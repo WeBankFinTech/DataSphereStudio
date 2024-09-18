@@ -21,6 +21,8 @@ public interface NodeContentMapper {
 
     NodeContentDO getNodeContentByKey(@Param("nodeKey") String nodeKey);
 
+    NodeContentDO getNodeContentByContentId(@Param("id") Long id);
+
     List<NodeContentDO> getNodeContentByKeyList(@Param("list") List<String> list, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
     List<NodeContentDO> getNodeContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);

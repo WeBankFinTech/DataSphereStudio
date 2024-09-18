@@ -1635,24 +1635,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     editFlowRequestMap.get(orchestratorId) : new ArrayList<>();
             editFlowRequests.add(editFlowRequest);
             editFlowRequestMap.put(orchestratorId, editFlowRequests);
-            if (!flowIdList.contains(editFlowRequest.getId())) {
-                DSSFlow flow = getFlow(editFlowRequest.getId());
-                Long projectId = flow.getProjectId();
-                ProjectUserAuthResponse projectUserAuthResponse = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance()
-                                .getProjectServerSender().ask(new ProjectUserAuthRequest(projectId, userName)),
-                        ProjectUserAuthResponse.class, ProjectUserAuthRequest.class);
-                boolean isEditable = false;
-                if (!CollectionUtils.isEmpty(projectUserAuthResponse.getPrivList())) {
-                    isEditable = projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_EDIT.getRank()) ||
-                            projectUserAuthResponse.getPrivList().contains(ProjectUserPrivEnum.PRIV_RELEASE.getRank());
-                }
-                isEditable = isEditable || projectUserAuthResponse.getProjectOwner().equals(userName);
-
-                if (!isEditable) {
-                    DSSExceptionUtils.dealErrorException(63335, "用户" + userName + "没有工作流节点" + editFlowRequest.getTitle() + "编辑权限，请检查后重新提交", DSSErrorException.class);
-                }
-                flowIdList.add(editFlowRequest.getId());
-            }
         }
 
         Set<Long> orchestratorIdList = editFlowRequestList.stream().map(EditFlowRequest::getOrchestratorId).collect(Collectors.toSet());
@@ -1680,18 +1662,22 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 DSSFlow dssFlow = getFlow(flowId);
                 lockFlow(dssFlow, userName, ticketId);
                 List<EditFlowRequest> editFlowRequests = editFlowRequestMap.get(orchestratorId);
-                StringBuilder modifyJson = new StringBuilder(dssFlow.getFlowJson());
+                DSSProject project = getProjectByProjectId(dssFlow.getProjectId());
+
                 for (EditFlowRequest editFlowRequest : editFlowRequests) {
+                    NodeContentDO nodeContentByContentId = nodeContentMapper.getNodeContentByContentId(editFlowRequest.getId());
+                    Long targetFlowId = nodeContentByContentId.getFlowId();
+                    DSSFlow targetFlow = getFlow(targetFlowId);
+                    StringBuilder modifyJson = new StringBuilder(targetFlow.getFlowJson());
                     String json = modifyJson(String.valueOf(modifyJson), editFlowRequest, modifyTime, userName);
                     modifyJson.setLength(0);
                     modifyJson.append(json);
+                    //批量修改属性
+                    String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
+                    saveFlow(targetFlowId, String.valueOf(resultJson)
+                            , dssFlow.getDescription(), userName
+                            , workspace.getWorkspaceName(), project.getName(), null);
                 }
-                DSSProject project = getProjectByProjectId(dssFlow.getProjectId());
-                //批量修改属性
-                String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
-                saveFlow(flowId, String.valueOf(resultJson)
-                        , dssFlow.getDescription(), userName
-                        , workspace.getWorkspaceName(), project.getName(), null);
             }
         }
     }

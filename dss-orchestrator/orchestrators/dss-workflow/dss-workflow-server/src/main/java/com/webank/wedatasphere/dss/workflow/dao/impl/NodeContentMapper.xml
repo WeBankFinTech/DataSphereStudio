@@ -82,6 +82,10 @@
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId} and flow_id = #{flowId}
     </select>
 
+    <select id="getContentListByFlowId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE flow_id = #{flowId}
+    </select>
+
 
     <delete id="deleteNodeContentByKey">
             DELETE FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey} and `orchestrator_id` = #{orchestratorId}
@@ -95,8 +99,16 @@
     </delete>
     
     <delete id="deleteNodeContentByOrchestratorId">
-        DELETE FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId}
+        DELETE FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId} and flow_id = #{flowId}
     </delete>
+
+    <delete id="deleteNodeContentByFlowId">
+        DELETE FROM dss_workflow_node_content WHERE flow_id = #{flowId}
+    </delete>
+
+    <update id="updateFlowId">
+        UPDATE dss_workflow_node_content set flow_id = #{flowId} where flow_id = #{oldFlowId}
+    </update>
     
     
     <select id="queryFlowNodeInfo" resultType="com.webank.wedatasphere.dss.workflow.entity.DSSFlowNodeInfo"

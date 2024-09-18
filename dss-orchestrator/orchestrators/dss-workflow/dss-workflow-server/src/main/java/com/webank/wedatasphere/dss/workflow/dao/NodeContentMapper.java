@@ -27,11 +27,17 @@ public interface NodeContentMapper {
 
     List<NodeContentDO> getContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
+    List<NodeContentDO> getContentListByFlowId(@Param("flowId") Long flowId);
+
     void deleteNodeContentByKey(@Param("nodeKey") String nodeKey, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
     void batchDelete(@Param("list") List<NodeContentDO> list, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
     void deleteNodeContentByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
+
+    void updateFlowId(@Param("flowId") Long flowId, @Param("flowId") Long oldFlowId);
+
+    void deleteNodeContentByFlowId(@Param("flowId") Long flowId);
 
     List<DSSFlowNodeInfo> queryFlowNodeInfo(@Param("projectIdList") List<Long> projectIdList,@Param("nodeTypeList") List<String> nodeTypeList);
 

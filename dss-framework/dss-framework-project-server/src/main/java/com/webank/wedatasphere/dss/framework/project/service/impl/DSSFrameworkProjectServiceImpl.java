@@ -514,9 +514,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         initProjectModifyRequest(projectModifyRequest,projectTransferRequest, oldProjectOwner);
 
         String newProjectOwner = projectTransferRequest.getTransferUserName();
-        if (!dssWorkspaceUserService.getUserRoleByUserName(newProjectOwner).isEmpty()) {
+        Long count = dssWorkspaceUserService.getCountByUsername(newProjectOwner, (int)workspace.getWorkspaceId());
+        if (count == null || count == 0) {
             dssUserService.insertIfNotExist(newProjectOwner, workspace);
-            List<Integer> roles = Collections.singletonList(3);
+            List<Integer> roles = Collections.singletonList(4);
             dssWorkspaceUserService.addWorkspaceUser(roles, workspace.getWorkspaceId(), newProjectOwner, "system",
                     null);
         }

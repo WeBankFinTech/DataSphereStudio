@@ -695,95 +695,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
             OrchestratorReleaseVersionInfo releaseVersion = versionMap.getOrDefault(orchestratorMeta.getOrchestratorId(),
                     new OrchestratorReleaseVersionInfo());
 
+            OrchestratorSubmitJob orchestratorSubmitJob =  submitJobMap.get(orchestratorMeta.getOrchestratorId());
+
             orchestratorMeta.setVersion(releaseVersion.getVersion());
             orchestratorMeta.setUpdateTime(releaseVersion.getReleaseTime());
             orchestratorMeta.setUpdateUser(releaseVersion.getReleaseUser());
-
-            /*
-             * 对于接入git的项目下，并且当前状态为save的编排，dss_orchestrator_submit_job_info根据编排Id获取最新的提交记录，
-             * 对于当前状态为push、publish或者为空的，查询 dss_release_task，根据编排Id获取
-             *
-             * 非git项目的工作流只有：发布中、无状态
-             * git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-             *
-             *  git项目Failed就展示 待发布 待提交
-             * 非git项目Failed就无状态
-             *
-             * **/
-
-            if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()) {
-                //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-                OrchestratorSubmitJob orchestratorSubmitJob = submitJobMap.get(orchestratorMeta.getOrchestratorId());
-
-                if(OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorMeta.getStatus()) && orchestratorSubmitJob!= null){
-
-                    getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
-
-                }else if (StringUtils.isBlank(orchestratorMeta.getStatus())
-                        || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorMeta.getStatus())
-                        || OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorMeta.getStatus())) {
-
-                    getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
-
-                }else{
-                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
-                }
-
-
-                // 获取最近一次的发布状态 |发布成功 or 发布失败 or 未发布
-                if(StringUtils.isEmpty(orchestratorMeta.getNewStatus())){
-
-                    // 未发布
-                    if(StringUtils.isEmpty(releaseVersion.getStatus())){
-                        orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
-                        orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
-                        orchestratorMeta.setVersion(null);
-
-                    }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())){
-
-                        orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
-                        orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
-                        orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
-
-                    } else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
-
-                        orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
-                        orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
-                    }
-
-                }
-
-
-            }else {
-                // 非git项目的工作流只有：发布中、无状态
-                if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
-                    // 发布中
-                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
-
-                }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())){
-                    // 发布失败 -> 无状态
-                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
-                    orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
-                    orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
-                    orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
-
-                }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
-
-                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
-                    orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
-                    orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
-
-                } else{
-                    // 无状态
-                    orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
-                    // 未进行发布的工作流，为未发布状态
-                    if(StringUtils.isEmpty(releaseVersion.getStatus())){
-                        orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
-                        orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
-                        orchestratorMeta.setVersion(null);
-                    }
-                }
-            }
+            orchestratorStatus(orchestratorMeta,orchestratorSubmitJob,releaseVersion);
 
             if (templateMap.containsKey(orchestratorMeta.getOrchestratorId())) {
                 orchestratorMeta.setTemplateName(templateMap.get(orchestratorMeta.getOrchestratorId()));
@@ -954,39 +871,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         OrchestratorReleaseVersionInfo releaseVersion = orchestratorMapper.getOrchestratorVersionById(orchestratorInfo.getOrchestratorId());
         OrchestratorSubmitJob orchestratorSubmitJob = orchestratorMapper.selectSubmitJobStatus(orchestratorInfo.getOrchestratorId());
-
-        if (orchestratorInfo.getAssociateGit() != null && orchestratorInfo.getAssociateGit()) {
-            //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
-
-            if(OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorInfo.getStatus()) && orchestratorSubmitJob!= null){
-
-                getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorInfo);
-
-            }else if (StringUtils.isBlank(orchestratorInfo.getStatus())
-                    || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorInfo.getStatus())
-                    || OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorInfo.getStatus())) {
-
-                getGitOrchestratorReleaseStatus(releaseVersion,orchestratorInfo);
-
-            }else{
-                orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
-            }
-
-        }else {
-            // 非git项目的工作流只有：发布中、无状态
-            if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
-                // 发布中
-                orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
-
-            }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())){
-                // 发布失败 -> 无状态
-                orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
-                orchestratorInfo.setErrorMsg(releaseVersion.getErrorMsg());
-            }else{
-                // 无状态
-                orchestratorInfo.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
-            }
-        }
+        orchestratorStatus(orchestratorInfo,orchestratorSubmitJob,releaseVersion);
 
         // 发布中和提交中的工作流不允许进行更新
         if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(orchestratorInfo.getStatus())
@@ -1021,6 +906,94 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         return orchestratorInfo;
 
+    }
+
+
+
+    public void orchestratorStatus(OrchestratorMeta orchestratorMeta,OrchestratorSubmitJob orchestratorSubmitJob, OrchestratorReleaseVersionInfo releaseVersion){
+
+        /*
+         * 对于接入git的项目下，并且当前状态为save的编排，dss_orchestrator_submit_job_info根据编排Id获取最新的提交记录，
+         * 对于当前状态为push、publish或者为空的，查询 dss_release_task，根据编排Id获取
+         *
+         * 非git项目的工作流只有：发布中、无状态
+         * git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
+         *
+         *  git项目Failed就展示 待发布 待提交
+         * 非git项目Failed就无状态
+         *
+         * **/
+
+        if (orchestratorMeta.getAssociateGit() != null && orchestratorMeta.getAssociateGit()) {
+            //  git项目下的工作流才有这四个状态：待提交 待发布 提交中 发布中
+            if(OrchestratorRefConstant.FLOW_STATUS_SAVE.equalsIgnoreCase(orchestratorMeta.getStatus()) && orchestratorSubmitJob!= null){
+
+                getGitOrchestratorSubmitStatus(orchestratorSubmitJob,orchestratorMeta);
+
+            }else if (StringUtils.isBlank(orchestratorMeta.getStatus())
+                    || OrchestratorRefConstant.FLOW_STATUS_PUSH.equalsIgnoreCase(orchestratorMeta.getStatus())
+                    || OrchestratorRefConstant.FLOW_STATUS_PUBLISH.equalsIgnoreCase(orchestratorMeta.getStatus())) {
+
+                getGitOrchestratorReleaseStatus(releaseVersion,orchestratorMeta);
+
+            }else{
+                orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_SAVE);
+            }
+
+
+            // 获取最近一次的发布状态 |发布成功 or 发布失败 or 未发布
+            if(StringUtils.isEmpty(orchestratorMeta.getNewStatus())){
+
+                // 未发布
+                if(StringUtils.isEmpty(releaseVersion.getStatus())){
+                    orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
+                    orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
+                    orchestratorMeta.setVersion(null);
+
+                }else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())){
+
+                    orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
+                    orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
+                    orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
+
+                } else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
+
+                    orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
+                    orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
+                }
+
+            }
+
+        }else {
+            // 非git项目的工作流只有：发布中、无状态
+            if (OrchestratorRefConstant.FLOW_STATUS_PUSHING.equalsIgnoreCase(releaseVersion.getStatus())) {
+                // 发布中
+                orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUBLISHING);
+
+            } else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED.equalsIgnoreCase(releaseVersion.getStatus())) {
+                // 发布失败 -> 无状态
+                orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
+                orchestratorMeta.setErrorMsg(releaseVersion.getErrorMsg());
+                orchestratorMeta.setNewStatus(OrchestratorStatusEnum.FAILED.getStatus());
+                orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.FAILED.getName());
+
+            } else if (OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS.equalsIgnoreCase(releaseVersion.getStatus())) {
+
+                orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
+                orchestratorMeta.setNewStatus(OrchestratorStatusEnum.SUCCESS.getStatus());
+                orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.SUCCESS.getName());
+
+            } else {
+                // 无状态
+                orchestratorMeta.setStatus(OrchestratorRefConstant.FLOW_STATUS_STATELESS);
+                // 未进行发布的工作流，为未发布状态
+                if (StringUtils.isEmpty(releaseVersion.getStatus())) {
+                    orchestratorMeta.setNewStatus(OrchestratorStatusEnum.UNPUBLISHED.getStatus());
+                    orchestratorMeta.setNewStatusName(OrchestratorStatusEnum.UNPUBLISHED.getName());
+                    orchestratorMeta.setVersion(null);
+                }
+            }
+        }
     }
 
 

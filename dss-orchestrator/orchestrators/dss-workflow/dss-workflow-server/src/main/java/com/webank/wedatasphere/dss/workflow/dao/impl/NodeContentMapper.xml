@@ -66,6 +66,10 @@
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey}
     </select>
 
+    <select id="getNodeContentByContentId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `id` = #{id}
+    </select>
+
     <select id="getNodeContentByKeyList" parameterType="java.lang.String" resultMap="nodeContentResultMap">
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content
         WHERE `orchestrator_id` = #{orchestratorId} and `flow_id` = #{flowId} and `node_key` IN

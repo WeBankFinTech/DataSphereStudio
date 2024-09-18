@@ -1649,6 +1649,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<OrchestratorVo> orchestratorVoes = responseQueryOrchestrator.getOrchestratorVoes();
 
         Long modifyTime = System.currentTimeMillis();
+        Map<Long, List<EditFlowRequest>> editFlowRequestTOFlowIDMap = new HashMap<>();
 
         for (OrchestratorVo orchestratorVo : orchestratorVoes) {
             DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
@@ -1662,24 +1663,38 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 DSSFlow dssFlow = getFlow(flowId);
                 lockFlow(dssFlow, userName, ticketId);
                 List<EditFlowRequest> editFlowRequests = editFlowRequestMap.get(orchestratorId);
-                DSSProject project = getProjectByProjectId(dssFlow.getProjectId());
 
                 for (EditFlowRequest editFlowRequest : editFlowRequests) {
                     NodeContentDO nodeContentByContentId = nodeContentMapper.getNodeContentByContentId(editFlowRequest.getId());
                     Long targetFlowId = nodeContentByContentId.getFlowId();
-                    DSSFlow targetFlow = getFlow(targetFlowId);
-                    StringBuilder modifyJson = new StringBuilder(targetFlow.getFlowJson());
-                    String json = modifyJson(String.valueOf(modifyJson), editFlowRequest, modifyTime, userName);
-                    modifyJson.setLength(0);
-                    modifyJson.append(json);
-                    //批量修改属性
-                    String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
-                    saveFlow(targetFlowId, String.valueOf(resultJson)
-                            , dssFlow.getDescription(), userName
-                            , workspace.getWorkspaceName(), project.getName(), null);
+                    List<EditFlowRequest> editFlowRequestsList = editFlowRequestMap.containsKey(targetFlowId) ?
+                            editFlowRequestMap.get(targetFlowId) : new ArrayList<>();
+                    editFlowRequestsList.add(editFlowRequest);
+                    editFlowRequestMap.put(targetFlowId, editFlowRequestsList);
                 }
             }
         }
+
+        for (Map.Entry<Long, List<EditFlowRequest>> entry : editFlowRequestTOFlowIDMap.entrySet()) {
+            Long targetFlowId = entry.getKey();
+            DSSFlow targetFlow = getFlow(targetFlowId);
+            DSSProject project = getProjectByProjectId(targetFlow.getProjectId());
+            StringBuilder modifyJson = new StringBuilder(targetFlow.getFlowJson());
+            List<EditFlowRequest> value = entry.getValue();
+            if (value != null) {
+                for (EditFlowRequest editFlow : value) {
+                    String json = modifyJson(String.valueOf(modifyJson), editFlow, modifyTime, userName);
+                    modifyJson.setLength(0);
+                    modifyJson.append(json);
+                }
+                //批量修改属性
+                String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
+                saveFlow(targetFlowId, String.valueOf(resultJson)
+                        , targetFlow.getDescription(), userName
+                        , workspace.getWorkspaceName(), project.getName(), null);
+            }
+        }
+
     }
 
     private DSSProject getProjectByProjectId(Long projectId) throws DSSErrorException {

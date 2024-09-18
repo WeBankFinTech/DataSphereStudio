@@ -44,9 +44,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.common.conf.TokenConf.HPMS_USER_TOKEN;
@@ -216,19 +214,24 @@ public class DSSWorkspaceUserRestful {
 
     /**
      * 判断username是否离职
-     * @param username
+     * @param usernames
      * @return 离职返回true，未离职false
      */
-    @RequestMapping(path = "isDismissed", method = RequestMethod.GET)
-    public Message isDismissed(String username) {
-        boolean isDismissed;
-        if(username.startsWith("hduser")||username.startsWith("WTSS_")){
-            isDismissed = false;
-        }else{
-            StaffInfo staffInfo= staffInfoGetter.getStaffInfoByUsername(username);
-            isDismissed = staffInfo != null && "2".equals(staffInfo.getStatus());
+    @RequestMapping(path = "isDismissed", method = RequestMethod.POST)
+    public Message isDismissed(@RequestBody List<String> usernames) {
+        List<Map<String, Boolean>> userStatus = new ArrayList<>(usernames.size());
+        for (String username : usernames) {
+            boolean isDismissed;
+            if(username.startsWith("hduser")||username.startsWith("WTSS_")){
+                isDismissed = false;
+            }else{
+                StaffInfo staffInfo= staffInfoGetter.getStaffInfoByUsername(username);
+                isDismissed = staffInfo != null && "2".equals(staffInfo.getStatus());
+            }
+            Map<String, Boolean> tuple=Collections.singletonMap(username, isDismissed);
+            userStatus.add(tuple);
         }
-        return Message.ok().data("isDismissed", isDismissed);
+        return Message.ok().data("isDismissed", userStatus);
     }
 
     @RequestMapping(path = "getWorkspaceIdByUserName", method = RequestMethod.GET)

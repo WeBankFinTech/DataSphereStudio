@@ -24,6 +24,7 @@ import com.webank.wedatasphere.dss.linkis.node.execution.job.LinkisJob;
 import com.webank.wedatasphere.dss.linkis.node.execution.service.BuildJobAction;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.linkis.common.conf.CommonVars;
 import org.apache.linkis.manager.label.constant.LabelKeyConstant;
 import org.apache.linkis.manager.label.entity.engine.EngineTypeLabel;
 import org.apache.linkis.manager.label.utils.EngineTypeLabelCreator;
@@ -47,6 +48,9 @@ public class BuildJobActionImpl implements BuildJobAction {
 
     private Logger logger = LoggerFactory.getLogger(BuildJobActionImpl.class);
     private static BuildJobAction buildJobAction = new BuildJobActionImpl();
+    private static final  String  NEBULA = "nebula";
+    private static final CommonVars<String> NEBULA_ENGINE_VERSION =
+            CommonVars.apply("wds.linkis.nebula.engine.version", "3.0.0");
 
     private BuildJobActionImpl() {
 
@@ -133,6 +137,10 @@ public class BuildJobActionImpl implements BuildJobAction {
         String code = parseExecutionCodeFor1X(job);
 
         EngineTypeLabel engineTypeLabel = EngineTypeLabelCreator.createEngineTypeLabel(parseAppConnEngineType(job.getEngineType(), job));
+        //TODO 升级linkis1.7.0版本之后，这段特殊的硬编码逻辑要去掉
+        if(NEBULA.equalsIgnoreCase( engineTypeLabel.getEngineType())){
+            engineTypeLabel.setVersion(NEBULA_ENGINE_VERSION.getValue());
+        }
 
         labels.put(LabelKeyConstant.ENGINE_TYPE_KEY, engineTypeLabel.getStringValue());
         labels.put(LabelKeyConstant.USER_CREATOR_TYPE_KEY, job.getUser() + "-" + LINKIS_JOB_CREATOR_1_X.getValue(job.getJobProps()));

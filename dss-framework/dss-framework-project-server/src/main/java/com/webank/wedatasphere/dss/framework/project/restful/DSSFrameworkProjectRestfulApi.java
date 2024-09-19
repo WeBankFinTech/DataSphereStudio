@@ -469,6 +469,10 @@ public class DSSFrameworkProjectRestfulApi {
             return Message.error(String.format("project %s is not exists.", projectTransferRequest.getProjectName()));
         }
         String oldProjectOwner = dbProject.getCreateBy();
+        if(!projectTransferRequest.getTransferUserName().equals(oldProjectOwner)){
+            LOGGER.warn("交接人和被交接人不能是同一个人。");
+            return Message.error("交接人和被交接人不能是同一个人。");
+        }
         String operator =SecurityFilter.getLoginUsername(request); ;
         String workspaceName = dssWorkspaceService.getWorkspaceName(dbProject.getWorkspaceId());
         Long workspaceId = dbProject.getWorkspaceId();

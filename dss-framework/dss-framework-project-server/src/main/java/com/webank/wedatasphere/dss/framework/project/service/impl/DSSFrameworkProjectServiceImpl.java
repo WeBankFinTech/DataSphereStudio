@@ -39,14 +39,11 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
-import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
-import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
-import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -511,7 +508,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         ProjectModifyRequest projectModifyRequest = new ProjectModifyRequest();
 
         BeanUtils.copyProperties(dbProject, projectModifyRequest);
-        initProjectModifyRequest(projectModifyRequest,projectTransferRequest, oldProjectOwner);
+        //项目交接，清空数据源
+        dbProject.setDataSourceListJson(null);
+        initProjectModifyRequestPermissionInfo(projectModifyRequest,projectTransferRequest, oldProjectOwner);
 
         String newProjectOwner = projectTransferRequest.getTransferUserName();
         Long count = dssWorkspaceUserService.getCountByUsername(newProjectOwner, (int)workspace.getWorkspaceId());
@@ -530,6 +529,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
         dbProject.setCreateBy(newProjectOwner);
         dbProject.setUsername(newProjectOwner);
+
         //3.修改dss_project owner信息
         updateProject4Transfer(dbProject, operator);
         //4.修改git权限
@@ -549,7 +549,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         projectMapper.update(dbProject, updateWrapper);
     }
 
-    private void initProjectModifyRequest(ProjectModifyRequest projectModifyRequest,ProjectTransferRequest projectTransferRequest,String oldProjectOwner){
+    private void initProjectModifyRequestPermissionInfo(ProjectModifyRequest projectModifyRequest, ProjectTransferRequest projectTransferRequest, String oldProjectOwner){
         List<DSSProjectUser> projectPriv = projectUserService.getProjectPriv(projectModifyRequest.getId());
         List<String> releaseUsers = projectPriv.stream().filter(projectUser -> projectUser.getPriv() == 3).map(DSSProjectUser::getUsername).collect(Collectors.toList());
         if(!releaseUsers.contains(projectTransferRequest.getTransferUserName())){

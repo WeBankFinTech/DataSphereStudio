@@ -1739,8 +1739,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 }
                 obj.addProperty("modifyTime", modifyTime);
                 obj.addProperty("modifyUser", username);
-                flowJsonAddProperty(obj, "title", title);
-                flowJsonAddProperty(obj, "desc", desc);
+                flowJsonAddPointProperty(obj, "title", title);
+                flowJsonAddPointProperty(obj, "desc", desc);
                 flowJsonAddProperty(obj, "appTag", appTag);
                 flowJsonAddProperty(obj, "businessTag", businessTag);
                 flowJsonAddProperty(obj, "ecConfTemplateId", ecConfTemplateId);
@@ -1752,9 +1752,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return modifyJson;
     }
 
+    private void flowJsonAddPointProperty(JsonObject obj, String contentName, String content) {
+        if (content != null) {
+            obj.addProperty(contentName, content);
+        }
+    }
+
     private void flowJsonAddProperty(JsonObject obj, String contentName, String content) {
         if (content != null) {
             obj.addProperty(contentName, content);
+        } else {
+            obj.remove(contentName);
         }
     }
 

@@ -17,10 +17,7 @@
 package com.webank.wedatasphere.dss.framework.project.entity.request;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
 
-
-@XmlRootElement
 public class ProjectTransferRequest {
 
     @NotNull(message = "工程转移用户不能为空")

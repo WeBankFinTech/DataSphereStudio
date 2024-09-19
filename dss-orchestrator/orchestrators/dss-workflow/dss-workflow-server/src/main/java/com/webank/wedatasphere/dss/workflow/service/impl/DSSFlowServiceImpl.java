@@ -1656,11 +1656,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             if (dssOrchestratorVersion != null) {
                 Long orchestratorId = dssOrchestratorVersion.getOrchestratorId();
                 Long flowId = dssOrchestratorVersion.getAppId();
+                DSSFlow dssFlow = getFlow(flowId);
                 DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowId);
                 if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
-                    throw new DSSErrorException(80001, "当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+                    throw new DSSErrorException(80001, "当前工作流" + dssFlow.getName() +"被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
                 }
-                DSSFlow dssFlow = getFlow(flowId);
+
                 lockFlow(dssFlow, userName, ticketId);
                 List<EditFlowRequest> editFlowRequests = editFlowRequestMap.get(orchestratorId);
 

@@ -1162,12 +1162,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return dataDevelopNodeResponse;
         }
 
-        Map<Long,DSSFlow> flowMap = getFlowMap(flowNodeInfoList);
 
-        if(flowMap.isEmpty()){
-            logger.error("queryDataDevelopNodeList not find dssFlow info");
-            return dataDevelopNodeResponse;
-        }
 
         // 查询模板信息
         //  List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).collect(Collectors.toList());
@@ -1182,7 +1177,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
                 List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
                 DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-                DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 
 //                Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
@@ -1190,7 +1184,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
 
                 Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
-                NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username,dssFlow);
+                NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
                 BeanUtils.copyProperties(nodeBaseInfo, dataDevelopNodeInfo);
 
                 dataDevelopNodeInfo.setResource(nodeMap.get("resources"));
@@ -1321,13 +1315,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return dataViewNodeResponse;
         }
 
-        Map<Long,DSSFlow> flowMap = getFlowMap(flowNodeInfoList);
-
-        if(flowMap.isEmpty()){
-            logger.error("queryDataViewNode not find dssFlow info");
-            return dataViewNodeResponse;
-        }
-
         List<DataViewNodeInfo> dataViewNodeInfoList = new ArrayList<>();
 
         for (Long contentId : nodeContentUIGroup.keySet()) {
@@ -1336,13 +1323,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username,dssFlow);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
             BeanUtils.copyProperties(nodeBaseInfo, dataViewNodeInfo);
 
             dataViewNodeInfo.setNodeDesc(nodeMap.get("desc"));
@@ -1829,13 +1815,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return dataCheckerNodeResponse;
         }
 
-        Map<Long,DSSFlow> flowMap = getFlowMap(flowNodeInfoList);
-
-        if(flowMap.isEmpty()){
-            logger.error("queryDataCheckerNode not find dssFlow info");
-            return dataCheckerNodeResponse;
-        }
-
 
         List<DataCheckerNodeInfo> dataCheckerNodeInfoList = new ArrayList<>();
 
@@ -1846,7 +1825,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 
 //            Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
@@ -1854,7 +1832,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username,dssFlow);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
             BeanUtils.copyProperties(nodeBaseInfo, dataCheckerNodeInfo);
 
             dataCheckerNodeInfo.setMaxCheckHours(nodeMap.get("max.check.hours"));
@@ -1982,12 +1960,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return eventSenderNodeResponse;
         }
 
-        Map<Long,DSSFlow> flowMap = getFlowMap(flowNodeInfoList);
-
-        if(flowMap.isEmpty()){
-            logger.error("queryEventSenderNode not find dssFlow info");
-            return eventSenderNodeResponse;
-        }
 
         List<EventSenderNodeInfo> eventSenderNodeInfoList = new ArrayList<>();
 
@@ -1998,13 +1970,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username,dssFlow);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
             BeanUtils.copyProperties(nodeBaseInfo, eventSenderNodeInfo);
             eventSenderNodeInfo.setNodeDesc(nodeMap.get("desc"));
             eventSenderNodeInfo.setMsgType(nodeMap.get("msg.type"));
@@ -2128,13 +2099,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return eventReceiveNodeResponse;
         }
 
-        Map<Long,DSSFlow> flowMap = getFlowMap(flowNodeInfoList);
-
-        if(flowMap.isEmpty()){
-            logger.error("queryEventSenderNode not find dssFlow info");
-            return eventReceiveNodeResponse;
-        }
-
 
         List<EventReceiverNodeInfo> eventReceiverNodeInfoList = new ArrayList<>();
 
@@ -2145,14 +2109,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             DSSFlowNodeInfo dssFlowNodeInfo = dssFlowNodeInfoMap.get(contentId);
             List<NodeContentUIDO> nodeUIList = nodeContentUIGroup.get(contentId);
             DSSProject dssProject = dssProjectMap.get(dssFlowNodeInfo.getProjectId());
-            DSSFlow dssFlow = flowMap.getOrDefault(dssFlowNodeInfo.getOrchestratorId(),new DSSFlow());
 //            Map<String, String> nodeDefaultValue = getNodeDefaultValue(nodeInfoGroup, dssFlowNodeInfo.getJobType());
 
             List<String> nodeUIKeys = nodeUIList.stream().map(NodeContentUIDO::getNodeUIKey).collect(Collectors.toList());
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username,dssFlow);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
             BeanUtils.copyProperties(nodeBaseInfo, eventReceiverNodeInfo);
             eventReceiverNodeInfo.setNodeDesc(nodeMap.get("desc"));
             eventReceiverNodeInfo.setMsgType(nodeMap.get("msg.type"));
@@ -2358,7 +2321,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
 
 
-    public NodeBaseInfo getNodeBaseInfo(DSSFlowNodeInfo dssFlowNodeInfo, DSSProject dssProject, Map<String, String> nodeMap,String username,DSSFlow dssFlow) {
+    public NodeBaseInfo getNodeBaseInfo(DSSFlowNodeInfo dssFlowNodeInfo, DSSProject dssProject, Map<String, String> nodeMap,String username) {
 
         NodeBaseInfo nodeBaseInfo = new NodeBaseInfo();
 
@@ -2380,7 +2343,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 || (CollectionUtils.isNotEmpty(dssProject.getReleaseUsers()) && dssProject.getReleaseUsers().contains(username))
                 || (StringUtils.isNotEmpty(dssProject.getCreateBy()) && dssProject.getCreateBy().equals(username));
         nodeBaseInfo.setEditable(editable);
-        nodeBaseInfo.setFlowId(dssFlow.getId());
+        nodeBaseInfo.setFlowId(dssFlowNodeInfo.getFlowId());
 
         return nodeBaseInfo;
 

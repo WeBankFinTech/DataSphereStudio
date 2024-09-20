@@ -789,7 +789,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         Long workspaceId  = projectListQueryRequest.getWorkspaceId();
         //判断工作空间是否设置了管理员能否查看该工作空间下所有项目的权限
         Integer workspaceAdminPermission = projectUserMapper.getWorkspaceAdminPermission(workspaceId);
-        if(isWorkspaceAdmin(workspaceId,queryUser) && workspaceAdminPermission != 1){
+        boolean isAdmin = isWorkspaceAdmin(workspaceId,projectListQueryRequest.getUsername());
+        if(isAdmin && workspaceAdminPermission == 1){
             queryUser = null;
         }
 
@@ -828,13 +829,15 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
             // 用户是否具有编辑权限  发布者和创建者、管理员都有
             if (projectVo.getCreateBy().equals(projectListQueryRequest.getUsername())
-                    || isWorkspaceAdmin(projectListQueryRequest.getWorkspaceId(), projectListQueryRequest.getUsername())
+                    || isAdmin
                     || dssProject.getReleaseUsers().contains(projectListQueryRequest.getUsername())
             ) {
                 dssProject.setEditable(true);
             } else {
                 dssProject.setEditable(false);
             }
+
+            dssProject.setAdmin(isAdmin);
 
             projectList.add(dssProject);
         }

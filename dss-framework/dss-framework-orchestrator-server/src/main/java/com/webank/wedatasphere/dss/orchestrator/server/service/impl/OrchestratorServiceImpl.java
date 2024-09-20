@@ -437,7 +437,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
 
     @Override
     public void rollbackOrchestratorGit(OrchestratorRollBackGitVo rollBackGitVo, String userName, Long projectId, String projectName,
-                                        Long orchestratorId, LabelRouteVO labels, Workspace workspace) throws Exception {
+                                        Long orchestratorId, LabelRouteVO labels, Workspace workspace, Long latestAppId) throws Exception {
         if (rollBackGitVo == null) {
             return;
         }
@@ -451,6 +451,9 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
         }
         if (labels.getRoute().equals("dev")) {
+            List<Long> flowIdList = new ArrayList<>();
+            flowService.getAllOldFlowId(latestAppId, flowIdList);
+            flowService.deleteNodeContent(flowIdList);
             flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
         }
 

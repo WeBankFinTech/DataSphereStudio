@@ -28,6 +28,9 @@ public class OrchestratorReleaseVersionInfo {
 
     private Long releaseTaskId;
 
+
+    private String releaseUser;
+
     public OrchestratorReleaseVersionInfo(Long id, Long orchestratorId, String version, Date updateTime, String status, String errorMsg, String updater, Date releaseTime, Long releaseTaskId) {
         this.id = id;
         this.orchestratorId = orchestratorId;
@@ -114,5 +117,14 @@ public class OrchestratorReleaseVersionInfo {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+
+    public String getReleaseUser() {
+        return releaseUser;
+    }
+
+    public void setReleaseUser(String releaseUser) {
+        this.releaseUser = releaseUser;
     }
 }

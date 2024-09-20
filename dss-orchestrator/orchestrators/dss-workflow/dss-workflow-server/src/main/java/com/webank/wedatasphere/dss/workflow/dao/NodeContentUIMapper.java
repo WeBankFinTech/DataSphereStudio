@@ -17,7 +17,7 @@ public interface NodeContentUIMapper {
 
     void updateNodeContentUI(NodeContentUIDO contentUIDO);
 
-    NodeContentUIDO getNodeContentUI(@Param("orchestratorId") Long orchestratorId);
+    NodeContentUIDO getNodeContentUI(@Param("contentId") Long contentId);
 
     void batchUpdateNodeContentUI(NodeContentUIDO contentUIDO);
 

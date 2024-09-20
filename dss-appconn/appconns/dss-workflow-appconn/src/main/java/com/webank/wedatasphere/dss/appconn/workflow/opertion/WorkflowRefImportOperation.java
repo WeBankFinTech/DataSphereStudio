@@ -17,7 +17,6 @@
 package com.webank.wedatasphere.dss.appconn.workflow.opertion;
 
 import com.webank.wedatasphere.dss.common.protocol.JobStatus;
-import com.webank.wedatasphere.dss.common.utils.MapUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -48,6 +47,9 @@ public class WorkflowRefImportOperation
                 requestRef.getNewVersion(),
                 requestRef.getWorkspace(),
                 requestRef.getContextId(), requestRef.getDSSLabels());
+        if("true".equals( requestRef.getParameter("isOldPackageStruct"))){
+            requestImportWorkflow.setOldPackageStruct(true);
+        }
 
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getWorkflowSender(requestRef.getDSSLabels());
         ResponseImportWorkflow responseImportWorkflow = RpcAskUtils.processAskException(sender.ask(requestImportWorkflow),

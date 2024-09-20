@@ -171,8 +171,10 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         dssOrchestratorVersion.setValidFlag(valid);
 
         DSSOrchestratorVersion oldVersion  = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(importDssOrchestratorInfo.getId(), 1);
+        Long oldAppId = null;
         if (oldVersion!=null) {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.increaseVersion(oldVersion.getVersion()));
+            oldAppId = oldVersion.getAppId();
         } else {
             dssOrchestratorVersion.setVersion(OrchestratorUtils.generateNewVersion());
         }
@@ -346,6 +348,7 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
                     ImportRequestRef requestRef = (ImportRequestRef) developmentRequestRef;
                     requestRef.setResourceMap(MapUtils.newCommonMap(ImportRequestRef.RESOURCE_ID_KEY, orcResourceId, ImportRequestRef.RESOURCE_VERSION_KEY, orcBmlVersion));
                     requestRef.setNewVersion(dssOrchestratorVersion.getVersion());
+                    requestRef.setParameter("isOldPackageStruct","true");
                     return ((RefImportOperation) developmentOperation).importRef(requestRef);
                 }, "import");
         long orchestrationId = (Long) responseRef.getRefJobContent().get(OrchestratorRefConstant.ORCHESTRATION_ID_KEY);

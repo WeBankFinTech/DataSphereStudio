@@ -131,6 +131,7 @@
               ,t1.modify_time as modifyTime
               ,t1.create_time as createTime
               ,t1.node_key  as nodeKey
+              ,t1.flow_id   as flowId
         from dss_workflow_node_content t1
         join (select * from dss_orchestrator_info
               where project_id in

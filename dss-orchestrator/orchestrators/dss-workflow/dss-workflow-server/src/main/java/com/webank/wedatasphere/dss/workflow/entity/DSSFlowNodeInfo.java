@@ -24,6 +24,8 @@ public class DSSFlowNodeInfo {
 
     private Date createTime;
 
+    private Long flowId;
+
 
     public String getNodeId() {
         return nodeId;
@@ -107,5 +109,14 @@ public class DSSFlowNodeInfo {
 
     public void setNodeKey(String nodeKey) {
         this.nodeKey = nodeKey;
+    }
+
+
+    public Long getFlowId() {
+        return flowId;
+    }
+
+    public void setFlowId(Long flowId) {
+        this.flowId = flowId;
     }
 }

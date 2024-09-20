@@ -301,9 +301,10 @@ public class DSSFrameworkOrchestratorRestful {
         LabelRouteVO labels = rollbackOrchestratorRequest.getLabels();
         try {
             LOGGER.info("user {} begin to rollbackOrchestrator, params:{}", username, rollbackOrchestratorRequest);
+            DSSOrchestratorVersion latestVersionById = orchestratorMapper.getLatestOrchestratorVersionById(orchestratorId);
             OrchestratorRollBackGitVo rollbackOrchestrator = orchestratorService.rollbackOrchestrator(username, projectId, projectName, orchestratorId, version, labels, workspace);
             try {
-                orchestratorService.rollbackOrchestratorGit(rollbackOrchestrator, username, projectId, projectName, orchestratorId, labels, workspace);
+                orchestratorService.rollbackOrchestratorGit(rollbackOrchestrator, username, projectId, projectName, orchestratorId, labels, workspace, latestVersionById.getAppId());
             } catch (Exception e) {
                 return Message.ok("回滚版本成功,git回滚失败，请重新保存并提交工作流").data("newVersion", rollbackOrchestrator.getVersion());
             }
@@ -536,11 +537,13 @@ public class DSSFrameworkOrchestratorRestful {
     @RequestMapping(path = "gitUrl", method = RequestMethod.GET)
     public Message gitUrl(@RequestParam(required = true, name = "projectName") String projectName,
                           @RequestParam(required = false, name = "workflowName") String workflowName,
+                          @RequestParam(required = false, name = "workflowNodeName") String workflowNodeName,
                           HttpServletResponse response) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
         Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, workflowName);
+        String filePath = StringUtils.isEmpty(workflowNodeName) ? workflowName : workflowName + "/" +workflowNodeName;
+        GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, filePath);
         GitAddMemberResponse addMemberResponse = RpcAskUtils.processAskException(sender.ask(gitAddMemberRequest), GitAddMemberResponse.class, GitAddMemberRequest.class);
         return Message.ok().data("gitUrl", addMemberResponse.getGitUrl());
 

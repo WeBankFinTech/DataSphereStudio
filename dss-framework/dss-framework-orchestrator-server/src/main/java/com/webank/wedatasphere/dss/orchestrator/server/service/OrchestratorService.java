@@ -135,7 +135,7 @@ public interface OrchestratorService {
                                                    Long orchestratorId, String version, LabelRouteVO labels, Workspace workspace) throws Exception;
 
     void rollbackOrchestratorGit(OrchestratorRollBackGitVo rollBackGitVo, String userName, Long projectId, String projectName,
-                                 Long orchestratorId, LabelRouteVO labels, Workspace workspace) throws Exception;
+                                 Long orchestratorId, LabelRouteVO labels, Workspace workspace, Long latestAppId) throws Exception;
     //**** new method
     void isExistSameNameBeforeCreate(Long workspaceId, Long projectId, String orchestratorName) throws DSSFrameworkErrorException;
 

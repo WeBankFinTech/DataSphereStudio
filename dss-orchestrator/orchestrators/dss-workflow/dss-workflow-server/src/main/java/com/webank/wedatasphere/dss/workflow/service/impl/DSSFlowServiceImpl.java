@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
+import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
@@ -30,9 +31,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectInfoRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
-import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryResponse;
+import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.utils.*;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
@@ -427,6 +426,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Override
     public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
+//        // flowId发生变化时，清空旧的flowId
+//        if (oldFLowId != null) {
+//            List<NodeContentDO> contentListByOrchestratorId = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, oldFLowId);
+//            if (CollectionUtils.isNotEmpty(contentListByOrchestratorId)) {
+//                List<Long> collect = contentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+//                nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
+//            }
+//            nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId, oldFLowId);
+//        }
         // 解析 jsonflow
         // 解析 proxyUser
         try {
@@ -473,7 +481,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
             }
 
-            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorId);
+            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, flowID);
 
             logger.info("workFlowNodes:{}", workFlowNodes);
             Set<NodeContentUIDO> nodeContentUIDOS = new HashSet<>();
@@ -499,7 +507,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     modifyDate = new Date(modifyTime);
                 }
                 String modifyUser = nodeDefault.getModifyUser();
-                NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, createDate, modifyDate, modifyUser);
+                NodeContentDO contentDO = new NodeContentDO(key, id, jobType, orchestratorId, flowID, createDate, modifyDate, modifyUser);
                 nodeContentDOS.add(contentDO);
             }
 
@@ -532,10 +540,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             if (CollectionUtils.isNotEmpty(difference1)) {
-                nodeContentMapper.batchDelete(new ArrayList<>(difference1), orchestratorId);
+                nodeContentMapper.batchDelete(new ArrayList<>(difference1), orchestratorId, flowID);
             }
 
-            List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId);
+            List<NodeContentDO> nodeContents = nodeContentMapper.getNodeContentByKeyList(keyList, orchestratorId, flowID);
             List<NodeTypeDO> workflowNodeNumberType = nodeInfoMapper.getWorkflowNodeNumberType();
             Map<String, String> nodeNumberMap = new HashMap<>();
             for (NodeTypeDO nodeTypeDO : workflowNodeNumberType) {
@@ -761,9 +769,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                                 String description, List<DSSLabel> dssLabels, String nodeSuffix,
                                 String newFlowName, Long newProjectId) throws DSSErrorException, IOException {
         DSSFlow dssFlow = flowMapper.selectFlowByID(rootFlowId);
+        Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabels);
+        OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
+                OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
+        Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
+        List<Long> flowIdList = new ArrayList<>();
+        getAllOldFlowId(rootFlowId, flowIdList);
+        deleteNodeContent(flowIdList);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
-                contextIdStr, workspace, dssLabels, nodeSuffix);
+                contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);
         DSSFlow copyFlow = flowMapper.selectFlowByID(rootFlowWithSubFlows.getId());
         copyFlow.setFlowIdParamConfTemplateIdTuples(rootFlowWithSubFlows.getFlowIdParamConfTemplateIdTuples());
         return copyFlow;
@@ -847,9 +862,32 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return cyFlow;
     }
 
+    @Override
+    public void getAllOldFlowId(Long flowId, List<Long> flowIdList) {
+        DSSFlow dssFlow = getFlow(flowId);
+        List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
+        flowIdList.add(flowId);
+        for (Long subFlowID : subFlowIDs) {
+            DSSFlow subDSSFlow = flowMapper.selectFlowByID(subFlowID);
+            if (dssFlow.getChildren() == null) {
+                dssFlow.setChildren(new ArrayList<DSSFlow>());
+            }
+            getAllOldFlowId(subFlowID, flowIdList);
+        }
+    }
+
+    @Override
+    public void deleteNodeContent(List<Long> flowIdList) {
+        if (CollectionUtils.isEmpty(flowIdList)) {
+            return;
+        }
+        nodeContentMapper.deleteNodeContentByFlowId(flowIdList);
+    }
+
     private void updateFlowJson(String userName, String projectName, DSSFlow rootFlow,
                                 String version, Long parentFlowId, String contextIdStr,
-                                Workspace workspace, List<DSSLabel> dssLabels, String nodeSuffix) throws DSSErrorException, IOException {
+                                Workspace workspace, List<DSSLabel> dssLabels, String nodeSuffix,
+                                Long orchestratorId) throws DSSErrorException, IOException {
         String flowJson = bmlService.readTextFromBML(userName, rootFlow.getResourceId(), rootFlow.getBmlVersion());
         //如果包含subflow,需要一同导入subflow内容，并更新parrentflow的json内容
         // TODO: 2020/7/31 优化update方法里面的saveContent
@@ -867,12 +905,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         //上传节点的资源或调用appconn的copyRef
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow,
                 version, workspace, dssLabels);
+        // 更新对应节点的FlowJson
+        saveFlowMetaData(rootFlow.getId(), updateFlowJson, orchestratorId);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
         List<String[]> templateIds = new ArrayList<>();
         if (subFlows != null) {
             for (DSSFlow subflow : subFlows) {
                 updateFlowJson(userName, projectName, subflow, version, rootFlow.getId(),
-                        contextIdStr, workspace, dssLabels, nodeSuffix);
+                        contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);
                 templateIds.addAll(subflow.getFlowIdParamConfTemplateIdTuples());
             }
         }
@@ -1105,7 +1145,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 查询节点信息
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
-        Map<String, List<NodeUIInfo>> nodeInfoGroup = nodeUIInfoGroupByNodeType(nodeTypeList);
+//        Map<String, List<NodeUIInfo>> nodeInfoGroup = nodeUIInfoGroupByNodeType(nodeTypeList);
 
         if (CollectionUtils.isEmpty(flowNodeInfoList)) {
             logger.error("queryDataDevelopNodeList find node info is empty, example project id is {}", projectIdList.get(0));
@@ -1121,6 +1161,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             logger.error("queryDataDevelopNodeList not find nodeUI info , example contextId is {}", contentIdList.get(0));
             return dataDevelopNodeResponse;
         }
+
+
 
         // 查询模板信息
         //  List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId).collect(Collectors.toList());
@@ -1142,7 +1184,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
 
                 Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
-                NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+                NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
                 BeanUtils.copyProperties(nodeBaseInfo, dataDevelopNodeInfo);
 
                 dataDevelopNodeInfo.setResource(nodeMap.get("resources"));
@@ -1237,13 +1279,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public DataViewNodeResponse queryDataViewNode(String username, Workspace workspace, DataViewNodeRequest request) {
 
-        DataViewNodeResponse dataDevelopNodeResponse = new DataViewNodeResponse();
+        DataViewNodeResponse dataViewNodeResponse = new DataViewNodeResponse();
 
         List<DSSProject> dssProjectList = getDSSProject(workspace, username);
 
         if (CollectionUtils.isEmpty(dssProjectList)) {
             logger.error("queryDataViewNode workspace is {}, username is {}", workspace, username);
-            return dataDevelopNodeResponse;
+            return dataViewNodeResponse;
         }
 
         Map<Long, DSSProject> dssProjectMap = projectListToMap(dssProjectList);
@@ -1253,14 +1295,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<NodeInfo> nodeInfoList = getNodeInfoByGroupName(WorkflowNodeGroupEnum.DataVisualization.getNameEn());
         if (CollectionUtils.isEmpty(nodeInfoList)) {
             logger.error("queryDataViewNode not find node type info");
-            return dataDevelopNodeResponse;
+            return dataViewNodeResponse;
         }
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
         if (CollectionUtils.isEmpty(flowNodeInfoList)) {
             logger.error("queryDataViewNode not find node info , example projectId is {}", projectIdList.get(0));
-            return dataDevelopNodeResponse;
+            return dataViewNodeResponse;
         }
 
         Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
@@ -1270,7 +1312,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
         if (nodeContentUIGroup.isEmpty()) {
             logger.error("queryDataViewNode not find nodeUI info , example contextId is {}", contentIdList.get(0));
-            return dataDevelopNodeResponse;
+            return dataViewNodeResponse;
         }
 
         List<DataViewNodeInfo> dataViewNodeInfoList = new ArrayList<>();
@@ -1286,18 +1328,22 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
             BeanUtils.copyProperties(nodeBaseInfo, dataViewNodeInfo);
 
             dataViewNodeInfo.setNodeDesc(nodeMap.get("desc"));
-            dataViewNodeInfo.setViewId(nodeMap.get("viewId"));
+            if(nodeMap.containsKey("viewId")){
+                dataViewNodeInfo.setViewId(nodeMap.get("viewId"));
+            } else if (nodeMap.containsKey("datasourceId")) {
+                dataViewNodeInfo.setViewId(nodeMap.get("datasourceId"));
+            }
 
             dataViewNodeInfoList.add(dataViewNodeInfo);
         }
 
         dataViewNodeInfoList = dataViewNodeResultFilter(request, dataViewNodeInfoList);
 
-        dataDevelopNodeResponse.setTotal((long) dataViewNodeInfoList.size());
+        dataViewNodeResponse.setTotal((long) dataViewNodeInfoList.size());
         // 分页处理
         int page = request.getPageNow() >= 1 ? request.getPageNow() : 1;
         int pageSize = request.getPageSize() >= 1 ? request.getPageSize() : 10;
@@ -1306,10 +1352,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         for (int i = start; i < end; i++) {
             DataViewNodeInfo dataViewNodeInfo = dataViewNodeInfoList.get(i);
-            dataDevelopNodeResponse.getDataDevelopNodeInfoList().add(dataViewNodeInfo);
+            dataViewNodeResponse.getDataDevelopNodeInfoList().add(dataViewNodeInfo);
         }
 
-        return dataDevelopNodeResponse;
+        return dataViewNodeResponse;
 
     }
 
@@ -1329,7 +1375,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             // 过滤具有编辑工作流权限的项目
             return (CollectionUtils.isNotEmpty(project.getEditUsers()) && project.getEditUsers().contains(username))
                     || (CollectionUtils.isNotEmpty(project.getReleaseUsers()) && project.getReleaseUsers().contains(username))
-                    || (StringUtils.isNotEmpty(project.getCreateBy()) && project.getCreateBy().equals(username));
+                    || (StringUtils.isNotEmpty(project.getCreateBy()) && project.getCreateBy().equals(username))
+                    || (CollectionUtils.isNotEmpty(project.getAccessUsers()) && project.getAccessUsers().contains(username))
+                    || project.isAdmin();
         }).collect(Collectors.toList());
 
     }
@@ -1549,7 +1597,13 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public List<String> queryViewId(Workspace workspace, String username) {
 
-        return queryNodeUiValueByKey(workspace, username, nodeUIViewIdKey, WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+        List<String> viewIdList = queryNodeUiValueByKey(workspace, username, nodeUIViewIdKey, WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+
+        List<String> dataSourceIdList = queryNodeUiValueByKey(workspace, username, "datasourceId", WorkflowNodeGroupEnum.DataVisualization.getNameEn());
+
+        viewIdList.addAll(dataSourceIdList);
+
+        return viewIdList.stream().distinct().collect(Collectors.toList());
     }
 
     @Override
@@ -1559,6 +1613,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
         List<EditFlowRequest> editFlowRequestList = batchEditFlowRequest.getEditNodeList();
         Map<Long, List<EditFlowRequest>> editFlowRequestMap = new HashMap<>();
+        Set<Long> flowIdList = new HashSet<>();
 
         for (EditFlowRequest editFlowRequest : editFlowRequestList) {
             Long orchestratorId = editFlowRequest.getOrchestratorId();
@@ -1580,33 +1635,53 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<OrchestratorVo> orchestratorVoes = responseQueryOrchestrator.getOrchestratorVoes();
 
         Long modifyTime = System.currentTimeMillis();
+        Map<Long, List<EditFlowRequest>> editFlowRequestTOFlowIDMap = new HashMap<>();
 
         for (OrchestratorVo orchestratorVo : orchestratorVoes) {
             DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
             if (dssOrchestratorVersion != null) {
                 Long orchestratorId = dssOrchestratorVersion.getOrchestratorId();
                 Long flowId = dssOrchestratorVersion.getAppId();
+                DSSFlow dssFlow = getFlow(flowId);
                 DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowId);
                 if (flowEditLock != null && !flowEditLock.getOwner().equals(ticketId)) {
-                    throw new DSSErrorException(80001, "当前工作流被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
+                    throw new DSSErrorException(80001, "当前工作流" + dssFlow.getName() +"被用户" + flowEditLock.getUsername() + "已锁定编辑，您编辑的内容不能再被保存。如有疑问，请与" + flowEditLock.getUsername() + "确认");
                 }
-                DSSFlow dssFlow = getFlow(flowId);
+
                 lockFlow(dssFlow, userName, ticketId);
                 List<EditFlowRequest> editFlowRequests = editFlowRequestMap.get(orchestratorId);
-                StringBuilder modifyJson = new StringBuilder(dssFlow.getFlowJson());
+
                 for (EditFlowRequest editFlowRequest : editFlowRequests) {
-                    String json = modifyJson(String.valueOf(modifyJson), editFlowRequest, modifyTime, userName);
+                    NodeContentDO nodeContentByContentId = nodeContentMapper.getNodeContentByContentId(editFlowRequest.getId());
+                    Long targetFlowId = nodeContentByContentId.getFlowId();
+                    List<EditFlowRequest> editFlowRequestsList = editFlowRequestTOFlowIDMap.containsKey(targetFlowId) ?
+                            editFlowRequestTOFlowIDMap.get(targetFlowId) : new ArrayList<>();
+                    editFlowRequestsList.add(editFlowRequest);
+                    editFlowRequestTOFlowIDMap.put(targetFlowId, editFlowRequestsList);
+                }
+            }
+        }
+
+        for (Map.Entry<Long, List<EditFlowRequest>> entry : editFlowRequestTOFlowIDMap.entrySet()) {
+            Long targetFlowId = entry.getKey();
+            DSSFlow targetFlow = getFlow(targetFlowId);
+            DSSProject project = getProjectByProjectId(targetFlow.getProjectId());
+            StringBuilder modifyJson = new StringBuilder(targetFlow.getFlowJson());
+            List<EditFlowRequest> value = entry.getValue();
+            if (value != null) {
+                for (EditFlowRequest editFlow : value) {
+                    String json = modifyJson(String.valueOf(modifyJson), editFlow, modifyTime, userName);
                     modifyJson.setLength(0);
                     modifyJson.append(json);
                 }
-                DSSProject project = getProjectByProjectId(dssFlow.getProjectId());
                 //批量修改属性
                 String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
-                saveFlow(flowId, String.valueOf(resultJson)
-                        , dssFlow.getDescription(), userName
+                saveFlow(targetFlowId, String.valueOf(resultJson)
+                        , targetFlow.getDescription(), userName
                         , workspace.getWorkspaceName(), project.getName(), null);
             }
         }
+
     }
 
     private DSSProject getProjectByProjectId(Long projectId) throws DSSErrorException {
@@ -1651,8 +1726,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 }
                 obj.addProperty("modifyTime", modifyTime);
                 obj.addProperty("modifyUser", username);
-                flowJsonAddProperty(obj, "title", title);
-                flowJsonAddProperty(obj, "desc", desc);
+                flowJsonAddPointProperty(obj, "title", title);
+                flowJsonAddPointProperty(obj, "desc", desc);
                 flowJsonAddProperty(obj, "appTag", appTag);
                 flowJsonAddProperty(obj, "businessTag", businessTag);
                 flowJsonAddProperty(obj, "ecConfTemplateId", ecConfTemplateId);
@@ -1664,9 +1739,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return modifyJson;
     }
 
-    private void flowJsonAddProperty(JsonObject obj, String contentName, String content) {
+    private void flowJsonAddPointProperty(JsonObject obj, String contentName, String content) {
         if (content != null) {
             obj.addProperty(contentName, content);
+        }
+    }
+
+    private void flowJsonAddProperty(JsonObject obj, String contentName, String content) {
+        if (StringUtils.isNotEmpty(content)) {
+            obj.addProperty(contentName, content);
+        } else {
+            obj.remove(contentName);
         }
     }
 
@@ -1714,7 +1797,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
-        Map<String, List<NodeUIInfo>> nodeInfoGroup = nodeUIInfoGroupByNodeType(nodeTypeList);
+//        Map<String, List<NodeUIInfo>> nodeInfoGroup = nodeUIInfoGroupByNodeType(nodeTypeList);
 
         if (CollectionUtils.isEmpty(flowNodeInfoList)) {
             logger.error("queryDataCheckerNode query not find node info , example projectId is {}", projectIdList.get(0));
@@ -1724,12 +1807,14 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Map<Long, DSSFlowNodeInfo> dssFlowNodeInfoMap = flowNodeToMap(flowNodeInfoList);
         List<Long> contentIdList = new ArrayList<>(dssFlowNodeInfoMap.keySet());
 
+
         // 查询节点保存的配置信息
         Map<Long, List<NodeContentUIDO>> nodeContentUIGroup = getNodeContentUIGroup(contentIdList);
         if (nodeContentUIGroup.isEmpty()) {
             logger.error("queryDataCheckerNode query not find nodeUI info , example contextId is {}", contentIdList.get(0));
             return dataCheckerNodeResponse;
         }
+
 
         List<DataCheckerNodeInfo> dataCheckerNodeInfoList = new ArrayList<>();
 
@@ -1747,7 +1832,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
             BeanUtils.copyProperties(nodeBaseInfo, dataCheckerNodeInfo);
 
             dataCheckerNodeInfo.setMaxCheckHours(nodeMap.get("max.check.hours"));
@@ -1875,6 +1960,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return eventSenderNodeResponse;
         }
 
+
         List<EventSenderNodeInfo> eventSenderNodeInfoList = new ArrayList<>();
 
         for (Long contentId : nodeContentUIGroup.keySet()) {
@@ -1889,7 +1975,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
             BeanUtils.copyProperties(nodeBaseInfo, eventSenderNodeInfo);
             eventSenderNodeInfo.setNodeDesc(nodeMap.get("desc"));
             eventSenderNodeInfo.setMsgType(nodeMap.get("msg.type"));
@@ -1996,7 +2082,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<String> nodeTypeList = nodeInfoList.stream().map(NodeInfo::getNodeType).collect(Collectors.toList());
         List<DSSFlowNodeInfo> flowNodeInfoList = nodeContentMapper.queryFlowNodeInfo(projectIdList, nodeTypeList);
 
-        Map<String, List<NodeUIInfo>> nodeInfoGroup = nodeUIInfoGroupByNodeType(nodeTypeList);
+//        Map<String, List<NodeUIInfo>> nodeInfoGroup = nodeUIInfoGroupByNodeType(nodeTypeList);
 
         if (CollectionUtils.isEmpty(flowNodeInfoList)) {
             logger.error("queryEventReceiveNode query not find node info , example projectId is {}", projectIdList.get(0));
@@ -2013,6 +2099,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             return eventReceiveNodeResponse;
         }
 
+
         List<EventReceiverNodeInfo> eventReceiverNodeInfoList = new ArrayList<>();
 
         for (Long contentId : nodeContentUIGroup.keySet()) {
@@ -2028,7 +2115,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             List<String> nodeUIValues = nodeUIList.stream().map(NodeContentUIDO::getNodeUIValue).collect(Collectors.toList());
             Map<String, String> nodeMap = CollUtil.zip(nodeUIKeys, nodeUIValues);
 
-            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap);
+            NodeBaseInfo nodeBaseInfo = getNodeBaseInfo(dssFlowNodeInfo, dssProject, nodeMap,username);
             BeanUtils.copyProperties(nodeBaseInfo, eventReceiverNodeInfo);
             eventReceiverNodeInfo.setNodeDesc(nodeMap.get("desc"));
             eventReceiverNodeInfo.setMsgType(nodeMap.get("msg.type"));
@@ -2142,7 +2229,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<String> nodeUIValue = new ArrayList<>();
         try {
 
-
             // 获取项目
             List<DSSProject> dssProjectList = getDSSProject(workspace, username);
 
@@ -2233,7 +2319,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
 
-    public NodeBaseInfo getNodeBaseInfo(DSSFlowNodeInfo dssFlowNodeInfo, DSSProject dssProject, Map<String, String> nodeMap) {
+
+
+    public NodeBaseInfo getNodeBaseInfo(DSSFlowNodeInfo dssFlowNodeInfo, DSSProject dssProject, Map<String, String> nodeMap,String username) {
 
         NodeBaseInfo nodeBaseInfo = new NodeBaseInfo();
 
@@ -2251,6 +2339,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         nodeBaseInfo.setCreateTime(dssFlowNodeInfo.getCreateTime());
         nodeBaseInfo.setNodeContent(nodeMap);
         nodeBaseInfo.setAssociateGit(dssProject.getAssociateGit());
+        boolean editable = (CollectionUtils.isNotEmpty(dssProject.getEditUsers()) && dssProject.getEditUsers().contains(username))
+                || (CollectionUtils.isNotEmpty(dssProject.getReleaseUsers()) && dssProject.getReleaseUsers().contains(username))
+                || (StringUtils.isNotEmpty(dssProject.getCreateBy()) && dssProject.getCreateBy().equals(username));
+        nodeBaseInfo.setEditable(editable);
+        nodeBaseInfo.setFlowId(dssFlowNodeInfo.getFlowId());
 
         return nodeBaseInfo;
 
@@ -2266,6 +2359,45 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         } else {
             return Arrays.asList(jobDesc.trim().split(""));
         }
+
+    }
+
+
+    public Map<Long,DSSFlow> getFlowMap(List<DSSFlowNodeInfo> flowNodeInfoList){
+
+        Map<Long,DSSFlow> flowMap = new HashMap<>();
+
+        List<Long> orchestratorIdList = flowNodeInfoList.stream().map(DSSFlowNodeInfo::getOrchestratorId)
+                .collect(Collectors.toList());
+
+        if(CollectionUtils.isEmpty(orchestratorIdList)){
+            logger.error("getFlowMap orchestratorIdList is empty");
+            return flowMap;
+        }
+
+        List<DSSFlow> dssFlowList = flowMapper.selectFlowListByOrchestratorId(orchestratorIdList);
+
+        if(CollectionUtils.isEmpty(dssFlowList)){
+            logger.error("example orchestratorId is {}",orchestratorIdList.get(0));
+            logger.error("getFlowMap dssFlow list is empty");
+            return flowMap;
+        }
+
+        Map<Long,List<DSSFlow>> dssFlowMap = dssFlowList.stream().collect(Collectors.groupingBy(DSSFlow::getOrchestratorId));
+
+
+        for(Long orchestratorId : dssFlowMap.keySet()){
+
+            DSSFlow dssFlow = dssFlowMap.get(orchestratorId).stream().max(Comparator.comparing(DSSFlow::getId)).orElse(null);
+
+            if(dssFlow == null){
+                continue;
+            }
+
+            flowMap.put(orchestratorId,dssFlow);
+        }
+
+        return flowMap;
 
     }
 

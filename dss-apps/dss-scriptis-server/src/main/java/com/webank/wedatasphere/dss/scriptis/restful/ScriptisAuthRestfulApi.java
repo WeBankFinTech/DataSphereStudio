@@ -40,12 +40,7 @@ public class ScriptisAuthRestfulApi {
     public Message globalLimits(HttpServletRequest req) {
         String username = SecurityFilter.getLoginUsername(req);
         Map<String,Object> globalLimits = scriptisAuthService.getGlobalLimits(username);
-        Map<String, Object> newGlobalLimits = new HashMap<>();
-        newGlobalLimits.putAll(globalLimits);
-        if (DSSScriptisConfiguration.isInCopilotWhiteList(username)) {
-            newGlobalLimits.put(DSSScriptisConfiguration.COPILOT_ENABLE_KEY, true);
-        }
-        return Message.ok().data("globalLimits", newGlobalLimits);
+        return Message.ok().data("globalLimits", globalLimits);
     }
 
     @RequestMapping(value = "/globalLimits/{globalLimitName}",method = RequestMethod.GET)

@@ -31,6 +31,10 @@ public class RequestImportWorkflow {
     private Workspace workspace;
     private String contextId;
     private List<DSSLabel> dssLabels;
+    /**
+     * 是否迁移dws的请求,默认不是
+     */
+    private boolean oldPackageStruct = false;
 
     public String getContextId() {
         return contextId;
@@ -104,6 +108,14 @@ public class RequestImportWorkflow {
 
     public void setDssLabels(List<DSSLabel> dssLabels) {
         this.dssLabels = dssLabels;
+    }
+
+    public boolean getOldPackageStruct() {
+        return oldPackageStruct;
+    }
+
+    public void setOldPackageStruct(boolean oldPackageStruct) {
+        this.oldPackageStruct = oldPackageStruct;
     }
 
     public RequestImportWorkflow(String userName,

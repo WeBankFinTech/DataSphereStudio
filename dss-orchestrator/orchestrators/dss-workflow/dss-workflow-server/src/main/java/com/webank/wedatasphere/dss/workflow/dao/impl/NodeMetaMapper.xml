@@ -47,7 +47,7 @@
     </update>
 
     <select id="getNodeMetaByOrchestratorId" parameterType="java.lang.Long" resultMap="nodeMetaResultMap">
-        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_meta WHERE orchestrator_id = #{orchestratorId}
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_meta WHERE orchestrator_id = #{orchestratorId} limit 1
     </select>
 
     <delete id="deleteNodeMetaByOrchestratorId" parameterType="java.lang.Long">

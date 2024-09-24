@@ -54,7 +54,7 @@ public interface DSSWorkspaceUserService {
 
     List<DepartmentUserTreeVo> getAllWorkspaceUsersDepartment(long workspaceId) ;
 
-    PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize);
+    PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize,boolean paged);
 
     List<Integer> getUserWorkspaceIds(String userName);
 

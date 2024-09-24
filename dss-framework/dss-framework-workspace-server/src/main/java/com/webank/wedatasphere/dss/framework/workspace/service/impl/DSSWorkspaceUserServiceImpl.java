@@ -184,8 +184,10 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
-    public PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize) {
-        PageHelper.startPage(pageNow, pageSize);
+    public PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize,boolean paged) {
+        if(paged) {
+            PageHelper.startPage(pageNow, pageSize);
+        }
         List<String> dos = dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
         com.github.pagehelper.PageInfo<String> doPage = new com.github.pagehelper.PageInfo<>(dos);
         return new PageInfo<>(doPage.getList(), doPage.getTotal());

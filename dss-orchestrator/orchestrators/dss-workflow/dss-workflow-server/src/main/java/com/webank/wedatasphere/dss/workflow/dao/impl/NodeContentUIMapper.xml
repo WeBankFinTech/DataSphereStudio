@@ -55,7 +55,7 @@
 
     <select id="getNodeContentUI" resultMap="nodeContentUiResultMap" parameterType="java.lang.Long">
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content_to_ui
-        WHERE `content_id` = #{contentId}
+        WHERE `content_id` = #{contentId} limit 1
     </select>
 
     <delete id="deleteNodeContentUIByContentList" parameterType="java.util.List">

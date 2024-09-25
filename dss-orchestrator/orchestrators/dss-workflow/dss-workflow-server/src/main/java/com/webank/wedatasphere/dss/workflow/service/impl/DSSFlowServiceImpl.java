@@ -42,6 +42,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConsta
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.workflow.DefaultWorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
@@ -1674,11 +1675,20 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     modifyJson.setLength(0);
                     modifyJson.append(json);
                 }
-                //批量修改属性
+                // 批量修改属性
                 String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
                 saveFlow(targetFlowId, String.valueOf(resultJson)
                         , targetFlow.getDescription(), userName
                         , workspace.getWorkspaceName(), project.getName(), null);
+            }
+        }
+
+        // 完成后批量解锁
+        for (OrchestratorVo orchestratorVo : orchestratorVoes) {
+            DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+            if (dssOrchestratorVersion != null) {
+                Long flowId = dssOrchestratorVersion.getAppId();
+                workFlowManager.unlockWorkflow(userName, flowId, true, workspace);
             }
         }
 

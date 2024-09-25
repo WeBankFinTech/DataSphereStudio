@@ -87,7 +87,10 @@
     </select>
 
     <select id="getContentListByFlowId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
-        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE flow_id = #{flowId}
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE flow_id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 
 

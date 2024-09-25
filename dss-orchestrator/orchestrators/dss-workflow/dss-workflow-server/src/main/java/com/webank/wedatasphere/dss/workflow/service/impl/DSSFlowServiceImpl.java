@@ -427,15 +427,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Override
     public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
-//        // flowId发生变化时，清空旧的flowId
-//        if (oldFLowId != null) {
-//            List<NodeContentDO> contentListByOrchestratorId = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, oldFLowId);
-//            if (CollectionUtils.isNotEmpty(contentListByOrchestratorId)) {
-//                List<Long> collect = contentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
-//                nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
-//            }
-//            nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId, oldFLowId);
-//        }
         // 解析 jsonflow
         // 解析 proxyUser
         try {
@@ -881,6 +872,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public void deleteNodeContent(List<Long> flowIdList) {
         if (CollectionUtils.isEmpty(flowIdList)) {
             return;
+        }
+        List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByFlowId(flowIdList);
+        List<Long> contentIdListByOrchestratorId = contentDOS.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+        // 删除当前节点的属性信息
+        if (CollectionUtils.isNotEmpty(contentIdListByOrchestratorId)) {
+            nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
         }
         nodeContentMapper.deleteNodeContentByFlowId(flowIdList);
     }

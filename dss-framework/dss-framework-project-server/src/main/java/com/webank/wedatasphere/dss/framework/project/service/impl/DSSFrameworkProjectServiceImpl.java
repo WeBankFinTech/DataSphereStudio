@@ -520,7 +520,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             projectModifyRequest.setCreatorLabel(dbProject.getLabel());
         }
         //项目交接，清空数据源
-        dbProject.setDataSourceListJson(null);
+//        dbProject.setDataSourceListJson(null);
         initProjectModifyRequestPermissionInfo(projectModifyRequest,projectTransferRequest, oldProjectOwner);
 
         String newProjectOwner = projectTransferRequest.getTransferUserName();

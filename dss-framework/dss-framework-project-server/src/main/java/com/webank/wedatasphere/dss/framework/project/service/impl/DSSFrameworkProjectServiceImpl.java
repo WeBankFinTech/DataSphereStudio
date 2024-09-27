@@ -37,6 +37,7 @@ import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorEx
 import com.webank.wedatasphere.dss.framework.project.service.DSSFrameworkProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectService;
 import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserService;
+import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
@@ -508,6 +509,16 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         ProjectModifyRequest projectModifyRequest = new ProjectModifyRequest();
 
         BeanUtils.copyProperties(dbProject, projectModifyRequest);
+        if (dbProject.getApplicationArea() != null) {
+            projectModifyRequest.setApplicationArea(dbProject.getApplicationArea().toString());
+        }
+        if (StringUtils.isNotBlank(dbProject.getDevProcess())) {
+            projectModifyRequest.setDevProcessList(ProjectStringUtils.convertList(dbProject.getDevProcess()));
+        }
+        projectModifyRequest.setOrchestratorModeList(ProjectStringUtils.convertList(dbProject.getOrchestratorMode()));
+        if (StringUtils.isNotEmpty(dbProject.getLabel())) {
+            projectModifyRequest.setCreatorLabel(dbProject.getLabel());
+        }
         //项目交接，清空数据源
         dbProject.setDataSourceListJson(null);
         initProjectModifyRequestPermissionInfo(projectModifyRequest,projectTransferRequest, oldProjectOwner);

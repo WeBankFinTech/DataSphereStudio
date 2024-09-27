@@ -29,7 +29,7 @@ public interface NodeContentMapper {
 
     List<NodeContentDO> getContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    List<NodeContentDO> getContentListByFlowId(@Param("flowId") Long flowId);
+    List<NodeContentDO> getContentListByFlowId(List<Long> list);
 
     void deleteNodeContentByKey(@Param("nodeKey") String nodeKey, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 

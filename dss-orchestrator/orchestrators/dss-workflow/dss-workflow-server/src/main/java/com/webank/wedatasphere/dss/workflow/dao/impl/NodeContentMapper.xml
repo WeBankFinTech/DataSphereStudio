@@ -63,11 +63,11 @@
     </update>
 
     <select id="getNodeContentByKey" parameterType="java.lang.String" resultMap="nodeContentResultMap">
-        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey}
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `node_key` = #{nodeKey} limit 1
     </select>
 
     <select id="getNodeContentByContentId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
-        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `id` = #{id}
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE `id` = #{id} limit 1
     </select>
 
     <select id="getNodeContentByKeyList" parameterType="java.lang.String" resultMap="nodeContentResultMap">
@@ -87,7 +87,10 @@
     </select>
 
     <select id="getContentListByFlowId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
-        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE flow_id = #{flowId}
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE flow_id IN
+        <foreach collection="list" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 
 
@@ -172,7 +175,7 @@
                ,create_time as createTime
                ,modify_time as modifyTime
                ,modify_user as modifyUser
-        from dss_workflow_node_content where id = #{contentId} and node_id = #{nodeId}
+        from dss_workflow_node_content where id = #{contentId} and node_id = #{nodeId} limit 1
 
     </select>
     

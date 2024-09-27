@@ -155,7 +155,7 @@ public class DSSFrameworkProjectRestfulApi {
                             && item.getEditable()).collect(Collectors.toList());
         }
         //如果是生产中心请求，则靠考虑用户或者代理用户是否有发布权限
-        if(request.getServletPath().endsWith("getAllProdProjects")){
+        if(request.getPathInfo().endsWith("getAllProdProjects")){
             String proxyUser=username;
             if(ProxyUserConfiguration.isProxyUserEnable()) {
                 try {

@@ -42,6 +42,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConsta
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.workflow.DefaultWorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
@@ -426,15 +427,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     @Override
     public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
-//        // flowId发生变化时，清空旧的flowId
-//        if (oldFLowId != null) {
-//            List<NodeContentDO> contentListByOrchestratorId = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, oldFLowId);
-//            if (CollectionUtils.isNotEmpty(contentListByOrchestratorId)) {
-//                List<Long> collect = contentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
-//                nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
-//            }
-//            nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId, oldFLowId);
-//        }
         // 解析 jsonflow
         // 解析 proxyUser
         try {
@@ -443,7 +435,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             StringBuilder globalVar = new StringBuilder();
             if (CollectionUtils.isNotEmpty(props)) {
                 for (Map<String, Object> prop : props) {
-                    if (prop.containsKey("user.to.proxy")) {
+                    if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
                         proxyUser = prop.get("user.to.proxy").toString();
                     } else {
                         for (Map.Entry<String, Object> map : prop.entrySet()) {
@@ -880,6 +872,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     public void deleteNodeContent(List<Long> flowIdList) {
         if (CollectionUtils.isEmpty(flowIdList)) {
             return;
+        }
+        List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByFlowId(flowIdList);
+        List<Long> contentIdListByOrchestratorId = contentDOS.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+        // 删除当前节点的属性信息
+        if (CollectionUtils.isNotEmpty(contentIdListByOrchestratorId)) {
+            nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdListByOrchestratorId);
         }
         nodeContentMapper.deleteNodeContentByFlowId(flowIdList);
     }
@@ -1674,11 +1672,20 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     modifyJson.setLength(0);
                     modifyJson.append(json);
                 }
-                //批量修改属性
+                // 批量修改属性
                 String resultJson = modifyFlowJsonTime(String.valueOf(modifyJson), modifyTime, userName);
                 saveFlow(targetFlowId, String.valueOf(resultJson)
                         , targetFlow.getDescription(), userName
                         , workspace.getWorkspaceName(), project.getName(), null);
+            }
+        }
+
+        // 完成后批量解锁
+        for (OrchestratorVo orchestratorVo : orchestratorVoes) {
+            DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo.getDssOrchestratorVersion();
+            if (dssOrchestratorVersion != null) {
+                Long flowId = dssOrchestratorVersion.getAppId();
+                workFlowManager.unlockWorkflow(userName, flowId, true, workspace);
             }
         }
 

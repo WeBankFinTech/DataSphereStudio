@@ -25,7 +25,6 @@ import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
-import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.framework.admin.conf.AdminConf;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkWarnException;
@@ -46,11 +45,6 @@ import com.webank.wedatasphere.dss.framework.workspace.util.CommonRoleEnum;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
-import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
-import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
-import com.webank.wedatasphere.dss.git.common.protocol.request.GitUserInfoByRequest;
-import com.webank.wedatasphere.dss.git.common.protocol.response.GitUserInfoListResponse;
-import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
@@ -185,7 +179,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             }
             //todo 初始化做的各项事情改为listener模式
             //为新用户自动加入部门关联的工作空间
-            joinWorkspaceForNewUser(userName, userId);
+            joinWorkspaceForNewUser(userName, userId, workspaceId, workspace0xId, analyserRole);
 
             //若路径没有workspaceId会出现页面没有首页、管理台
             String homepageUrl = "/home" + "?workspaceId=" + workspaceId;
@@ -696,7 +690,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         return new PageInfo<>(users);
     }
 
-    private void joinWorkspaceForNewUser(String userName, Long userId) {
+    private void joinWorkspaceForNewUser(String userName, Long userId, int workspaceId, Integer workspace0xId, Integer analyserRole) {
         String userOrgName = staffInfoGetter.getFullOrgNameByUsername(userName);
         String orgName = userOrgName.split("-")[0];
         List<DSSWorkspaceAssociateDepartments> workspaceAssociateDepartments = dssWorkspaceMapper.getWorkspaceAssociateDepartments();
@@ -715,9 +709,15 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         needToAdd.forEach(map -> {
             map.forEach((key, value) -> {
-                Arrays.stream(value.split(",")).forEach(roleId -> {
-                    dssWorkspaceUserMapper.insertUserRoleInWorkspace(key.intValue(), Integer.parseInt(roleId), new Date(), userName, "system", userId, "system");
-                });
+                if(key.intValue()==workspaceId||(workspace0xId != null&&key.intValue() == workspace0xId)){
+                    Arrays.stream(value.split(",")).filter(roleId->analyserRole==null||Integer.parseInt(roleId)!=analyserRole).forEach(roleId -> {
+                        dssWorkspaceUserMapper.insertUserRoleInWorkspace(key.intValue(), Integer.parseInt(roleId), new Date(), userName, "system", userId, "system");
+                    });
+                }else {
+                    Arrays.stream(value.split(",")).forEach(roleId -> {
+                        dssWorkspaceUserMapper.insertUserRoleInWorkspace(key.intValue(), Integer.parseInt(roleId), new Date(), userName, "system", userId, "system");
+                    });
+                }
             });
         });
     }

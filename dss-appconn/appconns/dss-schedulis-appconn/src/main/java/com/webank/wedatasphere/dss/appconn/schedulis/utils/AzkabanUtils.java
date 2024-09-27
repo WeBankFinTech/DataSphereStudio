@@ -20,6 +20,7 @@ import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class AzkabanUtils {
 
@@ -27,7 +28,7 @@ public class AzkabanUtils {
         if(StringUtils.isNotBlank(entityString)){
             if(entityString.startsWith("{") && entityString.endsWith("}")){
                 Map resMap = DSSCommonUtils.COMMON_GSON.fromJson(entityString, Map.class);
-                if(resMap.containsKey("error")){
+                if(resMap.containsKey("error") && !Objects.isNull(resMap.get("error"))){
                     return (String)resMap.get("error");
                 }
             }

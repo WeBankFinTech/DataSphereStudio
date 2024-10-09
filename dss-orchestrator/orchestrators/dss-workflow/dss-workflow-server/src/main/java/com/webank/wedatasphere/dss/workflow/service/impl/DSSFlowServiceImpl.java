@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
-import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
@@ -42,7 +41,6 @@ import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConsta
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.workflow.DefaultWorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
@@ -340,7 +338,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Long orchestratorId = dssOrchestratorVersion != null ? dssOrchestratorVersion.getOrchestratorId() : null;
         try {
             if (orchestratorId != null) {
-                saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+                saveFlowMetaData(flowID, jsonFlow, orchestratorId, false);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -426,7 +424,15 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
+    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId, Boolean flagImport) {
+        if (flagImport) {
+            List<NodeContentDO> nodeContentListByOrchestratorId = nodeContentMapper.getNodeContentListByOrchestratorId(orchestratorId);
+            nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId);
+            if (CollectionUtils.isNotEmpty(nodeContentListByOrchestratorId)) {
+                List<Long> collect = nodeContentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+                nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
+            }
+        }
         // 解析 jsonflow
         // 解析 proxyUser
         try {
@@ -473,7 +479,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
             }
 
-            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, flowID);
+            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorIdAndFlowId(orchestratorId, flowID);
 
             logger.info("workFlowNodes:{}", workFlowNodes);
             Set<NodeContentUIDO> nodeContentUIDOS = new HashSet<>();
@@ -904,7 +910,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow,
                 version, workspace, dssLabels);
         // 更新对应节点的FlowJson
-        saveFlowMetaData(rootFlow.getId(), updateFlowJson, orchestratorId);
+        saveFlowMetaData(rootFlow.getId(), updateFlowJson, orchestratorId, false);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
         List<String[]> templateIds = new ArrayList<>();
         if (subFlows != null) {

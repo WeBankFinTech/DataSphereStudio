@@ -79,6 +79,8 @@ public interface OrchestratorMapper {
 
     void updateOrchestratorVersion(DSSOrchestratorVersion dssOrchestratorVersion);
 
+    void updateOrchestratorVersionUpdateTime(@Param("id") Long id);
+
     void deleteOrchestratorVersion(Long versionId);
 
     /**

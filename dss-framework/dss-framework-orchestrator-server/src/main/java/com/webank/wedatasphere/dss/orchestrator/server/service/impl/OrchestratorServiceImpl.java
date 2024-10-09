@@ -727,4 +727,15 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         return orchestratorByAppId;
     }
 
+    @Override
+    public Boolean updateOrchestratorTime(Long orchestratorId) {
+        DSSOrchestratorVersion orcVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
+        if (orcVersion != null) {
+            orchestratorMapper.updateOrchestratorVersionUpdateTime(orcVersion.getId());
+            return true;
+        }
+
+        return false;
+    }
+
 }

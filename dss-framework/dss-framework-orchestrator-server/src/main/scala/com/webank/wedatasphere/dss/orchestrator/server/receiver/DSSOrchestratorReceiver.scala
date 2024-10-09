@@ -120,6 +120,11 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
       val orchestratorVo = orchestratorService.updateOrchestratorBML(orchestratorUpdateBMLRequest.getFlowId,orchestratorUpdateBMLRequest.getBmlResource)
       orchestratorVo
 
+    case orchestratorVersionUpdateTime: RequestOrchestratorVersionUpdateTime =>
+      val boolean = orchestratorService.updateOrchestratorTime(orchestratorVersionUpdateTime.getOrchestratorId)
+      boolean
+
+
     case _ => throw new DSSErrorException(90000, "Not support message type " + message)
   }
 

@@ -339,6 +339,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         try {
             if (orchestratorId != null) {
                 saveFlowMetaData(flowID, jsonFlow, orchestratorId, false);
+                // 更新版本更新时间
+                RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestOrchestratorVersionUpdateTime(orchestratorId)),
+                        Boolean.class, RequestOrchestratorVersionUpdateTime.class);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -451,9 +451,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
         }
         if (labels.getRoute().equals("dev")) {
-            List<Long> flowIdList = new ArrayList<>();
-            flowService.getAllOldFlowId(latestAppId, flowIdList);
-            flowService.deleteNodeContent(flowIdList);
+            flowService.deleteFlowMetaData(orchestratorId);;
             flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
         }
 

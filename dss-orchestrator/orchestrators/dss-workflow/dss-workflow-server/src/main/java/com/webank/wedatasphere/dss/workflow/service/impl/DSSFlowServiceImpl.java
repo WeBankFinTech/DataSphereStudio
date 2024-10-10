@@ -776,9 +776,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
                 OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
-        List<Long> flowIdList = new ArrayList<>();
-        getAllOldFlowId(rootFlowId, flowIdList);
-        deleteNodeContent(flowIdList);
+        deleteFlowMetaData(orchestratorId);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);

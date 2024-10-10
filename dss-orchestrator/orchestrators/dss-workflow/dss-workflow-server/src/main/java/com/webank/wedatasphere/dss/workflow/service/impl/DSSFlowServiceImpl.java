@@ -338,7 +338,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         Long orchestratorId = dssOrchestratorVersion != null ? dssOrchestratorVersion.getOrchestratorId() : null;
         try {
             if (orchestratorId != null) {
-                saveFlowMetaData(flowID, jsonFlow, orchestratorId, false);
+                saveFlowMetaData(flowID, jsonFlow, orchestratorId);
                 // 更新版本更新时间
                 RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestOrchestratorVersionUpdateTime(orchestratorId)),
                         Boolean.class, RequestOrchestratorVersionUpdateTime.class);
@@ -427,15 +427,17 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
-    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId, Boolean flagImport) {
-        if (flagImport) {
-            List<NodeContentDO> nodeContentListByOrchestratorId = nodeContentMapper.getNodeContentListByOrchestratorId(orchestratorId);
-            nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId);
-            if (CollectionUtils.isNotEmpty(nodeContentListByOrchestratorId)) {
-                List<Long> collect = nodeContentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
-                nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
-            }
+    public void deleteFlowMetaData(Long orchestratorId) {
+        List<NodeContentDO> nodeContentListByOrchestratorId = nodeContentMapper.getNodeContentListByOrchestratorId(orchestratorId);
+        nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId);
+        if (CollectionUtils.isNotEmpty(nodeContentListByOrchestratorId)) {
+            List<Long> collect = nodeContentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+            nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
         }
+    }
+
+    @Override
+    public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
         // 解析 jsonflow
         // 解析 proxyUser
         try {
@@ -913,7 +915,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow,
                 version, workspace, dssLabels);
         // 更新对应节点的FlowJson
-        saveFlowMetaData(rootFlow.getId(), updateFlowJson, orchestratorId, false);
+        saveFlowMetaData(rootFlow.getId(), updateFlowJson, orchestratorId);
         List<? extends DSSFlow> subFlows = rootFlow.getChildren();
         List<String[]> templateIds = new ArrayList<>();
         if (subFlows != null) {

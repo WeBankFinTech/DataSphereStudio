@@ -452,7 +452,7 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         }
         if (labels.getRoute().equals("dev")) {
             flowService.deleteFlowMetaData(orchestratorId);;
-            flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
+            flowService.saveAllFlowMetaData(dssFlow.getId(), orchestratorId);
         }
 
     }

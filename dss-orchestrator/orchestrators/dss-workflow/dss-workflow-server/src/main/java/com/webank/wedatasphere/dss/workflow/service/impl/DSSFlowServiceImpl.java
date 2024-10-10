@@ -437,6 +437,24 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
+    public void saveAllFlowMetaData(Long flowId, Long orchestratorId) {
+        DSSFlow flowWithJsonAndSubFlowsByID = getFlowWithJsonAndSubFlowsByID(flowId);
+        saveAllMetaData(flowWithJsonAndSubFlowsByID, orchestratorId);
+    }
+
+    private void saveAllMetaData(DSSFlow dssFlow, Long orchestratorId) {
+        if (dssFlow == null) return;
+        List<? extends DSSFlow> subFlows = dssFlow.getChildren();
+        saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
+        if (subFlows != null) {
+            // 递归遍历子节点保存
+            for (DSSFlow subFlow : subFlows) {
+                saveAllMetaData(subFlow, orchestratorId);
+            }
+        }
+    }
+
+    @Override
     public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
         // 解析 jsonflow
         // 解析 proxyUser

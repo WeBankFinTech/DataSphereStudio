@@ -69,6 +69,8 @@ public interface DSSFlowService {
 
     void deleteFlowMetaData(Long orchestratorId);
 
+    void saveAllFlowMetaData(Long flowId, Long orchestratorId);
+
     void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId);
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,

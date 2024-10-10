@@ -230,7 +230,9 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             Long versionOrchestratorId = dssOrchestratorVersion.getOrchestratorId();
             DSSFlow flowByID = dssFlowService.getFlow(appId);
             if (flowByID != null) {
-                dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), versionOrchestratorId, true);
+                dssFlowService.deleteFlowMetaData(versionOrchestratorId);
+                DSSFlow flowWithJsonAndSubFlowsByID = dssFlowService.getFlowWithJsonAndSubFlowsByID(appId);
+                saveAllFlowMetaData(flowWithJsonAndSubFlowsByID, versionOrchestratorId);
             }
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             if (projectInfo.getAssociateGit()) {
@@ -239,6 +241,18 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
         }
 
         return dssOrchestratorVersion;
+    }
+
+    private void saveAllFlowMetaData(DSSFlow dssFlow, Long orchestratorId) {
+        if (dssFlow == null) return;
+        List<? extends DSSFlow> subFlows = dssFlow.getChildren();
+        dssFlowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
+        if (subFlows != null) {
+            // 递归遍历子节点保存
+            for (DSSFlow subFlow : subFlows) {
+                saveAllFlowMetaData(subFlow, orchestratorId);
+            }
+        }
     }
 
     @Override

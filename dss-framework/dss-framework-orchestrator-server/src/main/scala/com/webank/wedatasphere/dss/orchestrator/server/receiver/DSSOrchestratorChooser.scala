@@ -58,6 +58,7 @@ class DSSOrchestratorChooser extends ReceiverChooser {
     case _: RequestSubmitOrchestratorSync => receiver
     case _: OrchestratorRequest => receiver
     case _: RequestUpdateOrchestratorBML => receiver
+    case _: RequestOrchestratorVersionUpdateTime => receiver
     case _ => None
   }
 }

@@ -451,10 +451,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, null, null);
         }
         if (labels.getRoute().equals("dev")) {
-            List<Long> flowIdList = new ArrayList<>();
-            flowService.getAllOldFlowId(latestAppId, flowIdList);
-            flowService.deleteNodeContent(flowIdList);
-            flowService.saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
+            flowService.deleteFlowMetaData(orchestratorId);;
+            flowService.saveAllFlowMetaData(dssFlow.getId(), orchestratorId);
         }
 
     }
@@ -725,6 +723,17 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         OrchestratorVo orchestratorByAppId = getOrchestratorByAppId(flowId);
         orchestratorMapper.updateOrchestratorBmlVersion(orchestratorByAppId.getDssOrchestratorInfo().getId(), bmlResource.getResourceId(), bmlResource.getVersion());
         return orchestratorByAppId;
+    }
+
+    @Override
+    public Boolean updateOrchestratorTime(Long orchestratorId) {
+        DSSOrchestratorVersion orcVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orchestratorId, 1);
+        if (orcVersion != null) {
+            orchestratorMapper.updateOrchestratorVersionUpdateTime(orcVersion.getId());
+            return true;
+        }
+
+        return false;
     }
 
 }

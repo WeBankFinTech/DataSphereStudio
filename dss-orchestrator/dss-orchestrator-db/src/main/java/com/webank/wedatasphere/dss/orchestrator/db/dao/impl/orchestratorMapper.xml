@@ -118,6 +118,13 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateOrchestratorVersionUpdateTime"
+            parameterType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
+        UPDATE dss_orchestrator_version_info
+        set `update_time` = Now()
+        WHERE id = #{id}
+    </update>
+
     <select id="getLatestOrchestratorVersionById"
             resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorVersion">
         SELECT

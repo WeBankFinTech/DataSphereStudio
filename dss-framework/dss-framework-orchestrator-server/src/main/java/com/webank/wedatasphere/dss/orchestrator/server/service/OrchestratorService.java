@@ -159,4 +159,6 @@ public interface OrchestratorService {
 
     OrchestratorVo updateOrchestratorBML(Long orchestratorId, BmlResource bmlResource);
 
+    Boolean updateOrchestratorTime(Long orchestratorId);
+
 }

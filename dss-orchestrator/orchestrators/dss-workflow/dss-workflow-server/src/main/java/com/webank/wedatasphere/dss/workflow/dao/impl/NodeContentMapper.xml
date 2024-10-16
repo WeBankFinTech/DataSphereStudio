@@ -79,10 +79,10 @@
     </select>
 
     <select id="getNodeContentListByOrchestratorId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
-        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId} and flow_id = #{flowId}
+        SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId}
     </select>
 
-    <select id="getContentListByOrchestratorId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
+    <select id="getContentListByOrchestratorIdAndFlowId" parameterType="java.lang.Long" resultMap="nodeContentResultMap">
         SELECT <include refid="baseColumns"/> FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId} and flow_id = #{flowId}
     </select>
 
@@ -105,8 +105,12 @@
         </foreach>
     </delete>
     
-    <delete id="deleteNodeContentByOrchestratorId">
+    <delete id="deleteNodeContentByOrchestratorIdAndFlowId">
         DELETE FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId} and flow_id = #{flowId}
+    </delete>
+
+    <delete id="deleteNodeContentByOrchestratorId">
+        DELETE FROM dss_workflow_node_content WHERE orchestrator_id = #{orchestratorId}
     </delete>
 
     <delete id="deleteNodeContentByFlowId">

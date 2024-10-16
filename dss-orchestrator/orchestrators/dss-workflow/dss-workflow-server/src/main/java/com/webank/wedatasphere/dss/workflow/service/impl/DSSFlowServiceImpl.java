@@ -19,7 +19,6 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
-import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
@@ -42,7 +41,6 @@ import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConsta
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.development.utils.DSSJobContentConstant;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
-import com.webank.wedatasphere.dss.workflow.DefaultWorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.WorkFlowManager;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlowRelation;
@@ -341,6 +339,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         try {
             if (orchestratorId != null) {
                 saveFlowMetaData(flowID, jsonFlow, orchestratorId);
+                // 更新版本更新时间
+                RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestOrchestratorVersionUpdateTime(orchestratorId)),
+                        Boolean.class, RequestOrchestratorVersionUpdateTime.class);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -426,6 +427,34 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
+    public void deleteFlowMetaData(Long orchestratorId) {
+        List<NodeContentDO> nodeContentListByOrchestratorId = nodeContentMapper.getNodeContentListByOrchestratorId(orchestratorId);
+        nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorId);
+        if (CollectionUtils.isNotEmpty(nodeContentListByOrchestratorId)) {
+            List<Long> collect = nodeContentListByOrchestratorId.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+            nodeContentUIMapper.deleteNodeContentUIByContentList(collect);
+        }
+    }
+
+    @Override
+    public void saveAllFlowMetaData(Long flowId, Long orchestratorId) {
+        DSSFlow flowWithJsonAndSubFlowsByID = getFlowWithJsonAndSubFlowsByID(flowId);
+        saveAllMetaData(flowWithJsonAndSubFlowsByID, orchestratorId);
+    }
+
+    private void saveAllMetaData(DSSFlow dssFlow, Long orchestratorId) {
+        if (dssFlow == null) return;
+        List<? extends DSSFlow> subFlows = dssFlow.getChildren();
+        saveFlowMetaData(dssFlow.getId(), dssFlow.getFlowJson(), orchestratorId);
+        if (subFlows != null) {
+            // 递归遍历子节点保存
+            for (DSSFlow subFlow : subFlows) {
+                saveAllMetaData(subFlow, orchestratorId);
+            }
+        }
+    }
+
+    @Override
     public void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId) {
         // 解析 jsonflow
         // 解析 proxyUser
@@ -473,7 +502,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 nodeMetaMapper.updateNodeMeta(new NodeMetaDO(nodeMetaByOrchestratorId.getId(), orchestratorId, proxyUser, resourceToString.toString(), globalVar.toString()));
             }
 
-            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorId, flowID);
+            List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorIdAndFlowId(orchestratorId, flowID);
 
             logger.info("workFlowNodes:{}", workFlowNodes);
             Set<NodeContentUIDO> nodeContentUIDOS = new HashSet<>();
@@ -765,9 +794,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         OrchestratorVo orchestratorVo = RpcAskUtils.processAskException(orcSender.ask(new RequestQuertByAppIdOrchestrator(dssFlow.getId())),
                 OrchestratorVo.class, RequestQueryByIdOrchestrator.class);
         Long orchestratorId = orchestratorVo.getDssOrchestratorInfo().getId();
-        List<Long> flowIdList = new ArrayList<>();
-        getAllOldFlowId(rootFlowId, flowIdList);
-        deleteNodeContent(flowIdList);
+        deleteFlowMetaData(orchestratorId);
         DSSFlow rootFlowWithSubFlows = copyFlowAndSetSubFlowInDB(dssFlow, userName, description, nodeSuffix, newFlowName, newProjectId);
         updateFlowJson(userName, projectName, rootFlowWithSubFlows, version, null,
                 contextIdStr, workspace, dssLabels, nodeSuffix, orchestratorId);

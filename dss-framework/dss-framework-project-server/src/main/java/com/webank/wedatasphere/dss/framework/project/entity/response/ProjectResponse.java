@@ -97,6 +97,11 @@ public class ProjectResponse implements Serializable {
 
     private String workspaceName;
 
+    /**
+     * 开发流程 下拉列表
+     */
+    private List<String> devProcessLabel;
+
     public String getWorkspaceName() {
         return workspaceName;
     }
@@ -264,6 +269,7 @@ public class ProjectResponse implements Serializable {
                 ", associateGit=" + associateGit +
                 ", gitUser=" + gitUser +
                 ", gitToken=" + gitToken +
+                ", devProcessLabel=" + devProcessLabel +
                 '}';
     }
 
@@ -289,5 +295,13 @@ public class ProjectResponse implements Serializable {
 
     public void setGitToken(String gitToken) {
         this.gitToken = gitToken;
+    }
+
+    public List<String> getDevProcessLabel() {
+        return devProcessLabel;
+    }
+
+    public void setDevProcessLabel(List<String> devProcessLabel) {
+        this.devProcessLabel = devProcessLabel;
     }
 }

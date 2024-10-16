@@ -25,9 +25,9 @@ public interface NodeContentMapper {
 
     List<NodeContentDO> getNodeContentByKeyList(@Param("list") List<String> list, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    List<NodeContentDO> getNodeContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
+    List<NodeContentDO> getNodeContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
 
-    List<NodeContentDO> getContentListByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
+    List<NodeContentDO> getContentListByOrchestratorIdAndFlowId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
     List<NodeContentDO> getContentListByFlowId(List<Long> list);
 
@@ -35,7 +35,9 @@ public interface NodeContentMapper {
 
     void batchDelete(@Param("list") List<NodeContentDO> list, @Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
 
-    void deleteNodeContentByOrchestratorId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
+    void deleteNodeContentByOrchestratorIdAndFlowId(@Param("orchestratorId") Long orchestratorId, @Param("flowId") Long flowId);
+
+    void deleteNodeContentByOrchestratorId(@Param("orchestratorId") Long orchestratorId);
 
     void updateFlowId(@Param("flowId") Long flowId, @Param("oldFlowId") Long oldFlowId);
 

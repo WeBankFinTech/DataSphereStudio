@@ -40,7 +40,6 @@ import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSExceptionUtils;
-import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.contextservice.service.impl.ContextServiceImpl;
@@ -52,8 +51,6 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.GitRenameRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQuertByAppIdOrchestrator;
-import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestQueryByIdOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.core.exception.DSSOrchestratorErrorException;
@@ -86,13 +83,10 @@ import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
 
 import com.webank.wedatasphere.dss.workflow.dao.*;
 import com.webank.wedatasphere.dss.workflow.dto.NodeContentDO;
-import com.webank.wedatasphere.dss.workflow.dto.NodeMetaDO;
-import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.SaveFlowHook;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.linkis.protocol.util.ImmutablePair;
 import org.apache.linkis.rpc.Sender;
@@ -101,7 +95,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -375,12 +368,12 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         orchestratorVo.setOrchestratorId(orchestratorInfoId);
 
         // 同步更新flowJson
-        List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorId(orchestratorInfoId, versionById.getAppId());
+        List<NodeContentDO> contentDOS = nodeContentMapper.getContentListByOrchestratorIdAndFlowId(orchestratorInfoId, versionById.getAppId());
         if (CollectionUtils.isEmpty(contentDOS)) {
             return orchestratorVo;
         }
         List<Long> contentIdList = contentDOS.stream().map(NodeContentDO::getId).collect(Collectors.toList());
-        nodeContentMapper.deleteNodeContentByOrchestratorId(orchestratorInfoId, versionById.getAppId());
+        nodeContentMapper.deleteNodeContentByOrchestratorIdAndFlowId(orchestratorInfoId, versionById.getAppId());
         if (CollectionUtils.isNotEmpty(contentIdList)) {
             nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
         }

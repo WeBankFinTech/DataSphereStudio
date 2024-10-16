@@ -230,7 +230,8 @@ public class ImportDSSOrchestratorPluginImpl extends AbstractDSSOrchestratorPlug
             Long versionOrchestratorId = dssOrchestratorVersion.getOrchestratorId();
             DSSFlow flowByID = dssFlowService.getFlow(appId);
             if (flowByID != null) {
-                dssFlowService.saveFlowMetaData(appId, flowByID.getFlowJson(), versionOrchestratorId);
+                dssFlowService.deleteFlowMetaData(versionOrchestratorId);
+                dssFlowService.saveAllFlowMetaData(appId, versionOrchestratorId);
             }
             DSSProject projectInfo = DSSFlowEditLockManager.getProjectInfo(projectId);
             if (projectInfo.getAssociateGit()) {

@@ -226,7 +226,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         List<QueryProjectVo> list;
         //判断工作空间是否设置了管理员能否查看该工作空间下所有项目的权限
         Integer workspaceAdminPermission = projectUserMapper.getWorkspaceAdminPermission(projectRequest.getWorkspaceId());
-        if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) && workspaceAdminPermission == 1) {
+        boolean isAdmin = isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername());
+        if (isAdmin && workspaceAdminPermission == 1) {
             list = projectMapper.getListForAdmin(projectRequest);
         } else {
             list = projectMapper.getListByParam(projectRequest);
@@ -303,11 +304,10 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
             // 用户是否具有编辑权限  发布权限和创建者和空间管理员都有
             if (!StringUtils.isEmpty(pusername) &&
-                    (projectVo.getCreateBy().equals(projectRequest.getUsername()) ||
-                            isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())) || projectResponse.getReleaseUsers().contains(projectRequest.getUsername())) {
+                    (projectVo.getCreateBy().equals(projectRequest.getUsername()) || isAdmin)
+                    || projectResponse.getReleaseUsers().contains(projectRequest.getUsername())) {
                 projectResponse.setEditable(true);
-            } else if (isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) ||
-                    projectVo.getCreateBy().equals(projectRequest.getUsername())) {
+            } else if (isAdmin || projectVo.getCreateBy().equals(projectRequest.getUsername())) {
                 projectResponse.setEditable(true);
             } else {
                 projectResponse.setEditable(false);
@@ -628,8 +628,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
         //判断工作空间是否设置了管理员能否查看该工作空间下所有项目的权限
         Integer workspaceAdminPermission = projectUserMapper.getWorkspaceAdminPermission(projectRequest.getWorkspaceId());
-
-        if (!isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername()) || workspaceAdminPermission != 1) {
+        boolean isAdmin = isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername());
+        if (!isAdmin || workspaceAdminPermission != 1) {
             projectRequest.setQueryUser(projectRequest.getUsername());
         }
 
@@ -699,7 +699,7 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
 
             // 用户是否具有编辑权限  发布者和创建者、管理员都有
             if (projectVo.getCreateBy().equals(projectRequest.getUsername())
-                    || isWorkspaceAdmin(projectRequest.getWorkspaceId(), projectRequest.getUsername())
+                    || isAdmin
                     || projectResponse.getReleaseUsers().contains(projectRequest.getUsername())
             ) {
                 projectResponse.setEditable(true);

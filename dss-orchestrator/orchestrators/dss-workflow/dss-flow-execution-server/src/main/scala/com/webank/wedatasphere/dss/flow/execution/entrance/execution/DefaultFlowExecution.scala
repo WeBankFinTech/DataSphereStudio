@@ -16,15 +16,14 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.execution
 
-import java.util.concurrent.{Executors, LinkedBlockingQueue, TimeUnit}
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
 import com.webank.wedatasphere.dss.flow.execution.entrance.node.{NodeExecutionState, NodeRunner}
 import com.webank.wedatasphere.dss.flow.execution.entrance.utils.FlowExecutionUtils
-import org.apache.linkis.common.utils.Logging
-import com.google.common.util.concurrent.ThreadFactoryBuilder
 import org.springframework.stereotype.Service
 
+import java.util.concurrent.{Executors, LinkedBlockingQueue, TimeUnit}
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
@@ -43,7 +42,6 @@ class DefaultFlowExecution extends FlowExecution with Logging {
   override def runJob(flowEntranceJob: FlowEntranceJob): Unit = {
 
     info(s"${flowEntranceJob.getId} Start to run executable node")
-    info(s"flowEntranceJob:${flowEntranceJob.toString} ")
     val scheduledNodes = flowEntranceJob.getFlowContext.getScheduledNodes
 
     if (!scheduledNodes.isEmpty) {
@@ -73,7 +71,9 @@ class DefaultFlowExecution extends FlowExecution with Logging {
         info(s"${flowEntranceJob.getId} Submit nodes(${runningNodes.size}) to running")
         runningNodes.foreach { node =>
           node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP).asInstanceOf[java.util.Map[String, Any]].putAll(flowEntranceJob.getParams)
-          info(s"node:${node.toString} ")
+          val objectMapper = new ObjectMapper()
+          val json = objectMapper.writeValueAsString(node)
+          info(s"nodeJson:${json} ")
           node.run()
           nodeRunnerQueue.put(node)
           if (pollerCount < FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_THREAD_SIZE.getValue) {

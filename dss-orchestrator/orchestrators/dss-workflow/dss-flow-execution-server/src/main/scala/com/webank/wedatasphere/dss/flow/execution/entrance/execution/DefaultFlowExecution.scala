@@ -74,8 +74,8 @@ class DefaultFlowExecution extends FlowExecution with Logging {
         info(s"${flowEntranceJob.getId} Submit nodes(${runningNodes.size}) to running")
         runningNodes.foreach { node =>
           node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP).asInstanceOf[java.util.Map[String, Any]].putAll(flowEntranceJob.getParams)
-          val starUp = node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.STAR_UP).asInstanceOf[java.util.Map[String, Any]]
-          starUp.put(FlowExecutionEntranceConfiguration.YARN_QUEUE, null)
+//          val starUp = node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.STAR_UP).asInstanceOf[java.util.Map[String, Any]]
+//          starUp.put(FlowExecutionEntranceConfiguration.YARN_QUEUE, null)
           info(s"nodeParams:${node.getNode.getDSSNode.getParams} ")
           info(s"JobContent:${node.getNode.getDSSNode.getJobContent} ")
           node.run()

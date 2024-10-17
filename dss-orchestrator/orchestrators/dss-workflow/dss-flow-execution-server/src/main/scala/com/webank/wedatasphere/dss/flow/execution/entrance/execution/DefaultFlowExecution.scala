@@ -43,6 +43,7 @@ class DefaultFlowExecution extends FlowExecution with Logging {
   override def runJob(flowEntranceJob: FlowEntranceJob): Unit = {
 
     info(s"${flowEntranceJob.getId} Start to run executable node")
+    info(s"flowEntranceJob:${flowEntranceJob.toString} ")
     val scheduledNodes = flowEntranceJob.getFlowContext.getScheduledNodes
 
     if (!scheduledNodes.isEmpty) {
@@ -72,6 +73,7 @@ class DefaultFlowExecution extends FlowExecution with Logging {
         info(s"${flowEntranceJob.getId} Submit nodes(${runningNodes.size}) to running")
         runningNodes.foreach { node =>
           node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP).asInstanceOf[java.util.Map[String, Any]].putAll(flowEntranceJob.getParams)
+          info(s"node:${node.toString} ")
           node.run()
           nodeRunnerQueue.put(node)
           if (pollerCount < FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_THREAD_SIZE.getValue) {

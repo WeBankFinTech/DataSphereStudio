@@ -74,7 +74,15 @@ class DefaultFlowExecution extends FlowExecution with Logging {
         info(s"${flowEntranceJob.getId} Submit nodes(${runningNodes.size}) to running")
         runningNodes.foreach { node =>
           node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP).asInstanceOf[java.util.Map[String, Any]].putAll(flowEntranceJob.getParams)
-          node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.CONFIGURATION).asInstanceOf[java.util.Map[String, Any]].get(FlowExecutionEntranceConfiguration.START_UP).asInstanceOf[java.util.Map[String, Any]].put(FlowExecutionEntranceConfiguration.YARN_QUEUE, null)
+          if (node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.CONFIGURATION) != null && node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.CONFIGURATION).asInstanceOf[java.util.Map[String, Any]].get(FlowExecutionEntranceConfiguration.START_UP) != null) {
+            node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.CONFIGURATION).asInstanceOf[java.util.Map[String, Any]].get(FlowExecutionEntranceConfiguration.START_UP).asInstanceOf[java.util.Map[String, Any]].put(FlowExecutionEntranceConfiguration.YARN_QUEUE, null)
+          }
+          if (node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP) != null && node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP).asInstanceOf[java.util.Map[String, Any]].get(FlowExecutionEntranceConfiguration.COMMAND) != null) {
+            node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP).asInstanceOf[java.util.Map[String, Any]].get(FlowExecutionEntranceConfiguration.COMMAND).asInstanceOf[java.util.Map[String, Any]].put(FlowExecutionEntranceConfiguration.USER_TO_PROXY, null)
+          }
+          if (node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.FLOW_VAR_MAP) != null) {
+            node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.FLOW_VAR_MAP).asInstanceOf[java.util.Map[String, Any]].put(FlowExecutionEntranceConfiguration.USER_TO_PROXY, null)
+          }
           info(s"nodeParams:${node.getNode.getDSSNode.getParams} ")
           info(s"JobContent:${node.getNode.getDSSNode.getJobContent} ")
           node.run()

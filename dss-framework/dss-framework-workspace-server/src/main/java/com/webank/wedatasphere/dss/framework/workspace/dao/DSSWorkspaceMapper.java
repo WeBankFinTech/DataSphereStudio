@@ -79,4 +79,7 @@ public interface DSSWorkspaceMapper {
 
     @Select("select * from dss_workspace_associate_departments")
     List<DSSWorkspaceAssociateDepartments> getWorkspaceAssociateDepartments();
+
+
+    void updateWorkSpace(DSSWorkspace dssWorkspace);
 }

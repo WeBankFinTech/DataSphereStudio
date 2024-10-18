@@ -49,6 +49,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.app.sso.builder.SSOUrlBuilderOperation;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -138,6 +139,40 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspaceUserService.updateWorkspaceUser(roleIds, workspaceId, userName, userName);
     }
 
+    @Override
+    public int transferWorkspace(String workspaceName, String oldOwner, String newOwner) throws DSSErrorException {
+        DSSWorkspace dssWorkspace = getWorkspacesByName(workspaceName,oldOwner);
+
+        Long userId = dssWorkspaceUserMapper.getUserID(newOwner);
+
+        if(userId == null){
+            throw new DSSFrameworkWarnException(30021, "DSS user list  not contains " + newOwner);
+        }
+
+        dssWorkspace.setCreateBy(newOwner);
+        dssWorkspace.setLastUpdateTime(new Date());
+        dssWorkspace.setLastUpdateUser(newOwner);
+        // 更改创建者 和更新时间
+        dssWorkspaceMapper.updateWorkSpace(dssWorkspace);
+
+        List<DSSWorkspaceMenuRole> dssWorkspaceMenuRoleList = dssMenuRoleMapper.queryWorkspaceMenuRole(dssWorkspace.getId(),oldOwner);
+
+        if(CollectionUtils.isNotEmpty(dssWorkspaceMenuRoleList)){
+            List<Integer> menuRoleIdList = dssWorkspaceMenuRoleList.stream().map(DSSWorkspaceMenuRole::getId).collect(Collectors.toList());
+            dssMenuRoleMapper.updateWorkspaceMenuRoleById(menuRoleIdList,newOwner);
+        }
+
+        List<DSSWorkspaceComponentPriv> dssWorkspaceComponentPrivList = dssComponentRoleMapper.queryDSSComponentRole(dssWorkspace.getId(),oldOwner);
+
+        if(CollectionUtils.isNotEmpty(dssWorkspaceComponentPrivList)){
+            List<Integer> componetPrivIdList = dssWorkspaceComponentPrivList.stream().map(DSSWorkspaceComponentPriv::getId).collect(Collectors.toList());
+            dssComponentRoleMapper.updateDSSComponentRoleById(componetPrivIdList,newOwner);
+        }
+
+        setAllRolesToWorkspaceCreator(dssWorkspace.getId(), newOwner);
+
+        return dssWorkspace.getId();
+    }
 
     //获取所有的工作空间
     @Override
@@ -689,6 +724,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         return new PageInfo<>(users);
     }
+
 
     private void joinWorkspaceForNewUser(String userName, Long userId, int workspaceId, Integer workspace0xId, Integer analyserRole) {
         String userOrgName = staffInfoGetter.getFullOrgNameByUsername(userName);

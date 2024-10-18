@@ -1234,6 +1234,10 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     dataDevelopNodeInfo.setReuseEngine(Boolean.valueOf(nodeMap.get("ReuseEngine")));
                 }
 
+                if(nodeMap.containsKey("script") && StringUtils.isNotEmpty(nodeMap.get("script"))){
+                    dataDevelopNodeInfo.setScript(nodeMap.get("script"));
+                }
+
                 dataDevelopNodeInfoList.add(dataDevelopNodeInfo);
             } catch (Exception exception) {
                 logger.error("queryDataDevelopNodeList error content id is {}", contentId);

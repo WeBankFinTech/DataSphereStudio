@@ -76,7 +76,9 @@
     </select>
 
     <update id="updateWorkSpace" parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
-        update dss_workspace set create_by = #{createBy},last_update_time=#{lastUpdateTime},last_update_user=#{lastUpdateUser} where id = #{workspaceId}
+        update dss_workspace set create_by = #{createBy},last_update_time=#{lastUpdateTime},
+        last_update_user=#{lastUpdateUser},description=#{description}
+        where id = #{workspaceId}
     </update>
 
 </mapper>

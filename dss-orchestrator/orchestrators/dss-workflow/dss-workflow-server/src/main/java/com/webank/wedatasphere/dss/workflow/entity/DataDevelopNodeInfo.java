@@ -21,6 +21,8 @@ public class DataDevelopNodeInfo  extends NodeBaseInfo{
     // 是否复用引擎
     private Boolean reuseEngine;
 
+    private String script;
+
     public Boolean getRefTemplate() {
         return isRefTemplate;
     }
@@ -59,5 +61,14 @@ public class DataDevelopNodeInfo  extends NodeBaseInfo{
 
     public void setTemplateId(String templateId) {
         this.templateId = templateId;
+    }
+
+
+    public String getScript() {
+        return script;
+    }
+
+    public void setScript(String script) {
+        this.script = script;
     }
 }

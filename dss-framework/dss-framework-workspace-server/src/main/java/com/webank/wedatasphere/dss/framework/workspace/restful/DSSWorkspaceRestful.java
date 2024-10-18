@@ -110,7 +110,7 @@ public class DSSWorkspaceRestful {
      */
     @RequestMapping(path = "updateWorkspace", method = RequestMethod.POST)
     public ItsmResponse updateWorkspace(@RequestBody ItsmRequest itsmRequest, HttpServletRequest req, HttpServletResponse resp) {
-        LOGGER.info("itsm try to update workspace, itsm id:{}.", itsmRequest.getExternalId());
+        LOGGER.info("itrtsm try to update workspace, itsm id:{}.", itsmRequest.getExternalId());
         // 获取请求头中的timestamp和sign字段
         String timestamp = req.getHeader("timeStamp");
         String sign = req.getHeader("sign");
@@ -190,7 +190,7 @@ public class DSSWorkspaceRestful {
 
                 try {
 
-                    int workspaceId = dssWorkspaceService.transferWorkspace(workspaceName,oldOwner,newOwner);
+                    int workspaceId = dssWorkspaceService.transferWorkspace(workspaceName,oldOwner,newOwner,desc);
 
                     AuditLogUtils.printLog(newOwner, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
                             OperateTypeEnum.UPDATE, itsmRequest);

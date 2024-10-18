@@ -77,4 +77,10 @@ object FlowExecutionEntranceConfiguration {
 
   val CONFIGURATION = "configuration"
 
+  val COMMAND = "command"
+
+  val USER_TO_PROXY = "user.to.proxy"
+
+  val FLOW_VAR_MAP = "flow_var_map"
+
 }

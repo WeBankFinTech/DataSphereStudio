@@ -71,8 +71,10 @@ object FlowExecutionEntranceConfiguration {
 
   val FLOW_RESOURCES = "flow_resources"
 
-  val STAR_UP = "startup"
+  val START_UP = "startup"
 
   val YARN_QUEUE = "wds.linkis.rm.yarnqueue"
+
+  val CONFIGURATION = "configuration"
 
 }

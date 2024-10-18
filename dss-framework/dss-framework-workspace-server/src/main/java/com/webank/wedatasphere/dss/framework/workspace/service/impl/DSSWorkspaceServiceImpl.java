@@ -140,7 +140,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     @Override
-    public int transferWorkspace(String workspaceName, String oldOwner, String newOwner) throws DSSErrorException {
+    public int transferWorkspace(String workspaceName, String oldOwner, String newOwner,String desc) throws DSSErrorException {
         DSSWorkspace dssWorkspace = getWorkspacesByName(workspaceName,oldOwner);
 
         Long userId = dssWorkspaceUserMapper.getUserID(newOwner);
@@ -152,6 +152,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspace.setCreateBy(newOwner);
         dssWorkspace.setLastUpdateTime(new Date());
         dssWorkspace.setLastUpdateUser(newOwner);
+        dssWorkspace.setDescription(desc);
         // 更改创建者 和更新时间
         dssWorkspaceMapper.updateWorkSpace(dssWorkspace);
 

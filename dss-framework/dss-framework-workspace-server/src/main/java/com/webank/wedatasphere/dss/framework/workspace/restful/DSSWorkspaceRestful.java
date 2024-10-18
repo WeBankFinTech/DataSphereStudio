@@ -16,8 +16,10 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
+import cn.hutool.core.util.StrUtil;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -26,6 +28,8 @@ import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.itsm.ItsmRequest;
+import com.webank.wedatasphere.dss.framework.workspace.bean.itsm.ItsmResponse;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
@@ -98,6 +102,113 @@ public class DSSWorkspaceRestful {
         AuditLogUtils.printLog(userName, workspaceId, workSpaceName, TargetTypeEnum.WORKSPACE, workspaceId, workSpaceName,
                 OperateTypeEnum.CREATE, createWorkspaceRequest);
         return Message.ok().data("workspaceId", workspaceId).data("workspaceName", workSpaceName);
+    }
+
+
+    /**
+     * 提供给ITSM 单使用， 新建或者修改工作空间信息接口
+     */
+    @RequestMapping(path = "updateWorkspace", method = RequestMethod.POST)
+    public ItsmResponse updateWorkspace(@RequestBody ItsmRequest itsmRequest, HttpServletRequest req, HttpServletResponse resp) {
+        LOGGER.info("itsm try to update workspace, itsm id:{}.", itsmRequest.getExternalId());
+        // 获取请求头中的timestamp和sign字段
+        String timestamp = req.getHeader("timeStamp");
+        String sign = req.getHeader("sign");
+        // 验证鉴权
+        if (!WorkspaceUtils.validateAuth(timestamp, sign)) {
+            // 鉴权失败，返回错误信息
+            LOGGER.error("Authentication failed.");
+            // 设置HTTP状态码为403
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return ItsmResponse.error().retDetail("Authentication failed.");
+        }
+        List<Map<String, String>> dataList = itsmRequest.getDataList();
+
+        // 鉴权成功
+        if (dataList.isEmpty()) {
+            return ItsmResponse.error().retDetail("data is empty");
+        }
+
+        String createUser = itsmRequest.getCreateUser();
+
+        for (Map<String, String> table : dataList) {
+            String workspaceName = table.get("workspaceName");
+
+            if(StrUtil.isEmpty(workspaceName)){
+                LOGGER.error(workspaceName + " workspace is empty");
+                return ItsmResponse.error().retDetail("工作空间信息不能为空！");
+            }
+
+            workspaceName = workspaceName.trim();
+            // 判断命名空间是否存在
+            boolean exists = dssWorkspaceService.existWorkspaceName(workspaceName);
+            String option = table.get("option");
+            String desc = table.get("desc");
+            // 工作空间owner为NULl，则获取提单人信息
+            String workspaceOwner = table.getOrDefault("workspaceOwner", createUser).trim();
+            String oldOwner = table.get("oldOwner");
+            String newOwner = table.get("newOwner");
+
+            if ("add".equalsIgnoreCase(option)) {
+                // 新建
+                if (exists) {
+                    LOGGER.error(workspaceName + " workspace info is exists!");
+                    return ItsmResponse.error().retDetail(workspaceName + "工作空间信息已存在,不能再次创建！");
+                }
+
+                try {
+
+                    int workspaceId = dssWorkspaceService.createWorkspace(workspaceName, "", workspaceOwner, desc,
+                            null, "DSS", "project");
+
+                    AuditLogUtils.printLog(workspaceOwner, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
+                            OperateTypeEnum.CREATE, itsmRequest);
+
+                } catch (Exception e) {
+                    LOGGER.info("{} workspace add fail , (工作空间 申请失败)", workspaceName);
+                    LOGGER.error(e.getMessage());
+                    return  ItsmResponse.error().retDetail(workspaceName + "工作空间新建失败!");
+                }
+
+            } else if ("modify".equalsIgnoreCase(option)) {
+                // 修改
+                if (!exists) {
+                    LOGGER.error(workspaceName + " workspace info not exists, not modify!");
+                    return ItsmResponse.error().retDetail(workspaceName + "工作空间信息不存在,不能进行修改！");
+                }
+
+                if(StrUtil.isEmpty(oldOwner) || StrUtil.isEmpty(newOwner)){
+                    return ItsmResponse.error().retDetail(workspaceName + "工作空间的新Owner和原Owner不能为空！");
+                }
+
+                oldOwner = oldOwner.trim();
+                newOwner = newOwner.trim();
+
+                if(oldOwner.equalsIgnoreCase(newOwner)){
+                    return ItsmResponse.error().retDetail(workspaceName + "工作空间的新Owner和原Owner不能是同一个用户！");
+                }
+
+                try {
+
+                    int workspaceId = dssWorkspaceService.transferWorkspace(workspaceName,oldOwner,newOwner);
+
+                    AuditLogUtils.printLog(newOwner, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
+                            OperateTypeEnum.UPDATE, itsmRequest);
+
+                } catch (Exception e) {
+                    LOGGER.info("{} workspace modify fail , (工作空间 申请失败)", workspaceName);
+                    LOGGER.error(e.getMessage());
+                    return  ItsmResponse.error().retDetail(workspaceName + "工作空间信息修改失败!");
+                }
+
+            } else {
+                return ItsmResponse.error().retDetail(workspaceName + "无法进行该操作,请正确选择操作选项!");
+            }
+
+        }
+        LOGGER.info("success to update workspace, itsm id:{}.", itsmRequest.getExternalId());
+        return ItsmResponse.ok().retDetail("Success to update workspace");
+
     }
 
     /**

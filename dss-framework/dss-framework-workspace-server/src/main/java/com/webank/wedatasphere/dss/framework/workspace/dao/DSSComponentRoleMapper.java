@@ -30,4 +30,8 @@ public interface DSSComponentRoleMapper extends BaseMapper<DSSComponentRole> {
 
     public void insertBatch(@Param("list") List<DSSWorkspaceComponentPriv> list);
 
+    List<DSSWorkspaceComponentPriv> queryDSSComponentRole(@Param("workspaceId") int workspaceId,@Param("updateBy") String updateBy);
+
+    void updateDSSComponentRoleById(@Param("list") List<Integer> idList,@Param("updateBy") String updateBy);
+
 }

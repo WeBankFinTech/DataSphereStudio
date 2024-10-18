@@ -27,4 +27,6 @@ public class ApplicationConf {
 
     public static final CommonVars<String> HOMEPAGE_URL =
             CommonVars.apply("wds.linkis.special.homepage.module.url", "/newHome?workspaceId=");
+
+    public static final CommonVars<String> ITSM_SECRETKEY = CommonVars.apply("wds.dss.itsm.secretkey","350965f1d6dfc38757cba3c34478163176aafcb2ed5ff2478d94a43b40d3ae42");
 }

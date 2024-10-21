@@ -167,7 +167,7 @@ public class DSSWorkspaceRestful {
                 } catch (Exception e) {
                     LOGGER.info("{} workspace add fail , (工作空间 申请失败)", workspaceName);
                     LOGGER.error(e.getMessage());
-                    return  ItsmResponse.error().retDetail(workspaceName + "工作空间新建失败!");
+                    return  ItsmResponse.error().retDetail(workspaceName + "工作空间新建失败!\n" + e.getMessage());
                 }
 
             } else if ("modify".equalsIgnoreCase(option)) {
@@ -196,9 +196,9 @@ public class DSSWorkspaceRestful {
                             OperateTypeEnum.UPDATE, itsmRequest);
 
                 } catch (Exception e) {
-                    LOGGER.info("{} workspace modify fail , (工作空间 申请失败)", workspaceName);
+                    LOGGER.error("{} workspace modify fail , (工作空间 申请失败)", workspaceName);
                     LOGGER.error(e.getMessage());
-                    return  ItsmResponse.error().retDetail(workspaceName + "工作空间信息修改失败!");
+                    return  ItsmResponse.error().retDetail(workspaceName + "工作空间信息修改失败!\n"+ e.getMessage());
                 }
 
             } else {

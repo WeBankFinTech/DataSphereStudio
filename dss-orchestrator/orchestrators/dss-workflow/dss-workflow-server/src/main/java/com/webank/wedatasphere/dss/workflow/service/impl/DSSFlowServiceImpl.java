@@ -576,13 +576,11 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                 Long contentByKeyId = nodeContentDO.getId();
                 DSSNodeDefault nodeDefault = map.get(nodeKey);
                 String jobType = nodeDefault.getJobType();
-                if (jobType.contains("newVisualis")) {
-                    Map<String, Object> jobContent = nodeDefault.getJobContent();
-                    if (jobContent != null) {
-                        for (Map.Entry<String, Object> entry : jobContent.entrySet()) {
-                            String value = entry.getValue() != null ? entry.getValue().toString() : "";
-                            nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, entry.getKey(), value, jobType, "String"));
-                        }
+                Map<String, Object> jobContent = nodeDefault.getJobContent();
+                if (jobContent != null) {
+                    for (Map.Entry<String, Object> entry : jobContent.entrySet()) {
+                        String value = entry.getValue() != null ? entry.getValue().toString() : "";
+                        nodeContentUIDOS.add(new NodeContentUIDO(contentByKeyId, entry.getKey(), value, jobType, "String"));
                     }
                 }
 

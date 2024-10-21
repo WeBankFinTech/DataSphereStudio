@@ -72,4 +72,6 @@ public interface DSSWorkspaceUserService {
     void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds);
 
     List<String> getWorkspaceUserByRoleId(Long workspaceId,Integer roleId);
+
+    void updateWorkspaceRole(List<Integer> roles, long workspaceId,String newOwner);
 }

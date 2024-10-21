@@ -33,6 +33,7 @@
               ,workspace_id as workspaceId
               ,menu_id      as menuId
               ,role_id      as roleId
+              ,update_time  as updateTime
               ,updateby     as updateBy
         from dss_workspace_menu_role
         where workspace_id = #{workspaceId} and updateby=#{updateBy}

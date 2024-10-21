@@ -139,6 +139,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspaceUserService.updateWorkspaceUser(roleIds, workspaceId, userName, userName);
     }
 
+    @Transactional
     @Override
     public int transferWorkspace(String workspaceName, String oldOwner, String newOwner,String desc) throws DSSErrorException {
         DSSWorkspace dssWorkspace = getWorkspacesByName(workspaceName,oldOwner);
@@ -157,20 +158,32 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspaceMapper.updateWorkSpace(dssWorkspace);
 
         List<DSSWorkspaceMenuRole> dssWorkspaceMenuRoleList = dssMenuRoleMapper.queryWorkspaceMenuRole(dssWorkspace.getId(),oldOwner);
+        LOGGER.info("====query dssWorkspaceMenuRoleList =======");
 
         if(CollectionUtils.isNotEmpty(dssWorkspaceMenuRoleList)){
+            LOGGER.info("====update dssWorkspaceMenuRoleList =======");
+
             List<Integer> menuRoleIdList = dssWorkspaceMenuRoleList.stream().map(DSSWorkspaceMenuRole::getId).collect(Collectors.toList());
             dssMenuRoleMapper.updateWorkspaceMenuRoleById(menuRoleIdList,newOwner);
+
+            LOGGER.info("====update dssWorkspaceMenuRoleList 111=======");
+
         }
 
-        List<DSSWorkspaceComponentPriv> dssWorkspaceComponentPrivList = dssComponentRoleMapper.queryDSSComponentRole(dssWorkspace.getId(),oldOwner);
 
-        if(CollectionUtils.isNotEmpty(dssWorkspaceComponentPrivList)){
-            List<Integer> componetPrivIdList = dssWorkspaceComponentPrivList.stream().map(DSSWorkspaceComponentPriv::getId).collect(Collectors.toList());
+        List<DSSWorkspaceComponentPriv> dssWorkspaceComponentList = dssComponentRoleMapper.queryDSSComponentRole(dssWorkspace.getId(),oldOwner);
+        LOGGER.info("====query dssWorkspaceComponentList =======");
+
+        if(CollectionUtils.isNotEmpty(dssWorkspaceComponentList)){
+            LOGGER.info("====update dssWorkspaceComponentList =======");
+            List<Integer> componetPrivIdList = dssWorkspaceComponentList.stream().map(DSSWorkspaceComponentPriv::getId).collect(Collectors.toList());
             dssComponentRoleMapper.updateDSSComponentRoleById(componetPrivIdList,newOwner);
+            LOGGER.info("====update dssWorkspaceComponentList 1111111=======");
         }
 
+        LOGGER.info("====setAllRolesToWorkspaceCreator=======");
         setAllRolesToWorkspaceCreator(dssWorkspace.getId(), newOwner);
+        LOGGER.info("====setAllRolesToWorkspaceCreator 1111111=======");
 
         return dssWorkspace.getId();
     }

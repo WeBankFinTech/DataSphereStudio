@@ -337,7 +337,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 解析并保存元数据
         Long orchestratorId = dssOrchestratorVersion != null ? dssOrchestratorVersion.getOrchestratorId() : null;
         try {
-            if (orchestratorId != null) {
+            // 当前保存的工作流为最新版本工作流时，再执行保存元数据，否则会有重复数据
+            if (orchestratorId != null && dssOrchestratorVersion.getAppId().equals(rootFlowId)) {
                 saveFlowMetaData(flowID, jsonFlow, orchestratorId);
                 // 更新版本更新时间
                 RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestOrchestratorVersionUpdateTime(orchestratorId)),

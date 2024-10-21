@@ -139,7 +139,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspaceUserService.updateWorkspaceUser(roleIds, workspaceId, userName, userName);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Throwable.class)
     @Override
     public int transferWorkspace(String workspaceName, String oldOwner, String newOwner,String desc) throws DSSErrorException {
         DSSWorkspace dssWorkspace = getWorkspacesByName(workspaceName,oldOwner);
@@ -175,7 +175,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssComponentRoleMapper.updateDSSComponentRoleById(componetPrivIdList,newOwner);
         }
 
-        setAllRolesToWorkspaceCreator(dssWorkspace.getId(), newOwner);
+        List<Integer> roleIds = dssWorkspaceService.getWorkspaceRoles(dssWorkspace.getId())
+                .stream()
+                .map(DSSWorkspaceRoleVO::getRoleId)
+                .collect(Collectors.toList());
+        dssWorkspaceUserService.updateWorkspaceRole(roleIds, dssWorkspace.getId(), newOwner);
+
         LOGGER.info("success transfer workspace {} ", workspaceName);
         return dssWorkspace.getId();
     }

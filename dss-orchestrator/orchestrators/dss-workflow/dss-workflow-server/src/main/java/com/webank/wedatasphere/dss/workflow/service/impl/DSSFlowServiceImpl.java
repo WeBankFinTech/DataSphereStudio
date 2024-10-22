@@ -264,6 +264,36 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
+    public void getParentProxy(DSSFlow dssFlow){
+
+        try {
+
+            if(Boolean.FALSE.equals(dssFlow.getRootFlow())){
+                Long parentFlowId = flowMapper.getParentFlowID(dssFlow.getId());
+                DSSFlow parentFlow = getFlowByID(parentFlowId);
+                Map<String,Object> json = bmlService.query(parentFlow.getName(), parentFlow.getResourceId(), parentFlow.getBmlVersion());
+
+                List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(json.get("string").toString(), "props");
+                String proxyUser = "";
+                if (CollectionUtils.isNotEmpty(props)) {
+                    for (Map<String, Object> prop : props) {
+                        if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
+                            proxyUser = prop.get("user.to.proxy").toString();
+                            break;
+                        }
+                    }
+                }
+
+                dssFlow.setDefaultProxyUser(proxyUser);
+            }
+
+        }catch (Exception e){
+            logger.error("getParentProxy dssFlow id is {}, error msg is {}", dssFlow.getId(), e.getMessage());
+        }
+    }
+
+
+    @Override
     public List<String> getSubFlowContextIdsByFlowIds(List<Long> flowIdList) throws ErrorException {
         ArrayList<String> contextIdList = new ArrayList<>();
         // 查出所有子工作流的上下文ID

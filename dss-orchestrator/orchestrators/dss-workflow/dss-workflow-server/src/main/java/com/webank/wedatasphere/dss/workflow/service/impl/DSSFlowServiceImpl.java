@@ -237,6 +237,25 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     @Override
     public DSSFlow getFlow(Long flowID) throws NullPointerException {
         DSSFlow dssFlow = getFlowByID(flowID);
+
+        if(Boolean.FALSE.equals(dssFlow.getRootFlow())){
+            Long parentFlowId = flowMapper.getParentFlowID(dssFlow.getId());
+            DSSFlow parentFlow = getFlowByID(parentFlowId);
+            Map<String,Object> json = bmlService.query(parentFlow.getName(), parentFlow.getResourceId(), parentFlow.getBmlVersion());
+
+            List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(json.get("string").toString(), "props");
+            String proxyUser = null;
+            if (CollectionUtils.isNotEmpty(props)) {
+                for (Map<String, Object> prop : props) {
+                    if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
+                        proxyUser = prop.get("user.to.proxy").toString();
+                        break;
+                    }
+                }
+            }
+            dssFlow.setDefaultProxyUser(proxyUser);
+        }
+
         //todo update
         String userName = dssFlow.getCreator();
         Map<String, Object> query = bmlService.query(userName, dssFlow.getResourceId(), dssFlow.getBmlVersion());

@@ -398,7 +398,8 @@ public class DSSProjectServiceImpl extends ServiceImpl<DSSProjectMapper, DSSProj
         }
     }
 
-    private Map<String, GitUserEntity> getProjectGitUserInfo(String username, Long workspaceId) {
+    @Override
+    public Map<String, GitUserEntity> getProjectGitUserInfo(String username, Long workspaceId) {
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         Map<String, BmlResource> file = new HashMap<>();
         // 测试数据 key表示项目名、value为项目BmlResource资源

@@ -129,7 +129,10 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         // 对于接入git的项目校验项目名称
         if(projectCreateRequest.getAssociateGit() != null && projectCreateRequest.getAssociateGit()) {
             // 校验gitUser gitToken合法性以及projectName是否重复
-            checkGitName(projectCreateRequest.getName(), workspace, username, projectCreateRequest.getGitUser(), projectCreateRequest.getGitToken());
+            boolean repeat = checkGitName(projectCreateRequest.getName(), workspace, username, projectCreateRequest.getGitUser(), projectCreateRequest.getGitToken());
+            if (repeat) {
+                throw new DSSProjectErrorException(71000, "git中存在同名项目，请更换名字或删去同名项目再重试");
+            }
         }
 
         //3.保存dss_project

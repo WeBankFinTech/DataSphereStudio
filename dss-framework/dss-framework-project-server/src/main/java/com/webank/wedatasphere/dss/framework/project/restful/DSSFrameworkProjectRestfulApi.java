@@ -134,6 +134,16 @@ public class DSSFrameworkProjectRestfulApi {
         if(message != null) {
             return message;
         }
+        String proxyUser=username;
+        if(ProxyUserConfiguration.isProxyUserEnable()) {
+            try {
+                proxyUser = dssProxyUserService.getProxyUser(request);
+            } catch (DSSProxyUserErrorException e) {
+                //do nothing
+            }
+        }
+        final String finalProxyUsername = proxyUser;
+        projectRequest.setProxyUser(finalProxyUsername);
 
         try {
             dssWorkspaceService.getWorkspacesById(projectRequest.getWorkspaceId(), username);
@@ -156,15 +166,6 @@ public class DSSFrameworkProjectRestfulApi {
         }
         //如果是生产中心请求，则靠考虑用户或者代理用户是否有发布权限
         if(request.getPathInfo().endsWith("getAllProdProjects")){
-            String proxyUser=username;
-            if(ProxyUserConfiguration.isProxyUserEnable()) {
-                try {
-                    proxyUser = dssProxyUserService.getProxyUser(request);
-                } catch (DSSProxyUserErrorException e) {
-                    //do nothing
-                }
-            }
-            final String finalProxyUsername = proxyUser;
             dssProjectVos = dssProjectVos.stream().filter(
                     item-> item.getReleaseUsers().contains(username)
                     ||item.getReleaseUsers().contains(finalProxyUsername)

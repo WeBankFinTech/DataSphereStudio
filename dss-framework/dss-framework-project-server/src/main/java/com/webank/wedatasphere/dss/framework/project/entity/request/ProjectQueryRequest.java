@@ -80,6 +80,8 @@ public class ProjectQueryRequest implements Serializable {
 
     private List<Integer> projectIdList;
 
+    private String proxyUser;
+
     public List<Integer> getProjectIdList() {
         return projectIdList;
     }
@@ -218,5 +220,13 @@ public class ProjectQueryRequest implements Serializable {
 
     public void setAccessUsers(List<String> accessUsers) {
         this.accessUsers = accessUsers;
+    }
+
+    public String getProxyUser() {
+        return proxyUser;
+    }
+
+    public void setProxyUser(String proxyUser) {
+        this.proxyUser = proxyUser;
     }
 }

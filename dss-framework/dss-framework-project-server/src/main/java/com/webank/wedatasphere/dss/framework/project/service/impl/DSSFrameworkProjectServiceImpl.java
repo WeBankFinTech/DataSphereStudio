@@ -19,6 +19,8 @@ package com.webank.wedatasphere.dss.framework.project.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.webank.wedatasphere.dss.appconn.core.AppConn;
 import com.webank.wedatasphere.dss.appconn.core.ext.OnlyStructureAppConn;
+import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
+import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.utils.*;
@@ -40,6 +42,7 @@ import com.webank.wedatasphere.dss.framework.project.service.DSSProjectUserServi
 import com.webank.wedatasphere.dss.framework.project.utils.ProjectStringUtils;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
+import com.webank.wedatasphere.dss.git.common.protocol.exception.GitErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
@@ -192,6 +195,12 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         Boolean associateGit = dbProject.getAssociateGit();
         // 校验参数正确性
         checkProjectRight(projectModifyRequest, dbProject, username, workspace);
+        // 对于首次接入git的项目需要校验项目名称
+        boolean repeat = false;
+        if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
+            // 校验gitUser gitToken合法性以及projectName是否重复
+            repeat = checkGitName(projectModifyRequest.getName(), workspace, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
+        }
 
         // 1.统一修改各个接入的第三方的系统的工程状态信息
         //调用第三方的工程修改接口
@@ -210,7 +219,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
         // 同步项目配置元数据到git
         try {
-            syncGitProject(projectModifyRequest, dbProject, username, workspace);
+            syncGitProject(projectModifyRequest, dbProject, username, workspace, repeat);
         }catch (Exception e) {
             DSSProjectDO project = new DSSProjectDO();
             project.setAssociateGit(associateGit);
@@ -371,7 +380,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         return projectMap;
     }
 
-    private void checkGitName(String name, Workspace workspace, String username, String gitUser, String gitToken) throws DSSProjectErrorException {
+    private boolean checkGitName(String name, Workspace workspace, String username, String gitUser, String gitToken) throws DSSProjectErrorException {
         // 校验是否为虚拟用户，此处禁止使用DSS实名用户接入Git
         List<StaffInfoVO> all = dssWorkspaceUserService.listAllDSSUsers();
         Set<String> allDSSUsers = all.stream().map(StaffInfoVO::getUsername).collect(Collectors.toSet());
@@ -388,38 +397,22 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         if (responseWorkflowValidNode == null) {
             throw new DSSProjectErrorException(71000, "向Git发起检查工程名是否重复失败，请稍后重试 ");
         } else if (responseWorkflowValidNode.getRepeat()) {
-            throw new DSSProjectErrorException(71000,  "git 已存在相同项目名称，请重新命名!");
+            LOGGER.info("项目{}重新接入git", name);
+            return true;
         }
-    }
-
-    private void initGitProject(Long workspaceId, String projectName, String resource, String version, String username, String gitUser, String gitToken) {
-        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        Map<String, BmlResource> file = new HashMap<>();
-        // 测试数据 key表示项目名、value为项目BmlResource资源
-        GitCreateProjectRequest request1 = new GitCreateProjectRequest(workspaceId, projectName, new BmlResource(resource, version), username, gitUser, gitToken);
-        LOGGER.info("-------=======================begin to create project: {}=======================-------", projectName);
-        Object ask = gitSender.ask(request1);
-        GitCreateProjectResponse responseWorkflowValidNode = RpcAskUtils.processAskException(ask, GitCreateProjectResponse.class, GitCreateProjectRequest.class);
-        LOGGER.info("-------=======================End to create project: {}=======================-------: {}", projectName, responseWorkflowValidNode);
-    }
-
-    private void checkAssociateGit(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws DSSProjectErrorException {
-        // 对于已经接入git的项目不允许进行取消
-        if (dbProject.getAssociateGit()!=null && dbProject.getAssociateGit()
-                && projectModifyRequest.getAssociateGit()!= null && !projectModifyRequest.getAssociateGit()) {
-            throw new DSSProjectErrorException(71000, "项目接入git后无法取消");
-        }
-        // 对于首次接入git的项目需要校验项目名称
-        if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
-            // 校验gitUser gitToken合法性以及projectName是否重复
-            checkGitName(projectModifyRequest.getName(), workspace, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
-        }
+        return false;
     }
 
     @Override
     public void modifyProjectMeta(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception {
         // 校验项目参数正确性
         checkProjectRight(projectModifyRequest, dbProject, username, workspace);
+        // 对于首次接入git的项目需要校验项目名称
+        boolean repeat = false;
+        if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
+            // 校验gitUser gitToken合法性以及projectName是否重复
+            repeat = checkGitName(projectModifyRequest.getName(), workspace, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
+        }
 
         // 1.统一修改各个接入的第三方的系统的工程状态信息
         //调用第三方的工程修改接口
@@ -434,7 +427,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         dssProjectService.modifyProjectMeta(username, projectModifyRequest);
 
         // 同步项目配置元数据到git
-        syncGitProject(projectModifyRequest, dbProject, username, workspace);
+        syncGitProject(projectModifyRequest, dbProject, username, workspace, repeat);
 
     }
 
@@ -458,14 +451,9 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             DSSExceptionUtils.dealErrorException(ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getCode(), ProjectServerResponse.PROJECT_NOT_EDIT_NAME.getMsg(), DSSProjectErrorException.class);
         }
 
-        // 校验是否接入git
-        if (projectModifyRequest.getAssociateGit() != null) {
-            checkAssociateGit(projectModifyRequest, dbProject, username, workspace);
-        }
-
     }
 
-    public void syncGitProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception{
+    public void syncGitProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace, boolean repeat) throws Exception{
 
         // 同步项目配置元数据到git
         if (projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
@@ -486,7 +474,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
                 }
             }
             BmlResource bmlResource = dssProjectService.exportOnlyProjectMeta(exportAllOrchestratorsReqest, uploadUserName, "", workspace);
-            if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
+            if (!repeat && (dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit() != null && projectModifyRequest.getAssociateGit()) {
                 createGitProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
                 OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), projectModifyRequest.getId());
                 List<DSSOrchestratorInfo> orchestratorInfoByLabel = orchestratorService.getOrchestratorInfoByLabel(orchestratorRequest);
@@ -545,7 +533,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
         updateProject4Transfer(dbProject, operator);
         //4.修改git权限
         try {
-            syncGitProject(projectModifyRequest, dbProject, newProjectOwner, workspace);
+            syncGitProject(projectModifyRequest, dbProject, newProjectOwner, workspace, true);
         }catch (Exception e){
             LOGGER.error("transfer git failed",e);
         }

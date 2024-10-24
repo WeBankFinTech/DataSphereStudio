@@ -611,25 +611,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
             if (CollectionUtils.isNotEmpty(difference1)) {
-                for (NodeContentDO contentDO : difference1) {
-                    if (contentDO.getJobType().equals("workflow.subflow")) {
-                        DSSFlow flow = getFlow(flowID);
-                        List<DSSNodeDefault> oldFlowNodes = DSSCommonUtils.getWorkFlowNodes(flow.getFlowJson());
-                        Map<String, DSSNodeDefault> oldMap = new HashMap<>();
-                        for (DSSNodeDefault nodeDefault : oldFlowNodes) {
-                            String key = nodeDefault.getKey();
-                            if (StringUtils.isNotEmpty(key)) {
-                                oldMap.put(key, nodeDefault);
-                            }
-                        }
-                        DSSNodeDefault nodeDefault = oldMap.get(contentDO.getNodeKey());
-                        Map<String, Object> jobContent = nodeDefault.getJobContent();
-                        if (jobContent != null && jobContent.get("embeddedFlowId") != null) {
-                            String embeddedFlowId = jobContent.get("embeddedFlowId").toString();
-                            deleteSubFlowMetaData(Long.valueOf(embeddedFlowId), orchestratorId);
-                        }
-                    }
-                }
                 nodeContentMapper.batchDelete(new ArrayList<>(difference1), orchestratorId, flowID);
             }
 
@@ -731,36 +712,28 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
 
-    private void deleteSubFlowMetaData(Long flowID, Long orchestratorId) {
-        DSSFlow flow = getFlow(flowID);
-        List<DSSNodeDefault> oldFlowNodes = DSSCommonUtils.getWorkFlowNodes(flow.getFlowJson());
-        Map<String, DSSNodeDefault> oldMap = new HashMap<>();
-        for (DSSNodeDefault nodeDefault : oldFlowNodes) {
-            String key = nodeDefault.getKey();
-            if (StringUtils.isNotEmpty(key)) {
-                oldMap.put(key, nodeDefault);
-            }
+    private void deleteFlowMetaDataByFlowId(Long flowID) {
+        Long rootFlowId = getRootFlowId(flowID);
+        OrchestratorVo orchestratorVo = null;
+        try {
+            orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                    OrchestratorVo.class, RequestQuertByAppIdOrchestrator.class);
+        } catch (Exception e) {
+            logger.error("保存工作流时获取编排失败，原因为：", e);
         }
-        for (DSSNodeDefault contentDO : oldFlowNodes) {
-            // 包含子工作流 则先删除子工作流所有节点，在删除当前工作流所有节点
-            if (contentDO.getJobType().equals("workflow.subflow")) {
-                DSSNodeDefault nodeDefault = oldMap.get(contentDO.getKey());
-                Map<String, Object> jobContent = nodeDefault.getJobContent();
-                if (jobContent != null && jobContent.get("embeddedFlowId") != null) {
-                    String embeddedFlowId = jobContent.get("embeddedFlowId").toString();
-                    // 递归删除
-                    deleteSubFlowMetaData(Long.valueOf(embeddedFlowId), orchestratorId);
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo != null ? orchestratorVo.getDssOrchestratorVersion() : null;
+        // 解析并保存元数据
+        Long orchestratorId = dssOrchestratorVersion != null ? dssOrchestratorVersion.getOrchestratorId() : null;
+        if (orchestratorId != null && dssOrchestratorVersion.getAppId().equals(rootFlowId)) {
+            List<NodeContentDO> contentDOList = nodeContentMapper.getContentListByOrchestratorIdAndFlowId(orchestratorId, Long.valueOf(flowID));
+            if (!CollectionUtils.isEmpty(contentDOList)) {
+                List<Long> contentIdList = contentDOList.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+                nodeContentMapper.deleteNodeContentByOrchestratorIdAndFlowId(orchestratorId, Long.valueOf(flowID));
+                if (CollectionUtils.isNotEmpty(contentIdList)) {
+                    nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
                 }
+                nodeMetaMapper.deleteNodeMetaByOrchestratorId(orchestratorId);
             }
-        }
-        List<NodeContentDO> contentDOList = nodeContentMapper.getContentListByOrchestratorIdAndFlowId(orchestratorId, Long.valueOf(flowID));
-        if (!CollectionUtils.isEmpty(contentDOList)) {
-            List<Long> contentIdList = contentDOList.stream().map(NodeContentDO::getId).collect(Collectors.toList());
-            nodeContentMapper.deleteNodeContentByOrchestratorIdAndFlowId(orchestratorId, Long.valueOf(flowID));
-            if (CollectionUtils.isNotEmpty(contentIdList)) {
-                nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
-            }
-            nodeMetaMapper.deleteNodeMetaByOrchestratorId(orchestratorId);
         }
     }
 
@@ -851,6 +824,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
         for (Long subFlowID : subFlowIDs) {
             deleteFlow(subFlowID);
+            deleteFlowMetaDataByFlowId(flowId);
         }
         for (Long subFlowID : subFlowIDs) {
             deleteDWSDB(subFlowID);

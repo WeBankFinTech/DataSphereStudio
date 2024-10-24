@@ -824,7 +824,6 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         List<Long> subFlowIDs = flowMapper.selectSubFlowIDByParentFlowID(flowId);
         for (Long subFlowID : subFlowIDs) {
             deleteFlow(subFlowID);
-            deleteFlowMetaDataByFlowId(flowId);
         }
         for (Long subFlowID : subFlowIDs) {
             deleteDWSDB(subFlowID);
@@ -833,6 +832,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             // TODO: 2019/6/5 事务的保证
         }
         deleteDWSDB(flowId);
+        deleteFlowMetaDataByFlowId(flowId);
     }
 
     private void deleteDWSDB(Long flowID) {

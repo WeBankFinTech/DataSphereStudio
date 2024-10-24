@@ -612,7 +612,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
             if (CollectionUtils.isNotEmpty(difference1)) {
                 for (NodeContentDO contentDO : difference1) {
-                    if (contentDO.equals("workflow.subflow")) {
+                    if (contentDO.getJobType().equals("workflow.subflow")) {
                         DSSFlow flow = getFlow(flowID);
                         List<DSSNodeDefault> oldFlowNodes = DSSCommonUtils.getWorkFlowNodes(flow.getFlowJson());
                         Map<String, DSSNodeDefault> oldMap = new HashMap<>();

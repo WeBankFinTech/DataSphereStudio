@@ -147,6 +147,10 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             isExist = true;
         }
         // 检测token合法性 数据库中已存在的配置无需再次校验
+        if (isExist && projectGitInfo.getGitTokenEncrypt().equals(gitToken)) {
+            // 加密token需解密再验证
+            gitToken = GitProjectManager.generateKeys(gitToken, Cipher.DECRYPT_MODE);
+        }
         Boolean tokenTest = GitProjectManager.gitTokenTest(gitToken, gitUser);
         String gitUrl = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue());
         if (tokenTest) {

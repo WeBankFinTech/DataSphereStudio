@@ -174,7 +174,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
             throw new GitErrorException(80101, "git init failed, the reason is: projectName " + projectName +" already exists");
         }
 
-        return new GitCheckProjectResponse(projectName, false);
+        return new GitCheckProjectResponse(projectName, isExist);
     }
 
     @Override

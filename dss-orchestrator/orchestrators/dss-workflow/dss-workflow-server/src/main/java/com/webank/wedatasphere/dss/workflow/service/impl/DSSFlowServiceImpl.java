@@ -831,8 +831,8 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             // TODO: 2019/6/5 json中资源的删除
             // TODO: 2019/6/5 事务的保证
         }
-        deleteDWSDB(flowId);
         deleteFlowMetaDataByFlowId(flowId);
+        deleteDWSDB(flowId);
     }
 
     private void deleteDWSDB(Long flowID) {

@@ -47,7 +47,9 @@ import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo;
 import com.webank.wedatasphere.dss.orchestrator.common.ref.OrchestratorRefConstant;
+import com.webank.wedatasphere.dss.orchestrator.db.dao.OrchestratorMapper;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
@@ -97,6 +99,8 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
     private OrchestratorService orchestratorService;
     @Autowired
     private LockMapper lockMapper;
+    @Autowired
+    private OrchestratorMapper orchestratorMapper;
 
 
     private static final boolean STRICT_PROJECT_CREATE_MODE = CommonVars.apply("wds.dss.project.strict.mode", false).getValue();
@@ -195,14 +199,23 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
 
     @Override
     public void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception {
-        Boolean associateGit = dbProject.getAssociateGit();
+        Boolean dbProjectAssociateGit = dbProject.getAssociateGit();
         // 校验参数正确性
         checkProjectRight(projectModifyRequest, dbProject, username, workspace);
         // 对于首次接入git的项目需要校验项目名称
         boolean repeat = false;
-        if ((dbProject.getAssociateGit() == null || !dbProject.getAssociateGit()) && projectModifyRequest.getAssociateGit()!= null && projectModifyRequest.getAssociateGit()) {
+        Boolean requestAssociateGit = projectModifyRequest.getAssociateGit();
+        if ((dbProjectAssociateGit == null || !dbProjectAssociateGit) && requestAssociateGit != null && requestAssociateGit) {
             // 校验gitUser gitToken合法性以及projectName是否重复
             repeat = checkGitName(projectModifyRequest.getName(), workspace, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
+        }
+        if ((requestAssociateGit == null || !requestAssociateGit) && (dbProjectAssociateGit != null && dbProjectAssociateGit)) {
+            // 不接入 清空编排bml缓存
+            OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), dbProject.getId());
+            List<OrchestratorBaseInfo> orchestratorInfos = orchestratorService.getOrchestratorInfos(orchestratorRequest, username);
+            for (OrchestratorBaseInfo baseInfo : orchestratorInfos) {
+                orchestratorMapper.updateOrchestratorBmlVersion(baseInfo.getId(), null, null);
+            }
         }
 
         // 1.统一修改各个接入的第三方的系统的工程状态信息
@@ -225,7 +238,7 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             syncGitProject(projectModifyRequest, dbProject, username, workspace, repeat);
         }catch (Exception e) {
             DSSProjectDO project = new DSSProjectDO();
-            project.setAssociateGit(associateGit);
+            project.setAssociateGit(dbProjectAssociateGit);
             UpdateWrapper<DSSProjectDO> updateWrapper = new UpdateWrapper<>();
             updateWrapper.eq("id", projectModifyRequest.getId());
             updateWrapper.eq("workspace_id", projectModifyRequest.getWorkspaceId());

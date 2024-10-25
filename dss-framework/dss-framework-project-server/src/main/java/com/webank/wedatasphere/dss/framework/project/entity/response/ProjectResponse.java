@@ -100,7 +100,7 @@ public class ProjectResponse implements Serializable {
     /**
      * 开发流程 下拉列表
      */
-    private List<String> devProcessLabel;
+    private List<String> devProcessPermission;
 
     public String getWorkspaceName() {
         return workspaceName;
@@ -269,7 +269,7 @@ public class ProjectResponse implements Serializable {
                 ", associateGit=" + associateGit +
                 ", gitUser=" + gitUser +
                 ", gitToken=" + gitToken +
-                ", devProcessLabel=" + devProcessLabel +
+                ", devProcessPermission=" + devProcessPermission +
                 '}';
     }
 
@@ -297,11 +297,11 @@ public class ProjectResponse implements Serializable {
         this.gitToken = gitToken;
     }
 
-    public List<String> getDevProcessLabel() {
-        return devProcessLabel;
+    public List<String> getDevProcessPermission() {
+        return devProcessPermission;
     }
 
-    public void setDevProcessLabel(List<String> devProcessLabel) {
-        this.devProcessLabel = devProcessLabel;
+    public void setDevProcessPermission(List<String> devProcessPermission) {
+        this.devProcessPermission = devProcessPermission;
     }
 }

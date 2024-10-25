@@ -27,6 +27,7 @@ import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
@@ -57,6 +58,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest);
 
+    Map<String, GitUserEntity> getProjectGitUserInfo(String username, Long workspaceId);
 
     ProjectInfoVo getProjectInfoById(Long id);
 

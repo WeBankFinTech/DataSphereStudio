@@ -79,7 +79,7 @@ public class WorkflowToAzkbanNodeRelConverter implements WorkflowToRelConverter 
             FileUtils.forceMkdir(jobDirFile);
             File jobFile = new File(storePath,workflowNode.getName() + AzkabanConstant.AZKABAN_JOB_SUFFIX);
             jobFile.createNewFile();
-            if("eventchecker.sender".equals(workflowNode.getNodeType())||"eventchecker.receiver".equals(workflowNode.getNodeType())){
+            if(workflowNode.getNodeType()!=null && workflowNode.getNodeType().startsWith(AzkabanConstant.WTSS_PREFIX)){
                 nodeConverter = ClassUtils.getInstanceOrDefault(NodeConverter.class, new WTSSJobConverter());
             }else{
                 nodeConverter = ClassUtils.getInstanceOrDefault(NodeConverter.class, new LinkisJobConverter());

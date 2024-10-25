@@ -118,5 +118,5 @@ public interface DSSFlowService {
 
     void deleteNodeContent(List<Long> flowIdList);
 
-    void getParentProxy(DSSFlow dssFlow);
+    void getRootFlowProxy(DSSFlow dssFlow);
 }

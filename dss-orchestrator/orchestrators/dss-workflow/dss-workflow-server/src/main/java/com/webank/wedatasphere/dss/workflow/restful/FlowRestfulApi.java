@@ -288,7 +288,7 @@ public class FlowRestfulApi {
                     String flowEditLock = DSSFlowEditLockManager.tryAcquireLock(dssFlow, username, ticketId);
                     dssFlow.setFlowEditLock(flowEditLock);
                 }
-                flowService.getParentProxy(dssFlow);
+                flowService.getRootFlowProxy(dssFlow);
             } catch (DSSErrorException e) {
                 if (DSSWorkFlowConstant.EDIT_LOCK_ERROR_CODE == e.getErrCode()) {
                     DSSFlowEditLock flowEditLock = lockMapper.getFlowEditLockByID(flowID);

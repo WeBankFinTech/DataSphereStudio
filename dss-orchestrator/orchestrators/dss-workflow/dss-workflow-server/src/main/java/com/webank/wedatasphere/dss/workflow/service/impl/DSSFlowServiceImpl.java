@@ -272,7 +272,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             }
 
         }catch (Exception e){
-            logger.error("getParentProxy dssFlow id is {}, error msg is {}", dssFlow.getId(), e.getMessage());
+            logger.error("getRootFlowProxy dssFlow id is {}, error msg is {}", dssFlow.getId(), e.getMessage());
         }
     }
 

@@ -245,6 +245,39 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     }
 
     @Override
+    public void getRootFlowProxy(DSSFlow dssFlow){
+
+        try {
+
+            if(Boolean.FALSE.equals(dssFlow.getRootFlow())){
+                Long rootFlowId = getRootFlowId(dssFlow.getId());
+                if(rootFlowId  == null){
+                    return;
+                }
+                DSSFlow rootFlow = getFlowByID(rootFlowId);
+                Map<String,Object> json = bmlService.query(rootFlow.getName(), rootFlow.getResourceId(), rootFlow.getBmlVersion());
+
+                List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(json.get("string").toString(), "props");
+                String proxyUser = "";
+                if (CollectionUtils.isNotEmpty(props)) {
+                    for (Map<String, Object> prop : props) {
+                        if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
+                            proxyUser = prop.get("user.to.proxy").toString();
+                            break;
+                        }
+                    }
+                }
+
+                dssFlow.setDefaultProxyUser(proxyUser);
+            }
+
+        }catch (Exception e){
+            logger.error("getParentProxy dssFlow id is {}, error msg is {}", dssFlow.getId(), e.getMessage());
+        }
+    }
+
+
+    @Override
     public List<String> getSubFlowContextIdsByFlowIds(List<Long> flowIdList) throws ErrorException {
         ArrayList<String> contextIdList = new ArrayList<>();
         // 查出所有子工作流的上下文ID
@@ -662,6 +695,32 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         }
     }
 
+
+    private void deleteFlowMetaDataByFlowId(Long flowID) {
+        Long rootFlowId = getRootFlowId(flowID);
+        OrchestratorVo orchestratorVo = null;
+        try {
+            orchestratorVo = RpcAskUtils.processAskException(getOrchestratorSender().ask(new RequestQuertByAppIdOrchestrator(rootFlowId)),
+                    OrchestratorVo.class, RequestQuertByAppIdOrchestrator.class);
+        } catch (Exception e) {
+            logger.error("保存工作流时获取编排失败，原因为：", e);
+        }
+        DSSOrchestratorVersion dssOrchestratorVersion = orchestratorVo != null ? orchestratorVo.getDssOrchestratorVersion() : null;
+        // 解析并保存元数据
+        Long orchestratorId = dssOrchestratorVersion != null ? dssOrchestratorVersion.getOrchestratorId() : null;
+        if (orchestratorId != null && dssOrchestratorVersion.getAppId().equals(rootFlowId)) {
+            List<NodeContentDO> contentDOList = nodeContentMapper.getContentListByOrchestratorIdAndFlowId(orchestratorId, Long.valueOf(flowID));
+            if (!CollectionUtils.isEmpty(contentDOList)) {
+                List<Long> contentIdList = contentDOList.stream().map(NodeContentDO::getId).collect(Collectors.toList());
+                nodeContentMapper.deleteNodeContentByOrchestratorIdAndFlowId(orchestratorId, Long.valueOf(flowID));
+                if (CollectionUtils.isNotEmpty(contentIdList)) {
+                    nodeContentUIMapper.deleteNodeContentUIByContentList(contentIdList);
+                }
+                nodeMetaMapper.deleteNodeMetaByOrchestratorId(orchestratorId);
+            }
+        }
+    }
+
     /**
      * 当数据库的父子工作流依赖关系和json中不一致时，该方法会删除数据库中的脏数据
      *
@@ -756,6 +815,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
             // TODO: 2019/6/5 json中资源的删除
             // TODO: 2019/6/5 事务的保证
         }
+        deleteFlowMetaDataByFlowId(flowId);
         deleteDWSDB(flowId);
     }
 

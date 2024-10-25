@@ -55,6 +55,8 @@ public class DSSFlow implements Flow {
 
     private Long orchestratorId;
 
+    private String defaultProxyUser;
+
     public List<String[]> getFlowIdParamConfTemplateIdTuples() {
         return flowIdParamConfTemplateIdTuples;
     }
@@ -284,5 +286,13 @@ public class DSSFlow implements Flow {
 
     public void setOrchestratorId(Long orchestratorId) {
         this.orchestratorId = orchestratorId;
+    }
+
+    public String getDefaultProxyUser() {
+        return defaultProxyUser;
+    }
+
+    public void setDefaultProxyUser(String defaultProxyUser) {
+        this.defaultProxyUser = defaultProxyUser;
     }
 }

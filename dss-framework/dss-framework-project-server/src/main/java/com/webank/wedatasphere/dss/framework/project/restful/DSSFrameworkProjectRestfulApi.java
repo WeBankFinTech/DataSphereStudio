@@ -38,6 +38,7 @@ import com.webank.wedatasphere.dss.framework.proxy.service.DssProxyUserService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitSearchRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitSearchResponse;
 import com.webank.wedatasphere.dss.sender.service.DSSSenderServiceFactory;
@@ -58,10 +59,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -233,6 +231,29 @@ public class DSSFrameworkProjectRestfulApi {
             dssProjectVo.setId(dbProject.getId());
             dssProjectVo.setName(dbProject.getName());
             message = Message.ok().data("project", dssProjectVo);
+        }
+        return message;
+    }
+
+    @RequestMapping(path = "getProjectGitInfo", method = RequestMethod.GET)
+    public Message getProjectInfoByName(HttpServletRequest request,
+                                        @RequestParam(name = "projectId") Long projectId) {
+        DSSProjectDO dbProject = dssProjectService.getProjectById(projectId);
+        Message message;
+        if (dbProject == null) {
+            message = Message.error("project does not exist.");
+        } else {
+            String username = SecurityFilter.getLoginUsername(request);
+            Workspace workspace = SSOHelper.getWorkspace(request);
+            Map<String, GitUserEntity> projectGitUserInfo = dssProjectService.getProjectGitUserInfo(username, workspace.getWorkspaceId());
+            GitUserEntity gitUserEntity = projectGitUserInfo.get(dbProject.getName());
+            String gitUser = null;
+            String gitToken = null;
+            if (gitUserEntity != null) {
+                gitUser = gitUserEntity.getGitUser();
+                gitToken = gitUserEntity.getGitToken();
+            }
+            message = Message.ok().data("gitUser", gitUser).data("gitToken", gitToken);
         }
         return message;
     }

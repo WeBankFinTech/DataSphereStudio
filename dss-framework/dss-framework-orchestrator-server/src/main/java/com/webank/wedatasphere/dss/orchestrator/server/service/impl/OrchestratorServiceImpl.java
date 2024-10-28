@@ -747,8 +747,8 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         } else {
             filePath = getFlowPath(workflowId);
         }
-        if (StringUtils.isEmpty(workflowNodeName)) {
-            filePath += "/" +workflowNodeName;
+        if (!StringUtils.isEmpty(workflowNodeName)) {
+            filePath += "/" + workflowNodeName;
         }
         GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, filePath);
         GitAddMemberResponse addMemberResponse = RpcAskUtils.processAskException(sender.ask(gitAddMemberRequest), GitAddMemberResponse.class, GitAddMemberRequest.class);

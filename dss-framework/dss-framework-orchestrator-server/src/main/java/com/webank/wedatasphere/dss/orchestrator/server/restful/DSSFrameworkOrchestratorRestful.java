@@ -538,14 +538,17 @@ public class DSSFrameworkOrchestratorRestful {
     public Message gitUrl(@RequestParam(required = true, name = "projectName") String projectName,
                           @RequestParam(required = false, name = "workflowName") String workflowName,
                           @RequestParam(required = false, name = "workflowNodeName") String workflowNodeName,
+                          @RequestParam(required = false, name = "workflowId") Long workflowId,
                           HttpServletResponse response) {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
-        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
-        String filePath = StringUtils.isEmpty(workflowNodeName) ? workflowName : workflowName + "/" +workflowNodeName;
-        GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, filePath);
-        GitAddMemberResponse addMemberResponse = RpcAskUtils.processAskException(sender.ask(gitAddMemberRequest), GitAddMemberResponse.class, GitAddMemberRequest.class);
-        return Message.ok().data("gitUrl", addMemberResponse.getGitUrl());
+        try {
+            String gitUrl = orchestratorService.getGitUrl(workflowName, workflowNodeName, projectName, userName, workspace, workflowId);
+            return Message.ok().data("gitUrl", gitUrl);
+        } catch (Exception e) {
+            return Message.error("跳转git失败，原因为:" + e.getMessage());
+        }
+
 
     }
 

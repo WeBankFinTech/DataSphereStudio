@@ -207,30 +207,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
         String gitUser = projectInfoByProjectName.getGitUser();
         String gitToken = projectInfoByProjectName.getGitToken();
         String gitUrl = projectInfoByProjectName.getGitUrl();
-        Long workspaceId = request.getWorkspaceId();
-
-        GitHistoryResponse response = new GitHistoryResponse();
-        // 拼接.git路径
-        String gitPath = DSSGitUtils.generateGitPath(projectName, request.getWorkspaceId(), gitUser);
         // 获取git仓库
-        File repoDir = new File(gitPath);
-        if (StringUtils.isNotEmpty(flowNodeName)) {
-            try (Repository repository = workflowManagerService.getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl)) {
-                // 本地保持最新状态
-                DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
-                String filePath = DSSGitUtils.generateGitPrePath(projectName, workspaceId, gitUser) + "/" + flowNodeName;
-                File file = new File(filePath);
-                if (!file.exists()) {
-                    throw new DSSErrorException(80001, "当前工作流或工作流节点未提交到git，请提交后再跳转");
-                }
-            } catch (JGitInternalException e) {
-                logger.error("get git failed, the reason is", e);
-                throw new DSSErrorException(80001, "当前项目下已有工作流在进行git操作，请稍后重试");
-            } catch (Exception e) {
-                logger.error("git init failed, the reason is ", e);
-                throw new DSSErrorException(80001, "diff failed, the reason is" + e.getMessage());
-            }
-        }
         String userIdByUsername = DSSGitUtils.getUserIdByUsername(gitUrl, gitToken, username);
         DSSGitUtils.addProjectMember(gitUrl, gitToken, userIdByUsername, gitProjectId, 20);
         String jumpUrl = gitUrl + "/" + gitUser + "/" + projectName;

@@ -34,8 +34,10 @@ import com.webank.wedatasphere.dss.common.utils.RpcAskUtils;
 import com.webank.wedatasphere.dss.contextservice.service.ContextService;
 import com.webank.wedatasphere.dss.framework.common.exception.DSSFrameworkErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.config.GitServerConfig;
+import com.webank.wedatasphere.dss.git.common.protocol.request.GitAddMemberRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRenameRequest;
 import com.webank.wedatasphere.dss.git.common.protocol.request.GitRevertRequest;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitAddMemberResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
 import com.webank.wedatasphere.dss.git.common.protocol.util.UrlUtils;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
@@ -81,7 +83,6 @@ import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.cs.client.ContextClient;
 import org.apache.linkis.cs.client.builder.ContextClientFactory;
 import org.apache.linkis.rpc.Sender;
@@ -95,6 +96,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -736,4 +738,40 @@ public class OrchestratorServiceImpl implements OrchestratorService {
         return false;
     }
 
+    @Override
+    public String getGitUrl(String workflowName, String workflowNodeName, String projectName, String userName, Workspace workspace, Long workflowId) throws Exception{
+        Sender sender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        String filePath;
+        if (workflowId == null) {
+            filePath = workflowName;
+        } else {
+            filePath = getFlowPath(workflowId);
+        }
+        if (StringUtils.isEmpty(workflowNodeName)) {
+            filePath += "/" +workflowNodeName;
+        }
+        GitAddMemberRequest gitAddMemberRequest = new GitAddMemberRequest(workspace.getWorkspaceId(), projectName, userName, filePath);
+        GitAddMemberResponse addMemberResponse = RpcAskUtils.processAskException(sender.ask(gitAddMemberRequest), GitAddMemberResponse.class, GitAddMemberRequest.class);
+        if (addMemberResponse == null) {
+            return null;
+        } else {
+            return addMemberResponse.getGitUrl();
+        }
+    }
+
+    private String getFlowPath(Long flowId) {
+        if (flowId == null) {
+            return null;
+        }
+        DSSFlow dssFlow = flowMapper.selectFlowByID(flowId);
+        if (dssFlow == null) {
+            return null;
+        }
+        if (dssFlow.getRootFlow()) {
+            return dssFlow.getName();
+        } else {
+            Long parentFlowID = flowMapper.getParentFlowID(flowId);
+            return getFlowPath(parentFlowID) + "/" + dssFlow.getName();
+        }
+    }
 }

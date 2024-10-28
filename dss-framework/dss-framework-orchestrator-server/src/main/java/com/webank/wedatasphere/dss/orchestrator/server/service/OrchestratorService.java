@@ -161,4 +161,6 @@ public interface OrchestratorService {
 
     Boolean updateOrchestratorTime(Long orchestratorId);
 
+    String getGitUrl(String workflowName, String workflowNodeName, String projectName, String userName, Workspace workspace, Long workflowId) throws Exception;
+
 }

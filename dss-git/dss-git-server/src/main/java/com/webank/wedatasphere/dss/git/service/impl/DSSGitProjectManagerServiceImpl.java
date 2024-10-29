@@ -221,6 +221,7 @@ public class DSSGitProjectManagerServiceImpl  implements DSSGitProjectManagerSer
                 String filePath = DSSGitUtils.generateGitPrePath(projectName, workspaceId, gitUser) + "/" + flowNodeName;
                 File file = new File(filePath);
                 if (!file.exists()) {
+                    logger.error("{}不存在", filePath);
                     throw new DSSErrorException(80001, "当前工作流或工作流节点未提交到git，请提交后再跳转");
                 }
             } catch (JGitInternalException e) {

@@ -502,6 +502,15 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             } else {
                 updateProject(workspace.getWorkspaceId(), dbProject.getName(), bmlResource, username, projectModifyRequest.getGitUser(), projectModifyRequest.getGitToken());
             }
+            // 如果重复，则表示之前接入过git，重新接入则需要更新所有编排状态
+            if (repeat) {
+                OrchestratorRequest orchestratorRequest = new OrchestratorRequest(workspace.getWorkspaceId(), projectModifyRequest.getId());
+                List<DSSOrchestratorInfo> orchestratorInfoByLabel = orchestratorService.getOrchestratorInfoByLabel(orchestratorRequest);
+                if (CollectionUtils.isNotEmpty(orchestratorInfoByLabel)) {
+                    List<Long> orchestratorIdList = orchestratorInfoByLabel.stream().map(DSSOrchestratorInfo::getId).collect(Collectors.toList());
+                    lockMapper.batchUpdateOrchestratorStatus(orchestratorIdList, OrchestratorRefConstant.FLOW_STATUS_SAVE);
+                }
+            }
         }
     }
 

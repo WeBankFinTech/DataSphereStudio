@@ -123,7 +123,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         Long userId = dssWorkspaceUserMapper.getUserID(userName);
         dssWorkspaceUserMapper.insertUserRoleInWorkspace(dssWorkspace.getId(),
-                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()),new Date(), userName, userName, userId, userName);
+                workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName()), new Date(), userName, userName, userId, userName);
         dssMenuRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceMenuRole(dssWorkspace.getId(), userName));
         dssWorkspaceHomepageMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceHomepage(dssWorkspace.getId(), userName));
         dssComponentRoleMapper.insertBatch(workspaceDBHelper.generateDefaultWorkspaceComponentPrivs(dssWorkspace.getId(), userName));
@@ -141,12 +141,17 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Transactional(rollbackFor = Throwable.class)
     @Override
-    public int transferWorkspace(String workspaceName, String oldOwner, String newOwner,String desc) throws DSSErrorException {
-        DSSWorkspace dssWorkspace = getWorkspacesByName(workspaceName,oldOwner);
+    public int transferWorkspace(String workspaceName, String oldOwner, String newOwner, String desc) throws DSSErrorException {
+        DSSWorkspace dssWorkspace = getWorkspacesByName(workspaceName, oldOwner);
+
+        if (!oldOwner.equals(dssWorkspace.getCreateBy())) {
+            LOGGER.error("{} workspace createBy is {}, oldOwner is {}", workspaceName, dssWorkspace.getCreateBy(), oldOwner);
+            throw new DSSFrameworkWarnException(30021, workspaceName + "工作空间的原Owner与" + oldOwner + "不一致！！");
+        }
 
         Long userId = dssWorkspaceUserMapper.getUserID(newOwner);
 
-        if(userId == null){
+        if (userId == null) {
             throw new DSSFrameworkWarnException(30021, "DSS user list  not contains " + newOwner);
         }
         LOGGER.info("workspace name is {}, oldOwner is {}, newOwner is {}", workspaceName, oldOwner, newOwner);
@@ -154,25 +159,25 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         dssWorkspace.setLastUpdateTime(new Date());
         dssWorkspace.setLastUpdateUser(newOwner);
         dssWorkspace.setDescription(desc);
-        LOGGER.info("updateWorkSpace name is {}", dssWorkspace.getName() );
+        LOGGER.info("updateWorkSpace name is {}", dssWorkspace.getName());
         // 更改创建者 和更新时间
         dssWorkspaceMapper.updateWorkSpace(dssWorkspace);
 
-        List<DSSWorkspaceMenuRole> dssWorkspaceMenuRoleList = dssMenuRoleMapper.queryWorkspaceMenuRole(dssWorkspace.getId(),oldOwner);
+        List<DSSWorkspaceMenuRole> dssWorkspaceMenuRoleList = dssMenuRoleMapper.queryWorkspaceMenuRole(dssWorkspace.getId(), oldOwner);
 
-        if(CollectionUtils.isNotEmpty(dssWorkspaceMenuRoleList)){
-            LOGGER.info("updateWorkspaceMenuRoleById  workspace name is {}, menuRoleIdList size is {}", workspaceName,dssWorkspaceMenuRoleList.size() );
+        if (CollectionUtils.isNotEmpty(dssWorkspaceMenuRoleList)) {
+            LOGGER.info("updateWorkspaceMenuRoleById  workspace name is {}, menuRoleIdList size is {}", workspaceName, dssWorkspaceMenuRoleList.size());
             List<Integer> menuRoleIdList = dssWorkspaceMenuRoleList.stream().map(DSSWorkspaceMenuRole::getId).collect(Collectors.toList());
-            dssMenuRoleMapper.updateWorkspaceMenuRoleById(menuRoleIdList,newOwner);
+            dssMenuRoleMapper.updateWorkspaceMenuRoleById(menuRoleIdList, newOwner);
 
         }
 
-        List<DSSWorkspaceComponentPriv> dssWorkspaceComponentList = dssComponentRoleMapper.queryDSSComponentRole(dssWorkspace.getId(),oldOwner);
+        List<DSSWorkspaceComponentPriv> dssWorkspaceComponentList = dssComponentRoleMapper.queryDSSComponentRole(dssWorkspace.getId(), oldOwner);
 
-        if(CollectionUtils.isNotEmpty(dssWorkspaceComponentList)){
-            LOGGER.info("updateDSSComponentRoleById  workspace name is {}, componentList size is {}", workspaceName,dssWorkspaceComponentList.size());
+        if (CollectionUtils.isNotEmpty(dssWorkspaceComponentList)) {
+            LOGGER.info("updateDSSComponentRoleById  workspace name is {}, componentList size is {}", workspaceName, dssWorkspaceComponentList.size());
             List<Integer> componetPrivIdList = dssWorkspaceComponentList.stream().map(DSSWorkspaceComponentPriv::getId).collect(Collectors.toList());
-            dssComponentRoleMapper.updateDSSComponentRoleById(componetPrivIdList,newOwner);
+            dssComponentRoleMapper.updateDSSComponentRoleById(componetPrivIdList, newOwner);
         }
 
         List<Integer> roleIds = dssWorkspaceService.getWorkspaceRoles(dssWorkspace.getId())
@@ -216,11 +221,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             int workspaceId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue());
             Integer analyserRole = workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ANALYSER.getName());
 
-            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId,analyserRole ,new Date(),
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId, analyserRole, new Date(),
                     userName, "system", userId, "system");
             Integer workspace0xId = dssWorkspaceMapper.getWorkspaceIdByName(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue());
             if (workspace0xId != null) {
-                dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspace0xId, analyserRole ,new Date(),
+                dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspace0xId, analyserRole, new Date(),
                         userName, "system", userId, "system");
             }
             //todo 初始化做的各项事情改为listener模式
@@ -243,7 +248,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             if ("/workspace".equals(homepageUrl)) {
                 //兼容旧的默认首页配置
                 homepageUrl = "/workspaceHome";
-            }else if("/workspaceHome/scheduleCenter".equals(homepageUrl)){
+            } else if ("/workspaceHome/scheduleCenter".equals(homepageUrl)) {
                 //兼容旧的生产中心首页配置
                 homepageUrl = "/scheduleCenter";
             }
@@ -304,7 +309,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 String[] fullNameArray = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT);
                 String departmentName = fullNameArray[0];
                 String officeName = "";
-                if(fullNameArray.length>1){
+                if (fullNameArray.length > 1) {
                     officeName = fullNameArray[1];
                 }
                 vo.setDepartment(departmentName);
@@ -490,7 +495,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public List<String> getAllDepartments() {
         List<String> allDepartments = staffInfoGetter.getAllDepartments().stream()
-                .map(department->department.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0]).distinct().collect(Collectors.toList());
+                .map(department -> department.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0]).distinct().collect(Collectors.toList());
         return allDepartments;
     }
 
@@ -723,7 +728,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Override
     public PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize) {
-        PageMethod.startPage(currentPage,pageSize);
+        PageMethod.startPage(currentPage, pageSize);
         List<DSSUserRoleComponentPriv> users = dssWorkspaceUserMapper.getAllUsers();
         Map<String, DSSUserRoleComponentPriv> userRolePrivMap = dssWorkspaceUserMapper.getWorkspaceRolePrivByUsername(users);
         //处理用户没有角色权限时只返回用户
@@ -756,11 +761,11 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         }
         needToAdd.forEach(map -> {
             map.forEach((key, value) -> {
-                if(key.intValue()==workspaceId||(workspace0xId != null&&key.intValue() == workspace0xId)){
-                    Arrays.stream(value.split(",")).filter(roleId->analyserRole==null||Integer.parseInt(roleId)!=analyserRole).forEach(roleId -> {
+                if (key.intValue() == workspaceId || (workspace0xId != null && key.intValue() == workspace0xId)) {
+                    Arrays.stream(value.split(",")).filter(roleId -> analyserRole == null || Integer.parseInt(roleId) != analyserRole).forEach(roleId -> {
                         dssWorkspaceUserMapper.insertUserRoleInWorkspace(key.intValue(), Integer.parseInt(roleId), new Date(), userName, "system", userId, "system");
                     });
-                }else {
+                } else {
                     Arrays.stream(value.split(",")).forEach(roleId -> {
                         dssWorkspaceUserMapper.insertUserRoleInWorkspace(key.intValue(), Integer.parseInt(roleId), new Date(), userName, "system", userId, "system");
                     });

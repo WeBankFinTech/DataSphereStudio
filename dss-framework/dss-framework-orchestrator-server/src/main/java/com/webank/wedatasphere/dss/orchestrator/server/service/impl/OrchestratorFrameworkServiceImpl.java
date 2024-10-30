@@ -786,6 +786,10 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
 
         // 更新user.to.proxy用户和proxyuser用户 信息
         JsonArray props = jsonObject.getAsJsonArray("props");
+        if(props == null){
+            props = new JsonArray();
+            jsonObject.add("props", props);
+        }
         // JsonArray 转list，是否包含 user.to.proxy key
         List<Map<String, Object>> propList = DSSCommonUtils.COMMON_GSON.fromJson(props,
                 new TypeToken<List<Map<String, Object>>>() {

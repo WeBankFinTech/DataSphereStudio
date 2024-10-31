@@ -216,6 +216,12 @@ public class DSSFrameworkProjectServiceImpl implements DSSFrameworkProjectServic
             for (OrchestratorBaseInfo baseInfo : orchestratorInfos) {
                 orchestratorMapper.updateOrchestratorBmlVersion(baseInfo.getId(), null, null);
             }
+            // 清空工作流状态
+            List<DSSOrchestratorInfo> orchestratorInfoByLabel = orchestratorService.getOrchestratorInfoByLabel(orchestratorRequest);
+            if (CollectionUtils.isNotEmpty(orchestratorInfoByLabel)) {
+                List<Long> orchestratorIdList = orchestratorInfoByLabel.stream().map(DSSOrchestratorInfo::getId).collect(Collectors.toList());
+                lockMapper.batchUpdateOrchestratorStatus(orchestratorIdList, null);
+            }
         }
 
         // 1.统一修改各个接入的第三方的系统的工程状态信息

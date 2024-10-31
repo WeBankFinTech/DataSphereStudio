@@ -33,14 +33,12 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.Workspa
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceFavoriteVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuAppconnVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.dto.response.WorkspaceMenuVo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.itsm.ItsmResponse;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.constant.ApplicationConf;
 import com.webank.wedatasphere.dss.framework.workspace.dao.*;
 import com.webank.wedatasphere.dss.framework.workspace.exception.DSSWorkspaceDuplicateNameException;
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
-import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
-import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.framework.workspace.service.*;
 import com.webank.wedatasphere.dss.framework.workspace.util.CommonRoleEnum;
 import com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -97,6 +95,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
     @Autowired
     private DSSWorkspaceRoleService dssWorkspaceRoleService;
+
+    @Autowired
+    private DSSWorkspaceRoleCheckService roleCheckService;
 
     //创建工作空间
     @Override
@@ -188,6 +189,15 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
 
         LOGGER.info("success transfer workspace {} ", workspaceName);
         return dssWorkspace.getId();
+    }
+
+
+    @Override
+    public boolean checkUserIfSettingAdmin(String username){
+
+        int roleId= workspaceDBHelper.getRoleIdByName(CommonRoleEnum.ADMIN.getName());
+        // 判断用户是否可以设置为管理员(代理和非合作伙伴不能设置为管理员)
+        return roleCheckService.checkUserRolesOperation(username, Collections.singletonList(roleId));
     }
 
     //获取所有的工作空间

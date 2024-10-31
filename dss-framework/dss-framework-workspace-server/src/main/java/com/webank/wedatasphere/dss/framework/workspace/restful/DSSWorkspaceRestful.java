@@ -34,6 +34,7 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.request.CreateWorksp
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceHomePageVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceOverviewVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceVO;
+import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleCheckService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleService;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceService;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
@@ -86,6 +87,7 @@ public class DSSWorkspaceRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private HttpServletResponse httpServletResponse;
+
 
     @RequestMapping(path = "createWorkspace", method = RequestMethod.POST)
     public Message createWorkspace(@RequestBody CreateWorkspaceRequest createWorkspaceRequest) throws ErrorException {
@@ -163,6 +165,10 @@ public class DSSWorkspaceRestful {
                 }
 
                 try {
+                    // 判断用户是否可以设置为管理员
+                    if(!dssWorkspaceService.checkUserIfSettingAdmin(workspaceOwner)){
+                        return ItsmResponse.error().retDetail("无权限进行该操作");
+                    }
 
                     int workspaceId = dssWorkspaceService.createWorkspace(workspaceName, "", workspaceOwner, desc,
                             null, "DSS", "project");
@@ -196,6 +202,11 @@ public class DSSWorkspaceRestful {
 
                 try {
 
+                    // 判断用户是否可以设置为管理员
+                    if(!dssWorkspaceService.checkUserIfSettingAdmin(newOwner)){
+                        return ItsmResponse.error().retDetail("无权限进行该操作");
+                    }
+
                     int workspaceId = dssWorkspaceService.transferWorkspace(workspaceName,oldOwner,newOwner,desc);
 
                     AuditLogUtils.printLog(newOwner, workspaceId, workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
@@ -203,7 +214,7 @@ public class DSSWorkspaceRestful {
 
                 } catch (Exception e) {
                     LOGGER.error("{} workspace modify fail , (工作空间 申请失败)", workspaceName);
-                    LOGGER.error(e.getMessage());
+                    LOGGER.error(e.getMessage(), e);
                     return  ItsmResponse.error().retDetail(workspaceName + "工作空间信息修改失败!\n"+ e.getMessage());
                 }
 

@@ -115,4 +115,6 @@ public interface DSSWorkspaceService {
     PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize);
 
     int transferWorkspace(String workspaceName,String oldOwner,String newOwner,String desc) throws DSSErrorException;
+
+    boolean checkUserIfSettingAdmin(String username);
 }

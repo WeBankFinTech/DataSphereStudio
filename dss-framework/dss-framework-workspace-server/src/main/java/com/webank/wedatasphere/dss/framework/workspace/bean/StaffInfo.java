@@ -40,7 +40,8 @@ public class StaffInfo {
     private String status;
     @SerializedName(value = "PersonGroup")
     private String personGroup;
-
+    @SerializedName(value = "bgName")
+    private String bgName;
     public StaffInfo(){
     }
 
@@ -128,6 +129,14 @@ public class StaffInfo {
 
     public void setPersonGroup(String personGroup) {
         this.personGroup = personGroup;
+    }
+
+    public String getBgName() {
+        return bgName;
+    }
+
+    public void setBgName(String bgName) {
+        this.bgName = bgName;
     }
 
     @Override

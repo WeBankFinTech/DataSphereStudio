@@ -660,6 +660,13 @@ public class DSSFrameworkOrchestratorRestful {
 
         String username = SecurityFilter.getLoginUsername(httpServletRequest);
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+
+        // workspaceId参数如果和cookie中不一致,则抛错
+        if(modifyOrchestratorMetaRequest.getWorkspaceId() != null
+                && !String.valueOf(workspace.getWorkspaceId()).equals(String.valueOf(modifyOrchestratorMetaRequest.getWorkspaceId()))){
+            return Message.error(String.format("%s 工作流所在工作空间和cookie中不一致，请刷新页面后，再次编辑！",modifyOrchestratorMetaRequest.getOrchestratorName()));
+        }
+
         if (orchestratorFrameworkService.getOrchestratorCopyStatus(modifyOrchestratorMetaRequest.getOrchestratorId())) {
             return Message.error("当前工作流正在被复制，不允许编辑");
         }

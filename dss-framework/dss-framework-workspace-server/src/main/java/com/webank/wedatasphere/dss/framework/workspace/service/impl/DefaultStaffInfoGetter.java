@@ -17,10 +17,8 @@
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
 import com.google.common.collect.Lists;
-import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
-import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
+import com.webank.wedatasphere.dss.common.StaffInfo;
+import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 
 import java.util.Arrays;
 import java.util.List;

@@ -558,7 +558,20 @@ public class DSSFrameworkOrchestratorRestful {
         String userName = SecurityFilter.getLoginUsername(httpServletRequest);
 
         try {
-            checkWorkspace(orchestratorId, workspace);
+            OrchestratorVo orchestratorVoById = orchestratorService.getOrchestratorVoById(orchestratorId);
+            if (orchestratorVoById == null) {
+                DSSExceptionUtils.dealErrorException(80001, "编排不存在", DSSErrorException.class);
+            }
+            long projectId = orchestratorVoById.getDssOrchestratorInfo().getProjectId();
+            ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+            projectInfoRequest.setProjectId(projectId);
+            DSSProject dssProject = (DSSProject) DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender().ask(projectInfoRequest);
+            if (dssProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+                DSSExceptionUtils.dealErrorException(63335, "工作流所在工作空间和cookie中不一致，请刷新页面后，再次发布！", DSSErrorException.class);
+            }
+            if (dssProject.getAssociateGit() == null || !dssProject.getAssociateGit()) {
+                return Message.ok().data("status", OrchestratorRefConstant.FLOW_STATUS_NO_GIT);
+            }
         } catch (Exception e) {
             LOGGER.error("check failed, the reason is: ", e);
             return Message.error("提交失败，原因为：" + e.getMessage());

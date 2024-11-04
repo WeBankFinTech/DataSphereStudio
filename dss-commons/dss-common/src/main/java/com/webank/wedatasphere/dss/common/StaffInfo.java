@@ -14,7 +14,7 @@
  *
  */
 
-package com.webank.wedatasphere.dss.framework.workspace.bean;
+package com.webank.wedatasphere.dss.common;
 
 import com.google.gson.annotations.SerializedName;
 

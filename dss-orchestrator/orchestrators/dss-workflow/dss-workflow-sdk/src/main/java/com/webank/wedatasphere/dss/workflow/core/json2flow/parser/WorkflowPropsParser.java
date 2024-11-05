@@ -36,9 +36,6 @@ public class WorkflowPropsParser implements WorkflowParser {
         JsonArray proJsonArray = flowJson.getAsJsonArray("props");
         List<Map<String, Object>> props = DSSCommonUtils.COMMON_GSON.fromJson(proJsonArray, new TypeToken<List<Map<String, Object>>>() {
         }.getType());
-        if(props == null){
-            props = new ArrayList<>();
-        }
         JsonArray resourcesJsonArray = flowJson.getAsJsonArray("resources");
         List<Resource> resources = DSSCommonUtils.COMMON_GSON.fromJson(resourcesJsonArray, new TypeToken<List<Resource>>() {
         }.getType());

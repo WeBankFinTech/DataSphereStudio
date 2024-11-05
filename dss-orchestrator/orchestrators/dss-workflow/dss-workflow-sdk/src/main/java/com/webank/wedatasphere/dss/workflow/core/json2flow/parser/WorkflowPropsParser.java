@@ -23,6 +23,8 @@ import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
 import com.webank.wedatasphere.dss.workflow.core.entity.Workflow;
 import com.webank.wedatasphere.dss.workflow.core.entity.WorkflowImpl;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +36,9 @@ public class WorkflowPropsParser implements WorkflowParser {
         JsonArray proJsonArray = flowJson.getAsJsonArray("props");
         List<Map<String, Object>> props = DSSCommonUtils.COMMON_GSON.fromJson(proJsonArray, new TypeToken<List<Map<String, Object>>>() {
         }.getType());
+        if(props == null){
+            props = new ArrayList<>();
+        }
         JsonArray resourcesJsonArray = flowJson.getAsJsonArray("resources");
         List<Resource> resources = DSSCommonUtils.COMMON_GSON.fromJson(resourcesJsonArray, new TypeToken<List<Resource>>() {
         }.getType());

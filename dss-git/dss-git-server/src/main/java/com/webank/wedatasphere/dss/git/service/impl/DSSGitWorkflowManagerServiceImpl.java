@@ -187,8 +187,8 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                             typeList.add(".properties");
                             for (String type : typeList) {
                                 if (path.endsWith(type)) {
-                                    root.setAbsolutePath(path);
-                                    root.addChild(path);
+                                    root.setAbsolutePath(fullPath);
+                                    root.addChild(fullPath);
                                     break;
                                 }
                             }

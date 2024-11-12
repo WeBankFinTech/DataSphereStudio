@@ -148,12 +148,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             LOGGER.error("{} workspace createBy is {}, oldOwner is {}", workspaceName, dssWorkspace.getCreateBy(), oldOwner);
             throw new DSSFrameworkWarnException(30021, workspaceName + "工作空间的原Owner与" + oldOwner + "不一致！！");
         }
-
-        Long userId = dssWorkspaceUserMapper.getUserID(newOwner);
-
-        if (userId == null) {
-            throw new DSSFrameworkWarnException(30021, "DSS user list  not contains " + newOwner);
-        }
+        
         LOGGER.info("workspace name is {}, oldOwner is {}, newOwner is {}", workspaceName, oldOwner, newOwner);
         dssWorkspace.setCreateBy(newOwner);
         dssWorkspace.setLastUpdateTime(new Date());

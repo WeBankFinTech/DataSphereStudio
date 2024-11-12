@@ -141,12 +141,6 @@ public class DSSWorkspaceRestful {
                 return ItsmResponse.error().retDetail("工作空间信息不能为空！");
             }
 
-            String regex = "^[a-zA-Z][a-zA-Z0-9_]*$";
-            if(!workspaceName.matches(regex)){
-                LOGGER.error(workspaceName + " workspace not match right rule");
-                return ItsmResponse.error().retDetail(workspaceName + "命名不符合规则,命名空间名称必须以字母开头，且只支持字母、数字、下划线！！");
-            }
-
             workspaceName = workspaceName.trim();
             // 判断命名空间是否存在
             boolean exists = dssWorkspaceService.existWorkspaceName(workspaceName);
@@ -161,7 +155,7 @@ public class DSSWorkspaceRestful {
                 // 新建
                 if (exists) {
                     LOGGER.error(workspaceName + " workspace info is exists!");
-                    return ItsmResponse.error().retDetail(workspaceName + "工作空间信息已存在,不能再次创建！");
+                    return ItsmResponse.error().retDetail(workspaceName + "同名工作空间已存在,不能再次创建！");
                 }
 
                 try {
@@ -186,7 +180,7 @@ public class DSSWorkspaceRestful {
                 // 修改
                 if (!exists) {
                     LOGGER.error(workspaceName + " workspace info not exists, not modify!");
-                    return ItsmResponse.error().retDetail(workspaceName + "工作空间信息不存在,不能进行修改！");
+                    return ItsmResponse.error().retDetail(workspaceName + "工作空间名称不存在,不能进行修改！");
                 }
 
                 if(StrUtil.isEmpty(oldOwner) || StrUtil.isEmpty(newOwner)){

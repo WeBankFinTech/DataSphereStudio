@@ -170,23 +170,32 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         String substring = path.substring(path.lastIndexOf("/") + 1);
 
         String result;
-        if (meta) {
-            result = GitConstant.GIT_SERVER_META_PATH + File.separator + substring;
-        }else {
-            result = substring;
-        }
-
+        String metaPath = GitConstant.GIT_SERVER_META_PATH + File.separator + substring;
+        result = meta? metaPath : substring;
 
 
         try (Stream<Path> paths = Files.walk(currentDir)) {
             paths
-                    .filter(Files::isRegularFile) // 只过滤出文件
+                    .filter(Files::isRegularFile)// 只过滤出文件
                     .forEach(file -> {
                         // 获取相对路径
                         Path relativePath = currentDir.relativize(file);
                         String fullPath = result + File.separator + relativePath.toString();
-                        root.setAbsolutePath(fullPath);
-                        root.addChild(fullPath);
+                        if (!meta) {
+                            List<String> typeList = new ArrayList<>();
+                            typeList.addAll(GitConstant.GIT_SERVER_SEARCH_TYPE);
+                            typeList.add(".properties");
+                            for (String type : typeList) {
+                                if (path.endsWith(type)) {
+                                    root.setAbsolutePath(path);
+                                    root.addChild(path);
+                                    break;
+                                }
+                            }
+                        } else {
+                            root.setAbsolutePath(fullPath);
+                            root.addChild(fullPath);
+                        }
                     });
         } catch (IOException e) {
            logger.error("get failed, the reason is ", e);

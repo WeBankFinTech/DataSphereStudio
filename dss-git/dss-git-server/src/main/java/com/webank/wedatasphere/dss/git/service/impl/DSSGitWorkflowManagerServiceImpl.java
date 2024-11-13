@@ -186,7 +186,7 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
                             typeList.addAll(GitConstant.GIT_SERVER_SEARCH_TYPE);
                             typeList.add(".properties");
                             for (String type : typeList) {
-                                if (path.endsWith(type)) {
+                                if (fullPath.endsWith(type)) {
                                     root.setAbsolutePath(fullPath);
                                     root.addChild(fullPath);
                                     break;

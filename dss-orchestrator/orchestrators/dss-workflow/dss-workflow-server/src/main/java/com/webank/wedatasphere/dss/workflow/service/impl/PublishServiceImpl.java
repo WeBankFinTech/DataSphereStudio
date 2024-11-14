@@ -95,7 +95,9 @@ public class PublishServiceImpl implements PublishService {
         //2.进行提交
         DSSFlow dssFlow = null;
         try {
+            LOGGER.info("trace workflow publish,flowId:{}. start submit publish",workflowId);
             dssFlow = checkFlowBeforeSubmit(workflowId, convertUser, workspace);
+            LOGGER.info("trace workflow publish,flowId:{}. 发布前校验完成",workflowId);
             String schedulerAppConnName = workFlowParser.getValueWithKey(dssFlow.getFlowJson(), DSSWorkFlowConstant.SCHEDULER_APP_CONN_NAME);
             if (StringUtils.isBlank(schedulerAppConnName)) {
                 // 向下兼容老版本

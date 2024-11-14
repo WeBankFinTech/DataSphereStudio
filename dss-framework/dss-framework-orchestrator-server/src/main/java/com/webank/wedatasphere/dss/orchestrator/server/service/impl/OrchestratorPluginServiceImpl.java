@@ -234,6 +234,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         }
         job.setOrchestratorPublishJob(orchestratorPublishJob);
         orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
+        LOGGER.info("trace workflow publish,flowId:{},orchestratorId:{}. 开始提交convert任务",
+                requestConversionOrchestration.getOrcAppId(),publishedOrcIds);
         //submit it
         releaseThreadPool.submit(job);
 

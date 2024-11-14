@@ -358,6 +358,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
 
     private GitCommitResponse submitWorkflowToBML(Long taskId, OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) {
+        LOGGER.info("====begin to submit flow {}====", flowRequest.getFlowId());
         Long orchestratorId = flowRequest.getOrchestratorId();
         Long flowId = flowRequest.getFlowId();
         String projectName = flowRequest.getProjectName();
@@ -365,16 +366,19 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         //2. 获取编排信息
         DSSOrchestratorInfo orchestrator = orchestratorMapper.getOrchestrator(orchestratorId);
         //3. 获取上传工作流信息
+        LOGGER.info("=====begin to submit flow {} to BML====", flowRequest.getFlowId());
         BmlResource bmlResource = orchestratorMapper.getOrchestratorBmlVersion(orchestratorId);
         if (bmlResource == null || bmlResource.getResourceId() == null || bmlResource.getVersion() == null) {
             bmlResource = uploadWorkflowToGit(flowId, projectName, label, username, workspace, orchestrator);
             orchestratorMapper.updateOrchestratorBmlVersion(orchestratorId, bmlResource.getResourceId(), bmlResource.getVersion());
         }
+        LOGGER.info("====finish flowTOBML, begin to submit flow {} to Git====", flowRequest.getFlowId());
         //4. 调用git服务上传
         GitCommitResponse commit = push(orchestrator.getName(), bmlResource, username, workspace.getWorkspaceId(), projectName, flowRequest.getComment());
         if (commit == null) {
             LOGGER.info("change is empty");
         }
+        LOGGER.info("====finish flowTOGIT {}====", flowRequest.getFlowId());
         orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_SUCCESS, "");
         //5. 返回文件列表
         lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);

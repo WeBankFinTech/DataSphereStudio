@@ -287,6 +287,9 @@ public class DSSFrameworkProjectRestfulApi {
             LOGGER.error("project {} is not exists.", projectModifyRequest.getName());
             return Message.error(String.format("project %s is not exists.", projectModifyRequest.getName()));
         }
+        if (dbProject.getWorkspaceId() != workspace.getWorkspaceId()) {
+            return Message.error("工作流所在工作空间和cookie中不一致，请刷新页面后，再次修改！");
+        }
         String createUsername = dbProject.getUsername();
         //將创建人默认为发布权限和編輯权限
         if (!projectModifyRequest.getEditUsers().contains(createUsername)) {

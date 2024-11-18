@@ -434,7 +434,7 @@ export default {
           eventType?: any,
           arg?: {}
       }]
-     * @param {*} param0 
+     * @param {*} param0
      */
     initListenerCopilotEvent() {
       plugin.on('copilot_web_listener_inster', this.insterCode)
@@ -523,7 +523,7 @@ export default {
       }
     },
     'Workbench:removeTab'() {
-      // fix http://***REMOVED***/#/product/100199/bug/detail/199545
+      // fix http://xxx/#/product/100199/bug/detail/199545
       if (this.node) {
         this.resizePanel()
       }

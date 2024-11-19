@@ -114,6 +114,9 @@ export default {
       type: Function,
       required: true
     },
+    getClient: {
+      type: Function,
+    },
     getResultUrl: {
       type: String,
       defalut: `filesystem`
@@ -173,8 +176,17 @@ export default {
     }
   },
   mounted() {
+    window.addEventListener('resize', this.resultResize)
+    this.resultResize()
   },
   methods: {
+    resultResize: debounce(function () {
+      if (this.getClient) {
+        this.scriptViewState.bottomContentHeight = this.getClient();
+      } else {
+        this.scriptViewState.bottomContentHeight = this.$el.parentElement.clientHeight - this.$el.parentElement.firstChild.clientHeight
+      }
+    }, 500),
     onChangeColPage(v) {
       this.scriptViewState = {...this.scriptViewState, columnPageNow: v}
     },
@@ -282,7 +294,6 @@ export default {
         if (this.script.progress.current) {
           this.script.progress.current = 1;
         }
-        console.log('show result')
         this.showPanelTab('result');
       });
       this.execute.on('progress', ({ progress, progressInfo, waitingSize }) => {
@@ -497,7 +508,10 @@ export default {
       });
       return tmpLogs;
     }
-  }
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.resultResize)
+  },
 }
 </script>
 <style lang="scss" scoped>
@@ -534,20 +548,6 @@ export default {
           @include bg-color($light-base-color, $dark-base-color);
           width: calc(100% - 45px);
           overflow: hidden;
-          &.work-list-tab {
-            overflow-x: auto;
-            overflow-y: hidden;
-            &::-webkit-scrollbar {
-              width: 0;
-              height: 0;
-              background-color: transparent;
-            }
-            .list-group>span {
-              white-space: nowrap;
-              display: block;
-              height: 0;
-            }
-          }
           .workbench-tab-item {
             text-align: center;
             border-top: none;
@@ -612,9 +612,6 @@ export default {
       }
       .workbench-container {
         height: calc(100% - 36px);
-        &.node {
-            height: 100%;
-        }
         flex: 1;
         @keyframes ivu-progress-active {
             0% {

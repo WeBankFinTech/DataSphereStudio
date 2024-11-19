@@ -55,7 +55,7 @@ export default {
         },
         orchestratorId: {
             type: [String, Number],
-            required: true
+            default: null
         },
         visible: {
             type: Boolean,

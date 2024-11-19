@@ -415,6 +415,7 @@
         "HZXM": "合作项目",
         "projectName": "项目名称",
         "inputProjectName": "请输入项目名称",
+        "workspaceTarget": "工作空间",
         "gotoScriptis": "进入Scriptis",
         "createProject": "创建项目",
         "editorProject": "修改项目",

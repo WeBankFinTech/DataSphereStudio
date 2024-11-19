@@ -6,6 +6,15 @@
     :model="copyProjectData"
     :rules="copyFormValid">
     <FormItem
+      :label="$t('message.common.projectDetail.workspaceTarget')"
+      prop="targetWorkspaceId">
+      <Select v-model="copyProjectData.targetWorkspaceId"
+        filterable
+        clearable @on-change="handleChangeWorkspace">
+        <Option v-for="item in workspaceList" :key="item.id" :value="item.id">{{item.name}}</Option>
+      </Select>
+    </FormItem>
+    <FormItem
       :label="$t('message.common.projectDetail.projectName')"
       prop="name">
       <Input
@@ -48,6 +57,9 @@
 </template>
 <script>
 import api from '@dataspherestudio/shared/common/service/api';
+import {
+  GetWorkspaceList,
+} from '@dataspherestudio/shared/common/service/apiCommonMethod.js';
 export default {
   name: 'Copy',
   props: {
@@ -59,6 +71,8 @@ export default {
   data() {
     return {
       copyProjectData: {
+        workspaceId: this.$route.query.workspaceId - 0,
+        targetWorkspaceId: this.$route.query.workspaceId - 0,
         id: '',
         name: '',
         associateGit: 'false',
@@ -81,9 +95,14 @@ export default {
           { required: true, message: '请输入gitToken', trigger: "blur" },
         ]
       },
+      workspaceList: []
     };
   },
   created() {
+    GetWorkspaceList({}, "get")
+        .then((res) => {
+          this.workspaceList = res.workspaces;
+        })
   },
   watch: {
     'currentProjectData.id'(val) {
@@ -94,13 +113,18 @@ export default {
   },
   computed: {
     isIncludesDev() {
-      return this.currentProjectData.devProcessList && this.currentProjectData.devProcessList.includes('dev');
+      return this.currentProjectData.devProcessList && this.currentProjectData.devProcessList.includes('dev') && this.copyProjectData.targetWorkspaceId == this.$route.query.workspaceId;;
     }
   },
   methods: {
     handleAssociateGit() {
       this.copyProjectData.gitUser = '';
       this.copyProjectData.gitToken = '';
+    },
+    handleChangeWorkspace(v) {
+      if (v != this.$route.query.workspaceId) {
+        this.copyProjectData.associateGit = 'false'
+      }
     },
     ProjectCopy() {
       this.$refs.copyProjectForm.validate((valid) => {
@@ -110,6 +134,7 @@ export default {
             projectId: this.currentProjectData.id,
             copyProjectName: this.copyProjectData.name,
             workspaceId: +this.$route.query.workspaceId,
+            targetWorkspaceId: this.copyProjectData.targetWorkspaceId,
             associateGit: this.copyProjectData.associateGit === 'true',
           }
           if (param.associateGit) {

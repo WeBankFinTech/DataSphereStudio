@@ -10,7 +10,7 @@
         <virtual-list ref="fieldList" wtag="ul" :size="size" :remain="remain">
           <li
             v-for="(item, index) in rowlist"
-            :key="item.title + index"
+            :key="item.key"
             :data-item="index"
             class="filter-view-item"
           >
@@ -38,7 +38,7 @@
           </div>
           <div
             v-for="(it, index) in selectedList"
-            :key="it.title"
+            :key="it.key"
             class="filter-view-item"
           >
             <span class="filter-view-item-text" :title="it.title">{{
@@ -131,7 +131,7 @@ export default {
   },
   mounted() {
     this.filterSearch()
-    this.selected = this.headRows.filter(it => this.checked.some(item => item === it.title))
+    this.selected = this.headRows.filter(it => this.checked.some(item => item === it.key))
   },
   methods: {
     changePage() {
@@ -188,13 +188,13 @@ export default {
         }
       } else {
         this.selected = this.selected.filter((item) => {
-          return !this.rowlist.some((it) => it.title === item.title)
+          return !this.rowlist.some((it) => it.key === item.key)
         })
       }
     },
     changeHeads() {
       if (this.selectedList.length) {
-        this.$emit('on-check', this.selectedList.map(it => it.title))
+        this.$emit('on-check', this.selectedList.map(it => it.key))
       } else {
         this.$Message.warning(this.$t('message.common.checkone'))
       }
@@ -210,7 +210,7 @@ export default {
       this.selected = []
     },
     isSelect(item) {
-      const idx = this.selected.findIndex((it) => it.title === item.title)
+      const idx = this.selected.findIndex((it) => it.key === item.key)
       return idx > -1
     },
     removeItem(idx) {
@@ -229,7 +229,7 @@ export default {
   @include bg-color(#fff, $dark-menu-base-color);
   border: 1px solid #dcdee2;
   @include border-color($border-color-base, #525354);
-  border-left: none;
+  // border-left: none;
   padding: 10px;
   z-index: 2;
   .select-panel {

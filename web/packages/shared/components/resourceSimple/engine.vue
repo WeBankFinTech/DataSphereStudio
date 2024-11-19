@@ -29,11 +29,13 @@
             v-for="(subitem, index) in ideEngineList">
             <li
               class="engine-li"
+              :title="subitem.fixedEngineConn"
               :class="[{'active': subitem.isActive}, supportColor(subitem.engineStatus)]"
               v-if="shouldRender(subitem, item)"
               :key="index"
               @click="subitem.isActive = !subitem.isActive">
               <SvgIcon class='engine-icon job-content-icon' :class="supportIcon(subitem).className" :icon-class="supportIcon(subitem).icon" style='font-size: 30px;' :color="supportIcon(subitem).color === 'yellow' ? '#f4cf2a': supportIcon(subitem).color"/>
+              <span v-if="subitem.fixedEngineConn" class="fixlabel">{{ subitem.fixedEngineConn }}</span>
               <Icon
                 v-show="subitem.isActive"
                 class="engine-right"
@@ -69,11 +71,13 @@
             v-for="(subitem, index) in boardEngineList">
             <li
               class="engine-li"
+              :title="subitem.fixedEngineConn"
               :class="[{'active': subitem.isActive}, supportColor(subitem.engineStatus)]"
               v-if="shouldRender(subitem, item)"
               :key="index"
               @click="subitem.isActive = !subitem.isActive">
               <SvgIcon class='engine-icon job-content-icon' :class="supportIcon(subitem).className" :icon-class="supportIcon(subitem).icon" style='font-size: 30px;' :color="supportIcon(subitem).color === 'yellow' ? '#f4cf2a': supportIcon(subitem).color"/>
+              <span v-if="subitem.fixedEngineConn" class="fixlabel">{{ subitem.fixedEngineConn }}</span>
               <Icon
                 v-show="subitem.isActive"
                 class="engine-right"
@@ -109,11 +113,13 @@
             v-for="(subitem, index) in otherEngineList">
             <li
               class="engine-li"
+              :title="subitem.fixedEngineConn"
               :class="[{'active': subitem.isActive}, supportColor(subitem.engineStatus)]"
               v-if="shouldRender(subitem, item)"
               :key="index"
               @click="subitem.isActive = !subitem.isActive">
               <SvgIcon class='engine-icon job-content-icon' :class="supportIcon(subitem).className" :icon-class="supportIcon(subitem).icon" style='font-size: 30px;' :color="supportIcon(subitem).color === 'yellow' ? '#f4cf2a': supportIcon(subitem).color"/>
+              <span v-if="subitem.fixedEngineConn" class="fixlabel">{{ subitem.fixedEngineConn }}</span>
               <Icon
                 v-show="subitem.isActive"
                 class="engine-right"
@@ -287,6 +293,15 @@ export default {
           if (item.engineType === 'pipeline') {
             item.engineType = 'pipeLine';
           }
+          try {
+            item.labels =  typeof item.labels == 'string' ? JSON.parse(item.labels) : item.labels;
+            if (Array.isArray(item.labels)) {
+              const labelItem = item.labels.find(item => item.labelKey === 'fixedEngineConn')
+              item.fixedEngineConn = labelItem ? labelItem.stringValue || '' : ''; 
+            }
+          } catch (error) {
+            
+          }
           if (item.creator === 'IDE') {
             this.ideEngineList.push(item);
           } else if (item.creator === 'Visualis') {
@@ -392,3 +407,11 @@ export default {
   },
 };
 </script>
+<style scoped>
+li span.fixlabel {
+  padding-left: 5px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

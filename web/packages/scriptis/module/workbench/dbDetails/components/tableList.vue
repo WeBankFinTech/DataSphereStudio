@@ -11,6 +11,14 @@
         <Option value='3'>{{ $t('message.scripts.ordercreatetime') }}</Option>
         <Option value="4">{{ $t('message.scripts.orderaccesstime') }}</Option>
       </Select>
+      <Select v-model="usageHeat" clearable class="searce-item margin-right" placeholder="表使用热度">
+        <Option value="VISITED_IN_THREE_MONTHS">最近3个月访问</Option>
+        <Option value="VISITED_IN_SIX_MONTHS">最近6个月访问</Option>
+        <Option value="VISITED_IN_TWELVE_MONTHS">最近12个月访问</Option>
+        <Option value="NOT_VISITED_IN_THREE_MONTHS">最近3个月未访问</Option>
+        <Option value="NOT_VISITED_IN_SIX_MONTHS">最近6个月未访问</Option>
+        <Option value="NOT_VISITED_IN_TWELVE_MONTHS">最近12个月未访问</Option>
+      </Select>
       <Select v-model="isTableOwner" class="searce-item margin-right">
         <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
         <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
@@ -46,6 +54,14 @@
         <Option value="0">{{ $t('message.scripts.owntable') }}</Option>
         <Option value="1">{{ $t('message.scripts.tablecreateby') }}</Option>
       </Select> -->
+      <Select v-model="usageHeat" class="searce-item margin-right" placeholder="表使用热度">
+        <Option value="VISITED_IN_THREE_MONTHS">最近3个月访问</Option>
+        <Option value="VISITED_IN_SIX_MONTHS">最近6个月访问</Option>
+        <Option value="VISITED_IN_TWELVE_MONTHS">最近12个月访问</Option>
+        <Option value="NOT_VISITED_IN_THREE_MONTHS">最近3个月未访问</Option>
+        <Option value="NOT_VISITED_IN_SIX_MONTHS">最近6个月未访问</Option>
+        <Option value="NOT_VISITED_IN_TWELVE_MONTHS">最近12个月未访问</Option>
+      </Select>
       <Input v-model="tableOwner" class="searce-item margin-right" :placeholder="$t('message.scripts.tableDetails.QSRBSZ')">
       </Input>
       <Button class="margin-right" type="primary" @click="handleGetTables">{{ $t('message.scripts.Search') }}</Button>
@@ -328,6 +344,7 @@ export default {
       loading: false,
       tablesName: [],
       isTableOwner: '0',
+      usageHeat: '',
       selectAllConfirm: false,
       selectAll: false,
       showTransferForm: false,
@@ -404,6 +421,7 @@ export default {
         dbName: this.dbName,
         tableName: this.tableName,
         orderBy: this.orderBy,
+        usageHeat: this.usageHeat,
         pageSize: this.pageData.pageSize,
         currentPage: this.pageData.currentPage
       }
@@ -441,6 +459,7 @@ export default {
         dbName: this.dbName,
         orderBy: this.orderBy,
         tableName: this.tableName,
+        usageHeat: this.usageHeat,
       }
       if (this.isAdminMode) {
         params.tableOwner = this.tableOwner
@@ -471,6 +490,7 @@ export default {
         dbName: this.dbName,
         tableName: this.tableName,
         orderBy: this.orderBy,
+        usageHeat: this.usageHeat,
         exactTableName: false
       }
       if (this.isAdminMode) {

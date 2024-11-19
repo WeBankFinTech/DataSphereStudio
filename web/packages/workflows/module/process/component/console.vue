@@ -588,20 +588,6 @@ export default {
           @include bg-color($light-base-color, $dark-base-color);
           width: calc(100% - 45px);
           overflow: hidden;
-          &.work-list-tab {
-            overflow-x: auto;
-            overflow-y: hidden;
-            &::-webkit-scrollbar {
-              width: 0;
-              height: 0;
-              background-color: transparent;
-            }
-            .list-group>span {
-              white-space: nowrap;
-              display: block;
-              height: 0;
-            }
-          }
           .workbench-tab-item {
             text-align: center;
             border-top: none;

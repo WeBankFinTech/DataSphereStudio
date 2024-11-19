@@ -10,7 +10,7 @@ export function sendLLMRequest(data, position) {
     }
     return new Promise((resolve, reject) => {
         timer = setTimeout(() => {
-            return api.fetch(`/dss/copilot/codecompletion`,
+            return api.fetch(`/copilot/codecompletion`,
                 { ...data },
                 {
                     method: 'post',
@@ -52,7 +52,7 @@ export function sendLLMRequest(data, position) {
 
 
 export function sendAccteptRequest(data) {
-    api.fetch(`/dss/copilot/codeadoption`,
+    api.fetch(`/copilot/codeadoption`,
         { adopt: true, id:  data.dbId },
         {
             method: 'post',

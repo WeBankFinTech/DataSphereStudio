@@ -464,7 +464,13 @@ const showErrMsg = function (error) {
 }
 // 对于某些特殊接口，接口报错时不做展示
 const isShowErr = (url) => {
-  const noShowUrlList = ['/validator/code-precheck', '/dss/copilot/codecompletion', '/dss/copilot/codeadoption', 'dss/guide/solution/reportProblem'];
+  const noShowUrlList = [
+    '/dss/datapipe/datasource/getSchemaBaseInfo',
+    '/validator/code-precheck', 
+    '/copilot/codecompletion', 
+    '/copilot/codeadoption', 
+    '/copilot/user/isinwhitelist',
+    '/dss/guide/solution/reportProblem'];
   if (noShowUrlList.includes(url)) {
     return false;
   }

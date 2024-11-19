@@ -1,54 +1,69 @@
 <template>
   <div class="dataServicesContent">
-    <Row class="content-top">
-      <i-col span="10">
-        <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
-        <Form ref="searchFrom" class="search-from" :label-width="100" :disabled="isHistory" :model="conditionResult">
-          <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="item.maxLength && !isHistory ? [
-          {
-            required: item.required,
-            message: $t('message.apiServices.placeholder.emter'),
-            trigger: 'blur'
-          },{
-            max: item.maxLength, 
-            message: $t('message.apiServices.placeholder.limitStrLength', { maxLength: item.maxLength })
-          }]:[
-          {
-            required: item.required,
-            message: $t('message.apiServices.placeholder.emter'),
-            trigger: 'blur'
-          }
-          ]">
-            <div class="label-class" :title="item.displayName || item.name" slot="label">
-              {{ `${item.displayName || item.name}:` }}
-              <div :title="item.details || ''" class="details-tip"><Icon type="md-help-circle" /></div>
-            </div>
-            <Input class="input-bar" :class="{ verificationValue: tip[item.name] }" :disabled="isHistory" @on-blur="verificationValue(item)" :type="inputType(item.type)" v-model="item.defaultValue" :placeholder="item.description || $t('message.apiServices.placeholder.emter')">
-            </Input>
-          </FormItem>
-          <Button class="execute-button" type="primary" :loading="excuteLoading" :disabled="isHistory" @click="search">{{buttonText}}</Button>
-        </Form>
-      </i-col>
-      <i-col span="10">
-        <template v-if="workInfo && workInfo.comment">
-          <h3 class="title">{{$t('message.apiServices.query.comment')}}</h3>
-          <Alert class="alert-bar" show-icon>{{ workInfo.comment }}</Alert>
-        </template>
-      </i-col>
-    </Row>
-    <results
-      ref="currentConsole"
-      getResultUrl="dss/apiservice"
-      :isHistory="isHistory"
-      :historyList="historyList"
-      :work="workInfo"
-      :dispatch="dispatch"
-      :height="height"
-      @executRun="executRun"
-      @viewHistory="viewHistory"
-      @updateHistory="updateHistory"
-    >
-    </results>
+    <we-panel
+      ref="wePanelRef"
+      diretion="vertical">
+      <we-panel-item
+        ref="wePanelItemRef"
+        :index="1"
+        :height="panelHeight"
+        :min="minPanelHeight"
+        :max="maxPanelHeight"
+        @on-change="handlePanelChange">
+        <Row class="content-top" :style="{height: `${currentPanelHeight}px`}">
+          <i-col :span="workInfo && workInfo.comment ? 10 : 24">
+            <h3 class="title">{{$t('message.apiServices.apiTestInfo.params')}}</h3>
+            <Form ref="searchFrom" class="search-from" :label-width="100" :disabled="isHistory" :model="conditionResult">
+              <FormItem v-for="(item, index) in conditionResult.items" :prop="`items.${index}.defaultValue`" :key="item.id"  :rules="item.maxLength && !isHistory ? [
+              {
+                required: item.required,
+                message: $t('message.apiServices.placeholder.emter'),
+                trigger: 'blur'
+              },{
+                max: item.maxLength, 
+                message: $t('message.apiServices.placeholder.limitStrLength', { maxLength: item.maxLength })
+              }]:[
+              {
+                required: item.required,
+                message: $t('message.apiServices.placeholder.emter'),
+                trigger: 'blur'
+              }
+              ]">
+                <div class="label-class" :title="item.displayName || item.name" slot="label">
+                  {{ `${item.displayName || item.name}:` }}
+                  <div :title="item.details || ''" class="details-tip"><Icon type="md-help-circle" /></div>
+                </div>
+                <Input class="input-bar" :class="{ verificationValue: tip[item.name] }" :disabled="isHistory" @on-blur="verificationValue(item)" :type="inputType(item.type)" v-model="item.defaultValue" :placeholder="item.description || $t('message.apiServices.placeholder.emter')">
+                </Input>
+              </FormItem>
+              <Button class="execute-button" type="primary" :loading="excuteLoading" :disabled="isHistory" @click="search">{{buttonText}}</Button>
+            </Form>
+          </i-col>
+          <i-col span="10" v-if="workInfo && workInfo.comment">
+            <template>
+              <h3 class="title">{{$t('message.apiServices.query.comment')}}</h3>
+              <Alert class="alert-bar" show-icon>{{ workInfo.comment }}</Alert>
+            </template>
+          </i-col>
+        </Row>
+      </we-panel-item>
+      <we-panel-item :index="2">
+        <results
+          ref="currentConsole"
+          getResultUrl="dss/apiservice"
+          :isHistory="isHistory"
+          :historyList="historyList"
+          :work="workInfo"
+          :dispatch="dispatch"
+          :height="height"
+          :getClient="getClient"
+          @executRun="executRun"
+          @viewHistory="viewHistory"
+          @updateHistory="updateHistory"
+        >
+        </results>
+      </we-panel-item>
+    </we-panel>
     <Modal :title="$t('message.apiServices.apiTestInfo.params')" v-model="conditionShow" @on-ok="confirmSelect">
       <CheckboxGroup v-model="selectCondition">
         <Checkbox v-for="item in conditionList" :key="item.id" :label="item.id" :disabled="!!item.required">
@@ -61,6 +76,7 @@
 <script>
 import results from '@dataspherestudio/shared/components/consoleComponent';
 import api from '@dataspherestudio/shared/common/service/api';
+import {debounce} from 'lodash';
 export default {
   name: "ModuleApiServiceExecute",
   components: {
@@ -101,8 +117,12 @@ export default {
       conditionShow: false,
       excuteLoading: false,
       tip: {},
-      height: 500,
-      historyFormData: {}
+      height: 480,
+      historyFormData: {},
+      panelHeight: 250,
+      minPanelHeight: 250,
+      maxPanelHeight: 375,
+      currentPanelHeight: 250,
     }
   },
   computed: {
@@ -141,6 +161,19 @@ export default {
     this.$refs.currentConsole.killExecute(false);
   },
   methods: {
+    getClient() {
+      if (this.$refs.wePanelRef && this.$refs.wePanelItemRef) {
+        return this.$refs.wePanelRef.$el.clientHeight - this.$refs.wePanelItemRef.$el.clientHeight;
+      } else {
+        return 480;
+      }
+    },
+    handlePanelChange: debounce(function (data) {
+      if (data.height >= this.minPanelHeight && data.height <= this.maxPanelHeight) {
+        this.currentPanelHeight = data.height;
+        this.height = this.getClient();
+      }
+    }, 500),
     // 判断首页是否还有再执行的任务
     async initHomeTask() {
       if (this.workInfo.shouldRuning) {

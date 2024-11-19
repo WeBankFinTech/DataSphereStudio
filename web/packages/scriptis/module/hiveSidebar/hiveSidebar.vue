@@ -1,20 +1,37 @@
 <template>
   <div class="we-side-bar">
+    <div class="datasource-select">
+      数据源类型:
+      <Select
+        v-model="datasourceType"
+        style="width:110px"
+        size="small"
+        @on-change="handleDatasourceTypeChange"
+      >
+        <Option
+          v-for="(item, idx) in datasourceList"
+          :value="item.name"
+          :key="idx"
+        >{{ item.name }}</Option
+        >
+      </Select>
+    </div>
     <we-navbar
       ref="navbar"
-      placeholder="db.table"
+      :placeholder="datasourceType == 'Hive' ? 'db.table' : '搜索图空间'"
       :nav-list="navList"
       :add-title="$t('message.scripts.createdTitle')"
       @on-add="openAddTab"
-      @on-refresh="reflesh"
+      @on-refresh="refresh"
       @on-export="openExportDialog('out')"
       @on-change-table-owner="toggleTableOwner"
       @text-change="setSearchText"/>
     <Spin
-      v-if="!tableList.length"
+      v-if="isPending"
       size="large"
       fix/>
     <we-hive-list
+      v-if="datasourceType == 'Hive'"
       class="we-side-bar-content v-hivedb-list"
       :data="tableList"
       :node="node"
@@ -25,6 +42,14 @@
       @we-click="onClick"
       @we-contextmenu="onContextMenu"
       @we-dblclick="handledbclick"/>
+    <ng-list 
+      v-if="datasourceType == 'NebulaGraph'"
+      class="we-side-bar-content v-hivedb-list"
+      :list="filterNgList"
+      :loading="isPending"
+      @we-click="onClickNG"
+      @we-contextmenu="onContextMenuNG"
+      @we-dblclick="handledbclickNG"/>
     <we-menu
       ref="contextMenu"
       id="hive">
@@ -39,7 +64,7 @@
           {{ $t('message.scripts.database.contextMenu.db.dbinfo') }}
         </we-menu-item>
         <we-menu-item class="ctx-divider"/>
-        <we-menu-item @select="reflesh">
+        <we-menu-item @select="refresh">
           {{ $t('message.scripts.constants.refresh') }}
         </we-menu-item>
         <we-menu-item v-if="sortshow" @select="timeSort">
@@ -62,11 +87,35 @@
         <we-menu-item @select="pasteName">{{ $t('message.scripts.database.contextMenu.tb.pasteName') }}</we-menu-item>
         <we-menu-item @select="copyAllColumns">{{ $t('message.scripts.database.contextMenu.tb.copyAllColumns') }}</we-menu-item>
         <we-menu-item class="ctx-divider"/>
-        <we-menu-item @select="reflesh">{{ $t('message.scripts.constants.refresh') }}</we-menu-item>
+        <we-menu-item @select="refresh">{{ $t('message.scripts.constants.refresh') }}</we-menu-item>
       </template>
       <template v-if="currentType === 'field'">
         <we-menu-item @select="copyName">{{ $t('message.scripts.database.contextMenu.field.copyColumnsName') }}</we-menu-item>
         <we-menu-item @select="pasteName">{{ $t('message.scripts.database.contextMenu.field.pasteName') }}</we-menu-item>
+      </template>
+      <template v-if="currentType === 'ng_space'">
+        <we-menu-item @select="copyName">
+          复制图空间名
+        </we-menu-item>
+        <we-menu-item @select="pasteName">
+          复制图空间名并粘贴至脚本
+        </we-menu-item>
+        <we-menu-item @select="viewSpaceInfo">
+          查看图空间信息
+        </we-menu-item>
+        <we-menu-item class="ctx-divider"/>
+        <we-menu-item @select="refresh">
+          {{ $t('message.scripts.constants.refresh') }}
+        </we-menu-item>
+      </template>
+      <template v-if="currentType === 'ng_tag' || currentType === 'ng_edge'">
+        <we-menu-item @select="viewAttr">
+          查看属性
+        </we-menu-item>
+        <we-menu-item class="ctx-divider"/>
+        <we-menu-item @select="refresh">
+          {{ $t('message.scripts.constants.refresh') }}
+        </we-menu-item>
       </template>
     </we-menu>
     <we-hive-table-export
@@ -97,6 +146,7 @@ import api from '@dataspherestudio/shared/common/service/api';
 import util from '@dataspherestudio/shared/common/util';
 import deleteDialog from '@dataspherestudio/shared/components/deleteDialog';
 import weHiveList from './hiveList';
+import ngList from './hiveList/ngList.vue';
 import WeHiveTableExport from './hiveTableExport';
 import plugin from '@dataspherestudio/shared/common/util/plugin'
 export default {
@@ -105,8 +155,13 @@ export default {
     weHiveList,
     WeHiveTableExport,
     deleteDialog,
+    ngList
   },
   props: {
+    type: {
+      type: String,
+      default: 'Hive'
+    },
     model: String,
     node: Object,
   },
@@ -125,10 +180,15 @@ export default {
       isDeleting: false,
       sortshow: false,
       loadDataFn: () => {},
-      // 用于避免双击和单击的冲突
-      dblClickTimer: null,
       oReq: null,
-      csTableList: []
+      csTableList: [],
+      ngListData: [],
+      datasourceType: this.type || 'Hive',
+      datasourceList: [{
+        name: 'Hive'
+      },{
+        name: 'NebulaGraph'
+      }]
     };
   },
   computed: {
@@ -153,17 +213,32 @@ export default {
       return this.checkAllow(this.currentAcitved.dbName);
     },
     navList() {
-      if (this.node && Object.keys(this.node)) {
+      if (this.datasourceType === 'NebulaGraph') {
+        return  ['search', 'refresh']
+      } else if (this.node && Object.keys(this.node)) {
         return ['search', 'refresh']
       } else {
         return ['search', 'mytable', 'newFile', 'refresh', 'export']
       }
+    },
+    filterNgList() {
+      return this.searchText ? this.ngListData.filter(it => it.name.includes(this.searchText)) : this.ngListData
+    }
+  },
+  watch: {
+    type(v) {
+      this.datasourceType = v
+      this.handleDatasourceTypeChange()
     }
   },
   mounted() {
-    this.initData();
-    if (this.node && Object.keys(this.node)) {
-      this.getTables({name: 'default', csssign: true }, true);
+    if (this.datasourceType === 'Hive') {
+      this.initData();
+      if (this.node && Object.keys(this.node)) {
+        this.getTables({name: 'default', csssign: true }, true);
+      }
+    } else {
+      this.handleDatasourceTypeChange()
     }
   },
   beforeDestroy() {
@@ -396,16 +471,371 @@ export default {
     handledbclick({ item }) {
       this.currentAcitved = item;
       this.setHiveCache(this.currentAcitved);
-      clearTimeout(this.dblClickTimer);
       this.pasteName();
+    },
+    handleDatasourceTypeChange() {
+      this.searchText = '';
+      setTimeout(()=>{
+        if (this.datasourceType === 'Hive') {
+          if (this.tableList.length) {
+            this.tableList = [...this.tableList]
+          } else {
+            this.initData();
+            if (this.node && Object.keys(this.node)) {
+              this.getTables({name: 'default', csssign: true }, true);
+            }
+          }
+        } else {
+          if (this.ngListData.length) {
+            this.ngListData = [...this.ngListData]
+          } else {
+            this.getNGDataList()
+          }
+        }
+      }, 20)
+    },
+    getSpaceChildren(item, refresh) {
+      this.currentAcitved = item;
+      item.children = item.children || []
+      if (refresh) {
+        item.children = []
+      }
+      Promise.all([
+        this.getTagEdges(item, 'ng_tag'),
+        this.getTagEdges(item, 'ng_edge'),
+        this.getTagEdgeIndex(item, 'ng_tag_index'),
+        this.getTagEdgeIndex(item, 'ng_edge_index'),
+      ]).then(res => {
+        item.loaded = true;
+        this.isPending = false;
+        res.forEach(data => {
+          item.children = item.children.concat(data)
+        })
+        this.ngListData = [...this.ngListData]
+      }).catch((err) => {
+        this.isPending = false;
+      })
+    },
+    getNGDataList() {
+      const params = {
+        // spaceName
+      }
+      this.isPending = true;
+      api.fetch('/dss/datapipe/datasource/permission', params, 'get').then(res => {
+        this.isPending = false;
+        if (res && res.permissionVos) {
+          this.ngListData = res.permissionVos.map(it =>{
+            return {
+              name: it.spaceName,
+              dataType: 'ng_space',
+              typeIcon: 'nbworkspace',
+              _id: util.guid(),
+              children: [],
+              loaded: false,
+              isLeaf: false,
+              ...it
+            }
+          })
+        }
+      }).catch((err) => {
+        this.isPending = false;
+      })
+    },
+    getNgSpaceInfo({spaceName,clusterCode}) {
+      const params = {
+        spaceName, 
+        clusterCode
+      }
+      return api.fetch('/dss/datapipe/datasource/space', params, 'get').then(res => {
+        return res && res.dMSpaceInfoBeans ? res.dMSpaceInfoBeans[0] || null: null
+      }).catch(err => {
+        return null
+      })
+    },
+    getTagEdges(item, dataType) {
+      const {spaceName,clusterCode, children} = item
+      if (children && children.length) return Promise.resolve([])
+      const params = {
+        spaceName, 
+        clusterCode
+      }
+      const urls = {
+        'ng_tag': '/dss/datapipe/datasource/tags',
+        'ng_edge': '/dss/datapipe/datasource/edges'
+      }
+      if (urls[dataType]) {
+        return api.fetch(urls[dataType], params, 'get').then(res => {
+          let data = []
+          if (res) {
+            if (dataType === 'ng_tag') {
+              data = res.tags.map(it => {
+                return {
+                  name: it.tagName,
+                  dataType: 'ng_tag',
+                  typeIcon: 'ngtag',
+                  _id: util.guid(),
+                  loaded: false,
+                  isLeaf: false,
+                  children: [],
+                  ...it
+                }
+              })
+            }
+            if (dataType === 'ng_edge') {
+              data = res.edges.map(it =>{
+                return {
+                  name: it.edgeTypeName,
+                  dataType: 'ng_edge',
+                  typeIcon: 'nbline',
+                  _id: util.guid(),
+                  loaded: false,
+                  children: [],
+                  isLeaf: false,
+                  ...it
+                }
+              })
+            }
+          }
+          return data
+        })
+      }
+      return Promise.resolve([])
+    },
+    getTagEdgeIndex(item, dataType) {
+      if (dataType === true) {
+        item.children = []
+        dataType = item.dataType
+      }
+      if (dataType) {
+        const {spaceName, clusterCode, children} = item
+        if (children && children.length) return Promise.resolve([])
+        const params = {
+          spaceName, 
+          clusterCode
+        }
+        const urls = {
+          'ng_tag_index': '/dss/datapipe/datasource/tag-index',
+          'ng_edge_index': '/dss/datapipe/datasource/edge-index'
+        }
+        if (urls[dataType]) {
+          this.isPending = true;
+          return api.fetch(urls[dataType], params, 'get').then(res => {
+            this.isPending = false;
+            let data = []
+            if (res) {
+              if (dataType === 'ng_tag_index') {
+                data = res.indexVoes.map(it => {
+                  return {
+                    name: it.indexName,
+                    dataType: 'ng_tag_index',
+                    typeIcon: 'nbindex',
+                    _id: util.guid(),
+                    loaded: true,
+                    isLeaf: false,
+                    children: (it.fields || []).map((field, idx) => {
+                      return {
+                        name: field,
+                        dataType: 'ng_field',
+                        typeIcon: 'fi-field',
+                        _id: util.guid(),
+                        loaded: true,
+                        isLeaf: true,
+                        type: Array.isArray(it.types) ? it.types[idx] || '': ''
+                      }
+                    }),
+                    ...it
+                  }
+                })
+              }
+              if (dataType === 'ng_edge_index') {
+                data = res.indexVoes.map(it =>{
+                  return {
+                    name: it.indexName,
+                    typeIcon: 'nbindex',
+                    _id: util.guid(),
+                    loaded: true,
+                    isLeaf: false,
+                    children: (it.fields || []).map((field, idx) => {
+                      return {
+                        name: field,
+                        dataType: 'ng_field',
+                        typeIcon: 'fi-field',
+                        _id: util.guid(),
+                        loaded: true,
+                        isLeaf: true,
+                        type: Array.isArray(it.types) ? it.types[idx] || '': ''
+                      }
+                    }),
+                    ...it,
+                    type: it.dataType,
+                    dataType: 'ng_edge_index',
+                  }
+                })
+              }
+            }
+            return data
+          })
+        }
+        return Promise.resolve([])
+      }
+    },
+    updateTagEdgeIndex(item, data) {
+      const { spaceName, clusterCode, indexName } = item
+      const space = this.ngListData.find(it => {
+        return it.spaceName === spaceName && it.clusterCode === clusterCode
+      })
+      if (space) {
+        const newIndexData = data.find(it => {
+          return it.indexName === indexName
+        })
+        if (newIndexData) {
+          item.fields = data.fields
+          item.children = data.children
+          this.ngListData = [...this.ngListData]
+        }
+      }
+      
+    },
+    getEdgeProp(item, refresh) {
+      const {spaceName,clusterCode, children, edgeTypeName} = item
+      if (refresh) {
+        item.children = []
+      }
+      const params = {
+        spaceName, 
+        clusterCode,
+        edgeTypeName
+      }
+      this.currentAcitved = item;
+      if (children && children.length) return Promise.resolve([])
+      this.isPending = true;
+      api.fetch('/dss/datapipe/datasource/edge-prop', params, 'get').then(res => {
+        this.isPending = false;
+        let data = []
+        if (res && res.edgeProps) {
+          data = res.edgeProps.map(it => {
+            return {
+              name: it.propName,
+              typeIcon: 'fi-field',
+              _id: util.guid(),
+              isLeaf: true,
+              ...it,
+              dataType: 'ng_field',
+              type: it.dataType
+            }
+          })
+        }
+        item.loaded = true;
+        item.children = data;
+        this.ngListData = [...this.ngListData]
+        return data
+      }).catch(() => {
+        this.isPending = false;
+        return []
+      })
+    },
+    getTagProp(item, refresh) {
+      const {spaceName,clusterCode, children, tagName} = item
+      if (refresh) {
+        item.children = []
+      }
+      const params = {
+        spaceName, 
+        clusterCode,
+        tagName
+      }
+      this.currentAcitved = item;
+      if (children && children.length) return
+      this.isPending = true;
+      api.fetch('/dss/datapipe/datasource/tag-prop', params, 'get').then(res => {
+        this.isPending = false;
+        let data = []
+        if (res && res.tagProps) {
+          data = res.tagProps.map(it => {
+            return {
+              name: it.propName,
+              typeIcon: 'fi-field',
+              _id: util.guid(),
+              isLeaf: true,
+              ...it,
+              dataType: 'ng_field',
+              type: it.dataType
+            }
+          })
+        }
+        item.loaded = true;
+        item.children = data;
+        this.ngListData = [...this.ngListData];
+        return data
+      }).catch(() => {
+        this.isPending = false;
+        return []
+      })
+    },
+    onClickNG({item}) {
+      this.$refs.contextMenu.close();
+      switch (item.dataType) {
+        case 'ng_space':
+          this.getSpaceChildren(item);
+          break;
+        case 'ng_tag':
+          this.getTagProp(item);
+          break;
+        case 'ng_edge':
+          this.getEdgeProp(item);
+          break;
+      }
+    },
+    handledbclickNG({ item }) {
+      this.currentAcitved = item;
+      this.pasteName();
+    },
+    onContextMenuNG({ ev, item }) {
+      this.currentType = item.dataType;
+      this.currentAcitved = item;
+      this.$refs.contextMenu.open(ev);
+    },
+    async viewSpaceInfo() {
+      const filename = `图空间信息(${this.currentAcitved.name})`;
+      const md5Path = util.md5(filename);
+      const spaceInfo = await this.getNgSpaceInfo(this.currentAcitved);
+      if (!spaceInfo) return
+      this.dispatch('Workbench:add', {
+        id: md5Path,
+        filename,
+        filepath: '',
+        data: spaceInfo,
+        type: 'ngSpaceInfo',
+        currentNodeKey: this.node ? this.node.key : ''
+      }, () => {
+      });
+    },
+    viewAttr() {
+      const titleMap = {
+        'ng_edge': '边类型',
+        'ng_tag': '标签',
+        'ng_tag_index': '标签索引',
+        'ng_tag_index': '边索引',
+      }
+      const filename = `${titleMap[this.currentAcitved.dataType]}信息(${this.currentAcitved.name})`;
+      const md5Path = util.md5(filename);
+      this.dispatch('Workbench:add', {
+        id: md5Path,
+        filename,
+        filepath: '',
+        data: this.currentAcitved,
+        type: 'tagEdgeInfo',
+        currentNodeKey: this.node ? this.node.key : ''
+      }, () => {
+      });
     },
     copyName() {
       let copyLable = '';
       switch (this.currentAcitved.dataType) {
         case 'tb':
-          if(this.currentAcitved.contextKey){
+          if (this.currentAcitved.contextKey) {
             copyLable = this.currentAcitved.name
-          }else{
+          } else {
             copyLable = `${this.currentAcitved.dbName}.${this.currentAcitved.name}`;
           }
           break;
@@ -415,35 +845,52 @@ export default {
       }
       util.executeCopy(copyLable);
     },
-    async reflesh() {
+    async refresh() {
       if (this.isPending) return this.$Message.warning(this.$t('message.scripts.constants.warning.api'));
-      if (this.currentAcitved) {
-        this.currentAcitved.children = [];
-        if (this.currentAcitved.dataType === 'tb') {
-          // 刷新时候清空下size和partitions，否则刷新后再打开表结构数据就会异常
-          this.$set(this.currentAcitved, 'size', null);
-          this.$set(this.currentAcitved, 'partitions', []);
-          await this.getTableColumns(this.currentAcitved);
-        } else if (this.currentAcitved.dataType === 'cs') { // 点击上游暂存表后刷新
-          this.getTables({name: 'default', csssign: true }, true);
+      if (this.datasourceType === 'NebulaGraph') {
+        if (this.currentAcitved) {
+          if (this.currentAcitved.dataType === 'ng_space') {
+            this.getSpaceChildren(this.currentAcitved, true)
+          } else if(this.currentAcitved.dataType === 'ng_tag'){
+            this.getTagProp(this.currentAcitved, true)
+          } else if(this.currentAcitved.dataType === 'ng_edge') {
+            this.getEdgeProp(this.currentAcitved, true)
+          } else if(this.currentAcitved.dataType === 'ng_tag_index' || this.currentAcitved.dataType === 'ng_edge_index') {
+            const list = await this.getTagEdgeIndex(this.currentAcitved, true)
+            this.updateTagEdgeIndex(this.currentAcitved, list)
+          } 
         } else {
-          await this.getTables(this.currentAcitved);
-          this.$refs.navbar ? this.$refs.navbar.searchText = '' : '';
+          this.getNGDataList();
         }
-        this.cacheHiveTree();
       } else {
-        const cur = storage.get('activedHiveInfo');
-        if (cur && cur.type === 'db') {
-          this.currentAcitved = this.tableList.find((item) => item.name === cur.name);
-          await this.getTables(this.currentAcitved);
+        if (this.currentAcitved) {
+          this.currentAcitved.children = [];
+          if (this.currentAcitved.dataType === 'tb') {
+            // 刷新时候清空下size和partitions，否则刷新后再打开表结构数据就会异常
+            this.$set(this.currentAcitved, 'size', null);
+            this.$set(this.currentAcitved, 'partitions', []);
+            await this.getTableColumns(this.currentAcitved);
+          } else if (this.currentAcitved.dataType === 'cs') { // 点击上游暂存表后刷新
+            this.getTables({name: 'default', csssign: true }, true);
+          } else {
+            await this.getTables(this.currentAcitved);
+            this.$refs.navbar ? this.$refs.navbar.searchText = '' : '';
+          }
+          this.cacheHiveTree();
         } else {
-          this.$Message.warning(this.$t('message.scripts.database.notPosition'));
+          const cur = storage.get('activedHiveInfo');
+          if (cur && cur.type === 'db') {
+            this.currentAcitved = this.tableList.find((item) => item.name === cur.name);
+            await this.getTables(this.currentAcitved);
+          } else {
+            this.$Message.warning(this.$t('message.scripts.database.notPosition'));
+          }
         }
       }
     },
     pasteName() {
       let value = this.currentAcitved.dataType === 'tb' ? `${this.currentAcitved.dbName}.${this.currentAcitved.name}` : this.currentAcitved.name;
-      if(this.currentAcitved.contextKey){
+      if (this.currentAcitved.contextKey) {
         value = this.currentAcitved.name
       }
       this.dispatch('Workbench:pasteInEditor', value, this.node);
@@ -451,14 +898,14 @@ export default {
     timeSort(){
       let item = this.currentAcitved.children.slice(0);
       this.currentAcitved.sort = !this.currentAcitved.sort;
-      if(item.length && this.currentAcitved.sort){
+      if (item.length && this.currentAcitved.sort) {
         item.sort((a,b)=>{
           return b.createdAt - a.createdAt
         })
         this.currentAcitved.children = item
         this.tableList = [...this.tableList]
-      }else{
-        this.reflesh()
+      } else {
+        this.refresh()
       }
     },
     queryTable(name) {
@@ -604,7 +1051,7 @@ export default {
             // 由于删除表成功之后，currentAcitved指向为当前已被删除的表，所以要改为刷新库
             this.currentAcitved = find(this.tableList, (db) => db.name === (this.currentAcitved.dbName || this.currentAcitved.name));
             this.setHiveCache(this.currentAcitved);
-            this.reflesh();
+            this.refresh();
           });
         });
       });
@@ -735,7 +1182,7 @@ export default {
       // 由于删除表成功之后，currentAcitved指向为当前已被删除的表，所以要改为刷新库
       this.currentAcitved = find(this.tableList, (db) => db.name === this.currentAcitved.dbName || this.currentAcitved.name);
       this.setHiveCache(this.currentAcitved);
-      this.reflesh();
+      this.refresh();
     },
     getFileTree(type) {
       const method = type === 'share' ? 'WorkSidebar:showTree' : 'HdfsSidebar:showTree';

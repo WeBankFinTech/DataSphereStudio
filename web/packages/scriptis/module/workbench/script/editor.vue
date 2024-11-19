@@ -1,5 +1,5 @@
 <template>
-  <div class="editor">
+  <div class="editor" ref="editorId">
     <div style="height: 32px;">
       <div class="workbench-body-navbar">
         <div
@@ -116,6 +116,7 @@
           @on-operator="heartBeat"
           @on-run="run"
           @on-save="save"
+          @open-db-table-suggest="openDbTableSuggest"
           @is-parse-success="changeParseSuccess"/>
       </we-panel-item>
       <we-panel-item
@@ -124,7 +125,7 @@
         class="setting-panel"
         v-show="showConfig"
         :min="showConfig ? 100 : 8"
-        :width="showConfig ? 200 : 8"
+        :width="showConfig ? showConfigWidth : 8"
       >
         <setting
           ref="setting"
@@ -177,6 +178,7 @@ export default {
     return {
       curTipKey: '',
       showConfig: false,
+      showConfigWidth:8,
       loading: false,
       isParseSuccess: true,
       dataSetValue: this.work.dataSetValue,
@@ -234,54 +236,112 @@ export default {
         this.$refs.editor.editor.revealLine(linenum);
         storage.remove("revealline")
       }
+      this.handleConfigTip()
     },50)
-    this.handleConfigTip()
+    this.handleResize = debounce(this.handleResize, 200);
+    window.addEventListener('resize', this.handleResize);
   },
   methods: {
+    handleResize() {
+      this.showConfigWidth = this.getMaxKeyOrValueLength(this.script.params.variable)
+    },
+
+  getTextWidth(str = '') {
+      if (!window.textWidthCache) {
+        window.textWidthCache = document.createElement('span');
+        window.textWidthCache.style.position = 'absolute';
+        window.textWidthCache.style.visibility = 'hidden';
+        window.textWidthCache.style.whiteSpace = 'nowrap'; // 防止换行影响宽度
+        document.body.appendChild(window.textWidthCache);
+      }
+      const dom = window.textWidthCache;
+      dom.textContent = str;
+      const width = dom.offsetWidth;
+      return width;
+    },
+    getMaxKeyOrValueLength(arr) {
+      let maxLength = 0;
+      arr.forEach(obj => {
+        Object.keys(obj).forEach(key => {
+          const keyLength = this.getTextWidth(key);
+          const valueLength = this.getTextWidth(obj[key]);
+          maxLength = Math.max(maxLength, keyLength, valueLength);
+        });
+      });
+      const clientWidth = this.$refs.editorId.clientWidth || 1681;
+      if (maxLength <= 40) {
+        return Math.min(200, clientWidth * 0.8)
+      }
+      return Math.min(60 + maxLength*3.5, clientWidth * 0.8)
+// 6    });
+    },
+    openDbTableSuggest() {
+      let len = storage.get('all-db-tables-length', 'local')
+      if (len && len > 30000) {
+        this.$Notice.close('show-db-table-many-tip')
+        this.$Notice.warning({
+          duration: 0,
+          name: 'show-db-table-many-tip',
+          title: this.$t('message.scripts.propmpt'),
+          desc: this.$t('message.scripts.largedatatip')
+        })
+      }
+    },
     handleConfigTip () {
       if (this.script.params && this.script.params.variable && this.script.params.variable.length > 0) {
         let curName = this.script.fileName
         if (this.script.params.configuration && this.script.params.configuration.runtime && this.script.params.configuration.runtime.nodeName) {
           curName = this.script.params.configuration.runtime.nodeName
         }
+        // console.log('this.script.params.variable', this.script.params.variable)
+        this.showConfigWidth = this.getMaxKeyOrValueLength(this.script.params.variable)
         this.showConfig = true;
-        this.curTipKey =  'showConfigTip_' + curName + '_'+ this.script.id
-        let curTipData = null
-        if(sessionStorage.getItem(this.curTipKey)) {
-            curTipData = JSON.parse(sessionStorage.getItem(this.curTipKey))
-        }
-        let curTipNames = [];
-        if(sessionStorage.getItem('showConfigName')) {
-            curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
-        }
-        // 当前展示提示数等于3条后，不再追加提示
-        // 初次打开，缓存数据为空，提示
-        // 没有关闭提示，关闭脚本后再次打开，不重复提示
-        // 关闭提示，再次打开，不提示
-        if (curTipNames.length <=2 && (curTipData === null ||  (curTipData.curShowStatus !== '1' && curTipData.showable === '1'))) {
-          const tipData = {
-            curShowStatus: '1',  // 1：当前正在展示，0：当前未展示
-            showable: '1', // 1：可以展示，0：不能展示
-          }
-          sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
-          curTipNames.push(this.curTipKey);
-          sessionStorage.setItem('showConfigName', JSON.stringify(curTipNames));
-          this.$Notice.open({
-              desc: `${curName}脚本存在已配置的自定义参数，请知悉`,
-              duration: 0,
-              name: this.curTipKey,
-              onClose: (v) => {
-                tipData.curShowStatus = '0';
-                tipData.showable = '0';
-                sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
-                curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
-                const newArray = curTipNames.filter(item => item !== this.curTipKey);
-                sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
-              }
-          });
-        }
       }
     },
+    // handleConfigTip () {
+    //   if (this.script.params && this.script.params.variable && this.script.params.variable.length > 0) {
+    //     let curName = this.script.fileName
+    //     if (this.script.params.configuration && this.script.params.configuration.runtime && this.script.params.configuration.runtime.nodeName) {
+    //       curName = this.script.params.configuration.runtime.nodeName
+    //     }
+    //     this.showConfig = true;
+    //     this.curTipKey =  'showConfigTip_' + curName + '_'+ this.script.id
+    //     let curTipData = null
+    //     if(sessionStorage.getItem(this.curTipKey)) {
+    //         curTipData = JSON.parse(sessionStorage.getItem(this.curTipKey))
+    //     }
+    //     let curTipNames = [];
+    //     if(sessionStorage.getItem('showConfigName')) {
+    //         curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+    //     }
+    //     // 当前展示提示数等于3条后，不再追加提示
+    //     // 初次打开，缓存数据为空，提示
+    //     // 没有关闭提示，关闭脚本后再次打开，不重复提示
+    //     // 关闭提示，再次打开，不提示
+    //     if (curTipNames.length <=2 && (curTipData === null ||  (curTipData.curShowStatus !== '1' && curTipData.showable === '1'))) {
+    //       const tipData = {
+    //         curShowStatus: '1',  // 1：当前正在展示，0：当前未展示
+    //         showable: '1', // 1：可以展示，0：不能展示
+    //       }
+    //       sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
+    //       curTipNames.push(this.curTipKey);
+    //       sessionStorage.setItem('showConfigName', JSON.stringify(curTipNames));
+    //       this.$Notice.open({
+    //           desc: `${curName}脚本存在已配置的自定义参数，请知悉`,
+    //           duration: 0,
+    //           name: this.curTipKey,
+    //           onClose: (v) => {
+    //             tipData.curShowStatus = '0';
+    //             tipData.showable = '0';
+    //             sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
+    //             curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+    //             const newArray = curTipNames.filter(item => item !== this.curTipKey);
+    //             sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
+    //           }
+    //       });
+    //     }
+    //   }
+    // },
     dataSetSelect(v) {
       // 模拟未保存状态 旧数据源为初始化时的或保存后的数据源，新数据源双向绑定的dataSetValue
       // 当新旧数据源不同时，用scriptUnsave暂存此时保存状态（可能为true或false），然后切换保存状态为未保存
@@ -372,6 +432,7 @@ export default {
       }
     }, 500),
     config() {
+      this.showConfigWidth = this.getMaxKeyOrValueLength(this.script.params.variable)
       this.showConfig = !this.showConfig;
     },
     settingClose() {
@@ -419,30 +480,20 @@ export default {
     }
   },
   beforeDestroy: function() {
-    const curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
-    const curTipData = JSON.parse(sessionStorage.getItem(this.curTipKey))
-    if(this.$Notice && this.curTipKey && curTipData && curTipData['curShowStatus'] === '1') {
-        this.$Notice.close(this.curTipKey);
-        const tipData = {
-          curShowStatus: '0',
-          showable: '1',
-        }
-        sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
-        const newArray = curTipNames.filter(item => item !== this.curTipKey);
-        sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
-    }
-    // if(this.$Notice && curTipNames && curTipNames.length > 0) {
-    //   curTipNames.forEach(name => {
-    //     this.$Notice.close(name);
+    // const curTipNames = JSON.parse(sessionStorage.getItem('showConfigName'))
+    // const curTipData = JSON.parse(sessionStorage.getItem(this.curTipKey))
+    // if(this.$Notice && this.curTipKey && curTipData && curTipData['curShowStatus'] === '1') {
+    //     this.$Notice.close(this.curTipKey);
     //     const tipData = {
     //       curShowStatus: '0',
     //       showable: '1',
     //     }
-    //     sessionStorage.setItem(name, JSON.stringify(tipData));
-    //   });
-    //     sessionStorage.setItem('showConfigName', JSON.stringify([]));
+    //     sessionStorage.setItem(this.curTipKey, JSON.stringify(tipData));
+    //     const newArray = curTipNames.filter(item => item !== this.curTipKey);
+    //     sessionStorage.setItem('showConfigName', JSON.stringify(newArray));
     // }
     elementResizeEvent.unbind(this.$el);
+    window.removeEventListener('resize', this.handleResize)
   },
 };
 </script>

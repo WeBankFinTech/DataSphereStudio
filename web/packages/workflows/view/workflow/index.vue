@@ -357,8 +357,10 @@ export default {
     tabList(val) {
       this.updateTabList(val)
     },
-    "$route.query"(v) {
-      this.tabList = [];
+    "$route.query"(v, oldVal) {
+      if (v.projectID != oldVal.projectID) {
+        this.tabList = []
+      }
       this.getAreaMap();
       this.getProjectData(()=>{
         this.updateBread();
@@ -462,6 +464,7 @@ export default {
     createProject() {
       this.actionType = "add";
       this.currentProjectData = {
+        devProcessPermission: this.currentProjectData.devProcessPermission,
         name: "",
         description: "",
         business: "",
@@ -503,7 +506,7 @@ export default {
     getSelectDevProcess() {
       this.selectDevprocess = this.devProcessBase
         ? this.devProcessBase.filter((item) =>
-          this.currentProjectData.devProcessList.includes(item.dicValue)
+          (this.currentProjectData.devProcessPermission || []).includes(item.dicValue)
         )
         : [];
       // 切换项目，若项目没有对应模式，自动切换第一个
@@ -651,16 +654,19 @@ export default {
             tiemstamp: new Date().getTime()
           }
           if (node) {
-             storage.set('revealline', linenum);
              storage.set('openflownode', `${node.orchestratorId}_flowidname_${item.nodeName}`);
+             storage.set('revealline', linenum);
              if (node.orchestratorId == this.$route.query.flowId || node.orchestratorId == this.current.id || this.tabList.length < 1) {
               this.showCodeDrawer = false;
+              if (this.tabList.length < 1) {
+                this.$router.push({
+                  //name: "Workflow",
+                  query,
+                });
+              }
               // 存储flow
               storage.set("clickFlowInTree", node);
-              this.$router.push({
-                //name: "Workflow",
-                query,
-              });
+              eventbus.emit('workflow.opennode.by.name', { flowId: node.orchestratorId, nodeName: item.nodeName})
               this.updateBread();
             } else {
               window.open(`/#/workflow?${qs.stringify(query)}`, '_blank');
@@ -1101,10 +1107,12 @@ export default {
     ProjectConfirm(projectData, callback) {
       const project = projectData;
       setVirtualRoles(project, this.getUserName());
-      this.currentProjectData = {
-        ...projectData,
-        canWrite: project.canWrite(),
-      };
+      // 会触发projectForm里的projectData的watch，有错误处理
+      // this.currentProjectData = {
+      //   ...projectData,
+      //   canWrite: project.canWrite(),
+      // };
+
       this.getSelectDevProcess();
       this.getSelectOrchestratorList();
       projectData.workspaceId = +this.$route.query.workspaceId;
@@ -1180,6 +1188,16 @@ export default {
                 name: projectData.name,
               })
             );
+            // 遍历临时对象，逐个字段地更新 currentProjectData
+            const tempData = {
+              ...projectData,
+              canWrite: project.canWrite(),
+            };
+            for (const key in tempData) {
+              if (tempData.hasOwnProperty(key)) {
+                this.currentProjectData[key] = tempData[key];
+              }
+            }
           })
           .catch(() => {
             typeof callback == "function" && callback();
@@ -1841,7 +1859,6 @@ export default {
   beforeDestroy() {
     clearTimeout(this.checkStatusTimer);
     storage.remove('revealline');
-    storage.remove('openflownode');
     window.removeEventListener('resize', this.resize);
   }
 };

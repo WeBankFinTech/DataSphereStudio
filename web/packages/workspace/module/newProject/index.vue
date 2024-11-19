@@ -692,7 +692,7 @@ export default {
         if (!id || id === item.id) {
           item.dwsProjectList = item.dwsProjectList.sort((a, b) => {
             if (name === 'updateTime') {
-              return b[name] - a[name]
+              return new Date(b[name]) - new Date(a[name])
             } else {
               return this.charCompare(a[name], b[name])
             }

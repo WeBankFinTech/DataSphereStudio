@@ -73,7 +73,7 @@
                   <i class="queue-manager-status-label"></i>
                 </span><span
                   class="queue-manager-status-idle"
-                  :style="{'width': formatToPercent(item.busyPercentage + item.idlePercentage)}"
+                  :style="{'width': formatToPercent(Math.min(item.busyPercentage + item.idlePercentage, 1))}"
                   :title="formatToPercent(item.idlePercentage)">
                   <i class="queue-manager-status-label"></i>
                 </span>

@@ -67,7 +67,7 @@ export default {
       return this.history.slice(this.page.start, this.page.end).map(item =>{
         return {
           ...item,
-          runningTime: new Date().getTime() - item.createDate
+          runningTime: EXECUTE_COMPLETE_TYPE.indexOf(item.status) !== -1 ? item.runningTime || 0 : new Date().getTime() - item.createDate
         }
       });
     },

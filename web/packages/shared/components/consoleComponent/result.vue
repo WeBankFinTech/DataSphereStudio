@@ -91,7 +91,7 @@
             :href="`/#/results?workspaceId=${
               $route.query.workspaceId
             }&resultPath=${resultPath}&fileName=${
-              script.fileName || script.ti
+              script.fileName || script.title
             }&from=${$route.name}&taskID=${taskID}`"
             target="_blank"
           >{{ $t('message.common.viewSet') }}</a>
@@ -259,6 +259,10 @@ export default {
         path: '',
         cache: {},
       },
+      currentSesitiveResult: {
+        idx: '0',
+        total: 0
+      }
     }
   },
   computed: {
@@ -285,7 +289,7 @@ export default {
               this.work.data.history &&
               this.work.data.history[0] &&
               this.work.data.history[0].taskID)
-        : ''
+        : this.$route.query.taskId || ''
     },
   },
   watch: {
@@ -364,7 +368,7 @@ export default {
             let newItem = {}
             row.forEach((item, index) => {
               Object.assign(newItem, {
-                [this.result.headRows[index].columnName]: item,
+                [`${this.result.headRows[index].columnName}_${index}`]: item,
               })
             })
             return newItem
@@ -504,6 +508,10 @@ export default {
      * PICTURE_TYPE: '4'
      * HTML_TYPE: '5'
      */
+      if (this.script.result && this.script.result.type === 'RES_EMPTY') { // 单独结果集页面传路径过来
+        this.getResultData(1)
+        return
+      }
       let result = this.result
       if (this.script.resultList && this.script.resultSet !== undefined) {
         result = this.script.resultList[this.script.resultSet].result
@@ -511,13 +519,9 @@ export default {
       if (!result && this.script.result) {
         result = this.script.result
       }
-      if (result.type !== '2') {
-        this.result = result
-        return
-      }
       if ('dss/apiservice' == this.getResultUrl) {
         // 数据服务
-        let columnPageNow = type == 'changeColumnPage' ? this.scriptViewState.columnPageNow : result.columnPageNow || 1;
+        let columnPageNow = type == 'changeColumnPage' ? this.scriptViewState.columnPageNow : 1;
         this.getResultData(columnPageNow)
       } else if (this.script.nodeId) {
         // 工作流
@@ -543,7 +547,7 @@ export default {
             if (resultList) {
               this.script.resultList = dropRight(toArray(resultList), 3);
               this.script.resultSet = resultList.resultSet;
-              let result = this.script.resultList[this.script.resultSet] 
+              let result = this.script.resultList[this.script.resultSet]; 
               let columnPageNow = type == 'changeColumnPage' ? this.scriptViewState.columnPageNow : result && result.result ? result.result.columnPageNow : 1;
               this.getResultData(columnPageNow)
             } else {
@@ -552,10 +556,175 @@ export default {
           }
         });
       }
-      
+    },
+    checkResult(resultPath) {
+      let taskId = this.taskID
+      if (!taskId) { // fix dpms 523552
+        const dirs = resultPath.split('/')
+        taskId = dirs[dirs.length - 2]
+      }
+      const paths = this.script.resultList.map(item => item.path);
+      // 已扣减过流量的直接通过
+      let hasDeducted = storage.get('senitive_result_'+ this.baseinfo.username) || [];
+      hasDeducted = hasDeducted.includes(this.taskID);
+      const checkType = !['hive','hql'].includes(this.script.scriptType)
+      const notScriptis = !['results', 'Home'].includes(this.$route.name)
+      if (checkType || hasDeducted || notScriptis) {
+        return Promise.resolve(false);
+      }
+      // 检查结果集是否需要扣减用量
+      const params = {
+        taskId: this.taskID,
+        scriptType: this.script.scriptType,
+        paths: paths
+      };
+      return new Promise((resolve, reject) => {
+        api.fetch('/dss/datapipe/dataset/checkDatasetSensitive', params, 'post').then(res => {
+          const result = res.result || []
+          const sensitiveResult = []
+          let flag = false
+          result.forEach((item, idx) => {
+            if (item.resultPath == resultPath && !item.hasSensitiveData) { // 当前查看的结果集不存在敏感数据
+              flag = true
+            }
+            if (item.hasSensitiveData) {
+              sensitiveResult.push({
+                ...item,
+                nameIndex: idx + 1
+              })
+            }
+          })
+          if (flag) {
+            return resolve(false);
+          }
+          if (sensitiveResult.length) {
+            this.currentSesitiveResult = {
+              ...this.currentSesitiveResult,
+              ...sensitiveResult[0]
+            }
+            const getTableData = (idx) => {
+              idx = idx - 0
+              this.currentSesitiveResult = {
+                idx: `${idx}`,
+                ...sensitiveResult[idx]
+              }
+            }
+            this.$Modal.confirm({
+              title: '疑似包含企业明文信息',
+              render: (h) => {
+                const options = [{
+                  title: '字段名',
+                  key: 'name'
+                }, {
+                  title: '是否包含企业明文',
+                  key: 'isContain'
+                }];
+                return h('div', [
+                  h('p', '疑似包含企业明文信息, 是否确认查看？'),
+                  h("Table", {
+                    style: {
+                      'margin-top': '10px'
+                    },
+                    props: {
+                      size: "small",
+                      columns: options,
+                      data: Object.keys(this.currentSesitiveResult.metadata).map(it => {
+                        return {
+                          name: it,
+                          isContain: this.currentSesitiveResult.metadata[it]
+                        }
+                      }),
+                      height: Object.keys(this.currentSesitiveResult.metadata).length * 40 > 400 ? 400 : (Object.keys(this.currentSesitiveResult.metadata).length + 1 ) * 40
+                    }
+                  }),
+                  h('div', {
+                    style: {
+                      'margin-top': '10px'
+                    },
+                  }, [
+                    h("Select", {
+                      style: {
+                        width: '100px',
+                        marginRight: '100px'
+                      },
+                      props: {
+                        size: "small",
+                        value: this.currentSesitiveResult.idx
+                      },
+                      on: {
+                        'on-change': (value) => {
+                          getTableData(value)
+                        }
+                      }
+                    }, sensitiveResult.map((it,idx) => {
+                        return h("Option", {
+                          props: {
+                            value: `${idx}`,
+                            label: `结果集${it.nameIndex}`
+                          }
+                        })
+                      })
+                    ),
+                    `结果集条数：${this.currentSesitiveResult.total}`
+                  ])
+                ])
+              },
+              onOk: () => {
+                this.useResult(paths, resolve)
+              },
+              onCancel: () => {
+                resolve(true)
+              }
+            });
+          } else {
+            resolve(false)
+          }
+        }).catch(() => {
+          resolve(false)
+        })
+      })
+    },
+    useResult(paths, resolve) {
+      // 扣减用量
+      const params = {
+        paths,
+        taskId: this.taskID
+      }
+      api.fetch('/dss/datapipe/dataset/deductQuota', params, 'post').then(res => {
+        let msg = ''
+        if (res.result && !res.result.needDeduct) {
+          const hasDeducted = storage.get('senitive_result_'+ this.baseinfo.username) || [];
+          storage.set('senitive_result_'+ this.baseinfo.username, [...hasDeducted,  this.taskID]);
+          return resolve(false)
+        }
+        if (res.result.isSuccess) {
+          msg = `包含企业信息明文，扣减用量${res.result.dataSetSize}，剩余用量${res.result.quota}quota`
+          this.$Message.success(msg)
+          const hasDeducted = storage.get('senitive_result_'+ this.baseinfo.username) || [];
+          storage.set('senitive_result_'+ this.baseinfo.username, [...hasDeducted,  this.taskID]);
+          resolve(false)
+        } else {
+          const fileds = Object.keys(res.result.metadata)
+          msg = `用户因如下字段疑似包含企业明文信息（字段清单为 ${fileds.join('、')}），无法直接展示；您当前可查看不超过${res.result.quota}条企业信息明文，如需申请查看更多企业信息明文，请联系CIB部门数据协管员`
+          setTimeout(() => {
+            this.$Modal.info({
+              title: '提示',
+              content: `<p style="word-break: break-all;max-height: 470px;overflow-y:auto">${msg}</p>`,
+              closable: true,
+              width: 650
+            });
+          }, 400)
+          resolve(true)
+        }
+      }).catch(err => {
+        resolve(true)
+      })
     },
     async getResultData(columnPageNow) {
-      let result = this.script.resultList[this.script.resultSet] || {}
+      let result = this.script.resultList ? this.script.resultList[this.script.resultSet] : this.script.result
+      if (!result || !result.path) {
+        return
+      }
       this.checkedFields = storage.get('column_show_'+ result.path) || [];
       this.scriptViewState.columnPageNow = columnPageNow
       // 获取列分页数据
@@ -580,12 +749,25 @@ export default {
       if ('dss/apiservice' == this.getResultUrl) {
         params.taskId = this.taskID
       }
-      try {
+      const checkResultSensitive = await this.checkResult(resultPath)
+      // 敏感信息判断 为true 需要被拦截，扣减流量失败或者取消请求结果集
+      if (!checkResultSensitive) {
+        try {
         ret = await api.fetch(url, params, 'get')
-      } catch (error) {
+        } catch (error) {
+        }
+      } else {
+        this.isLoading = false
+        ret = {
+          metadata: [],
+          fileContent: [],
+          totalLine: 0,
+          totalColumn: 0,
+          type: '2',
+        }
       }
-      this.isLoading = false;
     
+      this.isLoading = false;
       if (ret.display_prohibited) {
         result = {
           'headRows': [],
@@ -635,10 +817,10 @@ export default {
         let bodyRows = []
         this.tableData.total = this.result.total
         if (this.tableData.type === 'normal') {
-          for (let item of headRows) {
+          headRows.forEach((item, index) => {
             heads.push({
               title: item.columnName,
-              key: item.columnName,
+              key: `${item.columnName}_${index}`,
               minWidth: 120,
               width: 120,
               maxWidth: 240,
@@ -647,14 +829,14 @@ export default {
               columnType: item.dataType,
               colHeadHoverTitle: item.columnName + '\n' + item.dataType,
             })
-          }
+
+          })
           this.originRows = this.originRows.map((row, i) => {
             let newItem = {}
             row.forEach((item, index) => {
               try {
                 Object.assign(newItem, {
-                  // 结果集数据改造后不能直接当key使用，得用表字段作为唯一的key
-                  [headRows[index].columnName]: item,
+                  [heads[index].key]: item,
                 })
               } catch (error) {
                 console.error(error, row.length, i)
@@ -667,7 +849,7 @@ export default {
             heads.push({
               content: headRows[i].columnName,
               title: headRows[i].columnName,
-              key: headRows[i].columnName,
+              key: `${headRows[i].columnName}_${i}`,
               sortable: true,
               columnType: headRows[i].dataType,
               colHeadHoverTitle:
@@ -681,7 +863,7 @@ export default {
           if (this.checkedFields.length <= 50) {
             dataHeads = heads
               .filter((it, index) => {
-                if (this.checkedFields.includes(it.title)) {
+                if (this.checkedFields.includes(it.key)) {
                   cols.push(index)
                   return true
                 }
@@ -689,7 +871,7 @@ export default {
               })
               .map((it) => {
                 return {
-                  key: it.title,
+                  key: it.key,
                   minWidth: 120,
                   width: 120,
                   maxWidth: 240,
@@ -717,6 +899,9 @@ export default {
         }
         this.pageingData()
         this.initPage()
+        this.$nextTick(()=>{
+          this.$emit('loadDataDone')
+        })
       }
     },
     pageingData() {
@@ -729,7 +914,7 @@ export default {
           newArr = newArr.map((row) => {
             const list = {}
             this.cols.forEach((it, index) => {
-              list[this.data.headRows[index].title] = row[it]
+              list[`${this.data.headRows[index].key}`] = row[it]
             })
             return list
           })
@@ -766,7 +951,7 @@ export default {
         })
       } else if (this.script.id) {
         this.dispatch('IndexedDB:updateResult', {
-          tabId: this.script.id || this.work.id,
+          tabId: this.script.id,
           ...this.script.resultList,
           ...params
         })
@@ -875,13 +1060,13 @@ export default {
       let bodyRows = []
       const checked = {}
       if (fields.length) {
-        fields.forEach((title) => {
-          checked[title] = true
+        fields.forEach((key) => {
+          checked[key] = true
         })
         this.heads.forEach((it, index) => {
-          if (checked[it.title]) {
+          if (checked[it.key]) {
             rows.push({
-              key: it.title,
+              key: it.key,
               minWidth: 120,
               width: 120,
               maxWidth: 240,
@@ -895,7 +1080,7 @@ export default {
       } else {
         this.heads.forEach((it, index) => {
           rows.push({
-            key: it.title,
+            key: it.key,
             minWidth: 120,
             width: 120,
             maxWidth: 240,
@@ -913,7 +1098,7 @@ export default {
         bodyRows = this.result.bodyRows.map((row) => {
           const list = {}
           cols.forEach((it, index) => {
-            list[rows[index].title] = row[it]
+            list[rows[index].key] = row[it]
           })
           return list
         })

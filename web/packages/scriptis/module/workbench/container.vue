@@ -13,7 +13,6 @@
         >
           <draggable
             class="list-group"
-            style="height:24px;margin:0"
             tag="ul"
             v-model="worklist"
             v-bind="dragOptions"
@@ -21,25 +20,23 @@
             @end="isDragging = false"
             @change="changeOrder"
           >
-            <transition-group type="transition" name="flip-list">
-              <template v-for="(work, index) in worklist">
-                <div
-                  :key="work.id"
-                  :class="{active:work.id==current}"
-                  class="workbench-tab-item"
-                  ref="work_item"
-                  v-if="work.type !== 'backgroundScript'"
-                >
-                  <we-title
-                    :node="node"
-                    :index="index"
-                    :work="work"
-                    @on-choose="onChooseWork"
-                    @on-remove="removeWork"
-                  />
-                </div>
-              </template>
-            </transition-group>
+            <template v-for="(work, index) in worklist">
+              <div
+                :key="work.id"
+                :class="{active:work.id==current}"
+                class="workbench-tab-item"
+                ref="work_item"
+                v-if="work.type !== 'backgroundScript'"
+              >
+                <we-title
+                  :node="node"
+                  :index="index"
+                  :work="work"
+                  @on-choose="onChooseWork"
+                  @on-remove="removeWork"
+                />
+              </div>
+            </template>
           </draggable>
         </div>
         <div v-else ref="tab-list-scroll" class="workbench-tab work-list-tab">
@@ -242,6 +239,18 @@ export default {
         this.dispatch("Workbench:setResultCache", { id: oldVal })
         this.revealInSidebar()
       }
+      const work = this.worklist.find(
+        (item) => item.id === val
+      )
+      if (work) {
+        let supportedMode = find(this.getSupportModes(), (p) => p.rule.test(work.filename));
+        if (supportedMode) {
+          this.$emit('active-tab-change', {
+            id: val,
+            type: supportedMode.scriptType == 'Nebula' ? 'NebulaGraph': 'Hive'
+          })
+        }
+      }
     },
     workListLength() {
       this.toggleCtrlBtn(this)
@@ -328,7 +337,7 @@ export default {
         if(lastActivedWork) {
           work = lastActivedWork
         }
-        if(work) {
+        if (work) {
           this.chooseWork(work)
         }
         this.openQueryTab();
@@ -352,7 +361,7 @@ export default {
           })
           .then((args) => {
             hiveList = args
-            that.$emit('get-dbtable-length', hiveList.length)
+            storage.set('all-db-tables-length', hiveList.length, "local")
           })
       }
 
@@ -572,40 +581,43 @@ export default {
         })
       }
       let work = null
-      let dataSet = []
-      api
-        .fetch(
-          'data-source-manager/info',
-          {
-            //获取数据源数据
-            pageSize: 300,
-            currentPage: 1,
-          },
-          {
-            method: 'get',
-            cacheOptions: { time: 60000 }
-          }
-        )
-        .then((rst) => {
-          if (rst && rst.queryList) {
-            for (let i = 0; i < rst.queryList.length; i++) {
-              // expire 为false
-              // versionId 大于0
-              // publishedVersionId 存在此字段（未发布的数据源不含有此字段），且大于0
-              // 满足这三个条件的为有效数据源，需要在列表中被筛选
-              if (
-                rst.queryList[i].expire === false &&
-                rst.queryList[i].versionId > 0 &&
-                rst.queryList[i].publishedVersionId &&
-                !['tdsql', 'mysql'].includes(rst.queryList[i].dataSourceType.name)
-              ) {
-                dataSet.push(rst.queryList[i])
+      if (supportedMode.application === 'jdbc' || supportedMode.application === 'ck') {
+        let dataSet = []
+        api
+          .fetch(
+            'data-source-manager/info',
+            {
+              //获取数据源数据
+              pageSize: 300,
+              currentPage: 1,
+            },
+            {
+              method: 'get',
+              cacheOptions: { time: 60000 }
+            }
+          )
+          .then((rst) => {
+            if (rst && rst.queryList) {
+              for (let i = 0; i < rst.queryList.length; i++) {
+                // expire 为false
+                // versionId 大于0
+                // publishedVersionId 存在此字段（未发布的数据源不含有此字段），且大于0
+                // 满足这三个条件的为有效数据源，需要在列表中被筛选
+                if (
+                  rst.queryList[i].expire === false &&
+                  rst.queryList[i].versionId > 0 &&
+                  rst.queryList[i].publishedVersionId &&
+                  !['tdsql', 'mysql'].includes(rst.queryList[i].dataSourceType.name)
+                ) {
+                  dataSet.push(rst.queryList[i])
+                }
               }
             }
-          }
-        })
-        .catch(() => {})
-      option.dataSetList = dataSet
+          })
+          .catch(() => {})
+        option.dataSetList = dataSet
+      }
+     
       if (option.type !== "backgroundScript") {
         // 如果已经在tabs中，则打开
         let repeatWork = find(this.worklist, (work) => work.id == option.id)
@@ -877,10 +889,11 @@ export default {
       // node页面和scriptis页面操作不同，由于scriptis页面有缓存，所以关闭页面并不会注销组件，所以先判断是node页面触发的还是scriptis页面触发的，然后再判断是有那个编辑器触发的
       if (!this.node && Object.keys(node).length <= 0) {
         const work = find(this.worklist, (work) => work.id === this.current)
-        if (!work)
+        if (!work) {
           return this.$Message.warning(
             this.$t("message.scripts.container.warning.noSelectedScript")
           )
+        }
         this.dispatch("Workbench:insertValue", {
           id: this.current,
           value,
@@ -1337,7 +1350,7 @@ export default {
       width: calc(100% - 45px);
       overflow: hidden;
       &.work-list-tab {
-        overflow-x: auto;
+        overflow-x: overlay;
         overflow-y: hidden;
         padding-left: 16px;
         &::-webkit-scrollbar {
@@ -1352,10 +1365,10 @@ export default {
           box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
           border-radius: 3px;
         }
-        .list-group > span {
-          white-space: nowrap;
-          display: block;
-          height: 0;
+        .list-group {
+          display: flex;
+          align-items: center;
+          padding-top: 4px;
         }
       }
       .workbench-tab-item {
@@ -1426,10 +1439,7 @@ export default {
     }
   }
   .workbench-container {
-    height: calc(100% - 48px);
-    &.node {
-      height: 100%;
-    }
+    height: calc(100% - 45px);
     @keyframes ivu-progress-active {
       0% {
         opacity: 0.3;

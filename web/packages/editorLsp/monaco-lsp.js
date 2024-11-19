@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor';
+import storage from '@dataspherestudio/shared/common/helper/storage';
 import { sendLLMRequest } from '@dataspherestudio/shared/common/helper/aicompletion';
 
 // 引入主题，语言，关键字
@@ -112,6 +113,17 @@ export function initClient({ el, value, service }, config, filePath, cb) {
     return ({ client, errMsg }) => {
       if (client) {
         window.languageClient[type] = client
+        const closeSuggest = storage.get('close_db_table_suggest');
+        if (closeSuggest) {
+          client.onReady().then(() => {
+            // 关闭库表联想
+            const params = {
+              command: "changeAssociation",
+              arguments: ['close'],
+            };
+            client.sendRequest("workspace/executeCommand", params);
+          })
+        }
       }
       if (errMsg) {
         if (cb) {

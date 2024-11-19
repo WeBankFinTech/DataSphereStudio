@@ -39,7 +39,7 @@
         :max-size="400"
         class="left-panel">
         <workSidebar v-if="leftModule.key === 2"/>
-        <hiveSidebar v-if="leftModule.key === 3"/>
+        <hiveSidebar :type="dataSourcetype" v-if="leftModule.key === 3"/>
         <fnSidebar
           v-if="leftModule.key === 4"
           type="udf"
@@ -58,7 +58,7 @@
             ref="workbenchContainer"
             :width="props.width"
             v-if="props.width"
-            @get-dbtable-length="showTip" />
+            @active-tab-change="changeScriptTab"/>
         </template>
       </we-panel-item>
     </we-panel>
@@ -102,7 +102,8 @@ export default {
       navHeight: 0,
       showSetting: false,
       proxyUserName: '',
-      copilotEntryComponent: null
+      copilotEntryComponent: null,
+      dataSourcetype: 'Hive',
     };
   },
   //组建内的守卫
@@ -155,10 +156,17 @@ export default {
   async created() {
     let baseInfo = storage.get('baseInfo', 'local') || {}
     const globalRes = await this.getGlobalLimit()
+    let copilotEnable = false
+    try {
+      const res = await this.getCopilotEnabled()
+      copilotEnable = !!res.inWhitelist
+    } catch (error) {
+      //
+    }
     baseInfo = {
       ...baseInfo,
       ...globalRes.globalLimits,
-      copilotEnable: !!globalRes.globalLimits.copilotEnable
+      copilotEnable
     }
     storage.set('baseInfo', baseInfo, 'local')
     // languageServerDefaultEnable = true 默认启用language server
@@ -209,31 +217,27 @@ export default {
     }, 1500)
   },
   beforeDestroy() {
-    // 监听窗口变化，获取浏览器宽高
-    this.$Notice.close('show-db-table-many-tip')
     window.removeEventListener('resize', this.getHeight);
     plugin.emitHook('copilot_web_listener_event_remove')
   },
   methods: {
+    changeScriptTab({ type }) {
+      this.dataSourcetype = type
+    },
     getGlobalLimit() {
       return api.fetch(`/dss/scriptis/globalLimits`, {}, {
         method: 'get',
         cacheOptions: {time: 3000}
       })
     },
+    getCopilotEnabled() {
+      return api.fetch(`/copilot/user/isinwhitelist`, {}, {
+        method: 'get',
+        cacheOptions: {time: 3000}
+      })
+    },
     getHeight() {
       this.resize(window.innerHeight);
-    },
-    showTip(length) {
-      if (length > 30000) {
-        this.$Notice.close('show-db-table-many-tip')
-        this.$Notice.warning({
-          duration: 0,
-          name: 'show-db-table-many-tip',
-          title: this.$t('message.scripts.propmpt'),
-          desc: this.$t('message.scripts.largedatatip')
-        })
-      }
     },
     init() {
       this.chooseLeftModule(this.leftSideNavList[0]);

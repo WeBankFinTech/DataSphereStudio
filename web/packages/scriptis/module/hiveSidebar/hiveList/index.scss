@@ -51,7 +51,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .node-name[data-open=open] {
+  span[data-open=open] {
       color: #2186f1;
   }
   .v-hivetable-type {
@@ -63,4 +63,8 @@
   .icon-transform {
     transform: rotate(45deg);
   }
+}
+
+.nbindex {
+  width: 92%;
 }

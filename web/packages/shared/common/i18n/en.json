@@ -415,6 +415,7 @@
         "HZXM": "Projects",
         "projectName": "Project Name",
         "inputProjectName": "Input Project Name",
+        "workspaceTarget": "Target Workspace",
         "gotoScriptis": "Visit Scriptis",
         "createProject": "Create Project",
         "editorProject": "Edit Project",

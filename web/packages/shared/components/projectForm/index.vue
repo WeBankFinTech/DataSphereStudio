@@ -106,9 +106,9 @@
         label="是否接入Git"
         prop="associateGit"
       >
-        <RadioGroup v-model="projectDataCurrent.associateGit" @on-change="handleAssociateGit">
+        <RadioGroup v-model="projectDataCurrent.associateGit" @on-change="handleAssociateGitChange">
             <Radio label="true">是</Radio>
-            <Radio label="false" :disabled="projectDataCurrent.associateGitDisabled">否</Radio>
+            <Radio label="false">否</Radio>
         </RadioGroup>
       </FormItem>
       <FormItem
@@ -305,6 +305,7 @@ export default {
       isRepeat: false,
       workspaceData: {},
       datasourceListData: [],
+      initAssociateGit: null,
     };
   },
   computed: {
@@ -608,6 +609,7 @@ export default {
         params.orchestratorModeList = [this.orchestratorModeList.list[0].dicKey]
       }
       this.projectDataCurrent = {...params, datasource: this.convertSource(params)}
+      this.initAssociateGit = this.projectDataCurrent.associateGit
       this.initAssociate('init');
       this.mode = mode;
     },
@@ -632,11 +634,44 @@ export default {
         })
       })
       this.devProcess = temps;
-      if (type !== 'init') {
-        this.projectDataCurrent.gitUser = '';
-        this.projectDataCurrent.gitToken = '';
+      // if (type !== 'init') {
+      //   this.projectDataCurrent.gitUser = '';
+      //   this.projectDataCurrent.gitToken = '';
+      // }
+    },
+    handleAssociateGitChange(val) {
+      // 编辑项目，最初为git项目的切换为非git项目时做弹窗提示
+      if (this.actionType === 'modify' && this.initAssociateGit && val === 'false') {
+         this.$Modal.info({
+              title: '提示',
+              content: '请注意切换后,工作流将无法提交到GIT中。',
+          });
       }
-    }
+      // 编辑项目，最初为非git项目切换为git项目时，查询是否有对应git用户信息，有的话展示且不允许修改
+      if (this.actionType === 'modify' && !this.initAssociateGit && val === 'true') {
+        if (this.projectDataCurrent.id) {
+          api.fetch('dss/framework/project/getProjectGitInfo',
+          {
+            projectId: this.projectDataCurrent.id,
+          },
+          {
+            method: 'get',
+          }
+        )
+        .then((rst) => {
+          if(rst.gitUser) {
+            this.projectDataCurrent.gitUser =  rst.gitUser;
+            this.projectDataCurrent.gitToken =  rst.gitToken;
+            this.projectDataCurrent.associateGitDisabled = true;
+          } else {
+            this.projectDataCurrent.associateGitDisabled = false;
+          }
+        })
+        .catch(() => {})
+        }
+      }
+      this.handleAssociateGit(val);
+    },
   },
 };
 </script>

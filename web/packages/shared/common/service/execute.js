@@ -477,46 +477,11 @@ Execute.prototype.getFirstResult = function() {
       taskID: this.taskID,
       status: this.status,
     });
-    let params = {
-      path: this.currentResultPath,
-      pageSize,
-      enableLimit: true,
-    }
-    // 如果是api执行需要带上taskId
-    if (this.getResultUrl !== 'filesystem') {
-      params.taskId = this.taskID
-    }
-    const url = `/${this.getResultUrl}/openFile`;
-    const pageSize = 5000;
-    api.fetch(url, params, 'get')
-      .then((rst) => {
-        if (rst.display_prohibited) {
-          this.trigger('result', {
-            metadata: [],
-            fileContent: [],
-            type: rst.type,
-            totalLine: rst.totalLine,
-            hugeData: true,
-            tipMsg: localStorage.getItem("locale") === "en" ? rst.en_msg : rst.zh_msg
-          });
-        } else if (rst.column_limit_display) {
-          this.trigger('result', {
-            ...rst,
-            tipMsg: localStorage.getItem("locale") === "en" ? rst.en_msg : rst.zh_msg
-          });
-        } else {
-          this.trigger('result', rst);
-        }
-
-        const log = `**result tips: ${i18n.t('message.common.execute.success.getResultList')}`;
-        this.trigger('log', log);
-        this.trigger('steps', 'Completed');
-        this.run = false;
-      })
-      .catch((err) => {
-        this.trigger('steps', 'FailedToGetResultFirst');
-        logError(err, this);
-      });
+    this.trigger('result', {});
+    const log = `**result tips: ${i18n.t('message.common.execute.success.getResultList')}`;
+    this.trigger('log', log);
+    this.trigger('steps', 'Completed');
+    this.run = false;
   }
 };
 

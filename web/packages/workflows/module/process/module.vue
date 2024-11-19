@@ -184,6 +184,7 @@
     <associate-script
       ref="associateScript"
       @click="associateScript"/>
+    <generate-datachecker ref="datachecker" @confirm="addDatachecker"/>
     <!-- 创建节点弹窗 -->
     <Modal
       :title="addNodeTitle"
@@ -380,6 +381,7 @@ import console from './component/console.vue';
 import api from '@dataspherestudio/shared/common/service/api';
 import clickoutside from '@dataspherestudio/shared/common/helper/clickoutside';
 import associateScript from './component/associateScript.vue';
+import generateDatachecker from './component/generateDatachecker.vue';
 import { throttle, debounce  } from 'lodash';
 import { NODETYPE, ext } from '@/workflows/service/nodeType';
 import storage from '@dataspherestudio/shared/common/helper/storage';
@@ -409,6 +411,7 @@ export default {
     resource,
     nodeParameter,
     associateScript,
+    generateDatachecker,
     console,
     BottomTab,
     NodePath,
@@ -491,7 +494,6 @@ export default {
     }
   },
   data() {
-    const username = this.getUserName()
     return {
       // 提交
       showSubmit: false,
@@ -509,8 +511,9 @@ export default {
       json: null,
       // 工作流级别的参数
       props: [
-        {'user.to.proxy': username}
+        {'user.to.proxy': ''}
       ],
+      flowProxyUser: '',
       // 调度设置参数
       scheduleParams: {},
       // 工作流级别的资源
@@ -649,7 +652,7 @@ export default {
           }
           if (!this.workflowIsExecutor&& !this.myReadonly) {
             if (type === 'node') {
-              if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.PYTHON].includes(node.type)) {
+              if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.NEBULA].includes(node.type)) {
                 arr.push({
                   text: this.$t('message.workflow.process.associate'),
                   value: 'associate',
@@ -692,6 +695,13 @@ export default {
                 text: '批量关联节点',
                 icon: 'addLink'
               })
+              if ([NODETYPE.SPARKSQL, NODETYPE.HQL].includes(node.type)) {
+                arr.push({
+                  value: 'addDatachecker',
+                  text: '生成Datachecker',
+                  icon: 'icon-datacheck'
+                })
+              }
             }
           }
           if (type === 'view'&& !this.myReadonly) {
@@ -745,6 +755,7 @@ export default {
     this.shapeWidth = this.$refs.process && this.$refs.process.state.shapeOptions.viewWidth; // 自适应控制台宽度
     this.getConsoleParams();
     document.addEventListener('keyup', this.onKeyUp)
+    eventbus.on('workflow.opennode.by.name', this.openNodeByName);
     eventbus.on('workflow.fold.left.tree', this.foldHandler);
     eventbus.on('workflow.copying', this.onCopying);
     window.addEventListener('message', this.msgEvent, false);
@@ -961,30 +972,48 @@ export default {
       this.contextID = json.contextID;
       // 保存节点才有的值
       this.schedulerAppConnName = json.schedulerAppConnName
-      if (json && json.nodes) {
-        this.originalData = this.json = JSON.parse(JSON.stringify(json));
-        this.resources = json.resources;
-        this.props = json.props;
-        this.scheduleParams = json.scheduleParams || {};
+      if (json) {
+        if (json.nodes) {
+          this.originalData = this.json = JSON.parse(JSON.stringify(json));
+          this.resources = json.resources;
+        }
+        if (json.props) {
+          this.props = json.props;
+          this.flowProxyUser = (json.props[0] || {})['user.to.proxy'];
+          this.scheduleParams = json.scheduleParams || {};
+        }
       }
       if (json.config && json.config.type != 'table') {
         this.viewMode = json.config.type
       }
+      this.pollUpdateLock();
       this.$nextTick(() => {
         this.loading = false;
-        const openflownode = storage.get('openflownode');
-        if (openflownode) {
-          storage.remove('openflownode');
-          const [ flowid, nodename ] = openflownode.split('_flowidname_')
-          const node = this.originalData.nodes.find(node => {
-            return node.title === nodename
-          })
-          if (flowid == this.$route.query.flowId && node) {
-            this.dblclick(node)
-          }
-        }
-      });
-      this.pollUpdateLock();
+        this.openNodeByName()
+      })
+    },
+    openNodeByName(params) {
+      const openflownode = storage.get('openflownode');
+      let nodeName;
+      let flowId;
+      if (params) {
+        flowId = params.flowId
+        nodeName = params.nodeName
+      } else if (openflownode && !params) {
+        // 查找工作流内容新窗口打开节点的情况
+        params = openflownode.split('_flowidname_')
+        flowId = params[0] 
+        nodeName = params[1] 
+      }
+      const node = this.originalData.nodes.find(node => {
+        return node.title === nodeName
+      })
+      if (flowId == this.$route.query.flowId && node) {
+        this.dblclick(node)
+      }
+      setTimeout(() => {
+        storage.remove('openflownode');
+      }, 2500)
     },
     getOriginJson() {
       return api.fetch(`/dss/workflow/get`, {
@@ -997,7 +1026,8 @@ export default {
           this.setFlowEditLock(flowEditLock);
         }
         this.initAction(json);
-      }).catch(() => {
+      }).catch((err) => {
+        window.console.error(err);
         this.loading = false;
         this.locked = true;
         if (this.updateLockTimer) {
@@ -1027,6 +1057,18 @@ export default {
           });
         }
         this.orcVersion = json.orcVersion
+        // 代理用户有默认值做默认赋值
+        if(flow.defaultProxyUser) {
+          if(!json.scheduleParams) {
+            json.scheduleParams = {}
+            json.scheduleParams.proxyuser = flow.defaultProxyUser
+          }
+          if(!json.props) {
+            json.props= [{
+              'user.to.proxy': flow.defaultProxyUser,
+            }]
+          }
+        }
       }
       return json;
     },
@@ -1109,6 +1151,9 @@ export default {
               }
             }
           })
+        }
+        if (arg[0].params && arg[0].params.configuration && arg[0].params.configuration.startup) {
+          delete arg[0].params.configuration.startup['wds.linkis.rm.yarnqueue']
         }
         this.$emit('node-dblclick', arg);
       }
@@ -1379,15 +1424,19 @@ export default {
           this.$Notice.success({
             desc: this.$t('message.workflow.process.autoSaveWorkflow'),
           });
-        }        
-        this.jsonChange = false;
+        }
+        this.jsonChange = false; 
+        if(this.props && this.props.length > 0) {
+          this.flowProxyUser = this.props[0]['user.to.proxy'];
+        }
         // 保存成功后去更新tab的工作流数据
         this.$emit('updateWorkflowList');
         if(!this.isFlowSubmit && !this.isFlowPubulish) {
           this.$emit('updateFlowStatus');
         }
         return res;
-      }).catch(() => {
+      }).catch((e) => {
+        window.console.error('saveRequest',e)
         this.loading = false;
       });
     },
@@ -1552,6 +1601,7 @@ export default {
         };
       });
       this.jsonChange = true;
+      this.autoSave('更新资源文件', false)
     },
     async nodeDelete(node) {
       // 正在执行中的节点不能被删除
@@ -1646,12 +1696,12 @@ export default {
       if (nodeItem && nodeItem.params && nodeItem.params.configuration.startup && node.params && node.params.configuration.startup) {
         let hasChange = false;
         for (let key in nodeItem.params.configuration.startup) {
-          if (node.params.configuration.startup[key] !== nodeItem.params.configuration.startup[key]) {
+          if (key !== 'wds.linkis.rm.yarnqueue' && node.params.configuration.startup[key] !== nodeItem.params.configuration.startup[key]) {
             hasChange = true;
           }
         }
         if (hasChange) {
-          this.$Modal.confirm({ title: '提示', content: '请注意引擎参数有修改，Kill引擎后生效！' });
+          this.$Modal.confirm({ title: '提示', content: '请注意引擎参数有修改，若节点已打开，请关闭后重新打开，同时Kill引擎方才生效！' });
         }
       }
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonly'));
@@ -1686,6 +1736,9 @@ export default {
         case 'relySelectDown':
           this.relySelect(data, 'down');
           break;
+        case 'addDatachecker':
+          this.addDatachecker(data);
+          break;
         case 'delete':
           if (this.viewMode === 'cyeditor') {
             if (type ==='node') {
@@ -1706,6 +1759,54 @@ export default {
       const ids = [ id, ...upstreamIds, ...downstreamIds ];
       const results = this.json.nodes.filter(item => !ids.includes(item.id || item.key));
       return results;
+    },
+    addDatachecker(node, data){
+      if (data) {
+        // 第一行库表放到check.object，其余行放到job.desc
+        const checkObject = `${data[0].db}.${data[0].table}{${data[0].partition}}`;
+        const jobDesc = data.slice(1).map((item,idx) => {
+          return `check.object.${idx+1}=${item.db}.${item.table}{${item.partition}}`;
+        }).join('\n')
+        // 添加datacheck节点及连线
+        const checkerNode = {
+          "type": "linkis.appconn.datachecker",
+          "title": `datachecker_${Math.floor(Math.random()*10000)}`,
+          "desc": "",
+          "image": "/api/rest_j/v1/dss/workflow/nodeIcon/linkis.appconn.datachecker",
+          "key": Date.now(),
+          "layout": {
+            "width": 150,
+            "height": 40,
+            "x": node.x + Math.random() * 50 + 150,
+            "y": node.y + Math.random() * 30 + 40,
+          },
+          params:{ 
+            configuration:  {
+              special: {},
+              runtime: {
+                'check.object': checkObject,
+                'job.desc': jobDesc
+              },
+              startup: {}
+            }
+          },
+          "selected": true,
+          "createTime": Date.now()
+        }
+        const edge = {
+          linkType: "straight",
+          source: node.key,
+          target: checkerNode.key,
+          sourceLocation: "bottom",
+          targetLocation: "left"
+        }
+        this.json.edges.push(edge);
+        this.json.nodes.push(checkerNode);
+        this.originalData = { ...this.json };
+        this.jsonChange = true;
+      } else {
+        this.$refs.datachecker.open(node);
+      }
     },
     beforeAddEdges(node) {
       this.addEdgesShow = true;
@@ -1769,7 +1870,7 @@ export default {
     },
     checkAssociated(node) {
       if (this.myReadonly) return this.$Message.warning(this.$t('message.workflow.process.readonlyNoAssociated'));
-      if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.PYTHON].indexOf(node.type) === -1) {
+      if ([NODETYPE.SPARKSQL, NODETYPE.HQL, NODETYPE.SPARKPY, NODETYPE.SCALA, NODETYPE.PYTHON, NODETYPE.NEBULA].indexOf(node.type) === -1) {
         return this.$Notice.warning({
           desc: this.$t('message.workflow.process.noAssociated'),
         });
@@ -2024,6 +2125,7 @@ export default {
       });
       this.json.nodes.push(JSON.parse(JSON.stringify(this.cacheNode)));
       this.originalData = { ...this.json };
+      this.autoSave(this.$t('message.workflow.Saving'), false);
       this.click(this.cacheNode)
     },
     // 由于插件的selected不是响应式，所以得手动改变
@@ -2531,6 +2633,22 @@ export default {
           return;
         }  
       }
+      if (this.flowProxyUser) {
+        let isPassed = true;
+        try {
+          const rst = await api.fetch('/dss/framework/workspace/isDismissed', {usernames: [this.flowProxyUser]}, 'post');
+          if (rst && (rst.isDismissed || []).some(item => Object.values(item)[0])) {
+            this.$Message.warning(`${this.name}工作流的代理用户已离职，请确认是否修改代理用户`);
+            isPassed = false;
+          }
+        } catch (e) {
+          isPassed = false;
+        }
+        if (!isPassed) {
+          this.saveingComment = false;
+          return;
+        }
+      }
       // 调用发布接口
       const params = {
         orchestratorId: this.orchestratorId,
@@ -2854,7 +2972,7 @@ export default {
         }
         this.originalData = this.json;
         // 切换模式后保存数据，确保模式也被更新
-		    if (isSave) {
+		    if (isSave && !this.product) {
           this.autoSave(this.$t('message.workflow.Save'), false);
         }
       }

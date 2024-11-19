@@ -12,7 +12,7 @@ import highRiskGrammar from './highRiskGrammar';
 import eventbus from '@dataspherestudio/shared/common/helper/eventbus';
 import plugin from '@dataspherestudio/shared/common/util/plugin';
 import { sendAccteptRequest } from '@dataspherestudio/shared/common/helper/aicompletion';
-const typeMap ={'.py': 'pyspark','.hql': 'hive sql', '.sql': 'spark sql', '.scala': 'spark scala'};
+const typeMap ={'.py': 'pyspark','.hql': 'hive sql', '.sql': 'spark sql', '.scala': 'spark scala', '.txt': '文本'};
 
 const types = {
   code: {
@@ -57,14 +57,12 @@ export default {
     application: String,
   },
   data() {
-    const closeSuggest = storage.get('close_db_table_suggest', 'local')
     const autobreak = storage.get('editor_auto_breakline', 'local')
     return {
       editor: null,
       editorModel: null,
       decorations: null,
       isParserClose: true, // 默认关闭语法验证
-      dbtbsuggest: !closeSuggest, // 默认打开库表联想
       autobreak: autobreak, // 默认关闭自动换行
       closeParser: null,
       openParser: null,
@@ -227,6 +225,11 @@ export default {
             let elmentList = shadowRoot.querySelectorAll(`.actions-container .action-label[aria-label="${item.label}"]`);
             this.changeInnerText(elmentList, item.text);
           })
+        }
+        if (this.closeDbTbSuggest && this.openDbTbSuggest) {
+          const closeSuggest = storage.get('close_db_table_suggest')
+          this.closeDbTbSuggest.set(!closeSuggest);
+          this.openDbTbSuggest.set(closeSuggest);
         }
       }), 100)
     },
@@ -432,10 +435,10 @@ export default {
           editor.trigger('gotoLine', 'editor.action.gotoLine');
         },
       });
-
+      const closeSuggest = storage.get('close_db_table_suggest')
       // 打开、关闭库表联想
-      this.closeDbTbSuggest = this.editor.createContextKey('closeDbTbSuggest', this.dbtbsuggest);
-      this.openDbTbSuggest = this.editor.createContextKey('openDbTbSuggest', !this.dbtbsuggest);
+      this.closeDbTbSuggest = this.editor.createContextKey('closeDbTbSuggest', !closeSuggest);
+      this.openDbTbSuggest = this.editor.createContextKey('openDbTbSuggest', closeSuggest);
       const action_6 =this.editor.addAction({
         id: 'closeDbTbSuggest',
         label: this.$t('message.common.monacoMenu.GBKBTS'),
@@ -446,11 +449,9 @@ export default {
         contextMenuGroupId: 'control',
         contextMenuOrder: 2.2,
         run() {
-          vm.dbtbsuggest = false;
-          // 控制右键菜单的显示
           vm.openDbTbSuggest.set(true);
           vm.closeDbTbSuggest.set(false);
-          storage.set('close_db_table_suggest', true, 'local')
+          storage.set('close_db_table_suggest', true)
         },
       });
 
@@ -463,10 +464,10 @@ export default {
         contextMenuGroupId: 'control',
         contextMenuOrder: 2.3,
         run() {
-          vm.dbtbsuggest = true;
           vm.openDbTbSuggest.set(false);
           vm.closeDbTbSuggest.set(true);
-          storage.set('close_db_table_suggest', false, 'local')
+          storage.set('close_db_table_suggest', false);
+          vm.$emit('open-db-table-suggest', true);
         },
       });
 
@@ -575,31 +576,38 @@ export default {
           run() {
             const code = vm.getValueInRange() || vm.getValue();
             const message = `请解释以下${typeMap[vm.ext]||vm.application}代码：\n\`\`\`\n${code}\n\`\`\``;
-            plugin.emit('copilot_web_open_change', { type: 'codeExplain', message })
+            plugin.emit('copilot_web_open_change', { 
+              type: 'codeExplain', 
+              message,
+              params: {
+                code,
+                type: typeMap[vm.ext] || vm.application,
+              }
+            })
           },
         });
         
         const showConvertModal = () => {
-          let type; 
+          const options = ["hive", "spark", "starrocks"]
+            .filter(it => it !== vm.application)
+          let type  = options[0]; 
           this.$Modal.confirm({
             title: '代码转换',
             render: (h) => {
-              const options = ["hive", "spark", "trino", "starrocks"]
-                .filter(it => it !== vm.application)
-                .map(it => {
-                  return h("Option", {
-                    props: {
-                        value: it,
-                        label: it
-                    }
-                  })
-                })
-              return h('div', [
+              return h('div', {
+                style: {
+                    marginTop: '10px',
+                  }
+               },
+               [
                 h('span', '转换脚本为：'),
                 h("Select", {
                   size: "small",
                   autofocus: true,
                   placeholder: '请选择转换类型',
+                  props: {
+                    value: type
+                  },
                   on: {
                     'on-change'(value) {
                       type = value;
@@ -608,19 +616,40 @@ export default {
                   style: {
                     width: '200px'
                   }
-                }, options)
+                }, options.map(it => {
+                  return h("Option", {
+                    props: {
+                        value: it,
+                        label: it
+                    }
+                  })
+                })),
+                h('div', {
+                  style: {
+                    marginTop: '10px',
+                    display: vm.application === 'jdbc' ? 'block' : 'none',
+                  }
+                }, '请注意：类型转换jdbc脚本只支持StarRocks类型的转换')
               ])
             },
             onOk: () => {
               const code = vm.getValueInRange() || vm.getValue();
               const message = `请将以下${typeMap[vm.ext] || vm.application}代码转换为${type}类型：\n\`\`\`\n${code}\n\`\`\``;
-              plugin.emit('copilot_web_open_change', { type: 'codeConvert', message })
+              plugin.emit('copilot_web_open_change', { 
+                type: 'codeConvert', 
+                message,
+                params: {
+                  code,
+                  origin: typeMap[vm.ext]||vm.application,
+                  target: type
+                }
+              })
             }
           });
         }
        
         this.actions.push(action_13);
-        if (['hive', 'spark'].includes(vm.application)) {
+        if (['.hql', '.sql', '.jdbc'].includes(vm.ext)) {
           // 代码转换
           const action_14 = this.editor.addAction({
             id: 'codeConvert',

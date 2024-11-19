@@ -154,9 +154,9 @@ import mixin from '@dataspherestudio/shared/common/service/mixin';
 import plugin from '@dataspherestudio/shared/common/util/plugin';
 import { EXECUTE_COMPLETE_TYPE } from '@dataspherestudio/shared/common/config/const';
 
-
 // const extComponents = plugin.emitHook('script_console_tabs') || []
 const extComponents = []
+const typeMap ={'.py': 'pyspark','.hql': 'hive sql', '.sql': 'spark sql', '.scala': 'spark scala', '.txt': '文本'};
 
 export default {
   name: 'editor-script',
@@ -423,7 +423,7 @@ export default {
     this.autoSave();
     if (this.scriptResult && this.scriptResult.columnPageNow && this.scriptResult.columnPageNow != this.scriptViewState.columnPageNow) {
       this.scriptViewState.columnPageNow = this.scriptResult.columnPageNow;
-    }
+    }        
   },
   beforeDestroy() {
     // 关闭tab页面不再继续轮询接口
@@ -453,6 +453,7 @@ export default {
     }
     window.onbeforeunload = null;
     plugin.off('copilot_web_listener_inster', this.insterCode)
+    this.$Notice.close('codefixnotice')
   },
   methods: {
     /**
@@ -621,10 +622,76 @@ export default {
       this.isShowFieldDetailTab = true;
       this.showPanelTab('fieldDetail');
     },
+    showDiyParamsInfo(executionCode, variableData) {
+      // 步骤 1: 提取代码中的变量表达式
+      const regex = /\$\{([^}]*)\}/g;
+      let match;
+      const variablesInCode = new Set();
+
+      while ((match = regex.exec(executionCode)) !== null) {
+        const expression = match[1].trim(); // 提取变量表达式并去除前后空白字符
+
+        // 步骤 2: 处理变量表达式
+        if (expression.includes('+') || expression.includes('-')) {
+          // 表达式中有加减符号，按加减符号分隔
+          const parts = expression.split(/\s*[\+\-]\s*/);
+          parts.forEach(part => {
+            if (part && !/^\d+$/.test(part.trim())) { // 过滤掉纯数字
+              variablesInCode.add(part.trim());
+            }
+          });
+        } else {
+          // 表达式中没有加减符号，直接视作一个变量
+          variablesInCode.add(expression);
+        }
+      }
+      // console.log('variablesInCode', variablesInCode);
+      // 执行代码中无变量,返回 false
+      if(variablesInCode.size === 0) {
+        return false
+      }
+      // console.log('validDiyParams-variablesInCode', variablesInCode)
+      // 步骤 2: 检查变量是否存在
+      for (let variable of variablesInCode) {
+        const found = variableData.some(data => data.key === variable);
+        if (!found) {
+        // 如果执行代码中存在某变量，但在参数列表中不存在，则返回 false
+          // console.log('不存在的变量', variable)
+          return false; 
+        }
+      }
+
+      return true; // 所有变量都存在，则返回 true
+    },
+    filterComments(code) {
+        // 拆分成行
+        const lines = code.split('\n');
+        
+        // 过滤每一行
+        const filteredLines = lines.map(line => {
+            // 找到注释符的位置
+            const commentIndex = line.indexOf('--');
+            
+            if (commentIndex === 0) {
+                // 注释符在句首，过滤整行
+                return '';
+            } else if (commentIndex > 0) {
+                // 注释符在句中，过滤注释部分
+                return line.substring(0, commentIndex).trim();
+            } else {
+                // 没有注释符，保留原行
+                return line;
+            }
+        });
+        
+        // 合并过滤后的行
+        return filteredLines.join('\n').trim();
+    },
     async run(option, cb) {
       this.scriptViewState.columnPageNow = 1;
       this.handleLines = {}
       this.script.codePrecheckRes = {};
+      this.script.validParamsInfoRes = {};
       this.isShowFieldDetailTab = false;
       if (option && option.id === this.script.id) {
         if (window.$Wa) window.$Wa.clickStat('run',this.script.fileName);
@@ -634,6 +701,7 @@ export default {
         }
         if (this.$refs.progressTab) {
           this.$refs.progressTab.updateErrorMsg({})
+          this.$refs.progressTab.updateCodePreCheck({});
         }
         const data = this.getExecuteData(option);
         if (this.execute) {
@@ -819,19 +887,19 @@ export default {
         });
         this.execute.on('result', (ret) => {
           this.showPanelTab('result');
-          const storeResult = {
-            'headRows': ret.metadata,
-            'bodyRows': ret.fileContent,
-            'total': ret.totalLine,
-            'type': ret.type,
-            'totalColumn': ret.totalColumn,
-            'path': this.execute.currentResultPath,
-            'current': 1,
-            'size': 20,
-            tipMsg: ret.tipMsg,
-            hugeData: !!ret.hugeData
-          };
-          this.$set(this.execute.resultList[0], 'result', storeResult);
+          // const storeResult = {
+          //   'headRows': ret.metadata,
+          //   'bodyRows': ret.fileContent,
+          //   'total': ret.totalLine,
+          //   'type': ret.type,
+          //   'totalColumn': ret.totalColumn,
+          //   'path': this.execute.currentResultPath,
+          //   'current': 1,
+          //   'size': 20,
+          //   tipMsg: ret.tipMsg,
+          //   hugeData: !!ret.hugeData
+          // };
+          // this.$set(this.execute.resultList[0], 'result', storeResult);
           this.$set(this.script, 'resultSet', 0);
           this.script.resultList = this.execute.resultList;
           this.dispatch('IndexedDB:getResult', {
@@ -1068,6 +1136,23 @@ export default {
               }
             }
           }, 150)
+        setTimeout(()=>{
+          // 如果当前执行代码中配置的参数都在配置参数中,做提示
+          const filterCode = this.filterComments(this.script.executionCode)
+          const diyParamsInfoValidRes = this.showDiyParamsInfo(filterCode, this.script.params.variable)
+          let paramsRes = {
+              content: '',
+              isShow: false
+            }
+          if(diyParamsInfoValidRes) {
+            paramsRes = {
+              content: '脚本存在已配置的自定义参数,请知悉',
+              isShow:true
+            }
+          }
+          this.script.validParamsInfoRes = paramsRes;
+          this.$refs.progressTab.updateParamsInfo(paramsRes);
+        } , 150)
         }
       }
     },
@@ -1094,40 +1179,47 @@ export default {
       };
     },
     stop(cb) {
-      if (this.execute && this.execute.id) {
-        api.fetch(`/entrance/${this.execute.id}/kill`, {taskID: this.execute.taskID}, 'get').then(() => {
-          this.execute.trigger('stop');
-          this.execute.trigger('error');
-          this.execute.trigger('kill');
-          // 停止执行
-          const name = this.work.filepath || this.work.filename;
-          this.$Notice.close(name);
-          this.$Notice.warning({
-            title: this.$t('message.scripts.notice.kill.title'),
-            desc: `${this.$t('message.scripts.notice.kill.desc')} ${this.work.filename} ！`,
-            name: name,
-            duration: 3,
-          });
-          // kill请求发送成功后status还没有变成Canceled，会有状态请求的轮询，此时应当等待canceled之后才能进行下次执行 dpms 400007
-          const fn = () => {
-            if (this.script.steps.indexOf('Cancelled') > -1) {
-              cb()
-            } else {
-              this.canceledTimeout = setTimeout(() => {
-                fn()
-              }, 1000)
+      clearTimeout(this.killTimer)
+      const killAct = () => {
+        if (this.execute && this.execute.id) {
+          api.fetch(`/entrance/${this.execute.id}/kill`, {taskID: this.execute.taskID}, 'get').then(() => {
+            this.execute.trigger('stop');
+            this.execute.trigger('error');
+            this.execute.trigger('kill');
+            // 停止执行
+            const name = this.work.filepath || this.work.filename;
+            this.$Notice.close(name);
+            this.$Notice.warning({
+              title: this.$t('message.scripts.notice.kill.title'),
+              desc: `${this.$t('message.scripts.notice.kill.desc')} ${this.work.filename} ！`,
+              name: name,
+              duration: 3,
+            });
+            // kill请求发送成功后status还没有变成Canceled，会有状态请求的轮询，此时应当等待canceled之后才能进行下次执行 dpms 400007
+            const fn = () => {
+              if (this.script.steps.indexOf('Cancelled') > -1) {
+                cb()
+              } else {
+                this.canceledTimeout = setTimeout(() => {
+                  fn()
+                }, 1000)
+              }
             }
-          }
-          fn()
-        }).catch(() => {
-          this.execute.queryStatusaAfterKill = 0
+            fn()
+          }).catch(() => {
+            this.execute.queryStatusaAfterKill = 0
+            cb();
+          });
+          this.script.steps = []; // socket downgrade事件之前点击运行，终止运行loading后恢复
+          this.script.running = false;
+        } else {
+          this.killTimer = setTimeout(() => {
+            killAct()
+          }, 500)
           cb();
-        });
-      } else {
-        cb();
-        this.script.steps = []; // socket downgrade事件之前点击运行，终止运行loading后恢复
-        this.script.running = false;
+        }
       }
+      killAct()
     },
     autoSave() {
       clearTimeout(this.autoSaveTimer);
@@ -1384,7 +1476,7 @@ export default {
         showPanel: 'result',
         ...this.script.resultList,
       });
-      if(cb) {
+      if (cb) {
         cb();
       }
     },
@@ -1582,23 +1674,77 @@ export default {
       const baseinfo = storage.get('baseInfo', 'local')
       if (this.node) return
       if (baseinfo && !baseinfo.copilotEnable) return
+      const vm = this
+      const noticeFix = (res) => {
+        vm.$Notice.close('codefixnotice')
+        this.$Notice.warning({
+          name: 'codefixnotice',
+          title: "AI纠错",
+          render: h => {
+            return h("div", [
+              res.message,
+              h("div", {
+                style: {
+                  marginTop: "20px",
+                  display: 'flex',
+                  justifyContent: 'end'
+                },
+              }, [
+              h(
+                "Button",
+                {
+                  style: {
+                    marginRight: "20px",
+                  },
+                  on: {
+                    'click': function () {
+                      vm.$Notice.close('codefixnotice')
+                    }
+                  }
+                },
+                "取消"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "primary",
+                  },
+                  on: {
+                    'click': function () {
+                      const message = `请检查并修改如下代码中的语法错误: ${code}，执行错误信息如下: ${errMessage}`;
+                      plugin.emit('copilot_web_open_change', { 
+                        type: 'CodeCorrection', 
+                        message, 
+                        params: {
+                          type: vm.script ? typeMap[vm.script.ext] || vm.script.application : '',
+                          code,
+                          taskId,
+                          errMessage
+                        } 
+                      })
+                      vm.$Notice.close('codefixnotice')
+                    }
+                  }
+                },
+                "确认"
+              )
+
+              ])
+            ]);
+          },
+          duration: 0
+        })
+      }
       if (this.script.id == this.current) {
         // 当前激活脚本
         if (taskId && errCode) {
           storage.remove(`cache_needfix_${this.script.id}`)
-          api.fetch('/dss/copilot/executeCode', { 
-            // taskId, 
-            errCode 
+          api.fetch('/copilot/executeCode', { 
+            errCode
           }, 'get').then(res => {
             if (res.popup) {
-              this.$Modal.confirm({
-                title: '提示',
-                content: res.message,
-                onOk: () => {
-                  const message = `请检查并修改如下代码中的语法错误: ${code}，执行错误信息如下: ${errMessage}`;
-                  plugin.emit('copilot_web_open_change', { type: 'CodeCorrection', message })
-                }
-              });
+              noticeFix(res)
             }
           })
         }
@@ -1678,20 +1824,6 @@ export default {
           @include bg-color($light-base-color, $dark-base-color);
           width: calc(100% - 45px);
           overflow: hidden;
-          &.work-list-tab {
-            overflow-x: auto;
-            overflow-y: hidden;
-            &::-webkit-scrollbar {
-              width: 0;
-              height: 0;
-              background-color: transparent;
-            }
-            .list-group>span {
-              white-space: nowrap;
-              display: block;
-              height: 0;
-            }
-          }
           .workbench-tab-item {
             text-align: center;
             border-top: none;

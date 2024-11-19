@@ -602,7 +602,7 @@ export default {
       this.isConsolePage = true;
       this.currentId = -1;
       const url =
-        location.origin + "/dss/linkis/?noHeader=1&noFooter=1#/console";
+        `${location.origin}/dss/linkis/?noHeader=1&noFooter=1&t=${Date.now()}#/console`;
       this.$router.push({
         path: '/commonIframe/linkis',
         query: {
@@ -618,7 +618,7 @@ export default {
       this.currentId = -1;
       let workspaceId = this.$route.query.workspaceId;
       const url =
-        location.origin + "/next-web/#/accounts?workspaceId=" + workspaceId + "&timestamp=" + Date.now();
+        `${location.origin}/next-web/?workspaceId=${workspaceId}&timestamp=${Date.now()}#/accounts`;
       this.$router.push({
         path: '/commonIframe/accounts',
         query: {

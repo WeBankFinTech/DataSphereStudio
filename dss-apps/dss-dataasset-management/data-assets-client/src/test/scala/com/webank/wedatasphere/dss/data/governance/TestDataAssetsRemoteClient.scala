@@ -22,7 +22,7 @@ object TestDataAssetsRemoteClient {
       .readTimeout(30000)
       .setAuthenticationStrategy(new TokenAuthenticationStrategy())
       .setAuthTokenKey("hdfs")
-      .setAuthTokenValue("BML-AUTH")
+      .setAuthTokenValue("")
       .setDWSVersion("v1")
       .build()
 

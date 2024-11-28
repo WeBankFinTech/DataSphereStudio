@@ -42,7 +42,7 @@ public class HttpUtils {
         HttpPost httpPost = new HttpPost(url);
         httpPost.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
         httpPost.addHeader("Token-User",user);
-        httpPost.addHeader("Token-Code", "WS-AUTH");
+        httpPost.addHeader("Token-Code", "");
         CookieStore cookieStore = new BasicCookieStore();
         logger.info("Http request params is :"+params);
         StringEntity entity = entity = new StringEntity(params);
@@ -73,7 +73,7 @@ public class HttpUtils {
         logger.info("sendDeleteReq url is: "+url);
         httpdelete.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
         httpdelete.addHeader("Token-User",user);
-        httpdelete.addHeader("Token-Code","WS-AUTH");
+        httpdelete.addHeader("Token-Code","");
         CookieStore cookieStore = new BasicCookieStore();
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
@@ -100,7 +100,7 @@ public class HttpUtils {
         HttpPut httpPut = new HttpPut(url);
         httpPut.addHeader(HTTP.CONTENT_ENCODING, "UTF-8");
         httpPut.addHeader("Token-User",user);
-        httpPut.addHeader("Token-Code","WS-AUTH");
+        httpPut.addHeader("Token-Code","");
         CookieStore cookieStore = new BasicCookieStore();
         logger.info("Http put params is :"+params);
         StringEntity entity = null;

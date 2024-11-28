@@ -21,7 +21,7 @@ import org.apache.linkis.common.conf.CommonVars;
 
 public class AzkabanConf {
     public static final CommonVars<String> DEFAULT_STORE_PATH = CommonVars.apply("wds.dss.appconn.scheduler.project.store.dir", "/appcom/tmp/wds/dss");
-    public static final CommonVars<String> AZKABAN_LOGIN_PWD = CommonVars.apply("wds.dss.appconn.scheduler.azkaban.login.passwd", "userpwd");
+    public static final CommonVars<String> AZKABAN_LOGIN_PWD = CommonVars.apply("wds.dss.appconn.scheduler.azkaban.login.passwd", "");
     public static final CommonVars<String> LINKIS_VERSION = CommonVars.apply("wds.dss.appconn.scheduler.linkis.version",  "1.0.0");
     public static final CommonVars<String> JOB_LABEL = CommonVars.apply("wds.dss.appconn.scheduler.job.label",  "prod");
 

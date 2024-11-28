@@ -18,8 +18,8 @@ object DwLayerRemoteClientTest {
     .retryEnabled(false)
     .readTimeout(30000L)
     .setAuthenticationStrategy(new StaticAuthenticationStrategy())
-    .setAuthTokenKey("BML-AUTH")
-    .setAuthTokenValue("BML-AUTH")
+    .setAuthTokenKey("")
+    .setAuthTokenValue("")
     .setDWSVersion("v1")
     .build()
 

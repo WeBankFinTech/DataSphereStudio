@@ -21,8 +21,8 @@ cd linkis/bin/
 ##Linkis gateway url 
 LINKIS_GATEWAY_URL=http://127.0.0.1:9001 ## Linkis' GateWay address
 
-##Linkis gateway token defaultWS-AUTH 
-LINKIS_GATEWAY_TOKEN=WS-AUTH  ## Linkis proxy token, this parameter can use the default
+##Linkis gateway token default
+LINKIS_GATEWAY_TOKEN= ## Linkis proxy token, this parameter can use the default
 
 ##Azkaban executor host 
 AZKABAN_EXECUTOR_HOST=127.0.0.1 ## AZKABAN actuator machine IP

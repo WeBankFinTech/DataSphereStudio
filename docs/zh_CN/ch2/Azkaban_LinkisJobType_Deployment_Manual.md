@@ -21,8 +21,8 @@ cd linkis/bin/
 ##Linkis gateway url 
 LINKIS_GATEWAY_URL=http://127.0.0.1:9001 ## linkis的GateWay地址
 
-##Linkis gateway token defaultWS-AUTH 
-LINKIS_GATEWAY_TOKEN=WS-AUTH  ## Linkis的代理Token，该参数可以用默认值
+##Linkis gateway token default
+LINKIS_GATEWAY_TOKEN=  ## Linkis的代理Token，该参数可以用默认值
 
 ##Azkaban executor host 
 AZKABAN_EXECUTOR_HOST=127.0.0.1 ## 如果Azkaban是单机安装则该IP就是机器IP，如果是分布式安装为Azkaban执行器机器IP，

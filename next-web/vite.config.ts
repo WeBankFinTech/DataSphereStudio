@@ -41,7 +41,7 @@ export default defineConfig(({ command, mode }: ConfigEnv): UserConfig => {
             cookie: '',
             // cookie:
             // 'linkis_user_session_ticket_id_v1=FmzyJmP2DGUzEo5Hy/D0OqyinoWZ4+L52vOV55MqIl4=; workspaceId=104; workspaceName=bdapWorkspace_move',
-            TokenCode: 'admin-kmsnd',
+            TokenCode: '',
             TokenUser: 'stacyyan',
             TokenAlive: 'true',
           },

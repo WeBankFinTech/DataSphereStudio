@@ -126,7 +126,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
     private static ContextService contextService = ContextServiceImpl.getInstance();
 
-    private static final String TOKEN = CommonVars.apply("wds.dss.workspace.token", "BML-AUTH").getValue();
+    private static final String TOKEN = CommonVars.apply("wds.dss.workspace.token", "").getValue();
 
     protected Sender getOrchestratorSender() {
         return DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender();

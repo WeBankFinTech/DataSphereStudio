@@ -31,7 +31,7 @@ public class VisualisSecurityService extends AppJointUrlImpl implements Security
         VisualisSession visualisSession = new VisualisSession();
         visualisSession.setUser(user);
         visualisSession.getParameters().put("Token-User",user);
-        visualisSession.getParameters().put("Token-Code","WS-AUTH");
+        visualisSession.getParameters().put("Token-Code","");
         return visualisSession;
     }
 

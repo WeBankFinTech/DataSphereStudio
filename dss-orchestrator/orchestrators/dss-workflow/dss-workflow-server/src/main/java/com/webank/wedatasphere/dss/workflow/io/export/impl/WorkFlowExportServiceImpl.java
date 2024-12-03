@@ -53,6 +53,7 @@ import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.linkis.common.utils.Utils;
 import org.apache.linkis.rpc.Sender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +65,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.NODE_EXPORT_IMPORT_TIMEOUT_MINUTES;
@@ -104,10 +103,9 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     private DSSFlowService flowService;
 
 
-
     @Override
     public String exportFlowInfoNew(Long dssProjectId, String projectName, long rootFlowId, String userName,
-                                    Workspace workspace, List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+                                    Workspace workspace, List<DSSLabel> dssLabels, boolean exportExternalNodeAppConnResource) throws Exception {
         //获取rootFlow,和所有子Flow
         DSSFlow rootFlow = flowMapper.selectFlowByID(rootFlowId);
         List<DSSFlow> dssFlowList = new ArrayList<>();
@@ -139,13 +137,13 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 } else if (StringUtils.isNotBlank(flowJson)) {
                     // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx/flow_all_type_node/
                     String flowCodePath = IoUtils.generateFlowCodeIOPath(projectPath, dssOrchestratorInfo.getName());
-                    exportFlowResourcesNew(userName, dssProjectId, projectName, flowCodePath, flowJson, dssOrchestratorInfo.getName(), workspace, dssLabels,exportExternalNodeAppConnResource);
-                    exportAllSubFlowsNew(userName, dssFlow, dssProjectId, projectName, flowCodePath,flowMetaPath, workspace, dssLabels,exportExternalNodeAppConnResource);
+                    exportFlowResourcesNewForMultiThread(userName, dssProjectId, projectName, flowCodePath, flowJson, dssOrchestratorInfo.getName(), workspace, dssLabels, exportExternalNodeAppConnResource);
+                    exportAllSubFlowsNew(userName, dssFlow, dssProjectId, projectName, flowCodePath, flowMetaPath, workspace, dssLabels, exportExternalNodeAppConnResource);
                     String flowJsonWithoutParams = extractAndExportParams(flowJson, flowCodePath);
                     try (
-                            OutputStream outputStream = IoUtils.generateExportOutputStream(flowMetaFilePath )
+                            OutputStream outputStream = IoUtils.generateExportOutputStream(flowMetaFilePath)
                     ) {
-                        org.apache.commons.io.IOUtils.write(flowJsonWithoutParams,outputStream,"UTF-8");
+                        org.apache.commons.io.IOUtils.write(flowJsonWithoutParams, outputStream, "UTF-8");
                     }
                     dssFlows.add(dssFlow);
                 } else {
@@ -164,7 +162,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
     @Override
     public String exportFlowListNew(Long dssProjectId, String projectName, List<Long> rootFlowIdList, String userName,
-                                    Workspace workspace, List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+                                    Workspace workspace, List<DSSLabel> dssLabels, boolean exportExternalNodeAppConnResource) throws Exception {
         //获取rootFlow,和所有子Flow
         List<DSSFlow> rootFlowList = flowMapper.selectFlowListByID(rootFlowIdList);
         //生成rootflow及所有子flow
@@ -198,13 +196,13 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 } else if (StringUtils.isNotBlank(flowJson)) {
                     // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx/flow_all_type_node/
                     String flowCodePath = IoUtils.generateFlowCodeIOPath(projectPath, dssOrchestratorInfo.getName());
-                    exportFlowResourcesNew(userName, dssProjectId, projectName, flowCodePath, flowJson, dssOrchestratorInfo.getName(), workspace, dssLabels,exportExternalNodeAppConnResource);
-                    exportAllSubFlowsNew(userName, dssFlow, dssProjectId, projectName, flowCodePath,flowMetaPath, workspace, dssLabels,exportExternalNodeAppConnResource);
+                    exportFlowResourcesNew(userName, dssProjectId, projectName, flowCodePath, flowJson, dssOrchestratorInfo.getName(), workspace, dssLabels, exportExternalNodeAppConnResource);
+                    exportAllSubFlowsNew(userName, dssFlow, dssProjectId, projectName, flowCodePath, flowMetaPath, workspace, dssLabels, exportExternalNodeAppConnResource);
                     String flowJsonWithoutParams = extractAndExportParams(flowJson, flowCodePath);
                     try (
-                            OutputStream outputStream = IoUtils.generateExportOutputStream(flowMetaFilePath )
+                            OutputStream outputStream = IoUtils.generateExportOutputStream(flowMetaFilePath)
                     ) {
-                        org.apache.commons.io.IOUtils.write(flowJsonWithoutParams,outputStream,"UTF-8");
+                        org.apache.commons.io.IOUtils.write(flowJsonWithoutParams, outputStream, "UTF-8");
                     }
                     dssFlows.add(dssFlow);
                 } else {
@@ -219,6 +217,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         }
         return projectPath;
     }
+
     @Override
     public String exportFlowInfo(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
         //获取rootFlow,和所有子Flow
@@ -266,27 +265,27 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
 
     private void exportAllSubFlowsNew(String userName, DSSFlow dssFlowParent, Long projectId, String projectName,
                                       String parentFlowCodePath, String parentFlowMetaPath, Workspace workspace,
-                                      List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+                                      List<DSSLabel> dssLabels, boolean exportExternalNodeAppConnResource) throws Exception {
         List<? extends DSSFlow> subFlows = dssFlowParent.getChildren();
         if (subFlows != null) {
             for (DSSFlow subFlow : subFlows) {
                 String subFlowCodePath = parentFlowCodePath + File.separator + subFlow.getName();
-                String subFlowMetaPath = parentFlowMetaPath  + File.separator + subFlow.getName();
+                String subFlowMetaPath = parentFlowMetaPath + File.separator + subFlow.getName();
 
-                String subFlowMetaSavePath =  subFlowMetaPath+ File.separator +  FLOW_FILE_NAME;
+                String subFlowMetaSavePath = subFlowMetaPath + File.separator + FLOW_FILE_NAME;
                 //导出子flow的json文件
                 String flowJson = bmlService.readTextFromBML(userName, subFlow.getResourceId(), subFlow.getBmlVersion());
 
                 if (!subFlow.getHasSaved()) {
                     logger.info("工作流{}从未保存过，忽略", subFlow.getName());
                 } else if (StringUtils.isNotBlank(flowJson)) {
-                    exportFlowResourcesNew(userName, projectId, projectName, subFlowCodePath, flowJson, subFlow.getName(), workspace, dssLabels,exportExternalNodeAppConnResource);
-                    exportAllSubFlowsNew(userName, subFlow, projectId, projectName, subFlowCodePath, subFlowMetaPath, workspace, dssLabels,exportExternalNodeAppConnResource);
+                    exportFlowResourcesNewForMultiThread(userName, projectId, projectName, subFlowCodePath, flowJson, subFlow.getName(), workspace, dssLabels, exportExternalNodeAppConnResource);
+                    exportAllSubFlowsNew(userName, subFlow, projectId, projectName, subFlowCodePath, subFlowMetaPath, workspace, dssLabels, exportExternalNodeAppConnResource);
                     String subFlowWithoutParams = extractAndExportParams(flowJson, subFlowCodePath);
                     try (
-                            OutputStream outputStream = IoUtils.generateExportOutputStream(subFlowMetaSavePath )
+                            OutputStream outputStream = IoUtils.generateExportOutputStream(subFlowMetaSavePath)
                     ) {
-                        org.apache.commons.io.IOUtils.write(subFlowWithoutParams,outputStream,"UTF-8");
+                        org.apache.commons.io.IOUtils.write(subFlowWithoutParams, outputStream, "UTF-8");
                     }
 
                 } else {
@@ -297,6 +296,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             }
         }
     }
+
     private void exportAllSubFlows(String userName, DSSFlow dssFlowParent, Long projectId, String projectName,
                                    String projectExportBasePath, Workspace workspace, List<DSSLabel> dssLabels) throws Exception {
         List<? extends DSSFlow> subFlows = dssFlowParent.getChildren();
@@ -323,19 +323,21 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     private String genWorkFlowExportDir(String projectExportPath, String flowName) {
         return projectExportPath + File.separator + flowName;
     }
+
     /**
      * 导出工作流中的各种资源，放到flowCodePath中。
      * 工作流中的资源包括工作流资源和节点资源
-     * @param flowCodePath 保存工作流代码的目录
-     * @param flowJson 工作流元信息
-     * @param flowName 工作流明
-     * @param dssLabels label列表
+     *
+     * @param flowCodePath                      保存工作流代码的目录
+     * @param flowJson                          工作流元信息
+     * @param flowName                          工作流明
+     * @param dssLabels                         label列表
      * @param exportExternalNodeAppConnResource 是否导出第三方节点的appconn资源
      * @throws Exception
      */
     private void exportFlowResourcesNew(String userName, Long projectId, String projectName,
                                         String flowCodePath, String flowJson, String flowName,
-                                        Workspace workspace, List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception {
+                                        Workspace workspace, List<DSSLabel> dssLabels, boolean exportExternalNodeAppConnResource) throws Exception {
         if (StringUtils.isNotEmpty(flowCodePath)) {
             //导出工作流资源文件
             List<Resource> resources = workFlowParser.getWorkFlowResources(flowJson);
@@ -351,12 +353,12 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 for (DSSNode node : nodes) {
                     nodeExportService.downloadNodeResourceToLocalNew(userName, node, flowCodePath);
                     NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-                    if(nodeInfo==null){
+                    if (nodeInfo == null) {
                         String msg = String.format("%s note type not exist,please check appconn install successfully", node.getNodeType());
                         logger.error(msg);
                         throw new DSSRuntimeException(msg);
                     }
-                    if (exportExternalNodeAppConnResource&&Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
+                    if (exportExternalNodeAppConnResource && Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
                         logger.info("node.getJobContent() is :{}", node.getJobContent());
                         nodeExportService.downloadAppConnResourceToLocalNew(userName, projectId, projectName, node, flowCodePath, workspace, dssLabels);
                     }
@@ -368,13 +370,89 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         }
     }
 
+
+    private void exportFlowResourcesNewForMultiThread(String userName, Long projectId, String projectName,
+                                            String flowCodePath, String flowJson, String flowName,
+                                            Workspace workspace, List<DSSLabel> dssLabels, boolean exportExternalNodeAppConnResource) throws Exception {
+
+
+        if (StringUtils.isEmpty(flowCodePath)) {
+            throw new DSSErrorException(90067, "工作流导出生成路径为空");
+        }
+        logger.info("export flow resources start,flow name is {}", flowName);
+        // ExecutorService executor = Utils.newFixedThreadPool(5, "export-flow-resource-Thread-", true);
+        List<Resource> resources = workFlowParser.getWorkFlowResources(flowJson);
+        List<Future> futureList = new LinkedList<>();
+        if (resources != null) {
+            //导出工作流资源文件
+            for (Resource resource : resources) {
+                Future future = nodeExportThreadPool.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        downloadFlowResourceFromBmlNew(userName, resource, flowCodePath);
+                    }
+                });
+
+                futureList.add(future);
+            }
+        }
+        //导出工作流节点资源文件,工作流节点appconn文件
+        List<DSSNode> nodes = workFlowParser.getWorkFlowNodes(flowJson);
+        if (nodes != null) {
+            List<NodeInfo> nodeInfoList = nodeInfoMapper.getWorkflowNodeList();
+            Map<String, NodeInfo> nodeTypeMap = nodeInfoList.stream().collect(Collectors.toMap(NodeInfo::getNodeType, nodeInfo -> nodeInfo));
+
+            for (DSSNode node : nodes) {
+                Future future = nodeExportThreadPool.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+
+                            nodeExportService.downloadNodeResourceToLocalNew(userName, node, flowCodePath);
+                            NodeInfo nodeInfo = nodeTypeMap.get(node.getNodeType());
+                            if (nodeInfo == null) {
+                                String msg = String.format("%s note type not exist,please check appconn install successfully", node.getNodeType());
+                                logger.error(msg);
+                                throw new DSSRuntimeException(msg);
+                            }
+                            if (exportExternalNodeAppConnResource && Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
+                                logger.info("node.getJobContent() is :{}", node.getJobContent());
+                                nodeExportService.downloadAppConnResourceToLocalNew(userName, projectId, projectName, node, flowCodePath, workspace, dssLabels);
+                            }
+
+                        } catch (Exception e) {
+                            logger.error("{} node download error msg is  {}", node.getName(), e);
+                            throw new RuntimeException(node.getName() + " node export flow resource error msg is " +  e);
+                        }
+                    }
+                });
+
+                futureList.add(future);
+            }
+        }
+
+        try {
+            // 等待线程完成,等待线程超过60s后超时
+            for (Future future : futureList) {
+                future.get(60, TimeUnit.SECONDS);
+            }
+        } catch (Exception e) {
+            logger.error("export-flow-node thread fail msg is ｛｝ ", e);
+            throw new RuntimeException(e);
+        }
+
+        logger.info("export flow resources end,flow name is {}", flowName);
+    }
+
+
     /**
      * 从flowjson中分离各个节点的params参数，以及flow本身的参数，把参数写到磁盘，并返回分离后的flow
-     * @param flowJson 要分离参数的flow
+     *
+     * @param flowJson     要分离参数的flow
      * @param flowCodePath 工作流代码导出目录
      * @return 分离后的flow
      */
-    private String extractAndExportParams(String flowJson,String flowCodePath) throws IOException {
+    private String extractAndExportParams(String flowJson, String flowCodePath) throws IOException {
         JsonParser parser = new JsonParser();
         JsonObject jsonObject = parser.parse(flowJson).getAsJsonObject();
         JsonArray nodeJsonArray = jsonObject.getAsJsonArray("nodes");
@@ -391,10 +469,10 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
             String paramsJson = gson.toJson(params);
             try (
 
-                    OutputStream outputStream = IoUtils.generateExportOutputStream(nodeParamsPath )
+                    OutputStream outputStream = IoUtils.generateExportOutputStream(nodeParamsPath)
             ) {
 
-                org.apache.commons.io.IOUtils.write(paramsJson,outputStream,"UTF-8");
+                org.apache.commons.io.IOUtils.write(paramsJson, outputStream, "UTF-8");
 
             }
 
@@ -402,6 +480,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         return gson.toJson(jsonObject);
 
     }
+
     @Override
     public void exportFlowResources(String userName, Long projectId, String projectName,
                                     String projectSavePath, String flowJson, String flowName,
@@ -424,7 +503,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                 for (DSSNode node : nodes) {
                     nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
                     NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-                    if(nodeInfo==null){
+                    if (nodeInfo == null) {
                         String msg = String.format("%s note type not exist,please check appconn install successfully", node.getNodeType());
                         logger.error(msg);
                         throw new DSSRuntimeException(msg);
@@ -495,7 +574,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
                                 try {
                                     nodeExportService.downloadNodeResourceToLocal(userName, node, workFlowResourceSavePath);
                                     NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(node.getNodeType());
-                                    if(nodeInfo==null){
+                                    if (nodeInfo == null) {
                                         String msg = String.format("%s note type not exist,please check appconn install successfully", node.getNodeType());
                                         logger.error(msg);
                                         throw new DSSRuntimeException(msg);
@@ -542,10 +621,12 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
     public String downloadFlowJsonFromBml(String userName, String resourceId, String version, String savePath) {
         return bmlService.downloadAndGetText(userName, resourceId, version, savePath);
     }
+
     private String downloadFlowResourceFromBmlNew(String userName, Resource resource, String flowCodePath) {
-        String flowResourcePath = IoUtils.addFileSeparator(flowCodePath,resource.getFileName());
+        String flowResourcePath = IoUtils.addFileSeparator(flowCodePath, resource.getFileName());
         return bmlService.downloadToLocalPath(userName, resource.getResourceId(), resource.getVersion(), flowResourcePath);
     }
+
     private String downloadFlowResourceFromBml(String userName, Resource resource, String savePath) {
         String flowResourcePath = savePath + File.separator + resource.getResourceId() + ".re";
         return bmlService.downloadToLocalPath(userName, resource.getResourceId(), resource.getVersion(), flowResourcePath);

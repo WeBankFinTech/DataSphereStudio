@@ -45,6 +45,7 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.eclipse.jgit.treewalk.filter.OrTreeFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -354,13 +355,52 @@ public class DSSGitUtils {
     }
 
 
+    private static List <String> getDiffPath(List<String> paths,Git git){
+        List <String> diffPaths = new ArrayList<>();
+        try {
+
+            String devNull =  "/dev/null";
+            String[] array = paths.toArray(new String[paths.size()]);
+            TreeFilter pathFilter = createPathFilter(array);
+            List<DiffEntry> diff = git.diff()
+                    .setShowNameAndStatusOnly(true)
+                    .setPathFilter(pathFilter)
+                    .call();
+
+            // 未获取到差异文件信息或者第一次提交(oldPath 全为/dev/null)
+            if(CollectionUtils.isEmpty(diff)
+            || diff.stream().allMatch(diffEntry -> diffEntry.getOldPath().equalsIgnoreCase(devNull))){
+
+                diffPaths = new ArrayList<>(paths);
+
+            }else{
+                for (DiffEntry diffEntry: diff){
+                    logger.info("diff path is {} ,{}",diffEntry.getOldPath(),diffEntry.getNewPath());
+                    String diffPath =  diffEntry.getNewPath().equalsIgnoreCase(devNull) ? diffEntry.getOldPath():diffEntry.getNewPath();
+                    diffPaths.add(diffPath);
+                }
+            }
+
+        }catch (Exception e){
+            logger.error("getDiffPath diff error msg is ", e);
+            diffPaths = new ArrayList<>(paths);
+        }
+
+        return  diffPaths;
+    }
+
 
     public static void push(Repository repository, String projectName, String gitUser, String gitToken, String comment, List<String> paths) throws GitErrorException{
 
         try {
             Git git = new Git(repository);
+
+            logger.info("{} project workflow path is {}",projectName, StringUtils.join(paths,","));
+            List <String> diffPaths = getDiffPath(paths,git);
+
             // 添加新增、更改到暂存区
-            for (String path : paths) {
+            for (String path : diffPaths) {
+                logger.info("diff path is {}",path);
                 // 添加所有更改
                 git.add().addFilepattern(path).call();
                 // 添加删除到暂存区

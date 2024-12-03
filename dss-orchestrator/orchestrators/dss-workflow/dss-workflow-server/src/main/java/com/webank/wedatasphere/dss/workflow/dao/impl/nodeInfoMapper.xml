@@ -196,5 +196,9 @@
         </if>
     </select>
 
+    <select id="getWorkflowNodeList" resultMap="workflowNode">
+        select * from `dss_workflow_node`
+    </select>
+
 
 </mapper>

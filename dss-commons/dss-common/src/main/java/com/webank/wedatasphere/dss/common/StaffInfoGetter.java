@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.common;
 
 import java.util.List;
+import java.util.Set;
 
 
 public interface StaffInfoGetter {
@@ -28,5 +29,7 @@ public interface StaffInfoGetter {
     List<String> getAllDepartments();
 
     StaffInfo getStaffInfoByUsername(String username);
+
+    Set<String> getAllUsernames();
 
 }

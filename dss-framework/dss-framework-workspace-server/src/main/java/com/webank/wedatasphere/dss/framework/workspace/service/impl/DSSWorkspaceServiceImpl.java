@@ -742,6 +742,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
         PageMethod.startPage(currentPage, pageSize);
         List<DSSUserRoleComponentPriv> users = dssWorkspaceUserMapper.getAllUsers();
         Map<String, DSSUserRoleComponentPriv> userRolePrivMap = dssWorkspaceUserMapper.getWorkspaceRolePrivByUsername(users);
+        Set<String> allUsernames = staffInfoGetter.getAllUsernames();
+        users = users.stream().filter(user->allUsernames.contains(user.getUserName())).collect(Collectors.toList());
         //处理用户没有角色权限时只返回用户
         for (DSSUserRoleComponentPriv user : users) {
             if (MapUtils.isEmpty(userRolePrivMap) || Objects.isNull(userRolePrivMap.get(user.getUserName()))) {

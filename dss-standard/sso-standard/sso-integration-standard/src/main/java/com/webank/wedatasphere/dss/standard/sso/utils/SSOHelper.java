@@ -39,6 +39,7 @@ public class SSOHelper {
 
     public static final String WORKSPACE_ID_COOKIE_KEY = "workspaceId";
     public static final String WORKSPACE_NAME_COOKIE_KEY = "workspaceName";
+    public static final String USERNAME_NAME_COOKIE_KEY = "dss_user_name";
     private static SSOBuilderService ssoBuilderService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SSOHelper.class);
@@ -189,6 +190,18 @@ public class SSOHelper {
         } else {
             return host;
         }
+    }
+
+    public static void addUsernameCookie(HttpServletRequest request, HttpServletResponse response, String username) {
+        boolean isWorkspaceExists =  Arrays.stream(request.getCookies())
+                .anyMatch(cookie -> USERNAME_NAME_COOKIE_KEY.equals(cookie.getName()) && username.equals(cookie.getValue()));
+        if (isWorkspaceExists) {
+            LOGGER.warn("username {} already exists in DSS cookies, ignore to set it again.", username);
+            return ;
+        }
+        Cookie usernameCookie = new Cookie(USERNAME_NAME_COOKIE_KEY, username);
+        usernameCookie.setPath("/");
+        response.addCookie(usernameCookie);
     }
 
 }

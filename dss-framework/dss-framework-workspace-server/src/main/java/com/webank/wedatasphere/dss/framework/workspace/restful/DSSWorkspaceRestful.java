@@ -363,7 +363,10 @@ public class DSSWorkspaceRestful {
             LOGGER.error("User {} get workspace {} failed.", username, workspaceId, e);
             return Message.error(e);
         }
+
         SSOHelper.setAndGetWorkspace(httpServletRequest, httpServletResponse, workspace.getId(), workspace.getName());
+        SSOHelper.addUsernameCookie(httpServletRequest, httpServletResponse, username);
+
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, workspaceId.intValue());
         if (roles == null || roles.isEmpty()) {
             LOGGER.error("username {}, in workspace {} roles are null or empty", username, workspaceId);

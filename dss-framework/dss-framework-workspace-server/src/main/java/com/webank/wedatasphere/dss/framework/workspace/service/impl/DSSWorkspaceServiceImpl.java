@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.github.pagehelper.page.PageMethod;
@@ -269,6 +270,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setRoleName(workspaceDBHelper.getRoleNameById(minRoleId));
         } else {
             String homepageUrl = "/workspaceHome?workspaceId=" + workspaceIds.get(0);
+            DSSWorkspace defaultWorkspace = dssWorkspaces.stream()
+                    .filter(workspcae -> workspcae.getName().equalsIgnoreCase(ApplicationConf.HOMEPAGE_DEFAULT_WORKSPACE.getValue())).findAny().orElse(null);
+            if(ObjectUtil.isEmpty(defaultWorkspace)){
+                homepageUrl = "/workspaceHome?workspaceId=" + defaultWorkspace.getId();
+            }
+
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
                 homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
             }

@@ -16,13 +16,15 @@
 
 package com.webank.wedatasphere.dss.framework.workspace.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.collect.Lists;
 import com.webank.wedatasphere.dss.common.StaffInfo;
 import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-
+import java.util.Set;
 
 
 public class DefaultStaffInfoGetter implements StaffInfoGetter {
@@ -46,5 +48,10 @@ public class DefaultStaffInfoGetter implements StaffInfoGetter {
     @Override
     public StaffInfo getStaffInfoByUsername(String username) {
         return new StaffInfo();
+    }
+
+    @Override
+    public Set<String> getAllUsernames() {
+        return CollUtil.newHashSet("hadoop");
     }
 }

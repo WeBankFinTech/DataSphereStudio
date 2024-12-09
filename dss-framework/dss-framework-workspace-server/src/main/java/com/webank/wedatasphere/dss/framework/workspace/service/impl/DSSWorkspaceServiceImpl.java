@@ -272,7 +272,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             String homepageUrl = "/workspaceHome?workspaceId=" + workspaceIds.get(0);
             DSSWorkspace defaultWorkspace = dssWorkspaces.stream()
                     .filter(workspcae -> workspcae.getName().equalsIgnoreCase(ApplicationConf.HOMEPAGE_DEFAULT_WORKSPACE.getValue())).findAny().orElse(null);
-            if(ObjectUtil.isEmpty(defaultWorkspace)){
+            if(ObjectUtil.isNotEmpty(defaultWorkspace)){
                 homepageUrl = "/workspaceHome?workspaceId=" + defaultWorkspace.getId();
             }
 

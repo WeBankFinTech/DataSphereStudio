@@ -7,7 +7,7 @@ public class GitServerConfig {
 
     public static final CommonVars<String> GIT_RESTFUL_API_CREATE_PROJECTS = CommonVars.apply("wds.dss.git.server.rest.create.project", "api/v4/projects/");
 
-    public static final CommonVars<String> GIT_URL_PRE = CommonVars.apply("wds.dss.git.url", ***REMOVED***
+    public static final CommonVars<String> GIT_URL_PRE = CommonVars.apply("wds.dss.git.url", "***REMOVED***");
 
     public static final CommonVars<Integer> GIT_THREAD_NUM = CommonVars.apply("wds.dss.git.thread.num", 23);
 

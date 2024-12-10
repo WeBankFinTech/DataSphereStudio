@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -334,7 +335,7 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());
         String route = orchestratorDeleteRequest.getLabels().getRoute();
-        List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(route));
+        List<DSSLabel> dssLabels = CollUtil.newArrayList(new EnvDSSLabel(route));
         if(DSSCommonUtils.ENV_LABEL_VALUE_DEV.equals(route)){
             dssLabels.add(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_PROD));
         }

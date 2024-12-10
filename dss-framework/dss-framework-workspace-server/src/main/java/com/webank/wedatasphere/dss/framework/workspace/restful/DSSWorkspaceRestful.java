@@ -341,15 +341,8 @@ public class DSSWorkspaceRestful {
      */
     @RequestMapping(path = "getWorkSpaceStr", method = RequestMethod.GET)
     public Message getWorkSpaceStr(@RequestParam(name = "workspaceName") String workspaceName) {
-        String username = SecurityFilter.getLoginUsername(httpServletRequest);
-        DSSWorkspace workspaceEntity;
-        try {
-            workspaceEntity = dssWorkspaceService.getWorkspacesByName(workspaceName, username);
-        } catch (DSSErrorException e) {
-            LOGGER.error("User {} get workspace {} failed.", username, workspaceName, e);
-            return Message.error(e);
-        }
-        Workspace workspace = SSOHelper.setAndGetWorkspace(httpServletRequest, httpServletResponse, workspaceEntity.getId(), workspaceName);
+        int workspaceId = dssWorkspaceService.getWorkspaceId(workspaceName);
+        Workspace workspace = SSOHelper.setAndGetWorkspace(httpServletRequest, httpServletResponse, workspaceId, workspaceName);
         return Message.ok("succeed.").data("workspaceStr", DSSCommonUtils.COMMON_GSON.toJson(workspace));
     }
 

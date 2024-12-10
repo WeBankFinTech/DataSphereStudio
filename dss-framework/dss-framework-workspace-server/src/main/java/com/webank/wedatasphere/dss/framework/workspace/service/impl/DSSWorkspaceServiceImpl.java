@@ -26,6 +26,7 @@ import com.webank.wedatasphere.dss.appconn.manager.AppConnManager;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppInstanceConstants;
 import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
 import com.webank.wedatasphere.dss.framework.admin.conf.AdminConf;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
@@ -484,6 +485,14 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public String getWorkspaceName(Long workspaceId) {
         return dssWorkspaceMapper.getWorkspaceNameById(workspaceId);
+    }
+    @Override
+    public int getWorkspaceId(String workspaceName) {
+        Integer workspaceId= dssWorkspaceMapper.getWorkspaceIdByName(workspaceName);
+        if (workspaceId == null || workspaceId < 0) {
+            throw new DSSRuntimeException("workspace is not exist.workspaceName:" + workspaceName);
+        }
+        return workspaceId;
     }
 
     @Override

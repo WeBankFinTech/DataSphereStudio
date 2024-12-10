@@ -333,7 +333,11 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
         DSSProject dssProject = validateOperation(orchestratorDeleteRequest.getProjectId(), username);
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestrator(orchestratorDeleteRequest.getId());
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorInfo.getName());
-        List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(orchestratorDeleteRequest.getLabels().getRoute()));
+        String route = orchestratorDeleteRequest.getLabels().getRoute();
+        List<DSSLabel> dssLabels = Collections.singletonList(new EnvDSSLabel(route));
+        if(DSSCommonUtils.ENV_LABEL_VALUE_DEV.equals(route)){
+            dssLabels.add(new EnvDSSLabel(DSSCommonUtils.ENV_LABEL_VALUE_PROD));
+        }
         if (orchestratorDeleteRequest.getDeleteSchedulerWorkflow()) {
             tryOrchestrationOperation(dssLabels, false, username, dssProject.getName(), workspace, orchestratorInfo,
                     OrchestrationService::getOrchestrationDeletionOperation,

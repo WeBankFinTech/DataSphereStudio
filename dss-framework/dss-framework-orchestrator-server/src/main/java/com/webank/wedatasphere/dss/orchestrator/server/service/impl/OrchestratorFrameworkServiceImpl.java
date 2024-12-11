@@ -1000,12 +1000,14 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
     }
 
     @Override
-    public CommonOrchestratorVo deleteOrchestratorByLabel(String username, Long projectId, Long orchestratorId, Long workspaceId, String workspaceName, LabelRouteVO dssLabel, Map<String, String> cookies) throws Exception {
+    public CommonOrchestratorVo deleteOrchestratorByLabel(String username, Long projectId, Long orchestratorId, Long workspaceId, String workspaceName, Map<String, String> cookies) throws Exception {
         LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorId);
         OrchestratorDeleteRequest orchestratorDeleteRequest = new OrchestratorDeleteRequest();
         orchestratorDeleteRequest.setId(orchestratorId);
         orchestratorDeleteRequest.setWorkspaceId(workspaceId);
         orchestratorDeleteRequest.setProjectId(projectId);
+        LabelRouteVO dssLabel = new LabelRouteVO();
+        dssLabel.setRoute(DSSCommonUtils.ENV_LABEL_VALUE_PROD);
         orchestratorDeleteRequest.setLabels(dssLabel);
         Workspace workspace = new Workspace();
         workspace.setWorkspaceId(workspaceId);

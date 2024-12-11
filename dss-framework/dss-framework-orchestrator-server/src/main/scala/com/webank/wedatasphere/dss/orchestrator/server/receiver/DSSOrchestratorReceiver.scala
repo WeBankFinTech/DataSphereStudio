@@ -129,10 +129,9 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
       val projectId = requestOrcDelete.getProjectId
       val orchestratorId = requestOrcDelete.getOrchestratorId
       val workspaceId = requestOrcDelete.getWorkspaceId
-      val dssLabel = requestOrcDelete.getDssLabels
       val workspaceName = requestOrcDelete.getWorkspaceName
       val cookies = requestOrcDelete.getCookies
-      orchestratorFrameworkService.deleteOrchestratorByLabel(username, projectId, orchestratorId, workspaceId, workspaceName, dssLabel, cookies)
+      orchestratorFrameworkService.deleteOrchestratorByLabel(username, projectId, orchestratorId, workspaceId, workspaceName, cookies)
 
     case _ => throw new DSSErrorException(90000, "Not support message type " + message)
   }

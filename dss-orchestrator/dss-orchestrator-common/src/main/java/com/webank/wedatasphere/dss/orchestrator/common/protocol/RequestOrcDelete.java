@@ -10,17 +10,15 @@ public class RequestOrcDelete {
     private Long workspaceId;
     private Long projectId;
     private Long orchestratorId;
-    private LabelRouteVO dssLabels;
 
     protected String workspaceName;
     protected Map<String, String> cookies;
 
-    public RequestOrcDelete(String userName, Long workspaceId, Long projectId, Long orchestratorId, LabelRouteVO dssLabels, String workspaceName, Map<String, String> cookies) {
+    public RequestOrcDelete(String userName, Long workspaceId, Long projectId, Long orchestratorId, String workspaceName, Map<String, String> cookies) {
         this.userName = userName;
         this.workspaceId = workspaceId;
         this.projectId = projectId;
         this.orchestratorId = orchestratorId;
-        this.dssLabels = dssLabels;
         this.workspaceName = workspaceName;
         this.cookies = cookies;
     }

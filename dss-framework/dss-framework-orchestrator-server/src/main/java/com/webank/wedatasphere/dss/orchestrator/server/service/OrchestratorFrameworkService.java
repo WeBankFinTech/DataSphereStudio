@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.orchestrator.server.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitHistoryResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.entity.*;
@@ -29,6 +30,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.commons.math3.util.Pair;
 
 import java.util.List;
+import java.util.Map;
 
 
 public interface OrchestratorFrameworkService {
@@ -60,4 +62,6 @@ public interface OrchestratorFrameworkService {
     List<OrchestratorMeta> getAllOrchestratorMeta(OrchestratorMetaRequest orchestratorMetaRequest, List<Long> total,String username);
 
     DSSOrchestratorVersion getLatestOrchestratorVersion(Long orchestratorId);
+
+    CommonOrchestratorVo deleteOrchestratorByLabel(String username, Long projectId, Long orchestratorId, Long workspaceId, String workspaceName, LabelRouteVO dssLabel, Map<String, String> cookies) throws Exception;
 }

@@ -36,6 +36,7 @@ public interface DSSWorkspaceMapper {
             @Result(property = "createTime", column = "create_time"),
             @Result(property = "lastUpdateTime", column = "last_update_time"),
             @Result(property = "lastUpdateUser", column = "last_update_user"),
+            @Result(property = "enabledFlowKeywordsCheck",column = "enabled_flow_keywords_check"),
     })
     DSSWorkspace getWorkspace(@Param("workspaceId") int workspaceId);
 

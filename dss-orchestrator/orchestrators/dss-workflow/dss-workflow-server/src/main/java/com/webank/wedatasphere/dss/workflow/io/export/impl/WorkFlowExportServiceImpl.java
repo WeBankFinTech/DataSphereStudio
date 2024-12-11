@@ -432,7 +432,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         }
 
         try {
-            // 等待线程完成或等待线程超时
+            // 等待线程完成
             for (Future future : futureList) {
                 future.get();
             }

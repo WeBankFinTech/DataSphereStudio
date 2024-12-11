@@ -55,14 +55,6 @@ public class RequestOrcDelete {
         this.orchestratorId = orchestratorId;
     }
 
-    public LabelRouteVO getDssLabels() {
-        return dssLabels;
-    }
-
-    public void setDssLabels(LabelRouteVO dssLabels) {
-        this.dssLabels = dssLabels;
-    }
-
     public String getWorkspaceName() {
         return workspaceName;
     }

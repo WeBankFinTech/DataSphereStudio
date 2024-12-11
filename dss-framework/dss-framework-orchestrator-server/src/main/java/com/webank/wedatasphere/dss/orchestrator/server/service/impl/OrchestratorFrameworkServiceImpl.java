@@ -37,6 +37,7 @@ import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.common.protocol.project.*;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.DSSCommonUtils;
@@ -996,6 +997,21 @@ public class OrchestratorFrameworkServiceImpl implements OrchestratorFrameworkSe
                 }
             }
         }
+    }
+
+    @Override
+    public CommonOrchestratorVo deleteOrchestratorByLabel(String username, Long projectId, Long orchestratorId, Long workspaceId, String workspaceName, LabelRouteVO dssLabel, Map<String, String> cookies) throws Exception {
+        LOGGER.info("{} begins to delete a orchestrator {}.", username, orchestratorId);
+        OrchestratorDeleteRequest orchestratorDeleteRequest = new OrchestratorDeleteRequest();
+        orchestratorDeleteRequest.setId(orchestratorId);
+        orchestratorDeleteRequest.setWorkspaceId(workspaceId);
+        orchestratorDeleteRequest.setProjectId(projectId);
+        orchestratorDeleteRequest.setLabels(dssLabel);
+        Workspace workspace = new Workspace();
+        workspace.setWorkspaceId(workspaceId);
+        workspace.setWorkspaceName(workspaceName);
+        workspace.setCookies(cookies);
+        return deleteOrchestrator(username, orchestratorDeleteRequest, workspace);
     }
 
 

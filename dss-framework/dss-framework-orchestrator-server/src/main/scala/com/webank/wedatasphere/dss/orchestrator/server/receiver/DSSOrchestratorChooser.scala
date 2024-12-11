@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.receiver
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest
-import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
+import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorFrameworkService, OrchestratorPluginService, OrchestratorService}
 
 import javax.annotation.PostConstruct
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
@@ -39,10 +39,13 @@ class DSSOrchestratorChooser extends ReceiverChooser {
   @Autowired
   var orchestratorContext: DSSOrchestratorContext = _
 
+  @Autowired
+  var orchestratorFrameworkService: OrchestratorFrameworkService = _
+
   var receiver: Option[DSSOrchestratorReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService, orchestratorPluginService, orchestratorContext))
+  def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService, orchestratorPluginService, orchestratorContext, orchestratorFrameworkService))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: RequestExportOrchestrator => receiver
@@ -59,6 +62,7 @@ class DSSOrchestratorChooser extends ReceiverChooser {
     case _: OrchestratorRequest => receiver
     case _: RequestUpdateOrchestratorBML => receiver
     case _: RequestOrchestratorVersionUpdateTime => receiver
+    case _: RequestOrcDelete=> receiver
     case _ => None
   }
 }

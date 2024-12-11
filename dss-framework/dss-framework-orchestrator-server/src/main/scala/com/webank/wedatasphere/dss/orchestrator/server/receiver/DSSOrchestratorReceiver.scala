@@ -25,7 +25,7 @@ import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
 import com.webank.wedatasphere.dss.orchestrator.publish.entity.OrchestratorExportResult
 import com.webank.wedatasphere.dss.orchestrator.publish.{ExportDSSOrchestratorPlugin, ImportDSSOrchestratorPlugin}
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.{OrchestratorRequest, OrchestratorSubmitRequest}
-import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
+import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorFrameworkService, OrchestratorPluginService, OrchestratorService}
 import org.apache.linkis.rpc.{Receiver, Sender}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -33,7 +33,7 @@ import java.util
 import scala.concurrent.duration.Duration
 
 
-class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestratorPluginService: OrchestratorPluginService, orchestratorContext: DSSOrchestratorContext) extends Receiver {
+class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestratorPluginService: OrchestratorPluginService, orchestratorContext: DSSOrchestratorContext, orchestratorFrameworkService: OrchestratorFrameworkService) extends Receiver {
 
   private val LOGGER = LoggerFactory.getLogger(classOf[DSSOrchestratorReceiver])
 
@@ -124,6 +124,15 @@ class DSSOrchestratorReceiver(orchestratorService: OrchestratorService, orchestr
       val boolean = orchestratorService.updateOrchestratorTime(orchestratorVersionUpdateTime.getOrchestratorId)
       boolean
 
+    case requestOrcDelete: RequestOrcDelete =>
+      val username = requestOrcDelete.getUserName
+      val projectId = requestOrcDelete.getProjectId
+      val orchestratorId = requestOrcDelete.getOrchestratorId
+      val workspaceId = requestOrcDelete.getWorkspaceId
+      val dssLabel = requestOrcDelete.getDssLabels
+      val workspaceName = requestOrcDelete.getWorkspaceName
+      val cookies = requestOrcDelete.getCookies
+      orchestratorFrameworkService.deleteOrchestratorByLabel(username, projectId, orchestratorId, workspaceId, workspaceName, dssLabel, cookies)
 
     case _ => throw new DSSErrorException(90000, "Not support message type " + message)
   }

@@ -120,6 +120,7 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         // /appcom/tmp/dss/yyyyMMddHHmmssSSS/projectxxx/.flowmeta/flow_all_type_node/
         List<DSSFlow> dssFlows = new ArrayList<>();
         for (DSSFlow dssFlow : dssFlowList) {
+            //不出意外，永远只会有一个Root工作流，所以这里的循环if，只会进入一次
             if (dssFlow.getRootFlow()) {
                 // 生成rootflow orchestrator信息
                 Sender orcSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getOrcSender(dssLabels);

@@ -36,7 +36,7 @@ public interface NodeInputService {
                                  Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException,IOException;
     String uploadAppConnResourceNew(String userName, String projectName, DSSFlow dssFlow,
                                  String nodeJson, String flowContextId, String nodePath,
-                                 Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException,IOException;
+                                 Workspace workspace, String orcVersion, List<DSSLabel> dssLabels) throws IOException;
 
     String updateNodeSubflowID(String nodeJson, long subflowID) throws IOException;
 

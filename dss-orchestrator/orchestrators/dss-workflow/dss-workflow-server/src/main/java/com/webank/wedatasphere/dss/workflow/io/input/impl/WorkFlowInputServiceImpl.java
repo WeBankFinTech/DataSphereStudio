@@ -22,6 +22,7 @@ import com.google.gson.JsonParser;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.utils.IoUtils;
 import com.webank.wedatasphere.dss.common.utils.MapUtils;
@@ -37,6 +38,7 @@ import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.io.input.WorkFlowInputService;
 import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
@@ -55,6 +57,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -106,7 +112,7 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
                 parentFlowId,
                 contextId,
                 orcVersion);
-        flowJson = inputWorkFlowNodesNew(userName, projectName, flowJson, dssFlow,
+        flowJson = inputWorkFlowNodesNewForMultiThread(userName, projectName, flowJson, dssFlow,
                 flowCodePath, workspace, orcVersion, dssLabels);
         //如果包含subflow,需要一同导入subflow内容，并更新parentflow的json内容
         List<? extends DSSFlow> subFlows = dssFlow.getChildren();
@@ -317,6 +323,93 @@ public class WorkFlowInputServiceImpl implements WorkFlowInputService {
             }
         }
 
+        return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
+    }
+    /**
+     * 导入工作流节点
+     * @param userName
+     * @param projectName
+     * @param flowJson
+     * @param dssFlow
+     * @param workspace
+     * @param orcVersion
+     * @param dssLabels
+     * @return
+     * @throws DSSErrorException
+     * @throws IOException
+     */
+    private String inputWorkFlowNodesNewForMultiThread(String userName, String projectName, String flowJson,
+                                         DSSFlow dssFlow, String flowCodePath, Workspace workspace,
+                                         String orcVersion, List<DSSLabel> dssLabels) throws DSSErrorException, IOException {
+        List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
+        if (nodeJsonList == null) {
+            throw new DSSErrorException(90073, "工作流内没有工作流节点，导入失败 " + dssFlow.getName());
+        }
+        String updateContextId = workFlowParser.getValueWithKey(flowJson, CSCommonUtils.CONTEXT_ID_STR);
+        if (nodeJsonList.size() == 0) {
+            return flowJson;
+        }
+        List<DSSFlow> subflows = (List<DSSFlow>) dssFlow.getChildren();
+        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
+        if (nodeJsonList.size() > 0) {
+            List<Future<Map<String, Object>>> futures = new ArrayList<>(nodeJsonList.size());
+            for (String nodeJson : nodeJsonList) {
+                Future<Map<String, Object>> future =DssJobThreadPool.nodeImportThreadPool.submit(
+                        ()-> {
+                            try{
+                                String nodeName = nodeParser.getNodeValue("title", nodeJson);
+                                String nodePath = IoUtils.addFileSeparator(flowCodePath, nodeName);
+                                //上传节点资源到bml，实现节点资源导入，返回新的节点json
+                                String updateNodeJson = nodeInputService.uploadResourceToBmlNew(userName, nodeJson, nodePath,
+                                        nodeName, projectName);
+                                //导入第三方节点
+                                updateNodeJson = nodeInputService.uploadAppConnResourceNew(userName, projectName,
+                                        dssFlow, updateNodeJson, updateContextId, nodePath,
+                                        workspace, orcVersion, dssLabels);
+                                Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
+                                String nodeParamsJson = readNodeParam(userName, nodePath,nodeName);
+
+                                //更新subflowID
+                                String nodeType = nodeJsonMap.get("jobType").toString();
+                                if ("workflow.subflow".equals(nodeType) && CollectionUtils.isNotEmpty(subflows)) {
+                                    String subFlowName = nodeJsonMap.get("title").toString();
+                                    logger.info("subflows:{}", subflows);
+                                    List<DSSFlow> dssFlowList = subflows.stream().filter(subflow ->
+                                            subflow.getName().equals(subFlowName)
+                                    ).collect(Collectors.toList());
+                                    if (dssFlowList.size() == 1) {
+                                        updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, dssFlowList.get(0).getId());
+                                        nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
+
+                                    } else if (dssFlowList.size() > 1) {
+                                        logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                                        throw new DSSRuntimeException(90077, "工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                                    } else {
+                                        logger.error("工程内未能找到子工作流节点，导入失败" + subFlowName);
+                                        throw new DSSRuntimeException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
+                                    }
+                                }
+                                if (nodeParamsJson != null && !"null".equalsIgnoreCase(nodeParamsJson)) {
+                                    nodeJsonMap.put("params", BDPJettyServerHelper.jacksonJson().readValue(nodeParamsJson, Map.class));
+                                }
+                                return  nodeJsonMap;
+
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        });
+                futures.add(future);
+            }
+            for (Future<Map<String, Object>> future : futures) {
+                try{
+                    Map<String, Object> nodeJsonMap=future.get();
+                    nodeJsonListRes.add(nodeJsonMap);
+                } catch (InterruptedException|ExecutionException e) {
+                    logger.error("import-flow-node thread fail msg is ｛｝ ", e);
+                    throw new RuntimeException(e);
+                }
+            }
+        }
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
     }
 

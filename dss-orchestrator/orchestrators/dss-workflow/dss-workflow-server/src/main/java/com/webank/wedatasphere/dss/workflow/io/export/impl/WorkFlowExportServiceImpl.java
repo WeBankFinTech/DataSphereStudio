@@ -432,12 +432,12 @@ public class WorkFlowExportServiceImpl implements WorkFlowExportService {
         }
 
         try {
-            // 等待线程完成,等待线程超过60s后超时
+            // 等待线程完成
             for (Future future : futureList) {
-                future.get(60, TimeUnit.SECONDS);
+                future.get();
             }
         } catch (Exception e) {
-            logger.error("export-flow-node thread fail msg is ｛｝ ", e);
+            logger.error("{} flow export fail msg is ｛｝ ", flowName, e);
             throw new RuntimeException(e);
         }
 

@@ -35,6 +35,8 @@ public class DSSWorkspace {
     private int adminPermission;
     private Boolean enabledFlowKeywordsCheck;
 
+    private Boolean isDefaultReference;
+
     public int getAdminPermission() {
         return adminPermission;
     }
@@ -145,5 +147,13 @@ public class DSSWorkspace {
 
     public void setEnabledFlowKeywordsCheck(Boolean enabledFlowKeywordsCheck) {
         this.enabledFlowKeywordsCheck = enabledFlowKeywordsCheck;
+    }
+
+    public Boolean getDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setDefaultReference(Boolean defaultReference) {
+        isDefaultReference = defaultReference;
     }
 }

@@ -63,5 +63,4 @@ public interface OrchestratorFrameworkService {
 
     DSSOrchestratorVersion getLatestOrchestratorVersion(Long orchestratorId);
 
-    CommonOrchestratorVo deleteOrchestratorByLabel(String username, Long projectId, Long orchestratorId, Long workspaceId, String workspaceName, Map<String, String> cookies) throws Exception;
 }

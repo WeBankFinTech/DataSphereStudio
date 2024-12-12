@@ -39,13 +39,10 @@ class DSSOrchestratorChooser extends ReceiverChooser {
   @Autowired
   var orchestratorContext: DSSOrchestratorContext = _
 
-  @Autowired
-  var orchestratorFrameworkService: OrchestratorFrameworkService = _
-
   var receiver: Option[DSSOrchestratorReceiver] = _
 
   @PostConstruct
-  def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService, orchestratorPluginService, orchestratorContext, orchestratorFrameworkService))
+  def init(): Unit = receiver = Some(new DSSOrchestratorReceiver(orchestratorService, orchestratorPluginService, orchestratorContext))
 
   override def chooseReceiver(event: RPCMessageEvent): Option[Receiver] = event.message match {
     case _: RequestExportOrchestrator => receiver
@@ -62,7 +59,6 @@ class DSSOrchestratorChooser extends ReceiverChooser {
     case _: OrchestratorRequest => receiver
     case _: RequestUpdateOrchestratorBML => receiver
     case _: RequestOrchestratorVersionUpdateTime => receiver
-    case _: RequestOrcDelete=> receiver
     case _ => None
   }
 }

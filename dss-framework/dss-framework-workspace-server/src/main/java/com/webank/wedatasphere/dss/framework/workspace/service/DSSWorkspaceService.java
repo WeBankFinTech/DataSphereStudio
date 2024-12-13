@@ -119,4 +119,6 @@ public interface DSSWorkspaceService {
     int transferWorkspace(String workspaceName,String oldOwner,String newOwner,String desc) throws DSSErrorException;
 
     boolean checkUserIfSettingAdmin(String username);
+
+    void updateWorkspaceInfo(DSSWorkspace dssWorkspace);
 }

@@ -69,6 +69,10 @@ public enum TargetTypeEnum {
      * 工作流引用默认模板
      */
      DSS_EC_CONFIG_TEMPLATE_WORKFLOW("dss_ec_config_template_workflow"),
+
+
+    DSS_WORKSPACE_DEFAULT_TEMPLATE("dss_workspace_default_template"),
+
     ;
     private String name;
 

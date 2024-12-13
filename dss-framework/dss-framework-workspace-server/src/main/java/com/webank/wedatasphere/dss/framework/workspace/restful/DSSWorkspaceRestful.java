@@ -474,5 +474,35 @@ public class DSSWorkspaceRestful {
                 OperateTypeEnum.REM_FROM_FAVORITES, json);
         return Message.ok().data("favoriteId", favoriteId);
     }
+
+
+    @RequestMapping(value = "/updateWorkspaceInfo",method = RequestMethod.POST)
+    public Message updateWorkspaceInfo(@RequestBody Map<String, String> json) throws  DSSErrorException{
+
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        String workspaceId= json.getOrDefault("workspaceId",String.valueOf(workspace.getWorkspaceId()));
+
+        if(!workspaceId.equals(String.valueOf(workspace.getWorkspaceId()))){
+            throw  new DSSErrorException(90053,"当前工作空间与cookie中的不一致，重新刷新页面后在操作");
+        }
+
+        String enabledFlowKeywordsCheck = json.getOrDefault("enabledFlowKeywordsCheck","0");
+        String isDefaultReference = json.getOrDefault("isDefaultReference","0");
+
+        DSSWorkspace dssWorkspace = new DSSWorkspace();
+        dssWorkspace.setId(Integer.parseInt(workspaceId));
+        dssWorkspace.setEnabledFlowKeywordsCheck(enabledFlowKeywordsCheck);
+        dssWorkspace.setIsDefaultReference(isDefaultReference);
+
+        dssWorkspaceService.updateWorkspaceInfo(dssWorkspace);
+
+        AuditLogUtils.printLog(username, workspaceId, workspace.getWorkspaceName(), TargetTypeEnum.WORKSPACE, workspaceId, workspace.getWorkspaceName(),
+                OperateTypeEnum.UPDATE, json);
+
+        return  Message.ok().data("workspaceId", workspaceId);
+
+    }
 }
 

@@ -795,4 +795,10 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             });
         });
     }
+
+
+    @Override
+    public void updateWorkspaceInfo(DSSWorkspace dssWorkspace){
+        dssWorkspaceMapper.updateWorkspaceInfo(dssWorkspace);
+    }
 }

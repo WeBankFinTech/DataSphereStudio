@@ -83,4 +83,6 @@ public interface DSSWorkspaceMapper {
 
 
     void updateWorkSpace(DSSWorkspace dssWorkspace);
+
+    void updateWorkspaceInfo(DSSWorkspace dssWorkspace);
 }

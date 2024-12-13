@@ -81,4 +81,10 @@
         where id = #{id}
     </update>
 
+    <update id="updateWorkspaceInfo" parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
+        update dss_workspace set enabled_flow_keywords_check = #{enabledFlowKeywordsCheck},
+        is_default_reference = #{isDefaultReference}
+        where id = #{id}
+    </update>
+
 </mapper>

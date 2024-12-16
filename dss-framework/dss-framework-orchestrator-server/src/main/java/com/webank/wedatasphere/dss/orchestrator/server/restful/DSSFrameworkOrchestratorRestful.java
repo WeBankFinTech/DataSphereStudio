@@ -763,4 +763,14 @@ public class DSSFrameworkOrchestratorRestful {
         return Message.ok().data("data", orchestratorService.getAllOrchestratorName(workspaceId,projectName));
     }
 
+
+    @RequestMapping(value = "publishFlowCheck",method = RequestMethod.GET)
+    public Message publishFlowCheck(@RequestParam("orchestratorId") Long orchestratorId,
+                                    @RequestParam("projectId") Long projectId) throws  DSSErrorException{
+
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+
+        return  Message.ok().data("data",orchestratorPluginService.getNotContainsKeywordsNode(orchestratorId,projectId,workspace));
+    }
+
 }

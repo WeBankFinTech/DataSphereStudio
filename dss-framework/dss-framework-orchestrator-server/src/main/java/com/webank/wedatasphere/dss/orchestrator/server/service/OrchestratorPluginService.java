@@ -58,4 +58,6 @@ public interface OrchestratorPluginService {
     String diffStatus(Long taskId) throws DSSErrorException;
 
     OrchestratorDiffDirVo diffContent(Long taskId);
+
+    Map<String,List<String>> getNotContainsKeywordsNode(long orchestratorId,long projectId,Workspace workspace) throws  DSSErrorException;
 }

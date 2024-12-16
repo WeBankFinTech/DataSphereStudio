@@ -38,4 +38,7 @@ public interface DSSGitWorkflowManagerService {
     GitCommitResponse batchCommit(GitBatchCommitRequest request) throws DSSErrorException;
 
     Repository getRepository(File repoDir, String projectName, Long workspaceId, String gitUser, String gitToken, String gitUrl) throws DSSErrorException;
+
+    GitDiffFileContentResponse getDiffFileContent(GitDiffFileContentRequest request) throws DSSErrorException;
+
 }

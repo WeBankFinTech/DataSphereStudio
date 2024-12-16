@@ -170,5 +170,9 @@ public interface OrchestratorMapper {
     List<OrchestratorSubmitJob> getSubmitJobStatus(@Param("orchestratorIdList") List<Long> orchestratorIdList);
 
 
+    void updateOrchestratorNotContainsKeywordsNode(@Param("orchestratorId") Long orchestratorId, @Param("notContainsKeywordsNode") String notContainsKeywordsNode);
+
+    String getOrchestratorNotContainsKeywordsNode(@Param("orchestratorId") Long orchestratorId);
+
 
 }

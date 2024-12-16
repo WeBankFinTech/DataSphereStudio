@@ -508,5 +508,14 @@
         </foreach>
     </select>
 
+    <update id="updateOrchestratorNotContainsKeywordsNode">
+        update dss_orchestrator_info set not_contains_keywords_node = #{notContainsKeywordsNode}
+        where id = #{orchestratorId}
+    </update>
+
+    <select id="getOrchestratorNotContainsKeywordsNode" resultType="java.lang.String">
+        select not_contains_keywords_node from dss_orchestrator_info where id =#{orchestratorId}
+    </select>
+
 
 </mapper>

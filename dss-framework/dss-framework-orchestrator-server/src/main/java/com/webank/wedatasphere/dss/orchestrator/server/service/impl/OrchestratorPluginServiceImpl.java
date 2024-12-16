@@ -18,6 +18,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
@@ -32,6 +33,8 @@ import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthReques
 import com.webank.wedatasphere.dss.common.protocol.project.ProjectUserAuthResponse;
 import com.webank.wedatasphere.dss.common.service.BMLService;
 import com.webank.wedatasphere.dss.common.utils.*;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceMapper;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitResponse;
@@ -79,6 +82,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -109,6 +113,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
     @Autowired
     private OrchestratorPluginService orchestratorPluginService;
+
+    @Autowired
+    private DSSWorkspaceMapper dssWorkspaceMapper;
 
     @Autowired
     @Qualifier("workflowBmlService")
@@ -386,8 +393,149 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         lockMapper.updateOrchestratorStatus(orchestratorId, OrchestratorRefConstant.FLOW_STATUS_PUSH);
         // 更新commitId
         lockMapper.updateOrchestratorVersionCommitId(commit.getCommitId(), flowId);
+
+        updateOrchestratorNotContainsKeywordsNode(flowRequest,orchestrator,username,workspace,commit.getCommitId());
+
         return commit;
     }
+
+    @Override
+    public Map<String,List<String>> getNotContainsKeywordsNode(long orchestratorId,long projectId,Workspace workspace) throws DSSErrorException {
+
+        DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace((int) workspace.getWorkspaceId());
+        if(disabledKeywordsCheck(dssWorkspace)){
+            throw  new DSSErrorException(90058,"当前工作空间未启用工作流关键字校验");
+        }
+
+        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
+        projectInfoRequest.setProjectId(projectId);
+
+        DSSProject project = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
+                .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
+
+        // 项目未接入git
+        if(project.getAssociateGit() == null || !project.getAssociateGit()){
+            throw  new DSSErrorException(90058,"当前工作流所属项目未接入git");
+        }
+
+        String json = orchestratorMapper.getOrchestratorNotContainsKeywordsNode(orchestratorId);
+
+        if(StringUtils.isNotEmpty(json)){
+            return DSSCommonUtils.COMMON_GSON.fromJson(json,new TypeToken<List<Map<String, List<String>>>>() {
+            }.getType());
+        }
+
+        return null;
+
+
+    }
+
+    private boolean disabledKeywordsCheck(DSSWorkspace dssWorkspace){
+
+        // 命名空间 禁用关键字检查
+        return dssWorkspace == null || StringUtils.isEmpty(dssWorkspace.getEnabledFlowKeywordsCheck())
+                || !dssWorkspace.getEnabledFlowKeywordsCheck().equals("1");
+    }
+
+
+    private void updateOrchestratorNotContainsKeywordsNode(OrchestratorSubmitRequest flowRequest, DSSOrchestratorInfo orchestrator,
+                                                           String username, Workspace workspace,String commitId){
+
+        DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace((int) workspace.getWorkspaceId());
+
+        if(disabledKeywordsCheck(dssWorkspace)){
+            return;
+        }
+
+        GitDiffResponse gitDiffResponse = diffPublish(orchestrator.getName(), commitId,username,
+                workspace.getWorkspaceId(), flowRequest.getProjectName());
+
+        if (gitDiffResponse == null) {
+            LOGGER.info("gitDiffResponse change is empty");
+            return;
+        }
+
+        List<String> paths = new ArrayList<>();
+
+        gitDiffResponse.getCodeTree().forEach(gitTree -> {
+            getCodePath(paths,gitTree);
+        });
+
+        // 获取内容并检查
+        List<String> nodePathList = getNotContainsKeywordsNodePath(paths,commitId,workspace,flowRequest.getProjectName(),username);
+        Map<String,List<String>> map = new HashMap<>();
+        map.put(orchestrator.getName(),nodePathList);
+        String notContainsKeywordsNode =  DSSCommonUtils.COMMON_GSON.toJson(map);
+
+        orchestratorMapper.updateOrchestratorNotContainsKeywordsNode(flowRequest.getOrchestratorId(),notContainsKeywordsNode);
+    }
+
+
+    private void getCodePath(List<String> paths,GitTree gitTree){
+
+        if(MapUtils.isEmpty(gitTree.getChildren())){
+            return;
+        }
+
+        for (Map.Entry<String,GitTree> entry : gitTree.getChildren().entrySet()){
+            // 过滤后缀
+            if(StringUtils.endsWithAny(entry.getValue().getAbsolutePath(),".sql",".hql",".py")){
+                continue;
+            }
+
+            paths.add(gitTree.getAbsolutePath());
+
+            getCodePath(paths, entry.getValue());
+        }
+
+    }
+
+
+    private List<String> getNotContainsKeywordsNodePath(List<String> codePaths,String commitId,Workspace workspace,String projectName,String username){
+
+        List<String> nodePathList = new ArrayList<>();
+
+        if(CollectionUtils.isEmpty(codePaths)){
+            return  nodePathList;
+        }
+
+        GitDiffFileContentRequest diffFileContentRequest = new GitDiffFileContentRequest();
+        diffFileContentRequest.setFilePaths(codePaths);
+        diffFileContentRequest.setPublish(true);
+        diffFileContentRequest.setCommitId(commitId);
+        diffFileContentRequest.setUsername(username);
+        diffFileContentRequest.setWorkspaceId(workspace.getWorkspaceId());
+        diffFileContentRequest.setProjectName(projectName);
+        Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
+        // 批量获取脚本内容新
+        GitDiffFileContentResponse gitDiffFileContentResponse = RpcAskUtils.processAskException(
+                gitSender.ask(diffFileContentRequest), GitDiffFileContentResponse.class, GitDiffFileContentRequest.class);
+
+        if(gitDiffFileContentResponse  == null){
+            LOGGER.info("get script content isEmpty");
+            return null;
+        }
+
+        Pattern pattern = Pattern.compile("(create\\s+table|insert)\\s*",Pattern.CASE_INSENSITIVE);
+
+        for (GitFileContentResponse gitFileContentResponse: gitDiffFileContentResponse.getGitFileContentResponseList()){
+
+            String  content = gitFileContentResponse.getBefore();
+
+            // 内容为NULL或者已匹配到关键字 跳过
+            if(content == null || pattern.matcher(content).find()){
+                continue;
+            }
+
+            // 去掉/xxx.sql,hql,py 脚本名称
+            String nodePath = gitFileContentResponse.getFilePath().substring(0,gitFileContentResponse.getFilePath().lastIndexOf("/"));
+            nodePathList.add(nodePath);
+        }
+
+        return  nodePathList;
+
+    }
+
 
     public GitCommitResponse batchSubmitWorkflowToBML(List<Long> taskIdList, List<OrchestratorRelationVo> relationVos, String username, Workspace workspace, String projectName, String label, Long projectId, String comment) throws Exception {
 

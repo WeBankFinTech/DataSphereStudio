@@ -16,7 +16,7 @@
 
 package com.webank.wedatasphere.dss.git.receiver
 
-import com.webank.wedatasphere.dss.git.common.protocol.request.{GitAddMemberRequest, GitArchiveProjectRequest, GitBatchCommitRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitDiffTargetCommitRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserByWorkspaceIdRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest}
+import com.webank.wedatasphere.dss.git.common.protocol.request.{GitAddMemberRequest, GitArchiveProjectRequest, GitBatchCommitRequest, GitCheckProjectRequest, GitCommitInfoBetweenRequest, GitCommitRequest, GitConnectRequest, GitCreateProjectRequest, GitCurrentCommitRequest, GitDeleteRequest, GitDiffRequest, GitDiffTargetCommitRequest, GitFileContentRequest, GitHistoryRequest, GitRemoveRequest, GitRenameRequest, GitRevertRequest, GitSearchRequest, GitUserByWorkspaceIdRequest, GitUserInfoByRequest, GitUserInfoRequest, GitUserUpdateRequest,GitDiffFileContentRequest}
 import com.webank.wedatasphere.dss.git.manage.GitProjectManager
 import com.webank.wedatasphere.dss.git.service.{DSSGitProjectManagerService, DSSGitWorkflowManagerService}
 import org.apache.linkis.rpc.{Receiver, Sender}
@@ -68,6 +68,8 @@ class DSSGitReceiver(gitProjectManagerService: DSSGitProjectManagerService, gitW
       gitProjectManagerService.getProjectGitUserInfo(gitUserByWorkspaceIdRequest)
     case gitAddMemberRequest: GitAddMemberRequest =>
       gitProjectManagerService.addMember(gitAddMemberRequest)
+    case  gitDiffFileContentRequest: GitDiffFileContentRequest =>
+      gitWorkflowManagerService.getDiffFileContent(gitDiffFileContentRequest)
     case _ => None
   }
 

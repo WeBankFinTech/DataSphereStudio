@@ -644,6 +644,62 @@ public class DSSGitWorkflowManagerServiceImpl implements DSSGitWorkflowManagerSe
         }
     }
 
+
+    @Override
+    public GitDiffFileContentResponse getDiffFileContent(GitDiffFileContentRequest request) throws DSSErrorException{
+
+        Long workspaceId = request.getWorkspaceId();
+        String projectName = request.getProjectName();
+        List<String> filePaths = request.getFilePaths();
+
+        GitProjectGitInfo projectInfoByProjectName = GitProjectManager.getProjectInfoByProjectName(projectName);
+        if (projectInfoByProjectName == null) {
+            logger.error("getDiffFileContent the projectName : {} don't associate with git", projectName);
+            return null;
+        }
+
+        String gitUser = projectInfoByProjectName.getGitUser();
+        String gitToken = projectInfoByProjectName.getGitToken();
+        String gitUrl = projectInfoByProjectName.getGitUrl();
+
+        // 拼接.git路径
+        String gitPath = DSSGitUtils.generateGitPath(projectName, workspaceId, gitUser);
+        // 获取git仓库
+        File repoDir = new File(gitPath);
+
+
+        try {
+            Repository repository = getRepository(repoDir, projectName, workspaceId, gitUser, gitToken, gitUrl);
+            // 本地保持最新状态
+            DSSGitUtils.pull(repository, projectName, gitUser, gitToken);
+            // 获取的是提交之后的文件内容信息
+            List<GitFileContentResponse> gitFileContentResponseList = new ArrayList<>();
+            for(String filePath: filePaths){
+
+                GitFileContentResponse contentResponse = new GitFileContentResponse();
+                String after = DSSGitUtils.getFileContent(filePath, projectName, gitUser, workspaceId);
+                GitCommitResponse currentCommit = DSSGitUtils.getCurrentCommit(repository);
+                if (currentCommit.getCommitId() != null) {
+                    contentResponse.setAfterCommitId(currentCommit.getCommitId());
+                    contentResponse.setAfterAnnotate(currentCommit.getCommentFull());
+                }
+                contentResponse.setAfter(after);
+                contentResponse.setFilePath(filePath);
+
+                gitFileContentResponseList.add(contentResponse);
+            }
+
+
+            return new GitDiffFileContentResponse(gitFileContentResponseList);
+        } catch (JGitInternalException e) {
+            logger.error("get git failed, the reason is", e);
+            throw new DSSErrorException(80001, "当前项目下已有工作流在进行git操作，请稍后重试");
+        }catch (Exception e) {
+            throw new DSSErrorException(80001, "getFileContent failed, the reason is: " + e);
+        }
+
+    }
+
     @Override
     public GitHistoryResponse getHistory(GitHistoryRequest request) throws DSSErrorException {
         Long workspaceId = request.getWorkspaceId();

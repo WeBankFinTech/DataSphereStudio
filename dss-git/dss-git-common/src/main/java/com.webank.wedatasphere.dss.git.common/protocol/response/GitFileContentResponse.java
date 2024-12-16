@@ -14,6 +14,8 @@ public class GitFileContentResponse{
     // 反显CommitId --仅发布时diff需要
     private String AfterCommitId;
 
+    // 文件路径
+    private String filePath;
 
     public GitFileContentResponse() {
     }
@@ -27,6 +29,15 @@ public class GitFileContentResponse{
         AfterCommitId = afterCommitId;
     }
 
+    public GitFileContentResponse(String before, String after, String beforeAnnotate, String beforeCommitId, String afterAnnotate, String afterCommitId, String filePath) {
+        this.before = before;
+        this.after = after;
+        this.beforeAnnotate = beforeAnnotate;
+        this.beforeCommitId = beforeCommitId;
+        AfterAnnotate = afterAnnotate;
+        AfterCommitId = afterCommitId;
+        this.filePath = filePath;
+    }
 
     public String getBefore() {
         return before;
@@ -74,5 +85,13 @@ public class GitFileContentResponse{
 
     public void setAfterCommitId(String afterCommitId) {
         AfterCommitId = afterCommitId;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }

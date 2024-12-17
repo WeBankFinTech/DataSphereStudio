@@ -25,6 +25,7 @@ import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFramework
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffDirVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffNodeVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRelationVo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
@@ -59,5 +60,5 @@ public interface OrchestratorPluginService {
 
     OrchestratorDiffDirVo diffContent(Long taskId);
 
-    Map<String,List<String>> getNotContainsKeywordsNode(long orchestratorId,long projectId,Workspace workspace) throws  DSSErrorException;
+    OrchestratorDiffNodeVo getNotContainsKeywordsNode(long orchestratorId, long projectId, Workspace workspace) throws  DSSErrorException;
 }

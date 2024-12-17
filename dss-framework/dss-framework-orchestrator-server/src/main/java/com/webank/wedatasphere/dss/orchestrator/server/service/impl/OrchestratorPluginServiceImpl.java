@@ -57,6 +57,7 @@ import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffDirVo;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffNodeVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorRelationVo;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorPluginService;
 import com.webank.wedatasphere.dss.orchestrator.server.service.OrchestratorService;
@@ -126,15 +127,15 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     @Override
     public ResponseConvertOrchestrator convertOrchestration(RequestFrameworkConvertOrchestration requestConversionOrchestration) {
         // 如果是先导入，后发布的分两步模式，则走专门的逻辑
-        if(DSSOrchestratorConf.DSS_IMPORT_VALID_IMMEDIATELY.getValue() &&
+        if (DSSOrchestratorConf.DSS_IMPORT_VALID_IMMEDIATELY.getValue() &&
                 requestConversionOrchestration.isConvertAllOrcs() &&
-                requestConversionOrchestration.getProjectId()!=null){
+                requestConversionOrchestration.getProjectId() != null) {
             ResponseOperateOrchestrator responseOperateOrchestrator = convertWholeProjectOrcs(requestConversionOrchestration);
             return new ResponseConvertOrchestrator("-1", responseOperateOrchestrator);
         }
         LOGGER.info("conversion request is called, request is {}.", DSSCommonUtils.COMMON_GSON.toJson(requestConversionOrchestration));
         Long toPublishOrcId;
-        if(requestConversionOrchestration.getOrcAppId() != null) {
+        if (requestConversionOrchestration.getOrcAppId() != null) {
             OrchestratorInfo orchestratorInfo = orchestratorMapper.getOrcInfoByAppId(requestConversionOrchestration.getOrcAppId());
             toPublishOrcId = orchestratorInfo.getOrchestratorId();
         } else if (CollectionUtils.isNotEmpty(requestConversionOrchestration.getOrcIds())) {
@@ -150,9 +151,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         Map<Long, Long> orchestrationIdMap = new HashMap<>();
         List<Long> publishedOrcIds;
         List<DSSLabel> labels = LabelBuilderFactoryContext.getLabelBuilderFactory().getLabels(requestConversionOrchestration.getLabels());
-        if(requestConversionOrchestration.isConvertAllOrcs()) {
+        if (requestConversionOrchestration.isConvertAllOrcs()) {
             //获取所有的已经发布过的orchestrator
-            publishedOrcIds = orchestratorMapper.getAllOrcIdsByProjectId(projectId,1);
+            publishedOrcIds = orchestratorMapper.getAllOrcIdsByProjectId(projectId, 1);
             if (!publishedOrcIds.contains(toPublishOrcId)) {
                 publishedOrcIds.add(toPublishOrcId);
             }
@@ -166,7 +167,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                     continue;
                 }
                 DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration = orchestratorMapper.getRefOrchestrationId(orcId);
-                if(dssOrchestratorRefOrchestration != null) {
+                if (dssOrchestratorRefOrchestration != null) {
                     orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), dssOrchestratorRefOrchestration.getRefOrchestrationId());
                 } else {
                     orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), null);
@@ -174,27 +175,27 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             }
         } else {
             publishedOrcIds = new ArrayList<>();
-            if(requestConversionOrchestration.getOrcAppId() != null) {
+            if (requestConversionOrchestration.getOrcAppId() != null) {
                 publishedOrcIds.add(toPublishOrcId);
-                DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(toPublishOrcId,1);
+                DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(toPublishOrcId, 1);
                 if (dssOrchestratorVersion != null) {
                     DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration = orchestratorMapper.getRefOrchestrationId(toPublishOrcId);
-                    if(dssOrchestratorRefOrchestration != null) {
+                    if (dssOrchestratorRefOrchestration != null) {
                         orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), dssOrchestratorRefOrchestration.getRefOrchestrationId());
                     } else {
                         orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), null);
                     }
                 }
             }
-            if(requestConversionOrchestration.getOrcIds() != null && !requestConversionOrchestration.getOrcIds().isEmpty()) {
+            if (requestConversionOrchestration.getOrcIds() != null && !requestConversionOrchestration.getOrcIds().isEmpty()) {
                 for (Long orcId : requestConversionOrchestration.getOrcIds()) {
-                    DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,1);
+                    DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId, 1);
                     if (dssOrchestratorVersion == null) {
                         continue;
                     }
                     publishedOrcIds.add(orcId);
                     DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration = orchestratorMapper.getRefOrchestrationId(orcId);
-                    if(dssOrchestratorRefOrchestration != null) {
+                    if (dssOrchestratorRefOrchestration != null) {
                         orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), dssOrchestratorRefOrchestration.getRefOrchestrationId());
                     } else {
                         orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), null);
@@ -202,7 +203,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 }
             }
         }
-        if(orchestrationIdMap.isEmpty()) {
+        if (orchestrationIdMap.isEmpty()) {
             LOGGER.info("the project {} has no suitable workflow, the publish by user {} is ignored.", projectId,
                     requestConversionOrchestration.getUserName());
             return new ResponseConvertOrchestrator("no-necessary-id", ResponseOperateOrchestrator.failed("No suitable workflow(s) found, publish is ignored."));
@@ -242,11 +243,11 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         job.setOrchestratorPublishJob(orchestratorPublishJob);
         orchestratorJobMapper.insertPublishJob(orchestratorPublishJob);
         LOGGER.info("trace workflow publish,flowId:{},orchestratorId:{}. 开始提交convert任务",
-                requestConversionOrchestration.getOrcAppId(),publishedOrcIds);
+                requestConversionOrchestration.getOrcAppId(), publishedOrcIds);
         //submit it
         releaseThreadPool.submit(job);
 
-        LOGGER.info("publish orchestrator success. publishedOrcIds:{} ",publishedOrcIds);
+        LOGGER.info("publish orchestrator success. publishedOrcIds:{} ", publishedOrcIds);
         return new ResponseConvertOrchestrator(job.getId(), entity.getResponse());
     }
 
@@ -263,14 +264,14 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         submitJob.setStatus(OrchestratorRefConstant.FLOW_STATUS_PUSHING);
         orchestratorMapper.insertOrchestratorSubmitJob(submitJob);
         Long taskId = submitJob.getId();
-        releaseThreadPool.submit(() ->{
+        releaseThreadPool.submit(() -> {
             //1. 异步提交，更新提交状态
             try {
                 submitWorkflowToBML(taskId, flowRequest, username, workspace);
-            }  catch (Exception e) {
-            LOGGER.error("push failed, the reason is : ", e);
-            orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.getMessage());
-        }
+            } catch (Exception e) {
+                LOGGER.error("push failed, the reason is : ", e);
+                orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.getMessage());
+            }
         });
     }
 
@@ -358,7 +359,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         try {
             GitCommitResponse gitCommitResponse = submitWorkflowToBML(taskId, flowRequest, username, workspace);
             return gitCommitResponse;
-        }  catch (Exception e) {
+        } catch (Exception e) {
             LOGGER.error("push failed, the reason is : ", e);
             orchestratorMapper.updateOrchestratorSubmitJobStatus(taskId, OrchestratorRefConstant.FLOW_STATUS_PUSH_FAILED, e.toString());
             throw new DSSErrorException(80001, "push failed, the reason is : " + e.toString());
@@ -394,17 +395,18 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         // 更新commitId
         lockMapper.updateOrchestratorVersionCommitId(commit.getCommitId(), flowId);
 
-        updateOrchestratorNotContainsKeywordsNode(flowRequest,orchestrator,username,workspace,commit.getCommitId());
+        updateOrchestratorNotContainsKeywordsNode(flowRequest, orchestrator, username, workspace);
 
         return commit;
     }
 
     @Override
-    public Map<String,List<String>> getNotContainsKeywordsNode(long orchestratorId,long projectId,Workspace workspace) throws DSSErrorException {
+    public OrchestratorDiffNodeVo getNotContainsKeywordsNode(long orchestratorId, long projectId, Workspace workspace) throws DSSErrorException {
+
 
         DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace((int) workspace.getWorkspaceId());
-        if(disabledKeywordsCheck(dssWorkspace)){
-            throw  new DSSErrorException(90058,"当前工作空间未启用工作流关键字校验");
+        if (disabledKeywordsCheck(dssWorkspace)) {
+            throw new DSSErrorException(90058, "当前工作空间未启用工作流关键字校验");
         }
 
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
@@ -414,23 +416,22 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
 
         // 项目未接入git
-        if(project.getAssociateGit() == null || !project.getAssociateGit()){
-            throw  new DSSErrorException(90058,"当前工作流所属项目未接入git");
+        if (project.getAssociateGit() == null || !project.getAssociateGit()) {
+            throw new DSSErrorException(90058, "当前工作流所属项目未接入git");
         }
 
         String json = orchestratorMapper.getOrchestratorNotContainsKeywordsNode(orchestratorId);
-
-        if(StringUtils.isNotEmpty(json)){
-            return DSSCommonUtils.COMMON_GSON.fromJson(json,new TypeToken<List<Map<String, List<String>>>>() {
-            }.getType());
+        OrchestratorDiffNodeVo orchestratorDiffNodeVo = new OrchestratorDiffNodeVo();
+        if (StringUtils.isNotEmpty(json)) {
+            orchestratorDiffNodeVo =  DSSCommonUtils.COMMON_GSON.fromJson(json, new TypeToken<OrchestratorDiffNodeVo>() {}.getType());
         }
 
-        return null;
+        return orchestratorDiffNodeVo;
 
 
     }
 
-    private boolean disabledKeywordsCheck(DSSWorkspace dssWorkspace){
+    private boolean disabledKeywordsCheck(DSSWorkspace dssWorkspace) {
 
         // 命名空间 禁用关键字检查
         return dssWorkspace == null || StringUtils.isEmpty(dssWorkspace.getEnabledFlowKeywordsCheck())
@@ -439,15 +440,17 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
 
     private void updateOrchestratorNotContainsKeywordsNode(OrchestratorSubmitRequest flowRequest, DSSOrchestratorInfo orchestrator,
-                                                           String username, Workspace workspace,String commitId){
+                                                           String username, Workspace workspace) {
 
         DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace((int) workspace.getWorkspaceId());
 
-        if(disabledKeywordsCheck(dssWorkspace)){
+        if (disabledKeywordsCheck(dssWorkspace)) {
             return;
         }
 
-        GitDiffResponse gitDiffResponse = diffPublish(orchestrator.getName(), commitId,username,
+        String commitId = getLastPublishCommitId(orchestrator);
+
+        GitDiffResponse gitDiffResponse = diffPublish(orchestrator.getName(), commitId, username,
                 workspace.getWorkspaceId(), flowRequest.getProjectName());
 
         if (gitDiffResponse == null) {
@@ -458,32 +461,33 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         List<String> paths = new ArrayList<>();
 
         gitDiffResponse.getCodeTree().forEach(gitTree -> {
-            getCodePath(paths,gitTree);
+            getCodePath(paths, gitTree);
         });
 
         // 获取内容并检查
-        List<String> nodePathList = getNotContainsKeywordsNodePath(paths,commitId,workspace,flowRequest.getProjectName(),username);
-        Map<String,List<String>> map = new HashMap<>();
-        map.put(orchestrator.getName(),nodePathList);
-        String notContainsKeywordsNode =  DSSCommonUtils.COMMON_GSON.toJson(map);
+        List<String> nodePathList = getNotContainsKeywordsNodePath(paths, commitId, workspace, flowRequest.getProjectName(), username);
 
-        orchestratorMapper.updateOrchestratorNotContainsKeywordsNode(flowRequest.getOrchestratorId(),notContainsKeywordsNode);
+        String notContainsKeywordsNode = DSSCommonUtils.COMMON_GSON.toJson(
+                new OrchestratorDiffNodeVo(orchestrator.getName(), orchestrator.getId(), nodePathList)
+        );
+
+        orchestratorMapper.updateOrchestratorNotContainsKeywordsNode(flowRequest.getOrchestratorId(), notContainsKeywordsNode);
     }
 
 
-    private void getCodePath(List<String> paths,GitTree gitTree){
+    private void getCodePath(List<String> paths, GitTree gitTree) {
 
-        if(MapUtils.isEmpty(gitTree.getChildren())){
+        if (MapUtils.isEmpty(gitTree.getChildren())) {
             return;
         }
 
-        for (Map.Entry<String,GitTree> entry : gitTree.getChildren().entrySet()){
+        for (Map.Entry<String, GitTree> entry : gitTree.getChildren().entrySet()) {
             // 过滤后缀
-            if(StringUtils.endsWithAny(entry.getValue().getAbsolutePath(),".sql",".hql",".py")){
+            if (!StringUtils.endsWithAny(entry.getValue().getAbsolutePath(), ".sql", ".hql", ".py")) {
                 continue;
             }
 
-            paths.add(gitTree.getAbsolutePath());
+            paths.add(entry.getValue().getAbsolutePath());
 
             getCodePath(paths, entry.getValue());
         }
@@ -491,13 +495,15 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
 
-    private List<String> getNotContainsKeywordsNodePath(List<String> codePaths,String commitId,Workspace workspace,String projectName,String username){
+    private List<String> getNotContainsKeywordsNodePath(List<String> codePaths, String commitId, Workspace workspace, String projectName, String username) {
 
         List<String> nodePathList = new ArrayList<>();
 
-        if(CollectionUtils.isEmpty(codePaths)){
-            return  nodePathList;
+        if (CollectionUtils.isEmpty(codePaths)) {
+            return nodePathList;
         }
+
+        codePaths = codePaths.stream().distinct().collect(Collectors.toList());
 
         GitDiffFileContentRequest diffFileContentRequest = new GitDiffFileContentRequest();
         diffFileContentRequest.setFilePaths(codePaths);
@@ -511,28 +517,28 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         GitDiffFileContentResponse gitDiffFileContentResponse = RpcAskUtils.processAskException(
                 gitSender.ask(diffFileContentRequest), GitDiffFileContentResponse.class, GitDiffFileContentRequest.class);
 
-        if(gitDiffFileContentResponse  == null){
+        if (gitDiffFileContentResponse == null) {
             LOGGER.info("get script content isEmpty");
             return null;
         }
 
-        Pattern pattern = Pattern.compile("(create\\s+table|insert)\\s*",Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("(create\\s+table|insert)\\s*", Pattern.CASE_INSENSITIVE);
 
-        for (GitFileContentResponse gitFileContentResponse: gitDiffFileContentResponse.getGitFileContentResponseList()){
+        for (GitFileContentResponse gitFileContentResponse : gitDiffFileContentResponse.getGitFileContentResponseList()) {
 
-            String  content = gitFileContentResponse.getBefore();
+            String content = gitFileContentResponse.getAfter();
 
             // 内容为NULL或者已匹配到关键字 跳过
-            if(content == null || pattern.matcher(content).find()){
+            if (content == null || pattern.matcher(content).find()) {
                 continue;
             }
 
             // 去掉/xxx.sql,hql,py 脚本名称
-            String nodePath = gitFileContentResponse.getFilePath().substring(0,gitFileContentResponse.getFilePath().lastIndexOf("/"));
+            String nodePath = gitFileContentResponse.getFilePath().substring(0, gitFileContentResponse.getFilePath().lastIndexOf("/"));
             nodePathList.add(nodePath);
         }
 
-        return  nodePathList;
+        return nodePathList;
 
     }
 
@@ -556,7 +562,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return commit;
     }
 
-    private GitCommitResponse push (String path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
+    private GitCommitResponse push(String path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
         LOGGER.info("-------=======================begin to add testGit1=======================-------");
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         Map<String, BmlResource> file = new HashMap<>();
@@ -567,7 +573,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return responseWorkflowValidNode;
     }
 
-    private GitCommitResponse batchPush (List<String> path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
+    private GitCommitResponse batchPush(List<String> path, BmlResource bmlResource, String username, Long workspaceId, String projectName, String comment) {
         LOGGER.info("-------=======================begin to add testGit1=======================-------");
         Sender gitSender = DSSSenderServiceFactory.getOrCreateServiceInstance().getGitSender();
         GitBatchCommitRequest request1 = new GitBatchCommitRequest(workspaceId, projectName, comment, username, path, bmlResource);
@@ -577,7 +583,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     private BmlResource uploadWorkflowToGit(Long flowId, String projectName, String label, String username, Workspace workspace, DSSOrchestratorInfo orchestrator) {
-       // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
+        // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
 
         Long projectId = orchestrator.getProjectId();
         List<DSSLabel> dssLabelList = new ArrayList<>();
@@ -615,7 +621,8 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     public OrchestratorDiffDirVo diffContent(Long taskId) {
         String result = orchestratorMapper.selectResult(taskId);
         if (StringUtils.isNotEmpty(result)) {
-            Type listType = new TypeToken<OrchestratorDiffDirVo>() {}.getType();
+            Type listType = new TypeToken<OrchestratorDiffDirVo>() {
+            }.getType();
             Gson gson = new Gson();
             OrchestratorDiffDirVo gitTrees = gson.fromJson(result, listType);
             return gitTrees;
@@ -624,7 +631,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId) throws Exception{
+    public BmlResource uploadWorkflowListToGit(List<Long> flowIdList, String projectName, String label, String username, Workspace workspace, Long projectId) throws Exception {
         // 1. 将序列化好的工作流文件包提交给git服务，并拿到diff文件列表结果,
         List<DSSLabel> dssLabelList = new ArrayList<>();
         dssLabelList.add(new EnvDSSLabel(label));
@@ -667,9 +674,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             //删掉整个目录
             if (StringUtils.isNotEmpty(projectPath)) {
                 File file = new File(projectPath);
-                if (ZipHelper.deleteDir(file)){
+                if (ZipHelper.deleteDir(file)) {
                     LOGGER.info("结束删除目录 {} 成功", projectPath);
-                }else{
+                } else {
                     LOGGER.info("删除目录 {} 失败", projectPath);
                 }
             }
@@ -678,7 +685,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     }
 
     @Override
-    public Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws Exception{
+    public Long diffFlow(OrchestratorSubmitRequest flowRequest, String username, Workspace workspace) throws Exception {
         Long orchestratorId = flowRequest.getOrchestratorId();
         String status = lockMapper.selectOrchestratorStatus(orchestratorId);
         if (!StringUtils.isEmpty(status) && !status.equals(OrchestratorRefConstant.FLOW_STATUS_SAVE)) {
@@ -823,20 +830,20 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
      * 发布整个项目中所有未发布过的工作流。
      * 使用在先导入，后发布两步走的场景中
      */
-    private ResponseOperateOrchestrator convertWholeProjectOrcs(RequestFrameworkConvertOrchestration requestConversionOrchestration){
-        Long projectId=requestConversionOrchestration.getProjectId();
+    private ResponseOperateOrchestrator convertWholeProjectOrcs(RequestFrameworkConvertOrchestration requestConversionOrchestration) {
+        Long projectId = requestConversionOrchestration.getProjectId();
         List<DSSLabel> labels = LabelBuilderFactoryContext.getLabelBuilderFactory().getLabels(requestConversionOrchestration.getLabels());
 
         //这里的 key 为 DSS 具体编排（如 DSS 工作流）的 id；这里的 value 为 DSS 编排所对应的第三方调度系统的工作流 ID
         //请注意：由于对接的 SchedulerAppConn 调度系统有可能没有实现 OrchestrationService，
         //所以可能存在 DSS 在创建 DSS 编排时，无法同步去 SchedulerAppConn 创建工作流的情况，从而导致这个 Map 的所有 value 都为 null。
         Map<Long, Long> orchestrationIdMap = new HashMap<>();
-        List<Long> orcIds=new ArrayList<>();
+        List<Long> orcIds = new ArrayList<>();
         //所有之前发布过的编排
-        List<Long> publishedOrcIds = orchestratorMapper.getAllOrcIdsByProjectId(projectId,1);
+        List<Long> publishedOrcIds = orchestratorMapper.getAllOrcIdsByProjectId(projectId, 1);
         orcIds.addAll(publishedOrcIds);
         //所有之前未发布过的编排
-        List<Long> notPublished= orchestratorMapper.getAllOrcIdsByProjectId(projectId,0);
+        List<Long> notPublished = orchestratorMapper.getAllOrcIdsByProjectId(projectId, 0);
         orcIds.addAll(notPublished);
         for (Long publishedOrcId : orcIds) {
             DSSOrchestratorVersion dssOrchestratorVersion = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(publishedOrcId, 1);
@@ -844,13 +851,13 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 continue;
             }
             DSSOrchestratorRefOrchestration dssOrchestratorRefOrchestration = orchestratorMapper.getRefOrchestrationId(publishedOrcId);
-            if(dssOrchestratorRefOrchestration != null) {
+            if (dssOrchestratorRefOrchestration != null) {
                 orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), dssOrchestratorRefOrchestration.getRefOrchestrationId());
             } else {
                 orchestrationIdMap.put(dssOrchestratorVersion.getAppId(), null);
             }
         }
-        if(orchestrationIdMap.isEmpty()) {
+        if (orchestrationIdMap.isEmpty()) {
             LOGGER.info("the project {} has no suitable workflow, the publish by user {} is ignored.", projectId,
                     requestConversionOrchestration.getUserName());
             return ResponseOperateOrchestrator.failed("No suitable workflow(s) found, publish is ignored.");
@@ -860,23 +867,23 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         LOGGER.info("user {} try to submit a conversion job , the orchestrationIdMap is {}, the orcIdList is {}.",
                 requestConversionOrchestration.getUserName(),
                 orchestrationIdMap, publishedOrcIds);
-        long startTime=System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         //进行发布到schedulis等调度系统
         LOGGER.info(" begin to convert project {} for user {} to scheduler, the orchestrationIds is {}.",
-                projectId,requestConversionOrchestration.getUserName() , orcIds);
+                projectId, requestConversionOrchestration.getUserName(), orcIds);
         ConversionDSSOrchestratorPlugin conversionDSSOrchestratorPlugin = null;
-        for (DSSOrchestratorPlugin plugin:dssOrchestratorContext.getOrchestratorPlugins()) {
-            if(plugin instanceof ConversionDSSOrchestratorPlugin) {
+        for (DSSOrchestratorPlugin plugin : dssOrchestratorContext.getOrchestratorPlugins()) {
+            if (plugin instanceof ConversionDSSOrchestratorPlugin) {
                 conversionDSSOrchestratorPlugin = (ConversionDSSOrchestratorPlugin) plugin;
             }
         }
-        if(conversionDSSOrchestratorPlugin==null){
+        if (conversionDSSOrchestratorPlugin == null) {
             return ResponseOperateOrchestrator.failed("can not find plugin type of ConversionDSSOrchestratorPlugin,operate failed!");
         }
         ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
         projectInfoRequest.setProjectId(projectId);
         ResponseOperateOrchestrator response;
-        try{
+        try {
             DSSProject project = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
                     .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
             response = conversionDSSOrchestratorPlugin.convert(
@@ -886,24 +893,24 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                     orchestrationIdMap,
                     labels,
                     requestConversionOrchestration.getApproveId());
-            if(response.isFailed()) {
+            if (response.isFailed()) {
                 String msg = response.getMessage() == null ? "Unknown reason, please ask admin for help!" : response.getMessage();
                 throw new DSSErrorException(50000, msg);
             }
-            final ResponseOperateOrchestrator finalResponse=response;
+            final ResponseOperateOrchestrator finalResponse = response;
             //最后，把所有之前未发布过的编排，都标记为已发布。
             ConversionJobEntity entity = new ConversionJobEntity();
             entity.setUserName(requestConversionOrchestration.getUserName());
             entity.setOrcIdList(publishedOrcIds);
             entity.setLabels(labels);
             entity.setProject(project);
-            notPublished.forEach(toPublishOrcId-> this.updateDBAfterConversion(toPublishOrcId, finalResponse, entity, requestConversionOrchestration) );
-        } catch (final Exception t){
-            LOGGER.error("convert for project failed"+projectId, t);
+            notPublished.forEach(toPublishOrcId -> this.updateDBAfterConversion(toPublishOrcId, finalResponse, entity, requestConversionOrchestration));
+        } catch (final Exception t) {
+            LOGGER.error("convert for project failed" + projectId, t);
             response = ResponseOperateOrchestrator.failed(ExceptionUtils.getRootCauseMessage(t));
         }
-        LOGGER.info("convert project {} for user {} to Orchestrators {}, costs {}.",projectId,
-                requestConversionOrchestration.getUserName(),orcIds , ByteTimeUtils.msDurationToString(System.currentTimeMillis()-startTime));
+        LOGGER.info("convert project {} for user {} to Orchestrators {}, costs {}.", projectId,
+                requestConversionOrchestration.getUserName(), orcIds, ByteTimeUtils.msDurationToString(System.currentTimeMillis() - startTime));
 
         return response;
     }
@@ -922,7 +929,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         return new ResponseConvertOrchestrator(jobId, responseOperateOrchestrator);
     }
 
-    private void updateDBAfterConversion(Long toPublishOrcId,ResponseOperateOrchestrator response,
+    private void updateDBAfterConversion(Long toPublishOrcId, ResponseOperateOrchestrator response,
                                          ConversionJobEntity conversionJobEntity,
                                          RequestFrameworkConvertOrchestration requestConversionOrchestration) {
         if (response.isSucceed()) {
@@ -930,7 +937,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             List<Long> orcIdList = conversionJobEntity.getOrcIdList();
             LOGGER.info("the orcIdList is:{}", orcIdList);
             // 开发环境才新增版本号
-            if(DSSLabelUtil.isDevEnv(conversionJobEntity.getLabels())){
+            if (DSSLabelUtil.isDevEnv(conversionJobEntity.getLabels())) {
                 orcIdList.forEach(DSSExceptionUtils.handling(orcId -> {
                     DSSOrchestratorInfo dssOrchestratorInfo = orchestratorMapper.getOrchestrator(orcId);
                     dssOrchestratorContext.getDSSOrchestratorPlugin(ExportDSSOrchestratorPlugin.class)
@@ -942,18 +949,18 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             //2. 做一个标记表示已经发布过了
             orcIdList.forEach(orchestratorMapper::setPublished);
             //3.更新当前的提交的发布编排模式版本的common
-            updateCurrentPublishOrchestratorCommon(toPublishOrcId,requestConversionOrchestration.getComment(),conversionJobEntity.getLabels());
+            updateCurrentPublishOrchestratorCommon(toPublishOrcId, requestConversionOrchestration.getComment(), conversionJobEntity.getLabels());
         }
     }
 
-    public void updateCurrentPublishOrchestratorCommon(Long orcId,String realComment,List<DSSLabel> dssLabels) {
+    public void updateCurrentPublishOrchestratorCommon(Long orcId, String realComment, List<DSSLabel> dssLabels) {
         //DEV环境获取获取最新有效的版本即可
         int validFlag = 1;
-        if (!DSSOrchestratorConf.DSS_IMPORT_VALID_IMMEDIATELY.getValue()&& !DSSLabelUtil.isDevEnv(dssLabels)) {
+        if (!DSSOrchestratorConf.DSS_IMPORT_VALID_IMMEDIATELY.getValue() && !DSSLabelUtil.isDevEnv(dssLabels)) {
             //PROD获取当前编排模式最新版本的ID
             validFlag = 0;
         }
-        DSSOrchestratorVersion version = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId,validFlag);
+        DSSOrchestratorVersion version = orchestratorMapper.getLatestOrchestratorVersionByIdAndValidFlag(orcId, validFlag);
         DSSOrchestratorVersion updateCommentVersion = new DSSOrchestratorVersion();
         updateCommentVersion.setId(version.getId());
         updateCommentVersion.setComment(realComment);

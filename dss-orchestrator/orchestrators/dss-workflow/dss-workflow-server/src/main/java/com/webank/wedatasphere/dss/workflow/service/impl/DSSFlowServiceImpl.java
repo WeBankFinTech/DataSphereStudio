@@ -2102,6 +2102,20 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return eventSenderNodeResponse;
     }
 
+    @Override
+    public QueryNodeInfoByPathResponse queryNodeInfo(Long projectId, String orchestratorName, String nodeName) {
+        QueryNodeInfoByPathResponse result = new QueryNodeInfoByPathResponse();
+        DSSFlowNodeInfoOfFlow info= nodeContentMapper.getNodeInfoOfFLow(projectId, orchestratorName, nodeName);
+        if(info==null){
+            return null;
+        }
+        result.setAppId(info.getAppId());
+        result.setNodeName(nodeName);
+        result.setProjectId(projectId);
+        result.setOrchestratorId(info.getOrchestratorId());
+        result.setOrchestratorName(orchestratorName);
+        return result;
+    }
 
     public List<EventSenderNodeInfo> eventSenderNodeResultFilter(List<EventSenderNodeInfo> eventSenderNodeInfoList, EventSenderNodeRequest request) {
 

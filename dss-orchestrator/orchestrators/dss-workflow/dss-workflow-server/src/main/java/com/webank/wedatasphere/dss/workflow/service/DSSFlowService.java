@@ -107,6 +107,8 @@ public interface DSSFlowService {
     DataCheckerNodeResponse queryDataCheckerNode(String username, Workspace workspace, DataCheckerNodeRequest request);
 
     EventSenderNodeResponse queryEventSenderNode(String username, Workspace workspace, EventSenderNodeRequest request);
+    QueryNodeInfoByPathResponse queryNodeInfo(Long projectId,
+                                                     String orchestratorName,String nodeName);
 
     EventReceiveNodeResponse queryEventReceiveNode(String username, Workspace workspace, EventReceiverNodeRequest request);
 

@@ -52,6 +52,6 @@ public class DefaultStaffInfoGetter implements StaffInfoGetter {
 
     @Override
     public Set<String> getAllUsernames() {
-        return CollUtil.newHashSet("hadoop");
+        return CollUtil.newHashSet();
     }
 }

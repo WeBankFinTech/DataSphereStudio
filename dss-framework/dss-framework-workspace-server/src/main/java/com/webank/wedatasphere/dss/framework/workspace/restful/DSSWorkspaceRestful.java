@@ -17,6 +17,7 @@
 package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import cn.hutool.core.util.StrUtil;
+import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 
@@ -87,6 +88,8 @@ public class DSSWorkspaceRestful {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private HttpServletResponse httpServletResponse;
+    @Autowired
+    private StaffInfoGetter staffInfoGetter;
 
 
     @RequestMapping(path = "createWorkspace", method = RequestMethod.POST)
@@ -358,7 +361,11 @@ public class DSSWorkspaceRestful {
         }
 
         SSOHelper.setAndGetWorkspace(httpServletRequest, httpServletResponse, workspace.getId(), workspace.getName());
-        SSOHelper.addUsernameCookie(httpServletRequest, httpServletResponse, username);
+
+        Set<String> allUsernames = staffInfoGetter.getAllUsernames();
+        if(allUsernames.contains(username)) {
+            SSOHelper.addUsernameCookie(httpServletRequest, httpServletResponse, username);
+        }
 
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, workspaceId.intValue());
         if (roles == null || roles.isEmpty()) {

@@ -533,7 +533,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
                 continue;
             }
 
-            // 去掉/xxx.sql,hql,py 脚本名称
+            // 去掉/xxx.sql,hql,py 脚本后缀
             String nodePath = gitFileContentResponse.getFilePath().substring(0, gitFileContentResponse.getFilePath().lastIndexOf("/"));
             nodePathList.add(nodePath);
         }

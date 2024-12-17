@@ -450,6 +450,32 @@ public class NodeRestfulApi {
 
     }
 
+    @RequestMapping(value = "/queryNodeInfoByPath",method = RequestMethod.POST)
+    public Message queryEventSenderNode(HttpServletRequest req,@RequestBody QueryNodeInfoByPathRequest request){
+        // 1.根据path解析出节点名，编排名。test1/subFlow_9264/subFlow_8959/sql_5205/sql_5205.sql
+        Long projectId = request.getProjectId();
+        String path = request.getPath();
+        if (path == null || !path.contains("/")) {
+            return Message.error("请求参数不合法，必须包含节点path。path:"+path);
+        }
+        String[] strArray=path.split("/");
+        int nodeNameIndex=strArray.length-2;
+        int orchestratorNameIndex=0;
+        String nodeName = strArray[nodeNameIndex];
+        String orchestratorName = strArray[orchestratorNameIndex];
+        //2.通过项目id、编排名，找打编排id。 select  id  from dss_orchestrator_info doi where project_id =? and name=?
+        //3.通过编排id，找到所有的节点。select id from dss_workflow_node_content where orchestrator_id in 第二步
+        //4.根据节点名，过滤节点。拿到节点在的flowid。
+        QueryNodeInfoByPathResponse queryNodeInfoByPathResponse  = dssFlowService.queryNodeInfo(projectId,
+                orchestratorName,nodeName);
+        if (queryNodeInfoByPathResponse == null) {
+            logger.error("找不到节点所在的工作流信息。projectId:{},path:{}", request.getProjectId(), request.getPath());
+            return Message.error("找不到节点所在的工作流信息。请检查工作流最新版本是否成功提交。");
+        }
+        return Message.ok().data("data", queryNodeInfoByPathResponse);
+
+    }
+
 
 
     @RequestMapping(value = "/queryEventReceiveNode",method = RequestMethod.POST)

@@ -213,6 +213,7 @@ public class SSOHelper {
         }
         Cookie cookie = new Cookie(cookieKey, null);
         cookie.setMaxAge(0); // 设置为0，即立即删除
+        cookie.setPath("/");
         response.addCookie(cookie);
     }
 

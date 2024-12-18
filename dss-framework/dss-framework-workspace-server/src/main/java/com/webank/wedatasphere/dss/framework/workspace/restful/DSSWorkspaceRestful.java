@@ -68,6 +68,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.framework.workspace.util.DSSWorkspaceConstant.WORKSPACE_ID_STR;
+import static com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper.USERNAME_NAME_COOKIE_KEY;
 
 @RequestMapping(path = "/dss/framework/workspace", produces = {"application/json"})
 @RestController
@@ -365,6 +366,8 @@ public class DSSWorkspaceRestful {
         Set<String> allUsernames = staffInfoGetter.getAllUsernames();
         if(allUsernames.contains(username)) {
             SSOHelper.addUsernameCookie(httpServletRequest, httpServletResponse, username);
+        }else{
+            SSOHelper.deleteCookieByName(httpServletRequest, httpServletResponse, USERNAME_NAME_COOKIE_KEY);
         }
 
         List<String> roles = dssWorkspaceRoleService.getRoleInWorkspace(username, workspaceId.intValue());

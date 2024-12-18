@@ -204,4 +204,16 @@ public class SSOHelper {
         response.addCookie(usernameCookie);
     }
 
+    public static void deleteCookieByName(HttpServletRequest request, HttpServletResponse response, String cookieKey) {
+        boolean isCookieKeyExists =  Arrays.stream(request.getCookies())
+                .anyMatch(cookie -> cookieKey.equals(cookie.getName()));
+        if (!isCookieKeyExists) {
+            LOGGER.warn("cookie {} is not exists in DSS cookies.", cookieKey);
+            return ;
+        }
+        Cookie cookie = new Cookie(cookieKey, null);
+        cookie.setMaxAge(0); // 设置为0，即立即删除
+        response.addCookie(cookie);
+    }
+
 }

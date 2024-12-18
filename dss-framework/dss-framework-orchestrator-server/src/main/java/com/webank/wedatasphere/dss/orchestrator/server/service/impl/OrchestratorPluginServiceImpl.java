@@ -397,9 +397,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         // 更新commitId
         lockMapper.updateOrchestratorVersionCommitId(commit.getCommitId(), flowId);
 
-        String flowJson = bmlService.query(username,bmlResource.getResourceId(),bmlResource.getVersion()).get("string").toString();
-
-        updateOrchestratorNotContainsKeywordsNode(flowRequest, orchestrator, username, workspace,flowJson);
+        updateOrchestratorNotContainsKeywordsNode(flowRequest, orchestrator, username, workspace,bmlResource);
 
         return commit;
     }
@@ -444,7 +442,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
 
     private void updateOrchestratorNotContainsKeywordsNode(OrchestratorSubmitRequest flowRequest, DSSOrchestratorInfo orchestrator,
-                                                           String username, Workspace workspace,String flowJson) {
+                                                           String username, Workspace workspace,BmlResource bmlResource) {
 
         DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace((int) workspace.getWorkspaceId());
 
@@ -452,12 +450,19 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             return;
         }
 
-
-        List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(flowJson, "resources");
         List<String> resourceFileName = new ArrayList<>();
-        // 取资源文件名称
-        if(!CollectionUtils.isEmpty(resources)){
-            resourceFileName = resources.stream().map(resource -> String.valueOf(resource.get("fileName"))).collect(Collectors.toList());
+
+        try {
+            // 空工作流会获取json失败
+            String flowJson = bmlService.query(username,bmlResource.getResourceId(),bmlResource.getVersion()).get("string").toString();
+            List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(flowJson, "resources");
+
+            // 取资源文件名称
+            if(!CollectionUtils.isEmpty(resources)){
+                resourceFileName = resources.stream().map(resource -> String.valueOf(resource.get("fileName"))).collect(Collectors.toList());
+            }
+        }catch (Exception e){
+            LOGGER.error("OrchestratorNotContainsKeywordsNode get resource fail",e);
         }
 
         String commitId = getLastPublishCommitId(orchestrator);
@@ -465,27 +470,23 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         GitDiffResponse gitDiffResponse = diffPublish(orchestrator.getName(), commitId, username,
                 workspace.getWorkspaceId(), flowRequest.getProjectName());
 
-        if (gitDiffResponse == null) {
+        if (gitDiffResponse == null || CollectionUtils.isEmpty(gitDiffResponse.getCodeTree())) {
             LOGGER.info("gitDiffResponse change is empty");
             return;
         }
 
         List<String> paths = new ArrayList<>();
 
-        if(!CollectionUtils.isEmpty(gitDiffResponse.getCodeTree())){
+        Map<String,GitTree> codeTreeMap = gitDiffResponse.getCodeTree().get(0).getChildren();
 
-            Map<String,GitTree> codeTreeMap = gitDiffResponse.getCodeTree().get(0).getChildren();
+        for(String name: codeTreeMap.keySet()){
 
-            for(String name: codeTreeMap.keySet()){
-
-                // 判断是否资源文件
-                if(resourceFileName.contains(name)){
-                    continue;
-                }
-
-                getCodePath(paths,codeTreeMap.get(name));
+            // 判断是否资源文件
+            if(resourceFileName.contains(name)){
+                continue;
             }
 
+            getCodePath(paths,codeTreeMap.get(name));
         }
 
         // 获取内容并检查

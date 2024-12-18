@@ -8,16 +8,17 @@ public class OrchestratorDiffNodeVo {
 
     private Long orchestratorId;
 
-    private List<String> nodeContainsKeywordsNodeList;
+    private List<String> notContainsKeywordsNodeList;
 
 
     public OrchestratorDiffNodeVo() {
     }
 
-    public OrchestratorDiffNodeVo(String orchestratorName, Long orchestratorId, List<String> nodeContainsKeywordsNodeList) {
+
+    public OrchestratorDiffNodeVo(String orchestratorName, Long orchestratorId, List<String> notContainsKeywordsNodeList) {
         this.orchestratorName = orchestratorName;
         this.orchestratorId = orchestratorId;
-        this.nodeContainsKeywordsNodeList = nodeContainsKeywordsNodeList;
+        this.notContainsKeywordsNodeList = notContainsKeywordsNodeList;
     }
 
     public String getOrchestratorName() {
@@ -38,11 +39,11 @@ public class OrchestratorDiffNodeVo {
         this.orchestratorId = orchestratorId;
     }
 
-    public List<String> getNodeContainsKeywordsNodeList() {
-        return nodeContainsKeywordsNodeList;
+    public List<String> getNotContainsKeywordsNodeList() {
+        return notContainsKeywordsNodeList;
     }
 
-    public void setNodeContainsKeywordsNodeList(List<String> nodeContainsKeywordsNodeList) {
-        this.nodeContainsKeywordsNodeList = nodeContainsKeywordsNodeList;
+    public void setNotContainsKeywordsNodeList(List<String> notContainsKeywordsNodeList) {
+        this.notContainsKeywordsNodeList = notContainsKeywordsNodeList;
     }
 }

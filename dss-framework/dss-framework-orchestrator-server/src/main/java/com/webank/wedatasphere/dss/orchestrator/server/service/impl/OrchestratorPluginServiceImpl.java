@@ -18,9 +18,11 @@ package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.webank.wedatasphere.dss.common.constant.project.ProjectUserPrivEnum;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
@@ -395,7 +397,9 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         // 更新commitId
         lockMapper.updateOrchestratorVersionCommitId(commit.getCommitId(), flowId);
 
-        updateOrchestratorNotContainsKeywordsNode(flowRequest, orchestrator, username, workspace);
+        String flowJson = bmlService.query(username,bmlResource.getResourceId(),bmlResource.getVersion()).get("string").toString();
+
+        updateOrchestratorNotContainsKeywordsNode(flowRequest, orchestrator, username, workspace,flowJson);
 
         return commit;
     }
@@ -440,12 +444,20 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
 
     private void updateOrchestratorNotContainsKeywordsNode(OrchestratorSubmitRequest flowRequest, DSSOrchestratorInfo orchestrator,
-                                                           String username, Workspace workspace) {
+                                                           String username, Workspace workspace,String flowJson) {
 
         DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace((int) workspace.getWorkspaceId());
 
         if (disabledKeywordsCheck(dssWorkspace)) {
             return;
+        }
+
+
+        List<Map<String, Object>> resources = DSSCommonUtils.getFlowAttribute(flowJson, "resources");
+        List<String> resourceFileName = new ArrayList<>();
+        // 取资源文件名称
+        if(!CollectionUtils.isEmpty(resources)){
+            resourceFileName = resources.stream().map(resource -> String.valueOf(resource.get("fileName"))).collect(Collectors.toList());
         }
 
         String commitId = getLastPublishCommitId(orchestrator);
@@ -460,9 +472,21 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
         List<String> paths = new ArrayList<>();
 
-        gitDiffResponse.getCodeTree().forEach(gitTree -> {
-            getCodePath(paths, gitTree);
-        });
+        if(!CollectionUtils.isEmpty(gitDiffResponse.getCodeTree())){
+
+            Map<String,GitTree> codeTreeMap = gitDiffResponse.getCodeTree().get(0).getChildren();
+
+            for(String name: codeTreeMap.keySet()){
+
+                // 判断是否资源文件
+                if(resourceFileName.contains(name)){
+                    continue;
+                }
+
+                getCodePath(paths,codeTreeMap.get(name));
+            }
+
+        }
 
         // 获取内容并检查
         List<String> nodePathList = getNotContainsKeywordsNodePath(paths, commitId, workspace, flowRequest.getProjectName(), username);
@@ -482,12 +506,11 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         }
 
         for (Map.Entry<String, GitTree> entry : gitTree.getChildren().entrySet()) {
-            // 过滤后缀
-            if (!StringUtils.endsWithAny(entry.getValue().getAbsolutePath(), ".sql", ".hql", ".py")) {
-                continue;
-            }
 
-            paths.add(entry.getValue().getAbsolutePath());
+            // 过滤后缀
+            if (StringUtils.endsWithAny(entry.getValue().getAbsolutePath(), ".sql", ".hql", ".py")) {
+                paths.add(entry.getValue().getAbsolutePath());
+            }
 
             getCodePath(paths, entry.getValue());
         }

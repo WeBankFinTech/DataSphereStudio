@@ -28,7 +28,7 @@ public class DssJobThreadPool {
     private static ExecutorService executorServiceDeamon = Utils.newFixedThreadPool(100, "project-publish-deamon", true);
     public static ExecutorService nodeExportThreadPool = Utils.newFixedThreadPool(NODE_EXPORT_IMPORT_THREAD_NUM.getValue(), "workflowNode-Export-Thread-", true);
     public static ExecutorService nodeImportThreadPool = Utils.newFixedThreadPool(NODE_EXPORT_IMPORT_THREAD_NUM.getValue(), "workflowNode-Import-Thread-", true);
-
+    public static ExecutorService nodeUploadThreadPool = Utils.newFixedThreadPool(NODE_EXPORT_IMPORT_THREAD_NUM.getValue(), "workflowNode-Upload-Thread-", true);
     public static ExecutorService get() {
         return executorService;
     }

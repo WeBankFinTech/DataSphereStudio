@@ -72,6 +72,7 @@ import com.webank.wedatasphere.dss.workflow.io.input.NodeInputService;
 import com.webank.wedatasphere.dss.workflow.lock.DSSFlowEditLockManager;
 import com.webank.wedatasphere.dss.workflow.lock.Lock;
 import com.webank.wedatasphere.dss.common.service.BMLService;
+import com.webank.wedatasphere.dss.workflow.scheduler.DssJobThreadPool;
 import com.webank.wedatasphere.dss.workflow.service.DSSFlowService;
 import com.webank.wedatasphere.dss.workflow.service.SaveFlowHook;
 import com.webank.wedatasphere.dss.workflow.service.WorkflowNodeService;
@@ -97,6 +98,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.webank.wedatasphere.dss.workflow.constant.DSSWorkFlowConstant.*;
@@ -987,7 +990,7 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         //重新上传工作流资源
         updateFlowJson = uploadFlowResourceToBml(userName, updateFlowJson, projectName, rootFlow);
         //上传节点的资源或调用appconn的copyRef
-        updateFlowJson = updateWorkFlowNodeJson(userName, projectName, updateFlowJson, rootFlow,
+        updateFlowJson = updateWorkFlowNodeJsonForMultiThread(userName, projectName, updateFlowJson, rootFlow,
                 version, workspace, dssLabels);
         // 更新对应节点的FlowJson
         saveFlowMetaData(rootFlow.getId(), updateFlowJson, orchestratorId);
@@ -1175,6 +1178,114 @@ public class DSSFlowServiceImpl implements DSSFlowService {
 
         return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
     }
+
+
+
+
+    private String updateWorkFlowNodeJsonForMultiThread(String userName, String projectName,
+                                                        String flowJson, DSSFlow dssFlow,
+                                                        String version, Workspace workspace, List<DSSLabel> dssLabels) throws DSSErrorException, IOException{
+
+        if (StringUtils.isEmpty(version)) {
+            logger.warn("version id is null when updateWorkFlowNodeJson");
+            version = String.valueOf((new Random().nextLong()));
+        }
+
+        List<String> nodeJsonList = workFlowParser.getWorkFlowNodesJson(flowJson);
+        if (nodeJsonList == null) {
+            throw new DSSErrorException(90073, "工作流内没有工作流节点，导入失败." + dssFlow.getName());
+        }
+        String updateContextId = workFlowParser.getValueWithKey(flowJson, CSCommonUtils.CONTEXT_ID_STR);
+        if (nodeJsonList.size() == 0) {
+            return flowJson;
+        }
+        List<DSSFlow> subflows = (List<DSSFlow>) dssFlow.getChildren();
+        List<Map<String, Object>> nodeJsonListRes = new ArrayList<>();
+
+        List<Future<Map<String, Object>>> futures = new ArrayList<>(nodeJsonList.size());
+
+        String orcVersion = version;
+
+        for (String nodeJson : nodeJsonList) {
+
+            Future<Map<String, Object>> future = DssJobThreadPool.nodeUploadThreadPool.submit( ()-> {
+
+                try {
+                    //重新上传一份jar文件到bml
+                    String updateNodeJson = inputNodeFiles(userName, projectName, nodeJson);
+
+                    Map<String, Object> nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
+                    //更新subflowID
+                    String nodeType = nodeJsonMap.get(JOBTYPE_KEY).toString();
+                    NodeInfo nodeInfo = nodeInfoMapper.getWorkflowNodeByType(nodeType);
+                    if ("workflow.subflow".equals(nodeType)) {
+                        String subFlowName = nodeJsonMap.get(TITLE_KEY).toString();
+                        List<DSSFlow> dssFlowList = subflows.stream().filter(subflow ->
+                                subflow.getName().equals(subFlowName)
+                        ).collect(Collectors.toList());
+                        if (dssFlowList.size() == 1) {
+                            updateNodeJson = nodeInputService.updateNodeSubflowID(updateNodeJson, dssFlowList.get(0).getId());
+                            nodeJsonMap = BDPJettyServerHelper.jacksonJson().readValue(updateNodeJson, Map.class);
+
+                        } else if (dssFlowList.size() > 1) {
+                            logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                            throw new DSSErrorException(90077, "工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                        } else {
+                            logger.error("工程内存在重复的子工作流节点名称，导入失败" + subFlowName);
+                            throw new DSSErrorException(90078, "工程内未能找到子工作流节点，导入失败" + subFlowName);
+                        }
+                    } else if (nodeInfo == null) {
+                        String msg = String.format("%s note type not exist,please check appconn install successfully", nodeType);
+                        logger.error(msg);
+                        throw new DSSRuntimeException(msg);
+                    } else if (Boolean.TRUE.equals(nodeInfo.getSupportJump()) && nodeInfo.getJumpType() == 1) {
+                        logger.info("nodeJsonMap.jobContent is:{}", nodeJsonMap.get("jobContent"));
+                        CommonAppConnNode newNode = new CommonAppConnNode();
+                        CommonAppConnNode oldNode = new CommonAppConnNode();
+                        oldNode.setJobContent((Map<String, Object>) nodeJsonMap.get("jobContent"));
+                        oldNode.setContextId(updateContextId);
+                        oldNode.setNodeType(nodeType);
+                        oldNode.setName((String) nodeJsonMap.get(TITLE_KEY));
+                        oldNode.setFlowId(dssFlow.getId());
+                        oldNode.setWorkspace(workspace);
+                        oldNode.setDssLabels(dssLabels);
+                        oldNode.setFlowName(dssFlow.getName());
+                        oldNode.setProjectId(dssFlow.getProjectId());
+                        oldNode.setProjectName(projectName);
+                        newNode.setName(oldNode.getName());
+                        Map<String, Object> jobContent = workflowNodeService.copyNode(userName, newNode, oldNode, orcVersion);
+                        nodeJsonMap.put("jobContent", jobContent);
+
+                    }
+
+                    return nodeJsonMap;
+
+                }catch (IOException e){
+                    throw new RuntimeException(e);
+                }
+            });
+
+            futures.add(future);
+
+        }
+
+
+        for (Future<Map<String, Object>> future : futures) {
+            try{
+                Map<String, Object> nodeJsonMap=future.get();
+                nodeJsonListRes.add(nodeJsonMap);
+            } catch (InterruptedException | ExecutionException e) {
+                logger.error("upload-flow-node thread fail msg is ｛｝ ", e);
+                throw new RuntimeException(e);
+            }
+        }
+
+        return workFlowParser.updateFlowJsonWithKey(flowJson, "nodes", nodeJsonListRes);
+
+
+
+    }
+
 
     //由于每一个节点可能含有jar文件，这个功能不能直接复制使用，因为删掉新版本节点会直接删掉旧版本的node中的jar文件
     //所以重新上传一份jar文件到bml

@@ -16,6 +16,7 @@
 
 package com.webank.wedatasphere.dss.orchestrator.server.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -538,7 +539,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         // 获取内容并检查
         List<String> nodePathList = getNotContainsKeywordsNodePath(paths, commitId, workspace, flowRequest.getProjectName(), username);
 
-        String notContainsKeywordsNode = StringUtils.joinWith(",",nodePathList);
+        String notContainsKeywordsNode = StrUtil.join(",",nodePathList);
 
         orchestratorMapper.updateOrchestratorNotContainsKeywordsNode(flowRequest.getOrchestratorId(), notContainsKeywordsNode);
     }

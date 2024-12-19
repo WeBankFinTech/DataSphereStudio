@@ -144,13 +144,17 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Transactional(rollbackFor = Throwable.class)
     @Override
     public int transferWorkspace(String workspaceName, String oldOwner, String newOwner, String desc) throws DSSErrorException {
-        DSSWorkspace dssWorkspace = getWorkspacesByName(workspaceName, oldOwner);
 
-        if (!oldOwner.equals(dssWorkspace.getCreateBy())) {
-            LOGGER.error("{} workspace createBy is {}, oldOwner is {}", workspaceName, dssWorkspace.getCreateBy(), oldOwner);
-            throw new DSSFrameworkWarnException(30021, workspaceName + "工作空间的原Owner与" + oldOwner + "不一致！！");
+        List<DSSWorkspace> dssWorkspaces = workspaceMapper.findByWorkspaceName(workspaceName);
+
+        if (dssWorkspaces == null || dssWorkspaces.isEmpty()) {
+            throw new DSSFrameworkWarnException(30021, workspaceName + "工作空间不存在!");
+        } else if (dssWorkspaces.size() > 1) {
+            throw new DSSFrameworkWarnException(30021, "Too many workspaces named " + workspaceName);
         }
-        
+
+        DSSWorkspace dssWorkspace =  dssWorkspaces.get(0);
+
         LOGGER.info("workspace name is {}, oldOwner is {}, newOwner is {}", workspaceName, oldOwner, newOwner);
         dssWorkspace.setCreateBy(newOwner);
         dssWorkspace.setLastUpdateTime(new Date());

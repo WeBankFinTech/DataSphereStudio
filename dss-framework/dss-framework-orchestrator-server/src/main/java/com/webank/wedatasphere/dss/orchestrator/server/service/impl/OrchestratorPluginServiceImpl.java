@@ -414,31 +414,14 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             throw new DSSErrorException(90058, "当前工作空间未启用工作流关键字校验");
         }
 
-        ProjectInfoRequest projectInfoRequest = new ProjectInfoRequest();
-        projectInfoRequest.setProjectId(projectId);
-
-        DSSProject project = RpcAskUtils.processAskException(DSSSenderServiceFactory.getOrCreateServiceInstance().getProjectServerSender()
-                .ask(projectInfoRequest), DSSProject.class, ProjectInfoRequest.class);
-
+        DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestratorNotContainsKeywordsNode(orchestratorId);
         // 项目未接入git
-        if (project.getAssociateGit() == null || !project.getAssociateGit()) {
-            LOGGER.error("{} 项目未接入git,project id is {}",project.getName(),project.getId());
+        if (orchestratorInfo.getAssociateGit() == null || !orchestratorInfo.getAssociateGit()) {
+            LOGGER.error("{} 项目未接入git,project id is {}",orchestratorInfo.getProjectName(),orchestratorInfo.getProjectId());
             throw new DSSErrorException(90058, "当前工作流所属项目未接入git");
         }
 
-        DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestratorNotContainsKeywordsNode(orchestratorId);
-        OrchestratorDiffNodeVo orchestratorDiffNodeVo = new OrchestratorDiffNodeVo();
-
-        if (StringUtils.isNotEmpty(orchestratorInfo.getNotContainsKeywordsNode())) {
-            orchestratorDiffNodeVo.setNotContainsKeywordsNodeList(Arrays.asList(orchestratorInfo.getNotContainsKeywordsNode().split(",")));
-        }
-        orchestratorDiffNodeVo.setProjectName(project.getName());
-        orchestratorDiffNodeVo.setOrchestratorId(orchestratorId);
-        orchestratorDiffNodeVo.setProjectId(projectId);
-        orchestratorDiffNodeVo.setOrchestratorName(orchestratorInfo.getName());
-
-        return orchestratorDiffNodeVo;
-
+        return getOrchestratorDiffNodeVo(orchestratorInfo,dssWorkspace);
 
     }
 
@@ -463,21 +446,33 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
             for(DSSOrchestratorInfo orchestratorInfo: orchestratorInfoList){
 
-                OrchestratorDiffNodeVo orchestratorDiffNodeVo = new OrchestratorDiffNodeVo();
-                // 项目已接入git,notContainsKeywordsNode不为空
-                if (Boolean.TRUE.equals(orchestratorInfo.getAssociateGit()) && StringUtils.isNotEmpty(orchestratorInfo.getNotContainsKeywordsNode())) {
-                    orchestratorDiffNodeVo.setNotContainsKeywordsNodeList(Arrays.asList(orchestratorInfo.getNotContainsKeywordsNode().split(",")));
-                }
-                orchestratorDiffNodeVo.setProjectName(orchestratorInfo.getProjectName());
-                orchestratorDiffNodeVo.setOrchestratorId(orchestratorInfo.getId());
-                orchestratorDiffNodeVo.setProjectId(orchestratorInfo.getProjectId());
-                orchestratorDiffNodeVo.setOrchestratorName(orchestratorInfo.getName());
-                orchestratorDiffNodeVoList.add(orchestratorDiffNodeVo);
+                orchestratorDiffNodeVoList.add(getOrchestratorDiffNodeVo(orchestratorInfo,dssWorkspace));
             }
 
         }
 
         return  orchestratorDiffNodeVoList;
+    }
+
+
+    private  OrchestratorDiffNodeVo  getOrchestratorDiffNodeVo(DSSOrchestratorInfo orchestratorInfo,DSSWorkspace dssWorkspace){
+
+
+        OrchestratorDiffNodeVo orchestratorDiffNodeVo = new OrchestratorDiffNodeVo();
+        // 项目已接入git,notContainsKeywordsNode不为空
+        if (Boolean.TRUE.equals(orchestratorInfo.getAssociateGit()) && StringUtils.isNotEmpty(orchestratorInfo.getNotContainsKeywordsNode())) {
+            orchestratorDiffNodeVo.setNotContainsKeywordsNodeList(Arrays.asList(orchestratorInfo.getNotContainsKeywordsNode().split(",")));
+        }
+        orchestratorDiffNodeVo.setProjectName(orchestratorInfo.getProjectName());
+        orchestratorDiffNodeVo.setOrchestratorId(orchestratorInfo.getId());
+        orchestratorDiffNodeVo.setProjectId(orchestratorInfo.getProjectId());
+        orchestratorDiffNodeVo.setOrchestratorName(orchestratorInfo.getName());
+        orchestratorDiffNodeVo.setEnabledFlowKeywordsCheck(dssWorkspace.getEnabledFlowKeywordsCheck());
+        orchestratorDiffNodeVo.setWorkspaceId((long) dssWorkspace.getId());
+        orchestratorDiffNodeVo.setWorkspaceName(dssWorkspace.getName());
+        orchestratorDiffNodeVo.setAssociateGit(orchestratorInfo.getAssociateGit());
+        return  orchestratorDiffNodeVo;
+
     }
 
     private boolean disabledKeywordsCheck(DSSWorkspace dssWorkspace) {

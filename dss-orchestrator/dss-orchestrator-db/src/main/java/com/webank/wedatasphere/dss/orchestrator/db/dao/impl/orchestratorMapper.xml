@@ -514,7 +514,16 @@
     </update>
 
     <select id="getOrchestratorNotContainsKeywordsNode" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
-        select id,name,not_contains_keywords_node as notContainsKeywordsNode from dss_orchestrator_info where id =#{orchestratorId}
+        select t1.id
+              ,t1.name
+              ,t1.not_contains_keywords_node as notContainsKeywordsNode
+              ,t1.project_id  as projectId
+              ,t1.workspace_id as workspaceId
+              ,t2.name as projectName
+              ,t2.associate_git as associateGit
+        from dss_orchestrator_info t1
+        left join dss_project t2 on t1.project_id = t2.id
+        where t1.id =#{orchestratorId}
     </select>
 
 

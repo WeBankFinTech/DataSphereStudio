@@ -172,7 +172,9 @@ public interface OrchestratorMapper {
 
     void updateOrchestratorNotContainsKeywordsNode(@Param("orchestratorId") Long orchestratorId, @Param("notContainsKeywordsNode") String notContainsKeywordsNode);
 
-    String getOrchestratorNotContainsKeywordsNode(@Param("orchestratorId") Long orchestratorId);
+    DSSOrchestratorInfo getOrchestratorNotContainsKeywordsNode(@Param("orchestratorId") Long orchestratorId);
+
+    List<DSSOrchestratorInfo> getOrchestratorListById(@Param("orchestratorIdList") List<Long> orchestratorIdList);
 
 
 }

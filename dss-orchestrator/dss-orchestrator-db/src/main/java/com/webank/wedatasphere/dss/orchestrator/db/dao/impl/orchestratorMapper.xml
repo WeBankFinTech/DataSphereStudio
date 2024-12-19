@@ -513,8 +513,25 @@
         where id = #{orchestratorId}
     </update>
 
-    <select id="getOrchestratorNotContainsKeywordsNode" resultType="java.lang.String">
-        select not_contains_keywords_node from dss_orchestrator_info where id =#{orchestratorId}
+    <select id="getOrchestratorNotContainsKeywordsNode" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        select id,name,not_contains_keywords_node as notContainsKeywordsNode from dss_orchestrator_info where id =#{orchestratorId}
+    </select>
+
+
+    <select id="getOrchestratorListById" resultType="com.webank.wedatasphere.dss.orchestrator.common.entity.DSSOrchestratorInfo">
+        select t1.id
+              ,t1.name
+              ,t1.not_contains_keywords_node as notContainsKeywordsNode
+              ,t1.project_id  as projectId
+              ,t1.workspace_id as workspaceId
+              ,t2.name as projectName
+              ,t2.associate_git as associateGit
+        from dss_orchestrator_info t1
+        left join dss_project t2 on t1.project_id = t2.id
+        where id in
+        <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
+            #{orchestratorId}
+        </foreach>
     </select>
 
 

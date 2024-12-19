@@ -14,6 +14,14 @@ public class OrchestratorDiffNodeVo {
 
     private List<String> notContainsKeywordsNodeList;
 
+    private String enabledFlowKeywordsCheck;
+
+    private String workspaceName;
+
+    private Long workspaceId;
+
+    private Boolean  associateGit;
+
 
     public OrchestratorDiffNodeVo() {
     }
@@ -65,5 +73,38 @@ public class OrchestratorDiffNodeVo {
 
     public void setProjectId(Long projectId) {
         this.projectId = projectId;
+    }
+
+
+    public String getEnabledFlowKeywordsCheck() {
+        return enabledFlowKeywordsCheck;
+    }
+
+    public void setEnabledFlowKeywordsCheck(String enabledFlowKeywordsCheck) {
+        this.enabledFlowKeywordsCheck = enabledFlowKeywordsCheck;
+    }
+
+    public String getWorkspaceName() {
+        return workspaceName;
+    }
+
+    public void setWorkspaceName(String workspaceName) {
+        this.workspaceName = workspaceName;
+    }
+
+    public Long getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(Long workspaceId) {
+        this.workspaceId = workspaceId;
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

@@ -8,6 +8,10 @@ public class OrchestratorDiffNodeVo {
 
     private Long orchestratorId;
 
+    private String projectName;
+
+    private Long projectId;
+
     private List<String> notContainsKeywordsNodeList;
 
 
@@ -45,5 +49,21 @@ public class OrchestratorDiffNodeVo {
 
     public void setNotContainsKeywordsNodeList(List<String> notContainsKeywordsNodeList) {
         this.notContainsKeywordsNodeList = notContainsKeywordsNodeList;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 }

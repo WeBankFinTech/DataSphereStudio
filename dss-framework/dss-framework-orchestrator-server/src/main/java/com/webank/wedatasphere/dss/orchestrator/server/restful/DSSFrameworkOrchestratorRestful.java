@@ -773,4 +773,12 @@ public class DSSFrameworkOrchestratorRestful {
         return  Message.ok().data("data",orchestratorPluginService.getNotContainsKeywordsNode(orchestratorId,projectId,workspace));
     }
 
+    @RequestMapping(value = "batchPublishFlowCheck",method = RequestMethod.POST)
+    public Message batchPublishFlowCheck(@RequestBody BatchPublishFlowCheckRequest batchPublishFlowCheckRequest) throws  DSSErrorException{
+
+        Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
+
+        return  Message.ok().data("data",orchestratorPluginService.batchPublishFlowCheck(batchPublishFlowCheckRequest,workspace));
+    }
+
 }

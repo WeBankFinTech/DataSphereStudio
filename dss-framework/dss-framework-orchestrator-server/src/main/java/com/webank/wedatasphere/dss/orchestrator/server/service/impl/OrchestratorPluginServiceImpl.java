@@ -57,6 +57,7 @@ import com.webank.wedatasphere.dss.orchestrator.publish.conf.DSSOrchestratorConf
 import com.webank.wedatasphere.dss.orchestrator.publish.job.CommonUpdateConvertJobStatus;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.ConversionJobEntity;
 import com.webank.wedatasphere.dss.orchestrator.publish.job.OrchestratorConversionJob;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.BatchPublishFlowCheckRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffDirVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffNodeVo;
@@ -68,6 +69,7 @@ import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.dao.FlowMapper;
 import com.webank.wedatasphere.dss.workflow.dao.LockMapper;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.linkis.common.utils.ByteTimeUtils;
@@ -419,18 +421,62 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
 
         // 项目未接入git
         if (project.getAssociateGit() == null || !project.getAssociateGit()) {
+            LOGGER.error("{} 项目未接入git,project id is {}",project.getName(),project.getId());
             throw new DSSErrorException(90058, "当前工作流所属项目未接入git");
         }
 
-        String json = orchestratorMapper.getOrchestratorNotContainsKeywordsNode(orchestratorId);
+        DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestratorNotContainsKeywordsNode(orchestratorId);
         OrchestratorDiffNodeVo orchestratorDiffNodeVo = new OrchestratorDiffNodeVo();
-        if (StringUtils.isNotEmpty(json)) {
-            orchestratorDiffNodeVo =  DSSCommonUtils.COMMON_GSON.fromJson(json, new TypeToken<OrchestratorDiffNodeVo>() {}.getType());
+
+        if (StringUtils.isNotEmpty(orchestratorInfo.getNotContainsKeywordsNode())) {
+            orchestratorDiffNodeVo.setNotContainsKeywordsNodeList(Arrays.asList(orchestratorInfo.getNotContainsKeywordsNode().split(",")));
         }
+        orchestratorDiffNodeVo.setProjectName(project.getName());
+        orchestratorDiffNodeVo.setOrchestratorId(orchestratorId);
+        orchestratorDiffNodeVo.setProjectId(projectId);
+        orchestratorDiffNodeVo.setOrchestratorName(orchestratorInfo.getName());
 
         return orchestratorDiffNodeVo;
 
 
+    }
+
+    @Override
+    public List<OrchestratorDiffNodeVo> batchPublishFlowCheck(BatchPublishFlowCheckRequest request, Workspace workspace) throws DSSErrorException {
+
+        List<OrchestratorDiffNodeVo> orchestratorDiffNodeVoList = new ArrayList<>();
+        DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace((int) workspace.getWorkspaceId());
+        if (disabledKeywordsCheck(dssWorkspace) || CollectionUtils.isEmpty(request.getOrchestratorIdList())) {
+            return  orchestratorDiffNodeVoList;
+        }
+
+        List<DSSOrchestratorInfo> orchestratorInfoList =  orchestratorMapper.getOrchestratorListById(request.getOrchestratorIdList());
+
+        if(CollectionUtils.isNotEmpty(orchestratorInfoList)){
+            DSSOrchestratorInfo  dssOrchestratorInfo = orchestratorInfoList.get(0);
+            if(!String.valueOf(dssOrchestratorInfo.getWorkspaceId()).equals(String.valueOf(workspace.getWorkspaceId()))){
+                LOGGER.error("cookie workspaceId is {}, orchestrator workspaceId,id,name  is {},{},{} "
+                        ,workspace.getWorkspaceId(),dssOrchestratorInfo.getWorkspaceId(),dssOrchestratorInfo.getId(),dssOrchestratorInfo.getName());
+                throw new DSSErrorException(90058,"工作流对应的工作空间与cookie中不一致，请刷新页面后重试");
+            }
+
+            for(DSSOrchestratorInfo orchestratorInfo: orchestratorInfoList){
+
+                OrchestratorDiffNodeVo orchestratorDiffNodeVo = new OrchestratorDiffNodeVo();
+                // 项目已接入git,notContainsKeywordsNode不为空
+                if (Boolean.TRUE.equals(orchestratorInfo.getAssociateGit()) && StringUtils.isNotEmpty(orchestratorInfo.getNotContainsKeywordsNode())) {
+                    orchestratorDiffNodeVo.setNotContainsKeywordsNodeList(Arrays.asList(orchestratorInfo.getNotContainsKeywordsNode().split(",")));
+                }
+                orchestratorDiffNodeVo.setProjectName(orchestratorInfo.getProjectName());
+                orchestratorDiffNodeVo.setOrchestratorId(orchestratorInfo.getId());
+                orchestratorDiffNodeVo.setProjectId(orchestratorInfo.getProjectId());
+                orchestratorDiffNodeVo.setOrchestratorName(orchestratorInfo.getName());
+                orchestratorDiffNodeVoList.add(orchestratorDiffNodeVo);
+            }
+
+        }
+
+        return  orchestratorDiffNodeVoList;
     }
 
     private boolean disabledKeywordsCheck(DSSWorkspace dssWorkspace) {
@@ -492,9 +538,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
         // 获取内容并检查
         List<String> nodePathList = getNotContainsKeywordsNodePath(paths, commitId, workspace, flowRequest.getProjectName(), username);
 
-        String notContainsKeywordsNode = DSSCommonUtils.COMMON_GSON.toJson(
-                new OrchestratorDiffNodeVo(orchestrator.getName(), orchestrator.getId(), nodePathList)
-        );
+        String notContainsKeywordsNode = StringUtils.joinWith(",",nodePathList);
 
         orchestratorMapper.updateOrchestratorNotContainsKeywordsNode(flowRequest.getOrchestratorId(), notContainsKeywordsNode);
     }

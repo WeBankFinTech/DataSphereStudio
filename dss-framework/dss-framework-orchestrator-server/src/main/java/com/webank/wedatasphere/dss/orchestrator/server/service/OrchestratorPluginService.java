@@ -23,6 +23,7 @@ import com.webank.wedatasphere.dss.git.common.protocol.response.GitCommitRespons
 import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.RequestFrameworkConvertOrchestration;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
+import com.webank.wedatasphere.dss.orchestrator.server.entity.request.BatchPublishFlowCheckRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorSubmitRequest;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffDirVo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorDiffNodeVo;
@@ -61,4 +62,7 @@ public interface OrchestratorPluginService {
     OrchestratorDiffDirVo diffContent(Long taskId);
 
     OrchestratorDiffNodeVo getNotContainsKeywordsNode(long orchestratorId, long projectId, Workspace workspace) throws  DSSErrorException;
+
+    List<OrchestratorDiffNodeVo> batchPublishFlowCheck(BatchPublishFlowCheckRequest request,Workspace workspace) throws DSSErrorException;
+
 }

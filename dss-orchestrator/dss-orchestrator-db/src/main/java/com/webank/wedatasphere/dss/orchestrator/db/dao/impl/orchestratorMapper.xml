@@ -528,7 +528,7 @@
               ,t2.associate_git as associateGit
         from dss_orchestrator_info t1
         left join dss_project t2 on t1.project_id = t2.id
-        where id in
+        where t1.id in
         <foreach collection="orchestratorIdList" index="index" item="orchestratorId" open="(" close=")" separator=",">
             #{orchestratorId}
         </foreach>

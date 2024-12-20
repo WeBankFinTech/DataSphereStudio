@@ -54,7 +54,7 @@
     </sql>
 
     <select id="getWorkspaces" resultMap="dss_workspace">
-        SELECT * from dss_workspace where id in (select distinct workspace_id from dss_workspace_user_role WHERE username = #{username}) order by create_time desc
+        select dw.* from dss_workspace dw inner join (select workspace_id,min(create_time) create_time from dss_workspace_user_role WHERE username = #{username} group by workspace_id) dwur on dw.id = dwur.workspace_id order by dwur.create_time desc
     </select>
 
     <select id="getMenuId" resultType="java.lang.Integer">

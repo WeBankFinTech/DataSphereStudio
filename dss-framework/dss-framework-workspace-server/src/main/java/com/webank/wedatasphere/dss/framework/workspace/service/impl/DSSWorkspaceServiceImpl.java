@@ -223,8 +223,7 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     @Override
     public DSSWorkspaceHomePageVO getWorkspaceHomePage(String userName, String moduleName) throws DSSErrorException {
         List<DSSWorkspace> dssWorkspaces = dssWorkspaceMapper.getWorkspaces(userName);
-        List<Integer> workspaceIds = dssWorkspaces.stream().filter(l -> !DEFAULT_DEMO_WORKSPACE_NAME.getValue().equals(l.getName()))
-                .map(DSSWorkspace::getId).collect(Collectors.toList());
+        List<Integer> workspaceIds = sortDssWorkspacesIndex(dssWorkspaces);
         DSSWorkspaceHomePageVO dssWorkspaceHomePageVO = new DSSWorkspaceHomePageVO();
         if (workspaceIds.size() == 0) {
             Long userId = dssWorkspaceUserMapper.getUserID(userName);
@@ -275,8 +274,9 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setRoleName(workspaceDBHelper.getRoleNameById(minRoleId));
         } else {
             String homepageUrl = "/workspaceHome?workspaceId=" + workspaceIds.get(0);
+            String[] defaultWorkspaceName = ApplicationConf.HOMEPAGE_DEFAULT_WORKSPACE.getValue().split(",");
             DSSWorkspace defaultWorkspace = dssWorkspaces.stream()
-                    .filter(workspcae -> workspcae.getName().equalsIgnoreCase(ApplicationConf.HOMEPAGE_DEFAULT_WORKSPACE.getValue())).findAny().orElse(null);
+                    .filter(workspcae -> Arrays.stream(defaultWorkspaceName).anyMatch(n->n.equalsIgnoreCase(workspcae.getName()))).findFirst().orElse(null);
             if(ObjectUtil.isNotEmpty(defaultWorkspace)){
                 homepageUrl = "/workspaceHome?workspaceId=" + defaultWorkspace.getId();
             }
@@ -288,6 +288,23 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setHomePageUrl(homepageUrl);
         }
         return dssWorkspaceHomePageVO;
+    }
+
+    private List<Integer> sortDssWorkspacesIndex(List<DSSWorkspace> dssWorkspaces) {
+        List<Integer> workspaceIds = dssWorkspaces.stream().filter(l -> !DEFAULT_DEMO_WORKSPACE_NAME.getValue().equals(l.getName())
+                        &&!DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue().equals(l.getName())
+                        &&!DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue().equals(l.getName()))
+                .map(DSSWorkspace::getId).collect(Collectors.toList());
+        if(workspaceIds.size()>1){
+            Map<String, Integer> workspaceMap = dssWorkspaces.stream().collect(Collectors.toMap(DSSWorkspace::getName, DSSWorkspace::getId));
+            if(workspaceMap.keySet().contains(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue())){
+                workspaceIds.add(workspaceMap.get(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue()));
+            }
+            if(workspaceMap.keySet().contains(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue())){
+                workspaceIds.add(workspaceMap.get(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue()));
+            }
+        }
+        return workspaceIds;
     }
 
     @Override

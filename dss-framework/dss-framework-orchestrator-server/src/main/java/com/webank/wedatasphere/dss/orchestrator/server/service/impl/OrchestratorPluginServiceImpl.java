@@ -586,7 +586,7 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
             return null;
         }
 
-        Pattern pattern = Pattern.compile("(create\\s+table|insert)\\s*", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("\\b(create\\s+table|insert)\\b",Pattern.CASE_INSENSITIVE);
 
         for (GitFileContentResponse gitFileContentResponse : gitDiffFileContentResponse.getGitFileContentResponseList()) {
 

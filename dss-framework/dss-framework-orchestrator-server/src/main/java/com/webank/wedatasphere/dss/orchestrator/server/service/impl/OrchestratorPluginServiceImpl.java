@@ -408,17 +408,18 @@ public class OrchestratorPluginServiceImpl implements OrchestratorPluginService 
     @Override
     public OrchestratorDiffNodeVo getNotContainsKeywordsNode(long orchestratorId, long projectId, Workspace workspace) throws DSSErrorException {
 
-
+        OrchestratorDiffNodeVo  orchestratorDiffNodeVo =   new OrchestratorDiffNodeVo();
         DSSWorkspace dssWorkspace = dssWorkspaceMapper.getWorkspace((int) workspace.getWorkspaceId());
         if (disabledKeywordsCheck(dssWorkspace)) {
-            throw new DSSErrorException(90058, "当前工作空间未启用工作流关键字校验");
+            LOGGER.info("{} , {} 工作空间未启用工作流关键字校验",dssWorkspace.getId(),dssWorkspace.getName());
+            return orchestratorDiffNodeVo;
         }
 
         DSSOrchestratorInfo orchestratorInfo = orchestratorMapper.getOrchestratorNotContainsKeywordsNode(orchestratorId);
         // 项目未接入git
         if (orchestratorInfo.getAssociateGit() == null || !orchestratorInfo.getAssociateGit()) {
-            LOGGER.error("{} 项目未接入git,project id is {}",orchestratorInfo.getProjectName(),orchestratorInfo.getProjectId());
-            throw new DSSErrorException(90058, "当前工作流所属项目未接入git");
+            LOGGER.info("{} 项目未接入git,project id is {}",orchestratorInfo.getProjectName(),orchestratorInfo.getProjectId());
+            return orchestratorDiffNodeVo;
         }
 
         return getOrchestratorDiffNodeVo(orchestratorInfo,dssWorkspace);

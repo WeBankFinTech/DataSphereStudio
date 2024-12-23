@@ -292,12 +292,12 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     }
 
     private List<DSSWorkspace> sortDssWorkspacesIndex(List<DSSWorkspace> dssWorkspaces) {
+        List<DSSWorkspace> dssWorkspaceReq = dssWorkspaces.stream().filter(l -> !DEFAULT_DEMO_WORKSPACE_NAME.getValue().equals(l.getName()))
+                .collect(Collectors.toList());
         if(dssWorkspaces.size()>1){
-            List<DSSWorkspace> dssWorkspaceReq = dssWorkspaces.stream().filter(l -> !DEFAULT_DEMO_WORKSPACE_NAME.getValue().equals(l.getName())
-                        &&!DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue().equals(l.getName())
+            dssWorkspaceReq = dssWorkspaces.stream().filter(l -> !DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue().equals(l.getName())
                         &&!DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue().equals(l.getName()))
                     .collect(Collectors.toList());
-
             Map<String, DSSWorkspace> workspaceMap = dssWorkspaces.stream().collect(Collectors.toMap(DSSWorkspace::getName, w->w));
             if(workspaceMap.keySet().contains(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue())){
                 dssWorkspaceReq.add(workspaceMap.get(DSSWorkspaceConstant.DEFAULT_WORKSPACE_NAME.getValue()));
@@ -305,9 +305,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             if(workspaceMap.keySet().contains(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue())){
                 dssWorkspaceReq.add(workspaceMap.get(DSSWorkspaceConstant.DEFAULT_0XWORKSPACE_NAME.getValue()));
             }
-            return dssWorkspaceReq;
         }
-       return dssWorkspaces;
+       return dssWorkspaceReq;
     }
 
     @Override

@@ -506,6 +506,10 @@ public class DSSWorkspaceRestful {
         dssWorkspace.setEnabledFlowKeywordsCheck(enabledFlowKeywordsCheck);
         dssWorkspace.setIsDefaultReference(isDefaultReference);
 
+        if (!dssWorkspaceService.checkAdminByWorkspace(username, dssWorkspace.getId())) {
+            return Message.error(String.format("%s 用户不是当前工作空间管理员,无权限进行该操作!",username));
+        }
+
         dssWorkspaceService.updateWorkspaceInfo(dssWorkspace);
 
         AuditLogUtils.printLog(username, workspaceId, workspace.getWorkspaceName(), TargetTypeEnum.WORKSPACE, workspaceId, workspace.getWorkspaceName(),

@@ -170,7 +170,7 @@
 
  &nbsp; &nbsp; &nbsp; &nbsp;您也可以扫描下面的二维码，加入我们的 微信群，以获得更快速的响应。
 
-![交流](images/zh_CN/readme/communication.png)
+![交流](images/zh_CN/readme/communication.jpg)
 
 ## 谁在使用 DSS
 

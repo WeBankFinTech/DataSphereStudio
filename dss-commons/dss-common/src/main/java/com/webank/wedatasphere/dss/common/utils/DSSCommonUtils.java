@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.common.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
+import com.webank.wedatasphere.dss.common.entity.node.DSSNode;
 import com.webank.wedatasphere.dss.common.entity.node.DSSNodeDefault;
 import com.webank.wedatasphere.dss.common.exception.DSSRuntimeException;
 import org.apache.linkis.common.conf.CommonVars;
@@ -59,7 +60,6 @@ public class DSSCommonUtils {
                 }
             })
             .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> new Date(json.getAsLong()))
-            .setObjectToNumberStrategy(ToNumberPolicy.LAZILY_PARSED_NUMBER)
             .create();
 
     public static final ObjectMapper JACKSON = JsonUtils.jackson();

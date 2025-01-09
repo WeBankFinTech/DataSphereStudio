@@ -666,7 +666,16 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                             for (Map.Entry<String, Object> paramEntry : paramValue.entrySet()) {
                                 String paramName = paramEntry.getKey();
                                 if (paramEntry.getValue() != null) {
-                                    String paramVal = paramEntry.getValue().toString();
+                                    String paramVal;
+                                    Object value = paramEntry.getValue();
+                                    if (value instanceof Number) {
+                                        Number numValue = (Number) value;
+                                        paramVal = numValue.longValue() == numValue.doubleValue() ?
+                                                String.valueOf(numValue.longValue()) :
+                                                numValue.toString();
+                                    } else {
+                                        paramVal = value.toString();
+                                    }
                                     logger.info("{}:{}", paramName, paramVal);
                                     String nodeContentType = null;
                                     if (nodeNumberMap.containsKey(jobType) && nodeNumberMap.get(jobType).equals(paramName)) {

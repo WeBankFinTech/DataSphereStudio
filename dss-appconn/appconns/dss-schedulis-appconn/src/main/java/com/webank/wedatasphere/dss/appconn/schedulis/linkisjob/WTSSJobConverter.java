@@ -116,12 +116,21 @@ public class WTSSJobConverter implements NodeConverter {
                     v.forEach((k2, v2) -> {
                         if(AzkabanConstant.AUTO_DISABLED.equals(k2) && null !=v2){job.setAutoDisabled(v2.toString());}
                         else if(null !=v2) {
+                            String vStr;
+                            if (v2 instanceof Number) {
+                                Number numValue = (Number) v2;
+                                vStr = numValue.longValue() == numValue.doubleValue() ?
+                                        String.valueOf(numValue.longValue()) :
+                                        numValue.toString();
+                            } else {
+                                vStr = v2.toString();
+                            }
                             if("only.receive.today".equals(k2)){
-                                job.getConf().put("msg.rece.today", v2.toString());
+                                job.getConf().put("msg.rece.today", vStr);
                             }else if("max.receive.hours".equals(k2)){
-                                job.getConf().put("wait.time", v2.toString());
+                                job.getConf().put("wait.time", vStr);
                             }else{
-                                job.getConf().put(k2, v2.toString());
+                                job.getConf().put(k2, vStr);
                             }
                         }
                     });

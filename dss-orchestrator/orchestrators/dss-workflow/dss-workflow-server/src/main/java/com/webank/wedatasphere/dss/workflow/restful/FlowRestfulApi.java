@@ -107,7 +107,7 @@ public class FlowRestfulApi {
         Workspace workspace = SSOHelper.getWorkspace(httpServletRequest);
         // TODO: 2019/5/23 flowName工程名下唯一校验
         String name = addFlowRequest.getName();
-        if (name != null && name.length() > 128) {
+        if (name != null && name.length() > 127) {
             return Message.error("名称超限，请保持在1到128个字符之间。超限名称：" + name);
         }
         Long parentFlowID = addFlowRequest.getParentFlowID();

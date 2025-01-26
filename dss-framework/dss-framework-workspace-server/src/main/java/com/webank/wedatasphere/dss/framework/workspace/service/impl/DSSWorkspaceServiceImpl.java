@@ -205,20 +205,31 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
     public List<DSSWorkspace> getWorkspaces(String userName) {
         List<DSSWorkspace> workspaces = dssWorkspaceMapper.getWorkspaces(userName);
         workspaces = sortDssWorkspacesIndex(workspaces);
-        //用于展示demo的工作空间是不应该返回的,除非用户是管理员
-        if (dssWorkspaceUserMapper.isAdmin(userName) == 1) {
+        Integer isAdmin = dssWorkspaceUserMapper.isAdmin(userName);
+        // 获取默认工作空间
+        DSSUserDefaultWorkspace dssUserDefaultWorkspace = dssWorkspaceUserMapper.getDefaultWorkspaceByUsername(userName);
+        Long workspaceId = dssUserDefaultWorkspace == null ? null : dssUserDefaultWorkspace.getWorkspaceId();
+        // 如果用户未设置默认工作空间,且用户为管理员
+        if (workspaceId == null && isAdmin == 1){
             return workspaces;
-        } else {
-            //踢掉那个演示demo工作空间
-            List<DSSWorkspace> retWorkspaces = new ArrayList<>();
-            String[] defaultDemoWorkspaceNames = DEFAULT_DEMO_WORKSPACE_NAME.getValue().split(",");
-            for (DSSWorkspace workspace : workspaces) {
-                if (!ArrayUtils.contains(defaultDemoWorkspaceNames, workspace.getName())) {
-                    retWorkspaces.add(workspace);
-                }
-            }
-            return retWorkspaces;
         }
+
+        List<DSSWorkspace> retWorkspaces = new ArrayList<>();
+        String[] defaultDemoWorkspaceNames = DEFAULT_DEMO_WORKSPACE_NAME.getValue().split(",");
+        for (DSSWorkspace workspace : workspaces) {
+
+            // 除非用户是管理员, 否则踢掉那个演示demo工作空间
+            if (isAdmin != 1 && ArrayUtils.contains(defaultDemoWorkspaceNames, workspace.getName()) ) {
+                continue;
+            }
+
+            if (workspaceId != null && workspace.getId() == workspaceId.intValue()){
+                workspace.setIsDefaultWorkspace(true);
+            }
+            retWorkspaces.add(workspace);
+        }
+
+        return  retWorkspaces;
     }
 
     @Override
@@ -274,18 +285,22 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             dssWorkspaceHomePageVO.setWorkspaceId(workspaceIds.get(0));
             dssWorkspaceHomePageVO.setRoleName(workspaceDBHelper.getRoleNameById(minRoleId));
         } else {
-            String homepageUrl = "/workspaceHome?workspaceId=" + workspaceIds.get(0);
-            String[] defaultWorkspaceName = ApplicationConf.HOMEPAGE_DEFAULT_WORKSPACE.getValue().split(",");
-            DSSWorkspace defaultWorkspace = dssWorkspaces.stream()
-                    .filter(workspcae -> Arrays.stream(defaultWorkspaceName).anyMatch(n->n.equalsIgnoreCase(workspcae.getName()))).findFirst().orElse(null);
-            if(ObjectUtil.isNotEmpty(defaultWorkspace)){
-                homepageUrl = "/workspaceHome?workspaceId=" + defaultWorkspace.getId();
-            }
+            Integer workspaceId = workspaceIds.get(0);
+            String homepageUrl;
+
 
             if (ApplicationConf.HOMEPAGE_MODULE_NAME.getValue().equalsIgnoreCase(moduleName)) {
-                homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceIds.get(0);
+
+                homepageUrl = ApplicationConf.HOMEPAGE_URL.getValue() + workspaceId;
+
+            }else{
+
+                workspaceId = getDefaultWorkspaceId(dssWorkspaces,userName,workspaceIds);
+                homepageUrl = "/workspaceHome?workspaceId=" + workspaceId;
+
             }
-            dssWorkspaceHomePageVO.setWorkspaceId(workspaceIds.get(0));
+
+            dssWorkspaceHomePageVO.setWorkspaceId(workspaceId);
             dssWorkspaceHomePageVO.setHomePageUrl(homepageUrl);
         }
         return dssWorkspaceHomePageVO;
@@ -307,6 +322,34 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
             }
         }
        return dssWorkspaceReq;
+    }
+
+    private Integer getDefaultWorkspaceId(List<DSSWorkspace> dssWorkspaces, String username,List<Integer> workspaceIds){
+
+        LOGGER.info("get user {} default workspace",username);
+        DSSUserDefaultWorkspace dssUserDefaultWorkspace = dssWorkspaceUserMapper.getDefaultWorkspaceByUsername(username);
+
+        if(dssUserDefaultWorkspace != null && workspaceIds.contains(dssUserDefaultWorkspace.getWorkspaceId().intValue())){
+            LOGGER.info("get user {} custom setting default workspace {}",
+                    username,dssUserDefaultWorkspace.getWorkspaceId());
+            return  dssUserDefaultWorkspace.getWorkspaceId().intValue();
+        }
+
+        String[] defaultWorkspaceName = ApplicationConf.HOMEPAGE_DEFAULT_WORKSPACE.getValue().split(",");
+
+        DSSWorkspace defaultWorkspace = dssWorkspaces.stream()
+                .filter(workspace -> Arrays.stream(defaultWorkspaceName)
+                        .anyMatch(n->n.equalsIgnoreCase(workspace.getName())))
+                .findFirst().orElse(null);
+
+        if (defaultWorkspace != null){
+            LOGGER.info("get user {} homepage default config workspace  {}",
+                    username,defaultWorkspace.getId());
+            return  defaultWorkspace.getId();
+        }
+        LOGGER.info("get user {} by add workspace time , get first workspace {}",username,workspaceIds.get(0));
+        return  workspaceIds.get(0);
+
     }
 
     @Override

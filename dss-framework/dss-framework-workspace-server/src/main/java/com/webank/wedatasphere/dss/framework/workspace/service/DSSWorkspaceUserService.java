@@ -18,9 +18,13 @@ package com.webank.wedatasphere.dss.framework.workspace.service;
 
 
 import com.webank.wedatasphere.dss.common.entity.PageInfo;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateUserDefaultWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserTreeVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
+import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 
 import java.util.List;
 
@@ -74,4 +78,7 @@ public interface DSSWorkspaceUserService {
     List<String> getWorkspaceUserByRoleId(Long workspaceId,Integer roleId);
 
     void updateWorkspaceRole(List<Integer> roles, long workspaceId,String newOwner);
+
+
+    DSSUserDefaultWorkspace updateUserDefaultWorkspace(UpdateUserDefaultWorkspaceRequest request) throws DSSErrorException;
 }

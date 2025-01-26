@@ -210,10 +210,6 @@
                     <artifactId>spring-context-support</artifactId>
                     <groupId>org.springframework</groupId>
                 </exclusion>
-                <exclusion>
-                    <groupId>-org.apache.linkis</groupId>
-                    <artifactId>linkis-mybatis</artifactId>
-                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

@@ -37,6 +37,8 @@ public class DSSWorkspace {
 
     private String isDefaultReference;
 
+    private Boolean isDefaultWorkspace;
+
     public int getAdminPermission() {
         return adminPermission;
     }
@@ -156,5 +158,13 @@ public class DSSWorkspace {
 
     public void setIsDefaultReference(String isDefaultReference) {
         this.isDefaultReference = isDefaultReference;
+    }
+
+    public Boolean getIsDefaultWorkspace() {
+        return isDefaultWorkspace;
+    }
+
+    public void setIsDefaultWorkspace(Boolean defaultWorkspace) {
+        isDefaultWorkspace = defaultWorkspace;
     }
 }

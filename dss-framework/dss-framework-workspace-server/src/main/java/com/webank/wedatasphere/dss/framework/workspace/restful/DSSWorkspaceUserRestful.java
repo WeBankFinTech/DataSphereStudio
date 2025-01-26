@@ -18,11 +18,14 @@ package com.webank.wedatasphere.dss.framework.workspace.restful;
 
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.utils.AuditLogUtils;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.common.StaffInfo;
+import com.webank.wedatasphere.dss.framework.workspace.bean.DSSUserDefaultWorkspace;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.DeleteWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.RevokeUserRole;
+import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateUserDefaultWorkspaceRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.request.UpdateWorkspaceUserRequest;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.*;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceRoleCheckService;
@@ -98,7 +101,7 @@ public class DSSWorkspaceUserRestful {
     @RequestMapping(path = "getAllWorkspaceUsers", method = RequestMethod.GET)
     public Message getAllWorkspaceUsers(@RequestParam(value = WORKSPACE_ID_STR, required = false) Integer workspaceId) {
         DSSWorkspaceUsersVo dssWorkspaceUsersVo = new DSSWorkspaceUsersVo();
-        if(workspaceId == null){
+        if (workspaceId == null) {
             // workspaceId改为从cookie取
             workspaceId = (int) SSOHelper.getWorkspace(httpServletRequest).getWorkspaceId();
         }
@@ -214,6 +217,7 @@ public class DSSWorkspaceUserRestful {
 
     /**
      * 判断username是否离职
+     *
      * @param usernames
      * @return 离职返回true，未离职false
      */
@@ -223,13 +227,13 @@ public class DSSWorkspaceUserRestful {
         List<Map<String, Boolean>> userStatus = new ArrayList<>(usernames.size());
         for (String username : usernames) {
             boolean isDismissed;
-            if(username.startsWith("hduser")||username.startsWith("WTSS_")){
+            if (username.startsWith("hduser") || username.startsWith("WTSS_")) {
                 isDismissed = false;
-            }else{
-                StaffInfo staffInfo= staffInfoGetter.getStaffInfoByUsername(username);
+            } else {
+                StaffInfo staffInfo = staffInfoGetter.getStaffInfoByUsername(username);
                 isDismissed = staffInfo != null && "2".equals(staffInfo.getStatus());
             }
-            Map<String, Boolean> tuple=Collections.singletonMap(username, isDismissed);
+            Map<String, Boolean> tuple = Collections.singletonMap(username, isDismissed);
             userStatus.add(tuple);
         }
         return Message.ok().data("isDismissed", userStatus);
@@ -262,7 +266,7 @@ public class DSSWorkspaceUserRestful {
     }
 
     @RequestMapping(path = "/clearUser", method = RequestMethod.GET)
-    public Message clearUser(@RequestParam("userName") String userName,@RequestParam(name="handover_ename",required = false) String handover_ename) {
+    public Message clearUser(@RequestParam("userName") String userName, @RequestParam(name = "handover_ename", required = false) String handover_ename) {
         String token = ModuleUserUtils.getToken(httpServletRequest);
         if (StringUtils.isNotBlank(token)) {
             if (!token.equals(HPMS_USER_TOKEN)) {
@@ -330,6 +334,30 @@ public class DSSWorkspaceUserRestful {
 
         return Message.ok().data("users", users);
 
+    }
+
+    @RequestMapping(path = "/updateUserDefaultWorkspace", method = RequestMethod.POST)
+    public Message updateUserDefaultWorkspace(@RequestBody UpdateUserDefaultWorkspaceRequest request) throws DSSErrorException {
+
+        String username = SecurityFilter.getLoginUsername(httpServletRequest);
+
+        Long workspaceId = request.getWorkspaceId();
+        String workspaceName = dssWorkspaceService.getWorkspaceName(workspaceId);
+        if (StringUtils.isEmpty(workspaceName)) {
+            LOGGER.error("updateUserDefaultWorkspace workspaceId is  {} , workspaceName is {}",workspaceId,workspaceName);
+            throw new DSSErrorException(90054,String.format("%s workspace not exists!", workspaceName) );
+        }
+
+        request.setWorkspaceName(workspaceName);
+
+        request.setUsername(username);
+
+        DSSUserDefaultWorkspace dssUserDefaultWorkspace = dssWorkspaceUserService.updateUserDefaultWorkspace(request);
+
+        AuditLogUtils.printLog(username, workspaceId,workspaceName, TargetTypeEnum.WORKSPACE, workspaceId, workspaceName,
+                OperateTypeEnum.UPDATE, request);
+
+        return Message.ok().data("dssUserDefaultWorkspace", dssUserDefaultWorkspace);
     }
 
 

@@ -223,9 +223,8 @@ public class DSSWorkspaceServiceImpl implements DSSWorkspaceService {
                 continue;
             }
 
-            if (workspaceId != null && workspace.getId() == workspaceId.intValue()){
-                workspace.setIsDefaultWorkspace(true);
-            }
+            boolean  isDefaultWorkspace = workspaceId != null && workspace.getId() == workspaceId.intValue();
+            workspace.setIsDefaultWorkspace(isDefaultWorkspace);
             retWorkspaces.add(workspace);
         }
 

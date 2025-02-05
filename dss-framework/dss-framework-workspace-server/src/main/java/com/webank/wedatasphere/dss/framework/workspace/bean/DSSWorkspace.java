@@ -37,7 +37,7 @@ public class DSSWorkspace {
 
     private String isDefaultReference;
 
-    private Boolean isDefaultWorkspace;
+    private boolean isDefaultWorkspace;
 
     public int getAdminPermission() {
         return adminPermission;

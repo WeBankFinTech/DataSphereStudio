@@ -273,8 +273,8 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         Long count = getCountByUsername(request.getUsername(), request.getWorkspaceId().intValue());
         // 判断是否有权限操作工作空间  -> 无权限则抛错
         if (count == null || count == 0) {
-            throw new DSSErrorException(30021, String.format("user: %s have no permission to access this workspace %s",
-                    username, workspaceId));
+            throw new DSSErrorException(30021, String.format("user: %s have no permission to access this workspace",
+                    username));
         }
 
         DSSUserDefaultWorkspace dssUserDefaultWorkspace = new DSSUserDefaultWorkspace();

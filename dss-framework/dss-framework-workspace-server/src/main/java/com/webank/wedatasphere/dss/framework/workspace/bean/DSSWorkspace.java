@@ -160,11 +160,11 @@ public class DSSWorkspace {
         this.isDefaultReference = isDefaultReference;
     }
 
-    public Boolean getIsDefaultWorkspace() {
+    public boolean getIsDefaultWorkspace() {
         return isDefaultWorkspace;
     }
 
-    public void setIsDefaultWorkspace(Boolean defaultWorkspace) {
+    public void setIsDefaultWorkspace(boolean defaultWorkspace) {
         isDefaultWorkspace = defaultWorkspace;
     }
 }

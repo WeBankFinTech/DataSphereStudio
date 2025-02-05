@@ -197,7 +197,9 @@ public class DataCheckerDao {
             }
             log.info("start to check hive meta");
             proObjectMap.put(DataChecker.SOURCE_TYPE, HIVE_SOURCE_TYPE);
-            normalCheck= getJobTotalCount(dataObject, jobConn, log) > 0;
+            boolean denyView = Boolean.parseBoolean(
+                    props.getProperty(DataChecker.DENY_VIEW_SWITCH, "false"));
+            normalCheck= getJobTotalCount(dataObject, jobConn, log,denyView) > 0;
             if (null != action.getExecutionRequestRefContext()){
                 action.getExecutionRequestRefContext().appendLog(dataObjectStr+" check hive meta end,check result:"+normalCheck);
             }
@@ -386,7 +388,7 @@ public class DataCheckerDao {
     /**
      * 查hive 元数据库
      */
-    private long getJobTotalCount(CheckDataObject dataObject, Connection conn, Logger log) {
+    private long getJobTotalCount(CheckDataObject dataObject, Connection conn, Logger log,boolean denyView) {
         log.info("-------------------------------------- search hive/spark/mr data ");
         log.info("-------------------------------------- dataObject: " + dataObject);
         try (PreparedStatement pstmt = getJobStatement(conn, dataObject)) {
@@ -394,6 +396,12 @@ public class DataCheckerDao {
 //            long ret = rs.last() ? rs.getRow() : 0;
             long ret = 0L;
             while (rs.next()) {
+                String tableType = rs.getString("TBL_TYPE");
+                //如果禁用视图，则检查视图，有则报错
+                if (denyView && "VIRTUAL_VIEW".equals(tableType)) {
+                    log.error("Virtual view table is not allowed to use DataChecker. check object:{}", dataObject);
+                    throw new DSSRuntimeException("Virtual view table is not allowed to use DataChecker. check object:{}" + dataObject);
+                }
                 ret ++;
             }
             log.info("-------------------------------------- hive/spark/mr data result:"+ret);

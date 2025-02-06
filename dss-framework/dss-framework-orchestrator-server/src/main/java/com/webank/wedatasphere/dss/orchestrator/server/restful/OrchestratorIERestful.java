@@ -38,11 +38,11 @@ import com.webank.wedatasphere.dss.orchestrator.server.service.impl.Orchestrator
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.sso.utils.SSOHelper;
 import org.apache.commons.io.IOUtils;
+import org.apache.linkis.common.io.Fs;
 import org.apache.linkis.common.io.FsPath;
-import org.apache.linkis.filesystem.service.FsService;
 import org.apache.linkis.server.Message;
 import org.apache.linkis.server.security.SecurityFilter;
-import org.apache.linkis.storage.fs.FileSystem;
+import org.apache.linkis.storage.FSFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +58,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,8 +69,6 @@ public class OrchestratorIERestful {
     @Autowired
     @Qualifier("orchestratorBmlService")
     private BMLService bmlService;
-    @Autowired
-    private FsService fsService;
     @Autowired
     OrchestratorService orchestratorService;
     @Autowired
@@ -93,22 +92,25 @@ public class OrchestratorIERestful {
         Workspace workspace = SSOHelper.getWorkspace(req);
         InputStream inputStream;
         String fileName;
+        BmlResource resultMap=null;
         if (packageFile != null) {
             inputStream = packageFile.getInputStream();
             fileName = new String(packageFile.getOriginalFilename().getBytes("ISO8859-1"), "UTF-8");
             //3、打包新的zip包上传BML
             logger.info("User {} begin to import orchestrator file", userName);
+            resultMap = bmlService.upload(userName, inputStream, fileName, projectName);
         } else {
             FsPath fsPath = new FsPath(packageUri);
-            FileSystem fileSystem = fsService.getFileSystem(userName, fsPath);
-            if ( !fileSystem.exists(fsPath) ) {
-                throw new DSSRuntimeException("路径上不存在文件！");
+            try(Fs fileSystem = FSFactory.getFsByProxyUser(fsPath, userName)) {
+                fileSystem.init(new HashMap<String, String>());
+                if (!fileSystem.exists(fsPath)) {
+                    throw new DSSRuntimeException("路径上不存在文件！");
+                }
+                inputStream = fileSystem.read(fsPath);
+                fileName = packageUri.substring(packageUri.lastIndexOf('/') + 1);
+                resultMap = bmlService.upload(userName, inputStream, fileName, projectName);
             }
-            inputStream = fileSystem.read(fsPath);
-            fileName = packageUri.substring(packageUri.lastIndexOf('/') + 1);
         }
-
-        BmlResource resultMap = bmlService.upload(userName, inputStream, fileName, projectName);
         DSSOrchestratorVersion dssOrchestratorVersion;
         try {
             RequestImportOrchestrator importRequest = new RequestImportOrchestrator(userName, projectName,

@@ -20,6 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.webank.wedatasphere.dss.appconn.manager.utils.AppConnManagerUtils;
+import com.webank.wedatasphere.dss.common.StaffInfo;
+import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.common.auditlog.OperateTypeEnum;
 import com.webank.wedatasphere.dss.common.auditlog.TargetTypeEnum;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
@@ -89,6 +91,9 @@ public class FlowRestfulApi {
     private HttpServletRequest httpServletRequest;
     @Autowired
     private DSSFlowService dssFlowService;
+
+    @Autowired
+    private StaffInfoGetter staffInfoGetter;
 
 
     /**
@@ -404,6 +409,33 @@ public class FlowRestfulApi {
             return Message.error("批量编辑失败，原因为：" + e.getMessage());
         }
         return Message.ok("批量编辑成功");
+    }
+
+    /**
+     * 判断proxyUser是否离职
+     *
+     * @return 离职返回true，未离职false
+     */
+    @RequestMapping(value = "proxyUserIsDismissed",method = RequestMethod.GET)
+    public Message proxyUserIsDismissed(@RequestParam("proxyUser") String proxyUser){
+
+        // 允许hduser和hadoop 用户，WTSS开头的不行
+        if ("hadoop".equalsIgnoreCase(proxyUser) || proxyUser.toLowerCase().startsWith("hduser")){
+            return  Message.ok().data("isDismissed", false);
+        }
+
+        List<StaffInfo> staffInfoList =  staffInfoGetter.getAllUsers();
+
+        StaffInfo staff = staffInfoList.stream().filter(staffInfo -> staffInfo.getEnglishName().equalsIgnoreCase(proxyUser)).findFirst().orElse(null);
+
+        // 离职或不存在用户返回
+        if(staff == null || "2".equals(staff.getStatus())){
+
+            return Message.ok().data("isDismissed", true);
+        }
+
+
+        return Message.ok().data("isDismissed", false);
     }
 
 }

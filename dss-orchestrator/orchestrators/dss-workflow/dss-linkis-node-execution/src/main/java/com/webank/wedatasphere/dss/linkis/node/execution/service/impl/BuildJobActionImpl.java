@@ -148,6 +148,7 @@ public class BuildJobActionImpl implements BuildJobAction {
             String sparkVersion = variable.get("sparkVersion");
             if (StringUtils.isNotEmpty(sparkVersion) && "3".equals(sparkVersion.trim())){
                 EngineTypeLabelCreator.registerVersion(EngineType.SPARK().toString(),SPARK3_ENGINE_VERSION.getValue());
+                variable.put("linkis.spark3.engine.version",SPARK3_ENGINE_VERSION.getValue());
             }else{
                 EngineTypeLabelCreator.registerVersion(EngineType.SPARK().toString(), LabelCommonConfig.SPARK_ENGINE_VERSION.getValue());
             }

@@ -121,4 +121,7 @@ public interface DSSFlowService {
     void deleteNodeContent(List<Long> flowIdList);
 
     void getRootFlowProxy(DSSFlow dssFlow);
+
+
+    boolean proxyUserIsDismissed(String proxyUser);
 }

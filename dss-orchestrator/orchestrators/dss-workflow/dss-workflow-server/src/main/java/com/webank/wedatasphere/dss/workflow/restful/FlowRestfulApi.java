@@ -92,9 +92,6 @@ public class FlowRestfulApi {
     @Autowired
     private DSSFlowService dssFlowService;
 
-    @Autowired
-    private StaffInfoGetter staffInfoGetter;
-
 
     /**
      * 添加subflow节点
@@ -419,23 +416,7 @@ public class FlowRestfulApi {
     @RequestMapping(value = "proxyUserIsDismissed",method = RequestMethod.GET)
     public Message proxyUserIsDismissed(@RequestParam("proxyUser") String proxyUser){
 
-        // 允许hduser和hadoop 用户，WTSS开头的不行
-        if ("hadoop".equalsIgnoreCase(proxyUser) || proxyUser.toLowerCase().startsWith("hduser")){
-            return  Message.ok().data("isDismissed", false);
-        }
-
-        List<StaffInfo> staffInfoList =  staffInfoGetter.getAllUsers();
-
-        StaffInfo staff = staffInfoList.stream().filter(staffInfo -> staffInfo.getEnglishName().equalsIgnoreCase(proxyUser)).findFirst().orElse(null);
-
-        // 离职或不存在用户返回
-        if(staff == null || "2".equals(staff.getStatus())){
-
-            return Message.ok().data("isDismissed", true);
-        }
-
-
-        return Message.ok().data("isDismissed", false);
+        return Message.ok().data("isDismissed", dssFlowService.proxyUserIsDismissed(proxyUser));
     }
 
 }

@@ -19,6 +19,8 @@ package com.webank.wedatasphere.dss.workflow.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.*;
+import com.webank.wedatasphere.dss.common.StaffInfo;
+import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
 import com.webank.wedatasphere.dss.common.entity.Resource;
 import com.webank.wedatasphere.dss.common.entity.node.DSSEdge;
@@ -84,6 +86,7 @@ import org.apache.linkis.cs.client.utils.SerializeHelper;
 import org.apache.linkis.cs.common.utils.CSCommonUtils;
 import org.apache.linkis.rpc.Sender;
 import org.apache.linkis.server.BDPJettyServerHelper;
+import org.apache.linkis.server.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -139,6 +142,9 @@ public class DSSFlowServiceImpl implements DSSFlowService {
     private NodeContentUIMapper nodeContentUIMapper;
     @Autowired
     private NodeMetaMapper nodeMetaMapper;
+
+    @Autowired
+    private StaffInfoGetter staffInfoGetter;
 
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -342,6 +348,12 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         // 判断工作流中是否存在命名相同的节点
         if (checkIsExistSameFlow(jsonFlow)) {
             throw new DSSErrorException(80001, "It exists same flow.(存在相同的节点)");
+        }
+
+        String proxyUser = getProxyUser(jsonFlow);
+        // 判断代理用户是否离职或不存在
+        if(proxyUserIsDismissed(proxyUser)){
+            throw new DSSErrorException(80001, String.format("%s 代理用户已离职或不存在",proxyUser));
         }
 
         // 判断工作流中是否有子工作流未被保存
@@ -2631,6 +2643,46 @@ public class DSSFlowServiceImpl implements DSSFlowService {
         return flowMap;
 
     }
+
+    private String getProxyUser(String jsonFlow){
+        String proxyUser = null;
+
+        if(StringUtils.isEmpty(jsonFlow)){
+            return proxyUser;
+        }
+
+        List<Map<String, Object>> props = DSSCommonUtils.getFlowAttribute(jsonFlow, "props");
+
+        if (CollectionUtils.isNotEmpty(props)) {
+            for (Map<String, Object> prop : props) {
+                if (prop.containsKey("user.to.proxy") && prop.get("user.to.proxy") != null) {
+                    proxyUser = prop.get("user.to.proxy").toString();
+                    break;
+                }
+            }
+        }
+
+        return proxyUser;
+    }
+
+
+    @Override
+    public boolean proxyUserIsDismissed(String proxyUser){
+
+        // 允许hduser和hadoop 用户，WTSS开头的不行
+        if (StringUtils.isEmpty(proxyUser) || "hadoop".equalsIgnoreCase(proxyUser) || proxyUser.toLowerCase().startsWith("hduser")){
+            return  false;
+        }
+
+        List<StaffInfo> staffInfoList =  staffInfoGetter.getAllUsers();
+
+        StaffInfo staff = staffInfoList.stream().filter(staffInfo -> staffInfo.getEnglishName().equalsIgnoreCase(proxyUser)).findFirst().orElse(null);
+
+        // 离职或不存在用户返回
+        return staff == null || "2".equals(staff.getStatus());
+
+    }
+
 
 
 }

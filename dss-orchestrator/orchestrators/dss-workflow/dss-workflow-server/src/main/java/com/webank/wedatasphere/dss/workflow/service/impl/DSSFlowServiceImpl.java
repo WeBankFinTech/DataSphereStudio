@@ -2660,7 +2660,24 @@ public class DSSFlowServiceImpl implements DSSFlowService {
                     break;
                 }
             }
+
+            logger.info("props user.to.proxy value is {}", proxyUser);
         }
+
+        if(StringUtils.isEmpty(proxyUser)){
+
+            // user.to.proxy 中未取到代理用户，则从scheduleParams 属性中获取
+            JsonParser jsonParser = new JsonParser();
+            JsonObject jsonObject = jsonParser.parse(jsonFlow).getAsJsonObject();
+            JsonObject scheduleParams = jsonObject.getAsJsonObject("scheduleParams");
+            if(scheduleParams != null && scheduleParams.get("proxyuser") != null){
+                proxyUser = scheduleParams.get("proxyuser").getAsString();
+            }
+
+            logger.info("scheduleParams proxyuser value is {}", proxyUser);
+        }
+
+        logger.info("get proxyUser value is {}", proxyUser);
 
         return proxyUser;
     }

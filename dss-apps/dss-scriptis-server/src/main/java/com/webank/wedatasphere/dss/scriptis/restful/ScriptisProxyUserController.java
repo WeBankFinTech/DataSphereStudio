@@ -43,6 +43,9 @@ public class ScriptisProxyUserController extends DssProxyUserController {
             return Message.error("Failed to add proxy user，'userName：" + userRep.getUserName() + ", proxyName："+userRep.getProxyUserName()+" already exists.");
         }
         LOGGER.info("admin {} try to add proxy user, params:{}.", username, userRep);
+        if (dssProxyUserService.isExists(userRep.getUserName(), userRep.getProxyUserName(), null)) {
+            return Message.ok("proxy user already exist.");
+        }
         try {
             scriptisProxyUserService.insertProxyUser(userRep);
         } catch (Exception exception) {

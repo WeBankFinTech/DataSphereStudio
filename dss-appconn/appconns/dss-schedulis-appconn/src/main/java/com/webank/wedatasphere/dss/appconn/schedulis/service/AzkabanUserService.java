@@ -62,6 +62,7 @@ public class AzkabanUserService {
             }
         } catch (Exception e) {
             LOGGER.error("update all releaseUsers from Schedulis url {} failed.", baseUrl, e);
+            throw e;
         }
         return newEntityList;
     }

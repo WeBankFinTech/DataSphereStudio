@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.constant.GitConstant;
+import com.webank.wedatasphere.dss.git.common.protocol.response.GitFileContentResponse;
 import org.apache.http.client.methods.HttpDelete;
 import com.webank.wedatasphere.dss.git.common.protocol.GitTree;
 import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
@@ -29,6 +30,10 @@ import org.apache.http.util.EntityUtils;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.errors.AmbiguousObjectException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
@@ -36,8 +41,12 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.treewalk.filter.OrTreeFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -48,40 +57,40 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DSSGitUtils {
     private static final Logger logger = LoggerFactory.getLogger(DSSGitUtils.class);
 
-    public static void init(String projectName, GitUserEntity gitUserDO) throws Exception, GitErrorException{
-        String projectPath = gitUserDO.getGitUser() + "/" + projectName;
-        if (!checkIfProjectExists(gitUserDO, projectPath)) {
-            String url = UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/" + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue();
-            try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-                HttpPost post = new HttpPost(url);
-                post.addHeader("PRIVATE-TOKEN", gitUserDO.getGitToken());
-                post.addHeader("Content-Type", "application/json");
-                String jsonInputString = String.format("{\"name\": \"%s\", \"description\": \"%s\"}", projectName, projectName);
-                post.setEntity(new StringEntity(jsonInputString));
+    public static void init(String projectName, String gitUser, String gitToken, String gitUrl) throws Exception, GitErrorException{
+        String projectPath = gitUser + "/" + projectName;
 
-                try (CloseableHttpResponse response = httpClient.execute(post)) {
-                    int statusCode = response.getStatusLine().getStatusCode();
-                    if (statusCode == 201) {
-                        logger.info("init success");
-                    } else {
-                        throw new GitErrorException(80001, "创建Git项目失败，请检查工作空间token是否过期");
-                    }
+        String url = gitUrl + "/" + GitServerConfig.GIT_RESTFUL_API_CREATE_PROJECTS.getValue();
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost post = new HttpPost(url);
+            post.addHeader("PRIVATE-TOKEN", gitToken);
+            post.addHeader("Content-Type", "application/json");
+            String jsonInputString = String.format("{\"name\": \"%s\", \"description\": \"%s\"}", projectName, projectName);
+            post.setEntity(new StringEntity(jsonInputString));
+
+            try (CloseableHttpResponse response = httpClient.execute(post)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode == 201) {
+                    logger.info("init success");
+                } else {
+                    throw new GitErrorException(80001, "创建Git项目失败，请检查工作空间token是否过期");
                 }
             }
-        } else {
-            throw new GitErrorException(80101, "git init failed, the reason is: projectName " + projectName +" already exists");
         }
     }
 
-    public static void remote(Repository repository, String projectName, GitUserEntity gitUser)throws GitErrorException {
+    public static void remote(Repository repository, String projectName, String gitUser, String gitUrl)throws GitErrorException {
         // 拼接git remote Url
-        String remoteUrl = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/" +gitUser.getGitUser() + File.separator + projectName + ".git";
+        String remoteUrl = gitUrl + "/" + gitUser + File.separator + projectName + ".git";
         try {
             Git git = new Git(repository);
 
@@ -101,10 +110,10 @@ public class DSSGitUtils {
     }
 
 
-    public static void create(String projectName, GitUserEntity gitUserDO, Long workspaceId) throws GitErrorException{
+    public static void create(String projectName, Long workspaceId, String gitUser) throws GitErrorException{
         logger.info("start success");
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName); // 指定仓库的目录
-        File respo = new File(generateGitPath(projectName, workspaceId));
+        File repoDir = new File(generateGitPrePath(projectName, workspaceId, gitUser)); // 指定仓库的目录
+        File respo = new File(generateGitPath(projectName, workspaceId, gitUser));
         if (!respo.exists()) {
             try {
                 // 初始化仓库
@@ -123,7 +132,7 @@ public class DSSGitUtils {
         }
     }
 
-    public static void pull(Repository repository, String projectName, GitUserEntity gitUser)throws GitErrorException {
+    public static void pull(Repository repository, String projectName, String gitUser, String gitToken)throws GitErrorException {
         try {
             Git git = new Git(repository);
 
@@ -131,7 +140,7 @@ public class DSSGitUtils {
             while (true) {
                 i += 1;
                 // 拉取远程仓库更新至本地
-                PullCommand pullCmd = git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser.getGitUser(), gitUser.getGitToken()));
+                PullCommand pullCmd = git.pull().setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser, gitToken));
                 PullResult result = pullCmd.call();
 
                 // 成功直接返回，失败清空本地修改重试最多3次
@@ -153,6 +162,7 @@ public class DSSGitUtils {
         } catch (Exception e) {
             // 丢失本地修改，处理冲突
             reset(repository, projectName);
+            throw new GitErrorException(80001, "拉取git最新代码失败，原因为:" + e.getMessage());
         }
     }
 
@@ -186,20 +196,158 @@ public class DSSGitUtils {
         }
     }
 
-    public static GitDiffResponse diff(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException{
+    public static GitDiffResponse diff(Repository repository, String projectName, List<String> fileList, String gitUser, Long workspaceId)throws GitErrorException{
 
-        Set<String> status = status(projectName, fileList, workspaceId);
-        GitTree root = new GitTree("");
-        for (String statu : status) {
-            root.addChild(statu);
+        Set<String> status = status(projectName, fileList, gitUser, workspaceId);
+        List<GitTree> codeTree = new ArrayList<>();
+        List<GitTree> metaTree = new ArrayList<>();
+        GitCommitResponse currentCommit = getCurrentCommit(repository);
+        String commitId = currentCommit.getCommitId();
+        if (status.isEmpty()) {
+            return new GitDiffResponse(codeTree, metaTree, commitId);
         }
-        // 打印树形结构
-        printTree("", root);
-        return new GitDiffResponse(root);
+        GitTree root = new GitTree("", false);
+        GitTree rootMeta = new GitTree("", true);
+        for (String statu : status) {
+            if (statu.startsWith(GitConstant.GIT_SERVER_META_PATH)) {
+                rootMeta.setAbsolutePath(statu);
+                rootMeta.addChild(statu);
+            } else {
+                filterRoot(statu, root);
+            }
+        }
+        Map<String, GitTree> children = root.getChildren();
+        for (Map.Entry<String, GitTree> entry: children.entrySet()) {
+            codeTree.add(entry.getValue());
+            printTree("", entry.getValue());
+        }
+
+        for (Map.Entry<String, GitTree> entry : rootMeta.getChildren().entrySet()) {
+            metaTree.add(entry.getValue());
+            DSSGitUtils.printTree("", entry.getValue());
+        }
+
+        return new GitDiffResponse(codeTree, metaTree, commitId);
+    }
+
+    public static GitDiffResponse diffGit(Repository repository, String projectName, String commitId, String filePath) {
+        List<GitTree> codeTree = new ArrayList<>();
+        List<GitTree> metaTree = new ArrayList<>();
+        try (Git git = new Git(repository)) {
+            ObjectId commitObjectId = ObjectId.fromString(commitId);
+            try (RevWalk revWalk = new RevWalk(repository)) {
+                RevCommit commit = revWalk.parseCommit(commitObjectId);
+
+                // Get the tree of the specified commit
+                ObjectId commitTree = commit.getTree().getId();
+
+                // Get the tree of the current working directory
+                ObjectId workTree = repository.resolve("HEAD^{tree}");
+
+                // Prepare the tree iterators for the diff
+                CanonicalTreeParser commitTreeParser = new CanonicalTreeParser();
+                CanonicalTreeParser workTreeParser = new CanonicalTreeParser();
+
+                try (ObjectReader reader = repository.newObjectReader()) {
+                    commitTreeParser.reset(reader, commitTree);
+                    workTreeParser.reset(reader, workTree);
+                }
+
+                List<String> paths = new ArrayList<>();
+                paths.add(filePath);
+                paths.add(GitConstant.GIT_SERVER_META_PATH + File.separator + filePath);
+
+                String[] array = paths.toArray(new String[paths.size()]);
+                TreeFilter pathFilter = createPathFilter(array);
+
+                // Perform the diff
+                List<DiffEntry> diffs = git.diff()
+                        .setOldTree(commitTreeParser)
+                        .setNewTree(workTreeParser)
+                        .setPathFilter(pathFilter)
+                        .call();
+
+                GitTree root = new GitTree("", false);
+                GitTree rootMeta = new GitTree("", true);
+                // Filter the diffs by the specified file path
+                for (DiffEntry entry : diffs) {
+                    // 获取变更类型和文件路径
+                    DiffEntry.ChangeType changeType = entry.getChangeType();
+                    String oldPath = entry.getOldPath();
+                    String newPath = entry.getNewPath();
+
+                    if (changeType.equals(DiffEntry.ChangeType.RENAME)) {
+                        addChild(root, rootMeta, newPath, changeType, oldPath);
+                    } else {
+                        if (oldPath != null) {
+                            addChild(root, rootMeta, oldPath, changeType, null);
+                        }
+                        if (newPath != null) {
+                            addChild(root, rootMeta, newPath, changeType, null);
+                        }
+                    }
+                }
+                Map<String, GitTree> children = root.getChildren();
+                for (Map.Entry<String, GitTree> entry: children.entrySet()) {
+                    codeTree.add(entry.getValue());
+                    printTree("", entry.getValue());
+                }
+                for (Map.Entry<String, GitTree> entry: rootMeta.getChildren().entrySet()) {
+                    metaTree.add(entry.getValue());
+                    printTree("", entry.getValue());
+                }
+
+            } catch (GitAPIException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new GitDiffResponse(codeTree, metaTree, null);
+    }
+
+    private static TreeFilter createPathFilter(String[] paths) {
+        TreeFilter[] filters = new TreeFilter[paths.length];
+        for (int i = 0; i < paths.length; i++) {
+            filters[i] = PathFilter.create(paths[i]);
+        }
+        return OrTreeFilter.create(filters);
+    }
+
+    private static void addChild(GitTree root, GitTree rootMeta, String path, DiffEntry.ChangeType status, String oldFilePath) {
+        if (path == null) {
+            return;
+        }
+        String pathName = path;
+        if (pathName.contains("/dev/null")) {
+            return ;
+        }
+        // 处理重命名文件
+        if (status.equals(DiffEntry.ChangeType.RENAME)) {
+            String oldFileName = oldFilePath.substring(oldFilePath.lastIndexOf("/") + 1);
+            pathName = path + "--(" + oldFileName + ")--";
+        }
+        if (path.startsWith(GitConstant.GIT_SERVER_META_PATH)) {
+            rootMeta.setAbsolutePath(path);
+            rootMeta.addChild(pathName);
+        } else {
+            filterRoot(path, root);
+        }
+    }
+
+    private static void filterRoot(String path, GitTree root) {
+        List<String> typeList = new ArrayList<>();
+        typeList.addAll(GitConstant.GIT_SERVER_SEARCH_TYPE);
+        typeList.add(".properties");
+        for (String type : typeList) {
+            if (path.endsWith(type)) {
+                root.setAbsolutePath(path);
+                root.addChild(path);
+                break;
+            }
+        }
     }
 
     // 打印树结构
-    static void printTree(String prefix, GitTree tree) {
+    public static void printTree(String prefix, GitTree tree) {
         logger.info(prefix + tree.getName());
         for (GitTree child : tree.getChildren().values()) {
             printTree(prefix + "  ", child);
@@ -207,13 +355,52 @@ public class DSSGitUtils {
     }
 
 
+    private static List <String> getDiffPath(List<String> paths,Git git){
+        List <String> diffPaths = new ArrayList<>();
+        try {
 
-    public static void push(Repository repository, String projectName, GitUserEntity gitUser, String comment, List<String> paths) throws GitErrorException{
+            String devNull =  "/dev/null";
+            String[] array = paths.toArray(new String[paths.size()]);
+            TreeFilter pathFilter = createPathFilter(array);
+            List<DiffEntry> diff = git.diff()
+                    .setShowNameAndStatusOnly(true)
+                    .setPathFilter(pathFilter)
+                    .call();
+
+            // 未获取到差异文件信息或者第一次提交(oldPath 全为/dev/null)
+            if(CollectionUtils.isEmpty(diff)
+            || diff.stream().allMatch(diffEntry -> diffEntry.getOldPath().equalsIgnoreCase(devNull))){
+
+                diffPaths = new ArrayList<>(paths);
+
+            }else{
+                for (DiffEntry diffEntry: diff){
+                    logger.info("diff path is {} ,{}",diffEntry.getOldPath(),diffEntry.getNewPath());
+                    String diffPath =  diffEntry.getNewPath().equalsIgnoreCase(devNull) ? diffEntry.getOldPath():diffEntry.getNewPath();
+                    diffPaths.add(diffPath);
+                }
+            }
+
+        }catch (Exception e){
+            logger.error("getDiffPath diff error msg is ", e);
+            diffPaths = new ArrayList<>(paths);
+        }
+
+        return  diffPaths;
+    }
+
+
+    public static void push(Repository repository, String projectName, String gitUser, String gitToken, String comment, List<String> paths) throws GitErrorException{
 
         try {
             Git git = new Git(repository);
+
+            logger.info("{} project workflow path is {}",projectName, StringUtils.join(paths,","));
+            List <String> diffPaths = getDiffPath(paths,git);
+
             // 添加新增、更改到暂存区
-            for (String path : paths) {
+            for (String path : diffPaths) {
+                logger.info("diff path is {}",path);
                 // 添加所有更改
                 git.add().addFilepattern(path).call();
                 // 添加删除到暂存区
@@ -229,7 +416,7 @@ public class DSSGitUtils {
 
             // 推送到远程仓库
             git.push()
-                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser.getGitUser(), gitUser.getGitToken()))
+                    .setCredentialsProvider(new UsernamePasswordCredentialsProvider(gitUser, gitToken))
                     .call();
 
             logger.info("Changes pushed to remote repository.");
@@ -254,8 +441,8 @@ public class DSSGitUtils {
         }
     }
 
-    public static void checkoutTargetCommit(Repository repository, GitRevertRequest request) throws GitAPIException, IOException, GitErrorException {
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + request.getWorkspaceId() + File.separator + request.getProjectName()+ File.separator + ".git");
+    public static void checkoutTargetCommit(Repository repository, GitRevertRequest request, String gitUser) throws GitAPIException, IOException, GitErrorException {
+        File repoDir = new File(generateGitPath(request.getProjectName(), request.getWorkspaceId(), gitUser));
         String commitId = request.getCommitId(); // 替换为目标commit的完整哈希值
 
         try {
@@ -275,11 +462,11 @@ public class DSSGitUtils {
         }
     }
 
-    public static boolean checkIfProjectExists(GitUserEntity gitUser, String projectPath) throws GitErrorException {
-        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectPath.replace("/", "%2F");
+    public static boolean checkIfProjectExists(String gitToken, String projectPath) throws GitErrorException {
+        String url = UrlUtils.normalizeIp(GitServerConfig.GIT_URL_PRE.getValue()) + "/api/v4/projects/" + projectPath.replace("/", "%2F");
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(url);
-            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.addHeader("PRIVATE-TOKEN", gitToken);
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
@@ -299,12 +486,12 @@ public class DSSGitUtils {
         }
     }
 
-    public static String getUserIdByUsername(GitUserEntity gitUser, String username) throws GitErrorException, IOException {
-        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/users?username=" + username;
+    public static String getUserIdByUsername(String gitUrl, String gitToken, String username) throws GitErrorException, IOException {
+        String url = gitUrl + "/api/v4/users?username=" + username;
         BufferedReader in = null;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(url);
-            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.addHeader("PRIVATE-TOKEN", gitToken);
 
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
@@ -341,12 +528,12 @@ public class DSSGitUtils {
         }
     }
 
-    public static String getProjectIdByName(GitUserEntity gitUser, String projectName) throws GitErrorException{
-        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects?search=" + projectName;
+    public static String getProjectIdByName(String projectName, String gitUser, String gitToken, String gitUrl) throws GitErrorException{
+        String urlString = gitUrl + "/api/v4/projects?search=" + projectName;
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(urlString);
-            request.setHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.setHeader("PRIVATE-TOKEN", gitToken);
 
             CloseableHttpResponse response = httpClient.execute(request);
             System.out.println("Response Status Line: " + response.getStatusLine());
@@ -387,11 +574,11 @@ public class DSSGitUtils {
         return null;
     }
 
-    public static boolean addProjectMember(GitUserEntity gitUser, String userId, String projectId, int accessLevel) throws GitErrorException, IOException {
-        String url = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members";
+    public static boolean addProjectMember(String gitUrl, String gitToken, String userId, String projectId, int accessLevel) throws GitErrorException, IOException {
+        String url = gitUrl + "/api/v4/projects/" + projectId + "/members";
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost request = new HttpPost(url);
-            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+            request.addHeader("PRIVATE-TOKEN", gitToken);
             request.addHeader("Content-Type", "application/json");
 
             String json = String.format("{\"user_id\": \"%s\", \"access_level\": \"%d\"}", userId, accessLevel);
@@ -400,7 +587,7 @@ public class DSSGitUtils {
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 int statusCode = response.getStatusLine().getStatusCode();
                 String responseBody = EntityUtils.toString(response.getEntity());
-                if (statusCode == 201) {
+                if (statusCode == 201 || (statusCode == 409 && responseBody.contains("Member already exists"))) {
                     return true;
                 } else {
                     throw new GitErrorException(80111, "添加用户失败，请检查只读用户是否存在或编辑用户token是否过期");
@@ -411,39 +598,39 @@ public class DSSGitUtils {
         }
     }
 
-    public static boolean removeProjectMember(GitUserEntity gitUser, String userId, String projectId) throws GitErrorException {
-        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members/" + userId;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpDelete request = new HttpDelete(urlString);
-            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+//    public static boolean removeProjectMember(GitUserEntity gitUser, String userId, String projectId) throws GitErrorException {
+//        String urlString = UrlUtils.normalizeIp(gitUser.getGitUrl()) + "/api/v4/projects/" + projectId + "/members/" + userId;
+//        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+//            HttpDelete request = new HttpDelete(urlString);
+//            request.addHeader("PRIVATE-TOKEN", gitUser.getGitToken());
+//
+//            try (CloseableHttpResponse response = httpClient.execute(request)) {
+//                int responseCode = response.getStatusLine().getStatusCode();
+//                if (responseCode == 204) {
+//                    return true;
+//                } else {
+//                    throw new GitErrorException(80112, "请检查工作空间Git只读用户是否存在");
+//                }
+//            }
+//        } catch (IOException e) {
+//            throw new GitErrorException(80112, "更新用户权限失败", e);
+//        }
+//    }
 
-            try (CloseableHttpResponse response = httpClient.execute(request)) {
-                int responseCode = response.getStatusLine().getStatusCode();
-                if (responseCode == 204) {
-                    return true;
-                } else {
-                    throw new GitErrorException(80112, "请检查工作空间Git只读用户是否存在");
-                }
-            }
-        } catch (IOException e) {
-            throw new GitErrorException(80112, "更新用户权限失败", e);
-        }
-    }
-
-    public static List<String> getAllProjectName(GitUserEntity gitUserDO) throws DSSErrorException {
+    public static List<String> getAllProjectName(String gitToken, String gitUrl) throws DSSErrorException {
         int page = 1;
         List<String> allProjectNames = new ArrayList<>();
 
         List<String> projectNames = new ArrayList<>();
         do {
             // 修改为GitLab实例的URL
-            String gitLabUrl = UrlUtils.normalizeIp(gitUserDO.getGitUrl()) + "/api/v4/projects?per_page=100&page=" + page;
+            String gitLabUrl = gitUrl + "/api/v4/projects?per_page=100&page=" + page;
             // 创建HttpClient实例
             try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
                 // 创建HttpGet请求
                 HttpGet request = new HttpGet(gitLabUrl);
                 // 添加认证头部
-                request.addHeader("PRIVATE-TOKEN", gitUserDO.getGitToken());
+                request.addHeader("PRIVATE-TOKEN", gitToken);
                 // 执行请求
                 try (CloseableHttpResponse response = httpClient.execute(request)) {
                     // 获取响应实体
@@ -453,7 +640,7 @@ public class DSSGitUtils {
                     // 解析项目名称
                     projectNames = parseProjectNames(result);
                     // 打印项目名称
-                    logger.info("projectNames is: {}", projectNames.toString());
+                    logger.info("projectNames is: {}", projectNames);
                     // 添加到总项目列表中
                     allProjectNames.addAll(projectNames);
                 }
@@ -463,7 +650,7 @@ public class DSSGitUtils {
                 throw new GitErrorException(80113, "检查项目名称时解析JSON失败，请确认git当前是否可访问 ", e);
             }
             page++;
-        } while (projectNames.size() > 0);
+        } while (!projectNames.isEmpty());
 
         return allProjectNames;
     }
@@ -480,8 +667,8 @@ public class DSSGitUtils {
         return projectNames;
     }
 
-    public static Set<String> status(String projectName, List<String> fileList, Long workspaceId)throws GitErrorException {
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName + File.separator +".git"); // 修改为你的仓库路径
+    public static Set<String> status(String projectName, List<String> fileList, String gitUser, Long workspaceId)throws GitErrorException {
+        File repoDir = new File(generateGitPath(projectName, workspaceId, gitUser)); // 修改为你的仓库路径
 
         try (Repository repository = new FileRepositoryBuilder().setGitDir(repoDir).build()) {
             Git git = new Git(repository);
@@ -503,29 +690,31 @@ public class DSSGitUtils {
                     status.getMissing().toString(),
                     status.getConflicting().toString()
                     );
+            // 仅关注 修改、删除、新增并且未暂存的文件
+            Set<String> fileSet = new HashSet<>();
+            if (!CollectionUtils.isEmpty(status.getModified())) {
+                fileSet.addAll(status.getModified());
+            }
+            if (!CollectionUtils.isEmpty(status.getMissing())) {
+                fileSet.addAll(status.getMissing());
+            }
+            if (!CollectionUtils.isEmpty(status.getUntracked())) {
+                fileSet.addAll(status.getUntracked());
+            }
 
-            Set<String> tree = new HashSet<>();
-            tree.addAll(status.getModified());
-            tree.addAll(status.getUntracked());
-            tree.addAll(status.getAdded());
-            tree.addAll(status.getChanged());
-            tree.addAll(status.getRemoved());
-            tree.addAll(status.getMissing());
-            tree.addAll(status.getConflicting());
-
-            return tree;
+            return fileSet;
         } catch (IOException | GitAPIException e) {
             throw new GitErrorException(80114, "git status failed, the reason is : ", e);
         }
     }
 
-    public static void archive(String projectName, GitUserEntity gitUserDO) throws GitErrorException {
+    public static void archive(String projectName, String gitUser, String gitToken, String gitUrl) throws GitErrorException {
         try {
-            String projectUrlEncoded = java.net.URLEncoder.encode(gitUserDO.getGitUser() + "/" + projectName, "UTF-8");
-            URL url = new URL(gitUserDO.getGitUrl() + "/api/v4/projects/" + projectUrlEncoded + "/archive");
+            String projectUrlEncoded = java.net.URLEncoder.encode(gitUser + "/" + projectName, "UTF-8");
+            URL url = new URL(gitUrl + "/api/v4/projects/" + projectUrlEncoded + "/archive");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("PRIVATE-TOKEN", gitUserDO.getGitToken());
+            conn.setRequestProperty("PRIVATE-TOKEN", gitToken);
 
             int responseCode = conn.getResponseCode();
             logger.info("Response Code: " + responseCode);
@@ -547,8 +736,8 @@ public class DSSGitUtils {
         }
     }
 
-    public static void archiveLocal(String projectName, Long workspaceId) throws GitErrorException{
-        File repoDir = new File(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator + projectName + File.separator + ".git");
+    public static void archiveLocal(String projectName, String gitUser, Long workspaceId) throws GitErrorException{
+        File repoDir = new File(generateGitPath(projectName, workspaceId, gitUser));
         if (!repoDir.exists()) {
             logger.info("file {} not exists", repoDir.getAbsolutePath());
             return ;
@@ -558,7 +747,7 @@ public class DSSGitUtils {
             // 删除名为"origin"的远程仓库配置
             git.remoteRemove().setRemoteName("origin").call();
             // 删除本地文件
-            FileUtils.removeDirectory(File.separator + FileUtils.normalizePath(GitServerConfig.GIT_SERVER_PATH.getValue()) + File.separator + workspaceId + File.separator +  projectName);
+            FileUtils.removeDirectory(generateGitPrePath(projectName, workspaceId, gitUser));
             logger.info("Remote 'origin' removed successfully.");
         } catch (GitAPIException e) {
             throw new GitErrorException(80116, "git archive failed, the reason is : ", e);
@@ -567,7 +756,16 @@ public class DSSGitUtils {
         }
     }
 
-    public static String getTargetCommitFileContent(Repository repository, String projectName, String commitId, String filePath) throws GitErrorException {
+    public static String getFileContent(String path, String projectName, String gitUser, Long workspaceId) throws IOException {
+        String filePath = generateGitPrePath(projectName, workspaceId, gitUser) + File.separator + path;
+        File file = new File(filePath);
+        if (file.exists()) {
+            return new String(Files.readAllBytes(Paths.get(filePath)));
+        }
+        return null;
+    }
+
+    public static void getTargetCommitFileContent(Repository repository, String commitId, String filePath, GitFileContentResponse contentResponse) throws GitErrorException {
         String content = "";
         try {
             // 获取最新的commitId
@@ -575,15 +773,20 @@ public class DSSGitUtils {
             // 获取提交记录
             try (RevWalk revWalk = new RevWalk(repository)) {
                 RevCommit commit = revWalk.parseCommit(lastCommitId);
+                if (commit != null) {
+                    contentResponse.setBeforeAnnotate(commit.getShortMessage());
+                    contentResponse.setBeforeCommitId(commit.getId().getName());
+                }
                 RevTree tree = commit.getTree();
-                logger.info("Having tree: " + tree);
+                logger.info("Having tree: {}", tree);
                 // 遍历获取最近提交记录
                 try (TreeWalk treeWalk = new TreeWalk(repository)) {
                     treeWalk.addTree(tree);
                     treeWalk.setRecursive(true);
                     treeWalk.setFilter(PathFilter.create(filePath));
                     if (!treeWalk.next()) {
-                        throw new IllegalStateException("Did not find expected file '" + filePath + "'");
+                        logger.warn("Did not find expected file '{}'，忽略", filePath);
+                        contentResponse.setBefore(null);
                     }
 
                     ObjectId objectId = treeWalk.getObjectId(0);
@@ -601,8 +804,51 @@ public class DSSGitUtils {
         } catch (IOException e) {
             throw new GitErrorException(80117, "getFileContent failed, the reason is : ", e);
         }
-        return content;
+        contentResponse.setBefore(content);
     }
+
+    public static RevCommit getLatestCommitInfo(Repository repository, String filePath, String projectName, Long workspaceId, String gitUser) throws GitErrorException {
+        try {
+            Git git = new Git(repository);
+            Iterable<RevCommit> commits = git.log().addPath(filePath).call();
+            String path = DSSGitUtils.generateGitPrePath(projectName, workspaceId, gitUser) + filePath;
+            File file = new File(path);
+            if (file.exists()) {
+                for (RevCommit commit : commits) {
+                    return commit;
+                }
+            } else {
+                RevCommit previousCommit = null;
+                for (RevCommit commit : commits) {
+                    if (commit != null) {
+                        try (TreeWalk treeWalk = TreeWalk.forPath(git.getRepository(), path, commit.getTree())) {
+                            if (treeWalk == null) {
+                                // The file does not exist in this commit, so this is the deletion commit
+                                return commit;
+                            }
+                        }
+                    }
+                    previousCommit = commit;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            throw new GitErrorException(80118, "getLatestCommitInfo failed, the reason is : ", e);
+        }
+    }
+
+    public static RevCommit getTargetCommitInfo(Repository repository, String commitId) throws GitErrorException {
+        try {
+            Git git = new Git(repository);
+            ObjectId commitIdInfo = ObjectId.fromString("commitId");
+            RevWalk walk = new RevWalk(repository);
+            RevCommit commit = walk.parseCommit(commitIdInfo);
+            return commit;
+        } catch (Exception e) {
+            throw new GitErrorException(80118, "getTargetCommitInfo failed, the reason is : ", e);
+        }
+    }
+
 
     public static void getCommitId(Repository repository, String projectName, int num, Long workspaceId)throws GitErrorException {
         // 获取当前CommitId，
@@ -643,7 +889,7 @@ public class DSSGitUtils {
                 commitResponse.setCommitId(commit.getId().getName());
                 commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
                 String shortMessage = commit.getShortMessage();
-
+                commitResponse.setCommentFull(shortMessage);
                 getUserName(shortMessage, commitResponse, commit);
                 // 返回commitId字符串
                 return commitResponse;
@@ -672,15 +918,19 @@ public class DSSGitUtils {
     }
 
     public static List<GitCommitResponse> getLatestCommit(Repository repository, String filePath, Integer num) throws GitErrorException{
-        List<GitCommitResponse> commitResponseList = new ArrayList<>();
+        Set<GitCommitResponse> commitResponseList = new HashSet<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String metaPath = GitConstant.GIT_SERVER_META_PATH + "/" + filePath;
 
         try (Git git = new Git(repository)) {
             Iterable<RevCommit> commits = null;
+            Iterable<RevCommit> metaConfCommits = null;
             if (num == null) {
                 commits = git.log().addPath(filePath).call();
+                metaConfCommits = git.log().addPath(metaPath).call();
             } else {
                 commits = git.log().addPath(filePath).setMaxCount(num).call();
+                metaConfCommits = git.log().addPath(metaPath).setMaxCount(num).call();
             }
             for (RevCommit commit : commits) {
                 GitCommitResponse commitResponse = new GitCommitResponse();
@@ -692,7 +942,17 @@ public class DSSGitUtils {
                 commitResponseList.add(commitResponse);
             }
 
-            return commitResponseList;
+            for (RevCommit commit : metaConfCommits) {
+                GitCommitResponse commitResponse = new GitCommitResponse();
+                commitResponse.setCommitId(commit.getId().getName());
+                commitResponse.setCommitTime(sdf.format(commit.getAuthorIdent().getWhen()));
+                String shortMessage = commit.getShortMessage();
+                getUserName(shortMessage, commitResponse, commit);
+                logger.info("提交ID: " + commit.getId().getName());
+                commitResponseList.add(commitResponse);
+            }
+
+            return new ArrayList<>(commitResponseList);
         } catch (GitAPIException e) {
             throw new GitErrorException(80120, "get latestCommitId failed, the reason is : ", e);
         }
@@ -716,6 +976,8 @@ public class DSSGitUtils {
             gitLogHistory(git, repository, oldCommitId, commitIdNow, path, gitCommitResponseList, commitIdSet);
             // 元数据改动
             gitLogHistory(git, repository, oldCommitId, commitIdNow, GitConstant.GIT_SERVER_META_PATH + File.separator + path, gitCommitResponseList, commitIdSet);
+
+            gitCommitResponseList = gitCommitResponseList.stream().sorted(Comparator.comparing(GitCommitResponse::getCommitTime).reversed()).collect(Collectors.toList());
         } catch (Exception e) {
             throw new GitErrorException(80121, "get log between " + oldCommitId + " and " + newCommitId + "failed, the reason is : ", e);
         }
@@ -752,9 +1014,14 @@ public class DSSGitUtils {
 
 
 
-    public static String generateGitPath(String projectName, Long workspaceId) {
+    public static String generateGitPath(String projectName, Long workspaceId, String gitUser) {
         // eg ： /data/GitInstall/224/testGit/.git
-        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + projectName + File.separator + DSSGitConstant.GIT_PATH_SUFFIX;
+        return generateGitPrePath(projectName, workspaceId, gitUser) + File.separator + DSSGitConstant.GIT_PATH_SUFFIX;
+    }
+
+    public static String generateGitPrePath(String projectName, Long workspaceId, String gitUser) {
+        // eg ： /data/GitInstall/224/testGit
+        return DSSGitConstant.GIT_PATH_PRE + workspaceId + File.separator + gitUser + File.separator + projectName ;
     }
 
 

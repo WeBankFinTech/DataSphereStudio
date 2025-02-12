@@ -22,7 +22,7 @@
     <parent>
         <artifactId>dss-commons</artifactId>
         <groupId>com.webank.wedatasphere.dss</groupId>
-        <version>1.5.0-SNAPSHOT</version>
+        <version>1.10.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>dss-common</artifactId>
@@ -131,16 +131,19 @@
             <artifactId>spring-aop</artifactId>
             <groupId>org.springframework</groupId>
             <version>${spring.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <artifactId>spring-context-support</artifactId>
             <groupId>org.springframework</groupId>
             <version>${spring.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
             <version>${spring.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.linkis</groupId>

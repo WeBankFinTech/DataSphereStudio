@@ -21,6 +21,14 @@
       v-if="work.type == 'dbDetails'"
       :work="work">
     </dbDetails>
+    <spaceInfo
+      v-if="work.type == 'ngSpaceInfo'"
+      :work="work">
+    </spaceInfo>
+    <tagEdgeInfo
+      v-if="work.type == 'tagEdgeInfo'"
+      :work="work">
+    </tagEdgeInfo>
     <iframeView
       v-if="work.type == 'iframe'"
       :url="work.url">
@@ -33,6 +41,8 @@ import backgroundScriptView from './script/backgroundScript.vue';
 import tbDetail from './tableDetails/index.vue';
 import createTableView from './createTable/index.vue';
 import dbDetails from './dbDetails/index.vue';
+import spaceInfo from './nebulaInfo/spaceInfo.vue';
+import tagEdgeInfo from './nebulaInfo/tagEdgeInfo.vue';
 import iframeView from './iframeView/index.vue';
 export default {
   name: 'workbench',
@@ -42,6 +52,8 @@ export default {
     tbDetail,
     createTableView,
     dbDetails,
+    spaceInfo,
+    tagEdgeInfo,
     iframeView
   },
   props: {

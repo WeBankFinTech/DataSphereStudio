@@ -16,16 +16,21 @@
 
 package com.webank.wedatasphere.dss.workflow.service;
 
+import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.orchestrator.common.protocol.ResponseConvertOrchestrator;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
+import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.entity.request.BatchPublishWorkflowRequest;
 
 import java.util.Map;
 
 public interface PublishService {
 
 
-    String submitPublish(String publishUser, Long workflowId,
+    String submitPublish(String publishUser, Long workFlowId,
         Map<String, Object> dssLabel, Workspace workspace, String comment) throws Exception;
+
+    void batchPublish(BatchPublishWorkflowRequest publishWorkflowRequest, Workspace workspace, String convertUser, Map<String, Object> dssLabel) throws Exception;
 
     ResponseConvertOrchestrator getStatus(String username, String taskId) throws Exception;
 

@@ -7,7 +7,6 @@
   },
   "devDependencies": {},
   "scripts": {
-    "serve": "vue-cli-service serve example.js",
-    "build": "vue-cli-service build --target lib --name cyeditor index.js"
+    "serve": "vue-cli-service serve example.js"
   }
 }

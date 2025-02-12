@@ -99,7 +99,7 @@ public class DSSProjectUserServiceImpl implements DSSProjectUserService {
      * @param modifyRequest
      */
     @Override
-    public void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest modifyRequest, String loginuser, Workspace workspace) throws Exception {
+    public void modifyProjectUser(DSSProjectDO dbProject, ProjectModifyRequest modifyRequest) {
         projectUserMapper.deleteAllPriv(dbProject.getId());
         //將创建人默认为发布权限
         List<String> releaseUsers = modifyRequest.getReleaseUsers();

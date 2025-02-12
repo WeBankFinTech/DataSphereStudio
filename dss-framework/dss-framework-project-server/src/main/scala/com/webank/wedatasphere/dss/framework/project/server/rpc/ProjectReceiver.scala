@@ -76,6 +76,15 @@ class ProjectReceiver(projectService: DSSProjectService,
         val projectDo: DSSProjectDO = projectService.getProjectById(projectId)
         val privList = projectUserService.getProjectUserPriv(projectId, userName).map(_.getPriv)
         new ProjectUserAuthResponse(projectId, userName, privList, projectDo.getCreateBy)
+
+      case projectInfoListRequest: ProjectInfoListRequest =>
+        val projects = projectService.getDSSProjectByName(projectInfoListRequest.getProjectNames)
+        new ProjectInfoListResponse(projects)
+
+      case projectListQueryRequest: ProjectListQueryRequest =>
+        val projectList = projectService.queryProject(projectListQueryRequest)
+        new ProjectListQueryResponse(projectList)
+
     }
   }
 

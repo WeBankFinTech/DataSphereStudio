@@ -96,6 +96,15 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
      */
     private String status;
 
+    /** 不包含关键字的节点**/
+    private String notContainsKeywordsNode;
+
+    private String projectName;
+
+
+     /**所属项目是否接入git**/
+     private Boolean associateGit;
+
     public DSSOrchestratorInfo() {
 
     }
@@ -321,5 +330,34 @@ public class DSSOrchestratorInfo implements DSSOrchestration {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getNotContainsKeywordsNode() {
+        return notContainsKeywordsNode;
+    }
+
+    public void setNotContainsKeywordsNode(String notContainsKeywordsNode) {
+        this.notContainsKeywordsNode = notContainsKeywordsNode;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public Boolean getAssociateGit() {
+        return associateGit;
+    }
+
+    public void setAssociateGit(Boolean associateGit) {
+        this.associateGit = associateGit;
     }
 }

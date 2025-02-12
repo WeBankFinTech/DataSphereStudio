@@ -98,11 +98,14 @@ class FlowJobNodeParser extends FlowEntranceJobParser with Logging{
           run_date = new CustomDateType(getYesterday(false), false)
         })
       }
-      if (!flowVar.containsKey("run_today_h")) {
-        val run_today = new CustomDateType(getToday(std = false, run_date + 1), false)
-        val run_today_h = new CustomHourType(getCurHour(std = false, run_today.toString), false)
-        flowVar.put("run_today_h", run_today_h.toString())
-      }
+      val run_today = new CustomDateType(getToday(std = false, run_date + 1), false)
+      val cur_hour=getCurHour(std = false, run_today.toString)
+      val run_today_h = new CustomHourType(cur_hour, false)
+      flowVar.put("run_today_h", run_today_h.toString())
+      flowVar.put("run_today_hour", run_today_h.toString())
+      val run_today_h_std = new CustomHourType(cur_hour, true)
+      flowVar.put("run_today_h_std", run_today_h_std.toString())
+      flowVar.put("run_today_hour_std", run_today_h_std.toString())
       params.put(PROPS_MAP, propsMap)
       params.put(FLOW_VAR_MAP, flowVar)
       val flowNameAndResources = new util.HashMap[String, util.List[BMLResource]]()

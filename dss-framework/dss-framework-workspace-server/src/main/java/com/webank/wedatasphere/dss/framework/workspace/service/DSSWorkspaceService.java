@@ -64,6 +64,8 @@ public interface DSSWorkspaceService {
 
     String getWorkspaceName(Long workspaceId);
 
+    int getWorkspaceId(String workspaceName);
+
     /**
      * 工作空间管理员权限判断(is_admin=1的用户才拥有工作空间操作权限)
      * @param userName
@@ -113,4 +115,10 @@ public interface DSSWorkspaceService {
     boolean checkAdminByWorkspace(String username, int workspaceId);
 
     PageInfo<DSSUserRoleComponentPriv> getAllUserPrivs(Integer currentPage, Integer pageSize);
+
+    int transferWorkspace(String workspaceName,String oldOwner,String newOwner,String desc) throws DSSErrorException;
+
+    boolean checkUserIfSettingAdmin(String username);
+
+    void updateWorkspaceInfo(DSSWorkspace dssWorkspace);
 }

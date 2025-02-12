@@ -55,7 +55,8 @@
         "emter": "请输入",
         "startDate": "请选择起始日期",
         "dateAndTime": "请选择日期和时间",
-        "inputSubmitter": "输入提交人"
+        "inputSubmitter": "输入提交人",
+        "limitStrLength": "长度限制在{maxLength}字符内"
       },
       "label": {
         "apiName": "API名称：",
@@ -158,7 +159,9 @@
         },
         "defaultValue": "默认值",
         "displayName": "展示名",
-        "describe": "描述"
+        "describe": "描述",
+        "setLength": "长度设置",
+        "setLengthTips": "参数实际可输入最大长度受浏览器版本，请求协议，数据类型等因素影响。可能会出现字段实际输入最大长度小于设置的最大长度的情况"
       },
       "rule": {
         "nameRule": "请填写API名称",

@@ -115,8 +115,22 @@ public class LinkisJobConverter implements NodeConverter {
             configuration.forEach((k,v)-> {
                 if(null!=v) {
                     v.forEach((k2, v2) -> {
-                        if(AzkabanConstant.AUTO_DISABLED.equals(k2) && null !=v2){job.setAutoDisabled(v2.toString());}
-                        else if(null !=v2) {job.getConf().put(confprefix + k + "." + k2, v2.toString());}
+                        if(v2!=null) {
+                            String vStr;
+                            if (v2 instanceof Number) {
+                                Number numValue = (Number) v2;
+                                vStr = numValue.longValue() == numValue.doubleValue() ?
+                                        String.valueOf(numValue.longValue()) :
+                                        numValue.toString();
+                            } else {
+                                vStr = v2.toString();
+                            }
+                            if (AzkabanConstant.AUTO_DISABLED.equals(k2) ) {
+                                job.setAutoDisabled(vStr);
+                            } else {
+                                job.getConf().put(confprefix + k + "." + k2, vStr);
+                            }
+                        }
                     });
                 }
             });

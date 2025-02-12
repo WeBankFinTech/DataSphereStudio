@@ -58,10 +58,14 @@
       <template>
         <template v-for="item in curNodeParamsList">
           <template v-if="checkShow(item) && ['runtime', 'startup', 'special'].includes(item.position)">
-            <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
-              <Input v-model="currentNode.jobParams[poinToLink(item.key)]" :type="filterFormType(item.uiType)" :rows="6"
-                :placeholder="item.desc" :disabled="item.uiType === 'Disable'"
-              />
+            <FormItem v-if="['Input', 'Text', 'Disable'].includes(item.uiType)" style="position: relative;" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
+              <template slot="label">
+                {{ item.lableName }}
+              </template>
+              <Poptip popper-class="node-item-popper" :disabled="!['check.object', 'job.desc'].includes(item.lableName)" word-wrap width="270" trigger="focus" :content="item.desc" placement="top-start">
+                <Input v-model="currentNode.jobParams[poinToLink(item.key)]" :type="filterFormType(item.uiType)" :rows="6"
+                :placeholder="item.desc" :disabled="item.uiType === 'Disable'"/>
+              </Poptip>
             </FormItem>
             <FormItem v-if="item.uiType === 'Select' || item.uiType === 'MultiSelect'" :rules="paramsValid(item)" :key="poinToLink(item.key)" :label="item.lableName" :prop="'jobParams.'+ poinToLink(item.key)">
               <Select
@@ -153,7 +157,6 @@ export default {
   },
   data() {
     return {
-      test: [],
       currentNode: {
       },
       resources: [],
@@ -165,8 +168,8 @@ export default {
           { required: true, message: '请选择参数模板', trigger: 'change' }
         ],
       },
-      valueSemicolonValidReg: /^((check\.object|source\.type)\.\w+?=[^;\s]+?;\s*)+$/, // 校验分号分割
-      valueWordwrapValidReg: /^((check\.object|source\.type)\.\w+?=[^;\s]+?\s+)+$/, // 校验换行符分割
+      valueSemicolonValidReg: /^(\s*(check\.object|source\.type)\.\w+?=[^;\s]+?[ \t]*?;)+$/, // 校验分号分割
+      valueWordwrapValidReg: /^(\s*(check\.object|source\.type)\.\w+?=[^;\s]+?[ \t]*?\n+)+$/, // 校验换行符分割
     };
   },
   watch: {
@@ -182,13 +185,14 @@ export default {
           }
         })
       }
+      this.resources = []
       // 在节点没有保存参数时，需要设置默认值的值,先判断保存的值应该存在哪里starup或者runtime或者是node下
       let jobParams = {};
       this.curNodeParamsList.map((item) => {
         // 多选框是数组值
         const defaultValue = ['MultiBinding'].includes(item.uiType) ? JSON.parse(item.defaultValue) : this.consoleParamsDefault(item.defaultValue, item.key, this.consoleParams);
         if (['runtime', 'startup', 'special'].includes(item.position) && this.currentNode.params) {
-          const value = this.currentNode.params.configuration[item.position][item.key] ? this.currentNode.params.configuration[item.position][item.key] : defaultValue;
+          let value = this.currentNode.params.configuration[item.position][item.key] ? this.currentNode.params.configuration[item.position][item.key] : defaultValue;
           jobParams[this.poinToLink(item.key)] = value;
         } else if (item.uiType === 'Upload') {
           if (this.currentNode.resources && this.currentNode.resources.length) {
@@ -291,9 +295,6 @@ export default {
             });
           }
         })
-        if (rst[1].fullTree[0] && key === 'wds.linkis.rm.yarnqueue') {
-          value = rst[1].fullTree[0].settings[0].configValue || rst[1].fullTree[0].settings[0].defaultValue;
-        }
         rst[2].fullTree.forEach(item =>{
           if (item && item.settings.length > 0) {
             item.settings.forEach((it) => {
@@ -314,27 +315,24 @@ export default {
     poinToLink(key) {
       return key.replace(/\./g, '-');
     },
-    jobDescVaid(value) {
+    getJobDescDivide(value) {
       let valid = false;
-      let type = '';
-      if (this.valueSemicolonValidReg.test(value) || this.valueSemicolonValidReg.test(value + ';')) {
+      let divide = '';
+      if (
+        this.valueSemicolonValidReg.test(value) ||
+        this.valueSemicolonValidReg.test(value + ';')
+      ) {
         valid = true;
-        type = 'semicolon';
-      } else if (this.valueWordwrapValidReg.test(value) || this.valueWordwrapValidReg.test(value + '\n')) {
+        divide = ';';
+      } else if (
+        this.valueWordwrapValidReg.test(value) ||
+        this.valueWordwrapValidReg.test(value + '\n')
+      ) {
         valid = true;
-        type = 'wordwrap';
+        divide = '\n';
       }
-      return { valid, type };
-    },
-    getJobDescDuplication(value) {
-      const trimVal = (value || '').trim()
-      const type = this.jobDescVaid(trimVal).type;
-      let divide = type === 'wordwrap' ? /\s/ : ';';
-      const matches = trimVal.split(divide).map(item => item.trim()).filter(item => item);
-      if (type === 'wordwrap') {
-        divide = '\n'
-      }
-      return { matches, divide };
+
+      return { valid, divide };
     },
     // 各参数的校验规则
     paramsValid(param) {
@@ -365,31 +363,51 @@ export default {
       };
       // eslint-disable-next-line no-unused-vars
       const validateJobDesc = (rule, value, callback) => {
+        let errMsg = '';
         const trimVal = (value || '').trim();
-        if (trimVal && !this.jobDescVaid(trimVal).valid) {
-          callback(new Error(rule.message));
+        if (trimVal) {
+          const matches = trimVal.split(/[\n;]+\s*/);
+          matches.some((item) => {
+            const trimItem = item.trim(); // 去除首尾的空格
+            if (!/^(check\.object|source\.type)\.[^\=]+?.*?$/.test(trimItem)) {
+              errMsg = '每行请以check.object.xx或source.type.xx开头，xx为编号，从01开始';
+              return true;
+            } else if (/\s+/.test(trimItem)) {
+              const temp = trimItem.split(/[\s\=]+/);
+              errMsg = `${temp[0]}行内包含空格字符`;
+              return true;
+            }
+          })
+          if (!errMsg && !this.getJobDescDivide(trimVal).valid) {
+            errMsg = '请正确填写多源配置';
+          }
+        }
+        if (errMsg) {
+          callback(new Error(errMsg));
         } else {
-          callback();
+          callback()
         }
       }
 
       // eslint-disable-next-line no-unused-vars
       const validateJobDescDuplication = (rule, value, callback) => {
         let tmp = {}
-        let hasDuplicate = false
+        let duplicationKey = false;
+        const trimVal = (value || '').trim();
         if (value) {
-          const { matches } = this.getJobDescDuplication(value);
-          matches.forEach(it => {
-            const key = it.split('=')[0]
+          const matches = trimVal.split(/[\n;]+\s*/);
+          matches.some(it => {
+            const key = it.trim().split('=')[0]
             if (tmp[key]) {
-              hasDuplicate = true
+              duplicationKey = key;
+              return true;
             } else {
-              tmp[key] = 1
+              tmp[key] = 1;
             }
           })
         }
-        if (hasDuplicate) {
-          callback(new Error(rule.message));
+        if (duplicationKey) {
+          callback(new Error(`${duplicationKey}重复,请检查`));
         } else {
           callback();
         }
@@ -403,6 +421,23 @@ export default {
           callback();
         } else {
           callback(new Error())
+        }
+      };
+
+      const validateCheckObject = (rule, value, callback) => {
+        let errMsg = '';
+        const trimVal = (value || '').trim();
+        if (trimVal) {
+          if (trimVal.includes('check.object')) {
+            errMsg = '输入参数不能包含check.object字符串';
+          } else if (trimVal.match(/\s+/g)) {
+            errMsg = '输入参数中间不能包含空格字符';
+          }
+        }
+        if (errMsg) {
+          callback(new Error(errMsg));
+        } else {
+          callback()
         }
       };
       let temRule = [];
@@ -427,8 +462,8 @@ export default {
           } else if (item.validateType === 'Function') {
             temRule.push({
               // 只有和上面定义的函数名相同才让执行
-              validator: ['validatorTitle', 'validateJson', 'validateJobDesc', 'validateJobDescDuplication'].includes(item.validateRange) ? eval(item.validateRange) : () => {},
-              message: item.message,
+              validator: ['validatorTitle', 'validateJson', 'validateJobDesc', 'validateJobDescDuplication', 'validateCheckObject'].includes(item.validateRange) ? eval(item.validateRange) : (rule, value, callback) => { callback() },
+              message: ['validateJobDesc', 'validateCheckObject', 'validateJobDescDuplication'].includes(item.validateRange) ? undefined : item.message,
               trigger: item.trigger || 'blur'
             })
           } else if (item.validateType === 'NumInterval') {
@@ -499,13 +534,15 @@ export default {
         if (this.currentNode.jobParams && this.currentNode.params.configuration) {
           this.curNodeParamsList.map((item) => {
             if (['runtime', 'startup', 'special'].includes(item.position) && this.currentNode.params) {
-              const value = this.currentNode.jobParams[this.poinToLink(item.key)] ? this.currentNode.jobParams[this.poinToLink(item.key)] : item.defaultValue;
-              if (item.key && ['job.desc'].includes(item.key)) {
-                const { matches, divide } = this.getJobDescDuplication(value);
-                this.currentNode.params.configuration[item.position][item.key] = matches.join(divide);
-              } else {
-                this.currentNode.params.configuration[item.position][item.key] = value;
+              let value = this.currentNode.jobParams[this.poinToLink(item.key)] ? this.currentNode.jobParams[this.poinToLink(item.key)] : item.defaultValue;
+              if (item.key && ['job.desc', 'check.object'].includes(item.key)) {
+                value = (value || '').trim();
+                if (item.key === 'job.desc') {
+                  const { divide } = this.getJobDescDivide(value);
+                  value = value.split(/[\n;]+\s*/).map(item => item.trim()).join(divide);
+                }  
               }
+              this.currentNode.params.configuration[item.position][item.key] = value;
             }
           })
         }
@@ -526,11 +563,16 @@ export default {
       if (param.jobParams && param.params.configuration) {
         this.curNodeParamsList.map((item) => {
           if (['runtime', 'startup', 'special'].includes(item.position) && param.params) {
-            const value = param.jobParams[this.poinToLink(item.key)] ? param.jobParams[this.poinToLink(item.key)] : item.defaultValue;
-            if (item.key && ['job.desc'].includes(item.key)) {
-              const { matches, divide } = this.getJobDescDuplication(value);
-              param.params.configuration[item.position][item.key] = matches.join(divide);
-            }
+            let value = param.jobParams[this.poinToLink(item.key)] ? param.jobParams[this.poinToLink(item.key)] : item.defaultValue;
+            if (item.key && ['job.desc', 'check.object'].includes(item.key)) {
+                value = (value || '').trim();
+                if (item.key === 'job.desc') {
+                  const { divide } = this.getJobDescDivide(value);
+                  param.params.configuration[item.position][item.key] = value.split(/[\n;]+\s*/).map(item => item.trim()).join(divide);
+                } else {
+                  param.params.configuration[item.position][item.key] = value;
+                } 
+              }
           }
         })
       }
@@ -651,5 +693,14 @@ export default {
   text-align: left;
   line-height: 14px;
   padding-bottom: 6px;
+}
+.node-parameter-bar .ivu-form-item {
+  margin-bottom: 30px;
+}
+.node-parameter-bar .ivu-poptip {
+  width: 100%;
+}
+.node-parameter-bar .ivu-poptip .ivu-poptip-rel {
+  width: 100%;
 }
 </style>

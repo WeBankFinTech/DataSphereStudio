@@ -69,7 +69,7 @@ export function register(monaco) {
  * connect language server
  * @param {*} editor
  */
-export function connectService(editor, url, cb) {
+export function connectService(editor, url, cb, editorIns) {
   if (url) {
     if (!installed) {
       installed = true;

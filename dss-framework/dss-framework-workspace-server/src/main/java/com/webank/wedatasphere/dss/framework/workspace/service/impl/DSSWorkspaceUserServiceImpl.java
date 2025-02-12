@@ -20,7 +20,7 @@ import com.github.pagehelper.PageHelper;
 import com.webank.wedatasphere.dss.common.entity.PageInfo;
 import com.webank.wedatasphere.dss.framework.admin.service.DssAdminUserService;
 import com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceUser;
-import com.webank.wedatasphere.dss.framework.workspace.bean.StaffInfo;
+import com.webank.wedatasphere.dss.common.StaffInfo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DSSWorkspaceRoleVO;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserTreeVo;
 import com.webank.wedatasphere.dss.framework.workspace.bean.vo.DepartmentUserVo;
@@ -28,9 +28,9 @@ import com.webank.wedatasphere.dss.framework.workspace.bean.vo.StaffInfoVO;
 import com.webank.wedatasphere.dss.framework.workspace.dao.DSSWorkspaceUserMapper;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceAddUserHook;
 import com.webank.wedatasphere.dss.framework.workspace.service.DSSWorkspaceUserService;
-import com.webank.wedatasphere.dss.framework.workspace.service.StaffInfoGetter;
+import com.webank.wedatasphere.dss.common.StaffInfoGetter;
 import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceDBHelper;
-import com.webank.wedatasphere.dss.framework.workspace.util.WorkspaceServerConstant;
+import com.webank.wedatasphere.dss.common.conf.WorkspaceServerConstant;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +92,17 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public void updateWorkspaceRole(List<Integer> roles, long workspaceId,String newOwner){
+        //获取用户创建时间
+        dssWorkspaceUserMapper.removeAllRolesForUser(newOwner, workspaceId);
+        roles.forEach(role -> {
+            dssWorkspaceUserMapper.insertUserRoleInWorkspace(workspaceId, role, new Date() , newOwner, newOwner, 0L, newOwner);
+        });
+    }
+
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteWorkspaceUser(String userName, int workspaceId) {
         dssWorkspaceUserMapper.removeAllRolesForUser(userName, workspaceId);
@@ -109,8 +120,12 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         String orgFullName = staffInfo.getOrgFullName();
         if (StringUtils.isNotEmpty(orgFullName)) {
             try {
-                String departmentName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0];
-                String officeName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[1];
+                String[] fullNameArray = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT);
+                String departmentName = fullNameArray[0];
+                String officeName = "";
+                if(fullNameArray.length>1){
+                    officeName = fullNameArray[1];
+                }
                 staffInfoVO.setDepartment(departmentName);
                 staffInfoVO.setOffice(officeName);
             } catch (Exception e) {
@@ -159,8 +174,12 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         String orgFullName = staffInfoGetter.getFullOrgNameByUsername(userName);
         if (org.apache.commons.lang3.StringUtils.isNotEmpty(orgFullName)) {
             try {
-                String departmentName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[0];
-                String officeName = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT)[1];
+                String[] fullNameArray = orgFullName.split(WorkspaceServerConstant.DEFAULT_STAFF_SPLIT);
+                String departmentName = fullNameArray[0];
+                String officeName = WorkspaceServerConstant.DEFAULT_STAFF_SPLIT;
+                if(fullNameArray.length>1){
+                    officeName = fullNameArray[1];
+                }
                 vo.setDepartment(departmentName);
                 vo.setOffice(officeName);
             } catch (Exception e) {
@@ -168,13 +187,18 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
                 vo.setDepartment(WorkspaceServerConstant.DEFAULT_DEPARTMENT);
                 vo.setOffice(WorkspaceServerConstant.DEFAULT_OFFICE);
             }
+        }else{
+            vo.setDepartment(WorkspaceServerConstant.DEFAULT_RESIGNED);
+            vo.setOffice(WorkspaceServerConstant.DEFAULT_RESIGNED);
         }
         return vo;
     }
 
     @Override
-    public PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize) {
-        PageHelper.startPage(pageNow, pageSize);
+    public PageInfo<String> getAllWorkspaceUsersPage(long workspaceId, Integer pageNow, Integer pageSize,boolean paged) {
+        if(paged) {
+            PageHelper.startPage(pageNow, pageSize);
+        }
         List<String> dos = dssWorkspaceUserMapper.getAllWorkspaceUsers(workspaceId);
         com.github.pagehelper.PageInfo<String> doPage = new com.github.pagehelper.PageInfo<>(dos);
         return new PageInfo<>(doPage.getList(), doPage.getTotal());
@@ -219,11 +243,17 @@ public class DSSWorkspaceUserServiceImpl implements DSSWorkspaceUserService {
         dssWorkspaceUserMapper.deleteUserByUserName(userName);
         dssWorkspaceUserMapper.deleteUserRolesByUserName(userName);
         dssWorkspaceUserMapper.deleteProxyUserByUserName(userName);
+        dssWorkspaceUserMapper.deleteProjectUserByUserName(userName);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void revokeUserRoles(String userName, Integer[] workspaceIds, Integer[] roleIds) {
         dssWorkspaceUserMapper.deleteUserRoles(userName, workspaceIds, roleIds);
+    }
+
+    @Override
+    public List<String> getWorkspaceUserByRoleId(Long workspaceId, Integer roleId) {
+        return dssWorkspaceUserMapper.getWorkspaceUserByRoleId(workspaceId, roleId);
     }
 }

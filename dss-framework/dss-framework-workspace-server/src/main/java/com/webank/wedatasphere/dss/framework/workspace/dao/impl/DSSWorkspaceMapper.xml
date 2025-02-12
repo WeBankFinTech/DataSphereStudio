@@ -54,7 +54,7 @@
     </sql>
 
     <select id="getWorkspaces" resultMap="dss_workspace">
-        SELECT * from dss_workspace where id in (select distinct workspace_id from dss_workspace_user_role WHERE username = #{username}) order by create_time desc
+        select dw.* from dss_workspace dw inner join (select workspace_id,min(create_time) create_time from dss_workspace_user_role WHERE username = #{username} group by workspace_id) dwur on dw.id = dwur.workspace_id order by dwur.create_time desc
     </select>
 
     <select id="getMenuId" resultType="java.lang.Integer">
@@ -74,5 +74,17 @@
     <select id="getDSSWorkspaceMenuPriv" resultMap="dss_workspace_menu_priv_map">
         SELECT * from dss_workspace_menu_role where workspace_id = #{workspaceId}
     </select>
+
+    <update id="updateWorkSpace" parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
+        update dss_workspace set create_by = #{createBy},last_update_time=#{lastUpdateTime},
+        last_update_user=#{lastUpdateUser},description=#{description}
+        where id = #{id}
+    </update>
+
+    <update id="updateWorkspaceInfo" parameterType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspace">
+        update dss_workspace set enabled_flow_keywords_check = #{enabledFlowKeywordsCheck},
+        is_default_reference = #{isDefaultReference}
+        where id = #{id}
+    </update>
 
 </mapper>

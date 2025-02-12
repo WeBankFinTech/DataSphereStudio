@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.framework.project.entity.request;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.List;
 
 
 @XmlRootElement
@@ -34,6 +35,108 @@ public class ProjectQueryRequest implements Serializable {
     private String username;
 
     private boolean filterProject;
+    /**
+     * 标签
+     */
+    private String creatorLabel;
+
+    /**
+     * 项目名称列表
+     * **/
+    private List<String> projectNames;
+
+
+    /**
+     * 项目创建人
+     * **/
+    private  List<String> createUsers;
+
+    /**
+     * 发布权限用户
+     * **/
+    private List<String> releaseUsers;
+
+    /**
+     * 编辑权限用户
+     * **/
+    private List<String> editUsers;
+
+    /**
+     * 查看权限用户
+     * **/
+    private List<String> accessUsers;
+
+    private Integer pageNow;
+
+    private Integer pageSize;
+
+    private String sortBy;
+
+    private String orderBy;
+
+    private String orderBySql;
+
+    private String queryUser;
+
+    private List<Integer> projectIdList;
+
+    private String proxyUser;
+
+    public List<Integer> getProjectIdList() {
+        return projectIdList;
+    }
+
+    public void setProjectIdList(List<Integer> projectIdList) {
+        this.projectIdList = projectIdList;
+    }
+
+    public String getQueryUser() {
+        return queryUser;
+    }
+
+    public void setQueryUser(String queryUser) {
+        this.queryUser = queryUser;
+    }
+
+    public String getOrderBySql() {
+        return orderBySql;
+    }
+
+    public void setOrderBySql(String orderBySql) {
+        this.orderBySql = orderBySql;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
+    public String getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(String orderBy) {
+        this.orderBy = orderBy;
+    }
+
+    public Integer getPageNow() {
+        return pageNow;
+    }
+
+    public void setPageNow(Integer pageNow) {
+        this.pageNow = pageNow;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 
     public boolean getFilterProject() {
         return filterProject;
@@ -41,6 +144,14 @@ public class ProjectQueryRequest implements Serializable {
 
     public void setFilterProject(boolean filterProject) {
         this.filterProject = filterProject;
+    }
+
+    public String getCreatorLabel() {
+        return creatorLabel;
+    }
+
+    public void setCreatorLabel(String creatorLabel) {
+        this.creatorLabel = creatorLabel;
     }
 
     public Long getId() {
@@ -65,5 +176,57 @@ public class ProjectQueryRequest implements Serializable {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public boolean isFilterProject() {
+        return filterProject;
+    }
+
+    public List<String> getProjectNames() {
+        return projectNames;
+    }
+
+    public void setProjectNames(List<String> projectNames) {
+        this.projectNames = projectNames;
+    }
+
+    public List<String> getCreateUsers() {
+        return createUsers;
+    }
+
+    public void setCreateUsers(List<String> createUsers) {
+        this.createUsers = createUsers;
+    }
+
+    public List<String> getReleaseUsers() {
+        return releaseUsers;
+    }
+
+    public void setReleaseUsers(List<String> releaseUsers) {
+        this.releaseUsers = releaseUsers;
+    }
+
+    public List<String> getEditUsers() {
+        return editUsers;
+    }
+
+    public void setEditUsers(List<String> editUsers) {
+        this.editUsers = editUsers;
+    }
+
+    public List<String> getAccessUsers() {
+        return accessUsers;
+    }
+
+    public void setAccessUsers(List<String> accessUsers) {
+        this.accessUsers = accessUsers;
+    }
+
+    public String getProxyUser() {
+        return proxyUser;
+    }
+
+    public void setProxyUser(String proxyUser) {
+        this.proxyUser = proxyUser;
     }
 }

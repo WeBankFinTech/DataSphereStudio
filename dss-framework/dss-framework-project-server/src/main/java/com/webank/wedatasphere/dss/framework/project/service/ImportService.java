@@ -21,6 +21,7 @@ package com.webank.wedatasphere.dss.framework.project.service;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.framework.project.entity.OrchestratorBatchImportInfo;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.framework.project.entity.po.OrchestratorImportInfo;
 import com.webank.wedatasphere.dss.orchestrator.server.entity.vo.OrchestratorBaseInfo;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import org.apache.linkis.common.exception.ErrorException;
@@ -39,8 +40,8 @@ public interface ImportService {
     /**
      * 通过发布的导入,只需要将resourceId和version给到nextLabel的OrcFramework
      */
-    OrchestratorBaseInfo importOrc(String orchestratorName, String releaseUser, Long projectId, String projectName,
-                                   BmlResource bmlResource, DSSLabel dssLabel, String workspaceName, Workspace workspace) throws ErrorException;
+    OrchestratorImportInfo importOrc(String orchestratorName, String releaseUser, Long projectId, String projectName,
+                                     BmlResource bmlResource, DSSLabel dssLabel, String workspaceName, Workspace workspace) throws ErrorException;
 
     /**
      * 批量导入编排

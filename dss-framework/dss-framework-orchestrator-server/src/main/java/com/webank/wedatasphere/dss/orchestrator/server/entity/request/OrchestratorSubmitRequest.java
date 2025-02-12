@@ -8,6 +8,22 @@ public class OrchestratorSubmitRequest {
     private String projectName;
     private String comment;
     private Long orchestratorId;
+    private String filePath;
+    // 是否获取发布前后文件内容 true-发布 false-提交
+    private Boolean publish;
+
+    public OrchestratorSubmitRequest(Long flowId, LabelRouteVO labels, String projectName, String comment, Long orchestratorId, String filePath, Boolean publish) {
+        this.flowId = flowId;
+        this.labels = labels;
+        this.projectName = projectName;
+        this.comment = comment;
+        this.orchestratorId = orchestratorId;
+        this.filePath = filePath;
+        this.publish = publish;
+    }
+
+    public OrchestratorSubmitRequest() {
+    }
 
     public Long getFlowId() {
         return flowId;
@@ -47,5 +63,21 @@ public class OrchestratorSubmitRequest {
 
     public void setOrchestratorId(Long orchestratorId) {
         this.orchestratorId = orchestratorId;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public Boolean getPublish() {
+        return publish;
+    }
+
+    public void setPublish(Boolean publish) {
+        this.publish = publish;
     }
 }

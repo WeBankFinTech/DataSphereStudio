@@ -19,6 +19,7 @@ package com.webank.wedatasphere.dss.framework.project.service;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectCreateRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectModifyRequest;
+import com.webank.wedatasphere.dss.framework.project.entity.request.ProjectTransferRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectDetailVo;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.DSSProjectVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
@@ -41,4 +42,18 @@ public interface DSSFrameworkProjectService {
     void modifyProject(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
 
     void checkProjectName(String name, Workspace workspace,String username) throws DSSProjectErrorException;
+
+    void modifyProjectMeta(ProjectModifyRequest projectModifyRequest, DSSProjectDO dbProject, String username, Workspace workspace) throws Exception;
+
+    /**
+     * 项目交接
+     * @param projectTransferRequest 交接请求
+     * @param dbProject 原始项目
+     * @param oldProjectOwner 原始项目owner
+     * @param workspace 工作空间
+     * @param operator 操作人
+     * @throws Exception
+     */
+    void transferProject(ProjectTransferRequest projectTransferRequest, DSSProjectDO dbProject,
+                         String oldProjectOwner, Workspace workspace,String operator);
 }

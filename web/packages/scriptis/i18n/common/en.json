@@ -257,7 +257,7 @@
         "PATH": "Path:",
         "QKLB": "Clear list",
         "LIMIT2M": "Script file to upload cannot exceed 2MB!",
-        "LIMIT100M": "Script file to upload cannot exceed 100MB!",
+        "LIMIT200M": "Script file to upload cannot exceed 200MB!",
         "ZDSC": "This operation will interrupt file uploading, continue or not? ",
         "TS": "Notice",
         "ZJGB": "Close directly",

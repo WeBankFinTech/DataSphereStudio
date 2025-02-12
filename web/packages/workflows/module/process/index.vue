@@ -60,6 +60,9 @@
             :orchestratorId="item.data.orchestratorId"
             :orchestratorVersionId="item.data.orchestratorVersionId"
             :newTipVisible="newTipVisible"
+            :flowStatus="item.data.flowStatus"
+            :associateGit="associateGit"
+            :isMainFlow="query.appId === item.data.appId"
             @node-dblclick="dblclickNode(index, arguments)"
             @isChange="isChange(index, arguments)"
             @save-node="saveNode"
@@ -67,6 +70,7 @@
             @deleteNode="deleteNode"
             @saveBaseInfo="saveBaseInfo"
             @updateWorkflowList="$emit('updateWorkflowList')"
+            @updateFlowStatus="$emit('updateFlowStatus')"
             @release="release"
             @open="$emit('open')"
             @close="$emit('close')"
@@ -114,9 +118,20 @@ export default {
     query: {
       type: Object,
       default: () => {}
+    },
+    associateGit: {
+      type: Boolean,
+      default: false
     }
   },
-  computed: {},
+  watch: {
+    query : {
+      immediate: true,
+      handler: function(cur) {
+        this.tabs[0].data = {...cur}
+      }
+    }
+  },
   data() {
     return {
       defaultNodeIcon,
@@ -420,7 +435,7 @@ export default {
       if (Object.keys(resource).length > 0) {
         if (
           node.resources.length > 0 &&
-          node.resources[0].resourceId === resource.resourceId
+          (node.resources[0].resourceId === resource.resourceId || node.resources[0].fileName === resource.fileName)
         ) {
           // 已保存过的直接替换，没有保存的首项追加
           node.resources[0] = resource;

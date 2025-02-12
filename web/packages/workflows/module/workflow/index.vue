@@ -334,6 +334,7 @@ export default {
           uses,
           labels,
           isDefaultReference,
+          orchestratorLevel
         } = data;
         const params = {
           workspaceId,
@@ -346,7 +347,8 @@ export default {
           description,
           uses,
           labels,
-          isDefaultReference
+          isDefaultReference,
+          orchestratorLevel
         }
         if (!data.templateIds || data.templateIds.length === 0) {
           delete params.isDefaultReference

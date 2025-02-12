@@ -18,13 +18,16 @@ package com.webank.wedatasphere.dss.framework.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.webank.wedatasphere.dss.common.entity.BmlResource;
+import com.webank.wedatasphere.dss.common.entity.project.DSSProject;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
 import com.webank.wedatasphere.dss.common.label.EnvDSSLabel;
+import com.webank.wedatasphere.dss.common.protocol.project.ProjectListQueryRequest;
 import com.webank.wedatasphere.dss.framework.project.entity.DSSProjectDO;
 import com.webank.wedatasphere.dss.framework.project.entity.request.*;
 import com.webank.wedatasphere.dss.framework.project.entity.response.ProjectResponse;
 import com.webank.wedatasphere.dss.framework.project.entity.vo.ProjectInfoVo;
 import com.webank.wedatasphere.dss.framework.project.exception.DSSProjectErrorException;
+import com.webank.wedatasphere.dss.git.common.protocol.GitUserEntity;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.standard.common.desc.AppInstance;
 
@@ -55,6 +58,7 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     List<ProjectResponse> getListByParam(ProjectQueryRequest projectRequest);
 
+    Map<String, GitUserEntity> getProjectGitUserInfo(String username, Long workspaceId);
 
     ProjectInfoVo getProjectInfoById(Long id);
 
@@ -99,5 +103,16 @@ public interface DSSProjectService  extends IService<DSSProjectDO> {
 
     BmlResource exportOnlyProjectMeta(ExportAllOrchestratorsReqest exportAllOrchestratorsReqest,
                                   String username, String proxyUser, Workspace workspace) throws Exception;
+
+    DSSProjectDO modifyProjectMeta(String username, ProjectModifyRequest projectModifyRequest) throws DSSProjectErrorException;
+
+
+    List<ProjectResponse> queryListByParam(ProjectQueryRequest projectRequest,List<Long> totals);
+
+    List<DSSProject> getDSSProjectByName(List<String> name);
+
+    List<String> queryProjectName(ProjectQueryRequest projectRequest);
+
+    List<DSSProject> queryProject(ProjectListQueryRequest projectListQueryRequest);
 
 }

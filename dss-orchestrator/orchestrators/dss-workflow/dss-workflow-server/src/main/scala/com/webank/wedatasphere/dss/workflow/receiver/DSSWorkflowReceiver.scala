@@ -70,6 +70,30 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       ResponseExportWorkflow(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
         reqExportFlow.flowID)
 
+    case requestExportWorkflowList: RequestExportWorkflowList =>
+      val dssExportFlowResource : BmlResource = workflowManager.exportWorkflowListNew(requestExportWorkflowList.userName,
+        requestExportWorkflowList.flowIDList,
+        requestExportWorkflowList.projectId,
+        requestExportWorkflowList.projectName,
+        DSSCommonUtils.COMMON_GSON.fromJson(requestExportWorkflowList.workspaceStr, classOf[Workspace]),
+        requestExportWorkflowList.dssLabelList,
+        requestExportWorkflowList.exportExternalNodeAppConnResource)
+      ResponseExportWorkflowList(dssExportFlowResource.getResourceId, dssExportFlowResource.getVersion,
+        requestExportWorkflowList.flowIDList)
+
+    case reqReadFlow: RequestReadWorkflowNode =>
+      val workflowNode: String = workflowManager.readWorkflowNew(
+        reqReadFlow.userName,
+        reqReadFlow.flowID,
+        reqReadFlow.projectId,
+        reqReadFlow.projectName,
+        DSSCommonUtils.COMMON_GSON.fromJson(reqReadFlow.workspaceStr, classOf[Workspace]),
+        reqReadFlow.dssLabelList,
+        reqReadFlow.exportExternalNodeAppConnResource,
+        reqReadFlow.filePath
+      )
+      ResponseReadWorkflow(workflowNode)
+
     case requestImportWorkflow: RequestImportWorkflow =>
       val dssFlowImportParam: DSSFlowImportParam = new DSSFlowImportParam()
       dssFlowImportParam.setProjectID(requestImportWorkflow.getProjectId)
@@ -78,7 +102,12 @@ class DSSWorkflowReceiver(workflowManager: WorkFlowManager)  extends Receiver {
       dssFlowImportParam.setOrcVersion(requestImportWorkflow.getOrcVersion)
       dssFlowImportParam.setWorkspace(requestImportWorkflow.getWorkspace)
       dssFlowImportParam.setContextId(requestImportWorkflow.getContextId)
-      val dssFlows = workflowManager.importWorkflowNew(requestImportWorkflow.getUserName,
+      val dssFlows = if(requestImportWorkflow.getOldPackageStruct)
+        workflowManager.importWorkflow(requestImportWorkflow.getUserName,
+          requestImportWorkflow.getResourceId,
+          requestImportWorkflow.getBmlVersion,
+          dssFlowImportParam, requestImportWorkflow.getDssLabels)
+      else workflowManager.importWorkflowNew(requestImportWorkflow.getUserName,
         requestImportWorkflow.getResourceId,
         requestImportWorkflow.getBmlVersion,
         dssFlowImportParam, requestImportWorkflow.getDssLabels)

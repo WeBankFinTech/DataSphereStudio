@@ -113,7 +113,8 @@ export default {
                 id: this.formState.targetProjectId,
                 name: targetProj.name,
                 orchestratorId: '',
-                orchestratorName: this.formState.targetOrchestratorName
+                orchestratorName: this.formState.targetOrchestratorName,
+                associateGit: targetProj.associateGit
               },
               source: {
                 id: this.formState.sourceProjectId,

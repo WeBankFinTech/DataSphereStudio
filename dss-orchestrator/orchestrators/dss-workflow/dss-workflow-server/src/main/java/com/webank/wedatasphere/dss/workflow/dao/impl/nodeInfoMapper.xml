@@ -135,8 +135,70 @@
         AND nutv.validate_id = nuv.id
     </select>
 
+    <select id="getWorkflowNodeNumberType" resultType="com.webank.wedatasphere.dss.workflow.dto.NodeTypeDO">
+        SELECT
+        distinct(node_type), `key`
+        FROM
+        dss_workflow_node n,
+        dss_workflow_node_to_ui ntu,
+        dss_workflow_node_ui nu,
+        dss_workflow_node_ui_to_validate nutv,
+        dss_workflow_node_ui_validate nuv
+        WHERE
+        n.id = ntu.workflow_node_id
+        AND ntu.ui_id = nu.id
+        AND nu.id = nutv.ui_id
+        AND nutv.validate_id = nuv.id
+        AND nuv.validate_type = 'NumInterval'
+    </select>
+
     <select id="getWorkflowNodeByType" parameterType="java.lang.String" resultMap="workflowNode">
         select * from `dss_workflow_node` where node_type=#{nodeType}
     </select>
+
+    <select id="queryNodeUIInfoList" parameterType="java.util.List" resultType="com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo">
+        select t2.node_type
+              ,t2.name
+              ,t3.`position`
+              ,t3.`key`
+        from dss_workflow_node_to_ui t1
+        join dss_workflow_node t2 on t1.workflow_node_id  = t2.id
+        join dss_workflow_node_ui t3 on t1.ui_id  = t3.id
+        where  node_type in
+        <foreach collection="nodeTypeList" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="getNodeUIInfoByNodeType" parameterType="java.lang.String" resultType="com.webank.wedatasphere.dss.workflow.entity.NodeUIInfo">
+        select t2.node_type
+        ,t2.name
+        ,t3.`position`
+        ,t3.`key`
+        ,t3.default_value as defaultValue
+        from dss_workflow_node_to_ui t1
+        join (select * from dss_workflow_node where node_type = #{nodeType}) t2 on t1.workflow_node_id  = t2.id
+        join dss_workflow_node_ui t3 on t1.ui_id  = t3.id
+        join (select DISTINCT ui_id from dss_workflow_node_ui_to_validate) t4 on t1.ui_id = t4.ui_id
+        where  `position`  = 'startup'
+
+    </select>
+
+
+    <select id="getNodeTypeByGroupName" parameterType="java.lang.String" resultMap="workflowNode">
+        select t3.*
+        from dss_workflow_node_to_group  t1
+        join dss_workflow_node_group t2 on t1.group_id  = t2.id and t2.name_en  = #{groupName}
+        join dss_workflow_node t3 on t1.node_id  = t3.id
+        <if test="nodeTypeName != null and nodeTypeName != ''">
+            and t3.name = #{nodeTypeName}
+        </if>
+    </select>
+
+    <select id="getWorkflowNodeList" resultMap="workflowNode">
+        select * from `dss_workflow_node`
+    </select>
+
 
 </mapper>

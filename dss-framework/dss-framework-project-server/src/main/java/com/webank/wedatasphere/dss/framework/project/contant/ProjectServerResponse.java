@@ -21,7 +21,7 @@ public enum  ProjectServerResponse {
     PROJECT_NOT_EDIT_NAME(6002,"不能修改工程名称"),
     PROJECT_NOT_EXIST(6003,"工程不存在"),
     PROJECT_USER_NOT_IN_WORKSPACE(6004,"只有工作空间用户或管理员才能创建工程"),
-    PROJECT_IS_NOT_ADMIN(6005,"只有创建人或管理员才能编辑工程")
+    PROJECT_IS_NOT_ADMIN_OR_RELEASE(6005,"只有创建人、管理员或发布者权限用户才能编辑工程")
     ;
 
     ProjectServerResponse(int code, String msg) {

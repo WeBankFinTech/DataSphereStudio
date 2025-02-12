@@ -31,4 +31,6 @@ public class AzkabanConstant {
     public final static String JOB_COMMENT = "comment";
     public final static String AUTO_DISABLED = "auto.disabled";
 
+    public final static String WTSS_PREFIX = "wtss.";
+
 }

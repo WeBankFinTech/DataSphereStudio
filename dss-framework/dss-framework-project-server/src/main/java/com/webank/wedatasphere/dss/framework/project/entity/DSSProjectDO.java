@@ -108,6 +108,11 @@ public class DSSProjectDO implements Serializable {
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private String dataSourceListJson;
 
+    /**
+     * 标签
+     */
+    private String label;
+
     public Long getId() {
         return id;
     }
@@ -330,6 +335,14 @@ public class DSSProjectDO implements Serializable {
 
     public void setDataSourceListJson(String dataSourceListJson) {
         this.dataSourceListJson = dataSourceListJson;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     @Override

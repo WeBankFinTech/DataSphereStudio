@@ -39,8 +39,10 @@ public interface OrchestratorRefConstant {
     //workflow node suffix input by the user during workflow replication.
     String ORCHESTRATION_NODE_SUFFIX = "nodeSuffix";
     /**
-     * 工作流状态：save-已发布 push-已提交 publish-已保存
+     * 工作流状态：save-已发布 push-已提交 publish-已保存  noGit-未接入
      */
+    public static final String FLOW_STATUS_NO_GIT = "noGit";
+
     public static final String FLOW_STATUS_SAVE = "save";
 
     public static final String FLOW_STATUS_PUSHING = "running";
@@ -52,5 +54,11 @@ public interface OrchestratorRefConstant {
     public static final String FLOW_STATUS_PUSH = "push";
 
     public static final String FLOW_STATUS_PUBLISH = "publish";
+
+    public static final String FLOW_STATUS_PUBLISHING = "publishing";
+
+    public static final String FLOW_STATUS_STATELESS = "stateless";
+
+    public static final String FLOW_STATUS_UNPUBLISHED = "unpublished";
 
 }

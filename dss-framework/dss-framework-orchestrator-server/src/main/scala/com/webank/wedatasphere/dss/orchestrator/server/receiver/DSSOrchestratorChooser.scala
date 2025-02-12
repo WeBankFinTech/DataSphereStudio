@@ -19,7 +19,7 @@ package com.webank.wedatasphere.dss.orchestrator.server.receiver
 import com.webank.wedatasphere.dss.orchestrator.common.protocol._
 import com.webank.wedatasphere.dss.orchestrator.core.DSSOrchestratorContext
 import com.webank.wedatasphere.dss.orchestrator.server.entity.request.OrchestratorRequest
-import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorPluginService, OrchestratorService}
+import com.webank.wedatasphere.dss.orchestrator.server.service.{OrchestratorFrameworkService, OrchestratorPluginService, OrchestratorService}
 
 import javax.annotation.PostConstruct
 import org.apache.linkis.rpc.{RPCMessageEvent, Receiver, ReceiverChooser}
@@ -57,6 +57,8 @@ class DSSOrchestratorChooser extends ReceiverChooser {
     case _: RequestQuertByAppIdOrchestrator => receiver
     case _: RequestSubmitOrchestratorSync => receiver
     case _: OrchestratorRequest => receiver
+    case _: RequestUpdateOrchestratorBML => receiver
+    case _: RequestOrchestratorVersionUpdateTime => receiver
     case _ => None
   }
 }

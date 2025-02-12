@@ -37,7 +37,8 @@ const NODETYPE = {
   QUALITIS: 'linkis.appconn.qualitis',
   PROJECTNODE: 'projectNode',
   MLSS: 'linkis.appconn.mlss',
-  JDBC: 'linkis.jdbc.jdbc'
+  JDBC: 'linkis.jdbc.jdbc',
+  NEBULA: 'linkis.nebula.nebula',
 }
 
 const ext = {
@@ -47,7 +48,8 @@ const ext = {
   [NODETYPE.SPARKPY]: 'pyspark',
   [NODETYPE.SCALA]: 'scala',
   [NODETYPE.PYTHON]: 'python',
-  [NODETYPE.JDBC]: 'jdbc'
+  [NODETYPE.JDBC]: 'jdbc',
+  [NODETYPE.NEBULA]: 'nebula'
 }
 
 export { NODETYPE, ext};

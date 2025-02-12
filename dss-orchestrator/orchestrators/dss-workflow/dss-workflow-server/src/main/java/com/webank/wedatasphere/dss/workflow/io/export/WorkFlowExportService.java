@@ -37,6 +37,9 @@ public interface WorkFlowExportService {
     String exportFlowInfoNew(Long dssProjectId, String projectName, long rootFlowId, String userName, Workspace workspace,
                              List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception;
 
+
+    String exportFlowListNew(Long dssProjectId, String projectName, List<Long> rootFlowIdList, String userName,
+                             Workspace workspace, List<DSSLabel> dssLabels,boolean exportExternalNodeAppConnResource) throws Exception;
     /**
      * 将一个工作流导出成压缩包，存放到本地磁盘，并返回压缩包的路径
      * @param dssProjectId 所属工作空间id

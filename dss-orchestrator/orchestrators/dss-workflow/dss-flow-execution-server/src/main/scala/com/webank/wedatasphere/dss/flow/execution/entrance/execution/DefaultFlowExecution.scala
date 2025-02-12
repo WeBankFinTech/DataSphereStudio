@@ -16,6 +16,8 @@
 
 package com.webank.wedatasphere.dss.flow.execution.entrance.execution
 
+import com.fasterxml.jackson.databind.ObjectMapper
+
 import java.util.concurrent.{Executors, LinkedBlockingQueue, TimeUnit}
 import com.webank.wedatasphere.dss.flow.execution.entrance.conf.FlowExecutionEntranceConfiguration
 import com.webank.wedatasphere.dss.flow.execution.entrance.job.FlowEntranceJob
@@ -72,6 +74,9 @@ class DefaultFlowExecution extends FlowExecution with Logging {
         info(s"${flowEntranceJob.getId} Submit nodes(${runningNodes.size}) to running")
         runningNodes.foreach { node =>
           node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.PROPS_MAP).asInstanceOf[java.util.Map[String, Any]].putAll(flowEntranceJob.getParams)
+          if (node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.CONFIGURATION) != null && node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.CONFIGURATION).asInstanceOf[java.util.Map[String, Any]].get(FlowExecutionEntranceConfiguration.START_UP) != null) {
+            node.getNode.getDSSNode.getParams.get(FlowExecutionEntranceConfiguration.CONFIGURATION).asInstanceOf[java.util.Map[String, Any]].get(FlowExecutionEntranceConfiguration.START_UP).asInstanceOf[java.util.Map[String, Any]].put(FlowExecutionEntranceConfiguration.YARN_QUEUE, null)
+          }
           node.run()
           nodeRunnerQueue.put(node)
           if (pollerCount < FlowExecutionEntranceConfiguration.NODE_STATUS_POLLER_THREAD_SIZE.getValue) {

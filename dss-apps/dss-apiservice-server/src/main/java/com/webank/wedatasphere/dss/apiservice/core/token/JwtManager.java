@@ -15,7 +15,6 @@
  */
 
 package com.webank.wedatasphere.dss.apiservice.core.token;
-
 import com.sun.jersey.core.util.Base64;
 import com.webank.wedatasphere.dss.apiservice.core.config.ApiServiceConfiguration;
 import com.webank.wedatasphere.dss.apiservice.core.bo.ApiServiceToken;

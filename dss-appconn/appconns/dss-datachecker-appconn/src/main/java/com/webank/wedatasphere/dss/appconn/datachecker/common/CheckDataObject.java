@@ -75,6 +75,20 @@ public class CheckDataObject {
         TABLE,
 
     }
+    public String forMat(String secondPartitionExpand){
+        final StringBuilder sb = new StringBuilder();
+        sb.append(dbName)
+                .append(".")
+                .append(tableName);
+        if(type==Type.PARTITION){
+            sb.append("{").append(partitionName);
+            if(secondPartitionExpand!=null){
+                sb.append("/").append(secondPartitionExpand);
+            }
+            sb.append("}");
+        }
+        return sb.toString();
+    }
 
     @Override
     public String toString() {

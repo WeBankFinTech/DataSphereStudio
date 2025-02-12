@@ -38,7 +38,8 @@ public class AzkanbanBuilder extends Builder {
     private static final Logger LOGGER = LoggerFactory.getLogger(AzkanbanBuilder.class);
 
     private static final String RUN_DATE_KEY = "run_date";
-    private static final String RUN_DATE_HOUR_KEY = "run_today_h";
+    private static final String RUN_DATE_H_KEY = "run_today_h";
+    private static final String RUN_DATE_HOUR_KEY = "run_today_hour";
     private Map<String, String> jobProps;
 
     public AzkanbanBuilder setJobProps(Map<String, String> jobProps) {
@@ -103,6 +104,7 @@ public class AzkanbanBuilder extends Builder {
         // 只有工作流参数中没有设置,我们才会去进行替换
         // 改为不管工作流是否设置，在 Schedulis 这边都需要统一使用 Schedulis 设置的 run_date和un_date_h,防止出现批量调度的误导作用
         setNewRunDateVariable(variables, RUN_DATE_KEY);
+        setNewRunDateVariable(variables, RUN_DATE_H_KEY);
         setNewRunDateVariable(variables, RUN_DATE_HOUR_KEY);
         linkisJob.setVariables(variables);
         linkisJob.setSource(getSource());

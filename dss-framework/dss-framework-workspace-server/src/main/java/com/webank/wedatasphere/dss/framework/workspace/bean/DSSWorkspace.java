@@ -33,7 +33,9 @@ public class DSSWorkspace {
     private String lastUpdateUser;
     private String workspaceType;
     private int adminPermission;
-    private Boolean associateGit;
+    private String enabledFlowKeywordsCheck;
+
+    private String isDefaultReference;
 
     public int getAdminPermission() {
         return adminPermission;
@@ -140,11 +142,19 @@ public class DSSWorkspace {
     }
 
 
-    public Boolean getAssociateGit() {
-        return associateGit;
+    public String getEnabledFlowKeywordsCheck() {
+        return enabledFlowKeywordsCheck;
     }
 
-    public void setAssociateGit(Boolean associateGit) {
-        this.associateGit = associateGit;
+    public void setEnabledFlowKeywordsCheck(String enabledFlowKeywordsCheck) {
+        this.enabledFlowKeywordsCheck = enabledFlowKeywordsCheck;
+    }
+
+    public String getIsDefaultReference() {
+        return isDefaultReference;
+    }
+
+    public void setIsDefaultReference(String isDefaultReference) {
+        this.isDefaultReference = isDefaultReference;
     }
 }

@@ -50,6 +50,7 @@
   </div>
 </template>
 <script>
+import { debounce } from 'lodash';
 import Nav from './nav.js';
 export default {
   props: {
@@ -72,20 +73,21 @@ export default {
   },
   data() {
     return {
-      nav: null,
       searchText: '',
       all: true
     };
   },
   watch: {
-    searchText: function(value) {
+    searchText: debounce(function(value) {
       this.$emit('text-change', value);
-    },
+    }, 350)
   },
-  created() {
-    this.nav = new Nav({
-      navList: this.navList,
-    });
+  computed:{
+    nav(){
+      return new Nav({
+        navList: this.navList,
+      })
+    }
   },
   methods: {
     showSearch() {

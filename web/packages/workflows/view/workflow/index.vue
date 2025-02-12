@@ -21,8 +21,13 @@
           <div class="project-nav-tree">
             <div class="project-nav-tree-top">
               <div class="project-nav-tree-top-t">
-                <span class="project-nav-tree-top-t-txt">{{ $t('message.workflow.Project') }}</span>
-                <div class="project-nav-tree-top-t-icon">
+                <Input
+                  class="searchbox"
+                  v-model="searchText"
+                  clearable
+                  placeholder="请输入项目名进行搜索"
+                />
+                <div class="project-nav-tree-top-t-icon" style="border-bottom: 1px solid #eee; margin-top: 7px;">
                   <SvgIcon class="icon sort-icon" icon-class="xinzeng" style="display: inline-flex;margin-top: 4px;" @click="createProject" />
                   <Dropdown class="sort-icon" @on-click="filerSort($event,'sort')">
                     <SvgIcon class="icon" :icon-class="filterBar.sort ==='name' ? 'text-sort' : 'down'" style="display: inline-flex;font-size:14px"/>
@@ -64,10 +69,11 @@
               class="tree-container"
               keyText="id"
               :size="32"
-              :list="projectsTree"
+              :list="searchedProjectsTree"
               :render="renderNode"
               :open="openNode"
               :height="height - 30"
+              :computeStyle="computeStyle"
               @we-open-node="openNodeChange"
               @we-click="handleTreeClick" />
             <Spin v-show="loadingTree" size="large" fix />
@@ -97,6 +103,7 @@
           :bottomTapList="tabList"
           :modeName="modeName"
           :currentTab="current"
+          :associateGit="currentProjectData.associateGit"
           @bandleTapTab="onTabClick"
           @handleTabRemove="onTabRemove"
           @handleChangeButton="handleChangeButton"
@@ -140,7 +147,9 @@
                 v-else-if="item.orchestratorMode.startsWith(ORCHESTRATORMODES.WORKFLOW) && item.tabId === current.tabId"
                 :key="item.tabId"
                 :query="item.query"
-                @updateWorkflowList="updateWorkflowList"
+                :associateGit="currentProjectData.associateGit"
+                @updateWorkflowList="updateWorkflowList(item)"
+                @updateFlowStatus="updateFlowStatus(item)"
                 @isChange="isChange(index, arguments)"
                 @close="onTabRemove(item.tabId, false)"
                 @open="reopen(item)"
@@ -204,17 +213,20 @@
     <CopyModal v-model="showCopyForm" ref="copyForm" @finish="copySended" />
     <!-- 导入工作流 -->
     <ImportFlow v-model="importModal" ref="import" @finish="importSended" />
+    <!-- 查找代码 -->
+    <CodeSearchDrawer v-model="showCodeDrawer" :currentMode="currentMode" @openFlowNode="openFlowNode" />
   </div>
 </template>
 <script>
 import qs from 'qs';
-import { debounce } from 'lodash';
+import { debounce, cloneDeep } from 'lodash';
 import Workflow from '@/workflows/module/workflow';
 import WorkflowModal from '@/workflows/module/workflow/module/workflowModal.vue';
 import Process from '@/workflows/module/process';
 import storage from '@dataspherestudio/shared/common/helper/storage';
 import VirtualTree from '@dataspherestudio/shared/components/virtualTree';
 import WorkflowTabList from '@/workflows/module/common/tabList/index.vue';
+import CodeSearchDrawer from './codeSearchDrawer/index.vue';
 import ProjectForm from '@dataspherestudio/shared/components/projectForm/index.js';
 import eventbus from "@dataspherestudio/shared/common/helper/eventbus";
 import api from '@dataspherestudio/shared/common/service/api';
@@ -240,10 +252,12 @@ export default {
     ProjectForm,
     Streamis: Streamis.component,
     CopyModal,
-    ImportFlow
+    ImportFlow,
+    CodeSearchDrawer
   },
   data() {
     return {
+      searchText: "",
       tabList: [],
       current: {},
       modeOfKey: "dev",
@@ -262,6 +276,9 @@ export default {
         devProcessList: [],
         orchestratorModeList: [],
         releaseUsers: [],
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       },
       selectOrchestratorList: [],
       devProcessBase: [],
@@ -270,6 +287,7 @@ export default {
       ORCHESTRATORMODES,
       loading: false,
       loadingTree: false,
+      searchedProjectsTree: [],
       projectsTree: [],
       treeFold: false,
       treeModalShow: false,
@@ -319,16 +337,30 @@ export default {
       panelWidth: 250,
       minPanelWidth: 250,
       maxPanelWidth: 375,
-      currentPanelWidth: 250
+      currentPanelWidth: 250,
+      showCodeDrawer: false,
+      unLockQueue: [],
     }
   },
   filters,
   watch: {
+    searchText: function(value) {
+      const copiedProjectsTree = _.cloneDeep(this.projectsTree);
+      this.searchedProjectsTree = this.filterTreeByKeyword(copiedProjectsTree, value);
+      // console.log('searchText-searched', this.searchedProjectsTree)
+    },
+    projectsTree:function(value) {
+      const copiedProjectsTree = _.cloneDeep(this.projectsTree);
+      this.searchedProjectsTree = this.filterTreeByKeyword(copiedProjectsTree, this.searchText);
+      // console.log('projectsTree-searched', this.searchedProjectsTree)
+    },
     tabList(val) {
       this.updateTabList(val)
     },
-    "$route.query"(v) {
-      this.tabList = [];
+    "$route.query"(v, oldVal) {
+      if (v.projectID != oldVal.projectID) {
+        this.tabList = []
+      }
       this.getAreaMap();
       this.getProjectData(()=>{
         this.updateBread();
@@ -354,6 +386,7 @@ export default {
     this.getDicSecondList();
   },
   mounted() {
+    this.unLockQueue = [];
     // 获取所有project展示tree
     this.getAllProjects((res) => {
       if (this.$route.query.projectID) {
@@ -397,16 +430,41 @@ export default {
         this.projectsTree.forEach(item => {
           let name = item.name;
           let id = item.id + '';
-          res.push({name, id})
+          res.push({name, id, associateGit: item.associateGit})
         })
       }
       return res;
     }
   },
   methods: {
+    converStatus(item) {
+      if (!item.associateGit) return '';
+      switch (item.status) {
+        case 'save':
+          return '\n状态：工作流有修改，未提交';
+        case 'push':
+          return '\n状态：工作流已提交，未发布';
+        case 'publish':
+          return '\n状态：工作流未修改';
+        default:
+          return '';
+      }
+    },
+    computeStyle(item) {
+      if (!item.associateGit) return {};
+      switch (item.status) {
+        case 'save':
+          return {color: 'red'};
+        case 'push':
+          return {color: 'green'};
+        default:
+          return {};
+      }
+    },
     createProject() {
       this.actionType = "add";
       this.currentProjectData = {
+        devProcessPermission: this.currentProjectData.devProcessPermission,
         name: "",
         description: "",
         business: "",
@@ -416,6 +474,10 @@ export default {
         accessUsers: [],
         devProcessList: [],
         releaseUsers: [],
+        createBy: this.getUserName(),
+        associateGit: false,
+        gitUser: '',
+        gitToken: ''
       };
       this.$refs.projectForm.showProject(this.currentProjectData, 'add')
     },
@@ -444,7 +506,7 @@ export default {
     getSelectDevProcess() {
       this.selectDevprocess = this.devProcessBase
         ? this.devProcessBase.filter((item) =>
-          this.currentProjectData.devProcessList.includes(item.dicValue)
+          (this.currentProjectData.devProcessPermission || []).includes(item.dicValue)
         )
         : [];
       // 切换项目，若项目没有对应模式，自动切换第一个
@@ -556,6 +618,7 @@ export default {
               name: f.orchestratorName,
               projectId: param.id || f.projectId,
               projectName: param.name,
+              associateGit: param.associateGit,
               type: "flow",
             };
           });
@@ -563,12 +626,54 @@ export default {
         });
     },
     importSended(target, orchestratorId){
-      this.getFlow({id: target.id, name: target.name}, (flows) => {
+      this.getFlow({id: target.id, name: target.name, associateGit: target.associateGit}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
         this.tabList = this.tabList.filter(item => {
           return item.query.orchestratorId !== orchestratorId
         }) 
       })
+    },
+    openFlowNode(evt, item, code) {
+      let linenum = 0
+      if (code) {
+        linenum = code.number;
+      } else {
+        linenum = item.keyLines[0].number;
+      }
+      // 当前查找只能在同工程下查找
+      // 根据参数找到对应node
+      const cur = this.projectsTree.filter(item => item.id == this.$route.query.projectID)[0];
+      if (cur) {
+        this.getFlow(cur, (flows) => {
+          const node = flows.find(it => it.name == item.flowName);
+          const query = {
+            workspaceId: this.$route.query.workspaceId,
+            projectID: this.$route.query.projectID,
+            projectName: this.$route.query.projectName,
+            flowId: node.orchestratorId,
+            tiemstamp: new Date().getTime()
+          }
+          if (node) {
+             storage.set('openflownode', `${node.orchestratorId}_flowidname_${item.nodeName}`);
+             storage.set('revealline', linenum);
+             if (node.orchestratorId == this.$route.query.flowId || node.orchestratorId == this.current.id || this.tabList.length < 1) {
+              this.showCodeDrawer = false;
+              if (this.tabList.length < 1) {
+                this.$router.push({
+                  //name: "Workflow",
+                  query,
+                });
+              }
+              // 存储flow
+              storage.set("clickFlowInTree", node);
+              eventbus.emit('workflow.opennode.by.name', { flowId: node.orchestratorId, nodeName: item.nodeName})
+              this.updateBread();
+            } else {
+              window.open(`/#/workflow?${qs.stringify(query)}`, '_blank');
+            }
+          }
+        });
+      }      
     },
     handleTreeModal(project) {
       this.treeModalShow = true;
@@ -599,6 +704,7 @@ export default {
               projectId: param.id || f.projectId,
               // 补充projectName，点击工作流切换project时使用
               projectName: param.name || p.name,
+              associateGit: p.associateGit,
               type: "flow",
             };
           });
@@ -611,6 +717,8 @@ export default {
       this.openNode = {...v}
     },
     async handleTreeClick({item}) {
+      storage.remove('revealline');
+      storage.remove('openflownode');
       const node = item
       // 切换到开发模式
       this.modeOfKey =
@@ -772,6 +880,40 @@ export default {
     onDeleteFlow(params) {
       this.$refs.workflow.deleteWorkflow(params);
     },
+    // 仅针对项目做过滤
+     filterTreeByKeyword(tree, keyword) {
+      return tree.filter(node => {
+        if (node.name.includes(keyword)) {
+          return true;
+        }
+        return false;
+      })
+    },
+    // 该过滤逻辑为项目+工作流，如果项目或工作流包含关键字，则保留该节点及其子节点
+    // filterTreeByKeyword(tree, keyword) {
+    //   console.log('filterTreeByKeyword', tree, keyword)
+    //   return tree.filter(node => {
+    //     // 检查当前节点的 name 字段是否包含关键字
+    //     if (node.name.includes(keyword)) {
+    //       // 如果当前节点包含关键字，则递归地过滤其 children
+    //       node.children = node.children ? this.filterTreeByKeyword(node.children, keyword) : [];
+    //       return true;
+    //     }
+
+    //     // 如果当前节点不包含关键字，但有 children，则递归检查 children
+    //     if (node.children && node.children.length > 0) {
+    //       const filteredChildren = this.filterTreeByKeyword(node.children, keyword);
+    //       if (filteredChildren.length > 0) {
+    //         // 如果 children 中有匹配项，则保留当前节点，并更新 children
+    //         node.children = filteredChildren;
+    //         return true;
+    //       }
+    //     }
+
+    //     // 如果当前节点及其 children 都不符合条件，则不保留该节点
+    //     return false;
+    //   })
+    // },
     updateTabList(val = []) {
       let workspaceId = this.$route.query.workspaceId
       let workFlowLists = JSON.parse(sessionStorage.getItem(`work_flow_lists_${workspaceId}`)) || [];
@@ -796,6 +938,11 @@ export default {
       this.$refs.workflow.versionDetail(project.id, project);
     },
     unlockFlow(params, confirmDelete = false) {
+      if (this.unLockQueue.includes(params.orchestratorId)) {
+        this.$Message.warning('解锁中，请稍后');
+        return;
+      }
+      this.unLockQueue.push(params.orchestratorId);
       const workspaceData = storage.get("currentWorkspace");
       api
         .fetch(
@@ -827,6 +974,8 @@ export default {
           } else {
             this.$t('message.workflow.unlocksuccess')
           }
+        }).finally(() => {
+          this.unLockQueue = this.unLockQueue.filter(id => id !== params.orchestratorId);
         })
     },
     exportWorkflow(node) {
@@ -958,10 +1107,12 @@ export default {
     ProjectConfirm(projectData, callback) {
       const project = projectData;
       setVirtualRoles(project, this.getUserName());
-      this.currentProjectData = {
-        ...projectData,
-        canWrite: project.canWrite(),
-      };
+      // 会触发projectForm里的projectData的watch，有错误处理
+      // this.currentProjectData = {
+      //   ...projectData,
+      //   canWrite: project.canWrite(),
+      // };
+
       this.getSelectDevProcess();
       this.getSelectOrchestratorList();
       projectData.workspaceId = +this.$route.query.workspaceId;
@@ -979,6 +1130,9 @@ export default {
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
+          associateGit: projectData.associateGit,
+          gitUser: projectData.associateGit ? projectData.gitUser : '',
+          gitToken: projectData.associateGit ? projectData.gitToken : ''
         };
         api
           .fetch(
@@ -1015,6 +1169,10 @@ export default {
           workspaceId: projectData.workspaceId,
           devProcessList: projectData.devProcessList,
           orchestratorModeList: projectData.orchestratorModeList,
+          associateGit: projectData.associateGit,
+          dataSourceList: projectData.dataSourceList,
+          gitUser: projectData.associateGit ? projectData.gitUser : '',
+          gitToken: projectData.associateGit ? projectData.gitToken : ''
         };
         api
           .fetch(
@@ -1030,6 +1188,16 @@ export default {
                 name: projectData.name,
               })
             );
+            // 遍历临时对象，逐个字段地更新 currentProjectData
+            const tempData = {
+              ...projectData,
+              canWrite: project.canWrite(),
+            };
+            for (const key in tempData) {
+              if (tempData.hasOwnProperty(key)) {
+                this.currentProjectData[key] = tempData[key];
+              }
+            }
           })
           .catch(() => {
             typeof callback == "function" && callback();
@@ -1047,7 +1215,6 @@ export default {
      * parama 为打开工作流基本信息
      */
     async openWorkflow(params) {
-
       if (params.lastedNode) {
         const cur = this.projectsTree.filter(item => item.name == params.projectName)[0];
         this.getFlow(cur, (flows) => {
@@ -1086,6 +1253,7 @@ export default {
                 params.version = params.orchestratorVersionId =
                   openOrchestrator.OrchestratorVo.dssOrchestratorVersion.id;
                 params.isDefaultReference = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.isDefaultReference;
+                params.flowStatus = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.status;
                 this.openItemAction(params);
               } else {
                 return this.$Message.warning(
@@ -1141,27 +1309,26 @@ export default {
       })
     },
     openItemAction(params) {
-      this.current = {
+      const tabId = `${params.id}${params.version}` // 相同编排的不同版本
+      const hasInIndex = this.tabList.findIndex(it=>it.tabId === tabId)
+      if (hasInIndex !== -1) {
+        this.tabList.splice(hasInIndex, 1);
+      }
+      let current = {
         version: params.version, // 编排版本
         id: params.id, // 编排id
         name: params.name, // 用于tab显示
         query: params,
-        tabId: `${params.id}${params.version}`, // 相同编排的不同版本
+        tabId,
         isChange: false,
         orchestratorMode: params.orchestratorMode, // 后面根据具体的编排模式确认类型字段
         type: DEVPROCESS.DEVELOPMENTCENTER,
-        isDefaultReference: params.isDefaultReference
+        isDefaultReference: params.isDefaultReference,
+        flowStatus: params.flowStatus, // 工作流状态
+        associateGit: params.associateGit
       };
-      const hasInIndex = this.tabList.findIndex(it=>it.tabId === this.current.tabId)
-      if(hasInIndex !== -1) {
-        this.tabList.splice(hasInIndex,1);
-      }
-      this.tabList.push(this.current);
-      // 下述写法，工作流数据未及时更新
-      //  const hasIn = this.tabList.find(it=>it.tabId === this.current.tabId)
-      // if(!hasIn){
-      //   this.tabList.push(this.current);
-      // }
+      this.tabList.push(current);
+      this.current = current;
     },
     onTabRemove(tabId, del) {
       let index = "";
@@ -1206,8 +1373,12 @@ export default {
         removeAction();
       }
     },
-    // 切换开发流程
+    // 切换开发流程 or 点击查找
     handleChangeButton(item) {
+      if (item === 'find') {
+        this.showCodeDrawer = true;
+        return;
+      }
       if ( item.dicValue ==  this.modeOfKey ) {
         return
       }
@@ -1257,8 +1428,42 @@ export default {
       this.currentTreeId = currenTab.id
       this.current = currenTab;
     },
-    updateWorkflowList() {
+    updateCurrentWorkflowStatus(params) {
+      const workspaceData = storage.get("currentWorkspace");
+      api
+        .fetch(
+          `${this.$API_PATH.ORCHESTRATOR_PATH}openOrchestrator`,
+          {
+            orchestratorId: params.query.orchestratorId,
+            labels: { route: this.modeOfKey },
+            workspaceName: workspaceData.name,
+          },
+          "post"
+        )
+        .then((openOrchestrator) => {
+          if (openOrchestrator) {
+            const temp = { ...params.query };
+            temp.flowStatus = openOrchestrator.OrchestratorVo.dssOrchestratorInfo.status;
+            params.query = temp;
+            params.flowStatus = temp.flowStatus;
+            const hasInIndex = this.tabList.findIndex(it=>it.tabId === params.tabId)
+            if(hasInIndex !== -1) {
+              this.tabList.splice(hasInIndex, 1, {...params});
+            }
+          }
+        });
+    },
+    updateWorkflowList(item) {
       this.$refs.workflow.fetchFlowData();
+      this.updateCurrentWorkflowStatus(item);
+    },
+    updateFlowStatus(item) {
+      if(item.associateGit) {
+        const cur = this.projectsTree.filter(e => e.id == item.query.projectId)[0];
+        this.getFlow(cur, (flows) => {
+          this.reFreshTreeData(cur, flows)
+        });
+      }
     },
     isChange(index, val) {
       if (this.tabList[index]) {
@@ -1292,11 +1497,20 @@ export default {
           <div class="tree-info">
             <SvgIcon style="font-size:16px;margin-top: 6px;display: inline-block;" icon-class="more-more" />
           </div>
-          <DropdownMenu slot="list">
+          {
+            item.associateGit ? (<DropdownMenu slot="list">
+            <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
+            <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
+            <DropdownItem name="findin_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'findin_project', item)}}>{ this.$t('message.workflow.Find') }</DropdownItem>
+            <DropdownItem name="viewgit" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'viewgit', item)}}>{ this.$t('message.workflow.viewgit') }</DropdownItem>
+            <DropdownItem name="import" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'import', item)}}>{ this.$t('message.workflow.importflow') }</DropdownItem>
+          </DropdownMenu>) : (<DropdownMenu slot="list">
             <DropdownItem name="config_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'config_project', item)}}>{ this.$t('message.workflow.Configuration') }</DropdownItem>
             <DropdownItem name="delete_project" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'delete_project', item)}}>{ this.$t('message.workflow.Delete') }</DropdownItem>
             <DropdownItem name="import" nativeOnClick={(e)=>{this.handleFlowDropDown(e,'import', item)}}>{ this.$t('message.workflow.importflow') }</DropdownItem>
           </DropdownMenu>
+          )
+          }
         </Dropdown>
       )
       const projectAdd = (
@@ -1378,7 +1592,7 @@ export default {
               overflow: 'hidden'
             },
             attrs: {
-              title: `名称：${item.name}\n描述：${item.description||''}`
+              title: `名称：${item.name}\n描述：${item.description||''}${this.converStatus(item)}`
             }
           },
           item.name
@@ -1396,6 +1610,20 @@ export default {
             color: isActive ? 'rgb(45, 140, 240)' : ''
           }
         }, [item.name])
+      }
+    },
+    async gotoGit(node) {
+      const workspaceData = storage.get("currentWorkspace");
+      try {
+        let res = await api.fetch(`${this.$API_PATH.ORCHESTRATOR_PATH}gitUrl`, {
+          projectName: node.name,
+          workspaceName: workspaceData.name,
+        }, 'get');
+        if (res && res.gitUrl) {
+          window.open(res.gitUrl, '_blank');
+        }
+      } catch (error) {
+        //
       }
     },
     handleFlowDropDown(e, name, node) {
@@ -1425,6 +1653,12 @@ export default {
         case "import":
           this.importModal = true;
           this.$refs.import.init(node)
+          break;
+        case "findin_project":
+          this.showCodeDrawer = true;
+          break;
+        case "viewgit":
+          this.gotoGit(node);
           break;
         case "export":
           this.exportWorkflow(node);
@@ -1470,7 +1704,8 @@ export default {
             type: "project",
             canWrite: n.canWrite(),
             canPublish: n.canPublish(),
-            children: n.children || []
+            children: n.children || [],
+            associateGit: n.associateGit,
           };
         });
       }
@@ -1479,6 +1714,9 @@ export default {
      * 排序+筛选
      */
     filerSort(name, type) {
+      if (type === 'filter') {
+        this.searchText = ''
+      }
       // 保存已经加载项目下工作流数据
       if (!this.flowData) {
         this.flowData = {}
@@ -1546,7 +1784,7 @@ export default {
      * 轮询进度是否复制完成
      */
     copySended({target, source, copyJobId}) {
-      this.getFlow({id: target.id, name: target.name}, (flows) => {
+      this.getFlow({id: target.id, name: target.name, associateGit: target.associateGit}, (flows) => {
         this.reFreshTreeData({id: target.id, name: target.name}, flows)
         const targetFlow = flows.find(it => it.name === target.orchestratorName) || {}
         const sourceTarget = {
@@ -1619,7 +1857,8 @@ export default {
     next();
   },
   beforeDestroy() {
-    clearTimeout(this.checkStatusTimer)
+    clearTimeout(this.checkStatusTimer);
+    storage.remove('revealline');
     window.removeEventListener('resize', this.resize);
   }
 };
@@ -1628,6 +1867,21 @@ export default {
 @import "../../assets/styles/workflow.scss";
 @import "@dataspherestudio/shared/common/style/variables.scss";
 
+.searchbox{
+   flex: 1;
+   margin-top: 6px;
+   border-bottom: 1px solid #eee;
+   ::v-deep i.ivu-input-icon{
+     color: #808695;
+     font-weight: normal;
+   }
+   ::v-deep .ivu-input{
+     border: none;
+   }
+   ::v-deep .ivu-input:focus{
+     box-shadow: none;
+   }
+  }
 .prop-modal {
   .prop-item {
     padding: 5px;

@@ -4,7 +4,9 @@ package com.webank.wedatasphere.dss.git.service;
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.git.common.protocol.request.*;
 import com.webank.wedatasphere.dss.git.common.protocol.response.*;
+import org.eclipse.jgit.lib.Repository;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
@@ -30,4 +32,13 @@ public interface DSSGitWorkflowManagerService {
     GitCommitResponse rename(GitRenameRequest request) throws DSSErrorException;
 
     GitHistoryResponse getHistory(GitCommitInfoBetweenRequest request) throws DSSErrorException;
+
+    GitDiffResponse diffGit(GitDiffTargetCommitRequest request) throws DSSErrorException;
+
+    GitCommitResponse batchCommit(GitBatchCommitRequest request) throws DSSErrorException;
+
+    Repository getRepository(File repoDir, String projectName, Long workspaceId, String gitUser, String gitToken, String gitUrl) throws DSSErrorException;
+
+    GitDiffFileContentResponse getDiffFileContent(GitDiffFileContentRequest request) throws DSSErrorException;
+
 }

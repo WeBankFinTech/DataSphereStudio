@@ -18,13 +18,19 @@ package com.webank.wedatasphere.dss.workflow.service;
 
 import com.webank.wedatasphere.dss.common.exception.DSSErrorException;
 import com.webank.wedatasphere.dss.common.label.DSSLabel;
+import com.webank.wedatasphere.dss.common.label.LabelRouteVO;
 import com.webank.wedatasphere.dss.standard.app.sso.Workspace;
 import com.webank.wedatasphere.dss.workflow.common.entity.DSSFlow;
+import com.webank.wedatasphere.dss.workflow.entity.DSSFlowName;
+import com.webank.wedatasphere.dss.workflow.entity.NodeInfo;
+import com.webank.wedatasphere.dss.workflow.entity.request.*;
+import com.webank.wedatasphere.dss.workflow.entity.response.*;
 import com.webank.wedatasphere.dss.workflow.entity.vo.ExtraToolBarsVO;
 import org.apache.linkis.common.exception.ErrorException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface DSSFlowService {
     DSSFlow getFlowByID(Long id);
@@ -53,8 +59,19 @@ public interface DSSFlowService {
                     String comment,
                     String userName,
                     String workspaceName,
-                    String projectName
-    ) throws IOException;
+                    String projectName,
+                    LabelRouteVO labels
+    ) throws Exception;
+
+    void batchEditFlow(BatchEditFlowRequest batchEditFlowRequest, String ticketId, Workspace workspace, String userName) throws Exception;
+
+    void updateTOSaveStatus(Long projectId, Long flowID, Long orchestratorId) throws Exception;
+
+    void deleteFlowMetaData(Long orchestratorId);
+
+    void saveAllFlowMetaData(Long flowId, Long orchestratorId);
+
+    void saveFlowMetaData(Long flowID, String jsonFlow, Long orchestratorId);
 
     DSSFlow copyRootFlow(Long rootFlowId, String userName, Workspace workspace,
                          String projectName, String version, String contextIdStr,
@@ -72,4 +89,36 @@ public interface DSSFlowService {
     boolean checkIsExistSameFlow(String jsonFlow);
 
     List<String> checkIsSave(Long parentFlowID, String jsonFlow);
+
+    String getFlowJson(String userName, String projectName, DSSFlow dssFlow);
+
+    DataDevelopNodeResponse queryDataDevelopNodeList(String username, Workspace workspace, DataDevelopNodeRequest request);
+
+    Map<String,Object> getDataDevelopNodeContent(String nodeId, Long contentId) throws DSSErrorException;
+
+    DataViewNodeResponse queryDataViewNode(String username, Workspace workspace, DataViewNodeRequest request);
+
+    List<NodeInfo> getNodeInfoByGroupName(String groupNameEn);
+
+    DSSFlowName queryFlowNameList(String username, Workspace workspace, String groupNameEn,String nodeTypeName);
+
+    List<String> queryViewId(Workspace workspace,String username);
+
+    DataCheckerNodeResponse queryDataCheckerNode(String username, Workspace workspace, DataCheckerNodeRequest request);
+
+    EventSenderNodeResponse queryEventSenderNode(String username, Workspace workspace, EventSenderNodeRequest request);
+    QueryNodeInfoByPathResponse queryNodeInfo(Long projectId,
+                                                     String orchestratorName,String nodeName);
+
+    EventReceiveNodeResponse queryEventReceiveNode(String username, Workspace workspace, EventReceiverNodeRequest request);
+
+    List<String> queryJobDesc(Workspace workspace, String username);
+
+    List<String> querySourceType(Workspace workspace, String username);
+
+    void getAllOldFlowId(Long flowId, List<Long> flowIdList);
+
+    void deleteNodeContent(List<Long> flowIdList);
+
+    void getRootFlowProxy(DSSFlow dssFlow);
 }

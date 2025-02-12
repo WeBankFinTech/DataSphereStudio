@@ -67,7 +67,6 @@ export default {
       apiData: null,
       excuteLoading: false,
       tip: {},
-      height: 500,
       tabslist: [],
       currentTaskId: '',
       historyList: []
@@ -85,11 +84,7 @@ export default {
         noClose: true,
         taskID: ''
       }
-      const result = await api.fetch('/dss/apiservice/getApiHistory', {
-        apiId: this.apiData.id,
-        apiVersionId: this.apiData.latestVersionId
-      }, 'get')
-      this.historyList = (result.data || []).map(item => ({ execID: item.strongerExecId, ...item }))
+      await this.fetchHistory()
       if (this.historyList[0] && ['Inited','Scheduled', 'Running'].includes(this.historyList[0].status)) {
         homeTabItem = {
           ...homeTabItem,
@@ -100,16 +95,15 @@ export default {
       }
       this.tabslist.push(homeTabItem)
     },
+    async fetchHistory() {
+      const result = await api.fetch('/dss/apiservice/getApiHistory', {
+        apiId: this.apiData.id,
+        apiVersionId: this.apiData.latestVersionId
+      }, 'get')
+      this.historyList = (result.data || []).map(item => ({ execID: item.strongerExecId, ...item }))
+    },
     updateHistory(params) {
-      const data = {
-        ...this.historyList[0],
-        fileName: this.apiData.aliasName || this.apiData.name,
-        ...params
-      }
-      if (params.runningTime) {
-        data.costTime = params.runningTime
-      }
-      this.historyList.splice(0, 1, data)
+      this.fetchHistory()
     },
     // 获取api相关数据
     getExecutePath() {
@@ -237,16 +231,16 @@ export default {
     flex-wrap: nowrap;
     justify-content: flex-start;
     align-items: center;
-    height: 45px;
+    height: 36px;
     @include bg-color($light-base-color, $dark-base-color);
     width: calc(100% - 45px);
     overflow: hidden;
     &.work-list-tab {
-      overflow-x: auto;
+      overflow-x: overlay;
       overflow-y: hidden;
       padding-left: 16px;
       &::-webkit-scrollbar {
-        height: 6px;
+        height: 4px;
       }
       &::-webkit-scrollbar-thumb {
         box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
@@ -256,11 +250,6 @@ export default {
       &::-webkit-scrollbar-track {
         box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.2);
         border-radius: 3px;
-      }
-      .list-group > span {
-        white-space: nowrap;
-        display: block;
-        height: 0;
       }
     }
     .workbench-tab-item {

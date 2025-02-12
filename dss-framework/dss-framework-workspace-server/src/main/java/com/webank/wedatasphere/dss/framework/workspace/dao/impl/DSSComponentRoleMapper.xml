@@ -28,4 +28,23 @@
         </foreach>
     </insert>
 
+
+    <select id="queryDSSComponentRole" resultType="com.webank.wedatasphere.dss.framework.workspace.bean.DSSWorkspaceComponentPriv">
+        select  id as id
+               ,workspace_id as workspaceId
+               ,appconn_id   as componentId
+               ,role_id      as roleId
+               ,updateby     as updateBy
+        from dss_workspace_appconn_role
+        where workspace_id = #{workspaceId} and updateby= #{updateBy}
+    </select>
+
+    <update id="updateDSSComponentRoleById">
+        update dss_workspace_appconn_role set update_time = now(),updateby=#{updateBy}  where id in
+        <foreach collection="list" index="index" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+
 </mapper>

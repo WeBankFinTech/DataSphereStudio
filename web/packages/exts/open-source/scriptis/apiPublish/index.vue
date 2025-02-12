@@ -109,8 +109,11 @@
         </div>
         <div v-show="step === 2">
           <Table :columns="paramInfoColumns" :data="addApiData.paramList">
+            <template slot-scope="{row, index}" slot="maxLength">
+              <InputNumber style="width: 100%;" v-if="[1, 4].includes(row.paramType)" :max="20000" :min="1" :active-change="false" @on-blur="verificationValue(addApiData.paramList[index])" v-model="addApiData.paramList[index].maxLength" />
+            </template>
             <template slot-scope="{row, index}" slot="defaultValue">
-              <Input :class="{ verificationValue: tip[row.paramName] }" :title="addApiData.paramList[index].defaultValue" @on-blur="verificationValue(row)" :type="inputType(row.paramType)" v-model="addApiData.paramList[index].defaultValue"/>
+              <Input :class="{ verificationValue: tip[row.paramName] }" :title="addApiData.paramList[index].defaultValue" @on-blur="verificationValue(addApiData.paramList[index])" :type="inputType(row.paramType)" v-model="addApiData.paramList[index].defaultValue"/>
             </template>
           </Table>
         </div>
@@ -130,7 +133,7 @@
       </div>
     </Modal>
     <Modal
-      width="1030"
+      width="1200"
       :mask-closable="false"
       v-model="updateApiModalShow">
       <div
@@ -175,8 +178,11 @@
         </FormItem>
         {{$t('message.scripts.apiPublish.updateApiModal.paramConfirm')}}
         <Table :columns="paramInfoColumns" :data="updateApiData.paramList">
+          <template slot-scope="{row, index}" slot="maxLength">
+            <InputNumber style="width: 100%;" :key="row.paramType" v-if="[1, 4].includes(row.paramType)" :max="20000" :min="1" :active-change="false" @on-blur="verificationValue(updateApiData.paramList[index])" v-model="updateApiData.paramList[index].maxLength" />
+          </template>
           <template slot-scope="{row, index}" slot="defaultValue">
-            <Input :class="{ verificationValue: tip[row.paramName] }" @on-blur="verificationValue(row)" :title="updateApiData.paramList[index].defaultValue" :type="inputType(row.paramType)" v-model="updateApiData.paramList[index].defaultValue"/>
+            <Input :key="row.paramType" :class="{ verificationValue: tip[row.paramName] }" @on-blur="verificationValue(updateApiData.paramList[index])" :title="updateApiData.paramList[index].defaultValue" :type="inputType(row.paramType)" v-model="updateApiData.paramList[index].defaultValue"/>
           </template>
         </Table>
       </Form>
@@ -352,14 +358,18 @@ export default {
                 on: {
                   'on-change'(value) {
                     params.row.paramType = value;
+                    params.row.defaultValue = '';
+                    params.row.maxLength = null;
                     if (_this.addApiModalShow) {
                       _this.addApiData.paramList[params.row._index].paramType = value;
                       // 切换类型清空默认值
                       _this.addApiData.paramList[params.row._index].defaultValue = '';
+                      _this.addApiData.paramList[params.row._index].maxLength = null;
                     } else if (_this.updateApiModalShow) {
                       _this.updateApiData.paramList[params.row._index].paramType = value;
                       // 切换类型清空默认值
                       _this.updateApiData.paramList[params.row._index].defaultValue = '';
+                      _this.updateApiData.paramList[params.row._index].maxLength = null;
                     }
                   }
                 }
@@ -410,14 +420,32 @@ export default {
           }
         },
         {
+          title: this.$t('message.apiServices.paramTable.setLength'),
+          width: '160',
+          slot: 'maxLength',
+          renderHeader:(h, params)=>{
+            return h('div', [
+                h('span', {}, this.$t('message.apiServices.paramTable.setLength')),
+                h('Icon', {
+                  attrs: {
+                    title: this.$t('message.apiServices.paramTable.setLengthTips')
+                  },
+                  props: {
+                    type: 'md-alert'
+                  }
+                }, )
+            ],)
+          }
+        },
+        {
           title: this.$t('message.ext.opensource.defalut'),
-          width: '180',
+          width: '160',
           slot: 'defaultValue',
         },
         {
           title: this.$t('message.scripts.apiPublish.paramTable.describe'),
           key: 'describe',
-          width: '200',
+          width: '180',
           render: (h, params) => {
             return h('div', [
               h('Input', {
@@ -443,7 +471,7 @@ export default {
         {
           title: this.$t('message.ext.opensource.detail'),// TODO 国际化待合并后修改
           key: 'details',
-          width: '200',
+          width: '180',
           render: (h, params) => {
             return h('div', [
               h('Input', {
@@ -600,9 +628,7 @@ export default {
     // 验证发布和更新的默认值是否满足条件
     verificationValue (row) {
       let flag;
-      const method = this.updateApiData.id ? this.updateApiData.requestType : this.addApiData.requestType;
-      if (method.toUpperCase() === 'GET' && row.defaultValue.length > 500) {
-        this.$Message.error({ content: '不能超过500字符' });
+      if (row.maxLength && (row.defaultValue || '').length > row.maxLength) {
         flag = true;
       } else {
         flag = false;
@@ -674,9 +700,7 @@ export default {
         tag: '',
         visible: 'grantView',
         describe: '',
-        paramList: [
-
-        ],
+        paramList: [],
         tagArr: []
       }
     },
@@ -763,7 +787,8 @@ export default {
             defaultValue: paramItem.defaultValue || '',
             describe: paramItem.description,
             displayName: paramItem.displayName,
-            details: paramItem.details
+            details: paramItem.details,
+            maxLength: paramItem.maxLength || null
           })
         } else {
           paramList.push({
@@ -773,7 +798,8 @@ export default {
             defaultValue: '',
             describe: '',
             displayName: '',
-            details: ''
+            details: '',
+            maxLength: null
           })
         }
       })
@@ -787,7 +813,7 @@ export default {
     backStep() {
       this.step-=1
       if(this.step === 2) {
-        this.addApiModalWidth = 1030
+        this.addApiModalWidth = 1200
       } else {
         this.addApiModalWidth = 450
         this.step = 1
@@ -798,7 +824,7 @@ export default {
       if(e === 1) {
         this.$refs['addApi'].validate((valid) => {
           if (valid) {
-            this.addApiModalWidth = 1030
+            this.addApiModalWidth = 1200
             this.step+=1 // 当前步骤加1
             // 判断当前脚本的配置是否存在并且addApiData的属性列表是否已经存在
             if (this.script.params.variable && !this.addApiData.paramList.length) {
@@ -810,6 +836,7 @@ export default {
                   defaultValue: '',
                   require: 1,
                   displayName: '',
+                  maxLength: null
                 })
               })
             }
@@ -836,7 +863,8 @@ export default {
               defaultValue: item.defaultValue,
               displayName: item.displayName,
               description: item.describe,
-              details: item.details
+              details: item.details,
+              maxLength: item.maxLength || ''
             })
           })
           this.saveLoading = true;
@@ -895,7 +923,8 @@ export default {
               defaultValue: item.defaultValue,
               displayName: item.displayName,
               description: item.describe,
-              details: item.details
+              details: item.details,
+              maxLength: item.maxLength || ''
             })
           })
 
